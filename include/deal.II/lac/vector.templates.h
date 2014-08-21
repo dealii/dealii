@@ -148,7 +148,7 @@ Vector<Number>::Vector (const Vector<Number> &v)
 {
   if (vec_size != 0)
     {
-      val = new Number[max_vec_size];
+      initialize_val(max_vec_size);
       Assert (val != 0, ExcOutOfMemory());
       *this = v;
     }
@@ -168,7 +168,7 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
 {
   if (vec_size != 0)
     {
-      val = new Number[max_vec_size];
+      initialize_val(max_vec_size);
       Assert (val != 0, ExcOutOfMemory());
       std::copy (v.begin(), v.end(), begin());
     }
@@ -189,7 +189,7 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
 {
   if (vec_size != 0)
     {
-      val = new Number[max_vec_size];
+      iniatilize_val(max_vec_size);
       Assert (val != 0, ExcOutOfMemory());
 
       // get a representation of the vector
@@ -241,7 +241,7 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
 {
   if (vec_size != 0)
     {
-      val = new Number[max_vec_size];
+      initialize_val(max_vec_size);
       Assert (val != 0, ExcOutOfMemory());
 
       // Copy the distributed vector to
@@ -275,7 +275,7 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
 {
   if (vec_size != 0)
     {
-      val = new Number[max_vec_size];
+      initialize_val(max_vec_size);
       Assert (val != 0, ExcOutOfMemory());
 
       // get a representation of the vector
@@ -972,16 +972,45 @@ void Vector<Number>::add (const Vector<Number> &v)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  if (vec_size>internal::Vector::minimum_parallel_grain_size)
-    parallel::transform (val,
-                         val+vec_size,
-                         v.val,
-                         val,
-                         (boost::lambda::_1 + boost::lambda::_2),
-                         internal::Vector::minimum_parallel_grain_size);
-  else if (vec_size > 0)
+  // Vectorization can only be if v is not the current vector otherwise there
+  // will be collision
+  if (&(v.val[0])!=&val[0])
+  {
+#ifndef DEAL_II_WITH_THREADS
+#pragma omp simd
     for (size_type i=0; i<vec_size; ++i)
       val[i] += v.val[i];
+#else
+    if (vec_size>internal::Vector::minimum_parallel_grain_size)
+    {
+      internal::Vectorization_add_1<Number> vector_add;
+      vector_add.val = val;
+      vector_add.v_val = v.val;
+      tbb::parallel_for (tbb::blocked_range<size_type> (0, 
+            vec_size, 
+            internal::Vector::minimum_parallel_grain_size),
+          vector_add,
+          tbb::auto_partitioner());
+    }
+    else if (vec_size > 0)
+#pragma omp simd
+      for (size_type i=0; i<vec_size; ++i)
+        val[i] += v.val[i];
+#endif
+  }
+  else
+  {
+    if (vec_size>internal::Vector::minimum_parallel_grain_size)
+      parallel::transform (val,
+          val+vec_size,
+          v.val,
+          val,
+          (boost::lambda::_1 + boost::lambda::_2),
+          internal::Vector::minimum_parallel_grain_size);
+    else if (vec_size > 0)
+      for (size_type i=0; i<vec_size; ++i)
+        val[i] += v.val[i];
+  }
 }
 
 
@@ -1009,35 +1038,6 @@ void Vector<Number>::add (const Number a, const Vector<Number> &v,
       val[i] += a * v.val[i] + b * w.val[i];
 }
 
-
-template <typename Number>
-void Vector<Number>::vectorized_add (const Vector<Number> &v)
-{
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-
-#ifndef DEAL_II_WITH_THREADS
-#pragma omp simd
-  for (size_type i=0; i<vec_size; ++i)
-    val[i] += v.val[i];
-#else
-  if (vec_size>internal::Vector::minimum_parallel_grain_size)
-  {
-    internal::Vectorization_add_1<Number> vector_add;
-    vector_add.val = val;
-    vector_add.v_val = v.val;
-    tbb::parallel_for (tbb::blocked_range<size_type> (0, 
-                                                      vec_size, 
-                                                      internal::Vector::minimum_parallel_grain_size),
-                       vector_add,
-                       tbb::auto_partitioner());
-  }
-  else if (vec_size > 0)
-#pragma omp simd
-    for (size_type i=0; i<vec_size; ++i)
-      val[i] += v.val[i];
-#endif
-}
 
 
 template <typename Number>

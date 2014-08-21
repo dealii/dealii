@@ -31,6 +31,10 @@
 #include <cstring>
 #include <vector>
 
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+#include <emmintrin.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -626,14 +630,6 @@ public:
    */
   void add (const Vector<Number> &V);
 
-  /**
-   * Simple vectorized  (SIMD) vector addition, equal to the <tt>operator +=</tt>. 
-   * This function should not be used to add the vector to itself, i.e to
-   * multiply the current vector by two.
-   *
-   * @dealiiOperationIsMultithreaded
-   */
-  void vectorized_add (const Vector<Number> &V);
 
   /**
    * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
@@ -962,6 +958,18 @@ protected:
    * VectorView will access the pointer.
    */
   friend class VectorView<Number>;
+
+private:
+
+  /**
+   * Allocate @p v and, if possible, align along 64-byte boundaries.
+   */
+  void initialize_val(const size_type n);
+
+  /**
+   * Free @p val.
+   */
+  void clear_val();
 };
 
 /*@}*/
@@ -1017,7 +1025,7 @@ Vector<Number>::~Vector ()
 {
   if (val)
     {
-      delete[] val;
+      clear_val();
       val=0;
     }
 }
@@ -1030,7 +1038,7 @@ void Vector<Number>::reinit (const size_type n, const bool fast)
 {
   if (n==0)
     {
-      if (val) delete[] val;
+      if (val) clear_val();
       val = 0;
       max_vec_size = vec_size = 0;
       return;
@@ -1038,8 +1046,8 @@ void Vector<Number>::reinit (const size_type n, const bool fast)
 
   if (n>max_vec_size)
     {
-      if (val) delete[] val;
-      val = new value_type[n];
+      if (val) clear_val();
+      initialize_val(n);
       Assert (val != 0, ExcOutOfMemory());
       max_vec_size = n;
     };
@@ -1341,10 +1349,37 @@ Vector<Number>::load (Archive &ar, const unsigned int)
 
   ar &vec_size &max_vec_size ;
 
-  val = new Number[max_vec_size];
+  initialize_val(max_vec_size);
   ar &boost::serialization::make_array(val, max_vec_size);
 }
 
+
+
+template <typename Number>
+inline 
+void 
+Vector<Number>::initialize_val(const size_type size)
+{
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+  val = static_cast<Number*>(_mm_malloc (size, 64));
+#else
+  val = static_cast<Number*>(malloc (size));
+#endif
+}
+
+
+
+template <typename Number>
+inline
+void
+Vector<Number>::clear_val()
+{
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
+  _mm_free(val);
+#else
+  free(val);
+#endif
+}
 
 #endif
 
