@@ -97,6 +97,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: Most of the operations done on Vector (like add, sadd, etc.) 
+  are now vectorized (SIMD) using OpenMP 4.0
+  <br>
+  (Bruno Turcksin, 2014/08/25)
+  </li>
+
   <li> Updated: The version of BOOST that comes bundled with deal.II has 
   been updated to 1.56.0.
   <br>

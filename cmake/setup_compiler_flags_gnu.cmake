@@ -91,7 +91,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 # warning, if OpenMP 4.0 is not supported.
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-fopenmp-simd")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unkown-pragmas")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unknown-pragmas")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #

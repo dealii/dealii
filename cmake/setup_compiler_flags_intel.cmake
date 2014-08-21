@@ -144,7 +144,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd280")
 # warning, if OpenMP 4.0 is not supported.
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-openmp-simd")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unkown-pragmas")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unknown-pragmas")
 
 
 
