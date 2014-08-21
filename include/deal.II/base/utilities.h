@@ -81,6 +81,19 @@ namespace Utilities
   int
   string_to_int (const std::string &s);
 
+  /**
+   * Return a string describing the dimensions of the object. Often,
+   * functions in the deal.II library as well as in user codes need to
+   * define a string containing the template dimensions of some
+   * objects defined using two template parameters: dim (the
+   * topological dimension of the object) and spacedim (the dimension
+   * of the embedding Euclidean space).  Since in all deal.II classes,
+   * by default spacedim is equal to dimension, the above string is
+   * usually contracted to <dim>, instead of <dim,spacedim>. This
+   * function returns a string containing "dim" if dim is equal to
+   * spacedim, otherwhise it returns "dim,spacedim".
+   */
+  std::string dim_string(const int dim, const int spacedim);
 
   /**
    * Given a list of strings, convert it to a

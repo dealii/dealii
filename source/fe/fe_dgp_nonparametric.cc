@@ -106,7 +106,9 @@ FE_DGPNonparametric<dim,spacedim>::get_name () const
   // have to be kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_DGPNonparametric<" << dim << ">(" << degree << ")";
+  namebuf << "FE_DGPNonparametric<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << degree << ")";
 
   return namebuf.str();
 }

@@ -70,7 +70,6 @@ namespace Utilities
                   << "Can't convert the string " << arg1
                   << " to the desired type");
 
-
   std::string
   int_to_string (const unsigned int i,
                  const unsigned int digits)
@@ -123,6 +122,15 @@ namespace Utilities
     return s;
   }
 
+
+  std::string
+  dim_string(const int dim, const int spacedim)
+  {
+    if (dim == spacedim)
+      return int_to_string(dim);
+    else
+      return int_to_string(dim)+","+int_to_string(spacedim);
+  }
 
 
   unsigned int

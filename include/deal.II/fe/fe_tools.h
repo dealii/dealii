@@ -20,6 +20,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/tensor.h>
@@ -79,7 +80,7 @@ namespace FETools
    * @author Guido Kanschat, 2006
    */
   template <int dim, int spacedim=dim>
-  class FEFactoryBase
+  class FEFactoryBase : public Subscriptor
   {
   public:
     /**
@@ -113,20 +114,20 @@ namespace FETools
    * @author Guido Kanschat, 2006
    */
   template <class FE>
-  class FEFactory : public FEFactoryBase<FE::dimension,FE::dimension>
+  class FEFactory : public FEFactoryBase<FE::dimension,FE::space_dimension>
   {
   public:
     /**
      * Create a FiniteElement and return a pointer to it.
      */
-    virtual FiniteElement<FE::dimension,FE::dimension> *
+    virtual FiniteElement<FE::dimension,FE::space_dimension> *
     get (const unsigned int degree) const;
 
     /**
      * Create a FiniteElement from a quadrature formula (currently only
      * implemented for FE_Q) and return a pointer to it.
      */
-    virtual FiniteElement<FE::dimension,FE::dimension> *
+    virtual FiniteElement<FE::dimension,FE::space_dimension> *
     get (const Quadrature<1> &quad) const;
   };
 
@@ -810,7 +811,7 @@ namespace FETools
   template <int dim>
   void
   hierarchic_to_lexicographic_numbering (unsigned int degree,
-					 std::vector<unsigned int> &h2l);
+                                         std::vector<unsigned int> &h2l);
 
   template <int dim>
   void
@@ -875,8 +876,16 @@ namespace FETools
    * function, use the add_fe_name() function.  This function does not work if
    * one wants to get a codimension 1 finite element.
    */
+  template <int dim, int spacedim>
+  FiniteElement<dim, spacedim> *
+  get_fe_by_name (const std::string &name);
+
+
+  /**
+   * @deprecated Use get_fe_by_name() with two template parameters instead
+   */
   template <int dim>
-  FiniteElement<dim, dim> *
+  FiniteElement<dim,dim> *
   get_fe_from_name (const std::string &name);
 
 
@@ -1031,7 +1040,7 @@ namespace FETools
 namespace FETools
 {
   template <class FE>
-  FiniteElement<FE::dimension, FE::dimension> *
+  FiniteElement<FE::dimension, FE::space_dimension> *
   FEFactory<FE>::get (const unsigned int degree) const
   {
     return new FE(degree);

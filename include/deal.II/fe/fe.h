@@ -355,6 +355,11 @@ class FiniteElement : public Subscriptor,
 {
 public:
   /**
+   * The dimension of the image space, corresponding to Triangulation.
+   */
+  static const unsigned int space_dimension = spacedim;
+
+  /**
    * Base class for internal data.  Adds data for second derivatives to
    * Mapping::InternalDataBase()
    *
@@ -1002,7 +1007,7 @@ public:
                                    const bool face_orientation = true,
                                    const bool face_flip        = false,
                                    const bool face_rotation    = false) const;
- 
+
   /**
    * For lines with non-standard line_orientation in 3D, the dofs on lines
    * have to be permuted in order to be combined with the correct shape
