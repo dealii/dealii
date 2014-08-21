@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2013 by the deal.II authors
+## Copyright (C) 2013, 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -29,7 +29,7 @@ OPTION(DEAL_II_FORCE_BUNDLED_BOOST
   "Always use the bundled boost library instead of an external one."
   OFF)
 
-SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.49.0")
+SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.56.0")
 
 
 #
