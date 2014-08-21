@@ -277,6 +277,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Optimize construction of high-order FE_Nedelec by moving out some 
+  non-essential computations. Namely, construct restriction and prolongation 
+  matrices on first request. This reduces time spent in FE_Nedelec constructor
+  substantially.
+  <br>
+  (Alexander Grayver, 2014/08/22)
+  </li>
+
   <li> Changed: The functions GridTools::extract_boundary_mesh() and
   GridTools::create_union_triangulation() have been moved to
   GridGenerator::extract_boundary_mesh() and
