@@ -234,6 +234,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 	const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation_1,
 	const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation_2,
 	Triangulation<deal_II_dimension, deal_II_space_dimension>       &result);
+
 #if deal_II_dimension == deal_II_space_dimension
     template
     void

@@ -89,7 +89,7 @@ namespace Step38
     std::map<typename DoFHandler<boundary_dim, spacedim>::cell_iterator,
         typename DoFHandler<spacedim>::face_iterator>
         element_assignment =
-          GridTools::extract_boundary_mesh(space_dof_handler,
+          GridGenerator::extract_boundary_mesh(space_dof_handler,
                                            contact_dof_handler,
                                            boundary_ids);
 

@@ -277,6 +277,16 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: The functions GridTools::extract_boundary_mesh() and
+  GridTools::create_union_triangulation() have been moved to
+  GridGenerator::extract_boundary_mesh() and
+  GridGenerator::create_union_triangulation() since, conceptually, they
+  generate meshes. The old functions have been retained but are now
+  deprecated.
+  <br>
+  (Wolfgang Bangerth, 2014/08/19)
+  </li>
+
   <li> New: TriaAccessor::measure() is now also implemented for faces of
   3d cells as long as the face is planar.
   <br>

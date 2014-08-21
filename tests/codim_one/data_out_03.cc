@@ -94,7 +94,7 @@ int main ()
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
 
-  GridTools::extract_boundary_mesh (volume_mesh, tria,
+  GridGenerator::extract_boundary_mesh (volume_mesh, tria,
                                     boundary_ids);
 
   // test for the position

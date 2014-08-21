@@ -55,7 +55,7 @@ void test()
   GridGenerator::hyper_cube(volume_mesh);
 
   surface_to_volume_mapping
-    = GridTools::extract_boundary_mesh (volume_mesh, tria);
+    = GridGenerator::extract_boundary_mesh (volume_mesh, tria);
 
   FE_Q<dim,spacedim> fe(2);
   DoFHandler<dim,spacedim> dof_handler (tria);

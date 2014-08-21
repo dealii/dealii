@@ -54,6 +54,11 @@ template <typename number> class SparseMatrix;
 namespace GridGenerator
 {
   /**
+   *  @name Creating meshes for basic geometries
+   */
+  /*@{*/
+
+  /**
    * Initialize the given triangulation with a hypercube (line in 1D,
    * square in 2D, etc) consisting of exactly one cell. The hypercube
    * volume is the tensor product interval
@@ -641,6 +646,16 @@ namespace GridGenerator
                 const double        r);
 
   /**
+   * @}
+   */
+  /**
+   *  @name Creating meshes from other meshes
+   */
+  /**
+   * @{
+   */
+
+  /**
    * Given the two triangulations specified as the first two arguments, create
    * the triangulation that contains the cells of both triangulation and store
    * it in the third parameter. Previous content of @p result will be deleted.
@@ -668,13 +683,68 @@ namespace GridGenerator
    *
    * @note For a related operation on refined meshes when both meshes are
    * derived from the same coarse mesh, see
-   * GridTools::create_union_triangulation .
+   * GridGenerator::create_union_triangulation().
    */
   template <int dim, int spacedim>
   void
   merge_triangulations (const Triangulation<dim, spacedim> &triangulation_1,
                         const Triangulation<dim, spacedim> &triangulation_2,
                         Triangulation<dim, spacedim>       &result);
+
+  /**
+   * Given the two triangulations
+   * specified as the first two
+   * arguments, create the
+   * triangulation that contains
+   * the finest cells of both
+   * triangulation and store it in
+   * the third parameter. Previous
+   * content of @p result will be
+   * deleted.
+   *
+   * @note This function is intended
+   * to create an adaptively refined
+   * triangulation that contains the
+   * <i>most refined cells</i> from
+   * two input triangulations that
+   * were derived from the <i>same</i>
+   * coarse grid by adaptive refinement.
+   * This is an operation sometimes
+   * needed when one solves for two
+   * variables of a coupled problem
+   * on separately refined meshes on
+   * the same domain (for example
+   * because these variables have
+   * boundary layers in different places)
+   * but then needs to compute something
+   * that involves both variables or
+   * wants to output the result into a
+   * single file. In both cases, in
+   * order not to lose information,
+   * the two solutions can not be
+   * interpolated onto the respectively
+   * other mesh because that may be
+   * coarser than the ones on which
+   * the variable was computed. Rather,
+   * one needs to have a mesh for the
+   * domain that is at least as fine
+   * as each of the two initial meshes.
+   * This function computes such a mesh.
+   *
+   * @note If you want to create
+   * a mesh that is the merger of
+   * two other coarse meshes, for
+   * example in order to compose a mesh
+   * for a complicated geometry from
+   * meshes for simpler geometries,
+   * then this is not the function for you. Instead, consider
+   * GridGenerator::merge_triangulations().
+   */
+  template <int dim, int spacedim>
+  void
+  create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
+                              const Triangulation<dim, spacedim> &triangulation_2,
+                              Triangulation<dim, spacedim>       &result);
 
 
   /**
@@ -722,6 +792,134 @@ namespace GridGenerator
   void flatten_triangulation(const Triangulation<dim,spacedim1> &in_tria,
 			     Triangulation<dim,spacedim2> &out_tria);
 
+  /**
+   * @}
+   */
+
+  /**
+   *  @name Creating lower-dimensional meshes from parts of higher-dimensional meshes
+   */
+  /*@{*/
+
+
+#ifdef _MSC_VER
+  // Microsoft's VC++ has a bug where it doesn't want to recognize that
+  // an implementation (definition) of the extract_boundary_mesh function
+  // matches a declaration. This can apparently only be avoided by
+  // doing some contortion with the return type using the following
+  // intermediate type. This is only used when using MS VC++ and uses
+  // the direct way of doing it otherwise
+  template <template <int,int> class Container, int dim, int spacedim>
+  struct ExtractBoundaryMesh
+  {
+      typedef
+          std::map<typename Container<dim-1,spacedim>::cell_iterator,
+              typename Container<dim,spacedim>::face_iterator>
+          return_type;
+  };
+#endif
+
+  /**
+   * This function implements a boundary
+   * subgrid extraction.  Given a
+   * <dim,spacedim>-Triangulation (the
+   * "volume mesh") the function extracts a
+   * subset of its boundary (the "surface
+   * mesh").  The boundary to be extracted
+   * is specified by a list of
+   * boundary_ids.  If none is specified
+   * the whole boundary will be
+   * extracted. The function is used in
+   * step-38.
+   *
+   * The function also builds a mapping linking the
+   * cells on the surface mesh to the
+   * corresponding faces on the volume
+   * one. This mapping is the return value
+   * of the function.
+   *
+   * @note The function builds the surface
+   * mesh by creating a coarse mesh from
+   * the selected faces of the coarse cells
+   * of the volume mesh. It copies the
+   * boundary indicators of these faces to
+   * the cells of the coarse surface
+   * mesh. The surface mesh is then refined
+   * in the same way as the faces of the
+   * volume mesh are. In order to ensure
+   * that the surface mesh has the same
+   * vertices as the volume mesh, it is
+   * therefore important that you assign
+   * appropriate boundary objects through
+   * Triangulation::set_boundary to the
+   * surface mesh object before calling
+   * this function. If you don't, the
+   * refinement will happen under the
+   * assumption that all faces are straight
+   * (i.e using the StraightBoundary class)
+   * rather than any curved boundary object
+   * you may want to use to determine the
+   * location of new vertices.
+   *
+   *
+   * @tparam Container A type that satisfies the
+   * requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   * The map that is returned will
+   * be between cell
+   * iterators pointing into the container describing the surface mesh
+   * and face
+   * iterators of the volume
+   * mesh container. If the Container argument is
+   * DoFHandler of hp::DoFHandler, then
+   * the function will
+   * re-build the triangulation
+   * underlying the second argument
+   * and return a map between
+   * appropriate iterators into the Container arguments. However,
+   * the function will not actually
+   * distribute degrees of freedom
+   * on this newly created surface
+   * mesh.
+   *
+   * @note The algorithm outlined
+   * above assumes that all faces
+   * on higher refinement levels
+   * always have exactly the same
+   * boundary indicator as their
+   * parent face. Consequently, we
+   * can start with coarse level
+   * faces and build the surface
+   * mesh based on that. It would
+   * not be very difficult to
+   * extend the function to also
+   * copy boundary indicators from
+   * finer level faces to their
+   * corresponding surface mesh
+   * cells, for example to
+   * accommodate different geometry
+   * descriptions in the case of
+   * curved boundaries.
+   */
+  template <template <int,int> class Container, int dim, int spacedim>
+#ifndef _MSC_VER
+  std::map<typename Container<dim-1,spacedim>::cell_iterator,
+      typename Container<dim,spacedim>::face_iterator>
+#else
+  typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
+#endif
+      extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
+                             Container<dim-1,spacedim>     &surface_mesh,
+                             const std::set<types::boundary_id> &boundary_ids
+                             = std::set<types::boundary_id>());
+
+  /*@}*/
+
+  /**
+   *  @name Deprecated functions
+   */
+  /**
+   * @{
+   */
 
   /**
    * This function transforms the @p Triangulation @p tria smoothly to a
@@ -750,6 +948,16 @@ namespace GridGenerator
   void laplace_transformation (Triangulation<dim> &tria,
                                const std::map<unsigned int,Point<dim> > &new_points,
                                const Function<dim> *coefficient = 0) DEAL_II_DEPRECATED;
+
+  /**
+   * @}
+   */
+  /**
+   *  @name Exceptions
+   */
+  /**
+   * @{
+   */
 
   /**
    * Exception

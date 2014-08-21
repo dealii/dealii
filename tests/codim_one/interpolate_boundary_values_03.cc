@@ -45,7 +45,7 @@ void test()
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
 
-  GridTools::extract_boundary_mesh (volume_mesh, tria,boundary_ids);
+  GridGenerator::extract_boundary_mesh (volume_mesh, tria,boundary_ids);
 
   deallog << tria.n_active_cells() << " active cells" << std::endl;
 

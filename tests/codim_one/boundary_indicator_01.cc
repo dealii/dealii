@@ -91,7 +91,7 @@ int main ()
     // surface faces
     std::set<types::boundary_id> boundary_indicators;
     boundary_indicators.insert (0);
-    GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
+    GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh,
                                       boundary_indicators);
     deallog << volume_mesh.n_active_cells () << std::endl;
     deallog << boundary_mesh.n_active_cells () << std::endl;
