@@ -36,7 +36,7 @@ void test ()
   Triangulation<dim,spacedim> boundary_mesh;
   Triangulation<spacedim> volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);
-  GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh);
+  GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
   for (Triangulation<dim,spacedim>::active_cell_iterator
        cell = boundary_mesh.begin_active();
        cell != boundary_mesh.end(); ++cell)

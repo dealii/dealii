@@ -17,7 +17,7 @@
 
 /*
  Code for testing the function
- GridTools::extract_boundary_mesh (...).
+ GridGenerator::extract_boundary_mesh (...).
  We test that the order of cells and the orientation
  of the vertices is consistent between the two meshes.
 
@@ -107,7 +107,7 @@ int main ()
     boundary_mesh.set_boundary (0, surface_description);
 
     surface_to_volume_mapping
-      = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh);
+      = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
     deallog << volume_mesh.n_active_cells () << std::endl;
     deallog << boundary_mesh.n_active_cells () << std::endl;
     save_mesh(boundary_mesh);

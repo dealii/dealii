@@ -36,7 +36,7 @@ void test(unsigned int ref=1)
   Triangulation<spacedim, spacedim> volume_tria;
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_ball (volume_tria);
-  GridTools::extract_boundary_mesh(volume_tria, tria);
+  GridGenerator::extract_boundary_mesh(volume_tria, tria);
 
   typename Triangulation<dim,spacedim>::active_cell_iterator cell;
   

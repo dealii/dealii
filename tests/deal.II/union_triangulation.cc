@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,7 +61,7 @@ void test ()
   (++tria_2.begin_active())->set_refine_flag();
   tria_2.execute_coarsening_and_refinement ();
 
-  GridTools::create_union_triangulation (tria_1, tria_2, tria_3);
+  GridGenerator::create_union_triangulation (tria_1, tria_2, tria_3);
 
   GridOut().write_gnuplot (tria_3, logfile);
 
