@@ -749,12 +749,6 @@ inconvenience this causes.
   <br>
   (Martin Kronbichler, 2014/02/03)
 
-  <li>Added: A sanity check for the full link interface at configure time.
-  Hopefully this prevents some people from compiling the whole library just
-  to hit a link error.
-  <br>
-  (Matthias Maier, 2014/02/01)
-
   <li>Fixed: The build system does no longer record full paths to system
   libraries but uses the appropriate short names instead.
   <br>
