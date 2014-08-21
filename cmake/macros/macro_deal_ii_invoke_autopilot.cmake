@@ -36,11 +36,6 @@
 #                         empty
 #
 
-CMAKE_POLICY(PUSH)
-IF(NOT ${CMAKE_VERSION} VERSION_LESS 3.0.0)
-  CMAKE_POLICY(SET CMP0037 OLD) # allow to override the generic 'help' target
-ENDIF()
-
 MACRO(DEAL_II_INVOKE_AUTOPILOT)
 
   # Generator specific values:
@@ -234,16 +229,6 @@ ${_switch_targets}#
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
     )
 
-  #
-  # In case of the Unix Makefiles generator it is safe to override the
-  # default 'help' target, which is - frankly - quite unhelpful.
-  #
-  IF(CMAKE_GENERATOR MATCHES "Unix Makefiles")
-    ADD_CUSTOM_TARGET(help
-      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
-      )
-  ENDIF()
-
   # Print this message once:
   IF(NOT USAGE_PRINTED)
     INCLUDE(${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake)
@@ -253,6 +238,4 @@ ${_switch_targets}#
   ENDIF()
 
 ENDMACRO()
-
-CMAKE_POLICY(POP)
 
