@@ -249,7 +249,7 @@ get_new_point_on_hex (const typename Triangulation<dim, spacedim>::hex_iterator 
 template <>
 Point<3>
 Manifold<3,3>::
-get_new_point_on_hex (const typename Triangulation<3, 3>::hex_iterator &hex) const
+get_new_point_on_hex (const Triangulation<3, 3>::hex_iterator &hex) const
 {
   return get_new_point(get_default_quadrature(hex));
 }
