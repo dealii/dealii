@@ -74,21 +74,9 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int p) :
   // will be the correct ones, not
   // the raw shape functions anymore.
 
-  // Reinit the vectors of
-  // restriction and prolongation
-  // matrices to the right sizes.
-  // Restriction only for isotropic
-  // refinement
-#ifdef DEBUG_NEDELEC
-  deallog << "Embedding" << std::endl;
-#endif
-  this->reinit_restriction_and_prolongation_matrices ();
-  // Fill prolongation matrices with embedding operators
-  FETools::compute_embedding_matrices (*this, this->prolongation, true);
-#ifdef DEBUG_NEDELEC
-  deallog << "Restriction" << std::endl;
-#endif
-  initialize_restriction ();
+  // do not initialize embedding and restriction here. these matrices are
+  // initialized on demand in get_restriction_matrix and
+  // get_prolongation_matrix
 
 #ifdef DEBUG_NEDELEC
   deallog << "Face Embedding" << std::endl;
@@ -2967,7 +2955,105 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
     }
 }
 
+template <int dim>
+const FullMatrix<double> &
+FE_Nedelec<dim>
+::get_prolongation_matrix (const unsigned int child,
+                           const RefinementCase<dim> &refinement_case) const
+{
+  Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
+          ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
+  Assert (refinement_case!=RefinementCase<dim>::no_refinement,
+          ExcMessage("Prolongation matrices are only available for refined cells!"));
+  Assert (child<GeometryInfo<dim>::n_children(refinement_case),
+          ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
 
+  // initialization upon first request
+  if (this->prolongation[refinement_case-1][child].n() == 0)
+    {
+      Threads::Mutex::ScopedLock lock(this->mutex);
+
+      // if matrix got updated while waiting for the lock
+      if (this->prolongation[refinement_case-1][child].n() ==
+          this->dofs_per_cell)
+        return this->prolongation[refinement_case-1][child];
+
+      // now do the work. need to get a non-const version of data in order to
+      // be able to modify them inside a const function
+      FE_Nedelec<dim> &this_nonconst = const_cast<FE_Nedelec<dim>& >(*this);
+
+      // Reinit the vectors of
+      // restriction and prolongation
+      // matrices to the right sizes.
+      // Restriction only for isotropic
+      // refinement
+#ifdef DEBUG_NEDELEC
+  deallog << "Embedding" << std::endl;
+#endif
+      this_nonconst.reinit_restriction_and_prolongation_matrices ();
+      // Fill prolongation matrices with embedding operators
+      FETools::compute_embedding_matrices (this_nonconst, this_nonconst.prolongation, true);
+#ifdef DEBUG_NEDELEC
+  deallog << "Restriction" << std::endl;
+#endif
+      this_nonconst.initialize_restriction ();
+    }
+
+  // we use refinement_case-1 here. the -1 takes care of the origin of the
+  // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data
+  // available and so the vector indices are shifted
+  return this->prolongation[refinement_case-1][child];
+}
+
+template <int dim>
+const FullMatrix<double> &
+FE_Nedelec<dim>
+::get_restriction_matrix (const unsigned int child,
+                          const RefinementCase<dim> &refinement_case) const
+{
+  Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
+          ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
+  Assert (refinement_case!=RefinementCase<dim>::no_refinement,
+          ExcMessage("Restriction matrices are only available for refined cells!"));
+  Assert (child<GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+          ExcIndexRange(child,0,GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
+
+  // initialization upon first request
+  if (this->restriction[refinement_case-1][child].n() == 0)
+    {
+      Threads::Mutex::ScopedLock lock(this->mutex);
+
+      // if matrix got updated while waiting for the lock...
+      if (this->restriction[refinement_case-1][child].n() ==
+          this->dofs_per_cell)
+        return this->restriction[refinement_case-1][child];
+
+      // now do the work. need to get a non-const version of data in order to
+      // be able to modify them inside a const function
+      FE_Nedelec<dim> &this_nonconst = const_cast<FE_Nedelec<dim>& >(*this);
+
+      // Reinit the vectors of
+      // restriction and prolongation
+      // matrices to the right sizes.
+      // Restriction only for isotropic
+      // refinement
+#ifdef DEBUG_NEDELEC
+  deallog << "Embedding" << std::endl;
+#endif
+      this_nonconst.reinit_restriction_and_prolongation_matrices ();
+      // Fill prolongation matrices with embedding operators
+      FETools::compute_embedding_matrices (this_nonconst, this_nonconst.prolongation, true);
+#ifdef DEBUG_NEDELEC
+  deallog << "Restriction" << std::endl;
+#endif
+      this_nonconst.initialize_restriction ();
+    }
+
+  // we use refinement_case-1 here. the -1 takes care of the origin of the
+  // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data
+  // available and so the vector indices are shifted
+  return this->restriction[refinement_case-1][child];
+}
 
 // Since this is a vector valued element,
 // we cannot interpolate a scalar function.
