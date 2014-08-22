@@ -274,8 +274,19 @@ void Step6<dim>::solve ()
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
-  solver.solve (system_matrix, solution, system_rhs,
-                preconditioner);
+  try
+    {
+      deallog.depth_file(0);
+      solver.solve (system_matrix, solution, system_rhs,
+                    preconditioner);
+      deallog.depth_file(3);
+    }
+  catch (std::exception &e)
+    {
+      deallog.depth_file(3);
+      deallog << e.what() << std::endl;
+      abort ();
+    }
 
   hanging_node_constraints.distribute (solution);
 }
