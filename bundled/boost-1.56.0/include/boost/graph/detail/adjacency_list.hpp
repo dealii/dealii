@@ -243,6 +243,15 @@ namespace boost {
         m_target = x.m_target;
         return *this;
       }
+      
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && !defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS)
+      // Copy-construct is not necessary since stored_edge_property is non-copyable (only movable)
+      // but it doesn't hurt to have it, does it?
+      stored_edge(const stored_edge&) = default;
+      stored_edge(stored_edge&&) = default;
+      stored_edge& operator=(stored_edge&&) = default;
+#endif  // If no rvalue support, no need to define move functions.
+      
       inline Vertex& get_target() const { return m_target; }
       inline const no_property& get_property() const { return s_prop; }
       inline bool operator==(const stored_edge& x) const
