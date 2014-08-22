@@ -1275,7 +1275,7 @@ ParameterHandler::demangle (const std::string &s)
 bool
 ParameterHandler::is_parameter_node (const boost::property_tree::ptree &p)
 {
-  return (p.get_optional<std::string>("value"));
+  return static_cast<bool>(p.get_optional<std::string>("value"));
 }
 
 
