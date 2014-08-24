@@ -39,11 +39,11 @@
  * are available also for pre-C++11 compilers. This is done using
  * the following approach:
  *
- * - We create a namespace std_cxx1x.
+ * - We create a namespace std_cxx11.
  * - If the compiler supports C++11, we import the relevant classes
  *   and functions into this namespace using statements such as
  *   @code
- *     namespace std_cxx1x {  using std::shared_ptr;  }
+ *     namespace std_cxx11 {  using std::shared_ptr;  }
  *   @endcode
  * - If the compiler does not support C++11, if its support for
  *   C++11 is incomplete, or if it is buggy, then we use as a fallback
@@ -51,10 +51,10 @@
  *   <a href="http://www.boost.org">BOOST library</a> through
  *   statements such as
  *   @code
- *     namespace std_cxx1x {  using boost::shared_ptr;  }
+ *     namespace std_cxx11 {  using boost::shared_ptr;  }
  *   @endcode
  *
- * Consequently, namespace std_cxx1x contains all of the symbols
+ * Consequently, namespace std_cxx11 contains all of the symbols
  * we require. The classes that can be used this way are obviously
  * a subset of the intersection between C++11 and what BOOST provides.
  *

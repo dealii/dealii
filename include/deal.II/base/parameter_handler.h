@@ -21,7 +21,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -1934,7 +1934,7 @@ private:
    * A list of patterns that are used to describe the parameters of this
    * object. The are indexed by nodes in the property tree.
    */
-  std::vector<std_cxx1x::shared_ptr<const Patterns::PatternBase> > patterns;
+  std::vector<std_cxx11::shared_ptr<const Patterns::PatternBase> > patterns;
 
   /**
    * Mangle a string so that it doesn't contain any special characters or
@@ -2435,7 +2435,7 @@ ParameterHandler::load (Archive &ar, const unsigned int)
 
   patterns.clear ();
   for (unsigned int j=0; j<descriptions.size(); ++j)
-    patterns.push_back (std_cxx1x::shared_ptr<const Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
+    patterns.push_back (std_cxx11::shared_ptr<const Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
 }
 
 

@@ -25,7 +25,7 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <map>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -158,7 +158,7 @@ namespace internal
        * Initially, all entries have zero pointers, and we will allocate them
        * lazily as needed in select_fe_values().
        */
-      dealii::Table<3,std_cxx1x::shared_ptr<FEValues> > fe_values_table;
+      dealii::Table<3,std_cxx11::shared_ptr<FEValues> > fe_values_table;
 
       /**
        * Set of indices pointing at the fe_values object selected last time

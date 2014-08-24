@@ -930,25 +930,25 @@ namespace DerivativeApproximation
     template <class DerivativeDescription, int dim,
               template <int, int> class DH, class InputVector, int spacedim>
     void
-    approximate (SynchronousIterators<std_cxx1x::tuple<typename DH<dim,spacedim>::active_cell_iterator,Vector<float>::iterator> > const &cell,
+    approximate (SynchronousIterators<std_cxx11::tuple<typename DH<dim,spacedim>::active_cell_iterator,Vector<float>::iterator> > const &cell,
                  const Mapping<dim,spacedim>                  &mapping,
                  const DH<dim,spacedim>                       &dof_handler,
                  const InputVector                            &solution,
                  const unsigned int                            component)
     {
       // if the cell is not locally owned, then there is nothing to do
-      if (std_cxx1x::get<0>(cell.iterators)->is_locally_owned() == false)
-        *std_cxx1x::get<1>(cell.iterators) = 0;
+      if (std_cxx11::get<0>(cell.iterators)->is_locally_owned() == false)
+        *std_cxx11::get<1>(cell.iterators) = 0;
       else
         {
           typename DerivativeDescription::Derivative derivative;
           // call the function doing the actual
           // work on this cell
           approximate_cell<DerivativeDescription,dim,DH,InputVector>
-          (mapping,dof_handler,solution,component,std_cxx1x::get<0>(cell.iterators),derivative);
+          (mapping,dof_handler,solution,component,std_cxx11::get<0>(cell.iterators),derivative);
           // evaluate the norm and fill the vector
           //*derivative_norm_on_this_cell
-          *std_cxx1x::get<1>(cell.iterators) = DerivativeDescription::derivative_norm (derivative);
+          *std_cxx11::get<1>(cell.iterators) = DerivativeDescription::derivative_norm (derivative);
         }
     }
 
@@ -978,7 +978,7 @@ namespace DerivativeApproximation
       Assert (component < dof_handler.get_fe().n_components(),
               ExcIndexRange (component, 0, dof_handler.get_fe().n_components()));
 
-      typedef std_cxx1x::tuple<typename DH<dim,spacedim>::active_cell_iterator,Vector<float>::iterator>
+      typedef std_cxx11::tuple<typename DH<dim,spacedim>::active_cell_iterator,Vector<float>::iterator>
       Iterators;
       SynchronousIterators<Iterators> begin(Iterators(dof_handler.begin_active(),
                                                       derivative_norm.begin())),
@@ -989,14 +989,14 @@ namespace DerivativeApproximation
       // to write in derivative_norm. Scratch and CopyData are also useless.
       WorkStream::run(begin,
                       end,
-                      static_cast<std_cxx1x::function<void (SynchronousIterators<Iterators> const &,
+                      static_cast<std_cxx11::function<void (SynchronousIterators<Iterators> const &,
                                                             Assembler::Scratch const &, Assembler::CopyData &)> >
-                      (std_cxx1x::bind(&approximate<DerivativeDescription,dim,DH,InputVector,spacedim>,
-                                       std_cxx1x::_1,
-                                       std_cxx1x::cref(mapping),
-                                       std_cxx1x::cref(dof_handler),
-                                       std_cxx1x::cref(solution),component)),
-                      std_cxx1x::function<void (internal::Assembler::CopyData const &)> (),
+                      (std_cxx11::bind(&approximate<DerivativeDescription,dim,DH,InputVector,spacedim>,
+                                       std_cxx11::_1,
+                                       std_cxx11::cref(mapping),
+                                       std_cxx11::cref(dof_handler),
+                                       std_cxx11::cref(solution),component)),
+                      std_cxx11::function<void (internal::Assembler::CopyData const &)> (),
                       internal::Assembler::Scratch (),internal::Assembler::CopyData ());
     }
 

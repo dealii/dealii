@@ -39,7 +39,7 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/numerics/error_estimator.h>
 
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/bind.h>
 
 #include <numeric>
 #include <algorithm>
@@ -978,10 +978,10 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   // now let's work on all those cells:
   WorkStream::run (dof_handler.begin_active(),
                    static_cast<typename DH::active_cell_iterator>(dof_handler.end()),
-                   std_cxx1x::bind (&internal::estimate_one_cell<InputVector,DH>,
-                                    std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::ref(solutions)),
-                   std_cxx1x::bind (&internal::copy_local_to_global<DH>,
-                                    std_cxx1x::_1, std_cxx1x::ref(face_integrals)),
+                   std_cxx11::bind (&internal::estimate_one_cell<InputVector,DH>,
+                                    std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::ref(solutions)),
+                   std_cxx11::bind (&internal::copy_local_to_global<DH>,
+                                    std_cxx11::_1, std_cxx11::ref(face_integrals)),
                    parallel_data,
                    sample_local_face_integrals);
 

@@ -95,7 +95,7 @@ namespace internal
       if (fe_values_table(present_fe_values_index).get() == 0)
         fe_values_table(present_fe_values_index)
           =
-            std_cxx1x::shared_ptr<FEValues>
+            std_cxx11::shared_ptr<FEValues>
             (new FEValues ((*mapping_collection)[mapping_index],
                            (*fe_collection)[fe_index],
                            q_collection[q_index],

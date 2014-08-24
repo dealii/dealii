@@ -20,7 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/smartpointer.h>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/thread_local_storage.h>
 
 #include <string>
@@ -549,7 +549,7 @@ private:
    * We use tbb's thread local storage facility to generate a stringstream
    * for every thread that sends log messages.
    */
-  Threads::ThreadLocalStorage<std_cxx1x::shared_ptr<std::ostringstream> > outstreams;
+  Threads::ThreadLocalStorage<std_cxx11::shared_ptr<std::ostringstream> > outstreams;
 
   template <typename T> friend LogStream &operator << (LogStream &log, const T &t);
 };

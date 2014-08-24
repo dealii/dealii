@@ -22,7 +22,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/numerics/data_out_dof_data.h>
 
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -44,7 +44,7 @@ namespace internal
                     const unsigned int n_subdivisions,
                     const std::vector<unsigned int> &n_postprocessor_outputs,
                     const Mapping<dim,spacedim> &mapping,
-                    const std::vector<std_cxx1x::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
+                    const std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                     const UpdateFlags update_flags,
                     const std::vector<std::vector<unsigned int> > &cell_to_patch_index_map);
 

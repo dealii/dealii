@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,7 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #include <deal.II/base/index_set.h>
 
@@ -116,9 +116,9 @@ namespace
 
   template <int dim>
   void
-  fill_no_codim_fe_names (std::map<std::string,std_cxx1x::shared_ptr<const Subscriptor> > &result)
+  fill_no_codim_fe_names (std::map<std::string,std_cxx11::shared_ptr<const Subscriptor> > &result)
   {
-    typedef std_cxx1x::shared_ptr<const Subscriptor> FEFactoryPointer;
+    typedef std_cxx11::shared_ptr<const Subscriptor> FEFactoryPointer;
 
     result["FE_Q_Hierarchical"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<dim> >);
@@ -151,9 +151,9 @@ namespace
   // nonzero codimension.
   template <int dim, int spacedim>
   void
-  fill_codim_fe_names (std::map<std::string,std_cxx1x::shared_ptr<const Subscriptor> > &result)
+  fill_codim_fe_names (std::map<std::string,std_cxx11::shared_ptr<const Subscriptor> > &result)
   {
-    typedef std_cxx1x::shared_ptr<const Subscriptor> FEFactoryPointer;
+    typedef std_cxx11::shared_ptr<const Subscriptor> FEFactoryPointer;
 
     result["FE_DGP"]
       = FEFactoryPointer(new FETools::FEFactory<FE_DGP<dim,spacedim> >);
@@ -171,12 +171,12 @@ namespace
   // by the functions above.
   std::vector<std::vector<
   std::map<std::string,
-      std_cxx1x::shared_ptr<const Subscriptor> > > >
+      std_cxx11::shared_ptr<const Subscriptor> > > >
       fill_default_map()
   {
     std::vector<std::vector<
     std::map<std::string,
-        std_cxx1x::shared_ptr<const Subscriptor> > > >
+        std_cxx11::shared_ptr<const Subscriptor> > > >
         result(4);
 
     for (unsigned int d=0; d<4; ++d)
@@ -228,7 +228,7 @@ namespace
   static
   std::vector<std::vector<
   std::map<std::string,
-      std_cxx1x::shared_ptr<const Subscriptor> > > >
+      std_cxx11::shared_ptr<const Subscriptor> > > >
       fe_name_map = fill_default_map();
 }
 
@@ -1307,7 +1307,7 @@ namespace FETools
     // Insert the normalized name into
     // the map
     fe_name_map[dim][spacedim][name] =
-      std_cxx1x::shared_ptr<const Subscriptor> (factory);
+      std_cxx11::shared_ptr<const Subscriptor> (factory);
   }
 
 
@@ -1323,7 +1323,7 @@ namespace FETools
       FiniteElement<dim,spacedim> *
       get_fe_from_name_ext (std::string &name,
                             const std::map<std::string,
-                            std_cxx1x::shared_ptr<const Subscriptor> >
+                            std_cxx11::shared_ptr<const Subscriptor> >
                             &fe_name_map)
       {
         // Extract the name of the

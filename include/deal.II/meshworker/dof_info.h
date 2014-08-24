@@ -20,7 +20,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/meshworker/local_results.h>

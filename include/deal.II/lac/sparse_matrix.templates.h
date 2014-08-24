@@ -38,7 +38,7 @@
 #include <cmath>
 #include <vector>
 #include <numeric>
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/bind.h>
 
 
 
@@ -164,9 +164,9 @@ SparseMatrix<number>::operator = (const double d)
     (cols->n_nonzero_elements()+m()) / m();
   if (matrix_size>grain_size)
     parallel::apply_to_subranges (0U, matrix_size,
-                                  std_cxx1x::bind(&internal::SparseMatrix::template
+                                  std_cxx11::bind(&internal::SparseMatrix::template
                                                   zero_subrange<number>,
-                                                  std_cxx1x::_1, std_cxx1x::_2,
+                                                  std_cxx11::_1, std_cxx11::_2,
                                                   val),
                                   grain_size);
   else if (matrix_size > 0)
@@ -715,14 +715,14 @@ SparseMatrix<number>::vmult (OutVector &dst,
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
   parallel::apply_to_subranges (0U, m(),
-                                std_cxx1x::bind (&internal::SparseMatrix::vmult_on_subrange
+                                std_cxx11::bind (&internal::SparseMatrix::vmult_on_subrange
                                                  <number,InVector,OutVector>,
-                                                 std_cxx1x::_1, std_cxx1x::_2,
+                                                 std_cxx11::_1, std_cxx11::_2,
                                                  val,
                                                  cols->rowstart,
                                                  cols->colnums,
-                                                 std_cxx1x::cref(src),
-                                                 std_cxx1x::ref(dst),
+                                                 std_cxx11::cref(src),
+                                                 std_cxx11::ref(dst),
                                                  false),
                                 internal::SparseMatrix::minimum_parallel_grain_size);
 }
@@ -770,14 +770,14 @@ SparseMatrix<number>::vmult_add (OutVector &dst,
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
   parallel::apply_to_subranges (0U, m(),
-                                std_cxx1x::bind (&internal::SparseMatrix::vmult_on_subrange
+                                std_cxx11::bind (&internal::SparseMatrix::vmult_on_subrange
                                                  <number,InVector,OutVector>,
-                                                 std_cxx1x::_1, std_cxx1x::_2,
+                                                 std_cxx11::_1, std_cxx11::_2,
                                                  val,
                                                  cols->rowstart,
                                                  cols->colnums,
-                                                 std_cxx1x::cref(src),
-                                                 std_cxx1x::ref(dst),
+                                                 std_cxx11::cref(src),
+                                                 std_cxx11::ref(dst),
                                                  true),
                                 internal::SparseMatrix::minimum_parallel_grain_size);
 }
@@ -858,11 +858,11 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber> &v) const
 
   return
     parallel::accumulate_from_subranges<number>
-    (std_cxx1x::bind (&internal::SparseMatrix::matrix_norm_sqr_on_subrange
+    (std_cxx11::bind (&internal::SparseMatrix::matrix_norm_sqr_on_subrange
                       <number,Vector<somenumber> >,
-                      std_cxx1x::_1, std_cxx1x::_2,
+                      std_cxx11::_1, std_cxx11::_2,
                       val, cols->rowstart, cols->colnums,
-                      std_cxx1x::cref(v)),
+                      std_cxx11::cref(v)),
      0, m(),
      internal::SparseMatrix::minimum_parallel_grain_size);
 }
@@ -923,12 +923,12 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber> &u,
 
   return
     parallel::accumulate_from_subranges<number>
-    (std_cxx1x::bind (&internal::SparseMatrix::matrix_scalar_product_on_subrange
+    (std_cxx11::bind (&internal::SparseMatrix::matrix_scalar_product_on_subrange
                       <number,Vector<somenumber> >,
-                      std_cxx1x::_1, std_cxx1x::_2,
+                      std_cxx11::_1, std_cxx11::_2,
                       val, cols->rowstart, cols->colnums,
-                      std_cxx1x::cref(u),
-                      std_cxx1x::cref(v)),
+                      std_cxx11::cref(u),
+                      std_cxx11::cref(v)),
      0, m(),
      internal::SparseMatrix::minimum_parallel_grain_size);
 }
@@ -1312,13 +1312,13 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 
   return
     std::sqrt (parallel::accumulate_from_subranges<number>
-               (std_cxx1x::bind (&internal::SparseMatrix::residual_sqr_on_subrange
+               (std_cxx11::bind (&internal::SparseMatrix::residual_sqr_on_subrange
                                  <number,Vector<somenumber>,Vector<somenumber> >,
-                                 std_cxx1x::_1, std_cxx1x::_2,
+                                 std_cxx11::_1, std_cxx11::_2,
                                  val, cols->rowstart, cols->colnums,
-                                 std_cxx1x::cref(u),
-                                 std_cxx1x::cref(b),
-                                 std_cxx1x::ref(dst)),
+                                 std_cxx11::cref(u),
+                                 std_cxx11::cref(b),
+                                 std_cxx11::ref(dst)),
                 0, m(),
                 internal::SparseMatrix::minimum_parallel_grain_size));
 }

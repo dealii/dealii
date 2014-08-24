@@ -777,20 +777,20 @@ namespace Step13
 
       WorkStream::run(dof_handler.begin_active(),
                       dof_handler.end(),
-                      std_cxx1x::bind(&Solver<dim>::local_assemble_matrix,
+                      std_cxx11::bind(&Solver<dim>::local_assemble_matrix,
                                       this,
-                                      std_cxx1x::_1,
-                                      std_cxx1x::_2,
-                                      std_cxx1x::_3),
-                      std_cxx1x::bind(&Solver<dim>::copy_local_to_global,
+                                      std_cxx11::_1,
+                                      std_cxx11::_2,
+                                      std_cxx11::_3),
+                      std_cxx11::bind(&Solver<dim>::copy_local_to_global,
                                       this,
-                                      std_cxx1x::_1,
-                                      std_cxx1x::ref(linear_system)),
+                                      std_cxx11::_1,
+                                      std_cxx11::ref(linear_system)),
                       AssemblyScratchData(*fe, *quadrature),
                       AssemblyCopyData());
       linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
-      // The syntax above using <code>std_cxx1x::bind</code> requires
+      // The syntax above using <code>std_cxx11::bind</code> requires
       // some explanation. There are multiple version of
       // WorkStream::run that expect different arguments. In step-9,
       // we used one version that took a pair of iterators, a pair of
@@ -824,7 +824,7 @@ namespace Step13
       // typical way to generate such function objects is using
       // <code>std::bind</code> (or, if the compiler is too old, a
       // replacement for it, which we generically call
-      // <code>std_cxx1x::bind</code>) which takes a pointer to a
+      // <code>std_cxx11::bind</code>) which takes a pointer to a
       // (member) function and then <i>binds</i> individual arguments
       // to fixed values. For example, you can create a function that
       // takes an iterator, a scratch object and a copy object by
@@ -840,9 +840,9 @@ namespace Step13
       // that can then be filled by WorkStream::run().
       //
       // There remains the question of what the
-      // <code>std_cxx1x::_1</code>, <code>std_cxx1x::_2</code>, etc.,
+      // <code>std_cxx11::_1</code>, <code>std_cxx11::_2</code>, etc.,
       // mean. (These arguments are called <i>placeholders</i>.) The
-      // idea of using <code>std_cxx1x::bind</code> in the first of
+      // idea of using <code>std_cxx11::bind</code> in the first of
       // the two cases above is that it produces an object that can be
       // called with three arguments. But how are the three arguments
       // the function object is being called with going to be
@@ -855,9 +855,9 @@ namespace Step13
       // games in other circumstances. Consider, for example, having a
       // function <code>void f(double x, double y)</code>. Then,
       // creating a variable <code>p</code> of type
-      // <code>std_cxx1x::function@<void f(double,double)@></code> and
-      // initializing <code>p=std_cxx1x::bind(&f, std_cxx1x::_2,
-      // std_cxx1x::_1)</code> then calling <code>p(1,2)</code> will
+      // <code>std_cxx11::function@<void f(double,double)@></code> and
+      // initializing <code>p=std_cxx11::bind(&f, std_cxx11::_2,
+      // std_cxx11::_1)</code> then calling <code>p(1,2)</code> will
       // result in calling <code>f(2,1)</code>.
       //
       // @note Once deal.II can rely on every compiler being able to
@@ -1033,8 +1033,8 @@ namespace Step13
         = &DoFTools::make_hanging_node_constraints;
 
       // Start a side task then continue on the main thread
-      Threads::Task<> side_task(std_cxx1x::bind(mhnc_p,std_cxx1x::cref(dof_handler),
-                                                std_cxx1x::ref(hanging_node_constraints)));
+      Threads::Task<> side_task(std_cxx11::bind(mhnc_p,std_cxx11::cref(dof_handler),
+                                                std_cxx11::ref(hanging_node_constraints)));
 
       sparsity_pattern.reinit (dof_handler.n_dofs(),
                                dof_handler.n_dofs(),

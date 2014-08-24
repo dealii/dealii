@@ -915,9 +915,9 @@ namespace Step32
     double                                    old_time_step;
     unsigned int                              timestep_number;
 
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>    Amg_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionJacobi> Mp_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionJacobi> T_preconditioner;
+    std_cxx11::shared_ptr<TrilinosWrappers::PreconditionAMG>    Amg_preconditioner;
+    std_cxx11::shared_ptr<TrilinosWrappers::PreconditionJacobi> Mp_preconditioner;
+    std_cxx11::shared_ptr<TrilinosWrappers::PreconditionJacobi> T_preconditioner;
 
     bool                                      rebuild_stokes_matrix;
     bool                                      rebuild_stokes_preconditioner;
@@ -2234,12 +2234,12 @@ namespace Step32
   // specific signatures: three arguments in the first and one
   // argument in the latter case (see the documentation of the
   // WorkStream::run function for the meaning of these arguments).
-  // Note how we use the construct <code>std_cxx1x::bind</code> to
+  // Note how we use the construct <code>std_cxx11::bind</code> to
   // create a function object that satisfies this requirement. It uses
-  // placeholders <code>std_cxx1x::_1, std_cxx1x::_2,
-  // std_cxx1x::_3</code> for the local assembly function that specify
+  // placeholders <code>std_cxx11::_1, std_cxx11::_2,
+  // std_cxx11::_3</code> for the local assembly function that specify
   // cell, scratch data, and copy data, as well as the placeholder
-  // <code>std_cxx1x::_1</code> for the copy function that expects the
+  // <code>std_cxx11::_1</code> for the copy function that expects the
   // data to be written into the global matrix (for placeholder
   // arguments, also see the discussion in step-13's
   // <code>assemble_linear_system()</code> function). On the other
@@ -2281,16 +2281,16 @@ namespace Step32
                      stokes_dof_handler.begin_active()),
          CellFilter (IteratorFilters::LocallyOwnedCell(),
                      stokes_dof_handler.end()),
-         std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+         std_cxx11::bind (&BoussinesqFlowProblem<dim>::
                           local_assemble_stokes_preconditioner,
                           this,
-                          std_cxx1x::_1,
-                          std_cxx1x::_2,
-                          std_cxx1x::_3),
-         std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                          std_cxx11::_1,
+                          std_cxx11::_2,
+                          std_cxx11::_3),
+         std_cxx11::bind (&BoussinesqFlowProblem<dim>::
                           copy_local_to_global_stokes_preconditioner,
                           this,
-                          std_cxx1x::_1),
+                          std_cxx11::_1),
          Assembly::Scratch::
          StokesPreconditioner<dim> (stokes_fe, quadrature_formula,
                                     mapping,
@@ -2472,16 +2472,16 @@ namespace Step32
                      stokes_dof_handler.begin_active()),
          CellFilter (IteratorFilters::LocallyOwnedCell(),
                      stokes_dof_handler.end()),
-         std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+         std_cxx11::bind (&BoussinesqFlowProblem<dim>::
                           local_assemble_stokes_system,
                           this,
-                          std_cxx1x::_1,
-                          std_cxx1x::_2,
-                          std_cxx1x::_3),
-         std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                          std_cxx11::_1,
+                          std_cxx11::_2,
+                          std_cxx11::_3),
+         std_cxx11::bind (&BoussinesqFlowProblem<dim>::
                           copy_local_to_global_stokes_system,
                           this,
-                          std_cxx1x::_1),
+                          std_cxx11::_1),
          Assembly::Scratch::
          StokesSystem<dim> (stokes_fe, mapping, quadrature_formula,
                             (update_values    |
@@ -2593,16 +2593,16 @@ namespace Step32
                      temperature_dof_handler.begin_active()),
          CellFilter (IteratorFilters::LocallyOwnedCell(),
                      temperature_dof_handler.end()),
-         std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+         std_cxx11::bind (&BoussinesqFlowProblem<dim>::
                           local_assemble_temperature_matrix,
                           this,
-                          std_cxx1x::_1,
-                          std_cxx1x::_2,
-                          std_cxx1x::_3),
-         std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                          std_cxx11::_1,
+                          std_cxx11::_2,
+                          std_cxx11::_3),
+         std_cxx11::bind (&BoussinesqFlowProblem<dim>::
                           copy_local_to_global_temperature_matrix,
                           this,
-                          std_cxx1x::_1),
+                          std_cxx11::_1),
          Assembly::Scratch::
          TemperatureMatrix<dim> (temperature_fe, mapping, quadrature_formula),
          Assembly::CopyData::
@@ -2889,19 +2889,19 @@ namespace Step32
                      temperature_dof_handler.begin_active()),
          CellFilter (IteratorFilters::LocallyOwnedCell(),
                      temperature_dof_handler.end()),
-         std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+         std_cxx11::bind (&BoussinesqFlowProblem<dim>::
                           local_assemble_temperature_rhs,
                           this,
                           global_T_range,
                           maximal_velocity,
                           global_entropy_variation,
-                          std_cxx1x::_1,
-                          std_cxx1x::_2,
-                          std_cxx1x::_3),
-         std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                          std_cxx11::_1,
+                          std_cxx11::_2,
+                          std_cxx11::_3),
+         std_cxx11::bind (&BoussinesqFlowProblem<dim>::
                           copy_local_to_global_temperature_rhs,
                           this,
-                          std_cxx1x::_1),
+                          std_cxx11::_1),
          Assembly::Scratch::
          TemperatureRHS<dim> (temperature_fe, stokes_fe, mapping,
                               quadrature_formula),

@@ -97,6 +97,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Changed: Namespace std_cxx1x has been renamed to namespace
+  std_cxx11 to match the fact that the corresponding C++ standard
+  was approved back in 2011. The old namespace name was retained for
+  backward compatibility but is now deprecated.
+  <br>
+  (Wolfgang Bangerth, 2014/09/01)
+  </li>
+
   <li> New: Most of the operations done on Vector (like add, sadd, etc.) 
   are now vectorized (SIMD) using OpenMP 4.0
   <br>

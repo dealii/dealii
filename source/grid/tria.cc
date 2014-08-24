@@ -18,7 +18,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/geometry_info.h>
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/bind.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_levels.h>
@@ -40,7 +40,7 @@
 #include <cmath>
 #include <functional>
 
-#include <deal.II/base/std_cxx1x/array.h>
+#include <deal.II/base/std_cxx11/array.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -2074,7 +2074,7 @@ namespace internal
         // this file
         std::map<internal::Triangulation::TriaObject<2>,
             std::pair<typename Triangulation<dim,spacedim>::quad_iterator,
-            std_cxx1x::array<bool,GeometryInfo<dim>::lines_per_face> >,
+            std_cxx11::array<bool,GeometryInfo<dim>::lines_per_face> >,
             QuadComparator>
             needed_quads;
         for (unsigned int cell=0; cell<cells.size(); ++cell)
@@ -2105,7 +2105,7 @@ namespace internal
             std::pair<int,int> line_list[GeometryInfo<dim>::lines_per_cell],
                 inverse_line_list[GeometryInfo<dim>::lines_per_cell];
             unsigned int face_line_list[GeometryInfo<dim>::lines_per_face];
-            std_cxx1x::array<bool,GeometryInfo<dim>::lines_per_face> orientation;
+            std_cxx11::array<bool,GeometryInfo<dim>::lines_per_face> orientation;
 
             for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
               {
@@ -2226,7 +2226,7 @@ namespace internal
           quad = triangulation.begin_raw_quad();
           typename std::map<internal::Triangulation::TriaObject<2>,
                    std::pair<typename Triangulation<dim,spacedim>::quad_iterator,
-                   std_cxx1x::array<bool,GeometryInfo<dim>::lines_per_face> >,
+                   std_cxx11::array<bool,GeometryInfo<dim>::lines_per_face> >,
                    QuadComparator>
                    ::iterator q;
           for (q = needed_quads.begin(); quad!=triangulation.end_quad(); ++quad, ++q)
@@ -13273,22 +13273,22 @@ Triangulation<dim, spacedim>::add_refinement_listener (RefinementListener &liste
   std::vector<boost::signals2::connection> connections;
 
   connections.push_back
-  (signals.create.connect (std_cxx1x::bind (&RefinementListener::create_notification,
-                                            std_cxx1x::ref(listener),
-                                            std_cxx1x::cref(*this))));
+  (signals.create.connect (std_cxx11::bind (&RefinementListener::create_notification,
+                                            std_cxx11::ref(listener),
+                                            std_cxx11::cref(*this))));
   connections.push_back
-  (signals.copy.connect (std_cxx1x::bind (&RefinementListener::copy_notification,
-                                          std_cxx1x::ref(listener),
-                                          std_cxx1x::cref(*this),
-                                          std_cxx1x::_1)));
+  (signals.copy.connect (std_cxx11::bind (&RefinementListener::copy_notification,
+                                          std_cxx11::ref(listener),
+                                          std_cxx11::cref(*this),
+                                          std_cxx11::_1)));
   connections.push_back
-  (signals.pre_refinement.connect (std_cxx1x::bind (&RefinementListener::pre_refinement_notification,
-                                                    std_cxx1x::ref(listener),
-                                                    std_cxx1x::cref(*this))));
+  (signals.pre_refinement.connect (std_cxx11::bind (&RefinementListener::pre_refinement_notification,
+                                                    std_cxx11::ref(listener),
+                                                    std_cxx11::cref(*this))));
   connections.push_back
-  (signals.post_refinement.connect (std_cxx1x::bind (&RefinementListener::post_refinement_notification,
-                                                     std_cxx1x::ref(listener),
-                                                     std_cxx1x::cref(*this))));
+  (signals.post_refinement.connect (std_cxx11::bind (&RefinementListener::post_refinement_notification,
+                                                     std_cxx11::ref(listener),
+                                                     std_cxx11::cref(*this))));
 
   // now push the set of connections into the map
   refinement_listener_map.insert (std::make_pair(&listener, connections));

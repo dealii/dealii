@@ -1369,13 +1369,13 @@ namespace
   attach_mesh_data_recursively (const typename internal::p4est::types<dim>::tree &tree,
                                 const typename Triangulation<dim,spacedim>::cell_iterator &dealii_cell,
                                 const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-                                const typename std::list<std::pair<unsigned int, typename std_cxx1x::function<
+                                const typename std::list<std::pair<unsigned int, typename std_cxx11::function<
                                 void(typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator,
                                      typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus,
                                      void *)
                                 > > > &attached_data_pack_callbacks)
   {
-    typedef std::list<std::pair<unsigned int, typename std_cxx1x::function<
+    typedef std::list<std::pair<unsigned int, typename std_cxx11::function<
     void(typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator,
          typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus,
          void *)
@@ -1530,7 +1530,7 @@ namespace
                               const typename Triangulation<dim,spacedim>::cell_iterator &parent_cell,
                               const typename internal::p4est::types<dim>::quadrant &p4est_cell,
                               const unsigned int offset,
-                              const typename std_cxx1x::function<
+                              const typename std_cxx11::function<
                               void(typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator, typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus, void *)
                               > &unpack_callback)
   {
@@ -3233,7 +3233,7 @@ namespace parallel
     unsigned int
     Triangulation<dim,spacedim>::
     register_data_attach (const std::size_t size,
-                          const std_cxx1x::function<void(const cell_iterator &,
+                          const std_cxx11::function<void(const cell_iterator &,
                                                          const CellStatus,
                                                          void *)> &pack_callback)
     {
@@ -3256,7 +3256,7 @@ namespace parallel
     void
     Triangulation<dim,spacedim>::
     notify_ready_to_unpack (const unsigned int offset,
-                            const std_cxx1x::function<void (const cell_iterator &,
+                            const std_cxx11::function<void (const cell_iterator &,
                                                             const CellStatus,
                                                             const void *)> &unpack_callback)
     {

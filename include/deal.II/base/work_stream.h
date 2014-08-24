@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,8 +23,8 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/std_cxx1x/function.h>
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/function.h>
+#include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/parallel.h>
 
@@ -141,7 +141,7 @@ namespace WorkStream
   namespace internal
   {
 
-//TODO: The following classes all use std_cxx1x::shared_ptr, but the
+//TODO: The following classes all use std_cxx11::shared_ptr, but the
 //  correct pointer class would actually be std::unique_ptr. make this
 //  replacement whenever we have a class that provides these semantics
 //  and that is available also as a fall-back whenever via boost or similar
@@ -182,7 +182,7 @@ namespace WorkStream
            */
           struct ScratchDataObject
           {
-            std_cxx1x::shared_ptr<ScratchData> scratch_data;
+            std_cxx11::shared_ptr<ScratchData> scratch_data;
             bool                               currently_in_use;
 
             /**
@@ -504,7 +504,7 @@ namespace WorkStream
          * function that will do the
          * assembly.
          */
-        Worker (const std_cxx1x::function<void (const Iterator &,
+        Worker (const std_cxx11::function<void (const Iterator &,
                                                 ScratchData &,
                                                 CopyData &)> &worker,
                 bool copier_exist=true)
@@ -623,7 +623,7 @@ namespace WorkStream
          * that does the assembling
          * on the sequence of cells.
          */
-        const std_cxx1x::function<void (const Iterator &,
+        const std_cxx11::function<void (const Iterator &,
                                         ScratchData &,
                                         CopyData &)> worker;
 
@@ -661,7 +661,7 @@ namespace WorkStream
          * the global matrix or
          * similar.
          */
-        Copier (const std_cxx1x::function<void (const CopyData &)> &copier)
+        Copier (const std_cxx11::function<void (const CopyData &)> &copier)
           :
           tbb::filter (/*is_serial=*/true),
           copier (copier)
@@ -714,7 +714,7 @@ namespace WorkStream
         /**
          * Pointer to the function that does the copying of data.
          */
-        const std_cxx1x::function<void (const CopyData &)> copier;
+        const std_cxx11::function<void (const CopyData &)> copier;
       };
 
     }
@@ -751,8 +751,8 @@ namespace WorkStream
            */
           struct ScratchAndCopyDataObjects
           {
-            std_cxx1x::shared_ptr<ScratchData> scratch_data;
-            std_cxx1x::shared_ptr<CopyData>    copy_data;
+            std_cxx11::shared_ptr<ScratchData> scratch_data;
+            std_cxx11::shared_ptr<CopyData>    copy_data;
             bool                               currently_in_use;
 
             /**
@@ -1032,10 +1032,10 @@ namespace WorkStream
          * function that will do the
          * assembly.
          */
-        WorkerAndCopier (const std_cxx1x::function<void (const Iterator &,
+        WorkerAndCopier (const std_cxx11::function<void (const Iterator &,
                                                          ScratchData &,
                                                          CopyData &)> &worker,
-                         const std_cxx1x::function<void (const CopyData &)> &copier)
+                         const std_cxx11::function<void (const CopyData &)> &copier)
           :
           tbb::filter (/* is_serial= */ false),
           worker (worker),
@@ -1156,7 +1156,7 @@ namespace WorkStream
          * that does the assembling
          * on the sequence of cells.
          */
-        const std_cxx1x::function<void (const Iterator &,
+        const std_cxx11::function<void (const Iterator &,
                                         ScratchData &,
                                         CopyData &)> worker;
 
@@ -1164,7 +1164,7 @@ namespace WorkStream
          * Pointer to the function that does the copying from
          * local contribution to global object.
          */
-        const std_cxx1x::function<void (const CopyData &)> copier;
+        const std_cxx11::function<void (const CopyData &)> copier;
       };
     }
 
@@ -1187,7 +1187,7 @@ namespace WorkStream
         /**
          * Constructor.
          */
-        Worker (const std_cxx1x::function<void (const Iterator &,
+        Worker (const std_cxx11::function<void (const Iterator &,
                                                 ScratchData &,
                                                 CopyData &)> &worker,
                 const ScratchData    &sample_scratch_data,
@@ -1308,7 +1308,7 @@ namespace WorkStream
          * that does the assembling
          * on the sequence of cells.
          */
-        const std_cxx1x::function<void (const Iterator &,
+        const std_cxx11::function<void (const Iterator &,
                                         ScratchData &,
                                         CopyData &)> worker;
 
@@ -1453,11 +1453,11 @@ namespace WorkStream
           {
             // need to check if the function is not the zero function. To
             // check zero-ness, create a C++ function out of it and check that
-            if (static_cast<const std_cxx1x::function<void (const Iterator &,
+            if (static_cast<const std_cxx11::function<void (const Iterator &,
                                                             ScratchData &,
                                                             CopyData &)>& >(worker))
               worker (i, scratch_data, copy_data);
-            if (static_cast<const std_cxx1x::function<void (const CopyData &)>& >
+            if (static_cast<const std_cxx11::function<void (const CopyData &)>& >
                 (copier))
               copier (copy_data);
           }
@@ -1466,7 +1466,7 @@ namespace WorkStream
     else // have TBB and use more than one thread
       {
         // Check that the copier exist
-        if (static_cast<const std_cxx1x::function<void (const CopyData &)>& >(copier))
+        if (static_cast<const std_cxx11::function<void (const CopyData &)>& >(copier))
           {
             // create the three stages of the pipeline
             internal::Implementation2::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
@@ -1561,11 +1561,11 @@ namespace WorkStream
             {
               // need to check if the function is not the zero function. To
               // check zero-ness, create a C++ function out of it and check that
-              if (static_cast<const std_cxx1x::function<void (const Iterator &,
+              if (static_cast<const std_cxx11::function<void (const Iterator &,
                                                               ScratchData &,
                                                               CopyData &)>& >(worker))
                 worker (*p, scratch_data, copy_data);
-              if (static_cast<const std_cxx1x::function<void (const CopyData &)>& >(copier))
+              if (static_cast<const std_cxx11::function<void (const CopyData &)>& >(copier))
                 copier (copy_data);
             }
       }
@@ -1576,7 +1576,7 @@ namespace WorkStream
         for (unsigned int color=0; color<colored_iterators.size(); ++color)
           if (colored_iterators[color].size() > 0)
             {
-              if (static_cast<const std_cxx1x::function<void (const CopyData &)>& >(copier))
+              if (static_cast<const std_cxx11::function<void (const CopyData &)>& >(copier))
                 {
                   // there is a copier function, so we have to go with
                   // the full three-stage design of the pipeline
@@ -1605,7 +1605,7 @@ namespace WorkStream
               else
                 {
                   // no copier function, we can implement things as a parallel for
-                  Assert (static_cast<const std_cxx1x::function<void (const Iterator &,
+                  Assert (static_cast<const std_cxx11::function<void (const Iterator &,
                                                                       ScratchData &,
                                                                       CopyData &)>& >(worker),
                           ExcMessage ("It makes no sense to call this function with "
@@ -1628,9 +1628,9 @@ namespace WorkStream
                                      (colored_iterators[color].begin(),
                                       colored_iterators[color].end(),
                                       /*grain_size=*/chunk_size),
-                                     std_cxx1x::bind (&ParallelForWorker::operator(),
-                                                      std_cxx1x::ref(parallel_for_worker),
-                                                      std_cxx1x::_1),
+                                     std_cxx11::bind (&ParallelForWorker::operator(),
+                                                      std_cxx11::ref(parallel_for_worker),
+                                                      std_cxx11::_1),
                                      tbb::auto_partitioner());
                 }
             }
@@ -1689,12 +1689,12 @@ namespace WorkStream
   {
     // forward to the other function
     run (begin, end,
-         std_cxx1x::bind (worker,
-                          std_cxx1x::ref (main_object),
-                          std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
-         std_cxx1x::bind (copier,
-                          std_cxx1x::ref (main_object),
-                          std_cxx1x::_1),
+         std_cxx11::bind (worker,
+                          std_cxx11::ref (main_object),
+                          std_cxx11::_1, std_cxx11::_2, std_cxx11::_3),
+         std_cxx11::bind (copier,
+                          std_cxx11::ref (main_object),
+                          std_cxx11::_1),
          sample_scratch_data,
          sample_copy_data,
          queue_length,

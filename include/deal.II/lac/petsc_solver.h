@@ -24,7 +24,7 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/solver_control.h>
-#  include <deal.II/base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #  include <petscksp.h>
 
@@ -280,7 +280,7 @@ namespace PETScWrappers
      * the main solver routine if
      * necessary.
      */
-    std_cxx1x::shared_ptr<SolverData> solver_data;
+    std_cxx11::shared_ptr<SolverData> solver_data;
   };
 
 
@@ -1242,7 +1242,7 @@ namespace PETScWrappers
       PC  pc;
     };
 
-    std_cxx1x::shared_ptr<SolverDataMUMPS> solver_data;
+    std_cxx11::shared_ptr<SolverDataMUMPS> solver_data;
 
     /**
      * Flag specifies whether matrix

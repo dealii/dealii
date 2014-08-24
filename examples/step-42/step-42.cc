@@ -746,7 +746,7 @@ namespace Step42
     // one shot at setting it; the same is true for the mesh refinement
     // criterion):
     const std::string                                  base_mesh;
-    const std_cxx1x::shared_ptr<const Function<dim> >  obstacle;
+    const std_cxx11::shared_ptr<const Function<dim> >  obstacle;
 
     struct RefinementStrategy
     {

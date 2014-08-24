@@ -440,7 +440,7 @@ namespace Step52
     for (unsigned int i=0; i<n_time_steps; ++i)
       {
         time = explicit_runge_kutta.evolve_one_time_step(
-                 std_cxx1x::bind(&Diffusion::evaluate_diffusion,this,std_cxx1x::_1,std_cxx1x::_2),
+                 std_cxx11::bind(&Diffusion::evaluate_diffusion,this,std_cxx11::_1,std_cxx11::_2),
                  time,time_step,solution);
 
         if ((i+1)%10==0)
@@ -468,9 +468,9 @@ namespace Step52
     for (unsigned int i=0; i<n_time_steps; ++i)
       {
         time = implicit_runge_kutta.evolve_one_time_step(
-                 std_cxx1x::bind(&Diffusion::evaluate_diffusion,this,std_cxx1x::_1,std_cxx1x::_2),
-                 std_cxx1x::bind(&Diffusion::id_minus_tau_J_inverse,this,std_cxx1x::_1,std_cxx1x::_2,
-                                 std_cxx1x::_3),
+                 std_cxx11::bind(&Diffusion::evaluate_diffusion,this,std_cxx11::_1,std_cxx11::_2),
+                 std_cxx11::bind(&Diffusion::id_minus_tau_J_inverse,this,std_cxx11::_1,std_cxx11::_2,
+                                 std_cxx11::_3),
                  time,time_step,solution);
 
         if ((i+1)%10==0)
@@ -522,7 +522,7 @@ namespace Step52
           time_step = final_time-time;
 
         time = embedded_explicit_runge_kutta.evolve_one_time_step(
-                 std_cxx1x::bind(&Diffusion::evaluate_diffusion,this,std_cxx1x::_1,std_cxx1x::_2),
+                 std_cxx11::bind(&Diffusion::evaluate_diffusion,this,std_cxx11::_1,std_cxx11::_2),
                  time,time_step,solution);
 
         if ((n_steps+1)%10==0)

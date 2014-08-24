@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,7 +19,7 @@
 #define __deal2__mesh_worker_loop_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/grid/tria.h>
@@ -167,9 +167,9 @@ namespace MeshWorker
     ITERATOR cell,
     DoFInfoBox<dim, DOFINFO> &dof_info,
     INFOBOX &info,
-    const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
-    const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
-    const std_cxx1x::function<void (DOFINFO &, DOFINFO &,
+    const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
+    const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
+    const std_cxx11::function<void (DOFINFO &, DOFINFO &,
                                     typename INFOBOX::CellInfo &,
                                     typename INFOBOX::CellInfo &)> &face_worker,
     const LoopControl &loop_control)
@@ -377,9 +377,9 @@ namespace MeshWorker
             typename identity<ITERATOR>::type end,
             DOFINFO &dinfo,
             INFOBOX &info,
-            const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
-            const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
-            const std_cxx1x::function<void (DOFINFO &, DOFINFO &,
+            const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
+            const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
+            const std_cxx11::function<void (DOFINFO &, DOFINFO &,
                                             typename INFOBOX::CellInfo &,
                                             typename INFOBOX::CellInfo &)> &face_worker,
             ASSEMBLER &assembler,
@@ -397,10 +397,10 @@ namespace MeshWorker
     // Loop over all cells
 #ifdef DEAL_II_MESHWORKER_PARALLEL
     WorkStream::run(begin, end,
-                    std_cxx1x::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>,
-                                    std_cxx1x::_1, std_cxx1x::_3, std_cxx1x::_2,
+                    std_cxx11::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>,
+                                    std_cxx11::_1, std_cxx11::_3, std_cxx11::_2,
                                     cell_worker, boundary_worker, face_worker, lctrl),
-                    std_cxx1x::bind(&internal::assemble<dim,DOFINFO,ASSEMBLER>, std_cxx1x::_1, &assembler),
+                    std_cxx11::bind(&internal::assemble<dim,DOFINFO,ASSEMBLER>, std_cxx11::_1, &assembler),
                     info, dof_info);
 #else
     for (ITERATOR cell = begin; cell != end; ++cell)
@@ -419,9 +419,9 @@ namespace MeshWorker
             typename identity<ITERATOR>::type end,
             DOFINFO &dinfo,
             INFOBOX &info,
-            const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
-            const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
-            const std_cxx1x::function<void (DOFINFO &, DOFINFO &,
+            const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
+            const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
+            const std_cxx11::function<void (DOFINFO &, DOFINFO &,
                                             typename INFOBOX::CellInfo &,
                                             typename INFOBOX::CellInfo &)> &face_worker,
             ASSEMBLER &assembler,
@@ -433,9 +433,9 @@ namespace MeshWorker
             typename identity<ITERATOR>::type end,
             DOFINFO &dinfo,
             INFOBOX &info,
-            const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
-            const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
-            const std_cxx1x::function<void (DOFINFO &, DOFINFO &,
+            const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
+            const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
+            const std_cxx11::function<void (DOFINFO &, DOFINFO &,
                                             typename INFOBOX::CellInfo &,
                                             typename INFOBOX::CellInfo &)> &face_worker,
             ASSEMBLER &assembler,
@@ -465,9 +465,9 @@ namespace MeshWorker
                         typename identity<ITERATOR>::type end,
                         DoFInfo<dim, spacedim> &dof_info,
                         IntegrationInfoBox<dim, spacedim> &box,
-                        const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &cell_worker,
-                        const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &boundary_worker,
-                        const std_cxx1x::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
+                        const std_cxx11::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &cell_worker,
+                        const std_cxx11::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &boundary_worker,
+                        const std_cxx11::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
                                                         IntegrationInfo<dim, spacedim> &,
                                                         IntegrationInfo<dim, spacedim> &)> &face_worker,
                         ASSEMBLER &assembler,
@@ -479,9 +479,9 @@ namespace MeshWorker
                         typename identity<ITERATOR>::type end,
                         DoFInfo<dim, spacedim> &dof_info,
                         IntegrationInfoBox<dim, spacedim> &box,
-                        const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &cell_worker,
-                        const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &boundary_worker,
-                        const std_cxx1x::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
+                        const std_cxx11::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &cell_worker,
+                        const std_cxx11::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &boundary_worker,
+                        const std_cxx11::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
                                                         IntegrationInfo<dim, spacedim> &,
                                                         IntegrationInfo<dim, spacedim> &)> &face_worker,
                         ASSEMBLER &assembler,
@@ -528,17 +528,17 @@ namespace MeshWorker
                         ASSEMBLER &assembler,
                         bool cells_first)
   {
-    std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
-    std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
-    std_cxx1x::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
+    std_cxx11::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
+    std_cxx11::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
+    std_cxx11::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
                               IntegrationInfo<dim, spacedim> &,
                               IntegrationInfo<dim, spacedim> &)> face_worker;
     if (integrator.use_cell)
-      cell_worker = std_cxx1x::bind(&LocalIntegrator<dim, spacedim>::cell, &integrator, std_cxx1x::_1, std_cxx1x::_2);
+      cell_worker = std_cxx11::bind(&LocalIntegrator<dim, spacedim>::cell, &integrator, std_cxx11::_1, std_cxx11::_2);
     if (integrator.use_boundary)
-      boundary_worker = std_cxx1x::bind(&LocalIntegrator<dim, spacedim>::boundary, &integrator, std_cxx1x::_1, std_cxx1x::_2);
+      boundary_worker = std_cxx11::bind(&LocalIntegrator<dim, spacedim>::boundary, &integrator, std_cxx11::_1, std_cxx11::_2);
     if (integrator.use_face)
-      face_worker = std_cxx1x::bind(&LocalIntegrator<dim, spacedim>::face, &integrator, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4);
+      face_worker = std_cxx11::bind(&LocalIntegrator<dim, spacedim>::face, &integrator, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4);
 
     loop<dim, spacedim>
     (begin, end,
@@ -563,17 +563,17 @@ namespace MeshWorker
                         ASSEMBLER &assembler,
                         const LoopControl &lctrl = LoopControl())
   {
-    std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
-    std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
-    std_cxx1x::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
+    std_cxx11::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
+    std_cxx11::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;
+    std_cxx11::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
                               IntegrationInfo<dim, spacedim> &,
                               IntegrationInfo<dim, spacedim> &)> face_worker;
     if (integrator.use_cell)
-      cell_worker = std_cxx1x::bind(&LocalIntegrator<dim, spacedim>::cell, &integrator, std_cxx1x::_1, std_cxx1x::_2);
+      cell_worker = std_cxx11::bind(&LocalIntegrator<dim, spacedim>::cell, &integrator, std_cxx11::_1, std_cxx11::_2);
     if (integrator.use_boundary)
-      boundary_worker = std_cxx1x::bind(&LocalIntegrator<dim, spacedim>::boundary, &integrator, std_cxx1x::_1, std_cxx1x::_2);
+      boundary_worker = std_cxx11::bind(&LocalIntegrator<dim, spacedim>::boundary, &integrator, std_cxx11::_1, std_cxx11::_2);
     if (integrator.use_face)
-      face_worker = std_cxx1x::bind(&LocalIntegrator<dim, spacedim>::face, &integrator, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4);
+      face_worker = std_cxx11::bind(&LocalIntegrator<dim, spacedim>::face, &integrator, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4);
 
     loop<dim, spacedim>
     (begin, end,

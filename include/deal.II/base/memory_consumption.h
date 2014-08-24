@@ -19,7 +19,7 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #include <string>
 #include <complex>
@@ -438,7 +438,7 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  std::size_t memory_consumption (const std_cxx1x::shared_ptr<T> &);
+  std::size_t memory_consumption (const std_cxx11::shared_ptr<T> &);
 }
 
 
@@ -690,9 +690,9 @@ namespace MemoryConsumption
   template <typename T>
   inline
   std::size_t
-  memory_consumption (const std_cxx1x::shared_ptr<T> &)
+  memory_consumption (const std_cxx11::shared_ptr<T> &)
   {
-    return sizeof(std_cxx1x::shared_ptr<T>);
+    return sizeof(std_cxx11::shared_ptr<T>);
   }
 
 

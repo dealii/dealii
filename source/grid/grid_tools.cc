@@ -14,7 +14,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/std_cxx1x/array.h>
+#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -2156,7 +2156,7 @@ next_cell:
 
   template<> struct OrientationLookupTable<1>
   {
-    typedef std_cxx1x::array<unsigned int, GeometryInfo<1>::vertices_per_face> MATCH_T;
+    typedef std_cxx11::array<unsigned int, GeometryInfo<1>::vertices_per_face> MATCH_T;
     static inline std::bitset<3> lookup (const MATCH_T &)
     {
       // The 1D case is trivial
@@ -2166,7 +2166,7 @@ next_cell:
 
   template<> struct OrientationLookupTable<2>
   {
-    typedef std_cxx1x::array<unsigned int, GeometryInfo<2>::vertices_per_face> MATCH_T;
+    typedef std_cxx11::array<unsigned int, GeometryInfo<2>::vertices_per_face> MATCH_T;
     static inline std::bitset<3> lookup (const MATCH_T &matching)
     {
       // In 2D matching faces (=lines) results in two cases: Either
@@ -2187,7 +2187,7 @@ next_cell:
 
   template<> struct OrientationLookupTable<3>
   {
-    typedef std_cxx1x::array<unsigned int, GeometryInfo<3>::vertices_per_face> MATCH_T;
+    typedef std_cxx11::array<unsigned int, GeometryInfo<3>::vertices_per_face> MATCH_T;
     static inline std::bitset<3> lookup (const MATCH_T &matching)
     {
       // The full fledged 3D case. *Yay*
@@ -2232,7 +2232,7 @@ next_cell:
 
     // Do a full matching of the face vertices:
 
-    std_cxx1x::
+    std_cxx11::
     array<unsigned int, GeometryInfo<dim>::vertices_per_face> matching;
 
     std::set<unsigned int> face2_vertices;

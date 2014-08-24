@@ -692,7 +692,7 @@ protected:
    * In case the class is initialized from MappingFEEvaluation instead of
    * MatrixFree, this data structure holds the evaluated shape data.
    */
-  std_cxx1x::shared_ptr<internal::MatrixFreeFunctions::ShapeInfo<Number> > stored_shape_info;
+  std_cxx11::shared_ptr<internal::MatrixFreeFunctions::ShapeInfo<Number> > stored_shape_info;
 
   /**
    * Stores a pointer to the unit cell shape data, i.e., values, gradients and

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,36 +14,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__std_cxx1x_condition_variable_h
-#define __deal2__std_cxx1x_condition_variable_h
+// this file is deprecated. simply include the one we use now
+#include "../std_cxx11/condition_variable.h"
 
-
-#include <deal.II/base/config.h>
-
-#ifdef DEAL_II_WITH_CXX11
-
-#  include <condition_variable>
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx1x
-{
-  using std::condition_variable;
-  using std::unique_lock;
-  using std::adopt_lock;
-}
-DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-#  include <boost/thread/condition_variable.hpp>
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx1x
-{
-  using boost::condition_variable;
-  using boost::unique_lock;
-  using boost::adopt_lock;
-}
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
-
-#endif
+// then allow using the old namespace name instead of the new one
+namespace std_cxx1x = std_cxx11;

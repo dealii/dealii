@@ -309,7 +309,7 @@ namespace TrilinosWrappers
       Epetra_Map new_map (v.size(), n_elements, &global_ids[0], 0,
                           v.block(0).vector_partitioner().Comm());
 
-      std_cxx1x::shared_ptr<Epetra_FEVector> actual_vec;
+      std_cxx11::shared_ptr<Epetra_FEVector> actual_vec;
       if ( import_data == true )
         actual_vec.reset (new Epetra_FEVector (new_map));
       else
