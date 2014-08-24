@@ -225,7 +225,7 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
 
   DataOutBase::DXFlags dxflags;
   DataOutBase::GnuplotFlags gflags;
-  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
+  std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > vectors;
   if (dim==2)
     DataOutBase::write_gnuplot(patches, names, vectors, gflags, out);
   else

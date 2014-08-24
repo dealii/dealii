@@ -37,8 +37,8 @@ FOREACH(_full_file ${_header})
   # TODO: A more sophisticated way to get the relative include path:
   GET_FILENAME_COMPONENT(_path ${_full_file} PATH)
   GET_FILENAME_COMPONENT(_path ${_path} NAME)
-  IF("${_path}" STREQUAL "std_cxx1x")
-    SET(_path "base/std_cxx1x")
+  IF("${_path}" STREQUAL "std_cxx11")
+    SET(_path "base/std_cxx11")
   ENDIF()
 
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
