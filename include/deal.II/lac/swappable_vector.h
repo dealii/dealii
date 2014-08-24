@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,9 +73,7 @@ public:
    * out. In the latter case, warn
    * about that. In particular do
    * not take over ownership of any
-   * files that @p v might own (as,
-   * for example, <tt>C++</tt>'s
-   * @p auto_ptr objects would do).
+   * files that @p v might own.
    */
   SwappableVector (const SwappableVector &v);
 
