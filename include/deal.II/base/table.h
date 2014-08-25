@@ -1852,7 +1852,7 @@ protected:
    * then called <tt>vector2d</tt>.
    */
   typename AlignedVector<T>::reference el (const unsigned int i,
-                                         const unsigned int j);
+                                           const unsigned int j);
 
   /**
    * Return the value of the
@@ -1879,7 +1879,7 @@ protected:
    * then called <tt>vector2d</tt>.
    */
   typename AlignedVector<T>::const_reference el (const unsigned int i,
-                                               const unsigned int j) const;
+                                                 const unsigned int j) const;
 };
 
 
@@ -2282,7 +2282,7 @@ namespace internal
 
     template <typename InputIterator, typename T, int N>
     void fill_Fortran_style (InputIterator,
-                             TableBase<N,T>  &)
+                             TableBase<N,T> &)
     {
       Assert (false, ExcNotImplemented());
     }
@@ -2302,7 +2302,7 @@ TableBase<N,T>::fill (InputIterator entries,
 
   if (C_style_indexing)
     for (typename AlignedVector<T>::iterator p = values.begin();
-        p != values.end(); ++p)
+         p != values.end(); ++p)
       *p = *entries++;
   else
     internal::Table::fill_Fortran_style (entries, *this);

@@ -177,7 +177,7 @@ public:
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
-  void load (const double* ptr)
+  void load (const double *ptr)
   {
     data = _mm512_loadu_pd (ptr);
   }
@@ -188,7 +188,7 @@ public:
    * 64 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  void store (double* ptr) const
+  void store (double *ptr) const
   {
     _mm512_storeu_pd (ptr, data);
   }
@@ -369,7 +369,7 @@ public:
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
-  void load (const float* ptr)
+  void load (const float *ptr)
   {
     data = _mm512_loadu_ps (ptr);
   }
@@ -380,7 +380,7 @@ public:
    * 64 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
-  void store (float* ptr) const
+  void store (float *ptr) const
   {
     _mm512_storeu_ps (ptr, data);
   }
@@ -573,7 +573,7 @@ public:
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
-  void load (const double* ptr)
+  void load (const double *ptr)
   {
     data = _mm256_loadu_pd (ptr);
   }
@@ -584,7 +584,7 @@ public:
    * 32 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  void store (double* ptr) const
+  void store (double *ptr) const
   {
     _mm256_storeu_pd (ptr, data);
   }
@@ -772,7 +772,7 @@ public:
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
-  void load (const float* ptr)
+  void load (const float *ptr)
   {
     data = _mm256_loadu_ps (ptr);
   }
@@ -783,7 +783,7 @@ public:
    * 32 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
-  void store (float* ptr) const
+  void store (float *ptr) const
   {
     _mm256_storeu_ps (ptr, data);
   }
@@ -979,7 +979,7 @@ public:
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
-  void load (const double* ptr)
+  void load (const double *ptr)
   {
     data = _mm_loadu_pd (ptr);
   }
@@ -990,7 +990,7 @@ public:
    * 16 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  void store (double* ptr) const
+  void store (double *ptr) const
   {
     _mm_storeu_pd (ptr, data);
   }
@@ -1179,7 +1179,7 @@ public:
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
-  void load (const float* ptr)
+  void load (const float *ptr)
   {
     data = _mm_loadu_ps (ptr);
   }
@@ -1190,7 +1190,7 @@ public:
    * 16 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
-  void store (float* ptr) const
+  void store (float *ptr) const
   {
     _mm_storeu_ps (ptr, data);
   }
@@ -1420,7 +1420,7 @@ public:
    * in the vectorized array, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  void load (const Number* ptr)
+  void load (const Number *ptr)
   {
     data = *ptr;
   }
@@ -1431,7 +1431,7 @@ public:
    * the amount of bytes in the vectorized array, as opposed to casting a
    * double address to VectorizedArray<double>*.
    */
-  void store (Number* ptr) const
+  void store (Number *ptr) const
   {
     *ptr = data;
   }

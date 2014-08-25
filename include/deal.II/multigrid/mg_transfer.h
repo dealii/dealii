@@ -135,13 +135,13 @@ public:
    * Initialize the constraints to be used in build_matrices().
    */
   void initialize_constraints (const ConstraintMatrix &constraints,
-			       const MGConstrainedDoFs &mg_constrained_dofs);
+                               const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Reset the object to the state it had right after the default constructor.
    */
   void clear ();
-    
+
   /**
    * Actually build the prolongation
    * matrices for each level.

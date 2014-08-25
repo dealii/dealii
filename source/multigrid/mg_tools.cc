@@ -484,7 +484,7 @@ namespace MGTools
                                             nfe.first_block_of_base(base) + mult) != DoFTools::none)
                     {
                       const unsigned int dof_increment = nfe.base_element(base).dofs_per_cell
-                                                           - nfe.base_element(base).dofs_per_face;
+                                                         - nfe.base_element(base).dofs_per_face;
                       row_lengths[cell_indices[local_dof]] += dof_increment;
                     }
 
@@ -1418,7 +1418,7 @@ namespace MGTools
       }
   }
 
-  
+
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
@@ -1426,12 +1426,12 @@ namespace MGTools
   {
     std::vector<IndexSet> temp;
     temp.resize(interface_dofs.size());
-    for (unsigned int l=0;l<interface_dofs.size();++l)
+    for (unsigned int l=0; l<interface_dofs.size(); ++l)
       temp[l] = IndexSet(interface_dofs[l].size());
 
     extract_inner_interface_dofs(mg_dof_handler, temp);
 
-    for (unsigned int l=0;l<interface_dofs.size();++l)
+    for (unsigned int l=0; l<interface_dofs.size(); ++l)
       {
         Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
                 ExcDimensionMismatch (interface_dofs[l].size(),
@@ -1521,7 +1521,7 @@ namespace MGTools
                                   mg_dof_handler.get_tria().n_global_levels()));
 
     std::vector<std::vector<types::global_dof_index> >
-      tmp_interface_dofs(interface_dofs.size());
+    tmp_interface_dofs(interface_dofs.size());
 
     const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
 
@@ -1568,7 +1568,7 @@ namespace MGTools
 
         if (has_coarser_neighbor == false)
           continue;
-	
+
         const unsigned int level = cell->level();
         cell->get_mg_dof_indices (local_dof_indices);
 

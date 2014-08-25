@@ -36,7 +36,7 @@ template <int dim>
 class SphereGeometry : public Boundary<dim>
 {
 public:
-    SphereGeometry (const Point<dim> &center);
+  SphereGeometry (const Point<dim> &center);
   virtual
   Point<dim>
   get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
@@ -58,8 +58,8 @@ private:
 
 template <int dim>
 SphereGeometry<dim>::SphereGeometry (const Point<dim> &center)
-:
-center (center)
+  :
+  center (center)
 {}
 
 
@@ -100,7 +100,7 @@ SphereGeometry<3>::pull_back (const Point<3> &p) const
   const double r     = relative_point.norm();
   const double phi   = std::atan2 (relative_point[1], relative_point[0]);
   const double theta = std::atan2 (relative_point[2], std::sqrt (relative_point[0]*relative_point[0] +
-                                                                 relative_point[1]*relative_point[1]));
+                                   relative_point[1]*relative_point[1]));
 
   std_cxx1x::array<double,3> result;
   result[0] = r;
@@ -238,7 +238,8 @@ SphereGeometry<dim>::
 get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
 {
   std_cxx1x::array<double,dim> preimages[2] = { pull_back (line->vertex(0)),
-                                                pull_back (line->vertex(1)) };
+                                                pull_back (line->vertex(1))
+                                              };
 
   return push_forward(average (preimages));
 }
@@ -252,7 +253,8 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
   std_cxx1x::array<double,dim> preimages[4] = { pull_back (quad->vertex(0)),
                                                 pull_back (quad->vertex(1)),
                                                 pull_back (quad->vertex(2)),
-                                                pull_back (quad->vertex(3)) };
+                                                pull_back (quad->vertex(3))
+                                              };
 
   return push_forward(average(preimages));
 }
@@ -275,7 +277,7 @@ void make_grid ()
   triangulation.refine_global(1);
 
   for (typename Triangulation<dim>::active_cell_iterator cell=triangulation.begin_active();
-      cell!=triangulation.end(); ++cell)
+       cell!=triangulation.end(); ++cell)
     {
       if (cell->center().distance(center)< radius)
         cell->set_manifold_id(1);
@@ -295,7 +297,7 @@ void make_grid ()
 }
 
 
-  
+
 
 // @sect3{The main function}
 

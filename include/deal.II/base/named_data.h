@@ -266,7 +266,7 @@ void
 NamedData<DATA>::add(DATA &v, const std::string &n)
 {
   // see operator() below
-  
+
   //  Assert(!is_constant, ExcConstantObject());
   names.push_back(n);
   data.push_back(v);
@@ -279,7 +279,7 @@ void
 NamedData<DATA>::add(const DATA &v, const std::string &n)
 {
   // see operator() below
-  
+
   //  Assert(!is_constant, ExcConstantObject());
   DATA &aux = const_cast<DATA &>(v);
   data.push_back(aux);
@@ -295,7 +295,7 @@ void
 NamedData<DATA>::merge(NamedData<DATA2> &other)
 {
   // see operator() below
-  
+
   // Assert(!is_constant, ExcConstantObject());
 
   for (unsigned int i=0; i<other.size(); ++i)
@@ -314,7 +314,7 @@ void
 NamedData<DATA>::merge(const NamedData<DATA2> &other)
 {
   // see operator() below
-  
+
   //  Assert(!is_constant, ExcConstantObject());
   for (unsigned int i=0; i<other.size(); ++i)
     {

@@ -411,7 +411,7 @@ namespace TrilinosWrappers
 
       if (v.nonlocal_vector.get() != 0)
         nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
-      
+
       return *this;
     }
 

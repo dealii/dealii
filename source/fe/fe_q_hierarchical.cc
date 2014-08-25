@@ -1871,7 +1871,7 @@ FE_Q_Hierarchical<dim>::get_constant_modes () const
   for (unsigned int i=GeometryInfo<dim>::vertices_per_cell; i<this->dofs_per_cell; ++i)
     constant_modes(0,i) = false;
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, std::vector<unsigned int>(1, 0));
+         (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 

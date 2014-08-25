@@ -96,7 +96,7 @@ namespace TimeStepping
      */
     virtual double evolve_one_time_step(
       std::vector<std_cxx1x::function<VECTOR (const double, const VECTOR &)> > &F,
-      std::vector<std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> > & J_inverse,
+      std::vector<std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> > &J_inverse,
       double t,
       double delta_t,
       VECTOR &y) = 0;
@@ -147,7 +147,7 @@ namespace TimeStepping
      */
     double evolve_one_time_step(
       std::vector<std_cxx1x::function<VECTOR (const double, const VECTOR &)> > &F,
-      std::vector<std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> > & J_inverse,
+      std::vector<std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> > &J_inverse,
       double t,
       double delta_t,
       VECTOR &y);

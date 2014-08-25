@@ -67,9 +67,9 @@ void FunctionParser<dim>::initialize (const std::string                   &varia
 
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string              &vars,
-				      const std::vector<std::string> &expressions,
-				      const std::map<std::string, double> &constants,
-				      const bool time_dependent)
+                                      const std::vector<std::string> &expressions,
+                                      const std::map<std::string, double> &constants,
+                                      const bool time_dependent)
 {
   initialize(vars, expressions, constants, time_dependent, false);
 }
@@ -83,7 +83,7 @@ namespace internal
   {
     return static_cast<int>(val + ((val>=0.0) ? 0.5 : -0.5) );
   }
-  
+
   double mu_if(double condition, double thenvalue, double elsevalue)
   {
     if (mu_round(condition))
@@ -91,17 +91,17 @@ namespace internal
     else
       return elsevalue;
   }
-  
+
   double mu_or(double left, double right)
   {
     return (mu_round(left)) || (mu_round(right));
   }
-  
+
   double mu_and(double left, double right)
   {
     return (mu_round(left)) && (mu_round(right));
   }
-  
+
   double mu_int(double value)
   {
     return static_cast<double>(mu_round(value));
@@ -144,19 +144,19 @@ void FunctionParser<dim>:: init_muparser() const
 {
   if (fp.get().size()>0)
     return;
-  
+
   fp.get().resize(this->n_components);
   vars.get().resize(var_names.size());
   for (unsigned int component=0; component<this->n_components; ++component)
     {
       for (std::map< std::string, double >::const_iterator constant = constants.begin();
-          constant != constants.end(); ++constant)
+           constant != constants.end(); ++constant)
         {
- 	  fp.get()[component].DefineConst(constant->first.c_str(), constant->second);
-	}
+          fp.get()[component].DefineConst(constant->first.c_str(), constant->second);
+        }
 
-      for (unsigned int iv=0;iv<var_names.size();++iv)
-	fp.get()[component].DefineVar(var_names[iv].c_str(), &vars.get()[iv]);
+      for (unsigned int iv=0; iv<var_names.size(); ++iv)
+        fp.get()[component].DefineVar(var_names[iv].c_str(), &vars.get()[iv]);
 
       // define some compatibility functions:
       fp.get()[component].DefineFun("if",internal::mu_if, true);
@@ -169,9 +169,9 @@ void FunctionParser<dim>:: init_muparser() const
       fp.get()[component].DefineFun("floor", internal::mu_floor, true);
       fp.get()[component].DefineFun("sec", internal::mu_sec, true);
       fp.get()[component].DefineFun("log", internal::mu_log, true);
-      
+
       try
-	{
+        {
           // muparser expects that functions have no
           // space between the name of the function and the opening
           // parenthesis. this is awkward because it is not backward
@@ -181,42 +181,44 @@ void FunctionParser<dim>:: init_muparser() const
           // we may find after function names
           std::string transformed_expression = expressions[component];
 
-          const char *function_names[] = {
-                                           // functions predefined by muparser
-                                           "sin",
-                                           "cos",
-                                           "tan",
-                                           "asin",
-                                           "acos",
-                                           "atan",
-                                           "sinh",
-                                           "cosh",
-                                           "tanh",
-                                           "asinh",
-                                           "acosh",
-                                           "atanh",
-                                           "atan2",
-                                           "log2",
-                                           "log10",
-                                           "log",
-                                           "ln",
-                                           "exp",
-                                           "sqrt",
-                                           "sign",
-                                           "rint",
-                                           "abs",
-                                           "min",
-                                           "max",
-                                           "sum",
-                                           "avg",
-                                           // functions we define ourselves above
-                                           "if",
-                                           "int",
-                                           "ceil",
-                                           "cot",
-                                           "csc",
-                                           "floor",
-                                           "sec"  };
+          const char *function_names[] =
+          {
+            // functions predefined by muparser
+            "sin",
+            "cos",
+            "tan",
+            "asin",
+            "acos",
+            "atan",
+            "sinh",
+            "cosh",
+            "tanh",
+            "asinh",
+            "acosh",
+            "atanh",
+            "atan2",
+            "log2",
+            "log10",
+            "log",
+            "ln",
+            "exp",
+            "sqrt",
+            "sign",
+            "rint",
+            "abs",
+            "min",
+            "max",
+            "sum",
+            "avg",
+            // functions we define ourselves above
+            "if",
+            "int",
+            "ceil",
+            "cot",
+            "csc",
+            "floor",
+            "sec"
+          };
           for (unsigned int f=0; f<sizeof(function_names)/sizeof(function_names[0]); ++f)
             {
               const std::string  function_name        = function_names[f];
@@ -232,8 +234,8 @@ void FunctionParser<dim>:: init_muparser() const
 
                   // replace whitespace until there no longer is any
                   while ((pos+function_name_length<transformed_expression.size())
-                      &&
-                      ((transformed_expression[pos+function_name_length] == ' ')
+                         &&
+                         ((transformed_expression[pos+function_name_length] == ' ')
                           ||
                           (transformed_expression[pos+function_name_length] == '\t')))
                     transformed_expression.erase (transformed_expression.begin()+pos+function_name_length);
@@ -245,17 +247,17 @@ void FunctionParser<dim>:: init_muparser() const
             }
 
           // now use the transformed expression
-	  fp.get()[component].SetExpr(transformed_expression);
-	}
+          fp.get()[component].SetExpr(transformed_expression);
+        }
       catch (mu::ParserError &e)
-	{
+        {
           std::cerr << "Message:  " << e.GetMsg() << "\n";
-	  std::cerr << "Formula:  " << e.GetExpr() << "\n";
-	  std::cerr << "Token:    " << e.GetToken() << "\n";
-	  std::cerr << "Position: " << e.GetPos() << "\n";
-	  std::cerr << "Errc:     " << e.GetCode() << std::endl;	  
-	  AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
-	}      
+          std::cerr << "Formula:  " << e.GetExpr() << "\n";
+          std::cerr << "Token:    " << e.GetToken() << "\n";
+          std::cerr << "Position: " << e.GetPos() << "\n";
+          std::cerr << "Errc:     " << e.GetCode() << std::endl;
+          AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
+        }
     }
 }
 
@@ -269,12 +271,12 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
                                       const bool use_degrees)
 {
   this->fp.clear(); // this will reset all thread-local objects
-  
+
   this->constants = constants;
   this->var_names = Utilities::split_string_list(variables, ',');
   this->expressions = expressions;
   AssertThrow(((time_dependent)?dim+1:dim) == var_names.size(),
-	      ExcMessage("wrong number of variables"));
+              ExcMessage("wrong number of variables"));
   AssertThrow(!use_degrees, ExcNotImplemented());
 
   // We check that the number of
@@ -308,7 +310,7 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
     n_vars = dim;
 
   init_muparser();
-  
+
   // Now set the initialization bit.
   initialized = true;
 }
@@ -390,7 +392,7 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
       std::cerr << "Formula:  " << e.GetExpr() << "\n";
       std::cerr << "Token:    " << e.GetToken() << "\n";
       std::cerr << "Position: " << e.GetPos() << "\n";
-      std::cerr << "Errc:     " << e.GetCode() << std::endl;	  
+      std::cerr << "Errc:     " << e.GetCode() << std::endl;
       AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
       return 0.0;
     }
@@ -414,7 +416,7 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
     vars.get()[i] = p(i);
   if (dim != n_vars)
     vars.get()[dim] = this->get_time();
-  
+
   for (unsigned int component = 0; component < this->n_components;
        ++component)
     values(component) = fp.get()[component].Eval();

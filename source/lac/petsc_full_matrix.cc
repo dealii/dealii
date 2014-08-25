@@ -39,7 +39,7 @@ namespace PETScWrappers
 
   void
   FullMatrix::reinit (const size_type m,
-		      const size_type n)
+                      const size_type n)
   {
     // get rid of old matrix and generate a
     // new one
@@ -55,13 +55,13 @@ namespace PETScWrappers
 
   void
   FullMatrix::do_reinit (const size_type m,
-			 const size_type n)
+                         const size_type n)
   {
     // use the call sequence indicating only a maximal number of
     // elements per row for all rows globally
     const int ierr
       = MatCreateSeqDense (PETSC_COMM_SELF, m, n, PETSC_NULL,
-			   &matrix);
+                           &matrix);
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }

@@ -126,7 +126,7 @@ namespace types
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   typedef unsigned char boundary_id;
-  
+
   /**
    * The type used to denote manifold indicators associated with every
    * object of the mesh.
@@ -138,7 +138,7 @@ namespace types
    */
   typedef unsigned int manifold_id;
 
-  
+
   /**
    * @deprecated Old name for the typedef above.
    */
@@ -274,7 +274,7 @@ namespace numbers
    * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   const types::manifold_id invalid_manifold_id = static_cast<types::manifold_id>(-1);
-  
+
   /**
    * A manifold_id we reserve for the default flat Cartesian manifold.
    *

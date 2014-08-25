@@ -155,33 +155,33 @@ namespace internal
                        types<2>::balance_type btype,
                        p4est_init_t init_fn);
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       static
       p4est_gloidx_t (&partition) (types<2>::forest *p4est,
                                    int partition_for_coarsening,
                                    p4est_weight_t weight_fn);
-#else 
+#else
       static
       void (&partition) (types<2>::forest *p4est,
                          int partition_for_coarsening,
                          p4est_weight_t weight_fn);
-#endif 
+#endif
 
       static
       void (&save) (const char *filename,
                     types<2>::forest *p4est,
                     int save_data);
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       static
       types<2>::forest *(&load_ext) (const char *filename,
-                                 MPI_Comm mpicomm,
-                                 size_t data_size,
-                                 int load_data,
-                                 int autopartition, 
-                                 int broadcasthead,
-                                 void *user_pointer,
-                                 types<2>::connectivity **p4est);
+                                     MPI_Comm mpicomm,
+                                     size_t data_size,
+                                     int load_data,
+                                     int autopartition,
+                                     int broadcasthead,
+                                     void *user_pointer,
+                                     types<2>::connectivity **p4est);
 #else
       static
       types<2>::forest *(&load) (const char *filename,
@@ -192,28 +192,28 @@ namespace internal
                                  types<2>::connectivity **p4est);
 #endif
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       static
       int (&connectivity_save) (const char *filename,
                                 types<2>::connectivity *connectivity);
-#else 
+#else
       static
       void (&connectivity_save) (const char *filename,
                                  types<2>::connectivity *connectivity);
-#endif 
+#endif
 
       static
       int (&connectivity_is_valid) (types<2>::connectivity *connectivity);
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       static
       types<2>::connectivity *(&connectivity_load) (const char *filename,
                                                     long unsigned *length);
-#else 
+#else
       static
       types<2>::connectivity *(&connectivity_load) (const char *filename,
                                                     long *length);
-#endif 
+#endif
 
       static
       unsigned int (&checksum) (types<2>::forest *p4est);
@@ -332,33 +332,33 @@ namespace internal
                                    p4est_init_t init_fn)
       = p4est_balance;
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
-   p4est_gloidx_t (&functions<2>::partition) (types<2>::forest *p4est,
-                                              int partition_for_coarsening,
-                                              p4est_weight_t weight_fn)
-      = p4est_partition_ext; 
-#else 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
+    p4est_gloidx_t (&functions<2>::partition) (types<2>::forest *p4est,
+                                               int partition_for_coarsening,
+                                               p4est_weight_t weight_fn)
+      = p4est_partition_ext;
+#else
     void (&functions<2>::partition) (types<2>::forest *p4est,
                                      int partition_for_coarsening,
                                      p4est_weight_t weight_fn)
       = p4est_partition_ext;
-#endif 
+#endif
 
     void (&functions<2>::save) (const char *filename,
                                 types<2>::forest *p4est,
                                 int save_data)
       = p4est_save;
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
     types<2>::forest *
     (&functions<2>::load_ext) (const char *filename,
-                           MPI_Comm mpicomm,
-                           std::size_t data_size,
-                           int load_data,
-                           int autopartition, 
-                           int broadcasthead,
-                           void *user_pointer,
-                           types<2>::connectivity **p4est)
+                               MPI_Comm mpicomm,
+                               std::size_t data_size,
+                               int load_data,
+                               int autopartition,
+                               int broadcasthead,
+                               void *user_pointer,
+                               types<2>::connectivity **p4est)
       = p4est_load_ext;
 #else
     types<2>::forest *
@@ -371,31 +371,31 @@ namespace internal
       = p4est_load;
 #endif
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
-   int (&functions<2>::connectivity_save) (const char *filename,
-                                           types<2>::connectivity *connectivity)
-      = p4est_connectivity_save; 
-#else 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
+    int (&functions<2>::connectivity_save) (const char *filename,
+                                            types<2>::connectivity *connectivity)
+      = p4est_connectivity_save;
+#else
     void (&functions<2>::connectivity_save) (const char *filename,
                                              types<2>::connectivity *connectivity)
       = p4est_connectivity_save;
-#endif 
+#endif
 
     int (&functions<2>::connectivity_is_valid) (types<2>::connectivity
                                                 *connectivity)
       = p4est_connectivity_is_valid;
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
     types<2>::connectivity *
     (&functions<2>::connectivity_load) (const char *filename,
                                         long unsigned *length)
       = p4est_connectivity_load;
-#else 
+#else
     types<2>::connectivity *
     (&functions<2>::connectivity_load) (const char *filename,
                                         long *length)
       = p4est_connectivity_load;
-#endif 
+#endif
 
     unsigned int (&functions<2>::checksum) (types<2>::forest *p4est)
       = p4est_checksum;
@@ -515,33 +515,33 @@ namespace internal
                        types<3>::balance_type btype,
                        p8est_init_t init_fn);
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       static
       p4est_gloidx_t (&partition) (types<3>::forest *p8est,
                                    int partition_for_coarsening,
                                    p8est_weight_t weight_fn);
-#else 
+#else
       static
       void (&partition) (types<3>::forest *p8est,
                          int partition_for_coarsening,
                          p8est_weight_t weight_fn);
-#endif 
+#endif
 
       static
       void (&save) (const char *filename,
                     types<3>::forest *p4est,
                     int save_data);
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       static
       types<3>::forest *(&load_ext) (const char *filename,
-                                 MPI_Comm mpicomm,
-                                 std::size_t data_size,
-                                 int load_data,
-                                 int autopartition, 
-                                 int broadcasthead,
-                                 void *user_pointer,
-                                 types<3>::connectivity **p4est);
+                                     MPI_Comm mpicomm,
+                                     std::size_t data_size,
+                                     int load_data,
+                                     int autopartition,
+                                     int broadcasthead,
+                                     void *user_pointer,
+                                     types<3>::connectivity **p4est);
 #else
       static
       types<3>::forest *(&load) (const char *filename,
@@ -552,28 +552,28 @@ namespace internal
                                  types<3>::connectivity **p4est);
 #endif
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       static
       int (&connectivity_save) (const char *filename,
                                 types<3>::connectivity *connectivity);
-#else 
+#else
       static
       void (&connectivity_save) (const char *filename,
                                  types<3>::connectivity *connectivity);
-#endif 
+#endif
 
       static
       int (&connectivity_is_valid) (types<3>::connectivity *connectivity);
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       static
       types<3>::connectivity *(&connectivity_load) (const char *filename,
                                                     long unsigned *length);
-#else 
+#else
       static
       types<3>::connectivity *(&connectivity_load) (const char *filename,
                                                     long *length);
-#endif 
+#endif
 
       static
       unsigned int (&checksum) (types<3>::forest *p8est);
@@ -695,33 +695,33 @@ namespace internal
                                    p8est_init_t init_fn)
       = p8est_balance;
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
     p4est_gloidx_t (&functions<3>::partition) (types<3>::forest *p8est,
                                                int partition_for_coarsening,
                                                p8est_weight_t weight_fn)
       = p8est_partition_ext;
-#else 
+#else
     void (&functions<3>::partition) (types<3>::forest *p8est,
                                      int partition_for_coarsening,
                                      p8est_weight_t weight_fn)
       = p8est_partition_ext;
-#endif 
+#endif
 
     void (&functions<3>::save) (const char *filename,
                                 types<3>::forest *p4est,
                                 int save_data)
       = p8est_save;
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
     types<3>::forest *
     (&functions<3>::load_ext) (const char *filename,
-                           MPI_Comm mpicomm,
-                           std::size_t data_size,
-                           int load_data,
-                           int autopartition, 
-                           int broadcasthead,
-                           void *user_pointer,
-                           types<3>::connectivity **p4est)
+                               MPI_Comm mpicomm,
+                               std::size_t data_size,
+                               int load_data,
+                               int autopartition,
+                               int broadcasthead,
+                               void *user_pointer,
+                               types<3>::connectivity **p4est)
       = p8est_load_ext;
 #else
     types<3>::forest *
@@ -734,31 +734,31 @@ namespace internal
       = p8est_load;
 #endif
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
     int (&functions<3>::connectivity_save) (const char *filename,
                                             types<3>::connectivity *connectivity)
       = p8est_connectivity_save;
-#else 
+#else
     void (&functions<3>::connectivity_save) (const char *filename,
                                              types<3>::connectivity *connectivity)
       = p8est_connectivity_save;
-#endif 
+#endif
 
     int (&functions<3>::connectivity_is_valid) (types<3>::connectivity
                                                 *connectivity)
       = p8est_connectivity_is_valid;
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3) 
+#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
     types<3>::connectivity *
     (&functions<3>::connectivity_load) (const char *filename,
                                         long unsigned *length)
       = p8est_connectivity_load;
-#else 
+#else
     types<3>::connectivity *
     (&functions<3>::connectivity_load) (const char *filename,
                                         long *length)
       = p8est_connectivity_load;
-#endif 
+#endif
 
     unsigned int (&functions<3>::checksum) (types<3>::forest *p8est)
       = p8est_checksum;
@@ -2145,13 +2145,13 @@ namespace parallel
       // instead need to filter over locally owned cells
       bool res_local = false;
       for (typename Triangulation<dim, spacedim>::active_cell_iterator cell = this->begin_active();
-	   (cell != this->end()) && (cell->level() < (int)(n_global_levels()-1));
-	   cell++)
-	if (cell->is_locally_owned())
-	  {
-	    res_local = true;
-	    break;
-	  }
+           (cell != this->end()) && (cell->level() < (int)(n_global_levels()-1));
+           cell++)
+        if (cell->is_locally_owned())
+          {
+            res_local = true;
+            break;
+          }
 
       // reduce over MPI
       bool res;
@@ -2271,9 +2271,9 @@ namespace parallel
 #if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
 #else
       AssertThrow(numcpus <= Utilities::MPI::n_mpi_processes (mpi_communicator),
-          ExcMessage("parallel::distributed::Triangulation::load() only supports loading "
-              "saved data with a greater or equal number of processes than were used to "
-              "save() when using p4est 0.3.4.2."));
+                  ExcMessage("parallel::distributed::Triangulation::load() only supports loading "
+                             "saved data with a greater or equal number of processes than were used to "
+                             "save() when using p4est 0.3.4.2."));
 #endif
 
       attached_data_size = 0;
@@ -3260,9 +3260,9 @@ namespace parallel
                                                             const CellStatus,
                                                             const void *)> &unpack_callback)
     {
-      Assert (offset >= sizeof(CellStatus), 
+      Assert (offset >= sizeof(CellStatus),
               ExcMessage ("invalid offset in notify_ready_to_unpack()"));
-      Assert (offset < sizeof(CellStatus)+attached_data_size, 
+      Assert (offset < sizeof(CellStatus)+attached_data_size,
               ExcMessage ("invalid offset in notify_ready_to_unpack()"));
       Assert (n_attached_datas > 0, ExcMessage ("notify_ready_to_unpack() called too often"));
 
@@ -3584,24 +3584,24 @@ namespace parallel
       // the first two arguments to the type p[48]est_iterate wants to see. this
       // cast is the identity cast in each of the two branches, so it is safe.
       switch (dim)
-      {
-      case 2:
-        p4est_iterate (reinterpret_cast<dealii::internal::p4est::types<2>::forest*>(this->parallel_forest),
-                       reinterpret_cast<dealii::internal::p4est::types<2>::ghost*>(this->parallel_ghost),
-                       static_cast<void *>(&fg),
-                       NULL, find_ghosts_face<2,spacedim>, find_ghosts_corner<2,spacedim>);
-        break;
+        {
+        case 2:
+          p4est_iterate (reinterpret_cast<dealii::internal::p4est::types<2>::forest *>(this->parallel_forest),
+                         reinterpret_cast<dealii::internal::p4est::types<2>::ghost *>(this->parallel_ghost),
+                         static_cast<void *>(&fg),
+                         NULL, find_ghosts_face<2,spacedim>, find_ghosts_corner<2,spacedim>);
+          break;
 
-      case 3:
-        p8est_iterate (reinterpret_cast<dealii::internal::p4est::types<3>::forest*>(this->parallel_forest),
-                       reinterpret_cast<dealii::internal::p4est::types<3>::ghost*>(this->parallel_ghost),
-                       static_cast<void *>(&fg),
-                       NULL, find_ghosts_face<3,spacedim>, find_ghosts_edge<3,spacedim>, find_ghosts_corner<3,spacedim>);
-        break;
+        case 3:
+          p8est_iterate (reinterpret_cast<dealii::internal::p4est::types<3>::forest *>(this->parallel_forest),
+                         reinterpret_cast<dealii::internal::p4est::types<3>::ghost *>(this->parallel_ghost),
+                         static_cast<void *>(&fg),
+                         NULL, find_ghosts_face<3,spacedim>, find_ghosts_edge<3,spacedim>, find_ghosts_corner<3,spacedim>);
+          break;
 
-      default:
-        Assert (false, ExcNotImplemented());
-      }
+        default:
+          Assert (false, ExcNotImplemented());
+        }
 
       sc_array_destroy (fg.subids);
     }

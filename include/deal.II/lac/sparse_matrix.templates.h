@@ -1051,7 +1051,7 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
             &B.val[new_cols-&sp_B.colnums[sp_B.rowstart[0]]];
           const numberB *const end_cols = &B.val[sp_B.rowstart[col+1]];
           for (; B_val_ptr != end_cols; ++B_val_ptr)
-            *new_ptr++ = A_val * *B_val_ptr * (use_vector ? V(col) : 1);
+            *new_ptr++ = A_val **B_val_ptr * (use_vector ? V(col) : 1);
 
           C.add (i, new_ptr-&new_entries[0], new_cols, &new_entries[0],
                  false, true);

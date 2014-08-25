@@ -32,7 +32,7 @@ namespace TimeStepping
   template <typename VECTOR>
   double RungeKutta<VECTOR>::evolve_one_time_step(
     std::vector<std_cxx1x::function<VECTOR (const double, const VECTOR &)> > &F,
-    std::vector<std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> > & J_inverse,
+    std::vector<std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> > &J_inverse,
     double t,
     double delta_t,
     VECTOR &y)
@@ -161,7 +161,7 @@ namespace TimeStepping
 
     // Linear combinations of the stages.
     for (unsigned int i=0; i<this->n_stages; ++i)
-      y.sadd(1.,delta_t*this->b[i],f_stages[i]);
+      y.sadd(1.,delta_t *this->b[i],f_stages[i]);
 
     return (t+delta_t);
   }
@@ -188,7 +188,7 @@ namespace TimeStepping
       {
         VECTOR Y(y);
         for (unsigned int j=0; j<i; ++j)
-          Y.sadd(1.,delta_t*this->a[i][j],f_stages[j]);
+          Y.sadd(1.,delta_t *this->a[i][j],f_stages[j]);
         // Evaluate the function f at the point (t+c[i]*delta_t,Y).
         f_stages[i] = f(t+this->c[i]*delta_t,Y);
       }
@@ -296,7 +296,7 @@ namespace TimeStepping
       {
         y = old_y;
         for (unsigned int i=0; i<this->n_stages; ++i)
-          y.sadd(1.,delta_t*this->b[i],f_stages[i]);
+          y.sadd(1.,delta_t *this->b[i],f_stages[i]);
       }
 
     return (t+delta_t);
@@ -335,7 +335,7 @@ namespace TimeStepping
       {
         VECTOR old_y(z);
         for (unsigned int j=0; j<i; ++j)
-          old_y.sadd(1.,delta_t*this->a[i][j],f_stages[j]);
+          old_y.sadd(1.,delta_t *this->a[i][j],f_stages[j]);
 
         // Solve the nonlinear system using Newton's method
         const double new_t = t+this->c[i]*delta_t;
@@ -705,8 +705,8 @@ namespace TimeStepping
 
         for (unsigned int i=0; i<this->n_stages; ++i)
           {
-            y.sadd(1.,delta_t*this->b1[i],f_stages[i]);
-            error.sadd(1.,delta_t*(b2[i]-b1[i]),f_stages[i]);
+            y.sadd(1.,delta_t *this->b1[i],f_stages[i]);
+            error.sadd(1.,delta_t *(b2[i]-b1[i]),f_stages[i]);
           }
 
         error_norm = error.l2_norm();
@@ -715,7 +715,7 @@ namespace TimeStepping
           {
             done = true;
             // Increase the guessed time step
-            double new_delta_t = delta_t*coarsen_param;
+            double new_delta_t = delta_t *coarsen_param;
             // Check that the guessed time step is smaller than the maximum time
             // step allowed.
             if (new_delta_t>max_delta_t)
@@ -825,7 +825,7 @@ namespace TimeStepping
       {
         Y = y;
         for (unsigned int j = 0; j < i; ++j)
-          Y.sadd(1.0,delta_t*this->a[i][j],f_stages[j]);
+          Y.sadd(1.0,delta_t *this->a[i][j],f_stages[j]);
         f_stages[i] = f(t+this->c[i]*delta_t,Y);
       }
   }

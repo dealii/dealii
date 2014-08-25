@@ -145,7 +145,7 @@ public:
    * same argument list as this present function.
    */
   void reinit (const size_type rows,
-	       const size_type cols);
+               const size_type cols);
 
   /**
    * Return the dimension of the range space. @note The matrix is of
@@ -452,10 +452,10 @@ public:
    * to be told to use LAPACK.
    */
   void compute_eigenvalues_symmetric (const number        lower_bound,
-				      const number        upper_bound,
-				      const number        abs_accuracy,
-				      Vector<number>     &eigenvalues,
-				      FullMatrix<number> &eigenvectors);
+                                      const number        upper_bound,
+                                      const number        abs_accuracy,
+                                      Vector<number>     &eigenvalues,
+                                      FullMatrix<number> &eigenvectors);
 
   /**
    * Compute generalized eigenvalues and eigenvectors of a real generalized
@@ -479,12 +479,12 @@ public:
    * to be told to use LAPACK.
    */
   void compute_generalized_eigenvalues_symmetric (LAPACKFullMatrix<number>     &B,
-						  const number                  lower_bound,
-						  const number                  upper_bound,
-						  const number                  abs_accuracy,
-						  Vector<number>               &eigenvalues,
-						  std::vector<Vector<number> > &eigenvectors,
-						  const int                     itype = 1);
+                                                  const number                  lower_bound,
+                                                  const number                  upper_bound,
+                                                  const number                  abs_accuracy,
+                                                  Vector<number>               &eigenvalues,
+                                                  std::vector<Vector<number> > &eigenvectors,
+                                                  const int                     itype = 1);
 
   /**
    * Same as the other compute_generalized_eigenvalues_symmetric function
@@ -503,8 +503,8 @@ public:
    * to be told to use LAPACK.
    */
   void compute_generalized_eigenvalues_symmetric (LAPACKFullMatrix<number>     &B,
-						  std::vector<Vector<number> > &eigenvectors,
-						  const int                     itype = 1);
+                                                  std::vector<Vector<number> > &eigenvectors,
+                                                  const int                     itype = 1);
 
   /**
    * Compute the singular value decomposition of the matrix using LAPACK
@@ -581,7 +581,7 @@ public:
                         const double        threshold   = 0.) const;
 
 private:
-  
+
   /**
    * Since LAPACK operations notoriously change the meaning of the
    * matrix entries, we record the current state after the last

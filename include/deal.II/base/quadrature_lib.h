@@ -451,10 +451,10 @@ class QSorted : public Quadrature<dim>
 public:
   /** The constructor takes an arbitrary quadrature formula. */
   QSorted (const Quadrature<dim>);
-  
+
   /** A rule to reorder pairs of points and weights.*/
   bool operator()(const std::pair<double, Point<dim> > &a,
-		  const std::pair<double, Point<dim> > &b);
+                  const std::pair<double, Point<dim> > &b);
 };
 
 

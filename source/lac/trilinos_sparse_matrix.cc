@@ -986,7 +986,7 @@ namespace TrilinosWrappers
         nonlocal_matrix->FillComplete(*column_space_map, matrix->RowMap());
         if (nonlocal_matrix_exporter.get() == 0)
           nonlocal_matrix_exporter.reset
-            (new Epetra_Export(nonlocal_matrix->RowMap(), matrix->RowMap()));
+          (new Epetra_Export(nonlocal_matrix->RowMap(), matrix->RowMap()));
         ierr = matrix->Export(*nonlocal_matrix, *nonlocal_matrix_exporter, mode);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
         ierr = matrix->FillComplete(*column_space_map, matrix->RowMap());

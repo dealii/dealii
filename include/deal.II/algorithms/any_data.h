@@ -176,8 +176,8 @@ public:
 
   /// List the contents to a stream
   template <class STREAM>
-  void list (STREAM& os) const;
-    
+  void list (STREAM &os) const;
+
   /// Conversion from old NamedData
   template <typename type>
   AnyData(const NamedData<type> &);
@@ -472,14 +472,14 @@ AnyData::merge(const AnyData &other)
 
 template <class STREAM>
 inline
-void AnyData::list(STREAM& os) const
+void AnyData::list(STREAM &os) const
 {
-  for (unsigned int i=0;i<names.size();++i)
+  for (unsigned int i=0; i<names.size(); ++i)
     {
       os << i
-	 << '\t' << names[i]
-	 << '\t' << data[i].type().name()
-	 << std::endl;
+         << '\t' << names[i]
+         << '\t' << data[i].type().name()
+         << std::endl;
     }
 }
 

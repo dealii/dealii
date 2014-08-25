@@ -26,7 +26,7 @@ namespace MeshWorker
   DoFInfo<dim,spacedim,number>::DoFInfo(const BlockInfo &info)
     :
     block_info(&info, typeid(*this).name()),
-    level_cell (false)    
+    level_cell (false)
   {
     indices_by_block.resize(info.local().size());
     for (unsigned int i=0; i<indices_by_block.size(); ++i)

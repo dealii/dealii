@@ -2102,10 +2102,10 @@ operator / (const Tensor<rank,dim> &t,
  * @relates Tensor
  */
 template <int rank, int dim>
-  inline
-  Tensor<rank,dim,std::complex<double> >
-  operator * (const std::complex<double>  factor,
-	      const Tensor<rank,dim>     &t)
+inline
+Tensor<rank,dim,std::complex<double> >
+operator * (const std::complex<double>  factor,
+            const Tensor<rank,dim>     &t)
 {
   Tensor<rank,dim,std::complex<double> > tt;
   for (unsigned int d=0; d<dim; ++d)
@@ -2122,10 +2122,10 @@ template <int rank, int dim>
  * @relates Tensor
  */
 template <int rank, int dim>
-  inline
-  Tensor<rank,dim,std::complex<double> >
-  operator * (const Tensor<rank,dim>     &t,
-	      const std::complex<double>  factor)
+inline
+Tensor<rank,dim,std::complex<double> >
+operator * (const Tensor<rank,dim>     &t,
+            const std::complex<double>  factor)
 {
   Tensor<rank,dim,std::complex<double> > tt;
   for (unsigned int d=0; d<dim; ++d)

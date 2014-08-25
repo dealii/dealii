@@ -82,7 +82,7 @@ namespace GridGenerator
   void hyper_cube (Triangulation<dim,spacedim>  &tria,
                    const double                  left = 0.,
                    const double                  right= 1.,
-		   const bool                    colorize= false);
+                   const bool                    colorize= false);
 
   /**
    * Same as hyper_cube(), but with the difference that not only one cell is
@@ -797,7 +797,7 @@ namespace GridGenerator
    */
   template <int dim, int spacedim1, int spacedim2>
   void flatten_triangulation(const Triangulation<dim,spacedim1> &in_tria,
-			     Triangulation<dim,spacedim2> &out_tria);
+                             Triangulation<dim,spacedim2> &out_tria);
 
   /**
    * @}
@@ -819,10 +819,10 @@ namespace GridGenerator
   template <template <int,int> class Container, int dim, int spacedim>
   struct ExtractBoundaryMesh
   {
-      typedef
-          std::map<typename Container<dim-1,spacedim>::cell_iterator,
-              typename Container<dim,spacedim>::face_iterator>
-          return_type;
+    typedef
+    std::map<typename Container<dim-1,spacedim>::cell_iterator,
+        typename Container<dim,spacedim>::face_iterator>
+        return_type;
   };
 #endif
 

@@ -674,17 +674,17 @@ namespace Step22
 
                   }
 
-		// For the right-hand side we use the fact that the shape
-		// functions are only non-zero in one component (because our
-		// elements are primitive).  Instead of multiplying the tensor
-		// representing the dim+1 values of shape function i with the
-		// whole right-hand side vector, we only look at the only
-		// non-zero component. The Function
-		// FiniteElement::system_to_component_index(i) will return
-		// which component this shape function lives in (0=x velocity,
-		// 1=y velocity, 2=pressure in 2d), which we use to pick out
-		// the correct component of the right-hand side vector to
-		// multiply with.
+                // For the right-hand side we use the fact that the shape
+                // functions are only non-zero in one component (because our
+                // elements are primitive).  Instead of multiplying the tensor
+                // representing the dim+1 values of shape function i with the
+                // whole right-hand side vector, we only look at the only
+                // non-zero component. The Function
+                // FiniteElement::system_to_component_index(i) will return
+                // which component this shape function lives in (0=x velocity,
+                // 1=y velocity, 2=pressure in 2d), which we use to pick out
+                // the correct component of the right-hand side vector to
+                // multiply with.
 
                 const unsigned int component_i =
                   fe.system_to_component_index(i).first;

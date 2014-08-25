@@ -128,7 +128,7 @@ namespace MeshWorker
      * it is provided to help develop application programs.
      */
     std::vector<std::string> output_names;
-      
+
     /**
      * This error is thrown if one of the virtual functions cell(),
      * boundary(), or face() is called without being overloaded in a

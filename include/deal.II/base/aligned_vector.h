@@ -327,7 +327,7 @@ namespace internal
       // never arrive here because they are non-trivial).
 
       if (std_cxx1x::is_trivial<T>::value == true)
-        std::memcpy ((void*)(destination_+begin), source_+begin,
+        std::memcpy ((void *)(destination_+begin), source_+begin,
                      (end-begin)*sizeof(T));
       else if (copy_only_ == false)
         for (std::size_t i=begin; i<end; ++i)
@@ -384,7 +384,7 @@ namespace internal
           // cast element to (void*) to silence compiler warning for virtual
           // classes (they will never arrive here because they are
           // non-trivial).
-          if (std::memcmp(zero, (void*)&element, sizeof(T)) == 0)
+          if (std::memcmp(zero, (void *)&element, sizeof(T)) == 0)
             trivial_element = true;
         }
       if (size < minimum_parallel_grain_size)
@@ -406,7 +406,7 @@ namespace internal
       // classes (they will never arrive here because they are
       // non-trivial).
       if (std_cxx1x::is_trivial<T>::value == true && trivial_element)
-        std::memset ((void*)(destination_+begin), 0, (end-begin)*sizeof(T));
+        std::memset ((void *)(destination_+begin), 0, (end-begin)*sizeof(T));
       else
         // initialize memory and set
         for (std::size_t i=begin; i<end; ++i)
@@ -476,7 +476,7 @@ AlignedVector<T>::AlignedVector (const AlignedVector<T> &vec)
 
 template < class T >
 inline
-AlignedVector<T>&
+AlignedVector<T> &
 AlignedVector<T>::operator = (const AlignedVector<T> &vec)
 {
   resize(0);
@@ -558,7 +558,7 @@ AlignedVector<T>::reserve (const size_type size_alloc)
       if (_end_data != _data)
         {
           dealii::internal::AlignedVectorMove<T>(new_data, new_data + old_size,
-						 _data);
+                                                 _data);
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL > 0
           _mm_free(new_data);
 #else
@@ -807,7 +807,7 @@ typename AlignedVector<T>::size_type
 AlignedVector<T>::memory_consumption () const
 {
   size_type memory = sizeof(*this);
-  for (const T* t = _data ; t != _end_data; ++t)
+  for (const T *t = _data ; t != _end_data; ++t)
     memory += dealii::MemoryConsumption::memory_consumption(*t);
   memory += sizeof(T) * (_end_allocated-_end_data);
   return memory;
@@ -829,7 +829,7 @@ bool operator == (const AlignedVector<T> &lhs,
   if (lhs.size() != rhs.size())
     return false;
   for (typename AlignedVector<T>::const_iterator lit = lhs.begin(),
-         rit = rhs.begin(); lit != lhs.end(); ++lit, ++rit)
+       rit = rhs.begin(); lit != lhs.end(); ++lit, ++rit)
     if (*lit != *rit)
       return false;
   return true;

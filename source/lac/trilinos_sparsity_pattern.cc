@@ -367,7 +367,7 @@ namespace TrilinosWrappers
 #if DEAL_II_TRILINOS_VERSION_GTE(11,9,0)
                                          , true
 #endif
-                                         ));
+                                        ));
     else
       graph.reset (new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
                                          n_entries_per_row, false));
@@ -418,7 +418,7 @@ namespace TrilinosWrappers
 #if DEAL_II_TRILINOS_VERSION_GTE(11,9,0)
                                         , true
 #endif
-                                        ));
+                                       ));
     else
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
                                         n_entries_per_row[max_my_gid(input_row_map)],
@@ -713,7 +713,7 @@ namespace TrilinosWrappers
           {
             // insert dummy element
             TrilinosWrappers::types::int_type row = nonlocal_graph->RowMap().MyGID(
-                static_cast<TrilinosWrappers::types::int_type> (0));
+                                                      static_cast<TrilinosWrappers::types::int_type> (0));
             nonlocal_graph->InsertGlobalIndices(row, 1, &row);
           }
         Assert(nonlocal_graph->IndicesAreGlobal() == true,

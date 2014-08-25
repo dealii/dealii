@@ -560,7 +560,7 @@ FE_FaceQ<1,spacedim>::fill_fe_subface_values (
   const typename Triangulation<1,spacedim>::cell_iterator &,
   const unsigned int ,
   const unsigned int ,
-  const Quadrature<0> & ,
+  const Quadrature<0> &,
   typename Mapping<1,spacedim>::InternalDataBase &,
   typename Mapping<1,spacedim>::InternalDataBase &,
   FEValuesData<1,spacedim> &) const

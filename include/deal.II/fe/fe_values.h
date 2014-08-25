@@ -2207,7 +2207,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_inverse_jacobians}
    */
   const std::vector<DerivativeForm<1,spacedim,dim> > &get_inverse_jacobians () const;
-  
+
   /**
    * For a face, return the outward normal vector to the cell at the
    * <tt>i</tt>th quadrature point.

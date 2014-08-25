@@ -2484,27 +2484,27 @@ const
   // indices of the degrees of
   // freedom.
   if (dim == 3)
-  {
-    const unsigned int p = source_fe.degree;
-    const unsigned int q = this->degree;
+    {
+      const unsigned int p = source_fe.degree;
+      const unsigned int q = this->degree;
 
-    for (unsigned int i = 0; i <q; ++i)
-      {
-        for (int j = 1; j < (int) GeometryInfo<dim>::lines_per_face; ++j)
-          interpolation_matrix (j * p + i,
-                                j * q + i) = 1.0;
+      for (unsigned int i = 0; i <q; ++i)
+        {
+          for (int j = 1; j < (int) GeometryInfo<dim>::lines_per_face; ++j)
+            interpolation_matrix (j * p + i,
+                                  j * q + i) = 1.0;
 
-        for (unsigned int j = 0; j < q-1; ++j)
-          {
-            interpolation_matrix (GeometryInfo<dim>::lines_per_face * p + i * (p - 1) + j,
-                                  GeometryInfo<dim>::lines_per_face * q + i * (q - 1) + j)
+          for (unsigned int j = 0; j < q-1; ++j)
+            {
+              interpolation_matrix (GeometryInfo<dim>::lines_per_face * p + i * (p - 1) + j,
+                                    GeometryInfo<dim>::lines_per_face * q + i * (q - 1) + j)
                 = 1.0;
-            interpolation_matrix (GeometryInfo<dim>::lines_per_face * p + i + (j + p - 1) * p,
-                                  GeometryInfo<dim>::lines_per_face * q + i + (j + q - 1) * q)
+              interpolation_matrix (GeometryInfo<dim>::lines_per_face * p + i + (j + p - 1) * p,
+                                    GeometryInfo<dim>::lines_per_face * q + i + (j + q - 1) * q)
                 = 1.0;
-          }
-      }
-  }
+            }
+        }
+    }
 }
 
 
@@ -2988,13 +2988,13 @@ FE_Nedelec<dim>
       // Restriction only for isotropic
       // refinement
 #ifdef DEBUG_NEDELEC
-  deallog << "Embedding" << std::endl;
+      deallog << "Embedding" << std::endl;
 #endif
       this_nonconst.reinit_restriction_and_prolongation_matrices ();
       // Fill prolongation matrices with embedding operators
       FETools::compute_embedding_matrices (this_nonconst, this_nonconst.prolongation, true);
 #ifdef DEBUG_NEDELEC
-  deallog << "Restriction" << std::endl;
+      deallog << "Restriction" << std::endl;
 #endif
       this_nonconst.initialize_restriction ();
     }
@@ -3038,13 +3038,13 @@ FE_Nedelec<dim>
       // Restriction only for isotropic
       // refinement
 #ifdef DEBUG_NEDELEC
-  deallog << "Embedding" << std::endl;
+      deallog << "Embedding" << std::endl;
 #endif
       this_nonconst.reinit_restriction_and_prolongation_matrices ();
       // Fill prolongation matrices with embedding operators
       FETools::compute_embedding_matrices (this_nonconst, this_nonconst.prolongation, true);
 #ifdef DEBUG_NEDELEC
-  deallog << "Restriction" << std::endl;
+      deallog << "Restriction" << std::endl;
 #endif
       this_nonconst.initialize_restriction ();
     }
@@ -5564,7 +5564,7 @@ FE_Nedelec<dim>::get_constant_modes() const
   for (unsigned int d=0; d<dim; ++d)
     components.push_back(d);
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, components);
+         (constant_modes, components);
 }
 
 

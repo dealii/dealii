@@ -136,7 +136,7 @@ public:
    * and DoFHandler are embedded in.
    */
   static const unsigned int space_dimension = DH::space_dimension;
-  
+
   /**
    * Typedef to the iterator type
    * of the dof handler class under

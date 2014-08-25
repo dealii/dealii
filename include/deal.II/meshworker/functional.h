@@ -126,10 +126,10 @@ namespace MeshWorker
        */
       void initialize(AnyData &results, bool separate_faces = true);
 
-	/**
-	 * @deprecated
-	 */
-	void initialize(NamedData<BlockVector<number>*> &results,
+      /**
+       * @deprecated
+       */
+      void initialize(NamedData<BlockVector<number>*> &results,
                       bool separate_faces = true);
       /**
        * Initialize the local data
@@ -234,7 +234,7 @@ namespace MeshWorker
         {
           Assert(r.name(1) == "faces", AnyData::ExcNameMismatch(1, "faces"));
           AssertDimension(r.entry<BlockVector<double>*>(0)->n_blocks(),
-			  r.entry<BlockVector<double>*>(1)->n_blocks());
+                          r.entry<BlockVector<double>*>(1)->n_blocks());
         }
 
       results = r;
@@ -271,15 +271,15 @@ namespace MeshWorker
     inline void
     CellsAndFaces<number>::assemble(const DOFINFO &info)
     {
-      BlockVector<double>* v;
+      BlockVector<double> *v;
       if (separate_faces &&
-	  info.face_number != deal_II_numbers::invalid_unsigned_int)
-	v = results.entry<BlockVector<double>*>(1);
+          info.face_number != deal_II_numbers::invalid_unsigned_int)
+        v = results.entry<BlockVector<double>*>(1);
       else
-	v = results.entry<BlockVector<double>*>(0);
-      
+        v = results.entry<BlockVector<double>*>(0);
+
       for (unsigned int i=0; i<info.n_values(); ++i)
-	v->block(i)(info.cell->user_index()) += info.value(i);
+        v->block(i)(info.cell->user_index()) += info.value(i);
     }
 
 
@@ -293,7 +293,7 @@ namespace MeshWorker
         {
           if (separate_faces)
             {
-	      BlockVector<double>* v1 = results.entry<BlockVector<double>*>(1);
+              BlockVector<double> *v1 = results.entry<BlockVector<double>*>(1);
               const double J = info1.value(i) + info2.value(i);
               v1->block(i)(info1.face->user_index()) += J;
               if (info2.face != info1.face)
@@ -301,7 +301,7 @@ namespace MeshWorker
             }
           else
             {
-	      BlockVector<double>* v0 = results.entry<BlockVector<double>*>(0);
+              BlockVector<double> *v0 = results.entry<BlockVector<double>*>(0);
               v0->block(i)(info1.cell->user_index()) += .5*info1.value(i);
               v0->block(i)(info2.cell->user_index()) += .5*info2.value(i);
             }

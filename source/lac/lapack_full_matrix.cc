@@ -40,7 +40,7 @@ LAPACKFullMatrix<number>::LAPACKFullMatrix (const size_type n)
 
 template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix (const size_type m,
-					    const size_type n)
+                                            const size_type n)
   :
   TransposeTable<number> (m, n),
   state (matrix)
@@ -77,7 +77,7 @@ LAPACKFullMatrix<number>::reinit (const size_type n)
 template <typename number>
 void
 LAPACKFullMatrix<number>::reinit (const size_type m,
-				  const size_type n)
+                                  const size_type n)
 {
   this->TransposeTable<number>::reinit (m, n);
   state = LAPACKSupport::matrix;
@@ -607,7 +607,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
 template <typename number>
 void
 LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
-					      const bool left)
+                                              const bool left)
 {
   Assert(state == matrix, ExcState(state));
   const int nn = this->n_cols();
@@ -677,10 +677,10 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
 template <typename number>
 void
 LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lower_bound,
-							const number        upper_bound,
-							const number        abs_accuracy,
-							Vector<number>     &eigenvalues,
-							FullMatrix<number> &eigenvectors)
+                                                        const number        upper_bound,
+                                                        const number        abs_accuracy,
+                                                        Vector<number>     &eigenvalues,
+                                                        FullMatrix<number> &eigenvectors)
 {
   Assert(state == matrix, ExcState(state));
   const int nn = (this->n_cols() > 0 ? this->n_cols() : 1);

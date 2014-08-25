@@ -991,13 +991,13 @@ namespace
     // volume relative to |v01|*|v02|*|v03|. the test checks the
     // squares of these to avoid taking norms/square roots:
     if (std::abs((v03 * normal) * (v03 * normal) /
-		 (v03.square() * v01.square() * v02.square()))
-	>=
-	1e-24)
+                 (v03.square() * v01.square() * v02.square()))
+        >=
+        1e-24)
       {
-	Assert (false,
-		ExcMessage("Computing the measure of a nonplanar face is not implemented!"));
-	return std::numeric_limits<double>::quiet_NaN();
+        Assert (false,
+                ExcMessage("Computing the measure of a nonplanar face is not implemented!"));
+        return std::numeric_limits<double>::quiet_NaN();
       }
 
     // the face is planar. then its area is 1/2 of the norm of the
@@ -1009,7 +1009,7 @@ namespace
   }
 
 
-  
+
   template <int structdim, int dim, int spacedim>
   double
   measure (const TriaAccessor<structdim, dim, spacedim> &)

@@ -610,7 +610,7 @@ ChunkSparseMatrix<number>::extract_row_copy (const size_type row,
   const size_type reduced_row = row/chunk_size;
 
   SparsityPattern::iterator it = cols->sparsity_pattern.begin(reduced_row),
-    itend = cols->sparsity_pattern.end(reduced_row);
+                            itend = cols->sparsity_pattern.end(reduced_row);
   const number *val_ptr = &val[(it-cols->sparsity_pattern.begin(0))*chunk_size*chunk_size
                                +(row%chunk_size)*chunk_size];
 

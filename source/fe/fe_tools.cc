@@ -116,7 +116,7 @@ namespace
 
   template <int dim>
   void
-  fill_no_codim_fe_names (std::map<std::string,std_cxx1x::shared_ptr<const Subscriptor> >& result)
+  fill_no_codim_fe_names (std::map<std::string,std_cxx1x::shared_ptr<const Subscriptor> > &result)
   {
     typedef std_cxx1x::shared_ptr<const Subscriptor> FEFactoryPointer;
 
@@ -151,7 +151,7 @@ namespace
   // nonzero codimension.
   template <int dim, int spacedim>
   void
-  fill_codim_fe_names (std::map<std::string,std_cxx1x::shared_ptr<const Subscriptor> >& result)
+  fill_codim_fe_names (std::map<std::string,std_cxx1x::shared_ptr<const Subscriptor> > &result)
   {
     typedef std_cxx1x::shared_ptr<const Subscriptor> FEFactoryPointer;
 
@@ -169,30 +169,30 @@ namespace
   // through all legal dimension/spacedimension pairs and fills
   // fe_name_map[dimension][spacedimension] with the maps generated
   // by the functions above.
-std::vector<std::vector<
-		std::map<std::string,
-			 std_cxx1x::shared_ptr<const Subscriptor> > > >
-fill_default_map()
-{
   std::vector<std::vector<
+  std::map<std::string,
+      std_cxx1x::shared_ptr<const Subscriptor> > > >
+      fill_default_map()
+  {
+    std::vector<std::vector<
     std::map<std::string,
-	     std_cxx1x::shared_ptr<const Subscriptor> > > >
-    result(4);
+        std_cxx1x::shared_ptr<const Subscriptor> > > >
+        result(4);
 
-  for (unsigned int d=0;d<4;++d)
-    result[d].resize(4);
-  
-  fill_no_codim_fe_names<1> (result[1][1]);
-  fill_no_codim_fe_names<2> (result[2][2]);
-  fill_no_codim_fe_names<3> (result[3][3]);
-  
-  fill_codim_fe_names<1,2> (result[1][2]);
-  fill_codim_fe_names<1,3> (result[1][3]);
-  fill_codim_fe_names<2,3> (result[2][3]);
-    
-  return result;
-}
-  
+    for (unsigned int d=0; d<4; ++d)
+      result[d].resize(4);
+
+    fill_no_codim_fe_names<1> (result[1][1]);
+    fill_no_codim_fe_names<2> (result[2][2]);
+    fill_no_codim_fe_names<3> (result[3][3]);
+
+    fill_codim_fe_names<1,2> (result[1][2]);
+    fill_codim_fe_names<1,3> (result[1][3]);
+    fill_codim_fe_names<2,3> (result[2][3]);
+
+    return result;
+  }
+
 
   // have a lock that guarantees that at most one thread is changing
   // and accessing the fe_name_map variable. make this lock local to
@@ -227,9 +227,9 @@ fill_default_map()
   // each dimension and then separate between them further down
   static
   std::vector<std::vector<
-		std::map<std::string,
-			 std_cxx1x::shared_ptr<const Subscriptor> > > >
-  fe_name_map = fill_default_map();
+  std::map<std::string,
+      std_cxx1x::shared_ptr<const Subscriptor> > > >
+      fe_name_map = fill_default_map();
 }
 
 
@@ -392,8 +392,8 @@ namespace FETools
       for (unsigned int m=0; m<element.element_multiplicity(b); ++m)
         {
           block_data[count++] = (return_start_indices)
-                            ? k
-                            : (element.base_element(b).n_dofs_per_cell());
+                                ? k
+                                : (element.base_element(b).n_dofs_per_cell());
           k += element.base_element(b).n_dofs_per_cell();
         }
     Assert (count == element.n_blocks(), ExcInternalError());
@@ -931,9 +931,9 @@ namespace FETools
       for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
         {
           const unsigned int offset_c = GeometryInfo<dim>::face_to_cell_vertices(face_coarse, i)
-                                          *fe.dofs_per_vertex;
+                                        *fe.dofs_per_vertex;
           const unsigned int offset_f = GeometryInfo<dim>::face_to_cell_vertices(face_fine, i)
-                                          *fe.dofs_per_vertex;
+                                        *fe.dofs_per_vertex;
           for (unsigned int j=0; j<fe.dofs_per_vertex; ++j)
             {
               face_c_dofs[face_dof] = offset_c + j;
@@ -944,11 +944,11 @@ namespace FETools
       for (unsigned int i=1; i<=GeometryInfo<dim>::lines_per_face; ++i)
         {
           const unsigned int offset_c = fe.first_line_index
-              + GeometryInfo<dim>::face_to_cell_lines(face_coarse, i-1)
-              *fe.dofs_per_line;
+                                        + GeometryInfo<dim>::face_to_cell_lines(face_coarse, i-1)
+                                        *fe.dofs_per_line;
           const unsigned int offset_f = fe.first_line_index
-              + GeometryInfo<dim>::face_to_cell_lines(face_fine, i-1)
-              *fe.dofs_per_line;
+                                        + GeometryInfo<dim>::face_to_cell_lines(face_fine, i-1)
+                                        *fe.dofs_per_line;
           for (unsigned int j=0; j<fe.dofs_per_line; ++j)
             {
               face_c_dofs[face_dof] = offset_c + j;
@@ -959,11 +959,11 @@ namespace FETools
       for (unsigned int i=1; i<=GeometryInfo<dim>::quads_per_face; ++i)
         {
           const unsigned int offset_c = fe.first_quad_index
-              + face_coarse
-              *fe.dofs_per_quad;
+                                        + face_coarse
+                                        *fe.dofs_per_quad;
           const unsigned int offset_f = fe.first_quad_index
-              + face_fine
-              *fe.dofs_per_quad;
+                                        + face_fine
+                                        *fe.dofs_per_quad;
           for (unsigned int j=0; j<fe.dofs_per_quad; ++j)
             {
               face_c_dofs[face_dof] = offset_c + j;
@@ -1482,8 +1482,8 @@ namespace FETools
             // argument, which defaults to 1,
             // so this properly returns
             // FE_Nothing()
-	    const Subscriptor* ptr = fe_name_map.find(name_part)->second.get();
-	    const FEFactoryBase<dim,spacedim>* fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
+            const Subscriptor *ptr = fe_name_map.find(name_part)->second.get();
+            const FEFactoryBase<dim,spacedim> *fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
             return fef->get(1);
           }
         else
@@ -1505,9 +1505,9 @@ namespace FETools
                 const std::pair<int,unsigned int> tmp
                   = Utilities::get_integer_at_position (name, 0);
                 name.erase(0, tmp.second+1);
-		const Subscriptor* ptr = fe_name_map.find(name_part)->second.get();
-		const FEFactoryBase<dim,spacedim>* fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
-		return fef->get(tmp.first);
+                const Subscriptor *ptr = fe_name_map.find(name_part)->second.get();
+                const FEFactoryBase<dim,spacedim> *fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
+                return fef->get(tmp.first);
               }
             else
               {
@@ -1520,9 +1520,9 @@ namespace FETools
                       = Utilities::get_integer_at_position (name, 0);
                     // delete "))"
                     name.erase(0, tmp.second+2);
-		    const Subscriptor* ptr = fe_name_map.find(name_part)->second.get();
-		    const FEFactoryBase<dim,spacedim>* fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
-		    return fef->get(QGaussLobatto<1>(tmp.first));
+                    const Subscriptor *ptr = fe_name_map.find(name_part)->second.get();
+                    const FEFactoryBase<dim,spacedim> *fef=dynamic_cast<const FEFactoryBase<dim,spacedim>*>(ptr);
+                    return fef->get(QGaussLobatto<1>(tmp.first));
                   }
                 else
                   {
@@ -1549,7 +1549,7 @@ namespace FETools
       template <int dim,int spacedim>
       FiniteElement<dim,spacedim> *get_fe_from_name (std::string &name)
       {
-	return get_fe_from_name_ext<dim,spacedim> (name, fe_name_map[dim][spacedim]);
+        return get_fe_from_name_ext<dim,spacedim> (name, fe_name_map[dim][spacedim]);
       }
     }
   }
@@ -1635,7 +1635,7 @@ namespace FETools
   {
     return get_fe_by_name<dim,dim> (parameter_name);
   }
-  
+
 
   template <int dim, int spacedim>
   void
@@ -1889,14 +1889,14 @@ namespace FETools
 
   template <int dim>
   void
-  hierarchic_to_lexicographic_numbering (unsigned int degree, std::vector<unsigned int>& h2l)
+  hierarchic_to_lexicographic_numbering (unsigned int degree, std::vector<unsigned int> &h2l)
   {
     // number of support points in each
     // direction
     const unsigned int n = degree+1;
 
     unsigned int dofs_per_cell = n;
-    for (unsigned int i=1;i<dim;++i)
+    for (unsigned int i=1; i<dim; ++i)
       dofs_per_cell *= n;
 
     // Assert size maches degree

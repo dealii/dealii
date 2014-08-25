@@ -2728,7 +2728,7 @@ namespace Step44
           // We've chosen by default a SSOR preconditioner as it appears to
           // provide the fastest solver convergence characteristics for this
           // problem on a single-thread machine.  However, this might not be
-	  // true for different problem sizes.
+          // true for different problem sizes.
           PreconditionSelector<SparseMatrix<double>, Vector<double> >
           preconditioner (parameters.preconditioner_type,
                           parameters.preconditioner_relaxation);

@@ -994,7 +994,7 @@ void PointValueHistory<dim>
             }
 
           for (std::map <std::string, std::vector <std::vector <double> > >::iterator
-              data_store_begin = data_store.begin (); data_store_begin != data_store.end (); ++data_store_begin)
+               data_store_begin = data_store.begin (); data_store_begin != data_store.end (); ++data_store_begin)
             {
               typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(data_store_begin->first);
               unsigned int n_stored = mask->second.n_selected_components();
@@ -1029,7 +1029,7 @@ void PointValueHistory<dim>
                 }
 
               for (std::map <std::string, std::vector <std::vector <double> > >::iterator
-                    data_store_begin = data_store.begin ();
+                   data_store_begin = data_store.begin ();
                    data_store_begin != data_store.end (); ++data_store_begin)
                 {
                   typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(data_store_begin->first);

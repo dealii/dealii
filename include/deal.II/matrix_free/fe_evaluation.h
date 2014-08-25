@@ -619,7 +619,7 @@ protected:
    * or before distributing them into a result vector). The methods
    * get_dof_value() and submit_dof_value() read from or write to this field.
    */
-  VectorizedArray<Number>* values_dofs[n_components];
+  VectorizedArray<Number> *values_dofs[n_components];
 
   /**
    * This field stores the values of the finite element function on quadrature
@@ -627,7 +627,7 @@ protected:
    * integrating. The methods get_value() and submit_value() access this
    * field.
    */
-  VectorizedArray<Number>* values_quad[n_components];
+  VectorizedArray<Number> *values_quad[n_components];
 
   /**
    * This field stores the gradients of the finite element function on
@@ -636,14 +636,14 @@ protected:
    * some specializations like get_symmetric_gradient() or get_divergence())
    * access this field.
    */
-  VectorizedArray<Number>* gradients_quad[n_components][dim];
+  VectorizedArray<Number> *gradients_quad[n_components][dim];
 
   /**
    * This field stores the Hessians of the finite element function on
    * quadrature points after applying unit cell transformations. The methods
    * get_hessian(), get_laplacian(), get_hessian_diagonal() access this field.
    */
-  VectorizedArray<Number>* hessians_quad[n_components][(dim*(dim+1))/2];
+  VectorizedArray<Number> *hessians_quad[n_components][(dim*(dim+1))/2];
 
   /**
    * Stores the number of the quadrature formula of the present cell.
@@ -827,7 +827,7 @@ protected:
    * A temporary data structure necessary to read degrees of freedom when no
    * MatrixFree object was given at initialization.
    */
-   mutable std::vector<types::global_dof_index> local_dof_indices;
+  mutable std::vector<types::global_dof_index> local_dof_indices;
 };
 
 
@@ -1433,8 +1433,8 @@ public:
   FEEvaluationGeneral (const MatrixFree<dim,Number> &matrix_free,
                        const unsigned int            fe_no   = 0,
                        const unsigned int            quad_no = 0) DEAL_II_DEPRECATED
-    :
-    BaseClass (matrix_free, fe_no, quad_no)
+:
+  BaseClass (matrix_free, fe_no, quad_no)
   {}
 
   /**
@@ -1443,8 +1443,8 @@ public:
   FEEvaluationGeneral (const MappingFEEvaluation<dim,Number> &geometry,
                        const DoFHandler<dim>                 &dof_handler,
                        const unsigned int                     first_selected_component = 0) DEAL_II_DEPRECATED
-    :
-    BaseClass (geometry, dof_handler, first_selected_component)
+:
+  BaseClass (geometry, dof_handler, first_selected_component)
   {}
 };
 
@@ -1474,8 +1474,8 @@ public:
   FEEvaluationGL (const MatrixFree<dim,Number> &matrix_free,
                   const unsigned int          fe_no   = 0,
                   const unsigned int          quad_no = 0) DEAL_II_DEPRECATED
-    :
-    BaseClass (matrix_free, fe_no, quad_no)
+:
+  BaseClass (matrix_free, fe_no, quad_no)
   {}
 
   /**
@@ -1484,8 +1484,8 @@ public:
   FEEvaluationGL (const MappingFEEvaluation<dim,Number> &geometry,
                   const DoFHandler<dim>                 &dof_handler,
                   const unsigned int                     first_selected_component = 0) DEAL_II_DEPRECATED
-    :
-    BaseClass (geometry, dof_handler, first_selected_component)
+:
+  BaseClass (geometry, dof_handler, first_selected_component)
   {}
 };
 
@@ -1541,8 +1541,8 @@ public:
   FEEvaluationDGP (const MatrixFree<dim,Number> &matrix_free,
                    const unsigned int            fe_no   = 0,
                    const unsigned int            quad_no = 0) DEAL_II_DEPRECATED
-    :
-    BaseClass (matrix_free, fe_no, quad_no)
+:
+  BaseClass (matrix_free, fe_no, quad_no)
   {}
 
   /**
@@ -1551,8 +1551,8 @@ public:
   FEEvaluationDGP (const MappingFEEvaluation<dim,Number> &geometry,
                    const DoFHandler<dim>                 &dof_handler,
                    const unsigned int                     first_selected_component = 0) DEAL_II_DEPRECATED
-    :
-    BaseClass (geometry, dof_handler, first_selected_component)
+:
+  BaseClass (geometry, dof_handler, first_selected_component)
   {}
 };
 
@@ -3521,7 +3521,7 @@ FEEvaluationAccess<dim,1,Number>
 template <int dim, typename Number>
 inline
 FEEvaluationAccess<dim,1,Number>
-::FEEvaluationAccess (const FEEvaluationAccess<dim,1,Number>&other)
+::FEEvaluationAccess (const FEEvaluationAccess<dim,1,Number> &other)
   :
   FEEvaluationBase <dim,1,Number>(other)
 {}
@@ -3755,7 +3755,7 @@ FEEvaluationAccess<dim,dim,Number>
 template <int dim, typename Number>
 inline
 FEEvaluationAccess<dim,dim,Number>
-::FEEvaluationAccess (const FEEvaluationAccess<dim,dim,Number>&other)
+::FEEvaluationAccess (const FEEvaluationAccess<dim,dim,Number> &other)
   :
   FEEvaluationBase <dim,dim,Number>(other)
 {}
@@ -4085,11 +4085,11 @@ namespace internal
    * products are implemented.
    */
   enum EvaluatorVariant
-    {
-      evaluate_general,
-      evaluate_symmetric,
-      evaluate_evenodd
-    };
+  {
+    evaluate_general,
+    evaluate_symmetric,
+    evaluate_evenodd
+  };
 
   /**
    * Generic evaluator framework
@@ -4161,9 +4161,9 @@ namespace internal
                        const Number in [],
                        Number       out []);
 
-    const Number * shape_values;
-    const Number * shape_gradients;
-    const Number * shape_hessians;
+    const Number *shape_values;
+    const Number *shape_gradients;
+    const Number *shape_hessians;
   };
 
   // evaluates the given shape data in 1d-3d using the tensor product
@@ -4368,9 +4368,9 @@ namespace internal
     hessians (const Number in [],
               Number       out[]) const;
 
-    const Number * shape_values;
-    const Number * shape_gradients;
-    const Number * shape_hessians;
+    const Number *shape_values;
+    const Number *shape_gradients;
+    const Number *shape_hessians;
   };
 
 
@@ -4960,9 +4960,9 @@ namespace internal
                        const Number  in [],
                        Number        out []);
 
-    const Number * shape_values;
-    const Number * shape_gradients;
-    const Number * shape_hessians;
+    const Number *shape_values;
+    const Number *shape_gradients;
+    const Number *shape_hessians;
   };
 
 
@@ -5257,7 +5257,7 @@ namespace internal
     const EvaluatorVariant variant =
       EvaluatorSelector<type,(fe_degree+n_q_points_1d>4)>::variant;
     typedef EvaluatorTensorProduct<variant, dim, fe_degree, n_q_points_1d,
-                                   VectorizedArray<Number> > Eval;
+            VectorizedArray<Number> > Eval;
     Eval eval (variant == evaluate_evenodd ? shape_info.shape_val_evenodd :
                shape_info.shape_values,
                variant == evaluate_evenodd ? shape_info.shape_gra_evenodd :
@@ -5459,7 +5459,7 @@ namespace internal
     const EvaluatorVariant variant =
       EvaluatorSelector<type,(fe_degree+n_q_points_1d>4)>::variant;
     typedef EvaluatorTensorProduct<variant, dim, fe_degree, n_q_points_1d,
-                                   VectorizedArray<Number> > Eval;
+            VectorizedArray<Number> > Eval;
     Eval eval (variant == evaluate_evenodd ? shape_info.shape_val_evenodd :
                shape_info.shape_values,
                variant == evaluate_evenodd ? shape_info.shape_gra_evenodd :
@@ -5473,7 +5473,7 @@ namespace internal
     VectorizedArray<Number> temp2[temp_size];
 
     // expand dof_values to tensor product for truncated tensor products
-    VectorizedArray<Number> ** values_dofs = values_dofs_actual;
+    VectorizedArray<Number> **values_dofs = values_dofs_actual;
     VectorizedArray<Number> data_array[type!=MatrixFreeFunctions::truncated_tensor ? 1 :
                                        n_components*Eval::dofs_per_cell];
     VectorizedArray<Number> *expanded_dof_values[n_components];
@@ -5613,7 +5613,7 @@ namespace internal
   // operation is identity, which allows us to write shorter code.
   template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
   struct FEEvaluationImpl<MatrixFreeFunctions::tensor_gausslobatto, dim,
-                          fe_degree, n_q_points_1d, n_components, Number>
+    fe_degree, n_q_points_1d, n_components, Number>
   {
     static
     void evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
@@ -5639,17 +5639,17 @@ namespace internal
   void
   FEEvaluationImpl<MatrixFreeFunctions::tensor_gausslobatto, dim,
                    fe_degree, n_q_points_1d, n_components, Number>
-  ::evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-              VectorizedArray<Number> *values_dofs[],
-              VectorizedArray<Number> *values_quad[],
-              VectorizedArray<Number> *gradients_quad[][dim],
-              VectorizedArray<Number> *hessians_quad[][(dim*(dim+1))/2],
-              const bool               evaluate_val,
-              const bool               evaluate_grad,
-              const bool               evaluate_lapl)
+                   ::evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+                               VectorizedArray<Number> *values_dofs[],
+                               VectorizedArray<Number> *values_quad[],
+                               VectorizedArray<Number> *gradients_quad[][dim],
+                               VectorizedArray<Number> *hessians_quad[][(dim*(dim+1))/2],
+                               const bool               evaluate_val,
+                               const bool               evaluate_grad,
+                               const bool               evaluate_lapl)
   {
     typedef EvaluatorTensorProduct<evaluate_evenodd, dim, fe_degree, fe_degree+1,
-                                   VectorizedArray<Number> > Eval;
+            VectorizedArray<Number> > Eval;
     Eval eval (shape_info.shape_val_evenodd, shape_info.shape_gra_evenodd,
                shape_info.shape_hes_evenodd);
 
@@ -5766,15 +5766,15 @@ namespace internal
   void
   FEEvaluationImpl<MatrixFreeFunctions::tensor_gausslobatto, dim,
                    fe_degree, n_q_points_1d, n_components, Number>
-  ::integrate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-               VectorizedArray<Number> *values_dofs[],
-               VectorizedArray<Number> *values_quad[],
-               VectorizedArray<Number> *gradients_quad[][dim],
-               const bool               integrate_val,
-               const bool               integrate_grad)
+                   ::integrate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+                                VectorizedArray<Number> *values_dofs[],
+                                VectorizedArray<Number> *values_quad[],
+                                VectorizedArray<Number> *gradients_quad[][dim],
+                                const bool               integrate_val,
+                                const bool               integrate_grad)
   {
     typedef EvaluatorTensorProduct<evaluate_evenodd, dim, fe_degree, fe_degree+1,
-                                   VectorizedArray<Number> > Eval;
+            VectorizedArray<Number> > Eval;
     Eval eval (shape_info.shape_val_evenodd, shape_info.shape_gra_evenodd,
                shape_info.shape_hes_evenodd);
 
@@ -5846,7 +5846,7 @@ namespace internal
                                                        values_dofs[comp]);
             }
         break;
-        
+
       default:
         AssertThrow(false, ExcNotImplemented());
       }
@@ -5939,56 +5939,56 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
     case internal::MatrixFreeFunctions::tensor_symmetric:
       evaluate_funct =
         internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric,
-                                   dim, fe_degree, n_q_points_1d, n_components_,
-                                   Number>::evaluate;
+        dim, fe_degree, n_q_points_1d, n_components_,
+        Number>::evaluate;
       integrate_funct =
         internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric,
-                                   dim, fe_degree, n_q_points_1d, n_components_,
-                                   Number>::integrate;
+        dim, fe_degree, n_q_points_1d, n_components_,
+        Number>::integrate;
       break;
 
     case internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0:
       evaluate_funct =
         internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-                                   dim, fe_degree, n_q_points_1d, n_components_,
-                                   Number>::evaluate;
+        dim, fe_degree, n_q_points_1d, n_components_,
+        Number>::evaluate;
       integrate_funct =
         internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-                                   dim, fe_degree, n_q_points_1d, n_components_,
-                                   Number>::integrate;
+        dim, fe_degree, n_q_points_1d, n_components_,
+        Number>::integrate;
       break;
 
     case internal::MatrixFreeFunctions::tensor_general:
       evaluate_funct =
         internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-                                   dim, fe_degree, n_q_points_1d, n_components_,
-                                   Number>::evaluate;
+        dim, fe_degree, n_q_points_1d, n_components_,
+        Number>::evaluate;
       integrate_funct =
         internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-                                   dim, fe_degree, n_q_points_1d, n_components_,
-                                   Number>::integrate;
+        dim, fe_degree, n_q_points_1d, n_components_,
+        Number>::integrate;
       break;
 
     case internal::MatrixFreeFunctions::tensor_gausslobatto:
       evaluate_funct =
         internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_gausslobatto,
-                                   dim, fe_degree, n_q_points_1d, n_components_,
-                                   Number>::evaluate;
+        dim, fe_degree, n_q_points_1d, n_components_,
+        Number>::evaluate;
       integrate_funct =
         internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_gausslobatto,
-                                   dim, fe_degree, n_q_points_1d, n_components_,
-                                   Number>::integrate;
+        dim, fe_degree, n_q_points_1d, n_components_,
+        Number>::integrate;
       break;
 
     case internal::MatrixFreeFunctions::truncated_tensor:
       evaluate_funct =
         internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
-                                   dim, fe_degree, n_q_points_1d, n_components_,
-                                   Number>::evaluate;
+        dim, fe_degree, n_q_points_1d, n_components_,
+        Number>::evaluate;
       integrate_funct =
         internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
-                                   dim, fe_degree, n_q_points_1d, n_components_,
-                                   Number>::integrate;
+        dim, fe_degree, n_q_points_1d, n_components_,
+        Number>::integrate;
       break;
 
     default:

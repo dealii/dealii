@@ -164,46 +164,46 @@ void second_grid ()
       cell = triangulation.begin_active(),
       endc = triangulation.end();
       for (; cell!=endc; ++cell)
-	{
-	  // @note Writing a loop like this requires a lot of typing, but it
-	  // is the only way of doing it in C++98 and C++03. However, if you
-	  // have a C++11-compliant compiler, you can also use the C++11
-	  // range-based for loop style that requires significantly less
-	  // typing. Take a look at @ref CPP11 "the deal.II C++11 page" to see
-	  // how this works.
-	  //
-	  // Next, we want to loop over all vertices of the cells. Since we are
-	  // in 2d, we know that each cell has exactly four vertices. However,
-	  // instead of penning down a 4 in the loop bound, we make a first
-	  // attempt at writing it in a dimension-independent way by which we
-	  // find out about the number of vertices of a cell. Using the
-	  // GeometryInfo class, we will later have an easier time getting the
-	  // program to also run in 3d: we only have to change all occurrences
-	  // of <code>&lt;2&gt;</code> to <code>&lt;3&gt;</code>, and do not
-	  // have to audit our code for the hidden appearance of magic numbers
-	  // like a 4 that needs to be replaced by an 8:
-	  for (unsigned int v=0;
-	       v < GeometryInfo<2>::vertices_per_cell;
-	       ++v)
-	    {
-	      // If this cell is at the inner boundary, then at least one of its
-	      // vertices must sit on the inner ring and therefore have a radial
-	      // distance from the center of exactly 0.5, up to floating point
-	      // accuracy. Compute this distance, and if we have found a vertex
-	      // with this property flag this cell for later refinement. We can
-	      // then also break the loop over all vertices and move on to the
-	      // next cell.
-	      const double distance_from_center
-		= center.distance (cell->vertex(v));
+        {
+          // @note Writing a loop like this requires a lot of typing, but it
+          // is the only way of doing it in C++98 and C++03. However, if you
+          // have a C++11-compliant compiler, you can also use the C++11
+          // range-based for loop style that requires significantly less
+          // typing. Take a look at @ref CPP11 "the deal.II C++11 page" to see
+          // how this works.
+          //
+          // Next, we want to loop over all vertices of the cells. Since we are
+          // in 2d, we know that each cell has exactly four vertices. However,
+          // instead of penning down a 4 in the loop bound, we make a first
+          // attempt at writing it in a dimension-independent way by which we
+          // find out about the number of vertices of a cell. Using the
+          // GeometryInfo class, we will later have an easier time getting the
+          // program to also run in 3d: we only have to change all occurrences
+          // of <code>&lt;2&gt;</code> to <code>&lt;3&gt;</code>, and do not
+          // have to audit our code for the hidden appearance of magic numbers
+          // like a 4 that needs to be replaced by an 8:
+          for (unsigned int v=0;
+               v < GeometryInfo<2>::vertices_per_cell;
+               ++v)
+            {
+              // If this cell is at the inner boundary, then at least one of its
+              // vertices must sit on the inner ring and therefore have a radial
+              // distance from the center of exactly 0.5, up to floating point
+              // accuracy. Compute this distance, and if we have found a vertex
+              // with this property flag this cell for later refinement. We can
+              // then also break the loop over all vertices and move on to the
+              // next cell.
+              const double distance_from_center
+                = center.distance (cell->vertex(v));
 
-	      if (std::fabs(distance_from_center - inner_radius) < 1e-10)
-		{
-		  cell->set_refine_flag ();
-		  break;
-		}
-	    }
-	}
-      
+              if (std::fabs(distance_from_center - inner_radius) < 1e-10)
+                {
+                  cell->set_refine_flag ();
+                  break;
+                }
+            }
+        }
+
       // Now that we have marked all the cells that we want refined, we let
       // the triangulation actually do this refinement. The function that does
       // so owes its long name to the fact that one can also mark cells for
@@ -220,7 +220,7 @@ void second_grid ()
   GridOut grid_out;
   grid_out.write_eps (triangulation, out);
 
-  std::cout << "Grid written to grid-2.eps" << std::endl;  
+  std::cout << "Grid written to grid-2.eps" << std::endl;
 
   // At this point, all objects created in this function will be destroyed in
   // reverse order. Unfortunately, we defined the boundary object after the

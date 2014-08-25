@@ -81,7 +81,7 @@ FE_DGVector<POLY,dim,spacedim>::get_dpo_vector (const unsigned int deg)
 template <class POLY, int dim, int spacedim>
 bool
 FE_DGVector<POLY,dim,spacedim>::has_support_on_face (const unsigned int,
-						     const unsigned int) const
+                                                     const unsigned int) const
 {
   return true;
 }
