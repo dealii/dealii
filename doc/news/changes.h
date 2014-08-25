@@ -97,6 +97,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Updated: The version of BOOST that comes bundled with deal.II has 
+  been updated to 1.56.0.
+  <br>
+  (Wolfgang Bangerth, 2014/08/19)
+  </li>
+
   <li> New: There is now a GridGenerator::flatten_triangulation()
   taking a Triangulation<dim, spacedim_1> as input and returning
   a Triangulation<dim, spacedim_2> as output. The output

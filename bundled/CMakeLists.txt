@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -29,6 +29,7 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
     )
 
   ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/serialization/src)
+  ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/system/src)
 
   IF(DEAL_II_WITH_ZLIB)
     ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/iostreams/src)
