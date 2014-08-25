@@ -1,2 +1,101 @@
 <h1>Results</h1>
 
+Running the program produces a mesh file <code>mesh.vtu</code> that we can
+visualize with any of the usual visualization programs that can read the VTU
+file format. If one just looks at the mesh itself, it is actually very difficult
+to see anything that doesn't just look like a perfectly round piece of a
+sphere (though if one modified the program so that it does produce a sphere and
+looked at them at the same time, the difference between the overall sphere and
+WGS 84 shape is quite apparent). Apparently, Earth is actually quite a flat place.
+Of course we already know this from satellite pictures. 
+However, we can tease out something more by
+coloring cells by their volume. This both produces slight variations in hue
+along the top surface and something for the visualization programs to apply
+their shading algorithms to (because the top surfaces of the cells are now no
+longer just tangential to a sphere but tilted):
+
+<img src="http://www.dealii.org/images/steps/developer/step-53.mesh.png" alt="">
+
+Yet, at least as far as visualizations are concerned, this is still not too
+impressive. Rather, let us visualize things in a way so that we show the
+actual elevation along the top surface. In other words, we want a picture like
+this, with an incredible amount of detail:
+
+<img src="http://www.dealii.org/images/steps/developer/step-53.topo.png" alt="">
+
+This image was produced with three small modifications: 
+<ol>
+  <li> An addition seventh mesh refinement towards the top surface,
+  
+  <li> The addition of the following piece function that, given a point 
+  <code>x</code> computes the elevation by converting the point to
+  reference WGS 84 coordinates and only keeping the depth variable (the
+  function is, consequently, a simplified version of the
+  <code>AfricaGeometry::pull_back_wgs84()</code> version:
+
+@code
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
+
+
+double get_elevation (const Point<3> &x)
+  {
+    const double R           = 6378137;
+    const double ellipticity = 8.1819190842622e-2;
+
+    const double b     = std::sqrt(R * R * (1 - ellipticity * ellipticity));
+    const double ep    = std::sqrt((R * R - b * b) / (b * b));
+    const double p     = std::sqrt(x(0) * x(0) + x(1) * x(1));
+    const double th    = std::atan2(R * x(2), b * p);
+    const double theta = std::atan2((x(2) + ep * ep * b * std::sin(th) * std::sin(th) * std::sin(th)),
+                                      (p - (ellipticity * ellipticity * R  * (std::cos(th) * std::cos(th) * std::cos(th)))));
+    const double R_bar = R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) * std::sin(theta)));
+    const double R_plus_d = p / std::cos(theta);
+
+    return R_plus_d - R_bar;
+  }
+@endcode
+
+  <li>Adding the following piece to the bottom of the <code>run()</code> function:
+
+@code
+      FE_Q<3>       fe(1);
+      DoFHandler<3> dof_handler (triangulation);
+      dof_handler.distribute_dofs(fe);
+
+      Vector<double> elevation (dof_handler.n_dofs());
+      {
+        std::map<unsigned int,double> boundary_values;
+        VectorTools::interpolate_boundary_values(dof_handler,
+                                                 5,
+                                                 ScalarFunctionFromFunctionObject<3>(get_elevation),
+                                                 boundary_values);
+        for (std::map<unsigned int,double>::const_iterator p = boundary_values.begin(); 
+             p!=boundary_values.end(); ++p)
+          elevation[p->first] = p->second;
+      }
+
+      DataOut<3>    data_out;
+      data_out.attach_dof_handler(dof_handler);
+      data_out.add_data_vector (elevation, "elevation");
+      data_out.build_patches();
+
+      std::ofstream out ("data.vtu");
+      data_out.write_vtu (out);
+@endcode
+</ol>
+This last piece of code first creates a $Q_1$ finite element space on the mesh.
+It then (ab)uses VectorTools::interpolate_boundary_values() to evaluate the
+elevation function for every node at the top boundary (the one with boundary
+indicator 5). We here wrap the call to <code>get_elevation()</code> with the
+ScalarFunctionFromFunctionObject class to make a regular C++ function look
+like an object of a class derived from the Function class that we want
+to use in VectorTools::interpolate_boundary_values(). Having so gotten a list
+of degrees of freedom located at the top boundary and corresponding elevation
+values, we just go down this list and set these elevations in the 
+<code>elevation</code> vector (leaving all interior degrees of freedom at
+their original zero value). This vector is then output using DataOut as
+usual and can be visualized as shown above.
+
