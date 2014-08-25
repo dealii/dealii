@@ -47,8 +47,8 @@ class Implicit : public Operator<Vector<double> >
 public:
   Implicit(const FullMatrix<double> &matrix);
   void operator() (AnyData &out, const AnyData &in);
-    
-  private:
+
+private:
   SmartPointer<const FullMatrix<double>, Implicit> matrix;
   FullMatrix<double> m;
 };
@@ -93,7 +93,7 @@ Explicit::Explicit(const FullMatrix<double> &M)
 void
 Explicit::operator() (AnyData &out, const AnyData &in)
 {
-  const double timestep = *in.read_ptr<double>("Timestep");  
+  const double timestep = *in.read_ptr<double>("Timestep");
   if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
     {
       m.equ(-timestep, *matrix);
@@ -102,7 +102,7 @@ Explicit::operator() (AnyData &out, const AnyData &in)
     }
   this->notifications.clear();
   m.vmult(*out.entry<Vector<double>*>(0),
-	  *in.read_ptr<Vector<double> >("Previous iterate"));
+          *in.read_ptr<Vector<double> >("Previous iterate"));
 }
 
 
@@ -117,7 +117,7 @@ Implicit::Implicit(const FullMatrix<double> &M)
 void
 Implicit::operator() (AnyData &out, const AnyData &in)
 {
-  const double timestep = *in.read_ptr<double>("Timestep");  
+  const double timestep = *in.read_ptr<double>("Timestep");
   if (this->notifications.test(Events::initial) || this->notifications.test(Events::new_timestep_size))
     {
       m.equ(timestep, *matrix);
@@ -127,7 +127,7 @@ Implicit::operator() (AnyData &out, const AnyData &in)
     }
   this->notifications.clear();
   m.vmult(*out.entry<Vector<double>*>(0),
-	  *in.read_ptr<Vector<double> >("Previous time"));
+          *in.read_ptr<Vector<double> >("Previous time"));
 }
 
 

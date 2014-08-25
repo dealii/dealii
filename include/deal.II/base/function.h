@@ -115,7 +115,7 @@ template <int rank, int dim, typename Number> class TensorFunction;
  */
 template <int dim, typename Number=double>
 class Function : public FunctionTime<Number>,
-		 public Subscriptor
+  public Subscriptor
 {
 public:
   /**
@@ -231,7 +231,7 @@ public:
    * given point.
    */
   virtual Tensor<1,dim, Number> gradient (const Point<dim, Number>   &p,
-                                  const unsigned int  component = 0) const;
+                                          const unsigned int  component = 0) const;
 
   /**
    * Return the gradient of all components of the function at the given
@@ -353,7 +353,7 @@ public:
                                   std::vector<Vector<Number> >   &values) const;
 
   virtual Tensor<1,dim, Number> gradient (const Point<dim, Number> &p,
-                                  const unsigned int component = 0) const;
+                                          const unsigned int component = 0) const;
 
   virtual void vector_gradient (const Point<dim, Number>            &p,
                                 std::vector<Tensor<1,dim, Number> > &gradients) const;

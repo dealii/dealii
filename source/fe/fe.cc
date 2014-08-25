@@ -561,7 +561,7 @@ face_to_cell_index (const unsigned int face_index,
           ExcIndexRange(face_index, 0, this->dofs_per_face));
   Assert (face < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
- 
+
 //TODO: we could presumably solve the 3d case below using the
 // adjust_quad_dof_index_for_face_orientation_table field. for the
 // 2d case, we can't use adjust_line_dof_index_for_line_orientation_table
@@ -570,7 +570,7 @@ face_to_cell_index (const unsigned int face_index,
 // DoFTools::make_periodicity_constraints, for example). so we
 // would need to either fill this field, or rely on derived classes
 // implementing this function, as we currently do
- 
+
   // see the function's documentation for an explanation of this
   // assertion -- in essence, derived classes have to implement
   // an overloaded version of this function if we are to use any
@@ -581,7 +581,7 @@ face_to_cell_index (const unsigned int face_index,
                         "Rather, the derived class you are using must provide "
                         "an overloaded version but apparently hasn't done so. See "
                         "the documentation of this function for more information."));
- 
+
   // we need to distinguish between DoFs on vertices, lines and in 3d quads.
   // do so in a sequence of if-else statements
   if (face_index < this->first_face_line_index)
@@ -591,7 +591,7 @@ face_to_cell_index (const unsigned int face_index,
       // along with the number of the DoF on this vertex
       const unsigned int face_vertex         = face_index / this->dofs_per_vertex;
       const unsigned int dof_index_on_vertex = face_index % this->dofs_per_vertex;
- 
+
       // then get the number of this vertex on the cell and translate
       // this to a DoF number on the cell
       return (GeometryInfo<dim>::face_to_cell_vertices(face, face_vertex,
@@ -608,10 +608,10 @@ face_to_cell_index (const unsigned int face_index,
       // do the same kind of translation as before. we need to only consider
       // DoFs on the lines, i.e., ignoring those on the vertices
       const unsigned int index = face_index - this->first_face_line_index;
- 
+
       const unsigned int face_line         = index / this->dofs_per_line;
       const unsigned int dof_index_on_line = index % this->dofs_per_line;
- 
+
       return (this->first_line_index
               + GeometryInfo<dim>::face_to_cell_lines(face, face_line,
                                                       face_orientation,
@@ -625,19 +625,19 @@ face_to_cell_index (const unsigned int face_index,
     // DoF is on a quad
     {
       Assert (dim >= 3, ExcInternalError());
- 
+
       // ignore vertex and line dofs
       const unsigned int index = face_index - this->first_face_quad_index;
- 
+
       return (this->first_quad_index
               + face * this->dofs_per_quad
               + index);
     }
 }
- 
- 
- 
- 
+
+
+
+
 template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim,spacedim>::adjust_quad_dof_index_for_face_orientation (const unsigned int index,
@@ -1109,8 +1109,8 @@ FiniteElement<dim,spacedim>::get_constant_modes () const
 {
   Assert (false, ExcNotImplemented());
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (Table<2,bool>(this->n_components(), this->dofs_per_cell),
-     std::vector<unsigned int>(this->n_components()));
+         (Table<2,bool>(this->n_components(), this->dofs_per_cell),
+          std::vector<unsigned int>(this->n_components()));
 }
 
 

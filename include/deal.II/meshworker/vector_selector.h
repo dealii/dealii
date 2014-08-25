@@ -212,7 +212,7 @@ namespace MeshWorker
      * @note Make sure the VectorSelector base class was filled with
      * reasonable data before calling this function.
      */
-    void initialize(const AnyData&);
+    void initialize(const AnyData &);
 
     /**
      * Virtual, but empty destructor.
@@ -356,9 +356,9 @@ namespace MeshWorker
       const unsigned int start,
       const unsigned int size) const;
 
-     /**
-     * The memory used by this object.
-     */
+    /**
+    * The memory used by this object.
+    */
     std::size_t memory_consumption () const;
   };
 
@@ -373,7 +373,7 @@ namespace MeshWorker
    */
   template <class VECTOR, int dim, int spacedim = dim>
   class MGVectorData :
-      public VectorData<VECTOR, dim, spacedim>
+    public VectorData<VECTOR, dim, spacedim>
   {
   public:
     /**

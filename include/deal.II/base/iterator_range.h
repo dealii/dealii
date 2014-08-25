@@ -124,7 +124,7 @@ public:
    * as discussed in the design sections of the IteratorRange class.
    */
   class IteratorOverIterators : public std::iterator<std::forward_iterator_tag, Iterator,
-                                                     typename Iterator::difference_type>
+    typename Iterator::difference_type>
   {
   public:
     /**
@@ -152,13 +152,13 @@ public:
      * Dereferencing operator.
      * @return The iterator within the collection currently pointed to.
      */
-    const BaseIterator * operator-> () const;
+    const BaseIterator *operator-> () const;
 
     /**
      * Prefix increment operator. Move the current iterator to the next
      * element of the collection and return the new value.
      */
-    IteratorOverIterators & operator ++ ();
+    IteratorOverIterators &operator ++ ();
 
     /**
      * Postfix increment operator. Move the current iterator to the next

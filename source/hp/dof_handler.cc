@@ -1780,7 +1780,7 @@ namespace hp
       IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
       (begin_active(level), end_active(level));
   }
-  
+
 
 
 
@@ -2668,7 +2668,7 @@ namespace hp
       for (; cell != endc; ++cell)
         next_free_dof
           = dealii::internal::hp::DoFHandler::Implementation::distribute_dofs_on_cell<spacedim> (cell,
-            next_free_dof);
+              next_free_dof);
 
       number_cache.n_global_dofs = next_free_dof;
     }
@@ -3303,7 +3303,7 @@ namespace hp
             // checking whether it has children now but didn't have
             // children before refinement (the has_children array is
             // set in pre-refinement action)
-	    //
+            //
             // Note: Although one level is added to
             // the DoFHandler levels, when the
             // triangulation got one, for the buffer
@@ -3325,8 +3325,8 @@ namespace hp
                 // allowed for inactive cells, but we can access this
                 // information from the DoFLevels directly
                 for (unsigned int i = 0; i < cell->n_children(); ++i)
-		  cell->child (i)->set_active_fe_index
-		    (levels[cell->level()]->active_fe_index (cell->index()));
+                  cell->child (i)->set_active_fe_index
+                  (levels[cell->level()]->active_fe_index (cell->index()));
               }
           }
       }

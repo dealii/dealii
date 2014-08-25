@@ -380,45 +380,45 @@ void Step3::assemble_system ()
       // global right hand side to zero, before we fill them:
       cell_matrix = 0;
       cell_rhs = 0;
-      
+
       // Now it is time to start integration over the cell, which we
       // do by looping over all quadrature points, which we will
       // number by q_index.
       for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
-	{
-	  // First assemble the matrix: For the Laplace problem, the
-	  // matrix on each cell is the integral over the gradients of
-	  // shape function i and j. Since we do not integrate, but
-	  // rather use quadrature, this is the sum over all
-	  // quadrature points of the integrands times the determinant
-	  // of the Jacobian matrix at the quadrature point times the
-	  // weight of this quadrature point. You can get the gradient
-	  // of shape function $i$ at quadrature point with number q_index by
-	  // using <code>fe_values.shape_grad(i,q_index)</code>; this
-	  // gradient is a 2-dimensional vector (in fact it is of type
-	  // Tensor@<1,dim@>, with here dim=2) and the product of two
-	  // such vectors is the scalar product, i.e. the product of
-	  // the two shape_grad function calls is the dot
-	  // product. This is in turn multiplied by the Jacobian
-	  // determinant and the quadrature point weight (that one
-	  // gets together by the call to FEValues::JxW() ). Finally,
-	  // this is repeated for all shape functions $i$ and $j$:
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (fe_values.shape_grad (i, q_index) *
-				   fe_values.shape_grad (j, q_index) *
-				   fe_values.JxW (q_index));
+        {
+          // First assemble the matrix: For the Laplace problem, the
+          // matrix on each cell is the integral over the gradients of
+          // shape function i and j. Since we do not integrate, but
+          // rather use quadrature, this is the sum over all
+          // quadrature points of the integrands times the determinant
+          // of the Jacobian matrix at the quadrature point times the
+          // weight of this quadrature point. You can get the gradient
+          // of shape function $i$ at quadrature point with number q_index by
+          // using <code>fe_values.shape_grad(i,q_index)</code>; this
+          // gradient is a 2-dimensional vector (in fact it is of type
+          // Tensor@<1,dim@>, with here dim=2) and the product of two
+          // such vectors is the scalar product, i.e. the product of
+          // the two shape_grad function calls is the dot
+          // product. This is in turn multiplied by the Jacobian
+          // determinant and the quadrature point weight (that one
+          // gets together by the call to FEValues::JxW() ). Finally,
+          // this is repeated for all shape functions $i$ and $j$:
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              cell_matrix(i,j) += (fe_values.shape_grad (i, q_index) *
+                                   fe_values.shape_grad (j, q_index) *
+                                   fe_values.JxW (q_index));
 
-	  // We then do the same thing for the right hand side. Here,
-	  // the integral is over the shape function i times the right
-	  // hand side function, which we choose to be the function
-	  // with constant value one (more interesting examples will
-	  // be considered in the following programs).
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    cell_rhs(i) += (fe_values.shape_value (i, q_index) *
-			    1 *
-			    fe_values.JxW (q_index));
-	}
+          // We then do the same thing for the right hand side. Here,
+          // the integral is over the shape function i times the right
+          // hand side function, which we choose to be the function
+          // with constant value one (more interesting examples will
+          // be considered in the following programs).
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            cell_rhs(i) += (fe_values.shape_value (i, q_index) *
+                            1 *
+                            fe_values.JxW (q_index));
+        }
       // Now that we have the contribution of this cell, we have to transfer
       // it to the global matrix and right hand side. To this end, we first
       // have to find out which global numbers the degrees of freedom on this

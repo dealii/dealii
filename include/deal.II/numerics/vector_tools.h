@@ -563,11 +563,11 @@ namespace VectorTools
    */
   template<typename VECTOR, typename DH>
   void
-  interpolate_based_on_material_id(const Mapping<DH::dimension, DH::space_dimension>&                          mapping,
-                                   const DH&                                                                   dof_handler,
-                                   const std::map< types::material_id, const Function<DH::space_dimension,double>* >& function_map,
-                                   VECTOR&                                                                     dst,
-                                   const ComponentMask&                                                        component_mask = ComponentMask());
+  interpolate_based_on_material_id(const Mapping<DH::dimension, DH::space_dimension>                          &mapping,
+                                   const DH                                                                   &dof_handler,
+                                   const std::map< types::material_id, const Function<DH::space_dimension,double>* > &function_map,
+                                   VECTOR                                                                     &dst,
+                                   const ComponentMask                                                        &component_mask = ComponentMask());
 
   /**
    * Gives the interpolation of a
@@ -1520,7 +1520,7 @@ namespace VectorTools
    * once.
    *
    * The forth parameter describes the boundary function that is used for
-   * computing these constraints. 
+   * computing these constraints.
    *
    * The mapping argument is used to compute the boundary points where the
    * function needs to request the normal vector $\vec n$ from the boundary
@@ -1719,7 +1719,7 @@ namespace VectorTools
                                                typename FunctionMap<spacedim>::type &function_map,
                                                ConstraintMatrix      &constraints,
                                                const Mapping<dim, spacedim>    &mapping = StaticMappingQ1<dim>::mapping);
-  
+
   /**
    * Same as above for homogeneous tangential-flux constraints.
    *

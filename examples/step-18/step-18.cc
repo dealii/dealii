@@ -1474,9 +1474,9 @@ namespace Step18
     // step number, and finally the processor id (encoded as a three digit
     // number):
     std::string filename = "solution-" + Utilities::int_to_string(timestep_no,4)
-			   + "." + Utilities::int_to_string(this_mpi_process,3)
-			   + ".vtu";
-    
+                           + "." + Utilities::int_to_string(this_mpi_process,3)
+                           + ".vtu";
+
     // The following assertion makes sure that there are less than 1000
     // processes (a very conservative check, but worth having anyway) as our
     // scheme of generating process numbers would overflow if there were 1000
@@ -1489,7 +1489,7 @@ namespace Step18
     // the largest computations with the most processors in optimized mode,
     // and we should check our assumptions in this particular case, and not
     // only when running in debug mode:
-    AssertThrow (n_mpi_processes < 1000, ExcNotImplemented());    
+    AssertThrow (n_mpi_processes < 1000, ExcNotImplemented());
 
     // With the so-completed filename, let us open a file and write the data
     // we have generated into it:
@@ -1500,39 +1500,39 @@ namespace Step18
     // so we do this on processor 0:
     if (this_mpi_process==0)
       {
-	// Here we collect all filenames of the current timestep (same format as above)
-	std::vector<std::string> filenames;
+        // Here we collect all filenames of the current timestep (same format as above)
+        std::vector<std::string> filenames;
         for (unsigned int i=0; i<n_mpi_processes; ++i)
           filenames.push_back ("solution-" + Utilities::int_to_string(timestep_no,4)
-			       + "." + Utilities::int_to_string(i,3)
-			       + ".vtu");
+                               + "." + Utilities::int_to_string(i,3)
+                               + ".vtu");
 
-	// Now we write the .visit file. The naming is similar to the .vtu files, only
-	// that the file obviously doesn't contain a processor id.
+        // Now we write the .visit file. The naming is similar to the .vtu files, only
+        // that the file obviously doesn't contain a processor id.
         const std::string
         visit_master_filename = ("solution-" +
-				 Utilities::int_to_string(timestep_no,4) +
+                                 Utilities::int_to_string(timestep_no,4) +
                                  ".visit");
         std::ofstream visit_master (visit_master_filename.c_str());
         data_out.write_visit_record (visit_master, filenames);
 
-	// Similarly, we write the paraview .pvtu:
+        // Similarly, we write the paraview .pvtu:
         const std::string
         pvtu_master_filename = ("solution-" +
-				Utilities::int_to_string(timestep_no,4) +
+                                Utilities::int_to_string(timestep_no,4) +
                                 ".pvtu");
         std::ofstream pvtu_master (pvtu_master_filename.c_str());
         data_out.write_pvtu_record (pvtu_master, filenames);
 
-	// Finally, we write the paraview record, that references all .pvtu files and
-	// their respective time. Note that the variable times_and_names is declared
-	// static, so it will retain the entries from the pervious timesteps.
-	static std::vector<std::pair<double,std::string> > times_and_names;
-	times_and_names.push_back (std::pair<double,std::string> (present_time, pvtu_master_filename));
-	std::ofstream pvd_output ("solution.pvd");
-	data_out.write_pvd_record (pvd_output, times_and_names);
+        // Finally, we write the paraview record, that references all .pvtu files and
+        // their respective time. Note that the variable times_and_names is declared
+        // static, so it will retain the entries from the pervious timesteps.
+        static std::vector<std::pair<double,std::string> > times_and_names;
+        times_and_names.push_back (std::pair<double,std::string> (present_time, pvtu_master_filename));
+        std::ofstream pvd_output ("solution.pvd");
+        data_out.write_pvd_record (pvd_output, times_and_names);
       }
-    
+
   }
 
 

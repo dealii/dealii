@@ -831,7 +831,7 @@ no_constraint:
       // nothing here, assume all cells to belong to the zero partition (that
       // we otherwise use for MPI boundary cells)
       unsigned int start_up = 0,
-        start_nonboundary = numbers::invalid_unsigned_int;
+                   start_nonboundary = numbers::invalid_unsigned_int;
       if (task_info.use_coloring_only == false)
         {
           start_nonboundary =

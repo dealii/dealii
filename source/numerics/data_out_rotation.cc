@@ -122,9 +122,9 @@ build_one_patch (const cell_iterator *cell,
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {
       angle_directions[i][dimension-1] = std::cos(2*numbers::PI *
-                                                      i/n_patches_per_circle);
+                                                  i/n_patches_per_circle);
       angle_directions[i][dimension] = std::sin(2*numbers::PI *
-                                                    i/n_patches_per_circle);
+                                                i/n_patches_per_circle);
     }
 
   for (unsigned int angle=0; angle<n_patches_per_circle; ++angle)

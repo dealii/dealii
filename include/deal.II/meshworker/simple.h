@@ -61,13 +61,13 @@ namespace MeshWorker
     class ResidualSimple
     {
     public:
-     /**
-      * Initialize with an AnyData object holding the result of
-      * assembling.
-      *
-      * Assembling currently writes into the first vector of <tt>results</tt>.
-      */
-      void initialize(AnyData& results);
+      /**
+       * Initialize with an AnyData object holding the result of
+       * assembling.
+       *
+       * Assembling currently writes into the first vector of <tt>results</tt>.
+       */
+      void initialize(AnyData &results);
 
       /**
        * @deprecated Use initialize(AnyData&) instead.
@@ -555,7 +555,7 @@ namespace MeshWorker
     {
       for (unsigned int k=0; k<residuals.size(); ++k)
         {
-	  VECTOR* v = residuals.entry<VECTOR*>(k);
+          VECTOR *v = residuals.entry<VECTOR *>(k);
           if (constraints == 0)
             {
               for (unsigned int i=0; i<info.vector(k).block(0).size(); ++i)
@@ -580,7 +580,7 @@ namespace MeshWorker
     {
       for (unsigned int k=0; k<residuals.size(); ++k)
         {
-	  VECTOR* v = residuals.entry<VECTOR*>(k);
+          VECTOR *v = residuals.entry<VECTOR *>(k);
           if (constraints == 0)
             {
               for (unsigned int i=0; i<info1.vector(k).block(0).size(); ++i)
@@ -877,35 +877,35 @@ namespace MeshWorker
         {
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
-	      {
-		// Only enter the local values into the global matrix,
-		//  if the value is larger than the threshold
-		if (std::fabs(M(j,k)) < threshold)
-		  continue;
-		
-		// Do not enter, if either the row or the column
-		// corresponds to an index on the refinement edge. The
-		// level problems are solved with homogeneous
-		// Dirichlet boundary conditions, therefore we
-		// eliminate these rows and columns. The corresponding
-		// matrix entries are entered by assemble_in() and
-		// assemble_out().
+              {
+                // Only enter the local values into the global matrix,
+                //  if the value is larger than the threshold
+                if (std::fabs(M(j,k)) < threshold)
+                  continue;
+
+                // Do not enter, if either the row or the column
+                // corresponds to an index on the refinement edge. The
+                // level problems are solved with homogeneous
+                // Dirichlet boundary conditions, therefore we
+                // eliminate these rows and columns. The corresponding
+                // matrix entries are entered by assemble_in() and
+                // assemble_out().
                 if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) ||
                     mg_constrained_dofs->at_refinement_edge(level, i2[k]))
-		  continue;
-		
-		// At the boundary, only enter the term on the
-		// diagonal, but not the coupling terms
-		if ((mg_constrained_dofs->is_boundary_index(level, i1[j]) ||
-		     mg_constrained_dofs->is_boundary_index(level, i2[k])) &&
-		    (i1[j] != i2[k]))
-		  continue;
-		
-		G.add(i1[j], i2[k], M(j,k));
-	      }
-	}
+                  continue;
+
+                // At the boundary, only enter the term on the
+                // diagonal, but not the coupling terms
+                if ((mg_constrained_dofs->is_boundary_index(level, i1[j]) ||
+                     mg_constrained_dofs->is_boundary_index(level, i2[k])) &&
+                    (i1[j] != i2[k]))
+                  continue;
+
+                G.add(i1[j], i2[k], M(j,k));
+              }
+        }
     }
-    
+
 
     template <class MATRIX>
     inline void
@@ -995,13 +995,13 @@ namespace MeshWorker
             if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                 !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
               {
-		if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
-		     !mg_constrained_dofs->is_boundary_index(level, i2[k]))
-		    ||
-		    (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
-		     mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
-		     i1[j] == i2[k]))
-		  G.add(i1[j], i2[k], M(j,k));
+                if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+                     !mg_constrained_dofs->is_boundary_index(level, i2[k]))
+                    ||
+                    (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+                     mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
+                     i1[j] == i2[k]))
+                  G.add(i1[j], i2[k], M(j,k));
               }
     }
 
@@ -1025,13 +1025,13 @@ namespace MeshWorker
             if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                 !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
               {
-		if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
-		     !mg_constrained_dofs->is_boundary_index(level, i2[k]))
-		    ||
-		    (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
-		     mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
-		     i1[j] == i2[k]))
-		  G.add(i1[j], i2[k], M(k,j));
+                if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+                     !mg_constrained_dofs->is_boundary_index(level, i2[k]))
+                    ||
+                    (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+                     mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
+                     i1[j] == i2[k]))
+                  G.add(i1[j], i2[k], M(k,j));
               }
     }
 
@@ -1091,11 +1091,11 @@ namespace MeshWorker
         {
           if (level1 == level2)
             {
-	      assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices, level1);
-	      assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices, level1);
-	      assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices, level1);
-	      assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
-	    }
+              assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices, level1);
+              assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices, level1);
+              assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices, level1);
+              assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
+            }
           else
             {
               Assert(level1 > level2, ExcInternalError());
@@ -1118,10 +1118,10 @@ namespace MeshWorker
 
             if (level1 == level2)
               {
-		assemble((*matrix)[level1], info1.matrix(k,false).matrix, info1.indices_by_block[row], info1.indices_by_block[column], level1);
-		assemble((*matrix)[level1], info1.matrix(k,true).matrix, info1.indices_by_block[row], info2.indices_by_block[column], level1);
-		assemble((*matrix)[level1], info2.matrix(k,false).matrix, info2.indices_by_block[row], info2.indices_by_block[column], level1);
-		assemble((*matrix)[level1], info2.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column], level1);
+                assemble((*matrix)[level1], info1.matrix(k,false).matrix, info1.indices_by_block[row], info1.indices_by_block[column], level1);
+                assemble((*matrix)[level1], info1.matrix(k,true).matrix, info1.indices_by_block[row], info2.indices_by_block[column], level1);
+                assemble((*matrix)[level1], info2.matrix(k,false).matrix, info2.indices_by_block[row], info2.indices_by_block[column], level1);
+                assemble((*matrix)[level1], info2.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column], level1);
               }
             else
               {

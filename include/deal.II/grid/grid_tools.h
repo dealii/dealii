@@ -360,7 +360,7 @@ namespace GridTools
    *  @name Finding cells and vertices of a triangulation
    */
   /*@{*/
-  
+
   /**
    * Find and return the number of
    * the used vertex in a given
@@ -578,7 +578,7 @@ namespace GridTools
    *  @name Partitions and subdomains of triangulations
    */
   /*@{*/
-  
+
   /**
    * Produce a sparsity pattern in which
    * nonzero entries indicate that two
@@ -958,7 +958,7 @@ namespace GridTools
 
   /*@}*/
   /**
-   *  @name Lower-dimensional meshes for parts of higher-dimensional meshes 
+   *  @name Lower-dimensional meshes for parts of higher-dimensional meshes
    */
   /*@{*/
 
@@ -973,10 +973,10 @@ namespace GridTools
   template <template <int,int> class Container, int dim, int spacedim>
   struct ExtractBoundaryMesh
   {
-      typedef
-          std::map<typename Container<dim-1,spacedim>::cell_iterator,
-              typename Container<dim,spacedim>::face_iterator>
-          return_type;
+    typedef
+    std::map<typename Container<dim-1,spacedim>::cell_iterator,
+        typename Container<dim,spacedim>::face_iterator>
+        return_type;
   };
 #endif
 
@@ -1290,10 +1290,11 @@ namespace GridTools
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
-              { // this line has children
+              {
+                // this line has children
                 cell->face(face)->child(0)->vertex(1)
-                                       = (cell->face(face)->vertex(0) +
-                                           cell->face(face)->vertex(1)) / 2;
+                  = (cell->face(face)->vertex(0) +
+                     cell->face(face)->vertex(1)) / 2;
               }
       }
     else if (dim==3)
@@ -1305,20 +1306,21 @@ namespace GridTools
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
-              { // this face has hanging nodes
+              {
+                // this face has hanging nodes
                 cell->face(face)->child(0)->vertex(1)
-                    = (cell->face(face)->vertex(0) + cell->face(face)->vertex(1)) / 2.0;
+                  = (cell->face(face)->vertex(0) + cell->face(face)->vertex(1)) / 2.0;
                 cell->face(face)->child(0)->vertex(2)
-                    = (cell->face(face)->vertex(0) + cell->face(face)->vertex(2)) / 2.0;
+                  = (cell->face(face)->vertex(0) + cell->face(face)->vertex(2)) / 2.0;
                 cell->face(face)->child(1)->vertex(3)
-                    = (cell->face(face)->vertex(1) + cell->face(face)->vertex(3)) / 2.0;
+                  = (cell->face(face)->vertex(1) + cell->face(face)->vertex(3)) / 2.0;
                 cell->face(face)->child(2)->vertex(3)
-                    = (cell->face(face)->vertex(2) + cell->face(face)->vertex(3)) / 2.0;
+                  = (cell->face(face)->vertex(2) + cell->face(face)->vertex(3)) / 2.0;
 
                 // center of the face
                 cell->face(face)->child(0)->vertex(3)
-                    = (cell->face(face)->vertex(0) + cell->face(face)->vertex(1)
-                        + cell->face(face)->vertex(2) + cell->face(face)->vertex(3)) / 4.0;
+                  = (cell->face(face)->vertex(0) + cell->face(face)->vertex(1)
+                     + cell->face(face)->vertex(2) + cell->face(face)->vertex(3)) / 4.0;
               }
       }
   }

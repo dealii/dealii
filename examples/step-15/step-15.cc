@@ -550,9 +550,9 @@ namespace Step15
 
             for (unsigned int i = 0; i < dofs_per_cell; ++i)
               cell_residual(i) -= (fe_values.shape_grad(i, q_point)
-                              * coeff
-                              * gradients[q_point]
-                              * fe_values.JxW(q_point));
+                                   * coeff
+                                   * gradients[q_point]
+                                   * fe_values.JxW(q_point));
           }
 
         cell->get_dof_indices (local_dof_indices);

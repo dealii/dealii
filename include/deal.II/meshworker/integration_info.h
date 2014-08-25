@@ -136,8 +136,8 @@ namespace MeshWorker
      * Return a reference to the FiniteElement that was used to
      * initialize this object.
      */
-    const FiniteElement<dim, spacedim>& finite_element() const;
-      
+    const FiniteElement<dim, spacedim> &finite_element() const;
+
     /// This is true if we are assembling for multigrid
     bool multigrid;
     /// Access to finite element
@@ -210,11 +210,11 @@ namespace MeshWorker
     std::size_t memory_consumption () const;
 
   private:
-      /**
-       * The pointer to the (system) element used for initialization.
-       */
-      SmartPointer<const FiniteElement<dim, spacedim>, IntegrationInfo<dim, spacedim> > fe_pointer;
-      
+    /**
+     * The pointer to the (system) element used for initialization.
+     */
+    SmartPointer<const FiniteElement<dim, spacedim>, IntegrationInfo<dim, spacedim> > fe_pointer;
+
     /**
      * Use the finite element functions in #global_data and fill the
      * vectors #values, #gradients and #hessians with values according
@@ -325,7 +325,7 @@ namespace MeshWorker
     void initialize(const FiniteElement<dim, spacedim> &el,
                     const Mapping<dim, spacedim> &mapping,
                     const AnyData &data,
-		    const VECTOR& dummy,
+                    const VECTOR &dummy,
                     const BlockInfo *block_info = 0);
     /**
      * @deprecated Use AnyData instead of NamedData.
@@ -653,7 +653,7 @@ namespace MeshWorker
     Assert (fe_pointer !=0, ExcNotInitialized());
     return *fe_pointer;
   }
-  
+
   template <int dim, int spacedim>
   inline const FEValuesBase<dim, spacedim> &
   IntegrationInfo<dim,spacedim>::fe_values() const
@@ -798,13 +798,13 @@ namespace MeshWorker
     const FiniteElement<dim,sdim> &el,
     const Mapping<dim,sdim> &mapping,
     const AnyData &data,
-    const VECTOR& dummy,
+    const VECTOR &dummy,
     const BlockInfo *block_info)
   {
     initialize(el, mapping, block_info);
     std_cxx1x::shared_ptr<VectorData<VECTOR, dim, sdim> > p;
-    VectorDataBase<dim,sdim>* pp;
-    
+    VectorDataBase<dim,sdim> *pp;
+
     p = std_cxx1x::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (cell_selector));
     // Public member function of parent class was not found without
     // explicit cast

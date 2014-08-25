@@ -347,9 +347,9 @@ FESystem<dim,spacedim>::get_name () const
 
   std::ostringstream namebuf;
 
-  namebuf << "FESystem<" 
-	  << Utilities::dim_string(dim,spacedim)	  
-	  << ">[";
+  namebuf << "FESystem<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">[";
   for (unsigned int i=0; i< this->n_base_elements(); ++i)
     {
       namebuf << base_element(i).get_name();
@@ -535,13 +535,13 @@ FESystem<dim,spacedim>::get_interpolation_matrix (
   // to m==n==0 internally. this may happen when we use a FE_Nothing,
   // so write the test in a more lenient way
   Assert ((interpolation_matrix.m() == this->dofs_per_cell)
-	  ||
-	  (x_source_fe.dofs_per_cell == 0),
+          ||
+          (x_source_fe.dofs_per_cell == 0),
           ExcDimensionMismatch (interpolation_matrix.m(),
                                 this->dofs_per_cell));
   Assert ((interpolation_matrix.n() == x_source_fe.dofs_per_cell)
-	  ||
-	  (this->dofs_per_cell == 0),
+          ||
+          (this->dofs_per_cell == 0),
           ExcDimensionMismatch (interpolation_matrix.m(),
                                 x_source_fe.dofs_per_cell));
 
@@ -2996,7 +2996,7 @@ FESystem<dim,spacedim>::get_constant_modes () const
   for (unsigned int i=0; i<base_elements.size(); ++i)
     {
       std::pair<Table<2,bool>, std::vector<unsigned int> >
-        base_table = base_elements[i].first->get_constant_modes();
+      base_table = base_elements[i].first->get_constant_modes();
       AssertDimension(base_table.first.n_rows(), base_table.second.size());
       const unsigned int element_multiplicity = this->element_multiplicity(i);
 

@@ -976,7 +976,7 @@ namespace Step9
   template <int dim>
   GradientEstimation::EstimateScratchData<dim>::
   EstimateScratchData (const FiniteElement<dim> &fe,
-                         const Vector<double>     &solution)
+                       const Vector<double>     &solution)
     :
     fe_midpoint_value(fe,
                       QMidpoint<dim> (),
@@ -1033,8 +1033,8 @@ namespace Step9
     SynchronousIterators<IteratorTuple>
     begin_sync_it (IteratorTuple (dof_handler.begin_active(),
                                   error_per_cell.begin())),
-    end_sync_it (IteratorTuple (dof_handler.end(),
-                                error_per_cell.end()));
+                                                       end_sync_it (IteratorTuple (dof_handler.end(),
+                                                           error_per_cell.end()));
 
     WorkStream::run (begin_sync_it,
                      end_sync_it,
@@ -1095,9 +1095,9 @@ namespace Step9
   template <int dim>
   void
   GradientEstimation::estimate_cell (const SynchronousIterators<std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,
-                                                                                 Vector<float>::iterator> > &cell,
+                                     Vector<float>::iterator> > &cell,
                                      EstimateScratchData<dim>                                               &scratch_data,
-                                     const EstimateCopyData                                                 &)
+                                     const EstimateCopyData &)
   {
     // We need space for the tensor <code>Y</code>, which is the sum of
     // outer products of the y-vectors.

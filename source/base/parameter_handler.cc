@@ -1643,13 +1643,13 @@ long int ParameterHandler::get_integer (const std::string &entry_string) const
   std::string s = get (entry_string);
   char *endptr;
   const long int i = std::strtol (s.c_str(), &endptr, 10);
-  
+
   // assert that there was no error. an error would be if
   // either there was no string to begin with, or if
   // strtol set the endptr to anything but the end of
   // the string
   AssertThrow ((s.size()>0) && (*endptr == '\0'),
-	       ExcConversionError(s));
+               ExcConversionError(s));
 
   return i;
 }
@@ -1667,7 +1667,7 @@ double ParameterHandler::get_double (const std::string &entry_string) const
   // strtol set the endptr to anything but the end of
   // the string
   AssertThrow ((s.size()>0) && (*endptr == '\0'),
-	       ExcConversionError(s));
+               ExcConversionError(s));
 
   return d;
 }
@@ -2187,108 +2187,108 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
   // between the last entry and the first
   // subsection
   if (style != XML)
-  {
-    unsigned int n_parameters = 0;
-    unsigned int n_sections   = 0;
-    for (boost::property_tree::ptree::const_iterator
-         p = current_section.begin();
-         p != current_section.end(); ++p)
-      if (is_parameter_node (p->second) == true)
-        ++n_parameters;
-      else
-        ++n_sections;
+    {
+      unsigned int n_parameters = 0;
+      unsigned int n_sections   = 0;
+      for (boost::property_tree::ptree::const_iterator
+           p = current_section.begin();
+           p != current_section.end(); ++p)
+        if (is_parameter_node (p->second) == true)
+          ++n_parameters;
+        else
+          ++n_sections;
 
-    if ((style != Description)
-        &&
-        (!(style & 128))
-        &&
-        (n_parameters != 0)
-        &&
-        (n_sections != 0))
-      out << std::endl << std::endl;
+      if ((style != Description)
+          &&
+          (!(style & 128))
+          &&
+          (n_parameters != 0)
+          &&
+          (n_sections != 0))
+        out << std::endl << std::endl;
 
-  // now traverse subsections tree,
-  // in alphabetical order
-  for (boost::property_tree::ptree::const_assoc_iterator
-       p = current_section.ordered_begin();
-       p != current_section.not_found(); ++p)
-    if (is_parameter_node (p->second) == false)
-      {
-        // first print the subsection header
-        switch (style)
+      // now traverse subsections tree,
+      // in alphabetical order
+      for (boost::property_tree::ptree::const_assoc_iterator
+           p = current_section.ordered_begin();
+           p != current_section.not_found(); ++p)
+        if (is_parameter_node (p->second) == false)
           {
-          case Text:
-          case Description:
-          case ShortText:
+            // first print the subsection header
+            switch (style)
+              {
+              case Text:
+              case Description:
+              case ShortText:
                 out << std::setw(overall_indent_level*2) << ""
-                << "subsection " << demangle(p->first) << std::endl;
-            break;
-          case LaTeX:
-          {
-            out << std::endl
-                << "\\subsection{Parameters in section \\tt ";
+                    << "subsection " << demangle(p->first) << std::endl;
+                break;
+              case LaTeX:
+              {
+                out << std::endl
+                    << "\\subsection{Parameters in section \\tt ";
 
-            // find the path to the
-            // current section so that we
-            // can print it in the
-            // \subsection{...} heading
-            for (unsigned int i=0; i<subsection_path.size(); ++i)
-              out << subsection_path[i] << "/";
-            out << demangle(p->first);
+                // find the path to the
+                // current section so that we
+                // can print it in the
+                // \subsection{...} heading
+                for (unsigned int i=0; i<subsection_path.size(); ++i)
+                  out << subsection_path[i] << "/";
+                out << demangle(p->first);
 
-            out << "}" << std::endl;
-            out << "\\label{parameters:";
-            for (unsigned int i=0; i<subsection_path.size(); ++i)
-              out << mangle(subsection_path[i]) << "/";
-            out << p->first << "}";
-            out << std::endl;
+                out << "}" << std::endl;
+                out << "\\label{parameters:";
+                for (unsigned int i=0; i<subsection_path.size(); ++i)
+                  out << mangle(subsection_path[i]) << "/";
+                out << p->first << "}";
+                out << std::endl;
 
-            out << std::endl;
-            break;
-          }
+                out << std::endl;
+                break;
+              }
 
-          default:
-            Assert (false, ExcNotImplemented());
-          };
+              default:
+                Assert (false, ExcNotImplemented());
+              };
 
-        // then the contents of the
-        // subsection
-        enter_subsection (demangle(p->first));
+            // then the contents of the
+            // subsection
+            enter_subsection (demangle(p->first));
             print_parameters_section (out, style, overall_indent_level+1);
-        leave_subsection ();
-        switch (style)
-          {
-          case Text:
-            // write end of
-            // subsection. one
-            // blank line after
-            // each subsection
+            leave_subsection ();
+            switch (style)
+              {
+              case Text:
+                // write end of
+                // subsection. one
+                // blank line after
+                // each subsection
                 out << std::setw(overall_indent_level*2) << ""
-                << "end" << std::endl
-                << std::endl;
+                    << "end" << std::endl
+                    << std::endl;
 
-            // if this is a toplevel
-            // subsection, then have two
-            // newlines
+                // if this is a toplevel
+                // subsection, then have two
+                // newlines
                 if (overall_indent_level == 0)
-              out << std::endl;
+                  out << std::endl;
 
-            break;
-          case Description:
-            break;
-          case ShortText:
-            // write end of
-            // subsection.
+                break;
+              case Description:
+                break;
+              case ShortText:
+                // write end of
+                // subsection.
                 out << std::setw(overall_indent_level*2) << ""
-                << "end" << std::endl;
-            break;
-          case LaTeX:
-            break;
-          default:
-            Assert (false, ExcNotImplemented());
+                    << "end" << std::endl;
+                break;
+              case LaTeX:
+                break;
+              default:
+                Assert (false, ExcNotImplemented());
+              }
           }
-      }
-}
+    }
 
   // close top level elements, if there are any
   switch (style)

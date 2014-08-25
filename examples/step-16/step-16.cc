@@ -109,7 +109,7 @@ namespace Step16
   {
   public:
     LaplaceIntegrator();
-      virtual void cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
+    virtual void cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
   };
 
 
@@ -140,7 +140,7 @@ namespace Step16
   // LocalIntegrators::Laplace::cell_matrix() or
   // LocalIntegrators::L2::L2(). Since we are assembling only a single
   // PDE, there is also only one of these objects with index zero.
-  
+
   // In addition, we note that this integrator serves to compute the
   // matrices for the multilevel preconditioner as well as the matrix
   // and the right hand side for the global system. Since the
@@ -269,12 +269,12 @@ namespace Step16
     dof_handler.distribute_mg_dofs (fe);
 
     deallog << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
-              << " (by level: ";
+            << dof_handler.n_dofs()
+            << " (by level: ";
     for (unsigned int level=0; level<triangulation.n_levels(); ++level)
       deallog << dof_handler.n_dofs(level)
-                << (level == triangulation.n_levels()-1
-                    ? ")" : ", ");
+              << (level == triangulation.n_levels()-1
+                  ? ")" : ", ");
     deallog << std::endl;
 
     sparsity_pattern.reinit (dof_handler.n_dofs(),
@@ -642,8 +642,8 @@ namespace Step16
           refine_grid ();
 
         deallog << "   Number of active cells:       "
-		<< triangulation.n_active_cells()
-		<< std::endl;
+                << triangulation.n_active_cells()
+                << std::endl;
 
         setup_system ();
 

@@ -1503,7 +1503,7 @@ FE_Q_Base<POLY,dim,spacedim>::get_constant_modes () const
   AssertDimension(this->dofs_per_cell, Utilities::fixed_power<dim>(this->degree+1));
   constant_modes.fill(true);
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, std::vector<unsigned int>(1, 0));
+         (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 

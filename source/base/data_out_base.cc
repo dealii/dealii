@@ -3672,7 +3672,7 @@ namespace DataOutBase
     double hmax=patches[0].data(0,0);
 
     for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	 patch != patches.end(); ++patch)
+         patch != patches.end(); ++patch)
       {
         const unsigned int n_subdivisions = patch->n_subdivisions;
 
@@ -3957,7 +3957,7 @@ namespace DataOutBase
     AssertThrow (dim==2, ExcNotImplemented());
   }
 
-  
+
   template <int spacedim>
   void write_eps (const std::vector<Patch<2,spacedim> > &patches,
                   const std::vector<std::string>          &/*data_names*/,

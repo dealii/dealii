@@ -50,7 +50,7 @@ namespace PETScWrappers
   class FullMatrix : public MatrixBase
   {
   public:
-    
+
     /**
      * Declare type for container size.
      */

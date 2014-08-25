@@ -902,8 +902,8 @@ next_cell:
     // Find closest vertex and determine
     // all adjacent cells
     std::vector<active_cell_iterator> adjacent_cells_tmp
-    = find_cells_adjacent_to_vertex(container,
-                                    find_closest_vertex(container, p));
+      = find_cells_adjacent_to_vertex(container,
+                                      find_closest_vertex(container, p));
 
     // Make sure that we have found
     // at least one cell adjacent to vertex.
@@ -2056,10 +2056,10 @@ next_cell:
   get_patch_around_cell(const typename Container::active_cell_iterator &cell)
   {
     Assert (cell->is_locally_owned(),
-	    ExcMessage ("This function only makes sense if the cell for "
-			"which you are asking for a patch, is locally "
-			"owned."));
-    
+            ExcMessage ("This function only makes sense if the cell for "
+                        "which you are asking for a patch, is locally "
+                        "owned."));
+
     std::vector<typename Container::active_cell_iterator> patch;
     patch.push_back (cell);
     for (unsigned int face_number=0; face_number<GeometryInfo<Container::dimension>::faces_per_cell; ++face_number)
@@ -2081,7 +2081,7 @@ next_cell:
                 // in 1d, we need to work a bit harder: iterate until we find
                 // the child by going from cell to child to child etc
                 typename Container::cell_iterator neighbor
-                = cell->neighbor (face_number);
+                  = cell->neighbor (face_number);
                 while (neighbor->has_children())
                   neighbor = neighbor->child(1-face_number);
 

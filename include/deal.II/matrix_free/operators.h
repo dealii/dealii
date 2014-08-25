@@ -172,8 +172,8 @@ namespace MatrixFreeOperators
     Assert(dim == 2 || dim == 3, ExcNotImplemented());
 
     internal::EvaluatorTensorProduct<internal::evaluate_evenodd,dim,fe_degree,
-                                     fe_degree+1, VectorizedArray<Number> >
-      evaluator(inverse_shape, inverse_shape, inverse_shape);
+             fe_degree+1, VectorizedArray<Number> >
+             evaluator(inverse_shape, inverse_shape, inverse_shape);
 
     const unsigned int shift_coefficient =
       inverse_coefficients.size() > dofs_per_cell ? dofs_per_cell : 0;
@@ -181,8 +181,8 @@ namespace MatrixFreeOperators
     VectorizedArray<Number> temp_data_field[dofs_per_cell];
     for (unsigned int d=0; d<n_actual_components; ++d)
       {
-        const VectorizedArray<Number>* in = in_array+d*dofs_per_cell;
-        VectorizedArray<Number>* out = out_array+d*dofs_per_cell;
+        const VectorizedArray<Number> *in = in_array+d*dofs_per_cell;
+        VectorizedArray<Number> *out = out_array+d*dofs_per_cell;
         // Need to select 'apply' method with hessian slot because values
         // assume symmetries that do not exist in the inverse shapes
         evaluator.template hessians<0,false,false> (in, temp_data_field);

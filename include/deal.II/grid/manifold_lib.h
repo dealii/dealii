@@ -186,7 +186,7 @@ private:
 /**
  * Manifold description derived from ChartManifold, based on explicit
  * Function<spacedim> and Function<chartdim> objects describing the
- * push_forward() and pull_back() functions. 
+ * push_forward() and pull_back() functions.
  *
  * You can use this Manifold object to describe any arbitray shape
  * domain, as long as you can express it in terms of an invertible
@@ -195,13 +195,13 @@ private:
  *
  * In debug mode, a check is performed to verify that the
  * tranformations are actually one the inverse of the other.
- * 
+ *
  * @ingroup manifold
  *
  * @author Luca Heltai, 2014
  */
 template <int dim, int spacedim=dim, int chartdim=dim>
-class FunctionManifold : public ChartManifold<dim, spacedim, chartdim> 
+class FunctionManifold : public ChartManifold<dim, spacedim, chartdim>
 {
 public:
   /**
@@ -214,9 +214,9 @@ public:
    * that the two functions are one the inverse of the other.
    */
   FunctionManifold(const Function<chartdim> &push_forward_function,
-			const Function<spacedim> &pull_back_function,
-			const Point<chartdim> periodicity=Point<chartdim>(),
-			const double tolerance=1e-10);
+                   const Function<spacedim> &pull_back_function,
+                   const Point<chartdim> periodicity=Point<chartdim>(),
+                   const double tolerance=1e-10);
 
   /**
    * Expressions constructor. Takes the expressions of the
@@ -234,18 +234,18 @@ public:
    * that the two functions are one the inverse of the other.
    */
   FunctionManifold(const std::string push_forward_expression,
-			const std::string pull_back_expression,
-			const Point<chartdim> periodicity=Point<chartdim>(), 
-			const typename FunctionParser<spacedim>::ConstMap = typename FunctionParser<spacedim>::ConstMap(),
-			const std::string chart_vars=FunctionParser<chartdim>::default_variable_names(),
-			const std::string space_vars=FunctionParser<spacedim>::default_variable_names(),
-			const double tolerance=1e-10);
+                   const std::string pull_back_expression,
+                   const Point<chartdim> periodicity=Point<chartdim>(),
+                   const typename FunctionParser<spacedim>::ConstMap = typename FunctionParser<spacedim>::ConstMap(),
+                   const std::string chart_vars=FunctionParser<chartdim>::default_variable_names(),
+                   const std::string space_vars=FunctionParser<spacedim>::default_variable_names(),
+                   const double tolerance=1e-10);
 
   /**
    * If needed, we delete the pointers we own.
    */
   ~FunctionManifold();
-  
+
   /**
    * Given a point in the chartdim coordinate system, uses the
    * push_forward_function to compute the push_forward of points in
@@ -272,14 +272,14 @@ private:
    * Pointer to the push_forward function.
    */
   SmartPointer<const Function<chartdim>,
-	       FunctionManifold<dim,spacedim,chartdim> > push_forward_function;
-  
+               FunctionManifold<dim,spacedim,chartdim> > push_forward_function;
+
   /**
    * Pointer to the pull_back function.
    */
-  SmartPointer<const Function<spacedim>, 
-	       FunctionManifold<dim,spacedim,chartdim> > pull_back_function;
-  
+  SmartPointer<const Function<spacedim>,
+               FunctionManifold<dim,spacedim,chartdim> > pull_back_function;
+
   /**
    * Relative tolerance. In debug mode, we check that the two
    * functions provided at construction time are actually one the
@@ -287,7 +287,7 @@ private:
    * this check.
    */
   const double tolerance;
-  
+
   /**
    * Check ownership of the smart pointers. Indicates whether this
    * class is the owner of the objects pointed to by the previous two
@@ -297,8 +297,8 @@ private:
    */
   const bool owns_pointers;
 };
-  
-  
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

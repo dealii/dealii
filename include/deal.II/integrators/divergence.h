@@ -539,22 +539,22 @@ namespace LocalIntegrators
 
       AssertDimension(fetest.get_fe().n_components(), dim);
       AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
-      
+
       for (unsigned int k=0; k<fetest.n_quadrature_points; ++k)
         {
           const double dx = factor * fetest.JxW(k);
           for (unsigned int i=0; i<n_dofs; ++i)
-	    {
-	      double dv = 0.;
-	      double du = 0.;
-	      for (unsigned int d=0; d<dim; ++d)
-		{
-		  dv += fetest.shape_grad_component(i,k,d)[d];
-		  du += input[d][k][d];
-		}
-	      
-	      result(i) += dx * du * dv;
-	    }
+            {
+              double dv = 0.;
+              double du = 0.;
+              for (unsigned int d=0; d<dim; ++d)
+                {
+                  dv += fetest.shape_grad_component(i,k,d)[d];
+                  du += input[d][k][d];
+                }
+
+              result(i) += dx * du * dv;
+            }
         }
     }
 

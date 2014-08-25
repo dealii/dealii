@@ -714,8 +714,8 @@ namespace TrilinosWrappers
                   const unsigned int                     smoother_sweeps,
                   const unsigned int                     smoother_overlap,
                   const bool                             output_details,
-                  const char*                            smoother_type,
-                  const char*                            coarse_type)
+                  const char                            *smoother_type,
+                  const char                            *coarse_type)
     :
     elliptic (elliptic),
     higher_order_elements (higher_order_elements),

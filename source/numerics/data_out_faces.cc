@@ -79,7 +79,7 @@ DataOutFaces<dim,DH>::DataOutFaces(const bool so)
   surface_only(so)
 {
   Assert (dim == DH::dimension,
-	  ExcNotImplemented());
+          ExcNotImplemented());
 }
 
 

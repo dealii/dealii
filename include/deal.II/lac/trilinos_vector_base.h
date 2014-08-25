@@ -1383,10 +1383,10 @@ namespace TrilinosWrappers
             // use pre-allocated vector for non-local entries if it exists for
             // addition operation
             const TrilinosWrappers::types::int_type my_row = nonlocal_vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(row));
-            Assert(my_row != -1, 
+            Assert(my_row != -1,
                    ExcMessage("Attempted to write into off-processor vector entry "
                               "that has not be specified as being writable upon "
-                               "initialization"));
+                              "initialization"));
             (*nonlocal_vector)[0][my_row] += values[i];
             compressed = false;
           }
@@ -1709,17 +1709,17 @@ namespace TrilinosWrappers
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
-    if(local_size() == v.local_size())
-    {
-      const int ierr = vector->Update(1., *(v.vector), s);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    }
+    if (local_size() == v.local_size())
+      {
+        const int ierr = vector->Update(1., *(v.vector), s);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
     else
-    {
-      VectorBase tmp = v;
-      tmp *= s;
-      this->add(tmp, true);
-    }
+      {
+        VectorBase tmp = v;
+        tmp *= s;
+        this->add(tmp, true);
+      }
   }
 
 
@@ -1738,18 +1738,18 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
-    if(local_size() == v.local_size())
-    {
-      const int ierr = vector->Update(a, *(v.vector), s);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    }
+    if (local_size() == v.local_size())
+      {
+        const int ierr = vector->Update(a, *(v.vector), s);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
     else
-    {
-      (*this)*=s;
-      VectorBase tmp = v;
-      tmp *= a;
-      this->add(tmp, true);
-    }
+      {
+        (*this)*=s;
+        VectorBase tmp = v;
+        tmp *= a;
+        this->add(tmp, true);
+      }
   }
 
 
@@ -1772,26 +1772,26 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
-    
-    if(local_size() == v.local_size() && local_size() == w.local_size())
-    {
-      const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    }
+
+    if (local_size() == v.local_size() && local_size() == w.local_size())
+      {
+        const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
     else
-    {
-      (*this)*=s;
       {
-        VectorBase tmp = v;
-        tmp *= a;
-        this->add(tmp, true);
+        (*this)*=s;
+        {
+          VectorBase tmp = v;
+          tmp *= a;
+          this->add(tmp, true);
+        }
+        {
+          VectorBase tmp = w;
+          tmp *= b;
+          this->add(tmp, true);
+        }
       }
-      {
-        VectorBase tmp = w;
-        tmp *= b;
-        this->add(tmp, true);
-      }
-    }
   }
 
 
@@ -1820,39 +1820,39 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
     Assert (numbers::is_finite(c), ExcNumberNotFinite());
 
-    if(local_size() == v.local_size()
-       && local_size() == w.local_size()
-       && local_size() == x.local_size())
-    {
-      // Update member can only
-      // input two other vectors so
-      // do it in two steps
-      const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-      
-      const int jerr = vector->Update(c, *(x.vector), 1.);
-      Assert (jerr == 0, ExcTrilinosError(jerr));
-      (void)jerr; // removes -Wunused-parameter warning in optimized mode
-    }
+    if (local_size() == v.local_size()
+        && local_size() == w.local_size()
+        && local_size() == x.local_size())
+      {
+        // Update member can only
+        // input two other vectors so
+        // do it in two steps
+        const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+        const int jerr = vector->Update(c, *(x.vector), 1.);
+        Assert (jerr == 0, ExcTrilinosError(jerr));
+        (void)jerr; // removes -Wunused-parameter warning in optimized mode
+      }
     else
-    {
-      (*this)*=s;
       {
-        VectorBase tmp = v;
-        tmp *= a;
-        this->add(tmp, true);
+        (*this)*=s;
+        {
+          VectorBase tmp = v;
+          tmp *= a;
+          this->add(tmp, true);
+        }
+        {
+          VectorBase tmp = w;
+          tmp *= b;
+          this->add(tmp, true);
+        }
+        {
+          VectorBase tmp = x;
+          tmp *= c;
+          this->add(tmp, true);
+        }
       }
-      {
-        VectorBase tmp = w;
-        tmp *= b;
-        this->add(tmp, true);
-      }
-      {
-        VectorBase tmp = x;
-        tmp *= c;
-        this->add(tmp, true);
-      }
-    }
   }
 
 

@@ -181,7 +181,7 @@ namespace parallel
      *
      * @note This class does not support anisotropic refinement, because
      * it relies on the p4est library that does not support this. Attempts
-     * to refine cells anisotropically will result in errors. 
+     * to refine cells anisotropically will result in errors.
      * @note There is currently no support for distributing 1d triangulations.
      *
      *
@@ -318,24 +318,24 @@ namespace parallel
     class Triangulation : public dealii::Triangulation<dim,spacedim>
     {
     public:
-     /**
-      * A typedef that is used to to identify cell iterators. The
-      * concept of iterators is discussed at length in the
-      * @ref Iterators "iterators documentation module".
-      *
-      * The current typedef identifies cells in a triangulation. You
-      * can find the exact type it refers to in the base class's own
-      * typedef, but it should be TriaIterator<CellAccessor<dim,spacedim> >. The
-      * TriaIterator class works like a pointer that when you
-      * dereference it yields an object of type CellAccessor.
-      * CellAccessor is a class that identifies properties that
-      * are specific to cells in a triangulation, but it is derived
-      * (and consequently inherits) from TriaAccessor that describes
-      * what you can ask of more general objects (lines, faces, as
-      * well as cells) in a triangulation.
-      *
-      * @ingroup Iterators
-      */
+      /**
+       * A typedef that is used to to identify cell iterators. The
+       * concept of iterators is discussed at length in the
+       * @ref Iterators "iterators documentation module".
+       *
+       * The current typedef identifies cells in a triangulation. You
+       * can find the exact type it refers to in the base class's own
+       * typedef, but it should be TriaIterator<CellAccessor<dim,spacedim> >. The
+       * TriaIterator class works like a pointer that when you
+       * dereference it yields an object of type CellAccessor.
+       * CellAccessor is a class that identifies properties that
+       * are specific to cells in a triangulation, but it is derived
+       * (and consequently inherits) from TriaAccessor that describes
+       * what you can ask of more general objects (lines, faces, as
+       * well as cells) in a triangulation.
+       *
+       * @ingroup Iterators
+       */
       typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
 
       /**
@@ -616,23 +616,23 @@ namespace parallel
        */
       enum CellStatus
       {
-	/**
-	 * The cell will not be refined or coarsened and might or might
-	 * not move to a different processor.
-	 */
+        /**
+         * The cell will not be refined or coarsened and might or might
+         * not move to a different processor.
+         */
         CELL_PERSIST,
-	/**
-	 * The cell will be or was refined.
-	 */
-	CELL_REFINE,
-	/**
-	 * The children of this cell will be or were coarsened into this cell.
-	 */
-	CELL_COARSEN,
-	/**
-	 * Invalid status. Will not occur for the user.
-	 */
-	CELL_INVALID
+        /**
+         * The cell will be or was refined.
+         */
+        CELL_REFINE,
+        /**
+         * The children of this cell will be or were coarsened into this cell.
+         */
+        CELL_COARSEN,
+        /**
+         * Invalid status. Will not occur for the user.
+         */
+        CELL_INVALID
       };
 
       /**
@@ -649,19 +649,19 @@ namespace parallel
        * Callers need to store the return value.  It specifies an
        * offset of the position at which data can later be retrieved
        * during a call to notify_ready_to_unpack().
-       * 
+       *
        * The CellStatus argument in the callback function will tell you if the
        * given cell will be coarsened, refined, or will persist as is (this
        * can be different than the coarsen and refine flags set by you). If it
        * is
-       * 
+       *
        * - CELL_PERIST: the cell won't be refined/coarsened, but might be
        *   moved to a different processor
        * - CELL_REFINE: this cell will be refined into 4/8 cells, you can not
        *   access the children (because they don't exist yet)
        * - CELL_COARSEN: the children of this cell will be coarsened into the
        *   given cell (you can access the active children!)
-       * 
+       *
        * When unpacking the data with notify_ready_to_unpack() you can access
        * the children of the cell if the status is CELL_REFINE but not for
        * CELL_COARSEN. As a consequence you need to handle coarsening while

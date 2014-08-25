@@ -151,12 +151,12 @@ namespace Algorithms
      * new.
      */
     extern const Event initial;
-    
+
     /**
      * The mesh has changed.
      */
     extern const Event remesh;
-    
+
     /**
      * The current derivative leads
      * to slow convergence of

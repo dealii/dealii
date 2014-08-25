@@ -1065,7 +1065,7 @@ namespace internal
     Accessor<rank,dim,constness,P,Number>::
     Accessor ()
       :
-      tensor (*static_cast<tensor_type*>(0)),
+      tensor (*static_cast<tensor_type *>(0)),
       previous_indices ()
     {
       Assert (false, ExcMessage ("You can't call the default constructor of this class."));
@@ -1106,7 +1106,7 @@ namespace internal
     Accessor<rank,dim,constness,1,Number>::
     Accessor ()
       :
-      tensor (*static_cast<tensor_type*>(0)),
+      tensor (*static_cast<tensor_type *>(0)),
       previous_indices ()
     {
       Assert (false, ExcMessage ("You can't call the default constructor of this class."));

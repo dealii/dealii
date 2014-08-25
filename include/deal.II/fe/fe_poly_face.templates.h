@@ -210,42 +210,42 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
   if (flags & update_values)
     for (unsigned int i=0; i<quadrature.size(); ++i)
       {
-	for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+        for (unsigned int k=0; k<this->dofs_per_cell; ++k)
           data.shape_values(k,i) = 0.;
-	switch (dim)
-	  {
-	    case 3:
-	      {
-		// Fill data for quad shape functions
-		if (this->dofs_per_quad !=0)
-		  {
-		    const unsigned int foffset = this->first_quad_index + this->dofs_per_quad * face;
-		    for (unsigned int k=0; k<this->dofs_per_quad; ++k)
-		      data.shape_values(foffset+k,i) = fe_data.shape_values[k+this->first_face_quad_index][i];
-		  }
-	      }
-	    case 2:
-	      {
-		// Fill data for line shape functions
-		if (this->dofs_per_line != 0)
-		  {
-		    const unsigned int foffset = this->first_line_index;
-		    for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_face; ++line)
-		      {
-		        for (unsigned int k=0; k<this->dofs_per_line; ++k)
-		          data.shape_values(foffset+GeometryInfo<dim>::face_to_cell_lines(face, line)*this->dofs_per_line+k,i) = fe_data.shape_values[k+(line*this->dofs_per_line)+this->first_face_line_index][i];
-		      }
-		  }
-	      }
-	    case 1:
-	      {
-		// Fill data for vertex shape functions
-		if (this->dofs_per_vertex != 0)
-		  for (unsigned int lvertex=0; lvertex<GeometryInfo<dim>::vertices_per_face; ++lvertex)
-		    data.shape_values(GeometryInfo<dim>::face_to_cell_vertices(face, lvertex),i) = fe_data.shape_values[lvertex][i];
-		break;
-	      }
-	  }
+        switch (dim)
+          {
+          case 3:
+          {
+            // Fill data for quad shape functions
+            if (this->dofs_per_quad !=0)
+              {
+                const unsigned int foffset = this->first_quad_index + this->dofs_per_quad * face;
+                for (unsigned int k=0; k<this->dofs_per_quad; ++k)
+                  data.shape_values(foffset+k,i) = fe_data.shape_values[k+this->first_face_quad_index][i];
+              }
+          }
+          case 2:
+          {
+            // Fill data for line shape functions
+            if (this->dofs_per_line != 0)
+              {
+                const unsigned int foffset = this->first_line_index;
+                for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_face; ++line)
+                  {
+                    for (unsigned int k=0; k<this->dofs_per_line; ++k)
+                      data.shape_values(foffset+GeometryInfo<dim>::face_to_cell_lines(face, line)*this->dofs_per_line+k,i) = fe_data.shape_values[k+(line*this->dofs_per_line)+this->first_face_line_index][i];
+                  }
+              }
+          }
+          case 1:
+          {
+            // Fill data for vertex shape functions
+            if (this->dofs_per_vertex != 0)
+              for (unsigned int lvertex=0; lvertex<GeometryInfo<dim>::vertices_per_face; ++lvertex)
+                data.shape_values(GeometryInfo<dim>::face_to_cell_vertices(face, lvertex),i) = fe_data.shape_values[lvertex][i];
+            break;
+          }
+          }
       }
 }
 

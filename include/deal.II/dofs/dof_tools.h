@@ -1184,7 +1184,7 @@ namespace DoFTools
    * @name Identifying subsets of degrees of freedom with particular properties
    * @{
    */
-  
+
   /**
    * Extract the indices of the degrees of freedom belonging to
    * certain vector components of a vector-valued finite element. The
@@ -1436,7 +1436,7 @@ namespace DoFTools
   extract_constant_modes (const DH                        &dof_handler,
                           const ComponentMask             &component_mask,
                           std::vector<std::vector<bool> > &constant_modes);
-  
+
   /**
    * @}
    */
@@ -1887,7 +1887,7 @@ namespace DoFTools
                             std::vector<types::global_dof_index> &dofs_per_component,
                             std::vector<unsigned int>  target_component) DEAL_II_DEPRECATED;
 
-  
+
   /**
    * For each active cell of a DoFHandler or hp::DoFHandler, extract
    * the active finite element index and fill the vector given as
@@ -1992,7 +1992,7 @@ namespace DoFTools
   /**
    * @}
    */
-  
+
   /**
    * Create a mapping from degree of freedom indices to the index of
    * that degree of freedom on the boundary. After this operation,

@@ -102,7 +102,7 @@ public:
    * Set a particular entry in the mask to a value.
    */
   void set (const unsigned int index, const bool value);
-    
+
   /**
    * If this component mask has been initialized with a mask of
    * size greater than zero, then return the size of the mask

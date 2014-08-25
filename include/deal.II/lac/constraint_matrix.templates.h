@@ -2739,7 +2739,7 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
         sparsity_pattern.add_entries(actual_dof_indices[i],
                                      actual_dof_indices.begin(),
                                      actual_dof_indices.end(),
-                                   true);
+                                     true);
 
       // need to add the whole row and column structure in case we keep
       // constrained entries. Unfortunately, we can't use the nice matrix

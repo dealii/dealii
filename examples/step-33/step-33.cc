@@ -2064,18 +2064,18 @@ namespace Step33
   {
     switch (parameters.solver)
       {
-        // If the parameter file specified that a direct solver shall be used,
-        // then we'll get here. The process is straightforward, since deal.II
-        // provides a wrapper class to the Amesos direct solver within
-        // Trilinos. All we have to do is to create a solver control object
-        // (which is just a dummy object here, since we won't perform any
-        // iterations), and then create the direct solver object. When
-        // actually doing the solve, note that we don't pass a
-        // preconditioner. That wouldn't make much sense for a direct solver
-        // anyway.  At the end we return the solver control statistics &mdash;
-        // which will tell that no iterations have been performed and that the
-        // final linear residual is zero, absent any better information that
-        // may be provided here:
+      // If the parameter file specified that a direct solver shall be used,
+      // then we'll get here. The process is straightforward, since deal.II
+      // provides a wrapper class to the Amesos direct solver within
+      // Trilinos. All we have to do is to create a solver control object
+      // (which is just a dummy object here, since we won't perform any
+      // iterations), and then create the direct solver object. When
+      // actually doing the solve, note that we don't pass a
+      // preconditioner. That wouldn't make much sense for a direct solver
+      // anyway.  At the end we return the solver control statistics &mdash;
+      // which will tell that no iterations have been performed and that the
+      // final linear residual is zero, absent any better information that
+      // may be provided here:
       case Parameters::Solver::direct:
       {
         SolverControl solver_control (1,0);

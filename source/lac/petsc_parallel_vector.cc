@@ -333,26 +333,26 @@ namespace PETScWrappers
 
 #if DEBUG
       {
-	// test ghost allocation in debug mode
-	PetscInt begin, end;
+        // test ghost allocation in debug mode
+        PetscInt begin, end;
 
-	ierr = VecGetOwnershipRange (vector, &begin, &end);
+        ierr = VecGetOwnershipRange (vector, &begin, &end);
 
-	Assert(local_size==(size_type)(end-begin), ExcInternalError());
+        Assert(local_size==(size_type)(end-begin), ExcInternalError());
 
-	Vec l;
-	ierr = VecGhostGetLocalForm(vector, &l);
-	AssertThrow (ierr == 0, ExcPETScError(ierr));
+        Vec l;
+        ierr = VecGhostGetLocalForm(vector, &l);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-	PetscInt lsize;
-	ierr = VecGetSize(l, &lsize);
-	AssertThrow (ierr == 0, ExcPETScError(ierr));
+        PetscInt lsize;
+        ierr = VecGetSize(l, &lsize);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-	ierr = VecGhostRestoreLocalForm(vector, &l);
-	AssertThrow (ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostRestoreLocalForm(vector, &l);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-	Assert (lsize==end-begin+(PetscInt)ghost_indices.n_elements(),
-		ExcInternalError());
+        Assert (lsize==end-begin+(PetscInt)ghost_indices.n_elements(),
+                ExcInternalError());
       }
 #endif
 
@@ -377,12 +377,12 @@ namespace PETScWrappers
     {
       unsigned int has_nonzero = VectorBase::all_zero()?0:1;
 #ifdef DEAL_II_WITH_MPI
-    // in parallel, check that the vector
-    // is zero on _all_ processors.
-    unsigned int num_nonzero = Utilities::MPI::sum(has_nonzero, communicator);
-    return num_nonzero == 0;
+      // in parallel, check that the vector
+      // is zero on _all_ processors.
+      unsigned int num_nonzero = Utilities::MPI::sum(has_nonzero, communicator);
+      return num_nonzero == 0;
 #else
-    return has_nonzero == 0;
+      return has_nonzero == 0;
 #endif
     }
 

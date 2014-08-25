@@ -3111,7 +3111,7 @@ namespace Step32
       double global_temperature[2];
 
       for (unsigned int i=distributed_temperature_solution.local_range().first;
-	   i < distributed_temperature_solution.local_range().second; ++i)
+           i < distributed_temperature_solution.local_range().second; ++i)
         {
           temperature[0] = std::min<double> (temperature[0],
                                              distributed_temperature_solution(i));

@@ -357,25 +357,25 @@ namespace GridOutFlags
            const bool label_subdomain_id,
            const bool draw_colorbar,
            const bool draw_legend)
-		  :
-		  height(1000),
-		  width(0),
-		  line_thickness(line_thickness),
-		  boundary_line_thickness(boundary_line_thickness),
-		  margin(margin),
-		  background(background),
-		  azimuth_angle(azimuth_angle),
-		  polar_angle(polar_angle),
-		  coloring(coloring),
-		  convert_level_number_to_height(convert_level_number_to_height),
-		  level_height_factor(0.3f),
-		  label_level_number(label_level_number),
-		  label_cell_index(label_cell_index),
-		  label_material_id(label_material_id),
-		  label_subdomain_id(label_subdomain_id),
-		  label_level_subdomain_id(false),
-		  draw_colorbar(draw_colorbar),
-		  draw_legend(draw_legend)
+    :
+    height(1000),
+    width(0),
+    line_thickness(line_thickness),
+    boundary_line_thickness(boundary_line_thickness),
+    margin(margin),
+    background(background),
+    azimuth_angle(azimuth_angle),
+    polar_angle(polar_angle),
+    coloring(coloring),
+    convert_level_number_to_height(convert_level_number_to_height),
+    level_height_factor(0.3f),
+    label_level_number(label_level_number),
+    label_cell_index(label_cell_index),
+    label_material_id(label_material_id),
+    label_subdomain_id(label_subdomain_id),
+    label_level_subdomain_id(false),
+    draw_colorbar(draw_colorbar),
+    draw_legend(draw_legend)
   {}
 
   MathGL::MathGL ()
@@ -1878,8 +1878,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   for (unsigned int level_index = min_level; level_index <= max_level; level_index++)
     {
       Triangulation<2,2>::cell_iterator
-          cell = tria.begin(level_index),
-          endc = tria.end(level_index);
+      cell = tria.begin(level_index),
+      endc = tria.end(level_index);
 
       for (; cell != endc; ++cell)
         {
@@ -2437,7 +2437,7 @@ namespace
 
     // convert each of the active cells into a patch
     for (typename Triangulation<dim,spacedim>::active_cell_iterator cell = triangulation.begin_active();
-        cell != triangulation.end(); ++cell)
+         cell != triangulation.end(); ++cell)
       {
         DataOutBase::Patch<dim,spacedim> patch;
         patch.n_subdivisions = 1;
@@ -2459,7 +2459,7 @@ namespace
 
 template <int dim, int spacedim>
 void GridOut::write_vtk (const Triangulation<dim,spacedim> &tria,
-                            std::ostream             &out) const
+                         std::ostream             &out) const
 {
   AssertThrow (out, ExcIO ());
 
@@ -3428,8 +3428,8 @@ namespace internal
         case 2:
         {
           for (typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-              cell=tria.begin_active();
-              cell!=tria.end(); ++cell)
+               cell=tria.begin_active();
+               cell!=tria.end(); ++cell)
             for (unsigned int line_no=0;
                  line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
               {
@@ -3501,8 +3501,8 @@ namespace internal
               // generate the info from
               // them
               for (typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
-                  cell=tria.begin_active();
-                  cell!=tria.end(); ++cell)
+                   cell=tria.begin_active();
+                   cell!=tria.end(); ++cell)
                 for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
                   {
                     const typename dealii::Triangulation<dim, spacedim>::face_iterator

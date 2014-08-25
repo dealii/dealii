@@ -805,11 +805,11 @@ namespace FEValuesViews
                   // we're in 2d, so the formula for the curl is simple:
                   if (shape_function_data[shape_function].single_nonzero_component_index == 0)
                     for (unsigned int q_point = 0;
-                        q_point < n_quadrature_points; ++q_point)
+                         q_point < n_quadrature_points; ++q_point)
                       curls[q_point][0] -= value * (*shape_gradient_ptr++)[1];
                   else
                     for (unsigned int q_point = 0;
-                        q_point < n_quadrature_points; ++q_point)
+                         q_point < n_quadrature_points; ++q_point)
                       curls[q_point][0] += value * (*shape_gradient_ptr++)[0];
                 }
               else
@@ -2259,7 +2259,7 @@ namespace internal
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     if (dofs_per_cell == 0)
       return;
-    
+
     const unsigned int n_quadrature_points = shape_values.n_cols();
     const unsigned int n_components = fe.n_components();
 

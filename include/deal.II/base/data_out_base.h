@@ -1531,7 +1531,7 @@ namespace DataOutBase
                   const EpsFlags                          &flags,
                   std::ostream                            &out);
 
-  
+
   /**
    * Write the given list of patches to the output stream in
    * GMV format.

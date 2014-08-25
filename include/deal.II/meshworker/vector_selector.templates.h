@@ -134,24 +134,24 @@ namespace MeshWorker
     AssertDimension(gradients.size(), this->n_gradients());
     AssertDimension(hessians.size(), this->n_hessians());
 
-    const AnyData& data = this->data;
+    const AnyData &data = this->data;
     for (unsigned int i=0; i<this->n_values(); ++i)
       {
-        const VECTOR* src = data.read_ptr<VECTOR>(this->value_index(i));
+        const VECTOR *src = data.read_ptr<VECTOR>(this->value_index(i));
         VectorSlice<std::vector<std::vector<double> > > dst(values[i], component, n_comp);
         fe.get_function_values(*src, make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_gradients(); ++i)
       {
-        const VECTOR* src = data.read_ptr<VECTOR>(this->gradient_index(i));
+        const VECTOR *src = data.read_ptr<VECTOR>(this->gradient_index(i));
         VectorSlice<std::vector<std::vector<Tensor<1,dim> > > > dst(gradients[i], component, n_comp);
         fe.get_function_gradients(*src, make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_hessians(); ++i)
       {
-        const VECTOR* src = data.read_ptr<VECTOR>(this->hessian_index(i));
+        const VECTOR *src = data.read_ptr<VECTOR>(this->hessian_index(i));
         VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
         fe.get_function_hessians(*src, make_slice(index, start, size), dst, true);
       }
@@ -176,8 +176,8 @@ namespace MeshWorker
 
   template <class VECTOR, int dim, int spacedim>
   MGVectorData<VECTOR, dim, spacedim>::MGVectorData(const VectorSelector &s)
-		  :
-		  VectorData<VECTOR, dim, spacedim>(s)
+    :
+    VectorData<VECTOR, dim, spacedim>(s)
   {}
 
 
@@ -219,24 +219,24 @@ namespace MeshWorker
     AssertDimension(gradients.size(), this->n_gradients());
     AssertDimension(hessians.size(), this->n_hessians());
 
-    const AnyData& data = this->data;
+    const AnyData &data = this->data;
     for (unsigned int i=0; i<this->n_values(); ++i)
       {
-        const MGLevelObject<VECTOR>* src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
+        const MGLevelObject<VECTOR> *src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
         VectorSlice<std::vector<std::vector<double> > > dst(values[i], component, n_comp);
         fe.get_function_values((*src)[level], make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_gradients(); ++i)
       {
-        const MGLevelObject<VECTOR>* src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
+        const MGLevelObject<VECTOR> *src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
         VectorSlice<std::vector<std::vector<Tensor<1,dim> > > > dst(gradients[i], component, n_comp);
         fe.get_function_gradients((*src)[level], make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_hessians(); ++i)
       {
-        const MGLevelObject<VECTOR>* src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
+        const MGLevelObject<VECTOR> *src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
         VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
         fe.get_function_hessians((*src)[level], make_slice(index, start, size), dst, true);
       }

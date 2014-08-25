@@ -1339,8 +1339,8 @@ namespace TrilinosWrappers
                       const unsigned int                     smoother_sweeps = 2,
                       const unsigned int                     smoother_overlap = 0,
                       const bool                             output_details = false,
-                      const char*                            smoother_type = "Chebyshev",
-                      const char*                            coarse_type = "Amesos-KLU");
+                      const char                            *smoother_type = "Chebyshev",
+                      const char                            *coarse_type = "Amesos-KLU");
 
       /**
        * Determines whether the AMG preconditioner should be optimized for
@@ -1447,13 +1447,13 @@ namespace TrilinosWrappers
        *   <li>  "IFPACK-Block Chebyshev" </li>
        * </ul>
        */
-      const char* smoother_type;
+      const char *smoother_type;
 
       /**
        * Determines which solver to use on the coarsest level. The same
        * settings as for the smoother type are possible.
        */
-      const char* coarse_type;
+      const char *coarse_type;
     };
 
     /**

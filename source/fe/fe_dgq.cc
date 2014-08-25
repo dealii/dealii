@@ -225,8 +225,8 @@ FE_DGQ<dim, spacedim>::get_name () const
 
   std::ostringstream namebuf;
   namebuf << "FE_DGQ<"
-	  << Utilities::dim_string(dim,spacedim)
-	  << ">(" << this->degree << ")";
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << this->degree << ")";
   return namebuf.str();
 }
 
@@ -501,10 +501,10 @@ FE_DGQ<dim,spacedim>
       if (refinement_case == RefinementCase<dim>::isotropic_refinement)
         {
           std::vector<std::vector<FullMatrix<double> > >
-            isotropic_matrices(RefinementCase<dim>::isotropic_refinement);
+          isotropic_matrices(RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().
-            resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-                   FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
+          resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+                 FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
           if (dim == spacedim)
             FETools::compute_embedding_matrices (*this, isotropic_matrices, true);
           else
@@ -567,15 +567,15 @@ FE_DGQ<dim,spacedim>
       if (refinement_case == RefinementCase<dim>::isotropic_refinement)
         {
           std::vector<std::vector<FullMatrix<double> > >
-            isotropic_matrices(RefinementCase<dim>::isotropic_refinement);
+          isotropic_matrices(RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().
-            resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-                   FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
+          resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+                 FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
           if (dim == spacedim)
             FETools::compute_projection_matrices (*this, isotropic_matrices, true);
           else
             FETools::compute_projection_matrices (FE_DGQ<dim>(this->degree),
-                                                 isotropic_matrices, true);
+                                                  isotropic_matrices, true);
           this_nonconst.restriction[refinement_case-1].swap(isotropic_matrices.back());
         }
       else
@@ -780,7 +780,7 @@ FE_DGQ<dim,spacedim>::get_constant_modes () const
   Table<2,bool> constant_modes(1, this->dofs_per_cell);
   constant_modes.fill(true);
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, std::vector<unsigned int>(1, 0));
+         (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 

@@ -504,7 +504,7 @@ namespace PETScWrappers
 
       /**
        * @copydoc PETScWrappers::VectorBase::all_zero()
-       * 
+       *
        * @note This function overloads the one in the base class
        * to make this a collective operation.
        */
@@ -598,11 +598,11 @@ namespace PETScWrappers
     {
       // make sure left- and right-hand side of the assignment are compress()'ed:
       Assert(v.last_action == VectorOperation::unknown,
-            internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
-                                                   v.last_action));
+             internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
+                                                      v.last_action));
       Assert(last_action == VectorOperation::unknown,
-            internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
-                                                   last_action));
+             internal::VectorReference::ExcWrongMode (VectorOperation::unknown,
+                                                      last_action));
 
 
       if (v.size()==0)

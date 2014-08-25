@@ -2033,7 +2033,7 @@ namespace internal
       tbb::task *execute ()
       {
         tbb::empty_task *root = new( tbb::task::allocate_root() )
-          tbb::empty_task;
+        tbb::empty_task;
         unsigned int evens = task_info.partition_evens[partition];
         unsigned int odds  = task_info.partition_odds[partition];
         unsigned int n_blocked_workers =
@@ -2046,14 +2046,14 @@ namespace internal
         for (unsigned int j=0; j<evens; j++)
           {
             worker[j] = new(root->allocate_child())
-              CellWork<Worker>(function, task_info.
-                               partition_color_blocks_row_index[partition]+2*j,
-                               task_info, false);
+            CellWork<Worker>(function, task_info.
+                             partition_color_blocks_row_index[partition]+2*j,
+                             task_info, false);
             if (j>0)
               {
                 worker[j]->set_ref_count(2);
                 blocked_worker[j-1]->dummy = new(worker[j]->allocate_child())
-                  tbb::empty_task;
+                tbb::empty_task;
                 worker[j-1]->spawn(*blocked_worker[j-1]);
               }
             else
@@ -2061,24 +2061,24 @@ namespace internal
             if (j<evens-1)
               {
                 blocked_worker[j] = new(worker[j]->allocate_child())
-                  CellWork<Worker>(function, task_info.
-                                   partition_color_blocks_row_index
-                                   [partition] + 2*j+1, task_info, true);
+                CellWork<Worker>(function, task_info.
+                                 partition_color_blocks_row_index
+                                 [partition] + 2*j+1, task_info, true);
               }
             else
               {
                 if (odds==evens)
                   {
                     worker[evens] = new(worker[j]->allocate_child())
-                      CellWork<Worker>(function, task_info.
-                                       partition_color_blocks_row_index[partition]+2*j+1,
-                                       task_info, false);
+                    CellWork<Worker>(function, task_info.
+                                     partition_color_blocks_row_index[partition]+2*j+1,
+                                     task_info, false);
                     worker[j]->spawn(*worker[evens]);
                   }
                 else
                   {
                     tbb::empty_task *child = new(worker[j]->allocate_child())
-                      tbb::empty_task();
+                    tbb::empty_task();
                     worker[j]->spawn(*child);
                   }
               }
