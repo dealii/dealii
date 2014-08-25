@@ -22,6 +22,7 @@ env:
 
 #  These tests run ok, but they might be out of policy...
   - CI_TEST_SUITE=build CI_BUILD_TYPE=Debug
+  - CI_TEST_SUITE=indent
 #  - CI_TEST_SUITE=build CI_BUILD_TYPE=Release
 
 # These tests only compile and run "make tests"
