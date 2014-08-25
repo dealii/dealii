@@ -789,7 +789,11 @@
  * meshes can happen with sufficiently irregular boundary descriptions
  * (and if the coarse mesh is entirely inadequate to resolve the
  * complexity of the boundary), the Triangulation class does not know
- * what to do in such situations. Consequently, the
+ * what to do in such situations unless one attaches an appropriate manifold
+ * object to the cells in question (see the
+ * @ref manifold "documentation module on manifolds"). Consequently, absent
+ * such a manifold description or if the manifold description does not
+ * provide a sufficient description of the geometry, the
  * Triangulation::execute_coarsening_and_refinement function does
  * create such meshes, but it keeps a list of cells whose children are
  * distorted. If this list is non-empty at the end of a refinement

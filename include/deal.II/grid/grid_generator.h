@@ -458,10 +458,10 @@ namespace GridGenerator
    * is zero (as is the default), then it is computed adaptively such that the
    * resulting elements have the least aspect ratio.
    *
-   * In 3d, only two different numbers are meaningful, 6 for a surface based
+   * In 3d, only certain numbers are allowed, 6 for a surface based
    * on a hexahedron (i.e. 6 panels on the inner sphere extruded in radial
-   * direction to form 6 cells) and 12 for the rhombic dodecahedron. These
-   * give rise to the following meshes upon one refinement:
+   * direction to form 6 cells), 12 for the rhombic dodecahedron, and 96 (see
+   * below). These give rise to the following meshes upon one refinement:
    *
    * @image html hypershell3d-6.png
    * @image html hypershell3d-12.png
@@ -472,7 +472,7 @@ namespace GridGenerator
    *
    * @image html hyper_shell_6_cross_plane.png
    *
-   * The mesh generated with <code>n_cells=6</code> is better but still not
+   * The mesh generated with <code>n_cells=12</code> is better but still not
    * good. As a consequence, you may also specify <code>n_cells=96</code> as a
    * third option. The mesh generated in this way is based on a once refined
    * version of the one with <code>n_cells=12</code>, where all internal nodes
@@ -484,6 +484,13 @@ namespace GridGenerator
    *
    * @image html hyper_shell_12_cut.png
    * @image html hyper_shell_96_cut.png
+   *
+   * A different way to approach the problem with distorted cells
+   * is to attach appropriate manifold descriptions to the geometry created
+   * by this function. In the current context, this would involve the
+   * SphericalManifold class. An example of how this works and what it leads
+   * to is shown in the documentation of the
+   * @ref manifold "documentation module on manifolds".
    *
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
