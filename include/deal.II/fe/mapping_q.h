@@ -22,6 +22,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/manifold.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -265,7 +266,35 @@ protected:
   add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                           std::vector<Point<spacedim> > &a) const;
 
+
 private:
+  /**
+   * Ask the manifold descriptor to return intermediate points on
+   * lines or faces. The function needs to return one or multiple
+   * points (depending on the number of elements in the output vector
+   * @p points that lie inside a line, quad or hex). Whether it is a
+   * line, quad or hex doesn't really matter to this function but it
+   * can be inferred from the number of input points in the @p
+   * surrounding_points vector.
+   */
+  void get_intermediate_points(const Manifold<dim, spacedim> &manifold,
+                               const std::vector<Point<spacedim> > &surrounding_points,
+                               std::vector<Point<spacedim> > &points) const;
+
+
+  /**
+   * Ask the manifold descriptor to return intermediate points on the
+   * object pointed to by the TriaIterator @p iter. This function
+   * tries to be backward compatible with respect to the differences
+   * between Boundary<dim,spacedim> and Manifold<dim,spacedim>,
+   * querying the first whenever the passed @p manifold can be
+   * upgraded to a Boundary<dim,spacedim>.
+   */
+  template <class TriaIterator>
+  void get_intermediate_points_on_object(const Manifold<dim, spacedim> &manifold,
+                                         const TriaIterator &iter,
+                                         std::vector<Point<spacedim> > &points) const;
+
 
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
@@ -434,6 +463,18 @@ private:
    */
   const FE_Q<dim> feq;
 
+
+  /*
+   * The default line support points. These are used when computing
+   * the location in real space of the support points on lines and
+   * quads, which are asked to the Manifold<dim,spacedim> class.
+   *
+   * The number of quadrature points depends on the degree of this
+   * class, and it matches the number of degrees of freedom of an
+   * FE_Q<1>(this->degree).
+   */
+  QGaussLobatto<1> line_support_points;
+
   /**
    * Declare other MappingQ classes friends.
    */
@@ -461,19 +502,51 @@ void MappingQ<3>::set_laplace_on_hex_vector(Table<2,double> &lohvs) const;
 
 template <>
 void MappingQ<1>::compute_laplace_vector(Table<2,double> &) const;
-template <>
-void MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
-                                           std::vector<Point<1> > &) const;
-template <>
-void MappingQ<1,2>::add_line_support_points (const Triangulation<1,2>::cell_iterator &,
-                                             std::vector<Point<2> > &) const;
-template <>
-void MappingQ<1,3>::add_line_support_points (const Triangulation<1,3>::cell_iterator &,
-                                             std::vector<Point<3> > &) const;
+
 
 template<>
 void MappingQ<3>::add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
                                           std::vector<Point<3> >                &a) const;
+
+// ---- Templated functions ---- //
+template <int dim, int spacedim>
+template <class TriaIterator>
+void
+MappingQ<dim,spacedim>::get_intermediate_points_on_object(const Manifold<dim, spacedim> &manifold,
+                                                          const TriaIterator &iter,
+                                                          std::vector<Point<spacedim> > &points) const
+{
+  const unsigned int structdim = TriaIterator::AccessorType::structure_dimension;
+  // Try backward compatibility option.
+  const Boundary<dim,spacedim> *boundary = dynamic_cast<const Boundary<dim,spacedim> *>(&manifold);
+  if (boundary) // This is actually a boundary. Call old methods.
+    switch (structdim)
+      {
+      case 1:
+      {
+        const typename Triangulation<dim,spacedim>::line_iterator line = iter;
+        boundary->get_intermediate_points_on_line(line, points);
+        return;
+      }
+      case 2:
+      {
+        const typename Triangulation<dim,spacedim>::quad_iterator quad = iter;
+        boundary->get_intermediate_points_on_quad(quad, points);
+        return;
+      }
+      default:
+        Assert(false, ExcInternalError());
+        return;
+      }
+  else
+    {
+      std::vector<Point<spacedim> > sp(GeometryInfo<structdim>::vertices_per_cell);
+      for (unsigned int i=0; i<sp.size(); ++i)
+        sp[i] = iter->vertex(i);
+      get_intermediate_points(manifold, sp, points);
+    }
+}
+
 
 #endif // DOXYGEN
 

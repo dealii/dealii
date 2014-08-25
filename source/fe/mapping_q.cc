@@ -71,7 +71,8 @@ MappingQ<1>::MappingQ (const unsigned int,
   n_shape_functions(2),
   renumber(0),
   use_mapping_q_on_all_cells (false),
-  feq(degree)
+  feq(degree),
+  line_support_points(degree+1)
 {}
 
 
@@ -85,7 +86,8 @@ MappingQ<1>::MappingQ (const MappingQ<1> &m):
   n_shape_functions(2),
   renumber(0),
   use_mapping_q_on_all_cells (m.use_mapping_q_on_all_cells),
-  feq(degree)
+  feq(degree),
+  line_support_points(degree+1)
 {}
 
 template<>
@@ -128,13 +130,13 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
                                      degree))),
   use_mapping_q_on_all_cells (use_mapping_q_on_all_cells
                               || (dim != spacedim)),
-  feq(degree)
+  feq(degree),
+  line_support_points(degree+1)
 {
   // Construct the tensor product polynomials used as shape functions for the
   // Qp mapping of cells at the boundary.
-  const QGaussLobatto<1> points(degree+1);
   tensor_pols = new TensorProductPolynomials<dim>
-  (Polynomials::generate_complete_Lagrange_basis(points.get_points()));
+  (Polynomials::generate_complete_Lagrange_basis(line_support_points.get_points()));
   Assert (n_shape_functions==tensor_pols->n(),
           ExcInternalError());
   Assert(n_inner+n_outer==n_shape_functions, ExcInternalError());
@@ -161,7 +163,8 @@ MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
   n_shape_functions(mapping.n_shape_functions),
   renumber(mapping.renumber),
   use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
-  feq(degree)
+  feq(degree),
+  line_support_points(degree+1)
 {
   tensor_pols=new TensorProductPolynomials<dim> (*mapping.tensor_pols);
   laplace_on_quad_vector=mapping.laplace_on_quad_vector;
@@ -744,101 +747,26 @@ MappingQ<dim,spacedim>::compute_support_points_laplace(const typename Triangulat
 }
 
 
-
-template <>
-void
-MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
-                                      std::vector<Point<1> > &) const
-{
-  // there are no points on bounding lines which are to be added
-  const unsigned int dim=1;
-  Assert (dim > 1, ExcImpossibleInDim(dim));
-}
-
-
-
-template <>
-void
-MappingQ<1,2>::add_line_support_points (const Triangulation<1,2>::cell_iterator &cell,
-                                        std::vector<Point<2> > &a) const
-{
-  const unsigned int dim      = 1;
-  const unsigned int spacedim = 2;
-  // Ask for the mid point, if that's the only thing we need.
-  if (degree==2)
-    {
-      const Boundary<dim,spacedim> *const boundary
-        = &(cell->get_triangulation().get_boundary(cell->material_id()));
-      a.push_back(boundary->get_new_point_on_line(cell));
-    }
-  else
-    // otherwise call the more complicated functions and ask for inner points
-    // from the boundary description
-    {
-      std::vector<Point<spacedim> > line_points (degree-1);
-
-      const Boundary<dim,spacedim> *const boundary
-        = &(cell->get_triangulation().get_boundary(cell->material_id()));
-
-      boundary->get_intermediate_points_on_line (cell, line_points);
-      // Append all points
-      a.insert (a.end(), line_points.begin(), line_points.end());
-    }
-}
-
-
-
-template <>
-void
-MappingQ<1,3>::add_line_support_points (const Triangulation<1,3>::cell_iterator &cell,
-                                        std::vector<Point<3> > &a) const
-{
-  const unsigned int dim      = 1;
-  const unsigned int spacedim = 3;
-  // Ask for the mid point, if that's the only thing we need.
-  if (degree==2)
-    {
-      const Boundary<dim,spacedim> *const boundary
-        = &(cell->get_triangulation().get_boundary(cell->material_id()));
-      a.push_back(boundary->get_new_point_on_line(cell));
-    }
-  else
-    // otherwise call the more complicated functions and ask for inner points
-    // from the boundary description
-    {
-      std::vector<Point<spacedim> > line_points (degree-1);
-
-      const Boundary<dim,spacedim> *const boundary
-        = &(cell->get_triangulation().get_boundary(cell->material_id()));
-
-      boundary->get_intermediate_points_on_line (cell, line_points);
-      // Append all points
-      a.insert (a.end(), line_points.begin(), line_points.end());
-    }
-}
-
-
-
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                                  std::vector<Point<spacedim> > &a) const
 {
-  static const StraightBoundary<dim,spacedim> straight_boundary;
   // if we only need the midpoint, then ask for it.
   if (degree==2)
     {
       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
         {
-          const typename Triangulation<dim,spacedim>::line_iterator line = cell->line(line_no);
-          const Boundary<dim,spacedim> *const boundary
-            = (line->at_boundary()?
-               &line->get_triangulation().get_boundary(line->boundary_indicator()):
-               (dim != spacedim) ?
-               &line->get_triangulation().get_boundary(cell->material_id()):
-               &straight_boundary);
+          const typename Triangulation<dim,spacedim>::line_iterator line =
+            (dim == 1  ?
+             static_cast<typename Triangulation<dim,spacedim>::line_iterator>(cell) :
+             cell->line(line_no));
 
-          a.push_back(boundary->get_new_point_on_line(line));
+          const Manifold<dim,spacedim> &manifold =
+            ( ( line->manifold_id() == numbers::invalid_manifold_id ) &&
+              ( dim < spacedim ) ? cell->get_manifold() :
+              line->get_manifold() );
+          a.push_back(manifold.get_new_point_on_line(line));
         };
     }
   else
@@ -846,21 +774,24 @@ MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<di
     // from the boundary description
     {
       std::vector<Point<spacedim> > line_points (degree-1);
-
       // loop over each of the lines, and if it is at the boundary, then first
       // get the boundary description and second compute the points on it
       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
         {
-          const typename Triangulation<dim,spacedim>::line_iterator line = cell->line(line_no);
+          const typename Triangulation<dim,spacedim>::line_iterator
+          line = (dim == 1
+                  ?
+                  static_cast<typename Triangulation<dim,spacedim>::line_iterator>(cell)
+                  :
+                  cell->line(line_no));
 
-          const Boundary<dim,spacedim> *const boundary
-            = (line->at_boundary()?
-               &line->get_triangulation().get_boundary(line->boundary_indicator()) :
-               (dim != spacedim) ?
-               &line->get_triangulation().get_boundary(cell->material_id()) :
-               &straight_boundary);
+          const Manifold<dim,spacedim> &manifold =
+            ( ( line->manifold_id() == numbers::invalid_manifold_id ) &&
+              ( dim < spacedim ) ? cell->get_manifold() :
+              line->get_manifold() );
 
-          boundary->get_intermediate_points_on_line (line, line_points);
+          get_intermediate_points_on_object (manifold, line, line_points);
+
           if (dim==3)
             {
               // in 3D, lines might be in wrong orientation. if so, reverse
@@ -898,6 +829,9 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
   // used if only one line of face quad is at boundary
   std::vector<Point<3> > b(4*degree);
 
+  // Used by the new Manifold interface. This vector collects the
+  // vertices used to compute the intermediate points.
+  std::vector<Point<3> > vertices(4);
 
   // loop over all faces and collect points on them
   for (unsigned int face_no=0; face_no<faces_per_cell; ++face_no)
@@ -931,8 +865,8 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
       // points on it
       if (face->at_boundary())
         {
-          face->get_triangulation().get_boundary(face->boundary_indicator())
-          .get_intermediate_points_on_quad (face, quad_points);
+          get_intermediate_points_on_object(face->get_manifold(), face, quad_points);
+
           // in 3D, the orientation, flip and rotation of the face might not
           // match what we expect here, namely the standard orientation. thus
           // reorder points accordingly. since a Mapping uses the same shape
@@ -992,9 +926,12 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
             }
           else
             {
-              // face is entirely in the interior. get intermediate points
-              // from a straight boundary object
-              straight_boundary.get_intermediate_points_on_quad (face, quad_points);
+              // face is entirely in the interior. get intermediate
+              // points from the relevant manifold object.
+              vertices.resize(4);
+              for (unsigned int i=0; i<4; ++i)
+                vertices[i] = face->vertex(i);
+              get_intermediate_points (face->get_manifold(), vertices, quad_points);
               // in 3D, the orientation, flip and rotation of the face might
               // not match what we expect here, namely the standard
               // orientation. thus reorder points accordingly. since a Mapping
@@ -1019,9 +956,7 @@ add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
                         std::vector<Point<3> >                &a) const
 {
   std::vector<Point<3> > quad_points ((degree-1)*(degree-1));
-
-  cell->get_triangulation().get_boundary(cell->material_id())
-  .get_intermediate_points_on_quad (cell, quad_points);
+  get_intermediate_points_on_object (cell->get_manifold(), cell, quad_points);
   for (unsigned int i=0; i<quad_points.size(); ++i)
     a.push_back(quad_points[i]);
 }
@@ -1265,6 +1200,75 @@ MappingQ<dim,spacedim>::clone () const
   return new MappingQ<dim,spacedim>(*this);
 }
 
+
+template<int dim, int spacedim>
+void
+MappingQ<dim,spacedim>::get_intermediate_points (const Manifold<dim, spacedim> &manifold,
+                                                 const std::vector<Point<spacedim> > &surrounding_points,
+                                                 std::vector<Point<spacedim> > &points) const
+{
+  Assert(surrounding_points.size() >= 2, ExcMessage("At least 2 surrounding points are required"));
+  const unsigned int n=points.size();
+  Assert(n>0, ExcMessage("You can't ask for 0 intermediate points."));
+  std::vector<double> w(surrounding_points.size());
+
+  switch (surrounding_points.size())
+    {
+    case 2:
+    {
+      // If two points are passed, these are the two vertices, and
+      // we can only compute degree-1 intermediate points.
+      AssertDimension(n, degree-1);
+      for (unsigned int i=0; i<n; ++i)
+        {
+          const double x = line_support_points.point(i+1)[0];
+          w[1] = x;
+          w[0] = (1-x);
+          Quadrature<spacedim> quadrature(surrounding_points, w);
+          points[i] = manifold.get_new_point(quadrature);
+        }
+      break;
+    }
+
+    case 4:
+    {
+      Assert(spacedim >= 2, ExcImpossibleInDim(spacedim));
+      const unsigned m=
+        static_cast<unsigned int>(std::sqrt(static_cast<double>(n)));
+      // is n a square number
+      Assert(m*m==n, ExcInternalError());
+
+      // If four points are passed, these are the two vertices, and
+      // we can only compute (degree-1)*(degree-1) intermediate
+      // points.
+      AssertDimension(m, degree-1);
+
+      for (unsigned int i=0; i<m; ++i)
+        {
+          const double y=line_support_points.point(1+i)[0];
+          for (unsigned int j=0; j<m; ++j)
+            {
+              const double x=line_support_points.point(1+j)[0];
+
+              w[0] = (1-x)*(1-y);
+              w[1] =     x*(1-y);
+              w[2] = (1-x)*y    ;
+              w[3] =     x*y    ;
+              Quadrature<spacedim> quadrature(surrounding_points, w);
+              points[i*m+j]=manifold.get_new_point(quadrature);
+            }
+        }
+      break;
+    }
+
+    case 8:
+      Assert(false, ExcNotImplemented());
+      break;
+    default:
+      Assert(false, ExcInternalError());
+      break;
+    }
+}
 
 
 

@@ -111,7 +111,14 @@ inconvenience this causes.
 
 
 <ol>
-  
+
+  <li> New: Made MappingQ<dim,spacedim> aware of
+  Manifold<dim,spacedim>. Now we can use high order mappings that
+  actually follow the geometry also on the interior of codimension
+  zero meshes.
+  <br> (Luca Heltai, 2014/09/13) 
+  </li>
+
   <li> New: Added two optional parameters to TriaAccessor::center()
   and a new method TriaAccessor::intermediate_point(). 
   They allow to query for a 
@@ -122,18 +129,19 @@ inconvenience this causes.
   TriaAccessor::center() interface when querying for new points.
   <br>
   (Luca Heltai, 2014/09/13)
-
+  </li>
 
   <li> New: The new tutorial program step-52 explains how to use the 
   new time stepping methods.
   <br>
   (Bruno Turcksin, Damien Lebrun-Grandie, 2014/09/12)
-
+  </li>
 
   <li> New: The new tutorial program step-53 explains how to deal with
   complicated geometries.
   <br>
   (Wolfgang Bangerth, Luca Heltai, 2014/09/02)
+  </li>
 
   <li> Changed: Namespace std_cxx1x has been renamed to namespace
   std_cxx11 to match the fact that the corresponding C++ standard
