@@ -3,7 +3,9 @@ language: C++
 compiler: 
 - gcc
 
-script: ./contrib/utilities/run_travis.sh 
+before_install: ./contrib/utilities/setup_astyle.sh 
+
+script: ./contrib/utilities/check_indentation.sh 
 
 branches:
   only:
