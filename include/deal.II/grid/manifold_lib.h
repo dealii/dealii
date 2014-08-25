@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: tria_boundary_lib.h 30130 2013-07-23 13:01:18Z heltai $
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Luca Heltai, 2014
  */
-template <int dim, int spacedim>
+template <int dim, int spacedim = dim>
 class SphericalManifold : public ChartManifold<dim, spacedim, spacedim>
 {
 public:
