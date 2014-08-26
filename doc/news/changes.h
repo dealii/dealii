@@ -97,10 +97,21 @@ inconvenience this causes.
 
 
 <ol>
+  
+  <li> New: Added two optional parameters to TriaAccessor::center()
+  and a new method TriaAccessor::point(). They allow to query for a 
+  geometrically coherent center, or ask for arbitrary points on the 
+  underlying Manifold, given the dim coordinates in the reference 
+  element.
+  <br>
+  (Luca Heltai, 2014/09/12)
+
+
   <li> New: The new tutorial program step-52 explains how to use the 
   new time stepping methods.
   <br>
   (Bruno Turcksin, Damien Lebrun-Grandie, 2014/09/12)
+
 
   <li> New: The new tutorial program step-53 explains how to deal with
   complicated geometries.

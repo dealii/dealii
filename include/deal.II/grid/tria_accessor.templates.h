@@ -2060,18 +2060,6 @@ TriaAccessor<structdim, dim, spacedim>::minimum_vertex_distance () const
 }
 
 
-
-template <int structdim, int dim, int spacedim>
-Point<spacedim>
-TriaAccessor<structdim, dim, spacedim>::center () const
-{
-  Point<spacedim> p;
-  for (unsigned int v=0; v<GeometryInfo<structdim>::vertices_per_cell; ++v)
-    p += vertex(v);
-  return p/GeometryInfo<structdim>::vertices_per_cell;
-}
-
-
 template <int structdim, int dim, int spacedim>
 bool
 TriaAccessor<structdim, dim, spacedim>::
