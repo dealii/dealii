@@ -499,7 +499,7 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
 {
   if (vec_size != 0)
     {
-      iniatilize_val(max_vec_size);
+      allocate(max_vec_size);
       Assert (val != 0, ExcOutOfMemory());
 
       // get a representation of the vector
