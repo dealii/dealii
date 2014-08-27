@@ -45,6 +45,9 @@ ADD_FLAGS(DEAL_II_CXX_FLAGS "/W3")
 # Globally disable some legacy min and max macros that cause problems:
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/NOMINMAX")
 
+# Disable warning about unknown pragmas
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4068")
+
 #############################
 #                           #
 #    For Release target:    #

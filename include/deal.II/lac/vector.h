@@ -586,7 +586,7 @@ public:
   Vector<Number> &operator -= (const Vector<Number> &V);
 
   /**
-   * A collective add operation: This funnction adds a whole set of values
+   * A collective add operation: This function adds a whole set of values
    * stored in @p values to the vector components specified by @p indices.
    */
   template <typename OtherNumber>
@@ -626,12 +626,6 @@ public:
    */
   void add (const Vector<Number> &V);
 
-  /**
-   * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
-   *
-   * @dealiiOperationIsMultithreaded
-   */
-  void add (const Number a, const Vector<Number> &V);
 
   /**
    * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
@@ -640,6 +634,13 @@ public:
    */
   void add (const Number a, const Vector<Number> &V,
             const Number b, const Vector<Number> &W);
+
+  /**
+   * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
+   *
+   * @dealiiOperationIsMultithreaded
+   */
+  void add (const Number a, const Vector<Number> &V);
 
   /**
    * Scaling and simple vector addition, i.e.  <tt>*this = s*(*this)+V</tt>.
@@ -953,6 +954,18 @@ protected:
    * VectorView will access the pointer.
    */
   friend class VectorView<Number>;
+
+private:
+
+  /**
+   * Allocate and align @p v along 64-byte boundaries.
+   */
+  void allocate(const size_type n);
+
+  /**
+   * Deallocate @p val.
+   */
+  void deallocate();
 };
 
 /*@}*/
@@ -1008,7 +1021,7 @@ Vector<Number>::~Vector ()
 {
   if (val)
     {
-      delete[] val;
+      deallocate();
       val=0;
     }
 }
@@ -1021,7 +1034,7 @@ void Vector<Number>::reinit (const size_type n, const bool fast)
 {
   if (n==0)
     {
-      if (val) delete[] val;
+      if (val) deallocate();
       val = 0;
       max_vec_size = vec_size = 0;
       return;
@@ -1029,8 +1042,8 @@ void Vector<Number>::reinit (const size_type n, const bool fast)
 
   if (n>max_vec_size)
     {
-      if (val) delete[] val;
-      val = new value_type[n];
+      if (val) deallocate();
+      allocate(n);
       Assert (val != 0, ExcOutOfMemory());
       max_vec_size = n;
     };
@@ -1332,10 +1345,9 @@ Vector<Number>::load (Archive &ar, const unsigned int)
 
   ar &vec_size &max_vec_size ;
 
-  val = new Number[max_vec_size];
+  allocate(max_vec_size);
   ar &boost::serialization::make_array(val, max_vec_size);
 }
-
 
 #endif
 
