@@ -389,8 +389,13 @@
  *
  *   <tr valign="top">
  *       <td>step-51</td>
- *       <td> Solving the convection-diffusion equation with a hyrbidizable
+ *       <td> Solving the convection-diffusion equation with a hybridizable
  *       discontinuous Galerkin method using face elements.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-53</td>
+ *       <td> Describing the geometry of complex domains and curved boundaries.
  *       </td></tr>
  * </table>
  *
@@ -612,7 +617,8 @@
  *     <td>
  *       step-32,
  *       step-34,
- *       step-38
+ *       step-38,
+ *       step-53
  *     </td>
  *   </tr>
  *
@@ -634,10 +640,11 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> Advanced meshes
+ *     <td> Advanced meshes and geometries
  *     </td>
  *     <td>
- *       step-49
+ *       step-49,
+ *       step-53
  *     </td>
  *   </tr>
  *
