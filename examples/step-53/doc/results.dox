@@ -23,11 +23,32 @@ this, with an incredible amount of detail:
 
 <img src="http://www.dealii.org/images/steps/developer/step-53.topo.png" alt="">
 
-This image was produced with three small modifications: 
+A zoom-in of this picture shows the vertical displacement quite clearly (here,
+looking from the West-Northwest over the rift valley, the triple peaks
+of 
+<a href="http://en.wikipedia.org/wiki/Mount_Stanley">Mount Stanley</a>,
+<a href="http://en.wikipedia.org/wiki/Mount_Speke">Mount Speke</a>, and
+<a href="http://en.wikipedia.org/wiki/Mount_Baker_%28Uganda%29">Mount Baker</a>
+in the
+<a href="http://en.wikipedia.org/wiki/Rwenzori_Mountains">Rwenzori Range</a>,
+<a href="http://en.wikipedia.org/wiki/Lake_George_%28Uganda%29">Lake
+George</a>
+and the great flatness of
+<a href="http://en.wikipedia.org/wiki/Lake_Victoria">Lake Victoria</a>:
+
+<img src="http://www.dealii.org/images/steps/developer/step-53.topo.png" alt="">
+
+
+These image were produced with three small modifications: 
 <ol>
-  <li> An addition seventh mesh refinement towards the top surface,
+  <li> An additional seventh mesh refinement towards the top surface for the
+  first of these two pictures, and a total of nine for the second. In the
+  second image, the horizontal mesh size is approximately 1.5km, and just
+  under 1km in vertical direction. (The picture was also created using a
+  more resolved data set; however, it is too big to distribute as part of
+  the tutorial.)
   
-  <li> The addition of the following piece function that, given a point 
+  <li> The addition of the following function that, given a point 
   <code>x</code> computes the elevation by converting the point to
   reference WGS 84 coordinates and only keeping the depth variable (the
   function is, consequently, a simplified version of the
