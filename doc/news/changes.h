@@ -97,6 +97,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: The new tutorial program step-53 explains how to deal with
+  complicated geometries.
+  <br>
+  (Wolfgang Bangerth, Luca Heltai, 2014/09/02)
+
   <li> Changed: Namespace std_cxx1x has been renamed to namespace
   std_cxx11 to match the fact that the corresponding C++ standard
   was approved back in 2011. The old namespace name was retained for
