@@ -1,0 +1,227 @@
+topography.txt.gz contains data from the Shuttle Radar Topography Mission and
+was originally downloaded from http://dds.cr.usgs.gov/srtm/version1/,
+following by some data processing by D. Sarah Stamps (MIT). The documentation
+accompanying SRTM data can be found at
+http://dds.cr.usgs.gov/srtm/version1/Documentation/SRTM_Topo.txt and contains
+further information about measurement method, data layout (of the original,
+not the processed data), copyright holders and conditions and is reproduced in
+full below. In particular, note that the SRTM level 1 data corresponds to the
+statement "In advance of that, the unedited data are being released for public
+use subject to the caveats discussed below." This implies that the data is in
+the public domain and can be used for the purpose of this tutorial program and
+all modifications you may want to make to it. Similar statements about the
+data being in the public domain can be found at
+  http://dds.cr.usgs.gov/srtm/version1/Documentation/SRTM_Topo.txt
+  http://wiki.openstreetmap.org/wiki/SRTM
+  http://www.earthmodels.org/data-and-tools/topography/srtm
+  https://groups.google.com/forum/#!topic/osmand/9nj3GY1KBGI
+
+................................................
+
+SRTM_Topo     (last update 11/05/03)
+
+SRTM Documentation (best viewed with mono-spaced font, such as courier)
+
+1.0  Introduction
+
+The SRTM data sets result from a collaborative effort by the National
+Aeronautics and Space Administration (NASA) and the National Imagery and
+Mapping Agency (NIMA), as well as the participation of the German and
+Italian space agencies, to generate a near-global digital elevation model
+(DEM) of the Earth using radar interferometry. The SRTM instrument
+consisted of the Spaceborne Imaging Radar-C (SIR-C) hardware set modified
+with a Space Station-derived mast and additional antennae to form an
+interferometer with a 60 meter long baseline. A description of the SRTM
+mission, can be found in Farr and Kobrick (2000).
+
+Synthetic aperture radars are side-looking instruments and acquire data
+along continuous swaths. The SRTM swaths extended from about 30 degrees
+off-nadir to about 58 degrees off-nadir from an altitude of 233 km, and
+thus were about 225 km wide. During the data flight the instrument was
+operated at all times the orbiter was over land and about 1000 individual
+swaths were acquired over the ten days of mapping operations. Length of the
+acquired swaths range from a few hundred to several thousand km. Each
+individual data acquisition is referred to as a "data take."
+
+SRTM was the primary (and pretty much only) payload on the STS-99 mission
+of the Space Shuttle Endeavour, which launched February 11, 2000 and flew
+for 11 days. Following several hours for instrument deployment, activation
+and checkout, systematic interferometric data were collected for 222.4
+consecutive hours. The instrument operated virtually flawlessly and imaged
+99.96% of the targeted landmass at least one time, 94.59% at least twice
+and about 50% at least three or more times. The goal was to image each
+terrain segment at least twice from different angles (on ascending, or
+north-going, and descending orbit passes) to fill in areas shadowed from
+the radar beam by terrain.
+
+This 'targeted landmass' consisted of all land between 56 degrees south and
+60 degrees north latitude, which comprises almost exactly 80% of the total
+landmass.
+
+2.0 Data Set Characteristics
+
+2.1 General
+
+SRTM data were processed in a systematic fashion using the SRTM Ground
+Data Processing System (GDPS) supercomputer system at the Jet Propulsion
+Laboratory. Data were mosaicked into approximately 15,000 one degree by
+one degree cells and formatted according to the Digital Terrain Elevation
+Data (DTED) specification for delivery to NIMA, who will use it to update
+and extend their DTED products. Data were processed on a
+continent-by-continent basis beginning with North America. NIMA is applying
+several post-processing steps to these data including editing, spike and well
+removal, water body leveling and coastline definition. Following these
+"finishing" steps data will be returned to NASA for distribution to the
+scientific and civil user communities, as well as the public. In advance of
+that, the unedited data are being released for public use subject to the
+caveats discussed below.
+
+2.2 Organization
+
+SRTM data are organized into individual rasterized cells, or tiles, each
+covering one degree by one degree in latitude and longitude. Sample spacing
+for individual data points is either 1 arc-second or 3 arc-seconds,
+referred to as SRTM-1 and SRTM-3, respectively. Since one arc-second at the
+equator corresponds to roughly 30 meters in horizontal extent, the sets are
+sometimes referred to as "30 meter" or "90 meter" data.
+
+Unedited SRTM-3 data are being released continent-by-continent, with the
+definitions of the continents displayed in the file Continent_def.gif.
+By agreement with NIMA unedited SRTM-1 data for the United States and its
+territories and possessions are also being released and can be found in
+the directory /United_States_1arcsec./ Cells that straddle the border with
+neighboring countries have been masked with quarter degree quantiation
+such that data outside the U.S. have the void value.
+
+2.3 Elevation mosaics
+
+Each SRTM data tile contains a mosaic of elevations generated by averaging
+all data takes that fall within that tile. Since the primary error source
+in synthetic aperture radar data is speckle, which has the characteristics
+of random noise, combining data through averaging reduces the error by the
+square root of the number of data takes used. In the case of SRTM the
+number of data takes could range from a minimum of one (in a very few
+cases) up to as many as ten or more.
+
+3.0 Data Formats
+
+The names of individual data tiles refer to the longitude and latitude of
+the lower-left (southwest) corner of the tile (this follows the DTED
+convention as opposed to the GTOPO30 standard). For example, the
+coordinates of the lower-left corner of tile N40W118 are 40 degrees north
+latitude and 118 degrees west longitude. To be more exact, these
+coordinates refer to the geometric center of the lower left pixel, which in
+the case of SRTM-1 data will be about 30 meters in extent.
+
+SRTM-1 data are sampled at one arc-second of latitude and longitude and
+each file contains 3601 lines and 3601 samples. The rows at the north
+and south ecges as well as the columns at the east and west edges of each
+cell overlap and are identical to the edge rows and columns in the adjacent
+cell.
+
+SRTM-3 data are sampled at three arc-seconds and contain 1201 lines and
+1201 samples with similar overlapping rows and columns. This organization
+also follows the DTED convention. Unlike DTED, however, 3 arc-second data
+are generated in each case by 3x3 averaging of the 1 arc-second data - thus
+9 samples are combined in each 3 arc-second data point. Since the primary
+error source in the elevation data has the characteristics of random noise
+this reduces that error by roughly a factor of three.
+
+This sampling scheme is sometimes called a "geographic projection", but of
+course it is not actually a projection in the mapping sense. It does not
+possess any of the characteristics usually present in true map projections,
+for example it is not conformal, so that if it is displayed as an image
+geographic features will be distorted. However it is quite easy to handle
+mathematically, can be easily imported into most image processing and GIS
+software packages, and multiple cells can be assembled easily into a larger
+mosaic (unlike the pesky UTM projection, for example.)
+
+3.1 DEM File (.HGT)
+
+The DEM is provided as 16-bit signed integer data in a simple binary
+raster. There are no header or trailer bytes embedded in the file. The data
+are stored in row major order (all the data for row 1, followed by all the
+data for row 2, etc.).
+
+All elevations are in meters referenced to the WGS84 EGM96 geoid as
+documented at http://www.nima.mil/GandG/wgsegm/.
+
+Byte order is Motorola ("big-endian") standard with the most significant
+byte first. Since they are signed integers elevations can range from -32767
+to 32767 meters, encompassing the range of elevation to be found on the
+Earth.
+
+In these preliminary data there commonly will be data voids from a number of
+causes such as shadowing, phase unwrapping anomalies, or other
+radar-specific causes. Voids are flagged with the value -32768.
+
+
+4.0  Notes and Hints for SRTM Data Users
+
+4.1 Data Encoding
+
+Because the DEM data are stored in a 16-bit binary format, users must be
+aware of how the bytes are addressed on their computers. The DEM data are
+provided in Motorola or IEEE byte order, which stores the most significant
+byte first ("big endian"). Systems such as Sun SPARC and Silicon Graphics
+workstations use the Motorola byte order. The Intel byte order, which
+stores the least significant byte first ("little endian"), is used on DEC
+Alpha systems and most PCs. Users with systems that address bytes in the
+Intel byte order may have to "swap bytes" of the DEM data unless their
+application software performs the conversion during ingest. 
+
+4.3 SRTM Caveats
+
+As with all digital geospatial data sets, users of SRTM must be aware of
+certain characteristics of the data set (resolution, accuracy, method of
+production and any resulting artifacts, etc.) in order to better judge its
+suitability for a specific application. A characteristic of SRTM that
+renders it unsuitable for one application may have no relevance as a
+limiting factor for its use in a different application.
+
+In particular, data produced by the PI processor should be considered as
+"research grade" data suitable for scientific investigations and
+development and testing of various civil applications.
+
+No editing has been performed on the data, and the elevation data in
+particular contain numerous voids and other spurious points such as
+anomalously high (spike) or low (well) values. Water bodies will generally
+not be well-defined - in fact since water surfaces generally produce very
+low radar backscatter they will appear quite "noisy" or rough, in the
+elevations data. Similarly, coastlines will not be well-defined.
+
+5.0 References
+
+Farr, T.G., M. Kobrick, 2000, Shuttle Radar Topography Mission produces a
+wealth of data, Amer. Geophys. Union Eos, v. 81, p. 583-585.
+
+Rosen, P.A., S. Hensley, I.R. Joughin, F.K. Li, S.N. Madsen, E. Rodriguez,
+R.M. Goldstein, 2000, Synthetic aperture radar interferometry, Proc. IEEE,
+v. 88, p. 333-382.
+
+DMATR 8350.2, Dept. of Defense World Geodetic System 1984, Its Definition
+and Relationship with Local Geodetic Systems, Third Edition, 4 July 1997.
+http://164.214.2.59/GandG/tr8350_2.html
+
+Lemoine, F.G. et al, NASA/TP-1998-206861, The Development of the Joint NASA
+GSFC and NIMA Geopotential Model EGM96, NASA Goddard Space Flight Center,
+Greenbelt, MD 20771, U.S.A., July 1998.
+
+Other Web sites of interest:
+
+NASA/JPL SRTM: http://www.jpl.nasa.gov/srtm/
+
+NIMA: http://164.214.2.59/nimahome.html
+
+STS-99 Press Kit: http://www.shuttlepresskit.com/STS-99/index.htm
+
+Johnson Space Center STS-99:
+http://spaceflight.nasa.gov/shuttle/archives/sts-99/index.html
+
+German Space Agency: http://www.dlr.de/srtm
+
+Italian Space Agency: http://srtm.det.unifi.it/index.htm
+
+U.S. Geological Survey, EROS Data Center: http://edc.usgs.gov/
+
+Note: DTED is a trademark of the National Imagery and Mapping Agency
