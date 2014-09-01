@@ -2412,6 +2412,8 @@ namespace TrilinosWrappers
                      const TrilinosScalar *values,
                      const bool            elide_zero_values)
   {
+    AssertIndexRange(row, this->m());
+
     int ierr;
     if (last_action == Add)
       {
@@ -2641,6 +2643,7 @@ namespace TrilinosWrappers
                      const bool            elide_zero_values,
                      const bool            /*col_indices_are_sorted*/)
   {
+    AssertIndexRange(row, this->m());
     int ierr;
     if (last_action == Insert)
       {
