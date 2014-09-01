@@ -47,7 +47,7 @@ namespace internal
                     const unsigned int n_subdivisions,
                     const std::vector<unsigned int> &n_postprocessor_outputs,
                     const Mapping<dim,spacedim> &mapping,
-                    const std::vector<std_cxx1x::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
+                    const std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                     const UpdateFlags update_flags);
 
       std::vector<Point<dim> > patch_normals;

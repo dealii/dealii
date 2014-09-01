@@ -24,7 +24,7 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/iterator_range.h>
-#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/tria_faces.h>
 #include <deal.II/grid/tria_levels.h>
@@ -1029,8 +1029,8 @@ namespace internal
  *           // mesh refinement
  *           previous_cell = current_cell;
  *           previous_cell.get_tria().signals.post_refinement
- *             .connect (std_cxx1x::bind (&FEValues<dim>::invalidate_previous_cell,
- *                                        std_cxx1x::ref (*this)));
+ *             .connect (std_cxx11::bind (&FEValues<dim>::invalidate_previous_cell,
+ *                                        std_cxx11::ref (*this)));
  *         }
  *       else
  *         previous_cell = current_cell;

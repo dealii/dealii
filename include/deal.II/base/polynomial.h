@@ -23,7 +23,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 #include <vector>
 
@@ -398,7 +398,7 @@ namespace Polynomials
     /**
      * Coefficients for the interval $[0,1]$.
      */
-    static std::vector<std_cxx1x::shared_ptr<const std::vector<double> > > shifted_coefficients;
+    static std::vector<std_cxx11::shared_ptr<const std::vector<double> > > shifted_coefficients;
 
     /**
      * Vector with already computed
@@ -413,7 +413,7 @@ namespace Polynomials
      * free the memory of the vectors when
      * the global destructor is called.
      */
-    static std::vector<std_cxx1x::shared_ptr<const std::vector<double> > > recursive_coefficients;
+    static std::vector<std_cxx11::shared_ptr<const std::vector<double> > > recursive_coefficients;
 
     /**
      * Compute coefficients recursively.
@@ -594,7 +594,7 @@ namespace Polynomials
      * free the memory of the vectors when
      * the global destructor is called.
      */
-    static std::vector<std_cxx1x::shared_ptr<const std::vector<double> > > recursive_coefficients;
+    static std::vector<std_cxx11::shared_ptr<const std::vector<double> > > recursive_coefficients;
   };
 
 

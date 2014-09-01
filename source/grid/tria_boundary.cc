@@ -198,7 +198,7 @@ get_line_support_points (const unsigned int n_intermediate_points) const
       // another thread might have created points in the meantime
       if (points[n_intermediate_points].get() == 0)
         {
-          std_cxx1x::shared_ptr<QGaussLobatto<1> >
+          std_cxx11::shared_ptr<QGaussLobatto<1> >
           quadrature (new QGaussLobatto<1>(n_intermediate_points+2));
           points[n_intermediate_points] = quadrature;
         }

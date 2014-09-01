@@ -24,7 +24,7 @@
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 

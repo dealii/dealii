@@ -24,7 +24,7 @@
 #include <deal.II/lac/lapack_support.h>
 #include <deal.II/lac/vector_memory.h>
 
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <vector>
 #include <complex>
 
@@ -638,13 +638,13 @@ private:
    * The matrix <i>U</i> in the singular value decomposition
    * <i>USV<sup>T</sup></i>.
    */
-  std_cxx1x::shared_ptr<LAPACKFullMatrix<number> > svd_u;
+  std_cxx11::shared_ptr<LAPACKFullMatrix<number> > svd_u;
 
   /**
    * The matrix <i>V<sup>T</sup></i> in the singular value decomposition
    * <i>USV<sup>T</sup></i>.
    */
-  std_cxx1x::shared_ptr<LAPACKFullMatrix<number> > svd_vt;
+  std_cxx11::shared_ptr<LAPACKFullMatrix<number> > svd_vt;
 };
 
 

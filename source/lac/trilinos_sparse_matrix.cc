@@ -529,7 +529,7 @@ namespace TrilinosWrappers
     // that tells how the domain dofs of the matrix will be distributed). for
     // only one processor, we can directly assign the columns as well. Compare
     // this with bug # 4123 in the Sandia Bugzilla.
-    std_cxx1x::shared_ptr<Epetra_CrsGraph> graph;
+    std_cxx11::shared_ptr<Epetra_CrsGraph> graph;
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
                                         &n_entries_per_row[0], true));
@@ -656,7 +656,7 @@ namespace TrilinosWrappers
     Epetra_Map off_processor_map(-1, ghost_rows.size(), &ghost_rows[0],
                                  0, input_row_map.Comm());
 
-    std_cxx1x::shared_ptr<Epetra_CrsGraph> graph, nonlocal_graph;
+    std_cxx11::shared_ptr<Epetra_CrsGraph> graph, nonlocal_graph;
     if (input_row_map.Comm().NumProc() > 1)
       {
         graph.reset (new Epetra_CrsGraph (Copy, input_row_map,

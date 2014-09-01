@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -707,12 +707,12 @@ namespace internal
         dst.reinit (vec_size, true);
       if (vec_size>internal::Vector::minimum_parallel_grain_size)
         parallel::apply_to_subranges (0U, vec_size,
-                                      std_cxx1x::bind(&internal::Vector::template
+                                      std_cxx11::bind(&internal::Vector::template
                                                       copy_subrange <T,U>,
-                                                      std_cxx1x::_1,
-                                                      std_cxx1x::_2,
-                                                      std_cxx1x::cref(src),
-                                                      std_cxx1x::ref(dst)),
+                                                      std_cxx11::_1,
+                                                      std_cxx11::_2,
+                                                      std_cxx11::cref(src),
+                                                      std_cxx11::ref(dst)),
                                       internal::Vector::minimum_parallel_grain_size);
       else if (vec_size > 0)
         copy_subrange (0U, vec_size, src, dst);
@@ -731,9 +731,9 @@ Vector<Number>::operator = (const Number s)
     Assert (vec_size!=0, ExcEmptyObject());
   if (vec_size>internal::Vector::minimum_parallel_grain_size)
     parallel::apply_to_subranges (0U, vec_size,
-                                  std_cxx1x::bind(&internal::Vector::template
+                                  std_cxx11::bind(&internal::Vector::template
                                                   set_subrange<Number>,
-                                                  s, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::ref(*this)),
+                                                  s, std_cxx11::_1, std_cxx11::_2, std_cxx11::ref(*this)),
                                   internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
     internal::Vector::set_subrange<Number>(s, 0U, vec_size, *this);

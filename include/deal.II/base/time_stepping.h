@@ -19,7 +19,7 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx11/function.h>
 
 #include <vector>
 
@@ -95,8 +95,8 @@ namespace TimeStepping
      * time step.
      */
     virtual double evolve_one_time_step(
-      std::vector<std_cxx1x::function<VECTOR (const double, const VECTOR &)> > &F,
-      std::vector<std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> > &J_inverse,
+      std::vector<std_cxx11::function<VECTOR (const double, const VECTOR &)> > &F,
+      std::vector<std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> > &J_inverse,
       double t,
       double delta_t,
       VECTOR &y) = 0;
@@ -146,8 +146,8 @@ namespace TimeStepping
      * only contain one element.
      */
     double evolve_one_time_step(
-      std::vector<std_cxx1x::function<VECTOR (const double, const VECTOR &)> > &F,
-      std::vector<std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> > &J_inverse,
+      std::vector<std_cxx11::function<VECTOR (const double, const VECTOR &)> > &F,
+      std::vector<std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> > &J_inverse,
       double t,
       double delta_t,
       VECTOR &y);
@@ -164,8 +164,8 @@ namespace TimeStepping
      * evolve_one_time_step returns the time at the end of the time step.
      */
     virtual double evolve_one_time_step(
-      std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
-      std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+      std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
+      std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
       double t,
       double delta_t,
       VECTOR &y) = 0;
@@ -231,8 +231,8 @@ namespace TimeStepping
      * evolve_one_time_step returns the time at the end of the time step.
      */
     double evolve_one_time_step(
-      std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
-      std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+      std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
+      std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
       double t,
       double delta_t,
       VECTOR &y);
@@ -244,7 +244,7 @@ namespace TimeStepping
      * explicit methods. evolve_one_time_step returns the time at the end of the
      * time step.
      */
-    double evolve_one_time_step(std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
+    double evolve_one_time_step(std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
                                 double t,
                                 double delta_t,
                                 VECTOR &y);
@@ -266,7 +266,7 @@ namespace TimeStepping
     /**
      * Compute the different stages needed.
      */
-    void compute_stages(std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
+    void compute_stages(std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
                         const double t,
                         const double delta_t,
                         const VECTOR &y,
@@ -322,8 +322,8 @@ namespace TimeStepping
      * evolve_one_time_step returns the time at the end of the time step.
      */
     double evolve_one_time_step(
-      std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
-      std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+      std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
+      std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
       double t,
       double delta_t,
       VECTOR &y);
@@ -356,8 +356,8 @@ namespace TimeStepping
      * Compute the different stages needed.
      */
     void compute_stages(
-      std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
-      std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+      std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
+      std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
       double t,
       double delta_t,
       VECTOR &y,
@@ -366,14 +366,14 @@ namespace TimeStepping
     /**
      * Newton solver used for the implicit stages.
      */
-    void newton_solve(std_cxx1x::function<void (const VECTOR &,VECTOR &)> get_residual,
-                      std_cxx1x::function<VECTOR (const VECTOR &)> id_minus_tau_J_inverse,
+    void newton_solve(std_cxx11::function<void (const VECTOR &,VECTOR &)> get_residual,
+                      std_cxx11::function<VECTOR (const VECTOR &)> id_minus_tau_J_inverse,
                       VECTOR &y);
 
     /**
      * Compute the residual needed by the Newton solver.
      */
-    void compute_residual(std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
+    void compute_residual(std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
                           double t,
                           double delta_t,
                           const VECTOR &old_y,
@@ -465,8 +465,8 @@ namespace TimeStepping
      * evolve_one_time_step returns the time at the end of the time step.
      */
     double evolve_one_time_step(
-      std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
-      std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+      std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
+      std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
       double t,
       double delta_t,
       VECTOR &y);
@@ -478,7 +478,7 @@ namespace TimeStepping
      * explicit methods. evolve_one_time_step returns the time at the end of the
      * time step.
      */
-    double evolve_one_time_step(std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
+    double evolve_one_time_step(std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
                                 double t,
                                 double delta_t,
                                 VECTOR &y);
@@ -517,7 +517,7 @@ namespace TimeStepping
     /**
      * Compute the different stages needed.
      */
-    void compute_stages(std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
+    void compute_stages(std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
                         const double t,
                         const double delta_t,
                         const VECTOR &y,

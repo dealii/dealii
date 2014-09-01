@@ -23,9 +23,9 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/synchronous_iterator.h>
 
-#include <deal.II/base/std_cxx1x/tuple.h>
-#include <deal.II/base/std_cxx1x/bind.h>
-#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx11/tuple.h>
+#include <deal.II/base/std_cxx11/bind.h>
+#include <deal.II/base/std_cxx11/function.h>
 
 #include <cstddef>
 
@@ -86,9 +86,9 @@ namespace parallel
       static
       void
       apply (const F &f,
-             const std_cxx1x::tuple<I1,I2> &p)
+             const std_cxx11::tuple<I1,I2> &p)
       {
-        *std_cxx1x::get<1>(p) = f (*std_cxx1x::get<0>(p));
+        *std_cxx11::get<1>(p) = f (*std_cxx11::get<0>(p));
       }
 
       /**
@@ -99,10 +99,10 @@ namespace parallel
       static
       void
       apply (const F &f,
-             const std_cxx1x::tuple<I1,I2,I3> &p)
+             const std_cxx11::tuple<I1,I2,I3> &p)
       {
-        *std_cxx1x::get<2>(p) = f (*std_cxx1x::get<0>(p),
-                                   *std_cxx1x::get<1>(p));
+        *std_cxx11::get<2>(p) = f (*std_cxx11::get<0>(p),
+                                   *std_cxx11::get<1>(p));
       }
 
       /**
@@ -114,11 +114,11 @@ namespace parallel
       static
       void
       apply (const F &f,
-             const std_cxx1x::tuple<I1,I2,I3,I4> &p)
+             const std_cxx11::tuple<I1,I2,I3,I4> &p)
       {
-        *std_cxx1x::get<3>(p) = f (*std_cxx1x::get<0>(p),
-                                   *std_cxx1x::get<1>(p),
-                                   *std_cxx1x::get<2>(p));
+        *std_cxx11::get<3>(p) = f (*std_cxx11::get<0>(p),
+                                   *std_cxx11::get<1>(p),
+                                   *std_cxx11::get<2>(p));
       }
     };
 
@@ -189,7 +189,7 @@ namespace parallel
     for (OutputIterator in = begin_in; in != end_in;)
       *out++ = predicate (*in++);
 #else
-    typedef std_cxx1x::tuple<InputIterator,OutputIterator> Iterators;
+    typedef std_cxx11::tuple<InputIterator,OutputIterator> Iterators;
     typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators x_begin (begin_in, out);
     Iterators x_end (end_in, OutputIterator());
@@ -258,7 +258,7 @@ namespace parallel
       *out++ = predicate (*in1++, *in2++);
 #else
     typedef
-    std_cxx1x::tuple<InputIterator1,InputIterator2,OutputIterator>
+    std_cxx11::tuple<InputIterator1,InputIterator2,OutputIterator>
     Iterators;
     typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators x_begin (begin_in1, in2, out);
@@ -328,7 +328,7 @@ namespace parallel
       *out++ = predicate (*in1++, *in2++, *in3++);
 #else
     typedef
-    std_cxx1x::tuple<InputIterator1,InputIterator2,InputIterator3,OutputIterator>
+    std_cxx11::tuple<InputIterator1,InputIterator2,InputIterator3,OutputIterator>
     Iterators;
     typedef SynchronousIterators<Iterators> SyncIterators;
     Iterators x_begin (begin_in1, in2, in3, out);
@@ -401,11 +401,11 @@ namespace parallel
    *   {
    *     parallel::apply_to_subranges
    *        (0, A.n_rows(),
-   *         std_cxx1x::bind (&mat_vec_on_subranges,
-   *                          std_cxx1x::_1, std_cxx1x::_2,
-   *                          std_cxx1x::cref(A),
-   *                          std_cxx1x::cref(x),
-   *                          std_cxx1x::ref(y)),
+   *         std_cxx11::bind (&mat_vec_on_subranges,
+   *                          std_cxx11::_1, std_cxx11::_2,
+   *                          std_cxx11::cref(A),
+   *                          std_cxx11::cref(x),
+   *                          std_cxx11::ref(y)),
    *         50);
    *   }
    *
@@ -422,14 +422,14 @@ namespace parallel
    * @endcode
    *
    * Note how we use the
-   * <code>std_cxx1x::bind</code> function to
+   * <code>std_cxx11::bind</code> function to
    * convert
    * <code>mat_vec_on_subranged</code> from a
    * function that takes 5 arguments to one
    * taking 2 by binding the remaining
    * arguments (the modifiers
-   * <code>std_cxx1x::ref</code> and
-   * <code>std_cxx1x::cref</code> make sure
+   * <code>std_cxx11::ref</code> and
+   * <code>std_cxx11::cref</code> make sure
    * that the enclosed variables are actually
    * passed by reference and constant
    * reference, rather than by value). The
@@ -482,9 +482,9 @@ namespace parallel
 #else
     tbb::parallel_for (tbb::blocked_range<RangeType>
                        (begin, end, grainsize),
-                       std_cxx1x::bind (&internal::apply_to_subranges<RangeType,Function>,
-                                        std_cxx1x::_1,
-                                        std_cxx1x::cref(f)),
+                       std_cxx11::bind (&internal::apply_to_subranges<RangeType,Function>,
+                                        std_cxx11::_1,
+                                        std_cxx11::cref(f)),
                        tbb::auto_partitioner());
 #endif
   }
@@ -661,7 +661,7 @@ namespace parallel
        * reduce the result of two calls
        * into one number.
        */
-      const std_cxx1x::function<ResultType (ResultType, ResultType)> reductor;
+      const std_cxx11::function<ResultType (ResultType, ResultType)> reductor;
     };
 #endif
   }
@@ -690,10 +690,10 @@ namespace parallel
    *      std::sqrt
    *       (parallel::accumulate_from_subranges<double>
    *        (0, A.n_rows(),
-   *         std_cxx1x::bind (&mat_norm_sqr_on_subranges,
-   *                          std_cxx1x::_1, std_cxx1x::_2,
-   *                          std_cxx1x::cref(A),
-   *                          std_cxx1x::cref(x)),
+   *         std_cxx11::bind (&mat_norm_sqr_on_subranges,
+   *                          std_cxx11::_1, std_cxx11::_2,
+   *                          std_cxx11::cref(A),
+   *                          std_cxx11::cref(x)),
    *         50);
    *   }
    *

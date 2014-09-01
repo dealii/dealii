@@ -94,8 +94,8 @@ PointValueHistory<dim>::PointValueHistory (const DoFHandler<dim> &dof_handler,
     = std::vector<std::vector <double> > (n_indep, std::vector <double> (0));
   indep_names = std::vector <std::string> ();
 
-  tria_listener = dof_handler.get_tria().signals.any_change.connect (std_cxx1x::bind (&PointValueHistory<dim>::tria_change_listener,
-                  std_cxx1x::ref(*this)));
+  tria_listener = dof_handler.get_tria().signals.any_change.connect (std_cxx11::bind (&PointValueHistory<dim>::tria_change_listener,
+                  std_cxx11::ref(*this)));
 }
 
 
@@ -124,8 +124,8 @@ PointValueHistory<dim>::PointValueHistory (const PointValueHistory &point_value_
   // Presume subscribe new instance?
   if (have_dof_handler)
     {
-      tria_listener = dof_handler->get_tria().signals.any_change.connect (std_cxx1x::bind     (&PointValueHistory<dim>::tria_change_listener,
-                      std_cxx1x::ref(*this)));
+      tria_listener = dof_handler->get_tria().signals.any_change.connect (std_cxx11::bind     (&PointValueHistory<dim>::tria_change_listener,
+                      std_cxx11::ref(*this)));
     }
 }
 
@@ -156,8 +156,8 @@ PointValueHistory<dim>::operator= (const PointValueHistory &point_value_history)
   // Presume subscribe new instance?
   if (have_dof_handler)
     {
-      tria_listener = dof_handler->get_tria().signals.any_change.connect (std_cxx1x::bind     (&PointValueHistory<dim>::tria_change_listener,
-                      std_cxx1x::ref(*this)));
+      tria_listener = dof_handler->get_tria().signals.any_change.connect (std_cxx11::bind     (&PointValueHistory<dim>::tria_change_listener,
+                      std_cxx11::ref(*this)));
     }
 
   return * this;

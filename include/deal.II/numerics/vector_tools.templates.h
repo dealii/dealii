@@ -60,7 +60,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 
-#include <deal.II/base/std_cxx1x/array.h>
+#include <deal.II/base/std_cxx11/array.h>
 #include <numeric>
 #include <algorithm>
 #include <vector>
@@ -4870,8 +4870,8 @@ namespace VectorTools
     template <int dim>
     struct PointComparator
     {
-      bool operator ()(const std_cxx1x::array<types::global_dof_index,dim> &p1,
-                       const std_cxx1x::array<types::global_dof_index,dim> &p2)
+      bool operator ()(const std_cxx11::array<types::global_dof_index,dim> &p1,
+                       const std_cxx11::array<types::global_dof_index,dim> &p2)
       {
         for (unsigned int d=0; d<dim; ++d)
           if (p1[d] < p2[d])
@@ -4952,14 +4952,14 @@ namespace VectorTools
     // Extract a list that collects all vector components that belong to the
     // same node (scalar basis function). When creating that list, we use an
     // array of dim components that stores the global degree of freedom.
-    std::set<std_cxx1x::array<types::global_dof_index,dim>, PointComparator<dim> > vector_dofs;
+    std::set<std_cxx11::array<types::global_dof_index,dim>, PointComparator<dim> > vector_dofs;
     std::vector<types::global_dof_index> face_dofs;
 
-    std::map<std_cxx1x::array<types::global_dof_index,dim>, Vector<double> >
+    std::map<std_cxx11::array<types::global_dof_index,dim>, Vector<double> >
     dof_vector_to_b_values;
 
     std::set<types::boundary_id>::iterator b_id;
-    std::vector<std_cxx1x::array<types::global_dof_index,dim> > cell_vector_dofs;
+    std::vector<std_cxx11::array<types::global_dof_index,dim> > cell_vector_dofs;
     for (typename DH<dim,spacedim>::active_cell_iterator cell =
            dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
       if (!cell->is_artificial())
@@ -5024,7 +5024,7 @@ namespace VectorTools
     // iterate over the list of all vector components we found and see if we
     // can find constrained ones
     unsigned int n_total_constraints_found = 0;
-    for (typename std::set<std_cxx1x::array<types::global_dof_index,dim>,
+    for (typename std::set<std_cxx11::array<types::global_dof_index,dim>,
          PointComparator<dim> >::const_iterator it=vector_dofs.begin();
          it!=vector_dofs.end(); ++it)
       {

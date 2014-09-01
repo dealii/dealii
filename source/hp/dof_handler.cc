@@ -17,7 +17,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/thread_management.h>
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/dof_level.h>
 #include <deal.II/hp/dof_faces.h>
@@ -70,7 +70,7 @@ namespace internal
     void
     ensure_existence_of_dof_identities (const FiniteElement<dim,spacedim> &fe1,
                                         const FiniteElement<dim,spacedim> &fe2,
-                                        std_cxx1x::shared_ptr<DoFIdentities> &identities)
+                                        std_cxx11::shared_ptr<DoFIdentities> &identities)
     {
       // see if we need to fill this
       // entry, or whether it already
@@ -82,7 +82,7 @@ namespace internal
             case 0:
             {
               identities =
-                std_cxx1x::shared_ptr<DoFIdentities>
+                std_cxx11::shared_ptr<DoFIdentities>
                 (new DoFIdentities(fe1.hp_vertex_dof_identities(fe2)));
               break;
             }
@@ -90,7 +90,7 @@ namespace internal
             case 1:
             {
               identities =
-                std_cxx1x::shared_ptr<DoFIdentities>
+                std_cxx11::shared_ptr<DoFIdentities>
                 (new DoFIdentities(fe1.hp_line_dof_identities(fe2)));
               break;
             }
@@ -98,7 +98,7 @@ namespace internal
             case 2:
             {
               identities =
-                std_cxx1x::shared_ptr<DoFIdentities>
+                std_cxx11::shared_ptr<DoFIdentities>
                 (new DoFIdentities(fe1.hp_quad_dof_identities(fe2)));
               break;
             }
@@ -1653,16 +1653,16 @@ namespace hp
 
     tria_listeners.push_back
     (tria.signals.pre_refinement
-     .connect (std_cxx1x::bind (&DoFHandler<dim,spacedim>::pre_refinement_action,
-                                std_cxx1x::ref(*this))));
+     .connect (std_cxx11::bind (&DoFHandler<dim,spacedim>::pre_refinement_action,
+                                std_cxx11::ref(*this))));
     tria_listeners.push_back
     (tria.signals.post_refinement
-     .connect (std_cxx1x::bind (&DoFHandler<dim,spacedim>::post_refinement_action,
-                                std_cxx1x::ref(*this))));
+     .connect (std_cxx11::bind (&DoFHandler<dim,spacedim>::post_refinement_action,
+                                std_cxx11::ref(*this))));
     tria_listeners.push_back
     (tria.signals.create
-     .connect (std_cxx1x::bind (&DoFHandler<dim,spacedim>::post_refinement_action,
-                                std_cxx1x::ref(*this))));
+     .connect (std_cxx11::bind (&DoFHandler<dim,spacedim>::post_refinement_action,
+                                std_cxx11::ref(*this))));
   }
 
 
@@ -2109,7 +2109,7 @@ namespace hp
     // vertices at all, I can't think
     // of a finite element that would
     // make that necessary...
-    Table<2,std_cxx1x::shared_ptr<dealii::internal::hp::DoFIdentities> >
+    Table<2,std_cxx11::shared_ptr<dealii::internal::hp::DoFIdentities> >
     vertex_dof_identities (get_fe().size(),
                            get_fe().size());
 
@@ -2275,7 +2275,7 @@ namespace hp
     // and then only deal with those that are
     // not identical of which we can handle
     // at most 2
-    Table<2,std_cxx1x::shared_ptr<internal::hp::DoFIdentities> >
+    Table<2,std_cxx11::shared_ptr<internal::hp::DoFIdentities> >
     line_dof_identities (finite_elements->size(),
                          finite_elements->size());
 
@@ -2509,7 +2509,7 @@ namespace hp
     // for quads only in 4d and
     // higher, so this isn't a
     // particularly frequent case
-    Table<2,std_cxx1x::shared_ptr<internal::hp::DoFIdentities> >
+    Table<2,std_cxx11::shared_ptr<internal::hp::DoFIdentities> >
     quad_dof_identities (finite_elements->size(),
                          finite_elements->size());
 

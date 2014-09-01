@@ -24,8 +24,8 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/base/std_cxx1x/function.h>
-#include <deal.II/base/std_cxx1x/tuple.h>
+#include <deal.II/base/std_cxx11/function.h>
+#include <deal.II/base/std_cxx11/tuple.h>
 
 #include <set>
 #include <vector>
@@ -233,7 +233,7 @@ namespace parallel
      * into the function. C++ provides a nice mechanism for this that is best
      * explained using an example:
      * @code
-     *     #include <deal.II/base/std_cxx1x/bind.h>
+     *     #include <deal.II/base/std_cxx11/bind.h>
      *
      *     template <int dim>
      *     void set_boundary_indicators (parallel::distributed::Triangulation<dim> &triangulation)
@@ -249,13 +249,13 @@ namespace parallel
      *       ... create the coarse mesh ...
      *
      *       coarse_grid.signals.post_refinement.connect
-     *         (std_cxx1x::bind (&set_boundary_indicators<dim>,
-     *                           std_cxx1x::ref(coarse_grid)));
+     *         (std_cxx11::bind (&set_boundary_indicators<dim>,
+     *                           std_cxx11::ref(coarse_grid)));
      *
      *     }
      * @endcode
      *
-     * What the call to <code>std_cxx1x::bind</code> does is to produce an object that
+     * What the call to <code>std_cxx11::bind</code> does is to produce an object that
      * can be called like a function with no arguments. It does so by taking the
      * address of a function that does, in fact, take an argument but permanently fix
      * this one argument to a reference to the coarse grid triangulation. After each
@@ -271,7 +271,7 @@ namespace parallel
      * function has been declared as a (non-static, but possibly private) member
      * function of the <code>MyClass</code> class, then the following will work:
      * @code
-     *     #include <deal.II/base/std_cxx1x/bind.h>
+     *     #include <deal.II/base/std_cxx11/bind.h>
      *
      *     template <int dim>
      *     void
@@ -289,9 +289,9 @@ namespace parallel
      *       ... create the coarse mesh ...
      *
      *       coarse_grid.signals.post_refinement.connect
-     *         (std_cxx1x::bind (&MyGeometry<dim>::set_boundary_indicators,
-     *                           std_cxx1x::cref(*this),
-     *                           std_cxx1x::ref(coarse_grid)));
+     *         (std_cxx11::bind (&MyGeometry<dim>::set_boundary_indicators,
+     *                           std_cxx11::cref(*this),
+     *                           std_cxx11::ref(coarse_grid)));
      *     }
      * @endcode
      * Here, like any other member function, <code>set_boundary_indicators</code>
@@ -673,7 +673,7 @@ namespace parallel
        */
       unsigned int
       register_data_attach (const std::size_t size,
-                            const std_cxx1x::function<void (const cell_iterator &,
+                            const std_cxx11::function<void (const cell_iterator &,
                                                             const CellStatus,
                                                             void *)> &pack_callback);
 
@@ -693,7 +693,7 @@ namespace parallel
        */
       void
       notify_ready_to_unpack (const unsigned int offset,
-                              const std_cxx1x::function<void (const cell_iterator &,
+                              const std_cxx11::function<void (const cell_iterator &,
                                                               const CellStatus,
                                                               const void *)> &unpack_callback);
 
@@ -822,7 +822,7 @@ namespace parallel
        */
       unsigned int n_attached_deserialize;
 
-      typedef  std_cxx1x::function<
+      typedef  std_cxx11::function<
       void(typename Triangulation<dim,spacedim>::cell_iterator, CellStatus, void *)
       > pack_callback_t;
 

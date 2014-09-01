@@ -22,7 +22,7 @@
 #include <deal.II/meshworker/assembler.h>
 #include <deal.II/meshworker/loop.h>
 
-#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -116,9 +116,9 @@ test_mesh(MGDoFHandler<dim> &mgdofs)
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, EmptyInfoBox>
   (dofs.begin_active(), dofs.end(),
    dof_info, info_box,
-   std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
-   std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
-   std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
+   std_cxx11::bind (&Local<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
+   std_cxx11::bind (&Local<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
+   std_cxx11::bind (&Local<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
    assembler, true);
 
   deallog << "  Results cells";
@@ -138,9 +138,9 @@ test_mesh(MGDoFHandler<dim> &mgdofs)
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, EmptyInfoBox>
   (mgdofs.begin(), mgdofs.end(),
    mg_dof_info, info_box,
-   std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
-   std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
-   std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
+   std_cxx11::bind (&Local<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
+   std_cxx11::bind (&Local<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
+   std_cxx11::bind (&Local<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
    assembler, true);
 
   deallog << "MGResults cells";

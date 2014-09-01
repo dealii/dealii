@@ -24,7 +24,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx11/function.h>
 
 #include <vector>
 
@@ -577,9 +577,9 @@ protected:
  * or we could write it like so:
  * @code
  *    ScalarFunctionFromFunctionObject<dim, Number>
- *      my_distance_object (std_cxx1x::bind (&Point<dim, Number>::distance,
+ *      my_distance_object (std_cxx11::bind (&Point<dim, Number>::distance,
  *                                           q,
- *                                           std_cxx1x::_1));
+ *                                           std_cxx11::_1));
  * @endcode
  * The savings in work to write this are apparent.
  *
@@ -593,7 +593,7 @@ public:
    * Given a function object that takes a Point and returns a Number value,
    * convert this into an object that matches the Function<dim, Number> interface.
    */
-  ScalarFunctionFromFunctionObject (const std_cxx1x::function<Number (const Point<dim, Number> &)> &function_object);
+  ScalarFunctionFromFunctionObject (const std_cxx11::function<Number (const Point<dim, Number> &)> &function_object);
 
   /**
    * Return the value of the function at the given point. Returns the value
@@ -607,7 +607,7 @@ private:
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    **/
-  const std_cxx1x::function<Number (const Point<dim, Number> &)> function_object;
+  const std_cxx11::function<Number (const Point<dim, Number> &)> function_object;
 };
 
 
@@ -662,7 +662,7 @@ public:
    * @param selected_component The single component that should be
    *     filled by the first argument.
    **/
-  VectorFunctionFromScalarFunctionObject (const std_cxx1x::function<Number (const Point<dim, Number> &)> &function_object,
+  VectorFunctionFromScalarFunctionObject (const std_cxx11::function<Number (const Point<dim, Number> &)> &function_object,
                                           const unsigned int selected_component,
                                           const unsigned int n_components);
 
@@ -687,7 +687,7 @@ private:
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    **/
-  const std_cxx1x::function<Number (const Point<dim, Number> &)> function_object;
+  const std_cxx11::function<Number (const Point<dim, Number> &)> function_object;
 
   /**
    * The vector component whose value is to be filled by the given scalar

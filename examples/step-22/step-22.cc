@@ -149,7 +149,7 @@ namespace Step22
     // in how many places a preconditioner object is still referenced, it can
     // never create a memory leak, and can never produce a dangling pointer to
     // an already destroyed object:
-    std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
+    std_cxx11::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
   };
 
   // @sect3{Boundary values and right hand side}
@@ -735,7 +735,7 @@ namespace Step22
     std::cout << "   Computing preconditioner..." << std::endl << std::flush;
 
     A_preconditioner
-      = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
+      = std_cxx11::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
     A_preconditioner->initialize (system_matrix.block(0,0),
                                   typename InnerPreconditioner<dim>::type::AdditionalData());
 

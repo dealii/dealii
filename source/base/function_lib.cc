@@ -2318,7 +2318,7 @@ namespace Functions
 
   template <int dim>
   InterpolatedTensorProductGridData<dim>::
-  InterpolatedTensorProductGridData(const std_cxx1x::array<std::vector<double>,dim> &coordinate_values,
+  InterpolatedTensorProductGridData(const std_cxx11::array<std::vector<double>,dim> &coordinate_values,
                                     const Table<dim,double>                         &data_values)
     :
     coordinate_values (coordinate_values),
@@ -2389,8 +2389,8 @@ namespace Functions
 
   template <int dim>
   InterpolatedUniformGridData<dim>::
-  InterpolatedUniformGridData(const std_cxx1x::array<std::pair<double,double>,dim> &interval_endpoints,
-                              const std_cxx1x::array<unsigned int,dim>             &n_subintervals,
+  InterpolatedUniformGridData(const std_cxx11::array<std::pair<double,double>,dim> &interval_endpoints,
+                              const std_cxx11::array<unsigned int,dim>             &n_subintervals,
                               const Table<dim,double>                              &data_values)
     :
     interval_endpoints (interval_endpoints),

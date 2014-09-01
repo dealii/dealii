@@ -214,7 +214,7 @@ namespace parallel
        * partitioner data only once and share it between several vectors with
        * the same layout.
        */
-      Vector (const std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
+      Vector (const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
       /**
        * Destructor.
@@ -270,7 +270,7 @@ namespace parallel
        * the partitioner data only once and share it between several vectors
        * with the same layout.
        */
-      void reinit (const std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
+      void reinit (const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could
@@ -1005,7 +1005,7 @@ namespace parallel
        * information can be shared between several vectors that have the same
        * partitioning.
        */
-      std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
+      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
 
       /**
        * The size that is currently allocated in the val array.
@@ -1177,7 +1177,7 @@ namespace parallel
     template <typename Number>
     inline
     Vector<Number>::
-    Vector (const std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
+    Vector (const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
       :
       allocated_size (0),
       val (0),

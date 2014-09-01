@@ -26,7 +26,7 @@ namespace MeshWorker
   template<int dim, int sdim>
   void
   IntegrationInfo<dim,sdim>::initialize_data(
-    const std_cxx1x::shared_ptr<VectorDataBase<dim,sdim> > &data)
+    const std_cxx11::shared_ptr<VectorDataBase<dim,sdim> > &data)
   {
     global_data = data;
     const unsigned int nqp = fevalv[0]->n_quadrature_points;

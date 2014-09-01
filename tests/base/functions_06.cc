@@ -59,9 +59,9 @@ void check2 ()
     q[d] = d;
 
   ScalarFunctionFromFunctionObject<dim>
-  object (std_cxx1x::bind (&Point<dim>::distance,
+  object (std_cxx11::bind (&Point<dim>::distance,
                            q,
-                           std_cxx1x::_1));
+                           std_cxx11::_1));
 
   for (unsigned int i=0; i<10; ++i)
     {

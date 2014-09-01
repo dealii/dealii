@@ -20,7 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/named_data.h>
 #include <deal.II/base/smartpointer.h>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/lac/block_indices.h>
@@ -415,7 +415,7 @@ private:
 template <class MATRIX>
 class MatrixBlockVector
   :
-  private NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >
+  private NamedData<std_cxx11::shared_ptr<MatrixBlock<MATRIX> > >
 {
 public:
   /**
@@ -490,10 +490,10 @@ public:
   /**
    * import functions from private base class
    */
-  using NamedData<std_cxx1x::shared_ptr<value_type> >::subscribe;
-  using NamedData<std_cxx1x::shared_ptr<value_type> >::unsubscribe;
-  using NamedData<std_cxx1x::shared_ptr<value_type> >::size;
-  using NamedData<std_cxx1x::shared_ptr<value_type> >::name;
+  using NamedData<std_cxx11::shared_ptr<value_type> >::subscribe;
+  using NamedData<std_cxx11::shared_ptr<value_type> >::unsubscribe;
+  using NamedData<std_cxx11::shared_ptr<value_type> >::size;
+  using NamedData<std_cxx11::shared_ptr<value_type> >::name;
 };
 
 
@@ -956,8 +956,8 @@ MatrixBlockVector<MATRIX>::add(
   size_type row, size_type column,
   const std::string &name)
 {
-  std_cxx1x::shared_ptr<value_type> p(new value_type(row, column));
-  NamedData<std_cxx1x::shared_ptr<value_type> >::add(p, name);
+  std_cxx11::shared_ptr<value_type> p(new value_type(row, column));
+  NamedData<std_cxx11::shared_ptr<value_type> >::add(p, name);
 }
 
 

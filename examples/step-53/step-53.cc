@@ -24,7 +24,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 
-#include <deal.II/base/std_cxx1x/array.h>
+#include <deal.II/base/std_cxx11/array.h>
 
 #include <fstream>
 
@@ -46,11 +46,11 @@ public:
   get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
 private:
 
-  std_cxx1x::array<double,dim> pull_back (const Point<dim> &p) const;
-  Point<dim>                   push_forward (const std_cxx1x::array<double,dim> &preimage) const;
+  std_cxx11::array<double,dim> pull_back (const Point<dim> &p) const;
+  Point<dim>                   push_forward (const std_cxx11::array<double,dim> &preimage) const;
 
   template <int N>
-  static std_cxx1x::array<double,dim> average (const std_cxx1x::array<double,dim> (&array)[N]);
+  static std_cxx11::array<double,dim> average (const std_cxx11::array<double,dim> (&array)[N]);
 
   const Point<dim> center;
 };
@@ -64,7 +64,7 @@ SphereGeometry<dim>::SphereGeometry (const Point<dim> &center)
 
 
 template <>
-std_cxx1x::array<double,2>
+std_cxx11::array<double,2>
 SphereGeometry<2>::pull_back (const Point<2> &p) const
 {
   const Point<2> relative_point = p - center;
@@ -72,7 +72,7 @@ SphereGeometry<2>::pull_back (const Point<2> &p) const
   const double r = relative_point.norm();
   const double phi = std::atan2 (relative_point[1], relative_point[0]);
 
-  std_cxx1x::array<double,2> result;
+  std_cxx11::array<double,2> result;
   result[0] = r;
   result[1] = phi;
 
@@ -82,7 +82,7 @@ SphereGeometry<2>::pull_back (const Point<2> &p) const
 
 template <>
 Point<2>
-SphereGeometry<2>::push_forward (const std_cxx1x::array<double,2> &preimage) const
+SphereGeometry<2>::push_forward (const std_cxx11::array<double,2> &preimage) const
 {
   const Point<2> relative_point = preimage[0] * Point<2>(std::cos(preimage[1]), std::sin(preimage[1]));
 
@@ -92,7 +92,7 @@ SphereGeometry<2>::push_forward (const std_cxx1x::array<double,2> &preimage) con
 
 
 template <>
-std_cxx1x::array<double,3>
+std_cxx11::array<double,3>
 SphereGeometry<3>::pull_back (const Point<3> &p) const
 {
   const Point<3> relative_point = p - center;
@@ -102,7 +102,7 @@ SphereGeometry<3>::pull_back (const Point<3> &p) const
   const double theta = std::atan2 (relative_point[2], std::sqrt (relative_point[0]*relative_point[0] +
                                    relative_point[1]*relative_point[1]));
 
-  std_cxx1x::array<double,3> result;
+  std_cxx11::array<double,3> result;
   result[0] = r;
   result[1] = phi;
   result[2] = theta;
@@ -113,7 +113,7 @@ SphereGeometry<3>::pull_back (const Point<3> &p) const
 
 template <>
 Point<3>
-SphereGeometry<3>::push_forward (const std_cxx1x::array<double,3> &preimage) const
+SphereGeometry<3>::push_forward (const std_cxx11::array<double,3> &preimage) const
 {
   const Point<3> relative_point = (preimage[0] *
                                    Point<3>(std::cos(preimage[1]),
@@ -127,10 +127,10 @@ SphereGeometry<3>::push_forward (const std_cxx1x::array<double,3> &preimage) con
 
 template <>
 template <int N>
-std_cxx1x::array<double,2>
-SphereGeometry<2>::average (const std_cxx1x::array<double,2> (&array)[N])
+std_cxx11::array<double,2>
+SphereGeometry<2>::average (const std_cxx11::array<double,2> (&array)[N])
 {
-  std_cxx1x::array<double,2> result;
+  std_cxx11::array<double,2> result;
 
   // average the radii first. this is uncritical
   {
@@ -179,10 +179,10 @@ SphereGeometry<2>::average (const std_cxx1x::array<double,2> (&array)[N])
 
 template <>
 template <int N>
-std_cxx1x::array<double,3>
-SphereGeometry<3>::average (const std_cxx1x::array<double,3> (&array)[N])
+std_cxx11::array<double,3>
+SphereGeometry<3>::average (const std_cxx11::array<double,3> (&array)[N])
 {
-  std_cxx1x::array<double,3> result;
+  std_cxx11::array<double,3> result;
 
   // average the radii first. this is uncritical
   {
@@ -250,7 +250,7 @@ Point<dim>
 SphereGeometry<dim>::
 get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
 {
-  std_cxx1x::array<double,dim> preimages[4] = { pull_back (quad->vertex(0)),
+  std_cxx11::array<double,dim> preimages[4] = { pull_back (quad->vertex(0)),
                                                 pull_back (quad->vertex(1)),
                                                 pull_back (quad->vertex(2)),
                                                 pull_back (quad->vertex(3))

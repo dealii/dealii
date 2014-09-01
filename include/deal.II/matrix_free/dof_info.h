@@ -26,7 +26,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/matrix_free/helper_functions.h>
 
-#include <deal.II/base/std_cxx1x/array.h>
+#include <deal.II/base/std_cxx11/array.h>
 
 #include <memory>
 
@@ -305,7 +305,7 @@ namespace internal
        * certain structure in the indices, like indices for vector-valued
        * problems or for cells where not all vector components are filled.
        */
-      std::vector<std_cxx1x::array<unsigned int, 3> > row_starts;
+      std::vector<std_cxx11::array<unsigned int, 3> > row_starts;
 
       /**
        * Stores the indices of the degrees of freedom for each cell. These
@@ -342,7 +342,7 @@ namespace internal
        * in the vector, and also includes how the ghosts look like. This
        * enables initialization of vectors based on the DoFInfo field.
        */
-      std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner> vector_partitioner;
+      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> vector_partitioner;
 
       /**
        * This stores a (sorted) list of all locally owned degrees of freedom

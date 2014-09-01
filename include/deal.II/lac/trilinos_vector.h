@@ -22,7 +22,7 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  include <deal.II/base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/base/std_cxx11/shared_ptr.h>
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/utilities.h>

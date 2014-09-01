@@ -61,7 +61,7 @@ public:
               const VECTOR &src) const
   {
     dst = 0;
-    const std_cxx1x::function<void(const MatrixFree<dim,typename VECTOR::value_type> &,
+    const std_cxx11::function<void(const MatrixFree<dim,typename VECTOR::value_type> &,
                                    VECTOR &,
                                    const VECTOR &,
                                    const std::pair<unsigned int,unsigned int> &)>
