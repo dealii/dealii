@@ -87,7 +87,7 @@ public:
             SymmetricTensor<2,dim,vector_t> sym_grad_u =
               velocity.get_symmetric_gradient (q);
             vector_t pres = pressure.get_value(q);
-            vector_t div = -velocity.get_divergence(q);
+            vector_t div = -trace(sym_grad_u);
             pressure.submit_value   (div, q);
 
             // subtract p * I
