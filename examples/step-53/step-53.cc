@@ -83,8 +83,8 @@ namespace Step53
   private:
     const Functions::InterpolatedUniformGridData<2> topography_data;
 
-    static std_cxx1x::array<std::pair<double,double>,2> get_endpoints ();
-    static std_cxx1x::array<unsigned int,2>             n_intervals ();
+    static std_cxx11::array<std::pair<double,double>,2> get_endpoints ();
+    static std_cxx11::array<unsigned int,2>             n_intervals ();
     static std::vector<double>                           get_data ();
   };
 
@@ -124,20 +124,20 @@ namespace Step53
   }
 
 
-  std_cxx1x::array<std::pair<double,double>,2>
+  std_cxx11::array<std::pair<double,double>,2>
   AfricaTopography::get_endpoints ()
   {
-    std_cxx1x::array<std::pair<double,double>,2> endpoints;
+    std_cxx11::array<std::pair<double,double>,2> endpoints;
     endpoints[0] = std::make_pair (-6.983333, 11.966667);
     endpoints[1] = std::make_pair (25, 35.95);
     return endpoints;
   }
 
 
-  std_cxx1x::array<unsigned int,2>
+  std_cxx11::array<unsigned int,2>
   AfricaTopography::n_intervals ()
   {
-    std_cxx1x::array<unsigned int,2> endpoints;
+    std_cxx11::array<unsigned int,2> endpoints;
     endpoints[0] = 379;
     endpoints[1] = 219;
     return endpoints;
@@ -329,52 +329,6 @@ namespace Step53
     return phi_theta_d_hat;
   }
 
-  return result;
-}
-
-
-
-
-template <int dim>
-Point<dim>
-SphereGeometry<dim>::
-get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
-{
-  std_cxx1x::array<double,dim> preimages[2] = { pull_back (line->vertex(0)),
-                                                pull_back (line->vertex(1))
-                                              };
-
-  return push_forward(average (preimages));
-}
-
-
-template <int dim>
-Point<dim>
-SphereGeometry<dim>::
-get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
-{
-  std_cxx11::array<double,dim> preimages[4] = { pull_back (quad->vertex(0)),
-                                                pull_back (quad->vertex(1)),
-                                                pull_back (quad->vertex(2)),
-                                                pull_back (quad->vertex(3))
-                                              };
-
-  return push_forward(average(preimages));
-}
-
-
-
-
-template <int dim>
-void make_grid ()
-{
-  Point<dim> center;
-  for (unsigned int i=0; i<dim; ++i)
-    center[i] = .25;
-  const double radius=center.norm();
-=======
->>>>>>> Replace the original attempt at providing step-53 by something real.
-
 
   // @sect3{Creating the mesh}
   //
@@ -424,9 +378,9 @@ void make_grid ()
                                                  corner_points[0], corner_points[1],
                                                  true);
 
-      GridTools::transform (std_cxx1x::bind(&AfricaGeometry::push_forward,
-                                            std_cxx1x::cref(geometry),
-                                            std_cxx1x::_1),
+      GridTools::transform (std_cxx11::bind(&AfricaGeometry::push_forward,
+                                            std_cxx11::cref(geometry),
+                                            std_cxx11::_1),
                             triangulation);
     }
 
