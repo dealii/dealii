@@ -52,7 +52,7 @@ These image were produced with three small modifications:
   <code>x</code> computes the elevation by converting the point to
   reference WGS 84 coordinates and only keeping the depth variable (the
   function is, consequently, a simplified version of the
-  <code>AfricaGeometry::pull_back_wgs84()</code> version:
+  <code>AfricaGeometry::pull_back_wgs84()</code> function):
 
 @code
 #include <deal.II/fe/fe_q.h>
