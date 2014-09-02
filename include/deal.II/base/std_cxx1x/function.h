@@ -18,4 +18,6 @@
 #include "../std_cxx11/function.h"
 
 // then allow using the old namespace name instead of the new one
+DEAL_II_NAMESPACE_OPEN
 namespace std_cxx1x = std_cxx11;
+DEAL_II_NAMESPACE_CLOSE
