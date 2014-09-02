@@ -33,8 +33,8 @@ in the
 <a href="http://en.wikipedia.org/wiki/Rwenzori_Mountains">Rwenzori Range</a>,
 <a href="http://en.wikipedia.org/wiki/Lake_George_%28Uganda%29">Lake
 George</a>
-and the great flatness of
-<a href="http://en.wikipedia.org/wiki/Lake_Victoria">Lake Victoria</a>:
+and toward the great flatness of
+<a href="http://en.wikipedia.org/wiki/Lake_Victoria">Lake Victoria</a>):
 
 <img src="http://www.dealii.org/images/steps/developer/step-53.topozoom.png" alt="">
 
@@ -52,7 +52,7 @@ These image were produced with three small modifications:
   <code>x</code> computes the elevation by converting the point to
   reference WGS 84 coordinates and only keeping the depth variable (the
   function is, consequently, a simplified version of the
-  <code>AfricaGeometry::pull_back_wgs84()</code> version:
+  <code>AfricaGeometry::pull_back_wgs84()</code> function):
 
 @code
 #include <deal.II/fe/fe_q.h>
