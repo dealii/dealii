@@ -1208,6 +1208,9 @@ namespace Functions
    * box since it frequently happens that a point lies just outside the box
    * by an amount on the order of numerical roundoff.)
    *
+   * @note The use of the related class InterpolatedUniformGridData
+   * is discussed in step-53.
+   *
    * @author Wolfgang Bangerth, 2013
    */
   template <int dim>
@@ -1290,6 +1293,8 @@ namespace Functions
    * direction. (The class does not throw an error if a point lies outside the
    * box since it frequently happens that a point lies just outside the box
    * by an amount on the order of numerical roundoff.)
+   *
+   * @note The use of this class is discussed in step-53.
    *
    * @author Wolfgang Bangerth, 2013
    */
