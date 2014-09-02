@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -43,6 +43,7 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "obstacle_file.pbm"    # step-42
     PATTERN "untitled.geo"         # step-49
     PATTERN "untitled.msh"         # step-49
+    PATTERN "topography.txt.gz"    # step-53
     )
 
   MESSAGE(STATUS "Setting up examples - Done")
