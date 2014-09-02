@@ -99,9 +99,15 @@
 #cmakedefine DEAL_II_WORDS_BIGENDIAN
 
 /** Equal to 0 in the generic case, equal to 1 if CPU compiled for supports
- * SSE2, equal to 2 if CPU compiled for supports AVX
+ * SSE2, equal to 2 if CPU compiled for supports AVX, equal to 3 if AVX512
+ * support is available
  */
 #define DEAL_II_COMPILER_VECTORIZATION_LEVEL @DEAL_II_COMPILER_VECTORIZATION_LEVEL@
+
+/** If openmp simd support is available this string contains the
+ * corresponding pragma directive
+ */
+#define DEAL_II_OPENMP_SIMD_PRAGMA @DEAL_II_OPENMP_SIMD_PRAGMA@
 
 
 /***************************************

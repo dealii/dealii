@@ -156,7 +156,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] *= factor;
     }
@@ -177,7 +177,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] += factor*v_val[i];
     }
@@ -199,7 +199,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] = x*val[i] + a*v_val[i];
     }
@@ -219,7 +219,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] -= v_val[i];
     }
@@ -239,7 +239,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] += factor;
     }
@@ -259,7 +259,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] += v_val[i];
     }
@@ -282,7 +282,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] = val[i] + a*v_val[i] + b*w_val[i];
     }
@@ -303,7 +303,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] = x*val[i] + v_val[i];
     }
@@ -327,7 +327,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] = x*val[i] + a*v_val[i] + b*w_val[i];
     }
@@ -347,7 +347,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] *= v_val[i];
     }
@@ -368,7 +368,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] = a*u_val[i];
     }
@@ -391,7 +391,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] = a*u_val[i] + b*v_val[i];
     }
@@ -416,7 +416,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] = a*u_val[i] + b*v_val[i] + c*w_val[i];
     }
@@ -437,7 +437,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      #pragma omp simd
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (size_type i=begin; i<end; ++i)
         val[i] = a_val[i]/b_val[i];
     }
