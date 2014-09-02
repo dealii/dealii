@@ -348,8 +348,8 @@ private:
  *   Manifold<dim,spacedim> and is used in an object of type
  *   Triangulation<dim,spacedim>:  It specializes a Manifold of
  *   dimension chartdim embedded in a manifold of dimension spacedim,
- *   for which you have explicit pull_back and push_forward
- *   transformations.
+ *   for which you have explicit pull_back() and push_forward()
+ *   transformations. Its use is explained in great detail in step-53.
  *
  *   This is a helper class which is useful when you have an explicit
  *   map from an Euclidean space of dimension chartdim to an Euclidean

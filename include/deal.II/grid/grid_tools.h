@@ -233,7 +233,7 @@ namespace GridTools
    *
    * This function is used in the
    * "Possibilities for extensions" section
-   * of step-38. It is also used in step-49.
+   * of step-38. It is also used in step-49 and step-53.
    */
   template <int dim, typename Transformation, int spacedim>
   void transform (const Transformation        &transformation,
