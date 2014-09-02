@@ -1758,8 +1758,8 @@ Number determinant (const Tensor<2,dim,Number> &t)
 template <int dim, typename Number>
 Number trace (const Tensor<2,dim,Number> &d)
 {
-  Number t=0;
-  for (unsigned int i=0; i<dim; ++i)
+  Number t=d[0][0];
+  for (unsigned int i=1; i<dim; ++i)
     t += d[i][i];
   return t;
 }
