@@ -528,9 +528,10 @@ protected:
  * like VectorTools::interpolate_boundary_values() etc., and thereby allows
  * for simpler experimenting without having to write all the boiler plate
  * code of declaring a class that is derived from Function and implementing
- * the Function::value() function.
+ * the Function::value() function. An example of this is given in the results
+ * section of step-53.
  *
- * The class gains additional expressvive power because the argument it
+ * The class gains additional expressive power because the argument it
  * takes does not have to be a pointer to an actual function. Rather, it is
  * a function object, i.e., it can also be the result of call to std::bind
  * (or boost::bind) or some other object that can be called with a single
