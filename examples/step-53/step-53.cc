@@ -97,11 +97,11 @@ namespace Step53
   // (which are here given by the intervals $[-6.983333, 11.98333]$,
   // using the trick of switching end points discussed in the introduction,
   // and $[25, 35.983333]$, both given in degrees), the number of intervals
-  // into which the data is split (1138 in latitude direction and 659 in
-  // longitude direction, for a total of $1139\times 660$ data points), and
+  // into which the data is split (379 in latitude direction and 219 in
+  // longitude direction, for a total of $380\times 220$ data points), and
   // a Table object that contains the data. The data then of course has
-  // size $1139\times 660$ and we initialize it by providing an iterator
-  // to the first of the 751,740 elements of a std::vector object returned
+  // size $380\times 220$ and we initialize it by providing an iterator
+  // to the first of the 83,600 elements of a std::vector object returned
   // by the <code>get_data()</code> function below. Note that all of the
   // member functions we call here are static because (i) they do not
   // access any member variables of the class, and (ii) because they are
@@ -145,7 +145,7 @@ namespace Step53
 
 
   // The only other function of greater interest is the <code>get_data()</code>
-  // function. It returns a temporary vector that contains all 751,740 data
+  // function. It returns a temporary vector that contains all 83,600 data
   // points describing the altitude and is read from the file
   // <code>topography.txt.gz</code>. Because the file is compressed by gzip,
   // we cannot just read it through an object of type std::ifstream, but
@@ -179,7 +179,7 @@ namespace Step53
     in.push(boost::iostreams::basic_gzip_decompressor<>());
     in.push(boost::iostreams::file_source("topography.txt.gz"));
 
-    for (unsigned int line=0; line<751740; ++line)
+    for (unsigned int line=0; line<83600; ++line)
       {
         try
           {
@@ -191,7 +191,7 @@ namespace Step53
         catch (...)
           {
             AssertThrow (false,
-                         ExcMessage ("Could not read all 751,740 data points "
+                         ExcMessage ("Could not read all 83,600 data points "
                                      "from the file <topography.txt.gz>!"));
           }
       }
