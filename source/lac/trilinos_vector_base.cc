@@ -63,9 +63,9 @@ namespace TrilinosWrappers
       const TrilinosWrappers::types::int_type local_index =
         vector.vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
       Assert (local_index >= 0,
-              ExcAccessToNonLocalElement (index,
-                                          vector.vector->Map().MinMyGID(),
-                                          vector.vector->Map().MaxMyGID()));
+              VectorBase::ExcAccessToNonLocalElement (index, vector.local_size(),
+                                                      vector.vector->Map().MinMyGID(),
+                                                      vector.vector->Map().MaxMyGID()));
 
 
       return (*(vector.vector))[0][local_index];
@@ -240,22 +240,13 @@ namespace TrilinosWrappers
     // Extract local indices in the vector.
     TrilinosWrappers::types::int_type trilinos_i =
       vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
-    TrilinosScalar value = 0.;
 
     // If the element is not present on the current processor, we can't
-    // continue. Just print out 0.
-
-    // TODO: Is this reasonable?
-    if (trilinos_i == -1 )
-      {
-        return 0.;
-        //Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
-        //                                local_range().second-1));
-      }
+    // continue. Just print out 0 as opposed to the () method below.
+    if (trilinos_i == -1)
+      return 0.;
     else
-      value = (*vector)[0][trilinos_i];
-
-    return value;
+      return (*vector)[0][trilinos_i];
   }
 
 
@@ -270,10 +261,11 @@ namespace TrilinosWrappers
 
     // If the element is not present on the current processor, we can't
     // continue. This is the main difference to the el() function.
-    if (trilinos_i == -1 )
+    if (trilinos_i == -1)
       {
-        Assert (false, ExcAccessToNonlocalElement(index, local_range().first,
-                                                  local_range().second-1));
+        Assert (false, ExcAccessToNonLocalElement(index, local_size(),
+                                                  vector->Map().MinMyGID(),
+                                                  vector->Map().MaxMyGID()));
       }
     else
       value = (*vector)[0][trilinos_i];
