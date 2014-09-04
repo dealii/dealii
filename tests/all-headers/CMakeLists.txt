@@ -33,7 +33,7 @@ SET(_category all-headers)
 # Glob together all header files and strip SOURCE_DIR/include/deal.II to
 # get a correct relative path:
 #
-FILE(GLOB_RECURSE _headers ${DEAL_II_SOURCE_DIR}/include/deal.II/
+FILE(GLOB_RECURSE _headers RELATIVE ${DEAL_II_SOURCE_DIR}/include/deal.II
   ${DEAL_II_SOURCE_DIR}/include/deal.II/*.h
   )
 
