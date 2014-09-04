@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -158,20 +158,6 @@ namespace TrilinosWrappers
                       int,
                       << "An error with error number " << arg1
                       << " occurred while calling a Trilinos function");
-
-      /**
-       * Exception
-       */
-      DeclException3 (ExcAccessToNonLocalElement,
-                      size_type, size_type, size_type,
-                      << "You tried to access element " << arg1
-                      << " of a distributed vector, but this element is not stored "
-                      << "on the current processor. Note: The elements stored "
-                      << "on the current processor are within the range "
-                      << arg2 << " through " << arg3
-                      << " but Trilinos vectors need not store contiguous "
-                      << "ranges on each processor, and not every element in "
-                      << "this range may in fact be stored locally.");
 
     private:
       /**
@@ -504,13 +490,24 @@ namespace TrilinosWrappers
 
     /**
      * Provide access to a given element, both read and write.
+     *
+     * When using a vector distributed with MPI, this operation only makes
+     * sense for elements that are actually present on the calling
+     * processor. Otherwise, an exception is thrown. This is different from
+     * the <code>el()</code> function below that always succeeds (but returns
+     * zero on non-local elements).
      */
     reference
     operator () (const size_type index);
 
     /**
-     * Provide read-only access to an element. This is equivalent to the
-     * <code>el()</code> command.
+     * Provide read-only access to an element.
+     *
+     * When using a vector distributed with MPI, this operation only makes
+     * sense for elements that are actually present on the calling
+     * processor. Otherwise, an exception is thrown. This is different from
+     * the <code>el()</code> function below that always succeeds (but returns
+     * zero on non-local elements).
      */
     TrilinosScalar
     operator () (const size_type index) const;
@@ -524,8 +521,7 @@ namespace TrilinosWrappers
     operator [] (const size_type index);
 
     /**
-     * Provide read-only access to an element. This is equivalent to the
-     * <code>el()</code> command.
+     * Provide read-only access to an element.
      *
      * Exactly the same as operator().
      */
@@ -553,8 +549,10 @@ namespace TrilinosWrappers
     /**
      * Return the value of the vector entry <i>i</i>. Note that this function
      * does only work properly when we request a data stored on the local
-     * processor. The function will throw an exception in case the elements
-     * sits on another process.
+     * processor. In case the elements sits on another process, this function
+     * returns 0 which might or might not be appropriate in a given
+     * situation. If you rely on consistent results, use the access functions
+     * () or [] that throw an assertion in case a non-local element is used.
      */
     TrilinosScalar el (const size_type index) const;
 
@@ -858,12 +856,17 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException3 (ExcAccessToNonlocalElement,
-                    size_type, size_type, size_type,
+    DeclException4 (ExcAccessToNonLocalElement,
+                    size_type, size_type, size_type, size_type,
                     << "You tried to access element " << arg1
-                    << " of a distributed vector, but only entries "
-                    << arg2 << " through " << arg3
-                    << " are stored locally and can be accessed.");
+                    << " of a distributed vector, but this element is not stored "
+                    << "on the current processor. Note: There are "
+                    << arg2 << " elements stored "
+                    << "on the current processor from within the range "
+                    << arg4 << " through " << arg4
+                    << " but Trilinos vectors need not store contiguous "
+                    << "ranges on each processor, and not every element in "
+                    << "this range may in fact be stored locally.");
 
 
   private:
