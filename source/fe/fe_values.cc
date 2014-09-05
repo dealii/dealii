@@ -966,38 +966,37 @@ namespace FEValuesViews
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
-        if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-          {
-            const int snc = shape_function_data[shape_function].single_nonzero_component;
+        {
+          const int snc = shape_function_data[shape_function].single_nonzero_component;
 
-            if (snc == -2)
-              // shape function is zero for the selected components
-              continue;
+          if (snc == -2)
+            // shape function is zero for the selected components
+            continue;
 
-            const double value = dof_values(shape_function);
-            if (value == 0.)
-              continue;
+          const double value = dof_values(shape_function);
+          if (value == 0.)
+            continue;
 
-            if (snc != -1)
-              {
-                const unsigned int comp =
-                  shape_function_data[shape_function].single_nonzero_component_index;
-                const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
-                  &shape_hessians[snc][0];
-                for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                  laplacians[q_point][comp] += value * trace(*shape_hessian_ptr++);
-              }
-            else
-              for (unsigned int d=0; d<spacedim; ++d)
-                if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
-                  {
-                    const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
-                      &shape_hessians[shape_function_data[shape_function].
-                                      row_index[d]][0];
-                    for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                      laplacians[q_point][d] += value * trace(*shape_hessian_ptr++);
-                  }
-          }
+          if (snc != -1)
+            {
+              const unsigned int comp =
+                shape_function_data[shape_function].single_nonzero_component_index;
+              const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
+                &shape_hessians[snc][0];
+              for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
+                laplacians[q_point][comp] += value * trace(*shape_hessian_ptr++);
+            }
+          else
+            for (unsigned int d=0; d<spacedim; ++d)
+              if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+                {
+                  const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
+                    &shape_hessians[shape_function_data[shape_function].
+                                    row_index[d]][0];
+                  for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
+                    laplacians[q_point][d] += value * trace(*shape_hessian_ptr++);
+                }
+        }
     }
 
 
