@@ -275,8 +275,8 @@ FunctionManifold<dim,spacedim,chartdim>::push_forward(const Point<chartdim> &cha
   pull_back_function->vector_value(result, pb);
   for (unsigned int i=0; i<chartdim; ++i)
     Assert((chart_point.norm() > tolerance &&
-            (abs(pb[i]-chart_point[i]) < tolerance*chart_point.norm())) ||
-           (abs(pb[i]-chart_point[i]) < tolerance),
+            (std::abs(pb[i]-chart_point[i]) < tolerance*chart_point.norm())) ||
+           (std::abs(pb[i]-chart_point[i]) < tolerance),
            ExcMessage("The push forward is not the inverse of the pull back! Bailing out."));
 #endif
 
