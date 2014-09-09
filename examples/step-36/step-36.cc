@@ -292,6 +292,28 @@ namespace Step36
     // be compressed as no more entries will be added:
     stiffness_matrix.compress (VectorOperation::add);
     mass_matrix.compress (VectorOperation::add);
+
+
+    // Before leaving the function,
+    // we calculate spurious eigenvalues,
+    // introduced to the system by zero Dirichlet constraints.
+    double min_ev = 1e+10,
+	   max_ev = -min_ev;
+
+    for (unsigned int ind = 0; ind < dof_handler.n_dofs(); ind++)
+      if (constraints.is_constrained(ind))
+	{
+	  const double ev = stiffness_matrix(ind,ind)/mass_matrix(ind,ind);
+	  if ( min_ev > ev )
+	    min_ev = ev;
+	  if ( max_ev < ev )
+	    max_ev = ev;
+	}
+
+    std::cout << "   Spurious eigenvalues are in "
+	<< "["<<min_ev<<":"<<max_ev<<"]"
+	<< std::endl;
+
   }
 
 
