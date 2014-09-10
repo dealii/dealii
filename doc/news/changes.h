@@ -281,7 +281,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> Optimize construction of high-order FE_Nedelec by moving out some 
+  <li> New: The class MPI_InitFinalize that is used to initialize the MPI
+  system now has an additional constructor that allows to set the number
+  of threads a process uses so that all cores on a system are used.
+  <br>
+  (Wolfgang Bangerth, 2014/09/14)
+  </li>
+
+  <li> Improved: Optimize construction of high-order FE_Nedelec by moving out some 
   non-essential computations. Namely, construct restriction and prolongation 
   matrices on first request. This reduces time spent in FE_Nedelec constructor
   substantially.
