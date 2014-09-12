@@ -886,7 +886,13 @@ public:
    * non-zero, positive, and of the same order of magnitude as the other
    * entries of the matrix.
    *
-   * Thus, by using this function to distribute local contributions to the
+   * @note While not changing the condition number, the procedure
+   * described above adds an unforeseeable number of artificial
+   * eigenvalues to the spectrum of the matrix. Therefore, it is
+   * recommended to use the equivalent function with two local index
+   * vectors in such a case.
+   *
+   * By using this function to distribute local contributions to the
    * global object, one saves the call to the condense function after the
    * vectors and matrices are fully assembled.
    *
@@ -905,7 +911,33 @@ public:
                               MatrixType                   &global_matrix) const;
 
   /**
-   * Does the same as the function above but can treat non quadratic matrices.
+   * Does almost the same as the function above but can treat non
+   * quadratic matrices.  The main difference to achieve this is that
+   * the diagonal entries in constrained rows are left untouched
+   * instead of being filled with arbitrary values.
+   *
+   * Since the diagonal entries corresponding to eliminated degrees of
+   * freedom are not set, the result may have a zero eigenvalue, if
+   * applied to a quadratic matrix. This has to be considered when
+   * solving the resulting problems. For solving a source problem, it
+   * is possible to set the diagonal entry after building the matrix
+   * by a piece of code of the form
+   *
+   * @code
+   *   for (unsigned int i=0;i<matrix.m();++i)
+   *     if (constraints.is_constrained(i))
+   *       matrix.diag_element(i) = 1.;
+   * @endcode
+   *
+   * The value of one which is used here is arbitrary, but in the
+   * context of Krylov space methods uncritical, since it corresponds
+   * to an invariant subspace. If the other matrix entries are smaller
+   * or larger by a factor close to machine accuracy, it may be
+   * advisable to adjust it.
+   *
+   * For solving eigenvalue problems, there will be only one possibly
+   * multiple eigenvalue zero. Taking this into account, nothing has
+   * to be changed.
    */
   template <typename MatrixType>
   void
