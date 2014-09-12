@@ -97,6 +97,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: The new tutorial program step-52 explains how to use the 
+  new time stepping methods.
+  <br>
+  (Bruno Turcksin, Damien Lebrun-Grandie, 2014/09/12)
+
   <li> New: The new tutorial program step-53 explains how to deal with
   complicated geometries.
   <br>

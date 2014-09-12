@@ -64,8 +64,16 @@ namespace Step52
 
   // @sect3{Diffusion}
 
-  // Now, here comes the declaration of the main class. Most of the functions in
-  // this class are not new and have been explained in previous tutorials.
+  // The next piece is the declaration of the main class. Most of the functions in
+  // this class are not new and have been explained in previous tutorials. The
+  // only interesting functions are <code>evaluate_diffusion</code> and
+  // <code>id_minus_tau_J_inverse</code>. <code>evaluate_diffusion</code> evaluates the
+  // diffusion equation, $M^{-1}(f(t,y))$, at a given time, for a given $\tau$
+  // and a given $y$. <code>id_minus_tau_J_inverse</code> evaluates
+  // $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1}$ or
+  // equivalently $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} M$ at
+  // a given time, for a given $\tau$ and $y$. This function is needed when an
+  // implicit method is used.
   class Diffusion
   {
   public:
@@ -80,13 +88,8 @@ namespace Step52
 
     double get_source(double time,const Point<2> &point) const;
 
-    // This function evaluates the diffusion equation $M^{-1}(f(t,y))$ at a given time and
-    // for a given y.
     Vector<double> evaluate_diffusion(const double time, const Vector<double> &y) const;
 
-    // Evaluate $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1}$ or
-    // equivalently $\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} M$ at a given
-    // time, for a given $\tau$ and y.
     Vector<double> id_minus_tau_J_inverse(const double time,
                                           const double tau,
                                           const Vector<double> &y);
@@ -96,7 +99,7 @@ namespace Step52
     // The next three functions are the driver for the explicit methods, the
     // implicit methods, and the embedded explicit methods respectively. The
     // driver function for embedded explicit methods returns the number of
-    // steps executed since this number is adapted.
+    // steps executed.
     void explicit_method(TimeStepping::runge_kutta_method method,
                          const unsigned int n_time_steps,
                          const double       initial_time,
@@ -153,7 +156,7 @@ namespace Step52
 
   // @sect5{<code>Diffusion::setup_system</code>}
   // Now, we create the constraint matrix and the sparsity pattern. Then, we
-  // initialize the matrices that we will use and the solution vector.
+  // initialize the matrices and the solution vector.
   void Diffusion::setup_system()
   {
     dof_handler.distribute_dofs(fe);
@@ -255,7 +258,8 @@ namespace Step52
 
   // @sect5{<code>Diffusion:evaluate_diffusion</code>}
   //
-  // Now, the weak form of the diffusion equation is evaluated at a given time t and for a given vector y.
+  // Now, the weak form of the diffusion equation is evaluated at a given
+  // time $t$ and for a given vector $y$.
   Vector<double> Diffusion::evaluate_diffusion(const double time, const Vector<double> &y) const
   {
     Vector<double> tmp(dof_handler.n_dofs());
@@ -421,10 +425,11 @@ namespace Step52
 
 
   // @sect5{<code>Diffusion::explicit_method</code>}
-  // This function is the driver for all the explicit method. It call
-  // evolve_one_time_step which performs one time step. evolve_one_time_step
-  // needs to evaluate $M^{-1}(f(t,y))$, i.e it needs evaluate_diffusion.
-  // Because evaluate_diffusion is a member function, it needs to be bind to
+  // This function is the driver for all the explicit method. It calls
+  // <code>evolve_one_time_step</code> which performs one time step.
+  // <code>evolve_one_time_step</code> needs to evaluate $M^{-1}(f(t,y))$,
+  // i.e, it needs <code>evaluate_diffusion</code>. Because
+  // <code>evaluate_diffusion</code> is a member function, it needs to be bind to
   // $this$. Finally, the solution is output every 10 time steps.
   void Diffusion::explicit_method(TimeStepping::runge_kutta_method method,
                                   const unsigned int                n_time_steps,
@@ -451,9 +456,9 @@ namespace Step52
 
 
   // @sect5{<code>Diffusion::implicit_method</code>}
-  // This function is equivalent to explicit_method but for implicit methods.
-  // When using implicit methods, we need to evaluate $M^{-1}(f(t,y))$ and
-  // $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1}$.
+  // This function is equivalent to <code>explicit_method</code> but for implicit
+  // methods. When using implicit methods, we need to evaluate $M^{-1}(f(t,y))$
+  // and $\left(I-\tau M^{-1} \frac{\partial f(t,y)}{\partial y}\right)^{-1}$.
   void Diffusion::implicit_method(TimeStepping::runge_kutta_method method,
                                   const unsigned int               n_time_steps,
                                   const double                     initial_time,
@@ -494,7 +499,7 @@ namespace Step52
   // Embedded methods use a guessed time step. If the error using this time step
   // is too large, the time step will be reduced. If the error is below the
   // threshold, a larger time step will be tried for the next time step.
-  // delta_t_guess is the guessed time step produced by the embedded method.
+  // </code>delta_t_guess</code> is the guessed time step produced by the embedded method.
   unsigned int Diffusion::embedded_explicit_method(TimeStepping::runge_kutta_method method,
                                                    const unsigned int n_time_steps,
                                                    const double initial_time,
@@ -516,7 +521,7 @@ namespace Step52
     unsigned int n_steps=0;
     while (time<final_time)
       {
-        // We choose the last time step such that the final time is exactly
+        // The last time step is chosend such that the final time is exactly
         // reached.
         if (time+time_step>final_time)
           time_step = final_time-time;
@@ -660,8 +665,8 @@ namespace Step52
 
 // @sect3{The <code>main()</code> function}
 //
-// The following <code>main</code> function is similar to previous examples as
-// well, and need not be commented on.
+// The following <code>main</code> function is similar to previous examples
+// and need not be commented on.
 int main ()
 {
   try

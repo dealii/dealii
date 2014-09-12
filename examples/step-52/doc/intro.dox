@@ -2,6 +2,10 @@
 
 <i>This program was contributed by Bruno Turcksin and Damien Lebrun-Grandie.</i>
 
+<b>Note:</b> In order to run this program, deal.II must be configured to use
+the UMFPACK sparse direct solver. Refer to the <a
+href="../../readme.html#umfpack">ReadMe</a> for instructions how to do this.
+
 <a name="Intro"></a>
 <h1>Introducion</h1>
 
@@ -9,7 +13,7 @@ This program shows how to use Runge-Kutta methods to solve a time-dependent
 problem. It solves a small variation of the heat equation discussed first in
 step-26 but, since the purpose of this program is only to demonstrate using
 more advanced ways to interface with deal.II's time stepping algorithms, only
-solves a simple problem on a uniformly refined mesh.
+solves a simple problem on a uniformly refined mesh. 
 
 
 <h3>Problem statement</h3>
