@@ -1,8 +1,0 @@
-
-DEAL::const0
-DEAL::NamedData: "P1" "P2" "P3" "P4" "P5"
-DEAL::Const should be true: true
-DEAL::Selection 0:P1 0.500000
-DEAL::Selection 1:
-DEAL::Selection 2:P5 4.50000
-DEAL::Selection 3:P3 2.50000

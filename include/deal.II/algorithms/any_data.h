@@ -19,7 +19,6 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/named_data.h>
 
 #include <boost/any.hpp>
 #include <vector>
@@ -49,7 +48,7 @@ public:
   void add(type entry, const std::string &name);
 
   /**
-   * @brief Merge the data of another NamedData to the end of this object.
+   * @brief Merge the data of another AnyData to the end of this object.
    */
   void merge(const AnyData &other);
 
@@ -171,10 +170,6 @@ public:
   template <class STREAM>
   void list (STREAM &os) const;
 
-  /// Conversion from old NamedData
-  template <typename type>
-  AnyData(const NamedData<type> &);
-
   /// An entry with this name does not exist in the AnyData object.
   DeclException1(ExcNameNotFound, std::string,
                  << "No entry with the name " << arg1 << " exists.");
@@ -203,15 +198,6 @@ private:
 inline
 AnyData::AnyData()
 {}
-
-
-template <typename type>
-inline
-AnyData::AnyData(const NamedData<type> &other)
-{
-  for (unsigned int i=0; i<other.size(); ++i)
-    add(other(i), other.name(i));
-}
 
 
 unsigned int

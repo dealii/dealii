@@ -19,7 +19,7 @@
 
 #include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/precondition_block.h>
@@ -359,8 +359,7 @@ namespace Step39
     Triangulation<dim>        triangulation;
     const MappingQ1<dim>      mapping;
     const FiniteElement<dim> &fe;
-    DoFHandler<dim>         mg_dof_handler;
-    DoFHandler<dim>          &dof_handler;
+    DoFHandler<dim>           dof_handler;
 
     SparsityPattern      sparsity;
     SparseMatrix<double> matrix;
@@ -382,8 +381,7 @@ namespace Step39
     :
     mapping(),
     fe(fe),
-    mg_dof_handler(triangulation),
-    dof_handler(mg_dof_handler),
+    dof_handler(triangulation),
     estimates(1)
   {
     GridGenerator::hyper_cube_slit(triangulation, -1, 1);
@@ -396,13 +394,13 @@ namespace Step39
   {
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs(fe);
-    unsigned int n_dofs = dof_handler.n_dofs();
+    types::global_dof_index n_dofs = dof_handler.n_dofs();
     solution.reinit(n_dofs);
     right_hand_side.reinit(n_dofs);
 
-    CompressedSparsityPattern c_sparsity(n_dofs);
-    DoFTools::make_flux_sparsity_pattern(dof_handler, c_sparsity);
-    sparsity.copy_from(c_sparsity);
+    DynamicSparsityPattern dsp(n_dofs);
+    DoFTools::make_flux_sparsity_pattern(dof_handler, dsp);
+    sparsity.copy_from(dsp);
     matrix.reinit(sparsity);
 
     const unsigned int n_levels = triangulation.n_levels();
@@ -418,17 +416,17 @@ namespace Step39
     for (unsigned int level=mg_sparsity.min_level();
          level<=mg_sparsity.max_level(); ++level)
       {
-        CompressedSparsityPattern c_sparsity(mg_dof_handler.n_dofs(level));
-        MGTools::make_flux_sparsity_pattern(mg_dof_handler, c_sparsity, level);
-        mg_sparsity[level].copy_from(c_sparsity);
+        DynamicSparsityPattern dsp(dof_handler.n_dofs(level));
+        MGTools::make_flux_sparsity_pattern(dof_handler, dsp, level);
+        mg_sparsity[level].copy_from(dsp);
         mg_matrix[level].reinit(mg_sparsity[level]);
 
         if (level>0)
           {
-            CompressedSparsityPattern ci_sparsity;
-            ci_sparsity.reinit(mg_dof_handler.n_dofs(level-1), mg_dof_handler.n_dofs(level));
-            MGTools::make_flux_sparsity_pattern_edge(mg_dof_handler, ci_sparsity, level);
-            mg_sparsity_dg_interface[level].copy_from(ci_sparsity);
+            DynamicSparsityPattern dsp;
+            dsp.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
+            MGTools::make_flux_sparsity_pattern_edge(dof_handler, dsp, level);
+            mg_sparsity_dg_interface[level].copy_from(dsp);
             mg_matrix_dg_up[level].reinit(mg_sparsity_dg_interface[level]);
             mg_matrix_dg_down[level].reinit(mg_sparsity_dg_interface[level]);
           }
@@ -467,7 +465,7 @@ namespace Step39
     info_box.add_update_flags_all(update_flags);
     info_box.initialize(fe, mapping);
 
-    MeshWorker::DoFInfo<dim> dof_info(mg_dof_handler);
+    MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
     MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
     assembler.initialize(mg_matrix);
@@ -475,7 +473,7 @@ namespace Step39
 
     MatrixIntegrator<dim> integrator;
     MeshWorker::integration_loop<dim, dim> (
-      mg_dof_handler.begin_mg(), mg_dof_handler.end_mg(),
+      dof_handler.begin_mg(), dof_handler.end_mg(),
       dof_info, info_box,
       integrator, assembler);
   }
@@ -493,9 +491,8 @@ namespace Step39
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
     MeshWorker::Assembler::ResidualSimple<Vector<double> > assembler;
-    NamedData<Vector<double>* > data;
-    Vector<double> *rhs = &right_hand_side;
-    data.add(rhs, "RHS");
+    AnyData data;
+    data.add<Vector<double>*>(&right_hand_side, "RHS");
     assembler.initialize(data);
 
     RHSIntegrator<dim> integrator;
@@ -516,7 +513,7 @@ namespace Step39
     SolverCG<Vector<double> > solver(control);
 
     MGTransferPrebuilt<Vector<double> > mg_transfer;
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build_matrices(dof_handler);
 
     FullMatrix<double> coarse_matrix;
     coarse_matrix.copy_from (mg_matrix[0]);
@@ -538,14 +535,14 @@ namespace Step39
     mg::Matrix<Vector<double> > mgdown(mg_matrix_dg_down);
     mg::Matrix<Vector<double> > mgup(mg_matrix_dg_up);
 
-    Multigrid<Vector<double> > mg(mg_dof_handler, mgmatrix,
+    Multigrid<Vector<double> > mg(dof_handler, mgmatrix,
                                   mg_coarse, mg_transfer,
                                   mg_smoother, mg_smoother);
     mg.set_edge_flux_matrices(mgdown, mgup);
 
     PreconditionMG<dim, Vector<double>,
                    MGTransferPrebuilt<Vector<double> > >
-                   preconditioner(mg_dof_handler, mg, mg_transfer);
+                   preconditioner(dof_handler, mg, mg_transfer);
     solver.solve(matrix, solution, right_hand_side, preconditioner);
   }
 
@@ -567,22 +564,21 @@ namespace Step39
     const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
     info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
 
-    NamedData<Vector<double>* > solution_data;
-    solution_data.add(&solution, "solution");
+    AnyData solution_data;
+    solution_data.add<const Vector<double>*>(&solution, "solution");
 
     info_box.cell_selector.add("solution", false, false, true);
     info_box.boundary_selector.add("solution", true, true, false);
     info_box.face_selector.add("solution", true, true, false);
 
     info_box.add_update_flags_boundary(update_quadrature_points);
-    info_box.initialize(fe, mapping, solution_data);
+    info_box.initialize(fe, mapping, solution_data, solution);
 
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
     MeshWorker::Assembler::CellsAndFaces<double> assembler;
-    NamedData<BlockVector<double>* > out_data;
-    BlockVector<double> *est = &estimates;
-    out_data.add(est, "cells");
+    AnyData out_data;
+    out_data.add<BlockVector<double>*>(&estimates, "cells");
     assembler.initialize(out_data, false);
 
     Estimator<dim> integrator;
@@ -612,8 +608,8 @@ namespace Step39
     const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
     info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
 
-    NamedData<Vector<double>* > solution_data;
-    solution_data.add(&solution, "solution");
+    AnyData solution_data;
+    solution_data.add<Vector<double>*>(&solution, "solution");
 
     info_box.cell_selector.add("solution", true, true, false);
     info_box.boundary_selector.add("solution", true, false, false);
@@ -621,14 +617,13 @@ namespace Step39
 
     info_box.add_update_flags_cell(update_quadrature_points);
     info_box.add_update_flags_boundary(update_quadrature_points);
-    info_box.initialize(fe, mapping, solution_data);
+    info_box.initialize(fe, mapping, solution_data, solution);
 
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
     MeshWorker::Assembler::CellsAndFaces<double> assembler;
-    NamedData<BlockVector<double>* > out_data;
-    BlockVector<double> *est = &errors;
-    out_data.add(est, "cells");
+    AnyData out_data;
+    out_data.add<BlockVector<double>* >(&errors, "cells");
     assembler.initialize(out_data, false);
 
     ErrorIntegrator<dim> integrator;
@@ -689,7 +684,7 @@ namespace Step39
         setup_system();
         deallog << "DoFHandler " << dof_handler.n_dofs() << " dofs, level dofs";
         for (unsigned int l=0; l<triangulation.n_levels(); ++l)
-          deallog << ' ' << mg_dof_handler.n_dofs(l);
+          deallog << ' ' << dof_handler.n_dofs(l);
         deallog << std::endl;
 
         deallog << "Assemble matrix" << std::endl;

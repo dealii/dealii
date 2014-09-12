@@ -17,7 +17,6 @@
 #ifndef __deal2__mesh_worker_simple_h
 #define __deal2__mesh_worker_simple_h
 
-#include <deal.II/base/named_data.h>
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/mg_level_object.h>
@@ -63,10 +62,6 @@ namespace MeshWorker
        */
       void initialize(AnyData &results);
 
-      /**
-       * @deprecated Use initialize(AnyData&) instead.
-       */
-      void initialize(NamedData<VECTOR *> &results);
       /**
        * Initialize the constraints.
        */
@@ -483,13 +478,6 @@ namespace MeshWorker
     template <class VECTOR>
     inline void
     ResidualSimple<VECTOR>::initialize(AnyData &results)
-    {
-      residuals = results;
-    }
-
-    template <class VECTOR>
-    inline void
-    ResidualSimple<VECTOR>::initialize(NamedData<VECTOR *> &results)
     {
       residuals = results;
     }

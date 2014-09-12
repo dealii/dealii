@@ -92,13 +92,6 @@ namespace Algorithms
 
   template <class VECTOR>
   void
-  Newton<VECTOR>::operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in)
-  {
-    Operator<VECTOR>::operator() (out, in);
-  }
-
-  template <class VECTOR>
-  void
   Newton<VECTOR>::operator() (AnyData &out, const AnyData &in)
   {
     Assert (out.size() == 1, ExcNotImplemented());
@@ -133,13 +126,13 @@ namespace Algorithms
 
     if (debug_vectors)
       {
-        NamedData<VECTOR *> out;
+        AnyData out;
         VECTOR *p = &u;
-        out.add(p, "solution");
+        out.add<const VECTOR *>(p, "solution");
         p = Du;
-        out.add(p, "update");
+        out.add<const VECTOR *>(p, "update");
         p = res;
-        out.add(p, "residual");
+        out.add<const VECTOR *>(p, "residual");
         *data_out << step;
         *data_out << out;
       }
@@ -164,13 +157,13 @@ namespace Algorithms
 
         if (debug_vectors)
           {
-            NamedData<VECTOR *> out;
+            AnyData out;
             VECTOR *p = &u;
-            out.add(p, "solution");
+            out.add<const VECTOR *>(p, "solution");
             p = Du;
-            out.add(p, "update");
+            out.add<const VECTOR *>(p, "update");
             p = res;
-            out.add(p, "residual");
+            out.add<const VECTOR *>(p, "residual");
             *data_out << step;
             *data_out << out;
           }

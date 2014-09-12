@@ -17,7 +17,6 @@
 #define __deal2__matrix_block_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/named_data.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/base/memory_consumption.h>
@@ -26,6 +25,7 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/algorithms/any_data.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -322,7 +322,7 @@ private:
 template <class MATRIX>
 class MatrixBlockVector
   :
-  private NamedData<std_cxx11::shared_ptr<MatrixBlock<MATRIX> > >
+  private AnyData
 {
 public:
   /**
@@ -334,6 +334,13 @@ public:
    * The type of object stored.
    */
   typedef MatrixBlock<MATRIX> value_type;
+
+  /**
+   * The pointer type used for storing the objects. We use a shard
+   * pointer, such that they get deleted automatically when not used
+   * anymore.
+   */
+  typedef std_cxx11::shared_ptr<value_type> ptr_type;
 
   /**
    * Add a new matrix block at the position <tt>(row,column)</tt> in the block
@@ -382,10 +389,10 @@ public:
   /**
    * import functions from private base class
    */
-  using NamedData<std_cxx11::shared_ptr<value_type> >::subscribe;
-  using NamedData<std_cxx11::shared_ptr<value_type> >::unsubscribe;
-  using NamedData<std_cxx11::shared_ptr<value_type> >::size;
-  using NamedData<std_cxx11::shared_ptr<value_type> >::name;
+  using AnyData::subscribe;
+  using AnyData::unsubscribe;
+  using AnyData::size;
+  using AnyData::name;
 };
 
 
@@ -531,7 +538,7 @@ public:
   std::size_t memory_consumption () const;
 private:
   /// Clear one of the matrix objects
-  void clear_object(NamedData<MGLevelObject<MatrixBlock<MATRIX> > > &);
+  void clear_object(AnyData &);
 
   /// Flag for storing matrices_in and matrices_out
   const bool edge_matrices;
@@ -540,15 +547,15 @@ private:
   const bool edge_flux_matrices;
 
   /// The level matrices
-  NamedData<MGLevelObject<MatrixBlock<MATRIX> > > matrices;
+  AnyData matrices;
   /// The matrix from the interior of a level to the refinement edge
-  NamedData<MGLevelObject<MatrixBlock<MATRIX> > > matrices_in;
+  AnyData matrices_in;
   /// The matrix from the refinement edge to the interior of a level
-  NamedData<MGLevelObject<MatrixBlock<MATRIX> > > matrices_out;
+  AnyData matrices_out;
   /// The DG flux from a level to the lower level
-  NamedData<MGLevelObject<MatrixBlock<MATRIX> > > flux_matrices_down;
+  AnyData flux_matrices_down;
   /// The DG flux from the lower level to a level
-  NamedData<MGLevelObject<MatrixBlock<MATRIX> > > flux_matrices_up;
+  AnyData flux_matrices_up;
 };
 
 
@@ -813,8 +820,8 @@ MatrixBlockVector<MATRIX>::add(
   size_type row, size_type column,
   const std::string &name)
 {
-  std_cxx11::shared_ptr<value_type> p(new value_type(row, column));
-  NamedData<std_cxx11::shared_ptr<value_type> >::add(p, name);
+  ptr_type p(new value_type(row, column));
+  AnyData::add(p, name);
 }
 
 
@@ -850,7 +857,7 @@ template <class MATRIX>
 inline const MatrixBlock<MATRIX> &
 MatrixBlockVector<MATRIX>::block(size_type i) const
 {
-  return *this->read(i);
+  return *this->read<ptr_type>(i);
 }
 
 
@@ -858,7 +865,7 @@ template <class MATRIX>
 inline MatrixBlock<MATRIX> &
 MatrixBlockVector<MATRIX>::block(size_type i)
 {
-  return *(*this)(i);
+  return *this->entry<ptr_type>(i);
 }
 
 
@@ -866,7 +873,7 @@ template <class MATRIX>
 inline MATRIX &
 MatrixBlockVector<MATRIX>::matrix(size_type i)
 {
-  return (*this)(i)->matrix;
+  return this->entry<ptr_type>(i)->matrix;
 }
 
 
@@ -920,7 +927,7 @@ template <class MATRIX>
 inline const MGLevelObject<MatrixBlock<MATRIX> > &
 MGMatrixBlockVector<MATRIX>::block(size_type i) const
 {
-  return matrices.read(i);
+  return *matrices.read<const MGLevelObject<MATRIX>* >(i);
 }
 
 
@@ -928,7 +935,7 @@ template <class MATRIX>
 inline MGLevelObject<MatrixBlock<MATRIX> > &
 MGMatrixBlockVector<MATRIX>::block(size_type i)
 {
-  return matrices(i);
+  return *matrices.entry<MGLevelObject<MATRIX>* >(i);
 }
 
 
@@ -936,7 +943,7 @@ template <class MATRIX>
 inline const MGLevelObject<MatrixBlock<MATRIX> > &
 MGMatrixBlockVector<MATRIX>::block_in(size_type i) const
 {
-  return matrices_in.read(i);
+  return *matrices_in.read<const MGLevelObject<MATRIX>* >(i);
 }
 
 
@@ -944,7 +951,7 @@ template <class MATRIX>
 inline MGLevelObject<MatrixBlock<MATRIX> > &
 MGMatrixBlockVector<MATRIX>::block_in(size_type i)
 {
-  return matrices_in(i);
+  return *matrices_in.entry<MGLevelObject<MATRIX>* >(i);
 }
 
 
@@ -952,7 +959,7 @@ template <class MATRIX>
 inline const MGLevelObject<MatrixBlock<MATRIX> > &
 MGMatrixBlockVector<MATRIX>::block_out(size_type i) const
 {
-  return matrices_out.read(i);
+  return *matrices_out.read<const MGLevelObject<MATRIX>* >(i);
 }
 
 
@@ -960,7 +967,7 @@ template <class MATRIX>
 inline MGLevelObject<MatrixBlock<MATRIX> > &
 MGMatrixBlockVector<MATRIX>::block_out(size_type i)
 {
-  return matrices_out(i);
+  return *matrices_out.entry<MGLevelObject<MATRIX>* >(i);
 }
 
 
@@ -968,7 +975,7 @@ template <class MATRIX>
 inline const MGLevelObject<MatrixBlock<MATRIX> > &
 MGMatrixBlockVector<MATRIX>::block_up(size_type i) const
 {
-  return flux_matrices_up.read(i);
+  return *flux_matrices_up.read<const MGLevelObject<MATRIX>* >(i);
 }
 
 
@@ -976,7 +983,7 @@ template <class MATRIX>
 inline MGLevelObject<MatrixBlock<MATRIX> > &
 MGMatrixBlockVector<MATRIX>::block_up(size_type i)
 {
-  return flux_matrices_up(i);
+  return *flux_matrices_up.entry<MGLevelObject<MATRIX>* >(i);
 }
 
 
@@ -984,7 +991,7 @@ template <class MATRIX>
 inline const MGLevelObject<MatrixBlock<MATRIX> > &
 MGMatrixBlockVector<MATRIX>::block_down(size_type i) const
 {
-  return flux_matrices_down.read(i);
+  return *flux_matrices_down.read<const MGLevelObject<MATRIX>* >(i);
 }
 
 
@@ -992,7 +999,7 @@ template <class MATRIX>
 inline MGLevelObject<MatrixBlock<MATRIX> > &
 MGMatrixBlockVector<MATRIX>::block_down(size_type i)
 {
-  return flux_matrices_down(i);
+  return *flux_matrices_down.entry<MGLevelObject<MATRIX>* >(i);
 }
 
 
@@ -1070,11 +1077,11 @@ MGMatrixBlockVector<MATRIX>::reinit_edge_flux(const MGLevelObject<BlockSparsityP
 
 template <class MATRIX>
 inline void
-MGMatrixBlockVector<MATRIX>::clear_object(NamedData<MGLevelObject<MatrixBlock<MATRIX> > > &mo)
+MGMatrixBlockVector<MATRIX>::clear_object(AnyData &mo)
 {
   for (size_type i=0; i<mo.size(); ++i)
     {
-      MGLevelObject<MatrixBlock<MATRIX> > &o = mo(i);
+      MGLevelObject<MatrixBlock<MATRIX> > &o = mo.entry<MGLevelObject<MATRIX>* >(i);
       for (size_type level = o.min_level(); level <= o.max_level(); ++level)
         o[level].matrix.clear();
     }
