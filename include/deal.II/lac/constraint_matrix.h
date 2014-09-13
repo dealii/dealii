@@ -879,18 +879,20 @@ public:
    * corresponding to constrained nodes. Thus, if a degree of freedom in @p
    * local_dof_indices is constrained, we distribute the corresponding entries
    * in the matrix, but also add the absolute value of the diagonal entry of
-   * the local matrix to the corresponding entry in the global matrix. Since
-   * the exact value of the diagonal element is not important (the value of
-   * the respective degree of freedom will be overwritten by the distribute()
-   * call later on anyway), this guarantees that the diagonal entry is always
+   * the local matrix to the corresponding entry in the global
+   * matrix. Assuming the discretized operator is positive definite,
+   * this guarantees that the diagonal entry is always
    * non-zero, positive, and of the same order of magnitude as the other
-   * entries of the matrix.
+   * entries of the matrix. On the other hand, when solving a source
+   * problem $Au=f$ the exact value of the diagonal element is not
+   * important, since the value of
+   * the respective degree of freedom will be overwritten by the distribute()
+   * call later on anyway.
    *
-   * @note While not changing the condition number, the procedure
-   * described above adds an unforeseeable number of artificial
-   * eigenvalues to the spectrum of the matrix. Therefore, it is
-   * recommended to use the equivalent function with two local index
-   * vectors in such a case.
+   * @note The procedure described above adds an unforeseeable number
+   * of artificial eigenvalues to the spectrum of the
+   * matrix. Therefore, it is recommended to use the equivalent
+   * function with two local index vectors in such a case.
    *
    * By using this function to distribute local contributions to the
    * global object, one saves the call to the condense function after the
@@ -911,17 +913,17 @@ public:
                               MatrixType                   &global_matrix) const;
 
   /**
-   * Does almost the same as the function above but can treat non
-   * quadratic matrices.  The main difference to achieve this is that
-   * the diagonal entries in constrained rows are left untouched
+   * Does almost the same as the function above but can treat general
+   * rectangular matrices.  The main difference to achieve this is
+   * that the diagonal entries in constrained rows are left untouched
    * instead of being filled with arbitrary values.
    *
    * Since the diagonal entries corresponding to eliminated degrees of
    * freedom are not set, the result may have a zero eigenvalue, if
-   * applied to a quadratic matrix. This has to be considered when
-   * solving the resulting problems. For solving a source problem, it
-   * is possible to set the diagonal entry after building the matrix
-   * by a piece of code of the form
+   * applied to a square matrix. This has to be considered when
+   * solving the resulting problems. For solving a source problem
+   * $Au=f$, it is possible to set the diagonal entry after building
+   * the matrix by a piece of code of the form
    *
    * @code
    *   for (unsigned int i=0;i<matrix.m();++i)
@@ -935,9 +937,9 @@ public:
    * or larger by a factor close to machine accuracy, it may be
    * advisable to adjust it.
    *
-   * For solving eigenvalue problems, there will be only one possibly
-   * multiple eigenvalue zero. Taking this into account, nothing has
-   * to be changed.
+   * For solving eigenvalue problems, this will only add one spurious
+   * zero eigenvalue (with a multiplicity that is possibly greater
+   * than one). Taking this into account, nothing else has to be changed.
    */
   template <typename MatrixType>
   void
