@@ -1539,18 +1539,42 @@ public:
   double minimum_vertex_distance () const;
 
   /**
-   * Center of the object. The center of an
-   * object is defined to be the average of
-   * the locations of the vertices, which
-   * is also where the (dim-)linear mapping
-   * places the midpoint of the unit cell
-   * in real space.  However, this may not
-   * be the barycenter of the object and it
-   * may also not be the true center of an
-   * object if higher order mappings are
-   * used.
+   * Returns a point belonging to the Manifold<dim,spacedim> where
+   * this object lives, given its parametric coordinates on the
+   * reference #structdim cell. This function queries the underlying
+   * manifold object, and can be used to obtain the exact geometrical
+   * location of arbitrary points on this object.
+   *
+   * Notice that the argument @p coordinates are the coordinates on
+   * the <emph>reference cell</emph>, given in reference
+   * coordinates. In other words, the argument provides a weighting
+   * between the different vertices. For example, for lines, calling
+   * this function with argument Point<1>(.5), is equivalent to asking
+   * the line for its center.
    */
-  Point<spacedim> center () const;
+  Point<spacedim> intermediate_point(const Point<structdim> &coordinates) const;
+
+  /**
+   * Center of the object. The center of an object is defined to be
+   * the average of the locations of the vertices. If required, the
+   * user may ask this function to return the average of the point
+   * according to the underlyinging Manifold object, by setting to
+   * true the optional parameter @p respect_manifold.
+   *
+   * When the geometry of a TriaAccessor is not flat, or when part of
+   * the bounding objects of this TriaAccessor are not flat, the
+   * result given by the TriaAccessor::center() function may not be
+   * accurate enough, even when parameter @p respect_manifold is set
+   * to true. If you find this to be case, than you can further refine
+   * the computation of the center by setting to true the second
+   * additional parameter @p use_laplace_transformation, which will
+   * force this function to compute the location of the center by
+   * solving a linear elasticity problem with Dirichlet boundary
+   * conditions set to the location of the bounding vertices and the
+   * centers of the bounding lines and quads.
+   */
+  Point<spacedim> center (const bool respect_manifold=false,
+                          const bool use_laplace_transformation=false) const;
 
   /**
    * Barycenter of the object.

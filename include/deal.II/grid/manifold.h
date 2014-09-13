@@ -39,23 +39,14 @@ template <int dim, int space_dim> class Triangulation;
 namespace Manifolds
 {
   /**
-   * Given a hex iterator, construct a quadrature with the Laplace
-   * weigths, and all relevant points of the hex: vertices, line
-   * centers and face centers, which can be called when creating
-   * middle vertices in the manifold routines.
-   */
-  Quadrature<3>
-  get_default_quadrature(const TriaIterator<CellAccessor<3, 3> > &hex);
-
-  /**
     * Given a general mesh iterator, construct a quadrature with the
     * Laplace weights or with uniform weights according the parameter
     * @p with_laplace, and with all relevant points of the iterator:
     * vertices, line centers and/or face centers, which can be called
     * when creating new vertices in the manifold routines.
     */
-  template <typename OBJECT, int spacedim>
-  Quadrature<spacedim>
+  template <typename OBJECT>
+  Quadrature<OBJECT::AccessorType::space_dimension>
   get_default_quadrature(const OBJECT &obj, bool with_laplace = false);
 }
 
@@ -527,20 +518,21 @@ get_new_point_on_hex (const Triangulation<3,3>::hex_iterator &) const;
 namespace Manifolds
 {
 
-  template <typename OBJECT, int spacedim>
-  Quadrature<spacedim>
+  template <typename OBJECT>
+  Quadrature<OBJECT::AccessorType::space_dimension>
   get_default_quadrature(const OBJECT &obj, bool with_laplace)
   {
+    const int spacedim = OBJECT::AccessorType::space_dimension;
+    const int dim = OBJECT::AccessorType::structure_dimension;
+
     std::vector<Point<spacedim> > sp;
     std::vector<double> wp;
 
-    const int dim = OBJECT::AccessorType::structure_dimension;
 
     // note that the exact weights are chosen such as to minimize the
     // distortion of the four new quads from the optimal shape; their
     // derivation and values is copied over from the
     // @p{MappingQ::set_laplace_on_vector} function
-    AssertDimension(spacedim, OBJECT::AccessorType::space_dimension);
     switch (dim)
       {
       case 1:
@@ -554,23 +546,15 @@ namespace Manifolds
       case 2:
         sp.resize(8);
         wp.resize(8);
-        sp[0] = obj->vertex(0);
-        sp[1] = obj->vertex(1);
-        sp[2] = obj->vertex(2);
-        sp[3] = obj->vertex(3);
 
-        sp[4] = obj->line(0)->has_children() ?
-                obj->line(0)->child(0)->vertex(1) :
-                obj->line(0)->get_manifold().get_new_point_on_line(obj->line(0));
-        sp[5] = obj->line(1)->has_children() ?
-                obj->line(1)->child(0)->vertex(1) :
-                obj->line(1)->get_manifold().get_new_point_on_line(obj->line(1));
-        sp[6] = obj->line(2)->has_children() ?
-                obj->line(2)->child(0)->vertex(1) :
-                obj->line(2)->get_manifold().get_new_point_on_line(obj->line(2));
-        sp[7] = obj->line(3)->has_children() ?
-                obj->line(3)->child(0)->vertex(1) :
-                obj->line(3)->get_manifold().get_new_point_on_line(obj->line(3));
+        for (unsigned int i=0; i<4; ++i)
+          {
+            sp[i] = obj->vertex(i);
+            sp[4+i] = ( obj->line(i)->has_children() ?
+                        obj->line(i)->child(0)->vertex(1) :
+                        obj->line(i)->get_manifold().get_new_point_on_line(obj->line(i)) );
+          }
+
         if (with_laplace)
           {
             std::fill(wp.begin(), wp.begin()+4, 1.0/16.0);
@@ -579,6 +563,49 @@ namespace Manifolds
         else
           std::fill(wp.begin(), wp.end(), 1.0/8.0);
         break;
+      case 3:
+      {
+        TriaIterator<TriaAccessor<3, 3, 3> > hex
+          = static_cast<TriaIterator<TriaAccessor<3, 3, 3> > >(obj);
+        const unsigned int np =
+          GeometryInfo<dim>::vertices_per_cell+
+          GeometryInfo<dim>::lines_per_cell+
+          GeometryInfo<dim>::faces_per_cell;
+        sp.resize(np);
+        wp.resize(np);
+        std::vector<Point<3> > *sp3 = reinterpret_cast<std::vector<Point<3> > *>(&sp);
+
+        unsigned int j=0;
+
+        // note that the exact weights are chosen such as to minimize the
+        // distortion of the eight new hexes from the optimal shape; their
+        // derivation and values is copied over from the
+        // @p{MappingQ::set_laplace_on_vector} function
+        for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i, ++j)
+          {
+            (*sp3)[j] = hex->vertex(i);
+            wp[j] = 1.0/128.0;
+          }
+        for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i, ++j)
+          {
+            (*sp3)[j] = (hex->line(i)->has_children() ?
+                         hex->line(i)->child(0)->vertex(1) :
+                         hex->line(i)->get_manifold().get_new_point_on_line(hex->line(i)));
+            wp[j] = 7.0/192.0;
+          }
+        for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i, ++j)
+          {
+            (*sp3)[j] = (hex->quad(i)->has_children() ?
+                         hex->quad(i)->isotropic_child(0)->vertex(3) :
+                         hex->quad(i)->get_manifold().get_new_point_on_quad(hex->quad(i)));
+            wp[j] = 1.0/12.0;
+          }
+        // Overwrited the weights with 1/np if we don't want to use
+        // laplace vectors.
+        if (with_laplace == false)
+          std::fill(wp.begin(), wp.end(), 1.0/np);
+      }
+      break;
       default:
         Assert(false, ExcInternalError());
         break;

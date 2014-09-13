@@ -21,13 +21,15 @@
 #include <deal.II/grid/tria_accessor.templates.h>
 #include <deal.II/grid/tria_iterator.templates.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/quadrature.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 // anonymous namespace for helper functions
 namespace
@@ -1019,6 +1021,27 @@ namespace
     Assert (false, ExcNotImplemented());
     return std::numeric_limits<double>::quiet_NaN();
   }
+
+  template <int dim, int spacedim>
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<1, dim, spacedim> &obj)
+  {
+    TriaIterator<TriaAccessor<1,dim,spacedim> > it(obj);
+    return obj.get_manifold().get_new_point_on_line(it);
+  }
+
+  template <int dim, int spacedim>
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<2, dim, spacedim> &obj)
+  {
+    TriaIterator<TriaAccessor<2,dim,spacedim> > it(obj);
+    return obj.get_manifold().get_new_point_on_quad(it);
+  }
+
+  template <int dim, int spacedim>
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<3, dim, spacedim> &obj)
+  {
+    TriaIterator<TriaAccessor<3,dim,spacedim> > it(obj);
+    return obj.get_manifold().get_new_point_on_hex(it);
+  }
 }
 
 
@@ -1158,6 +1181,51 @@ set_all_manifold_ids (const types::manifold_id manifold_ind) const
   // Twelve bounding lines
   for (unsigned int i=0; i<12; ++i)
     this->line(i)->set_manifold_id (manifold_ind);
+}
+
+
+template <int structdim, int dim, int spacedim>
+Point<spacedim>
+TriaAccessor<structdim, dim, spacedim>::intermediate_point (const Point<structdim> &coordinates) const
+{
+  // We use an FE_Q<structdim>(1) to extract the "weights" of each
+  // vertex, used to get a point from the manifold.
+  static FE_Q<structdim> fe(1);
+
+  // Surrounding points and weights.
+  std::vector<Point<spacedim> > p(GeometryInfo<structdim>::vertices_per_cell);
+  std::vector<double>   w(GeometryInfo<structdim>::vertices_per_cell);
+
+  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+    {
+      p[i] = this->vertex(i);
+      w[i] = fe.shape_value(i, coordinates);
+    }
+
+  Quadrature<spacedim> quadrature(p, w);
+  return this->get_manifold().get_new_point(quadrature);
+}
+
+
+template <int structdim, int dim, int spacedim>
+Point<spacedim>
+TriaAccessor<structdim, dim, spacedim>::center (const bool respect_manifold,
+                                                const bool use_laplace) const
+{
+  if (respect_manifold == false)
+    {
+      Assert(use_laplace == false, ExcNotImplemented());
+      Point<spacedim> p;
+      for (unsigned int v=0; v<GeometryInfo<structdim>::vertices_per_cell; ++v)
+        p += vertex(v);
+      return p/GeometryInfo<structdim>::vertices_per_cell;
+    }
+  else
+    {
+      TriaRawIterator<TriaAccessor<structdim, dim, spacedim> > it(*this);
+      Quadrature<spacedim> quadrature = Manifolds::get_default_quadrature(it, use_laplace);
+      return this->get_manifold().get_new_point(quadrature);
+    }
 }
 
 

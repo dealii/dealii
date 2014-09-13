@@ -28,9 +28,7 @@ template <int dim, int spacedim>
 SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center):
   ChartManifold<dim,spacedim,spacedim>(SphericalManifold<dim,spacedim>::get_periodicity()),
   center(center)
-{
-  Assert(spacedim != 1, ExcImpossibleInDim(1));
-}
+{}
 
 
 

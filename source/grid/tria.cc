@@ -3957,9 +3957,7 @@ namespace internal
                 // triangulation.vertices[next_unused_vertex] = new_point;
                 triangulation.vertices[next_unused_vertex] =
                   cell->get_manifold().get_new_point
-                  (Manifolds::get_default_quadrature
-                   <typename Triangulation<dim,spacedim>::active_cell_iterator,
-                   spacedim>(cell));
+                  (Manifolds::get_default_quadrature(cell));
 
                 // if the user_flag is set, i.e. if the
                 // cell is at the boundary, use a
@@ -5827,9 +5825,7 @@ namespace internal
                         // function
                         triangulation.vertices[next_unused_vertex] =
                           quad->get_manifold().get_new_point
-                          (Manifolds::get_default_quadrature
-                           <typename Triangulation<dim,spacedim>::quad_iterator,
-                           spacedim>(quad, true));
+                          (Manifolds::get_default_quadrature(quad, true));
                       }
                     triangulation.vertices_used[next_unused_vertex] = true;
                     // now that we created the right point, make up
