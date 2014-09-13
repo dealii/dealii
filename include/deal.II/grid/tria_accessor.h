@@ -1541,11 +1541,18 @@ public:
   /**
    * Returns a point belonging to the Manifold<dim,spacedim> where
    * this object lives, given its parametric coordinates on the
-   * reference #strucdim cell. This function queries the underlying
+   * reference #structdim cell. This function queries the underlying
    * manifold object, and can be used to obtain the exact geometrical
    * location of arbitrary points on this object.
+   *
+   * Notice that the argument @p coordinates are the coordinates on
+   * the <emph>reference cell</emph>, given in reference
+   * coordinates. In other words, the argument provides a weighting
+   * between the different vertices. For example, for lines, calling
+   * this function with argument Point<1>(.5), is equivalent to asking
+   * the line for its center.
    */
-  Point<spacedim> point(const Point<structdim> &coordinates) const;
+  Point<spacedim> intermediate_point(const Point<structdim> &coordinates) const;
 
   /**
    * Center of the object. The center of an object is defined to be

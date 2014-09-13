@@ -1186,7 +1186,7 @@ set_all_manifold_ids (const types::manifold_id manifold_ind) const
 
 template <int structdim, int dim, int spacedim>
 Point<spacedim>
-TriaAccessor<structdim, dim, spacedim>::point (const Point<structdim> &coordinates) const
+TriaAccessor<structdim, dim, spacedim>::intermediate_point (const Point<structdim> &coordinates) const
 {
   // We use an FE_Q<structdim>(1) to extract the "weights" of each
   // vertex, used to get a point from the manifold.

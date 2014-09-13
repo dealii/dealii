@@ -99,7 +99,8 @@ inconvenience this causes.
 <ol>
   
   <li> New: Added two optional parameters to TriaAccessor::center()
-  and a new method TriaAccessor::point(). They allow to query for a 
+  and a new method TriaAccessor::intermediate_point(). 
+  They allow to query for a 
   geometrically coherent center, or ask for arbitrary points on the 
   underlying Manifold, given the dim coordinates in the reference 
   element.
