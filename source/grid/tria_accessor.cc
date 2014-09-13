@@ -1023,21 +1023,21 @@ namespace
   }
 
   template <int dim, int spacedim>
-  Point<spacedim> get_new_point_on_obj(const TriaAccessor<1, dim, spacedim> &obj)
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<1, dim, spacedim> &obj)
   {
     TriaIterator<TriaAccessor<1,dim,spacedim> > it(obj);
     return obj.get_manifold().get_new_point_on_line(it);
   }
 
   template <int dim, int spacedim>
-  Point<spacedim> get_new_point_on_obj(const TriaAccessor<2, dim, spacedim> &obj)
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<2, dim, spacedim> &obj)
   {
     TriaIterator<TriaAccessor<2,dim,spacedim> > it(obj);
     return obj.get_manifold().get_new_point_on_quad(it);
   }
 
   template <int dim, int spacedim>
-  Point<spacedim> get_new_point_on_obj(const TriaAccessor<3, dim, spacedim> &obj)
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<3, dim, spacedim> &obj)
   {
     TriaIterator<TriaAccessor<3,dim,spacedim> > it(obj);
     return obj.get_manifold().get_new_point_on_hex(it);

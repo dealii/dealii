@@ -1568,10 +1568,10 @@ public:
    * to true. If you find this to be case, than you can further refine
    * the computation of the center by setting to true the second
    * additional parameter @p use_laplace_transformation, which will
-   * force this function to compute the center performing a Laplace
-   * transformation on all bounding support points. The Laplace
-   * transformation is computed similarly to what happens in
-   * @p{MappingQ::set_laplace_on_vector}.
+   * force this function to compute the location of the center by
+   * solving a linear elasticity problem with Dirichlet boundary
+   * conditions set to the location of the bounding vertices and the
+   * centers of the bounding lines and quads.
    */
   Point<spacedim> center (const bool respect_manifold=false,
                           const bool use_laplace_transformation=false) const;
