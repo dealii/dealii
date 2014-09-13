@@ -104,8 +104,10 @@ inconvenience this causes.
   geometrically coherent center, or ask for arbitrary points on the 
   underlying Manifold, given the dim coordinates in the reference 
   element.
+  Triangulation was refactored internally to use the new 
+  TriaAccessor::center() interface when querying for new points.
   <br>
-  (Luca Heltai, 2014/09/12)
+  (Luca Heltai, 2014/09/13)
 
 
   <li> New: The new tutorial program step-52 explains how to use the 
