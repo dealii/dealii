@@ -86,8 +86,11 @@ namespace hp
    * interface that do not immediate match (for example, if you have
    * $Q_2$ and $Q_3$ elements meeting at a common face), then one needs
    * to compute constraints to ensure that the resulting finite element
-   * space on the mesh remains conforming. The whole process of working
-   * with objects of this type is explained in step-27.
+   * space on the mesh remains conforming.
+   *
+   * The whole process of working with objects of this type is explained in
+   * step-27. Many of the algorithms this class implements are described
+   * in the @ref hp_paper "hp paper".
    *
    *
    * <h3>Active FE indices and their behavior under mesh refinement</h3>
