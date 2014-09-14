@@ -4397,7 +4397,7 @@ namespace internal
 
                   // Now we always ask the cell itself where to put
                   // the new point. The cell in turn will query the
-                  // maifold object internally.
+                  // manifold object internally.
                   triangulation.vertices[next_unused_vertex] =
                     cell->center(true);
 
