@@ -3955,9 +3955,7 @@ namespace internal
             if (dim == spacedim)
               {
                 // triangulation.vertices[next_unused_vertex] = new_point;
-                triangulation.vertices[next_unused_vertex] =
-                  cell->get_manifold().get_new_point
-                  (Manifolds::get_default_quadrature(cell));
+                triangulation.vertices[next_unused_vertex] = cell->center(true);
 
                 // if the user_flag is set, i.e. if the
                 // cell is at the boundary, use a
@@ -4025,8 +4023,6 @@ namespace internal
                 // user flag is set or not
                 cell->clear_user_flag();
 
-
-
                 // An assert to make sure that the static_cast in the
                 // next line has the chance to give reasonable
                 // results.
@@ -4035,10 +4031,8 @@ namespace internal
 
                 // new vertex is placed on the surface according to
                 // the information stored in the boundary class
-                const Manifold<dim,spacedim> &manifold = cell->get_manifold();
-
                 triangulation.vertices[next_unused_vertex] =
-                  manifold.get_new_point_on_quad (cell);
+                  cell->center(true);
               }
           }
 
@@ -4401,17 +4395,12 @@ namespace internal
                   Assert (next_unused_vertex < triangulation.vertices.size(),
                           ExcTooFewVerticesAllocated());
 
-                  // Now we always ask the manifold where to put the
-                  // new point. The get_manifold function will return
-                  // a flat boundary if invalid_manifold_id is set,
-                  // behaving as before in the flat case.  Backward
-                  // compatibility requires us to use the material id
-                  // of the cell in the codimension one case, however
-                  // we only do this if the manifold_id is the invalid
-                  // one, otherwise use the material id. This is done
-                  // internally in the get_manifold() function.
+                  // Now we always ask the cell itself where to put
+                  // the new point. The cell in turn will query the
+                  // manifold object internally.
                   triangulation.vertices[next_unused_vertex] =
-                    cell->get_manifold().get_new_point_on_line(cell);
+                    cell->center(true);
+
                   triangulation.vertices_used[next_unused_vertex] = true;
 
                   // search for next two unused cell (++ takes care of
@@ -4745,7 +4734,7 @@ namespace internal
                       // lines we can compute the midpoint as the mean
                       // of the two vertices: if (line->at_boundary())
                       triangulation.vertices[next_unused_vertex]
-                        = line->get_manifold().get_new_point_on_line (line);
+                        = line->center(true);
                     }
                   else
                     // however, if spacedim>dim, we always have to ask
@@ -4758,7 +4747,7 @@ namespace internal
                         = triangulation.get_manifold(line->user_index()).get_new_point_on_line (line);
                     else
                       triangulation.vertices[next_unused_vertex]
-                        = line->get_manifold().get_new_point_on_line (line);
+                        = line->center(true);
 
                   // now that we created the right point, make up the
                   // two child lines.  To this end, find a pair of
@@ -5203,7 +5192,7 @@ namespace internal
                   triangulation.vertices_used[next_unused_vertex] = true;
 
                   triangulation.vertices[next_unused_vertex]
-                    = line->get_manifold().get_new_point_on_line (line);
+                    = line->center(true);
 
                   // now that we created the right point, make up the
                   // two child lines (++ takes care of the end of the
@@ -5736,7 +5725,7 @@ namespace internal
                             // of the domain, so we need not care
                             // about boundary quads here
                             triangulation.vertices[next_unused_vertex]
-                              = middle_line->get_manifold().get_new_point_on_line(middle_line);
+                              = middle_line->center(true);
                             triangulation.vertices_used[next_unused_vertex] = true;
 
                             // now search a slot for the two
@@ -5799,7 +5788,7 @@ namespace internal
                     if (quad->at_boundary() ||
                         (quad->manifold_id() != numbers::invalid_manifold_id) )
                       triangulation.vertices[next_unused_vertex]
-                        = quad->get_manifold().get_new_point_on_quad (quad);
+                        = quad->center(true);
                     else
                       {
                         // it might be that the quad itself is not at
@@ -5824,8 +5813,7 @@ namespace internal
                         // the @p{MappingQ::set_laplace_on_vector}
                         // function
                         triangulation.vertices[next_unused_vertex] =
-                          quad->get_manifold().get_new_point
-                          (Manifolds::get_default_quadrature(quad, true));
+                          quad->center(true, true);
                       }
                     triangulation.vertices_used[next_unused_vertex] = true;
                     // now that we created the right point, make up
@@ -7924,16 +7912,13 @@ namespace internal
                       triangulation.vertices_used[next_unused_vertex] = true;
 
                       // the new vertex is definitely in the interior,
-                      // so we need not worry about the boundary.  let
-                      // it be the average of the 26 vertices
-                      // surrounding it. weight these vertices in the
-                      // same way as they are weighted in the
-                      // @p{MappingQ::set_laplace_on_hex_vector}
-                      // function, and like the new vertex at the
-                      // center of the quad is weighted (see above)
-
+                      // so we need not worry about the
+                      // boundary. However we need to worry about
+                      // Manifolds. Let the cell compute its own
+                      // center, by querying the underlying manifold
+                      // object.
                       triangulation.vertices[next_unused_vertex] =
-                        hex->get_manifold().get_new_point_on_hex(hex);
+                        hex->center(true, true);
 
                       // set the data of the six lines.  first collect
                       // the indices of the seven vertices (consider
@@ -8558,7 +8543,7 @@ namespace internal
                         // the new point on the boundary would be this
                         // one.
                         const Point<spacedim> new_bound
-                          = face->get_manifold().get_new_point_on_face (face);
+                          = face->center(true);
                         // to check it, transform to the unit cell
                         // with Q1Mapping
                         const Point<dim> new_unit

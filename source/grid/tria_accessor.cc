@@ -1022,6 +1022,7 @@ namespace
     return std::numeric_limits<double>::quiet_NaN();
   }
 
+
   template <int dim, int spacedim>
   Point<spacedim> get_new_point_on_object(const TriaAccessor<1, dim, spacedim> &obj)
   {
@@ -1041,6 +1042,20 @@ namespace
   {
     TriaIterator<TriaAccessor<3,dim,spacedim> > it(obj);
     return obj.get_manifold().get_new_point_on_hex(it);
+  }
+
+  template <int structdim, int dim, int spacedim>
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<structdim, dim, spacedim> &obj,
+                                          const bool use_laplace)
+  {
+    if (use_laplace == false)
+      return get_new_point_on_object(obj);
+    else
+      {
+        TriaRawIterator<TriaAccessor<structdim, dim, spacedim> > it(obj);
+        Quadrature<spacedim> quadrature = Manifolds::get_default_quadrature(it, use_laplace);
+        return obj.get_manifold().get_new_point(quadrature);
+      }
   }
 }
 
@@ -1221,11 +1236,7 @@ TriaAccessor<structdim, dim, spacedim>::center (const bool respect_manifold,
       return p/GeometryInfo<structdim>::vertices_per_cell;
     }
   else
-    {
-      TriaRawIterator<TriaAccessor<structdim, dim, spacedim> > it(*this);
-      Quadrature<spacedim> quadrature = Manifolds::get_default_quadrature(it, use_laplace);
-      return this->get_manifold().get_new_point(quadrature);
-    }
+    return get_new_point_on_object(*this, use_laplace);
 }
 
 
