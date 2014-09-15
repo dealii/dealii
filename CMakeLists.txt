@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------
 ## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -95,13 +95,10 @@ INCLUDE(setup_compiler_flags)
 # Include information about bundled libraries:
 #
 IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  FILE(GLOB _check_files "bundled/*.cmake")
-  LIST(SORT _check_files)
-  FOREACH(_file ${_check_files})
-    MESSAGE(STATUS "")
-    MESSAGE(STATUS "Include ${_file}")
-    INCLUDE(${_file})
-  ENDFOREACH()
+  SET(_file ${CMAKE_SOURCE_DIR}/bundled/setup_bundled.cmake)
+  MESSAGE(STATUS "")
+  MESSAGE(STATUS "Include ${_file}")
+  INCLUDE(${_file})
 ENDIF()
 
 #
