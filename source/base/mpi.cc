@@ -321,38 +321,15 @@ namespace Utilities
     {
       do_init(argc, argv);
 
-      // set maximum number of threads (also respecting the environment
-      // variable that the called function evaluates)
-      multithread_info.set_thread_limit(max_num_threads);
-    }
-
-
-
-    MPI_InitFinalize::MPI_InitFinalize (int    &argc,
-                                        char ** &argv,
-                                        const ThreadsPerMPIProcess threads_per_process)
-      :
-      owns_mpi (true)
-    {
-      do_init(argc, argv);
-
-      // set maximum number of threads (also respecting the environment
-      // variable that the called function evaluates)
-      switch (threads_per_process)
+      if (max_num_threads != numbers::invalid_unsigned_int)
         {
-        case one_thread_per_process:
-        {
-          multithread_info.set_thread_limit(1);
-          break;
+          // set maximum number of threads (also respecting the environment
+          // variable that the called function evaluates) based on what
+          // the user asked
+          multithread_info.set_thread_limit(max_num_threads);
         }
-        case one_thread_per_core:
-        {
-          // choose the maximal number of threads possible
-          multithread_info.set_thread_limit(numbers::invalid_unsigned_int);
-          break;
-        }
-
-        case optimal_number_of_threads:
+      else
+        // user wants automatic choice
         {
           // we need to figure out how many MPI processes there
           // are on the current node, as well as how many CPU cores
@@ -407,11 +384,6 @@ namespace Utilities
 
           // finally set this number of threads
           multithread_info.set_thread_limit(n_threads);
-          break;
-        }
-
-        default:
-          Assert (false, ExcNotImplemented());
         }
     }
 

@@ -258,42 +258,6 @@ namespace Utilities
     class MPI_InitFinalize
     {
     public:
-      /**
-       * An enumeration data type that is used in one
-       * of the constructors. It determines how many threads
-       * the current process should be using. The options are:
-       *
-       * - @p one_thread_per_process : Each MPI process will be
-       *   run as a single-threaded process. In other words, deal.II
-       *   will not support running multiple tasks in parallel. This
-       *   is often a useful default if you start as many MPI processes
-       *   per node as there are processor cores. In this case, running
-       *   each process with multiple threads would oversubscribe the
-       *   available resources.
-       * - @p one_thread_per_core : This is the default behavior of
-       *   sequential programs, where you want to run as many threads
-       *   in parallel as there are cores on your machine. It would
-       *   also be the appropriate behavior if you started only one
-       *   MPI process per node of your cluster, even if these nodes
-       *   have multiple cores.
-       * - @p optimal_number_of_threads : This selects the number of
-       *   threads to runon this MPI process in such a way that all of
-       *   the cores in your node are spoken for. In other words, if you
-       *   have started one MPI process per node, this option is equivalent
-       *   to @p one_thread_per_core. If you have started as many MPI
-       *   processes per node as there are cores on each node, then
-       *   this is equivalent to @p one_thread_per_process. On the
-       *   other hand, if, for example, you start 4 MPI processes
-       *   on each 16-core node, then this option will start 4 worker
-       *   threads for each node. If you start 3 processes on an 8 core
-       *   node, then they will start 3, 3 and 2 threads, respectively.
-       */
-      enum ThreadsPerMPIProcess
-      {
-        one_thread_per_process,
-        one_thread_per_core,
-        optimal_number_of_threads
-      };
 
       /**
        * Constructor. Takes the arguments from the command line (in case of
@@ -310,55 +274,43 @@ namespace Utilities
       /**
        * Initialize MPI (and, if deal.II was configured to use it, PETSc)
        * and set the number of threads used by deal.II (via the underlying
-       * Threading Building Blocks library) to the given parameter. If set to
-       * numbers::invalid_unsigned_int, the number of threads is determined by
-       * TBB. When in doubt, set this value to 1 since MPI jobs are typically
-       * run in a way where one has one MPI process per available processor
-       * core and there will be little CPU resources left to support multithreaded
-       * processes.
-       *
-       * This function calls MultithreadInfo::set_thread_limit()
-       * unconditionally with @p max_num_threads . That function in turn also
-       * evaluates the environment variable DEAL_II_NUM_THREADS and the number
-       * of threads to be used will be the minimum of the argument passed here
-       * and the environment (if both are set).
+       * Threading Building Blocks library) to the given parameter.
        *
        * @param[in,out] argc A reference to the 'argc' argument passed to main. This
        *   argument is used to initialize MPI (and, possibly, PETSc) as they
        *   read arguments from the command line.
        * @param[in,out] argv A reference to the 'argv' argument passed to main.
        * @param[in] max_num_threads The maximal number of threads this MPI process
-       *   should utilize.
+       *   should utilize. If this argument is set to
+       *   numbers::invalid_unsigned_int, the number of threads is determined by
+       *   automatically in the following way: the number of
+       *   threads to run on this MPI process is set in such a way that all of
+       *   the cores in your node are spoken for. In other words, if you
+       *   have started one MPI process per node, setting this argument is
+       *   equivalent to setting it to the number of cores present in the node
+       *   this MPI process runs on. If you have started as many MPI
+       *   processes per node as there are cores on each node, then
+       *   this is equivalent to passing 1 as the argument. On the
+       *   other hand, if, for example, you start 4 MPI processes
+       *   on each 16-core node, then this option will start 4 worker
+       *   threads for each node. If you start 3 processes on an 8 core
+       *   node, then they will start 3, 3 and 2 threads, respectively.
+       *
+       * @note This function calls MultithreadInfo::set_thread_limit()
+       * with either @p max_num_threads or, following the discussion above, a
+       * number of threads equal to the number of cores allocated to this
+       * MPI process. However, MultithreadInfo::set_thread_limit() in turn also
+       * evaluates the environment variable DEAL_II_NUM_THREADS. Finally, the worker
+       * threads can only be created on cores to which the current MPI process has
+       * access to; some MPI implementations limit the number of cores each process
+       * has access to to one or a subset of cores in order to ensure better cache
+       * behavior. Consequently, the number of threads that will really be created
+       * will be the minimum of the argument passed here, the environment variable
+       * (if set), and the number of cores accessible to the thread.
        */
       MPI_InitFinalize (int    &argc,
                         char ** &argv,
                         const unsigned int max_num_threads);
-
-      /**
-       * Initialize MPI (and, if deal.II was configured to use it, PETSc)
-       * and set the number of threads used by deal.II (via the underlying
-       * Threading Building Blocks library) to using the policy described by
-       * the last argument.
-       *
-       * This function calls MultithreadInfo::set_thread_limit()
-       * unconditionally with @p max_num_threads . That function in turn also
-       * evaluates the environment variable DEAL_II_NUM_THREADS and the number
-       * of threads to be used will be the minimum of the number determined
-       * by the policy selected via the last argument and the environment
-       * (if both are set).
-       *
-       * @param[in,out] argc A reference to the 'argc' argument passed to main. This
-       *   argument is used to initialize MPI (and, possibly, PETSc) as they
-       *   read arguments from the command line.
-       * @param[in,out] argv A reference to the 'argv' argument passed to main.
-       * @param[in] threads_per_process A policy that describes how the number
-       *   of threads this MPI process should use is determined. See the
-       *   documentation of the ThreadsPerMPIProcess enum for a discussion of the
-       *   possible options.
-       */
-      MPI_InitFinalize (int    &argc,
-                        char ** &argv,
-                        const ThreadsPerMPIProcess threads_per_process);
 
       /**
        * Destructor. Calls <tt>MPI_Finalize()</tt> in case this class owns the
