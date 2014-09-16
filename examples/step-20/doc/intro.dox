@@ -439,14 +439,14 @@ class SchurComplement
 {
   public:
     SchurComplement (const BlockSparseMatrix<double> &A,
-                     const InverseMatrix             &Minv);
+                     const IterativeInverse<Vector<double> > &Minv);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix>              m_inverse;
+    const SmartPointer<const IterativeInverse<Vector<double> > > m_inverse;
 
     mutable Vector<double> tmp1, tmp2;
 };

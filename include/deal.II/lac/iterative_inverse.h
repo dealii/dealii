@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
  * order to approximate the action of the inverse matrix.
  *
  * Krylov space methods like SolverCG or SolverBicgstab
- * become inefficient if soution down to machine accuracy is
+ * become inefficient if solution down to machine accuracy is
  * needed. This is due to the fact, that round-off errors spoil the
  * orthogonality of the vector sequences. Therefore, a nested
  * iteration of two methods is proposed: The outer method is
