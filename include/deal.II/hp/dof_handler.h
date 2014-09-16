@@ -73,11 +73,49 @@ namespace hp
    * hp-FEM algorithms. This class satisfies the requirements outlined in
    * @ref GlossMeshAsAContainer "Meshes as containers".
    *
-   * This class has not yet been implemented for the use in the codimension
-   * one case (<tt>spacedim != dim </tt>).
+   * The purpose of this class is to allow for an enumeration of degrees
+   * of freedom in the same way as the ::DoFHandler class, but it allows
+   * to use a different finite element on every cell. To this end, one
+   * assigns an <code>active_fe_index</code> to every cell that indicates which
+   * element within a collection of finite elements (represented by an object
+   * of type hp::FECollection) is the one that lives on this cell.
+   * The class then enumerates the degree of freedom associated with these
+   * finite elements on each cell of a triangulation and, if possible,
+   * identifies degrees of freedom at the interfaces of cells if they
+   * match. If neighboring cells have degrees of freedom along the common
+   * interface that do not immediate match (for example, if you have
+   * $Q_2$ and $Q_3$ elements meeting at a common face), then one needs
+   * to compute constraints to ensure that the resulting finite element
+   * space on the mesh remains conforming.
+   *
+   * The whole process of working with objects of this type is explained in
+   * step-27. Many of the algorithms this class implements are described
+   * in the @ref hp_paper "hp paper".
+   *
+   *
+   * <h3>Active FE indices and their behavior under mesh refinement</h3>
+   *
+   * The typical workflow for using this class is to create a mesh,
+   * assign an active FE index to every active cell, calls
+   * hp::DoFHandler::distribute_dofs(), and then assemble a linear
+   * system and solve a problem on this finite element space. However,
+   * one can skip assigning active FE indices upon mesh refinement
+   * in certain circumstances. In particular, the following rules apply:
+   * - Upon mesh refinement, child cells inherit the active FE index
+   *   of the parent.
+   * - On the other hand, when coarsening cells, the (now active) parent
+   *   cell will not have an active FE index set and you will have to
+   *   set it explicitly before calling hp::DoFHandler::distribute_dofs().
+   *   In particular, to avoid stale information to be used by accident,
+   *   this class deletes the active FE index of cells that are
+   *   refined after inheriting this index to the children; this implies
+   *   that if the children are coarsened away, the old value is no
+   *   longer available on the parent cell.
    *
    * @ingroup dofs
    * @ingroup hp
+   *
+   * @author Wolfgang Bangerth, Oliver Kayser-Herold, 2003, 2004
    */
   template <int dim, int spacedim=dim>
   class DoFHandler : public Subscriptor
