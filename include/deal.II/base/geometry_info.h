@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,73 @@
 #include <deal.II/base/point.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+/**
+ * A class that can represent the kinds of objects a triangulation is
+ * made up of: vertices, lines, quads and hexes.
+ *
+ * The class is rather primitive: it only stores a single integer
+ * that represents the dimensionality of the object represented.
+ * In other words, this class is useful primarily as a way to
+ * pass around an object whose data type explains what it does
+ * (unlike just passing around an integer), and for providing
+ * symbolic names for these objects such as GeometryPrimitive::vertex
+ * instead of an integer zero.
+ *
+ * Since the ability to identify such objects with the integral
+ * dimension of the object represented, this class provides
+ * conversion operators to and from unsigned integers.
+ *
+ * @author Wolfgang Bangerth, 2014
+ */
+class GeometryPrimitive
+{
+public:
+  /**
+   * An enumeration providing symbolic names for the
+   * objects that can be represented by this class.
+   * The numeric values of these symbolic names equal
+   * the geometric dimensionality of the represented
+   * objects to make conversion from and to integer
+   * variables simpler.
+   */
+  enum Object
+  {
+    vertex = 0,
+    line   = 1,
+    quad   = 2,
+    hex    = 3
+  };
+
+  /**
+   * Constructor. Initialize the object with the
+   * given argument representing a vertex, line, etc.
+   */
+  GeometryPrimitive (const Object object);
+
+  /**
+   * Constructor. Initialize the object with an
+   * integer that should represent the dimensionality of
+   * the geometric object in question. This will usually be
+   * a number between zero (a vertex) and three (a hexahedron).
+   */
+  GeometryPrimitive (const unsigned int object_dimension);
+
+  /**
+   * Return the integral dimension of the object
+   * currently represented, i.e. zero for a vertex,
+   * one for a line, etc.
+   */
+  operator unsigned int () const;
+
+private:
+  /**
+   * The object currently represented.
+   */
+  Object object;
+};
+
 
 
 
@@ -2315,6 +2382,30 @@ d_linear_shape_function_gradient (const Point<3> &xi,
 
 
 /* -------------- inline functions ------------- */
+
+
+inline
+GeometryPrimitive::GeometryPrimitive (const Object object)
+  :
+  object (object)
+{}
+
+
+
+inline
+GeometryPrimitive::GeometryPrimitive (const unsigned int object_dimension)
+  :
+  object (static_cast<Object>(object_dimension))
+{}
+
+
+inline
+GeometryPrimitive::operator unsigned int () const
+{
+  return static_cast<unsigned int>(object);
+}
+
+
 
 namespace internal
 {

@@ -307,6 +307,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The new function FiniteElement::get_associated_geometry_primitive() allows to
+  query whether a given degree of freedom is associated with a vertex, line,
+  quad, or hex.
+  <br>
+  (Wolfgang Bangerth, 2014/09/26)
+  </li>
+
   <li> Fixed: The vector and array versions of Utilities::MPI::sum() and
   Utilities::MPI::max() produced segmentation faults with some MPI implementations
   if the input and output arguments were the same. This is now fixed.

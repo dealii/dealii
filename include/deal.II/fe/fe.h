@@ -1500,6 +1500,56 @@ public:
   has_generalized_face_support_points () const;
 
   /**
+   * For a given degree of freedom, return whether it is logically
+   * associated with a vertex, line, quad or hex.
+   *
+   * For instance, for continuous finite elements this coincides with
+   * the lowest dimensional object the support point of the degree of
+   * freedom lies on. To give an example, for $Q_1$ elements in 3d,
+   * every degree of freedom is defined by a shape function that we
+   * get by interpolating using support points that lie on the
+   * vertices of the cell. The support of these points of course
+   * extends to all edges connected to this vertex, as well
+   * as the adjacent faces and the cell interior, but we say that
+   * logically the degree of freedom is associated with the vertex as
+   * this is the lowest-dimensional object it is associated with.
+   * Likewise, for $Q_2$ elements in 3d, the degrees of freedom
+   * with support points at edge midpoints would yield a value of
+   * GeometryPrimitive::line from this function, whereas those on
+   * the centers of faces in 3d would return GeometryPrimitive::quad.
+   *
+   * To make this more formal, the kind of object returned by
+   * this function represents the object so that the support of the
+   * shape function corresponding to the degree of freedom, (i.e., that
+   * part of the domain where the function "lives") is the union
+   * of all of the cells sharing this object. To return to the example
+   * above, for $Q_2$ in 3d, the shape function with support point at
+   * an edge midpoint has support on all cells that share the edge and
+   * not only the cells that share the adjacent faces, and consequently
+   * the function will return GeometryPrimitive::line.
+   *
+   * On the other hand, for discontinuous elements of type $DGQ_2$,
+   * a degree of freedom associated with an interpolation polynomial
+   * that has its support point physically located at a line bounding
+   * a cell, but is nonzero only on one cell. Consequently, it is
+   * logically associated with the interior of that cell (i.e., with a
+   * GeometryPrimitive::quad in 2d and a GeometryPrimitive::hex in 3d).
+   *
+   * @param[in] cell_dof_index The index of a shape function or
+   *   degree of freedom. This index must be in the range
+   *   <code>[0,dofs_per_cell)</code>.
+   *
+   * @note The integer value of the object returned by this function
+   *   equals the dimensionality of the object it describes, and can
+   *   consequently be used in generic programming paradigms. For
+   *   example, if a degree of freedom is associated with a vertex,
+   *   then this function returns GeometryPrimitive::vertex, which has
+   *   a numeric value of zero (the dimensionality of a vertex).
+   */
+  GeometryPrimitive
+  get_associated_geometry_primitive (const unsigned int cell_dof_index) const;
+
+  /**
    * Interpolate a set of scalar values, computed in the generalized support
    * points.
    *
@@ -2279,6 +2329,28 @@ FiniteElement<dim,spacedim>::is_primitive (const unsigned int i) const
   // if the entire FE is primitive
   return (is_primitive() ||
           (n_nonzero_components_table[i] == 1));
+}
+
+
+
+template <int dim, int spacedim>
+inline
+GeometryPrimitive
+FiniteElement<dim,spacedim>::get_associated_geometry_primitive (const unsigned int cell_dof_index) const
+{
+  Assert (cell_dof_index < this->dofs_per_cell,
+          ExcIndexRange (cell_dof_index, 0, this->dofs_per_cell));
+
+  // just go through the usual cases, taking into account how DoFs
+  // are enumerated on the reference cell
+  if (cell_dof_index < this->first_line_index)
+    return GeometryPrimitive::vertex;
+  else if (cell_dof_index < this->first_quad_index)
+    return GeometryPrimitive::line;
+  else if (cell_dof_index < this->first_hex_index)
+    return GeometryPrimitive::quad;
+  else
+    return GeometryPrimitive::hex;
 }
 
 
