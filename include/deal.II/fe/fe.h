@@ -30,13 +30,12 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim> class FEValuesData;
 template <int dim, int spacedim> class FEValuesBase;
 template <int dim, int spacedim> class FEValues;
-template <int dim, int spacedim>   class FEFaceValues;
-template <int dim, int spacedim>   class FESubfaceValues;
-template <int dim, int spacedim>   class FESystem;
-template <class POLY, int dim, int spacedim> class FE_PolyTensor;
+template <int dim, int spacedim> class FEFaceValues;
+template <int dim, int spacedim> class FESubfaceValues;
+template <int dim, int spacedim> class FESystem;
 namespace hp
 {
-  template <int dim, int spacedim>   class FECollection;
+  template <int dim, int spacedim> class FECollection;
 }
 
 
@@ -407,6 +406,14 @@ public:
    * properly.
    */
   virtual ~FiniteElement ();
+
+  /**
+   * A sort of virtual copy constructor. Some places in the library, for
+   * example the constructors of FESystem as well as the hp::FECollection
+   * class, need to make copies of finite elements without knowing their exact
+   * type. They do so through this function.
+   */
+  virtual FiniteElement<dim,spacedim> *clone() const = 0;
 
   /**
    * Return a string that uniquely identifies a finite element. The general
@@ -1490,7 +1497,8 @@ public:
    * For more information, see the documentation for the has_support_points()
    * function.
    */
-  bool has_generalized_face_support_points () const;
+  bool
+  has_generalized_face_support_points () const;
 
   /**
    * Interpolate a set of scalar values, computed in the generalized support
@@ -1501,8 +1509,10 @@ public:
    * just the values in the suport points. All other elements must reimplement
    * it.
    */
-  virtual void interpolate(std::vector<double>       &local_dofs,
-                           const std::vector<double> &values) const;
+  virtual
+  void
+  interpolate(std::vector<double>       &local_dofs,
+              const std::vector<double> &values) const;
 
   /**
    * Interpolate a set of vector values, computed in the generalized support
@@ -1513,17 +1523,20 @@ public:
    * be interpolated. Maybe consider changing your data structures to use the
    * next function.
    */
-  virtual void interpolate(std::vector<double>                &local_dofs,
-                           const std::vector<Vector<double> > &values,
-                           unsigned int offset = 0) const;
+  virtual
+  void
+  interpolate(std::vector<double>                &local_dofs,
+              const std::vector<Vector<double> > &values,
+              unsigned int offset = 0) const;
 
   /**
    * Interpolate a set of vector values, computed in the generalized support
    * points.
    */
-  virtual void interpolate(
-    std::vector<double> &local_dofs,
-    const VectorSlice<const std::vector<std::vector<double> > > &values) const;
+  virtual
+  void
+  interpolate(std::vector<double> &local_dofs,
+              const VectorSlice<const std::vector<std::vector<double> > > &values) const;
 
   //@}
 
@@ -1536,6 +1549,7 @@ public:
    * itself.
    */
   virtual std::size_t memory_consumption () const;
+
   /**
    * Exception
    *
@@ -1754,80 +1768,6 @@ protected:
   std::vector<int> adjust_line_dof_index_for_line_orientation_table;
 
   /**
-   * Return the size of interface constraint matrices. Since this is needed in
-   * every derived finite element class when initializing their size, it is
-   * placed into this function, to avoid having to recompute the
-   * dimension-dependent size of these matrices each time.
-   *
-   * Note that some elements do not implement the interface constraints for
-   * certain polynomial degrees. In this case, this function still returns the
-   * size these matrices should have when implemented, but the actual matrices
-   * are empty.
-   */
-  TableIndices<2>
-  interface_constraints_size () const;
-
-  /**
-   * Compute second derivatives by finite differences of gradients.
-   */
-  void compute_2nd (const Mapping<dim,spacedim>                      &mapping,
-                    const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
-                    const unsigned int                       offset,
-                    typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                    InternalDataBase                        &fe_internal,
-                    FEValuesData<dim,spacedim>                       &data) const;
-
-  /**
-   * Given the pattern of nonzero components for each shape function, compute
-   * for each entry how many components are non-zero for each shape
-   * function. This function is used in the constructor of this class.
-   */
-  static
-  std::vector<unsigned int>
-  compute_n_nonzero_components (const std::vector<ComponentMask> &nonzero_components);
-
-  /**
-   * Determine the values a finite element should compute on initialization of
-   * data for FEValues.
-   *
-   * Given a set of flags indicating what quantities are requested from a
-   * FEValues object, update_once() and update_each() compute which values
-   * must really be computed. Then, the <tt>fill_*_values</tt> functions are
-   * called with the result of these.
-   *
-   * Furthermore, values must be computed either on the unit cell or on the
-   * physical cell. For instance, the function values of FE_Q do only depend
-   * on the quadrature points on the unit cell. Therefore, this flags will be
-   * returned by update_once(). The gradients require computation of the
-   * covariant transformation matrix. Therefore, @p
-   * update_covariant_transformation and @p update_gradients will be returned
-   * by update_each().
-   *
-   * For an example see the same function in the derived class FE_Q.
-   */
-  virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
-
-  /**
-   * Complementary function for update_once().
-   *
-   * While update_once() returns the values to be computed on the unit cell
-   * for yielding the required data, this function determines the values that
-   * must be recomputed on each cell.
-   *
-   * Refer to update_once() for more details.
-   */
-  virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
-
-  /**
-   * A sort of virtual copy constructor. Some places in the library, for
-   * example the constructors of FESystem as well as the hp::FECollection
-   * class, need to make copies of finite elements without knowing their exact
-   * type. They do so through this function.
-   */
-  virtual FiniteElement<dim,spacedim> *clone() const = 0;
-
-private:
-  /**
    * Store what system_to_component_index() will return.
    */
   std::vector< std::pair<unsigned int, unsigned int> > system_to_component_table;
@@ -1960,6 +1900,71 @@ private:
   static const double fd_step_length;
 
   /**
+   * Return the size of interface constraint matrices. Since this is needed in
+   * every derived finite element class when initializing their size, it is
+   * placed into this function, to avoid having to recompute the
+   * dimension-dependent size of these matrices each time.
+   *
+   * Note that some elements do not implement the interface constraints for
+   * certain polynomial degrees. In this case, this function still returns the
+   * size these matrices should have when implemented, but the actual matrices
+   * are empty.
+   */
+  TableIndices<2>
+  interface_constraints_size () const;
+
+  /**
+   * Compute second derivatives by finite differences of gradients.
+   */
+  void compute_2nd (const Mapping<dim,spacedim>                      &mapping,
+                    const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
+                    const unsigned int                       offset,
+                    typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+                    InternalDataBase                        &fe_internal,
+                    FEValuesData<dim,spacedim>                       &data) const;
+
+  /**
+   * Given the pattern of nonzero components for each shape function, compute
+   * for each entry how many components are non-zero for each shape
+   * function. This function is used in the constructor of this class.
+   */
+  static
+  std::vector<unsigned int>
+  compute_n_nonzero_components (const std::vector<ComponentMask> &nonzero_components);
+
+  /**
+   * Determine the values a finite element should compute on initialization of
+   * data for FEValues.
+   *
+   * Given a set of flags indicating what quantities are requested from a
+   * FEValues object, update_once() and update_each() compute which values
+   * must really be computed. Then, the <tt>fill_*_values</tt> functions are
+   * called with the result of these.
+   *
+   * Furthermore, values must be computed either on the unit cell or on the
+   * physical cell. For instance, the function values of FE_Q do only depend
+   * on the quadrature points on the unit cell. Therefore, this flags will be
+   * returned by update_once(). The gradients require computation of the
+   * covariant transformation matrix. Therefore, @p
+   * update_covariant_transformation and @p update_gradients will be returned
+   * by update_each().
+   *
+   * For an example see the same function in the derived class FE_Q.
+   */
+  virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
+
+  /**
+   * Complementary function for update_once().
+   *
+   * While update_once() returns the values to be computed on the unit cell
+   * for yielding the required data, this function determines the values that
+   * must be recomputed on each cell.
+   *
+   * Refer to update_once() for more details.
+   */
+  virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
+
+  /**
    * Prepare internal data structures and fill in values independent of the
    * cell. Returns a pointer to an object of which the caller of this function
    * then has to assume ownership (which includes destruction when it is no
@@ -2046,10 +2051,7 @@ private:
   friend class FEValues<dim,spacedim>;
   friend class FEFaceValues<dim,spacedim>;
   friend class FESubfaceValues<dim,spacedim>;
-  template <int, int > friend class FESystem;
-  template <class POLY, int dim_, int spacedim_> friend class FE_PolyTensor;
-  friend class hp::FECollection<dim,spacedim>;
-
+  friend class FESystem<dim,spacedim>;
 };
 
 
