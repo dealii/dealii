@@ -331,6 +331,7 @@ namespace Utilities
       else
         // user wants automatic choice
         {
+#ifdef DEAL_II_WITH_MPI
           // we need to figure out how many MPI processes there
           // are on the current node, as well as how many CPU cores
           // we have. for the first task, check what get_hostname()
@@ -381,6 +382,9 @@ namespace Utilities
                         :
                         0),
                        1U);
+#else
+          const unsigned int n_threads = multithread_info.n_cpus;
+#endif
 
           // finally set this number of threads
           multithread_info.set_thread_limit(n_threads);
