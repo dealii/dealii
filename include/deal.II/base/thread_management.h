@@ -4365,6 +4365,10 @@ namespace Threads
      * Join the task represented by this object, i.e. wait for it to
      * finish.
      *
+     * A task can be joined multiple times (while the first join() operation
+     * may block until the task has completed running, all successive attempts
+     * to join will return immediately).
+     *
      * @pre You can't call this function if you have used the default
      *   constructor of this class and have not assigned a task object
      *   to it. In other words, the function joinable() must return
@@ -4380,8 +4384,14 @@ namespace Threads
      * Return whether the current object can be joined. You can join a
      * task object once a task (typically created with
      * Threads::new_task()) has actually been assigned to it. On the
-     * other hand, the function returns false if it has been default
-     * constructed.
+     * other hand, the function returns false if the object has been
+     * default constructed.
+     *
+     * A task can be joined multiple times (while the first join() operation
+     * may block until the task has completed running, all successive attempts
+     * to join will return immediately). Consequently, if this function
+     * returns true, it will continue to return true until the task object it
+     * reports on is assigned to from another object.
      */
     bool joinable () const
     {
@@ -4393,7 +4403,9 @@ namespace Threads
     /**
      * Get the return value of the function of the task. Since this is
      * only available once the task finishes, this implicitly also
-     * calls <tt>join()</tt>.
+     * calls <tt>join()</tt>. You can call this function multiple times
+     * as long as the object refers to the same task, and expect to get
+     * the same return value every time.
      *
      * @pre You can't call this function if you have used the default
      *   constructor of this class and have not assigned a task object
