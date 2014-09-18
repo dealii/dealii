@@ -297,6 +297,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The function Threads::Task::joinable() can be used to verify whether
+  a task object can be joined or not.
+  <br>
+  (Wolfgang Bangerth, 2014/09/17)
+  </li>
+
   <li> Improved: Optimize construction of high-order FE_Nedelec by moving out some 
   non-essential computations. Namely, construct restriction and prolongation 
   matrices on first request. This reduces time spent in FE_Nedelec constructor
