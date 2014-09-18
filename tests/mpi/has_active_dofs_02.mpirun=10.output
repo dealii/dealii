@@ -1,0 +1,65 @@
+
+DEAL:0:2d::Processor 0 has cells: no
+DEAL:0:2d::Processor 1 has cells: yes
+DEAL:0:2d::Processor 2 has cells: no
+DEAL:0:2d::Processor 3 has cells: yes
+DEAL:0:2d::Processor 4 has cells: no
+DEAL:0:2d::Processor 5 has cells: no
+DEAL:0:2d::Processor 6 has cells: yes
+DEAL:0:2d::Processor 7 has cells: no
+DEAL:0:2d::Processor 8 has cells: yes
+DEAL:0:2d::Processor 9 has cells: no
+DEAL:0:2d::# processors owning cells=4
+DEAL:0:2d::Processor 0 has dofs: no
+DEAL:0:2d::Processor 1 has dofs: no
+DEAL:0:2d::Processor 2 has dofs: no
+DEAL:0:2d::Processor 3 has dofs: no
+DEAL:0:2d::Processor 4 has dofs: no
+DEAL:0:2d::Processor 5 has dofs: no
+DEAL:0:2d::Processor 6 has dofs: no
+DEAL:0:2d::Processor 7 has dofs: no
+DEAL:0:2d::Processor 8 has dofs: no
+DEAL:0:2d::Processor 9 has dofs: no
+DEAL:0:2d::# processors owning dofs=0
+DEAL:0:2d::
+DEAL:0:3d::Processor 0 has cells: yes
+DEAL:0:3d::Processor 1 has cells: yes
+DEAL:0:3d::Processor 2 has cells: no
+DEAL:0:3d::Processor 3 has cells: yes
+DEAL:0:3d::Processor 4 has cells: yes
+DEAL:0:3d::Processor 5 has cells: yes
+DEAL:0:3d::Processor 6 has cells: yes
+DEAL:0:3d::Processor 7 has cells: no
+DEAL:0:3d::Processor 8 has cells: yes
+DEAL:0:3d::Processor 9 has cells: yes
+DEAL:0:3d::# processors owning cells=8
+DEAL:0:3d::Processor 0 has dofs: no
+DEAL:0:3d::Processor 1 has dofs: no
+DEAL:0:3d::Processor 2 has dofs: no
+DEAL:0:3d::Processor 3 has dofs: no
+DEAL:0:3d::Processor 4 has dofs: no
+DEAL:0:3d::Processor 5 has dofs: no
+DEAL:0:3d::Processor 6 has dofs: no
+DEAL:0:3d::Processor 7 has dofs: no
+DEAL:0:3d::Processor 8 has dofs: no
+DEAL:0:3d::Processor 9 has dofs: no
+DEAL:0:3d::# processors owning dofs=0
+DEAL:0:3d::
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
