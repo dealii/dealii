@@ -390,13 +390,23 @@ public:
   bool has_level_dofs() const;
 
   /**
-   * This function returns whether
-   * this DoFHandler has active
-   * DoFs or in other words if
-   * distribute_dofs() has been
-   * called.
+   * This function returns whether this DoFHandler has active
+   * DoFs. This is equivalent to asking whether (i) distribute_dofs()
+   * has been called and (ii) the finite element for which degrees of
+   * freedom have been distributed actually has degrees of freedom
+   * (which is not the case for FE_Nothing, for example).
+   *
+   * If this object is based on a
+   * parallel::distributed::Triangulation, then the current function
+   * returns true if <i>any</i> partition of the parallel DoFHandler
+   * object has any degrees of freedom. In other words, the function
+   * returns true even if the Triangulation does not own any active
+   * cells on the current MPI process, but at least one process owns
+   * cells and at least this one process has any degrees of freedom
+   * associated with it.
    */
   bool has_active_dofs() const;
+
   /**
    * After distribute_dofs() with
    * an FESystem element, the block
