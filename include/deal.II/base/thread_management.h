@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -4321,9 +4321,11 @@ namespace Threads
   {
   public:
     /**
-     * Construct a task object
-     * given a function object to
-     * execute on the task.
+     * Construct a task object given a function object to execute on
+     * the task, and then schedule this function for execution.
+     *
+     * @post Using this constructor automatically makes the task
+     * object joinable().
      */
     Task (const std_cxx11::function<RT ()> &function_object)
     {
@@ -4339,6 +4341,9 @@ namespace Threads
 
     /**
      * Copy constructor.
+     *
+     * @post Using this constructor automatically makes the task
+     * object joinable().
      */
     Task (const Task<RT> &t)
       :
@@ -4347,41 +4352,53 @@ namespace Threads
 
 
     /**
-     * Default constructor. You
-     * can't do much with a task
-     * object constructed this way,
-     * except for assigning it a
-     * task object that holds
-     * data created by the
-     * <tt>spawn</tt> functions.
+     * Default constructor. You can't do much with a task object
+     * constructed this way, except for assigning it a task object
+     * that holds data created by the Threads::new_task() functions.
+     *
+     * @post Using this constructor leaves the object in an unjoinable
+     *   state, i.e., joinable() will return false.
      */
     Task () {}
 
     /**
-     * Join the task represented
-     * by this object, i.e. wait
-     * for it to finish. You can't
-     * call this function if you
-     * have used the default
-     * constructor of this class
-     * and have not assigned a
-     * task object to it.
+     * Join the task represented by this object, i.e. wait for it to
+     * finish.
+     *
+     * @pre You can't call this function if you have used the default
+     *   constructor of this class and have not assigned a task object
+     *   to it. In other words, the function joinable() must return
+     *   true.
      */
     void join () const
     {
-      AssertThrow (task_descriptor !=
-                   std_cxx11::shared_ptr<internal::TaskDescriptor<RT> >(),
-                   ExcNoTask());
+      AssertThrow (joinable(), ExcNoTask());
       task_descriptor->join ();
     }
 
     /**
-     * Get the return value of the
-     * function of the
-     * task. Since this is only
-     * available once the task
-     * finishes, this implicitly
-     * also calls <tt>join()</tt>.
+     * Return whether the current object can be joined. You can join a
+     * task object once a task (typically created with
+     * Threads::new_task()) has actually been assigned to it. On the
+     * other hand, the function returns false if it has been default
+     * constructed.
+     */
+    bool joinable () const
+    {
+      return (task_descriptor !=
+              std_cxx11::shared_ptr<internal::TaskDescriptor<RT> >());
+    }
+
+
+    /**
+     * Get the return value of the function of the task. Since this is
+     * only available once the task finishes, this implicitly also
+     * calls <tt>join()</tt>.
+     *
+     * @pre You can't call this function if you have used the default
+     *   constructor of this class and have not assigned a task object
+     *   to it. In other words, the function joinable() must return
+     *   true.
      */
     RT return_value ()
     {
@@ -4401,9 +4418,7 @@ namespace Threads
      */
     bool operator == (const Task &t)
     {
-      AssertThrow (task_descriptor !=
-                   std_cxx11::shared_ptr<internal::TaskDescriptor<RT> >(),
-                   ExcNoTask());
+      AssertThrow (joinable(), ExcNoTask());
       return task_descriptor == t.task_descriptor;
     }
 
