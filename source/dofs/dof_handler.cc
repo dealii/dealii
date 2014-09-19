@@ -14,17 +14,20 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/graph_coloring.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_handler_policy.h>
 #include <deal.II/dofs/dof_levels.h>
 #include <deal.II/dofs/dof_faces.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_levels.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/base/geometry_info.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/fe/fe.h>
 
 #include <set>
@@ -785,6 +788,11 @@ DoFHandler<dim,spacedim>::DoFHandler ()
 template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::~DoFHandler ()
 {
+  // make sure no background task is still pending that might access
+  // some of our memory
+  if (colored_locally_owned_active_cells_task.joinable())
+    colored_locally_owned_active_cells_task.join();
+
   // release allocated memory
   clear ();
 }
@@ -1196,6 +1204,17 @@ DoFHandler<dim,spacedim>::memory_consumption () const
   for (unsigned int i = 0; i < mg_vertex_dofs.size (); ++i)
     mem += sizeof (MGVertexDoFs) + (1 + mg_vertex_dofs[i].get_finest_level () - mg_vertex_dofs[i].get_coarsest_level ()) * sizeof (types::global_dof_index);
 
+
+  // now also add the data due to the colored cell arrays. we have to
+  // make sure that this data is in fact already set up and not still
+  // being computed.
+  if (colored_locally_owned_active_cells_task.joinable())
+    {
+      colored_locally_owned_active_cells_task.join();
+      mem += (sizeof (colored_locally_owned_active_cells_task) +
+              MemoryConsumption::memory_consumption (colored_locally_owned_active_cells));
+    }
+
   return mem;
 }
 
@@ -1234,6 +1253,87 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
   // correctly yet if it is parallel
   if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&*tria) == 0)
     block_info_object.initialize(*this, false, true);
+
+  // if distribute_dofs() had previously been called, then it spawned
+  // its own task computing the colored set of active cells. see if
+  // such a task had been spawned and if so wait for it (if necessary,
+  // otherwise join() will immediately return). then re-compute the
+  // colored set of cells
+  if (colored_locally_owned_active_cells_task.joinable())
+    colored_locally_owned_active_cells_task.join();
+  colored_locally_owned_active_cells_task
+    = Threads::new_task (&DoFHandler<dim,spacedim>::make_colored_locally_owned_active_cells, *this);
+}
+
+
+namespace
+{
+  template <int dim, int spacedim>
+  std::vector<types::global_dof_index>
+  get_conflict_indices (const FilteredIterator<typename DoFHandler<dim,spacedim>::active_cell_iterator> &cell,
+                        const ConstraintMatrix &constraints)
+  {
+    std::vector<types::global_dof_index> local_dof_indices(cell->get_fe().dofs_per_cell);
+    cell->get_dof_indices(local_dof_indices);
+
+    constraints.resolve_indices(local_dof_indices);
+
+    return local_dof_indices;
+  }
+}
+
+template <int dim, int spacedim>
+void
+DoFHandler<dim,spacedim>::make_colored_locally_owned_active_cells()
+{
+  typedef FilteredIterator<active_cell_iterator> CellFilter;
+
+  // we need to resolve constraints. as documented, the constraints we
+  // take into account are only hanging node constraints, but no
+  // others
+  ConstraintMatrix constraints;
+  DoFTools::make_hanging_node_constraints (*this,
+                                           constraints);
+  constraints.close ();
+
+  // get the colored cells as a list of CellFilter objects
+  std::vector<std::vector<CellFilter> >
+  colored_cells
+    =
+      GraphColoring::make_graph_coloring<CellFilter>
+      (CellFilter (IteratorFilters::LocallyOwnedCell(),
+                   begin_active()),
+       CellFilter (IteratorFilters::LocallyOwnedCell(),
+                   end()),
+       std_cxx11::bind(&get_conflict_indices<dim,spacedim>,
+                       std_cxx11::_1,
+                       std_cxx11::cref(constraints)));
+
+  // now copy the result over to the member variable in which we
+  // don't use the CellFilter any more
+  colored_locally_owned_active_cells.clear ();
+  colored_locally_owned_active_cells.resize (colored_cells.size());
+  for (unsigned int i=0; i<colored_cells.size(); ++i)
+    colored_locally_owned_active_cells[i].insert
+    (colored_locally_owned_active_cells[i].end(),
+     colored_cells[i].begin(),
+     colored_cells[i].end());
+}
+
+
+
+template <int dim, int spacedim>
+const std::vector<std::vector<typename DoFHandler<dim,spacedim>::active_cell_iterator> > &
+DoFHandler<dim,spacedim>::get_colored_locally_owned_active_cells() const
+{
+  // make sure the task to compute the data we want here has been
+  // started. then wait for the task to finish (if it hasn't already)
+  // and return the object it computes
+  Assert (colored_locally_owned_active_cells_task.joinable(),
+          ExcMessage ("You can't call this function without calling "
+                      "DoFHandler::distribute_dofs() first."));
+  colored_locally_owned_active_cells_task.join();
+  return colored_locally_owned_active_cells;
 }
 
 
@@ -1340,7 +1440,25 @@ DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_ind
               ExcMessage ("New DoF index is not less than the total number of dofs."));
 #endif
 
+  // before we start renumbering, we need to make sure that no other
+  // threads are accessing the degree of freedom indices. in
+  // particular, this pertains to the task that computes the colorized
+  // cell list. consequently, ensure that this task has finished
+  // before we proceed with changing the indices
+  Assert (colored_locally_owned_active_cells_task.joinable(),
+          ExcInternalError());
+  colored_locally_owned_active_cells_task.join();
+
+
+  // then renumber:
   number_cache = policy->renumber_dofs (new_numbers, *this);
+
+  // one might think that following this we will have to repeat the
+  // computation of the colored set of cells. however, we don't: if
+  // cells didn't conflict before renumbering, then they also don't
+  // conflict after the permutation due to renumbering. consequently,
+  // the coloring remains valid and doesn't have to be recomputed,
+  // even though the indices of DoFs on the cells have changed
 }
 
 
@@ -1357,13 +1475,14 @@ template<>
 void DoFHandler<1>::renumber_dofs (const unsigned int level,
                                    const std::vector<types::global_dof_index> &new_numbers)
 {
-  Assert (new_numbers.size() == n_dofs(level), DoFHandler<1>::ExcRenumberingIncomplete());
+  Assert (new_numbers.size() == n_dofs(level),
+          DoFHandler<1>::ExcRenumberingIncomplete());
 
   // note that we can not use cell iterators
   // in this function since then we would
   // renumber the dofs on the interface of
   // two cells more than once. Anyway, this
-  // ways it's not only more correct but also
+  // way it's not only more correct but also
   // faster
   for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
        i!=mg_vertex_dofs.end(); ++i)

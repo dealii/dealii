@@ -24,6 +24,7 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/iterator_range.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
@@ -763,6 +764,95 @@ public:
    * @ingroup CPP11
    */
   IteratorRange<level_cell_iterator> mg_cell_iterators_on_level (const unsigned int level) const;
+
+  /**
+   * Return a partitioning of all active cell iterators so that no cells
+   * in the same partition share degrees of freedom.
+   *
+   * The purpose of this function is to "color" cells into partitions
+   * in such a way that one can do the local assembly and subsequent
+   * copy-local-to-global operation on all cells of a single color in
+   * parallel without a lock because the locations in global matrices
+   * and vectors we write to in the copy-local-to-global operations do
+   * not conflict. In other words, the vector elements we write to for
+   * one cell in a color are distinct from the vector elements we
+   * write to for any of the other cells of the same color (and,
+   * obviously, the same holds true for writes into matrices). On the
+   * other hand, two cells located in different colors may write into
+   * the same locations and these writes therefore need to be
+   * synchronised to avoid race conditions; typically, this is done by
+   * only working on cells of a single color at any given time.
+   *
+   * The assumption that underlies this function is that the
+   * copy-local-to-global operations only write into vector and matrix
+   * elements that correspond to the rows and columns identified by
+   * the global indices of the degrees of freedom located on the
+   * current cell plus the set of degrees of freedom one writes into
+   * taking into account that some degrees of freedom are constrained
+   * because they are hanging nodes (i.e., the constraints one gets
+   * from DoFTools::make_hanging_node_constraints()). This is true for
+   * typical continuous Galerkin methods. On the other hand, it is not
+   * true in at least the following sentences:
+   *
+   * - For discontinuous Galerkin (DG) methods where the bilinear
+   *   form may contain jump terms that couple degrees of freedom that
+   *   are located on separate cells.
+   * - If you have constraints that couple degrees of freedom in ways
+   *   other than through only hanging node constraints. Examples of
+   *   such constraints include tangential or normal flow at boundary
+   *   as computed by VectorTools::compute_nonzero_normal_flux_constraints()
+   *   and similar functions.
+   *
+   * The coloring returned by this function is therefore not suitable
+   * for these situations; however, it is straightforward to compute
+   * such a coloring yourself using the functions in namespace
+   * GraphColoring.
+   *
+   * This function typically provides the input for the variant of the
+   * WorkStream::run() functions that takes a matching first
+   * argument. It computes the partitioning using
+   * GraphColoring::make_graph_coloring(). Examples of how the results
+   * of this function can be used and how it is computed are provided
+   * in the @ref workstream_paper "WorkStream paper".
+   *
+   * @return Return a vector of vector of active cell iterators. Each
+   * element of the outer vector denotes a partition ("color") of the
+   * set of cells and the elements of each inner vector are, jointly,
+   * a partition.
+   *
+   * @pre This function can only be called after calling distribute_dofs().
+   *
+   * @post The cells that make up each of the partitions ("colors") do
+   * not share any degree of freedom. In other words, if
+   * <code>dofs(cell)</code> were a function that returned the set of
+   * global indices of degrees of freedom on <code>cell</code>, and if
+   * <code>partitions</code> were the object returned by this
+   * function, then <code>dofs(partitions[i][j])</code> and
+   * <code>dofs(partitions[i][k])</code> will not have any elements in
+   * common if $j\neq k$.
+   *
+   * @note If the current DoFHandler object is built on a
+   * parallel::distributed::Triangulation, then the cells in the
+   * partitions returned only contain the locally owned active
+   * cells. This is consistent with the typical use of the result of
+   * this function in parallel assembly where one will only assemble
+   * on the locally owned cells, not on all locally relevant
+   * (including @ref GlossGhostCell "ghost cells") or in fact all
+   * active cells (including ghost and
+   * @ref GlossArtificialCell "artificial cells"). If you need to do
+   * something also on other than just the locally owned cells, then
+   * this function is not for you.
+   *
+   * @note The computation of the data this function returns happens
+   * on a separate thread that is started at the end of
+   * distribute_dofs(). Consequently, calling this function may incur
+   * a wait if you call it immediately after distribute_dofs() if the
+   * result is not yet ready, and you may want to do other
+   * computations first. On the other hand, subsequent calls will
+   * return the result immediately.
+   */
+  const std::vector<std::vector<active_cell_iterator> > &
+  get_colored_locally_owned_active_cells () const;
   //@}
 
   /*---------------------------------------*/
@@ -1302,6 +1392,12 @@ private:
 
   friend struct dealii::internal::DoFHandler::Implementation;
   friend struct dealii::internal::DoFHandler::Policy::Implementation;
+
+  void
+  make_colored_locally_owned_active_cells ();
+
+  std::vector<std::vector<active_cell_iterator> > colored_locally_owned_active_cells;
+  Threads::Task<> colored_locally_owned_active_cells_task;
 };
 
 
