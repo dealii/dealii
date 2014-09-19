@@ -1,0 +1,8 @@
+
+DEAL::vmult
+DEAL:Schur::src:2.0000
+DEAL:Schur::C:18.0000
+DEAL:Schur::Dt:13.4164
+DEAL:Schur::Ainverse:89.1964
+DEAL:Schur::dst:900.0000
+DEAL::900.0000	
