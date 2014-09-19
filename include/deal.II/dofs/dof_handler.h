@@ -763,7 +763,6 @@ public:
    * @ingroup CPP11
    */
   IteratorRange<level_cell_iterator> mg_cell_iterators_on_level (const unsigned int level) const;
-
   //@}
 
   /*---------------------------------------*/
@@ -1076,21 +1075,35 @@ public:
                   << ", but this level is empty.");
 
 
-protected:
+private:
   /**
-   * The object containing
+   * Copy constructor. I can see no reason
+   * why someone might want to use it, so
+   * I don't provide it. Since this class
+   * has pointer members, making it private
+   * prevents the compiler to provide it's
+   * own, incorrect one if anyone chose to
+   * copy such an object.
+   */
+  DoFHandler (const DoFHandler &);
+
+  /**
+   * Copy operator. I can see no reason
+   * why someone might want to use it, so
+   * I don't provide it. Since this class
+   * has pointer members, making it private
+   * prevents the compiler to provide it's
+   * own, incorrect one if anyone chose to
+   * copy such an object.
+   */
+  DoFHandler &operator = (const DoFHandler &);
+
+
+  /**
+   * An object containing
    * information on the block structure.
    */
   BlockInfo block_info_object;
-
-  /**
-   * Array to store the indices for
-   * degrees of freedom located at
-   * vertices.
-   */
-  std::vector<types::global_dof_index>      vertex_dofs;
-
-
 
   /**
    * Address of the triangulation to
@@ -1135,33 +1148,9 @@ protected:
   dealii::internal::DoFHandler::NumberCache number_cache;
 
   /**
-   * Datastructure like number_cache, but for each Multigrid level.
+   * Data structure like number_cache, but for each multigrid level.
    */
   std::vector<dealii::internal::DoFHandler::NumberCache> mg_number_cache;
-
-private:
-
-  /**
-   * Copy constructor. I can see no reason
-   * why someone might want to use it, so
-   * I don't provide it. Since this class
-   * has pointer members, making it private
-   * prevents the compiler to provide it's
-   * own, incorrect one if anyone chose to
-   * copy such an object.
-   */
-  DoFHandler (const DoFHandler &);
-
-  /**
-   * Copy operator. I can see no reason
-   * why someone might want to use it, so
-   * I don't provide it. Since this class
-   * has pointer members, making it private
-   * prevents the compiler to provide it's
-   * own, incorrect one if anyone chose to
-   * copy such an object.
-   */
-  DoFHandler &operator = (const DoFHandler &);
 
   /**
    * A data structure that is used to store the DoF indices associated with
@@ -1268,6 +1257,19 @@ private:
   void set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index) const;
 
   /**
+   * Array to store the indices for
+   * degrees of freedom located at
+   * vertices.
+   */
+  std::vector<types::global_dof_index> vertex_dofs;
+
+  /**
+   * An array to store the indices for level degrees of freedom located
+   * at vertices.
+   */
+  std::vector<MGVertexDoFs> mg_vertex_dofs;
+
+  /**
    * Space to store the DoF numbers
    * for the different
    * levels. Analogous to the
@@ -1289,8 +1291,6 @@ private:
   dealii::internal::DoFHandler::DoFFaces<dim> *faces;
 
   dealii::internal::DoFHandler::DoFFaces<dim> *mg_faces;
-
-  std::vector<MGVertexDoFs> mg_vertex_dofs;
 
   /**
    * Make accessor objects friends.
