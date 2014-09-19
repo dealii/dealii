@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,12 +61,12 @@ public:
  * degree <i>n-1</i>. The quadrature weights are
  * <i>2/(n(n-1)(P<sub>n-1</sub>(x<sub>i</sub>)<sup>2</sup>)</i>.
  *
- * Note: This implementation has not yet been optimized concerning
- *       numerical stability and efficiency. It can be easily adapted
- *       to the general case of Gauss-Lobatto-Jacobi-Bouzitat quadrature
- *       with arbitrary parameters <i>alpha</i>, <i>beta</i>, of which
- *       the Gauss-Lobatto-Legendre quadrature (<i>alpha = beta = 0</i>)
- *       is a special case.
+ * @note This implementation has not been optimized concerning
+ *   numerical stability and efficiency. It can be easily adapted
+ *   to the general case of Gauss-Lobatto-Jacobi-Bouzitat quadrature
+ *   with arbitrary parameters $\alpha$, $\beta, of which
+ *   the Gauss-Lobatto-Legendre quadrature ($\alpha = \beta = 0$)
+ *   is a special case.
  *
  * @sa http://en.wikipedia.org/wiki/Handbook_of_Mathematical_Functions
  * @sa Karniadakis, G.E. and Sherwin, S.J.:
@@ -75,7 +75,7 @@ public:
  *
  * @author Guido Kanschat, 2005, 2006; F. Prill, 2006
  */
-template<int dim>
+template <int dim>
 class QGaussLobatto : public Quadrature<dim>
 {
 public:
@@ -144,7 +144,8 @@ protected:
 
 
 /**
- * Midpoint quadrature rule, exact for linear polynomials.
+ * A quadrature formula implementing the one-point, midpoint quadrature
+ * rule. This formula is exact for linear polynomials.
  */
 template <int dim>
 class QMidpoint : public Quadrature<dim>
@@ -155,7 +156,8 @@ public:
 
 
 /**
- * Simpson quadrature rule, exact for polynomials of degree 3.
+ * A quadrature formula implementing the Simpson quadrature rule (with 3
+ * quadrature points). This formula is exact for polynomials of degree 3.
  */
 template <int dim>
 class QSimpson : public Quadrature<dim>
@@ -166,7 +168,16 @@ public:
 
 
 /**
- * Trapezoidal quadrature rule, exact for linear polynomials.
+ * A quadrature formula implementing the trapezoidal quadrature rule. This
+ * formula is exact for linear polynomials.
+ *
+ * The class is poorly named since the proper name of the quadrature formula
+ * is "trapezoidal rule", or sometimes also called the "trapezoid rule". The
+ * misnomer results from the fact that its original authors's poor English
+ * language skills led them to translate the name incorrectly from the German
+ * "Trapezregel".
+ *
+ * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class QTrapez : public Quadrature<dim>
@@ -176,8 +187,10 @@ public:
 };
 
 /**
- * Milne-rule. Closed Newton-Cotes formula, exact for polynomials of degree 5.
- * See Stoer: Einführung in die Numerische Mathematik I, p. 102
+ * A quadrature formula implementing the Milne rule. The Milne rule is a
+ * closed Newton-Cotes formula and is exact for polynomials of degree 5.
+ *
+ * @sa Stoer: Einführung in die Numerische Mathematik I, p. 102
  */
 template <int dim>
 class QMilne : public Quadrature<dim>
@@ -188,8 +201,10 @@ public:
 
 
 /**
- * Weddle-rule. Closed Newton-Cotes formula, exact for polynomials of degree 7.
- * See Stoer: Einführung in die Numerische Mathematik I, p. 102
+ * A quadrature formula implementing the Weddle rule. The Weddle rule is a
+ * closed Newton-Cotes formula and is exact for polynomials of degree 7.
+ *
+ * @sa Stoer: Einführung in die Numerische Mathematik I, p. 102
  */
 template <int dim>
 class QWeddle : public Quadrature<dim>
@@ -201,19 +216,19 @@ public:
 
 
 /**
- * Gauss Quadrature Formula with logarithmic weighting function. This
- * formula is used to to integrate <tt>ln|x|*f(x)</tt> on the interval
- * <tt>[0,1]</tt>, where f is a smooth function without
+ * A quadrature formula implementing the Gauss quadrature formula with
+ * logarithmic weighting function. This
+ * formula is used to integrate $\ln|x|\;f(x)$ on the interval
+ * $[0,1]$, where $f$ is a smooth function without
  * singularities. The collection of quadrature points and weights has
  * been obtained using <tt>Numerical Recipes</tt>.
  *
- * Notice that only the function <tt>f(x)</tt> should be provided,
- * i.e., $\int_0^1 f(x) ln|x| dx = \sum_{i=0}^N w_i f(q_i)$. Setting
+ * Notice that only the function $f(x)$ should be provided,
+ * i.e., $\int_0^1 f(x) \ln|x| dx = \sum_{i=0}^N w_i f(q_i)$. Setting
  * the @p revert flag to true at construction time switches the weight
- * from <tt>ln|x|</tt> to <tt>ln|1-x|</tt>.
+ * from $\ln|x|$ to $\ln|1-x|$.
  *
  * The weights and functions have been tabulated up to order 12.
- *
  */
 template <int dim>
 class QGaussLog : public Quadrature<dim>
@@ -287,9 +302,8 @@ protected:
  * for regular functions once you factored out the singularity.
  *
  * The weights and functions have been tabulated up to order 12.
- *
  */
-template<int dim>
+template <int dim>
 class QGaussLogR : public Quadrature<dim>
 {
 public:
@@ -344,7 +358,7 @@ protected:
  * used to integrate $g(x) = 1/R\ f(x)$, or simply $f(x)$, with the $1/R$
  * factor already included in the quadrature weights.
  */
-template<int dim>
+template <int dim>
 class QGaussOneOverR : public Quadrature<dim>
 {
 public:
@@ -425,10 +439,12 @@ public:
                  const unsigned int vertex_index,
                  const bool factor_out_singular_weight=false);
 private:
-  /** Given a quadrature point and a degree n, this function returns
-    * the size of the singular quadrature rule, considering whether
-    * the point is inside the cell, on an edge of the cell, or on a
-    * corner of the cell. */
+  /**
+   * Given a quadrature point and a degree n, this function returns
+   * the size of the singular quadrature rule, considering whether
+   * the point is inside the cell, on an edge of the cell, or on a
+   * corner of the cell.
+   */
   static unsigned int quad_size(const Point<dim> singularity,
                                 const unsigned int n);
 };
@@ -449,10 +465,14 @@ template <int dim>
 class QSorted : public Quadrature<dim>
 {
 public:
-  /** The constructor takes an arbitrary quadrature formula. */
+  /**
+   * The constructor takes an arbitrary quadrature formula.
+   */
   QSorted (const Quadrature<dim>);
 
-  /** A rule to reorder pairs of points and weights.*/
+  /**
+   * A rule to reorder pairs of points and weights.
+   */
   bool operator()(const std::pair<double, Point<dim> > &a,
                   const std::pair<double, Point<dim> > &b);
 };
