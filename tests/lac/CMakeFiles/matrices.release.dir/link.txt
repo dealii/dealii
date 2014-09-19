@@ -1,1 +1,0 @@
-/usr/bin/c++       -rdynamic -pthread  CMakeFiles/matrices.release.dir/matrices.cc.o CMakeFiles/matrices.release.dir/matrices.release/interrupt_guard.cc.o  -o matrices.release/matrices.release -rdynamic /git/dealii/lib/libdeal_II.so.8.2.pre -lm -ldl -lz -Wl,-rpath,/git/dealii/lib 

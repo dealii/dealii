@@ -1,1 +1,0 @@
-/usr/bin/c++       -rdynamic -pthread  CMakeFiles/trace.release.dir/trace.cc.o CMakeFiles/trace.release.dir/trace.release/interrupt_guard.cc.o  -o trace.release/trace.release -rdynamic /git/dealii/lib/libdeal_II.so.8.2.pre -lm -ldl -lz -Wl,-rpath,/git/dealii/lib 

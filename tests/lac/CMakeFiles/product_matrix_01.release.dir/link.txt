@@ -1,1 +1,0 @@
-/usr/bin/c++       -rdynamic -pthread  CMakeFiles/product_matrix_01.release.dir/product_matrix_01.cc.o CMakeFiles/product_matrix_01.release.dir/product_matrix_01.release/interrupt_guard.cc.o  -o product_matrix_01.release/product_matrix_01.release -rdynamic /git/dealii/lib/libdeal_II.so.8.2.pre -lm -ldl -lz -Wl,-rpath,/git/dealii/lib 

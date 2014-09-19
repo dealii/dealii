@@ -1,1 +1,0 @@
-/usr/bin/c++       -rdynamic -pthread -ggdb CMakeFiles/solver.debug.dir/solver.cc.o CMakeFiles/solver.debug.dir/solver.debug/interrupt_guard.cc.o  -o solver.debug/solver.debug -rdynamic /git/dealii/lib/libdeal_II.g.so.8.2.pre -lm -ldl -lz -Wl,-rpath,/git/dealii/lib 

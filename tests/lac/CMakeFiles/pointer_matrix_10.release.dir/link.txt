@@ -1,1 +1,0 @@
-/usr/bin/c++       -rdynamic -pthread  CMakeFiles/pointer_matrix_10.release.dir/pointer_matrix_10.cc.o CMakeFiles/pointer_matrix_10.release.dir/pointer_matrix_10.release/interrupt_guard.cc.o  -o pointer_matrix_10.release/pointer_matrix_10.release -rdynamic /git/dealii/lib/libdeal_II.so.8.2.pre -lm -ldl -lz -Wl,-rpath,/git/dealii/lib 

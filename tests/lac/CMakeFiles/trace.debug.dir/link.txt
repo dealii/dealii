@@ -1,1 +1,0 @@
-/usr/bin/c++       -rdynamic -pthread -ggdb CMakeFiles/trace.debug.dir/trace.cc.o CMakeFiles/trace.debug.dir/trace.debug/interrupt_guard.cc.o  -o trace.debug/trace.debug -rdynamic /git/dealii/lib/libdeal_II.g.so.8.2.pre -lm -ldl -lz -Wl,-rpath,/git/dealii/lib 

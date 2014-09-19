@@ -1,1 +1,0 @@
-/usr/bin/c++       -rdynamic -pthread -ggdb CMakeFiles/block_indices.debug.dir/block_indices.cc.o CMakeFiles/block_indices.debug.dir/block_indices.debug/interrupt_guard.cc.o  -o block_indices.debug/block_indices.debug -rdynamic /git/dealii/lib/libdeal_II.g.so.8.2.pre -lm -ldl -lz -Wl,-rpath,/git/dealii/lib 

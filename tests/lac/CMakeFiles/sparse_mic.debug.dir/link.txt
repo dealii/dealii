@@ -1,1 +1,0 @@
-/usr/bin/c++       -rdynamic -pthread -ggdb CMakeFiles/sparse_mic.debug.dir/sparse_mic.cc.o CMakeFiles/sparse_mic.debug.dir/sparse_mic.debug/interrupt_guard.cc.o  -o sparse_mic.debug/sparse_mic.debug -rdynamic /git/dealii/lib/libdeal_II.g.so.8.2.pre -lm -ldl -lz -Wl,-rpath,/git/dealii/lib 

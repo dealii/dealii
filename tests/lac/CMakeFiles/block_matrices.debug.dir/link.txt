@@ -1,1 +1,0 @@
-/usr/bin/c++       -rdynamic -pthread -ggdb CMakeFiles/block_matrices.debug.dir/block_matrices.cc.o CMakeFiles/block_matrices.debug.dir/block_matrices.debug/interrupt_guard.cc.o  -o block_matrices.debug/block_matrices.debug -rdynamic /git/dealii/lib/libdeal_II.g.so.8.2.pre -lm -ldl -lz -Wl,-rpath,/git/dealii/lib 
