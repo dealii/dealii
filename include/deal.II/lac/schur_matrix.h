@@ -349,7 +349,7 @@ void SchurMatrix<MA_inverse, MB, MDt, MC>
   Dt->Tvmult(*h1, src);
   if (debug > 0)
     deallog << "Dt:" << h1->l2_norm() << std::endl;
-  h1->sadd(-1.,rhs);
+  h1->sadd(-1.,rhs);  
   Ainv->vmult(dst,*h1);
   if (debug > 0)
     deallog << "dst:" << dst.l2_norm() << std::endl;
