@@ -26,24 +26,24 @@
 #include <vector>
 
 template<class MA_inverse, class MB, class MDt, class MC>
-  void
-  checkVmult(BlockVector<double> &dst, const BlockVector<double> &src,
-      const MA_inverse &Ainv, const MB &B, const MDt &Dt, const MC &C)
-  {
-    deallog << "vmult" << std::endl;
+void
+checkVmult(BlockVector<double> &dst, const BlockVector<double> &src,
+           const MA_inverse &Ainv, const MB &B, const MDt &Dt, const MC &C)
+{
+  deallog << "vmult" << std::endl;
 
-    GrowingVectorMemory < BlockVector<double> > mem;
+  GrowingVectorMemory < BlockVector<double> > mem;
 
-    SchurMatrix<MA_inverse, MB, MDt, MC> S(Ainv, B, Dt, C, mem);
+  SchurMatrix<MA_inverse, MB, MDt, MC> S(Ainv, B, Dt, C, mem);
 
-    S.debug_level(1);
+  S.debug_level(1);
 
-    S.vmult(dst, src);
+  S.vmult(dst, src);
 
-    for (unsigned int i = 0; i < dst.size(); ++i)
-      deallog << dst(i) << '\t';
-    deallog << std::endl;
-  }
+  for (unsigned int i = 0; i < dst.size(); ++i)
+    deallog << dst(i) << '\t';
+  deallog << std::endl;
+}
 
 int
 main()
@@ -59,38 +59,38 @@ main()
   ivector[0] = 1;
 
   double array[] =
-    { 2 };
+  { 2 };
   std::list<double> l(&array[0], &array[1]);
 
   BlockVector<double> src(ivector, l.begin(), l.end());
   BlockVector<double> dst(ivector);
 
   const double Adata1[] =
-    { 1 };
+  { 1 };
 
   const double Adata2[] =
-    { 2 };
+  { 2 };
 
   const double Adata3[] =
-    { 4 };
+  { 4 };
 
   const double Adata4[] =
-    { 5 };
+  { 5 };
 
   const double Ddata1[] =
-    { 3 };
+  { 3 };
 
   const double Ddata2[] =
-    { 6 };
+  { 6 };
 
   const double Bdata1[] =
-    { 7 };
+  { 7 };
 
   const double Bdata2[] =
-    { 8 };
+  { 8 };
 
   const double Cdata[] =
-    { 9 };
+  { 9 };
 
   FullMatrix<double> MA1(1, 1);
   FullMatrix<double> MA2(1, 1);
@@ -128,6 +128,6 @@ main()
   Dt.enter(MD2, 0, 1);
 
   checkVmult<BlockMatrixArray<double>, BlockMatrixArray<double>,
-      BlockMatrixArray<double>, BlockMatrixArray<double> >(dst, src, Ainv, B,
-      Dt, C);
+             BlockMatrixArray<double>, BlockMatrixArray<double> >(dst, src, Ainv, B,
+                 Dt, C);
 }

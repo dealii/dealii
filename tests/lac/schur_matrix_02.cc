@@ -26,21 +26,21 @@
 #include <vector>
 
 template<class MA_inverse, class MB, class MDt, class MC>
-  void
-  checkResidual(BlockVector<double> &dst, const BlockVector<double> &src,
-      const BlockVector<double> &rhs, const MA_inverse &Ainv, const MB &B,
-      const MDt &Dt, const MC &C)
-  {
-    deallog << "residual" << std::endl;
+void
+checkResidual(BlockVector<double> &dst, const BlockVector<double> &src,
+              const BlockVector<double> &rhs, const MA_inverse &Ainv, const MB &B,
+              const MDt &Dt, const MC &C)
+{
+  deallog << "residual" << std::endl;
 
-    GrowingVectorMemory < BlockVector<double> > mem;
+  GrowingVectorMemory < BlockVector<double> > mem;
 
-    SchurMatrix<MA_inverse, MB, MDt, MC> S(Ainv, B, Dt, C, mem);
+  SchurMatrix<MA_inverse, MB, MDt, MC> S(Ainv, B, Dt, C, mem);
 
-    double r = S.residual(dst, src, rhs);
+  double r = S.residual(dst, src, rhs);
 
-    deallog << "Residual:" << r << std::endl;
-  }
+  deallog << "Residual:" << r << std::endl;
+}
 
 int
 main()
@@ -56,43 +56,43 @@ main()
   ivector[0] = 1;
 
   double src_array[] =
-    { 2 };
+  { 2 };
   std::list<double> src_l(&src_array[0], &src_array[1]);
   BlockVector<double> src(ivector, src_l.begin(), src_l.end());
 
   double rhs_array[] =
-    { 1000 };
+  { 1000 };
   std::list<double> rhs_l(&rhs_array[0], &rhs_array[1]);
   BlockVector<double> rhs(ivector, rhs_l.begin(), rhs_l.end());
 
   BlockVector<double> dst(ivector);
 
   const double Adata1[] =
-    { 1 };
+  { 1 };
 
   const double Adata2[] =
-    { 2 };
+  { 2 };
 
   const double Adata3[] =
-    { 4 };
+  { 4 };
 
   const double Adata4[] =
-    { 5 };
+  { 5 };
 
   const double Ddata1[] =
-    { 3 };
+  { 3 };
 
   const double Ddata2[] =
-    { 6 };
+  { 6 };
 
   const double Bdata1[] =
-    { 7 };
+  { 7 };
 
   const double Bdata2[] =
-    { 8 };
+  { 8 };
 
   const double Cdata[] =
-    { 9 };
+  { 9 };
 
   FullMatrix<double> MA1(1, 1);
   FullMatrix<double> MA2(1, 1);
@@ -130,7 +130,7 @@ main()
   Dt.enter(MD2, 0, 1);
 
   checkResidual<BlockMatrixArray<double>, BlockMatrixArray<double>,
-      BlockMatrixArray<double>, BlockMatrixArray<double> >(dst, src, rhs, Ainv,
-      B, Dt, C);
+                BlockMatrixArray<double>, BlockMatrixArray<double> >(dst, src, rhs, Ainv,
+                    B, Dt, C);
 
 }
