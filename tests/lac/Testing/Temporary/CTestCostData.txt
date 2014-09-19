@@ -1,0 +1,5 @@
+lac/schur_matrix_01.debug 2 8.3471
+lac/schur_matrix_02.debug 3 6.86697
+lac/schur_matrix_03.debug 2 1.5351
+lac/schur_matrix_04.debug 2 1.52068
+---

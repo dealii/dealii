@@ -1,0 +1,6 @@
+
+DEAL::postprocess
+DEAL:Schur-post::src:2.0000
+DEAL:Schur-post::Dt:13.4164
+DEAL:Schur-post::rhs-Dt:9.4868
+DEAL:Schur-post::dst:60.7454

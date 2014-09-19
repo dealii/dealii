@@ -1,0 +1,22 @@
+Start testing: Sep 18 23:58 CDT
+----------------------------------------------------------
+280/349 Testing: lac/schur_matrix_04.debug
+280/349 Test: lac/schur_matrix_04.debug
+Command: "/usr/local/bin/cmake" "-DTRGT=schur_matrix_04.debug.diff" "-DTEST=lac/schur_matrix_04.debug" "-DEXPECT=PASSED" "-DDEAL_II_BINARY_DIR=/git/dealii/tests/lac" "-DGUARD_FILE=/git/dealii/tests/lac/schur_matrix_04.debug/interrupt_guard.cc" "-P" "/git/dealii/tests/run_test.cmake"
+Directory: /git/dealii/tests/lac/schur_matrix_04.debug
+"lac/schur_matrix_04.debug" start time: Sep 18 23:58 CDT
+Output:
+----------------------------------------------------------
+Test lac/schur_matrix_04.debug: PASSED
+===============================   OUTPUT BEGIN  ===============================
+lac/schur_matrix_04.debug: PASSED.
+===============================    OUTPUT END   ===============================
+<end of output>
+Test time =   3.04 sec
+----------------------------------------------------------
+Test Passed.
+"lac/schur_matrix_04.debug" end time: Sep 18 23:58 CDT
+"lac/schur_matrix_04.debug" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Sep 18 23:58 CDT
