@@ -68,7 +68,7 @@ namespace Threads
    * multithreading. It allows to write programs such that they start new
    * threads and/or lock objects in multithreading mode, and use dummy thread
    * management and synchronization classes instead when running in
-   * single-thread mode. Specifically, the <tt>new_thread</tt> functions only
+   * single-thread mode. Specifically, the new_thread() functions only
    * call the function but wait for it to return instead of running in on
    * another thread, and the mutices do nothing really. The only reason to
    * provide such a function is that the program can be compiled both in MT and
@@ -110,7 +110,7 @@ namespace Threads
      * automatically be the case
      * when you lock and unlock the
      * mutex "by hand", i.e. using
-     * <tt>acquire</tt> and <tt>release</tt>.
+     * <code>acquire()</code> and <code>release()</code>.
      */
     class ScopedLock
     {
@@ -159,7 +159,7 @@ namespace Threads
    * programs such that they start new threads and/or lock objects in
    * multithreading mode, and use dummy thread management and
    * synchronisation classes instead when running in single-thread
-   * mode. Specifically, the <tt>new_thread</tt> functions only call the function
+   * mode. Specifically, the new_thread() functions only call the function
    * but wait for it to return instead of running in on another thread,
    * and the mutices do nothing really. The only reason to provide such
    * a function is that the program can be compiled both in MT and
@@ -203,7 +203,7 @@ namespace Threads
      * mutex which needs to be
      * given to this function as an
      * argument, see the man page
-     * of <tt>posix_cond_wait</tt> for a
+     * of <code>posix_cond_wait</code> for a
      * description of the
      * mechanisms. Since in single
      * threaded mode, this function
@@ -225,7 +225,7 @@ namespace Threads
    * (otherwise, the barrier could not be left, since the one thread is
    * waiting for some other part of the program to reach a certain point
    * of execution), the constructor of this class throws an exception if
-   * the <tt>count</tt> argument denoting the number of threads that need to
+   * the <code>count</code> argument denoting the number of threads that need to
    * be synchronized is not equal to one.
    *
    * @author Wolfgang Bangerth, 2001
@@ -240,7 +240,7 @@ namespace Threads
      * number of threads to be
      * synchronised is one, this
      * constructor raises an
-     * exception if the <tt>count</tt>
+     * exception if the <code>count</code>
      * argument is one.
      */
     DummyBarrier (const unsigned int  count,
@@ -345,7 +345,7 @@ namespace Threads
      * automatically be the case
      * when you lock and unlock the
      * mutex "by hand", i.e. using
-     * <tt>acquire</tt> and <tt>release</tt>.
+     * <code>acquire()</code> and <code>release()</code>.
      */
     class ScopedLock
     {
@@ -470,7 +470,7 @@ namespace Threads
      * mutex which needs to be
      * given to this function as an
      * argument, see the man page
-     * of <tt>pthread_cond_wait</tt> for a
+     * of <code>pthread_cond_wait</code> for a
      * description of the
      * mechanisms.
      *
@@ -677,13 +677,13 @@ namespace Threads
    * threads are created by directly
    * calling the respective functions
    * of the operating system
-   * (e.g. <tt>pthread_create</tt>
+   * (e.g. <code>pthread_create</code>
    * for the POSIX thread interface),
    * or if they are killed
    * (e.g. either through
-   * <tt>pthread_exit</tt> from the
+   * <code>pthread_exit</code> from the
    * spawned thread, or
-   * <tt>pthread_kill</tt> from
+   * <code>pthread_kill</code> from
    * another thread), then these
    * events are not registered and
    * counted for the result of this
@@ -702,15 +702,15 @@ namespace Threads
    * Return a number used as id of
    * this thread. This number is
    * generated using the system call
-   * <tt>getpid</tt>, or, if it
-   * exists <tt>gettid</tt>. The
+   * <code>getpid</code>, or, if it
+   * exists <code>gettid</code>. The
    * result of either is converted to
    * an integer and returned by this
    * function.
    *
    * @todo As of now, none of our
    * systems seems to support
-   * <tt>gettid</tt>, so that part of
+   * <code>gettid</code>, so that part of
    * the code is untested yet.
    *
    * @ingroup threads
@@ -718,17 +718,17 @@ namespace Threads
   unsigned int this_thread_id ();
 
   /**
-   * Split the range <tt>[begin,end)</tt>
-   * into <tt>n_intervals</tt> subintervals
+   * Split the range <code>[begin,end)</code>
+   * into <code>n_intervals</code> subintervals
    * of equal size. The last interval
    * will be a little bit larger, if
    * the number of elements in the
    * whole range is not exactly
-   * divisible by <tt>n_intervals</tt>. The
+   * divisible by <code>n_intervals</code>. The
    * type of the iterators has to
    * fulfill the requirements of a
    * forward iterator,
-   * i.e. <tt>operator++</tt> must be
+   * i.e. <code>operator++</code> must be
    * available, and of course it must
    * be assignable.
    *
@@ -736,7 +736,7 @@ namespace Threads
    * returned as a vector of pairs of
    * iterators, where each pair
    * denotes the range
-   * <tt>[begin[i],end[i])</tt>.
+   * <code>[begin[i],end[i])</code>.
    *
    * @ingroup threads
    */
@@ -747,7 +747,7 @@ namespace Threads
                const unsigned int n_intervals);
 
   /**
-   * Split the interval <tt>[begin,end)</tt>
+   * Split the interval <code>[begin,end)</code>
    * into subintervals of (almost)
    * equal size. This function works
    * mostly as the one before, with
@@ -803,7 +803,7 @@ namespace Threads
      * points to new threads, we
      * therefore install a try-catch
      * block, and if an exception of
-     * type <tt>std::exception</tt> is
+     * type <code>std::exception</code> is
      * caught, it passes over control
      * to this function, which will
      * then provide some output.
@@ -814,7 +814,7 @@ namespace Threads
      * @internal
      * Same as above, but the type of
      * the exception is not derived
-     * from <tt>std::exception</tt>, so
+     * from <code>std::exception</code>, so
      * there is little way to provide
      * something more useful.
      */
@@ -1528,7 +1528,7 @@ namespace Threads
    * thread has finished its work.
    *
    * The default value of the
-   * template argument is <tt>void</tt>,
+   * template argument is <code>void</code>,
    * so if the function you are
    * calling on a new thread has no
    * return value, you can omit the
@@ -1562,7 +1562,7 @@ namespace Threads
      * except for assigning it a
      * thread object that holds
      * data created by the
-     * <tt>new_thread</tt> functions.
+     * new_thread() functions.
      */
     Thread () {}
 
@@ -1594,7 +1594,7 @@ namespace Threads
      * thread. Since this is only
      * available once the thread
      * finishes, this implicitly
-     * also calls <tt>join()</tt>.
+     * also calls join().
      */
     RT return_value ()
     {
@@ -4403,7 +4403,7 @@ namespace Threads
     /**
      * Get the return value of the function of the task. Since this is
      * only available once the task finishes, this implicitly also
-     * calls <tt>join()</tt>. You can call this function multiple times
+     * calls join(). You can call this function multiple times
      * as long as the object refers to the same task, and expect to get
      * the same return value every time.
      *
