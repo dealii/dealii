@@ -27,10 +27,13 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Gauss-Legendre quadrature of arbitrary order.
+ * The Gauss-Legendre family of quadrature rules for numerical
+ * integration.
  *
- * The coefficients of these quadrature rules are computed by the
- * function found in <tt>Numerical Recipies</tt>.
+ * The coefficients of these quadrature rules are computed by the function
+ * described in <a
+ * href="http://en.wikipedia.org/wiki/Numerical_Recipes">Numerical
+ * Recipies</a>.
  *
  * @author Guido Kanschat, 2001
  */
@@ -50,7 +53,8 @@ public:
 
 
 /**
- * The Gauss-Lobatto quadrature rule.
+ * The Gauss-Lobatto family of quadrature rules for numerical
+ * integration.
  *
  * This modification of the Gauss quadrature uses the two interval end
  * points as well. Being exact for polynomials of degree <i>2n-3</i>,
@@ -64,7 +68,7 @@ public:
  * @note This implementation has not been optimized concerning
  *   numerical stability and efficiency. It can be easily adapted
  *   to the general case of Gauss-Lobatto-Jacobi-Bouzitat quadrature
- *   with arbitrary parameters $\alpha$, $\beta, of which
+ *   with arbitrary parameters $\alpha$, $\beta$, of which
  *   the Gauss-Lobatto-Legendre quadrature ($\alpha = \beta = 0$)
  *   is a special case.
  *
@@ -94,10 +98,10 @@ protected:
    * equal to the roots of the
    * corresponding Jacobi
    * polynomial (specified by @p
-   * alpha, @p beta).  @p q is
+   * alpha, @p beta).  @p q is the
    * number of points.
    *
-   * @return vector containing nodes.
+   * @return Vector containing nodes.
    */
   std::vector<long double>
   compute_quadrature_points (const unsigned int q,
@@ -111,7 +115,8 @@ protected:
    * related to Jacobi polynomial specified
    * by @p alpha, @p beta.
    * @p x denotes the quadrature points.
-   * @return vector containing weights.
+   *
+   * @return Vector containing weights.
    */
   std::vector<long double>
   compute_quadrature_weights (const std::vector<long double> &x,
@@ -144,8 +149,8 @@ protected:
 
 
 /**
- * A quadrature formula implementing the one-point, midpoint quadrature
- * rule. This formula is exact for linear polynomials.
+ * The midpoint rule for numerical quadrature. This one-point formula is exact
+ * for linear polynomials.
  */
 template <int dim>
 class QMidpoint : public Quadrature<dim>
@@ -156,8 +161,8 @@ public:
 
 
 /**
- * A quadrature formula implementing the Simpson quadrature rule (with 3
- * quadrature points). This formula is exact for polynomials of degree 3.
+ * The Simpson rule for numerical quadrature. This formula with 3 quadrature
+ * points is exact for polynomials of degree 3.
  */
 template <int dim>
 class QSimpson : public Quadrature<dim>
@@ -167,9 +172,10 @@ public:
 };
 
 
+
 /**
- * A quadrature formula implementing the trapezoidal quadrature rule. This
- * formula is exact for linear polynomials.
+ * The trapezoidal rule for numerical quadrature. This formula with two
+ * quadrature points is exact for linear polynomials.
  *
  * The class is poorly named since the proper name of the quadrature formula
  * is "trapezoidal rule", or sometimes also called the "trapezoid rule". The
@@ -186,8 +192,10 @@ public:
   QTrapez ();
 };
 
+
+
 /**
- * A quadrature formula implementing the Milne rule. The Milne rule is a
+ * The Milne rule for numerical quadrature formula. The Milne rule is a
  * closed Newton-Cotes formula and is exact for polynomials of degree 5.
  *
  * @sa Stoer: Einführung in die Numerische Mathematik I, p. 102
@@ -201,7 +209,7 @@ public:
 
 
 /**
- * A quadrature formula implementing the Weddle rule. The Weddle rule is a
+ * The Weddle rule for numerical quadrature. The Weddle rule is a
  * closed Newton-Cotes formula and is exact for polynomials of degree 7.
  *
  * @sa Stoer: Einführung in die Numerische Mathematik I, p. 102
@@ -216,7 +224,7 @@ public:
 
 
 /**
- * A quadrature formula implementing the Gauss quadrature formula with
+ * A class for Gauss quadrature with
  * logarithmic weighting function. This
  * formula is used to integrate $\ln|x|\;f(x)$ on the interval
  * $[0,1]$, where $f$ is a smooth function without
@@ -262,7 +270,7 @@ protected:
 
 
 /**
- * Gauss Quadrature Formula with arbitrary logarithmic weighting
+ * A class for Gauss quadrature with arbitrary logarithmic weighting
  * function. This formula is used to to integrate
  * $\ln(|x-x_0|/\alpha)\;f(x)$ on the interval $[0,1]$,
  * where $f$ is a smooth function without singularities, and $x_0$ and
@@ -335,7 +343,7 @@ protected:
 
 
 /**
- * Gauss Quadrature Formula with $1/R$ weighting function. This formula
+ * A class for Gauss quadrature with $1/R$ weighting function. This formula
  * can be used to to integrate $1/R \ f(x)$ on the reference
  * element $[0,1]^2$, where $f$ is a smooth function without
  * singularities, and $R$ is the distance from the point $x$ to the vertex
