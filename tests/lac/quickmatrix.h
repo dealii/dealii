@@ -1,4 +1,3 @@
-// $Id$
 
 /**
  * Hard-coded Laplacian matrix.

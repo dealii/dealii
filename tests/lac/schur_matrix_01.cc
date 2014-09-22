@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id: schur_matrix_01.cc dilangov $
 //
 // Copyright (C) 2014 by the deal.II authors
 //

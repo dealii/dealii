@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by Martin Steigemann and Wolfgang Bangerth
 //

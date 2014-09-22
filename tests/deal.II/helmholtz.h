@@ -1,4 +1,3 @@
-// $Id$
 
 #include "../tests.h"
 #include <deal.II/multigrid/mg_base.h>
