@@ -1,4 +1,3 @@
-// $Id$
 
 template<int dim, class MATRIX>
 void

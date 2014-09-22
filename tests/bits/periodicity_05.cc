@@ -1,5 +1,4 @@
 //----------------------------  periodicity_05.cc  ---------------------------
-//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2002, 2003, 2004, 2005, 2010, 2013 by the deal.II authors

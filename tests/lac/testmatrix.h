@@ -1,4 +1,3 @@
-// $Id$
 
 #include "../tests.h"
 #include <deal.II/base/exceptions.h>

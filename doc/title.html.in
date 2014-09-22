@@ -6,7 +6,6 @@
   <link href="screen.css" rel="StyleSheet">
   <meta name="copyright" content="Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2010 by the deal.II Authors">
   <meta name="date" content="$Date$">
-  <meta name="svn_id" content="$Id$">
 </head>
 
 <body class="title">
