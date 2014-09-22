@@ -1290,8 +1290,12 @@ DoFHandler<dim,spacedim>::make_colored_locally_owned_active_cells()
 
   // we need to resolve constraints. as documented, the constraints we
   // take into account are only hanging node constraints, but no
-  // others
-  ConstraintMatrix constraints;
+  // others. we only need constraints on the locally relevant set of DoFs
+  IndexSet locally_relevant_dofs;
+  DoFTools::extract_locally_relevant_dofs (*this,
+                                           locally_relevant_dofs);
+
+  ConstraintMatrix constraints (locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints (*this,
                                            constraints);
   constraints.close ();
