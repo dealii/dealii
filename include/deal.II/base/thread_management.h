@@ -93,8 +93,8 @@ namespace Threads
      * is thrown between the locking and unlocking point, the
      * destructor makes sure that the mutex is unlocked; this would
      * not automatically be the case when you lock and unlock the
-     * mutex "by hand", i.e. using <code>acquire()</code> and
-     * <code>release()</code>.
+     * mutex "by hand", i.e. using Mutex::acquire() and
+     * Mutex::release().
      */
     class ScopedLock
     {
@@ -132,10 +132,10 @@ namespace Threads
    * implementing real condition variable semantics. It allows to
    * write programs such that they start new threads and/or lock
    * objects in multithreading mode, and use dummy thread management
-   * and synchronisation classes instead when running in single-thread
+   * and synchronization classes instead when running in single-thread
    * mode. Specifically, the new_thread() functions only call the
    * function but wait for it to return instead of running in on
-   * another thread, and the mutices do nothing really. The only
+   * another thread, and the mutexes do nothing really. The only
    * reason to provide such a function is that the program can be
    * compiled both in MT and non-MT mode without difference.
    *
@@ -269,8 +269,8 @@ namespace Threads
      * is thrown between the locking and unlocking point, the
      * destructor makes sure that the mutex is unlocked; this would
      * not automatically be the case when you lock and unlock the
-     * mutex "by hand", i.e. using <code>acquire()</code> and
-     * <code>release()</code>.
+     * mutex "by hand", i.e. using Mutex::acquire() and
+     * Mutex::release().
      */
     class ScopedLock
     {
