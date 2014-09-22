@@ -305,6 +305,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The function TrilinosWrappers::SparseMatrix::add(double factor,
+  SparseMatrix &rhs) produced wrong results and ran into an exception if the
+  rhs matrix included off-processor column entries. This is now fixed.
+  <br>
+  (Martin Kronbichler, 2014/09/21)
+  </li>
+
   <li> New: The function Threads::Task::joinable() can be used to verify whether
   a task object can be joined or not.
   <br>
