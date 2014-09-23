@@ -635,7 +635,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
   // define two aliases
   VECTOR &v = tmp_vectors(0, x);
-  VECTOR &p = tmp_vectors(n_tmp_vectors-1, x);
+  VECTOR &p = tmp_vectors(n_tmp_vectors-1, b);
 
   // Following vectors are needed
   // when not the default residuals
@@ -672,8 +672,9 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
         }
       else
         {
-          A.vmult(v,x);
-          v.sadd(-1.,1.,b);
+          A.vmult(p,x);
+          p.sadd(-1.,1.,b);
+          v = p;
         };
 
       double rho = v.l2_norm();
@@ -739,8 +740,9 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
             }
           else
             {
-              precondition.vmult(p, tmp_vectors[inner_iteration]);
-              A.vmult(vv,p);
+              precondition.vmult(vv, tmp_vectors[inner_iteration]);
+              A.vmult(p,vv);
+              vv = p;
             };
 
           dim = inner_iteration+1;
@@ -861,6 +863,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
           p = 0.;
           for (unsigned int i=0; i<dim; ++i)
             p.add(h(i), tmp_vectors[i]);
+          v.reinit(x); 
           precondition.vmult(v,p);
           x.add(1.,v);
         };
