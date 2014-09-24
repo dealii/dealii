@@ -16,7 +16,7 @@
 #include <fstream>
 #include <base/logstream.h>
 
-#include <deal.II/grid/occ_utilities.h>
+#include <deal.II/opencascade/utilities.h>
 #include <TopTools.hxx>
 #include <TopoDS_Shape.hxx>
 #include <Standard_Stream.hxx>

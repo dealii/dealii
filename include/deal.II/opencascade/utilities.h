@@ -43,8 +43,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * @addtogroup OpenCASCADE
- * @{
  * We collect in this namespace all utilities which operate on
  * OpenCASCADE entities. OpenCASCADE splits every object into a
  * topological description and a geometrical entity. The basic
@@ -161,15 +159,15 @@ namespace OpenCASCADE
    * This class is used to interpolate a BsplineCurve passing through
    * an array of points, with a C2 Continuity. If the optional
    * parameter @p closed is set to true, then the curve will be C2 at
-   * all points execpt the first (where only C1 continuity will be
+   * all points except the first (where only C1 continuity will be
    * given), and it will be a closed curve.
    *
    * The curve is garanteed to be at distance @p tolerance from the
    * input points. If the algorithm fails in generating such a curve,
    * an exception is thrown.
    */
-  TopoDS_Edge interpolation_curve(std::vector<dealii::Point<3> >  &curve_points,
-                                  const dealii::Point<3> direction=dealii::Point<3>(),
+  TopoDS_Edge interpolation_curve(std::vector<Point<3> >  &curve_points,
+                                  const Tensor<1,3> &direction=Tensor<1,3>(),
                                   const bool closed=false,
                                   const double tolerance=1e-7);
 
@@ -232,32 +230,32 @@ namespace OpenCASCADE
    *
    * The optional @p tolerance parameter is used to compute distances.
    */
-  Point<3> axis_intersection(const TopoDS_Shape in_shape,
-                             const Point<3> origin,
-                             const Point<3> direction,
+  Point<3> line_intersection(const TopoDS_Shape &in_shape,
+                             const Point<3> &origin,
+                             const Tensor<1,3> &direction,
                              const double tolerance=1e-7);
 
 
   /**
    * Convert OpenCASCADE point into a Point<3>.
    */
-  Point<3> Pnt(const gp_Pnt &p);
+  Point<3> point(const gp_Pnt &p);
 
 
   /**
    * Convert Point<3> into OpenCASCADE point.
    */
-  gp_Pnt Pnt(const Point<3> &p);
+  gp_Pnt point(const Point<3> &p);
 
 
   /**
    * Sort two points according to their scalar product with
    * direction. If the norm of the direction is zero, then use
-   * lexycographical ordering. The optional parameter is used as a
+   * lexicographical ordering. The optional parameter is used as a
    * relative tolerance when comparing objects.
    */
-  bool point_compare(const dealii::Point<3> &p1, const dealii::Point<3> &p2,
-                     const dealii::Point<3> direction=Point<3>(),
+  bool point_compare(const Point<3> &p1, const Point<3> &p2,
+                     const Tensor<1,3> &direction=Tensor<1,3>(),
                      const double tolerance=1e-10);
 
 
@@ -298,7 +296,7 @@ namespace OpenCASCADE
   DeclException0(ExcUnsupportedShape);
 
 }
-/*@}*/
+
 
 DEAL_II_NAMESPACE_CLOSE
 

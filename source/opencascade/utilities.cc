@@ -1,4 +1,4 @@
-#include <deal.II/grid/occ_utilities.h>
+#include <deal.II/opencascade/utilities.h>
 
 #ifdef DEAL_II_WITH_OPENCASCADE
 
@@ -140,19 +140,19 @@ namespace OpenCASCADE
       }
   }
 
-  gp_Pnt Pnt(const Point<3> &p)
+  gp_Pnt point(const Point<3> &p)
   {
     return gp_Pnt(p(0), p(1), p(2));
   }
 
 
-  Point<3> Pnt(const gp_Pnt &p)
+  Point<3> point(const gp_Pnt &p)
   {
     return Point<3>(p.X(), p.Y(), p.Z());
   }
 
-  bool point_compare(const dealii::Point<3> &p1, const dealii::Point<3> &p2,
-                     const dealii::Point<3> direction,
+  bool point_compare(const Point<3> &p1, const Point<3> &p2,
+                     const Tensor<1,3> &direction,
                      const double tolerance)
   {
     const double rel_tol=std::max(tolerance, std::max(p1.norm(), p2.norm())*tolerance);
@@ -177,8 +177,8 @@ namespace OpenCASCADE
     IGESControl_Reader reader;
     IFSelect_ReturnStatus stat;
     stat = reader.ReadFile(filename.c_str());
-    Assert(stat == IFSelect_RetDone,
-           ExcMessage("Error in reading file!"));
+    AssertThrow(stat == IFSelect_RetDone,
+                ExcMessage("Error in reading file!"));
 
     Standard_Boolean failsonly = Standard_False;
     IFSelect_PrintCount mode = IFSelect_ItemsByEntity;
@@ -211,10 +211,10 @@ namespace OpenCASCADE
     IGESControl_Controller::Init();
     IGESControl_Writer ICW ("MM", 0);
     Standard_Boolean ok = ICW.AddShape (shape);
-    Assert(ok, ExcMessage("Failed to add shape to IGES controller."));
+    AssertThrow(ok, ExcMessage("Failed to add shape to IGES controller."));
     ICW.ComputeModel();
     Standard_Boolean OK = ICW.Write (filename.c_str());
-    Assert(OK, ExcMessage("Failed to write IGES file."));
+    AssertThrow(OK, ExcMessage("Failed to write IGES file."));
   }
 
 
@@ -295,15 +295,15 @@ namespace OpenCASCADE
   }
 
 
-  Point<3> axis_intersection(const TopoDS_Shape in_shape,
-                             const Point<3> origin,
-                             const Point<3> direction,
+  Point<3> line_intersection(const TopoDS_Shape &in_shape,
+                             const Point<3> &origin,
+                             const Tensor<1,3> &direction,
                              const double tolerance)
   {
     // translating original Point<dim> to gp point
 
-    gp_Pnt P0 = Pnt(origin);
-    gp_Ax1 gpaxis(P0, gp_Dir(direction(0), direction(1), direction(2)));
+    gp_Pnt P0 = point(origin);
+    gp_Ax1 gpaxis(P0, gp_Dir(direction[0], direction[1], direction[2]));
     gp_Lin line(gpaxis);
 
     // destination point
@@ -316,11 +316,11 @@ namespace OpenCASCADE
 
     Inters.PerformNearest(line,-RealLast(),+RealLast());
     Assert(Inters.IsDone(), ExcMessage("Could not project point."));
-    return Pnt(Inters.Pnt(1));
+    return point(Inters.Pnt(1));
   }
 
   TopoDS_Edge interpolation_curve(std::vector<Point<3> > &curve_points,
-                                  const Point<3> direction,
+                                  const Tensor<1,3> &direction,
                                   const bool closed,
                                   const double tolerance)
   {
@@ -337,7 +337,7 @@ namespace OpenCASCADE
     Handle(TColgp_HArray1OfPnt) vertices = new TColgp_HArray1OfPnt(1,n_vertices);
     for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
       {
-        vertices->SetValue(vertex+1,Pnt(curve_points[vertex]));
+        vertices->SetValue(vertex+1,point(curve_points[vertex]));
       }
 
 
@@ -360,7 +360,7 @@ namespace OpenCASCADE
   {
 
     TopExp_Explorer exp;
-    gp_Pnt Pproj = Pnt(origin);
+    gp_Pnt Pproj = point(origin);
 
     double minDistance = 1e7;
     gp_Pnt tmp_proj(0.0,0.0,0.0);
@@ -378,11 +378,11 @@ namespace OpenCASCADE
         Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
 
         ShapeAnalysis_Surface projector(SurfToProj);
-        gp_Pnt2d proj_params = projector.ValueOfUV(Pnt(origin), tolerance);
+        gp_Pnt2d proj_params = projector.ValueOfUV(point(origin), tolerance);
 
         SurfToProj->D0(proj_params.X(),proj_params.Y(),tmp_proj);
 
-        double distance = Pnt(tmp_proj).distance(origin);
+        double distance = point(tmp_proj).distance(origin);
         if (distance < minDistance)
           {
             minDistance = distance;
@@ -407,7 +407,7 @@ namespace OpenCASCADE
             // curve upon which the edge is defined
             Handle(Geom_Curve) CurveToProj = BRep_Tool::Curve(edge,L,First,Last);
 
-            GeomAPI_ProjectPointOnCurve Proj(Pnt(origin),CurveToProj);
+            GeomAPI_ProjectPointOnCurve Proj(point(origin),CurveToProj);
             unsigned int num_proj_points = Proj.NbPoints();
             if ((num_proj_points > 0) && (Proj.LowerDistance() < minDistance))
               {
@@ -421,7 +421,7 @@ namespace OpenCASCADE
       }
 
     Assert(counter > 0, ExcMessage("Could not find projection points."));
-    return Pnt(Pproj);
+    return point(Pproj);
   }
 
   void create_triangulation(const TopoDS_Face &face,
@@ -437,10 +437,10 @@ namespace OpenCASCADE
     std::vector<Point<3> > vertices;
     SubCellData t;
 
-    vertices.push_back(Pnt(surf.Value(u0,v0)));
-    vertices.push_back(Pnt(surf.Value(u1,v0)));
-    vertices.push_back(Pnt(surf.Value(u0,v1)));
-    vertices.push_back(Pnt(surf.Value(u1,v1)));
+    vertices.push_back(point(surf.Value(u0,v0)));
+    vertices.push_back(point(surf.Value(u1,v0)));
+    vertices.push_back(point(surf.Value(u0,v1)));
+    vertices.push_back(point(surf.Value(u1,v1)));
 
     CellData<2> cell;
     for (unsigned int i=0; i<4; ++i)

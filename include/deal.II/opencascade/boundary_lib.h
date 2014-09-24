@@ -22,7 +22,7 @@
 
 #ifdef DEAL_II_WITH_OPENCASCADE
 
-#include <deal.II/grid/occ_utilities.h>
+#include <deal.II/opencascade/utilities.h>
 #include <deal.II/grid/tria_boundary.h>
 
 #include <BRepAdaptor_Curve.hxx>

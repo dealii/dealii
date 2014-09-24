@@ -15,7 +15,7 @@
 
 #include "../tests.h"
 
-#include <deal.II/grid/occ_boundary_lib.h>
+#include <deal.II/opencascade/boundary_lib.h>
 
 #include <fstream>
 #include <base/logstream.h>
@@ -44,7 +44,7 @@ int main ()
 {
   std::ofstream logfile("output");
   
-  TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/goteborg.iges");
+  TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/goteborg.iges", 1);
   std::vector<TopoDS_Face> faces;
   std::vector<TopoDS_Edge> edges;
   std::vector<TopoDS_Vertex> vertices;

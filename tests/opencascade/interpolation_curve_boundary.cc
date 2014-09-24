@@ -14,7 +14,7 @@
 
 #include "../tests.h"
 
-#include <deal.II/grid/occ_boundary_lib.h>
+#include <deal.II/opencascade/boundary_lib.h>
 
 #include <fstream>
 #include <base/logstream.h>

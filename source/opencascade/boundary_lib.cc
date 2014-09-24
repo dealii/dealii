@@ -1,4 +1,4 @@
-#include <deal.II/grid/occ_boundary_lib.h>
+#include <deal.II/opencascade/boundary_lib.h>
 
 #ifdef DEAL_II_WITH_OPENCASCADE
 
@@ -106,7 +106,7 @@ namespace OpenCASCADE
                                                  tolerance),
              ExcPointNotOnManifold(surrounding_points[i]));
 
-    return axis_intersection(sh, candidate, direction, tolerance);
+    return line_intersection(sh, candidate, direction, tolerance);
   }
 
   /*============================== ArclengthProjectionLineManifold ==============================*/
@@ -133,7 +133,7 @@ namespace OpenCASCADE
     ShapeAnalysis_Curve curve_analysis;
     gp_Pnt proj;
     double t;
-    double dist = curve_analysis.Project(curve->GetCurve(), Pnt(space_point), tolerance, proj, t, true);
+    double dist = curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true);
     Assert(dist < tolerance*length, ExcPointNotOnManifold(space_point));
     return Point<1>(GCPnts_AbscissaPoint::Length(curve->GetCurve(),curve->GetCurve().FirstParameter(),t));
   }
@@ -146,12 +146,12 @@ namespace OpenCASCADE
   {
     GCPnts_AbscissaPoint AP(curve->GetCurve(), chart_point[0], curve->GetCurve().FirstParameter());
     gp_Pnt P = curve->GetCurve().Value(AP.Parameter());
-    return Pnt(P);
+    return point(P);
   }
 
 
   // Explicit instantiations
-#include "occ_boundary_lib.inst"
+#include "boundary_lib.inst"
 
 } // end namespace OpenCASCADE
 

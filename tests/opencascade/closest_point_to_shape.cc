@@ -14,7 +14,7 @@
 
 #include "../tests.h"
 
-#include <deal.II/grid/occ_utilities.h>
+#include <deal.II/opencascade/utilities.h>
 
 #include <base/logstream.h>
 #include <grid/tria.h>
