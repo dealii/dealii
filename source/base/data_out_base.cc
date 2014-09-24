@@ -7953,7 +7953,7 @@ merge (const DataOutReader<dim,spacedim> &source)
   // adjust patch neighbors
   for (unsigned int i=old_n_patches; i<patches.size(); ++i)
     for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-      if (patches[i].neighbors[n] != Patch::no_neighbor)
+      if (patches[i].neighbors[n] != dealii::DataOutBase::Patch<dim,spacedim>::no_neighbor)
         patches[i].neighbors[n] += old_n_patches;
 }
 
