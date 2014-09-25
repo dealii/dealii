@@ -186,7 +186,9 @@ namespace Step40
   // machines available (MPI_COMM_WORLD); ask the triangulation to ensure that
   // the mesh remains smooth and free to refined islands, for example; and
   // initialize the <code>pcout</code> variable to only allow processor zero
-  // to output anything:
+  // to output anything. The final piece is to initialize a timer that we
+  // use to determine how much compute time the different parts of the program
+  // take:
   template <int dim>
   LaplaceProblem<dim>::LaplaceProblem ()
     :
@@ -200,7 +202,8 @@ namespace Step40
     pcout (std::cout,
            (Utilities::MPI::this_mpi_process(mpi_communicator)
             == 0)),
-    computing_timer (pcout,
+    computing_timer (mpi_communicator,
+                     pcout,
                      TimerOutput::summary,
                      TimerOutput::wall_times)
   {}
