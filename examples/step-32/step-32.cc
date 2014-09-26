@@ -1241,7 +1241,8 @@ namespace Step32
     rebuild_temperature_matrices (true),
     rebuild_temperature_preconditioner (true),
 
-    computing_timer (pcout,
+    computing_timer (MPI_COMM_WORLD,
+                     pcout,
                      TimerOutput::summary,
                      TimerOutput::wall_times)
   {}

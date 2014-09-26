@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,7 +106,7 @@ public:
    * compiler.
    */
   Timer (MPI_Comm mpi_communicator,
-         bool sync_wall_time = false);
+         const bool sync_wall_time = false);
 
   /**
    * Returns a reference to the data
@@ -364,7 +364,56 @@ private:
  * @endcode
  *
  *
- * See the step-32 tutorial program for usage of this class.
+ * <h3>Usage in parallel programs using MPI</h3>
+ *
+ * In a parallel program built on MPI, using the class in a way such
+ * as the one shown above would result in a situation where each
+ * process times the corresponding sections and then outputs the resulting
+ * timing information at the end. This is annoying since you'd get a lot
+ * of output -- one set of timing information from each processor.
+ *
+ * This can be avoided by only letting one processor generate screen output,
+ * typically by using an object of type ConditionalOStream instead of
+ * <code>std::cout</code> to write to screen (see, for example, step-17,
+ * step-18, step-32 and step-40, all of which use this method).
+ *
+ * This way, only a single processor outputs timing information, typically
+ * the first process in the MPI universe. However,
+ * if you take the above code snippet as an example, imagine what would happen
+ * if <code>setup_dofs()</code> is fast on processor zero and slow on at
+ * least one of the other processors; and if the first thing
+ * <code>assemble_system_1()</code> does is something that requires all
+ * processors to communicate. In this case, on processor zero, the timing
+ * section with name <code>"Setup dof system"</code> will yield a short
+ * run time on processor zero, whereas the section <code> "Assemble"</code>
+ * will take a long time: not because <code>assemble_system_1()</code>
+ * takes a particularly long time, but because on the processor on which
+ * we time (or, rather, the one on which we generate output) happens to
+ * have to wait for a long time till the other processor is finally done
+ * with <code>setup_dofs()</code> and starts to participate in
+ * <code>assemble_system_1()</code>. In other words, the timing that is
+ * reported is unreliable because it reflects run times from other
+ * processors. Furthermore, the run time of this section on processor zero
+ * has nothing to do with the run time of the section on other processors
+ * but instead with the run time of <i>the previous section</i> on another
+ * processor.
+ *
+ * The usual way to avoid this is to introduce a barrier into the parallel
+ * code just before we start and stop timing sections. This ensures that
+ * all processes are at the same place and the timing information then
+ * reflects the maximal run time across all processors. To achieve this,
+ * you need to initialize the TimerOutput object with an MPI communicator
+ * object, for example as in the following code:
+ * @code
+ *   TimerOutput timer (MPI_COMM_WORLD,
+ *                      pcout,
+ *                      TimerOutput::summary,
+ *                      TimerOutput::wall_times);
+ * @endcode
+ * Here, <code>pcout</code> is an object of type ConditionalOStream that
+ * makes sure that we only generate output on a single processor.
+ * See the step-32 and step-40 tutorial programs for this kind of usage
+ * of this class.
  *
  * @ingroup utilities
  * @author M. Kronbichler, 2009.
@@ -459,12 +508,12 @@ public:
 
 #ifdef DEAL_II_WITH_MPI
   /**
-   * Constructor that takes an MPI
-   * communicator as input. A timer
-   * constructed this way will sum up the
-   * CPU times over all processors in the
-   * MPI network for calculating the CPU
-   * time.
+   * Constructor that takes an MPI communicator as input. A timer
+   * constructed this way will sum up the CPU times over all
+   * processors in the MPI network for calculating the CPU time, or
+   * take the maximum over all processors, depending on the value of
+   * @p output_type . See the documentation of this class for the
+   * rationale for this constructor and an example.
    *
    * @param mpi_comm An MPI communicator across which we should accumulate or
    *   otherwise synchronize the timing information we produce on every MPI process.
@@ -472,7 +521,13 @@ public:
    * @param output_frequency A variable indicating when output is to be written
    *   to the given stream.
    * @param output_type A variable indicating what kind of timing the output
-   *   should represent (CPU or wall time).
+   *   should represent (CPU or wall time). In this parallel context, when this
+   *   argument selects CPU time, then times are accumulated over all processes
+   *   participating in the MPI communicator. If this argument selects wall
+   *   time, then reported times are the maximum over all processors' run times
+   *   for this section. (The latter is computed by placing an
+   *   <code>MPI_Barrier</code> call before starting and stopping the timer
+   *   for each section.
    */
   TimerOutput (MPI_Comm                   mpi_comm,
                std::ostream              &stream,
@@ -480,12 +535,12 @@ public:
                const enum OutputType      output_type);
 
   /**
-   * Constructor that takes an MPI
-   * communicator as input. A timer
-   * constructed this way will sum up the
-   * CPU times over all processors in the
-   * MPI network for calculating the CPU
-   * time.
+   * Constructor that takes an MPI communicator as input. A timer
+   * constructed this way will sum up the CPU times over all
+   * processors in the MPI network for calculating the CPU time, or
+   * take the maximum over all processors, depending on the value of
+   * @p output_type . See the documentation of this class for the
+   * rationale for this constructor and an example.
    *
    * @param mpi_comm An MPI communicator across which we should accumulate or
    *   otherwise synchronize the timing information we produce on every MPI process.
@@ -493,7 +548,13 @@ public:
    * @param output_frequency A variable indicating when output is to be written
    *   to the given stream.
    * @param output_type A variable indicating what kind of timing the output
-   *   should represent (CPU or wall time).
+   *   should represent (CPU or wall time). In this parallel context, when this
+   *   argument selects CPU time, then times are accumulated over all processes
+   *   participating in the MPI communicator. If this argument selects wall
+   *   time, then reported times are the maximum over all processors' run times
+   *   for this section. (The latter is computed by placing an
+   *   <code>MPI_Barrier</code> call before starting and stopping the timer
+   *   for each section.)
    */
   TimerOutput (MPI_Comm                   mpi_comm,
                ConditionalOStream        &stream,
