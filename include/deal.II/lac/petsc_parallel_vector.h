@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,6 +60,7 @@ namespace PETScWrappers
      * depending on the actual vector type (much like using virtual
      * functions). Only the functions creating a vector of specific type differ,
      * and are implemented in this particular class.
+     *
      *
      * <h3>Parallel communication model</h3>
      *
@@ -149,6 +150,8 @@ namespace PETScWrappers
      * compress(), or making sure that all processes do the same type of
      * operations at the same time, for example by placing zero additions if
      * necessary.
+     *
+     * @see @ref GlossGhostedVector "vectors with ghost elements"
      *
      * @ingroup PETScWrappers
      * @ingroup Vectors
@@ -270,6 +273,8 @@ namespace PETScWrappers
        *
        * @note This operation always creates a ghosted
        * vector.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       explicit Vector (const MPI_Comm     &communicator,
                        const IndexSet   &local,
@@ -295,6 +300,8 @@ namespace PETScWrappers
        *
        * @note This operation always creates a ghosted
        * vector.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const IndexSet &local,
               const IndexSet &ghost,
@@ -302,14 +309,15 @@ namespace PETScWrappers
 
       /**
        * Constructs a new parallel PETSc
-       * vector from an Indexset. This creates a non
+       * vector from an IndexSet. This creates a non
        * ghosted vector.
        */
       explicit Vector (const MPI_Comm &communicator,
                        const IndexSet &local) DEAL_II_DEPRECATED;
+
       /**
        * Constructs a new parallel PETSc
-       * vector from an Indexset. This creates a non
+       * vector from an IndexSet. This creates a non
        * ghosted vector.
        */
       explicit Vector (const IndexSet &local,
@@ -442,14 +450,18 @@ namespace PETScWrappers
        * Reinit as a ghosted vector. See
        * constructor with same signature
        * for more details.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const MPI_Comm     &communicator,
                    const IndexSet   &local,
                    const IndexSet &ghost) DEAL_II_DEPRECATED;
       /**
        * Reinit as a vector without ghost elements. See
-       * constructor with same signature
+       * the constructor with same signature
        * for more detais.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &local,
                    const IndexSet &ghost,
@@ -462,10 +474,13 @@ namespace PETScWrappers
        */
       void reinit (const MPI_Comm     &communicator,
                    const IndexSet   &local) DEAL_II_DEPRECATED;
+
       /**
        * Reinit as a vector without ghost elements. See
        * constructor with same signature
        * for more detais.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &local,
                    const MPI_Comm &communicator);

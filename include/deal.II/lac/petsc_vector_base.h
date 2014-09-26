@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -423,6 +423,8 @@ namespace PETScWrappers
     /**
      * Return if the vector contains ghost
      * elements.
+     *
+     * @see @ref GlossGhostedVector "vectors with ghost elements"
      */
     bool has_ghost_elements() const;
 

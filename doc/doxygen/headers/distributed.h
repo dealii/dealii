@@ -235,33 +235,39 @@
  * information is provided by the
  * DoFTools::extract_locally_relevant_dofs() function.
  *
- * <h5>Vectors with Ghost-elements</h5>
- * 
+ *
+ * <h5>Vectors with ghost elements</h5>
+ *
  * A typical parallel application is dealing with two different kinds
  * of parallel vectors: vectors with ghost elements (also called
- * ghosted vectors) and vectors without ghost elements.  Of course
- * these might be different flavours (BlockVector, Vector; using
- * Trilinos or PETSc, etc.).
- * 
- * In vectors without ghost elements knowledge about a single entry i
- * in the vector is only known to a single processor. They are
- * constructed with an IndexSet reflecting the
- * locally_owned_dofs(). There is no overlap in the IndexSets.
- * Ghosted vectors are typically created using locally_active or
- * locally_relevant IndexSets and contain elements on processors that
- * are owned by a different processor.
+ * ghosted vectors) and vectors without ghost elements.  (Both
+ * kinds can typically be represented by the same data type, but there
+ * are of course different vector types that can each represent both flavors:
+ * for example TrilinosWrappers::MPI::Vector, PETScWrappers::Vector, and
+ * BlockVector objects built on these).
+ * You can find a discussion of what distinguishes these kinds of vectors
+ * in the @ref GlossGhostedVector "glossary entry on ghosted vectors".
  *
- * One important aspect is that we forbid any modification of ghosted
- * vectors. This is because it would create subtle bugs if elements
- * are edited on one processor but do not immediately transfer to the
- * ghosted entries on the other processors.
+ * From a usage point of view, ghosted vectors are typically used for
+ * data output, postprocessing, error estimation, input in
+ * integration. This is because in these operations, one typically
+ * needs access not only to @ref GlossLocallyOwnedDofs "locally owned dofs"
+ * but also to @ref GlossLocallyActiveDofs "locally active dofs"
+ * and sometimes to @ref GlossLocallyRelevantDofs "locally relevant dofs",
+ * and their values may not be stored in non-ghosted vectors on the
+ * processor that needs them. The operations listed above also only
+ * require read-only access to vectors, and ghosted vectors are therefore
+ * usable in these contexts.
  *
- * The usage is typically split up in the following way: ghosted
- * vectors are used for data output, postprocessing, error estimation,
- * input in integration. Vectors without ghost entries are used in all
+ * On the other hand, vectors without ghost entries are used in all
  * other places like assembling, solving, or any other form of
- * manipulation. You can copy between vectors with and without ghost
+ * manipulation. These are typically write-only operations and
+ * therefore need not have read access to vector elements that may be
+ * owned by another processor.
+ *
+ * You can copy between vectors with and without ghost
  * elements (you can see this in step-40 and step-32) using operator=.
+ *
  *
  * <h5>Sparsity patterns</h5>
  *
@@ -383,17 +389,17 @@
 
 namespace parallel
 {
-                                   /**
-                                    * A namespace for class and
-                                    * functions that support %parallel
-                                    * computing on %distributed memory
-                                    * machines. See the @ref
-                                    * distributed module for an
-                                    * overview of the facilities this
-                                    * namespace offers.
-                                    *
-                                    * @ingroup distributed
-                                    */
+  /**
+   * A namespace for class and
+   * functions that support %parallel
+   * computing on %distributed memory
+   * machines. See the @ref
+   * distributed module for an
+   * overview of the facilities this
+   * namespace offers.
+   *
+   * @ingroup distributed
+   */
   namespace distributed
   {
   }
