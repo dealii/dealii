@@ -304,6 +304,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The function TrilinosWrappers::VectorBase::sadd(double factor,
+  VectorBase &v) erroneously added factor*v instead of scaling the calling
+  vector by factor. This is now fixed.
+  <br>
+  (Martin Kronbichler, 2014/09/26)
+  </li>
+
   <li> Fixed: The function TrilinosWrappers::SparseMatrix::add(double factor,
   SparseMatrix &rhs) produced wrong results and ran into an exception if the
   rhs matrix included off-processor column entries. This is now fixed.

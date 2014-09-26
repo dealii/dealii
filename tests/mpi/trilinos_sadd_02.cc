@@ -29,7 +29,7 @@
 
 void test ()
 {
-  TrilinosWrappers::MPI::Vector ghosted, distributed;
+  TrilinosWrappers::MPI::Vector ghosted, ghosted2, distributed, distributed2;
   //All processes should own 10 entries
   const int entries_per_process = 10;
   const int n_proc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -46,10 +46,13 @@ void test ()
     (local_begin, local_end);
  
   distributed.reinit(locally_owned, MPI_COMM_WORLD);
+  distributed2.reinit(locally_owned, MPI_COMM_WORLD);
   ghosted.reinit (locally_owned, locally_relevant, MPI_COMM_WORLD);
+  ghosted2.reinit (locally_owned, locally_relevant, MPI_COMM_WORLD);
 
   distributed=1.;
   ghosted=distributed;
+  ghosted *= 1.6;
   distributed.sadd (2., ghosted);
   ghosted = distributed;
   deallog << "sadd (s, v)" <<std::endl;
@@ -59,6 +62,7 @@ void test ()
 
   distributed=1.;
   ghosted=distributed;
+  ghosted *= 1.6;
   distributed.sadd (2., 3., ghosted);
   ghosted = distributed;
   deallog << "sadd (s, a, v)" <<std::endl;
@@ -68,7 +72,10 @@ void test ()
 
   distributed=1.;
   ghosted=distributed;
-  distributed.sadd (2., 3., ghosted, 4., ghosted);
+  ghosted *= 1.6;
+  ghosted2 = distributed;
+  ghosted2 *= 0.354;
+  distributed.sadd (2., 3., ghosted, 4., ghosted2);
   ghosted = distributed;
   deallog << "sadd (s, a, v, b, w)" <<std::endl;
   if (my_id==0)
@@ -77,7 +84,8 @@ void test ()
 
   distributed=1.;
   ghosted=distributed;
-  distributed.sadd (2., 3., ghosted, 4., ghosted, 5., ghosted);
+  distributed2 = 7.22;
+  distributed.sadd (2., 3., ghosted, 4., ghosted2, 5., distributed2);
   ghosted = distributed;
   deallog << "sadd (s, a, v, b, w, c, x)" <<std::endl;
   if (my_id==0)
