@@ -295,6 +295,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Trying to have FE_Q(p) and FE_DGQ(r) elements next to each
+  other in an hp::DoFHandler object led to assertions saying that these two
+  elements don't know how to compute interface constraints where such
+  elements touch. This has now been fixed: FE_DGQ is a discontinuous element,
+  so there cannot be any interface constraints at all.
+  <br>
+  (Wolfgang Bangerth, 2014/09/26)
+  </li>
+
   <li> Fixed: The function TrilinosWrappers::VectorBase::sadd(double factor,
   VectorBase &v) erroneously added factor*v instead of scaling the calling
   vector by factor. This is now fixed.
