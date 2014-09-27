@@ -374,51 +374,6 @@
  *
  * @see @ref boundary "The module on boundaries"
  *
- * <dt class="glossary">@anchor GlossManifoldIndicator <b>%Manifold indicator</b></dt>
- *
- * <dd> Every object that makes up a Triangulation (cells, faces,
- * edges, etc.), is associated with a unique number (of type
- * types::manifol_id) that is used to identify which manifold object
- * is responsible to generate new points when the mesh is refined. 
- *
- * By default, all manifold indicators of a mesh are set to
- * numbers::invalid_manifold_id. A typical piece of code that sets the
- * manifold indicator on a object to something else would look like
- * this, here setting the manifold indicator to 42 for all cells whose
- * center has an $x$ component less than zero:
- *
- * @code
- * for (typename Triangulation<dim>::active_cell_iterator cell =
- *	triangulation.begin_active();
- *	cell != triangulation.end(); ++cell)
- *   if (cell->center()[0] < 0)
- *     cell->set_manifold_id (42);
- * @endcode
- *
- * Here we call the function TriaAccessor::set_manifold_id(). It may
- * also be appropriate to call TriaAccessor::set_all_manifold_ids
- * instead, to set recursively the manifold id on each face (and edge,
- * if in 3d). To query the manifold indicator of a particular object
- * edge, use TriaAccessor::manifold_id().
- *
- * The code above only sets the manifold indicators of a particular
- * part of the Triangulation, but it does not by itself change the way
- * the Triangulation class treats this object for the purposes of mesh
- * refinement. For this, you need to call Triangulation::set_manifold()
- * to associate a manifold object with a particular manifold
- * indicator. This allows the Triangulation objects to use a different
- * method of finding new points on cells, faces or edges to be
- * refined; the default is to use a FlatManifold object for all faces
- * and edges.
- *
- * @note Manifold indicators are inherited from parents to their
- * children upon mesh refinement. Some more information about manifold
- * indicators is also presented in a section of the documentation of
- * the Triangulation class as well as in the
- * @ref manifold "Manifold documentation module".
- * </dd>
- *
- * @see @ref manifold "The module on Manifolds"
  *
  * <dt class="glossary">@anchor GlossComponent <b>Component</b></dt>
  *
@@ -1038,6 +993,53 @@ Article{BK07,
  * Locally relevant DoFs are a superset of the
  * @ref GlossLocallyActiveDof "locally active DoFs."
  * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossManifoldIndicator <b>%Manifold indicator</b></dt>
+ *
+ * <dd> Every object that makes up a Triangulation (cells, faces,
+ * edges, etc.), is associated with a unique number (of type
+ * types::manifol_id) that is used to identify which manifold object
+ * is responsible to generate new points when the mesh is refined. 
+ *
+ * By default, all manifold indicators of a mesh are set to
+ * numbers::invalid_manifold_id. A typical piece of code that sets the
+ * manifold indicator on a object to something else would look like
+ * this, here setting the manifold indicator to 42 for all cells whose
+ * center has an $x$ component less than zero:
+ *
+ * @code
+ * for (typename Triangulation<dim>::active_cell_iterator cell =
+ *	triangulation.begin_active();
+ *	cell != triangulation.end(); ++cell)
+ *   if (cell->center()[0] < 0)
+ *     cell->set_manifold_id (42);
+ * @endcode
+ *
+ * Here we call the function TriaAccessor::set_manifold_id(). It may
+ * also be appropriate to call TriaAccessor::set_all_manifold_ids
+ * instead, to set recursively the manifold id on each face (and edge,
+ * if in 3d). To query the manifold indicator of a particular object
+ * edge, use TriaAccessor::manifold_id().
+ *
+ * The code above only sets the manifold indicators of a particular
+ * part of the Triangulation, but it does not by itself change the way
+ * the Triangulation class treats this object for the purposes of mesh
+ * refinement. For this, you need to call Triangulation::set_manifold()
+ * to associate a manifold object with a particular manifold
+ * indicator. This allows the Triangulation objects to use a different
+ * method of finding new points on cells, faces or edges to be
+ * refined; the default is to use a FlatManifold object for all faces
+ * and edges.
+ *
+ * @note Manifold indicators are inherited from parents to their
+ * children upon mesh refinement. Some more information about manifold
+ * indicators is also presented in a section of the documentation of
+ * the Triangulation class as well as in the
+ * @ref manifold "Manifold documentation module".
+ * </dd>
+ *
+ * @see @ref manifold "The module on Manifolds"
  *
  *
  * <dt class="glossary">@anchor GlossMaterialId <b>Material id</b></dt>
