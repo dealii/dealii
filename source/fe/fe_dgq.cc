@@ -617,16 +617,12 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
 hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 {
-  // there are no such constraints for DGQ
-  // elements at all
-  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
-    return
-      std::vector<std::pair<unsigned int, unsigned int> > ();
-  else
-    {
-      Assert (false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int> > ();
-    }
+  // this element is discontinuous, so by definition there can
+  // be no identities between its dofs and those of any neighbor
+  // (of whichever type the neighbor may be -- after all, we have
+  // no face dofs on this side to begin with)
+  return
+    std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
 
@@ -636,16 +632,12 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
 hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 {
-  // there are no such constraints for DGQ
-  // elements at all
-  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
-    return
-      std::vector<std::pair<unsigned int, unsigned int> > ();
-  else
-    {
-      Assert (false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int> > ();
-    }
+  // this element is discontinuous, so by definition there can
+  // be no identities between its dofs and those of any neighbor
+  // (of whichever type the neighbor may be -- after all, we have
+  // no face dofs on this side to begin with)
+  return
+    std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
 
@@ -655,16 +647,12 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
 hp_quad_dof_identities (const FiniteElement<dim, spacedim>        &fe_other) const
 {
-  // there are no such constraints for DGQ
-  // elements at all
-  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
-    return
-      std::vector<std::pair<unsigned int, unsigned int> > ();
-  else
-    {
-      Assert (false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int> > ();
-    }
+  // this element is discontinuous, so by definition there can
+  // be no identities between its dofs and those of any neighbor
+  // (of whichever type the neighbor may be -- after all, we have
+  // no face dofs on this side to begin with)
+  return
+    std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
 
@@ -673,14 +661,10 @@ template <int dim, int spacedim>
 FiniteElementDomination::Domination
 FE_DGQ<dim, spacedim>::compare_for_face_domination (const FiniteElement<dim, spacedim> &fe_other) const
 {
-  // check whether both are discontinuous
-  // elements, see the description of
-  // FiniteElementDomination::Domination
-  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
-    return FiniteElementDomination::no_requirements;
-
-  Assert (false, ExcNotImplemented());
-  return FiniteElementDomination::neither_element_dominates;
+  // this is a discontinuous element, so by definition there will
+  // be no constraints wherever this element comes together with
+  // any other kind of element
+  return FiniteElementDomination::no_requirements;
 }
 
 
