@@ -1718,9 +1718,8 @@ namespace TrilinosWrappers
       }
     else
       {
-        VectorBase tmp = v;
-        tmp *= s;
-        this->add(tmp, true);
+        (*this) *= s;
+        this->add(v, true);
       }
   }
 
@@ -1747,7 +1746,7 @@ namespace TrilinosWrappers
       }
     else
       {
-        (*this)*=s;
+        (*this) *= s;
         VectorBase tmp = v;
         tmp *= a;
         this->add(tmp, true);
