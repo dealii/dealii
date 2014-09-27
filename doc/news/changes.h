@@ -115,19 +115,8 @@ inconvenience this causes.
   Manifold<dim,spacedim>. Now we can use high order mappings that
   actually follow the geometry also on the interior of codimension
   zero meshes.
-  <br> (Luca Heltai, 2014/09/13) 
-  </li>
-
-  <li> New: Added two optional parameters to TriaAccessor::center()
-  and a new method TriaAccessor::intermediate_point(). 
-  They allow to query for a 
-  geometrically coherent center, or ask for arbitrary points on the 
-  underlying Manifold, given the dim coordinates in the reference 
-  element.
-  Triangulation was refactored internally to use the new 
-  TriaAccessor::center() interface when querying for new points.
   <br>
-  (Luca Heltai, 2014/09/13)
+  (Luca Heltai, 2014/09/13) 
   </li>
 
   <li> New: The new tutorial program step-52 explains how to use the 
@@ -184,9 +173,11 @@ inconvenience this causes.
   A new Manifold<dim,spacedim> class was introduced which only contains the
   interface needed by Triangulation to refine objects, leaving all boundary
   related functions in the class Boundary<dim,spacedim>, which was made
-  derived from Manifold<dim,spacedim>. <br>
+  derived from Manifold<dim,spacedim>.
+  <br>
   This new construction allows for curved interior cells, and custom refinement
-  strategies. At the moment the following Manifolds are supported:
+  strategies (see, for example, the new tutorial program step-53).
+  At the moment the following Manifolds are supported:
   <ul>
   <li> FlatManifold<dim,spacedim>: This class replaces the old
   StraightBoundary<dim,spacedim>, and it adds support for periodic
@@ -315,6 +306,18 @@ inconvenience this causes.
   a task object can be joined or not.
   <br>
   (Wolfgang Bangerth, 2014/09/17)
+  </li>
+
+  <li> New: Added two optional parameters to TriaAccessor::center()
+  and a new method TriaAccessor::intermediate_point(). 
+  They allow to query for a 
+  geometrically coherent center, or ask for arbitrary points on the 
+  underlying Manifold, given the dim coordinates in the reference 
+  element.
+  Triangulation was refactored internally to use the new 
+  TriaAccessor::center() interface when querying for new points.
+  <br>
+  (Luca Heltai, 2014/09/13)
   </li>
 
   <li> Improved: Optimize construction of high-order FE_Nedelec by moving out some 
