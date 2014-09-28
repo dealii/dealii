@@ -295,20 +295,27 @@ namespace Step36
 
 
     // Before leaving the function, we calculate spurious eigenvalues,
-    // introduced to the system by zero Dirichlet constraints.
-    double min_ev = std::numeric_limits<double>::max(),
-           max_ev = -std::numeric_limits<double>::max();
+    // introduced to the system by zero Dirichlet constraints. As
+    // discussed in the introduction, the use of Dirichlet boundary
+    // conditions coupled with the fact that the degrees of freedom
+    // located at the boundary of the domain remain part of the linear
+    // system we solve, introduces a number of spurious eigenvalues.
+    // Below, we output the interval within which they all lie to
+    // ensure that we can ignore them should they show up in our
+    // computations.
+    double min_spurious_eigenvalue = std::numeric_limits<double>::max(),
+           max_spurious_eigenvalue = -std::numeric_limits<double>::max();
 
-    for (unsigned int ind = 0; ind < dof_handler.n_dofs(); ind++)
-      if (constraints.is_constrained(ind))
+    for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
+      if (constraints.is_constrained(i))
         {
-          const double ev = stiffness_matrix(ind,ind)/mass_matrix(ind,ind);
-          min_ev = std::min (min_ev, ev);
-          max_ev = std::max (max_ev, ev);
+          const double ev = stiffness_matrix(i,i)/mass_matrix(i,i);
+          min_spurious_eigenvalue = std::min (min_spurious_eigenvalue, ev);
+          max_spurious_eigenvalue = std::max (max_spurious_eigenvalue, ev);
         }
 
-    std::cout << "   Spurious eigenvalues are in "
-              << "["<<min_ev<<":"<<max_ev<<"]"
+    std::cout << "   Spurious eigenvalues are all in the interval "
+              << "[" << min_spurious_eigenvalue << "," << max_spurious_eigenvalue << "]"
               << std::endl;
 
   }
