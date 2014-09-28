@@ -93,6 +93,22 @@ $A$ and $M$ that we will solve in the current tutorial program. We
 will want to solve it for the lowermost few eigenvalue/eigenfunction
 pairs.
 
+Zero Dirichlet boundary conditions result in some degrees of freedom (DoFs) being constrained. 
+Those DoFs will not be eliminated from the algebraic system. 
+Rather, during assembly process 
+the condensed matrices $A$ and $M$ are made to have zero rows and columns for the corresponding 
+DoFs and non-zero diagonal elements. 
+For the local matrices these diagonal elements, if non-zero, 
+are set to their absolute value. Otherwise, they are set to the average of  
+absolute values of the diagonal. 
+This results in a block-diagonal structure of $A$ and $M$, where one block
+corresponds to the eigenpairs of interest and the other introduces 
+spurious (real) positive eigenvalues $\varepsilon_{h,i}=A_{ii}/M_{ii}$ (where $i$ are constrained DoFs). 
+In order to filter out the spurious eigenvalues, one could scale the diagonal elements of either matrix 
+thus shifting them away from the frequency of interest in the eigen-spectrum. 
+However, this strategy was not pursued here as those eigenvalues happen to be greater than the lowest 
+five that we will calculate.
+
 <h3>Implementation details</h3>
 
 The program below is essentially just a slightly modified version of 
