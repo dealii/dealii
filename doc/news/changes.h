@@ -110,6 +110,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: There is now a section in the introduction of step-36 that
+  discusses the interaction of Dirichlet boundary values and the solution
+  of eigenvalue problems.
+  <br>
+  (Denis Davydov, Wolfgang Bangerth, 2014/09/28)
+  </li>
 
   <li> New: Made MappingQ<dim,spacedim> aware of
   Manifold<dim,spacedim>. Now we can use high order mappings that
