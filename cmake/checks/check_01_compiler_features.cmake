@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -152,7 +152,7 @@ CHECK_CXX_SOURCE_COMPILES(
   HAVE_GLIBC_STACKTRACE)
 
 IF(HAVE_GLIBC_STACKTRACE AND NOT DEAL_II_STATIC_EXECUTABLE)
-  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-rdynamic")
+  ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-rdynamic")
 ENDIF()
 
 

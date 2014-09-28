@@ -187,6 +187,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
     "
     DEAL_II_HAVE_CXX11_ICCNUMERICLIMITSBUG_OK)
 
+
   #
   # icc-14.0.0 has an astonishing bug [1] where it hits an internal compiler
   # error when run in C++11 mode with libstdc++-4.7 (from gcc).
@@ -212,6 +213,40 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
     DEAL_II_HAVE_CXX11_ICCLIBSTDCPP47CXX11BUG_OK)
 
 
+  #
+  # icc does not play nicely with boost::signals2 and -std=c++11.
+  # Disable C++11 support in this case.
+  #
+  # [1] https://software.intel.com/en-us/forums/topic/515966
+  #
+  # - Matthias Maier, 2014
+  #
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <boost/signals2/signal.hpp>
+    using namespace boost::signals2;
+
+    class Order {};
+
+    class Foo
+    {
+     signal<void(Order*)> beforeOrder;
+     void test(Order* o)
+     {
+      beforeOrder(o);
+     }
+    };
+
+    int main()
+    {
+     Order o;
+     Foo foo;
+     return 0;
+    }
+    "
+    DEAL_II_HAVE_CXX11_ICCBOOSTSIGNALSBUG_OK)
+
+
   IF( DEAL_II_HAVE_CXX11_ARRAY AND
       DEAL_II_HAVE_CXX11_CONDITION_VARIABLE AND
       DEAL_II_HAVE_CXX11_FUNCTIONAL AND
@@ -223,7 +258,8 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       DEAL_II_HAVE_CXX11_TYPE_TRAITS AND
       DEAL_II_HAVE_CXX11_MACOSXC99BUG_OK AND
       DEAL_II_HAVE_CXX11_ICCNUMERICLIMITSBUG_OK AND
-      DEAL_II_HAVE_CXX11_ICCLIBSTDCPP47CXX11BUG_OK )
+      DEAL_II_HAVE_CXX11_ICCLIBSTDCPP47CXX11BUG_OK AND
+      DEAL_II_HAVE_CXX11_ICCBOOSTSIGNALSBUG_OK)
       SET(DEAL_II_HAVE_CXX11 TRUE)
   ENDIF()
 
