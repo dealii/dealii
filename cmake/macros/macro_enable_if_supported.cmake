@@ -22,6 +22,17 @@
 #
 
 MACRO(ENABLE_IF_SUPPORTED _variable _flag)
+  #
+  # Clang is too conservative when reporting unsupported compiler flags.
+  # Therefore, we promote all warnings for an unsupported compiler flag to
+  # actual errors with the -Werror switch:
+  #
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    SET(_werror_string "-Werror ")
+  ELSE()
+    SET(_werror_string "")
+  ENDIF()
+
   STRING(STRIP "${_flag}" _flag_stripped)
   IF(NOT "${_flag_stripped}" STREQUAL "")
     STRING(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
@@ -29,7 +40,7 @@ MACRO(ENABLE_IF_SUPPORTED _variable _flag)
     STRING(REPLACE "-" "_" _flag_name "${_flag_name}")
     STRING(REPLACE "++" "__" _flag_name "${_flag_name}")
     CHECK_CXX_COMPILER_FLAG(
-      "${_flag_stripped}"
+      "${_werror_string}${_flag_stripped}"
       DEAL_II_HAVE_FLAG_${_flag_name}
       )
     IF(DEAL_II_HAVE_FLAG_${_flag_name})
