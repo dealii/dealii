@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2013 by the deal.II authors
+ * Copyright (C) 2009 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -292,6 +292,32 @@ namespace Step36
     // be compressed as no more entries will be added:
     stiffness_matrix.compress (VectorOperation::add);
     mass_matrix.compress (VectorOperation::add);
+
+
+    // Before leaving the function, we calculate spurious eigenvalues,
+    // introduced to the system by zero Dirichlet constraints. As
+    // discussed in the introduction, the use of Dirichlet boundary
+    // conditions coupled with the fact that the degrees of freedom
+    // located at the boundary of the domain remain part of the linear
+    // system we solve, introduces a number of spurious eigenvalues.
+    // Below, we output the interval within which they all lie to
+    // ensure that we can ignore them should they show up in our
+    // computations.
+    double min_spurious_eigenvalue = std::numeric_limits<double>::max(),
+           max_spurious_eigenvalue = -std::numeric_limits<double>::max();
+
+    for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
+      if (constraints.is_constrained(i))
+        {
+          const double ev = stiffness_matrix(i,i)/mass_matrix(i,i);
+          min_spurious_eigenvalue = std::min (min_spurious_eigenvalue, ev);
+          max_spurious_eigenvalue = std::max (max_spurious_eigenvalue, ev);
+        }
+
+    std::cout << "   Spurious eigenvalues are all in the interval "
+              << "[" << min_spurious_eigenvalue << "," << max_spurious_eigenvalue << "]"
+              << std::endl;
+
   }
 
 
