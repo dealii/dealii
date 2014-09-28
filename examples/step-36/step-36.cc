@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2013 by the deal.II authors
+ * Copyright (C) 2009 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -294,25 +294,22 @@ namespace Step36
     mass_matrix.compress (VectorOperation::add);
 
 
-    // Before leaving the function,
-    // we calculate spurious eigenvalues,
+    // Before leaving the function, we calculate spurious eigenvalues,
     // introduced to the system by zero Dirichlet constraints.
-    double min_ev = 1e+10,
-	   max_ev = -min_ev;
+    double min_ev = std::numeric_limits<double>::max(),
+           max_ev = -std::numeric_limits<double>::max();
 
     for (unsigned int ind = 0; ind < dof_handler.n_dofs(); ind++)
       if (constraints.is_constrained(ind))
-	{
-	  const double ev = stiffness_matrix(ind,ind)/mass_matrix(ind,ind);
-	  if ( min_ev > ev )
-	    min_ev = ev;
-	  if ( max_ev < ev )
-	    max_ev = ev;
-	}
+        {
+          const double ev = stiffness_matrix(ind,ind)/mass_matrix(ind,ind);
+          min_ev = std::min (min_ev, ev);
+          max_ev = std::max (max_ev, ev);
+        }
 
     std::cout << "   Spurious eigenvalues are in "
-	<< "["<<min_ev<<":"<<max_ev<<"]"
-	<< std::endl;
+              << "["<<min_ev<<":"<<max_ev<<"]"
+              << std::endl;
 
   }
 
