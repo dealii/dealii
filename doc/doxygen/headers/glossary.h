@@ -549,10 +549,6 @@
  * This argument is required for vectors and matrices starting with the 7.3
  * release.
  *
- * In olde releases we also proposed fake add/set operations. Those were the
- * cause of many bugs and deadlocks, so the usage of VectorOperation is now
- * required.
- *
  * In short, you need to call compress() in the following cases (and only in
  * those cases, though calling compress() in other cases just costs some
  * performance):
@@ -572,6 +568,11 @@
  * into deal.II (VectorTools, ConstraintMatrix, ...) or solvers do not require
  * calls to compress().
  * </dd>
+ *
+ * @note Compressing is an operation that only applies to vectors whose
+ * elements are uniquely owned by one and only one processor in a parallel
+ * MPI universe. It does not apply to
+ * @ref GlossGhostedVector "vectors with ghost elements".
  *
  *
  * <dt class="glossary">@anchor GlossDoF <b>Degree of freedom</b></dt>
@@ -895,6 +896,77 @@
  * dealii::Triangulation class.  </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossGhostedVector <b>Ghosted vectors</b></dt>
+ * <dd>
+ * In parallel computations, vectors come in two general kinds:
+ * without and with ghost elements. Vectors without ghost
+ * elements uniquely partition the vector elements between
+ * processors: each vector entry has exactly one processor that
+ * owns it, and this is the only processor that stores the value
+ * of this entry. In other words, if processor zero stores elements
+ * 0...49 of a vector and processor one stores elements 50...99,
+ * then processor one is out of luck accessing element 42 of this
+ * vector: it is not stored here and the value can not be assessed.
+ * This will result in an assertion.
+ *
+ * On the other hand, there are many situations where one needs to
+ * know vector elements that aren't locally owned, for example to
+ * evaluate the solution on a locally owned cell (see
+ * @ref GlossLocallyOwnedCell) for which one of the degrees of freedom
+ * is at an interface to a cell that we do not own locally (which,
+ * in this case must then be a @ref GlossGhostCell "ghost cell")
+ * and for which the neighboring cell may be the owner -- in other
+ * words, the degree of freedom is not a
+ * @ref GlossLocallyOwnedDof "locally owned" but instead only a
+ * @ref GlossLocallyActiveDof "locally active DoFs". The values of such
+ * degrees of freedom are typically stored on the machine that owns the
+ * degree of freedom and, consequently, would not be accessible on the
+ * current machine.
+ *
+ * Because one often needs these values anyway, there is a second kind of
+ * vector, often called "ghosted vector". Ghosted vectors store some elements
+ * on each processor for which that processor is not the owner.
+ * For such vectors, you can read those elements that the
+ * processor you are currently on stores but you cannot write into them
+ * because to make this work would require propagating the new value to
+ * all other processors that have a copy of this value (the list of
+ * such processors may be something which the current processor does not
+ * know and has no way of finding out efficiently). Since you cannot
+ * write into ghosted vectors, the only way to initialize such a vector
+ * is by assignment from a non-ghosted vector. This implies having to
+ * import those elements we locally want to store from other processors.
+ *
+ * The way ghosted vectors are actually stored is different between the
+ * various implementations of parallel vectors. For PETSc (and the corresponding
+ * PETScWrappers::MPI::Vector class), ghosted vectors store the same
+ * elements as non-ghosted ones would, plus some additional elements
+ * that are owned by other processors. In other words, for each element
+ * there is a clear owner among all of the processors and those elements
+ * that the current processor stores but does not own (i.e., the
+ * "ghost elements") are simply mirror images of a master value somewhere
+ * else -- thus, the name "ghost". This is also the case for the
+ * parallel::distributed::Vector class.
+ *
+ * On the other hand, in Trilinos (and consequently in
+ * TrilinosWrappers::MPI::Vector), a ghosted vector is simply a view
+ * of the parallel vector where the element distributions overlap. The
+ * 'ghosted' Trilinos vector in itself has no idea of which entries
+ * are ghosted and which are locally owned. In fact, a ghosted vector
+ * may not even store all of the elements a non-ghosted vector would
+ * store on the current processor. Consequently, for Trilinos vectors,
+ * there is no notion of an 'owner' of vector elements in the way we
+ * have it in the the non-ghost case view (or in the PETSc case) and
+ * the name "ghost element" may be misleading since in this view,
+ * every element we have available locally may or may not be stored
+ * somewhere else as well, but even if it is, the local element is not
+ * a mirror value of a master location as there is no owner of each
+ * element.
+ *
+ * @note The @ref distributed documentation module provides a brief
+ * overview of where the different kinds of vectors are typically
+ * used.
+ * </dd>
+ *
  * <dt class="glossary">@anchor hp_paper <b>%hp paper</b></dt>
  * <dd>The "hp paper" is a paper by W. Bangerth and O. Kayser-Herold, titled
  * "Data Structures and Requirements for hp Finite Element Software", that
@@ -1000,7 +1072,7 @@ Article{BK07,
  * <dd> Every object that makes up a Triangulation (cells, faces,
  * edges, etc.), is associated with a unique number (of type
  * types::manifol_id) that is used to identify which manifold object
- * is responsible to generate new points when the mesh is refined. 
+ * is responsible to generate new points when the mesh is refined.
  *
  * By default, all manifold indicators of a mesh are set to
  * numbers::invalid_manifold_id. A typical piece of code that sets the
@@ -1010,8 +1082,8 @@ Article{BK07,
  *
  * @code
  * for (typename Triangulation<dim>::active_cell_iterator cell =
- *	triangulation.begin_active();
- *	cell != triangulation.end(); ++cell)
+ *  triangulation.begin_active();
+ *  cell != triangulation.end(); ++cell)
  *   if (cell->center()[0] < 0)
  *     cell->set_manifold_id (42);
  * @endcode

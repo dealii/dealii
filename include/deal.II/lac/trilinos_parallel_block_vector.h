@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -293,6 +293,8 @@ namespace TrilinosWrappers
 
       /**
        * Returns if this Vector contains ghost elements.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       bool has_ghost_elements() const;
 

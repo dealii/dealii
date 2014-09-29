@@ -82,7 +82,9 @@ namespace parallel
      *   communicator)</code>, and retained until the partitioning is changed
      *   again. This allows for efficient parallel communication of indices. In
      *   particular, it stores the communication pattern, rather than having
-     *   to compute it again for every communication.
+     *   to compute it again for every communication. (For more information on
+     *   ghost vectors, see also the
+     *   @ref GlossGhostedVector "glossary entry on vectors with ghost elements".)
      * - Besides the usual global access operator () it is also possible to
      *   access vector entries in the local index space with the function @p
      *   local_element(). Locally owned indices are placed first, [0,
@@ -97,6 +99,7 @@ namespace parallel
      *   Note that the @p insert mode of @p compress() does not set the
      *   elements included in ghost entries but simply discards them, assuming
      *   that the owning processor has set them to the desired value already.
+     *   (See also the @ref GlossCompress "glossary entry on compress".)
      * - The <code>update_ghost_values()</code> function imports the data from
      *   the owning processor to the ghost indices in order to provide read
      *   access to the data associated with ghosts.
@@ -196,6 +199,8 @@ namespace parallel
        * called once for a given layout. Use the constructor with
        * Vector<Number> argument to create additional vectors with the same
        * parallel layout.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const IndexSet &local_range,
               const IndexSet &ghost_indices,
@@ -252,6 +257,8 @@ namespace parallel
        * called once for a given layout. Use the @p reinit function with
        * Vector<Number> argument to create additional vectors with the same
        * parallel layout.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &local_range,
                    const IndexSet &ghost_indices,
@@ -363,7 +370,6 @@ namespace parallel
        * i.e., whenever a non-zero ghost element is found, it is compared to
        * the value on the owning processor and an exception is thrown if these
        * elements do not agree.
-       *
        */
       void compress (::dealii::VectorOperation::values operation);
 
@@ -389,6 +395,8 @@ namespace parallel
        * inner product will always ignore ghost elements in order to avoid
        * counting the ghost data more than once. To allow writing to ghost
        * elements again, call zero_out_ghosts().
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       void update_ghost_values () const;
 
@@ -475,6 +483,8 @@ namespace parallel
        * read-access to ghost elements is prohibited whereas write access is
        * still possible (to those entries specified as ghosts during
        * initialization), not that there are no ghost elements at all.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       bool has_ghost_elements() const;
 

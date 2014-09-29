@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -120,18 +120,19 @@ namespace TrilinosWrappers
      * One particular case, where an MPI message may be generated
      * unexpectedly is discussed below.
      *
+     *
      * <h3>Accessing individual elements of a vector</h3>
      *
-     * Trilinos does allow read access to individual elements of a vector,
-     * but in the distributed case only to elements that are stored
-     * locally. We implement this through calls like
-     * <tt>d=vec(i)</tt>. However, if you access an element outside the
-     * locally stored range, an exception is generated.
+     * Trilinos does of course allow read access to individual
+     * elements of a vector, but in the distributed case only to
+     * elements that are stored locally. We implement this through
+     * calls like <tt>d=vec(i)</tt>. However, if you access an element
+     * outside the locally stored range, an exception is generated.
      *
      * In contrast to read access, Trilinos (and the respective deal.II
      * wrapper classes) allow to write (or add) to individual elements of
      * vectors, even if they are stored on a different process. You can do
-     * this writing by writing into or adding to elements using the syntax
+     * this by writing into or adding to elements using the syntax
      * <tt>vec(i)=d</tt> or <tt>vec(i)+=d</tt>,
      * or similar operations. There is one catch, however, that may lead to
      * very confusing error messages: Trilinos requires application programs
@@ -193,19 +194,23 @@ namespace TrilinosWrappers
      * Parallel vectors come in two kinds: without and with ghost elements.
      * Vectors without ghost elements uniquely partition the vector elements
      * between processors: each vector entry has exactly one processor that
-     * owns it. For such vectors, you can read those elements that you are
-     * owned by the processor you are currently on, and you can write into
+     * owns it. For such vectors, you can read those elements that
+     * the processor you are currently on owns, and you can write into
      * any element whether you own it or not: if you don't own it, the
      * value written or added to a vector element will be shipped to the
      * processor that owns this vector element the next time you call
      * compress(), as described above.
      *
-     * What we call a 'ghosted' vector is simply a view of the
+     * What we call a 'ghosted' vector (see
+     * @ref GlossGhostedVector "vectors with ghost elements")
+     * is simply a view of the
      * parallel vector where the element distributions overlap. The 'ghosted'
      * Trilinos vector in itself has no idea of which entries are ghosted and
-     * which are locally owned. In particular, there is no notion of
-     * an 'owner' of vector selement in the way we have it in the
-     * the non-ghost case view.
+     * which are locally owned. In fact, a ghosted vector
+     * may not even store all of the elements a non-ghosted vector would
+     * store on the current processor.  Consequently, for Trilinos vectors,
+     * there is no notion of an 'owner' of vector elements in the way we
+     * have it in the the non-ghost case view.
      *
      * This explains why we do not allow writing into ghosted vectors on the
      * Trilinos side: Who would be responsible for taking care of the
@@ -385,6 +390,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       explicit Vector (const Epetra_Map &parallel_partitioning);
 
@@ -398,6 +405,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const Epetra_Map &parallel_partitioning,
               const VectorBase &v);
@@ -410,6 +419,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       template <typename number>
       void reinit (const Epetra_Map             &parallel_partitioner,
@@ -423,6 +434,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const Epetra_Map &parallel_partitioning,
                    const bool        fast = false);
@@ -435,6 +448,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       template <typename Number>
       Vector (const Epetra_Map             &parallel_partitioning,
@@ -454,6 +469,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       explicit Vector (const IndexSet &parallel_partitioning,
                        const MPI_Comm &communicator = MPI_COMM_WORLD);
@@ -465,6 +482,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const IndexSet &local,
               const IndexSet &ghost,
@@ -480,6 +499,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const IndexSet   &parallel_partitioning,
               const VectorBase &v,
@@ -493,6 +514,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       template <typename Number>
       Vector (const IndexSet               &parallel_partitioning,
@@ -510,6 +533,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &parallel_partitioning,
                    const MPI_Comm &communicator = MPI_COMM_WORLD,
@@ -537,6 +562,8 @@ namespace TrilinosWrappers
        * subdivides elements among processors or not, the resulting vector
        * may or may not have ghost elements. See the general documentation of
        * this class for more information.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &locally_owned_entries,
                    const IndexSet &ghost_entries,

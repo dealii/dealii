@@ -420,6 +420,8 @@ namespace TrilinosWrappers
     /**
      * Return if the vector contains ghost elements. This answer is true if
      * there are ghost elements on at least one process.
+     *
+     * @see @ref GlossGhostedVector "vectors with ghost elements"
      */
     bool has_ghost_elements() const;
 

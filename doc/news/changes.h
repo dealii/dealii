@@ -117,6 +117,12 @@ inconvenience this causes.
   (Denis Davydov, Wolfgang Bangerth, 2014/09/28)
   </li>
 
+  <li> New: The glossary now contains an extensive entry on ghosted and
+  non-ghosted vectors (see @ref GlossGhostedVector
+  <br>
+  (Wolfgang Bangerth, 2014/09/27)
+  </li>
+
   <li> New: Made MappingQ<dim,spacedim> aware of
   Manifold<dim,spacedim>. Now we can use high order mappings that
   actually follow the geometry also on the interior of codimension
