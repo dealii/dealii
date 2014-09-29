@@ -301,6 +301,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The vector and array versions of Utilities::MPI::sum() and
+  Utilities::MPI::max() produced segmentation faults with some MPI implementations
+  if the input and output arguments were the same. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2014/09/29)
+  </li>
+
   <li> Fixed: Trying to have FE_Q(p) and FE_DGQ(r) elements next to each
   other in an hp::DoFHandler object led to assertions saying that these two
   elements don't know how to compute interface constraints where such

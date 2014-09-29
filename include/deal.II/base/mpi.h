@@ -138,6 +138,8 @@ namespace Utilities
      * array of length N. In other words, the i-th element of the results
      * array is the sum over the i-th entries of the input arrays from each
      * processor.
+     *
+     * Input and output arrays may be the same.
      */
     template <typename T, unsigned int N>
     inline
@@ -149,6 +151,8 @@ namespace Utilities
      * Like the previous function, but take the sums over the elements of a
      * std::vector. In other words, the i-th element of the results array is
      * the sum over the i-th entries of the input arrays from each processor.
+     *
+     * Input and output vectors may be the same.
      */
     template <typename T>
     inline
@@ -184,6 +188,8 @@ namespace Utilities
      * array of length N. In other words, the i-th element of the results
      * array is the maximum of the i-th entries of the input arrays from each
      * processor.
+     *
+     * Input and output arrays may be the same.
      */
     template <typename T, unsigned int N>
     inline
@@ -196,6 +202,8 @@ namespace Utilities
      * std::vector. In other words, the i-th element of the results array is
      * the maximum over the i-th entries of the input arrays from each
      * processor.
+     *
+     * Input and output vectors may be the same.
      */
     template <typename T>
     inline
@@ -415,7 +423,11 @@ namespace Utilities
               T (&sums)[N])
     {
 #ifdef DEAL_II_WITH_MPI
-      MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&values[0])),
+      MPI_Allreduce ((&values[0] != &sums[0]
+                      ?
+                      const_cast<void *>(static_cast<const void *>(&values[0]))
+                      :
+                      MPI_IN_PLACE),
                      &sums[0], N, internal::mpi_type_id(values), MPI_SUM,
                      mpi_communicator);
 #else
@@ -434,7 +446,11 @@ namespace Utilities
     {
 #ifdef DEAL_II_WITH_MPI
       sums.resize (values.size());
-      MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&values[0])),
+      MPI_Allreduce ((&values[0] != &sums[0]
+                      ?
+                      const_cast<void *>(static_cast<const void *>(&values[0]))
+                      :
+                      MPI_IN_PLACE),
                      &sums[0], values.size(), internal::mpi_type_id((T *)0), MPI_SUM,
                      mpi_communicator);
 #else
@@ -469,7 +485,11 @@ namespace Utilities
               T (&maxima)[N])
     {
 #ifdef DEAL_II_WITH_MPI
-      MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&values[0])),
+      MPI_Allreduce ((&values[0] != &maxima[0]
+                      ?
+                      const_cast<void *>(static_cast<const void *>(&values[0]))
+                      :
+                      MPI_IN_PLACE),
                      &maxima[0], N, internal::mpi_type_id(values), MPI_MAX,
                      mpi_communicator);
 #else
@@ -488,7 +508,11 @@ namespace Utilities
     {
 #ifdef DEAL_II_WITH_MPI
       maxima.resize (values.size());
-      MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&values[0])),
+      MPI_Allreduce ((&values[0] != &maxima[0]
+                      ?
+                      const_cast<void *>(static_cast<const void *>(&values[0]))
+                      :
+                      MPI_IN_PLACE),
                      &maxima[0], values.size(), internal::mpi_type_id((T *)0), MPI_MAX,
                      mpi_communicator);
 #else
