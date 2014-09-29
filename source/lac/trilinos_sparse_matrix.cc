@@ -392,12 +392,13 @@ namespace TrilinosWrappers
     nonlocal_matrix.reset();
     nonlocal_matrix_exporter.reset();
 
-    // check whether we need to update the
-    // partitioner or can just copy the data:
-    // in case we have the same distribution,
-    // we can just copy the data.
-    if (local_range() == m.local_range())
-      *matrix = *m.matrix;
+    // check whether we need to update the partitioner or can just copy the
+    // data: in case we have the same distribution, we can just copy the data.
+    if (&matrix->Graph() == &m.matrix->Graph() && m.matrix->Filled())
+      {
+        std::memcpy(matrix->ExpertExtractValues(), m.matrix->ExpertExtractValues(),
+                    matrix->NumMyNonzeros()*sizeof(*matrix->ExpertExtractValues()));
+      }
     else
       {
         column_space_map.reset (new Epetra_Map (m.domain_partitioner()));
@@ -410,7 +411,7 @@ namespace TrilinosWrappers
     if (m.nonlocal_matrix.get() != 0)
       nonlocal_matrix.reset(new Epetra_CrsMatrix(Copy, m.nonlocal_matrix->Graph()));
 
-    compress();
+    matrix->FillComplete(*column_space_map, matrix->RowMap());
   }
 
 
