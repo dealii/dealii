@@ -221,30 +221,40 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
   #
   # - Matthias Maier, 2014
   #
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <boost/signals2/signal.hpp>
-    using namespace boost::signals2;
 
-    class Order {};
+  #
+  # Use bundled boost headers for this regression test because external
+  # features (such as boost) are not yet configured at this point. If we
+  # have no bundled directory available, skip the test.
+  #
+  IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      #include <${BOOST_FOLDER}/include/boost/signals2/signal.hpp>
+      using namespace boost::signals2;
 
-    class Foo
-    {
-     signal<void(Order*)> beforeOrder;
-     void test(Order* o)
-     {
-      beforeOrder(o);
-     }
-    };
+      class Order {};
 
-    int main()
-    {
-     Order o;
-     Foo foo;
-     return 0;
-    }
-    "
-    DEAL_II_HAVE_CXX11_ICCBOOSTSIGNALSBUG_OK)
+      class Foo
+      {
+       signal<void(Order*)> beforeOrder;
+       void test(Order* o)
+       {
+        beforeOrder(o);
+       }
+      };
+
+      int main()
+      {
+       Order o;
+       Foo foo;
+       return 0;
+      }
+      "
+      DEAL_II_HAVE_CXX11_ICCBOOSTSIGNALSBUG_OK)
+  ELSE()
+    SET(DEAL_II_HAVE_CXX11_ICCBOOSTSIGNALSBUG_OK TRUE)
+  ENDIF()
 
 
   IF( DEAL_II_HAVE_CXX11_ARRAY AND
