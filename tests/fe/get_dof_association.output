@@ -1,0 +1,15 @@
+
+DEAL::FE_Q<1>(2)
+DEAL::vvl
+DEAL::FE_Q<2>(2)
+DEAL::vvvvllllq
+DEAL::FE_Q<3>(2)
+DEAL::vvvvvvvvllllllllllllqqqqqqh
+DEAL::FE_Nedelec<2>(0)
+DEAL::llll
+DEAL::FE_Nedelec<3>(0)
+DEAL::llllllllllll
+DEAL::FE_Nedelec<2>(1)
+DEAL::llllllllqqqq
+DEAL::FE_Nedelec<3>(1)
+DEAL::llllllllllllllllllllllllqqqqqqqqqqqqqqqqqqqqqqqqhhhhhh
