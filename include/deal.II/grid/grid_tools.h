@@ -354,6 +354,26 @@ namespace GridTools
                        Triangulation<dim, spacedim> &triangulation,
                        const bool   keep_boundary=true);
 
+  /**
+   * When vertices have been moved locally, this function updates the
+   * location of the vertices in the ghost layer on all MPI processes.
+   *
+   * All the vertices that have been moved and might be in the ghost layer
+   * of a process have to be reported to  @p vertex_locally_moved.
+   * This ensures that we reduce the information that has to be send
+   * between processes. Additionally, it is quite important that vertices
+   * on the boundary between processes are reported on exactly one process
+   * (e.g. the one with the highest id). Otherwise we could expect
+   * undesirable results if multiple processes move a vertex differently.
+   *
+   * This functions needs not to be called if all MPI processes know
+   * how the position of all the vertices changed.
+   */
+  template <int dim, int spacedim>
+  void
+  communicate_locally_moved_vertices (parallel::distributed::Triangulation<dim, spacedim> &triangulation,
+                                      const std::vector<bool> &vertex_locally_moved);
+
   /*@}*/
   /**
    *  @name Finding cells and vertices of a triangulation
