@@ -345,6 +345,14 @@ inconvenience this causes.
   (Fahad Alrashed, 2014/11/09)
   </li>
 
+  <li> New: GridTools::communicate_locally_moved_vertices allows to
+  update vertex positions that have been moved just locally on distributed
+  meshes. GridTools::distort_random now works for distributed meshes and 
+  hanging nodes in 3D as well.
+  <br>
+  (Daniel Arndt, 2014/11/06)
+  </li>
+
   <li> New: The FE_Nothing class now has a second template argument
   corresponding to the space dimension in which the mesh is embedded,
   like many other classes. This allows to use this element in codimension
