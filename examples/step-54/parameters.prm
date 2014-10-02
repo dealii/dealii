@@ -1,6 +1,6 @@
 # Listing of Parameters
 # ---------------------
-set Number of cycles                = 6
+set Number of cycles                = 7
 
 
 subsection Quadrature rules

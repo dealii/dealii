@@ -99,14 +99,55 @@ namespace OpenCASCADE
   {
     TopoDS_Shape out_shape;
     double u=0, v=0;
+    Point<3> average_normal(0.0,0.0,0.0);
     for (unsigned int i=0; i<surrounding_points.size(); ++i)
-      Assert(closest_point(sh, surrounding_points[i], out_shape, u, v)
-             .distance(surrounding_points[i]) < (surrounding_points[i].norm()>0 ?
-                                                 tolerance*surrounding_points[i].norm() :
-                                                 tolerance),
+        {
+        Point<3> surface_normal;
+        double mean_curvature;
+        Assert(closest_point_and_differential_forms(sh, surrounding_points[i], surface_normal, mean_curvature)
+               .distance(surrounding_points[i]) <
+             1e3*std::max(tolerance*surrounding_points[i].norm(), tolerance),
              ExcPointNotOnManifold(surrounding_points[i]));
+        average_normal += surface_normal;
+        }
 
-    return line_intersection(sh, candidate, direction, tolerance);
+    average_normal/=surrounding_points.size();
+
+    if (surrounding_points.size() == 2)
+       {
+       Point<3> P = (surrounding_points[0]+surrounding_points[1])/2;
+       Point<3> N = surrounding_points[0]-surrounding_points[1];
+       N = N/sqrt(N.square());
+       average_normal = average_normal-(average_normal*N)*N;
+       average_normal = average_normal/sqrt(average_normal.square());
+       }
+    else if (surrounding_points.size() == 8)
+       {
+       //cout<<"Ps = ["<<endl;
+       //for (unsigned int i=0; i<surrounding_points.size(); ++i)
+       //    cout<<surrounding_points[i]<<endl;
+       //cout<<"]"<<endl;
+       Point<3> u = surrounding_points[1]-surrounding_points[0];
+       Point<3> v = surrounding_points[2]-surrounding_points[0];
+       Point<3> n1(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(1)*v(1)-u(1)*v(0));
+       n1 = n1/n1.norm();
+       u = surrounding_points[2]-surrounding_points[3];
+       v = surrounding_points[1]-surrounding_points[3];
+       Point<3> n2(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(1)*v(1)-u(1)*v(0));
+       n2 = n2/n2.norm();
+
+       average_normal = (n1+n2)/2.0;
+       average_normal = average_normal/average_normal.norm();
+       }
+
+  
+    average_normal = average_normal/sqrt(average_normal.square());
+    // if for any reason the normals have zero average, just use the direction
+    // specified at the construction of the projector. Otherwise use "local" normal estimate    
+    if (average_normal.norm() < 0.9)
+       return axis_intersection(sh, candidate, direction, tolerance);
+    else
+       return axis_intersection(sh, candidate, average_normal, tolerance);
   }
 
   /*============================== ArclengthProjectionLineManifold ==============================*/

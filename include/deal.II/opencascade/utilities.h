@@ -223,6 +223,22 @@ namespace OpenCASCADE
                          double &v,
                          const double tolerance=1e-7);
 
+
+  /**
+   * Get the closest point to the given topological shape. If the
+   * shape is not elementary, all its subshapes are iterated, faces
+   * first, then edges, and the closest point is returned together
+   * with the shape which contains it, and the u v coordinates of the
+   * point. If the returned shape is an edge, then only the u
+   * coordinate is filled with sensible information, and the v
+   * coordinate is set to zero.
+   */
+  Point<3>  closest_point_and_differential_forms(const TopoDS_Shape in_shape,
+                                                 const Point<3> origin,
+                                                 Point<3> &surface_normal,
+                                                 double &mean_curvature,
+                                                 const double tolerance=1e-7);
+
   /**
    * Intersect a line passing through the given @p origin point along
    * @p direction and the given topological shape. If there is more than
