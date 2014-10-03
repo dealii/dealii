@@ -166,11 +166,15 @@ namespace PETScWrappers
        * Create a sparse matrix of
        * dimensions @p m times @p n, with
        * an initial guess of @p
-       * n_nonzero_per_row nonzero elements
-       * per row. PETSc is able to cope
-       * with the situation that more than
-       * this number of elements are later
-       * allocated for a row, but this
+       * n_nonzero_per_row and @p
+       * n_offdiag_nonzero_per_row nonzero
+       * elements per row (see documentation
+       * of the MatCreateAIJ PETSc function
+       * for more information about these
+       * parameters). PETSc is able to
+       * cope with the situation that more
+       * than this number of elements are
+       * later allocated for a row, but this
        * involves copying data, and is thus
        * expensive.
        *
@@ -198,14 +202,17 @@ namespace PETScWrappers
                     const size_type  local_rows,
                     const size_type  local_columns,
                     const size_type  n_nonzero_per_row,
-                    const bool       is_symmetric = false);
+                    const bool       is_symmetric = false,
+                    const size_type  n_offdiag_nonzero_per_row = 0);
 
       /**
        * Initialize a rectangular matrix
        * with @p m rows and @p n columns.
        * The maximal number of nonzero
-       * entries for each row separately is
-       * given by the @p row_lengths array.
+       * entries for diagonal and off-
+       * diagonal blocks of each row is
+       * given by the @p row_lengths and
+       * @p offdiag_row_lengths arrays.
        *
        * For the meaning of the @p
        * local_row and @p local_columns
@@ -239,7 +246,8 @@ namespace PETScWrappers
                     const size_type               local_rows,
                     const size_type               local_columns,
                     const std::vector<size_type> &row_lengths,
-                    const bool                    is_symmetric = false);
+                    const bool                    is_symmetric = false,
+                    const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Initialize using the given
@@ -328,7 +336,8 @@ namespace PETScWrappers
                    const size_type local_rows,
                    const size_type local_columns,
                    const size_type n_nonzero_per_row,
-                   const bool      is_symmetric = false);
+                   const bool      is_symmetric = false,
+                   const size_type n_offdiag_nonzero_per_row = 0);
 
       /**
        * Throw away the present matrix and
@@ -344,7 +353,8 @@ namespace PETScWrappers
                    const size_type               local_rows,
                    const size_type               local_columns,
                    const std::vector<size_type> &row_lengths,
-                   const bool                    is_symmetric = false);
+                   const bool                    is_symmetric = false,
+                   const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Initialize using the given
@@ -482,7 +492,8 @@ namespace PETScWrappers
                       const size_type local_rows,
                       const size_type local_columns,
                       const size_type n_nonzero_per_row,
-                      const bool      is_symmetric = false);
+                      const bool      is_symmetric = false,
+                      const size_type n_offdiag_nonzero_per_row = 0);
 
       /**
        * Same as previous function.
@@ -492,7 +503,8 @@ namespace PETScWrappers
                       const size_type               local_rows,
                       const size_type               local_columns,
                       const std::vector<size_type> &row_lengths,
-                      const bool                    is_symmetric = false);
+                      const bool                    is_symmetric = false,
+                      const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Same as previous functions.
