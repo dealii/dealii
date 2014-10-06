@@ -376,6 +376,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: Add MueLu preconditioner from Trilinos. This is a new algebraic 
+  multigrid package. The input parameters are almost the same as the ones 
+  from ML so that the two preconditioners can be easily swapped.
+  <br>
+  (Bruno Turcksin, 2015/03/11)
+  </li>
+
   <li> Fixed: Iterating over the elements of a TrilinosWrappers::SparseMatrix
   object previously led to errors if the matrix was in fact stored in
   parallel across multiple MPI processes. This is now fixed: rows not
