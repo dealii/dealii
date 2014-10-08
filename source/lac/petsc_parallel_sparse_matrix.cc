@@ -60,12 +60,14 @@ namespace PETScWrappers
                                 const size_type  local_rows,
                                 const size_type  local_columns,
                                 const size_type  n_nonzero_per_row,
-                                const bool       is_symmetric)
+                                const bool       is_symmetric,
+                                const size_type  n_offdiag_nonzero_per_row)
       :
       communicator (communicator)
     {
       do_reinit (m, n, local_rows, local_columns,
-                 n_nonzero_per_row, is_symmetric);
+                 n_nonzero_per_row, is_symmetric,
+                 n_offdiag_nonzero_per_row);
     }
 
 
@@ -76,12 +78,13 @@ namespace PETScWrappers
                                 const size_type               local_rows,
                                 const size_type               local_columns,
                                 const std::vector<size_type> &row_lengths,
-                                const bool                    is_symmetric)
+                                const bool                    is_symmetric,
+                                const std::vector<size_type> &offdiag_row_lengths)
       :
       communicator (communicator)
     {
       do_reinit (m, n, local_rows, local_columns,
-                 row_lengths, is_symmetric);
+                 row_lengths, is_symmetric, offdiag_row_lengths);
     }
 
 
@@ -130,7 +133,8 @@ namespace PETScWrappers
                           const size_type  local_rows,
                           const size_type  local_columns,
                           const size_type  n_nonzero_per_row,
-                          const bool       is_symmetric)
+                          const bool       is_symmetric,
+                          const size_type  n_offdiag_nonzero_per_row)
     {
       this->communicator = communicator;
 
@@ -144,7 +148,8 @@ namespace PETScWrappers
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       do_reinit (m, n, local_rows, local_columns,
-                 n_nonzero_per_row, is_symmetric);
+                 n_nonzero_per_row, is_symmetric,
+                 n_offdiag_nonzero_per_row);
     }
 
 
@@ -156,7 +161,8 @@ namespace PETScWrappers
                           const size_type               local_rows,
                           const size_type               local_columns,
                           const std::vector<size_type> &row_lengths,
-                          const bool                    is_symmetric)
+                          const bool                    is_symmetric,
+                          const std::vector<size_type> &offdiag_row_lengths)
     {
       this->communicator = communicator;
 
@@ -169,7 +175,8 @@ namespace PETScWrappers
 #endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      do_reinit (m, n, local_rows, local_columns, row_lengths, is_symmetric);
+      do_reinit (m, n, local_rows, local_columns,
+                 row_lengths, is_symmetric, offdiag_row_lengths);
     }
 
 
@@ -228,7 +235,8 @@ namespace PETScWrappers
                              const size_type local_rows,
                              const size_type local_columns,
                              const size_type n_nonzero_per_row,
-                             const bool      is_symmetric)
+                             const bool      is_symmetric,
+                             const size_type n_offdiag_nonzero_per_row)
     {
       Assert (local_rows <= m, ExcLocalRowsTooLarge (local_rows, m));
 
@@ -242,14 +250,16 @@ namespace PETScWrappers
         = MatCreateMPIAIJ (communicator,
                            local_rows, local_columns,
                            m, n,
-                           n_nonzero_per_row, 0, 0, 0,
+                           n_nonzero_per_row, 0,
+                           n_offdiag_nonzero_per_row, 0,
                            &matrix);
 #else
       ierr
         = MatCreateAIJ (communicator,
                         local_rows, local_columns,
                         m, n,
-                        n_nonzero_per_row, 0, 0, 0,
+                        n_nonzero_per_row, 0,
+                        n_offdiag_nonzero_per_row, 0,
                         &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -280,7 +290,8 @@ namespace PETScWrappers
                              const size_type local_rows,
                              const size_type local_columns,
                              const std::vector<size_type> &row_lengths,
-                             const bool      is_symmetric)
+                             const bool      is_symmetric,
+                             const std::vector<size_type> &offdiag_row_lengths)
     {
       Assert (local_rows <= m, ExcLocalRowsTooLarge (local_rows, m));
 
@@ -307,6 +318,8 @@ namespace PETScWrappers
       // tricks with conversions of pointers
       const std::vector<PetscInt> int_row_lengths (row_lengths.begin(),
                                                    row_lengths.end());
+      const std::vector<PetscInt> int_offdiag_row_lengths (offdiag_row_lengths.begin(),
+                                                           offdiag_row_lengths.end());
 
 //TODO: There must be a significantly better way to provide information about the off-diagonal blocks of the matrix. this way, petsc keeps allocating tiny chunks of memory, and gets completely hung up over this
 
@@ -317,14 +330,16 @@ namespace PETScWrappers
         = MatCreateMPIAIJ (communicator,
                            local_rows, local_columns,
                            m, n,
-                           0, &int_row_lengths[0], 0, 0,
+                           0, &int_row_lengths[0],
+                           0, offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
                            &matrix);
 #else
       ierr
         = MatCreateAIJ (communicator,
                         local_rows, local_columns,
                         m, n,
-                        0, &int_row_lengths[0], 0, 0,
+                        0, &int_row_lengths[0],
+                        0, offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
                         &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
