@@ -175,7 +175,7 @@ namespace PETScWrappers
 #endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      do_reinit (m, n, local_rows, local_columns, 
+      do_reinit (m, n, local_rows, local_columns,
                  row_lengths, is_symmetric, offdiag_row_lengths);
     }
 
@@ -250,7 +250,7 @@ namespace PETScWrappers
         = MatCreateMPIAIJ (communicator,
                            local_rows, local_columns,
                            m, n,
-                           n_nonzero_per_row, 0, 
+                           n_nonzero_per_row, 0,
                            n_offdiag_nonzero_per_row, 0,
                            &matrix);
 #else
@@ -258,7 +258,7 @@ namespace PETScWrappers
         = MatCreateAIJ (communicator,
                         local_rows, local_columns,
                         m, n,
-                        n_nonzero_per_row, 0, 
+                        n_nonzero_per_row, 0,
                         n_offdiag_nonzero_per_row, 0,
                         &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -330,7 +330,7 @@ namespace PETScWrappers
         = MatCreateMPIAIJ (communicator,
                            local_rows, local_columns,
                            m, n,
-                           0, &int_row_lengths[0], 
+                           0, &int_row_lengths[0],
                            0, offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
                            &matrix);
 #else
@@ -338,7 +338,7 @@ namespace PETScWrappers
         = MatCreateAIJ (communicator,
                         local_rows, local_columns,
                         m, n,
-                        0, &int_row_lengths[0], 
+                        0, &int_row_lengths[0],
                         0, offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : 0,
                         &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));

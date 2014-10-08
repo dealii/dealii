@@ -167,13 +167,13 @@ namespace PETScWrappers
        * dimensions @p m times @p n, with
        * an initial guess of @p
        * n_nonzero_per_row and @p
-       * n_offdiag_nonzero_per_row nonzero 
-       * elements per row (see documentation 
-       * of the MatCreateAIJ PETSc function 
-       * for more information about these 
-       * parameters). PETSc is able to 
-       * cope with the situation that more 
-       * than this number of elements are 
+       * n_offdiag_nonzero_per_row nonzero
+       * elements per row (see documentation
+       * of the MatCreateAIJ PETSc function
+       * for more information about these
+       * parameters). PETSc is able to
+       * cope with the situation that more
+       * than this number of elements are
        * later allocated for a row, but this
        * involves copying data, and is thus
        * expensive.
@@ -211,7 +211,7 @@ namespace PETScWrappers
        * The maximal number of nonzero
        * entries for diagonal and off-
        * diagonal blocks of each row is
-       * given by the @p row_lengths and 
+       * given by the @p row_lengths and
        * @p offdiag_row_lengths arrays.
        *
        * For the meaning of the @p
@@ -354,7 +354,7 @@ namespace PETScWrappers
                    const size_type               local_columns,
                    const std::vector<size_type> &row_lengths,
                    const bool                    is_symmetric = false,
-		   const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
+                   const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Initialize using the given
@@ -504,7 +504,7 @@ namespace PETScWrappers
                       const size_type               local_columns,
                       const std::vector<size_type> &row_lengths,
                       const bool                    is_symmetric = false,
-		      const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
+                      const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Same as previous functions.
