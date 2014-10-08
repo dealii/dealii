@@ -38,7 +38,7 @@ SET_IF_EMPTY(BLACS_DIR "$ENV{BLACS_DIR}")
 # Search for scalapack:
 #
 
-DEAL_II_FIND_LIBRARY(SCALAPACK_LIBRARY NAMES scalapack
+DEAL_II_FIND_LIBRARY(SCALAPACK_LIBRARY NAMES scalapack scalapack-openmpi
   HINTS ${SCALAPACK_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
@@ -51,7 +51,7 @@ DEAL_II_FIND_LIBRARY(SCALAPACK_LIBRARY NAMES scalapack
 FOREACH(_lib blacs blacsCinit blacsF77init)
   STRING(TOUPPER "${_lib}" _lib_upper)
   DEAL_II_FIND_LIBRARY(${_lib_upper}_LIBRARY
-    NAMES ${_lib} ${_lib}_MPI-LINUX-0 ${_lib}_MPI-DARWIN-0
+    NAMES ${_lib} ${_lib}_MPI-LINUX-0 ${_lib}_MPI-DARWIN-0 ${_lib}-openmpi
     HINTS ${BLACS_DIR} ${SCALAPACK_DIR} ${SCALAPACK_DIR}/../blacs/
     PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib LIB
   )
