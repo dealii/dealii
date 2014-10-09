@@ -1239,9 +1239,10 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
 template<int dim, int spacedim>
 void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe)
 {
+  Assert(levels.size()>0, ExcMessage("Distribute active DoFs using distribute_dofs() before calling distribute_mg_dofs()."));
+
   const FiniteElement<dim, spacedim> *old_fe = selected_fe;
-  Assert((old_fe==NULL) || (old_fe == &fe), ExcMessage("you are required to use the same FE for level and active DoFs!") );
-  selected_fe = &fe;
+  Assert(old_fe == &fe, ExcMessage("You are required to use the same FE for level and active DoFs!") );
 
   clear_mg_space();
 
@@ -1311,6 +1312,8 @@ template <int dim, int spacedim>
 void
 DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_index> &new_numbers)
 {
+  Assert(levels.size()>0, ExcMessage("You need to distribute DoFs before you can renumber them."));
+
   Assert (new_numbers.size() == n_locally_owned_dofs(),
           ExcRenumberingIncomplete());
 
@@ -1356,6 +1359,8 @@ template<>
 void DoFHandler<1>::renumber_dofs (const unsigned int level,
                                    const std::vector<types::global_dof_index> &new_numbers)
 {
+  Assert(mg_levels.size()>0 && levels.size()>0,
+         ExcMessage("You need to distribute active and level DoFs before you can renumber level DoFs."));
   Assert (new_numbers.size() == n_dofs(level), DoFHandler<1>::ExcRenumberingIncomplete());
 
   // note that we can not use cell iterators
@@ -1390,6 +1395,8 @@ template<>
 void DoFHandler<2>::renumber_dofs (const unsigned int  level,
                                    const std::vector<types::global_dof_index>  &new_numbers)
 {
+  Assert(mg_levels.size()>0 && levels.size()>0,
+         ExcMessage("You need to distribute active and level DoFs before you can renumber level DoFs."));
   Assert (new_numbers.size() == n_dofs(level),
           DoFHandler<2>::ExcRenumberingIncomplete());
 
@@ -1447,6 +1454,8 @@ template<>
 void DoFHandler<3>::renumber_dofs (const unsigned int  level,
                                    const std::vector<types::global_dof_index>  &new_numbers)
 {
+  Assert(mg_levels.size()>0 && levels.size()>0,
+         ExcMessage("You need to distribute active and level DoFs before you can renumber level DoFs."));
   Assert (new_numbers.size() == n_dofs(level),
           DoFHandler<3>::ExcRenumberingIncomplete());
 
