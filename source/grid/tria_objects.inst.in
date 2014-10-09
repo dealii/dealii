@@ -17,20 +17,20 @@
 for (deal_II_dimension : DIMENSIONS)
   {
 #if deal_II_dimension >= 2
-    template dealii::TriaRawIterator<dealii::TriaAccessor<1,deal_II_dimension,deal_II_dimension> >
+    template dealii::TriaRawIterator<dealii::TriaAccessor<TriaObject<1>::dimension,deal_II_dimension,deal_II_dimension> >
     TriaObjects<TriaObject<1> >::next_free_single_object (const dealii::Triangulation<deal_II_dimension> &tria);
-    template dealii::TriaRawIterator<dealii::TriaAccessor<1,deal_II_dimension,deal_II_dimension> >
+    template dealii::TriaRawIterator<dealii::TriaAccessor<TriaObject<1>::dimension,deal_II_dimension,deal_II_dimension> >
     TriaObjects<TriaObject<1> >::next_free_pair_object (const dealii::Triangulation<deal_II_dimension> &tria);
-    template dealii::TriaRawIterator<dealii::TriaAccessor<2,deal_II_dimension,deal_II_dimension> >
+    template dealii::TriaRawIterator<dealii::TriaAccessor<TriaObject<2>::dimension,deal_II_dimension,deal_II_dimension> >
     TriaObjects<TriaObject<2> >::next_free_single_object (const dealii::Triangulation<deal_II_dimension> &tria);
-    template dealii::TriaRawIterator<dealii::TriaAccessor<2,deal_II_dimension,deal_II_dimension> >
+    template dealii::TriaRawIterator<dealii::TriaAccessor<TriaObject<2>::dimension,deal_II_dimension,deal_II_dimension> >
     TriaObjects<TriaObject<2> >::next_free_pair_object (const dealii::Triangulation<deal_II_dimension> &tria);
 #endif
 
 #if deal_II_dimension >= 3
-    template dealii::TriaRawIterator<dealii::TriaAccessor<3,deal_II_dimension,deal_II_dimension> >
+    template dealii::TriaRawIterator<dealii::TriaAccessor<TriaObject<3>::dimension,deal_II_dimension,deal_II_dimension> >
     TriaObjects<TriaObject<3> >::next_free_single_object (const dealii::Triangulation<deal_II_dimension> &tria);
-    template dealii::TriaRawIterator<dealii::TriaAccessor<3,deal_II_dimension,deal_II_dimension> >
+    template dealii::TriaRawIterator<dealii::TriaAccessor<TriaObject<3>::dimension,deal_II_dimension,deal_II_dimension> >
     TriaObjects<TriaObject<3> >::next_free_pair_object (const dealii::Triangulation<deal_II_dimension> &tria);
 
     template dealii::Triangulation<deal_II_dimension>::raw_hex_iterator
