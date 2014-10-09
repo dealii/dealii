@@ -550,7 +550,7 @@ public:
    * resulting from face integrals can be assumed to be zero and may therefore
    * be omitted from integration.
    *
-   * A default implementation is provided in this basa class which always
+   * A default implementation is provided in this base class which always
    * returns @p true. This is the safe way to go.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
