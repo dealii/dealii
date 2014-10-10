@@ -3245,8 +3245,6 @@ typename DoFCellAccessor<DH,level_dof_access>::face_iterator
 DoFCellAccessor<DH,level_dof_access>::face (const unsigned int i) const
 {
   Assert (i<GeometryInfo<dim>::faces_per_cell, ExcIndexRange (i, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (static_cast<unsigned int>(this->level()) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
 
   const unsigned int dim = DH::dimension;
   return dealii::internal::DoFCellAccessor::get_face (*this, i, dealii::internal::int2type<dim>());
