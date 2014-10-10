@@ -372,8 +372,11 @@ public:
   virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe);
 
   /**
-   * Distribute multigrid degrees of freedom similar
-   * to distribute_dofs() but on each level.
+   * Distribute level degrees of freedom on each level for geometric
+   * multigrid. The active DoFs need to be distributed using distribute_dofs()
+   * before calling this function and the @p fe needs to be identical to the
+   * finite element passed to distribute_dofs().
+   *
    * This replaces the functionality of the old MGDoFHandler.
    */
   virtual void distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe);
