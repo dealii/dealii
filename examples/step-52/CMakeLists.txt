@@ -19,6 +19,9 @@ SET(TARGET_SRC
   ${TARGET}.cc
   )
 
+# Define the output that should be cleaned:
+SET(CLEAN_UP_FILES *.vtu)
+
 # Usually, you will not need to modify anything beyond this point...
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
