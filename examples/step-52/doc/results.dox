@@ -1,10 +1,10 @@
 <h1>Results</h1>
 
-The point of this program is less to show partcular results, but instead to
-show how it is done and that we have already demonstrated using the code
-above. Consequently, the output the program yields is relatively sparse and
-consists only of the console output and the solutions given in
-VTU format for visualization.
+The point of this program is less to show particular results, but instead to
+show how it is done. This we have already demonstrated simply by discussing
+the code above. Consequently, the output the program yields is relatively
+sparse and consists only of the console output and the solutions given in VTU
+format for visualization.
 
 The console output contains both errors and, for some of the methods, the
 number of steps they performed:
@@ -20,7 +20,7 @@ Implicit Midpoint:        error=0.00862702
 Crank-Nicolson:           error=0.00862675
 SDIRK:                    error=0.0042349
 
-Embedded explicit methods:
+Embedded %explicit methods:
 Heun-Euler:               error=0.0073012
                 steps performed=284
 Bogacki-Shampine:         error=0.000207511
