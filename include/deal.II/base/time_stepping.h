@@ -314,9 +314,10 @@ namespace TimeStepping
      * is the function $ f(t,y) $ that should be integrated, the input
      * parameters are the time t and the vector y and the output is value of
      * f at this point. @p id_minus_tau_J_inverse is a function that computes
-     * $ inv(I-\tau J)$ where $ I $ is the identity matrix, $ \tau
-     * $ is given, and $ J $ is the Jacobian $ \frac{\partial
-     * J}{\partial y} $. The input parameters are the time, $ \tau $, and
+     * $ (I-\tau J)^{-1}$ where $ I $ is the identity matrix, $ \tau $
+     * is given, and $ J $ is the Jacobian $ \frac{\partial
+     * J}{\partial y} $. The input parameters this function receives
+     * are the time, $ \tau $, and
      * a vector. The output is the value of function at this point.
      * evolve_one_time_step returns the time at the end of the time step.
      */
