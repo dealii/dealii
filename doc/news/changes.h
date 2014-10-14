@@ -307,6 +307,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: PETSc and Trilinos vectors with ghost entries can now be reset to zero
+  using = 0.0;
+  <br>
+  (Timo Heister, 2014/10/14)
+  </li>
+
   <li> New: The new function FiniteElement::get_associated_geometry_primitive() allows to
   query whether a given degree of freedom is associated with a vertex, line,
   quad, or hex.

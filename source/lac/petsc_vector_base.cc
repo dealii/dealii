@@ -213,13 +213,25 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator = (const PetscScalar s)
   {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
     //TODO[TH]: assert(is_compressed())
 
-    const int ierr = VecSet (vector, s);
+    int ierr = VecSet (vector, s);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    if (has_ghost_elements())
+      {
+        Vec ghost = PETSC_NULL;
+        ierr = VecGhostGetLocalForm(vector, &ghost);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        ierr = VecSet (ghost, s);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        ierr = VecGhostRestoreLocalForm(vector, &ghost);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
 
     return *this;
   }
