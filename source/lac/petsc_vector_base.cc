@@ -221,18 +221,18 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     if (has_ghost_elements())
-    {
-      Vec ghost = PETSC_NULL;
-      ierr = VecGhostGetLocalForm(vector, &ghost);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      {
+        Vec ghost = PETSC_NULL;
+        ierr = VecGhostGetLocalForm(vector, &ghost);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      ierr = VecSet (ghost, s);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+        ierr = VecSet (ghost, s);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-      ierr = VecGhostRestoreLocalForm(vector, &ghost);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
-    }
-    
+        ierr = VecGhostRestoreLocalForm(vector, &ghost);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
+
     return *this;
   }
 
