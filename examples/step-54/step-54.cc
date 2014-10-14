@@ -43,6 +43,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 
+// And here are the headers of the opencascade support classes and functions:
 #include <deal.II/opencascade/boundary_lib.h>
 #include <deal.II/opencascade/utilities.h>
 
@@ -73,28 +74,27 @@ namespace Step54
 
   // @sect3{The TriangulationOnCAD class}
 
-  // The structure of a boundary element method code is very similar to the
-  // structure of a finite element code, and so the member functions of this
-  // class are like those of most of the other tutorial programs. In
-  // particular, by now you should be familiar with reading parameters from an
-  // external file, and with the splitting of the different tasks into
-  // different modules. The same applies to boundary element methods, and we
-  // won't comment too much on them, except on the differences.
+  // The structure of this class is very small. Since we only want
+  // to show how a triangulation can be refined onto a CAD surface, the
+  // arguments of this class are basically just the input and output file
+  // names and the triangulation we want to play with.
+  // The member functions of this class are like those that in most of the
+  // other tutorial programs deal with the setup of the grid for the
+  // simulations.
 
   class TriangulationOnCAD
   {
   public:
-    TriangulationOnCAD(const unsigned int fe_degree = 1,
-               const unsigned int mapping_degree = 1);
+    TriangulationOnCAD(const std::string &initial_mesh_filename,
+                       const std::string &output_filename,
+                       const unsigned int &surface_projection_kind = 0);
 
-    
+
     ~TriangulationOnCAD();
 
     void run();
 
   private:
-
-    void read_parameters (const std::string &filename);
 
     void read_domain();
 
@@ -103,146 +103,115 @@ namespace Step54
     void output_results(const unsigned int cycle);
 
     Triangulation<2, 3>   tria;
-    FE_Q<2,3>             fe;
-    DoFHandler<2,3>       dh;
-    MappingQ<2,3>      mapping;
 
-    std_cxx11::shared_ptr<Quadrature<2> > quadrature;
-
-    SolverControl solver_control;
-
-    unsigned int n_cycles;
-
-    OpenCASCADE::ArclengthProjectionLineManifold<2,3> *line_projector;
-    OpenCASCADE::NormalProjectionBoundary<2,3> *normal_projector;
-    OpenCASCADE::DirectionalProjectionBoundary<2,3> *directional_projector;
+    const std::string &initial_mesh_filename;
+    const std::string &output_filename;
+    const unsigned int &surface_projection_kind;
 
   };
 
 
-  // @sect4{TriangulationOnCAD::TriangulationOnCAD and TriangulationOnCAD::read_parameters}
+  // @sect4{TriangulationOnCAD::TriangulationOnCAD }
 
-  // The constructor initializes the various object in much the same way as
-  // done in the finite element programs such as step-4 or step-6. The only
-  // new ingredient here is the ParsedFunction object, which needs, at
-  // construction time, the specification of the number of components.
-  //
-  // For the exact solution the number of vector components is one, and no
-  // action is required since one is the default value for a ParsedFunction
-  // object. The wind, however, requires dim components to be
-  // specified. Notice that when declaring entries in a parameter file for the
-  // expression of the Functions::ParsedFunction, we need to specify the
-  // number of components explicitly, since the function
-  // Functions::ParsedFunction::declare_parameters is static, and has no
-  // knowledge of the number of components.
+  // The constructor of the TriangulationOnCAD class is very simple.
+  // The input arguments are strings for the input and output file
+  // names, and an unsigned int flag which can only assume values
+  // 0,1,2 and determines which kind of surface projector is used in
+  // the mesh refinement cycles (see below for details).
 
-  TriangulationOnCAD::TriangulationOnCAD(const unsigned int fe_degree,
-                              const unsigned int mapping_degree)
+  TriangulationOnCAD::TriangulationOnCAD(const std::string &initial_mesh_filename,
+                                         const std::string &output_filename,
+                                         const unsigned int &surface_projection_kind)
     :
-    fe(fe_degree),
-    dh(tria),
-    mapping(mapping_degree, true)
-  {}
+    initial_mesh_filename(initial_mesh_filename),
+    output_filename(output_filename),
+    surface_projection_kind(surface_projection_kind)
+  {
+  }
 
   TriangulationOnCAD::~TriangulationOnCAD()
   {
-  tria.set_manifold(1);
-  tria.set_manifold(2);
-  delete line_projector;
-  delete normal_projector;
-  delete directional_projector;
   }
 
-  void TriangulationOnCAD::read_parameters (const std::string &filename)
-  {
-    deallog << std::endl << "Parsing parameter file " << filename << std::endl
-            << "for a three dimensional geometry. " << std::endl;
-
-    ParameterHandler prm;
-
-    prm.declare_entry("Number of cycles", "4",
-                      Patterns::Integer());
-
-    prm.enter_subsection("Quadrature rules");
-    {
-      prm.declare_entry("Quadrature type", "gauss",
-                        Patterns::Selection(QuadratureSelector<(2)>::get_quadrature_names()));
-      prm.declare_entry("Quadrature order", "4", Patterns::Integer());
-    }
-    prm.leave_subsection();
-
-    // After declaring all these parameters to the ParameterHandler object,
-    // let's read an input file that will give the parameters their values. We
-    // then proceed to extract these values from the ParameterHandler object:
-    prm.read_input(filename);
-
-    n_cycles = prm.get_integer("Number of cycles");
-
-    prm.enter_subsection("Quadrature rules");
-    {
-      quadrature =
-        std_cxx11::shared_ptr<Quadrature<2> >
-        (new QuadratureSelector<2> (prm.get("Quadrature type"),
-                                        prm.get_integer("Quadrature order")));
-    }
-    prm.leave_subsection();
-
-  }
 
 
   // @sect4{TriangulationOnCAD::read_domain}
 
 
-  // Some of the mesh formats supported in deal.II use by default three
-  // dimensional points to describe meshes. These are the formats which are
-  // compatible with the boundary element method capabilities of deal.II. In
-  // particular we can use either UCD or GMSH formats. In both cases, we have
-  // to be particularly careful with the orientation of the mesh, because,
-  // unlike in the standard finite element case, no reordering or
-  // compatibility check is performed here.  All meshes are considered as
-  // oriented, because they are embedded in a higher dimensional space. (See
-  // the documentation of the GridIn and of the Triangulation for further
-  // details on orientation of cells in a triangulation.) In our case, the
-  // normals to the mesh are external to both the circle in 2d or the sphere
-  // in 3d.
+  // The following function represents the core of the present tutorial program.
+  // In this function we in fact import the CAD shape upon which we want to generate
+  // and refine our triangulation. Such CAD surface is contained in the IGES
+  // file "DTMB-5415_bulbous_bow.iges", and represents the bulbous bow of a ship.
+  // The presence of several convex and concave high curvature regions makes this
+  // geometry a particularly meaningful example.
   //
-  // The other detail that is required for appropriate refinement of the
-  // boundary element mesh, is an accurate description of the manifold that
-  // the mesh is approximating. We already saw this several times for the
-  // boundary of standard finite element meshes (for example in step-5 and
-  // step-6), and here the principle and usage is the same, except that the
-  // HyperBallBoundary class takes an additional template parameter that
-  // specifies the embedding space dimension. The function object still has to
-  // be static to live at least as long as the triangulation object to which
-  // it is attached.
+  // So, after importing the hull bow surface, we extract some of the curves and surfaces
+  // comosing it, and use them to generate a set of projectors. Such projectors substantially
+  // define the rules deal.ii has to follow to position each new node during the cell
+  // refinement.
+  //
+  // As for the triangulation, as done in previous tutorial programs, we import a
+  // pre-existing grid saved in .vtk format. The imported mesh is composed of a single
+  // quadrilateral cell the vertices of which have been located on the CAD shape. In
+  // this tutorial, we chose to import our mesh in vtk format.
+  //
+  // So, after importing both the initial mesh, we assign the projectors
+  // previously generated to each of the edges and cells which will have to be
+  // refined on the CAD surface.
+  //
+  // In this tutorial, we will test three different ways to project new mesh nodes onto
+  // the CAD surface, and will analyze the results obtained with each surface projection
+  // strategy. A first approach consists in projecting each node in the direction which
+  // is normal to the surface. A second possibility is represented by chosing a single
+  // direction along which to project all the nodes on the surface. The third strategy
+  // consists in projecting the new nodes on the surface along a direction which represents
+  // an estimate of the mesh cell normal. Each of such projection strategies has been
+  // implemented in a different class, which can be assigned to the set_manifold method
+  // of a deal.ii triangulation class.
+  //
+
+
 
 
   void TriangulationOnCAD::read_domain()
   {
 
-
-    std::ifstream in;
-
-    in.open ("initial_mesh_3d.inp");
-
-    GridIn<2,3> gi;
-    gi.attach_triangulation (tria);
-    gi.read_ucd (in);
-
-
-    Triangulation<2,3>::active_cell_iterator cell = tria.begin_active();
-    cell->set_manifold_id(1);
-
-    for (unsigned int f=0; f<GeometryInfo<2>::faces_per_cell; ++f)
-        cell->face(f)->set_manifold_id(2);
+    // this function allows for the CAD file of interest (in IGES format) to be imported.
+    // The function input parameters are a string containing the desired file name, and
+    // a scale factor. In this example, such scale factor is set to 1e-3, as the original
+    // geometry is written in millimeters, while we prefer to work in meters.
+    // The output of the function is an object of opencascade generic topological shape
+    // class, namely a TopoDS_Shape.
 
     TopoDS_Shape bow_surface = OpenCASCADE::read_IGES("DTMB-5415_bulbous_bow.iges",1e-3);
 
+    // Each CAD geometrical object is defined along with a tolerance, which indicates
+    // possible inaccuracy of its placement. For instance, the tolerance tol of a vertex
+    // indicates that it can be located in any point contained in a sphere centered
+    // in the nominal position and having radius tol. While projecting a point onto a
+    // surface (which will in turn have its tolerance) we must keep in mind that the
+    // precision of the projection will be limited by the tolerance with which the
+    // surface is built.
+
+    // Thus, we use a method that extracts the tolerance of a desired shape
+
+    double tolerance = OpenCASCADE::get_shape_tolerance(bow_surface);
+
+
+    // To stay out of trouble, we make this tolerance a bit bigger
+    tolerance*=5.0;
+
+    // We now want to extract from the generic shape, a set of composite sub-shapes (we are
+    // in particular interested in the single wire contained in the CAD file, which will
+    // allow us to define a line projector).
+    // To extract all these sub-shapes, we resort to a method of the OpenCASCADE namespace.
+    // The input of extract_compound_shapes is a shape and a set of empty std::vectors
+    // of subshapes.
     std::vector<TopoDS_Compound> compounds;
     std::vector<TopoDS_CompSolid> compsolids;
     std::vector<TopoDS_Solid> solids;
     std::vector<TopoDS_Shell> shells;
-    std::vector<TopoDS_Wire> wires;    
+    std::vector<TopoDS_Wire> wires;
 
     OpenCASCADE::extract_compound_shapes(bow_surface,
                                          compounds,
@@ -251,30 +220,91 @@ namespace Step54
                                          shells,
                                          wires);
 
+    // The next few steps are more familiar, and allow us to import an existing
+    // mesh from an external vtk file, and convert it to a deal triangulation.
+    std::ifstream in;
 
-    line_projector = new OpenCASCADE::ArclengthProjectionLineManifold<2,3>(wires[0]);
-    normal_projector = new OpenCASCADE::NormalProjectionBoundary<2,3>(bow_surface);
-    directional_projector = new OpenCASCADE::DirectionalProjectionBoundary<2,3>(bow_surface, Point<3>(0.0,1.0,0.0));
+    in.open(initial_mesh_filename.c_str());
 
-    tria.set_manifold(2, *line_projector);
-    tria.set_manifold(1,*directional_projector);
+    GridIn<2,3> gi;
+    gi.attach_triangulation(tria);
+    gi.read_vtk(in);
+
+    // We output this initial mesh saving it as the refinement step 0.
+    output_results(0);
+
+    // The mesh imported has a single cell. so, we get an iterator to that cell.
+    // and assgin it the manifold_id 1
+    Triangulation<2,3>::active_cell_iterator cell = tria.begin_active();
+    cell->set_manifold_id(1);
+
+    // We also get an iterator to its faces, and assign each of them to manifold_id 2.
+
+    for (unsigned int f=0; f<GeometryInfo<2>::faces_per_cell; ++f)
+      cell->face(f)->set_manifold_id(2);
+
+    // Once both the CAD geometry and the initial mesh have been imported and digested, we
+    // use the CAD surfaces and curves to define the projectors and assign them to the
+    // manifold ids just specified.
+
+    // A first projector is defined using the single wire contained in our CAD file.
+    // The ArclengthProjectionLineManifold will make sure that every mesh edge located
+    // on the wire is refined with a point that lies on the wire and splits in two equal arcs
+    // the wire portion lying between the edge vertices.
+
+    static OpenCASCADE::ArclengthProjectionLineManifold<2,3> line_projector(wires[0], tolerance);
+
+    // Once the projector is created, we assign it to all the edges with manifold_id = 2
+    tria.set_manifold(2, line_projector);
+
+    // The surface projector is created according to what specified with the surface_projection_kind
+    // option of the constructor.
+    switch (surface_projection_kind)
+      {
+      case 0:
+        // If the value is 0, we select the NormalProjectionBoundary. The new mesh points will initially
+        // generated at the baricenter of the cell/edge considere, and then projected
+        // on the CAD surface along its normal direction.
+        // The NormalProjectionBoundary constructor only needs a shape and a tolerance.
+        static OpenCASCADE::NormalProjectionBoundary<2,3> normal_projector(bow_surface, tolerance);
+        // The normal projector is assigned to the manifold having id 1.
+        tria.set_manifold(1,normal_projector);
+        break;
+      case 1:
+        // If the value is 1, we select the DirectionalProjectionBoundary. The new mesh points will initially
+        // generated at the baricenter of the cell/edge considere, and then projected
+        // on the CAD surface along a direction that is specified to the DirectionalProjectionBoundary
+        // constructor. In this case, the projection is done along the y-axis.
+        static OpenCASCADE::DirectionalProjectionBoundary<2,3> directional_projector(bow_surface, Point<3>(0.0,1.0,0.0), tolerance);
+        tria.set_manifold(1,directional_projector);
+        break;
+      case 2:
+        // If the value is 2, we select the NormaToMeshlProjectionBoundary. The new mesh points will initially
+        // generated at the baricenter of the cell/edge considere, and then projected
+        // on the CAD surface along a direction that is an estimate of the mesh normal direction.
+        // The NormalToMeshProjectionBoundary constructor only requires a shape (containing at least a face)
+        // and a tolerance.
+        static OpenCASCADE::NormalToMeshProjectionBoundary<2,3> normal_to_mesh_projector(bow_surface, tolerance);
+        tria.set_manifold(1,normal_to_mesh_projector);
+        break;
+      default:
+        AssertThrow(false, ExcMessage("No valid projector selected: surface_projection_kind must be 0,1 or 2."));
+        break;
+      }
+
   }
 
 
   // @sect4{TriangulationOnCAD::refine_and_resize}
 
-  // This function globally refines the mesh, distributes degrees of freedom,
-  // and resizes matrices and vectors.
+  // This function globally refines the mesh. In other tutorials, it tipically also distributes degrees
+  // of freedom, and resizes matrices and vectors. These tasks are not carried out
+  // here, since we are not running any simulation on the triangolation produced.
 
 
   void TriangulationOnCAD::refine_and_resize()
   {
     tria.refine_global(1);
-
-    dh.distribute_dofs(fe);
-
-    const unsigned int n_dofs =  dh.n_dofs();
-
   }
 
 
@@ -288,13 +318,12 @@ namespace Step54
   void TriangulationOnCAD::output_results(const unsigned int cycle)
   {
 
-    std::string filename = ( Utilities::int_to_string(3) +
-                             "d_meshhh_" +
+    std::string filename = ( output_filename + "_" +
                              Utilities::int_to_string(cycle) +
-                             ".inp" );
-  std::ofstream logfile(filename.c_str());
-  GridOut grid_out;
-  grid_out.write_ucd(tria, logfile);
+                             ".vtk" );
+    std::ofstream logfile(filename.c_str());
+    GridOut grid_out;
+    grid_out.write_vtk(tria, logfile);
 
 
   }
@@ -308,14 +337,13 @@ namespace Step54
   void TriangulationOnCAD::run()
   {
 
-    read_parameters("parameters.prm");
 
     read_domain();
-
+    unsigned int n_cycles = 5;
     for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
       {
         refine_and_resize();
-        output_results(cycle);
+        output_results(cycle+1);
       }
 
   }
@@ -333,12 +361,42 @@ int main ()
       using namespace dealii;
       using namespace Step54;
 
-      const unsigned int degree = 1;
-      const unsigned int mapping_degree = 1;
 
       deallog.depth_console (3);
-      TriangulationOnCAD triangulation_on_cad(degree, mapping_degree);
-      triangulation_on_cad.run();
+
+      std::string in_mesh_filename = "initial_mesh_3d.vtk";
+
+      cout<<"----------------------------------------------------------"<<endl;
+      cout<<"Testing projection in direction normal to CAD surface"<<endl;
+      cout<<"----------------------------------------------------------"<<endl;
+      std::string out_mesh_filename = ( "3d_mesh_normal_projection" );
+      TriangulationOnCAD tria_on_cad_norm(in_mesh_filename,out_mesh_filename,0);
+      tria_on_cad_norm.run();
+      cout<<"----------------------------------------------------------"<<endl;
+      cout<<endl;
+      cout<<endl;
+
+      cout<<"----------------------------------------------------------"<<endl;
+      cout<<"Testing projection in y-axis direction"<<endl;
+      cout<<"----------------------------------------------------------"<<endl;
+      out_mesh_filename = ( "3d_mesh_directional_projection" );
+      TriangulationOnCAD tria_on_cad_dir(in_mesh_filename,out_mesh_filename,1);
+      tria_on_cad_dir.run();
+      cout<<"----------------------------------------------------------"<<endl;
+      cout<<endl;
+      cout<<endl;
+
+      cout<<"----------------------------------------------------------"<<endl;
+      cout<<"Testing projection in direction normal to mesh elements"<<endl;
+      cout<<"----------------------------------------------------------"<<endl;
+      out_mesh_filename = ( "3d_mesh_normal_to_mesh_projection" );
+      TriangulationOnCAD tria_on_cad_norm_to_mesh(in_mesh_filename,out_mesh_filename,2);
+      tria_on_cad_norm_to_mesh.run();
+      cout<<"----------------------------------------------------------"<<endl;
+      cout<<endl;
+      cout<<endl;
+
+
 
     }
   catch (std::exception &exc)

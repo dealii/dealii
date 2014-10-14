@@ -79,6 +79,7 @@ namespace OpenCASCADE
     return closest_point(sh, candidate, out_shape, u, v);
   }
 
+
   /*============================== DirectionalProjectionBoundary ==============================*/
   template <int dim, int spacedim>
   DirectionalProjectionBoundary<dim,spacedim>::DirectionalProjectionBoundary(const TopoDS_Shape &sh,
@@ -99,59 +100,118 @@ namespace OpenCASCADE
   {
     TopoDS_Shape out_shape;
     double u=0, v=0;
-    Point<3> average_normal(0.0,0.0,0.0);
     for (unsigned int i=0; i<surrounding_points.size(); ++i)
-        {
-        Point<3> surface_normal;
-        double mean_curvature;
-        Assert(closest_point_and_differential_forms(sh, surrounding_points[i], surface_normal, mean_curvature)
-               .distance(surrounding_points[i]) <
-             1e3*std::max(tolerance*surrounding_points[i].norm(), tolerance),
+      Assert(closest_point(sh, surrounding_points[i], out_shape, u, v)
+             .distance(surrounding_points[i]) <
+             std::max(tolerance*surrounding_points[i].norm(), tolerance),
              ExcPointNotOnManifold(surrounding_points[i]));
-        average_normal += surface_normal;
-        }
 
-    average_normal/=surrounding_points.size();
+    return line_intersection(sh, candidate, direction, tolerance);
 
-    if (surrounding_points.size() == 2)
-       {
-       Point<3> P = (surrounding_points[0]+surrounding_points[1])/2;
-       Point<3> N = surrounding_points[0]-surrounding_points[1];
-       N = N/sqrt(N.square());
-       average_normal = average_normal-(average_normal*N)*N;
-       average_normal = average_normal/sqrt(average_normal.square());
-       }
-    else if (surrounding_points.size() == 8)
-       {
-       //cout<<"Ps = ["<<endl;
-       //for (unsigned int i=0; i<surrounding_points.size(); ++i)
-       //    cout<<surrounding_points[i]<<endl;
-       //cout<<"]"<<endl;
-       Point<3> u = surrounding_points[1]-surrounding_points[0];
-       Point<3> v = surrounding_points[2]-surrounding_points[0];
-       Point<3> n1(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(1)*v(1)-u(1)*v(0));
-       n1 = n1/n1.norm();
-       u = surrounding_points[2]-surrounding_points[3];
-       v = surrounding_points[1]-surrounding_points[3];
-       Point<3> n2(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(1)*v(1)-u(1)*v(0));
-       n2 = n2/n2.norm();
-
-       average_normal = (n1+n2)/2.0;
-       average_normal = average_normal/average_normal.norm();
-       }
-
-  
-    average_normal = average_normal/sqrt(average_normal.square());
-    // if for any reason the normals have zero average, just use the direction
-    // specified at the construction of the projector. Otherwise use "local" normal estimate    
-    if (average_normal.norm() < 0.9)
-       return axis_intersection(sh, candidate, direction, tolerance);
-    else
-       return axis_intersection(sh, candidate, average_normal, tolerance);
   }
 
-  /*============================== ArclengthProjectionLineManifold ==============================*/
 
+
+  /*============================== NormalToMeshProjectionBoundary ==============================*/
+  template <int dim, int spacedim>
+  NormalToMeshProjectionBoundary<dim,spacedim>::NormalToMeshProjectionBoundary(const TopoDS_Shape &sh,
+      const double tolerance) :
+    sh(sh),
+    tolerance(tolerance)
+  {
+    Assert(spacedim == 3, ExcNotImplemented());
+
+    unsigned int n_faces;
+    unsigned int n_edges;
+    unsigned int n_vertices;
+    count_elements(sh,
+                   n_faces,
+                   n_edges,
+                   n_vertices);
+
+    Assert(n_faces > 0, ExcMessage("NormalToMeshProjectionBoundary needs a shape containing faces to operate."));
+  }
+
+
+  template <int dim, int spacedim>
+  Point<spacedim>  NormalToMeshProjectionBoundary<dim,spacedim>::
+  project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
+                       const Point<spacedim> &candidate) const
+  {
+    TopoDS_Shape out_shape;
+    double u=0, v=0;
+    Point<3> average_normal(0.0,0.0,0.0);
+    for (unsigned int i=0; i<surrounding_points.size(); ++i)
+      {
+        Assert(closest_point(sh, surrounding_points[i], out_shape, u, v)
+               .distance(surrounding_points[i]) <
+               std::max(tolerance*surrounding_points[i].norm(), tolerance),
+               ExcPointNotOnManifold(surrounding_points[i]));
+      }
+
+    switch (surrounding_points.size())
+      {
+      case 2:
+      {
+        for (unsigned int i=0; i<surrounding_points.size(); ++i)
+          {
+            Point<3> surface_normal;
+            double mean_curvature;
+            closest_point_and_differential_forms(sh, surrounding_points[i], surface_normal, mean_curvature);
+            average_normal += surface_normal;
+          }
+
+        average_normal/=2.0;
+
+        Assert(average_normal.norm() > 1e-4,
+               ExcMessage("Failed to refine cell: the average of the surface normals at the surrounding edge turns out to be a null vector, making the projection direction undetermined."));
+
+        Point<3> P = (surrounding_points[0]+surrounding_points[1])/2;
+        Point<3> N = surrounding_points[0]-surrounding_points[1];
+        N = N/sqrt(N.square());
+        average_normal = average_normal-(average_normal*N)*N;
+        average_normal = average_normal/average_normal.norm();
+        break;
+      }
+      case 8:
+      {
+        Point<3> u = surrounding_points[1]-surrounding_points[0];
+        Point<3> v = surrounding_points[2]-surrounding_points[0];
+        Point<3> n1(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(1)*v(1)-u(1)*v(0));
+        n1 = n1/n1.norm();
+        u = surrounding_points[2]-surrounding_points[3];
+        v = surrounding_points[1]-surrounding_points[3];
+        Point<3> n2(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(1)*v(1)-u(1)*v(0));
+        n2 = n2/n2.norm();
+        u = surrounding_points[4]-surrounding_points[7];
+        v = surrounding_points[6]-surrounding_points[7];
+        Point<3> n3(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(1)*v(1)-u(1)*v(0));
+        n3 = n3/n3.norm();
+        u = surrounding_points[6]-surrounding_points[7];
+        v = surrounding_points[5]-surrounding_points[7];
+        Point<3> n4(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(1)*v(1)-u(1)*v(0));
+        n4 = n4/n4.norm();
+
+        average_normal = (n1+n2+n3+n4)/4.0;
+
+        Assert(average_normal.norm() > 1e-4,
+               ExcMessage("Failed to refine cell: the average of the surface normals at the surrounding edge turns out to be a null vector, making the projection direction undetermined."));
+
+        average_normal = average_normal/average_normal.norm();
+        break;
+      }
+      default:
+      {
+        AssertThrow(false, ExcNotImplemented());
+        break;
+      }
+      }
+
+    return line_intersection(sh, candidate, average_normal, tolerance);
+  }
+
+
+  /*============================== ArclengthProjectionLineManifold ==============================*/
   template <int dim, int spacedim>
   ArclengthProjectionLineManifold<dim,spacedim>::ArclengthProjectionLineManifold(const TopoDS_Shape &sh,
       const double tolerance):

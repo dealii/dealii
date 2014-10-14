@@ -40,7 +40,7 @@ namespace OpenCASCADE
   /**
    * A Boundary object based on OpenCASCADE TopoDS_Shape where where
    * new points are first computed by averaging the surrounding points
-   * in the same way as FlatManifold does, and then projecting in the
+   * in the same way as FlatManifold does, and are then projected in the
    * normal direction using OpenCASCADE utilities.
    *
    * This class makes no assumptions on the shape you pass to it, and
@@ -107,7 +107,7 @@ namespace OpenCASCADE
   /**
    * A Boundary object based on OpenCASCADE TopoDS_Shape where new
    * points are first computed by averaging the surrounding points in
-   * the same way as FlatManifold does, and then projecting in onto
+   * the same way as FlatManifold does, and then projecting them onto
    * the manifold along the direction specified at construction time
    * using OpenCASCADE utilities.
    *
@@ -139,6 +139,99 @@ namespace OpenCASCADE
     DirectionalProjectionBoundary(const TopoDS_Shape &sh,
                                   const Tensor<1,spacedim> &direction,
                                   const double tolerance=1e-7);
+
+    /**
+     * Perform the actual projection onto the manifold. This function,
+     * in debug mode, checks that each of the @p surrounding_points is
+     * within tolerance from the given TopoDS_Shape. If this is not
+     * the case, an exception is thrown.
+     *
+     * The projected point is computed using OpenCASCADE directional
+     * projection algorithms.
+     */
+    virtual Point<spacedim>
+    project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
+                         const Point<spacedim> &candidate) const;
+
+  private:
+    /**
+     * The topological shape which is used internally to project
+     * points. You can construct such a shape by calling the
+     * OpenCASCADE::read_IGES() function, which will create a
+     * TopoDS_Shape with the geometry contained in the IGES file.
+     */
+    const TopoDS_Shape sh;
+
+    /**
+     * Direction used to project new points on the shape.
+     */
+    const Point<3> direction;
+
+    /**
+     * Relative tolerance used by this class to compute distances.
+     */
+    const double tolerance;
+  };
+
+
+  /**
+   * A Boundary object based on OpenCASCADE TopoDS_Shape where new
+   * points are first computed by averaging the surrounding points in
+   * the same way as FlatManifold does, and then projecting it using
+   * OpenCASCADE utilities onto the manifold along a direction which
+   * is an estimation of the surrounding points (hence mesh cell) normal.
+   * The direction normal to the mesh is particularly useful because
+   * it is the direction in which the mesh is missing nodes. For
+   * instance, during the refinement of a cell a new node is initially
+   * created around the baricenter of the cell. This location somehow
+   * ensures a uniform distance from the nodes of the old cell.
+   * Projecting such cell baricenter onto the CAD surface in the direction
+   * normal to the original cell will then retain uniform distance from
+   * the points of the original cell. Of course, at the stage of mesh
+   * generation, no dof handler nor finite element are defined, and
+   * such direction has to be estimated.
+   * For the case in which 8 surrounding points are present, 4 different
+   * triangles are identified with the points assigned, and the normals
+   * of such triangles are averaged to obtain the approximation of
+   * the normal to the cell.
+   * The case in which 2 surrounding points are present (i.e.:a cell
+   * edge is being refined) is of course more tricky. The average of
+   * the CAD surface normals at the 2 surrounding points is first
+   * computed, and then projected onto the plane normal to the
+   * segment linking the surrounding points. This again is an attempt
+   * to have the new point with equal distance with respect to the
+   * surrounding points
+   *
+   * This class only operates with CAD faces and makes the
+   * assumption that the shape you pass to it
+   * contains at least a face. If that is not the case, an Exeption
+   * is thrown. In debug mode there is a sanity check to
+   * make sure that the surrounding points (the ones used in
+   * project_to_manifold()) actually live on the Manifold, i.e.,
+   * calling OpenCASCADE::closest_point() on those points leaves them
+   * untouched. If this is not the case, an ExcPointNotOnManifold is
+   * thrown.
+   *
+   *
+   * Notice that this type of Boundary descriptor may fail to give
+   * results if the triangulation to be refined is close to the
+   * boundary of the given TopoDS_Shape, or when the normal direction
+   * estimated from the surrounding points does not intersect the shape.
+   * An exception
+   * is thrown when this appens.
+   *
+   * @author Luca Heltai, Andrea Mola, 2011--2014.
+   */
+  template <int dim, int spacedim>
+  class NormalToMeshProjectionBoundary : public Boundary<dim,spacedim>
+  {
+  public:
+    /**
+     * Construct a Boundary object which will project points on the
+     * TopoDS_Shape @p sh, along the given @p direction.
+     */
+    NormalToMeshProjectionBoundary(const TopoDS_Shape &sh,
+                                   const double tolerance=1e-7);
 
     /**
      * Perform the actual projection onto the manifold. This function,

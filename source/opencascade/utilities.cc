@@ -218,6 +218,31 @@ namespace OpenCASCADE
     AssertThrow(OK, ExcMessage("Failed to write IGES file."));
   }
 
+  double get_shape_tolerance(const TopoDS_Shape &shape)
+  {
+    double tolerance = 0.0;
+
+    std::vector<TopoDS_Face> faces;
+    std::vector<TopoDS_Edge> edges;
+    std::vector<TopoDS_Vertex> vertices;
+
+    extract_geometrical_shapes(shape,
+                               faces,
+                               edges,
+                               vertices);
+
+    for (unsigned int i=0; i<vertices.size(); ++i)
+      tolerance = fmax(tolerance,BRep_Tool::Tolerance(vertices[i]));
+
+    for (unsigned int i=0; i<edges.size(); ++i)
+      tolerance = fmax(tolerance,BRep_Tool::Tolerance(edges[i]));
+
+    for (unsigned int i=0; i<faces.size(); ++i)
+      tolerance = fmax(tolerance,BRep_Tool::Tolerance(faces[i]));
+
+
+    return tolerance;
+  }
 
   TopoDS_Shape intersect_plane(const TopoDS_Shape &in_shape,
                                const double c_x,
@@ -321,20 +346,20 @@ namespace OpenCASCADE
     Assert(Inters.IsDone(), ExcMessage("Could not project point."));
 
     double minDistance = 1e7;
-    double distance; 
+    double distance;
     int lowest_dist_int = 0;
     Point<3> result;
     for (int i=0; i<Inters.NbPnt(); ++i)
-        {
-        distance = Pnt(origin).Distance(Inters.Pnt(i+1));
-        //cout<<"Point "<<i<<": "<<Pnt(Inters.Pnt(i+1))<<"  distance: "<<distance<<endl;
+      {
+        distance = point(origin).Distance(Inters.Pnt(i+1));
+        //cout<<"Point "<<i<<": "<<point(Inters.Pnt(i+1))<<"  distance: "<<distance<<endl;
         if (distance < minDistance)
-           {
-           minDistance = distance;
-           result = Pnt(Inters.Pnt(i+1));
-           lowest_dist_int = i+1;
-           }
-        }
+          {
+            minDistance = distance;
+            result = point(Inters.Pnt(i+1));
+            lowest_dist_int = i+1;
+          }
+      }
 
     return result;
   }
@@ -420,12 +445,12 @@ namespace OpenCASCADE
     // to loop on edges. Even if the closest point lies on the boundary of a parametric surface,
     // we need in fact to retain the face and both u and v, if we want to use this method to
     // retrieve the surface normal
-    if (face_counter==0)    
-       for (exp.Init(in_shape, TopAbs_EDGE); exp.More(); exp.Next())
-         {
-           TopoDS_Edge edge = TopoDS::Edge(exp.Current());
-           if (!BRep_Tool::Degenerated(edge))
-              {
+    if (face_counter==0)
+      for (exp.Init(in_shape, TopAbs_EDGE); exp.More(); exp.Next())
+        {
+          TopoDS_Edge edge = TopoDS::Edge(exp.Current());
+          if (!BRep_Tool::Degenerated(edge))
+            {
               TopLoc_Location L;
               Standard_Real First;
               Standard_Real Last;
@@ -434,18 +459,18 @@ namespace OpenCASCADE
               // curve upon which the edge is defined
               Handle(Geom_Curve) CurveToProj = BRep_Tool::Curve(edge,L,First,Last);
 
-              GeomAPI_ProjectPointOnCurve Proj(Pnt(origin),CurveToProj);
+              GeomAPI_ProjectPointOnCurve Proj(point(origin),CurveToProj);
               unsigned int num_proj_points = Proj.NbPoints();
               if ((num_proj_points > 0) && (Proj.LowerDistance() < minDistance))
-                 {
-                 minDistance = Proj.LowerDistance();
-                 Pproj = Proj.NearestPoint();
-                 out_shape = edge;
-                 u=Proj.LowerDistanceParameter();
-                 ++counter;
-                 }
-              }
-         }
+                {
+                  minDistance = Proj.LowerDistance();
+                  Pproj = Proj.NearestPoint();
+                  out_shape = edge;
+                  u=Proj.LowerDistanceParameter();
+                  ++counter;
+                }
+            }
+        }
 
     Assert(counter > 0, ExcMessage("Could not find projection points."));
     return point(Pproj);
@@ -472,15 +497,15 @@ namespace OpenCASCADE
 
     // just a check here: the number of faces in out_shape must be 1, otherwise
     // something is wrong
-    unsigned int n_faces, n_edges, n_vertices;   
+    unsigned int n_faces, n_edges, n_vertices;
     count_elements(out_shape,
                    n_faces,
                    n_edges,
                    n_vertices);
-    
+
     Assert(n_faces > 0, ExcMessage("Could not find normal: the shape containing the closest point has 0 faces."));
     Assert(n_faces < 2, ExcMessage("Could not find normal: the shape containing the closest point has more than 1 face."));
-    
+
 
     TopExp_Explorer exp;
     exp.Init(in_shape, TopAbs_FACE);
@@ -488,7 +513,7 @@ namespace OpenCASCADE
 
     Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
     GeomLProp_SLProps props(SurfToProj, u, v, 1, tolerance);
-    gp_Dir Normal = props.Normal(); 
+    gp_Dir Normal = props.Normal();
     Standard_Real Mean_Curvature = props.MeanCurvature();
 
     surface_normal = Point<3>(Normal.X(),Normal.Y(),Normal.Z());
