@@ -1,0 +1,35 @@
+
+DEAL:0:PETSc::numproc=4
+DEAL:0:PETSc::ghosted value: 2.00000 (should be 2.0)
+DEAL:0:PETSc::ghosted value: 0.00000 (should be 0.0)
+DEAL:0:PETSc::ghosted value: 42.1000 (should be 42.1)
+DEAL:0:PETSc::OK
+DEAL:0:Trilinos::numproc=4
+DEAL:0:Trilinos::ghosted value: 2.00000 (should be 2.0)
+DEAL:0:Trilinos::ghosted value: 0.00000 (should be 0.0)
+DEAL:0:Trilinos::ghosted value: 42.1000 (should be 42.1)
+DEAL:0:Trilinos::OK
+
+DEAL:1:PETSc::ghosted value: 2.00000 (should be 2.0)
+DEAL:1:PETSc::ghosted value: 0.00000 (should be 0.0)
+DEAL:1:PETSc::ghosted value: 42.1000 (should be 42.1)
+DEAL:1:Trilinos::ghosted value: 2.00000 (should be 2.0)
+DEAL:1:Trilinos::ghosted value: 0.00000 (should be 0.0)
+DEAL:1:Trilinos::ghosted value: 42.1000 (should be 42.1)
+
+
+DEAL:2:PETSc::ghosted value: 2.00000 (should be 2.0)
+DEAL:2:PETSc::ghosted value: 0.00000 (should be 0.0)
+DEAL:2:PETSc::ghosted value: 42.1000 (should be 42.1)
+DEAL:2:Trilinos::ghosted value: 2.00000 (should be 2.0)
+DEAL:2:Trilinos::ghosted value: 0.00000 (should be 0.0)
+DEAL:2:Trilinos::ghosted value: 42.1000 (should be 42.1)
+
+
+DEAL:3:PETSc::ghosted value: 2.00000 (should be 2.0)
+DEAL:3:PETSc::ghosted value: 0.00000 (should be 0.0)
+DEAL:3:PETSc::ghosted value: 42.1000 (should be 42.1)
+DEAL:3:Trilinos::ghosted value: 2.00000 (should be 2.0)
+DEAL:3:Trilinos::ghosted value: 0.00000 (should be 0.0)
+DEAL:3:Trilinos::ghosted value: 42.1000 (should be 42.1)
+
