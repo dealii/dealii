@@ -2,7 +2,7 @@
 
 <i>This program was contributed by Bruno Turcksin and Damien Lebrun-Grandie.</i>
 
-<b>Note:</b> In order to run this program, deal.II must be configured to use
+@note In order to run this program, deal.II must be configured to use
 the UMFPACK sparse direct solver. Refer to the <a
 href="../../readme.html#umfpack">ReadMe</a> for instructions how to do this.
 
@@ -45,8 +45,12 @@ $[0,b]\times[0,b]$ of the form
 \phi(x,t) = A\sin(\omega t)(bx-x^2).
 @f}
 By using quadratic finite elements, we can represent this function exactly at
-any particular time, and all the error will be due to the time discretization. We
-impose the following boundary conditions: homogeneous Dirichlet for $x=0$ and
+any particular time, and all the error will be due to the time
+discretization. We do this because it is then easy to observe the order of
+convergence of the various time stepping schemes we will consider, without
+having to separate spatial and temporal errors.
+
+We impose the following boundary conditions: homogeneous Dirichlet for $x=0$ and
 $x=b$ and homogeneous Neumann conditions for $y=0$ and $y=b$. We choose the
 source term so that the corresponding solution is
 in fact of the form stated above:
@@ -54,9 +58,15 @@ in fact of the form stated above:
 S=A\left(\frac{1}{v}\omega \cos(\omega t)(bx -x^2) + \sin(\omega t)
 \left(\Sigma_a (bx-x^2)+2D\right) \right).
 @f}
-Because the solution is a sine, we know that $\phi\left(x,\pi\right) = 0$.
+Because the solution is a sine in time, we know that the exact solution
+satisfies $\phi\left(x,\pi\right) = 0$.
 Therefore, the error at time $t=\pi$ is simply the norm of the numerical
-solution and is particularly easily evaluated.
+solution, i.e., $\|e(\cdot,t=\pi)\|_{L_2} = \|\phi_h(\cdot,t=\pi)\|_{L_2}$,
+and is particularly easily evaluated. In the code, we evaluate the $l_2$ norm
+of the vector of nodal values of $\phi_h$ instead of the $L_2$ norm of the
+associated spatial function, since the former is simpler to compute; however,
+on uniform meshes, the two are just related by a constant and we can
+consequently observe the temporal convergence order with either.
 
 
 <h3>Runge-Kutta methods</h3>
@@ -85,7 +95,7 @@ spatially discretized equation has the form
 M\frac{dU}{dt} = f(t,U),
 @f}
 where $M$ is the mass matrix and $f(t,U)$ is the spatially discretized version
-of the $q(t,u(x,t))$ (where $q$ is typically the place where spatial
+of $q(t,u(x,t))$ (where $q$ is typically the place where spatial
 derivatives appear, but this is not of much concern for the moment given that
 we only consider time derivatives). In other words, this form fits the general
 scheme above if we write 
@@ -113,11 +123,16 @@ Butcher tableaus.)
 At the time of the writing of this tutorial, the methods implemented in
 deal.II can be divided in three categories:
 <ol>
-<li> explicit Runge-Kutta
-<li> embedded (or adaptive) Runge-Kutta
-<li> implicit Runge-Kutta
+<li> Explicit Runge-Kutta; in order for a method to be explicit, it is
+necessary that in the formula above defining $k_i$, $k_i$ does not appear
+on the right hand side. In other words, these methods have to satisfy
+$a_{ii}=0, i=1,\ldots,s$.
+<li> Embedded (or adaptive) Runge-Kutta; we will discuss their properties below.
+<li> Implicit Runge-Kutta; this class of methods require the solution of a
+possibly nonlinear system the stages $k_i$ above, i.e., they have
+$a_{ii}\neq 0$ for at least one of the stages $i=1,\ldots,s$.
 </ol> 
-Many well known time stepping schemes that one does not typically associated
+Many well known time stepping schemes that one does not typically associate
 with the names Runge or Kutta can in fact be written in a way so that they,
 too, can be expressed in these categories. They oftentimes represent the
 lowest-order members of these families.
@@ -159,13 +174,13 @@ form $\alpha y = f(t,y)$
 for $y$ in each (sub-)timestep. Internally, this is
 done using a Newton-type method and, consequently, they require that the user
 provide functions that can evaluate $M^{-1}f(t,y)$ and
-$\left(I-\Delta t M^{-1} \frac{\partial f}{\partial y}\right)^{-1}$ or equivalently 
-$\left(M - \Delta t \frac{\partial f}{\partial y}\right)^{-1} M$. 
+$\left(I-\tau M^{-1} \frac{\partial f}{\partial y}\right)^{-1}$ or equivalently 
+$\left(M - \tau \frac{\partial f}{\partial y}\right)^{-1} M$. 
 
 The particular form of this operator results from the fact that each Newton
 step requires the solution of an equation of the form
 @f{align*}
-  \left(M - \Delta t \frac{\partial f}{\partial y}\right) \Delta y
+  \left(M - \tau \frac{\partial f}{\partial y}\right) \Delta y
   = -M h(t,y)
 @f}
 for some (given) $h(t,y)$. Implicit methods are 
@@ -174,12 +189,17 @@ course affect the <i>accuracy</i> of the solution, even if the numerical
 solution remains stable and bounded.
 
 Methods in this class include backward Euler, implicit midpoint,
-Crank-Nicolson, and a two stage SDIRK. 
+Crank-Nicolson, and the two stage SDIRK method (short for "singly diagonally
+implicit Runge-Kutta", a term coined to indicate that the diagonal elements
+$a_{ii}$ defining the time stepping method are all equal; this property
+allows for the Newton matrix $I-\tau M^{-1}\frac{\partial f}{\partial y}$ to
+be re-used between stages because $\tau$ is the same every time).
 
 
 <h3>Spatially discrete formulation</h3>
 
-By expanding the solution as always using shape functions $\psi_j$ and writing
+By expanding the solution of our model problem
+as always using shape functions $\psi_j$ and writing
 @f{eqnarray*}
 \phi_h(x,t) = \sum_j U_j(t) \psi_j(x),
 @f}
@@ -197,13 +217,16 @@ where
 @f}
 See also step-24 and step-26 to understand how we arrive here.
 %Boundary terms are not necessary due to the chosen boundary conditions for
-the current problem. To use the Runge-Kutta methods, we can then recast this
+the current problem. To use the Runge-Kutta methods, we recast this
 as follows:
 @f{eqnarray*}
-f(y) = -{\cal D}y - {\cal A}y + {\cal S}
+f(y) = -{\cal D}y - {\cal A}y + {\cal S}.
 @f}
 In the code, we will need to be able to evaluate this function $f(U)$ along
-with its derivative.
+with its derivative,
+@f{eqnarray*}
+\frac{\partial f}{\partial y} = -{\cal D} - {\cal A}.
+@f}
 
 
 <h3>Notes on the testcase</h3>
@@ -219,7 +242,7 @@ important to remember the following issues:
 <ol>
 <li> You will need to project the solution to the new mesh when the mesh is changed. Of course,
      the mesh 
-     used should be the same at the beginning and at the end of the time step,
+     used should be the same from the beginning to the end of each time step,
      a question that arises because Runge-Kutta methods use multiple
      evaluations of the equations within each time step.
 <li> You will need to update the mass matrix and its inverse every time the
