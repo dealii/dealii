@@ -84,14 +84,17 @@ template <int dim, int spacedim> class MGDoFHandler;
 /*------------------------------------------------------------------------*/
 
 /**
- * Structure which is passed to Triangulation::create_triangulation. It
+ * A structure to describe individual cells and passed as argument to
+ * Triangulation::create_triangulation(). It
  * contains all data needed to construct a cell, namely the indices of the
- * vertices and the material indicator.
+ * vertices, the material or boundary indicator (depending on whether it
+ * represents a cell or a face), and a manifold id to describe the manifold
+ * this object belongs to.
  *
  * This structure is also used to represent data for faces and edge as part of
  * the SubCellData class. In that case the #vertices array needs to represent
  * the vertices of a face or edge of a cell listed in the argument to
- * Triangulation::create_triangulation that denotes the cells. It can be used
+ * Triangulation::create_triangulation() that denotes the faces. It can be used
  * to attach boundary indicators to faces.
  *
  * @ingroup grid
@@ -132,8 +135,10 @@ struct CellData
   types::manifold_id manifold_id;
 
   /**
-   * Default constructor. Sets the vertex indices to invalid values and the boundary or material
-   * id the default value (zero).
+   * Default constructor. Sets the member variables to the following values:
+   * - vertex indices to invalid values
+   * - boundary or material id zero (the default for boundary or material ids)
+   * - manifold id to numbers::invalid_manifold_id
    */
   CellData ();
 };
