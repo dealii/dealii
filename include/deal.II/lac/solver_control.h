@@ -30,18 +30,18 @@ class ParameterHandler;
 /*@{*/
 
 /**
- * Control class for iterative solvers.
+ * Control class to determine convergence of iterative solvers.
  *
  * Used by iterative methods to determine whether the iteration should
- * be continued. To this respect, the virtual function <tt>check()</tt> is
+ * be continued. To this end, the virtual function <tt>check()</tt> is
  * called in each iteration with the current iteration step and the
  * value indicating convergence (usually the residual).
  *
- * After the iteration has terminated, the functions @p last_value and
- * @p last_step can be used to obtain information about the final state
+ * After the iteration has terminated, the functions last_value() and
+ * last_step() can be used to obtain information about the final state
  * of the iteration.
  *
- * <tt>check()</tt> can be replaced in derived classes to allow for more
+ * check() can be replaced in derived classes to allow for more
  * sophisticated tests.
  *
  *
