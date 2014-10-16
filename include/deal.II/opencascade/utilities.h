@@ -95,14 +95,12 @@ namespace OpenCASCADE
   /**
    * Count the subobjects of a shape. This function is useful to
    * gather information about the TopoDS_Shape passed as argument. It
-   * counts the number of faces, edges and vertices (the only
+   * returns the number of faces, edges and vertices (the only
    * topological entities associated with actual geometries) which are
    * contained in the given shape.
    */
-  void count_elements(const TopoDS_Shape &shape,
-                      unsigned int &n_faces,
-                      unsigned int &n_edges,
-                      unsigned int &n_vertices);
+  std_cxx11::tuple<unsigned int, unsigned int, unsigned int>
+  count_elements(const TopoDS_Shape &shape);
 
   /**
    * Read IGES files and translate their content into openCascade
@@ -123,16 +121,17 @@ namespace OpenCASCADE
 
   /**
     * This function returns the tolerance associated with the shape.
-    * Each CAD geometrical object is defined along with a tolerance, which indicates
-    * possible inaccuracy of its placement. For instance, the tolerance tol of a vertex
-    * indicates that it can be located in any point contained in a sphere centered
-    * in the nominal position and having radius tol. While carrying out an operation
-    * such as projecting a point onto a
-    * surface (which will in turn have its tolerance) we must keep in mind that the
-    * precision of the projection will be limited by the tolerance with which the
-    * surface is built.
-    * The tolerance is computed taking the maximum tolerance among the subshapes
-    * composing the shape.
+    * Each CAD geometrical object is defined along with a tolerance,
+    * which indicates possible inaccuracy of its placement. For
+    * instance, the tolerance of a vertex indicates that it can be
+    * located in any point contained in a sphere centered in the
+    * nominal position and having radius tol. While carrying out an
+    * operation such as projecting a point onto a surface (which will
+    * in turn have its tolerance) we must keep in mind that the
+    * precision of the projection will be limited by the tolerance
+    * with which the surface is built.  The tolerance is computed
+    * taking the maximum tolerance among the subshapes composing the
+    * shape.
     */
   double get_shape_tolerance(const TopoDS_Shape &shape);
 
@@ -219,38 +218,75 @@ namespace OpenCASCADE
                                std::vector<TopoDS_Shell> &shells,
                                std::vector<TopoDS_Wire> &wires);
 
+  /**
+   * Project the point @p origin on the topological shape given by @p
+   * in_shape, and returns the projected point, the subshape which
+   * contains the point and the parametric u and v coordinates of the
+   * point within the resulting shape. If the shape is not elementary,
+   * all its subshapes are iterated, faces first, then edges, and the
+   * returned shape is the closest one to the point @p origin. If the
+   * returned shape is an edge, then only the u coordinate is filled
+   * with sensible information, and the v coordinate is set to zero.
+   *
+   * This function returns a tuple containing the projected point, the
+   * shape, the u coordinate and the v coordinate (which is different
+   * from zero only if the resulting shape is a face).
+   */
+  std_cxx11::tuple<Point<3>, TopoDS_Shape, double, double>
+  project_point_and_pull_back(const TopoDS_Shape &in_shape,
+                              const Point<3> &origin,
+                              const double tolerance=1e-7);
 
   /**
-   * Get the closest point to the given topological shape. If the
-   * shape is not elementary, all its subshapes are iterated, faces
-   * first, then edges, and the closest point is returned together
-   * with the shape which contains it, and the u v coordinates of the
-   * point. If the returned shape is an edge, then only the u
-   * coordinate is filled with sensible information, and the v
-   * coordinate is set to zero.
+   * Return the projection of the point @p origin on the topological
+   * shape given by @p in_shape. If the shape is not elementary, all
+   * its subshapes are iterated, faces first, then edges, and the
+   * returned point is the closest one to the @p in_shape, regardless
+   * of its type.
    */
-  Point<3> closest_point(const TopoDS_Shape in_shape,
-                         const Point<3> origin,
-                         TopoDS_Shape &out_shape,
-                         double &u,
-                         double &v,
+  Point<3> closest_point(const TopoDS_Shape &in_shape,
+                         const Point<3> &origin,
                          const double tolerance=1e-7);
 
+  /**
+   * Given an elementary shape @p in_shape and the reference
+   * coordinates within the shape, returns the corresponding point in
+   * real space. If the shape is a TopoDS_Edge, the @p v coordinate is
+   * ignored. Only edges or faces, as returned by the function
+   * project_point_and_pull_back(), can be used as input to this
+   * function. If this is not the case, an Exception is thrown.
+   */
+  Point<3> push_forward(const TopoDS_Shape &in_shape,
+                        const double u,
+                        const double v);
+
 
   /**
-   * Get the closest point to the given topological shape. If the
-   * shape is not elementary, all its subshapes are iterated, faces
-   * first, then edges, and the closest point is returned together
-   * with the shape which contains it, and the u v coordinates of the
-   * point. If the returned shape is an edge, then only the u
-   * coordinate is filled with sensible information, and the v
-   * coordinate is set to zero.
+   * Given a TopoDS_Face @p face and the reference coordinates within
+   * this face, returns the corresponding point in real space, the
+   * normal to the surface at that point and the mean curvature as a
+   * tuple.
    */
-  Point<3>  closest_point_and_differential_forms(const TopoDS_Shape in_shape,
-                                                 const Point<3> origin,
-                                                 Point<3> &surface_normal,
-                                                 double &mean_curvature,
-                                                 const double tolerance=1e-7);
+  std_cxx11::tuple<Point<3>, Point<3>, double >
+  push_forward_and_differential_forms(const TopoDS_Face &face,
+                                      const double u,
+                                      const double v,
+                                      const double tolerance=1e-7);
+
+
+  /**
+   * Get the closest point to the given topological shape, together
+   * with the normal and the mean curvature at that point. If the
+   * shape is not elementary, all its sub-faces (only the faces) are
+   * iterated, faces first, and only the closest point is
+   * returned. This function will throw an exception if the @p
+   * in_shape does not contain at least one face.
+   */
+  std_cxx11::tuple<Point<3>, Point<3>, double>
+  closest_point_and_differential_forms(const TopoDS_Shape &in_shape,
+                                       const Point<3> &origin,
+                                       const double tolerance=1e-7);
+
 
   /**
    * Intersect a line passing through the given @p origin point along
@@ -323,7 +359,6 @@ namespace OpenCASCADE
    * Trying to make operations on the wrong type of shapes.
    */
   DeclException0(ExcUnsupportedShape);
-
 }
 
 

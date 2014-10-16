@@ -124,7 +124,7 @@ namespace OpenCASCADE
    * results if the triangulation to be refined is close to the
    * boundary of the given TopoDS_Shape, or when the direction you use
    * at construction time does not intersect the shape. An exception
-   * is thrown when this appens.
+   * is thrown when this happens.
    *
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
@@ -177,9 +177,11 @@ namespace OpenCASCADE
   /**
    * A Boundary object based on OpenCASCADE TopoDS_Shape where new
    * points are first computed by averaging the surrounding points in
-   * the same way as FlatManifold does, and then projecting it using
+   * the same way as FlatManifold does, and then projecting them using
    * OpenCASCADE utilities onto the manifold along a direction which
-   * is an estimation of the surrounding points (hence mesh cell) normal.
+   * is an estimation of the surrounding points (hence mesh cell)
+   * normal.
+   *
    * The direction normal to the mesh is particularly useful because
    * it is the direction in which the mesh is missing nodes. For
    * instance, during the refinement of a cell a new node is initially
@@ -194,6 +196,7 @@ namespace OpenCASCADE
    * triangles are identified with the points assigned, and the normals
    * of such triangles are averaged to obtain the approximation of
    * the normal to the cell.
+   *
    * The case in which 2 surrounding points are present (i.e.:a cell
    * edge is being refined) is of course more tricky. The average of
    * the CAD surface normals at the 2 surrounding points is first
@@ -202,23 +205,21 @@ namespace OpenCASCADE
    * to have the new point with equal distance with respect to the
    * surrounding points
    *
-   * This class only operates with CAD faces and makes the
-   * assumption that the shape you pass to it
-   * contains at least a face. If that is not the case, an Exeption
-   * is thrown. In debug mode there is a sanity check to
-   * make sure that the surrounding points (the ones used in
-   * project_to_manifold()) actually live on the Manifold, i.e.,
-   * calling OpenCASCADE::closest_point() on those points leaves them
-   * untouched. If this is not the case, an ExcPointNotOnManifold is
-   * thrown.
+   * This class only operates with CAD faces and makes the assumption
+   * that the shape you pass to it contains at least one face. If that
+   * is not the case, an Exception is thrown. In debug mode there is a
+   * sanity check to make sure that the surrounding points (the ones
+   * used in project_to_manifold()) actually live on the Manifold,
+   * i.e., calling OpenCASCADE::closest_point() on those points leaves
+   * them untouched. If this is not the case, an ExcPointNotOnManifold
+   * is thrown.
    *
    *
    * Notice that this type of Boundary descriptor may fail to give
    * results if the triangulation to be refined is close to the
    * boundary of the given TopoDS_Shape, or when the normal direction
-   * estimated from the surrounding points does not intersect the shape.
-   * An exception
-   * is thrown when this appens.
+   * estimated from the surrounding points does not intersect the
+   * shape.  An exception is thrown when this happens.
    *
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
@@ -228,7 +229,8 @@ namespace OpenCASCADE
   public:
     /**
      * Construct a Boundary object which will project points on the
-     * TopoDS_Shape @p sh, along the given @p direction.
+     * TopoDS_Shape @p sh, along a direction which is approximately
+     * normal to the mesh cell.
      */
     NormalToMeshProjectionBoundary(const TopoDS_Shape &sh,
                                    const double tolerance=1e-7);
@@ -238,9 +240,6 @@ namespace OpenCASCADE
      * in debug mode, checks that each of the @p surrounding_points is
      * within tolerance from the given TopoDS_Shape. If this is not
      * the case, an exception is thrown.
-     *
-     * The projected point is computed using OpenCASCADE directional
-     * projection algorithms.
      */
     virtual Point<spacedim>
     project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,

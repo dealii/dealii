@@ -62,13 +62,11 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace OpenCASCADE
 {
-  void count_elements(const TopoDS_Shape &shape,
-                      unsigned int &n_faces,
-                      unsigned int &n_edges,
-                      unsigned int &n_vertices)
+  std_cxx11::tuple<unsigned int, unsigned int, unsigned int>
+  count_elements(const TopoDS_Shape &shape)
   {
     TopExp_Explorer exp;
-    n_faces=0, n_edges=0, n_vertices=0;
+    unsigned int n_faces=0, n_edges=0, n_vertices=0;
     for (exp.Init(shape, TopAbs_FACE);
          exp.More(); exp.Next(), ++n_faces)
       {}
@@ -78,6 +76,7 @@ namespace OpenCASCADE
     for (exp.Init(shape, TopAbs_VERTEX);
          exp.More(); exp.Next(), ++n_vertices)
       {}
+    return std_cxx11::tuple<unsigned int, unsigned int, unsigned int>(n_faces, n_edges, n_vertices);
   }
 
   void extract_geometrical_shapes(const TopoDS_Shape &shape,
@@ -347,7 +346,6 @@ namespace OpenCASCADE
 
     double minDistance = 1e7;
     double distance;
-    int lowest_dist_int = 0;
     Point<3> result;
     for (int i=0; i<Inters.NbPnt(); ++i)
       {
@@ -357,7 +355,6 @@ namespace OpenCASCADE
           {
             minDistance = distance;
             result = point(Inters.Pnt(i+1));
-            lowest_dist_int = i+1;
           }
       }
 
@@ -395,15 +392,11 @@ namespace OpenCASCADE
     return out_shape;
   }
 
-
-  Point<3> closest_point(const TopoDS_Shape in_shape,
-                         const Point<3> origin,
-                         TopoDS_Shape &out_shape,
-                         double &u,
-                         double &v,
-                         const double tolerance)
+  std_cxx11::tuple<Point<3>, TopoDS_Shape, double, double>
+  project_point_and_pull_back(const TopoDS_Shape &in_shape,
+                              const Point<3> &origin,
+                              const double tolerance)
   {
-
     TopExp_Explorer exp;
     gp_Pnt Pproj = point(origin);
 
@@ -412,8 +405,10 @@ namespace OpenCASCADE
 
     unsigned int counter = 0;
     unsigned int face_counter = 0;
-    u=0;
-    v=0;
+
+    TopoDS_Shape out_shape;
+    double u=0;
+    double v=0;
 
     for (exp.Init(in_shape, TopAbs_FACE); exp.More(); exp.Next())
       {
@@ -473,53 +468,89 @@ namespace OpenCASCADE
         }
 
     Assert(counter > 0, ExcMessage("Could not find projection points."));
-    return point(Pproj);
+    return std_cxx11::tuple<Point<3>, TopoDS_Shape, double, double>
+           (point(Pproj),out_shape, u, v);
   }
 
 
-  Point<3> closest_point_and_differential_forms(const TopoDS_Shape in_shape,
-                                                const Point<3> origin,
-                                                Point<3> &surface_normal,
-                                                double &mean_curvature,
-                                                const double tolerance)
+  Point<3> closest_point(const TopoDS_Shape &in_shape,
+                         const Point<3> &origin,
+                         const double tolerance)
+  {
+    std_cxx11::tuple<Point<3>, TopoDS_Shape, double, double>
+    ref = project_point_and_pull_back(in_shape, origin, tolerance);
+    return std_cxx11::get<0>(ref);
+  }
+
+  std_cxx11::tuple<Point<3>, Point<3>, double>
+  closest_point_and_differential_forms(const TopoDS_Shape &in_shape,
+                                       const Point<3> &origin,
+                                       const double tolerance)
 
   {
+    std_cxx11::tuple<Point<3>, TopoDS_Shape, double, double>
+    shape_and_params = project_point_and_pull_back(in_shape,
+                                                   origin,
+                                                   tolerance);
 
-    TopoDS_Shape out_shape;
-    double u, v;
-
-    Point<3> result = closest_point(in_shape,
-                                    origin,
-                                    out_shape,
-                                    u,
-                                    v,
-                                    tolerance);
+    TopoDS_Shape &out_shape = std_cxx11::get<1>(shape_and_params);
+    double &u = std_cxx11::get<2>(shape_and_params);
+    double &v = std_cxx11::get<3>(shape_and_params);
 
     // just a check here: the number of faces in out_shape must be 1, otherwise
     // something is wrong
-    unsigned int n_faces, n_edges, n_vertices;
-    count_elements(out_shape,
-                   n_faces,
-                   n_edges,
-                   n_vertices);
+    std_cxx11::tuple<unsigned int, unsigned int, unsigned int> numbers =
+      count_elements(out_shape);
 
-    Assert(n_faces > 0, ExcMessage("Could not find normal: the shape containing the closest point has 0 faces."));
-    Assert(n_faces < 2, ExcMessage("Could not find normal: the shape containing the closest point has more than 1 face."));
+    Assert(std_cxx11::get<0>(numbers) > 0,
+           ExcMessage("Could not find normal: the shape containing the closest point has 0 faces."));
+    Assert(std_cxx11::get<0>(numbers) < 2,
+           ExcMessage("Could not find normal: the shape containing the closest point has more than 1 face."));
 
 
     TopExp_Explorer exp;
-    exp.Init(in_shape, TopAbs_FACE);
+    exp.Init(out_shape, TopAbs_FACE);
     TopoDS_Face face = TopoDS::Face(exp.Current());
+    return push_forward_and_differential_forms(face, u, v, tolerance);
+  }
 
+  Point<3> push_forward(const TopoDS_Shape &in_shape,
+                        const double u,
+                        const double v)
+  {
+    switch (in_shape.ShapeType())
+      {
+      case TopAbs_FACE:
+      {
+        BRepAdaptor_Surface surf(TopoDS::Face(in_shape));
+        return point(surf.Value(u,v));
+      }
+      case TopAbs_EDGE:
+      {
+        BRepAdaptor_Curve curve(TopoDS::Edge(in_shape));
+        return point(curve.Value(u));
+      }
+      default:
+        Assert(false, ExcUnsupportedShape());
+      }
+    return Point<3>();
+  }
+
+  std_cxx11::tuple<Point<3>, Point<3>, double >
+  push_forward_and_differential_forms(const TopoDS_Face &face,
+                                      const double u,
+                                      const double v,
+                                      const double tolerance)
+  {
     Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
-    GeomLProp_SLProps props(SurfToProj, u, v, 1, tolerance);
+    GeomLProp_SLProps props(SurfToProj, u, v, 1, 1e-7);
+    gp_Pnt Value = props.Value();
+    Assert(props.IsNormalDefined(), ExcMessage("Normal is not well defined!"));
     gp_Dir Normal = props.Normal();
+    Assert(props.IsCurvatureDefined(), ExcMessage("Curvature is not well defined!"));
     Standard_Real Mean_Curvature = props.MeanCurvature();
-
-    surface_normal = Point<3>(Normal.X(),Normal.Y(),Normal.Z());
-    mean_curvature = double(Mean_Curvature);
-
-    return result;
+    Point<3> normal = Point<3>(Normal.X(),Normal.Y(),Normal.Z());
+    return std_cxx11::tuple<Point<3>, Point<3>, double>(point(Value), normal, Mean_Curvature);
   }
 
 

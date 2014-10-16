@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------
 
-// Read the first face of goteborg.iges, attach it to a projector,
+// Read the file side.iges, attach it to a projector,
 // create a single-cell Triangulation, and refine it with the new
 // projector.
 
@@ -44,7 +44,7 @@ int main ()
 {
   std::ofstream logfile("output");
   
-  TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/goteborg.iges", 1);
+  TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/side.iges");
   std::vector<TopoDS_Face> faces;
   std::vector<TopoDS_Edge> edges;
   std::vector<TopoDS_Vertex> vertices;

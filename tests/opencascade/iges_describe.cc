@@ -36,11 +36,15 @@ int main ()
 
   extract_geometrical_shapes(sh, faces, edges, vertices);
   
-  unsigned int nf=0, ne=0, nv=0;
-  count_elements(sh, nf, ne, nv);
-  deallog << "Shape contains " << nf << " faces, "
-	  << ne << " edges, and " 
-	  << nv << " vertices." << std::endl;
+  std_cxx11::tuple<unsigned int, unsigned int, unsigned int>
+    n = count_elements(sh);
+  unsigned int nf=std_cxx11::get<0>(n);
+  unsigned int ne=std_cxx11::get<1>(n);
+  unsigned int nv=std_cxx11::get<2>(n);
+
+  deallog << "Shape contains " << std_cxx11::get<0>(n) << " faces, "
+	  << std_cxx11::get<1>(n) << " edges, and " 
+	  << std_cxx11::get<2>(n) << " vertices." << std::endl;
   
   if(nf != faces.size())
     deallog << "Error!" << std::endl;

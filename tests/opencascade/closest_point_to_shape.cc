@@ -70,7 +70,13 @@ int main ()
   TopoDS_Shape sh;
   for(unsigned int i=0; i<points.size(); ++i) 
     {
-      Point<3> pp = closest_point(edge, points[i], sh, u, v);
+      std_cxx11::tuple<Point<3>, TopoDS_Shape, double, double> ref = 
+	project_point_and_pull_back(edge, points[i]);
+      
+      Point<3> pp = std_cxx11::get<0>(ref);
+      sh = std_cxx11::get<1>(ref);
+      u = std_cxx11::get<2>(ref);
+      v = std_cxx11::get<3>(ref);
       
       deallog << "Origin: " << points[i]
 	      << ", on unit circle: " << pp

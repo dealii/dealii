@@ -1,0 +1,25 @@
+<br>
+
+<i>This program was contributed by Andrea Mola and Luca Heltai.</i>
+
+@note This program elaborates on concepts of industrial geometry, using 
+tools that interface with OpenCASCADE (http://www.opencascade.org) that 
+allow the specification of arbitrary IGES files as boundaries for your
+geometries.
+
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+In some of the previous tutorial programs (step-1 and step-5 among others)
+we have seen that the deal.II mesh refinement is able to 
+
+-mesh refinement -> rule to refine boundary cells
+-set_boundary
+-so far only elementary shapes were considered
+
+-this tutorial shows how to refine a mesh on top of a complex surface
+generated with a CAD modeler and saved in an IGES file.
+
+
+<h2>Where geometry and meshes intersect</h2>

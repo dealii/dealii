@@ -68,15 +68,14 @@ namespace OpenCASCADE
   project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
                        const Point<spacedim> &candidate) const
   {
-    TopoDS_Shape out_shape;
-    double u=0, v=0;
+#ifdef DEBUG
     for (unsigned int i=0; i<surrounding_points.size(); ++i)
-      Assert(closest_point(sh, surrounding_points[i], out_shape, u, v)
+      Assert(closest_point(sh, surrounding_points[i], tolerance)
              .distance(surrounding_points[i]) <
              std::max(tolerance*surrounding_points[i].norm(), tolerance),
              ExcPointNotOnManifold(surrounding_points[i]));
-
-    return closest_point(sh, candidate, out_shape, u, v);
+#endif
+    return closest_point(sh, candidate,tolerance);
   }
 
 
@@ -98,16 +97,14 @@ namespace OpenCASCADE
   project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
                        const Point<spacedim> &candidate) const
   {
-    TopoDS_Shape out_shape;
-    double u=0, v=0;
+#ifdef DEBUG
     for (unsigned int i=0; i<surrounding_points.size(); ++i)
-      Assert(closest_point(sh, surrounding_points[i], out_shape, u, v)
+      Assert(closest_point(sh, surrounding_points[i],tolerance)
              .distance(surrounding_points[i]) <
              std::max(tolerance*surrounding_points[i].norm(), tolerance),
              ExcPointNotOnManifold(surrounding_points[i]));
-
+#endif
     return line_intersection(sh, candidate, direction, tolerance);
-
   }
 
 
@@ -121,15 +118,10 @@ namespace OpenCASCADE
   {
     Assert(spacedim == 3, ExcNotImplemented());
 
-    unsigned int n_faces;
-    unsigned int n_edges;
-    unsigned int n_vertices;
-    count_elements(sh,
-                   n_faces,
-                   n_edges,
-                   n_vertices);
+    std_cxx11::tuple<unsigned int, unsigned int, unsigned int>
+    counts = count_elements(sh);
 
-    Assert(n_faces > 0, ExcMessage("NormalToMeshProjectionBoundary needs a shape containing faces to operate."));
+    Assert(std_cxx11::get<0>(counts) > 0, ExcMessage("NormalToMeshProjectionBoundary needs a shape containing faces to operate."));
   }
 
 
@@ -141,13 +133,15 @@ namespace OpenCASCADE
     TopoDS_Shape out_shape;
     double u=0, v=0;
     Point<3> average_normal(0.0,0.0,0.0);
+#ifdef DEBUG
     for (unsigned int i=0; i<surrounding_points.size(); ++i)
       {
-        Assert(closest_point(sh, surrounding_points[i], out_shape, u, v)
+        Assert(closest_point(sh, surrounding_points[i], tolerance)
                .distance(surrounding_points[i]) <
                std::max(tolerance*surrounding_points[i].norm(), tolerance),
                ExcPointNotOnManifold(surrounding_points[i]));
       }
+#endif
 
     switch (surrounding_points.size())
       {
@@ -155,10 +149,12 @@ namespace OpenCASCADE
       {
         for (unsigned int i=0; i<surrounding_points.size(); ++i)
           {
-            Point<3> surface_normal;
-            double mean_curvature;
-            closest_point_and_differential_forms(sh, surrounding_points[i], surface_normal, mean_curvature);
-            average_normal += surface_normal;
+            std_cxx11::tuple<Point<3>, Point<3>, double>
+            p_and_diff_forms =
+              closest_point_and_differential_forms(sh,
+                                                   surrounding_points[i],
+                                                   tolerance);
+            average_normal += std_cxx11::get<1>(p_and_diff_forms);
           }
 
         average_normal/=2.0;
@@ -166,11 +162,10 @@ namespace OpenCASCADE
         Assert(average_normal.norm() > 1e-4,
                ExcMessage("Failed to refine cell: the average of the surface normals at the surrounding edge turns out to be a null vector, making the projection direction undetermined."));
 
-        Point<3> P = (surrounding_points[0]+surrounding_points[1])/2;
-        Point<3> N = surrounding_points[0]-surrounding_points[1];
-        N = N/sqrt(N.square());
-        average_normal = average_normal-(average_normal*N)*N;
-        average_normal = average_normal/average_normal.norm();
+        Point<3> T = surrounding_points[0]-surrounding_points[1];
+        T /= T.norm();
+        average_normal = average_normal-(average_normal*T)*T;
+        average_normal /= average_normal.norm();
         break;
       }
       case 8:
@@ -194,10 +189,10 @@ namespace OpenCASCADE
 
         average_normal = (n1+n2+n3+n4)/4.0;
 
-        Assert(average_normal.norm() > 1e-4,
+        Assert(average_normal.norm() > tolerance,
                ExcMessage("Failed to refine cell: the average of the surface normals at the surrounding edge turns out to be a null vector, making the projection direction undetermined."));
 
-        average_normal = average_normal/average_normal.norm();
+        average_normal /= average_normal.norm();
         break;
       }
       default:
