@@ -26,75 +26,84 @@ template <typename number> class Vector;
 class SolverControl;
 
 /**
- * This class defines possible return states of linear solvers and
- * provides interfaces to a memory pool and the control object.
+ * A base class for iterative linear solvers. This class
+ * provides interfaces to a memory pool and the objects that
+ * determine whether a solver has converged.
  *
- * <h3>Requirements for template classes</h3>
+ *
+ * <h3>Requirements common to derived solver classes</h3>
  *
  * Since iterative solvers do not rely on any special structure of
- * matrices or the format of storage, but only require that matrices
- * and vector define certain operations such as matrix-vector
+ * matrices or the format of storage but only require that matrices
+ * and vectors define certain operations such as matrix-vector
  * products, or scalar products between vectors, this class as well as
- * the derived classes implementing concrete linear solvers are
- * templated on the types of matrices and vectors. However, there are
- * some common requirements a matrix or vector type must fulfill to
- * qualify as an applicable type for the solvers in this
- * hierarchy. These requirements are listed following. The listed
- * classes are not any concrete class, they are rather intended to
+ * the derived classes and their member functions implementing concrete
+ * linear solvers are templated on the types of matrices and vectors.
+ * However, there are some common requirements a matrix or vector type
+ * must fulfill to qualify as an acceptable type for the solvers in this
+ * hierarchy. These requirements are listed below.
+ *
+ * The classes we show below are not any concrete class. Rather, they are intended to
  * form a `signature' which a concrete class has to conform to. Note
  * that the matrix and vector classes within this library of course
  * conform to this interface; therefore, SparseMatrix and Vector are
- * good examples for these classes.
+ * good examples for these classes as they provide the necessary
+ * signatures of member functions.
  *
  * @code
  * class Matrix
  * {
  *   public:
  *                        // Application of matrix to vector src.
- *                        // write result into dst
- *     void vmult (VECTOR &dst, const VECTOR &src) const;
+ *                        // Write result into dst
+ *     void vmult (VECTOR &dst,
+ *                 const VECTOR &src) const;
  *
- *                        // Application of transpose to a Vector.
- *                        // Only used by certain iterative methods.
- *     void Tvmult (VECTOR &dst, const VECTOR &src) const;
+ *                        // Application of transpose to a vector.
+ *                        // Only used by some iterative methods.
+ *     void Tvmult (VECTOR &dst,
+ *                  const VECTOR &src) const;
  * };
  *
  *
- * class VECTOR
+ * class Vector
  * {
  *   public:
- *                        // resize to have the same structure
- *                        // as the one provided and/or
- *                        // clear vector. note
- *                        // that the second argument must have
+ *                        // Resize the current object to have
+ *                        // the same size and layout as the model_vector
+ *                        // argument provided. The second argument
+ *                        // indicates whether to clear the current
+ *                        // object after resizing.
+ *                        // The second argument must have
  *                        // a default value equal to false
- *     void reinit (const VECTOR&,
- *                  bool  leave_elements_uninitialized = false);
+ *     void reinit (const Vector &model_vector,
+ *                  const bool  leave_elements_uninitialized = false);
  *
- *                        // scalar product
- *     double operator * (const VECTOR &v) const;
+ *                        // Scalar product between the current object
+ *                        // and the argument
+ *     double operator * (const Vector &v) const;
  *
- *                        // addition of vectors
- *     void add (const VECTOR &x);
+ *                        // Addition of vectors
+ *     void add (const Vector &x);
  *
- *                        // scaled addition of vectors
+ *                        // Scaled addition of vectors
  *     void add (const double  a,
- *               const VECTOR &x);
+ *               const Vector &x);
  *
- *                        // scaled addition of vectors
+ *                        // Scaled addition of vectors
  *     void sadd (const double  a,
  *                const double  b,
- *                const VECTOR &x);
+ *                const Vector &x);
  *
- *                        // scaled assignment of a vector
+ *                        // Scaled assignment of a vector
  *     void equ (const double  a,
- *               const VECTOR &x);
+ *               const Vector &x);
  *
- *                        // scale the elements of the vector
- *                        // by a fixed value
- *     VECTOR & operator *= (const double a);
+ *                        // Multiply the elements of the current
+ *                        // object by a fixed value
+ *     Vector & operator *= (const double a);
  *
- *                        // return the l2 norm of the vector
+ *                        // Return the l2 norm of the vector
  *     double l2_norm () const;
  * };
  * @endcode
@@ -111,16 +120,16 @@ class SolverControl;
  *
  * Several solvers need additional data, like the damping parameter @p omega
  * of the @p SolverRichardson class or the maximum number of temporary
- * vectors of the @p SolverGMRES.  To have a standardized constructor for
- * each solver class the <tt>struct AdditionalData</tt> has been introduced to each
- * solver class. Some solvers need no additional data, like @p SolverCG or
- * @p SolverBicgstab. For these solvers the struct @p AdditionalData is
+ * vectors of @p SolverGMRES.  To have a standardized way of constructing solvers,
+ * each solver class has a <tt>struct AdditionalData</tt> as a member, and constructors
+ * of all solver classes take such an argument. Some solvers need no additional data,
+ * or may not at the current time. For these solvers the struct @p AdditionalData is
  * empty and calling the constructor may be done without giving the additional
  * structure as an argument as a default @p AdditionalData is set by default.
  *
- * Now the generating of a solver looks like
+ * With this, creating a solver looks like
  * @code
- *                               // GMRES with 50 tmp vectors
+ *                               // GMRES with restart every 50 iterations
  * SolverGMRES solver_gmres (solver_control, vector_memory,
  *                           SolverGMRES::AdditionalData(50));
  *
@@ -132,9 +141,9 @@ class SolverControl;
  * SolverCG solver_cg (solver_control, vector_memory);
  * @endcode
  *
- * Using a unified constructor parameter list for all solvers was introduced
- * when the @p SolverSelector class was written; the unified interface
- * enabled us to use this class unchanged even if the number of types of
+ * Using a unified constructor parameter list for all solvers supports
+ * the @p SolverSelector class; the unified interface
+ * enables us to use this class unchanged even if the number of types of
  * parameters to a certain solver changes and it is still possible in a simple
  * way to give these additional data to the @p SolverSelector object for each
  * solver which it may use.
@@ -150,8 +159,8 @@ public:
    * Constructor. Takes a control
    * object which evaluates the
    * conditions for convergence,
-   * and an object to provide
-   * memory.
+   * and an object that allows solvers to allocate
+   * memory for temporary objects.
    *
    * Of both objects, a reference is
    * stored, so it is the user's
@@ -169,7 +178,7 @@ public:
    * conditions for convergence. In
    * contrast to the other
    * constructor, this constructor
-   * denotes an internal object of
+   * designates an internal object of
    * type GrowingVectorMemory to
    * allocate memory.
    *
@@ -177,14 +186,14 @@ public:
    * object is stored, so it is the
    * user's responsibility to
    * guarantee that the lifetime of
-   * the two arguments is at least
+   * the argument is at least
    * as long as that of the solver
    * object.
    */
   Solver (SolverControl        &solver_control);
 
   /**
-   * Access to object that controls
+   * Return a reference to the object that controls
    * convergence.
    */
   SolverControl &control() const;
@@ -199,15 +208,16 @@ protected:
   mutable GrowingVectorMemory<VECTOR> static_vector_memory;
 
   /**
-   * Control structure.
+   * Reference to the object that determines convergence.
    */
   SolverControl &cntrl;
 
   /**
-   * Memory for auxiliary vectors.
+   * A reference to an object that provides memory for auxiliary vectors.
    */
   VectorMemory<VECTOR> &memory;
 };
+
 
 /*-------------------------------- Inline functions ------------------------*/
 
