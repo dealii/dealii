@@ -332,6 +332,9 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   std::vector<double> diagonal;
   std::vector<double> offdiagonal;
 
+  int  it=0;
+  double res = -std::numeric_limits<double>::max();
+
   try
     {
       // define some aliases for simpler access
@@ -344,10 +347,8 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
       g.reinit(x, true);
       d.reinit(x, true);
       h.reinit(x, true);
-      // Implementation taken from the DEAL
-      // library
-      int  it=0;
-      double res,gh,alpha,beta;
+
+      double gh,alpha,beta;
 
       // compute residual. if vector is
       // zero, then short-circuit the
@@ -361,8 +362,8 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
         g.equ(-1.,b);
       res = g.l2_norm();
 
-      conv = this->control().check(0,res);
-      if (conv)
+      conv = this->iteration_status(0, res, x);
+      if (conv != SolverControl::iterate)
         {
           cleanup();
           return;
@@ -397,7 +398,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 
           print_vectors(it, x, g, d);
 
-          conv = this->control().check(it,res);
+          conv = this->iteration_status(it, res, x);
           if (conv != SolverControl::iterate)
             break;
 
@@ -481,9 +482,8 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   // Deallocate Memory
   cleanup();
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  if (conv != SolverControl::success)
+    AssertThrow(false, SolverControl::NoConvergence (it, res));
   // otherwise exit as normal
 }
 

@@ -189,19 +189,39 @@ protected:
    * the square root of the @p res2 value.
    */
   double res2;
+
   /**
-   * Additional parameters..
+   * Additional parameters.
    */
   AdditionalData additional_data;
+
 private:
+
   /**
-   * The iteration loop itself.
+   * A structure returned by the iterate() function representing
+   * what it found is happening during the iteration.
+   */
+  struct IterationResult
+  {
+    SolverControl::State state;
+    double               last_residual;
+
+    IterationResult (const SolverControl::State state,
+                     const double               last_residual);
+  };
+
+
+  /**
+   * The iteration loop itself. The function returns a structure
+   * indicating what happened in this function.
    */
   template<class MATRIX, class PRECONDITIONER>
-  bool
-  iterate(const MATRIX &A, const PRECONDITIONER &precondition);
+  IterationResult
+  iterate (const MATRIX &A,
+           const PRECONDITIONER &precondition);
+
   /**
-   * The current iteration step.
+   * Number of the current iteration (accumulated over restarts)
    */
   unsigned int step;
 };
@@ -210,6 +230,15 @@ private:
 /*------------------------- Implementation ----------------------------*/
 
 #ifndef DOXYGEN
+
+template<class VECTOR>
+SolverQMRS<VECTOR>::IterationResult::IterationResult(const SolverControl::State state,
+                                                     const double               last_residual)
+  :
+  state (state),
+  last_residual (last_residual)
+{}
+
 
 template<class VECTOR>
 SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
@@ -280,15 +309,15 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
 
   step = 0;
 
-  bool state;
+  IterationResult state (SolverControl::failure,0);
 
   do
     {
-      if (step)
+      if (step > 0)
         deallog << "Restart step " << step << std::endl;
       state = iterate(A, precondition);
     }
-  while (state);
+  while (state.state == SolverControl::iterate);
 
   // Deallocate Memory
   this->memory.free(Vv);
@@ -301,9 +330,9 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
   deallog.pop();
 
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  AssertThrow(state.state == SolverControl::success,
+              SolverControl::NoConvergence (step,
+                                            state.last_residual));
   // otherwise exit as normal
 }
 
@@ -311,7 +340,7 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-bool
+typename SolverQMRS<VECTOR>::IterationResult
 SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
                             const PRECONDITIONER &precondition)
 {
@@ -346,8 +375,8 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
   v.sadd(-1.,1.,b);
   res = v.l2_norm();
 
-  if (this->control().check(step, res) == SolverControl::success)
-    return false;
+  if (this->iteration_status(step, res, x) == SolverControl::success)
+    return IterationResult(SolverControl::success, res);
 
   p = v;
 
@@ -367,7 +396,7 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
 
 //TODO:[?] Find a really good breakdown criterion. The absolute one detects breakdown instead of convergence
       if (std::fabs(sigma/rho) < additional_data.breakdown)
-        return true;
+        return IterationResult(SolverControl::iterate, std::fabs(sigma/rho));
       // Step 3
       alpha = rho/sigma;
 
@@ -391,13 +420,13 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
         }
       else
         res = std::sqrt((it+1)*tau);
-      state = this->control().check(step,res);
+      state = this->iteration_status(step,res,x);
       if ((state == SolverControl::success)
           || (state == SolverControl::failure))
-        return false;
+        return IterationResult(state, res);
       // Step 6
       if (std::fabs(rho) < additional_data.breakdown)
-        return true;
+        return IterationResult(SolverControl::iterate, std::fabs(rho));
       // Step 7
       rho_old = rho;
       precondition.vmult(q,v);
@@ -407,7 +436,7 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
       p.sadd(beta,v);
       precondition.vmult(q,p);
     }
-  return false;
+  return IterationResult(SolverControl::success, std::fabs(rho));
 }
 
 #endif // DOXYGEN

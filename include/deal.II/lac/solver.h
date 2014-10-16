@@ -19,11 +19,13 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/solver_control.h>
+
+#include <boost/signals2.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class Vector;
-class SolverControl;
 
 /**
  * A base class for iterative linear solvers. This class
@@ -192,12 +194,6 @@ public:
    */
   Solver (SolverControl        &solver_control);
 
-  /**
-   * Return a reference to the object that controls
-   * convergence.
-   */
-  SolverControl &control() const;
-
 protected:
   /**
    * A static vector memory object
@@ -208,27 +204,120 @@ protected:
   mutable GrowingVectorMemory<VECTOR> static_vector_memory;
 
   /**
-   * Reference to the object that determines convergence.
-   */
-  SolverControl &cntrl;
-
-  /**
    * A reference to an object that provides memory for auxiliary vectors.
    */
   VectorMemory<VECTOR> &memory;
+
+private:
+  /**
+   * A class whose operator() combines two states indicating whether
+   * we should continue iterating or stop, and returns a state that
+   * dominates. The rules are:
+   * - If one of the two states indicates failure, return failure.
+   * - Otherwise, if one of the two states indicates to continue
+   *   iterating, then continue iterating.
+   * - Otherwise, return success.
+   */
+  struct StateCombiner
+  {
+    typedef SolverControl::State result_type;
+
+    SolverControl::State operator() (const SolverControl::State state1,
+                                     const SolverControl::State state2) const;
+
+    template <typename Iterator>
+    SolverControl::State operator() (const Iterator begin,
+                                     const Iterator end) const;
+  };
+
+protected:
+  /**
+   * A signal that iterative solvers can execute at the end of every
+   * iteration (or in an otherwise periodic fashion) to find out whether
+   * we should continue iterating or not. The signal may call one or
+   * more slots that each will make this determination by themselves,
+   * and the result over all slots (function calls) will be determined
+   * by the StateCombiner object.
+   *
+   * The arguments passed to the signal are (i) the number of the current
+   * iteration; (ii) the value that is used to determine convergence (oftentimes
+   * the residual, but in other cases other quantities may be used as long
+   * as they converge to zero as the iterate approaches the solution of
+   * the linear system); and (iii) a vector that corresponds to the current
+   * best guess for the solution at the point where the signal is called.
+   * Note that some solvers do not update the approximate solution in every
+   * iteration but only after convergence or failure has been determined
+   * (GMRES is an example); in such cases, the vector passed as the last
+   * argument to the signal is simply the best approximate at the time
+   * the signal is called, but not the vector that will be returned if
+   * the signal's return value indicates that the iteration should be
+   * terminated.
+   */
+  boost::signals2::signal<SolverControl::State (const unsigned int iteration,
+                                                const double        check_value,
+                                                const VECTOR       &current_iterate),
+                                                      StateCombiner> iteration_status;
 };
 
 
 /*-------------------------------- Inline functions ------------------------*/
+
+
+template <class VECTOR>
+inline
+SolverControl::State
+Solver<VECTOR>::StateCombiner::operator ()(const SolverControl::State state1,
+                                           const SolverControl::State state2) const
+{
+  if ((state1 == SolverControl::failure)
+      ||
+      (state2 == SolverControl::failure))
+    return SolverControl::failure;
+  else if ((state1 == SolverControl::iterate)
+           ||
+           (state2 == SolverControl::iterate))
+    return SolverControl::iterate;
+  else
+    return SolverControl::success;
+}
+
+
+template <class VECTOR>
+template <typename Iterator>
+inline
+SolverControl::State
+Solver<VECTOR>::StateCombiner::operator ()(const Iterator begin,
+                                           const Iterator end) const
+{
+  Assert (begin != end, ExcMessage ("You can't combine iterator states if no state is given."));
+
+  // combine the first with all of the following states
+  SolverControl::State state = *begin;
+  Iterator p = begin;
+  ++p;
+  for (; p != end; ++p)
+    state = this->operator()(state, *p);
+
+  return state;
+}
+
 
 template<class VECTOR>
 inline
 Solver<VECTOR>::Solver (SolverControl        &solver_control,
                         VectorMemory<VECTOR> &vector_memory)
   :
-  cntrl(solver_control),
   memory(vector_memory)
-{}
+{
+  // connect the solver control object to the signal. SolverControl::check
+  // only takes two arguments, the iteration and the check_value, and so
+  // we simply ignore the third argument that is passed in whenever the
+  // signal is executed
+  iteration_status.connect (std_cxx11::bind(&SolverControl::check,
+                                            std_cxx11::ref(solver_control),
+                                            std_cxx11::_1,
+                                            std_cxx11::_2));
+}
 
 
 
@@ -236,18 +325,17 @@ template<class VECTOR>
 inline
 Solver<VECTOR>::Solver (SolverControl        &solver_control)
   :
-  cntrl(solver_control),
+  // use the static memory object this class owns
   memory(static_vector_memory)
-{}
-
-
-
-template <class VECTOR>
-inline
-SolverControl &
-Solver<VECTOR>::control() const
 {
-  return cntrl;
+  // connect the solver control object to the signal. SolverControl::check
+  // only takes two arguments, the iteration and the check_value, and so
+  // we simply ignore the third argument that is passed in whenever the
+  // signal is executed
+  iteration_status.connect (std_cxx11::bind(&SolverControl::check,
+                                            std_cxx11::ref(solver_control),
+                                            std_cxx11::_1,
+                                            std_cxx11::_2));
 }
 
 

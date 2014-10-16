@@ -122,10 +122,11 @@ SolverRelaxation<VECTOR>::solve (
 
   deallog.push("Relaxation");
 
+  int iter=0;
   try
     {
       // Main loop
-      for (int iter=0; conv==SolverControl::iterate; iter++)
+      for (; conv==SolverControl::iterate; iter++)
         {
           // Compute residual
           A.vmult(r,x);
@@ -136,7 +137,7 @@ SolverRelaxation<VECTOR>::solve (
           // residual is computed in
           // criterion() and stored
           // in res.
-          conv = this->control().check (iter, r.l2_norm());
+          conv = this->iteration_status (iter, r.l2_norm(), x);
           if (conv != SolverControl::iterate)
             break;
           R.step(x,b);
@@ -150,9 +151,8 @@ SolverRelaxation<VECTOR>::solve (
   deallog.pop();
 
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  AssertThrow(conv == SolverControl::success,
+              SolverControl::NoConvergence (iter, r.l2_norm()));
   // otherwise exit as normal
 }
 

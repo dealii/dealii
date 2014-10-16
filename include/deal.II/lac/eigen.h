@@ -273,7 +273,8 @@ EigenPower<VECTOR>::solve (double       &value,
   A.vmult (y,x);
 
   // Main loop
-  for (int iter=0; conv==SolverControl::iterate; iter++)
+  int iter=0;
+  for (; conv==SolverControl::iterate; iter++)
     {
       y.add(additional_data.shift, x);
 
@@ -307,7 +308,7 @@ EigenPower<VECTOR>::solve (double       &value,
 
       // Check the change of the eigenvalue
       // Brrr, this is not really a good criterion
-      conv = this->control().check (iter, std::fabs(1./length-1./old_length));
+      conv = this->iteration_status (iter, std::fabs(1./length-1./old_length), x);
     }
 
   this->memory.free(Vy);
@@ -316,9 +317,9 @@ EigenPower<VECTOR>::solve (double       &value,
   deallog.pop();
 
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  AssertThrow(conv == SolverControl::success, SolverControl::NoConvergence (iter,
+              std::fabs(1./length-1./old_length)));
+
   // otherwise exit as normal
 }
 
@@ -378,7 +379,9 @@ EigenInverse<VECTOR>::solve (double       &value,
   x.scale(1./length);
 
   // Main loop
-  for (size_type iter=0; conv==SolverControl::iterate; iter++)
+  double res = -std::numeric_limits<double>::max();
+  size_type iter=0;
+  for (; conv==SolverControl::iterate; iter++)
     {
       solver.solve (A_s, y, x, prec);
 
@@ -420,13 +423,14 @@ EigenInverse<VECTOR>::solve (double       &value,
           y.equ (value, x);
           A.vmult(r,x);
           r.sadd(-1., value, x);
-          double res = r.l2_norm();
+          res = r.l2_norm();
           // Check the residual
-          conv = this->control().check (iter, res);
+          conv = this->iteration_status (iter, res, x);
         }
       else
         {
-          conv = this->control().check (iter, std::fabs(1./value-1./old_value));
+          res = std::fabs(1./value-1./old_value);
+          conv = this->iteration_status (iter, res, x);
         }
       old_value = value;
     }
@@ -438,9 +442,9 @@ EigenInverse<VECTOR>::solve (double       &value,
 
   // in case of failure: throw
   // exception
-  if (this->control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (this->control().last_step(),
-                                        this->control().last_value());
+  AssertThrow (conv == SolverControl::success,
+               SolverControl::NoConvergence (iter,
+                                             res));
   // otherwise exit as normal
 }
 

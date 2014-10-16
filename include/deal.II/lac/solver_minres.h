@@ -281,7 +281,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   m[1]->reinit(b);
   m[2]->reinit(b);
 
-  conv = this->control().check(0,r_l2);
+  conv = this->iteration_status(0, r_l2, x);
 
   while (conv==SolverControl::iterate)
     {
@@ -321,7 +321,8 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 
       d = std::sqrt (d_*d_ + delta[2]);
 
-      if (j>1) tau *= s / c;
+      if (j>1)
+        tau *= s / c;
       c = d_ / d;
       tau *= c;
 
@@ -337,7 +338,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
       x.add (tau, *m[0]);
       r_l2 *= std::fabs(s);
 
-      conv = this->control().check(j,r_l2);
+      conv = this->iteration_status(j, r_l2, x);
 
       // next iteration step
       ++j;
@@ -380,9 +381,9 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   deallog.pop ();
 
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  AssertThrow(conv == SolverControl::success,
+              SolverControl::NoConvergence (j, r_l2));
+
   // otherwise exit as normal
 }
 

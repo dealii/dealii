@@ -226,18 +226,50 @@ private:
   SolverControl::State start(const MATRIX &A);
 
   /**
-   * The iteration loop itself.
+   * A structure returned by the iterate() function representing
+   * what it found is happening during the iteration.
+   */
+  struct IterationResult
+  {
+    bool                 breakdown;
+    SolverControl::State state;
+    unsigned int         last_step;
+    double               last_residual;
+
+    IterationResult (const bool breakdown,
+                     const SolverControl::State state,
+                     const unsigned int         last_step,
+                     const double               last_residual);
+  };
+
+  /**
+   * The iteration loop itself. The function returns a structure
+   * indicating what happened in this function.
    */
   template<class MATRIX, class PRECONDITIONER>
-  bool
-  iterate(const MATRIX &A, const PRECONDITIONER &precondition);
-
+  IterationResult
+  iterate(const MATRIX &A,
+          const PRECONDITIONER &precondition);
 };
 
 /*@}*/
 /*-------------------------Inline functions -------------------------------*/
 
 #ifndef DOXYGEN
+
+
+template<class VECTOR>
+SolverBicgstab<VECTOR>::IterationResult::IterationResult(const bool breakdown,
+                                                         const SolverControl::State state,
+                                                         const unsigned int         last_step,
+                                                         const double               last_residual)
+  :
+  breakdown (breakdown),
+  state (state),
+  last_step (last_step),
+  last_residual (last_residual)
+{}
+
 
 template<class VECTOR>
 SolverBicgstab<VECTOR>::SolverBicgstab (SolverControl &cn,
@@ -289,7 +321,7 @@ SolverBicgstab<VECTOR>::start(const MATRIX &A)
   Vr->sadd(-1.,1.,*Vb);
   res = Vr->l2_norm();
 
-  return this->control().check(step, res);
+  return this->iteration_status(step, res, *Vx);
 }
 
 
@@ -306,7 +338,7 @@ SolverBicgstab<VECTOR>::print_vectors(const unsigned int,
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-bool
+typename SolverBicgstab<VECTOR>::IterationResult
 SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
                                 const PRECONDITIONER &precondition)
 {
@@ -349,17 +381,22 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
 //TODO:[?] Find better breakdown criterion
 
       if (std::fabs(alpha) > 1.e10)
-        return true;
+        return IterationResult(true, state, step, res);
 
       r.add(-alpha, v);
 
       // check for early success, see the lac/bicgstab_early testcase as to
       // why this is necessary
-      if (this->control().check(step, r.l2_norm()) == SolverControl::success)
+      //
+      // note: the vector *Vx we pass to the iteration_status signal here is only
+      // the current approximation, not the one we will return with,
+      // which will be x=*Vx + alpha*y
+      res = r.l2_norm();
+      if (this->iteration_status(step, res, *Vx) == SolverControl::success)
         {
           Vx->add(alpha, y);
           print_vectors(step, *Vx, r, y);
-          return false;
+          return IterationResult(false, SolverControl::success, step, res);
         }
 
       precondition.vmult(z,r);
@@ -374,11 +411,11 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
       else
         res = r.l2_norm();
 
-      state = this->control().check(step, res);
+      state = this->iteration_status(step, res, *Vx);
       print_vectors(step, *Vx, r, y);
     }
   while (state == SolverControl::iterate);
-  return false;
+  return IterationResult(false, state, step, res);
 }
 
 
@@ -411,17 +448,21 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
 
   step = 0;
 
-  bool state;
+  IterationResult state(false,SolverControl::failure,0,0);
 
+  // iterate while the inner iteration returns a breakdown
   do
     {
       if (step != 0)
         deallog << "Restart step " << step << std::endl;
       if (start(A) == SolverControl::success)
-        break;
+        {
+          state.state = SolverControl::success;
+          break;
+        }
       state = iterate(A, precondition);
     }
-  while (state);
+  while (state.breakdown == true);
 
   this->memory.free(Vr);
   this->memory.free(Vrbar);
@@ -434,9 +475,9 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
   deallog.pop();
 
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  AssertThrow(state.state == SolverControl::success,
+              SolverControl::NoConvergence (state.last_step,
+                                            state.last_residual));
   // otherwise exit as normal
 }
 
