@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -540,12 +540,13 @@ public:
   DeclException1 (ExcGmshUnsupportedGeometry,
                   int,
                   << "The Element Identifier <" << arg1 << "> is not "
-                  << "supported in the Deal.II Library.\n"
+                  << "supported in the deal.II library when "
+                  << "reading meshes in " << dim << " dimensions.\n"
                   << "Supported elements are: \n"
                   << "ELM-TYPE\n"
                   << "1 Line (2 nodes, 1 edge).\n"
                   << "3 Quadrilateral (4 nodes, 4 edges).\n"
-                  << "5 Hexahedron (8 nodes, 12 edges, 6 faces).\n"
+                  << "5 Hexahedron (8 nodes, 12 edges, 6 faces) when in 3d.\n"
                   << "15 Point (1 node, ignored when read)");
 
 
