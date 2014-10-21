@@ -19,22 +19,9 @@
 
 // @sect3{Include files}
 
-// The program starts with including a bunch of include files that we will use
+// We start with including a bunch of files that we will use
 // in the various parts of the program. Most of them have been discussed in
 // previous tutorials already:
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/convergence_table.h>
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/quadrature_selector.h>
-#include <deal.II/base/parsed_function.h>
-#include <deal.II/base/utilities.h>
-
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/solver_control.h>
-#include <deal.II/lac/solver_gmres.h>
-#include <deal.II/lac/precondition.h>
-
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -42,23 +29,15 @@
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
 
 // And here are the headers of the opencascade support classes and functions:
 #include <deal.II/opencascade/boundary_lib.h>
 #include <deal.II/opencascade/utilities.h>
 
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q.h>
-
-#include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vector_tools.h>
-
-// And here are a few C++ standard header files that we will need:
+// Finally, a few C++ standard header files that we will need:
 #include <cmath>
 #include <iostream>
 #include <fstream>
@@ -77,8 +56,10 @@ namespace Step54
   // The structure of this class is very small. Since we only want
   // to show how a triangulation can be refined onto a CAD surface, the
   // arguments of this class are basically just the input and output file
-  // names and the triangulation we want to play with.
-  // The member functions of this class are like those that in most of the
+  // names, and a flag indicating the surface projection strategy we want to
+  // test. Along with the input argument, the only other member of the class
+  // is the triangulation we want to play with. 
+  // The member functions of this class are similar to those that in most of the
   // other tutorial programs deal with the setup of the grid for the
   // simulations.
 
@@ -138,7 +119,7 @@ namespace Step54
   // @sect4{TriangulationOnCAD::read_domain}
 
 
-  // The following function represents the core of the present tutorial program.
+  // The following function represents the core of thhis program.
   // In this function we in fact import the CAD shape upon which we want to generate
   // and refine our triangulation. Such CAD surface is contained in the IGES
   // file "DTMB-5415_bulbous_bow.iges", and represents the bulbous bow of a ship.
@@ -146,28 +127,23 @@ namespace Step54
   // geometry a particularly meaningful example.
   //
   // So, after importing the hull bow surface, we extract some of the curves and surfaces
-  // comosing it, and use them to generate a set of projectors. Such projectors substantially
-  // define the rules deal.ii has to follow to position each new node during the cell
+  // composing it, and use them to generate a set of projectors. Such projectors substantially
+  // define the rules the Triangulation has to follow to position each new node during the cell
   // refinement.
   //
-  // As for the triangulation, as done in previous tutorial programs, we import a
-  // pre-existing grid saved in .vtk format. The imported mesh is composed of a single
-  // quadrilateral cell the vertices of which have been located on the CAD shape. In
-  // this tutorial, we chose to import our mesh in vtk format.
+  // To initialize the Triangulation, as done in previous tutorial programs, we import a
+  // pre-existing grid saved in VTK format. The imported mesh is composed of a single
+  // quadrilateral cell the vertices of which have been placed on the CAD shape. 
   //
-  // So, after importing both the initial mesh, we assign the projectors
-  // previously generated to each of the edges and cells which will have to be
+  // So, after importing both the IGES geometry and the initial mesh, we assign the projectors
+  // previously discussed to each of the edges and cells which will have to be
   // refined on the CAD surface.
   //
-  // In this tutorial, we will test three different ways to project new mesh nodes onto
-  // the CAD surface, and will analyze the results obtained with each surface projection
-  // strategy. A first approach consists in projecting each node in the direction which
-  // is normal to the surface. A second possibility is represented by chosing a single
-  // direction along which to project all the nodes on the surface. The third strategy
-  // consists in projecting the new nodes on the surface along a direction which represents
-  // an estimate of the mesh cell normal. Each of such projection strategies has been
+  // In this tutorial, we will test the three different CAD surface projectors described in
+  // the introduction, and will analyze the results obtained with each of them.
+  // As mentioned, each of such projection strategiy has been
   // implemented in a different class, which can be assigned to the set_manifold method
-  // of a deal.ii triangulation class.
+  // of a Triangulation class.
   //
 
 
@@ -176,11 +152,11 @@ namespace Step54
   void TriangulationOnCAD::read_domain()
   {
 
-    // this function allows for the CAD file of interest (in IGES format) to be imported.
-    // The function input parameters are a string containing the desired file name, and
+    // The following function allows for the CAD file of interest (in IGES format) to be imported.
+    // The function arguments are a string containing the desired file name, and
     // a scale factor. In this example, such scale factor is set to 1e-3, as the original
     // geometry is written in millimeters, while we prefer to work in meters.
-    // The output of the function is an object of opencascade generic topological shape
+    // The output of the function is an object of OpenCASCADE generic topological shape
     // class, namely a TopoDS_Shape.
 
     TopoDS_Shape bow_surface = OpenCASCADE::read_IGES("DTMB-5415_bulbous_bow.iges",1e-3);
@@ -221,7 +197,7 @@ namespace Step54
                                          wires);
 
     // The next few steps are more familiar, and allow us to import an existing
-    // mesh from an external vtk file, and convert it to a deal triangulation.
+    // mesh from an external VTK file, and convert it to a deal triangulation.
     std::ifstream in;
 
     in.open(initial_mesh_filename.c_str());
@@ -233,7 +209,7 @@ namespace Step54
     // We output this initial mesh saving it as the refinement step 0.
     output_results(0);
 
-    // The mesh imported has a single cell. so, we get an iterator to that cell.
+    // The mesh imported has a single cell. So, we get an iterator to that cell.
     // and assgin it the manifold_id 1
     Triangulation<2,3>::active_cell_iterator cell = tria.begin_active();
     cell->set_manifold_id(1);
@@ -262,16 +238,16 @@ namespace Step54
     switch (surface_projection_kind)
       {
       case 0:
-        // If the value is 0, we select the NormalProjectionBoundary. The new mesh points will initially
-        // generated at the baricenter of the cell/edge considere, and then projected
+        // If surface_projection_kind value is 0, we select the NormalProjectionBoundary. The new mesh points will initially
+        // generated at the baricenter of the cell/edge considered, and then projected
         // on the CAD surface along its normal direction.
         // The NormalProjectionBoundary constructor only needs a shape and a tolerance.
         static OpenCASCADE::NormalProjectionBoundary<2,3> normal_projector(bow_surface, tolerance);
-        // The normal projector is assigned to the manifold having id 1.
+        // Once created, the normal projector is assigned to the manifold having id 1.
         tria.set_manifold(1,normal_projector);
         break;
       case 1:
-        // If the value is 1, we select the DirectionalProjectionBoundary. The new mesh points will initially
+        // If surface_projection_kind value is 1, we select the DirectionalProjectionBoundary. The new mesh points will initially
         // generated at the baricenter of the cell/edge considere, and then projected
         // on the CAD surface along a direction that is specified to the DirectionalProjectionBoundary
         // constructor. In this case, the projection is done along the y-axis.
@@ -279,7 +255,7 @@ namespace Step54
         tria.set_manifold(1,directional_projector);
         break;
       case 2:
-        // If the value is 2, we select the NormaToMeshlProjectionBoundary. The new mesh points will initially
+        // If surface_projection_kind value is 2, we select the NormaToMeshlProjectionBoundary. The new mesh points will initially
         // generated at the baricenter of the cell/edge considere, and then projected
         // on the CAD surface along a direction that is an estimate of the mesh normal direction.
         // The NormalToMeshProjectionBoundary constructor only requires a shape (containing at least a face)
@@ -299,7 +275,7 @@ namespace Step54
 
   // This function globally refines the mesh. In other tutorials, it tipically also distributes degrees
   // of freedom, and resizes matrices and vectors. These tasks are not carried out
-  // here, since we are not running any simulation on the triangolation produced.
+  // here, since we are not running any simulation on the Triangulation produced.
 
 
   void TriangulationOnCAD::refine_and_resize()

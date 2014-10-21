@@ -7,19 +7,114 @@ tools that interface with OpenCASCADE (http://www.opencascade.org) that
 allow the specification of arbitrary IGES files as boundaries for your
 geometries.
 
-
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-In some of the previous tutorial programs (step-1 and step-5 among others)
-we have seen that the deal.II mesh refinement is able to 
 
--mesh refinement -> rule to refine boundary cells
--set_boundary
--so far only elementary shapes were considered
+In some of the previous tutorial programs (step-1, step-3, step-5 and step-6 among others)
+we have learned how to use the mesh refinement methods provided in deal.II. The tutorials
+have shown how to employ such tools to produce a fine grid for a single simulation, as done
+in step-3; or to start from a coarse grid and carry out a series of simulations on adaptively
+refined grids, as is the case of step-6. Regardless of which approach is taken, the mesh refinement
+requires a suitable geometrical description of the computational domain boundary in order to
+place, at each refinement, the new mesh nodes onto the boundary surface. For instance, step-5
+shows how to assign a circular shape to the boundary of the computational domain, so that
+the faces lying on the boundary are refined onto the circle.
+So far, only elementary boundary shapes such as circles, spheres and boxes were available in the
+library. In this tutorial, we will show how to use a new set of classes developed to import
+arbitrary CAD geometries, assign them to the desired boundary of the computational domain,
+and refine a computational grid on such complex shapes.
 
--this tutorial shows how to refine a mesh on top of a complex surface
-generated with a CAD modeler and saved in an IGES file.
+
+<h3> CAD surfaces </h3>
+
+In the most common industrial practice, the geometrical models of arbitrary shaped objects
+are realized by means of Computer Aided Design (CAD) tools. The use of CAD modelers has
+spread in the last decades, as they allow for the generation of a full virtual model of
+each designed object, which through a computer can be visualized, inspected, and analyzed
+in its finest details well before it is physically crafted. 
+By a mathematical perspective, the engine lying under the hood of CAD modelers is represented
+by analytical geometry, and in particular by parametric curves and surfaces such as B-splines
+and NURBS. 
+Thus, once a virtual model is ready, all the geometrical features of the desired object
+are stored in files which materially contain the coefficients of the parametric surfaces and
+curves composing the object. Depending on the specific CAD tool used to define the geometrical model,
+there are of course several different file formats in which the information of a CAD model can
+be organized. To provide a common ground to exchange data across CAD tools, the U.S. National
+Bureau of Standards published in 1980 the Initial Graphics Exchange Representation (IGES) neutral
+file format, which is used in this example.
+
+<h3> The boundary projector classes </h3>
+
+To import and interrogate CAD models, in the current deal.II release we developed a series of
+classes that wrap functions of the OpenCASCADE open source library for CAD modeling. Once imported
+from an IGES file, the model is stored in a TopoDS_Shape, which is the generic topological entity
+defined into the OpenCASCADE framework. From a TopoDS_Shape, it is then possible to access to all the
+sub-shapes (such as vertices, edges and faces) composing it, along with their geometrical description.
+In the deal.II framework, the topological entities composing a shape are used to create an object
+of the Boundary class. In Step-6 we saw how to build a HyperBallBoundary and assign 
+it to a set of faces (or cells, for co-dimension 1) of a Triangulation, to have cells and faces
+refined on a sphere or circle.
+The new functions of the CAD modeling interface have been designed to retain the same structure. Hence, we build a
+projector object using the imported CAD shapes, and using the
+very same procedure we were previously using with HyperBallBoundary we assign such projector object to cells,
+faces or edges of a coarse mesh. At each refinement cycle, the new mesh nodes will be then automatically generated
+on the specified geometry. But differently from a spherical or circular boundary, a boundary with a complex geometry
+poses proplems as to where exactly place on the prescribed shape the new nodes created upon refinement.
+HyperBallBoundary first creates the new nodes on the cell to be refined by averaging the
+surrounding points in the same way as FlatManifold does. Successively, it goes on to project such nodes on the circle or
+sphere along the radial direction. On such geometry, the radial direction ensures that the newly generated nodes remain evenly
+spaced across the refinement levels required.  
+In the case of an arbitrary and complex shape though, the correct direction of projection cannot be identified that easily.
+That is why we have implemented several different projector classes that employ different projection strategies. A first
+projector, the ArclengthProjectionLineManifold, is to be used only for edge refinement. It is built assigning it a TopoDS_Edge,
+and refines a mesh edge finding the new vertex as the point splitting in two even parts the curvilinear length of the CAD curve
+portion that lies between the vertices of the original edge.
+
+<img src="http://www.dealii.org/images/steps/developer/step-54.CurveSplit.png" alt="" width="500">
 
 
-<h2>Where geometry and meshes intersect</h2>
+A different projection stategy has been implemented in the NormalProjectionBoundary. The TopoDS_Shape assigned in construction can be arbitrary
+(a collection of shapes, faces, edges or a single face or edge willall work). The new cell nodes are first computed by averaging the
+surrounding points in the same way as FlatManifold does. In a second moment all the new nodes will be projected onto the TopoDS_Shape
+along the direction normal to the shape. If no normal projection is available, the closest point ---typically lying on the shape boundary---
+to the original one is selected. In cases instead where more than one normal projection is available, the closest of them to the original
+point is again selected. If the shape is composed by several sub-shapes, the projection is carried out onto every single
+sub-shape, and the closest projection point point is selected. 
+
+<img src="http://www.dealii.org/images/steps/developer/step-54.NormalProjectionEdge.png" alt="" width="500">
+<img src="http://www.dealii.org/images/steps/developer/step-54.NormalProjection.png" alt="" width="500">
+
+As we are about to experience, in presence of arbitrary shapes setting the projection direction as that normal to the CAD surface will not
+lead to surface mesh elements of suitable quality. This because the direction normal to the CAD surface has in principle nothing to do with the
+direction along which the mesh needs the new nodes to be located. For this reason we implemented the DirectionalProjectionBoundary, which
+is constructed assigning a TopoDS_Shape (containing at least a face) and a direction along which all the projections will be carried out.
+In this way, the user will have a higher control on the projection direction to be enforced to ensure good mesh quality.
+
+<img src="http://www.dealii.org/images/steps/developer/step-54.DirectionalProjection.png" alt="" width="500">
+
+
+Of course the latter approach results effective only when the orientation of the surface is rather uniform, so that a single projection
+direction can be identified. In cases in which the surface direction is approaching the projection direction, it is even possible that the
+directional projection is not found. To overcome these problems, in the NormalToMeshProjectionBoundary class we also implemented a third
+projection algorithm. The NormalToMeshProjectionBoundary is built assigning a TopoDS_Shape (containing at least a face) to the contructor,
+and works exactly like a DirectionalProjection. But, as the name of the class suggests, NormalToMeshProjectionBoundary tries to come up
+with a suitable estimate of the direction normal to the mesh elements to be refined, and uses it for the projection of the new nodes
+onto the CAD surface. If we consider a mesh edge in a 2D space, the direction of its axis is a direction along which to split it in order to
+give rise to two new cells of the same length. We here extended this concept in 3D, and project all new nodes in a direction that approximates
+the cell normal.
+
+In the next figure, which is inpired to the geometry considered in this tutorial, we make an attempt to compare the behavior of the
+three projectors considered. As can be seen on the left, given the original cell (in blue), the new point found with the normal projection is found
+in a position which does not allow for the generation of evenly spaced new elements (in red). The situation will get worse in further refinement steps.
+Since the geometry here considered is somehow perpendicular to the horizontal direction, we notice that the directional projection (central image) defined
+with horizontal direction as the projection direction, does a rather good job in getting the new mesh point. Yet, since the surface is almost horizontal
+at the bottom of the picture, we can expect problems in such region with a directional projection, if further refinement steps are carried out. Finally,
+the picture on the right shows that a node located on the cell axis will result in two new cells having the same length. Of course the situation
+in 3D gets a little more complicated than that described in this simple 2D case. Nevertheless, the results of this test confirm that the normal to the
+mesh direction is the best approach among the three tested, when arbitrarily shaped surfaces are considered. 
+
+
+<img src="http://www.dealii.org/images/steps/developer/step-54.ProjectionComparisons.png" alt="" width="700">
+
+

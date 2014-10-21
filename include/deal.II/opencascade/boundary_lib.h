@@ -69,7 +69,7 @@ namespace OpenCASCADE
      * The standard constructor takes a generic TopoDS_Shape @p sh,
      * and a tolerance used to compute distances internally.
      *
-     * The TopoDS_Shape can be of arbitrary, i.e., a collection of
+     * The TopoDS_Shape can be arbitrary, i.e., a collection of
      * shapes, faces, edges or a single face or edge.
      */
     NormalProjectionBoundary(const TopoDS_Shape &sh,
