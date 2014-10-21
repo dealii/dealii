@@ -82,6 +82,13 @@ namespace SLEPcWrappers
      */
     void set_context (EPS &eps);
 
+    /**
+     * Set a flag to indicate how the
+     * transformed matrices are being stored in
+     * the spectral transformations.
+     */
+    void set_matrix_mode(STMatMode mode);
+
   protected:
 
     virtual void set_transformation_type (ST &st) const = 0;
