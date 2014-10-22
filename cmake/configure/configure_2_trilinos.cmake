@@ -42,7 +42,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       )
 
     FOREACH(_module
-      Amesos Epetra Ifpack AztecOO Sacado Teuchos
+      Amesos Epetra Ifpack AztecOO Sacado Teuchos ML
       )
       ITEM_MATCHES(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
