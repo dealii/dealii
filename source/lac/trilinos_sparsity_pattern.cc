@@ -363,9 +363,13 @@ namespace TrilinosWrappers
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset (new Epetra_FECrsGraph(Copy, input_row_map,
                                          n_entries_per_row, false
-#if DEAL_II_TRILINOS_VERSION_GTE(11,9,0)
-                                         , true
-#endif
+                                         // TODO: Check which new Trilinos
+                                         // version supports this... Remember
+                                         // to change tests/trilinos/assemble_matrix_parallel_07
+                                         // too.
+                                         //#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
+                                         //, true
+                                         //#endif
                                         ));
     else
       graph.reset (new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,

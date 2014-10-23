@@ -265,14 +265,15 @@ void LaplaceProblem<dim>::setup_system ()
     TrilinosWrappers::SparsityPattern csp;
     IndexSet relevant_set;
     DoFTools::extract_locally_relevant_dofs (dof_handler, relevant_set);
-#if DEAL_II_TRILINOS_VERSION_GTE(11,9,0)
+    // TODO: currently no Trilinos version is capable of doing this...
+    //#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
     // Cannot pre-build sparsity pattern, Trilinos must provide it...
-    csp.reinit(locally_owned, locally_owned, MPI_COMM_WORLD);
-#else
+    //csp.reinit(locally_owned, locally_owned, MPI_COMM_WORLD);
+    //#else
     // OK, Trilinos not new enough - use exactly the same as
     // assemble_matrix_parallel_02.cc
     csp.reinit(locally_owned, locally_owned, relevant_set, MPI_COMM_WORLD);
-#endif
+    //#endif
     DoFTools::make_sparsity_pattern (dof_handler, csp,
                                      constraints, false);
     csp.compress();
