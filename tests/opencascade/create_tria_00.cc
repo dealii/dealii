@@ -9,9 +9,8 @@
 //
 //-----------------------------------------------------------
 
-// Read the file side.iges, attach it to a projector,
-// create a single-cell Triangulation, and refine it with the new
-// projector.
+// Read the file side.iges, and  
+// create a single-cell Triangulation
 
 #include "../tests.h"
 
@@ -38,7 +37,6 @@
 #include <TopoDS_Face.hxx>
 #include <BRepPrimAPI_MakeSphere.hxx>
 
-
 using namespace OpenCASCADE;
 
 int main () 
@@ -52,18 +50,8 @@ int main ()
   
   extract_geometrical_shapes(sh, faces, edges, vertices);
 
-  // Create a boundary projector on the first face.
-  NormalProjectionBoundary<2,3> boundary(faces[0]);
-  
-  // Create a Triangulation with a single cell
   Triangulation<2,3> tria;
   create_triangulation(faces[0], tria);
-
-  // Set the boundary
-  tria.set_manifold(1, boundary);
-  tria.begin()->set_all_manifold_ids(1);
-
-  tria.refine_global(2);
 
   // You can open the generated file with gmsh
   GridOut gridout;

@@ -9,9 +9,9 @@
 //
 //-----------------------------------------------------------
 
-// Read the file side.iges, attach it to a projector,
-// create a single-cell Triangulation, and refine it with the new
-// projector.
+// Read the file side.iges, attach it to a projector, create a
+// single-cell Triangulation, ask the center of the single cell, and
+// then repeat by using the version which queries the manifold.
 
 #include "../tests.h"
 
@@ -43,7 +43,7 @@ using namespace OpenCASCADE;
 
 int main () 
 {
-  std::ofstream logfile("output");
+  initlog();
   
   TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/wigley.iges", 0.001);
   std::vector<TopoDS_Face> faces;
@@ -51,6 +51,7 @@ int main ()
   std::vector<TopoDS_Vertex> vertices;
   
   extract_geometrical_shapes(sh, faces, edges, vertices);
+
 
   // Create a boundary projector on the first face.
   NormalProjectionBoundary<2,3> boundary(faces[0]);
@@ -63,11 +64,10 @@ int main ()
   tria.set_manifold(1, boundary);
   tria.begin()->set_all_manifold_ids(1);
 
-  tria.refine_global(2);
+  deallog << "Ncells: " << tria.n_active_cells() << std::endl
+	  << "Cell[0] center: " << tria.begin()->center() << std::endl
+	  << "Projected center: " << tria.begin()->center(true) << std::endl;
 
-  // You can open the generated file with gmsh
-  GridOut gridout;
-  gridout.write_msh (tria, logfile);
   
   return 0;
 }

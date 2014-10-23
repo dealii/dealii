@@ -36,7 +36,7 @@ in its finest details well before it is physically crafted.
 By a mathematical perspective, the engine lying under the hood of CAD modelers is represented
 by analytical geometry, and in particular by parametric curves and surfaces such as B-splines
 and NURBS. 
-Thus, once a virtual model is ready, all the geometrical features of the desired object
+Once a virtual model is ready, all the geometrical features of the desired object
 are stored in files which materially contain the coefficients of the parametric surfaces and
 curves composing the object. Depending on the specific CAD tool used to define the geometrical model,
 there are of course several different file formats in which the information of a CAD model can
@@ -46,49 +46,56 @@ file format, which is used in this example.
 
 <h3> The boundary projector classes </h3>
 
-To import and interrogate CAD models, in the current deal.II release we developed a series of
-classes that wrap functions of the OpenCASCADE open source library for CAD modeling. Once imported
-from an IGES file, the model is stored in a TopoDS_Shape, which is the generic topological entity
+To import and interrogate CAD models, the deal.II library contains a series of
+wrapper functions for the OpenCASCADE open source library for CAD modeling. These functions allow to import 
+IGES files into OpenCASCADE native objects, and wrap them inside a series of Manifold classes. 
+
+Once imported from an IGES file, the model is stored in a TopoDS_Shape, which is the generic topological entity
 defined into the OpenCASCADE framework. From a TopoDS_Shape, it is then possible to access to all the
 sub-shapes (such as vertices, edges and faces) composing it, along with their geometrical description.
-In the deal.II framework, the topological entities composing a shape are used to create an object
-of the Boundary class. In Step-6 we saw how to build a HyperBallBoundary and assign 
+In the deal.II framework, the topological entities composing a shape are used to create objects
+of the Manifold or Boundary classes. In Step-6 we saw how to build a HyperBallBoundary and assign 
 it to a set of faces (or cells, for co-dimension 1) of a Triangulation, to have cells and faces
 refined on a sphere or circle.
-The new functions of the CAD modeling interface have been designed to retain the same structure. Hence, we build a
-projector object using the imported CAD shapes, and using the
-very same procedure we were previously using with HyperBallBoundary we assign such projector object to cells,
+The functions of the CAD modeling interface have been designed to retain the same structure, allowing the user to build a
+projector object using the imported CAD shapes, maintaining  the
+very same procedure we use with HyperBallBoundary, i.e., assigning such projector object to cells,
 faces or edges of a coarse mesh. At each refinement cycle, the new mesh nodes will be then automatically generated
-on the specified geometry. But differently from a spherical or circular boundary, a boundary with a complex geometry
-poses proplems as to where exactly place on the prescribed shape the new nodes created upon refinement.
+on the specified geometry. 
+
+Differently from a spherical or circular boundary, a boundary with a complex geometry
+poses proplems as to where it is best to place the new nodes created upon refinement on the prescribed shape.
 HyperBallBoundary first creates the new nodes on the cell to be refined by averaging the
 surrounding points in the same way as FlatManifold does. Successively, it goes on to project such nodes on the circle or
-sphere along the radial direction. On such geometry, the radial direction ensures that the newly generated nodes remain evenly
-spaced across the refinement levels required.  
-In the case of an arbitrary and complex shape though, the correct direction of projection cannot be identified that easily.
-That is why we have implemented several different projector classes that employ different projection strategies. A first
-projector, the ArclengthProjectionLineManifold, is to be used only for edge refinement. It is built assigning it a TopoDS_Edge,
+sphere along the radial direction. On such a geometry, the radial direction ensures that the newly generated nodes remain evenly
+spaced when remaining on a given refinement level.  
+
+In the case of an arbitrary and complex shape though, the best direction of the projection cannot be identified that easily.
+The library provides several projector classes that employ different projection strategies. A first
+projector, the ArclengthProjectionLineManifold, is to be used only for edge refinement. It is built assigning it a topological shape 
+of dimension one, either a TopoDS_Edge or a TopoDS_Wire (which is a compound shape, made of several connected TopoDS_Edges)
 and refines a mesh edge finding the new vertex as the point splitting in two even parts the curvilinear length of the CAD curve
 portion that lies between the vertices of the original edge.
 
 <img src="http://www.dealii.org/images/steps/developer/step-54.CurveSplit.png" alt="" width="500">
 
 
-A different projection stategy has been implemented in the NormalProjectionBoundary. The TopoDS_Shape assigned in construction can be arbitrary
-(a collection of shapes, faces, edges or a single face or edge willall work). The new cell nodes are first computed by averaging the
+A different projection stategy has been implemented in the NormalProjectionBoundary. The TopoDS_Shape assigned at construction time can be arbitrary
+(a collection of shapes, faces, edges or a single face or edge will all work). The new cell nodes are first computed by averaging the
 surrounding points in the same way as FlatManifold does. In a second moment all the new nodes will be projected onto the TopoDS_Shape
-along the direction normal to the shape. If no normal projection is available, the closest point ---typically lying on the shape boundary---
-to the original one is selected. In cases instead where more than one normal projection is available, the closest of them to the original
-point is again selected. If the shape is composed by several sub-shapes, the projection is carried out onto every single
+along the direction normal to the shape. If no normal projection is available, the point which is closest to the shape ---typically lying on the shape boundary---
+is selected. If the shape is composed by several sub-shapes, the projection is carried out onto every single
 sub-shape, and the closest projection point point is selected. 
 
 <img src="http://www.dealii.org/images/steps/developer/step-54.NormalProjectionEdge.png" alt="" width="500">
 <img src="http://www.dealii.org/images/steps/developer/step-54.NormalProjection.png" alt="" width="500">
 
-As we are about to experience, in presence of arbitrary shapes setting the projection direction as that normal to the CAD surface will not
-lead to surface mesh elements of suitable quality. This because the direction normal to the CAD surface has in principle nothing to do with the
-direction along which the mesh needs the new nodes to be located. For this reason we implemented the DirectionalProjectionBoundary, which
-is constructed assigning a TopoDS_Shape (containing at least a face) and a direction along which all the projections will be carried out.
+As we are about to experience, for some shapes, setting the projection direction as that normal to the CAD surface will not
+lead to surface mesh elements of suitable quality. This is because the direction normal to the CAD surface has in principle nothing to do with the
+direction along which the mesh needs the new nodes to be located. The DirectionalProjectionBoundary, in this case, can help. This class 
+is constructed assigning a TopoDS_Shape (containing at least a face) and a direction along which all the projections will be carried out. New points will be 
+computed by first averaging the surrounding points (as in the FlatManifold case), and then taking the closest intersection between the topological shape
+and the line passing throught the resulting point, along the direction used at construction time. 
 In this way, the user will have a higher control on the projection direction to be enforced to ensure good mesh quality.
 
 <img src="http://www.dealii.org/images/steps/developer/step-54.DirectionalProjection.png" alt="" width="500">
@@ -96,8 +103,8 @@ In this way, the user will have a higher control on the projection direction to 
 
 Of course the latter approach results effective only when the orientation of the surface is rather uniform, so that a single projection
 direction can be identified. In cases in which the surface direction is approaching the projection direction, it is even possible that the
-directional projection is not found. To overcome these problems, in the NormalToMeshProjectionBoundary class we also implemented a third
-projection algorithm. The NormalToMeshProjectionBoundary is built assigning a TopoDS_Shape (containing at least a face) to the contructor,
+directional projection is not found. To overcome these problems, the NormalToMeshProjectionBoundary class implements a third
+projection algorithm. The NormalToMeshProjectionBoundary is built assigning a TopoDS_Shape (containing at least one face) to the contructor,
 and works exactly like a DirectionalProjection. But, as the name of the class suggests, NormalToMeshProjectionBoundary tries to come up
 with a suitable estimate of the direction normal to the mesh elements to be refined, and uses it for the projection of the new nodes
 onto the CAD surface. If we consider a mesh edge in a 2D space, the direction of its axis is a direction along which to split it in order to
@@ -105,11 +112,11 @@ give rise to two new cells of the same length. We here extended this concept in 
 the cell normal.
 
 In the next figure, which is inpired to the geometry considered in this tutorial, we make an attempt to compare the behavior of the
-three projectors considered. As can be seen on the left, given the original cell (in blue), the new point found with the normal projection is found
+three projectors considered. As can be seen on the left, given the original cell (in blue), the new point found with the normal projection is 
 in a position which does not allow for the generation of evenly spaced new elements (in red). The situation will get worse in further refinement steps.
-Since the geometry here considered is somehow perpendicular to the horizontal direction, we notice that the directional projection (central image) defined
+Since the geometry we considered is somehow perpendicular to the horizontal direction, the directional projection (central image) defined
 with horizontal direction as the projection direction, does a rather good job in getting the new mesh point. Yet, since the surface is almost horizontal
-at the bottom of the picture, we can expect problems in such region with a directional projection, if further refinement steps are carried out. Finally,
+at the bottom of the picture, we can expect problems in those regions when further refinement steps are carried out. Finally,
 the picture on the right shows that a node located on the cell axis will result in two new cells having the same length. Of course the situation
 in 3D gets a little more complicated than that described in this simple 2D case. Nevertheless, the results of this test confirm that the normal to the
 mesh direction is the best approach among the three tested, when arbitrarily shaped surfaces are considered. 
