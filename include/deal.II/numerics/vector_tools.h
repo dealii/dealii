@@ -124,7 +124,7 @@ class ConstraintMatrix;
  *   MatrixTools::apply_boundary_values() function. The projection of
  *   the trace of the function to the boundary is done with the
  *   VectorTools::project_boundary_values() (see below) function,
- *   which is called with a map of boundary functions FunctioMap in
+ *   which is called with a map of boundary functions FunctionMap in
  *   which all boundary indicators from zero to numbers::internal_face_boundary_id-1
  *   (numbers::internal_face_boundary_id is used for other purposes,
  *   see the Triangulation class documentation) point
@@ -200,7 +200,7 @@ class ConstraintMatrix;
  *   To use it, you have to
  *   specify a list of pairs of boundary indicators (of type <tt>types::boundary_id</tt>;
  *   see the section in the documentation of the Triangulation class for more
- *   details) and the according functions denoting the dirichlet boundary values
+ *   details) and the according functions denoting the Dirichlet boundary values
  *   of the nodes on boundary faces with this boundary indicator.
  *
  *   Usually, all other boundary conditions, such as inhomogeneous Neumann values
@@ -1302,7 +1302,7 @@ namespace VectorTools
    * conflicting constraints in the
    * module on @ref constraints .
    *
-   * This function is explecitly written to
+   * This function is explicitly written to
    * use with the FE_Nedelec elements. Thus
    * it throws an exception, if it is
    * called with other finite elements.
@@ -1516,7 +1516,7 @@ namespace VectorTools
    * boundary condition is to be enforced. Note that, as explained below, this
    * is one of the few functions where it makes a difference where we call the
    * function multiple times with only one boundary indicator, or whether we
-   * call the function onces with the whole set of boundary indicators at
+   * call the function once with the whole set of boundary indicators at
    * once.
    *
    * The forth parameter describes the boundary function that is used for
@@ -2005,7 +2005,9 @@ namespace VectorTools
    *     element space in which the solution vector lives.
    * @param[in] fe_function A vector with nodal values representing the
    *     numerical approximation $u_h$. This vector needs to correspond
-   *     to the finite element space represented by @p dof
+   *     to the finite element space represented by @p dof .
+   * @param[in] exact_solution The exact solution that is used to compute
+   * the error.
    * @param[out] difference The vector of values $d_K$ computed as above.
    * @param[in] q The quadrature formula used to approximate the integral
    *     shown above. Note that some quadrature formulas are more useful
