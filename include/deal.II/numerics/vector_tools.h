@@ -1386,8 +1386,15 @@ namespace VectorTools
    * Compute constraints that correspond to
    * boundary conditions of the form
    * $\vec{n}^T\vec{u}=\vec{n}^T\vec{f}$,
-   * i.e. the normal components of $u$
-   * and $f$ shall coincide.
+   * i.e. the normal components of the solution $u$
+   * and a given $f$ shall coincide. The function $f$ is given by @p boundary_function and 
+   * the resulting constraints are added to @p constraints for faces with boundary indicator
+   * @p boundary_component.
+   *
+   * This function is explicitly written to
+   * use with the FE_RaviartThomas elements.
+   * Thus it throws an exception, if it is
+   * called with other finite elements.
    *
    * If the ConstraintMatrix @p constraints
    * contained values or other
@@ -1407,31 +1414,25 @@ namespace VectorTools
    * conflicting constraints in the
    * module on @ref constraints .
    *
-   * This function is explecitly written to
-   * use with the FE_RaviartThomas elements.
-   * Thus it throws an exception, if it is
-   * called with other finite elements.
-   *
-   * The second argument of this function
+   * The argument @p first_vector_component 
    * denotes the first vector component in
    * the finite element that corresponds to
-   * the vector function that you want to
+   * the vector function $\vec{u}$ that you want to
    * constrain. Vectors are implicitly
    * assumed to have exactly
    * <code>dim</code> components that are
    * ordered in the same way as we
    * usually order the coordinate directions,
-   * i.e. $x$-, $y$-, and finally
+   * i.e., $x$-, $y$-, and finally
    * $z$-component.
    *
    * The parameter @p boundary_component
-   * corresponds to the number
-   * @p boundary_indicator of the face.
+   * corresponds to the
+   * @p boundary_indicator of the faces where the boundary conditions are applied.
    *  numbers::internal_face_boundary_id
    * is an illegal value, since it is
    * reserved for interior faces.
-   *
-   * The last argument is denoted to compute
+   * The @p mapping is used to compute
    * the normal vector $\vec{n}$ at the
    * boundary points.
    *
