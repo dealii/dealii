@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -112,7 +112,8 @@ namespace internal
  * preconditioning. The default is left preconditioning. Finally it
  * includes a flag indicating whether or not the default residual is
  * used as stopping criterion.
-
+ *
+ *
  * <h3>Left versus right preconditioning</h3>
  *
  * @p AdditionalData allows you to choose between left and right
@@ -132,6 +133,7 @@ namespace internal
  * residuals have to be computed in this case, impeding the overall
  * performance of the solver.
  *
+ *
  * <h3>The size of the Arnoldi basis</h3>
  *
  * The maximal basis size is controlled by
@@ -149,6 +151,14 @@ namespace internal
  *
  * For the requirements on matrices and vectors in order to work with
  * this class, see the documentation of the Solver base class.
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described
+ * in the Solver base class to determine convergence. This mechanism
+ * can also be used to observe the progress of the iteration.
+ *
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
  */

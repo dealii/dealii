@@ -55,6 +55,7 @@ class PreconditionIdentity;
  * Elements". It requires a symmetric preconditioner (i.e., for example, SOR
  * is not a possible choice).
  *
+ *
  * <h3>Eigenvalue computation</h3>
  *
  * The cg-method performs an orthogonal projection of the original
@@ -75,8 +76,16 @@ class PreconditionIdentity;
  * <tt>sqrt(beta_0)/alpha_0</tt>, ..., <tt>sqrt(beta_{m-2</tt>)/alpha_{m-2}}.
  * The eigenvalues of this matrix can be computed by postprocessing.
  *
- * See Y. Saad: "Iterative methods for Sparse Linear Systems", section
+ * @see Y. Saad: "Iterative methods for Sparse Linear Systems", section
  * 6.7.3 for details.
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described
+ * in the Solver base class to determine convergence. This mechanism
+ * can also be used to observe the progress of the iteration.
+ *
  *
  * @author W. Bangerth, G. Kanschat, R. Becker and F.-T. Suttmeier
  */

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,6 +41,14 @@ DEAL_II_NAMESPACE_OPEN
  * work even if number or type of the additional parameters for a certain
  * solver changes. AdditionalData of this class currently does not
  * contain any data.
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described
+ * in the Solver base class to determine convergence. This mechanism
+ * can also be used to observe the progress of the iteration.
+ *
  *
  * @ingroup Solvers
  * @author Guido Kanschat

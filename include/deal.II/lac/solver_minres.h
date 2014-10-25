@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,10 +51,17 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The preconditioner has to be positive definite and symmetric
  *
- * The algorithm is taken from the Master thesis of Astrid Batterman
- * with some changes.
- * The full text can be found at
- * <tt>http://scholar.lib.vt.edu/theses/public/etd-12164379662151/etd-title.html</tt>
+ * The algorithm is taken from the Master thesis of Astrid Battermann
+ * with some changes. The full text can be found at
+ * http://scholar.lib.vt.edu/theses/public/etd-12164379662151/etd-title.html
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described
+ * in the Solver base class to determine convergence. This mechanism
+ * can also be used to observe the progress of the iteration.
+ *
  *
  * @author Thomas Richter, 2000, Luca Heltai, 2006
  */

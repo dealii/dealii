@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,6 +61,14 @@ DEAL_II_NAMESPACE_OPEN
  * The second parameter is the size of a breakdown criterion. It is
  * difficult to find a general good criterion, so if things do not
  * work for you, try to change this value.
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described
+ * in the Solver base class to determine convergence. This mechanism
+ * can also be used to observe the progress of the iteration.
+ *
  */
 template <class VECTOR = Vector<double> >
 class SolverBicgstab : public Solver<VECTOR>
