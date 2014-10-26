@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,8 @@
 
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
+
+#include <mm_malloc.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -57,14 +59,14 @@ namespace parallel
           Assert (((allocated_size > 0 && val != 0) ||
                    val == 0), ExcInternalError());
           if (val != 0)
-            delete [] val;
-          val = new Number[new_alloc_size];
+            _mm_free(val);
+          val = static_cast<Number *>(_mm_malloc (sizeof(Number)*new_alloc_size, 64));
           allocated_size = new_alloc_size;
         }
       else if (new_alloc_size == 0)
         {
           if (val != 0)
-            delete [] val;
+            _mm_free(val);
           val = 0;
           allocated_size = 0;
         }

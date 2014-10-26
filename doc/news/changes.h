@@ -307,6 +307,21 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The vector classes in deal.II (including Trilinos and PETSc
+  wrappers) now have a new method x.add_and_dot(factor,v,w) which performs
+  x.add(factor,v) and subsequent inner product of x with another vector
+  w. This operation occurs in some iterative solvers; by a combined operation,
+  reduced memory transfer and thus higher performance are enabled.
+  <br>
+  (Martin Kronbichler, 2014/10/27)
+  </li>
+
+  <li> Improved: Inner products and norms on deal.II's own vector classes now
+  use vectorization through VectorizedArray if available.
+  <br>
+  (Martin Kronbichler, 2014/10/27)
+  </li>
+
   <li> Changed: PETSc and Trilinos vectors with ghost entries can now be reset to zero
   using = 0.0;
   <br>

@@ -573,6 +573,25 @@ namespace PETScWrappers
     real_type linfty_norm () const;
 
     /**
+     * Performs a combined operation of a vector addition and a subsequent
+     * inner product, returning the value of the inner product. In other
+     * words, the result of this function is the same as if the user called
+     * @code
+     * this->add(a, V);
+     * return_value = *this * W;
+     * @endcode
+     *
+     * The reason this function exists is for compatibility with deal.II's own
+     * vector classes which can implement this functionality with less memory
+     * transfer. However, for PETSc vectors such a combined operation is not
+     * natively supported and thus the cost is completely equivalent as
+     * calling the two methods separately.
+     */
+    PetscScalar add_and_dot (const Number      a,
+                             const VectorBase &V,
+                             const VectorBase &W);
+
+    /**
      * Normalize vector by dividing by the $l_2$-norm of the
      * vector. Return the vector norm before normalization.
      */

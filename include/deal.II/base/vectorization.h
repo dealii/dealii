@@ -2017,6 +2017,29 @@ namespace std
 
 
   /**
+   * Raises the given number @p x to the power @p p for a vectorized data
+   * field. The result is returned as vectorized array in the form
+   * <tt>{pow(x[0],p), pow(x[1],p), ..., pow(x[n_array_elements-1],p)}</tt>.
+   *
+   * @relates VectorizedArray
+   */
+  template <typename Number>
+  inline
+  ::dealii::VectorizedArray<Number>
+  pow (const ::dealii::VectorizedArray<Number> &x,
+       const Number p)
+  {
+    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
+    for (unsigned int i=0; i<dealii::VectorizedArray<Number>::n_array_elements; ++i)
+      values[i] = std::pow(x[i], p);
+    ::dealii::VectorizedArray<Number> out;
+    out.load(&values[0]);
+    return out;
+  }
+
+
+
+  /**
    * Computes the absolute value (modulus) of a vectorized data field. The
    * result is returned as vectorized array in the form <tt>{abs(x[0]),
    * abs(x[1]), ..., abs(x[n_array_elements-1])}</tt>.

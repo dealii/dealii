@@ -351,11 +351,11 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
       if (std::fabs(alpha) > 1.e10)
         return true;
 
-      r.add(-alpha, v);
+      res = std::sqrt(r.add_and_dot(-alpha, v, r));
 
       // check for early success, see the lac/bicgstab_early testcase as to
       // why this is necessary
-      if (this->control().check(step, r.l2_norm()) == SolverControl::success)
+      if (this->control().check(step, res) == SolverControl::success)
         {
           Vx->add(alpha, y);
           print_vectors(step, *Vx, r, y);
@@ -367,12 +367,14 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
       rhobar = t*r;
       omega = rhobar/(t*t);
       Vx->add(alpha, y, omega, z);
-      r.add(-omega, t);
 
       if (additional_data.exact_residual)
-        res = criterion(A, *Vx, *Vb);
+        {
+          r.add(-omega, t);
+          res = criterion(A, *Vx, *Vb);
+        }
       else
-        res = r.l2_norm();
+        res = std::sqrt(r.add_and_dot(-omega, t, r));
 
       state = this->control().check(step, res);
       print_vectors(step, *Vx, r, y);

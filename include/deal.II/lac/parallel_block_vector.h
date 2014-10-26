@@ -378,6 +378,26 @@ namespace parallel
       real_type linfty_norm () const;
 
       /**
+       * Performs a combined operation of a vector addition and a subsequent
+       * inner product, returning the value of the inner product. In other
+       * words, the result of this function is the same as if the user called
+       * @code
+       * this->add(a, V);
+       * return_value = *this * W;
+       * @endcode
+       *
+       * The reason this function exists is that this operation involves less
+       * memory transfer than calling the two functions separately. This
+       * method only needs to load three vectors, @p this, @p V, @p W, whereas
+       * calling separate methods means to load the calling vector @p this
+       * twice. Since most vector operations are memory transfer limited, this
+       * reduces the time by 25\% (or 50\% if @p W equals @p this).
+       */
+      Number add_and_dot (const Number               a,
+                          const BlockVector<Number> &V,
+                          const BlockVector<Number> &W);
+
+      /**
        * Scale each element of the vector by the given factor.
        *
        * This function is deprecated and will be removed in a future
@@ -928,7 +948,28 @@ namespace parallel
 
     template <typename Number>
     inline
-    void BlockVector<Number>::swap (BlockVector<Number> &v)
+    Number
+    BlockVector<Number>::add_and_dot (const Number               a,
+                                      const BlockVector<Number> &V,
+                                      const BlockVector<Number> &W)
+    {
+      Number local_result = Number();
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result += this->block(i).add_and_dot_local(a, V.block(i), W.block(i));
+
+      if (this->block(0).partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result,
+                                    this->block(0).partitioner->get_communicator());
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    inline
+    void
+    BlockVector<Number>::swap (BlockVector<Number> &v)
     {
       Assert (this->n_blocks() == v.n_blocks(),
               ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));

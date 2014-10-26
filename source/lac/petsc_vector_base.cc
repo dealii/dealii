@@ -376,6 +376,17 @@ namespace PETScWrappers
 
 
 
+  PetscScalar
+  VectorBase::add_and_dot (const PetscScalar a,
+                           const VectorBase &V,
+                           const VectorBase &W)
+  {
+    this->add(a, V);
+    return *this * W;
+  }
+
+
+
   void
   VectorBase::compress (::dealii::VectorOperation::values)
   {
@@ -825,7 +836,7 @@ namespace PETScWrappers
 
   void
   VectorBase::add (const PetscScalar a,
-                   const VectorBase     &v)
+                   const VectorBase &v)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());

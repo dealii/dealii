@@ -391,9 +391,8 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
           Assert(alpha != 0., ExcDivideByZero());
           alpha = gh/alpha;
 
-          g.add(alpha,h);
           x.add(alpha,d);
-          res = g.l2_norm();
+          res = std::sqrt(g.add_and_dot(alpha, h, g));
 
           print_vectors(it, x, g, d);
 
