@@ -52,7 +52,7 @@ namespace SLEPcWrappers
     set_transformation_type(transformation_data->st);
   }
 
-  void TransformationBase::set_matrix_mode(STMatMode mode)
+  void TransformationBase::set_matrix_mode(const STMatMode mode)
   {
     int ierr = STSetMatMode(transformation_data->st,mode);
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
