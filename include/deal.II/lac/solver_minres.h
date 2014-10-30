@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,10 +51,17 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The preconditioner has to be positive definite and symmetric
  *
- * The algorithm is taken from the Master thesis of Astrid Batterman
- * with some changes.
- * The full text can be found at
- * <tt>http://scholar.lib.vt.edu/theses/public/etd-12164379662151/etd-title.html</tt>
+ * The algorithm is taken from the Master thesis of Astrid Battermann
+ * with some changes. The full text can be found at
+ * http://scholar.lib.vt.edu/theses/public/etd-12164379662151/etd-title.html
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described
+ * in the Solver base class to determine convergence. This mechanism
+ * can also be used to observe the progress of the iteration.
+ *
  *
  * @author Thomas Richter, 2000, Luca Heltai, 2006
  */
@@ -281,7 +288,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   m[1]->reinit(b);
   m[2]->reinit(b);
 
-  conv = this->control().check(0,r_l2);
+  conv = this->iteration_status(0, r_l2, x);
 
   while (conv==SolverControl::iterate)
     {
@@ -321,7 +328,8 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 
       d = std::sqrt (d_*d_ + delta[2]);
 
-      if (j>1) tau *= s / c;
+      if (j>1)
+        tau *= s / c;
       c = d_ / d;
       tau *= c;
 
@@ -337,7 +345,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
       x.add (tau, *m[0]);
       r_l2 *= std::fabs(s);
 
-      conv = this->control().check(j,r_l2);
+      conv = this->iteration_status(j, r_l2, x);
 
       // next iteration step
       ++j;
@@ -380,9 +388,9 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   deallog.pop ();
 
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  AssertThrow(conv == SolverControl::success,
+              SolverControl::NoConvergence (j, r_l2));
+
   // otherwise exit as normal
 }
 

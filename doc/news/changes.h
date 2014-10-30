@@ -39,6 +39,15 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: The base class to the iterative linear solvers, Solver,
+  received a SolverControl object upon construction and had a member
+  function <code>control()</code> that returned a reference to the
+  object previously passed in. The class now no longer stores such
+  a reference, and consequently, the function has been removed.
+  <br>
+  (Wolfgang Bangerth, 2014/10/24)
+  </li>
+
   <li> Removed: The constructor of the Utilities::MPI::MPI_InitFinalize
   class used to interpret a last argument equal to numbers::invalid_unsigned_int
   as "<i>create as many threads as there are processor cores on the current
@@ -110,6 +119,15 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: The classes implementing iterative solvers have gained
+  a mechanism by which it is possible to observe the progress of
+  the iterations, or to influence when to stop the iteration. The
+  documentation of the Solver class now contains an extended
+  discussion and example of this functionality.
+  <br>
+  (Wolfgang Bangerth, 2014/10/24)
+  </li>
+
   <li> New: There is now a section in the introduction of step-36 that
   discusses the interaction of Dirichlet boundary values and the solution
   of eigenvalue problems.
