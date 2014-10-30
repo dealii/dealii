@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -786,7 +786,9 @@ MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<di
 
           const Manifold<dim,spacedim> &manifold =
             ( ( line->manifold_id() == numbers::invalid_manifold_id ) &&
-              ( dim < spacedim ) ? cell->get_manifold() :
+              ( dim < spacedim )
+              ?
+              cell->get_manifold() :
               line->get_manifold() );
 
           get_intermediate_points_on_object (manifold, line, line_points);

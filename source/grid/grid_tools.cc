@@ -179,6 +179,12 @@ namespace GridTools
     const QGauss<dim> quadrature_formula (mapping_degree + 1);
     const unsigned int n_q_points = quadrature_formula.size();
 
+    // we really want the JxW values from the FEValues object, but it
+    // wants a finite element. create a cheap element as a dummy
+    // element
+//TODO: using FE_Nothing here would be nice, but right now, FE_Nothing
+//  only takes one argument and can not be used for FEValues<dim,spacedim>
+//  if dim != spacedim
     FE_DGQ<dim,spacedim> dummy_fe(0);
     FEValues<dim,spacedim> fe_values (mapping, dummy_fe, quadrature_formula,
                                       update_JxW_values);
