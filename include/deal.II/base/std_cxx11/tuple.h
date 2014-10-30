@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
   using std::tuple;
+  using std::make_tuple;
   using std::get;
   using std::tuple_size;
   using std::tuple_element;
@@ -39,6 +40,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
   using boost::tuple;
+  using boost::make_tuple;
   using boost::get;
 
 				   // boost::tuples::length has been renamed
