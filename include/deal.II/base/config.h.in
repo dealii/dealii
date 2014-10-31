@@ -50,6 +50,13 @@
 #define DEAL_II_VERSION_MINOR @DEAL_II_VERSION_MINOR@
 #define DEAL_II_MINOR @DEAL_II_VERSION_MINOR@
 
+#define DEAL_II_VERSION_GTE(major,minor,subminor) \
+ ((DEAL_II_VERSION_MAJOR * 10000 + \
+    DEAL_II_VERSION_MINOR * 100 + \
+     DEAL_II_VERSION_SUBMINOR) \
+    >=  \
+    (major)*10000 + (minor)*100 + (subminor))
+
 
 /********************************************
  * Configured in check_1_compiler_features: *

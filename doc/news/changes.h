@@ -325,6 +325,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: There is now a macro <code>DEAL_II_VERSION_GTE</code>
+  that can be used to test whether the deal.II version is greater
+  than or equal a particular version number. This is useful if you
+  need to make application programs compatible with different
+  deal.II releases.
+  <br>
+  (Wolfgang Bangerth, 2014/10/31)
+  </li>
+
   <li> Changed: PETSc and Trilinos vectors with ghost entries can now be reset to zero
   using = 0.0;
   <br>
