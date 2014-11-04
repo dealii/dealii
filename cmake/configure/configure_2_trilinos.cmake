@@ -67,31 +67,18 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # Trilinos 10.6 had quite a number of bugs we ran into, see
-    # for example
-    #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5062
-    #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5319
+    # We require at least Trilinos 11.2
     #
-    # The same is unfortunately true for 10.8.[01]:
-    #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5370
-    #
-    IF((TRILINOS_VERSION_MAJOR EQUAL 10 AND
-        TRILINOS_VERSION_MINOR EQUAL 6)
-       OR
-       (TRILINOS_VERSION_MAJOR EQUAL 10 AND
-        TRILINOS_VERSION_MINOR EQUAL 8 AND
-        TRILINOS_VERSION_SUBMINOR LESS 2))
+    IF(TRILINOS_VERSION VERSION_LESS 11.2)
 
       MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
-        "Version ${TRILINOS_VERSION_MAJOR}.${TRILINOS_VERSION_MINOR}.${TRILINOS_VERSION_SUBMINOR} has bugs that make "
-        "it incompatible with deal.II. Please use versions before 10.6 or after 10.8.1"
+        "deal.II requires at least version 11.2, but version ${TRILINOS_VERSION} was found."
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
-        "with version ${TRILINOS_VERSION_MAJOR}.${TRILINOS_VERSION_MINOR}.${TRILINOS_VERSION_SUBMINOR} has bugs that make\n"
-        "it incompatible with deal.II. Please use versions before 10.6 or after\n"
-        "10.8.1.\n\n"
+        "with version ${TRILINOS_VERSION} is too old.\n"
+        "deal.II requires at least version 11.2.\n\n"
         )
       SET(${var} FALSE)
     ENDIF()
