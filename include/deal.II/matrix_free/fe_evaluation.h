@@ -1236,12 +1236,11 @@ template <typename Number>
 class FEEvaluationAccess<1,1,Number> : public FEEvaluationBase<1,1,Number>
 {
 public:
-  static const int dim                         = 1;
   typedef Number                                 number_type;
   typedef VectorizedArray<Number>                value_type;
-  typedef Tensor<1,dim,VectorizedArray<Number> > gradient_type;
-  static const unsigned int dimension          = dim;
-  typedef FEEvaluationBase<dim,1,Number>         BaseClass;
+  typedef Tensor<1,1,VectorizedArray<Number> >   gradient_type;
+  static const unsigned int dimension          = 1;
+  typedef FEEvaluationBase<1,1,Number>           BaseClass;
 
   /**
    * Returns the value stored for the local degree of freedom with index @p
@@ -4265,7 +4264,7 @@ FEEvaluationAccess<1,1,Number>
 template <typename Number>
 inline
 FEEvaluationAccess<1,1,Number>
-::FEEvaluationAccess (const FEEvaluationAccess<dim,1,Number> &other)
+::FEEvaluationAccess (const FEEvaluationAccess<1,1,Number> &other)
   :
   FEEvaluationBase <1,1,Number>(other)
 {}
@@ -4437,10 +4436,7 @@ FEEvaluationAccess<1,1,Number>
         this->cell_type == internal::MatrixFreeFunctions::general ?
         this->J_value[q_point] : this->J_value[0] * this->quadrature_weights[q_point];
 
-      VectorizedArray<Number> new_val = jac[0][0] * grad_in[0];
-      for (unsigned int e=1; e<dim; ++e)
-        new_val += jac[e][0] * grad_in[e];
-      this->gradients_quad[0][0][q_point] = new_val * JxW;
+      this->gradients_quad[0][0][q_point] = jac[0][0] * grad_in[0] * JxW;
     }
 }
 
