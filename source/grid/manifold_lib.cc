@@ -104,8 +104,6 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
 {
   const Point<spacedim> R = space_point-center;
   const double rho = R.norm();
-  const double x = R[0];
-  const double y = R[1];
 
   Point<spacedim> p;
   p[0] = rho;
@@ -113,17 +111,17 @@ SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) c
   switch (spacedim)
     {
     case 2:
-      p[1] = atan2(y,x);
+      p[1] = atan2(R[1],R[0]);
       if (p[1] < 0)
         p[1] += 2*numbers::PI;
       break;
     case 3:
     {
       const double z = R[2];
-      p[2] = atan2(y,x); // phi
+      p[2] = atan2(R[1],R[0]); // phi
       if (p[2] < 0)
         p[2] += 2*numbers::PI; // phi is periodic
-      p[1] = atan2(sqrt(x*x+y*y),z);  // theta
+      p[1] = atan2(sqrt(R[0]*R[0]+R[1]*R[1]),z);  // theta
     }
     break;
     default:
