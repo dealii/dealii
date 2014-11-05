@@ -1224,6 +1224,162 @@ protected:
 };
 
 
+/**
+ * This class provides access to the data fields of the FEEvaluation
+ * classes. Partial specialization for scalar fields in 1d that defines access with
+ * simple data fields, i.e., scalars for the values and Tensor<1,1> for the
+ * gradients.
+ *
+ * @author Katharina Kormann and Martin Kronbichler, 2010, 2011, Shiva Rudraraju, 2014
+ */
+template <typename Number>
+class FEEvaluationAccess<1,1,Number> : public FEEvaluationBase<1,1,Number>
+{
+public:
+  static const int dim                         = 1;
+  typedef Number                                 number_type;
+  typedef VectorizedArray<Number>                value_type;
+  typedef Tensor<1,dim,VectorizedArray<Number> > gradient_type;
+  static const unsigned int dimension          = dim;
+  typedef FEEvaluationBase<dim,1,Number>         BaseClass;
+
+  /**
+   * Returns the value stored for the local degree of freedom with index @p
+   * dof. If the object is vector-valued, a vector-valued return argument is
+   * given. Note that when vectorization is enabled, values from several cells
+   * are grouped together. If @p set_dof_values was called last, the value
+   * corresponds to the one set there. If @p integrate was called last, it
+   * instead corresponds to the value of the integrated function with the test
+   * function of the given index.
+   */
+  value_type get_dof_value (const unsigned int dof) const;
+
+  /**
+   * Write a value to the field containing the degrees of freedom with
+   * component @p dof. Access to the same field as through @p get_dof_value.
+   */
+  void submit_dof_value (const value_type   val_in,
+                         const unsigned int dof);
+
+  /**
+   * Returns the value of a finite element function at quadrature point number
+   * @p q_point after a call to @p evaluate(true,...), or the value that has
+   * been stored there with a call to @p submit_value. If the object is
+   * vector-valued, a vector-valued return argument is given. Note that when
+   * vectorization is enabled, values from several cells are grouped together.
+   */
+  value_type get_value (const unsigned int q_point) const;
+
+  /**
+   * Write a value to the field containing the values on quadrature points
+   * with component @p q_point. Access to the same field as through @p
+   * get_value. If applied before the function @p integrate(true,...) is
+   * called, this specifies the value which is tested by all basis function on
+   * the current cell and integrated over.
+   */
+  void submit_value (const value_type   val_in,
+                     const unsigned int q_point);
+
+  /**
+   * Returns the gradient of a finite element function at quadrature point
+   * number @p q_point after a call to @p evaluate(...,true,...), or the value
+   * that has been stored there with a call to @p submit_gradient.
+   */
+  gradient_type get_gradient (const unsigned int q_point) const;
+
+  /**
+   * Write a contribution that is tested by the gradient to the field
+   * containing the values on quadrature points with component @p
+   * q_point. Access to the same field as through @p get_gradient. If applied
+   * before the function @p integrate(...,true) is called, this specifies what
+   * is tested by all basis function gradients on the current cell and
+   * integrated over.
+   */
+  void submit_gradient(const gradient_type grad_in,
+                       const unsigned int  q_point);
+
+  /**
+   * Returns the Hessian of a finite element function at quadrature point
+   * number @p q_point after a call to @p evaluate(...,true). If only the
+   * diagonal part of the Hessian or its trace, the Laplacian, are needed, use
+   * the respective functions below.
+   */
+  Tensor<2,1,VectorizedArray<Number> >
+  get_hessian (unsigned int q_point) const;
+
+  /**
+   * Returns the diagonal of the Hessian of a finite element function at
+   * quadrature point number @p q_point after a call to @p evaluate(...,true).
+   */
+  gradient_type get_hessian_diagonal (const unsigned int q_point) const;
+
+  /**
+   * Returns the Laplacian of a finite element function at quadrature point
+   * number @p q_point after a call to @p evaluate(...,true).
+   */
+  value_type get_laplacian (const unsigned int q_point) const;
+
+  /**
+   * Takes values on quadrature points, multiplies by the Jacobian determinant
+   * and quadrature weights (JxW) and sums the values for all quadrature
+   * points on the cell. The result is a scalar, representing the integral
+   * over the function over the cell. If a vector-element is used, the
+   * resulting components are still separated. Moreover, if vectorization is
+   * enabled, the integral values of several cells are represented together.
+   */
+  value_type integrate_value () const;
+
+protected:
+  /**
+   * Constructor. Made protected to avoid initialization in user code. Takes
+   * all data stored in MatrixFree. If applied to problems with more than one
+   * finite element or more than one quadrature formula selected during
+   * construction of @p matrix_free, @p fe_no and @p quad_no allow to select
+   * the appropriate components.
+   */
+  FEEvaluationAccess (const MatrixFree<1,Number> &matrix_free,
+                      const unsigned int          fe_no,
+                      const unsigned int          quad_no,
+                      const unsigned int          fe_degree,
+                      const unsigned int          n_q_points);
+
+  /**
+   * Constructor that comes with reduced functionality and works similar as
+   * FEValues. The user has to provide a structure of type MappingFEEvaluation
+   * and a DoFHandler in order to allow for reading out the finite element
+   * data. It uses the data provided by dof_handler.get_fe(). If the element
+   * is vector-valued, the optional argument allows to specify the index of
+   * the base element (as long as the element is primitive, non-primitive are
+   * not supported currently).
+   *
+   * With initialization from a FEValues object, no call to a reinit method of
+   * this class is necessary. Instead, it is enough if the geometry is
+   * initialized to a given cell iterator. It can also read from or write to
+   * vectors in the standard way for DoFHandler<dim>::active_cell_iterator
+   * types (which is less efficient with MPI since index translation has to be
+   * done), but of course only for one cell at a time. Hence, a kernel using
+   * this method does not vectorize over several elements (which is most
+   * efficient for vector operations), but only possibly within the element if
+   * the evaluate/integrate routines are combined (e.g. for computing cell
+   * matrices).
+   * With this initialization, no call to a reinit method of this
+   * class. Instead, it is enough if the geometry is initialized to a given
+   * cell iterator. Moreover, beware that a kernel using this method does not
+   * vectorize over several elements (which is most efficient for vector
+   * operations), but only possibly within the element if the
+   * evaluate/integrate routines are combined (e.g. for matrix assembly).
+   */
+  FEEvaluationAccess (const MappingFEEvaluation<1,Number> &geometry,
+                      const DoFHandler<1>                 &dof_handler,
+                      const unsigned int                   first_selected_component = 0);
+
+  /**
+   * Copy constructor
+   */
+  FEEvaluationAccess (const FEEvaluationAccess &other);
+};
+
+
 
 /**
  * The class that provides all functions necessary to evaluate functions at
@@ -4073,6 +4229,230 @@ FEEvaluationAccess<dim,dim,Number>
       Assert (false, ExcNotImplemented());
     }
   submit_gradient (grad, q_point);
+}
+
+
+/*-------------------- FEEvaluationAccess scalar for 1d ----------------------------*/
+
+
+template <typename Number>
+inline
+FEEvaluationAccess<1,1,Number>
+::FEEvaluationAccess (const MatrixFree<1,Number> &data_in,
+                      const unsigned int fe_no,
+                      const unsigned int quad_no_in,
+                      const unsigned int fe_degree,
+                      const unsigned int n_q_points)
+  :
+  FEEvaluationBase <1,1,Number>
+  (data_in, fe_no, quad_no_in, fe_degree, n_q_points)
+{}
+
+
+
+template <typename Number>
+inline
+FEEvaluationAccess<1,1,Number>
+::FEEvaluationAccess (const MappingFEEvaluation<1,Number> &geometry,
+                      const DoFHandler<1>               &dof_handler,
+                      const unsigned int                 first_selected_component)
+  :
+  FEEvaluationBase <1,1,Number> (geometry, dof_handler, first_selected_component)
+{}
+
+
+
+template <typename Number>
+inline
+FEEvaluationAccess<1,1,Number>
+::FEEvaluationAccess (const FEEvaluationAccess<dim,1,Number> &other)
+  :
+  FEEvaluationBase <1,1,Number>(other)
+{}
+
+
+
+template <typename Number>
+inline
+VectorizedArray<Number>
+FEEvaluationAccess<1,1,Number>
+::get_dof_value (const unsigned int dof) const
+{
+  AssertIndexRange (dof, this->data->dofs_per_cell);
+  return this->values_dofs[0][dof];
+}
+
+
+
+template <typename Number>
+inline
+VectorizedArray<Number>
+FEEvaluationAccess<1,1,Number>
+::get_value (const unsigned int q_point) const
+{
+  Assert (this->values_quad_initialized==true,
+          internal::ExcAccessToUninitializedField());
+  AssertIndexRange (q_point, this->data->n_q_points);
+  return this->values_quad[0][q_point];
+}
+
+
+
+template <typename Number>
+inline
+Tensor<1,1,VectorizedArray<Number> >
+FEEvaluationAccess<1,1,Number>
+::get_gradient (const unsigned int q_point) const
+{
+  // could use the base class gradient, but that involves too many inefficient
+  // initialization operations on tensors
+
+  Assert (this->gradients_quad_initialized==true,
+          internal::ExcAccessToUninitializedField());
+  AssertIndexRange (q_point, this->data->n_q_points);
+
+  Tensor<1,1,VectorizedArray<Number> > grad_out (false);
+
+  // Cartesian cell
+  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+    {
+      grad_out[0] = (this->gradients_quad[0][0][q_point] *
+                     this->cartesian_data[0][0]);
+    }
+  // cell with general/constant Jacobian
+  else
+    {
+      const Tensor<2,1,VectorizedArray<Number> > &jac =
+        this->cell_type == internal::MatrixFreeFunctions::general ?
+        this->jacobian[q_point] : this->jacobian[0];
+
+      grad_out[0] = (jac[0][0] * this->gradients_quad[0][0][q_point]);
+    }
+  return grad_out;
+}
+
+
+
+template <typename Number>
+inline
+Tensor<2,1,VectorizedArray<Number> >
+FEEvaluationAccess<1,1,Number>
+::get_hessian (const unsigned int q_point) const
+{
+  return BaseClass::get_hessian(q_point)[0];
+}
+
+
+
+template <typename Number>
+inline
+Tensor<1,1,VectorizedArray<Number> >
+FEEvaluationAccess<1,1,Number>
+::get_hessian_diagonal (const unsigned int q_point) const
+{
+  return BaseClass::get_hessian_diagonal(q_point)[0];
+}
+
+
+
+template <typename Number>
+inline
+VectorizedArray<Number>
+FEEvaluationAccess<1,1,Number>
+::get_laplacian (const unsigned int q_point) const
+{
+  return BaseClass::get_laplacian(q_point)[0];
+}
+
+
+
+template <typename Number>
+inline
+void
+FEEvaluationAccess<1,1,Number>
+::submit_dof_value (const VectorizedArray<Number> val_in,
+                    const unsigned int dof)
+{
+#ifdef DEBUG
+  this->dof_values_initialized = true;
+  AssertIndexRange (dof, this->data->dofs_per_cell);
+#endif
+  this->values_dofs[0][dof] = val_in;
+}
+
+
+
+template <typename Number>
+inline
+void
+FEEvaluationAccess<1,1,Number>
+::submit_value (const VectorizedArray<Number> val_in,
+                const unsigned int q_point)
+{
+#ifdef DEBUG
+  Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+  AssertIndexRange (q_point, this->data->n_q_points);
+  this->values_quad_submitted = true;
+#endif
+  if (this->cell_type == internal::MatrixFreeFunctions::general)
+    {
+      const VectorizedArray<Number> JxW = this->J_value[q_point];
+      this->values_quad[0][q_point] = val_in * JxW;
+    }
+  else //if (this->cell_type < internal::MatrixFreeFunctions::general)
+    {
+      const VectorizedArray<Number> JxW = this->J_value[0] * this->quadrature_weights[q_point];
+      this->values_quad[0][q_point] = val_in * JxW;
+    }
+}
+
+
+
+template <typename Number>
+inline
+void
+FEEvaluationAccess<1,1,Number>
+::submit_gradient (const Tensor<1,1,VectorizedArray<Number> > grad_in,
+                   const unsigned int q_point)
+{
+#ifdef DEBUG
+  Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+  AssertIndexRange (q_point, this->data->n_q_points);
+  this->gradients_quad_submitted = true;
+#endif
+  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+    {
+      const VectorizedArray<Number> JxW = this->J_value[0] * this->quadrature_weights[q_point];
+      this->gradients_quad[0][0][q_point] = (grad_in[0] *
+                                             this->cartesian_data[0][0] *
+                                             JxW);
+    }
+  // general/affine cell type
+  else
+    {
+      const Tensor<2,1,VectorizedArray<Number> > &jac =
+        this->cell_type == internal::MatrixFreeFunctions::general ?
+        this->jacobian[q_point] : this->jacobian[0];
+      const VectorizedArray<Number> JxW =
+        this->cell_type == internal::MatrixFreeFunctions::general ?
+        this->J_value[q_point] : this->J_value[0] * this->quadrature_weights[q_point];
+
+      VectorizedArray<Number> new_val = jac[0][0] * grad_in[0];
+      for (unsigned int e=1; e<dim; ++e)
+        new_val += jac[e][0] * grad_in[e];
+      this->gradients_quad[0][0][q_point] = new_val * JxW;
+    }
+}
+
+
+
+template <typename Number>
+inline
+VectorizedArray<Number>
+FEEvaluationAccess<1,1,Number>
+::integrate_value () const
+{
+  return BaseClass::integrate_value()[0];
 }
 
 

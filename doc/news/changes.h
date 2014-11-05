@@ -325,6 +325,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Using the FEEvaluation framework did not work for 
+  scalar elements in 1d because there were conflicting partial
+  specializations. This is now fixed.
+  <br>
+  (Shiva Rudraraju, 2014/11/04)
+  </li>
+
   <li> New: There is now a macro <code>DEAL_II_VERSION_GTE</code>
   that can be used to test whether the deal.II version is greater
   than or equal a particular version number. This is useful if you
