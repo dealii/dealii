@@ -538,6 +538,7 @@ SolverGMRES<VECTOR>::modified_gram_schmidt (const internal::SolverGMRES::TmpVect
                                             Vector<double>     &h,
                                             bool               &re_orthogonalize)
 {
+  Assert(dim > 0, ExcInternalError());
   const unsigned int inner_iteration = dim - 1;
 
   // need initial norm for detection of re-orthogonalization, see below
@@ -546,11 +547,10 @@ SolverGMRES<VECTOR>::modified_gram_schmidt (const internal::SolverGMRES::TmpVect
     norm_vv_start = vv.l2_norm();
 
   // Orthogonalization
-  for (unsigned int i=0 ; i<dim ; ++i)
-    {
-      h(i) = vv * orthogonal_vectors[i];
-      vv.add(-h(i), orthogonal_vectors[i]);
-    };
+  h(0) = vv * orthogonal_vectors[0];
+  for (unsigned int i=1 ; i<dim ; ++i)
+    h(i) = vv.add_and_dot(-h(i-1), orthogonal_vectors[i-1], orthogonal_vectors[i]);
+  double norm_vv = std::sqrt(vv.add_and_dot(-h(dim-1), orthogonal_vectors[dim-1], vv));
 
   // Re-orthogonalization if loss of orthogonality detected. For the test, use
   // a strategy discussed in C. T. Kelley, Iterative Methods for Linear and
@@ -561,7 +561,6 @@ SolverGMRES<VECTOR>::modified_gram_schmidt (const internal::SolverGMRES::TmpVect
   // previous vectors, which indicates loss of precision.
   if (re_orthogonalize == false && inner_iteration % 5 == 4)
     {
-      const double norm_vv = vv.l2_norm();
       if (norm_vv > 10. * norm_vv_start *
           std::sqrt(std::numeric_limits<typename VECTOR::value_type>::epsilon()))
         return norm_vv;
@@ -575,14 +574,18 @@ SolverGMRES<VECTOR>::modified_gram_schmidt (const internal::SolverGMRES::TmpVect
     }
 
   if (re_orthogonalize == true)
-    for (unsigned int i=0 ; i<dim ; ++i)
-      {
-        double htmp = vv * orthogonal_vectors[i];
-        h(i) += htmp;
-        vv.add(-htmp, orthogonal_vectors[i]);
-      }
+    {
+      double htmp = vv * orthogonal_vectors[0];
+      h(0) += htmp;
+      for (unsigned int i=1 ; i<dim ; ++i)
+        {
+          htmp = vv.add_and_dot(-htmp, orthogonal_vectors[i-1], orthogonal_vectors[i]);
+          h(i) += htmp;
+        }
+      norm_vv = std::sqrt(vv.add_and_dot(-htmp, orthogonal_vectors[dim-1], vv));
+    }
 
-  return vv.l2_norm();
+  return norm_vv;
 }
 
 
@@ -996,12 +999,10 @@ SolverFGMRES<VECTOR>::solve (
           A.vmult(*aux, z[j]);
 
           // Gram-Schmidt
-          for (unsigned int i=0; i<=j; ++i)
-            {
-              H(i,j) = *aux * v[i];
-              aux->add(-H(i,j), v[i]);
-            }
-          H(j+1,j) = a = aux->l2_norm();
+          H(0,j) = *aux * v[0];
+          for (unsigned int i=1; i<=j; ++i)
+            H(i,j) = aux->add_and_dot(-H(i-1,j), v[i-1], v[i]);
+          H(j+1,j) = a = std::sqrt(aux->add_and_dot(-H(j,j), v[j], *aux));
 
           // Compute projected solution
 

@@ -1025,6 +1025,27 @@ public:
   real_type linfty_norm () const;
 
   /**
+   * Performs a combined operation of a vector addition and a subsequent
+   * inner product, returning the value of the inner product. In other words,
+   * the result of this function is the same as if the user called
+   * @code
+   * this->add(a, V);
+   * return_value = *this * W;
+   * @endcode
+   *
+   * The reason this function exists is that this operation involves less
+   * memory transfer than calling the two functions separately on deal.II's
+   * vector classes (Vector<Number> and parallel::distributed::Vector<double>).
+   * This method only needs to load three vectors, @p this, @p V, @p W,
+   * whereas calling separate methods means to load the calling vector @p this
+   * twice. Since most vector operations are memory transfer limited, this
+   * reduces the time by 25\% (or 50\% if @p W equals @p this).
+   */
+  value_type add_and_dot (const value_type       a,
+                          const BlockVectorBase &V,
+                          const BlockVectorBase &W);
+
+  /**
    * Returns true if the given global index is
    * in the local range of this processor.
    * Asks the corresponding block.
@@ -2086,6 +2107,25 @@ BlockVectorBase<VectorType>::linfty_norm () const
       if (sum<newval)
         sum = newval;
     }
+  return sum;
+}
+
+
+
+template <class VectorType>
+typename BlockVectorBase<VectorType>::value_type
+BlockVectorBase<VectorType>::
+add_and_dot (const typename BlockVectorBase<VectorType>::value_type a,
+             const BlockVectorBase<VectorType> &V,
+             const BlockVectorBase<VectorType> &W)
+{
+  AssertDimension (n_blocks(), V.n_blocks());
+  AssertDimension (n_blocks(), W.n_blocks());
+
+  value_type sum = 0.;
+  for (size_type i=0; i<n_blocks(); ++i)
+    sum += components[i].add_and_dot(a, V.components[i], W.components[i]);
+
   return sum;
 }
 

@@ -22,6 +22,7 @@
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/vectorization.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 
@@ -823,14 +824,28 @@ namespace internal
   namespace Vector
   {
     // All sums over all the vector entries (l2-norm, inner product, etc.) are
-    // performed with the same code, using a templated operation defined here
+    // performed with the same code, using a templated operation defined
+    // here. There are always two versions defined, a standard one that covers
+    // most cases and a vectorized one which is only for equal types and float
+    // and double.
     template <typename Number, typename Number2>
-    struct InnerProd
+    struct Dot
     {
       Number
-      operator() (const Number *&X, const Number2 *&Y, const Number &) const
+      operator() (const Number *&X, const Number2 *&Y, const Number &, Number *&) const
       {
         return *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
+      }
+
+      VectorizedArray<Number>
+      do_vectorized(const Number *&X, const Number *&Y, const Number &, Number *&) const
+      {
+        VectorizedArray<Number> x, y;
+        x.load(X);
+        y.load(Y);
+        X += VectorizedArray<Number>::n_array_elements;
+        Y += VectorizedArray<Number>::n_array_elements;
+        return x * y;
       }
     };
 
@@ -838,9 +853,18 @@ namespace internal
     struct Norm2
     {
       RealType
-      operator() (const Number  *&X, const Number  *&, const RealType &) const
+      operator() (const Number  *&X, const Number  *&, const RealType &, Number *&) const
       {
         return numbers::NumberTraits<Number>::abs_square(*X++);
+      }
+
+      VectorizedArray<Number>
+      do_vectorized(const Number *&X, const Number *&, const Number &, Number *&) const
+      {
+        VectorizedArray<Number> x;
+        x.load(X);
+        X += VectorizedArray<Number>::n_array_elements;
+        return x * x;
       }
     };
 
@@ -848,9 +872,18 @@ namespace internal
     struct Norm1
     {
       RealType
-      operator() (const Number  *&X, const Number  *&, const RealType &) const
+      operator() (const Number  *&X, const Number  *&, const RealType &, Number *&) const
       {
         return numbers::NumberTraits<Number>::abs(*X++);
+      }
+
+      VectorizedArray<Number>
+      do_vectorized(const Number *&X, const Number *&, const Number &, Number *&) const
+      {
+        VectorizedArray<Number> x;
+        x.load(X);
+        X += VectorizedArray<Number>::n_array_elements;
+        return std::abs(x);
       }
     };
 
@@ -858,9 +891,18 @@ namespace internal
     struct NormP
     {
       RealType
-      operator() (const Number  *&X, const Number  *&, const RealType &p) const
+      operator() (const Number  *&X, const Number  *&, const RealType &p, Number *&) const
       {
         return std::pow(numbers::NumberTraits<Number>::abs(*X++), p);
+      }
+
+      VectorizedArray<Number>
+      do_vectorized(const Number *&X, const Number *&, const Number &p, Number *&) const
+      {
+        VectorizedArray<Number> x;
+        x.load(X);
+        X += VectorizedArray<Number>::n_array_elements;
+        return std::pow(std::abs(x),p);
       }
     };
 
@@ -868,11 +910,137 @@ namespace internal
     struct MeanValue
     {
       Number
-      operator() (const Number  *&X, const Number  *&, const Number &) const
+      operator() (const Number  *&X, const Number  *&, const Number &, Number *&) const
       {
         return *X++;
       }
+
+      VectorizedArray<Number>
+      do_vectorized(const Number *&X, const Number *&, const Number &, Number *&) const
+      {
+        VectorizedArray<Number> x;
+        x.load(X);
+        X += VectorizedArray<Number>::n_array_elements;
+        return x;
+      }
     };
+
+    template <typename Number>
+    struct AddAndDot
+    {
+      Number
+      operator() (const Number *&V, const Number *&W, const Number &a,
+                  Number *&X) const
+      {
+        *X += a **V++;
+        return *X++ * Number(numbers::NumberTraits<Number>::conjugate(*W++));
+      }
+
+      VectorizedArray<Number>
+      do_vectorized(const Number *&V, const Number *&W, const Number &a,
+                    Number *&X) const
+      {
+        VectorizedArray<Number> x, w, v;
+        x.load(X);
+        v.load(V);
+        x += a * v;
+        x.store(X);
+        // may only load from W after storing in X because the pointers might
+        // point to the same memory
+        w.load(W);
+        X += VectorizedArray<Number>::n_array_elements;
+        V += VectorizedArray<Number>::n_array_elements;
+        W += VectorizedArray<Number>::n_array_elements;
+        return x * w;
+      }
+    };
+
+
+
+    // this is the inner working routine for the accumulation loops
+    // below. This is the standard case where the loop bounds are known. We
+    // pulled this function out of the regular accumulate routine because we
+    // might do this thing vectorized (see specialized function below)
+    template <typename Operation, typename Number, typename Number2,
+              typename ResultType, typename size_type>
+    void
+    accumulate_regular(const Operation &op,
+                       const Number   *&X,
+                       const Number2  *&Y,
+                       const ResultType power,
+                       const size_type  n_chunks,
+                       Number         *&Z,
+                       ResultType (&outer_results)[128],
+                       internal::bool2type<false>,
+                       const unsigned int start_chunk=0)
+    {
+      AssertIndexRange(start_chunk, n_chunks+1);
+      for (size_type i=start_chunk; i<n_chunks; ++i)
+        {
+          ResultType r0 = op(X, Y, power, Z);
+          ResultType r1 = op(X, Y, power, Z);
+          ResultType r2 = op(X, Y, power, Z);
+          ResultType r3 = op(X, Y, power, Z);
+          for (size_type j=1; j<8; ++j)
+            {
+              r0 += op(X, Y, power, Z);
+              r1 += op(X, Y, power, Z);
+              r2 += op(X, Y, power, Z);
+              r3 += op(X, Y, power, Z);
+            }
+          r0 += r1;
+          r2 += r3;
+          outer_results[i] = r0 + r2;
+        }
+    }
+
+
+
+    // this is the inner working routine for the accumulation loops
+    // below. This is the specialized case where the loop bounds are known and
+    // where we can vectorize. In that case, we request the 'do_vectorized'
+    // routine of the operation instead of the regular one which does several
+    // operations at once.
+    template <typename Operation, typename Number, typename size_type>
+    void
+    accumulate_regular(const Operation &op,
+                       const Number   *&X,
+                       const Number   *&Y,
+                       const Number     power,
+                       const size_type  n_chunks,
+                       Number         *&Z,
+                       Number (&outer_results)[128],
+                       internal::bool2type<true>)
+    {
+      for (size_type i=0; i<n_chunks/VectorizedArray<Number>::n_array_elements; ++i)
+        {
+          VectorizedArray<Number> r0 = op.do_vectorized(X, Y, power, Z);
+          VectorizedArray<Number> r1 = op.do_vectorized(X, Y, power, Z);
+          VectorizedArray<Number> r2 = op.do_vectorized(X, Y, power, Z);
+          VectorizedArray<Number> r3 = op.do_vectorized(X, Y, power, Z);
+          for (size_type j=1; j<8; ++j)
+            {
+              r0 += op.do_vectorized(X, Y, power, Z);
+              r1 += op.do_vectorized(X, Y, power, Z);
+              r2 += op.do_vectorized(X, Y, power, Z);
+              r3 += op.do_vectorized(X, Y, power, Z);
+            }
+          r0 += r1;
+          r2 += r3;
+          r0 += r2;
+          r0.store(&outer_results[i*VectorizedArray<Number>::n_array_elements]);
+        }
+
+      // If we are treating a case where the vector length is not divisible by
+      // the vectorization length, need the other routine for the cleanup work
+      if (n_chunks % VectorizedArray<Number>::n_array_elements != 0)
+        accumulate_regular(op, X, Y, power, n_chunks, Z, outer_results,
+                           internal::bool2type<false>(),
+                           (n_chunks/VectorizedArray<Number>::n_array_elements)
+                           * VectorizedArray<Number>::n_array_elements);
+    }
+
+
 
     // this is the main working loop for all vector sums using the templated
     // operation above. it accumulates the sums using a block-wise summation
@@ -903,6 +1071,7 @@ namespace internal
                      const Number2     *Y,
                      const ResultType   power,
                      const size_type    vec_size,
+                     Number            *Z,
                      ResultType        &result,
                      const int          depth = -1)
     {
@@ -917,29 +1086,17 @@ namespace internal
           const size_type remainder = vec_size % 32;
           Assert (remainder == 0 || n_chunks < 128, ExcInternalError());
 
-          for (size_type i=0; i<n_chunks; ++i)
-            {
-              ResultType r0 = op(X, Y, power);
-              for (size_type j=1; j<8; ++j)
-                r0 += op(X, Y, power);
-              ResultType r1 = op(X, Y, power);
-              for (size_type j=1; j<8; ++j)
-                r1 += op(X, Y, power);
-              r0 += r1;
-              r1 = op(X, Y, power);
-              for (size_type j=1; j<8; ++j)
-                r1 += op(X, Y, power);
-              ResultType r2 = op(X, Y, power);
-              for (size_type j=1; j<8; ++j)
-                r2 += op(X, Y, power);
-              r1 += r2;
-              r0 += r1;
-              outer_results[i] = r0;
-            }
+          // Select between the regular version and vectorized version based
+          // on the number types we are given. To choose the vectorized
+          // version often enough, we need to have all tasks but the last one
+          // to be divisible by the vectorization length
+          accumulate_regular(op, X, Y, power, n_chunks, Z, outer_results,
+                             internal::bool2type<(types_are_equal<Number,Number2>::value &&
+                                                  (types_are_equal<Number,double>::value ||
+                                                   types_are_equal<Number,float>::value))>());
 
-          // now work on the remainder, i.e., the last
-          // up to 32 values. Use switch statement with
-          // fall-through to work on these values.
+          // now work on the remainder, i.e., the last up to 32 values. Use
+          // switch statement with fall-through to work on these values.
           if (remainder > 0)
             {
               const size_type inner_chunks = remainder / 8;
@@ -950,24 +1107,24 @@ namespace internal
               switch (inner_chunks)
                 {
                 case 3:
-                  r2 = op(X, Y, power);
+                  r2 = op(X, Y, power, Z);
                   for (size_type j=1; j<8; ++j)
-                    r2 += op(X, Y, power);
+                    r2 += op(X, Y, power, Z);
                 // no break
                 case 2:
-                  r1 = op(X, Y, power);
+                  r1 = op(X, Y, power, Z);
                   for (size_type j=1; j<8; ++j)
-                    r1 += op(X, Y, power);
+                    r1 += op(X, Y, power, Z);
                   r1 += r2;
                 // no break
                 case 1:
-                  r2 = op(X, Y, power);
+                  r2 = op(X, Y, power, Z);
                   for (size_type j=1; j<8; ++j)
-                    r2 += op(X, Y, power);
+                    r2 += op(X, Y, power, Z);
                 // no break
                 default:
                   for (size_type j=0; j<remainder_inner; ++j)
-                    r0 += op(X, Y, power);
+                    r0 += op(X, Y, power, Z);
                   r0 += r2;
                   r0 += r1;
                   outer_results[n_chunks] = r0;
@@ -1010,19 +1167,20 @@ namespace internal
           Threads::TaskGroup<> task_group;
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
                                           ResultType,size_type>,
-                                          op, X, Y, power, new_size, r0, next_depth);
+                                          op, X, Y, power, new_size, Z, r0, next_depth);
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
                                           ResultType,size_type>,
                                           op, X+new_size, Y+new_size, power,
-                                          new_size, r1, next_depth);
+                                          new_size, Z+new_size, r1, next_depth);
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
                                           ResultType,size_type>,
                                           op, X+2*new_size, Y+2*new_size, power,
-                                          new_size, r2, next_depth);
+                                          new_size, Z+2*new_size, r2, next_depth);
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
                                           ResultType,size_type>,
                                           op, X+3*new_size, Y+3*new_size, power,
-                                          vec_size-3*new_size, r3, next_depth);
+                                          vec_size-3*new_size, Z+3*new_size, r3,
+                                          next_depth);
           task_group.join_all();
           r0 += r1;
           r2 += r3;
@@ -1031,15 +1189,15 @@ namespace internal
 #endif
       else
         {
-          // split vector into four pieces and work on
-          // the pieces recursively. Make pieces (except last)
-          // divisible by 1024.
+          // split vector into four pieces and work on the pieces
+          // recursively. Make pieces (except last) divisible by 1024.
           const size_type new_size = (vec_size / 4096) * 1024;
           ResultType r0, r1, r2, r3;
-          accumulate (op, X, Y, power, new_size, r0);
-          accumulate (op, X+new_size, Y+new_size, power, new_size, r1);
-          accumulate (op, X+2*new_size, Y+2*new_size, power, new_size, r2);
-          accumulate (op, X+3*new_size, Y+3*new_size, power, vec_size-3*new_size, r3);
+          accumulate (op, X, Y, power, new_size, Z, r0);
+          accumulate (op, X+new_size, Y+new_size, power, new_size, Z+new_size, r1);
+          accumulate (op, X+2*new_size, Y+2*new_size, power, new_size, Z+2*new_size, r2);
+          accumulate (op, X+3*new_size, Y+3*new_size, power, vec_size-3*new_size,
+                      Z+3*new_size, r3);
           r0 += r1;
           r2 += r3;
           result = r0 + r2;
@@ -1063,12 +1221,13 @@ Number Vector<Number>::operator * (const Vector<Number2> &v) const
           ExcDimensionMismatch(vec_size, v.size()));
 
   Number sum;
-  internal::Vector::accumulate (internal::Vector::InnerProd<Number,Number2>(),
-                                val, v.val, Number(), vec_size, sum);
+  internal::Vector::accumulate (internal::Vector::Dot<Number,Number2>(),
+                                val, v.val, Number(), vec_size, val, sum);
   Assert(numbers::is_finite(sum), ExcNumberNotFinite());
 
   return sum;
 }
+
 
 
 template <typename Number>
@@ -1079,12 +1238,13 @@ Vector<Number>::norm_sqr () const
 
   real_type sum;
   internal::Vector::accumulate (internal::Vector::Norm2<Number,real_type>(),
-                                val, val, real_type(), vec_size, sum);
+                                val, val, real_type(), vec_size, val, sum);
 
   Assert(numbers::is_finite(sum), ExcNumberNotFinite());
 
   return sum;
 }
+
 
 
 template <typename Number>
@@ -1094,7 +1254,7 @@ Number Vector<Number>::mean_value () const
 
   Number sum;
   internal::Vector::accumulate (internal::Vector::MeanValue<Number>(),
-                                val, val, Number(), vec_size, sum);
+                                val, val, Number(), vec_size, val, sum);
 
   return sum / real_type(size());
 }
@@ -1109,7 +1269,7 @@ Vector<Number>::l1_norm () const
 
   real_type sum;
   internal::Vector::accumulate (internal::Vector::Norm1<Number,real_type>(),
-                                val, val, real_type(), vec_size, sum);
+                                val, val, real_type(), vec_size, val, sum);
 
   return sum;
 }
@@ -1129,7 +1289,7 @@ Vector<Number>::l2_norm () const
 
   real_type norm_square;
   internal::Vector::accumulate (internal::Vector::Norm2<Number,real_type>(),
-                                val, val, real_type(), vec_size, norm_square);
+                                val, val, real_type(), vec_size, val, norm_square);
   if (numbers::is_finite(norm_square) &&
       norm_square >= std::numeric_limits<real_type>::min())
     return std::sqrt(norm_square);
@@ -1172,7 +1332,7 @@ Vector<Number>::lp_norm (const real_type p) const
 
   real_type sum;
   internal::Vector::accumulate (internal::Vector::NormP<Number,real_type>(),
-                                val, val, p, vec_size, sum);
+                                val, val, p, vec_size, val, sum);
 
   if (numbers::is_finite(sum) && sum >= std::numeric_limits<real_type>::min())
     return std::pow(sum, static_cast<real_type>(1./p));
@@ -1216,6 +1376,27 @@ Vector<Number>::linfty_norm () const
 }
 
 
+
+template <typename Number>
+Number
+Vector<Number>::add_and_dot (const Number          a,
+                             const Vector<Number> &V,
+                             const Vector<Number> &W)
+{
+  Assert (vec_size!=0, ExcEmptyObject());
+  AssertDimension (vec_size, V.size());
+  AssertDimension (vec_size, W.size());
+
+  Number sum;
+  internal::Vector::accumulate (internal::Vector::AddAndDot<Number>(),
+                                V.val, W.val, a, vec_size, val, sum);
+  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+
+  return sum;
+}
+
+
+
 template <typename Number>
 Vector<Number> &Vector<Number>::operator += (const Vector<Number> &v)
 {
@@ -1224,6 +1405,7 @@ Vector<Number> &Vector<Number>::operator += (const Vector<Number> &v)
   add (v);
   return *this;
 }
+
 
 
 template <typename Number>
@@ -1241,6 +1423,7 @@ Vector<Number> &Vector<Number>::operator -= (const Vector<Number> &v)
 }
 
 
+
 template <typename Number>
 void Vector<Number>::add (const Number v)
 {
@@ -1251,6 +1434,7 @@ void Vector<Number>::add (const Number v)
   vector_add.factor = v;
   internal::vectorized_transform(vector_add,vec_size);
 }
+
 
 
 template <typename Number>
@@ -1264,6 +1448,7 @@ void Vector<Number>::add (const Vector<Number> &v)
   vector_add.v_val = v.val;
   internal::vectorized_transform(vector_add,vec_size);
 }
+
 
 
 template <typename Number>

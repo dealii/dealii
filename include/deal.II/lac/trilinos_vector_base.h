@@ -469,6 +469,25 @@ namespace TrilinosWrappers
     real_type linfty_norm () const;
 
     /**
+     * Performs a combined operation of a vector addition and a subsequent
+     * inner product, returning the value of the inner product. In other
+     * words, the result of this function is the same as if the user called
+     * @code
+     * this->add(a, V);
+     * return_value = *this * W;
+     * @endcode
+     *
+     * The reason this function exists is for compatibility with deal.II's own
+     * vector classes which can implement this functionality with less memory
+     * transfer. However, for Trilinos vectors such a combined operation is
+     * not natively supported and thus the cost is completely equivalent as
+     * calling the two methods separately.
+     */
+    TrilinosScalar add_and_dot (const TrilinosScalar a,
+                                const VectorBase    &V,
+                                const VectorBase    &W);
+
+    /**
      * Return whether the vector contains only elements with value
      * zero. This is a collective operation. This function is expensive, because
      * potentially all elements have to be checked.
@@ -1561,6 +1580,18 @@ namespace TrilinosWrappers
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
     return d;
+  }
+
+
+
+  inline
+  TrilinosScalar
+  VectorBase::add_and_dot (const TrilinosScalar a,
+                           const VectorBase &V,
+                           const VectorBase &W)
+  {
+    this->add(a, V);
+    return *this * W;
   }
 
 

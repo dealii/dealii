@@ -391,7 +391,7 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
       if (std::fabs(alpha) > 1.e10)
         return IterationResult(true, state, step, res);
 
-      r.add(-alpha, v);
+      res = std::sqrt(r.add_and_dot(-alpha, v, r));
 
       // check for early success, see the lac/bicgstab_early testcase as to
       // why this is necessary
@@ -399,7 +399,6 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
       // note: the vector *Vx we pass to the iteration_status signal here is only
       // the current approximation, not the one we will return with,
       // which will be x=*Vx + alpha*y
-      res = r.l2_norm();
       if (this->iteration_status(step, res, *Vx) == SolverControl::success)
         {
           Vx->add(alpha, y);
@@ -412,12 +411,14 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
       rhobar = t*r;
       omega = rhobar/(t*t);
       Vx->add(alpha, y, omega, z);
-      r.add(-omega, t);
 
       if (additional_data.exact_residual)
-        res = criterion(A, *Vx, *Vb);
+        {
+          r.add(-omega, t);
+          res = criterion(A, *Vx, *Vb);
+        }
       else
-        res = r.l2_norm();
+        res = std::sqrt(r.add_and_dot(-omega, t, r));
 
       state = this->iteration_status(step, res, *Vx);
       print_vectors(step, *Vx, r, y);

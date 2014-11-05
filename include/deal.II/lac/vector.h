@@ -489,6 +489,31 @@ public:
    * Maximum absolute value of the elements.
    */
   real_type linfty_norm () const;
+
+  /**
+   * Performs a combined operation of a vector addition and a subsequent
+   * inner product, returning the value of the inner product. In other words,
+   * the result of this function is the same as if the user called
+   * @code
+   * this->add(a, V);
+   * return_value = *this * W;
+   * @endcode
+   *
+   * The reason this function exists is that this operation involves less
+   * memory transfer than calling the two functions separately. This method
+   * only needs to load three vectors, @p this, @p V, @p W, whereas calling
+   * separate methods means to load the calling vector @p this twice. Since
+   * most vector operations are memory transfer limited, this reduces the time
+   * by 25\% (or 50\% if @p W equals @p this).
+   *
+   * @dealiiOperationIsMultithreaded The algorithm uses pairwise
+   * summation with the same order of summation in every run, which gives
+   * fully repeatable results from one run to another.
+   */
+  Number add_and_dot (const Number          a,
+                      const Vector<Number> &V,
+                      const Vector<Number> &W);
+
   //@}
 
 

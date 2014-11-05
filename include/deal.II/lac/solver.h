@@ -81,7 +81,7 @@ template <typename number> class Vector;
  *     void reinit (const Vector &model_vector,
  *                  const bool  leave_elements_uninitialized = false);
  *
- *                        // Scalar product between the current object
+ *                        // Inner product between the current object
  *                        // and the argument
  *     double operator * (const Vector &v) const;
  *
@@ -100,6 +100,13 @@ template <typename number> class Vector;
  *                        // Scaled assignment of a vector
  *     void equ (const double  a,
  *               const Vector &x);
+ *
+ *                        // Combined scaled addition of vector x into
+ *                        // the current object and subsequent inner
+ *                        // product of the current object with v
+ *     double add_and_dot (const double  a,
+ *                         const Vector &x,
+ *                         const Vector &v);
  *
  *                        // Multiply the elements of the current
  *                        // object by a fixed value
