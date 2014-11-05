@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,6 +47,14 @@ DEAL_II_NAMESPACE_OPEN
  * For the Richardson method, the additional data is the damping parameter,
  * which is the only content of the @p AdditionalData structure. By default,
  * the constructor of the structure sets it to one.
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described
+ * in the Solver base class to determine convergence. This mechanism
+ * can also be used to observe the progress of the iteration.
+ *
  *
  * @author Ralf Hartmann
  */
@@ -237,6 +245,10 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
 {
   SolverControl::State conv=SolverControl::iterate;
 
+  double last_criterion = -std::numeric_limits<double>::max();
+
+  unsigned int iter = 0;
+
   // Memory allocation
   Vr  = this->memory.alloc();
   VECTOR &r  = *Vr;
@@ -250,7 +262,7 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
   try
     {
       // Main loop
-      for (int iter=0; conv==SolverControl::iterate; iter++)
+      while (conv==SolverControl::iterate)
         {
           // Do not use residual,
           // but do it in 2 steps
@@ -263,13 +275,15 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
           // residual is computed in
           // criterion() and stored
           // in res.
-          conv = this->control().check (iter, criterion());
-//        conv = this->control().check (iter, std::sqrt(A.matrix_norm_square(r)));
+          last_criterion = criterion();
+          conv = this->iteration_status (iter, last_criterion, x);
           if (conv != SolverControl::iterate)
             break;
 
           x.add(additional_data.omega,d);
           print_vectors(iter,x,r,d);
+
+          ++iter;
         }
     }
   catch (...)
@@ -285,9 +299,9 @@ SolverRichardson<VECTOR>::solve (const MATRIX         &A,
   deallog.pop();
 
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  if (conv != SolverControl::success)
+    AssertThrow(false, SolverControl::NoConvergence (iter,
+                                                     last_criterion));
   // otherwise exit as normal
 }
 
@@ -301,6 +315,9 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
                                   const PRECONDITIONER &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
+  double last_criterion = -std::numeric_limits<double>::max();
+
+  unsigned int iter = 0;
 
   // Memory allocation
   Vr  = this->memory.alloc();
@@ -315,7 +332,7 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
   try
     {
       // Main loop
-      for (int iter=0; conv==SolverControl::iterate; iter++)
+      while (conv==SolverControl::iterate)
         {
           // Do not use Tresidual,
           // but do it in 2 steps
@@ -323,12 +340,15 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
           r.sadd(-1.,1.,b);
           precondition.Tvmult(d,r);
 
-          conv = this->control().check (iter, criterion());
+          last_criterion = criterion();
+          conv = this->iteration_status (iter, last_criterion, x);
           if (conv != SolverControl::iterate)
             break;
 
           x.add(additional_data.omega,d);
           print_vectors(iter,x,r,d);
+
+          ++iter;
         }
     }
   catch (...)
@@ -344,9 +364,9 @@ SolverRichardson<VECTOR>::Tsolve (const MATRIX         &A,
   this->memory.free(Vd);
   deallog.pop();
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  if (conv != SolverControl::success)
+    AssertThrow(false, SolverControl::NoConvergence (iter, last_criterion));
+
   // otherwise exit as normal
 }
 

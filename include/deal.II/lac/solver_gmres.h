@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -112,7 +112,8 @@ namespace internal
  * preconditioning. The default is left preconditioning. Finally it
  * includes a flag indicating whether or not the default residual is
  * used as stopping criterion.
-
+ *
+ *
  * <h3>Left versus right preconditioning</h3>
  *
  * @p AdditionalData allows you to choose between left and right
@@ -132,6 +133,7 @@ namespace internal
  * residuals have to be computed in this case, impeding the overall
  * performance of the solver.
  *
+ *
  * <h3>The size of the Arnoldi basis</h3>
  *
  * The maximal basis size is controlled by
@@ -149,6 +151,14 @@ namespace internal
  *
  * For the requirements on matrices and vectors in order to work with
  * this class, see the documentation of the Solver base class.
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described
+ * in the Solver base class to determine convergence. This mechanism
+ * can also be used to observe the progress of the iteration.
+ *
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
  */
@@ -626,6 +636,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
   unsigned int dim = 0;
 
   SolverControl::State iteration_state = SolverControl::iterate;
+  double last_res = -std::numeric_limits<double>::max();
 
   // switch to determine whether we want a left or a right preconditioner. at
   // present, left is default, but both ways are implemented
@@ -686,8 +697,8 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
       // check here, the next scaling operation would produce garbage
       if (use_default_residual)
         {
-          iteration_state = this->control().check (
-                              accumulated_iterations, rho);
+          last_res = rho;
+          iteration_state = this->iteration_status (accumulated_iterations, rho, x);
 
           if (iteration_state != SolverControl::iterate)
             break;
@@ -705,8 +716,8 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
             precondition.vmult(*r,v);
 
           double res = r->l2_norm();
-          iteration_state = this->control().check (
-                              accumulated_iterations, res);
+          last_res = res;
+          iteration_state = this->iteration_status (accumulated_iterations, res, x);
 
           if (iteration_state != SolverControl::iterate)
             {
@@ -744,7 +755,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
             {
               precondition.vmult(p, tmp_vectors[inner_iteration]);
               A.vmult(vv,p);
-            };
+            }
 
           dim = inner_iteration+1;
 
@@ -764,7 +775,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
             for (unsigned int i=0; i<dim+1; ++i)
               H_orig(i,inner_iteration) = h(i);
 
-          //  Transformation into triagonal structure
+          //  Transformation into tridiagonal structure
           givens_rotation(h,gamma,ci,si,inner_iteration);
 
           //  append vector on matrix
@@ -775,8 +786,10 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
           rho = std::fabs(gamma(dim));
 
           if (use_default_residual)
-            iteration_state = this->control().check (
-                                accumulated_iterations, rho);
+            {
+              last_res = rho;
+              iteration_state = this->iteration_status (accumulated_iterations, rho, x);
+            }
           else
             {
               deallog << "default_res=" << rho << std::endl;
@@ -809,17 +822,18 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
               if (left_precondition)
                 {
                   const double res=r->l2_norm();
+                  last_res = res;
 
-                  iteration_state = this->control().check (
-                                      accumulated_iterations, res);
+                  iteration_state = this->iteration_status (accumulated_iterations, res, x);
                 }
               else
                 {
                   precondition.vmult(*x_, *r);
                   const double preconditioned_res=x_->l2_norm();
+                  last_res = preconditioned_res;
 
-                  iteration_state = this->control().check (
-                                      accumulated_iterations, preconditioned_res);
+                  iteration_state = this->iteration_status (accumulated_iterations,
+                                                            preconditioned_res, x);
                 }
             }
         };
@@ -881,11 +895,11 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
     }
 
   deallog.pop();
+
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
-  // otherwise exit as normal
+  AssertThrow(iteration_state == SolverControl::success,
+              SolverControl::NoConvergence (accumulated_iterations,
+                                            last_res));
 }
 
 
@@ -955,6 +969,7 @@ SolverFGMRES<VECTOR>::solve (
   Vector<double> y;
 
   // Iteration starts here
+  double res = -std::numeric_limits<double>::max();
 
   VECTOR *aux = this->memory.alloc();
   aux->reinit(x);
@@ -964,8 +979,9 @@ SolverFGMRES<VECTOR>::solve (
       aux->sadd(-1., 1., b);
 
       double beta = aux->l2_norm();
-      if (this->control().check(accumulated_iterations,beta)
-          == SolverControl::success)
+      res = beta;
+      iteration_state = this->iteration_status(accumulated_iterations, res, x);
+      if (iteration_state == SolverControl::success)
         break;
 
       H.reinit(basis_size+1, basis_size);
@@ -997,17 +1013,22 @@ SolverFGMRES<VECTOR>::solve (
               y.reinit(j);
               projected_rhs(0) = beta;
               H1.fill(H);
+
+              // check convergence. note that the vector 'x' we pass to the
+              // criterion is not the final solution we compute if we
+              // decide to jump out of the iteration (we update 'x' again
+              // right after the current loop)
               Householder<double> house(H1);
-              double res = house.least_squares(y, projected_rhs);
-              iteration_state = this->control().check(++accumulated_iterations, res);
+              res = house.least_squares(y, projected_rhs);
+              iteration_state = this->iteration_status(++accumulated_iterations, res, x);
               if (iteration_state != SolverControl::iterate)
                 break;
             }
         }
+
       // Update solution vector
       for (unsigned int j=0; j<y.size(); ++j)
         x.add(y(j), z[j]);
-
     }
   while (iteration_state == SolverControl::iterate);
 
@@ -1015,9 +1036,9 @@ SolverFGMRES<VECTOR>::solve (
 
   deallog.pop();
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  if (iteration_state != SolverControl::success)
+    AssertThrow(false, SolverControl::NoConvergence (accumulated_iterations,
+                                                     res));
 }
 
 #endif // DOXYGEN

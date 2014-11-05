@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,7 @@ template <int dim, int space_dim> class Triangulation;
  *   about boundary indicators and the like, as well as all other information
  *   provided by these objects.
  *
- *   There are specialisations, StraightBoundary, which places
+ *   There are specializations, StraightBoundary, which places
  *   the new point right into the middle of the given points, and
  *   HyperBallBoundary creating a hyperball with given radius
  *   around a given center point.

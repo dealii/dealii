@@ -39,6 +39,15 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: The base class to the iterative linear solvers, Solver,
+  received a SolverControl object upon construction and had a member
+  function <code>control()</code> that returned a reference to the
+  object previously passed in. The class now no longer stores such
+  a reference, and consequently, the function has been removed.
+  <br>
+  (Wolfgang Bangerth, 2014/10/24)
+  </li>
+
   <li> Removed: The constructor of the Utilities::MPI::MPI_InitFinalize
   class used to interpret a last argument equal to numbers::invalid_unsigned_int
   as "<i>create as many threads as there are processor cores on the current
@@ -110,6 +119,15 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: The classes implementing iterative solvers have gained
+  a mechanism by which it is possible to observe the progress of
+  the iterations, or to influence when to stop the iteration. The
+  documentation of the Solver class now contains an extended
+  discussion and example of this functionality.
+  <br>
+  (Wolfgang Bangerth, 2014/10/24)
+  </li>
+
   <li> New: There is now a section in the introduction of step-36 that
   discusses the interaction of Dirichlet boundary values and the solution
   of eigenvalue problems.
@@ -307,6 +325,22 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Using the FEEvaluation framework did not work for 
+  scalar elements in 1d because there were conflicting partial
+  specializations. This is now fixed.
+  <br>
+  (Shiva Rudraraju, 2014/11/04)
+  </li>
+
+  <li> New: There is now a macro <code>DEAL_II_VERSION_GTE</code>
+  that can be used to test whether the deal.II version is greater
+  than or equal a particular version number. This is useful if you
+  need to make application programs compatible with different
+  deal.II releases.
+  <br>
+  (Wolfgang Bangerth, 2014/10/31)
+  </li>
+
   <li> New: The vector classes in deal.II (including Trilinos and PETSc
   wrappers) now have a new method x.add_and_dot(factor,v,w) which performs
   x.add(factor,v) and subsequent inner product of x with another vector

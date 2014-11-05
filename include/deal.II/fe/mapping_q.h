@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -516,27 +516,31 @@ MappingQ<dim,spacedim>::get_intermediate_points_on_object(const Manifold<dim, sp
                                                           std::vector<Point<spacedim> > &points) const
 {
   const unsigned int structdim = TriaIterator::AccessorType::structure_dimension;
+
   // Try backward compatibility option.
-  const Boundary<dim,spacedim> *boundary = dynamic_cast<const Boundary<dim,spacedim> *>(&manifold);
-  if (boundary) // This is actually a boundary. Call old methods.
-    switch (structdim)
-      {
-      case 1:
-      {
-        const typename Triangulation<dim,spacedim>::line_iterator line = iter;
-        boundary->get_intermediate_points_on_line(line, points);
-        return;
-      }
-      case 2:
-      {
-        const typename Triangulation<dim,spacedim>::quad_iterator quad = iter;
-        boundary->get_intermediate_points_on_quad(quad, points);
-        return;
-      }
-      default:
-        Assert(false, ExcInternalError());
-        return;
-      }
+  if (const Boundary<dim,spacedim> *boundary
+      = dynamic_cast<const Boundary<dim,spacedim> *>(&manifold))
+    // This is actually a boundary. Call old methods.
+    {
+      switch (structdim)
+        {
+        case 1:
+        {
+          const typename Triangulation<dim,spacedim>::line_iterator line = iter;
+          boundary->get_intermediate_points_on_line(line, points);
+          return;
+        }
+        case 2:
+        {
+          const typename Triangulation<dim,spacedim>::quad_iterator quad = iter;
+          boundary->get_intermediate_points_on_quad(quad, points);
+          return;
+        }
+        default:
+          Assert(false, ExcInternalError());
+          return;
+        }
+    }
   else
     {
       std::vector<Point<spacedim> > sp(GeometryInfo<structdim>::vertices_per_cell);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,6 +41,14 @@ DEAL_II_NAMESPACE_OPEN
  * work even if number or type of the additional parameters for a certain
  * solver changes. AdditionalData of this class currently does not
  * contain any data.
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described
+ * in the Solver base class to determine convergence. This mechanism
+ * can also be used to observe the progress of the iteration.
+ *
  *
  * @ingroup Solvers
  * @author Guido Kanschat
@@ -122,10 +130,11 @@ SolverRelaxation<VECTOR>::solve (
 
   deallog.push("Relaxation");
 
+  int iter=0;
   try
     {
       // Main loop
-      for (int iter=0; conv==SolverControl::iterate; iter++)
+      for (; conv==SolverControl::iterate; iter++)
         {
           // Compute residual
           A.vmult(r,x);
@@ -136,7 +145,7 @@ SolverRelaxation<VECTOR>::solve (
           // residual is computed in
           // criterion() and stored
           // in res.
-          conv = this->control().check (iter, r.l2_norm());
+          conv = this->iteration_status (iter, r.l2_norm(), x);
           if (conv != SolverControl::iterate)
             break;
           R.step(x,b);
@@ -150,9 +159,8 @@ SolverRelaxation<VECTOR>::solve (
   deallog.pop();
 
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  AssertThrow(conv == SolverControl::success,
+              SolverControl::NoConvergence (iter, r.l2_norm()));
   // otherwise exit as normal
 }
 

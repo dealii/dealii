@@ -55,7 +55,7 @@ DEAL:sor:Richardson::Starting value 3.000
 DEAL:sor:Richardson::Convergence step 7 value 0.0004339
 DEAL:sor:cg::Starting value 3.000
 DEAL:sor:cg::Failure step 100 value 0.2585
-DEAL:sor::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:sor::Exception: SolverControl::NoConvergence (it, res)
 DEAL:sor:Bicgstab::Starting value 3.000
 DEAL:sor:Bicgstab::Convergence step 5 value 0
 DEAL:sor:GMRES::Starting value 1.462
@@ -70,7 +70,7 @@ DEAL:psor:Richardson::Starting value 3.000
 DEAL:psor:Richardson::Convergence step 8 value 0.0004237
 DEAL:psor:cg::Starting value 3.000
 DEAL:psor:cg::Failure step 100 value 0.1024
-DEAL:psor::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:psor::Exception: SolverControl::NoConvergence (it, res)
 DEAL:psor:Bicgstab::Starting value 3.000
 DEAL:psor:Bicgstab::Convergence step 4 value 0.0007969
 DEAL:psor:GMRES::Starting value 1.467
@@ -81,23 +81,23 @@ DEAL::Size 12 Unknowns 121
 DEAL::SOR-diff:0
 DEAL:no-fail:cg::Starting value 11.00
 DEAL:no-fail:cg::Failure step 10 value 0.1496
-DEAL:no-fail::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:no-fail::Exception: SolverControl::NoConvergence (it, res)
 DEAL:no-fail:Bicgstab::Starting value 11.00
 DEAL:no-fail:Bicgstab::Failure step 10 value 0.002830
 DEAL:no-fail:Bicgstab::Failure step 10 value 0.001961
-DEAL:no-fail::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:no-fail::Exception: SolverControl::NoConvergence (state.last_step, state.last_residual)
 DEAL:no-fail:GMRES::Starting value 11.00
 DEAL:no-fail:GMRES::Failure step 10 value 0.8414
-DEAL:no-fail::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:no-fail::Exception: SolverControl::NoConvergence (accumulated_iterations, last_res)
 DEAL:no-fail:GMRES::Starting value 11.00
 DEAL:no-fail:GMRES::Failure step 10 value 0.8414
-DEAL:no-fail::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:no-fail::Exception: SolverControl::NoConvergence (accumulated_iterations, last_res)
 DEAL:no-fail:QMRS::Starting value 11.00
 DEAL:no-fail:QMRS::Failure step 10 value 0.4215
-DEAL:no-fail::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:no-fail::Exception: SolverControl::NoConvergence (step, state.last_residual)
 DEAL:no:Richardson::Starting value 11.00
 DEAL:no:Richardson::Failure step 100 value 0.3002
-DEAL:no::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:no::Exception: SolverControl::NoConvergence (iter, last_criterion)
 DEAL:no:cg::Starting value 11.00
 DEAL:no:cg::Convergence step 15 value 0.0005794
 DEAL:no:Bicgstab::Starting value 11.00
@@ -110,7 +110,7 @@ DEAL:no:QMRS::Starting value 11.00
 DEAL:no:QMRS::Convergence step 16 value 0.0002583
 DEAL:rich:Richardson::Starting value 11.00
 DEAL:rich:Richardson::Failure step 100 value 1.219
-DEAL:rich::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:rich::Exception: SolverControl::NoConvergence (iter, last_criterion)
 DEAL:rich:cg::Starting value 11.00
 DEAL:rich:cg::Convergence step 15 value 0.0005794
 DEAL:rich:Bicgstab::Starting value 11.00
@@ -141,7 +141,7 @@ DEAL:sor:Richardson::Starting value 11.00
 DEAL:sor:Richardson::Convergence step 88 value 0.0009636
 DEAL:sor:cg::Starting value 11.00
 DEAL:sor:cg::Failure step 100 value 5.643
-DEAL:sor::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:sor::Exception: SolverControl::NoConvergence (it, res)
 DEAL:sor:Bicgstab::Starting value 11.00
 DEAL:sor:Bicgstab::Convergence step 14 value 0.0009987
 DEAL:sor:GMRES::Starting value 7.322
@@ -154,7 +154,7 @@ DEAL:psor:Richardson::Starting value 11.00
 DEAL:psor:Richardson::Convergence step 89 value 0.0009736
 DEAL:psor:cg::Starting value 11.00
 DEAL:psor:cg::Failure step 100 value 2.935
-DEAL:psor::Exception: SolverControl::NoConvergence (this->control().last_step(), this->control().last_value())
+DEAL:psor::Exception: SolverControl::NoConvergence (it, res)
 DEAL:psor:Bicgstab::Starting value 11.00
 DEAL:psor:Bicgstab::Convergence step 11 value 0.0005151
 DEAL:psor:GMRES::Starting value 7.345
