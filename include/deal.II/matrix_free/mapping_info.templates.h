@@ -191,7 +191,7 @@ namespace internal
               current_data.n_q_points.push_back (n_q_points);
 
               current_data.n_q_points_face.push_back
-              (Utilities::fixed_power<dim-1>(n_q_points_1d[q]));
+              (dim>1 ? Utilities::fixed_power<dim-1>(n_q_points_1d[q]) : 1);
               current_data.quadrature.push_back
               (Quadrature<dim>(quad[my_q][q]));
               current_data.face_quadrature.push_back
