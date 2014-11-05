@@ -27,10 +27,10 @@ namespace
 
 
 
-template <int dim>
-FE_Nothing<dim>::FE_Nothing (const unsigned int n_components)
+template <int dim, int spacedim>
+FE_Nothing<dim,spacedim>::FE_Nothing (const unsigned int n_components)
   :
-  FiniteElement<dim>
+  FiniteElement<dim,spacedim>
   (FiniteElementData<dim>(std::vector<unsigned>(dim+1,0),
                           n_components, 0,
                           FiniteElementData<dim>::unknown),
@@ -45,18 +45,18 @@ FE_Nothing<dim>::FE_Nothing (const unsigned int n_components)
 }
 
 
-template <int dim>
-FiniteElement<dim> *
-FE_Nothing<dim>::clone() const
+template <int dim, int spacedim>
+FiniteElement<dim,spacedim> *
+FE_Nothing<dim,spacedim>::clone() const
 {
-  return new FE_Nothing<dim>(*this);
+  return new FE_Nothing<dim,spacedim>(*this);
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::string
-FE_Nothing<dim>::get_name () const
+FE_Nothing<dim,spacedim>::get_name () const
 {
   std::ostringstream namebuf;
   namebuf << "FE_Nothing<" << dim << ">(";
@@ -68,28 +68,28 @@ FE_Nothing<dim>::get_name () const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 UpdateFlags
-FE_Nothing<dim>::update_once (const UpdateFlags /*flags*/) const
+FE_Nothing<dim,spacedim>::update_once (const UpdateFlags /*flags*/) const
 {
   return update_default;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 UpdateFlags
-FE_Nothing<dim>::update_each (const UpdateFlags /*flags*/) const
+FE_Nothing<dim,spacedim>::update_each (const UpdateFlags /*flags*/) const
 {
   return update_default;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 double
-FE_Nothing<dim>::shape_value (const unsigned int /*i*/,
-                              const Point<dim> & /*p*/) const
+FE_Nothing<dim,spacedim>::shape_value (const unsigned int /*i*/,
+                                       const Point<dim> & /*p*/) const
 {
   Assert(false,ExcMessage(zero_dof_message));
   return 0;
@@ -97,31 +97,31 @@ FE_Nothing<dim>::shape_value (const unsigned int /*i*/,
 
 
 
-template <int dim>
-typename Mapping<dim>::InternalDataBase *
-FE_Nothing<dim>::get_data (const UpdateFlags  /*flags*/,
-                           const Mapping<dim> & /*mapping*/,
-                           const Quadrature<dim> & /*quadrature*/) const
+template <int dim, int spacedim>
+typename Mapping<dim,spacedim>::InternalDataBase *
+FE_Nothing<dim,spacedim>::get_data (const UpdateFlags  /*flags*/,
+                                    const Mapping<dim,spacedim> & /*mapping*/,
+                                    const Quadrature<dim> & /*quadrature*/) const
 {
   // Create a default data object.  Normally we would then
   // need to resize things to hold the appropriate numbers
   // of dofs, but in this case all data fields are empty.
-  typename Mapping<dim>::InternalDataBase *data
-    = new typename FiniteElement<dim>::InternalDataBase();
+  typename Mapping<dim,spacedim>::InternalDataBase *data
+    = new typename FiniteElement<dim,spacedim>::InternalDataBase();
   return data;
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nothing<dim>::
-fill_fe_values (const Mapping<dim> & /*mapping*/,
-                const typename Triangulation<dim>::cell_iterator & /*cell*/,
+FE_Nothing<dim,spacedim>::
+fill_fe_values (const Mapping<dim,spacedim> & /*mapping*/,
+                const typename Triangulation<dim,spacedim>::cell_iterator & /*cell*/,
                 const Quadrature<dim> & /*quadrature*/,
-                typename Mapping<dim>::InternalDataBase & /*mapping_data*/,
-                typename Mapping<dim>::InternalDataBase & /*fedata*/,
-                FEValuesData<dim,dim> & /*data*/,
+                typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
+                typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
+                FEValuesData<dim,spacedim> & /*data*/,
                 CellSimilarity::Similarity & /*cell_similarity*/) const
 {
   // leave data fields empty
@@ -129,49 +129,49 @@ fill_fe_values (const Mapping<dim> & /*mapping*/,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nothing<dim>::
-fill_fe_face_values (const Mapping<dim> & /*mapping*/,
-                     const typename Triangulation<dim>::cell_iterator & /*cell*/,
+FE_Nothing<dim,spacedim>::
+fill_fe_face_values (const Mapping<dim,spacedim> & /*mapping*/,
+                     const typename Triangulation<dim,spacedim>::cell_iterator & /*cell*/,
                      const unsigned int /*face*/,
                      const Quadrature<dim-1> & /*quadrature*/,
-                     typename Mapping<dim>::InternalDataBase & /*mapping_data*/,
-                     typename Mapping<dim>::InternalDataBase & /*fedata*/,
-                     FEValuesData<dim,dim> & /*data*/) const
+                     typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
+                     typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
+                     FEValuesData<dim,spacedim> & /*data*/) const
 {
   // leave data fields empty
 }
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nothing<dim>::
-fill_fe_subface_values (const Mapping<dim> & /*mapping*/,
-                        const typename Triangulation<dim>::cell_iterator & /*cell*/,
+FE_Nothing<dim,spacedim>::
+fill_fe_subface_values (const Mapping<dim,spacedim> & /*mapping*/,
+                        const typename Triangulation<dim,spacedim>::cell_iterator & /*cell*/,
                         const unsigned int /*face*/,
                         const unsigned int /*subface*/,
                         const Quadrature<dim-1> & /*quadrature*/,
-                        typename Mapping<dim>::InternalDataBase & /*mapping_data*/,
-                        typename Mapping<dim>::InternalDataBase & /*fedata*/,
-                        FEValuesData<dim,dim> & /*data*/) const
+                        typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
+                        typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
+                        FEValuesData<dim,spacedim> & /*data*/) const
 {
   // leave data fields empty
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_Nothing<dim> ::
-compare_for_face_domination (const FiniteElement<dim> &) const
+FE_Nothing<dim,spacedim> ::
+compare_for_face_domination (const FiniteElement<dim,spacedim> &) const
 {
   return FiniteElementDomination::no_requirements;
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_Nothing<dim> ::
-hp_vertex_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
+FE_Nothing<dim,spacedim> ::
+hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &/*fe_other*/) const
 {
   // the FE_Nothing has no
   // degrees of freedom, so there
@@ -181,10 +181,10 @@ hp_vertex_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_Nothing<dim> ::
-hp_line_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
+FE_Nothing<dim,spacedim> ::
+hp_line_dof_identities (const FiniteElement<dim,spacedim> &/*fe_other*/) const
 {
   // the FE_Nothing has no
   // degrees of freedom, so there
@@ -194,10 +194,10 @@ hp_line_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_Nothing<dim> ::
-hp_quad_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
+FE_Nothing<dim,spacedim> ::
+hp_quad_dof_identities (const FiniteElement<dim,spacedim> &/*fe_other*/) const
 {
   // the FE_Nothing has no
   // degrees of freedom, so there
@@ -207,19 +207,19 @@ hp_quad_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 bool
-FE_Nothing<dim> ::
+FE_Nothing<dim,spacedim> ::
 hp_constraints_are_implemented () const
 {
   return true;
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nothing<dim>::
-get_face_interpolation_matrix (const FiniteElement<dim> &/*source_fe*/,
+FE_Nothing<dim,spacedim>::
+get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &/*source_fe*/,
                                FullMatrix<double>       &interpolation_matrix) const
 {
   // since this element has no face dofs, the
@@ -234,10 +234,10 @@ get_face_interpolation_matrix (const FiniteElement<dim> &/*source_fe*/,
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-FE_Nothing<dim>::
-get_subface_interpolation_matrix (const FiniteElement<dim> & /*source_fe*/,
+FE_Nothing<dim,spacedim>::
+get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> & /*source_fe*/,
                                   const unsigned int /*index*/,
                                   FullMatrix<double>  &interpolation_matrix) const
 {

@@ -76,8 +76,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Joshua White, Wolfgang Bangerth
  */
-template <int dim>
-class FE_Nothing : public FiniteElement<dim>
+template <int dim, int spacedim=dim>
+class FE_Nothing : public FiniteElement<dim,spacedim>
 {
 public:
 
@@ -86,7 +86,7 @@ public:
     * number of components to give this
     * finite element (default = 1).
     */
-  FE_Nothing (unsigned int n_components = 1);
+  FE_Nothing (const unsigned int n_components = 1);
 
   /**
    * A sort of virtual copy
@@ -100,7 +100,7 @@ public:
    * do so through this function.
    */
   virtual
-  FiniteElement<dim> *
+  FiniteElement<dim,spacedim> *
   clone() const;
 
   /**
@@ -190,12 +190,12 @@ public:
    */
   virtual
   void
-  fill_fe_values (const Mapping<dim> &mapping,
-                  const typename Triangulation<dim>::cell_iterator &cell,
+  fill_fe_values (const Mapping<dim,spacedim> &mapping,
+                  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim> &quadrature,
-                  typename Mapping<dim>::InternalDataBase &mapping_data,
-                  typename Mapping<dim>::InternalDataBase &fedata,
-                  FEValuesData<dim,dim> &data,
+                  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+                  FEValuesData<dim,spacedim> &data,
                   CellSimilarity::Similarity &cell_similarity) const;
 
   /**
@@ -212,13 +212,13 @@ public:
    */
   virtual
   void
-  fill_fe_face_values (const Mapping<dim> &mapping,
-                       const typename Triangulation<dim> :: cell_iterator &cell,
+  fill_fe_face_values (const Mapping<dim,spacedim> &mapping,
+                       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int face,
                        const Quadrature<dim-1> & quadrature,
-                       typename Mapping<dim> :: InternalDataBase &mapping_data,
-                       typename Mapping<dim> :: InternalDataBase &fedata,
-                       FEValuesData<dim,dim> &data) const;
+                       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                       typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+                       FEValuesData<dim,spacedim> &data) const;
 
   /**
    * Fill the fields of
@@ -234,14 +234,14 @@ public:
    */
   virtual
   void
-  fill_fe_subface_values (const Mapping<dim> &mapping,
-                          const typename Triangulation<dim>::cell_iterator &cell,
+  fill_fe_subface_values (const Mapping<dim,spacedim> &mapping,
+                          const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                           const unsigned int face,
                           const unsigned int subface,
                           const Quadrature<dim-1> & quadrature,
-                          typename Mapping<dim>::InternalDataBase &mapping_data,
-                          typename Mapping<dim>::InternalDataBase &fedata,
-                          FEValuesData<dim,dim> &data) const;
+                          typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                          typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+                          FEValuesData<dim,spacedim> &data) const;
 
   /**
    * Prepare internal data
@@ -260,9 +260,9 @@ public:
    * element.
    */
   virtual
-  typename Mapping<dim>::InternalDataBase *
+  typename Mapping<dim,spacedim>::InternalDataBase *
   get_data (const UpdateFlags     update_flags,
-            const Mapping<dim>     &mapping,
+            const Mapping<dim,spacedim>     &mapping,
             const Quadrature<dim> &quadrature) const;
 
   /**
@@ -285,21 +285,21 @@ public:
    */
   virtual
   FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
 
 
 
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+  hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+  hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+  hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   virtual
   bool
@@ -321,7 +321,7 @@ public:
 
   virtual
   void
-  get_face_interpolation_matrix (const FiniteElement<dim> &source_fe,
+  get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source_fe,
                                  FullMatrix<double>       &interpolation_matrix) const;
 
 
@@ -341,7 +341,7 @@ public:
 
   virtual
   void
-  get_subface_interpolation_matrix (const FiniteElement<dim> &source_fe,
+  get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source_fe,
                                     const unsigned int index,
                                     FullMatrix<double>  &interpolation_matrix) const;
 
