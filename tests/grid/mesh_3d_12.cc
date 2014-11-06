@@ -62,9 +62,9 @@ void check_this (Triangulation<3> &tria)
                                     u,
                                     e);
 
-  deallog << "  " << e.l1_norm() << std::endl;
-  deallog << "  " << e.l2_norm() << std::endl;
-  deallog << "  " << e.linfty_norm() << std::endl;
+  deallog << "  " << static_cast<double>(e.l1_norm()) << std::endl;
+  deallog << "  " << static_cast<double>(e.l2_norm()) << std::endl;
+  deallog << "  " << static_cast<double>(e.linfty_norm()) << std::endl;
 }
 
 
@@ -91,6 +91,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
+  deallog << std::setprecision(5);
 
   {
     Triangulation<3> coarse_grid;
