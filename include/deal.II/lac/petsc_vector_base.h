@@ -587,7 +587,7 @@ namespace PETScWrappers
      * natively supported and thus the cost is completely equivalent as
      * calling the two methods separately.
      */
-    PetscScalar add_and_dot (const Number      a,
+    PetscScalar add_and_dot (const PetscScalar a,
                              const VectorBase &V,
                              const VectorBase &W);
 
