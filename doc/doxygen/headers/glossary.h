@@ -795,9 +795,6 @@
   volume =       38,
   pages =        {14/1--28}}
  * @endcode
- * It is also available as
- * <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
- * preprint 2011-187</a>.
  *
  * For massively %parallel
  * computations, deal.II builds on the
