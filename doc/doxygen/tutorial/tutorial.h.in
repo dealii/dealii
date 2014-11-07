@@ -393,7 +393,7 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>step-52/td>
+ *       <td>step-52</td>
  *       <td> Solving the time dependent neutron diffusion equation using 
  *       Runge-Kutta methods.
  *       </td></tr>
