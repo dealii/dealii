@@ -346,6 +346,8 @@ namespace Step36
     // its work:
     eigensolver.set_which_eigenpairs (EPS_SMALLEST_REAL);
 
+    eigensolver.set_problem_type (EPS_GHEP);
+
     eigensolver.solve (stiffness_matrix, mass_matrix,
                        eigenvalues, eigenfunctions,
                        eigenfunctions.size());
