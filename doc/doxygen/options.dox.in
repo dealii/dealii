@@ -158,6 +158,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_PETSC=1 \
                          DEAL_II_WITH_SLEPC=1 \
                          DEAL_II_WITH_TRILINOS=1 \
+                         DEAL_II_WITH_OPENCASCADE=1 \
                          DEAL_II_WITH_THREADS=1 \
                          DEAL_II_USE_MT_POSIX=1 \
 			 DEAL_II_WITH_ARPACK=1 \
