@@ -28,7 +28,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -182,10 +182,7 @@ namespace GridTools
     // we really want the JxW values from the FEValues object, but it
     // wants a finite element. create a cheap element as a dummy
     // element
-//TODO: using FE_Nothing here would be nice, but right now, FE_Nothing
-//  only takes one argument and can not be used for FEValues<dim,spacedim>
-//  if dim != spacedim
-    FE_DGQ<dim,spacedim> dummy_fe(0);
+    FE_Nothing<dim,spacedim> dummy_fe;
     FEValues<dim,spacedim> fe_values (mapping, dummy_fe, quadrature_formula,
                                       update_JxW_values);
 

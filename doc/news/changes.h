@@ -333,6 +333,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The FE_Nothing class now has a second template argument
+  corresponding to the space dimension in which the mesh is embedded,
+  like many other classes. This allows to use this element in codimension
+  one cases as well now.
+  <br>
+  (Wolfgang Bangerth, 2014/11/05)
+  </li>
+
   <li> Fixed: Using the FEEvaluation framework did not work for 
   scalar elements in 1d because there were conflicting partial
   specializations. This is now fixed.

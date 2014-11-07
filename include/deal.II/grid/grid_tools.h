@@ -74,12 +74,31 @@ namespace GridTools
   /**
    * Compute the volume (i.e. the dim-dimensional measure) of the
    * triangulation. We compute the measure using the integral
-   * $\int 1 \; dx$. The integral approximated is approximated
+   * $\sum_K \int_K 1 \; dx$ where $K$ are the cells of the
+   * given triangulation. The integral is approximated
    * via quadrature for which we need the mapping argument.
+   *
+   * If the triangulation is a dim-dimensional one embedded in
+   * a higher dimensional space of dimension spacedim, then the
+   * value returned is the dim-dimensional measure. For example,
+   * for a two-dimensional triangulation in three-dimensional space,
+   * the value returned is the area of the surface so described.
+   * (This obviously makes sense since the spacedim-dimensional
+   * measure of a dim-dimensional triangulation would always be
+   * zero if dim @< spacedim.
    *
    * This function also works for objects of type
    * parallel::distributed::Triangulation, in which case the
    * function is a collective operation.
+   *
+   * @param tria The triangulation.
+   * @param mapping An optional argument used to denote the mapping
+   *   that should be used when describing whether cells are bounded
+   *   by straight or curved faces. The default is to use a $Q_1$
+   *   mapping, which corresponds to straight lines bounding the
+   *   cells.
+   * @return The dim-dimensional measure of the domain described
+   *   by the triangulation, as discussed above.
    */
   template <int dim, int spacedim>
   double volume (const Triangulation<dim,spacedim> &tria,
