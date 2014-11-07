@@ -1105,7 +1105,8 @@ Article{BK07,
  * children upon mesh refinement. Some more information about manifold
  * indicators is also presented in a section of the documentation of
  * the Triangulation class as well as in the
- * @ref manifold "Manifold documentation module".
+ * @ref manifold "Manifold documentation module". Manifold indicators
+ * are used in step-53 and step-54.
  * </dd>
  *
  * @see @ref manifold "The module on Manifolds"
