@@ -937,7 +937,7 @@ namespace Step51
   template <int dim>
   void HDG<dim>::run ()
   {
-    for (unsigned int cycle=0; cycle<12-3*dim; ++cycle)
+    for (unsigned int cycle=0; cycle<11-3*dim; ++cycle)
       {
         refine_grid (cycle);
         setup_system ();
@@ -947,11 +947,11 @@ namespace Step51
         output_results (cycle);
       }
 
-    convergence_table.set_precision("val L2", 3);
+    convergence_table.set_precision("val L2", 2);
     convergence_table.set_scientific("val L2", true);
-    convergence_table.set_precision("grad L2", 3);
+    convergence_table.set_precision("grad L2", 2);
     convergence_table.set_scientific("grad L2", true);
-    convergence_table.set_precision("val L2-post", 3);
+    convergence_table.set_precision("val L2-post", 2);
     convergence_table.set_scientific("val L2-post", true);
 
     convergence_table
