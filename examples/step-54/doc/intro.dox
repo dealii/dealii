@@ -127,3 +127,18 @@ mesh direction is the best approach among the three tested, when arbitrarily sha
 <img src="http://www.dealii.org/images/steps/developer/step-54.ProjectionComparisons.png" alt="" width="700">
 
 
+<h3> The testcase </h3>
+
+In this program, we will consider creating a surface mesh for a real geometry
+describing the bow of a ship (this geometry is frequently used in CAD and mesh
+generation comparisons and is freely available). The surface mesh we get from
+this could then be used to solve a boundary element equation to simulate the
+flow of water around the ship (in a way similar to step-34) but we will not
+try to do this here. To already give you an idea of the geometry we consider,
+here is a picture:
+
+<img src="http://www.dealii.org/images/steps/developer/step-54.normal_5.png" alt="" width="500">
+
+In the program, we read both the geometry and a coarse mesh from files, and
+then employ several of the options discussed above to place new vertices for a
+sequence of mesh refinement steps.
