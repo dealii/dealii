@@ -119,6 +119,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: Added support for OpenCASCADE (www.opencascade.org) 
+  library, which allows the use of arbitrary IGES files to describe
+  the boundary of a mesh. The use of the new classes is described in 
+  the new Step-54. 
+  <br>
+  (Luca Heltai, Andrea Mola, 2014/10/31)
+  </li>
+
   <li> New: The classes implementing iterative solvers have gained
   a mechanism by which it is possible to observe the progress of
   the iterations, or to influence when to stop the iteration. The

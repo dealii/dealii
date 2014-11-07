@@ -1,0 +1,5 @@
+
+DEAL::Origin: 3.00000 0.00000 0.00000, on unit circle: 1.00000 0.00000 0.00000, with local coordinates (u, v): (0.00000, 0.00000)
+DEAL::Origin: 0.00000 3.00000 0.00000, on unit circle: 6.12323e-17 1.00000 0.00000, with local coordinates (u, v): (1.57080, 0.00000)
+DEAL::Origin: 0.100000 0.00000 3.00000, on unit circle: 1.00000 0.00000 0.00000, with local coordinates (u, v): (0.00000, 0.00000)
+DEAL::Origin: 0.100000 0.00000 4.00000, on unit circle: 1.00000 0.00000 0.00000, with local coordinates (u, v): (0.00000, 0.00000)
