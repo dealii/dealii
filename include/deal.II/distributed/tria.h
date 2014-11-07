@@ -697,25 +697,21 @@ namespace parallel
                                                               const void *)> &unpack_callback);
 
       /**
-       * Returns a permutation vector for the mapping from the
+       * Return a permutation vector for the order the coarse cells
+       * are handed off to p4est. For example the value of the $i$th element
+       * in this vector is the index of the deal.II coarse cell (counting
+       * from begin(0)) that corresponds to the $i$th tree managed by p4est.
+       */
+      const std::vector<types::global_dof_index> &
+      get_p4est_tree_to_coarse_cell_permutation() const;
+
+      /**
+       * Return a permutation vector for the mapping from the
        * coarse deal cells to the p4est trees. This is the inverse
        * of get_p4est_tree_to_coarse_cell_permutation.
        */
       const std::vector<types::global_dof_index> &
       get_coarse_cell_to_p4est_tree_permutation() const;
-
-
-
-      /**
-       * Returns a permutation vector for the order the coarse cells
-       * are handed of to p4est. For example the first element i in
-       * this vector denotes that the first cell in hierarchical
-       * ordering is the ith deal cell starting from begin(0).
-       */
-      const std::vector<types::global_dof_index> &
-      get_p4est_tree_to_coarse_cell_permutation() const;
-
-
 
       /**
        * Join faces in the p4est forest for periodic boundary
