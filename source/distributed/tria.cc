@@ -3320,6 +3320,14 @@ namespace parallel
     }
 
 
+    template <int dim, int spacedim>
+    const std::vector<types::global_dof_index> &
+    Triangulation<dim, spacedim>::get_coarse_cell_to_p4est_tree_permutation() const
+    {
+      return coarse_cell_to_p4est_tree_permutation;
+    }
+
+
 
     template <int dim, int spacedim>
     const std::vector<types::global_dof_index> &

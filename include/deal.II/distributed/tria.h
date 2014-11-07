@@ -697,6 +697,16 @@ namespace parallel
                                                               const void *)> &unpack_callback);
 
       /**
+       * Returns a permutation vector for the mapping from the
+       * coarse deal cells to the p4est trees. This is the inverse
+       * of get_p4est_tree_to_coarse_cell_permutation.
+       */
+      const std::vector<types::global_dof_index> &
+      get_coarse_cell_to_p4est_tree_permutation() const;
+
+
+
+      /**
        * Returns a permutation vector for the order the coarse cells
        * are handed of to p4est. For example the first element i in
        * this vector denotes that the first cell in hierarchical

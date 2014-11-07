@@ -333,6 +333,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: GridTools::communicate_locally_moved_vertices allows to
+  update vertex positions that have been moved just locally on distributed
+  meshes. GridTools::distort_random now works for distributed meshes and 
+  hanging nodes in 3D as well.
+  <br>
+  (Daniel Arndt, 2014/11/06)
+  </li>
+
   <li> Fixed: Using the FEEvaluation framework did not work for 
   scalar elements in 1d because there were conflicting partial
   specializations. This is now fixed.
