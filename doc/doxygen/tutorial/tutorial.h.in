@@ -393,7 +393,7 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>step-52/td>
+ *       <td>step-52</td>
  *       <td> Solving the time dependent neutron diffusion equation using 
  *       Runge-Kutta methods.
  *       </td></tr>
@@ -401,6 +401,11 @@
  *   <tr valign="top">
  *       <td>step-53</td>
  *       <td> Describing the geometry of complex domains and curved boundaries.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-54</td>
+ *       <td> Using CAD files to describe the boundary of your domain.
  *       </td></tr>
  * </table>
  *
@@ -623,7 +628,8 @@
  *       step-32,
  *       step-34,
  *       step-38,
- *       step-53
+ *       step-53,
+ *       step-54
  *     </td>
  *   </tr>
  *
@@ -649,7 +655,8 @@
  *     </td>
  *     <td>
  *       step-49,
- *       step-53
+ *       step-53,
+ *       step-54
  *     </td>
  *   </tr>
  *
