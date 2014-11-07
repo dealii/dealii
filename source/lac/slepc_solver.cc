@@ -211,7 +211,11 @@ namespace SLEPcWrappers
       // only if at least one eigenvector has converged.
       if ((*n_converged)>0)
         {
-          ierr = EPSComputeResidualNorm (solver_data->eps, 0, &residual_norm);
+          // EPSComputeRelativeError is consistent with the one
+          // used during the solution process. Given EPS_CONV_ABS set above,
+          // this can be either the l2 norm or the mass-matrix induced norm
+          // when EPS_GHEP is set.
+          ierr = EPSComputeRelativeError (solver_data->eps, 0, &residual_norm);
           AssertThrow (ierr == 0, ExcSLEPcError(ierr));
         }
 
