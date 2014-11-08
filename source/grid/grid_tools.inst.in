@@ -186,10 +186,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 				     const bool);
 
     template
-      void communicate_locally_moved_vertices (parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-                                               const std::vector<bool> &);
-
-    template
       void get_face_connectivity_of_cells
       (const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation,
        SparsityPattern          &cell_connectivity);
