@@ -333,6 +333,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: TableHandler objects can be cleared - i.e. reset to a 
+  zero-sized state.
+  <br>
+  (Fahad Alrashed, 2014/11/09)
+  </li>
+
   <li> New: The FE_Nothing class now has a second template argument
   corresponding to the space dimension in which the mesh is embedded,
   like many other classes. This allows to use this element in codimension
