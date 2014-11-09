@@ -3139,10 +3139,10 @@ public:
    *
    * @post The returned value is equal to
    * <code>!is_ghost() &&
-   * !is_artificial()</code>.
+   * !is_locally_owned()</code>.
    *
    * @note Whether a cell is a ghost cell, artificial, or is
-   * locally owned or is a property that only pertains to cells
+   * locally owned is a property that only pertains to cells
    * that are active. Consequently,
    * you can only call this function if the cell it refers to has
    * no children.
