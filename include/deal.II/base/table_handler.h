@@ -514,8 +514,8 @@ public:
   void write_tex (std::ostream &file, const bool with_header=true) const;
 
   /**
-   * Clears the rows of the table, 
-   * i.e. calls clear() on all the 
+   * Clears the rows of the table,
+   * i.e. calls clear() on all the
    * underlying storage data structures.
    */
   void clear ();
