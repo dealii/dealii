@@ -169,6 +169,13 @@ public:
    */
   double wall_time () const;
 
+  /**
+   * Returns the last lap time; the
+   * time taken between the last start()/stop()
+   * call.
+   */
+  double get_lap_time () const;
+
 private:
 
   /**
@@ -224,6 +231,12 @@ private:
    * not included.
    */
   double              cumulative_wall_time;
+
+  /**
+   * Stores the last lap time; the time
+   * between the last start()/stop() cycle.
+   */
+  double              time;
 
   /**
    * Store whether the timer is presently
