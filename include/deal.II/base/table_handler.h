@@ -514,6 +514,11 @@ public:
   void write_tex (std::ostream &file, const bool with_header=true) const;
 
   /**
+   * Clears the values in the table.
+   */
+  void clear ();
+
+  /**
    * Read or write the data of this
    * object to or from a stream for
    * the purpose of serialization.

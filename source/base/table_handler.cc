@@ -666,6 +666,20 @@ void TableHandler::write_tex (std::ostream &out, const bool with_header) const
 }
 
 
+void TableHandler::clear()
+{
+
+  columns.clear();
+  supercolumns.clear();
+  column_order.clear();
+  tex_supercaptions.clear();
+
+  tex_table_label.clear();
+  tex_table_caption.clear();
+
+}
+
+
 unsigned int TableHandler::n_rows() const
 {
   if (columns.size() == 0)
