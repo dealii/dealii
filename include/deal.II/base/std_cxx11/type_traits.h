@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2013 by the deal.II authors
+// Copyright (C) 2012 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,5 +62,11 @@ namespace std_cxx11
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
+
+
+// then allow using the old namespace name instead of the new one
+DEAL_II_NAMESPACE_OPEN
+namespace std_cxx1x = std_cxx11;
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
