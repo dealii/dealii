@@ -647,12 +647,11 @@ namespace GridTools
                   Triangulation<dim,spacedim> &triangulation,
                   const bool                   keep_boundary)
   {
-    // If the triangulation is distributed, we need to
-    // exchange the moved vertices across mpi processes
-    parallel::distributed::Triangulation< dim, spacedim > *tr
-      = dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
-        (&triangulation);
-    const bool distributed = (tr==0) ? false : true;
+    // if spacedim>dim we need to make sure that we perturb
+    // points but keep them on
+    // the manifold. however, this isn't implemented right now
+    Assert (spacedim == dim, ExcNotImplemented());
+
 
     // find the smallest length of the
     // lines adjacent to the
@@ -672,12 +671,7 @@ namespace GridTools
                                         almost_infinite_length);
 
     // also note if a vertex is at the boundary
-    // or owned by a higher process id
-    // or already moved
     std::vector<bool>   at_boundary (triangulation.n_vertices(), false);
-    std::vector<bool>   forbid_move (distributed ? triangulation.n_vertices() : 0, false);
-    std::vector<bool>   vertex_moved (triangulation.n_vertices(), false);
-
     for (typename Triangulation<dim,spacedim>::active_cell_iterator
          cell=triangulation.begin_active(); cell!=triangulation.end(); ++cell)
       if (cell->is_locally_owned())
@@ -720,61 +714,101 @@ namespace GridTools
         }
 
     const unsigned int n_vertices = triangulation.n_vertices();
-    Point<spacedim> shift_vector;
 
-    if (distributed)
+    // If the triangulation is distributed, we need to
+    // exchange the moved vertices across mpi processes
+    if (parallel::distributed::Triangulation< dim, spacedim > *distributed_triangulation
+        = dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*> (&triangulation))
       {
-        // We don't want to move vertices that are shared
-        // with a cell that has a higher subdomain_id
+        const std::vector<bool> locally_owned_vertices = get_locally_owned_vertices(triangulation);
+        std::vector<bool>       vertex_moved (triangulation.n_vertices(), false);
+
+        // Next move vertices on locally owned cells
         for (typename Triangulation<dim,spacedim>::active_cell_iterator
              cell=triangulation.begin_active(); cell!=triangulation.end(); ++cell)
-          if (cell->is_ghost() &&
-              cell->subdomain_id()
-              > Utilities::MPI::this_mpi_process(tr->get_communicator()))
-            for (unsigned int vertex_no=0;
-                 vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
-              forbid_move[cell->vertex_index(vertex_no)] = true;
-      }
-
-    // Next move vertices on locally owned cells
-    for (typename Triangulation<dim,spacedim>::active_cell_iterator
-         cell=triangulation.begin_active(); cell!=triangulation.end(); ++cell)
-      if (cell->is_locally_owned())
-        {
-          for (unsigned int vertex_no=0; vertex_no<GeometryInfo<dim>::vertices_per_cell;
-               ++vertex_no)
+          if (cell->is_locally_owned())
             {
-              const unsigned global_vertex_no = cell->vertex_index(vertex_no);
+              for (unsigned int vertex_no=0; vertex_no<GeometryInfo<dim>::vertices_per_cell;
+                   ++vertex_no)
+                {
+                  const unsigned global_vertex_no = cell->vertex_index(vertex_no);
 
-              // ignore this vertex if we shall keep the boundary and
-              // this vertex *is* at the boundary, if it is already moved
-              // or if another process moves this vertex (in the distributed case)
-              if ((keep_boundary && at_boundary[global_vertex_no])
-                  || vertex_moved[global_vertex_no]
-                  || (distributed && forbid_move[global_vertex_no]))
-                continue;
+                  // ignore this vertex if we shall keep the boundary and
+                  // this vertex *is* at the boundary, if it is already moved
+                  // or if another process moves this vertex
+                  if ((keep_boundary && at_boundary[global_vertex_no])
+                      || vertex_moved[global_vertex_no]
+                      || !locally_owned_vertices[global_vertex_no])
+                    continue;
 
-              // first compute a random shift vector
-              for (unsigned int d=0; d<spacedim; ++d)
-                shift_vector(d) = std::rand()*2.0/RAND_MAX-1;
+                  // first compute a random shift vector
+                  Point<spacedim> shift_vector;
+                  for (unsigned int d=0; d<spacedim; ++d)
+                    shift_vector(d) = std::rand()*2.0/RAND_MAX-1;
 
-              shift_vector *= factor * minimal_length[global_vertex_no] /
-                              std::sqrt(shift_vector.square());
+                  shift_vector *= factor * minimal_length[global_vertex_no] /
+                                  std::sqrt(shift_vector.square());
 
-              // finally move the vertex
-              cell->vertex(vertex_no) += shift_vector;
-              vertex_moved[global_vertex_no] = true;
+                  // finally move the vertex
+                  cell->vertex(vertex_no) += shift_vector;
+                  vertex_moved[global_vertex_no] = true;
+                }
             }
-        }
 
-    if (distributed)
-      tr->communicate_locally_moved_vertices(vertex_moved);
+        distributed_triangulation
+        ->communicate_locally_moved_vertices(locally_owned_vertices);
+      }
+    else
+      // if this is a sequential triangulation, we could in principle
+      // use the algorithm above, but we'll use an algorithm that we used
+      // before the parallel::distributed::Triangulation was introduced
+      // in order to preserve backward compatibility
+      {
+        // loop over all vertices and compute their new locations
+        const unsigned int n_vertices = triangulation.n_vertices();
+        std::vector<Point<spacedim> > new_vertex_locations (n_vertices);
+        const std::vector<Point<spacedim> > &old_vertex_locations
+          = triangulation.get_vertices();
 
+        for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
+          {
+            // ignore this vertex if we will keep the boundary and
+            // this vertex *is* at the boundary
+            if (keep_boundary && at_boundary[vertex])
+              new_vertex_locations[vertex] = old_vertex_locations[vertex];
+            else
+              {
+                // compute a random shift vector
+                Point<spacedim> shift_vector;
+                for (unsigned int d=0; d<spacedim; ++d)
+                  shift_vector(d) = std::rand()*2.0/RAND_MAX-1;
+
+                shift_vector *= factor * minimal_length[vertex] /
+                                std::sqrt(shift_vector.square());
+
+                // record new vertex location
+                new_vertex_locations[vertex] = old_vertex_locations[vertex] + shift_vector;
+              }
+          }
+
+        // now do the actual move of the vertices
+        for (typename Triangulation<dim,spacedim>::active_cell_iterator
+             cell=triangulation.begin_active(); cell!=triangulation.end(); ++cell)
+          for (unsigned int vertex_no=0;
+               vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
+            cell->vertex(vertex_no) = new_vertex_locations[cell->vertex_index(vertex_no)];
+      }
 
     // Correct hanging nodes if necessary
     if (dim>=2)
       {
         // We do the same as in GridTools::transform
+        //
+        // exclude hanging nodes at the boundaries of artificial cells:
+        // these may belong to ghost cells for which we know the exact
+        // location of vertices, whereas the artificial cell may or may
+        // not be further refined, and so we cannot know whether
+        // the location of the hanging node is correct or not
         typename Triangulation<dim,spacedim>::active_cell_iterator
         cell = triangulation.begin_active(),
         endc = triangulation.end();

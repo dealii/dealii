@@ -2283,9 +2283,13 @@ namespace parallel
               return;
             }
 
-          // We're at a leaf cell.
+          // We're at a leaf cell. If the cell is locally owned, we may
+          // have to send its vertices to other processors if any of
+          // its vertices is adjacent to a ghost cell and has been moved
+          //
           // If one of the vertices of the cell is interesting,
-          // sent all moved vertices of the cell.
+          // send all moved vertices of the cell to all processors
+          // adjacent to all cells adjacent to this vertex
           if (dealii_cell->is_locally_owned())
             {
               std::set<dealii::types::subdomain_id> send_to;
@@ -2305,7 +2309,6 @@ namespace parallel
                     }
                 }
 
-
               if (send_to.size() > 0)
                 {
                   std::vector<unsigned int> vertex_indices;
@@ -2317,31 +2320,32 @@ namespace parallel
                         local_vertices.push_back(dealii_cell->vertex(v));
                       }
 
-                  for (std::set<dealii::types::subdomain_id>::iterator it=send_to.begin();
-                       it!=send_to.end(); ++it)
-                    {
-                      const dealii::types::subdomain_id subdomain = *it;
+                  if (vertex_indices.size()>0)
+                    for (std::set<dealii::types::subdomain_id>::iterator it=send_to.begin();
+                         it!=send_to.end(); ++it)
+                      {
+                        const dealii::types::subdomain_id subdomain = *it;
 
-                      // get an iterator to what needs to be sent to that
-                      // subdomain (if already exists), or create such an object
-                      typename std::map<dealii::types::subdomain_id, CellInfo<dim, spacedim> >::iterator
-                      p
-                        = needs_to_get_cell.insert (std::make_pair(subdomain,
-                                                                   CellInfo<dim,spacedim>()))
-                          .first;
+                        // get an iterator to what needs to be sent to that
+                        // subdomain (if already exists), or create such an object
+                        const typename std::map<dealii::types::subdomain_id, CellInfo<dim, spacedim> >::iterator
+                        p
+                          = needs_to_get_cell.insert (std::make_pair(subdomain,
+                                                                     CellInfo<dim,spacedim>()))
+                            .first;
 
-                      p->second.tree_index.push_back(tree_index);
-                      p->second.quadrants.push_back(p4est_cell);
+                        p->second.tree_index.push_back(tree_index);
+                        p->second.quadrants.push_back(p4est_cell);
 
-                      p->second.vertex_indices.push_back(vertex_indices.size());
-                      p->second.vertex_indices.insert(p->second.vertex_indices.end(),
-                                                      vertex_indices.begin(),
-                                                      vertex_indices.end());
+                        p->second.vertex_indices.push_back(vertex_indices.size());
+                        p->second.vertex_indices.insert(p->second.vertex_indices.end(),
+                                                        vertex_indices.begin(),
+                                                        vertex_indices.end());
 
-                      p->second.vertices.insert(p->second.vertices.end(),
-                                                local_vertices.begin(),
-                                                local_vertices.end());
-                    }
+                        p->second.vertices.insert(p->second.vertices.end(),
+                                                  local_vertices.begin(),
+                                                  local_vertices.end());
+                      }
                 }
             }
         }
@@ -3509,11 +3513,12 @@ namespace parallel
       }
 #endif
 
-
       std::map<unsigned int, std::set<dealii::types::subdomain_id> >
       vertices_with_ghost_neighbors;
 
-      // First find out which process should receive which vertices...
+      // First find out which process should receive which vertices.
+      // these are specifically the ones that sit on ghost cells and,
+      // among these, the ones that we own locally
       for (typename Triangulation<dim,spacedim>::active_cell_iterator
            cell=this->begin_active(); cell!=this->end();
            ++cell)
@@ -3521,8 +3526,8 @@ namespace parallel
           for (unsigned int vertex_no=0;
                vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
             {
-              const unsigned int global_vertex_no = cell->vertex_index(vertex_no);
-              vertices_with_ghost_neighbors[global_vertex_no].insert
+              const unsigned int process_local_vertex_no = cell->vertex_index(vertex_no);
+              vertices_with_ghost_neighbors[process_local_vertex_no].insert
               (cell->subdomain_id());
             }
 
