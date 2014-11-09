@@ -512,6 +512,11 @@ namespace parallel
        * every vertex, call this function, and before refining or coarsening
        * the mesh apply the opposite offset and call this function again.
        *
+       * @param vertex_locally_moved A bitmap indicating which vertices have
+       *   been moved. The size of this array must be equal to
+       *   Triangulation::n_vertices() and must be a subset of those vertices
+       *   flagged by GridTools::get_locally_owned_vertices().
+       *
        * @see This function is used, for example, in GridTools::distort_random().
        */
       void

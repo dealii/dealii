@@ -3496,6 +3496,19 @@ namespace parallel
       Assert (vertex_locally_moved.size() == this->n_vertices(),
               ExcDimensionMismatch(vertex_locally_moved.size(),
                                    this->n_vertices()));
+#ifdef DEBUG
+      {
+        const std::vector<bool> locally_owned_vertices
+          = GridTools::get_locally_owned_vertices (*this);
+        for (unsigned int i=0; i<locally_owned_vertices.size(); ++i)
+          Assert ((vertex_locally_moved[i] == false)
+                  ||
+                  (locally_owned_vertices[i] == true),
+                  ExcMessage ("The vertex_locally_moved argument must not "
+                              "contain vertices that are not locally owned"));
+      }
+#endif
+
 
       std::map<unsigned int, std::set<dealii::types::subdomain_id> >
       vertices_with_ghost_neighbors;

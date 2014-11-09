@@ -220,6 +220,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       const types::subdomain_id);
 
     template
+    std::vector<bool>
+    get_locally_owned_vertices (const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
+    template
       double
       minimal_cell_diameter (const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation);
 

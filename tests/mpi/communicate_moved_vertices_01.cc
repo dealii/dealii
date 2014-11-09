@@ -34,28 +34,6 @@
 #include <fstream>
 
 
-template <int dim, int spacedim>
-std::vector<bool>
-get_locally_owned_vertices (const Triangulation<dim,spacedim> &triangulation)
-{
-  std::vector<bool> locally_owned_vertices = triangulation.get_used_vertices();
-
-  if (const parallel::distributed::Triangulation<dim,spacedim> *tr
-      = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>
-      (&triangulation))
-    for (typename Triangulation<dim,spacedim>::active_cell_iterator
-	 cell = triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
-    if (cell->is_artificial()
-	||
-	(cell->is_ghost() && (cell->subdomain_id() < tr->locally_owned_subdomain())))
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	locally_owned_vertices[cell->vertex_index(v)] = false;
-
-  return locally_owned_vertices;
-}
-
-
 template<int dim>
 void test()
 {
@@ -67,7 +45,7 @@ void test()
   tr.refine_global(2);
 
   const std::vector<bool> locally_owned_vertices
-    = get_locally_owned_vertices (tr);
+    = GridTools::get_locally_owned_vertices (tr);
   
   if (myid == 0)
     deallog << "#vertices = "

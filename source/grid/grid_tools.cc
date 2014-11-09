@@ -37,6 +37,8 @@
 
 #include <cmath>
 #include <numeric>
+#include <list>
+#include <set>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -1468,7 +1470,6 @@ next_cell:
 
   template <int dim, int spacedim>
   unsigned int
-
   count_cells_with_subdomain_association (const Triangulation<dim, spacedim> &triangulation,
                                           const types::subdomain_id       subdomain)
   {
@@ -1480,6 +1481,35 @@ next_cell:
         ++count;
 
     return count;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<bool>
+  get_locally_owned_vertices (const Triangulation<dim,spacedim> &triangulation)
+  {
+    // start with all vertices
+    std::vector<bool> locally_owned_vertices = triangulation.get_used_vertices();
+
+    // if the triangulation is distributed, eliminate those that
+    // are owned by other processors -- either because the vertex is
+    // on an artificial cell, or because it is on a ghost cell with
+    // a smaller subdomain
+    if (const parallel::distributed::Triangulation<dim,spacedim> *tr
+        = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>
+        (&triangulation))
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator
+           cell = triangulation.begin_active();
+           cell != triangulation.end(); ++cell)
+        if (cell->is_artificial()
+            ||
+            (cell->is_ghost() &&
+             (cell->subdomain_id() < tr->locally_owned_subdomain())))
+          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+            locally_owned_vertices[cell->vertex_index(v)] = false;
+
+    return locally_owned_vertices;
   }
 
 
