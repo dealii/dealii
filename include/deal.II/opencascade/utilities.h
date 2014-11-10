@@ -112,7 +112,7 @@ namespace OpenCASCADE
    */
   TopoDS_Shape read_IGES(const std::string &filename,
                          const double scale_factor=1e-3);
-			 
+
   /**
     * Write the given topological shape into an IGES file.
     */
@@ -129,7 +129,13 @@ namespace OpenCASCADE
    */
   TopoDS_Shape read_STEP(const std::string &filename,
                          const double scale_factor=1e-3);
-			 
+
+
+  /**
+    * Write the given topological shape into an STEP file.
+    */
+  void write_STEP(const TopoDS_Shape &shape,
+                  const std::string &filename);
 
   /**
     * This function returns the tolerance associated with the shape.

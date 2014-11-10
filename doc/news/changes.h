@@ -333,6 +333,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: Added support for STEP files in the OpenCASCADE 
+  wrappers. STEP files can now be imported and exported respectively
+  with the read_STEP and write_STEP functions.
+  <br>
+  (Andrea Mola, 2014/11/12)
+  </li>
+
   <li> New: Timer now has get_lap_time() which returns the time
   lapsed between the last start()/stop() cycle.
   <br>

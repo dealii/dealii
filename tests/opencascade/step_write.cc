@@ -9,7 +9,8 @@
 //
 //-----------------------------------------------------------
 
-// Create a bspline, and write it as an IGES file.
+// Read a file in iges format, and write it out again in the same
+// format.
 
 #include "../tests.h"
 #include <fstream>
@@ -24,24 +25,29 @@ using namespace OpenCASCADE;
 
 int main () 
 {
-  // Create a bspline passing through the points
-  std::vector<Point<3> > pts;
-  pts.push_back(Point<3>(0,0,0));
-  pts.push_back(Point<3>(0,1,0));
-  pts.push_back(Point<3>(1,1,0));
-  pts.push_back(Point<3>(1,0,0));
-
-  TopoDS_Edge edge = interpolation_curve(pts);
-  write_IGES(edge, "tmp.iges");
-  std::ifstream in("tmp.iges");
+  TopoDS_Shape sh = read_STEP(SOURCE_DIR "/step_files/wigley.step");
+  write_STEP(sh, "tmp.step");
+  std::ifstream in("tmp.step");
   std::ofstream out("output");
   std::string line;
-  unsigned int counter = 5;
-  while(counter--) std::getline(in, line);
-  while(std::getline(in, line))
-    out << line << std::endl;
+  unsigned int counter = 0;
+
+  while(std::getline(in,line))
+       {
+       counter++;
+       if ( (counter == 4) ||
+            (counter == 5) ||
+            (counter == 6) ||
+            (counter == 18) ||
+            (counter == 19)   )
+          {
+	  }
+       else
+          out << line << std::endl;
+       }  
+    
+    
   in.close();
   out.close();
   return 0;
 }
-                  
