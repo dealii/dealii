@@ -3335,7 +3335,7 @@ namespace parallel
        * vertices_with_ghost_neighbors via the p4est_iterate tool
        */
       template <int dim, int spacedim>
-      struct find_ghosts
+      struct FindGhosts
       {
         typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation;
         sc_array_t *subids;
@@ -3359,7 +3359,7 @@ namespace parallel
         typename dealii::internal::p4est::iter<dim>::corner_side *sides =
           (typename dealii::internal::p4est::iter<dim>::corner_side *)
           (info->sides.array);
-        struct find_ghosts<dim,spacedim> *fg = static_cast<struct find_ghosts<dim,spacedim> *>(user_data);
+        FindGhosts<dim,spacedim> *fg = static_cast<FindGhosts<dim,spacedim> *>(user_data);
         sc_array_t *subids = fg->subids;
         typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
         int nsubs;
@@ -3421,7 +3421,7 @@ namespace parallel
         typename dealii::internal::p4est::iter<dim>::edge_side *sides =
           (typename dealii::internal::p4est::iter<dim>::edge_side *)
           (info->sides.array);
-        struct find_ghosts<dim,spacedim> *fg = static_cast<struct find_ghosts<dim,spacedim> *>(user_data);
+        FindGhosts<dim,spacedim> *fg = static_cast<FindGhosts<dim,spacedim> *>(user_data);
         sc_array_t *subids = fg->subids;
         typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
         int nsubs;
@@ -3492,7 +3492,7 @@ namespace parallel
         typename dealii::internal::p4est::iter<dim>::face_side *sides =
           (typename dealii::internal::p4est::iter<dim>::face_side *)
           (info->sides.array);
-        struct find_ghosts<dim,spacedim> *fg = static_cast<struct find_ghosts<dim,spacedim> *>(user_data);
+        FindGhosts<dim,spacedim> *fg = static_cast<FindGhosts<dim,spacedim> *>(user_data);
         sc_array_t *subids = fg->subids;
         typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
         int nsubs;
@@ -3573,8 +3573,7 @@ namespace parallel
     {
       Assert (dim>1, ExcNotImplemented());
 
-      struct find_ghosts<dim,spacedim> fg;
-
+      FindGhosts<dim,spacedim> fg;
       fg.subids = sc_array_new (sizeof (dealii::types::subdomain_id));
       fg.triangulation = this;
       fg.vertices_with_ghost_neighbors = &vertices_with_ghost_neighbors;
