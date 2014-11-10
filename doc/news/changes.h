@@ -333,6 +333,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: Timer now has get_lap_time() which returns the time
+  lapsed between the last start()/stop() cycle.
+  <br>
+  (Fahad Alrashed, 2014/11/09)
+  </li>
+
   <li> New: TableHandler objects can be cleared - i.e. reset to a 
   zero-sized state.
   <br>

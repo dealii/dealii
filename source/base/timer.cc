@@ -160,10 +160,10 @@ double Timer::stop ()
 
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
-      double time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
-                    - start_wall_time;
+      last_lap_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
+                      - start_wall_time;
 #elif defined(DEAL_II_MSVC)
-      double time = windows::wall_clock() - start_wall_time;
+      last_lap_time = windows::wall_clock() - start_wall_time;
       cumulative_time += windows::cpu_clock() - start_time;
 #else
 #  error Unsupported platform. Porting not finished.
@@ -173,15 +173,31 @@ double Timer::stop ()
       if (sync_wall_time && Utilities::System::job_supports_mpi())
         {
           this->mpi_data
-            = Utilities::MPI::min_max_avg (time, mpi_communicator);
-
-          cumulative_wall_time += this->mpi_data.max;
+            = Utilities::MPI::min_max_avg (last_lap_time, mpi_communicator);
+          last_lap_time = this->mpi_data.max;
+          cumulative_wall_time += last_lap_time;
         }
       else
 #endif
-        cumulative_wall_time += time;
+        cumulative_wall_time += last_lap_time;
     }
   return cumulative_time;
+}
+
+
+
+double Timer::get_lap_time() const
+{
+  // time already has the difference
+  // between the last start()/stop()
+  // cycle.
+#ifdef DEAL_II_WITH_MPI
+  if (Utilities::System::job_supports_mpi())
+    return Utilities::MPI::max (last_lap_time, mpi_communicator);
+  else
+#endif
+    return last_lap_time;
+
 }
 
 
@@ -255,6 +271,7 @@ double Timer::wall_time () const
 
 void Timer::reset ()
 {
+  last_lap_time = 0.;
   cumulative_time = 0.;
   cumulative_wall_time = 0.;
   running         = false;
