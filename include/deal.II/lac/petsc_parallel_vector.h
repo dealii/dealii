@@ -271,6 +271,8 @@ namespace PETScWrappers
        * the set of locally relevant
        * degrees of freedom, see step-32.
        *
+       * @deprecated Use Vector::Vector(const IndexSet &,const IndexSet &,const MPI_Comm &) instead.
+       *
        * @note This operation always creates a ghosted
        * vector.
        *
@@ -311,6 +313,8 @@ namespace PETScWrappers
        * Constructs a new parallel PETSc
        * vector from an IndexSet. This creates a non
        * ghosted vector.
+       *
+       * @deprecated Use Vector::Vector(const IndexSet &,const MPI_Comm &) instead.
        */
       explicit Vector (const MPI_Comm &communicator,
                        const IndexSet &local) DEAL_II_DEPRECATED;
@@ -451,6 +455,8 @@ namespace PETScWrappers
        * constructor with same signature
        * for more details.
        *
+       * @deprecated Use Vector::reinit(const IndexSet &, const IndexSet &, const MPI_Comm &) instead.
+       *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const MPI_Comm     &communicator,
@@ -459,7 +465,7 @@ namespace PETScWrappers
       /**
        * Reinit as a vector without ghost elements. See
        * the constructor with same signature
-       * for more detais.
+       * for more details.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -470,7 +476,9 @@ namespace PETScWrappers
       /**
        * Reinit as a vector without ghost elements. See
        * constructor with same signature
-       * for more detais.
+       * for more details.
+       *
+       * @deprecated Use Vector::reinit(const IndexSet &, const MPI_Comm &) instead.
        */
       void reinit (const MPI_Comm     &communicator,
                    const IndexSet   &local) DEAL_II_DEPRECATED;
@@ -478,7 +486,7 @@ namespace PETScWrappers
       /**
        * Reinit as a vector without ghost elements. See
        * constructor with same signature
-       * for more detais.
+       * for more details.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
