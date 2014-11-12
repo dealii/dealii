@@ -49,29 +49,9 @@ ENDIF()
 
 # These seem to be pretty much the only required ones.
 SET(_opencascade_libraries
-    TKFillet
-    TKMesh
-    TKernel
-    TKG2d
-    TKG3d
-    TKMath
-    TKIGES
-    TKSTL
-    TKShHealing
-    TKXSBase
-    TKBool
-    TKBO
-    TKBRep
-    TKTopAlgo
-    TKGeomAlgo
-    TKGeomBase
-    TKOffset
-    TKPrim
-    TKSTEP
-    TKSTEPBase
-    TKSTEPAttr
-    TKHLR
-    TKFeat
+  TKBO TKBool TKBRep TKernel TKFeat TKFillet TKG2d TKG3d TKGeomAlgo
+  TKGeomBase TKHLR TKIGES TKMath TKMesh TKOffset TKPrim TKShHealing TKSTEP
+  TKSTEPAttr TKSTEPBase TKSTL TKTopAlgo TKXSBase
   )
 
 SET(_libraries "")
@@ -81,12 +61,6 @@ FOREACH(_library ${_opencascade_libraries})
     NAMES ${_library}
     HINTS ${OPENCASCADE_DIR}
     PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
-    NO_DEFAULT_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    NO_CMAKE_FIND_ROOT_PATH
     )
 ENDFOREACH()
 
