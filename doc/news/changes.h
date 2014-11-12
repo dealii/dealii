@@ -335,7 +335,7 @@ inconvenience this causes.
 <ol>
   <li> New: Added support for STEP files in the OpenCASCADE 
   wrappers. STEP files can now be imported and exported respectively
-  with the read_STEP and write_STEP functions.
+  with the OpenCASCADE::read_STEP() and OpenCASCADE::write_STEP() functions.
   <br>
   (Andrea Mola, 2014/11/12)
   </li>

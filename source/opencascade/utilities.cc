@@ -211,7 +211,6 @@ namespace OpenCASCADE
   void write_IGES(const TopoDS_Shape &shape,
                   const std::string &filename)
   {
-
     IGESControl_Controller::Init();
     IGESControl_Writer ICW ("MM", 0);
     Standard_Boolean ok = ICW.AddShape (shape);
@@ -257,7 +256,6 @@ namespace OpenCASCADE
   void write_STEP(const TopoDS_Shape &shape,
                   const std::string &filename)
   {
-
     STEPControl_Controller::Init();
     STEPControl_Writer SCW;
     IFSelect_ReturnStatus status;
@@ -267,8 +265,6 @@ namespace OpenCASCADE
     status = SCW.Write(filename.c_str());
 
     AssertThrow(status = IFSelect_RetDone, ExcMessage("Failed to write translated shape to STEP file."));
-
-
   }
 
   double get_shape_tolerance(const TopoDS_Shape &shape)
