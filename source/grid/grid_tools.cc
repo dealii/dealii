@@ -37,6 +37,8 @@
 
 #include <cmath>
 #include <numeric>
+#include <list>
+#include <set>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -93,6 +95,7 @@ namespace GridTools
       return container.get_tria();
     }
   }
+
 
 
   template <int dim, int spacedim>
@@ -634,16 +637,219 @@ namespace GridTools
 
 
 
+  /**
+    * Distort a triangulation in
+    * some random way.
+    */
   template <int dim, int spacedim>
   void
-  distort_random (const double        factor,
-                  Triangulation<dim, spacedim> &triangulation,
-                  const bool          keep_boundary)
+  distort_random (const double                 factor,
+                  Triangulation<dim,spacedim> &triangulation,
+                  const bool                   keep_boundary)
   {
-    //TODO: Move implementation of this function into the current
-    // namespace
-    triangulation.distort_random (factor, keep_boundary);
+    // if spacedim>dim we need to make sure that we perturb
+    // points but keep them on
+    // the manifold. however, this isn't implemented right now
+    Assert (spacedim == dim, ExcNotImplemented());
+
+
+    // find the smallest length of the
+    // lines adjacent to the
+    // vertex. take the initial value
+    // to be larger than anything that
+    // might be found: the diameter of
+    // the triangulation, here
+    // estimated by adding up the
+    // diameters of the coarse grid
+    // cells.
+    double almost_infinite_length = 0;
+    for (typename Triangulation<dim,spacedim>::cell_iterator
+         cell=triangulation.begin(0); cell!=triangulation.end(0); ++cell)
+      almost_infinite_length += cell->diameter();
+
+    std::vector<double> minimal_length (triangulation.n_vertices(),
+                                        almost_infinite_length);
+
+    // also note if a vertex is at the boundary
+    std::vector<bool>   at_boundary (triangulation.n_vertices(), false);
+    for (typename Triangulation<dim,spacedim>::active_cell_iterator
+         cell=triangulation.begin_active(); cell!=triangulation.end(); ++cell)
+      if (cell->is_locally_owned())
+        {
+          if (dim>1)
+            {
+              for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i)
+                {
+                  const typename Triangulation<dim,spacedim>::line_iterator line
+                    = cell->line(i);
+
+                  if (keep_boundary && line->at_boundary())
+                    {
+                      at_boundary[line->vertex_index(0)] = true;
+                      at_boundary[line->vertex_index(1)] = true;
+                    }
+
+                  minimal_length[line->vertex_index(0)]
+                    = std::min(line->diameter(),
+                               minimal_length[line->vertex_index(0)]);
+                  minimal_length[line->vertex_index(1)]
+                    = std::min(line->diameter(),
+                               minimal_length[line->vertex_index(1)]);
+                }
+            }
+          else //dim==1
+            {
+              if (keep_boundary)
+                for (unsigned int vertex=0; vertex<2; ++vertex)
+                  if (cell->at_boundary(vertex) == true)
+                    at_boundary[cell->vertex_index(vertex)] = true;
+
+              minimal_length[cell->vertex_index(0)]
+                = std::min(cell->diameter(),
+                           minimal_length[cell->vertex_index(0)]);
+              minimal_length[cell->vertex_index(1)]
+                = std::min(cell->diameter(),
+                           minimal_length[cell->vertex_index(1)]);
+            }
+        }
+
+    const unsigned int n_vertices = triangulation.n_vertices();
+
+    // If the triangulation is distributed, we need to
+    // exchange the moved vertices across mpi processes
+    if (parallel::distributed::Triangulation< dim, spacedim > *distributed_triangulation
+        = dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*> (&triangulation))
+      {
+        const std::vector<bool> locally_owned_vertices = get_locally_owned_vertices(triangulation);
+        std::vector<bool>       vertex_moved (triangulation.n_vertices(), false);
+
+        // Next move vertices on locally owned cells
+        for (typename Triangulation<dim,spacedim>::active_cell_iterator
+             cell=triangulation.begin_active(); cell!=triangulation.end(); ++cell)
+          if (cell->is_locally_owned())
+            {
+              for (unsigned int vertex_no=0; vertex_no<GeometryInfo<dim>::vertices_per_cell;
+                   ++vertex_no)
+                {
+                  const unsigned global_vertex_no = cell->vertex_index(vertex_no);
+
+                  // ignore this vertex if we shall keep the boundary and
+                  // this vertex *is* at the boundary, if it is already moved
+                  // or if another process moves this vertex
+                  if ((keep_boundary && at_boundary[global_vertex_no])
+                      || vertex_moved[global_vertex_no]
+                      || !locally_owned_vertices[global_vertex_no])
+                    continue;
+
+                  // first compute a random shift vector
+                  Point<spacedim> shift_vector;
+                  for (unsigned int d=0; d<spacedim; ++d)
+                    shift_vector(d) = std::rand()*2.0/RAND_MAX-1;
+
+                  shift_vector *= factor * minimal_length[global_vertex_no] /
+                                  std::sqrt(shift_vector.square());
+
+                  // finally move the vertex
+                  cell->vertex(vertex_no) += shift_vector;
+                  vertex_moved[global_vertex_no] = true;
+                }
+            }
+
+        distributed_triangulation
+        ->communicate_locally_moved_vertices(locally_owned_vertices);
+      }
+    else
+      // if this is a sequential triangulation, we could in principle
+      // use the algorithm above, but we'll use an algorithm that we used
+      // before the parallel::distributed::Triangulation was introduced
+      // in order to preserve backward compatibility
+      {
+        // loop over all vertices and compute their new locations
+        const unsigned int n_vertices = triangulation.n_vertices();
+        std::vector<Point<spacedim> > new_vertex_locations (n_vertices);
+        const std::vector<Point<spacedim> > &old_vertex_locations
+          = triangulation.get_vertices();
+
+        for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
+          {
+            // ignore this vertex if we will keep the boundary and
+            // this vertex *is* at the boundary
+            if (keep_boundary && at_boundary[vertex])
+              new_vertex_locations[vertex] = old_vertex_locations[vertex];
+            else
+              {
+                // compute a random shift vector
+                Point<spacedim> shift_vector;
+                for (unsigned int d=0; d<spacedim; ++d)
+                  shift_vector(d) = std::rand()*2.0/RAND_MAX-1;
+
+                shift_vector *= factor * minimal_length[vertex] /
+                                std::sqrt(shift_vector.square());
+
+                // record new vertex location
+                new_vertex_locations[vertex] = old_vertex_locations[vertex] + shift_vector;
+              }
+          }
+
+        // now do the actual move of the vertices
+        for (typename Triangulation<dim,spacedim>::active_cell_iterator
+             cell=triangulation.begin_active(); cell!=triangulation.end(); ++cell)
+          for (unsigned int vertex_no=0;
+               vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
+            cell->vertex(vertex_no) = new_vertex_locations[cell->vertex_index(vertex_no)];
+      }
+
+    // Correct hanging nodes if necessary
+    if (dim>=2)
+      {
+        // We do the same as in GridTools::transform
+        //
+        // exclude hanging nodes at the boundaries of artificial cells:
+        // these may belong to ghost cells for which we know the exact
+        // location of vertices, whereas the artificial cell may or may
+        // not be further refined, and so we cannot know whether
+        // the location of the hanging node is correct or not
+        typename Triangulation<dim,spacedim>::active_cell_iterator
+        cell = triangulation.begin_active(),
+        endc = triangulation.end();
+        for (; cell!=endc; ++cell)
+          if (!cell->is_artificial())
+            for (unsigned int face=0;
+                 face<GeometryInfo<dim>::faces_per_cell; ++face)
+              if (cell->face(face)->has_children() &&
+                  !cell->face(face)->at_boundary())
+                {
+                  // this face has hanging nodes
+                  if (dim==2)
+                    cell->face(face)->child(0)->vertex(1)
+                      = (cell->face(face)->vertex(0) +
+                         cell->face(face)->vertex(1)) / 2;
+                  else if (dim==3)
+                    {
+                      cell->face(face)->child(0)->vertex(1)
+                        = .5*(cell->face(face)->vertex(0)
+                              +cell->face(face)->vertex(1));
+                      cell->face(face)->child(0)->vertex(2)
+                        = .5*(cell->face(face)->vertex(0)
+                              +cell->face(face)->vertex(2));
+                      cell->face(face)->child(1)->vertex(3)
+                        = .5*(cell->face(face)->vertex(1)
+                              +cell->face(face)->vertex(3));
+                      cell->face(face)->child(2)->vertex(3)
+                        = .5*(cell->face(face)->vertex(2)
+                              +cell->face(face)->vertex(3));
+
+                      // center of the face
+                      cell->face(face)->child(0)->vertex(3)
+                        = .25*(cell->face(face)->vertex(0)
+                               +cell->face(face)->vertex(1)
+                               +cell->face(face)->vertex(2)
+                               +cell->face(face)->vertex(3));
+                    }
+                }
+      }
   }
+
 
 
   template <int dim, template <int, int> class Container, int spacedim>
@@ -1298,7 +1504,6 @@ next_cell:
 
   template <int dim, int spacedim>
   unsigned int
-
   count_cells_with_subdomain_association (const Triangulation<dim, spacedim> &triangulation,
                                           const types::subdomain_id       subdomain)
   {
@@ -1310,6 +1515,35 @@ next_cell:
         ++count;
 
     return count;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<bool>
+  get_locally_owned_vertices (const Triangulation<dim,spacedim> &triangulation)
+  {
+    // start with all vertices
+    std::vector<bool> locally_owned_vertices = triangulation.get_used_vertices();
+
+    // if the triangulation is distributed, eliminate those that
+    // are owned by other processors -- either because the vertex is
+    // on an artificial cell, or because it is on a ghost cell with
+    // a smaller subdomain
+    if (const parallel::distributed::Triangulation<dim,spacedim> *tr
+        = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>
+        (&triangulation))
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator
+           cell = triangulation.begin_active();
+           cell != triangulation.end(); ++cell)
+        if (cell->is_artificial()
+            ||
+            (cell->is_ghost() &&
+             (cell->subdomain_id() < tr->locally_owned_subdomain())))
+          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+            locally_owned_vertices[cell->vertex_index(v)] = false;
+
+    return locally_owned_vertices;
   }
 
 

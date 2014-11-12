@@ -469,6 +469,60 @@ namespace parallel
       virtual void execute_coarsening_and_refinement ();
 
       /**
+       * When vertices have been moved locally, for example using code
+       * like
+       * @code
+       *   cell->vertex(0) = new_location;
+       * @endcode
+       * then this function can be used to update the location of
+       * vertices between MPI processes.
+       *
+       * All the vertices that have been moved and might be in the ghost layer
+       * of a process have to be reported in the @p vertex_locally_moved argument.
+       * This ensures that that part of the information that has to be send
+       * between processes is actually sent. Additionally, it is quite important that vertices
+       * on the boundary between processes are reported on exactly one process
+       * (e.g. the one with the highest id). Otherwise we could expect
+       * undesirable results if multiple processes move a vertex differently.
+       * A typical strategy is to let processor $i$ move those vertices that
+       * are adjacent to cells whose owners include processor $i$ but no
+       * other processor $j$ with $j<i$; in other words, for vertices
+       * at the boundary of a subdomain, the processor with the lowest subdomain
+       * id "owns" a vertex.
+       *
+       * @note It only makes sense to move vertices that are either located
+       * on locally owned cells or on cells in the ghost layer. This is
+       * because you can be sure that these vertices indeed exist on the
+       * finest mesh aggregated over all processors, whereas vertices on
+       * artificial cells but not at least in the ghost layer may or may
+       * not exist on the globally finest mesh. Consequently, the
+       * @p vertex_locally_moved argument may not contain vertices that
+       * aren't at least on ghost cells.
+       *
+       * @note This function moves vertices in such a way that on every processor,
+       * the vertices of every locally owned and ghost cell is consistent with
+       * the corresponding location of these cells on other processors. On the
+       * other hand, the locations of artificial cells will in general be wrong
+       * since artificial cells may or may not exist on other processors
+       * and consequently it is not possible to determine their location
+       * in any way. This is not usually a problem since one never does anything
+       * on artificial cells. However, it may lead to problems if the mesh
+       * with moved vertices is refined in a later step. If that's what you
+       * want to do, the right way to do it is to save the offset applied to
+       * every vertex, call this function, and before refining or coarsening
+       * the mesh apply the opposite offset and call this function again.
+       *
+       * @param vertex_locally_moved A bitmap indicating which vertices have
+       *   been moved. The size of this array must be equal to
+       *   Triangulation::n_vertices() and must be a subset of those vertices
+       *   flagged by GridTools::get_locally_owned_vertices().
+       *
+       * @see This function is used, for example, in GridTools::distort_random().
+       */
+      void
+      communicate_locally_moved_vertices (const std::vector<bool> &vertex_locally_moved);
+
+      /**
        * Return the subdomain id of those cells that are owned by the
        * current processor. All cells in the triangulation that do not
        * have this subdomain id are either owned by another processor
@@ -697,15 +751,21 @@ namespace parallel
                                                               const void *)> &unpack_callback);
 
       /**
-       * Returns a permutation vector for the order the coarse cells
-       * are handed of to p4est. For example the first element i in
-       * this vector denotes that the first cell in hierarchical
-       * ordering is the ith deal cell starting from begin(0).
+       * Return a permutation vector for the order the coarse cells
+       * are handed off to p4est. For example the value of the $i$th element
+       * in this vector is the index of the deal.II coarse cell (counting
+       * from begin(0)) that corresponds to the $i$th tree managed by p4est.
        */
       const std::vector<types::global_dof_index> &
       get_p4est_tree_to_coarse_cell_permutation() const;
 
-
+      /**
+       * Return a permutation vector for the mapping from the
+       * coarse deal cells to the p4est trees. This is the inverse
+       * of get_p4est_tree_to_coarse_cell_permutation.
+       */
+      const std::vector<types::global_dof_index> &
+      get_coarse_cell_to_p4est_tree_permutation() const;
 
       /**
        * Join faces in the p4est forest for periodic boundary
@@ -951,6 +1011,42 @@ namespace parallel
        */
       const std::vector<types::global_dof_index> &
       get_p4est_tree_to_coarse_cell_permutation() const;
+
+      /**
+       * When vertices have been moved locally, for example using code
+       * like
+       * @code
+       *   cell->vertex(0) = new_location;
+       * @endcode
+       * then this function can be used to update the location of
+       * vertices between MPI processes.
+       *
+       * All the vertices that have been moved and might be in the ghost layer
+       * of a process have to be reported in the @p vertex_locally_moved argument.
+       * This ensures that that part of the information that has to be send
+       * between processes is actually sent. Additionally, it is quite important that vertices
+       * on the boundary between processes are reported on exactly one process
+       * (e.g. the one with the highest id). Otherwise we could expect
+       * undesirable results if multiple processes move a vertex differently.
+       * A typical strategy is to let processor $i$ move those vertices that
+       * are adjacent to cells whose owners include processor $i$ but no
+       * other processor $j$ with $j<i$; in other words, for vertices
+       * at the boundary of a subdomain, the processor with the lowest subdomain
+       * id "owns" a vertex.
+       *
+       * @note It only makes sense to move vertices that are either located
+       * on locally owned cells or on cells in the ghost layer. This is
+       * because you can be sure that these vertices indeed exist on the
+       * finest mesh aggregated over all processors, whereas vertices on
+       * artificial cells but not at least in the ghost layer may or may
+       * not exist on the globally finest mesh. Consequently, the
+       * @p vertex_locally_moved argument may not contain vertices that
+       * aren't at least on ghost cells.
+       *
+       * @see This function is used, for example, in GridTools::distort_random().
+       */
+      void
+      communicate_locally_moved_vertices (const std::vector<bool> &vertex_locally_moved);
 
       /**
        * Return the subdomain id of those cells that are owned by the

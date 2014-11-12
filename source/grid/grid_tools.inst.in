@@ -220,6 +220,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       const types::subdomain_id);
 
     template
+    std::vector<bool>
+    get_locally_owned_vertices (const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
+    template
       double
       minimal_cell_diameter (const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation);
 
@@ -268,7 +272,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       std::vector<Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator>
       get_patch_around_cell<Container<deal_II_dimension,deal_II_space_dimension> >
       (const Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator &cell);
-      
+
 
 #if deal_II_dimension != 1
       template

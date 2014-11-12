@@ -767,6 +767,38 @@ namespace GridTools
   count_cells_with_subdomain_association (const Triangulation<dim, spacedim> &triangulation,
                                           const types::subdomain_id         subdomain);
 
+
+  /**
+   * For a triangulation, return a mask that represents which of its vertices
+   * are "owned" by the current process in the same way as we talk about
+   * locally owned cells or degrees of freedom (see @ref GlossLocallyOwnedCell
+   * and @ref GlossLocallyOwnedDof). For the purpose of this function,
+   * we define a locally owned vertex as follows: a vertex is owned by
+   * that processor with the smallest subdomain id (which equals the MPI
+   * rank of that processor) among all owners of cells adjacent to this vertex.
+   * In other words, vertices that are in the interior of a partition
+   * of the triangulation are owned by the owner of this partition; for
+   * vertices that lie on the boundary between two or more partitions,
+   * the owner is the processor with the least subdomain_id among all
+   * adjacent subdomains.
+   *
+   * For sequential triangulations (as opposed to, for example,
+   * parallel::distributed::Triangulation), every user vertex is of course
+   * owned by the current processor, i.e., the function returns
+   * Triangulation::get_used_vertices(). For parallel triangulations, the
+   * returned mask is a subset of what Triangulation::get_used_vertices()
+   * returns.
+   *
+   * @param triangulation The triangulation of which the function evaluates
+   *   which vertices are locally owned.
+   * @return The subset of vertices, as described above. The length of the
+   *   returned array equals Triangulation.n_vertices() and may, consequently,
+   *   be larger than Triangulation::n_used_vertices().
+   */
+  template <int dim, int spacedim>
+  std::vector<bool>
+  get_locally_owned_vertices (const Triangulation<dim,spacedim> &triangulation);
+
   /*@}*/
   /**
    *  @name Comparing different meshes

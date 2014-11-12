@@ -346,10 +346,34 @@ inconvenience this causes.
   (Fahad Alrashed, 2014/11/09)
   </li>
 
+  <li> New: GridTools::get_locally_owned_vertices() allows to query
+  which vertices of a triangulation are owned by the current
+  processor.
+  <br>
+  (Wolfgang Bangerth, 2014/11/09)
+  </li>
+
+  <li> New: parallel::distributed::Triangulation::communicate_locally_moved_vertices()
+  allows to
+  update vertex positions that have been moved just locally on distributed
+  meshes. GridTools::distort_random now works for distributed meshes and 
+  hanging nodes in 3D as well.
+  <br>
+  (Fahad Alrashed, 2014/11/09)
+  </li>
+
   <li> New: TableHandler objects can be cleared - i.e. reset to a 
   zero-sized state.
   <br>
   (Fahad Alrashed, 2014/11/09)
+  </li>
+
+  <li> New: GridTools::communicate_locally_moved_vertices allows to
+  update vertex positions that have been moved just locally on distributed
+  meshes. GridTools::distort_random now works for distributed meshes and 
+  hanging nodes in 3D as well.
+  <br>
+  (Daniel Arndt, 2014/11/06)
   </li>
 
   <li> New: The FE_Nothing class now has a second template argument
