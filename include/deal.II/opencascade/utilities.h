@@ -120,6 +120,24 @@ namespace OpenCASCADE
                   const std::string &filename);
 
   /**
+   * Read STEP files and translate their content into openCascade
+   * topological entities. The option scale_factor is used to
+   * compensate for different units being used in the STEP files and
+   * in the target application. The standard unit for STEP files is
+   * millimiters. The return object is a TopoDS_Shape which contains
+   * all objects from the file.
+   */
+  TopoDS_Shape read_STEP(const std::string &filename,
+                         const double scale_factor=1e-3);
+
+
+  /**
+    * Write the given topological shape into an STEP file.
+    */
+  void write_STEP(const TopoDS_Shape &shape,
+                  const std::string &filename);
+
+  /**
     * This function returns the tolerance associated with the shape.
     * Each CAD geometrical object is defined along with a tolerance,
     * which indicates possible inaccuracy of its placement. For

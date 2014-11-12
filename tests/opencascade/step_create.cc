@@ -32,14 +32,25 @@ int main ()
   pts.push_back(Point<3>(1,0,0));
 
   TopoDS_Edge edge = interpolation_curve(pts);
-  write_IGES(edge, "tmp.iges");
-  std::ifstream in("tmp.iges");
+  write_STEP(edge, "tmp.step");
+  std::ifstream in("tmp.step");
   std::ofstream out("output");
   std::string line;
-  unsigned int counter = 5;
-  while(counter--) std::getline(in, line);
-  while(std::getline(in, line))
-    out << line << std::endl;
+  unsigned int counter = 0;
+
+  while(std::getline(in,line))
+       {
+       counter++;
+       if ( (counter == 4) ||
+            (counter == 5) ||
+            (counter == 6) ||
+            (counter == 18) ||
+            (counter == 19)   )
+          {
+	  }
+       else
+          out << line << std::endl;
+       }
   in.close();
   out.close();
   return 0;

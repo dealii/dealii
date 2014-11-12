@@ -17,6 +17,10 @@
 #include <IGESControl_Reader.hxx>
 #include <IGESControl_Writer.hxx>
 
+#include <STEPControl_Controller.hxx>
+#include <STEPControl_Reader.hxx>
+#include <STEPControl_Writer.hxx>
+
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
@@ -207,7 +211,6 @@ namespace OpenCASCADE
   void write_IGES(const TopoDS_Shape &shape,
                   const std::string &filename)
   {
-
     IGESControl_Controller::Init();
     IGESControl_Writer ICW ("MM", 0);
     Standard_Boolean ok = ICW.AddShape (shape);
@@ -215,6 +218,53 @@ namespace OpenCASCADE
     ICW.ComputeModel();
     Standard_Boolean OK = ICW.Write (filename.c_str());
     AssertThrow(OK, ExcMessage("Failed to write IGES file."));
+  }
+
+  TopoDS_Shape read_STEP(const std::string &filename,
+                         const double scale_factor)
+  {
+    STEPControl_Reader reader;
+    IFSelect_ReturnStatus stat;
+    stat = reader.ReadFile(filename.c_str());
+    AssertThrow(stat == IFSelect_RetDone,
+                ExcMessage("Error in reading file!"));
+
+    Standard_Boolean failsonly = Standard_False;
+    IFSelect_PrintCount mode = IFSelect_ItemsByEntity;
+    reader.PrintCheckLoad (failsonly, mode);
+
+    Handle(TColStd_HSequenceOfTransient) myList = reader.GiveList("step-faces");
+    //selects all IGES faces in the
+    //file and puts them into a list
+    //called MyList,
+    Standard_Integer nTransFaces = reader.TransferList(myList);
+
+    AssertThrow(nTransFaces > 0,
+                ExcMessage("Read nothing from file."));
+
+    // Handle IGES Scale here.
+    gp_Pnt Origin;
+    gp_Trsf scale;
+    scale.SetScale (Origin, scale_factor);
+
+    TopoDS_Shape sh = reader.OneShape();
+    BRepBuilderAPI_Transform trans(sh, scale);
+
+    return trans.Shape();   // this is the actual translation
+  }
+
+  void write_STEP(const TopoDS_Shape &shape,
+                  const std::string &filename)
+  {
+    STEPControl_Controller::Init();
+    STEPControl_Writer SCW;
+    IFSelect_ReturnStatus status;
+    status = SCW.Transfer(shape, STEPControl_AsIs);
+    AssertThrow(status = IFSelect_RetDone, ExcMessage("Failed to add shape to STEP controller."));
+
+    status = SCW.Write(filename.c_str());
+
+    AssertThrow(status = IFSelect_RetDone, ExcMessage("Failed to write translated shape to STEP file."));
   }
 
   double get_shape_tolerance(const TopoDS_Shape &shape)
