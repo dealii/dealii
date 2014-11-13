@@ -716,8 +716,6 @@ namespace GridTools
             }
         }
 
-    const unsigned int n_vertices = triangulation.n_vertices();
-
     // If the triangulation is distributed, we need to
     // exchange the moved vertices across mpi processes
     if (parallel::distributed::Triangulation< dim, spacedim > *distributed_triangulation
@@ -766,8 +764,12 @@ namespace GridTools
                 }
             }
 
+#if DEAL_II_USE_P4EST
         distributed_triangulation
         ->communicate_locally_moved_vertices(locally_owned_vertices);
+#else
+        Assert (false, ExcInternalError());
+#endif
       }
     else
       // if this is a sequential triangulation, we could in principle
