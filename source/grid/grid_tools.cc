@@ -713,8 +713,6 @@ namespace GridTools
             }
         }
 
-    const unsigned int n_vertices = triangulation.n_vertices();
-
     // If the triangulation is distributed, we need to
     // exchange the moved vertices across mpi processes
     if (parallel::distributed::Triangulation< dim, spacedim > *distributed_triangulation
