@@ -753,8 +753,12 @@ namespace GridTools
                 }
             }
 
+#if DEAL_II_USE_P4EST
         distributed_triangulation
         ->communicate_locally_moved_vertices(locally_owned_vertices);
+#else
+        Assert (false, ExcInternalError());
+#endif
       }
     else
       // if this is a sequential triangulation, we could in principle
