@@ -128,6 +128,8 @@ namespace SLEPcWrappers
     };
 
     std_cxx11::shared_ptr<TransformationData> transformation_data;
+
+    std_cxx11::shared_ptr<STMatMode> mat_mode;
   };
 
   /**
