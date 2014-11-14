@@ -1,0 +1,54 @@
+#!/bin/bash
+
+if [ "$BASH_SOURCE" == "$0" ]
+then
+  export DEAL_II_BUNDLE=`echo "$0" | sed -e 's|/Contents/.*||'`
+  export DEAL_II_RESOURCES=$DEAL_II_BUNDLE/Contents/Resources
+else
+  export DEAL_II_BUNDLE=`echo "$BASH_SOURCE" | sed -e 's|/Contents/MacOS/.*||'`
+  export DEAL_II_RESOURCES=$DEAL_II_BUNDLE/Contents/Resources
+fi
+
+# Make sure DEAL_II_BUNDLE is set correctly
+if [ -z "$DEAL_II_BUNDLE" ]; then 
+    export DEAL_II_BUNDLE=/Applications/deal.II.app
+    if [ ! -d $DEAL_II_BUNDLE ]; then 
+	    return=`/usr/bin/osascript <<EOF
+tell app "System Events"
+    Activate
+    display dialog "This commands need to know where you installed the deal.II appliaction. If you moved it or renamed it, and you want to run this script from the command line, export the variable DEAL_II_BUNDLE to the correct path." buttons "OK" default button 1 with title "Location of deal.II changed." with icon 0
+end tell
+EOF`
+    exit 1
+    fi
+fi
+
+if [ -z "$DEAL_II_RESOURCES" ]; then 
+    export DEAL_II_RESOURCES=$DEAL_II_BUNDLE/Contents/Resources
+fi
+
+# Make sure XCode is installed
+if ! [[ -x /usr/bin/xcodebuild ]]; then
+    return=`/usr/bin/osascript <<EOF
+tell app "System Events"
+    Activate
+    display dialog "This package requires XCode to be installed in order to run. Please install XCode from the OS X install disc and try again." buttons "OK" default button 1 with title "XCode Missing" with icon 0
+end tell
+EOF`
+    exit 1
+fi
+
+# Everything seems to be okay. Launch a terminal with PATH's
+# set up to work with deal.II.
+CONF=$DEAL_II_RESOURCES/etc/dealii.conf
+
+if ! [[ -f $CONF ]]; then
+    return=`/usr/bin/osascript <<EOF
+tell app "System Events"
+    Activate
+    display dialog "I could not find the file $CONF. Make sure your deal.II app is installed correctly." buttons "OK" default button 1 with title "XCode Missing" with icon 0
+end tell
+EOF`
+    exit 1
+fi
+/bin/bash --rcfile $CONF -i
