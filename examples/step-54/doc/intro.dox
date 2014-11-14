@@ -183,7 +183,7 @@ flow of water around the ship (in a way similar to step-34) but we will not
 try to do this here. To already give you an idea of the geometry we consider,
 here is a picture:
 
-<img src="http://www.dealii.org/images/steps/developer/step-54.normal_5.png" alt="" width="500">
+<img src="http://www.dealii.org/images/steps/developer/step-54.bare.png" alt="" width="500">
 
 In the program, we read both the geometry and a coarse mesh from files, and
 then employ several of the options discussed above to place new vertices for a
