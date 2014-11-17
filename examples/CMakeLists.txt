@@ -37,12 +37,14 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     #
     # Special files:
     #
-    PATTERN "output.reference.dat" # step-39
-    PATTERN "postprocess.pl"       # step-39
-    PATTERN "obstacle_file.pbm"    # step-42
-    PATTERN "untitled.geo"         # step-49
-    PATTERN "untitled.msh"         # step-49
-    PATTERN "topography.txt.gz"    # step-53
+    PATTERN "output.reference.dat"        # step-39
+    PATTERN "postprocess.pl"              # step-39
+    PATTERN "obstacle_file.pbm"           # step-42
+    PATTERN "untitled.geo"                # step-49
+    PATTERN "untitled.msh"                # step-49
+    PATTERN "topography.txt.gz"           # step-53
+    PATTERN "initial_mesh_3d.vtk"         # step-54
+    PATTERN "DTMB-5415_bulbous_bow.iges"  # step-54
     )
 
   MESSAGE(STATUS "Setting up examples - Done")
