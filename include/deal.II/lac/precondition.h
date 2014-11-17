@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1581,30 +1581,86 @@ namespace internal
         }
     }
 
-    // worker loop for deal.II vectors
+    // worker routine for deal.II vectors. Because of vectorization, we need
+    // to put the loop into an extra structure because the virtual function of
+    // VectorUpdatesRange prevents the compiler from applying vectorization.
     template <typename Number>
-    struct VectorUpdatesRange : public parallel::ParallelForInteger
+    struct VectorUpdater
     {
-      typedef types::global_dof_index size_type;
-
-      VectorUpdatesRange (const size_t  size,
-                          const Number *src,
-                          const Number *matrix_diagonal_inverse,
-                          const bool    start_zero,
-                          const Number  factor1,
-                          const Number  factor2,
-                          Number       *update1,
-                          Number       *update2,
-                          Number       *dst)
+      VectorUpdater (const Number *src,
+                     const Number *matrix_diagonal_inverse,
+                     const bool    start_zero,
+                     const Number  factor1,
+                     const Number  factor2,
+                     Number       *update1,
+                     Number       *update2,
+                     Number       *dst)
         :
         src (src),
         matrix_diagonal_inverse (matrix_diagonal_inverse),
+        do_startup (factor1 == Number()),
         start_zero (start_zero),
         factor1 (factor1),
         factor2 (factor2),
         update1 (update1),
         update2 (update2),
         dst (dst)
+      {}
+
+      void
+      apply_to_subrange (const std::size_t begin,
+                         const std::size_t end) const
+      {
+        const Number factor1 = this->factor1;
+        const Number factor2 = this->factor2;
+        if (do_startup)
+          {
+            if (start_zero)
+              DEAL_II_OPENMP_SIMD_PRAGMA
+              for (std::size_t i=begin; i<end; ++i)
+                {
+                  dst[i] = factor2 * src[i] * matrix_diagonal_inverse[i];
+                  update1[i] = -dst[i];
+                }
+            else
+              DEAL_II_OPENMP_SIMD_PRAGMA
+              for (std::size_t i=begin; i<end; ++i)
+                {
+                  update1[i] = ((update2[i]-src[i]) *
+                                factor2*matrix_diagonal_inverse[i]);
+                  dst[i] -= update1[i];
+                }
+          }
+        else
+          DEAL_II_OPENMP_SIMD_PRAGMA
+          for (std::size_t i=begin; i<end; ++i)
+            {
+              const Number update =
+                factor1 * update1[i] + factor2 *
+                ((update2[i] - src[i]) * matrix_diagonal_inverse[i]);
+              update1[i] = update;
+              dst[i] -= update;
+            }
+      }
+
+      const Number *src;
+      const Number *matrix_diagonal_inverse;
+      const bool do_startup;
+      const bool start_zero;
+      const Number factor1;
+      const Number factor2;
+      mutable Number *update1;
+      mutable Number *update2;
+      mutable Number *dst;
+    };
+
+    template<typename Number>
+    struct VectorUpdatesRange : public parallel::ParallelForInteger
+    {
+      VectorUpdatesRange(const VectorUpdater<Number> &updater,
+                         const std::size_t size)
+        :
+        updater (updater)
       {
         if (size < internal::Vector::minimum_parallel_grain_size)
           apply_to_subrange (0, size);
@@ -1613,47 +1669,16 @@ namespace internal
                           internal::Vector::minimum_parallel_grain_size);
       }
 
-      ~VectorUpdatesRange()
-      {}
+      ~VectorUpdatesRange() {}
 
       virtual void
-      apply_to_subrange (const size_t begin,
-                         const size_t end) const
+      apply_to_subrange (const std::size_t begin,
+                         const std::size_t end) const
       {
-        if (factor1 == Number())
-          {
-            if (start_zero)
-              for (size_type i=begin; i<end; ++i)
-                {
-                  dst[i] = factor2 * src[i] * matrix_diagonal_inverse[i];
-                  update1[i] = -dst[i];
-                }
-            else
-              for (size_type i=begin; i<end; ++i)
-                {
-                  update1[i] = ((update2[i]-src[i]) *
-                                factor2*matrix_diagonal_inverse[i]);
-                  dst[i] -= update1[i];
-                }
-          }
-        else
-          for (size_type i=begin; i<end; ++i)
-            {
-              const Number update2i = ((update2[i] - src[i]) *
-                                       matrix_diagonal_inverse[i]);
-              update1[i] = factor1 * update1[i] + factor2 * update2i;
-              dst[i] -= update1[i];
-            }
+        updater.apply_to_subrange(begin, end);
       }
 
-      const Number *src;
-      const Number *matrix_diagonal_inverse;
-      const bool start_zero;
-      const Number factor1;
-      const Number factor2;
-      mutable Number *update1;
-      mutable Number *update2;
-      mutable Number *dst;
+      const VectorUpdater<Number> &updater;
     };
 
     // selection for deal.II vector
@@ -1669,10 +1694,10 @@ namespace internal
                     ::dealii::Vector<Number> &update2,
                     ::dealii::Vector<Number> &dst)
     {
-      VectorUpdatesRange<Number>(src.size(), src.begin(),
-                                 matrix_diagonal_inverse.begin(),
-                                 start_zero, factor1, factor2,
-                                 update1.begin(), update2.begin(), dst.begin());
+      VectorUpdater<Number> upd(src.begin(), matrix_diagonal_inverse.begin(),
+                                start_zero, factor1, factor2,
+                                update1.begin(), update2.begin(), dst.begin());
+      VectorUpdatesRange<Number>(upd, src.size());
     }
 
     // selection for parallel deal.II vector
@@ -1688,10 +1713,10 @@ namespace internal
                     parallel::distributed::Vector<Number> &update2,
                     parallel::distributed::Vector<Number> &dst)
     {
-      VectorUpdatesRange<Number>(src.local_size(), src.begin(),
-                                 matrix_diagonal_inverse.begin(),
-                                 start_zero, factor1, factor2,
-                                 update1.begin(), update2.begin(), dst.begin());
+      VectorUpdater<Number> upd(src.begin(), matrix_diagonal_inverse.begin(),
+                                start_zero, factor1, factor2,
+                                update1.begin(), update2.begin(), dst.begin());
+      VectorUpdatesRange<Number>(upd, src.local_size());
     }
 
     template <typename VECTOR>
