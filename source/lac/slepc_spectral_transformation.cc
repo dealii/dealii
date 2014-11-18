@@ -50,12 +50,19 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
 
     set_transformation_type(transformation_data->st);
+
+    // if mat_mode has been set,
+    // pass it to ST object
+    if (mat_mode.get() != 0)
+      {
+        int ierr = STSetMatMode(transformation_data->st,*(mat_mode.get()) );
+        AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
+      }
   }
 
   void TransformationBase::set_matrix_mode(const STMatMode mode)
   {
-    int ierr = STSetMatMode(transformation_data->st,mode);
-    AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
+    mat_mode.reset (new STMatMode(mode));
   }
 
   /* ------------------- TransformationShift --------------------- */
