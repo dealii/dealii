@@ -216,6 +216,8 @@ namespace Utilities
      */
     struct MinMaxAvg
     {
+      MinMaxAvg();
+
       double sum;
       double min;
       double max;

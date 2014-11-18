@@ -186,8 +186,7 @@ namespace Utilities
 
     namespace
     {
-      // custom MIP_Op for
-      // calculate_collective_mpi_min_max_avg
+      // custom MIP_Op for calculate_collective_mpi_min_max_avg
       void max_reduce ( const void *in_lhs_,
                         void *inout_rhs_,
                         int *len,
@@ -206,7 +205,7 @@ namespace Utilities
           }
         else if (inout_rhs->min == in_lhs->min)
           {
-            // choose lower cpu index when tied to make operator cumutative
+            // choose lower cpu index when tied to make operator commutative
             if (inout_rhs->min_index > in_lhs->min_index)
               inout_rhs->min_index = in_lhs->min_index;
           }
@@ -218,12 +217,24 @@ namespace Utilities
           }
         else if (inout_rhs->max == in_lhs->max)
           {
-            // choose lower cpu index when tied to make operator cumutative
+            // choose lower cpu index when tied to make operator commutative
             if (inout_rhs->max_index > in_lhs->max_index)
               inout_rhs->max_index = in_lhs->max_index;
           }
       }
     }
+
+
+
+    MinMaxAvg::MinMaxAvg ()
+      :
+      sum (0.),
+      min (std::numeric_limits<double>::max()),
+      max (-min),
+      min_index (0),
+      max_index (0),
+      avg (0)
+    {}
 
 
 
