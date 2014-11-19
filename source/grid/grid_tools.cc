@@ -2367,14 +2367,15 @@ next_cell:
    * An orthogonal equality test for points:
    *
    * point1 and point2 are considered equal, if
-   *    (point1 + offset) - point2
+   *   matrix.(point1 + offset) - point2
    * is parallel to the unit vector in <direction>
    */
   template<int spacedim>
   inline bool orthogonal_equality (const dealii::Point<spacedim> &point1,
                                    const dealii::Point<spacedim> &point2,
                                    const int                     direction,
-                                   const dealii::Tensor<1,spacedim> &offset)
+                                   const dealii::Tensor<1,spacedim> &offset,
+                                   const FullMatrix<double>      &matrix)
   {
     Assert (0<=direction && direction<spacedim,
             ExcIndexRange (direction, 0, spacedim));
@@ -2384,9 +2385,15 @@ next_cell:
         if (i == direction)
           continue;
 
-        if (fabs(point1(i) + offset[i] - point2(i)) > 1.e-10)
+        double transformed_p1_comp=0.;
+
+        for (int j = 0; j < spacedim; ++j)
+          transformed_p1_comp += matrix(i,j)*point1(j) + offset[j];
+
+        if (fabs(transformed_p1_comp - point2(i)) > 1.e-10)
           return false;
       }
+
     return true;
   }
 
@@ -2475,7 +2482,8 @@ next_cell:
                        const FaceIterator &face1,
                        const FaceIterator &face2,
                        const int          direction,
-                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset)
+                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
+                       const FullMatrix<double> &matrix)
   {
     static const int dim = FaceIterator::AccessorType::dimension;
 
@@ -2495,7 +2503,7 @@ next_cell:
              it++)
           {
             if (orthogonal_equality(face1->vertex(i),face2->vertex(*it),
-                                    direction, offset))
+                                    direction, offset, matrix))
               {
                 matching[i] = *it;
                 face2_vertices.erase(it);
@@ -2518,11 +2526,12 @@ next_cell:
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,
                        const int          direction,
-                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset)
+                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
+                       const FullMatrix<double> &matrix)
   {
     // Call the function above with a dummy orientation array
     std::bitset<3> dummy;
-    return orthogonal_equality (dummy, face1, face2, direction, offset);
+    return orthogonal_equality (dummy, face1, face2, direction, offset, matrix);
   }
 
 
@@ -2535,9 +2544,11 @@ next_cell:
   match_periodic_face_pairs
   (std::set<std::pair<CellIterator, unsigned int> > &pairs1,
    std::set<std::pair<typename identity<CellIterator>::type, unsigned int> > &pairs2,
-   const int direction,
-   std::vector<PeriodicFacePair<CellIterator> > &matched_pairs,
-   const dealii::Tensor<1,CellIterator::AccessorType::space_dimension> &offset)
+   const int                                        direction,
+   std::vector<PeriodicFacePair<CellIterator> >     &matched_pairs,
+   const dealii::Tensor<1,CellIterator::AccessorType::space_dimension> &offset,
+   const FullMatrix<double>                         &matrix,
+   const std::vector<unsigned int>                  &first_vector_components)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
     Assert (0<=direction && direction<space_dim,
@@ -2563,13 +2574,14 @@ next_cell:
             if (GridTools::orthogonal_equality(orientation,
                                                cell1->face(face_idx1),
                                                cell2->face(face_idx2),
-                                               direction, offset))
+                                               direction, offset,
+                                               matrix))
               {
                 // We have a match, so insert the matching pairs and
                 // remove the matched cell in pairs2 to speed up the
                 // matching:
                 const PeriodicFacePair<CellIterator> matched_face
-                = {{cell1, cell2},{face_idx1, face_idx2}, orientation};
+                = {{cell1, cell2},{face_idx1, face_idx2}, orientation, matrix, first_vector_components};
                 matched_pairs.push_back(matched_face);
                 pairs2.erase(it2);
                 ++n_matches;
@@ -2588,12 +2600,14 @@ next_cell:
   template<typename CONTAINER>
   void
   collect_periodic_faces
-  (const CONTAINER          &container,
-   const types::boundary_id b_id1,
-   const types::boundary_id b_id2,
-   const int                direction,
+  (const CONTAINER                            &container,
+   const types::boundary_id                   b_id1,
+   const types::boundary_id                   b_id2,
+   const int                                  direction,
    std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
-   const dealii::Tensor<1,CONTAINER::space_dimension> &offset)
+   const Tensor<1,CONTAINER::space_dimension> &offset,
+   const FullMatrix<double>                   &matrix,
+   const std::vector<unsigned int>            &first_vector_components)
   {
     static const int dim = CONTAINER::dimension;
     static const int space_dim = CONTAINER::space_dimension;
@@ -2632,7 +2646,8 @@ next_cell:
             ExcMessage ("Unmatched faces on periodic boundaries"));
 
     // and call match_periodic_face_pairs that does the actual matching:
-    match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs, offset);
+    match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs,
+                              offset, matrix, first_vector_components);
   }
 
 
@@ -2640,11 +2655,13 @@ next_cell:
   template<typename CONTAINER>
   void
   collect_periodic_faces
-  (const CONTAINER          &container,
-   const types::boundary_id b_id,
-   const int                direction,
+  (const CONTAINER                            &container,
+   const types::boundary_id                   b_id,
+   const int                                  direction,
    std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
-   const dealii::Tensor<1,CONTAINER::space_dimension> &offset)
+   const Tensor<1,CONTAINER::space_dimension> &offset,
+   const FullMatrix<double>                   &matrix,
+   const std::vector<unsigned int>            &first_vector_components)
   {
     static const int dim = CONTAINER::dimension;
     static const int space_dim = CONTAINER::space_dimension;
@@ -2690,7 +2707,8 @@ next_cell:
 #endif
 
     // and call match_periodic_face_pairs that does the actual matching:
-    match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs, offset);
+    match_periodic_face_pairs(pairs1, pairs2, direction, matched_pairs,
+                              offset, matrix, first_vector_components);
 
 #ifdef DEBUG
     //check for standard orientation

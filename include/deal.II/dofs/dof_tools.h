@@ -848,10 +848,10 @@ namespace DoFTools
    * denote which components of the finite element space shall be
    * constrained with periodic boundary conditions. If it is left as
    * specified by the default value all components are constrained. If it
-   * is different from the default value, it is assumed that the number
-   * of entries equals the number of components the finite element. This
-   * can be used to enforce periodicity in only one variable in a system
-   * of equations.
+   * is different from the default value, it is assumed that the number of
+   * entries equals the number of components of the finite element. This
+   * can be used to enforce periodicity in only one variable in a system of
+   * equations.
    *
    * @p face_orientation, @p face_flip and @p face_rotation describe an
    * orientation that should be applied to @p face_1 prior to matching and
@@ -945,15 +945,21 @@ namespace DoFTools
    * and any combination of that...
    * @endcode
    *
-   * More information on the topic can be found in the
-   * @ref GlossFaceOrientation "glossary" article.
+   * Optionally a matrix @p matrix along with an std::vector @p
+   * first_vector_components can be specified that describes how DoFs on @p
+   * face_1 should be modified prior to constraining to the DoFs of @p
+   * face_2. If the std::vector first_vector_components is non empty the
+   * matrix is interpreted as a rotation matrix that is applied to all
+   * vector valued blocks listed in first_vector_components of the
+   * FESystem.
    *
-   * @note For DoFHandler objects that are built on a
-   * parallel::distributed::Triangulation object
-   * parallel::distributed::Triangulation::add_periodicity has to be called
-   * before.
+   * Detailed information can be found in the @see @ref
+   * GlossPeriodicConstraints "Glossary entry on periodic boundary
+   * conditions".
    *
-   * @author Matthias Maier, 2012
+   * @todo: Reference to soon be written example step and glossary article.
+   *
+   * @author Matthias Maier, 2012, 2014
    */
   template<typename FaceIterator>
   void
@@ -964,7 +970,39 @@ namespace DoFTools
    const ComponentMask                         &component_mask = ComponentMask(),
    const bool                                  face_orientation = true,
    const bool                                  face_flip = false,
-   const bool                                  face_rotation = false);
+   const bool                                  face_rotation = false,
+   const FullMatrix<double>                    &matrix = FullMatrix<double>(),
+   const std::vector<unsigned int>             &first_vector_components = std::vector<unsigned int>());
+
+
+
+  /**
+   * Insert the (algebraic) constraints due to periodic boundary
+   * conditions into a ConstraintMatrix @p constraint_matrix.
+   *
+   * This is the main high level interface for above low level variant of
+   * make_periodicity_constraints. It takes an std::vector @p
+   * periodic_faces as argument and applies above
+   * make_periodicity_constraints on each entry. The std::vector @p
+   * periodic_faces can be created by GridTools::collect_periodic_faces.
+   *
+   * @note For DoFHandler objects that are built on a
+   * parallel::distributed::Triangulation object
+   * parallel::distributed::Triangulation::add_periodicity has to be called
+   * before.
+   *
+   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic
+   * boundary conditions" for further information.
+   *
+   * @author Daniel Arndt, Matthias Maier, 2013, 2014
+   */
+  template<typename DH>
+  void
+  make_periodicity_constraints
+  (const std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> >
+   &periodic_faces,
+   dealii::ConstraintMatrix &constraint_matrix,
+   const ComponentMask      &component_mask = ComponentMask());
 
 
 
@@ -973,8 +1011,7 @@ namespace DoFTools
    * conditions into a ConstraintMatrix @p constraint_matrix.
    *
    * This function serves as a high level interface for the
-   * make_periodicity_constraints function that takes face_iterator
-   * arguments.
+   * make_periodicity_constraints function.
    *
    * Define a 'first' boundary as all boundary faces having boundary_id
    * @p b_id1 and a 'second' boundary consisting of all faces belonging
@@ -1004,12 +1041,14 @@ namespace DoFTools
    * function will be used for which the respective flag was set in the
    * component mask.
    *
-   * @note For DoFHandler objects that are built on a
-   * parallel::distributed::Triangulation object
-   * parallel::distributed::Triangulation::add_periodicity has to be called
-   * before.
+   * @note: This function is a convenience wrapper. It internally calls
+   * GridTools::collect_periodic_faces with the supplied paramaters and
+   * feeds the output to above make_periodicity_constraints variant. If you
+   * need more functionality use GridTools::collect_periodic_faces
+   * directly.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic
+   * boundary conditions" for further information.
    *
    * @author Matthias Maier, 2012
    */
@@ -1023,35 +1062,6 @@ namespace DoFTools
    dealii::ConstraintMatrix &constraint_matrix,
    const ComponentMask      &component_mask = ComponentMask());
 
-
-  /**
-   * Same as above but with an optional argument @p offset.
-   *
-   * The @p offset is a vector tangential to the faces that is added to
-   * the location of vertices of the 'first' boundary when attempting to
-   * match them to the corresponding vertices of the 'second' boundary via
-   * @p orthogonal_equality. This can be used to implement conditions such
-   * as $u(0,y)=u(1,y+1)$.
-   *
-   * @note For DoFHandler objects that are built on a
-   * parallel::distributed::Triangulation object
-   * parallel::distributed::Triangulation::add_periodicity has to be called
-   * before.
-   *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
-   *
-   * @author Daniel Arndt, 2013, Matthias Maier, 2012
-   */
-  template<typename DH>
-  void
-  make_periodicity_constraints
-  (const DH                              &dof_handler,
-   const types::boundary_id              b_id1,
-   const types::boundary_id              b_id2,
-   const int                             direction,
-   dealii::Tensor<1,DH::space_dimension> &offset,
-   dealii::ConstraintMatrix              &constraint_matrix,
-   const ComponentMask                   &component_mask = ComponentMask());
 
 
   /**
@@ -1069,12 +1079,14 @@ namespace DoFTools
    * meshes with cells not in @ref GlossFaceOrientation
    * "standard orientation".
    *
-   * @note For DoFHandler objects that are built on a
-   * parallel::distributed::Triangulation object
-   * parallel::distributed::Triangulation::add_periodicity has to be called
-   * before.
+   * @note: This function is a convenience wrapper. It internally calls
+   * GridTools::collect_periodic_faces with the supplied paramaters and
+   * feeds the output to above make_periodicity_constraints variant. If you
+   * need more functionality use GridTools::collect_periodic_faces
+   * directly.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic
+   * boundary conditions" for further information.
    */
   template<typename DH>
   void
@@ -1086,9 +1098,31 @@ namespace DoFTools
    const ComponentMask      &component_mask = ComponentMask());
 
 
+
   /**
-   * Same as above but with an optional argument @p offset.
+   * The @p offset is a vector tangential to the faces that is added to
+   * the location of vertices of the 'first' boundary when attempting to
+   * match them to the corresponding vertices of the 'second' boundary via
+   * @p orthogonal_equality. This can be used to implement conditions such
+   * as $u(0,y)=u(1,y+1)$.
    *
+   * @deprecated This function is deprecated. Use
+   * GridTools::collect_periodic_faces in conjunction with
+   * make_periodicity_constraints instead.
+   */
+  template<typename DH>
+  void
+  make_periodicity_constraints
+  (const DH                              &dof_handler,
+   const types::boundary_id              b_id1,
+   const types::boundary_id              b_id2,
+   const int                             direction,
+   dealii::Tensor<1,DH::space_dimension> &offset,
+   dealii::ConstraintMatrix              &constraint_matrix,
+   const ComponentMask                   &component_mask = ComponentMask()) DEAL_II_DEPRECATED;
+
+
+  /**
    * The @p offset is a vector tangential to the faces that is added to
    * the location of vertices of the 'first' boundary when attempting to
    * match them to the corresponding vertices of the 'second' boundary via
@@ -1099,12 +1133,9 @@ namespace DoFTools
    * meshes with cells not in @ref GlossFaceOrientation
    * "standard orientation".
    *
-   * @note For DoFHandler objects that are built on a
-   * parallel::distributed::Triangulation object
-   * parallel::distributed::Triangulation::add_periodicity has to be called
-   * before.
-   *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @deprecated This function is deprecated. Use
+   * GridTools::collect_periodic_faces in conjunction with
+   * make_periodicity_constraints instead.
    */
   template<typename DH>
   void
@@ -1114,25 +1145,7 @@ namespace DoFTools
    const int                             direction,
    dealii::Tensor<1,DH::space_dimension> &offset,
    dealii::ConstraintMatrix              &constraint_matrix,
-   const ComponentMask                   &component_mask = ComponentMask());
-
-  /**
-   * Same as above but the periodicity information is given by
-   * @p periodic_faces. This std::vector can be created by
-   * GridTools::collect_periodic_faces.
-   *
-   * @note For DoFHandler objects that are built on a
-   * parallel::distributed::Triangulation object
-   * parallel::distributed::Triangulation::add_periodicity has to be called
-   * before.
-   */
-  template<typename DH>
-  void
-  make_periodicity_constraints
-  (const std::vector<GridTools::PeriodicFacePair<typename DH::cell_iterator> >
-   &periodic_faces,
-   dealii::ConstraintMatrix &constraint_matrix,
-   const ComponentMask      &component_mask = ComponentMask());
+   const ComponentMask                   &component_mask = ComponentMask()) DEAL_II_DEPRECATED;
 
 
   //@}
