@@ -73,12 +73,8 @@ class PreconditionIdentity : public Subscriptor
 {
 public:
   /**
-   * This function is only
-   * present to
-   * provide the interface of
-   * a preconditioner to be
-   * handed to a smoother.
-   * This does nothing.
+   * This function is only present to provide the interface of a
+   * preconditioner to be handed to a smoother.  This does nothing.
    */
   struct AdditionalData
   {
@@ -89,10 +85,8 @@ public:
   };
 
   /**
-   * The matrix
-   * argument is ignored and here
-   * just for compatibility with
-   * more complex preconditioners.
+   * The matrix argument is ignored and here just for compatibility with more
+   * complex preconditioners.
    */
   template <class MATRIX>
   void initialize (const MATRIX         &matrix,
@@ -105,11 +99,8 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner. Since this is
-   * the identity, this function is
-   * the same as
-   * vmult().
+   * Apply transpose preconditioner. Since this is the identity, this function
+   * is the same as vmult().
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
@@ -121,22 +112,15 @@ public:
   void vmult_add (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner, adding. Since this is
-   * the identity, this function is
-   * the same as
-   * vmult_add().
+   * Apply transpose preconditioner, adding. Since this is the identity, this
+   * function is the same as vmult_add().
    */
   template<class VECTOR>
   void Tvmult_add (VECTOR &, const VECTOR &) const;
 
   /**
-   * This function is only
-   * present to
-   * provide the interface of
-   * a preconditioner to be
-   * handed to a smoother.
-   * This does nothing.
+   * This function is only present to provide the interface of a
+   * preconditioner to be handed to a smoother.  This does nothing.
    */
   void clear () {}
 };
@@ -159,17 +143,14 @@ class PreconditionRichardson : public Subscriptor
 {
 public:
   /**
-   * Parameters for Richardson
-   * preconditioner.
+   * Parameters for Richardson preconditioner.
    */
   class AdditionalData
   {
   public:
     /**
-     * Constructor. Block size
-     * must be given since there
-     * is no reasonable default
-     * parameter.
+     * Constructor. Block size must be given since there is no reasonable
+     * default parameter.
      */
     AdditionalData (const double relaxation = 1.);
 
@@ -180,24 +161,19 @@ public:
   };
 
   /**
-   * Constructor, sets the
-   * relaxation parameter to its
-   * default.
+   * Constructor, sets the relaxation parameter to its default.
    */
   PreconditionRichardson();
 
   /**
-   * Change the relaxaton parameter.
+   * Change the relaxation parameter.
    */
   void initialize (const AdditionalData &parameters);
 
   /**
-   * Change the relaxaton parameter
-   * in a way consistent with other
-   * preconditioners. The matrix
-   * argument is ignored and here
-   * just for compatibility with
-   * more complex preconditioners.
+   * Change the relaxation parameter in a way consistent with other
+   * preconditioners. The matrix argument is ignored and here just for
+   * compatibility with more complex preconditioners.
    */
   template <class MATRIX>
   void initialize (const MATRIX &,
@@ -210,11 +186,8 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner. Since this is
-   * the identity, this function is
-   * the same as
-   * vmult().
+   * Apply transpose preconditioner. Since this is the identity, this function
+   * is the same as vmult().
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
@@ -225,29 +198,21 @@ public:
   void vmult_add (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner, adding. Since this is
-   * the identity, this function is
-   * the same as
-   * vmult_add().
+   * Apply transpose preconditioner, adding. Since this is the identity, this
+   * function is the same as vmult_add().
    */
   template<class VECTOR>
   void Tvmult_add (VECTOR &, const VECTOR &) const;
 
   /**
-   * This function is only
-   * present to
-   * provide the interface of
-   * a preconditioner to be
-   * handed to a smoother.
-   * This does nothing.
+   * This function is only present to provide the interface of a
+   * preconditioner to be handed to a smoother.  This does nothing.
    */
   void clear () {}
 
 private:
   /**
-   * The relaxation parameter
-   * multiplied with the vectors.
+   * The relaxation parameter multiplied with the vectors.
    */
   double relaxation;
 };
@@ -255,13 +220,12 @@ private:
 
 
 /**
- * Preconditioner using a matrix-builtin function.
- * This class forms a preconditioner suitable for the LAC solver
- * classes. Since many preconditioning methods are based on matrix
- * entries, these have to be implemented as member functions of the
- * underlying matrix implementation. This class now is intended to
- * allow easy access to these member functions from LAC solver
- * classes.
+ * Preconditioner using a matrix-builtin function.  This class forms a
+ * preconditioner suitable for the LAC solver classes. Since many
+ * preconditioning methods are based on matrix entries, these have to be
+ * implemented as member functions of the underlying matrix
+ * implementation. This class now is intended to allow easy access to these
+ * member functions from LAC solver classes.
  *
  * It seems that all builtin preconditioners have a relaxation
  * parameter, so please use PreconditionRelaxation for these.
@@ -300,28 +264,21 @@ class PreconditionUseMatrix : public Subscriptor
 {
 public:
   /**
-   * Type of the preconditioning
-   * function of the matrix.
+   * Type of the preconditioning function of the matrix.
    */
   typedef void ( MATRIX::* function_ptr)(VECTOR &, const VECTOR &) const;
 
   /**
-   * Constructor.
-   * This constructor stores a
-   * reference to the matrix object
-   * for later use and selects a
-   * preconditioning method, which
-   * must be a member function of
-   * that matrix.
+   * Constructor.  This constructor stores a reference to the matrix object
+   * for later use and selects a preconditioning method, which must be a
+   * member function of that matrix.
    */
   PreconditionUseMatrix(const MATRIX      &M,
                         const function_ptr method);
 
   /**
-   * Execute preconditioning. Calls the
-   * function passed to the constructor
-   * of this object with the two
-   * arguments given here.
+   * Execute preconditioning. Calls the function passed to the constructor of
+   * this object with the two arguments given here.
    */
   void vmult (VECTOR       &dst,
               const VECTOR &src) const;
@@ -333,8 +290,7 @@ private:
   const MATRIX &matrix;
 
   /**
-   * Pointer to the preconditioning
-   * function.
+   * Pointer to the preconditioning function.
    */
   const function_ptr precondition;
 };
@@ -370,21 +326,15 @@ public:
   };
 
   /**
-   * Initialize matrix and
-   * relaxation parameter. The
-   * matrix is just stored in the
-   * preconditioner object. The
-   * relaxation parameter should be
-   * larger than zero and smaller
-   * than 2 for numerical
-   * reasons. It defaults to 1.
+   * Initialize matrix and relaxation parameter. The matrix is just stored in
+   * the preconditioner object. The relaxation parameter should be larger than
+   * zero and smaller than 2 for numerical reasons. It defaults to 1.
    */
   void initialize (const MATRIX &A,
                    const AdditionalData &parameters = AdditionalData());
 
   /**
-   * Release the matrix and reset
-   * its pointer.
+   * Release the matrix and reset its pointer.
    */
   void clear();
 
@@ -438,27 +388,20 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner. Since this is
-   * a symmetric preconditioner,
-   * this function is the same as
-   * vmult().
+   * Apply transpose preconditioner. Since this is a symmetric preconditioner,
+   * this function is the same as vmult().
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Perform one step of the
-   * preconditioned Richardson
-   * iteration.
+   * Perform one step of the preconditioned Richardson iteration.
    */
   template<class VECTOR>
   void step (VECTOR &x, const VECTOR &rhs) const;
 
   /**
-   * Perform one transposed step of
-   * the preconditioned Richardson
-   * iteration.
+   * Perform one transposed step of the preconditioned Richardson iteration.
    */
   template<class VECTOR>
   void Tstep (VECTOR &x, const VECTOR &rhs) const;
@@ -522,24 +465,19 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner.
+   * Apply transpose preconditioner.
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Perform one step of the
-   * preconditioned Richardson
-   * iteration.
+   * Perform one step of the preconditioned Richardson iteration.
    */
   template<class VECTOR>
   void step (VECTOR &x, const VECTOR &rhs) const;
 
   /**
-   * Perform one transposed step of
-   * the preconditioned Richardson
-   * iteration.
+   * Perform one transposed step of the preconditioned Richardson iteration.
    */
   template<class VECTOR>
   void Tstep (VECTOR &x, const VECTOR &rhs) const;
@@ -588,14 +526,9 @@ public:
 
 
   /**
-   * Initialize matrix and
-   * relaxation parameter. The
-   * matrix is just stored in the
-   * preconditioner object. The
-   * relaxation parameter should be
-   * larger than zero and smaller
-   * than 2 for numerical
-   * reasons. It defaults to 1.
+   * Initialize matrix and relaxation parameter. The matrix is just stored in
+   * the preconditioner object. The relaxation parameter should be larger than
+   * zero and smaller than 2 for numerical reasons. It defaults to 1.
    */
   void initialize (const MATRIX &A,
                    const typename BaseClass::AdditionalData &parameters = typename BaseClass::AdditionalData());
@@ -607,36 +540,28 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner. Since this is
-   * a symmetric preconditioner,
-   * this function is the same as
-   * vmult().
+   * Apply transpose preconditioner. Since this is a symmetric preconditioner,
+   * this function is the same as vmult().
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
 
 
   /**
-   * Perform one step of the
-   * preconditioned Richardson
-   * iteration
+   * Perform one step of the preconditioned Richardson iteration
    */
   template<class VECTOR>
   void step (VECTOR &x, const VECTOR &rhs) const;
 
   /**
-   * Perform one transposed step of
-   * the preconditioned Richardson
-   * iteration.
+   * Perform one transposed step of the preconditioned Richardson iteration.
    */
   template<class VECTOR>
   void Tstep (VECTOR &x, const VECTOR &rhs) const;
 
 private:
   /**
-   * An array that stores for each matrix
-   * row where the first position after
+   * An array that stores for each matrix row where the first position after
    * the diagonal is located.
    */
   std::vector<std::size_t> pos_right_of_diagonal;
@@ -684,23 +609,15 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Initialize matrix and
-   * relaxation parameter. The
-   * matrix is just stored in the
-   * preconditioner object.
+   * Initialize matrix and relaxation parameter. The matrix is just stored in
+   * the preconditioner object.
    *
-   * The permutation vector is
-   * stored as a
-   * pointer. Therefore, it has to
-   * be assured that the lifetime
-   * of the vector exceeds the
-   * lifetime of the
+   * The permutation vector is stored as a pointer. Therefore, it has to be
+   * assured that the lifetime of the vector exceeds the lifetime of the
    * preconditioner.
    *
-   * The relaxation parameter
-   * should be larger than zero and
-   * smaller than 2 for numerical
-   * reasons. It defaults to 1.
+   * The relaxation parameter should be larger than zero and smaller than 2
+   * for numerical reasons. It defaults to 1.
    */
   void initialize (const MATRIX &A,
                    const std::vector<size_type> &permutation,
@@ -715,8 +632,7 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner.
+   * Apply transpose preconditioner.
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
@@ -726,8 +642,7 @@ private:
    */
   const std::vector<size_type> *permutation;
   /**
-   * Storage for the inverse
-   * permutation vector.
+   * Storage for the inverse permutation vector.
    */
   const std::vector<size_type> *inverse_permutation;
 };
@@ -790,15 +705,12 @@ class PreconditionLACSolver : public Subscriptor
 {
 public:
   /**
-   * Constructor. All work is done
-   * in initialize.
+   * Constructor. All work is done in initialize.
    */
   PreconditionLACSolver ();
 
   /**
-   * Initialization
-   * function. Provide a solver
-   * object, a matrix, and another
+   * Initialization function. Provide a solver object, a matrix, and another
    * preconditioner for this.
    */
   void initialize (SOLVER &,
@@ -848,24 +760,20 @@ class PreconditionedMatrix : public Subscriptor
 {
 public:
   /**
-   * Constructor. Provide matrix,
-   * preconditioner and a memory
-   * pool to obtain the auxiliary
-   * vector.
+   * Constructor. Provide matrix, preconditioner and a memory pool to obtain
+   * the auxiliary vector.
    */
   PreconditionedMatrix (const MATRIX          &A,
                         const PRECOND         &P,
                         VectorMemory<VECTOR> &mem);
 
   /**
-   * Preconditioned
-   * matrix-vector-product.
+   * Preconditioned matrix-vector-product.
    */
   void vmult (VECTOR &dst, const VECTOR &src) const;
 
   /**
-   * Transposed preconditioned
-   * matrix-vector-product.
+   * Transposed preconditioned matrix-vector-product.
    */
   void Tvmult (VECTOR &dst, const VECTOR &src) const;
 
@@ -1611,6 +1519,10 @@ namespace internal
       apply_to_subrange (const std::size_t begin,
                          const std::size_t end) const
       {
+        // To circumvent a bug in gcc
+        // (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63945), we create copies
+        // of the variables factor1 and factor2 and do not check based on
+        // factor1.
         const Number factor1 = this->factor1;
         const Number factor2 = this->factor2;
         if (do_startup)
