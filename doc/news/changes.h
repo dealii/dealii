@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013, 2014 by the deal.II authors
+// Copyright (C) 2013 - 2014, 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -333,6 +333,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: Complete the periodic boundary condition interface and add
+  support for rotating vector valued dof components.
+  <br>
+  (Daniel Arndt, Matthias Maier, 2014/11/19)
+  </li>
+
   <li> New: Added support for STEP files in the OpenCASCADE 
   wrappers. STEP files can now be imported and exported respectively
   with the OpenCASCADE::read_STEP() and OpenCASCADE::write_STEP() functions.
