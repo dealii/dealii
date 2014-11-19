@@ -226,18 +226,6 @@ namespace Utilities
 
 
 
-    MinMaxAvg::MinMaxAvg ()
-      :
-      sum (0.),
-      min (std::numeric_limits<double>::max()),
-      max (-min),
-      min_index (0),
-      max_index (0),
-      avg (0)
-    {}
-
-
-
     MinMaxAvg
     min_max_avg(const double my_value,
                 const MPI_Comm &mpi_communicator)
@@ -302,7 +290,6 @@ namespace Utilities
 
 
 
-
     MinMaxAvg
     min_max_avg(const double my_value,
                 const MPI_Comm &)
@@ -320,6 +307,18 @@ namespace Utilities
     }
 
 #endif
+
+
+
+    MinMaxAvg::MinMaxAvg ()
+      :
+      sum (0.),
+      min (std::numeric_limits<double>::max()),
+      max (-min),
+      min_index (0),
+      max_index (0),
+      avg (0)
+    {}
 
 
 
