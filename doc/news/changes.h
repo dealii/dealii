@@ -149,8 +149,8 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2014/09/27)
   </li>
 
-  <li> New: Made MappingQ<dim,spacedim> aware of
-  Manifold<dim,spacedim>. Now we can use high order mappings that
+  <li> New: MappingQ is now aware of
+  Manifold, i.e., we can use high order mappings that
   actually follow the geometry also on the interior of codimension
   zero meshes.
   <br>
@@ -276,12 +276,12 @@ inconvenience this causes.
   </li>
 
   <li> Changed: The functionparser library bundled with deal.II got replaced
-  by the muparser library.
+  by the <a href="http://muparser.beltoforion.de/">muparser</a> library.
   <br>
   (Timo Heister, 2014/02/10)
   </li>
 
-  <li> Changed: It was possible to call DoFAccessor::set_active_fe_index()
+  <li> Changed: It was possible to call DoFCellAccessor::set_active_fe_index()
   on non-active cells. However, this made no sense: Since degrees of
   freedoms only exist on active cells
   for hp::DoFHandler (i.e., there is currently no implementation
@@ -359,21 +359,13 @@ inconvenience this causes.
   meshes. GridTools::distort_random now works for distributed meshes and 
   hanging nodes in 3D as well.
   <br>
-  (Fahad Alrashed, 2014/11/09)
+  (Daniel Arndt, 2014/11/06)
   </li>
 
   <li> New: TableHandler objects can be cleared - i.e. reset to a 
   zero-sized state.
   <br>
   (Fahad Alrashed, 2014/11/09)
-  </li>
-
-  <li> New: GridTools::communicate_locally_moved_vertices allows to
-  update vertex positions that have been moved just locally on distributed
-  meshes. GridTools::distort_random now works for distributed meshes and 
-  hanging nodes in 3D as well.
-  <br>
-  (Daniel Arndt, 2014/11/06)
   </li>
 
   <li> New: The FE_Nothing class now has a second template argument
@@ -538,9 +530,7 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2014/08/07)
   </li>
 
-  <li> New: Added FunctionManifold descritpion.
-  <br>
-  This class allows arbitrary manifold descriptions, in which you have
+  <li> New: The new class FunctionManifold allows arbitrary manifold descriptions, in which you have
   an explicit Function<chartdim> for the ManifoldChart::push_forward()
   method, and an explicit Function<spacedim> for ManifoldChart::pull_back()
   method (or an expression for both). In these cases, you can construct a
@@ -549,7 +539,7 @@ inconvenience this causes.
   (Luca Heltai, 2014/08/07)
   </li>
 
-  <li> New: Added CylindricalManifold descritpion.
+  <li> New: Added CylindricalManifold description.
   <br>
   This class allows refinement of cylindrical manifolds. It is a good
   companion for GridGenerator::cylinder() and the perfect companion
@@ -693,10 +683,10 @@ inconvenience this causes.
   (Guido Kanschat, 2014/06/23)
   </li>
   
-  <li> New: Functions DoFTools::extract_locally_relevant_dofs(),
-  parallel::distributed::refine_and_coarsen_fixed_number() and
-  parallel::distributed::refine_and_coarsen_fixed_fraction() are
-  now also instantiation for objects of codimension 1.
+  <li> New: %Functions DoFTools::extract_locally_relevant_dofs(),
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number() and
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction() are
+  now also instantiated for objects of codimension 1.
   <br>
   (Michal Wichrowski, 2014/06/15)
   </li>
@@ -728,7 +718,7 @@ inconvenience this causes.
   (Guido Kanschat, 2014/06/03)
   </li>
 
-  <li> Improved: ThetaTimestepping and other operators now use AnyData
+  <li> Improved: Algorithms::ThetaTimestepping and other operators now use AnyData
   to communicate with operators they rely on. This way, time step data
   can be forwarded using the same mechanism, and no complicated back
   access to member data is required
@@ -837,7 +827,7 @@ inconvenience this causes.
   (Giorgos Kourakos, Timo Heister, Wolfgang Bangerth, 2014/04/14)
   </li>
 
-  <li> Changed: TableBase<N,T> now uses AlignedVector for storing data
+  <li> Changed: TableBase now uses AlignedVector for storing data
   instead of std::vector, which allows its use for VectorizedArray<Number>
   data fields which require more alignment.
   <br>
@@ -859,7 +849,7 @@ inconvenience this causes.
   (Timo Heister, 2014/04/08)
   </li>
   
-  <li> New: GridTools::laplace_transform() now takes an addition, optional
+  <li> New: GridTools::laplace_transform() now takes an additional, optional
   parameter that indicates the "stiffness" of the mapping.
   <br>
   (Denis Davydov, Jean-Paul Pelteret, 2014/04/07)
@@ -965,7 +955,7 @@ inconvenience this causes.
   <br>
   (Wolfgang Bangerth, 2014/02/08)
 
-  <li>New: ThreadLocalStorage::clear() clears out all objects allocated on the
+  <li>New: Threads::ThreadLocalStorage::clear() clears out all objects allocated on the
   current and all other threads.
   <br>
   (Wolfgang Bangerth, 2014/02/06)
