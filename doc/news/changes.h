@@ -333,8 +333,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> New: Complete the periodic boundary condition interface and add
-  support for rotating vector valued dof components.
+  <li> New: Complete the interface for periodic boundary conditions.
+  Now, it is possible to specify an additional (geometric) rotation matrix along
+  with vector components that should be rotated when applying periodic boundary
+  condiitions (or alternatively, directly a transformation matrix working
+  directly on dofs). With this it is e.g. now possible to to compute stokes flow
+  on a quarter pie with periodic boundary conditions and the velocity correctly
+  transformed.
   <br>
   (Daniel Arndt, Matthias Maier, 2014/11/19)
   </li>

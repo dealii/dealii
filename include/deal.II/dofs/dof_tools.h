@@ -954,8 +954,7 @@ namespace DoFTools
    * FESystem.
    *
    * Detailed information can be found in the @see @ref
-   * GlossPeriodicConstraints "Glossary entry on periodic boundary
-   * conditions".
+   * GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
    *
    * @todo: Reference to soon be written example step and glossary article.
    *
@@ -991,8 +990,8 @@ namespace DoFTools
    * parallel::distributed::Triangulation::add_periodicity has to be called
    * before.
    *
-   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic
-   * boundary conditions" for further information.
+   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
+   * for further information.
    *
    * @author Daniel Arndt, Matthias Maier, 2013, 2014
    */
@@ -1011,7 +1010,7 @@ namespace DoFTools
    * conditions into a ConstraintMatrix @p constraint_matrix.
    *
    * This function serves as a high level interface for the
-   * make_periodicity_constraints function.
+   * make_periodicity_constraints() function.
    *
    * Define a 'first' boundary as all boundary faces having boundary_id
    * @p b_id1 and a 'second' boundary consisting of all faces belonging
@@ -1032,23 +1031,23 @@ namespace DoFTools
    * kept and nothing happens.
    *
    * The flags in the last parameter, @p component_mask (see @ref
-   * GlossComponentMask) denote which components of the finite element space
-   * shall be constrained with periodic boundary conditions. If it is left
-   * as specified by the default value all components are constrained. If
-   * it is different from the default value, it is assumed that the number
-   * of entries equals the number of components in the boundary functions
-   * and the finite element, and those components in the given boundary
-   * function will be used for which the respective flag was set in the
-   * component mask.
+   * GlossComponentMask) denote which components of the finite element
+   * space shall be constrained with periodic boundary conditions. If it is
+   * left as specified by the default value all components are constrained.
+   * If it is different from the default value, it is assumed that the
+   * number of entries equals the number of components in the boundary
+   * functions and the finite element, and those components in the given
+   * boundary function will be used for which the respective flag was set
+   * in the component mask.
    *
    * @note: This function is a convenience wrapper. It internally calls
-   * GridTools::collect_periodic_faces with the supplied paramaters and
-   * feeds the output to above make_periodicity_constraints variant. If you
-   * need more functionality use GridTools::collect_periodic_faces
+   * GridTools::collect_periodic_faces() with the supplied paramaters and
+   * feeds the output to above make_periodicity_constraints() variant. If
+   * you need more functionality use GridTools::collect_periodic_faces()
    * directly.
    *
-   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic
-   * boundary conditions" for further information.
+   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
+   * for further information.
    *
    * @author Matthias Maier, 2012
    */
@@ -1080,13 +1079,13 @@ namespace DoFTools
    * "standard orientation".
    *
    * @note: This function is a convenience wrapper. It internally calls
-   * GridTools::collect_periodic_faces with the supplied paramaters and
-   * feeds the output to above make_periodicity_constraints variant. If you
-   * need more functionality use GridTools::collect_periodic_faces
+   * GridTools::collect_periodic_faces() with the supplied paramaters and
+   * feeds the output to above make_periodicity_constraints() variant. If
+   * you need more functionality use GridTools::collect_periodic_faces()
    * directly.
    *
-   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic
-   * boundary conditions" for further information.
+   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
+   * for further information.
    */
   template<typename DH>
   void
