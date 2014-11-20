@@ -302,26 +302,30 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                                        const X::active_face_iterator&,
                                                        const X::active_face_iterator&,
                                                        const int,
-                                                       const Tensor<1,deal_II_space_dimension> &);
+                                                       const Tensor<1,deal_II_space_dimension> &,
+                                                       const FullMatrix<double> &);
 
     template
     bool orthogonal_equality<X::face_iterator> (std::bitset<3> &,
                                                 const X::face_iterator&,
                                                 const X::face_iterator&,
                                                 const int,
-                                                const Tensor<1,deal_II_space_dimension> &);
+                                                const Tensor<1,deal_II_space_dimension> &,
+                                                const FullMatrix<double> &);
 
     template
     bool orthogonal_equality<X::active_face_iterator> (const X::active_face_iterator&,
                                                        const X::active_face_iterator&,
                                                        const int,
-                                                       const Tensor<1,deal_II_space_dimension> &);
+                                                       const Tensor<1,deal_II_space_dimension> &,
+                                                       const FullMatrix<double> &);
 
     template
     bool orthogonal_equality<X::face_iterator> (const X::face_iterator&,
                                                 const X::face_iterator&,
                                                 const int,
-                                                const Tensor<1,deal_II_space_dimension> &);
+                                                const Tensor<1,deal_II_space_dimension> &,
+                                                const FullMatrix<double> &);
 
     #if deal_II_dimension >= 2
 
@@ -331,14 +335,18 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                       const types::boundary_id,
                                       const int,
                                       std::vector<PeriodicFacePair<X::cell_iterator> > &,
-                                      const Tensor<1,X::space_dimension> &);
+                                      const Tensor<1,X::space_dimension> &,
+                                      const FullMatrix<double> &,
+                                      const std::vector<unsigned int> &);
 
       template
       void collect_periodic_faces<X> (const X &,
                                       const types::boundary_id,
                                       const int,
                                       std::vector<PeriodicFacePair<X::cell_iterator> > &,
-                                      const Tensor<1,X::space_dimension> &);
+                                      const Tensor<1,X::space_dimension> &,
+                                      const FullMatrix<double> &,
+                                      const std::vector<unsigned int> &);
 
     #endif
 
@@ -352,7 +360,6 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
    #if deal_II_dimension >= 2
 
      namespace GridTools \{
-
       template
       void
       collect_periodic_faces<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> >
@@ -361,7 +368,9 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
                                   const types::boundary_id,
                                   const int,
                                   std::vector<PeriodicFacePair<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator> > &,
-                                  const Tensor<1,parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
+                                  const Tensor<1,parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::space_dimension> &,
+                                  const FullMatrix<double> &,
+                                  const std::vector<unsigned int> &);
 
       template
       void
@@ -370,8 +379,9 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
                                   const types::boundary_id,
                                   const int,
                                   std::vector<PeriodicFacePair<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator> > &,
-                                  const Tensor<1,parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
-
+                                  const Tensor<1,parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::space_dimension> &,
+                                  const FullMatrix<double> &,
+                                  const std::vector<unsigned int> &);
      \}
    #endif
 #endif

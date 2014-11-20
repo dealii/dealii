@@ -1052,17 +1052,50 @@ namespace GridTools
   /*@{*/
 
   /**
-   * Data type that provides all the information that is needed
-   * to create periodicity constraints and a periodic p4est forest
-   * with respect to two periodic cell faces
+   * Data type that provides all information necessary to create
+   * periodicity constraints and a periodic p4est forest with respect to
+   * two 'periodic' cell faces.
    */
   template<typename CellIterator>
   struct PeriodicFacePair
   {
+    /**
+     * The cells associated with the two 'periodic' faces.
+     */
     CellIterator cell[2];
+
+    /**
+     * The local face indices (with respect to the specified cells) of the
+     * two 'periodic' faces.
+     */
     unsigned int face_idx[2];
+
+    /**
+     * The relative orientation of the first face with respect to the
+     * second face as described in orthogonal_equality() and
+     * make_periodicity_constraints() (and stored as a bitset).
+     */
     std::bitset<3> orientation;
+
+    /**
+     * A matrix that describes how vector valued DoFs of the first face
+     * should be modified prior to constraining to the DoFs of the second
+     * face. If the std::vector first_vector_components is non empty the
+     * matrix is interpreted as a rotation matrix that is applied to all
+     * vector valued blocks listed in first_vector_components of the
+     * FESystem. For more details see make_periodicity_constraints() and the
+     * glossary @ref GlossPeriodicConstraints "glossary entry on periodic
+     * boundary conditions".
+     */
+    FullMatrix<double> matrix;
+
+    /**
+     * A vector of unsigned ints pointing to the first components of all
+     * vector valued blocks that should be rotated by matrix.
+     */
+    std::vector<unsigned int> first_vector_components;
   };
+
 
   /**
    * An orthogonal equality test for faces.
@@ -1173,12 +1206,22 @@ namespace GridTools
    * them to the corresponding vertices of the 'second' boundary. This can
    * be used to implement conditions such as $u(0,y)=u(1,y+1)$.
    *
-   * @tparam Container A type that satisfies the
-   *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
+   * Optionally a (dim x dim) rotation matrix @p matrix along with a vector
+   * @p first_vector_components can be specified that describes how vector
+   * valued DoFs of the first face should be modified prior to constraining
+   * to the DoFs of the second face. If @p first_vector_components is non
+   * empty the matrix is interpreted as a rotation matrix that is applied
+   * to all vector valued blocks listed in @p first_vector_components of
+   * the FESystem. For more details see make_periodicity_constraints() and
+   * the glossary
+   * @ref GlossPeriodicConstraints "glossary entry on periodic boundary conditions".
+   *
+   * @tparam Container A type that satisfies the requirements of a mesh
+   * container (see @ref GlossMeshAsAContainer).
    *
    * @note The created std::vector can be used in
-   * DoFTools::make_periodicity_constraints and in
-   * parallel::distributed::Triangulation::add_periodicity to enforce
+   * DoFTools::make_periodicity_constraints() and in
+   * parallel::distributed::Triangulation::add_periodicity() to enforce
    * periodicity algebraically.
    *
    * @note Because elements will be added to @p matched_pairs (and existing
@@ -1186,17 +1229,19 @@ namespace GridTools
    * times with different boundary ids to generate a vector with all periodic
    * pairs.
    *
-   * @author Daniel Arndt, Matthias Maier, 2013
+   * @author Daniel Arndt, Matthias Maier, 2013, 2014
    */
-  template <typename Container>
+  template <typename CONTAINER>
   void
   collect_periodic_faces
-  (const Container &container,
-   const types::boundary_id b_id1,
-   const types::boundary_id b_id2,
-   const int                direction,
-   std::vector<PeriodicFacePair<typename Container::cell_iterator> > &matched_pairs,
-   const dealii::Tensor<1,Container::space_dimension> &offset = dealii::Tensor<1,Container::space_dimension>());
+  (const CONTAINER                                                   &container,
+   const types::boundary_id                                           b_id1,
+   const types::boundary_id                                           b_id2,
+   const int                                                          direction,
+   std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
+   const Tensor<1,CONTAINER::space_dimension>                        &offset = dealii::Tensor<1,CONTAINER::space_dimension>(),
+   const FullMatrix<double>                                          &matrix = FullMatrix<double>(IdentityMatrix(CONTAINER::space_dimension)),
+   const std::vector<unsigned int>                                   &first_vector_components = std::vector<unsigned int>());
 
 
   /**
@@ -1213,6 +1258,16 @@ namespace GridTools
    * This function will collect periodic face pairs on the coarsest mesh level
    * and add them to @p matched_pairs leaving the original contents intact.
    *
+   * Optionally a rotation matrix @p matrix along with a vector
+   * @p first_vector_components can be specified that describes how vector
+   * valued DoFs of the first face should be modified prior to constraining
+   * to the DoFs of the second face. If @p first_vector_components is non
+   * empty the matrix is interpreted as a rotation matrix that is applied
+   * to all vector valued blocks listet in @p first_vector_components of
+   * the FESystem. For more details see make_periodicity_constraints() and
+   * the glossary @ref GlossPeriodicConstraints "glossary entry on periodic
+   * boundary conditions".
+   *
    * @tparam Container A type that satisfies the
    *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
    *
@@ -1220,16 +1275,19 @@ namespace GridTools
    * meshes with cells not in @ref GlossFaceOrientation
    * "standard orientation".
    *
-   * @author Daniel Arndt, Matthias Maier, 2013
+   * @author Daniel Arndt, Matthias Maier, 2013, 2014
    */
-  template <typename Container>
+  template <typename CONTAINER>
   void
   collect_periodic_faces
-  (const Container         &container,
-   const types::boundary_id b_id,
-   const int                direction,
-   std::vector<PeriodicFacePair<typename Container::cell_iterator> > &matched_pairs,
-   const dealii::Tensor<1,Container::space_dimension> &offset = dealii::Tensor<1,Container::space_dimension>());
+  (const CONTAINER                                                   &container,
+   const types::boundary_id                                           b_id,
+   const int                                                          direction,
+   std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
+   const dealii::Tensor<1,CONTAINER::space_dimension>                &offset = dealii::Tensor<1,CONTAINER::space_dimension>(),
+   const FullMatrix<double>                                          &matrix = FullMatrix<double>(),
+   const std::vector<unsigned int>                                   &first_vector_components = std::vector<unsigned int>());
+
 
   /*@}*/
   /**
