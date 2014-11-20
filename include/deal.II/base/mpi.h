@@ -216,8 +216,8 @@ namespace Utilities
      */
     struct MinMaxAvg
     {
-      MinMaxAvg();
-
+      // Note: We assume a POD property of this struct in the MPI calls in
+      // min_max_avg
       double sum;
       double min;
       double max;

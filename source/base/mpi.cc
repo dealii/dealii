@@ -230,7 +230,11 @@ namespace Utilities
     min_max_avg(const double my_value,
                 const MPI_Comm &mpi_communicator)
     {
-      MinMaxAvg result;
+      // To avoid uninitialized values on some MPI implementations, provide
+      // result with a default value already...
+      MinMaxAvg result = { 0., std::numeric_limits<double>::max(),
+                           -std::numeric_limits<double>::max(), 0, 0, 0.
+                         };
 
       const unsigned int my_id
         = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
@@ -307,18 +311,6 @@ namespace Utilities
     }
 
 #endif
-
-
-
-    MinMaxAvg::MinMaxAvg ()
-      :
-      sum (0.),
-      min (std::numeric_limits<double>::max()),
-      max (-min),
-      min_index (0),
-      max_index (0),
-      avg (0)
-    {}
 
 
 
