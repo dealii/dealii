@@ -1196,7 +1196,7 @@ namespace GridTools
    *
    * The bitset that is returned inside of PeriodicFacePair encodes the
    * _relative_ orientation of the first face with respect to the second
-   * face, see the documentation of orthogonal_equality for further details.
+   * face, see the documentation of orthogonal_equality() for further details.
    *
    * The @p direction refers to the space direction in which periodicity
    * is enforced.
@@ -1245,7 +1245,7 @@ namespace GridTools
 
 
   /**
-   * This compatibility version of collect_periodic_face_pairs only works
+   * This compatibility version of collect_periodic_face_pairs() only works
    * on grids with cells in @ref GlossFaceOrientation "standard orientation".
    *
    * Instead of defining a 'first' and 'second' boundary with the help of
@@ -1271,7 +1271,7 @@ namespace GridTools
    * @tparam Container A type that satisfies the
    *   requirements of a mesh container (see @ref GlossMeshAsAContainer).
    *
-   * @note This version of collect_periodic_face_pairs  will not work on
+   * @note This version of collect_periodic_face_pairs() will not work on
    * meshes with cells not in @ref GlossFaceOrientation
    * "standard orientation".
    *

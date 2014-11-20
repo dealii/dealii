@@ -980,7 +980,7 @@ namespace DoFTools
    * conditions into a ConstraintMatrix @p constraint_matrix.
    *
    * This is the main high level interface for above low level variant of
-   * make_periodicity_constraints. It takes an std::vector @p
+   * make_periodicity_constraints(). It takes an std::vector @p
    * periodic_faces as argument and applies above
    * make_periodicity_constraints on each entry. The std::vector @p
    * periodic_faces can be created by GridTools::collect_periodic_faces.
@@ -1018,7 +1018,7 @@ namespace DoFTools
    *
    * This function tries to match all faces belonging to the first
    * boundary with faces belonging to the second boundary with the help
-   * of @p orthogonal_equality.
+   * of orthogonal_equality().
    *
    * If this matching is successful it constrains all DoFs associated
    * with the 'first' boundary to the respective DoFs of the 'second'
@@ -1102,7 +1102,7 @@ namespace DoFTools
    * The @p offset is a vector tangential to the faces that is added to
    * the location of vertices of the 'first' boundary when attempting to
    * match them to the corresponding vertices of the 'second' boundary via
-   * @p orthogonal_equality. This can be used to implement conditions such
+   * orthogonal_equality (). This can be used to implement conditions such
    * as $u(0,y)=u(1,y+1)$.
    *
    * @deprecated This function is deprecated. Use
@@ -1125,7 +1125,7 @@ namespace DoFTools
    * The @p offset is a vector tangential to the faces that is added to
    * the location of vertices of the 'first' boundary when attempting to
    * match them to the corresponding vertices of the 'second' boundary via
-   * @p orthogonal_equality. This can be used to implement conditions such
+   * orthogonal_equality(). This can be used to implement conditions such
    * as $u(0,y)=u(1,y+1)$.
    *
    * @note This version of make_periodicity_constraints  will not work on
