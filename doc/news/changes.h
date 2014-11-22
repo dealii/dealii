@@ -333,6 +333,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The class FEEvaluation with its fast tensor evaluation routines
+  can now be initialized from a mapping, a finite element, a quadrature, and
+  update flags on the fly similar to FEValues. This provides an alternative
+  entry point to these routines without the need to create a MatrixFree data
+  object.
+  <br>
+  (Martin Kronbichler, 2014/11/20)
+  </li>
+
   <li> New: Complete the interface for periodic boundary conditions.
   Now, it is possible to specify an additional (geometric) rotation matrix along
   with vector components that should be rotated when applying periodic boundary
