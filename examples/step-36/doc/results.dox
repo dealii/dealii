@@ -231,7 +231,7 @@ main class:
     SparsityPattern                     sparsity_pattern;
     SparseMatrix<double>                stiffness_matrix, mass_matrix;
     std::vector<Vector<double> >        eigenfunctions;
-    std::vector<complex<double>>      eigenvalues;
+    std::vector<std::complex<double>>   eigenvalues;
 @endcode
 and initialize them as usual in <code>make_grid_and_dofs()</code>:
 @code
@@ -253,24 +253,21 @@ For solving the eigenvalue problem with ARPACK, we finally need to modify
   template <int dim>
   unsigned int EigenvalueProblem<dim>::solve ()
   {
-    const unsigned int num_eigs =
-      parameters.get_integer ("Number of eigenvalues/eigenfunctions");
-
     SolverControl solver_control (dof_handler.n_dofs(), 1e-9);
 
     SparseDirectUMFPACK inverse;
     inverse.initialize (stiffness_matrix);
 
-    const unsigned int num_arnoldi_vectors = 2*num_eigs + 2
+    const unsigned int num_arnoldi_vectors = 2*eigenvalues.size() + 2;
     ArpackSolver::AdditionalData additional_data(num_arnoldi_vectors);
 
     ArpackSolver eigensolver (solver_control, additional_data);
     eigensolver.solve (stiffness_matrix,
                        mass_matrix,
-                       preconditioner,
+                       inverse,
                        eigenvalues,
                        eigenfunctions,
-                       num_eigs);
+                       eigenvalues.size());
 
     for (unsigned int i=0; i<eigenfunctions.size(); ++i)
       eigenfunctions[i] /= eigenfunctions[i].linfty_norm ();
