@@ -55,20 +55,21 @@ extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
  * and $\lambda, x$ are a set of eigenvalues and eigenvectors
  * respectively.
  *
- * The ArpackSolver can be used in application codes in the
- * following way:
+ * The ArpackSolver can be used in application codes
+ * with serial objects in the following way:
  @code
   SolverControl solver_control (1000, 1e-9);
   ArpackSolver (solver_control);
-  system.solve (A, B, P, lambda, x, size_of_spectrum);
+  system.solve (A, B, OP, lambda, x, size_of_spectrum);
  @endcode
  * for the generalized eigenvalue problem $Ax=B\lambda x$, where
  * the variable <code>size_of_spectrum</code>
  * tells ARPACK the number of eigenvector/eigenvalue pairs to
  * solve for. Here, <code>lambda</code> is a vector that will contain
  * the eigenvalues computed, <code>x</code> a vector that will
- * contain the eigenvectors computed, and <code>P</code> is
- * a preconditioner for the matrix <code>A</code>.
+ * contain the eigenvectors computed, and <code>OP</code> is
+ * an inverse operation for the matrix <code>A</code>.
+ * Shift and invert transformation around zero is applied.
  *
  * Through the AdditionalData the user can specify some of the
  * parameters to be set.
