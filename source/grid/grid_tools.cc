@@ -768,6 +768,7 @@ namespace GridTools
         distributed_triangulation
         ->communicate_locally_moved_vertices(locally_owned_vertices);
 #else
+        (void)distributed_triangulation;
         Assert (false, ExcInternalError());
 #endif
       }

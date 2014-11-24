@@ -3471,7 +3471,7 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
 template <int dim, int spacedim>
 template <class DH, bool lda>
 void
-FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > cell)
+FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > &cell)
 {
   // assert that the finite elements
   // passed to the constructor and
@@ -3646,7 +3646,7 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 template <int dim, int spacedim>
 template <class DH, bool lda>
 void
-FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > cell,
+FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > &cell,
                                     const unsigned int face_no)
 {
   // assert that the finite elements
@@ -3802,7 +3802,7 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
 template <int dim, int spacedim>
 template <class DH, bool lda>
-void FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > cell,
+void FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > &cell,
                                             const unsigned int         face_no,
                                             const unsigned int         subface_no)
 {
