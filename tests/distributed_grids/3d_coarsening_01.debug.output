@@ -6,8 +6,6 @@ DEAL:3d::Checksum: 141886106
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
