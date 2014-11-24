@@ -79,8 +79,6 @@ namespace Step36
     std::vector<Vector<double> >        eigenfunctions;
     std::vector<std::complex<double>>        eigenvalues;
 
-    //ParameterHandler parameters;
-
     ConstraintMatrix constraints;
   };
 
@@ -92,19 +90,6 @@ namespace Step36
     fe (1),
     dof_handler (triangulation)
   {
-//     parameters.declare_entry ("Global mesh refinement steps", "5",
-//                               Patterns::Integer (0, 20),
-//                               "The number of times the 1-cell coarse mesh should "
-//                               "be refined globally for our computations.");
-//     parameters.declare_entry ("Number of eigenvalues/eigenfunctions", "5",
-//                               Patterns::Integer (0, 100),
-//                               "The number of eigenvalues/eigenfunctions "
-//                               "to be computed.");
-//     parameters.declare_entry ("Potential", "0",
-//                               Patterns::Anything(),
-//                               "A functional description of the potential.");
-
-//     parameters.read_input (prm_file);
   }
 
 
@@ -113,7 +98,7 @@ namespace Step36
   void EigenvalueProblem<dim>::make_grid_and_dofs ()
   {
     GridGenerator::hyper_cube (triangulation, -1, 1);
-    triangulation.refine_global (5/*parameters.get_integer ("Global mesh refinement steps")*/);
+    triangulation.refine_global (5);
     dof_handler.distribute_dofs (fe);
 
     DoFTools::make_zero_boundary_constraints (dof_handler, constraints);
@@ -129,7 +114,7 @@ namespace Step36
     mass_matrix.reinit (sparsity_pattern);
 
     eigenfunctions
-    .resize (5/*parameters.get_integer ("Number of eigenvalues/eigenfunctions")*/);
+    .resize (5);
     for (unsigned int i=0; i<eigenfunctions.size (); ++i)
       eigenfunctions[i].reinit (dof_handler.n_dofs ());
 
@@ -157,7 +142,7 @@ namespace Step36
 
     FunctionParser<dim> potential;
     potential.initialize (FunctionParser<dim>::default_variable_names (),
-                          "0"/*parameters.get ("Potential")*/,
+                          "0",
                           typename FunctionParser<dim>::ConstMap());
 
     std::vector<double> potential_values (n_q_points);
@@ -220,11 +205,6 @@ namespace Step36
           min_spurious_eigenvalue = std::min (min_spurious_eigenvalue, ev);
           max_spurious_eigenvalue = std::max (max_spurious_eigenvalue, ev);
         }
-
-//     std::cout << "   Spurious eigenvalues are all in the interval "
-//               << "[" << min_spurious_eigenvalue << "," << max_spurious_eigenvalue << "]"
-//               << std::endl;
-
   }
 
 
@@ -271,7 +251,7 @@ namespace Step36
     {
       FunctionParser<dim> potential;
       potential.initialize (FunctionParser<dim>::default_variable_names (),
-                            "0"/*parameters.get ("Potential")*/,
+                            "0",
                             typename FunctionParser<dim>::ConstMap());
       VectorTools::interpolate (dof_handler, potential, projected_potential);
     }
@@ -290,26 +270,9 @@ namespace Step36
   {
     make_grid_and_dofs ();
 
-//     std::cout << "   Number of active cells:       "
-//               << triangulation.n_active_cells ()
-//               << std::endl
-//               << "   Number of degrees of freedom: "
-//               << dof_handler.n_dofs ()
-//               << std::endl;
-
     assemble_system ();
 
     const std::pair<unsigned int, double> res = solve ();
-//     std::cout << "   Solver converged in "   << res.first
-//               << " iterations. Residual is " << res.second << std::endl;
-
-//     output_results ();
-// 
-//     std::cout << std::endl;
-//     for (unsigned int i=0; i<eigenvalues.size(); ++i)
-//       std::cout << "      Eigenvalue " << i
-//                 << " : " << eigenvalues[i]
-//                 << std::endl;
 
     for (unsigned int i=0; i<eigenvalues.size(); ++i)
       deallog << "      Eigenvalue " << i
@@ -325,7 +288,7 @@ int main (int argc, char **argv)
     {
       using namespace dealii;
       using namespace Step36;
-      
+
       std::ofstream logfile("output");
       deallog.attach(logfile);
       deallog.depth_console(0);
@@ -365,10 +328,6 @@ int main (int argc, char **argv)
                 << std::endl;
       return 1;
     }
-
-//   std::cout << std::endl
-//             << "   Job done."
-//             << std::endl;
 
   return 0;
 }
