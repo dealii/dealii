@@ -2582,7 +2582,7 @@ public:
    * by the given cell is also the one used by this FEValues object.
    */
   template <class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > cell);
+  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > &cell);
 
   /**
    * Reinitialize the gradients, Jacobi determinants, etc for the given cell
@@ -2787,7 +2787,7 @@ public:
    * number @p face_no of @p cell and the given finite element.
    */
   template <class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > cell,
+  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > &cell,
                const unsigned int face_no);
 
   /**
@@ -2896,7 +2896,7 @@ public:
    * by the given cell is also the one used by this FESubfaceValues object.
    */
   template <class DH, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > cell,
+  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > &cell,
                const unsigned int                    face_no,
                const unsigned int                    subface_no);
 

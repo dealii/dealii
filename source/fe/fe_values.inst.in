@@ -52,11 +52,11 @@ for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS; deal_II
 #if (deal_II_space_dimension == DIM_A) || (deal_II_space_dimension == DIM_B)
 
     template void FEValues<deal_II_dimension,deal_II_space_dimension>::reinit(
-    TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >);
+    const TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >&);
     template void FEFaceValues<deal_II_dimension,deal_II_space_dimension>::reinit(
-    TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >, unsigned int);
+    const TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >&, unsigned int);
     template void FESubfaceValues<deal_II_dimension,deal_II_space_dimension>::reinit(
-    TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >, unsigned int, unsigned int);
+    const TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >&, unsigned int, unsigned int);
 #endif
 #endif
   }
