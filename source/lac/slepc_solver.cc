@@ -198,7 +198,7 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     PetscInt n_iterations   = 0;
-    PetscReal residual_norm = 1.e300;
+    PetscReal relative_error = 1.e300;
 
     // @todo Investigate elaborating on some of this to act on the
     // complete eigenspectrum
@@ -213,13 +213,13 @@ namespace SLEPcWrappers
         {
           // EPSGetErrorEstimate is consistent with the residual norm
           // used during the solution process.
-          ierr = EPSGetErrorEstimate (solver_data->eps, 0, &residual_norm);
+          ierr = EPSGetErrorEstimate (solver_data->eps, 0, &relative_error);
           AssertThrow (ierr == 0, ExcSLEPcError(ierr));
         }
 
       // check the solver state
       const SolverControl::State state
-        = solver_control.check (n_iterations, residual_norm);
+        = solver_control.check (n_iterations, relative_error);
 
       // get the solver state according to SLEPc
       get_solver_state (state);
