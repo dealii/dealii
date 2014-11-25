@@ -1025,7 +1025,7 @@ namespace GridTools
 
         // move on to the next cell if we have found the
         // vertex on the current one
-        next_cell:
+next_cell:
         ;
       }
 

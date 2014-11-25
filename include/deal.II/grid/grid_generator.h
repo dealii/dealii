@@ -279,7 +279,7 @@ namespace GridGenerator
   template <int dim>
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
-                             const unsigned int*  n_subdivisions,
+                             const unsigned int  *n_subdivisions,
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize = false);
 
