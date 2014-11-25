@@ -37,21 +37,6 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
 			 const Point<deal_II_space_dimension> &);
 
   template
-    std::vector<X::active_cell_iterator>
-    find_cells_adjacent_to_vertex(const X &,
-				  const unsigned int);
-  template
-    X::active_cell_iterator
-    find_active_cell_around_point (const X &,
-				   const Point<deal_II_space_dimension> &p);
-
-  template
-    std::pair<X::active_cell_iterator, Point<deal_II_dimension> >
-    find_active_cell_around_point (const Mapping<deal_II_dimension, deal_II_space_dimension> &,
-				   const X &,
-				   const Point<deal_II_space_dimension> &);
-
-  template
     std::list<std::pair<X::cell_iterator, X::cell_iterator> >
     get_finest_common_cells (const X &mesh_1,
   			     const X &mesh_2);
@@ -61,6 +46,59 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
     bool
     have_same_coarse_mesh (const X &mesh_1,
 			   const X &mesh_2);
+
+  \}
+
+  #endif
+}
+
+for (X : DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+
+#if deal_II_dimension <= deal_II_space_dimension
+  namespace GridTools \{
+
+  template
+    std::vector<TriaActiveIterator < dealii::DoFCellAccessor < X, false > > >
+    find_cells_adjacent_to_vertex(const X &,
+				  const unsigned int);
+
+  template
+    TriaActiveIterator < dealii::DoFCellAccessor < X, false > > 
+    find_active_cell_around_point (const X &,
+				   const Point<deal_II_space_dimension> &p);
+
+  template
+    std::pair<TriaActiveIterator < dealii::DoFCellAccessor < X, false > > , Point<deal_II_dimension> >
+    find_active_cell_around_point (const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+				   const X &,
+				   const Point<deal_II_space_dimension> &);
+
+  \}
+
+  #endif
+}
+
+for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+
+#if deal_II_dimension <= deal_II_space_dimension
+  namespace GridTools \{
+
+  template
+    std::vector<Triangulation<deal_II_dimension, deal_II_space_dimension>::active_cell_iterator>
+    find_cells_adjacent_to_vertex(const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+				  const unsigned int);
+  template
+    Triangulation<deal_II_dimension, deal_II_space_dimension>::active_cell_iterator
+    find_active_cell_around_point (const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+				   const Point<deal_II_space_dimension> &p);
+
+  template
+    std::pair<Triangulation<deal_II_dimension, deal_II_space_dimension>::active_cell_iterator, Point<deal_II_dimension> >
+    find_active_cell_around_point (const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+				   const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+				   const Point<deal_II_space_dimension> &);
 
   \}
 
@@ -84,6 +122,7 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
     std::vector<parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator>
     find_cells_adjacent_to_vertex(const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &,
 				  const unsigned int);
+
   template
     parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator
     find_active_cell_around_point (const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &,
@@ -201,7 +240,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 				    Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 
     template
-      std::pair<hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>::active_cell_iterator,
+      std::pair<TriaActiveIterator < dealii::DoFCellAccessor < hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>, false > >,	  
 		Point<deal_II_dimension> >
       find_active_cell_around_point
       (const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension> &,
@@ -269,7 +308,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     namespace GridTools \{
 
       template
-      std::vector<Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator>
+      std::vector<TriaActiveIterator < dealii::DoFCellAccessor < Container<deal_II_dimension,deal_II_space_dimension>, false > > >	  
       get_patch_around_cell<Container<deal_II_dimension,deal_II_space_dimension> >
       (const Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator &cell);
 
