@@ -1044,8 +1044,8 @@ next_cell:
   {
     template <int dim, template<int, int> class Container, int spacedim>
     void find_active_cell_around_point_internal(const Container<dim,spacedim> &container,
-      std::set<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > > &searched_cells,
-      std::set<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > > &adjacent_cells)
+                                                std::set<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > > &searched_cells,
+                                                std::set<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > > &adjacent_cells)
     {
       typedef TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > >  active_cell_iterator;
 
@@ -1061,7 +1061,7 @@ next_cell:
       endc = adjacent_cells.end();
       for (; cell != endc; ++cell)
         {
-        std::vector<active_cell_iterator> active_neighbors;
+          std::vector<active_cell_iterator> active_neighbors;
           get_active_neighbors<Container<dim, spacedim> >(*cell, active_neighbors);
           for (unsigned int i=0; i<active_neighbors.size(); ++i)
             if (searched_cells.find(active_neighbors[i]) == searched_cells.end())
@@ -1077,7 +1077,7 @@ next_cell:
           // that the domain is disconnected. in that case,
           // choose the first previously untouched cell we
           // can find
-        active_cell_iterator it = container.begin_active();
+          active_cell_iterator it = container.begin_active();
           for ( ; it!=container.end(); ++it)
             if (searched_cells.find(it) == searched_cells.end())
               {
