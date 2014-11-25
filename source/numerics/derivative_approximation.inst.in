@@ -54,7 +54,7 @@ approximate_second_derivative<deal_II_dimension>
 
 template
 void
-approximate_derivative_tensor
+approximate_derivative_tensor < DH<deal_II_dimension> >
 (const Mapping<DH<deal_II_dimension>::dimension,DH<deal_II_dimension>::space_dimension> &mapping,
  const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
@@ -64,7 +64,7 @@ approximate_derivative_tensor
 
 template
 void
-approximate_derivative_tensor
+approximate_derivative_tensor < DH<deal_II_dimension> >
 (const Mapping<DH<deal_II_dimension>::dimension,DH<deal_II_dimension>::space_dimension> &mapping,
  const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
@@ -74,7 +74,7 @@ approximate_derivative_tensor
 
 template
 void
-approximate_derivative_tensor
+approximate_derivative_tensor < DH<deal_II_dimension> >
 (const Mapping<DH<deal_II_dimension>::dimension,DH<deal_II_dimension>::space_dimension> &mapping,
  const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
@@ -85,7 +85,7 @@ approximate_derivative_tensor
 
 template
 void
-approximate_derivative_tensor
+approximate_derivative_tensor < DH<deal_II_dimension> >
 (const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
  const DH<deal_II_dimension>::active_cell_iterator &cell,
@@ -94,7 +94,7 @@ approximate_derivative_tensor
 
 template
 void
-approximate_derivative_tensor
+approximate_derivative_tensor < DH<deal_II_dimension> >
 (const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
  const DH<deal_II_dimension>::active_cell_iterator &cell,
@@ -103,7 +103,7 @@ approximate_derivative_tensor
 
 template
 void
-approximate_derivative_tensor
+approximate_derivative_tensor < DH<deal_II_dimension> >
 (const DH<deal_II_dimension> &dof_handler,
  const VEC &solution,
  const DH<deal_II_dimension>::active_cell_iterator &cell,
