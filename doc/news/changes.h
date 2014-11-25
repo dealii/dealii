@@ -81,7 +81,7 @@ inconvenience this causes.
   </li>
 
   <li> The change from functionparser to muparser introduced a small number of
-  incompatibilies: units, use_degress, and recursion with 'eval' are not
+  incompatibilities: units, use_degress, and recursion with 'eval' are not
   longer supported. Comparing for equality is done using '==' instead of '='.
   <br>
   (Timo Heister, 2014/02/10)
@@ -345,8 +345,8 @@ inconvenience this causes.
   <li> New: Complete the interface for periodic boundary conditions.
   Now, it is possible to specify an additional (geometric) rotation matrix along
   with vector components that should be rotated when applying periodic boundary
-  condiitions (or alternatively, directly a transformation matrix working
-  directly on dofs). With this it is e.g. now possible to to compute stokes flow
+  conditions (or alternatively, directly a transformation matrix working
+  directly on dofs). With this it is e.g. now possible to compute stokes flow
   on a quarter pie with periodic boundary conditions and the velocity correctly
   transformed.
   <br>
@@ -790,7 +790,7 @@ inconvenience this causes.
 
   <li> New: There is now a QSorted quadrature which takes an 
   arbitrary quadrature at construction time and reorders the quadrature
-  points according to the weigths, from smaller to bigger. This should
+  points according to the weights, from smaller to bigger. This should
   improve stability of higher order polynomial integration.
   <br>
   (Luca Heltai, 2014/05/07)
@@ -1042,7 +1042,7 @@ inconvenience this causes.
 
   <li>Fixed: A regression where a single whitespace accidentally added to
   DEAL_II_LINKER_FLAGS internally prevented cmake-2.8.8 from configuring
-  sucessfully.
+  successfully.
   <br>
   (Matthias Maier, Krysztof Bzowski, 2014/01/26)
 
