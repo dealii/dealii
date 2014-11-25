@@ -775,9 +775,9 @@ namespace GridGenerator
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize)
   {
-    // Equalise number of subdivisions in each dim-direction, heir
+    // Equalise number of subdivisions in each dim-direction, their
     // validity will be checked later
-    unsigned int (n_subdivisions_) [dim];
+    unsigned int n_subdivisions_ [dim];
     for (unsigned int i=0; i<dim; ++i)
       n_subdivisions_[i] = n_subdivisions;
 
@@ -790,7 +790,7 @@ namespace GridGenerator
   template<int dim>
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
-                             const unsigned int    ( n_subdivisions) [dim],
+  const unsigned int*  n_subdivisions,
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize)
   {
