@@ -908,7 +908,7 @@ namespace GridTools
   }
 
   template<int dim, template<int, int> class Container, int spacedim>
-  std::vector<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > >> find_cells_adjacent_to_vertex(const Container<dim, spacedim> &container, const unsigned int vertex)
+  std::vector<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > > find_cells_adjacent_to_vertex(const Container<dim, spacedim> &container, const unsigned int vertex)
   {
     typedef TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > >  active_cell_iterator;
 
@@ -1025,7 +1025,7 @@ namespace GridTools
 
         // move on to the next cell if we have found the
         // vertex on the current one
-next_cell:
+        next_cell:
         ;
       }
 
