@@ -574,6 +574,11 @@
 #cmakedefine DEAL_II_WITH_OPENCASCADE
 
 
+// Some systems require including mpi.h before stdio.h which happens in
+// types.h
+#if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
+#  include <mpi.h>
+#endif
 
 
 #include <deal.II/base/numbers.h>
