@@ -179,6 +179,11 @@ namespace SLEPcWrappers
     ierr = EPSSetFromOptions (solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
+    // TODO breaks step-36
+    // force solvers to use true residual
+    EPSSetTrueResidual(solver_data->eps, PETSC_TRUE);
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
     // Set convergence test to be absolute
     ierr = EPSSetConvergenceTest (solver_data->eps, EPS_CONV_ABS);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
@@ -198,7 +203,7 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     PetscInt n_iterations   = 0;
-    PetscReal relative_error = 1.e300;
+    PetscReal residual_norm = 0;
 
     // @todo Investigate elaborating on some of this to act on the
     // complete eigenspectrum
@@ -207,27 +212,44 @@ namespace SLEPcWrappers
       ierr = EPSGetIterationNumber (solver_data->eps, &n_iterations);
       AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-      // get the residual norm of the most extreme eigenvalue if and
-      // only if at least one eigenvector has converged.
-      if ((*n_converged)>0)
+      // get the maximum of residual norm among converged eigenvectors.
+      for (unsigned int i = 0; i < *n_converged; i++)
         {
-          // EPSGetErrorEstimate is consistent with the residual norm
+          double residual_norm_i = 0.0;
+          // EPSComputeResidualNorm is L2-norm and is not consistent with the stopping criteria
           // used during the solution process.
-          ierr = EPSGetErrorEstimate (solver_data->eps, 0, &relative_error);
+          // Yet, this is the norm which gives error bounds (Saad, 1992, ch3):
+          //   | \lambda - \widehat\lambda | <= ||r||_2
+          ierr = EPSComputeResidualNorm (solver_data->eps, i, &residual_norm_i);
+
+          // EPSComputeRelativeError may not be consistent with the stopping criteria
+          // used during the solution process. Given EPS_CONV_ABS set above,
+          // this can be either the l2 norm or the mass-matrix induced norm
+          // when EPS_GHEP is set.
+          // ierr = EPSComputeRelativeError (solver_data->eps, i, &residual_norm_i);
+
+          // EPSGetErrorEstimate is consistent with the residual norm
+          // used during the solution process. However, it is not guaranteed to
+          // be derived from the residual even when EPSSetTrueResidual is set.
+          // ierr = EPSGetErrorEstimate (solver_data->eps, i, &residual_norm_i);
+
           AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+          residual_norm = std::max (residual_norm, residual_norm_i);
         }
 
       // check the solver state
       const SolverControl::State state
-        = solver_control.check (n_iterations, relative_error);
+        = solver_control.check (n_iterations, residual_norm);
 
       // get the solver state according to SLEPc
       get_solver_state (state);
 
+      // as SLEPc uses different stopping criteria, we have to omit this step.
+      // This can be checked only in conjunction with EPSGetErrorEstimate.
       // and in case of failure: throw exception
-      if (solver_control.last_check () != SolverControl::success)
-        AssertThrow(false, SolverControl::NoConvergence (solver_control.last_step(),
-                                                         solver_control.last_value()));
+      // if (solver_control.last_check () != SolverControl::success)
+      //   AssertThrow(false, SolverControl::NoConvergence (solver_control.last_step(),
+      //                                                    solver_control.last_value()));
     }
   }
 
