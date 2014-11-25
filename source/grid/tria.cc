@@ -1911,7 +1911,13 @@ namespace internal
       };
 
 
-
+      /**
+      * Create a triangulation from
+      * given data. This function does
+      * this work for 3-dimensional
+      * triangulations independently
+      * of the actual space dimension.
+      */
       template <int spacedim>
       static
       void
@@ -1928,17 +1934,6 @@ namespace internal
         // copy vertices
         triangulation.vertices = v;
         triangulation.vertices_used = std::vector<bool> (v.size(), true);
-
-        // check that all cells have
-        // positive volume. if not call the
-        // invert_all_cells_of_negative_grid
-        // and reorder_cells function of
-        // GridReordering before creating
-        // the triangulation
-        for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
-          AssertThrow (dealii::GridTools::cell_measure(triangulation.vertices,
-                                                       cells[cell_no].vertices) >= 0,
-                       ExcGridHasInvalidCell(cell_no));
 
         ///////////////////////////////////////
         // first set up some collections of data
