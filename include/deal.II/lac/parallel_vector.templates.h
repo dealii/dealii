@@ -24,8 +24,9 @@
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
+#ifndef _MSC_VER
 #include <mm_malloc.h>
-
+#endif
 DEAL_II_NAMESPACE_OPEN
 
 
