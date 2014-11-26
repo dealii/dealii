@@ -981,6 +981,18 @@ namespace parallel
                       << std::setprecision(16) << arg2
                       << " on the owner processor " << arg3);
 
+      /**
+       * Exception
+       */
+      DeclException4 (ExcAccessToNonLocalElement,
+                      size_type, size_type, size_type, size_type,
+                      << "You tried to access element " << arg1
+                      << " of a distributed vector, but this element is not "
+                      << "stored on the current processor. Note: The range of "
+                      << "locally owned elements is " << arg2 << " to "
+                      << arg3 << ", and there are " << arg4 << " ghost elements "
+                      << "that this vector can access.");
+
     private:
       /**
        * Local part of all_zero().
@@ -1820,6 +1832,11 @@ namespace parallel
     Number
     Vector<Number>::operator() (const size_type global_index) const
     {
+      Assert (in_local_range (global_index) ||
+              partitioner->ghost_indices().is_element(global_index),
+              ExcAccessToNonLocalElement(global_index, local_range().first,
+                                         local_range().second,
+                                         partitioner->ghost_indices().n_elements()));
       // do not allow reading a vector which is not in ghost mode
       Assert (in_local_range (global_index) || vector_is_ghosted == true,
               ExcMessage("You tried to read a ghost element of this vector, "
@@ -1834,6 +1851,11 @@ namespace parallel
     Number &
     Vector<Number>::operator() (const size_type global_index)
     {
+      Assert (in_local_range (global_index) ||
+              partitioner->ghost_indices().is_element(global_index),
+              ExcAccessToNonLocalElement(global_index, local_range().first,
+                                         local_range().second,
+                                         partitioner->ghost_indices().n_elements()));
       // we would like to prevent reading ghosts from a vector that does not
       // have them imported, but this is not possible because we might be in a
       // part of the code where the vector has enabled ghosts but is non-const
