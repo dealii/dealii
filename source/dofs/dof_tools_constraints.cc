@@ -1878,11 +1878,11 @@ namespace DoFTools
     // Build up a (possibly rotated) interpolation matrix that is used in
     // set_periodicity_constraints with the help of user supplied matrix
     // and first_vector_components.
-    template<int dim>
+    template<int dim, int spacedim>
     FullMatrix<double> compute_transformation(
-      const FiniteElement<dim>        &fe,
-      const FullMatrix<double>        &matrix,
-      const std::vector<unsigned int> &first_vector_components)
+      const FiniteElement<dim, spacedim> &fe,
+      const FullMatrix<double>           &matrix,
+      const std::vector<unsigned int>    &first_vector_components)
     {
       Assert(matrix.m() == matrix.n(), ExcInternalError());
 
@@ -1905,14 +1905,14 @@ namespace DoFTools
       // transformation matrix, we assume that for a 0° rotation
       // we would have to build the identity matrix
 
-      Assert(matrix.m() == (int)dim, ExcInternalError())
+      Assert(matrix.m() == (int)spacedim, ExcInternalError())
 
       Quadrature<dim-1> quadrature (fe.get_unit_face_support_points());
       FEFaceValues<dim> fe_face_values (fe, quadrature, update_q_points);
 
       // have an array that stores the location of each vector-dof tuple
       // we want to rotate.
-      typedef std_cxx1x::array<unsigned int, dim> DoFTuple;
+      typedef std_cxx1x::array<unsigned int, spacedim> DoFTuple;
 
       // start with a pristine interpolation matrix...
       FullMatrix<double> transformation = IdentityMatrix(n_dofs);
@@ -1931,11 +1931,11 @@ namespace DoFTools
               DoFTuple vector_dofs;
               vector_dofs[0] = i;
 
-              Assert(*comp_it + dim <= fe.n_components(),
+              Assert(*comp_it + spacedim <= fe.n_components(),
                      ExcMessage("Error: the finite element does not have enough components "
                                 "to define rotated periodic boundaries."));
 
-              for (unsigned int k=0; k < n_dofs; ++k)
+              for (unsigned int k = 0; k < n_dofs; ++k)
                 if ((k != i)
                     &&
                     (quadrature.point(k) == quadrature.point(i))
@@ -1944,18 +1944,18 @@ namespace DoFTools
                      first_vector_component)
                     &&
                     (fe.face_system_to_component_index(k).first <
-                     first_vector_component + dim))
+                     first_vector_component + spacedim))
                   vector_dofs[fe.face_system_to_component_index(k).first -
                               first_vector_component]
                     = k;
 
               // ... and rotate all dofs belonging to vector valued
               // components that are selected by first_vector_components:
-              for (int i=0; i<dim; ++i)
+              for (int i = 0; i < spacedim; ++i)
                 {
-                  transformation[vector_dofs[i]][vector_dofs[i]]=0.;
-                  for (int j=0; j<dim; ++j)
-                    transformation[vector_dofs[i]][vector_dofs[j]]=matrix[i][j];
+                  transformation[vector_dofs[i]][vector_dofs[i]] = 0.;
+                  for (int j = 0; j < spacedim; ++j)
+                    transformation[vector_dofs[i]][vector_dofs[j]] = matrix[i][j];
                 }
             }
         }
@@ -1982,6 +1982,7 @@ namespace DoFTools
 
   {
     static const int dim = FaceIterator::AccessorType::dimension;
+    static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
     Assert( (dim != 1) ||
             (face_orientation == true &&
@@ -2010,9 +2011,9 @@ namespace DoFTools
            ExcMessage("The supplied (rotation or interpolation) matrix must "
                       "be a square matrix"));
 
-    Assert(first_vector_components.empty() || matrix.m() == (int)dim,
+    Assert(first_vector_components.empty() || matrix.m() == (int)spacedim,
            ExcMessage ("first_vector_components is nonempty, so matrix must "
-                       "be a rotation matrix exactly of size dim"));
+                       "be a rotation matrix exactly of size spacedim"));
 
 #ifdef DEBUG
     if (!face_1->has_children())
@@ -2022,9 +2023,9 @@ namespace DoFTools
             face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
 
         Assert(matrix.m() == 0 || matrix.m() == n_dofs ||
-               matrix.m() == (int)dim,
-               ExcMessage ("matrix must have either size 0 or dim or the size "
-                           "must be equal to the number of DoFs on the face"));
+               matrix.m() == (int)spacedim,
+               ExcMessage ("matrix must have either size 0 or spacedim or the "
+                           "size must be equal to the # of DoFs on the face"));
       }
 
     if (!face_2->has_children())
@@ -2034,9 +2035,9 @@ namespace DoFTools
             face_2->get_fe(face_2->nth_active_fe_index(0)).dofs_per_face;
 
         Assert(matrix.m() == 0 || matrix.m() == n_dofs ||
-               matrix.m() == (int)dim,
-               ExcMessage ("matrix must have either size 0 or dim or the size "
-                           "must be equal to the number of DoFs on the face"));
+               matrix.m() == (int)spacedim,
+               ExcMessage ("matrix must have either size 0 or spacedim or the "
+                           "size must be equal to the # of DoFs on the face"));
       }
 #endif
 
@@ -2112,7 +2113,7 @@ namespace DoFTools
         // we need to do some work and enter the constraints!
 
         // The finite element that matters is the one on the active face:
-        const FiniteElement<dim> &fe =
+        const FiniteElement<dim,spacedim> &fe =
             face_1->has_children()
                 ? face_2->get_fe(face_2->nth_active_fe_index(0))
                 : face_1->get_fe(face_1->nth_active_fe_index(0));
