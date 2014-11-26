@@ -1935,6 +1935,20 @@ namespace internal
         triangulation.vertices = v;
         triangulation.vertices_used = std::vector<bool> (v.size(), true);
 
+        // check that all cells have
+        // positive volume. if not call the
+        // invert_all_cells_of_negative_grid
+        // and reorder_cells function of
+        // GridReordering before creating
+        // the triangulation
+        //TODO: The following code does not compile with MSVC. Find a way around it
+#ifndef _MSC_VER
+        for (unsigned int cell_no = 0; cell_no<cells.size(); ++cell_no)
+          AssertThrow(dealii::GridTools::cell_measure(triangulation.vertices,
+                                                      cells[cell_no].vertices) >= 0,
+                      ExcGridHasInvalidCell(cell_no));
+#endif
+
         ///////////////////////////////////////
         // first set up some collections of data
         //
