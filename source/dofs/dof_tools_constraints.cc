@@ -2134,6 +2134,7 @@ namespace DoFTools
           {
             FullMatrix<double> inverse(transformation.m());
             inverse.invert(transformation);
+
             set_periodicity_constraints(face_2,
                                         face_1,
                                         inverse,
@@ -2147,13 +2148,22 @@ namespace DoFTools
           {
             Assert(!face_1->has_children(), ExcInternalError());
 
+            // Important note:
+            // In 3D we have to take care of the fact that face_rotation
+            // gives the relative rotation of face_1 to face_2, i.e. we
+            // have to invert the rotation when constraining face_2 to
+            // face_1. Therefore face_flip has to be toggled if
+            // face_rotation is true:
+            // In case of inverted orientation, nothing has to be done.
             set_periodicity_constraints(face_1,
                                         face_2,
                                         transformation,
                                         constraint_matrix,
                                         component_mask,
                                         face_orientation,
-                                        face_flip,
+                                        face_orientation
+                                          ? face_rotation ^ face_flip
+                                          : face_flip,
                                         face_rotation);
           }
       }
