@@ -2593,12 +2593,14 @@ next_cell:
                 // We have a match, so insert the matching pairs and
                 // remove the matched cell in pairs2 to speed up the
                 // matching:
-              const PeriodicFacePair<CellIterator> matched_face = {
+                const PeriodicFacePair<CellIterator> matched_face =
+                {
                   {cell1, cell2},
                   {face_idx1, face_idx2},
                   orientation,
                   matrix,
-                  first_vector_components};
+                  first_vector_components
+                };
                 matched_pairs.push_back(matched_face);
                 pairs2.erase(it2);
                 ++n_matches;

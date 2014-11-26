@@ -2020,7 +2020,7 @@ namespace DoFTools
       {
         Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
         const unsigned int n_dofs =
-            face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
+          face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
 
         Assert(matrix.m() == 0 || matrix.m() == n_dofs ||
                matrix.m() == (int)spacedim,
@@ -2032,7 +2032,7 @@ namespace DoFTools
       {
         Assert(face_2->n_active_fe_indices() == 1, ExcInternalError());
         const unsigned int n_dofs =
-            face_2->get_fe(face_2->nth_active_fe_index(0)).dofs_per_face;
+          face_2->get_fe(face_2->nth_active_fe_index(0)).dofs_per_face;
 
         Assert(matrix.m() == 0 || matrix.m() == n_dofs ||
                matrix.m() == (int)spacedim,
@@ -2072,16 +2072,17 @@ namespace DoFTools
 
     if (face_1->has_children() && face_2->has_children())
       {
-      // In the case that both faces have children, we loop over all
-      // children and apply make_periodicty_constrains recursively:
+        // In the case that both faces have children, we loop over all
+        // children and apply make_periodicty_constrains recursively:
 
-      Assert(face_1->n_children() == GeometryInfo<dim>::max_children_per_face &&
-                 face_2->n_children() ==
-                     GeometryInfo<dim>::max_children_per_face,
-             ExcNotImplemented());
+        Assert(face_1->n_children() == GeometryInfo<dim>::max_children_per_face &&
+               face_2->n_children() ==
+               GeometryInfo<dim>::max_children_per_face,
+               ExcNotImplemented());
 
-      for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face;
-           ++i) {
+        for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face;
+             ++i)
+          {
             // Lookup the index for the second face
             unsigned int j;
             switch (dim)
@@ -2114,9 +2115,9 @@ namespace DoFTools
 
         // The finite element that matters is the one on the active face:
         const FiniteElement<dim,spacedim> &fe =
-            face_1->has_children()
-                ? face_2->get_fe(face_2->nth_active_fe_index(0))
-                : face_1->get_fe(face_1->nth_active_fe_index(0));
+          face_1->has_children()
+          ? face_2->get_fe(face_2->nth_active_fe_index(0))
+          : face_1->get_fe(face_1->nth_active_fe_index(0));
 
         const unsigned int n_dofs = fe.dofs_per_face;
 
@@ -2127,7 +2128,7 @@ namespace DoFTools
           return;
 
         const FullMatrix<double> transformation =
-            compute_transformation(fe, matrix, first_vector_components);
+          compute_transformation(fe, matrix, first_vector_components);
 
         if (! face_2->has_children())
           {
@@ -2177,8 +2178,8 @@ namespace DoFTools
                                         component_mask,
                                         face_orientation,
                                         face_orientation
-                                          ? face_rotation ^ face_flip
-                                          : face_flip,
+                                        ? face_rotation ^ face_flip
+                                        : face_flip,
                                         face_rotation);
           }
       }
