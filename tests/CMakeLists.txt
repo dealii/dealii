@@ -101,6 +101,7 @@ FOREACH(_category ${_categories})
     )
   ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
+  # Turn this off for MSVC. The command 'test' is a Linux shell command not available on Windows.
   IF(NOT(MSVC))
     ADD_CUSTOM_TARGET(regen_tests_${_category}
       COMMAND
