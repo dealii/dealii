@@ -1909,24 +1909,40 @@ namespace DoFTools
                        "on the very same face"));
 
     Assert(face_1->at_boundary() && face_2->at_boundary(),
-           ExcMessage ("Faces for periodicity constraints must be on the boundary"));
+           ExcMessage ("Faces for periodicity constraints must be on the "
+                       "boundary"));
 
-    Assert(first_vector_components.empty()
-           || (matrix.size(0) == (int)dim && matrix.size(1) == (int)dim),
-           ExcMessage ("first_vector_components is nonempty, so matrix must be a rotation "
-                       "matrix exactly of size dim"));
+    Assert(matrix.m() == matrix.n(),
+           ExcMessage("The supplied (rotation or interpolation) matrix must "
+                      "be a square matrix"));
+
+    Assert(first_vector_components.empty() || matrix.m() == (int)dim,
+           ExcMessage ("first_vector_components is nonempty, so matrix must "
+                       "be a rotation matrix exactly of size dim"));
 
 #ifdef DEBUG
     if (!face_1->has_children())
       {
-        Assert(face_1->n_active_fe_indices()==1, ExcInternalError());
-        const unsigned int n_dofs = face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
-        Assert(first_vector_components.size() != 0 ||
-               ( (matrix.size(0) == 0 && matrix.size(1) == 0) ||
-                 (matrix.size(0) == n_dofs && matrix.size(1) == n_dofs) ||
-                 (matrix.size(0) == (int)dim && matrix.size(1) == (int)dim) ),
-               ExcMessage ("first_vector_components is empty, so matrix must have either "
-                           "size 0 or dim or the size must be equal to the number of DoFs on the face"));
+        Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
+        const unsigned int n_dofs =
+            face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
+
+        Assert(matrix.m() == 0 || matrix.m() == n_dofs ||
+               matrix.m() == (int)dim,
+               ExcMessage ("matrix must have either size 0 or dim or the size "
+                           "must be equal to the number of DoFs on the face"));
+      }
+
+    if (!face_2->has_children())
+      {
+        Assert(face_2->n_active_fe_indices() == 1, ExcInternalError());
+        const unsigned int n_dofs =
+            face_2->get_fe(face_2->nth_active_fe_index(0)).dofs_per_face;
+
+        Assert(matrix.m() == 0 || matrix.m() == n_dofs ||
+               matrix.m() == (int)dim,
+               ExcMessage ("matrix must have either size 0 or dim or the size "
+                           "must be equal to the number of DoFs on the face"));
       }
 #endif
 
@@ -1995,16 +2011,25 @@ namespace DoFTools
           }
       }
     else
-      // otherwise at least one of the two faces is active and
-      // we need to enter the constraints
       {
-        // Build up the transformation matrix:
-        FullMatrix<double> transformation;
-        const unsigned int n_dofs = face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
+        // otherwise at least one of the two faces is active and
+        // we need to enter the constraints
 
-        if (matrix.size(0) == n_dofs)
-          transformation = matrix;
-        else if (!first_vector_components.empty() && matrix.size(0) == (int)dim)
+        // Build up the transformation matrix:
+
+        FullMatrix<double> transformation;
+
+        const unsigned int n_dofs =
+            face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
+
+        if (matrix.m() == n_dofs)
+          {
+            // In case of m == n == n_dofs the supplied matrix is already
+            // an interpolation matrix, so we use it directly:
+            Assert(matrix.n() == n_dofs, ExcInternalError());
+            transformation = matrix;
+          }
+        else if (!first_vector_components.empty())
           {
             // The matrix describes a rotation and we have to build a
             // transformation matrix, we assume that for a 0° rotation
@@ -2022,8 +2047,8 @@ namespace DoFTools
             // we want to rotate.
             typedef std_cxx1x::array<unsigned int, dim> DoFTuple;
 
-            FullMatrix<double> rot_transformation
-              = IdentityMatrix(face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face);
+            // start with a pristine interpolation matrix...
+            transformation = IdentityMatrix(n_dofs);
 
             for (unsigned int i=0; i<fe1.dofs_per_face; ++i)
               {
@@ -2057,23 +2082,27 @@ namespace DoFTools
                                     first_vector_component]
                           = k;
 
+                    // ... and rotate all dofs belonging to vector valued
+                    // components that are selected by first_vector_components:
                     for (int i=0; i<dim; ++i)
                       {
-                        rot_transformation[vector_dofs[i]][vector_dofs[i]]=0.;
+                        transformation[vector_dofs[i]][vector_dofs[i]]=0.;
                         for (int j=0; j<dim; ++j)
-                          rot_transformation[vector_dofs[i]][vector_dofs[j]]=matrix[i][j];
+                          transformation[vector_dofs[i]][vector_dofs[j]]=matrix[i][j];
                       }
                   }
               }
-
-            transformation = rot_transformation;
           }
         else
-          transformation = IdentityMatrix(n_dofs);
+          {
+            // Just the identity matrix in case no rotation is specified:
+            transformation = IdentityMatrix(n_dofs);
+          }
+
 
         if (face_2->has_children() == false)
           {
-            FullMatrix<double> inverse(transformation.size(0));
+            FullMatrix<double> inverse(transformation.m());
             inverse.invert(transformation);
             set_periodicity_constraints(face_2, face_1,
                                         inverse,
