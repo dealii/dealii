@@ -168,11 +168,11 @@
 #  define BOOST_NO_CXX11_DECLTYPE_N3276
 #endif
 
-// Apply the bugfix from this patch: https ://svn.boost.org/trac/boost/ticket/10215
+// Apply the bugfix from this patch: https://svn.boost.org/trac/boost/ticket/10215
 // 
 //// Although VC 2013 claims to support defaulted functions, it 
 //// does not support the =default construct. See 
-//// h t t p : / / m s d n . m i c r o s o f t . c o m / e n - u s / l i b r a r y / h h 4 0 9 2 9 3 . a s p x 
+//// http://msdn.microsoft.com/en-us/library/hh409293.aspx 
 //// 
 #ifdef _MSC_VER
   #define BOOST_NO_CXX11_DEFAULTED_FUNCTIONS 
