@@ -2372,26 +2372,35 @@ next_cell:
    * is parallel to the unit vector in <direction>
    */
   template<int spacedim>
-  inline bool orthogonal_equality (const dealii::Point<spacedim> &point1,
-                                   const dealii::Point<spacedim> &point2,
-                                   const int                     direction,
-                                   const dealii::Tensor<1,spacedim> &offset,
-                                   const FullMatrix<double>      &matrix)
+  inline bool orthogonal_equality (const Point<spacedim>    &point1,
+                                   const Point<spacedim>    &point2,
+                                   const int                 direction,
+                                   const Tensor<1,spacedim> &offset,
+                                   const FullMatrix<double> &matrix)
   {
     Assert (0<=direction && direction<spacedim,
             ExcIndexRange (direction, 0, spacedim));
+
+    Assert(matrix.m() == matrix.n(), ExcInternalError());
+
+    Point<spacedim> distance;
+
+    if (matrix.m() == spacedim)
+      for (int i = 0; i < spacedim; ++i)
+        for (int j = 0; j < spacedim; ++j)
+          distance(i) = matrix(i,j) * point1(j);
+    else
+      distance = point1;
+
+    distance += offset - point2;
+
     for (int i = 0; i < spacedim; ++i)
       {
         // Only compare coordinate-components != direction:
         if (i == direction)
           continue;
 
-        double transformed_p1_comp=0.;
-
-        for (int j = 0; j < spacedim; ++j)
-          transformed_p1_comp += matrix(i,j)*point1(j) + offset[j];
-
-        if (fabs(transformed_p1_comp - point2(i)) > 1.e-10)
+        if (fabs(distance(i)) > 1.e-10)
           return false;
       }
 
@@ -2483,9 +2492,12 @@ next_cell:
                        const FaceIterator &face1,
                        const FaceIterator &face2,
                        const int          direction,
-                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
+                       const Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
                        const FullMatrix<double> &matrix)
   {
+    Assert(matrix.m() == matrix.n(),
+           ExcMessage("The supplied matrix must be a square matrix"));
+
     static const int dim = FaceIterator::AccessorType::dimension;
 
     // Do a full matching of the face vertices:
@@ -2527,7 +2539,7 @@ next_cell:
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,
                        const int          direction,
-                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
+                       const Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
                        const FullMatrix<double> &matrix)
   {
     // Call the function above with a dummy orientation array
@@ -2581,8 +2593,12 @@ next_cell:
                 // We have a match, so insert the matching pairs and
                 // remove the matched cell in pairs2 to speed up the
                 // matching:
-                const PeriodicFacePair<CellIterator> matched_face
-                = {{cell1, cell2},{face_idx1, face_idx2}, orientation, matrix, first_vector_components};
+              const PeriodicFacePair<CellIterator> matched_face = {
+                  {cell1, cell2},
+                  {face_idx1, face_idx2},
+                  orientation,
+                  matrix,
+                  first_vector_components};
                 matched_pairs.push_back(matched_face);
                 pairs2.erase(it2);
                 ++n_matches;
