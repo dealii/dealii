@@ -1643,6 +1643,8 @@ namespace DoFTools
 
   namespace
   {
+    // Internally used in make_periodicity_constraints.
+    //
     // enter constraints for periodicity into the given ConstraintMatrix object.
     // this function is called when at least one of the two face iterators corresponds
     // to an active object without further children
@@ -1869,10 +1871,101 @@ namespace DoFTools
                 }
         }
     }
-  }
 
 
-  // Implementation of the low level interface:
+    // Internally used in make_periodicity_constraints.
+    //
+    // Build up a (possibly rotated) interpolation matrix that is used in
+    // set_periodicity_constraints with the help of user supplied matrix
+    // and first_vector_components.
+    template<int dim>
+    FullMatrix<double> compute_transformation(
+      const FiniteElement<dim>        &fe,
+      const FullMatrix<double>        &matrix,
+      const std::vector<unsigned int> &first_vector_components)
+    {
+      Assert(matrix.m() == matrix.n(), ExcInternalError());
+
+      const unsigned int n_dofs = fe.dofs_per_face;
+
+      if (matrix.m() == n_dofs)
+        {
+          // In case of m == n == n_dofs the supplied matrix is already
+          // an interpolation matrix, so we use it directly:
+          return matrix;
+        }
+
+      if (first_vector_components.empty() && matrix.m() == 0)
+        {
+          // Just the identity matrix in case no rotation is specified:
+          return IdentityMatrix(n_dofs);
+        }
+
+      // The matrix describes a rotation and we have to build a
+      // transformation matrix, we assume that for a 0° rotation
+      // we would have to build the identity matrix
+
+      Assert(matrix.m() == (int)dim, ExcInternalError())
+
+      Quadrature<dim-1> quadrature (fe.get_unit_face_support_points());
+      FEFaceValues<dim> fe_face_values (fe, quadrature, update_q_points);
+
+      // have an array that stores the location of each vector-dof tuple
+      // we want to rotate.
+      typedef std_cxx1x::array<unsigned int, dim> DoFTuple;
+
+      // start with a pristine interpolation matrix...
+      FullMatrix<double> transformation = IdentityMatrix(n_dofs);
+
+      for (unsigned int i=0; i < n_dofs; ++i)
+        {
+          std::vector<unsigned int>::const_iterator comp_it
+            = std::find (first_vector_components.begin(),
+                         first_vector_components.end(),
+                         fe.face_system_to_component_index(i).first);
+          if (comp_it != first_vector_components.end())
+            {
+              const unsigned int first_vector_component = *comp_it;
+
+              // find corresponding other components of vector
+              DoFTuple vector_dofs;
+              vector_dofs[0] = i;
+
+              Assert(*comp_it + dim <= fe.n_components(),
+                     ExcMessage("Error: the finite element does not have enough components "
+                                "to define rotated periodic boundaries."));
+
+              for (unsigned int k=0; k < n_dofs; ++k)
+                if ((k != i)
+                    &&
+                    (quadrature.point(k) == quadrature.point(i))
+                    &&
+                    (fe.face_system_to_component_index(k).first >=
+                     first_vector_component)
+                    &&
+                    (fe.face_system_to_component_index(k).first <
+                     first_vector_component + dim))
+                  vector_dofs[fe.face_system_to_component_index(k).first -
+                              first_vector_component]
+                    = k;
+
+              // ... and rotate all dofs belonging to vector valued
+              // components that are selected by first_vector_components:
+              for (int i=0; i<dim; ++i)
+                {
+                  transformation[vector_dofs[i]][vector_dofs[i]]=0.;
+                  for (int j=0; j<dim; ++j)
+                    transformation[vector_dofs[i]][vector_dofs[j]]=matrix[i][j];
+                }
+            }
+        }
+      return transformation;
+    }
+
+  } /*namespace*/
+
+
+  // Low level interface:
 
 
   template <typename FaceIterator>
@@ -1886,6 +1979,7 @@ namespace DoFTools
                                 const bool                                   face_rotation,
                                 const FullMatrix<double>                    &matrix,
                                 const std::vector<unsigned int>             &first_vector_components)
+
   {
     static const int dim = FaceIterator::AccessorType::dimension;
 
@@ -1975,16 +2069,18 @@ namespace DoFTools
       },
     };
 
-    // In the case that both faces have children, we loop over all
-    // children and apply make_periodicty_constrains recursively:
     if (face_1->has_children() && face_2->has_children())
       {
-        Assert(face_1->n_children() == GeometryInfo<dim>::max_children_per_face &&
-               face_2->n_children() == GeometryInfo<dim>::max_children_per_face,
-               ExcNotImplemented());
+      // In the case that both faces have children, we loop over all
+      // children and apply make_periodicty_constrains recursively:
 
-        for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
-          {
+      Assert(face_1->n_children() == GeometryInfo<dim>::max_children_per_face &&
+                 face_2->n_children() ==
+                     GeometryInfo<dim>::max_children_per_face,
+             ExcNotImplemented());
+
+      for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face;
+           ++i) {
             // Lookup the index for the second face
             unsigned int j;
             switch (dim)
@@ -2012,111 +2108,51 @@ namespace DoFTools
       }
     else
       {
-        // otherwise at least one of the two faces is active and
-        // we need to enter the constraints
+        // Otherwise at least one of the two faces is active and
+        // we need to do some work and enter the constraints!
 
-        // Build up the transformation matrix:
+        // The finite element that matters is the one on the active face:
+        const FiniteElement<dim> &fe =
+            face_1->has_children()
+                ? face_2->get_fe(face_2->nth_active_fe_index(0))
+                : face_1->get_fe(face_1->nth_active_fe_index(0));
 
-        FullMatrix<double> transformation;
+        const unsigned int n_dofs = fe.dofs_per_face;
 
-        const unsigned int n_dofs =
-            face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
+        // Sometimes we just have nothing to do (for all finite elements,
+        // or systems which accidentally don't have any dofs on the
+        // boundary).
+        if (n_dofs == 0)
+          return;
 
-        if (matrix.m() == n_dofs)
-          {
-            // In case of m == n == n_dofs the supplied matrix is already
-            // an interpolation matrix, so we use it directly:
-            Assert(matrix.n() == n_dofs, ExcInternalError());
-            transformation = matrix;
-          }
-        else if (!first_vector_components.empty())
-          {
-            // The matrix describes a rotation and we have to build a
-            // transformation matrix, we assume that for a 0° rotation
-            // we would have to build the identity matrix
+        const FullMatrix<double> transformation =
+            compute_transformation(fe, matrix, first_vector_components);
 
-            const FiniteElement<dim> &fe1
-              = face_1->get_fe(face_1->nth_active_fe_index(0));
-
-            Quadrature<dim-1> quadrature (fe1.get_unit_face_support_points());
-
-            FEFaceValues<dim> fe_face_values
-            (fe1, quadrature, update_q_points);
-
-            // have an array that stores the location of each vector-dof tuple
-            // we want to rotate.
-            typedef std_cxx1x::array<unsigned int, dim> DoFTuple;
-
-            // start with a pristine interpolation matrix...
-            transformation = IdentityMatrix(n_dofs);
-
-            for (unsigned int i=0; i<fe1.dofs_per_face; ++i)
-              {
-                std::vector<unsigned int>::const_iterator comp_it
-                  = std::find (first_vector_components.begin(),
-                               first_vector_components.end(),
-                               fe1.face_system_to_component_index(i).first);
-                if (comp_it != first_vector_components.end())
-                  {
-                    const unsigned int first_vector_component = *comp_it;
-
-                    // find corresponding other components of vector
-                    DoFTuple vector_dofs;
-                    vector_dofs[0] = i;
-
-                    Assert(*comp_it+dim<=fe1.n_components(),
-                           ExcMessage("Error: the finite element does not have enough components "
-                                      "to define rotated periodic boundaries."));
-
-                    for (unsigned int k=0; k<fe1.dofs_per_face; ++k)
-                      if ((k != i)
-                          &&
-                          (quadrature.point(k) == quadrature.point(i))
-                          &&
-                          (fe1.face_system_to_component_index(k).first >=
-                           first_vector_component)
-                          &&
-                          (fe1.face_system_to_component_index(k).first <
-                           first_vector_component + dim))
-                        vector_dofs[fe1.face_system_to_component_index(k).first -
-                                    first_vector_component]
-                          = k;
-
-                    // ... and rotate all dofs belonging to vector valued
-                    // components that are selected by first_vector_components:
-                    for (int i=0; i<dim; ++i)
-                      {
-                        transformation[vector_dofs[i]][vector_dofs[i]]=0.;
-                        for (int j=0; j<dim; ++j)
-                          transformation[vector_dofs[i]][vector_dofs[j]]=matrix[i][j];
-                      }
-                  }
-              }
-          }
-        else
-          {
-            // Just the identity matrix in case no rotation is specified:
-            transformation = IdentityMatrix(n_dofs);
-          }
-
-
-        if (face_2->has_children() == false)
+        if (!face_2->has_children())
           {
             FullMatrix<double> inverse(transformation.m());
             inverse.invert(transformation);
-            set_periodicity_constraints(face_2, face_1,
+            set_periodicity_constraints(face_2,
+                                        face_1,
                                         inverse,
                                         constraint_matrix,
                                         component_mask,
-                                        face_orientation, face_flip, face_rotation);
+                                        face_orientation,
+                                        face_flip,
+                                        face_rotation);
           }
         else
           {
-            set_periodicity_constraints(face_1, face_2,
+            Assert(!face_1->has_children(), ExcInternalError());
+
+            set_periodicity_constraints(face_1,
+                                        face_2,
                                         transformation,
                                         constraint_matrix,
                                         component_mask,
-                                        face_orientation, face_flip, face_rotation);
+                                        face_orientation,
+                                        face_flip,
+                                        face_rotation);
           }
       }
   }
