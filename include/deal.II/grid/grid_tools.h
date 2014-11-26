@@ -1102,9 +1102,13 @@ namespace GridTools
    *
    * @p face1 and @p face2 are considered equal, if a one to one matching
    * between its vertices can be achieved via an orthogonal equality
-   * relation: Two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered
-   * equal, if <code> (v_1 + offset) - v_2</code> is parallel to the unit
-   * vector in @p direction.
+   * relation.
+   *
+   * Hereby, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered
+   * equal, if $M\cdot v_1 + offset - v_2</code> is parallel to the unit
+   * vector in unit direction @p direction. If the parameter @p matrix
+   * is a reference to a spacedim x spacedim matrix, $M$ is set to @p
+   * matrix, otherwise $M$ is the identity matrix.
    *
    * If the matching was successful, the _relative_ orientation of @p face1
    * with respect to @p face2 is returned in the bitset @p orientation,
@@ -1166,7 +1170,9 @@ namespace GridTools
                        const FaceIterator &face1,
                        const FaceIterator &face2,
                        const int          direction,
-                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset);
+                       const Tensor<1,FaceIterator::AccessorType::space_dimension> &offset
+                       = Tensor<1,FaceIterator::AccessorType::space_dimension>(),
+                       const FullMatrix<double> &matrix = FullMatrix<double>());
 
 
   /**
@@ -1177,7 +1183,9 @@ namespace GridTools
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,
                        const int          direction,
-                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset);
+                       const Tensor<2,FaceIterator::AccessorType::space_dimension> &offset
+                       = Tensor<1,FaceIterator::AccessorType::space_dimension>(),
+                       const FullMatrix<double> &matrix = FullMatrix<double>());
 
 
   /**
@@ -1240,7 +1248,7 @@ namespace GridTools
    const int                                                          direction,
    std::vector<PeriodicFacePair<typename CONTAINER::cell_iterator> > &matched_pairs,
    const Tensor<1,CONTAINER::space_dimension>                        &offset = dealii::Tensor<1,CONTAINER::space_dimension>(),
-   const FullMatrix<double>                                          &matrix = FullMatrix<double>(IdentityMatrix(CONTAINER::space_dimension)),
+   const FullMatrix<double>                                          &matrix = FullMatrix<double>(),
    const std::vector<unsigned int>                                   &first_vector_components = std::vector<unsigned int>());
 
 
