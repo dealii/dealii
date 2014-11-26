@@ -49,7 +49,7 @@ namespace SLEPcWrappers
     :
     solver_control (cn),
     mpi_communicator (mpi_communicator),
-    target_eigenvalue (0.),
+    target_eigenvalue (NULL),
     set_which (EPS_LARGEST_MAGNITUDE),
     set_problem (EPS_GNHEP),
     opA (NULL),
@@ -93,7 +93,7 @@ namespace SLEPcWrappers
   void
   SolverBase::set_target_eigenvalue (const PetscScalar &this_target)
   {
-    target_eigenvalue = this_target;
+    target_eigenvalue.reset (new PetscScalar(this_target));
   }
 
   void
@@ -159,10 +159,16 @@ namespace SLEPcWrappers
     if (transformation)
       {
         // set transformation type if any
+        // STSetShift is called inside
         transformation->set_context (solver_data->eps);
+      }
 
-        // set target eigenvalues to solve for
-        ierr = EPSSetTarget (solver_data->eps, target_eigenvalue);
+    // set target eigenvalues to solve for
+    // in all transformation except STSHIFT there is a direct connection between
+    // the target and the shift, read more on p41 of SLEPc manual.
+    if (target_eigenvalue.get() != 0)
+      {
+        int ierr = EPSSetTarget (solver_data->eps, *(target_eigenvalue.get()) );
         AssertThrow (ierr == 0, ExcSLEPcError(ierr));
       }
 
@@ -181,8 +187,8 @@ namespace SLEPcWrappers
 
     // TODO breaks step-36
     // force solvers to use true residual
-    EPSSetTrueResidual(solver_data->eps, PETSC_TRUE);
-    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+    //EPSSetTrueResidual(solver_data->eps, PETSC_TRUE);
+    //AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     // Set convergence test to be absolute
     ierr = EPSSetConvergenceTest (solver_data->eps, EPS_CONV_ABS);

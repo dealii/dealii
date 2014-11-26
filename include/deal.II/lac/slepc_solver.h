@@ -341,7 +341,7 @@ namespace SLEPcWrappers
     /**
      * Target eigenvalue to solve for.
      */
-    PetscScalar target_eigenvalue;
+    std_cxx11::shared_ptr<PetscScalar> target_eigenvalue;
 
     /**
      * Which portion of the spectrum to solve from.
