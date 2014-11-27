@@ -9,8 +9,8 @@ DEAL::0 is located at -1.000 -3.000
 DEAL::1 is located at 1.000 -3.000
 DEAL::8 is located at -0.3333 -3.000
 DEAL::9 is located at 0.3333 -3.000
-    16 1:  1.000
-    17 0:  1.000
-    24 9:  1.000
-    25 8:  1.000
+    0 17:  1.000
+    1 16:  1.000
+    8 25:  1.000
+    9 24:  1.000
 DEAL::Matching:
