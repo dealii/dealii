@@ -2162,8 +2162,8 @@ namespace DoFTools
                                         component_mask,
                                         face_orientation,
                                         face_orientation
-                                          ? face_rotation ^ face_flip
-                                          : face_flip,
+                                        ? face_rotation ^ face_flip
+                                        : face_flip,
                                         face_rotation);
           }
       }
