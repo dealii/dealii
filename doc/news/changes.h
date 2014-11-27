@@ -333,6 +333,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Serializing an object of type DoFHandler did not work without
+  including additional header files.
+  <br>
+  (David Wells, Wolfgang Bangerth, 2014/11/26)
+  </li>
+
   <li> New: The class FEEvaluation with its fast tensor evaluation routines
   can now be initialized from a mapping, a finite element, a quadrature, and
   update flags on the fly similar to FEValues. This provides an alternative
