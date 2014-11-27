@@ -2130,8 +2130,10 @@ namespace DoFTools
         const FullMatrix<double> transformation =
           compute_transformation(fe, matrix, first_vector_components);
 
-        if (!face_2->has_children())
+        if (face_1->has_children())
           {
+            Assert(!face_2->has_children(), ExcInternalError());
+
             FullMatrix<double> inverse(transformation.m());
             inverse.invert(transformation);
 
@@ -2146,8 +2148,6 @@ namespace DoFTools
           }
         else
           {
-            Assert(!face_1->has_children(), ExcInternalError());
-
             // Important note:
             // In 3D we have to take care of the fact that face_rotation
             // gives the relative rotation of face_1 to face_2, i.e. we
