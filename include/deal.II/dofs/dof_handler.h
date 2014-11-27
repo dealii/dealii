@@ -27,6 +27,8 @@
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/number_cache.h>
+#include <deal.II/dofs/dof_faces.h>
+#include <deal.II/dofs/dof_levels.h>
 #include <deal.II/dofs/function_map.h>
 
 #include <boost/serialization/split_member.hpp>
@@ -41,9 +43,6 @@ namespace internal
 {
   namespace DoFHandler
   {
-    template <int dim> class DoFLevel;
-    template <int dim> class DoFFaces;
-
     struct Implementation;
 
     namespace Policy

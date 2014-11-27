@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,9 +23,6 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-
-template <int, int> class DoFHandler;
-template <int, int> class MGDoFHandler;
 
 namespace internal
 {
