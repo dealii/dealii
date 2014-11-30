@@ -2129,19 +2129,35 @@ namespace DoFTools
         const FullMatrix<double> transformation =
             compute_transformation(fe, matrix, first_vector_components);
 
-        if (!face_2->has_children())
+        if (! face_2->has_children())
           {
-            FullMatrix<double> inverse(transformation.m());
-            inverse.invert(transformation);
+            // Performance hack: We do not need to compute an inverse if
+            // the matrix is the identity matrix.
+            if (first_vector_components.empty() && matrix.m() == 0)
+              {
+                set_periodicity_constraints(face_2,
+                                            face_1,
+                                            transformation,
+                                            constraint_matrix,
+                                            component_mask,
+                                            face_orientation,
+                                            face_flip,
+                                            face_rotation);
+              }
+            else
+              {
+                FullMatrix<double> inverse(transformation.m());
+                inverse.invert(transformation);
 
-            set_periodicity_constraints(face_2,
-                                        face_1,
-                                        inverse,
-                                        constraint_matrix,
-                                        component_mask,
-                                        face_orientation,
-                                        face_flip,
-                                        face_rotation);
+                set_periodicity_constraints(face_2,
+                                            face_1,
+                                            inverse,
+                                            constraint_matrix,
+                                            component_mask,
+                                            face_orientation,
+                                            face_flip,
+                                            face_rotation);
+              }
           }
         else
           {
