@@ -408,8 +408,7 @@ namespace GridTools
 
   template <int dim>
   double
-  cell_measure(const std::vector<Point<dim> > &,
-               const unsigned int ( &) [GeometryInfo<dim>::vertices_per_cell])
+  cell_measure(const std::vector<Point<dim> > &, const unsigned int (&) [GeometryInfo<dim>::vertices_per_cell])
   {
     Assert(false, ExcNotImplemented());
     return 0.;
@@ -908,12 +907,13 @@ namespace GridTools
     return best_vertex;
   }
 
-
   template<int dim, template<int, int> class Container, int spacedim>
-  std::vector<typename Container<dim,spacedim>::active_cell_iterator>
-  find_cells_adjacent_to_vertex(const Container<dim,spacedim> &container,
-                                const unsigned int    vertex)
+  std::vector<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > >
+  find_cells_adjacent_to_vertex(const Container<dim, spacedim> &container, const unsigned int vertex)
   {
+    typedef TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > >
+    active_cell_iterator;
+
     // make sure that the given vertex is
     // an active vertex of the underlying
     // triangulation
@@ -925,11 +925,9 @@ namespace GridTools
     // use a set instead of a vector
     // to ensure that cells are inserted only
     // once
-    std::set<typename Container<dim,spacedim>::active_cell_iterator> adjacent_cells;
+    std::set<active_cell_iterator> adjacent_cells;
 
-    typename Container<dim,spacedim>::active_cell_iterator
-    cell = container.begin_active(),
-    endc = container.end();
+    active_cell_iterator cell = container.begin_active(), endc = container.end();
 
     // go through all active cells and look if the vertex is part of that cell
     //
@@ -1039,8 +1037,7 @@ next_cell:
 
     // return the result as a vector, rather than the set we built above
     return
-      std::vector<typename Container<dim,spacedim>::active_cell_iterator>
-      (adjacent_cells.begin(), adjacent_cells.end());
+      std::vector<active_cell_iterator> (adjacent_cells.begin(), adjacent_cells.end());
   }
 
 
@@ -1049,24 +1046,24 @@ next_cell:
   {
     template <int dim, template<int, int> class Container, int spacedim>
     void find_active_cell_around_point_internal(const Container<dim,spacedim> &container,
-                                                std::set<typename Container<dim,spacedim>::active_cell_iterator> &searched_cells,
-                                                std::set<typename Container<dim,spacedim>::active_cell_iterator> &adjacent_cells)
+                                                std::set<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > > &searched_cells,
+                                                std::set<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > > &adjacent_cells)
     {
-      typedef typename Container<dim,spacedim>::active_cell_iterator cell_iterator;
+      typedef TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > >  active_cell_iterator;
 
       // update the searched cells
       searched_cells.insert(adjacent_cells.begin(), adjacent_cells.end());
       // now we to collect all neighbors
       // of the cells in adjacent_cells we
       // have not yet searched.
-      std::set<cell_iterator> adjacent_cells_new;
+      std::set<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > > adjacent_cells_new;
 
-      typename std::set<cell_iterator>::const_iterator
+      typename std::set<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > >::const_iterator
       cell = adjacent_cells.begin(),
       endc = adjacent_cells.end();
       for (; cell != endc; ++cell)
         {
-          std::vector<cell_iterator> active_neighbors;
+          std::vector<active_cell_iterator> active_neighbors;
           get_active_neighbors<Container<dim, spacedim> >(*cell, active_neighbors);
           for (unsigned int i=0; i<active_neighbors.size(); ++i)
             if (searched_cells.find(active_neighbors[i]) == searched_cells.end())
@@ -1082,7 +1079,7 @@ next_cell:
           // that the domain is disconnected. in that case,
           // choose the first previously untouched cell we
           // can find
-          cell_iterator it = container.begin_active();
+          active_cell_iterator it = container.begin_active();
           for ( ; it!=container.end(); ++it)
             if (searched_cells.find(it) == searched_cells.end())
               {
@@ -1094,7 +1091,7 @@ next_cell:
   }
 
   template <int dim, template<int, int> class Container, int spacedim>
-  typename Container<dim,spacedim>::active_cell_iterator
+  TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > >
   find_active_cell_around_point (const Container<dim,spacedim>  &container,
                                  const Point<spacedim> &p)
   {
@@ -1106,12 +1103,12 @@ next_cell:
 
 
   template <int dim, template <int, int> class Container, int spacedim>
-  std::pair<typename Container<dim,spacedim>::active_cell_iterator, Point<dim> >
+  std::pair<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > >, Point<dim> >
   find_active_cell_around_point (const Mapping<dim,spacedim>   &mapping,
                                  const Container<dim,spacedim> &container,
                                  const Point<spacedim>     &p)
   {
-    typedef typename Container<dim,spacedim>::active_cell_iterator active_cell_iterator;
+    typedef TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > >  active_cell_iterator;
 
     // The best distance is set to the
     // maximum allowable distance from
