@@ -945,16 +945,19 @@ namespace DoFTools
    * and any combination of that...
    * @endcode
    *
-   * Optionally a matrix @p matrix along with an std::vector @p
-   * first_vector_components can be specified that describes how DoFs on @p
-   * face_1 should be modified prior to constraining to the DoFs of @p
-   * face_2. If the std::vector first_vector_components is non empty the
-   * matrix is interpreted as a rotation matrix that is applied to all
-   * vector valued blocks listed in first_vector_components of the
-   * FESystem.
+   * Optionally a matrix @p matrix along with an std::vector
+   * @p first_vector_components can be specified that describes how DoFs on
+   * @p face_1 should be modified prior to constraining to the DoFs of
+   * @p face_2. Here, two declarations are possible:
+   * If the std::vector @p first_vector_components is non empty the
+   * matrix is interpreted as a @p dim $\times$ @p dim rotation matrix that is
+   * applied to all vector valued blocks listed in @p first_vector_components
+   * of the FESystem. If @p first_vector_components is empty the matrix is
+   * interpreted as an interpolation matrix with size no_face_dofs $\times$
+   * no_face_dofs.
    *
-   * Detailed information can be found in the @see @ref
-   * GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
+   * Detailed information can be found in the
+   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
    *
    * @todo: Reference to soon be written example step and glossary article.
    *

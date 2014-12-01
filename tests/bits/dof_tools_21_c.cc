@@ -42,7 +42,10 @@ using namespace dealii;
 //                                 dealii::ConstraintMatrix &,
 //                                 const std::vector<bool>  &,
 //                                 bool, bool, bool)
-// for correct behaviour on non standard oriented meshes.
+//
+// for correct behaviour with hanging nodes. This is done by additionally
+// refining the second cube once. Test that constraining face_1 -> face_2
+// and the opposite direction face_2 -> face_1 give the exact same result.
 //
 
 
@@ -110,7 +113,8 @@ void generate_grid(Triangulation<2> &triangulation, int orientation)
   face_1->set_boundary_indicator(42);
   face_2->set_boundary_indicator(43);
 
-  triangulation.refine_global(0);
+  cell_2->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement();
 }
 
 
@@ -185,7 +189,8 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
   face_1->set_boundary_indicator(42);
   face_2->set_boundary_indicator(43);
 
-  triangulation.refine_global(0);
+  cell_2->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement();
 }
 
 
@@ -352,26 +357,6 @@ int main()
       triangulation.refine_global(1);
       dof_handler.initialize(triangulation, fe);
       print_matching(dof_handler);
-    }
-
-
-  deallog << "Test for 3D, Taylor-Hood with Component-Mask on v:" << std::endl << std::endl;
-
-  for (int i = 0; i < 8; ++i)
-    {
-      // Generate a triangulation and match:
-      Triangulation<3> triangulation;
-      FE_Q<3> u(2);
-      FE_Q<3> p(1);
-      FESystem<3> taylor_hood(u, 3, p, 1);
-
-      DoFHandler<3> dof_handler;
-
-      deallog << "Triangulation:" << i << std::endl;
-
-      generate_grid(triangulation, i);
-      dof_handler.initialize(triangulation, taylor_hood);
-      print_matching(dof_handler, true);
     }
 
   return 0;
