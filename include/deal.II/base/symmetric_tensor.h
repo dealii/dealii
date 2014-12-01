@@ -2369,7 +2369,8 @@ deviator (const SymmetricTensor<2,dim,Number> &t)
 
 
 /**
- * Return a unit symmetric tensor of rank 2.
+ * Return a unit symmetric tensor of rank 2, i.e., the dim-by-dim
+ * identity matrix.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -2379,6 +2380,8 @@ inline
 SymmetricTensor<2,dim,Number>
 unit_symmetric_tensor ()
 {
+  // create a default constructed matrix filled with
+  // zeros, then set the diagonal elements to one
   SymmetricTensor<2,dim,Number> tmp;
   switch (dim)
     {
@@ -2401,7 +2404,9 @@ unit_symmetric_tensor ()
 
 
 /**
- * Return a unit symmetric tensor of rank 2 for double tensor.
+ * Return a unit symmetric tensor of rank 2, i.e., the dim-by-dim
+ * identity matrix. This specialization of the function uses
+ * <code>double</code> as the data type for the elements.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
