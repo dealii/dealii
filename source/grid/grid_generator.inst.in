@@ -111,12 +111,21 @@ namespace GridGenerator \{
 	const Point<deal_II_dimension> (&) [deal_II_dimension], 
 	const bool);  
 
+  #ifndef _MSC_VER
     template void
       subdivided_parallelepiped<deal_II_dimension> (
 	Triangulation<deal_II_dimension>&,
-	const unsigned int [deal_II_dimension], 
+	const unsigned int& [deal_II_dimension], 
 	const Point<deal_II_dimension> (&) [deal_II_dimension], 
-	const bool);  
+	const bool);
+  #else
+  template void
+      subdivided_parallelepiped<deal_II_dimension> (
+	Triangulation<deal_II_dimension>&,
+	const unsigned int*, 
+	const Point<deal_II_dimension> (&) [deal_II_dimension], 
+	const bool);
+  #endif
   
 #if deal_II_dimension > 1
   template void
