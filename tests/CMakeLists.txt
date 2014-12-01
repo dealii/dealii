@@ -104,24 +104,21 @@ FOREACH(_category ${_categories})
     )
   ADD_DEPENDENCIES(prune_tests prune_tests_${_category})
 
-  # Turn this off for MSVC. The command 'test' is a Linux shell command not available on Windows.
-  IF(NOT(DEAL_II_MSVC))
-    ADD_CUSTOM_TARGET(regen_tests_${_category}
-      COMMAND
-        test ! -d ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
-        --build ${CMAKE_BINARY_DIR}/tests/${_category} --target regenerate
-      COMMENT "Processing tests/${_category}"
-      )
-    ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
+  ADD_CUSTOM_TARGET(regen_tests_${_category}
+    COMMAND
+      test ! -d ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
+      --build ${CMAKE_BINARY_DIR}/tests/${_category} --target regenerate
+    COMMENT "Processing tests/${_category}"
+    )
+  ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
 
-    ADD_CUSTOM_TARGET(clean_tests_${_category}
-      COMMAND
-        test ! -d ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
-        --build ${CMAKE_BINARY_DIR}/tests/${_category} --target clean
-      COMMENT "Processing tests/${_category}"
-      )
-    ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
-  ENDIF()
+  ADD_CUSTOM_TARGET(clean_tests_${_category}
+    COMMAND
+      test ! -d ${CMAKE_BINARY_DIR}/tests/${_category} || ${CMAKE_COMMAND}
+      --build ${CMAKE_BINARY_DIR}/tests/${_category} --target clean
+    COMMENT "Processing tests/${_category}"
+    )
+  ADD_DEPENDENCIES(clean_tests clean_tests_${_category})
   
   FILE(APPEND ${CMAKE_BINARY_DIR}/tests/CTestTestfile.cmake
     "SUBDIRS(${_category})\n"
