@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,7 @@ template <class T> class Vector;
  * Collection of functions controlling refinement and coarsening of
  * Triangulation objects.
  *
- * The functions in this namespace are in two classes. There are the
+ * The functions in this namespace form two categories. There are the
  * auxiliary functions refine() and coarsen(). More important for
  * users are the other functions, which implement refinement
  * strategies, as being found in the literature on adaptive finite
@@ -49,7 +49,8 @@ template <class T> class Vector;
 namespace GridRefinement
 {
   /**
-   * This function provides a refinement strategy with predictable growth of the mesh.
+   * This function provides a refinement strategy with predictable
+   * growth of the mesh.
    *
    * The function takes a vector of refinement @p criteria and two values
    * between zero and one denoting the fractions of cells to be refined
@@ -186,28 +187,80 @@ namespace GridRefinement
 
 
   /**
-   * Refine the triangulation by flagging
-   * certain cells to reach an optimal
-   * grid: We try to minimize the error
-   * multiplied with the number of cells in
-   * the new grid. All cells with large
-   * error indicator are refined to
-   * generate an optimal grid in the above
-   * sense.  We assume that the error in
-   * one cell is reduced to 1-2^{-order}
-   * after refinement, if 'order' is the
-   * expected order of convergence. This
-   * expected order of convergence must be
-   * passed as an argument but is defaulted
-   * to 2.  The new triangulation has
-   * ($2^d-1$) new cells for every flagged
-   * cell (the original cell is replaced by
-   * $2^d$ cells but it then made
-   * inactive).
+   * Refine the triangulation by flagging certain cells to reach a grid that
+   * is optimal with respect to an objective function that tries to balance
+   * reducing the error and increasing the numerical cost when the mesh is
+   * refined. Specifically, this function makes the assumption that if you
+   * refine a cell $K$ with error indicator $\eta_K$ provided by the second
+   * argument to this function, then the error on the children (for all
+   * children together) will only be $2^{-\text{order}}\eta_K$ where
+   * <code>order</code> is the third argument of this function. This makes the
+   * assumption that the error is only a local property on a mesh and can
+   * be reduced by local refinement -- an assumption that is true for the
+   * interpolation operator, but not for the usual Galerkin projection,
+   * although it is approximately true for elliptic problems where the Greens
+   * function decays quickly and the error here is not too much affected by
+   * a too coarse mesh somewhere else.
    *
-   * Refer to the general doc of
-   * this class for more
-   * information.
+   * With this, we can define the objective function this function tries
+   * to optimize. Let us assume that the mesh currently has $N_0$ cells.
+   * Then, if we refine the $m$ cells with the largest errors, we expect
+   * to get (in $d$ space dimensions)
+   * @f[
+   *   N(m) = (N_0-m) + 2^d m = N_0 + (2^d-1)m
+   * @f]
+   * cells ($N_0-m$ are not refined, and each of the $m$ cells we refine
+   * yield $2^d$ child cells. On the other hand, with refining $m$ cells,
+   * and using the assumptions above, we expect that the error will be
+   * @f[
+   *   \eta^\text{exp}(m)
+   *   =
+   *   \sum_{K, K\; \text{will not be refined}} \eta_K
+   *   +
+   *   \sum_{K, K\; \text{will be refined}} 2^{-\text{order}}\eta_K
+   * @f]
+   * where the first sum extends over $N_0-m$ cells and the second
+   * over the $m$ cells that will be refined. Note that $N(m)$
+   * is an increasing function of $m$ whereas $\eta^\text{exp}(m)$
+   * is a decreasing function.
+   *
+   * This function then tries to find that number $m$ of cells to refine
+   * for which the objective function
+   * @f[
+   *   J(m) = N(m)^{\text{order}/d} \eta^\text{exp}(m)
+   * @f]
+   * is minimal.
+   *
+   * The rationale for this function is two-fold. First, compared to
+   * the refine_and_coarsen_fixed_fraction() and
+   * refine_and_coarsen_fixed_number() functions, this function has
+   * the property that if all refinement indicators are the same
+   * (i.e., we have achieved a mesh where the error per cell is
+   * equilibrated), then the entire mesh is refined. This is based on
+   * the observation that a mesh with equilibrated error indicators is
+   * the optimal mesh (i.e., has the least overall error) among all
+   * meshes with the same number of cells. (For proofs of this, see
+   * R. Becker, M. Braack, R. Rannacher: "Numerical simulation of
+   * laminar flames at low Mach number with adaptive finite elements",
+   * Combustion Theory and Modelling, Vol. 3, Nr. 3, p. 503-534 1999;
+   * and W. Bangerth, R. Rannacher: "Adaptive Finite Element Methods
+   * for Differential Equations", Birkhauser, 2003.)
+   *
+   * Second, the function uses the observation that ideally, the error
+   * behaves like $e \approx c N^{-\alpha}$ with some constant
+   * $\alpha$ that depends on the dimension and the finite element
+   * degree. It should - given optimal mesh refinement - not depend so
+   * much on the regularity of the solution, as it is based on the
+   * idea, that all singularities can be resolved by refinement. Mesh
+   * refinement is then based on the idea that we want to make
+   * $c=e N^\alpha$ small. This corresponds to the functional $J(m)$
+   * above.
+   *
+   * @note This function was originally implemented by Thomas
+   *   Richter. It follows a strategy described in T. Richter,
+   *   "Parallel Multigrid Method for Adaptive Finite Elements with
+   *   Application to 3D Flow Problems", PhD thesis, University of
+   *   Heidelberg, 2005. See in particular Section 4.3, pp. 42-43.
    */
   template <int dim, class Vector, int spacedim>
   void
