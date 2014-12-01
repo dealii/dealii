@@ -1643,25 +1643,29 @@ namespace DoFTools
 
   namespace
   {
-    // Internally used in make_periodicity_constraints.
-    //
-    // enter constraints for periodicity into the given ConstraintMatrix object.
-    // this function is called when at least one of the two face iterators corresponds
-    // to an active object without further children
-    //
-    // @param transformation A matrix that maps degrees of freedom from one face
-    // to another. If the DoFs on the two faces are supposed to match exactly, then
-    // the matrix so provided will be the identity matrix. if face 2 is once refined
-    // from face 1, then the matrix needs to be the interpolation matrix from a face
-    // to this particular child
-    //
-    // @precondition: face_1 is supposed to be active
-    //
-    // @note As bug #82 ((http://code.google.com/p/dealii/issues/detail?id=82) and the
-    // corresponding testcase bits/periodicity_05 demonstrate, we can occasionally
-    // get into trouble if we already have the constraint x1=x2 and want to insert
-    // x2=x1. we avoid this by skipping an identity constraint if the opposite
-    // constraint already exists
+    /**
+     * @internal
+     *
+     * Internally used in make_periodicity_constraints.
+     *
+     * enter constraints for periodicity into the given ConstraintMatrix object.
+     * this function is called when at least one of the two face iterators corresponds
+     * to an active object without further children
+     *
+     * @param transformation A matrix that maps degrees of freedom from one face
+     * to another. If the DoFs on the two faces are supposed to match exactly, then
+     * the matrix so provided will be the identity matrix. if face 2 is once refined
+     * from face 1, then the matrix needs to be the interpolation matrix from a face
+     * to this particular child
+     *
+     * @precondition: face_1 is supposed to be active
+     *
+     * @note As bug #82 ((http://code.google.com/p/dealii/issues/detail?id=82) and the
+     * corresponding testcase bits/periodicity_05 demonstrate, we can occasionally
+     * get into trouble if we already have the constraint x1=x2 and want to insert
+     * x2=x1. we avoid this by skipping an identity constraint if the opposite
+     * constraint already exists
+     */
     template <typename FaceIterator>
     void
     set_periodicity_constraints (const FaceIterator                          &face_1,
@@ -1886,11 +1890,11 @@ namespace DoFTools
     {
       Assert(matrix.m() == matrix.n(), ExcInternalError());
 
-      const unsigned int n_dofs = fe.dofs_per_face;
+      const unsigned int n_dofs_per_face = fe.dofs_per_face;
 
-      if (matrix.m() == n_dofs)
+      if (matrix.m() == n_dofs_per_face)
         {
-          // In case of m == n == n_dofs the supplied matrix is already
+          // In case of m == n == n_dofs_per_face the supplied matrix is already
           // an interpolation matrix, so we use it directly:
           return matrix;
         }
@@ -1898,11 +1902,11 @@ namespace DoFTools
       if (first_vector_components.empty() && matrix.m() == 0)
         {
           // Just the identity matrix in case no rotation is specified:
-          return IdentityMatrix(n_dofs);
+          return IdentityMatrix(n_dofs_per_face);
         }
 
       // The matrix describes a rotation and we have to build a
-      // transformation matrix, we assume that for a 0° rotation
+      // transformation matrix, we assume that for a 0* rotation
       // we would have to build the identity matrix
 
       Assert(matrix.m() == (int)spacedim, ExcInternalError())
@@ -1915,9 +1919,9 @@ namespace DoFTools
       typedef std_cxx1x::array<unsigned int, spacedim> DoFTuple;
 
       // start with a pristine interpolation matrix...
-      FullMatrix<double> transformation = IdentityMatrix(n_dofs);
+      FullMatrix<double> transformation = IdentityMatrix(n_dofs_per_face);
 
-      for (unsigned int i=0; i < n_dofs; ++i)
+      for (unsigned int i=0; i < n_dofs_per_face; ++i)
         {
           std::vector<unsigned int>::const_iterator comp_it
             = std::find (first_vector_components.begin(),
@@ -1935,19 +1939,19 @@ namespace DoFTools
                      ExcMessage("Error: the finite element does not have enough components "
                                 "to define rotated periodic boundaries."));
 
-              for (unsigned int k = 0; k < n_dofs; ++k)
-                if ((k != i)
-                    &&
-                    (quadrature.point(k) == quadrature.point(i))
-                    &&
+              for (unsigned int k = 0; k < n_dofs_per_face; ++k)
+                if ((k != i) &&
+                    (quadrature.point(k) == quadrature.point(i)) &&
                     (fe.face_system_to_component_index(k).first >=
-                     first_vector_component)
-                    &&
+                     first_vector_component) &&
                     (fe.face_system_to_component_index(k).first <
                      first_vector_component + spacedim))
-                  vector_dofs[fe.face_system_to_component_index(k).first -
-                              first_vector_component]
-                    = k;
+                  {
+                    vector_dofs[fe.face_system_to_component_index(k).first -
+                                first_vector_component]
+                      = k;
+                    break;
+                  }
 
               // ... and rotate all dofs belonging to vector valued
               // components that are selected by first_vector_components:
@@ -1979,7 +1983,6 @@ namespace DoFTools
                                 const bool                                   face_rotation,
                                 const FullMatrix<double>                    &matrix,
                                 const std::vector<unsigned int>             &first_vector_components)
-
   {
     static const int dim = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;
@@ -2019,10 +2022,10 @@ namespace DoFTools
     if (!face_1->has_children())
       {
         Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
-        const unsigned int n_dofs =
+        const unsigned int n_dofs_per_face =
           face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
 
-        Assert(matrix.m() == 0 || matrix.m() == n_dofs ||
+        Assert(matrix.m() == 0 || matrix.m() == n_dofs_per_face ||
                matrix.m() == (int)spacedim,
                ExcMessage ("matrix must have either size 0 or spacedim or the "
                            "size must be equal to the # of DoFs on the face"));
@@ -2031,10 +2034,10 @@ namespace DoFTools
     if (!face_2->has_children())
       {
         Assert(face_2->n_active_fe_indices() == 1, ExcInternalError());
-        const unsigned int n_dofs =
+        const unsigned int n_dofs_per_face =
           face_2->get_fe(face_2->nth_active_fe_index(0)).dofs_per_face;
 
-        Assert(matrix.m() == 0 || matrix.m() == n_dofs ||
+        Assert(matrix.m() == 0 || matrix.m() == n_dofs_per_face ||
                matrix.m() == (int)spacedim,
                ExcMessage ("matrix must have either size 0 or spacedim or the "
                            "size must be equal to the # of DoFs on the face"));
@@ -2119,12 +2122,12 @@ namespace DoFTools
           ? face_2->get_fe(face_2->nth_active_fe_index(0))
           : face_1->get_fe(face_1->nth_active_fe_index(0));
 
-        const unsigned int n_dofs = fe.dofs_per_face;
+        const unsigned int n_dofs_per_face = fe.dofs_per_face;
 
         // Sometimes we just have nothing to do (for all finite elements,
         // or systems which accidentally don't have any dofs on the
         // boundary).
-        if (n_dofs == 0)
+        if (n_dofs_per_face == 0)
           return;
 
         const FullMatrix<double> transformation =
