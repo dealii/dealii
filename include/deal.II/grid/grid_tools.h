@@ -426,7 +426,7 @@ namespace GridTools
    * to be checked for this case.
    */
   template<int dim, template <int, int> class Container, int spacedim>
-  std::vector<typename Container<dim,spacedim>::active_cell_iterator>
+  std::vector<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > > >
   find_cells_adjacent_to_vertex (const Container<dim,spacedim> &container,
                                  const unsigned int    vertex_index);
 
@@ -463,7 +463,7 @@ namespace GridTools
    * will have to decide what to do in that case.
    */
   template <int dim, template <int,int> class Container, int spacedim>
-  typename Container<dim,spacedim>::active_cell_iterator
+  TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > >
   find_active_cell_around_point (const Container<dim,spacedim>  &container,
                                  const Point<spacedim> &p);
 
@@ -514,7 +514,7 @@ namespace GridTools
    * will have to decide what to do in that case.
    */
   template <int dim, template<int, int> class Container, int spacedim>
-  std::pair<typename Container<dim,spacedim>::active_cell_iterator, Point<dim> >
+  std::pair<TriaActiveIterator < dealii::DoFCellAccessor < Container < dim, spacedim >, false > >, Point<dim> >
   find_active_cell_around_point (const Mapping<dim,spacedim>   &mapping,
                                  const Container<dim,spacedim> &container,
                                  const Point<spacedim>     &p);

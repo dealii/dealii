@@ -752,18 +752,27 @@ namespace DerivativeApproximation
 {
   namespace internal
   {
+
     /**
-     * Compute the derivative approximation on one cell. This computes the full
-     * derivative tensor.
-     */
-    template <class DerivativeDescription, int dim,
-              template <int, int> class DH, class InputVector, int spacedim>
+    * Workaround for Visual Studio bug which does not resolve the type DH<dim,spacedim>::active_cell_iterator well.
+    */
+#ifndef _MSC_VER
+#define cell_iterator typename DH<dim,spacedim>::active_cell_iterator
+#else
+#define cell_iterator TriaActiveIterator < dealii::DoFCellAccessor < DH < dim, spacedim >, false > >
+#endif
+
+    /**
+    * Compute the derivative approximation on one cell. This computes the full
+    * derivative tensor.
+    */
+    template <class DerivativeDescription, int dim, template <int, int> class DH, class InputVector, int spacedim>
     void
     approximate_cell (const Mapping<dim,spacedim>                   &mapping,
                       const DH<dim,spacedim>                        &dof_handler,
                       const InputVector                             &solution,
                       const unsigned int                             component,
-                      const typename DH<dim,spacedim>::active_cell_iterator  &cell,
+                      const TriaActiveIterator < dealii::DoFCellAccessor < DH < dim, spacedim >, false > >  &cell,
                       typename DerivativeDescription::Derivative    &derivative)
     {
       QMidpoint<dim> midpoint_rule;
@@ -792,7 +801,7 @@ namespace DerivativeApproximation
       // active neighbors of a cell
       // reserve the maximal number of
       // active neighbors
-      std::vector<typename DH<dim,spacedim>::active_cell_iterator> active_neighbors;
+      std::vector<TriaActiveIterator < dealii::DoFCellAccessor < DH < dim, spacedim >, false > > > active_neighbors;
       active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
                                 GeometryInfo<dim>::max_children_per_face);
 
@@ -834,11 +843,11 @@ namespace DerivativeApproximation
       // now loop over all active
       // neighbors and collect the
       // data we need
-      typename std::vector<typename DH<dim,spacedim>::active_cell_iterator>::const_iterator
+      typename std::vector<TriaActiveIterator < dealii::DoFCellAccessor < DH < dim, spacedim >, false > > >::const_iterator
       neighbor_ptr = active_neighbors.begin();
       for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
         {
-          const typename DH<dim,spacedim>::active_cell_iterator
+          const TriaActiveIterator < dealii::DoFCellAccessor < DH < dim, spacedim >, false > >
           neighbor = *neighbor_ptr;
 
           // reinit fe values object...
@@ -926,14 +935,13 @@ namespace DerivativeApproximation
      * derivative_norm vector with the norm of the computed derivative tensors
      * on the cell.
      */
-    template <class DerivativeDescription, int dim,
-              template <int, int> class DH, class InputVector, int spacedim>
+    template <class DerivativeDescription, int dim, template <int, int> class DH, class InputVector, int spacedim>
     void
-    approximate (SynchronousIterators<std_cxx11::tuple<typename DH<dim,spacedim>::active_cell_iterator,Vector<float>::iterator> > const &cell,
-                 const Mapping<dim,spacedim>                  &mapping,
-                 const DH<dim,spacedim>                       &dof_handler,
-                 const InputVector                            &solution,
-                 const unsigned int                            component)
+    approximate(SynchronousIterators<std_cxx11::tuple<TriaActiveIterator < dealii::DoFCellAccessor < DH < dim, spacedim >, false > >, Vector<float>::iterator> > const &cell,
+                const Mapping<dim,spacedim>                  &mapping,
+                const DH<dim,spacedim>                       &dof_handler,
+                const InputVector                            &solution,
+                const unsigned int                            component)
     {
       // if the cell is not locally owned, then there is nothing to do
       if (std_cxx11::get<0>(cell.iterators)->is_locally_owned() == false)
@@ -943,8 +951,8 @@ namespace DerivativeApproximation
           typename DerivativeDescription::Derivative derivative;
           // call the function doing the actual
           // work on this cell
-          approximate_cell<DerivativeDescription,dim,DH,InputVector>
-          (mapping,dof_handler,solution,component,std_cxx11::get<0>(cell.iterators),derivative);
+          approximate_cell<DerivativeDescription,dim,DH,InputVector, spacedim>(mapping,dof_handler,solution,component,std_cxx11::get<0>(cell.iterators),derivative);
+
           // evaluate the norm and fill the vector
           //*derivative_norm_on_this_cell
           *std_cxx11::get<1>(cell.iterators) = DerivativeDescription::derivative_norm (derivative);
@@ -977,7 +985,7 @@ namespace DerivativeApproximation
       Assert (component < dof_handler.get_fe().n_components(),
               ExcIndexRange (component, 0, dof_handler.get_fe().n_components()));
 
-      typedef std_cxx11::tuple<typename DH<dim,spacedim>::active_cell_iterator,Vector<float>::iterator>
+      typedef std_cxx11::tuple<TriaActiveIterator < dealii::DoFCellAccessor < DH < dim, spacedim >, false > >, Vector<float>::iterator>
       Iterators;
       SynchronousIterators<Iterators> begin(Iterators(dof_handler.begin_active(),
                                                       derivative_norm.begin())),
@@ -1070,16 +1078,16 @@ namespace DerivativeApproximation
   }
 
 
-  template <class DH, class InputVector, int order>
+  template <template <int, int> class DH, int dim, int spacedim, class InputVector, int order>
   void
-  approximate_derivative_tensor (const Mapping<DH::dimension,DH::space_dimension> &mapping,
-                                 const DH                                     &dof,
-                                 const InputVector                            &solution,
-                                 const typename DH::active_cell_iterator      &cell,
-                                 Tensor<order,DH::dimension>                  &derivative,
-                                 const unsigned int                            component)
+  approximate_derivative_tensor(const Mapping<DH<dim, spacedim>::dimension, DH<dim, spacedim>::space_dimension> &mapping,
+                                const DH<dim, spacedim>                      &dof,
+                                const InputVector                            &solution,
+                                const TriaActiveIterator < dealii::DoFCellAccessor < DH < dim, spacedim >, false > >      &cell,
+                                Tensor<order, DH<dim, spacedim>::dimension>  &derivative,
+                                const unsigned int                            component)
   {
-    internal::approximate_cell<typename internal::DerivativeSelector<order,DH::dimension>::DerivDescr>
+    internal::approximate_cell<typename internal::DerivativeSelector<order, DH<dim, spacedim>::dimension>::DerivDescr>
     (mapping,
      dof,
      solution,
@@ -1090,17 +1098,17 @@ namespace DerivativeApproximation
 
 
 
-  template <class DH, class InputVector, int order>
+  template <template <int, int> class DH, int dim, int spacedim, class InputVector, int order>
   void
-  approximate_derivative_tensor (const DH                                     &dof,
-                                 const InputVector                            &solution,
-                                 const typename DH::active_cell_iterator      &cell,
-                                 Tensor<order,DH::dimension>                  &derivative,
-                                 const unsigned int                            component)
+  approximate_derivative_tensor(const DH<dim, spacedim>                     &dof,
+                                const InputVector                            &solution,
+                                const TriaActiveIterator < dealii::DoFCellAccessor < DH < dim, spacedim >, false > >      &cell,
+                                Tensor<order, DH<dim, spacedim>::dimension>                  &derivative,
+                                const unsigned int                            component)
   {
     // just call the respective function with Q1 mapping
-    approximate_derivative_tensor<DH,InputVector,order>
-    (StaticMappingQ1<DH::dimension,DH::space_dimension>::mapping,
+    approximate_derivative_tensor<DH<dim, spacedim>, InputVector, order>
+    (StaticMappingQ1<DH<dim, spacedim>::dimension, DH<dim, spacedim>::space_dimension>::mapping,
      dof,
      solution,
      cell,
