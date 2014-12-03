@@ -41,7 +41,10 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
-#include <mm_malloc.h>
+
+#ifndef _MSC_VER
+#  include <mm_malloc.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
