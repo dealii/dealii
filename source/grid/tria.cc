@@ -1911,7 +1911,13 @@ namespace internal
       };
 
 
-
+      /**
+      * Create a triangulation from
+      * given data. This function does
+      * this work for 3-dimensional
+      * triangulations independently
+      * of the actual space dimension.
+      */
       template <int spacedim>
       static
       void
@@ -1935,10 +1941,13 @@ namespace internal
         // and reorder_cells function of
         // GridReordering before creating
         // the triangulation
-        for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
-          AssertThrow (dealii::GridTools::cell_measure(triangulation.vertices,
-                                                       cells[cell_no].vertices) >= 0,
-                       ExcGridHasInvalidCell(cell_no));
+#ifndef _MSC_VER
+        //TODO: The following code does not compile with MSVC. Find a way around it
+        for (unsigned int cell_no = 0; cell_no<cells.size(); ++cell_no)
+          AssertThrow(dealii::GridTools::cell_measure(triangulation.vertices,
+                                                      cells[cell_no].vertices) >= 0,
+                      ExcGridHasInvalidCell(cell_no));
+#endif
 
         ///////////////////////////////////////
         // first set up some collections of data
