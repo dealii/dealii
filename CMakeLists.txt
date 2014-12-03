@@ -156,7 +156,10 @@ ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
 
 IF(DEAL_II_HAVE_TESTS_DIRECTORY)
-  ADD_SUBDIRECTORY(tests)
+  # Turn this off for MSVC. The commands 'test', '> /dev/null', 'rm' are Linux shell commands not available on Windows.
+  IF(NOT DEAL_II_MSVC)
+    ADD_SUBDIRECTORY(tests)
+  ENDIF()
 ENDIF()
 
 #
