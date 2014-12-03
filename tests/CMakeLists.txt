@@ -75,11 +75,14 @@ ADD_CUSTOM_TARGET(setup_tests)
 # Remove all tests:
 ADD_CUSTOM_TARGET(prune_tests)
 
-# Regenerate tests (run "make rebuild_cache" in subprojects):
-ADD_CUSTOM_TARGET(regen_tests)
+# Turn this off for MSVC as none of the sub-targets is used for MSVC (see below).
+IF(NOT DEAL_II_MSVC)
+  # Regenerate tests (run "make rebuild_cache" in subprojects):
+  ADD_CUSTOM_TARGET(regen_tests)
 
-# Regenerate tests (run "make clean" in subprojects):
-ADD_CUSTOM_TARGET(clean_tests)
+  # Regenerate tests (run "make clean" in subprojects):
+  ADD_CUSTOM_TARGET(clean_tests)
+ENDIF()
 
 FOREACH(_category ${_categories})
   SET(_category_dir ${CMAKE_SOURCE_DIR}/tests/${_category})
