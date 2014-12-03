@@ -119,6 +119,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: Several parts of the library have been adjusted to allow
+  compilation with Microsoft Visual Studio. Unfortunately, not all
+  of the library can be compiled yet.
+  <br>
+  (Lukas Korous, 2014/12/03)
+  </li>
+
   <li> New: Added support for OpenCASCADE (www.opencascade.org) 
   library, which allows the use of arbitrary IGES files to describe
   the boundary of a mesh. The use of the new classes is described in 
