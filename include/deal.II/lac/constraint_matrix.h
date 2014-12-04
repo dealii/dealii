@@ -1099,8 +1099,8 @@ public:
    * Trilinos vector wrapper class, or any other type having the same
    * interface.
    *
-   * Note that if called with a TrilinosWrappers::MPI::Vector it may not
-   * contain ghost elements.
+   * @note If called with a TrilinosWrappers::MPI::Vector or
+   * PETScWrappers::MPI::Vector @p vec must not contain ghost elements.
    */
   template <class VectorType>
   void distribute (VectorType &vec) const;
