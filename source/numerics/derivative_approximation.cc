@@ -1075,7 +1075,11 @@ namespace DerivativeApproximation
   approximate_derivative_tensor(const Mapping<dim, spacedim> &mapping,
                                 const DH                    &dof,
                                 const InputVector                            &solution,
+#ifndef _MSC_VER
+                                const typename DH::active_cell_iterator      &cell,
+#else
                                 const TriaActiveIterator < dealii::DoFCellAccessor < DH, false > >      &cell,
+#endif
                                 Tensor<order, dim>  &derivative,
                                 const unsigned int                            component)
   {
@@ -1094,7 +1098,11 @@ namespace DerivativeApproximation
   void
   approximate_derivative_tensor(const DH                     &dof,
                                 const InputVector                            &solution,
+#ifndef _MSC_VER
+                                const typename DH::active_cell_iterator      &cell,
+#else
                                 const TriaActiveIterator < dealii::DoFCellAccessor < DH, false > >      &cell,
+#endif
                                 Tensor<order, dim>                  &derivative,
                                 const unsigned int                            component)
   {
