@@ -378,6 +378,13 @@ namespace DoFRenumbering
                          const bool                 use_constraints,
                          const std::vector<types::global_dof_index> &starting_indices)
   {
+    // see if there is anything to do at all or whether we can skip the work on this processor
+    if (dof_handler.locally_owned_dofs().n_elements() == 0)
+      {
+        Assert (new_indices.size() == 0, ExcInternalError());
+        return;
+      }
+
     // make the connection graph. in 2d/3d use an intermediate compressed
     // sparsity pattern since the we don't have very good estimates for
     // max_couplings_between_dofs() in 3d and this then leads to excessive
@@ -392,7 +399,9 @@ namespace DoFRenumbering
 
     IndexSet locally_owned = dof_handler.locally_owned_dofs();
     SparsityPattern sparsity;
-    if (DH::dimension < 2)
+
+    // otherwise compute the Cuthill-McKee permutation
+    if (DH::dimension == 1)
       {
         sparsity.reinit (dof_handler.n_dofs(),
                          dof_handler.n_dofs(),

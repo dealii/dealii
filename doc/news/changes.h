@@ -340,6 +340,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Calling DoFRenumbering::Cuthill_McKee threw an exception
+  whenever one of the processors of a parallel triangulation did not own
+  any degrees of freedom.
+  <br>
+  (Michal Wichrowski, Wolfgang Bangerth, 2014/12/04)
+  </li>
+
   <li> Fixed: Serializing an object of type DoFHandler did not work without
   including additional header files.
   <br>
