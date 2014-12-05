@@ -81,7 +81,7 @@ inconvenience this causes.
   </li>
 
   <li> The change from functionparser to muparser introduced a small number of
-  incompatibilities: units, use_degress, and recursion with 'eval' are not
+  incompatibilities: units, use_degress, and recursion with 'eval' are no
   longer supported. Comparing for equality is done using '==' instead of '='.
   <br>
   (Timo Heister, 2014/02/10)
@@ -126,10 +126,10 @@ inconvenience this causes.
   (Lukas Korous, 2014/12/03)
   </li>
 
-  <li> New: Added support for OpenCASCADE (www.opencascade.org) 
+  <li> New: Added support for OpenCASCADE (www.opencascade.org)
   library, which allows the use of arbitrary IGES files to describe
-  the boundary of a mesh. The use of the new classes is described in 
-  the new Step-54. 
+  the boundary of a mesh. The use of the new classes is described in
+  the new Step-54.
   <br>
   (Luca Heltai, Andrea Mola, 2014/10/31)
   </li>
@@ -151,7 +151,7 @@ inconvenience this causes.
   </li>
 
   <li> New: The glossary now contains an extensive entry on ghosted and
-  non-ghosted vectors (see @ref GlossGhostedVector
+  non-ghosted vectors (see @ref GlossGhostedVector ).
   <br>
   (Wolfgang Bangerth, 2014/09/27)
   </li>
@@ -161,10 +161,10 @@ inconvenience this causes.
   actually follow the geometry also on the interior of codimension
   zero meshes.
   <br>
-  (Luca Heltai, 2014/09/13) 
+  (Luca Heltai, 2014/09/13)
   </li>
 
-  <li> New: The new tutorial program step-52 explains how to use the 
+  <li> New: The new tutorial program step-52 explains how to use the
   new time stepping methods.
   <br>
   (Bruno Turcksin, Damien Lebrun-Grandie, 2014/09/12)
@@ -184,13 +184,13 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2014/09/01)
   </li>
 
-  <li> New: Most of the operations done on Vector (like add, sadd, etc.) 
-  are now vectorized (SIMD) using OpenMP 4.0
+  <li> New: Most of the operations done on Vector (like add, sadd, etc.)
+  are now vectorized (SIMD) using OpenMP 4.0.
   <br>
   (Bruno Turcksin, 2014/08/25)
   </li>
 
-  <li> Updated: The version of BOOST that comes bundled with deal.II has 
+  <li> Updated: The version of BOOST that comes bundled with deal.II has
   been updated to 1.56.0.
   <br>
   (Wolfgang Bangerth, 2014/08/19)
@@ -200,7 +200,7 @@ inconvenience this causes.
   with BOOST 1.46. Consequently, the CMake scripts now require at least
   BOOST 1.48 in order to use a BOOST version found on the system. If no
   installed BOOST library is found, or if the version is older than 1.48,
-  CMake will simply take the one that comes bundled with deal.II
+  CMake will simply take the one that comes bundled with deal.II.
   <br>
   (Wolfgang Bangerth, 2014/08/19)
   </li>
@@ -260,18 +260,18 @@ inconvenience this causes.
   description, much in the same way we do for boundaries, also for
   interior edges and faces. At the moment this information is used
   only for objects of topological dimension less than spacedim, but a
-  generalization of the class Boundary<dim,spacedim> is on its way to 
+  generalization of the class Boundary<dim,spacedim> is on its way to
   allow also curved cells.
   <br>
-  For the moment, full backward compatibility is granted, and one can 
-  keep using the old Boundary<dim,spacedim>, together with 
-  Triangulation::set_boundary(), and Triangulation::get_boundary() 
+  For the moment, full backward compatibility is granted, and one can
+  keep using the old Boundary<dim,spacedim>, together with
+  Triangulation::set_boundary(), and Triangulation::get_boundary()
   methods. However, this change suggests to use the types::boundary_id associated
-  with each boundary face to indicate only boundary condition types, and 
-  it allows to separate the geometric meaning from the physical meaning. The 
+  with each boundary face to indicate only boundary condition types, and
+  it allows to separate the geometric meaning from the physical meaning. The
   suggested usage is
   - types::boundary_id is used for the physical meaning
-  - types::manifold_id is used for the geometric meaning. 
+  - types::manifold_id is used for the geometric meaning.
   <br>
   (Luca Heltai, 2014/07/14)
   </li>
@@ -366,14 +366,20 @@ inconvenience this causes.
   Now, it is possible to specify an additional (geometric) rotation matrix along
   with vector components that should be rotated when applying periodic boundary
   conditions (or alternatively, directly a transformation matrix working
-  directly on dofs). With this it is e.g. now possible to compute stokes flow
+  directly on dofs). With this it is now possible to e.g. compute Stokes flow
   on a quarter pie with periodic boundary conditions and the velocity correctly
   transformed.
   <br>
   (Daniel Arndt, Matthias Maier, 2014/11/19)
   </li>
 
-  <li> New: Added support for STEP files in the OpenCASCADE 
+  <li> Improved: Vector updates in PreconditionChebyshev based on deal.II's own
+  vectors are now vectorized with OpenMP 4.0 SIMD pragmas.
+  <br>
+  (Martin Kronbichler, Bruno Turcksin, 2014/11/17)
+  </li>
+
+  <li> New: Added support for STEP files in the OpenCASCADE
   wrappers. STEP files can now be imported and exported respectively
   with the OpenCASCADE::read_STEP() and OpenCASCADE::write_STEP() functions.
   <br>
@@ -396,13 +402,13 @@ inconvenience this causes.
   <li> New: parallel::distributed::Triangulation::communicate_locally_moved_vertices()
   allows to
   update vertex positions that have been moved just locally on distributed
-  meshes. GridTools::distort_random now works for distributed meshes and 
+  meshes. GridTools::distort_random now works for distributed meshes and
   hanging nodes in 3D as well.
   <br>
   (Daniel Arndt, 2014/11/06)
   </li>
 
-  <li> New: TableHandler objects can be cleared - i.e. reset to a 
+  <li> New: TableHandler objects can be cleared - i.e. reset to a
   zero-sized state.
   <br>
   (Fahad Alrashed, 2014/11/09)
@@ -416,7 +422,7 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2014/11/05)
   </li>
 
-  <li> Fixed: Using the FEEvaluation framework did not work for 
+  <li> Fixed: Using the FEEvaluation framework did not work for
   scalar elements in 1d because there were conflicting partial
   specializations. This is now fixed.
   <br>
@@ -497,19 +503,19 @@ inconvenience this causes.
   </li>
 
   <li> New: Added two optional parameters to TriaAccessor::center()
-  and a new method TriaAccessor::intermediate_point(). 
-  They allow to query for a 
-  geometrically coherent center, or ask for arbitrary points on the 
-  underlying Manifold, given the dim coordinates in the reference 
+  and a new method TriaAccessor::intermediate_point().
+  They allow to query for a
+  geometrically coherent center, or ask for arbitrary points on the
+  underlying Manifold, given the dim coordinates in the reference
   element.
-  Triangulation was refactored internally to use the new 
+  Triangulation was refactored internally to use the new
   TriaAccessor::center() interface when querying for new points.
   <br>
   (Luca Heltai, 2014/09/13)
   </li>
 
-  <li> Improved: Optimize construction of high-order FE_Nedelec by moving out some 
-  non-essential computations. Namely, construct restriction and prolongation 
+  <li> Improved: Optimize construction of high-order FE_Nedelec by moving out some
+  non-essential computations. Namely, construct restriction and prolongation
   matrices on first request. This reduces time spent in FE_Nedelec constructor
   substantially.
   <br>
@@ -521,11 +527,11 @@ inconvenience this causes.
   a Triangulation<dim, spacedim_2> as output. The output
   triangulation will contain a single level with all active
   cells of the input triangulation, and will be topologically
-  equivalent to the input triangulation. If the two spacedimensions
+  equivalent to the input triangulation. If the two space dimensions
   are equal, then this function will copy the triangulation
-  removing all levels, e.g., flattening it. If the two spacedimensions
+  removing all levels, e.g., flattening it. If the two space dimensions
   are different, then this function will copy the vertices only
-  up to the smallest spacedimension parameter. <br>
+  up to the smallest space dimension parameter. <br>
   Using this function, you can create a Triangulation<2,3> from
   a Triangulation<2,2> or project to the plane z=0 your
   Triangulation<2,3>. No checks are performed on the validity of
@@ -551,8 +557,8 @@ inconvenience this causes.
   </li>
 
   <li> Fixed: Support SLEPc 3.5 by disabling SDFOLD spectrum transformation type
-  that has been removed from SLEPc. Therefore, TransformationSpectrumFolding 
-  cannot be used with newer SLEPc versions. 
+  that has been removed from SLEPc. Therefore, TransformationSpectrumFolding
+  cannot be used with newer SLEPc versions.
   <br>
   (Alexander Grayver, 2014/08/15)
   </li>
@@ -618,15 +624,15 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2014/07/20)
   </li>
 
-  <li> New: The function GridOut::write, can now be used also in 
-  the codimension one case. 
+  <li> New: The function GridOut::write can now be used also in
+  the codimension one case.
   <br>
   (Luca Heltai, 2014/07/18)
   </li>
 
-  <li> New: The Function classes, now take an additional optional
+  <li> New: The Function classes now take an additional optional
   template argument, specifying the type of number to use, which defaults
-  to double. 
+  to double.
   <br>
   (Luca Heltai, 2014/07/18)
   </li>
@@ -683,7 +689,7 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2014/07/04)
   </li>
 
-  <li> Fixed: GridGenerator::merge_triangulations produced sometimes invalid
+  <li> Fixed: GridGenerator::merge_triangulations sometimes produced invalid
   orientations of faces. This is now fixed.
   <br>
   (Daniel Arndt, 2014/06/30)
@@ -704,12 +710,12 @@ inconvenience this causes.
   into FEEvaluation and one should only use FEEvaluation, while the other
   interfaces have been marked deprecated and will be removed in a future
   version. The internal data structures for the various special cases have
-  been kept in order to provide for the most efficient routines, which is
+  been kept in order to provide for the most efficient routines, and are
   selected at construction of FEEvaluation.
   <br>
   (Martin Kronbichler, 2014/06/27)
   </li>
-  
+
   <li> Bugfix: TBB specific include directories have to be added to the
   list of user include directories because of direct inclusion of header
   files in base/thread_local_storage.h.
@@ -722,7 +728,7 @@ inconvenience this causes.
   <br>
   (Guido Kanschat, 2014/06/23)
   </li>
-  
+
   <li> New: %Functions DoFTools::extract_locally_relevant_dofs(),
   parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number() and
   parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction() are
@@ -799,22 +805,22 @@ inconvenience this causes.
   by the flag SolverGMRES::AdditionalData::compute_eigenvalues.
   <br>
   (Martin Kronbichler, 2014/05/11)
-  </li>  
+  </li>
 
   <li> New: The GridIn::read_vtk() function places fewer restrictions
   on the VTK files it wants to read and should, consequently, be able
   to read more correctly formatted VTK files than before.
   <br>
   (Giorgos Kourakos, 2014/05/08)
-  </li>  
+  </li>
 
-  <li> New: There is now a QSorted quadrature which takes an 
+  <li> New: There is now a QSorted quadrature which takes an
   arbitrary quadrature at construction time and reorders the quadrature
   points according to the weights, from smaller to bigger. This should
   improve stability of higher order polynomial integration.
   <br>
   (Luca Heltai, 2014/05/07)
-  </li>  
+  </li>
 
   <li> New: The class VectorizedArray<Number> now provides methods
   VectorizedArray::load(ptr) to read from arbitrary pointer addresses and
@@ -888,7 +894,7 @@ inconvenience this causes.
   <br>
   (Timo Heister, 2014/04/08)
   </li>
-  
+
   <li> New: GridTools::laplace_transform() now takes an additional, optional
   parameter that indicates the "stiffness" of the mapping.
   <br>
