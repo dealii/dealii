@@ -529,11 +529,11 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 
   qsort_index(criteria,tmp,0,criteria.size()-1);
 
-  double s0 = (1.-std::pow(2.,-1.*order)) * criteria(tmp[0]);
-  double E  = criteria.l1_norm();
+  // total error
+  const double E  = criteria.l1_norm();
 
-  unsigned int N = criteria.size();
-  unsigned int M = 0;
+  // number of elements
+  const unsigned int N = criteria.size();
 
   // The first M cells are refined
   // to minimize the expected error
@@ -545,22 +545,35 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
   // We assume that the error is
   // decreased by (1-2^(-order)) a_K if the cell
   // K with error indicator a_K is
-  // refined and 'order' ist the expected
+  // refined and 'order' is the expected
   // order of convergence.
   // The expected number of cells is
   // N+(2^d-1)*M (N is the current number
   // of cells)
-  double min =std::pow( ((std::pow(2.,dim)-1)*(1.+M)+N),(double) order/dim) * (E-s0);
 
+
+  // a varible to store the current minimum we found
+  double min = std::numeric_limits<double>::max();
+
+  // in the worst case, refine all cells:
   unsigned int minArg = N-1;
 
-  for (M=1; M<criteria.size(); ++M)
+  // the sum of the expected error reduction on refinement
+  // in those elements which were marked
+  double s0 = 0;
+
+  // note that the number of cells
+  // to be refined is M+1
+  for (unsigned int M=0; M<criteria.size(); ++M)
     {
       s0 += (1-std::pow(2.,-1.*order)) * criteria(tmp[M]);
 
-      if ( std::pow(((std::pow(2.,dim)-1)*(1+M)+N), (double) order/dim) * (E-s0) <= min)
+      // the function we want to minimize
+      const double min_M = std::pow(((std::pow(2.,dim)-1)*(1.+M)+N), (double) order/dim) * (E-s0);
+
+      if ( min_M <= min)
         {
-          min =  std::pow(((std::pow(2.,dim)-1)*(1+M)+N), (double) order/dim) * (E-s0);
+          min =  min_M;
           minArg = M;
         }
     }
