@@ -602,8 +602,9 @@ public:
 
   /**
    * This function is an alternative to the above ones, allowing the output of
-   * derived quantities instead of the given data. This converison has to be
-   * done in a class derived from DataPostprocessor.
+   * derived quantities instead of the given data. This conversion has to be
+   * done in a class derived from DataPostprocessor. This function is used in
+   * step-29. Other uses are shown in step-32 and step-33.
    *
    * The names for these derived quantities are provided by the @p
    * data_postprocessor argument. Likewise, the data_component_interpretation
@@ -617,6 +618,15 @@ public:
    * FEValuesBase::get_function_values() function. In particular, this
    * includes all of the usual vector types, but also IndexSet (see step-41
    * for a use of this).
+   *
+   * @note The DataPostprocessor object (i.e., in reality the object of your derived
+   * class) has to live until the DataOut object is destroyed as the latter keeps
+   * a pointer to the former and will complain if the object pointed to is
+   * destroyed while the latter still has a pointer to it. If both the data
+   * postprocessor and DataOut objects are local variables of a function
+   * (as they are, for example, in step-29), then you can avoid this
+   * error by declaring the data postprocessor variable before the DataOut
+   * variable as objects are destroyed in reverse order of declaration.
    */
   template <class VECTOR>
   void add_data_vector (const VECTOR                           &data,

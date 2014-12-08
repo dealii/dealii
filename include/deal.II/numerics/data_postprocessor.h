@@ -46,11 +46,19 @@ DEAL_II_NAMESPACE_OPEN
  * points where we want to generated output, the functions of this class can
  * be overloaded to compute new quantities.
  *
- * A data vector and an object of a derived class can be given to the
- * DataOut::add_data_vector() function, which will write the derived
- * quantities instead of the provided data to the output file. Note, that the
- * DataPostprocessor has to live until DataOut::build_patches has been
- * called. DataOutFaces and DataOutRotation can be used as well.
+ * A data vector and an object of a class derived from the current one can
+ * be given to the DataOut::add_data_vector() function (and similarly for
+ * DataOutRotation and DataOutFaces). This will cause
+ * DataOut::build_patches() to compute the derived quantities instead of using
+ * the data provided by the data vector (typically the solution vector). Note
+ * that the DataPostprocessor object (i.e., in reality the object of your derived
+ * class) has to live until the DataOut object is destroyed as the latter keeps
+ * a pointer to the former and will complain if the object pointed to is
+ * destroyed while the latter still has a pointer to it. If both the data
+ * postprocessor and DataOut objects are local variables of a function
+ * (as they are, for example, in step-29), then you can avoid this
+ * error by declaring the data postprocessor variable before the DataOut
+ * variable as objects are destroyed in reverse order of declaration.
  *
  * In order not to perform needless calculations, DataPostprocessor
  * has to provide information which input data is needed for the
