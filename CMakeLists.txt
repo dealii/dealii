@@ -155,11 +155,12 @@ ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
 
-IF(DEAL_II_HAVE_TESTS_DIRECTORY)
-  # Turn this off for MSVC. The commands 'test', '> /dev/null', 'rm' are Linux shell commands not available on Windows.
-  IF(NOT DEAL_II_MSVC)
-    ADD_SUBDIRECTORY(tests)
-  ENDIF()
+#
+# Do not configure testsuite on Windows targets because posix shell and
+# commands like 'test', '> /dev/null', 'rm', etc. are not available
+#
+IF(DEAL_II_HAVE_TESTS_DIRECTORY AND NOT DEAL_II_MSVC)
+  ADD_SUBDIRECTORY(tests)
 ENDIF()
 
 #
