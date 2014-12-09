@@ -63,9 +63,9 @@
   An example:
 <pre class="cmake">
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
-#
-# Set an appropriate keyword depending on target and build type:
-#
+  #
+  # Set an appropriate keyword depending on target and build type:
+  #
   IF(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
     SET(_keyword "general")
   ELSE()
@@ -94,7 +94,7 @@ ENDFOREACH()
 LIST(APPEND CONFIG_LIBRARIES
   ${_keyword}
   ${CONFIG_LIBRARIES_${_build}}
-)
+  )
 
 SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
   PROPERTIES
@@ -103,7 +103,7 @@ SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
   LINK_FLAGS "${DEAL_II_LINKER_FLAGS_${build}}"
   COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
   COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
-)
+  )
 </pre>
 
 <p>
@@ -254,7 +254,7 @@ SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     it does and why it is there, and should state author and year.
   <li>
     There are a number of readily available platform check macros:
-    
+
 <pre>
 CHECK_CXX_SOURCE_COMPILES(source variable)
   - Checks whether it is possible to compile _and_ link the code snippet
@@ -306,7 +306,7 @@ RESET_CMAKE_REQUIRED()
     <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best to append these
     lists and later on reset <code>CMAKE_REQUIRED_*</code> (including
     <code>CMAKE_REQUIRED_FLAGS</code>) to their default values:
-    
+
 <pre class="cmake">
 LIST(APPEND CMAKE_REQUIRED_INCLUDES &lt;a list of includes&gt;)
 LIST(APPEND CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;)
