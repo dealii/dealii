@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,64 +21,65 @@ IF(DEAL_II_COMPONENT_PACKAGE)
     ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/mac_startup_script.sh.in
     ${CMAKE_BINARY_DIR}/cpack/mac_startup_script.sh
     @ONLY
-  )
+    )
 
   CONFIGURE_FILE(
     ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-terminal.in
     ${CMAKE_BINARY_DIR}/cpack/dealii-terminal
     @ONLY
-  )
+    )
 
   CONFIGURE_FILE(
     ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii.conf.in
     ${CMAKE_BINARY_DIR}/cpack/dealii.conf
     @ONLY
-  )
+    )
 
   CONFIGURE_FILE(
     ${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/Info.plist.in
     ${CMAKE_BINARY_DIR}/cpack/Info.plist
     @ONLY
-  )
+    )
 
-  SET(CPACK_PACKAGE_ICON 
+  SET(CPACK_PACKAGE_ICON
     "${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-icon.icns"
-  )
+    )
 
-  set(CPACK_PACKAGE_FILE_NAME 
+  set(CPACK_PACKAGE_FILE_NAME
     "${DEAL_II_PACKAGE_NAME}-${DEAL_II_PACKAGE_VERSION}"
-  )
+    )
 
-  set(CPACK_BUNDLE_NAME 
+  set(CPACK_BUNDLE_NAME
     "${DEAL_II_PACKAGE_NAME}"
-  )
+    )
 
-  SET(CPACK_BUNDLE_ICON 
+  SET(CPACK_BUNDLE_ICON
     "${CMAKE_SOURCE_DIR}/cmake/cpack-mac-bundle/dealii-icon.icns"
-  )
+    )
 
-  SET(CPACK_BUNDLE_PLIST 
+  SET(CPACK_BUNDLE_PLIST
     "${CMAKE_BINARY_DIR}/cpack/Info.plist"
-  )
+    )
 
-  SET(CPACK_BUNDLE_STARTUP_COMMAND 
+  SET(CPACK_BUNDLE_STARTUP_COMMAND
     "${CMAKE_BINARY_DIR}/cpack/mac_startup_script.sh"
-  )
+    )
 
-  INSTALL(FILES 
+  INSTALL(FILES
     ${CMAKE_BINARY_DIR}/cpack/dealii.conf
     DESTINATION ${DEAL_II_COMMON_RELDIR}
-  )
+    )
 
-  INSTALL(PROGRAMS 
-    ${CMAKE_BINARY_DIR}/cpack/dealii-terminal 
+  INSTALL(PROGRAMS
+    ${CMAKE_BINARY_DIR}/cpack/dealii-terminal
     DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
-  )
+    )
 
   IF(NOT "${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}" STREQUAL "")
-     INSTALL(DIRECTORY ${DEAL_II_EXTERNAL_LIBS_TREE}/ 
-             DESTINATION opt
-             USE_SOURCE_PERMISSIONS)
+     INSTALL(DIRECTORY ${DEAL_II_EXTERNAL_LIBS_TREE}/
+       DESTINATION opt
+       USE_SOURCE_PERMISSIONS
+       )
   ENDIF()
 
   INCLUDE(CPack)
