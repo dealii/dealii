@@ -129,6 +129,10 @@ INCLUDE(setup_custom_targets)
 INCLUDE(setup_finalize)
 INCLUDE(setup_write_config)
 
+#
+# CPack configuration
+#
+INCLUDE(setup_cpack)
 
 ########################################################################
 #                                                                      #

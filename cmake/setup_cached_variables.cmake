@@ -27,6 +27,7 @@
 #     DEAL_II_COMPONENT_EXAMPLES
 #     DEAL_II_COMPONENT_MESH_CONVERTER
 #     DEAL_II_COMPONENT_PARAMETER_GUI
+#     DEAL_II_COMPONENT_PACKAGE
 #     DEAL_II_FORCE_AUTODETECTION
 #
 # Options regarding compilation and linking:
@@ -111,6 +112,10 @@ OPTION(DEAL_II_FORCE_AUTODETECTION
   OFF
   )
 
+OPTION(DEAL_II_COMPONENT_PACKAGE
+  "Generates additional targets for packaging deal.II"
+  OFF
+  )
 
 
 ########################################################################
@@ -403,3 +408,11 @@ FOREACH(_var ${_res})
     UNSET(${_var} CACHE)
   ENDIF()
 ENDFOREACH()
+
+# CPack miscellaneous options
+SET(DEAL_II_EXTERNAL_LIBS_TREE "" CACHE PATH
+    "Path to tree of external libraries that will be installed in bundle package."
+  )
+MARK_AS_ADVANCED(DEAL_II_EXTERNAL_LIBS_TREE)
+
+
