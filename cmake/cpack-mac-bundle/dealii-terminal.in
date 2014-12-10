@@ -23,9 +23,9 @@ else
 fi
 
 # Make sure DEAL_II_BUNDLE is set correctly
-if [ -z "$DEAL_II_BUNDLE" ]; then 
+if [ -z "$DEAL_II_BUNDLE" ]; then
     export DEAL_II_BUNDLE=/Applications/deal.II.app
-    if [ ! -d $DEAL_II_BUNDLE ]; then 
+    if [ ! -d $DEAL_II_BUNDLE ]; then
 	    return=`/usr/bin/osascript <<EOF
 tell app "System Events"
     Activate
@@ -36,7 +36,7 @@ EOF`
     fi
 fi
 
-if [ -z "$DEAL_II_RESOURCES" ]; then 
+if [ -z "$DEAL_II_RESOURCES" ]; then
     export DEAL_II_RESOURCES=$DEAL_II_BUNDLE/Contents/Resources
 fi
 
