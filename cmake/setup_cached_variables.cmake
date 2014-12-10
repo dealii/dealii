@@ -408,3 +408,11 @@ FOREACH(_var ${_res})
     UNSET(${_var} CACHE)
   ENDIF()
 ENDFOREACH()
+
+# CPack miscellaneous options
+SET(DEAL_II_EXTERNAL_LIBS_TREE "" CACHE PATH
+    "Path to tree of external libraries that will be installed in bundle package."
+  )
+MARK_AS_ADVANCED(DEAL_II_EXTERNAL_LIBS_TREE)
+
+

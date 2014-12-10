@@ -129,6 +129,10 @@ INCLUDE(setup_custom_targets)
 INCLUDE(setup_finalize)
 INCLUDE(setup_write_config)
 
+#
+# CPack configuration
+#
+INCLUDE(setup_cpack)
 
 ########################################################################
 #                                                                      #
@@ -162,8 +166,6 @@ ADD_SUBDIRECTORY(examples)
 IF(DEAL_II_HAVE_TESTS_DIRECTORY AND NOT DEAL_II_MSVC)
   ADD_SUBDIRECTORY(tests)
 ENDIF()
-
-ADD_SUBDIRECTORY(cpack)
 
 #
 # And finally, print the configuration:
