@@ -340,6 +340,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The FE_Q and FE_Q_Hierarchical classes now include pictures
+  of their 2d shape functions in the class documentation.
+  <br>
+  (Manuel Quezada de Luna, Wolfgang Bangerth, 2014/12/09)
+  </li>
+
   <li> Fixed: Calling DoFRenumbering::Cuthill_McKee threw an exception
   whenever one of the processors of a parallel triangulation did not own
   any degrees of freedom.
