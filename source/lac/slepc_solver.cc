@@ -49,7 +49,6 @@ namespace SLEPcWrappers
     :
     solver_control (cn),
     mpi_communicator (mpi_communicator),
-    target_eigenvalue (NULL),
     set_which (EPS_LARGEST_MAGNITUDE),
     set_problem (EPS_GNHEP),
     opA (NULL),
