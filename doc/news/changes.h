@@ -340,6 +340,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Fixed: CMake now correctly detects -Wno-... support for gcc.
+  <br>
+  (Matthias Maier, 2014/12/11)
+  </li>
+
   <li> New: The FE_Q and FE_Q_Hierarchical classes now include pictures
   of their 2d shape functions in the class documentation.
   <br>
