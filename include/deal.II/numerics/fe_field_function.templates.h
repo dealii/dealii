@@ -70,7 +70,7 @@ namespace Functions
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
-        const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
+        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
         AssertThrow (my_pair.first->is_locally_owned(),
                      ExcPointNotAvailableHere());
@@ -121,7 +121,7 @@ namespace Functions
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
-        const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
+        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
         AssertThrow (my_pair.first->is_locally_owned(),
                      ExcPointNotAvailableHere());
@@ -174,7 +174,7 @@ namespace Functions
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
-        const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
+        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
         AssertThrow (my_pair.first->is_locally_owned(),
                      ExcPointNotAvailableHere());
@@ -441,7 +441,7 @@ namespace Functions
       qp = get_reference_coordinates (cell, points[0]);
       if (!qp)
         {
-          const std::pair<typename DH::active_cell_iterator, Point<dim> >
+          const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> >
           my_pair  = GridTools::find_active_cell_around_point
                      (mapping, *dh, points[0]);
           AssertThrow (my_pair.first->is_locally_owned(),
@@ -506,7 +506,7 @@ namespace Functions
         // the next cell
         if (left_over == true)
           {
-            const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
+            const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
               = GridTools::find_active_cell_around_point (mapping, *dh, points[first_outside]);
             AssertThrow (my_pair.first->is_locally_owned(),
                          ExcPointNotAvailableHere());
