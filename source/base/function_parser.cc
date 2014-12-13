@@ -254,11 +254,11 @@ void FunctionParser<dim>:: init_muparser() const
         }
       catch (mu::ParserError &e)
         {
-          std::cerr << "Message:  " << e.GetMsg() << "\n";
-          std::cerr << "Formula:  " << e.GetExpr() << "\n";
-          std::cerr << "Token:    " << e.GetToken() << "\n";
-          std::cerr << "Position: " << e.GetPos() << "\n";
-          std::cerr << "Errc:     " << e.GetCode() << std::endl;
+          std::cerr << "Message:  <" << e.GetMsg() << ">\n";
+          std::cerr << "Formula:  <" << e.GetExpr() << ">\n";
+          std::cerr << "Token:    <" << e.GetToken() << ">\n";
+          std::cerr << "Position: <" << e.GetPos() << ">\n";
+          std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
           AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
         }
     }
@@ -279,7 +279,7 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
   this->var_names = Utilities::split_string_list(variables, ',');
   this->expressions = expressions;
   AssertThrow(((time_dependent)?dim+1:dim) == var_names.size(),
-              ExcMessage("wrong number of variables"));
+              ExcMessage("Wrong number of variables"));
   AssertThrow(!use_degrees, ExcNotImplemented());
 
   // We check that the number of
@@ -397,11 +397,11 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
     }
   catch (mu::ParserError &e)
     {
-      std::cerr << "Message:  " << e.GetMsg() << "\n";
-      std::cerr << "Formula:  " << e.GetExpr() << "\n";
-      std::cerr << "Token:    " << e.GetToken() << "\n";
-      std::cerr << "Position: " << e.GetPos() << "\n";
-      std::cerr << "Errc:     " << e.GetCode() << std::endl;
+      std::cerr << "Message:  <" << e.GetMsg() << ">\n";
+      std::cerr << "Formula:  <" << e.GetExpr() << ">\n";
+      std::cerr << "Token:    <" << e.GetToken() << ">\n";
+      std::cerr << "Position: <" << e.GetPos() << ">\n";
+      std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
       AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
       return 0.0;
     }
