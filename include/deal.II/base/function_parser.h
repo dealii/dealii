@@ -364,29 +364,39 @@ public:
 private:
 #ifdef DEAL_II_WITH_MUPARSER
   /**
-   * place for the variables for each thread
+   * Place for the variables for each thread
    */
   mutable Threads::ThreadLocalStorage<std::vector<double> > vars;
+
   /**
-   * the muParser objects for each thread (and one for each component)
+   * The muParser objects for each thread (and one for each component)
    */
   mutable Threads::ThreadLocalStorage<std::vector<mu::Parser> > fp;
 
   /**
-   * keep track of all the constants, required to initialize fp in each
-   * thread
+   * An array to keep track of all the constants, required to
+   * initialize fp in each thread.
    */
   std::map<std::string, double> constants;
+
   /**
-   * variable names, required to initialize fp in each thread
+   * An array for the variable names, required to initialize fp in
+   * each thread.
    */
   std::vector<std::string> var_names;
+
   /**
-   * the expressions, required to initialize fp in each thread
+   * An array of function expressions (one per component), required to
+   * initialize fp in each thread.
    */
   std::vector<std::string> expressions;
+
   /**
-   * this function will initialize fp on the current thread
+   * Initialize fp and vars on the current thread. This function may
+   * only be called once per thread. A thread can test whether the
+   * function has already been called by testing whether
+   * 'fp.get().size()==0' (not initialized) or >0 (already
+   * initialized).
    */
   void init_muparser() const;
 #endif
