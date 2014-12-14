@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -141,9 +141,13 @@ namespace internal
 template <int dim>
 void FunctionParser<dim>:: init_muparser() const
 {
-  if (fp.get().size()>0)
-    return;
+  // check that we have not already initialized the parser on the
+  // current thread, i.e., that the current function is only called
+  // once per thread
+  Assert (fp.get().size()==0, ExcInternalError());
 
+  // initialize the objects for the current thread (fp.get() and
+  // vars.get())
   fp.get().resize(this->n_components);
   vars.get().resize(var_names.size());
   for (unsigned int component=0; component<this->n_components; ++component)
@@ -250,11 +254,11 @@ void FunctionParser<dim>:: init_muparser() const
         }
       catch (mu::ParserError &e)
         {
-          std::cerr << "Message:  " << e.GetMsg() << "\n";
-          std::cerr << "Formula:  " << e.GetExpr() << "\n";
-          std::cerr << "Token:    " << e.GetToken() << "\n";
-          std::cerr << "Position: " << e.GetPos() << "\n";
-          std::cerr << "Errc:     " << e.GetCode() << std::endl;
+          std::cerr << "Message:  <" << e.GetMsg() << ">\n";
+          std::cerr << "Formula:  <" << e.GetExpr() << ">\n";
+          std::cerr << "Token:    <" << e.GetToken() << ">\n";
+          std::cerr << "Position: <" << e.GetPos() << ">\n";
+          std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
           AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
         }
     }
@@ -275,7 +279,7 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
   this->var_names = Utilities::split_string_list(variables, ',');
   this->expressions = expressions;
   AssertThrow(((time_dependent)?dim+1:dim) == var_names.size(),
-              ExcMessage("wrong number of variables"));
+              ExcMessage("Wrong number of variables"));
   AssertThrow(!use_degrees, ExcNotImplemented());
 
   // We check that the number of
@@ -308,9 +312,14 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
   else
     n_vars = dim;
 
-  init_muparser();
+  // create a parser object for the current thread we can then query
+  // in value() and vector_value(). this is not strictly necessary
+  // because a user may never call these functions on the current
+  // thread, but it gets us error messages about wrong formulas right
+  // away
+  init_muparser ();
 
-  // Now set the initialization bit.
+  // finally set the initialization bit
   initialized = true;
 }
 
@@ -373,8 +382,9 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
   Assert (component < this->n_components,
           ExcIndexRange(component, 0, this->n_components));
 
-  // initialize if not done so on this thread yet:
-  init_muparser();
+  // initialize the parser if that hasn't happened yet on the current thread
+  if (fp.get().size() == 0)
+    init_muparser();
 
   for (unsigned int i=0; i<dim; ++i)
     vars.get()[i] = p(i);
@@ -387,11 +397,11 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
     }
   catch (mu::ParserError &e)
     {
-      std::cerr << "Message:  " << e.GetMsg() << "\n";
-      std::cerr << "Formula:  " << e.GetExpr() << "\n";
-      std::cerr << "Token:    " << e.GetToken() << "\n";
-      std::cerr << "Position: " << e.GetPos() << "\n";
-      std::cerr << "Errc:     " << e.GetCode() << std::endl;
+      std::cerr << "Message:  <" << e.GetMsg() << ">\n";
+      std::cerr << "Formula:  <" << e.GetExpr() << ">\n";
+      std::cerr << "Token:    <" << e.GetToken() << ">\n";
+      std::cerr << "Position: <" << e.GetPos() << ">\n";
+      std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
       AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
       return 0.0;
     }
@@ -408,8 +418,9 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
           ExcDimensionMismatch (values.size(), this->n_components));
 
 
-  // initialize if not done so on this thread yet:
-  init_muparser();
+  // initialize the parser if that hasn't happened yet on the current thread
+  if (fp.get().size() == 0)
+    init_muparser();
 
   for (unsigned int i=0; i<dim; ++i)
     vars.get()[i] = p(i);
