@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -320,8 +320,8 @@ namespace internal
  * interpreted, i.e. whether each component of the data is logically an
  * independent scalar field, or whether some of them together form logically a
  * vector-field (see the
- * DataComponentInterpretation::DataComponentInterpretation enum, and the @ref
- * step_22 "step-22" tutorial program).
+ * DataComponentInterpretation::DataComponentInterpretation enum, and the
+ * @ref step_22 "step-22" tutorial program).
  *
  * It should be noted that this class does not copy the vector given to it
  * through the add_data_vector() functions, for memory consumption reasons. It

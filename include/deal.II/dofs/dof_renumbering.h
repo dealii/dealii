@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -163,8 +163,8 @@ DEAL_II_NAMESPACE_OPEN
  * The component_wise() function allows not only to honor enumeration based on
  * vector components, but also allows to group together vector components into
  * "blocks" using a defaulted argument to the various
- * DoFRenumber::component_wise() functions (see @ref GlossComponent vs @ref
- * GlossBlock for a description of the difference). The blocks designated
+ * DoFRenumber::component_wise() functions (see @ref GlossComponent vs
+ * @ref GlossBlock for a description of the difference). The blocks designated
  * through this argument may, but do not have to be, equal to the blocks that
  * the finite element reports. For example, a typical Stokes element would be
  * @code

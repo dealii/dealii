@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -93,8 +93,8 @@ namespace MeshWorker
      * used locally.
      *
      * In the block model, each of the blocks of the local vectors corresponds
-     * to the restriction of a single block of the system to this cell (@ref
-     * GlossBlock). Thus, the size of this local block is the number of
+     * to the restriction of a single block of the system to this cell
+     * (@ref GlossBlock). Thus, the size of this local block is the number of
      * degrees of freedom of the corresponding base element of the FESystem.
      *
      * @todo Comprehensive model currently not implemented.

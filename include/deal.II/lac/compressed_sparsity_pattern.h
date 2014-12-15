@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,10 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number> class SparseMatrix;
 
 
-//TODO[WB]: Unify implementation with the CompressedSetSparsityPattern since really all that's different is the Line structure in the two classes. We should have a templatized base class that simply gets the particular Line structure from a derived class.
+//  TODO[WB]: Unify implementation with the CompressedSetSparsityPattern
+//  since really all that's different is the Line structure in the two
+//  classes. We should have a templatized base class that simply gets the
+//  particular Line structure from a derived class.
 
 /*! @addtogroup Sparsity
  *@{
@@ -80,9 +83,9 @@ template <typename number> class SparseMatrix;
  *
  * <h3>Notes</h3>
  *
- * There are several, exchangeable variations of this class, see @ref
- * Sparsity, section '"Dynamic" or "compressed" sparsity patterns' for more
- * information.
+ * There are several, exchangeable variations of this class, see
+ * @ref Sparsity, section '"Dynamic" or "compressed" sparsity patterns' for
+ * more information.
  *
  * @author Wolfgang Bangerth, 2001
  */

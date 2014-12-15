@@ -380,8 +380,9 @@ private:
    * These are the factors multiplied to a function in the
    * #generalized_face_support_points when computing the integration.
    *
-   * See the @ref GlossGeneralizedSupport "glossary entry on generalized
-   * support points" for more information.
+   * See the
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * for more information.
    */
   Table<2, double> boundary_weights;
 

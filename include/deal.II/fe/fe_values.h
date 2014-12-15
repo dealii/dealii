@@ -129,8 +129,8 @@ namespace FEValuesViews
 {
   /**
    * A class representing a view to a single scalar component of a possibly
-   * vector-valued finite element. Views are discussed in the @ref
-   * vector_valued module.
+   * vector-valued finite element. Views are discussed in the
+   * @ref vector_valued module.
    *
    * You get an object of this type if you apply a FEValuesExtractors::Scalar
    * to an FEValues, FEFaceValues or FESubfaceValues object.
@@ -1170,8 +1170,8 @@ namespace internal
  * @note All data fields are public, but this is not critical, because access
  * to this object is private in FEValues.
  *
- * The purpose of this class is discussed on the page on @ref
- * UpdateFlagsEssay.
+ * The purpose of this class is discussed on the page on
+ * @ref UpdateFlagsEssay.
  *
  * @ingroup feaccess
  * @author Guido Kanschat

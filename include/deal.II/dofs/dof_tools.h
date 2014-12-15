@@ -922,9 +922,8 @@ namespace DoFTools
    * first_vector_components is empty the matrix is interpreted as an
    * interpolation matrix with size no_face_dofs $\times$ no_face_dofs.
    *
-   * Detailed information can be found in the @see @ref
-   * GlossPeriodicConstraints "Glossary entry on periodic boundary
-   * conditions".
+   * Detailed information can be found in the see
+   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
    *
    * @todo: Reference to soon be written example step and glossary article.
    *
@@ -960,8 +959,8 @@ namespace DoFTools
    * parallel::distributed::Triangulation::add_periodicity has to be called
    * before.
    *
-   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
-   * conditions" for further information.
+   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
+   * for further information.
    *
    * @author Daniel Arndt, Matthias Maier, 2013, 2014
    */
@@ -1000,8 +999,8 @@ namespace DoFTools
    * (dofs the entry is constrained to, inhomogeneities) is kept and nothing
    * happens.
    *
-   * The flags in the last parameter, @p component_mask (see @ref
-   * GlossComponentMask) denote which components of the finite element space
+   * The flags in the last parameter, @p component_mask (see
+   * @ref GlossComponentMask) denote which components of the finite element space
    * shall be constrained with periodic boundary conditions. If it is left as
    * specified by the default value all components are constrained. If it is
    * different from the default value, it is assumed that the number of
@@ -1014,8 +1013,8 @@ namespace DoFTools
    * feeds the output to above make_periodicity_constraints() variant. If you
    * need more functionality use GridTools::collect_periodic_faces() directly.
    *
-   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
-   * conditions" for further information.
+   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
+   * for further information.
    *
    * @author Matthias Maier, 2012
    */
@@ -1042,16 +1041,16 @@ namespace DoFTools
    * face index <code>2*dimension+1</code> and boundary indicator @p b_id.
    *
    * @note This version of make_periodicity_constraints  will not work on
-   * meshes with cells not in @ref GlossFaceOrientation "standard
-   * orientation".
+   * meshes with cells not in
+   * @ref GlossFaceOrientation "standard orientation".
    *
    * @note: This function is a convenience wrapper. It internally calls
    * GridTools::collect_periodic_faces() with the supplied paramaters and
    * feeds the output to above make_periodicity_constraints() variant. If you
    * need more functionality use GridTools::collect_periodic_faces() directly.
    *
-   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
-   * conditions" for further information.
+   * @see @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
+   * for further information.
    */
   template<typename DH>
   void
@@ -1095,8 +1094,8 @@ namespace DoFTools
    * $u(0,y)=u(1,y+1)$.
    *
    * @note This version of make_periodicity_constraints  will not work on
-   * meshes with cells not in @ref GlossFaceOrientation "standard
-   * orientation".
+   * meshes with cells not in
+   * @ref GlossFaceOrientation "standard orientation".
    *
    * @deprecated This function is deprecated. Use
    * GridTools::collect_periodic_faces in conjunction with
@@ -1312,8 +1311,8 @@ namespace DoFTools
    * @note If the DoFHandler object is indeed defined on a
    * parallel::distributed::Triangulation, then the @p selected_dofs index set
    * will contain only those degrees of freedom on the boundary that belong to
-   * the locally relevant set (see @ref GlossLocallyRelevantDof "locally
-   * relevant DoFs").
+   * the locally relevant set (see
+   * @ref GlossLocallyRelevantDof "locally relevant DoFs").
    *
    * @param dof_handler The object that describes which degrees of freedom
    * live on which cell
@@ -1362,8 +1361,9 @@ namespace DoFTools
 
   /**
    * Extract a vector that represents the constant modes of the DoFHandler for
-   * the components chosen by <tt>component_mask</tt> (see @ref
-   * GlossComponentMask).  The constant modes on a discretization are the null
+   * the components chosen by <tt>component_mask</tt> (see
+   * @ref GlossComponentMask).
+   * The constant modes on a discretization are the null
    * space of a Laplace operator on the selected components with Neumann
    * boundary conditions applied. The null space is a necessary ingredient for
    * obtaining a good AMG preconditioner when using the class
@@ -1457,8 +1457,8 @@ namespace DoFTools
    * is a superset of DoFHandler::locally_owned_dofs() and contains all DoF
    * indices that live on all locally owned cells (including on the interface
    * to ghost cells). However, it does not contain the DoF indices that are
-   * exclusively defined on ghost or artificial cells (see @ref
-   * GlossArtificialCell "the glossary").
+   * exclusively defined on ghost or artificial cells (see
+   * @ref GlossArtificialCell "the glossary").
    *
    * The degrees of freedom identified by this function equal those obtained
    * from the dof_indices_with_subdomain_association() function when called
@@ -1964,11 +1964,12 @@ namespace DoFTools
                                std::vector<types::global_dof_index>     &mapping);
 
   /**
-   * Return a list of support points (see this @ref GlossSupport "glossary
-   * entry") for all the degrees of freedom handled by this DoF handler
-   * object. This function, of course, only works if the finite element object
-   * used by the DoF handler object actually provides support points, i.e. no
-   * edge elements or the like. Otherwise, an exception is thrown.
+   * Return a list of support points (see this
+   * @ref GlossSupport "glossary entry") for all the degrees of freedom
+   * handled by this DoF handler object. This function, of course, only
+   * works if the finite element object used by the DoF handler object
+   * actually provides support points, i.e. no edge elements or the like.
+   * Otherwise, an exception is thrown.
    *
    * @pre The given array must have a length of as many elements as there are
    * degrees of freedom.
@@ -2007,8 +2008,9 @@ namespace DoFTools
    * hold a vector that would contain the locations of all DoFs even if they
    * were known. As a consequence, this function constructs a map from those
    * DoFs for which we can know the locations (namely, those DoFs that are
-   * locally relevant (see @ref GlossLocallyRelevantDof "locally relevant
-   * DoFs") to their locations.
+   * locally relevant (see
+   * @ref GlossLocallyRelevantDof "locally relevant DoFs") to their
+   * locations.
    *
    * For non-distributed triangulations, the map returned as @p support_points
    * is of course dense, i.e., every DoF is to be found in it.
@@ -2098,12 +2100,12 @@ namespace DoFTools
    * the case where there are conflicting constraints on individual degrees of
    * freedom.
    * @param component_mask An optional component mask that restricts the
-   * functionality of this function to a subset of an FESystem. For non-@ref
-   * GlossPrimitive "primitive" shape functions, any degree of freedom is
-   * affected that belongs to a shape function where at least one of its
-   * nonzero components is affected by the component mask (see @ref
-   * GlossComponentMask). If this argument is omitted, all components of the
-   * finite element with degrees of freedom at the boundary will be
+   * functionality of this function to a subset of an FESystem. For
+   * non-@ref GlossPrimitive "primitive" shape functions, any degree of freedom
+   * is affected that belongs to a shape function where at least one of its
+   * nonzero components is affected by the component mask (see
+   * @ref GlossComponentMask). If this argument is omitted, all components
+   * of the finite element with degrees of freedom at the boundary will be
    * considered.
    *
    * @ingroup constraints

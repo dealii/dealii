@@ -789,8 +789,8 @@ struct GeometryInfo<0>
 
 /**
  * This class provides dimension independent information to all topological
- * structures that make up the unit, or @ref GlossReferenceCell "reference
- * cell".
+ * structures that make up the unit, or
+ * @ref GlossReferenceCell "reference cell".
  *
  * It is the one central point in the library where information about the
  * numbering of vertices, lines, or faces of the reference cell is collected.
@@ -1302,8 +1302,8 @@ struct GeometryInfo<0>
  *
  *
  * @note Instantiations for this template are provided for dimensions 1,2,3,4,
- * and there is a specialization for dim=0 (see the section on @ref
- * Instantiations in the manual).
+ * and there is a specialization for dim=0 (see the section on
+ * @ref Instantiations in the manual).
  *
  * @ingroup grid geomprimitives aniso
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005, Tobias Leicht, 2007
@@ -1545,8 +1545,8 @@ struct GeometryInfo
    * the standard and non-standard orientation. <tt>face_orientation</tt>
    * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
    * default to <tt>false</tt> (standard orientation) and has no effect in 2d.
-   * The concept of face orientations is explained in this @ref
-   * GlossFaceOrientation "glossary" entry.
+   * The concept of face orientations is explained in this
+   * @ref GlossFaceOrientation "glossary" entry.
    *
    * In the case of anisotropically refined cells and faces, the @p
    * RefinementCase of the face, <tt>face_ref_case</tt>, might have an
@@ -1882,8 +1882,8 @@ struct GeometryInfo
    * Note that this is only the <em>standard orientation</em> of faces. At
    * least in 3d, actual faces of cells in a triangulation can also have the
    * opposite orientation, depending on a flag that one can query from the
-   * cell it belongs to. For more information, see the @ref
-   * GlossFaceOrientation "glossary" entry on face orientation.
+   * cell it belongs to. For more information, see the
+   * @ref GlossFaceOrientation "glossary" entry on face orientation.
    */
   static const int unit_normal_orientation[faces_per_cell];
 

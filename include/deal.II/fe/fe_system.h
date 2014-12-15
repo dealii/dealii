@@ -49,8 +49,8 @@ DEAL_II_NAMESPACE_OPEN
  * covered in step-8 has $d$ components in $d$ space dimensions. In general,
  * the number of components of a FESystem element is the accumulated number of
  * components of all base elements times their multiplicities. A bit more on
- * components is also given in the @ref GlossComponent "glossary entry on
- * components".
+ * components is also given in the
+ * @ref GlossComponent "glossary entry on components".
  *
  * While the concept of components is important from the viewpoint of a
  * partial differential equation, the finite element side looks a bit

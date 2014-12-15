@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -131,8 +131,8 @@ namespace internal
 
       /**
        * One bool per cell to indicate the direction of the normal true:  use
-       * orientation from vertex false: revert the orientation. See @ref
-       * GlossDirectionFlag .
+       * orientation from vertex false: revert the orientation. See
+       * @ref GlossDirectionFlag .
        *
        * This is only used for codim==1 meshes.
        */

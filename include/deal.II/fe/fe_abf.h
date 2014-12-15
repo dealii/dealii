@@ -89,8 +89,9 @@ template <int dim, int spacedim> class MappingQ;
  * points such that this quadrature can be performed with sufficient accuracy.
  * The points needed are those of QGauss<sub>k+1</sub> on each face as well as
  * QGauss<sub>k</sub> in the interior of the cell (or none for
- * RT<sub>0</sub>). See the @ref GlossGeneralizedSupport "glossary entry on
- * generalized support points" for more information.
+ * RT<sub>0</sub>). See the
+ * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+ * for more information.
  *
  *
  * @author Oliver Kayser-Herold, 2006, based on previous work by Guido
@@ -155,8 +156,9 @@ private:
    * class and fill the tables with interpolation weights (#boundary_weights
    * and #interior_weights). Called from the constructor.
    *
-   * See the @ref GlossGeneralizedSupport "glossary entry on generalized
-   * support points" for more information.
+   * See the
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * for more information.
    */
   void initialize_support_points (const unsigned int rt_degree);
 

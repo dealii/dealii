@@ -213,8 +213,9 @@ private:
    * organized such that there is one row for each generalized face support
    * point and one column for each degree of freedom on the face.
    *
-   * See the @ref GlossGeneralizedSupport "glossary entry on generalized
-   * support points" for more information.
+   * See the
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * for more information.
    */
   Table<2, double> boundary_weights;
   /**
@@ -353,8 +354,9 @@ private:
    * FiniteElement<dim>::generalized_face_support_points fields. Called from
    * the constructor.
    *
-   * See the @ref GlossGeneralizedSupport "glossary entry on generalized
-   * support points" for more information.
+   * See the
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * for more information.
    */
   void initialize_support_points (const unsigned int rt_degree);
 };

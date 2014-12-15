@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,8 +61,8 @@ namespace IteratorFilters
 
   /**
    * Filter that evaluates to true if either the iterator points to an object
-   * for which the user flag is set or an iterator past the end. See @ref
-   * GlossUserFlags for information about user flags.
+   * for which the user flag is set or an iterator past the end. See
+   * @ref GlossUserFlags for information about user flags.
    *
    * @ingroup Iterators
    */
@@ -166,11 +166,11 @@ namespace IteratorFilters
 
   /**
    * Filter for iterators that evaluates to true if a cell is owned by the
-   * current processor, i.e., if it is a @ref GlossLocallyOwnedCell "locally
-   * owned cell".
+   * current processor, i.e., if it is a
+   * @ref GlossLocallyOwnedCell "locally owned cell".
    *
-   * This class is used in step-32, in connection with the methods of the @ref
-   * distributed module.
+   * This class is used in step-32, in connection with the methods of the
+   * @ref distributed module.
    *
    * @ingroup Iterators
    */

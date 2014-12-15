@@ -62,8 +62,8 @@ namespace TrilinosWrappers
      * elements of each of these blocks to be stored on the local process.
      *
      * @ingroup Vectors
-     * @ingroup TrilinosWrappers @see @ref GlossBlockLA "Block (linear
-     * algebra)"
+     * @ingroup TrilinosWrappers @see
+     * @ref GlossBlockLA "Block (linear algebra)"
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
      */
     class BlockVector : public BlockVectorBase<Vector>

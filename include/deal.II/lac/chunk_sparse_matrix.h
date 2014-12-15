@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -829,8 +829,8 @@ public:
    * this matrix.
    *
    * Note that while this function can operate on all vectors that offer
-   * iterator classes, it is only really effective for objects of type @ref
-   * Vector. For all classes for which iterating over elements, or random
+   * iterator classes, it is only really effective for objects of type
+   * @ref Vector. For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.
@@ -847,8 +847,8 @@ public:
    * takes the transposed matrix.
    *
    * Note that while this function can operate on all vectors that offer
-   * iterator classes, it is only really effective for objects of type @ref
-   * Vector. For all classes for which iterating over elements, or random
+   * iterator classes, it is only really effective for objects of type
+   * @ref Vector. For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.
@@ -864,8 +864,8 @@ public:
    * <i>M</i> being this matrix.
    *
    * Note that while this function can operate on all vectors that offer
-   * iterator classes, it is only really effective for objects of type @ref
-   * Vector. For all classes for which iterating over elements, or random
+   * iterator classes, it is only really effective for objects of type
+   * @ref Vector. For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.
@@ -882,8 +882,8 @@ public:
    * as vmult_add() but takes the transposed matrix.
    *
    * Note that while this function can operate on all vectors that offer
-   * iterator classes, it is only really effective for objects of type @ref
-   * Vector. For all classes for which iterating over elements, or random
+   * iterator classes, it is only really effective for objects of type
+   * @ref Vector. For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.

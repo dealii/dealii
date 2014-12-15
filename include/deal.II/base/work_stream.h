@@ -46,9 +46,10 @@ DEAL_II_NAMESPACE_OPEN
  * each of which operates on a subset of the given range of objects. The class
  * uses the Intel Threading Building Blocks (TBB) to load balance the
  * individual subranges onto the available threads. For a lengthy discussion
- * of the rationale of this class, see the @ref threads "Parallel computing
- * with multiple processors" module. It is used in the tutorial first in
- * step-9, and again in step-13, step-14, step-32 and others.
+ * of the rationale of this class, see the
+ * @ref threads "Parallel computing with multiple processors" module. It is
+ * used in the tutorial first in step-9, and again in step-13, step-14,
+ * step-32 and others.
  *
  * The class is built on the following premise: One frequently has some work
  * that needs to be done on a sequence of objects; a prototypical example is

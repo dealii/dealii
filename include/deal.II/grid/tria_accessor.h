@@ -232,8 +232,8 @@ namespace TriaAccessorExceptions
  * level or the container with all objects of this dimension
  * (<tt>structdim&lt;dim</tt>).
  *
- * Some internals of this class are discussed in @ref
- * IteratorAccessorInternals .
+ * Some internals of this class are discussed in
+ * @ref IteratorAccessorInternals .
  *
  * @ingroup grid
  * @ingroup Accessors
@@ -952,10 +952,11 @@ public:
   /**
    * Return a constant reference to the manifold object used for this object.
    *
-   * As explained in @ref boundary "Boundary and manifold description for
-   * triangulations", the process involved in finding the appropriate manifold
-   * description involves querying both the manifold or boundary indicators.
-   * See there for more information.
+   * As explained in
+   * @ref boundary "Boundary and manifold description for triangulations",
+   * the process involved in finding the appropriate manifold description
+   * involves querying both the manifold or boundary indicators. See there
+   * for more information.
    */
   const Manifold<dim,spacedim> &get_manifold () const;
 
@@ -1051,8 +1052,8 @@ public:
   void recursively_clear_user_flag () const;
 
   /**
-   * Reset the user data to zero, independent if pointer or index. See @ref
-   * GlossUserData for more information.
+   * Reset the user data to zero, independent if pointer or index. See
+   * @ref GlossUserData for more information.
    */
   void clear_user_data () const;
 

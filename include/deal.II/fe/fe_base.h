@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,9 +66,9 @@ namespace FiniteElementDomination
    * are then implemented in the FiniteElement::compare_for_line_domination()
    * function.
    *
-   * Note that there are situations where neither side dominates. The @ref
-   * hp_paper "hp paper" lists two case, with the simpler one being that a
-   * $Q_2\times Q_1$ vector-valued element (i.e. a
+   * Note that there are situations where neither side dominates. The
+   * @ref hp_paper "hp paper" lists two case, with the simpler one being
+   * that a $Q_2\times Q_1$ vector-valued element (i.e. a
    * <code>FESystem(FE_Q(2),1,FE_Q(1),1)</code>) meets a $Q_1\times Q_2$
    * element: here, for each of the two vector-components, we can define a
    * domination relationship, but it is different for the two components.

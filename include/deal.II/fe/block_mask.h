@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,10 +29,11 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class represents a mask that can be used to select individual vector
- * blocks of a finite element (see also @ref GlossBlockMask "this glossary
- * entry"). It will typically have as many elements as the finite element has
- * blocks, and one can use <code>operator[]</code> to query whether a
- * particular block has been selected.
+ * blocks of a finite element (see also
+ * @ref GlossBlockMask "this glossary entry"). It will typically have as
+ * many elements as the finite element has blocks, and one can use
+ * <code>operator[]</code> to query whether a particular block has been
+ * selected.
  *
  * The semantics of this class are the same as the related ComponentMask
  * class, i.e., a default constructed mask represents all possible blocks. See

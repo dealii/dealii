@@ -37,9 +37,10 @@ template <typename number> class SparseMatrix;
  * triangulations for some basic geometries.
  *
  * Some of these functions receive a flag @p colorize. If this is set, parts
- * of the boundary receive different boundary indicators (@ref
- * GlossBoundaryIndicator), allowing them to be distinguished for the purpose
- * of attaching geometry objects and evaluating different boundary conditions.
+ * of the boundary receive different boundary indicators (
+ * @ref GlossBoundaryIndicator), allowing them to be distinguished for the
+ * purpose of attaching geometry objects and evaluating different boundary
+ * conditions.
  *
  * This namespace also provides a function
  * GridGenerator::laplace_transformation that smoothly transforms a domain
@@ -479,8 +480,8 @@ namespace GridGenerator
    * appropriate manifold descriptions to the geometry created by this
    * function. In the current context, this would involve the
    * SphericalManifold class. An example of how this works and what it leads
-   * to is shown in the documentation of the @ref manifold "documentation
-   * module on manifolds".
+   * to is shown in the documentation of the
+   * @ref manifold "documentation module on manifolds".
    *
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.

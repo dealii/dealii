@@ -423,8 +423,8 @@ namespace internal
  * dependent of the dimension and there only exist specialized versions for
  * distinct dimensions.
  *
- * This class satisfies the requirements outlined in @ref
- * GlossMeshAsAContainer "Meshes as containers".
+ * This class satisfies the requirements outlined in
+ * @ref GlossMeshAsAContainer "Meshes as containers".
  *
  *
  * <h3>Structure and iterators</h3>
@@ -1383,8 +1383,8 @@ public:
 
   /**
    * A typedef that is used to to identify cell iterators. The concept of
-   * iterators is discussed at length in the @ref Iterators "iterators
-   * documentation module".
+   * iterators is discussed at length in the
+   * @ref Iterators "iterators documentation module".
    *
    * The current typedef identifies cells in a triangulation. The TriaIterator
    * class works like a pointer that when you dereference it yields an object
@@ -1399,9 +1399,10 @@ public:
   typedef TriaIterator      <CellAccessor<dim,spacedim>         > cell_iterator;
 
   /**
-   * A typedef that is used to to identify @ref GlossActive "active cell
-   * iterators". The concept of iterators is discussed at length in the @ref
-   * Iterators "iterators documentation module".
+   * A typedef that is used to to identify
+   * @ref GlossActive "active cell iterators". The concept of iterators is
+   * discussed at length in the
+   * @ref Iterators "iterators documentation module".
    *
    * The current typedef identifies active cells in a triangulation. The
    * TriaActiveIterator class works like a pointer to active objects that when
@@ -1522,8 +1523,8 @@ public:
   /**
    * A structure that is used as an exception object by the
    * create_triangulation() function to indicate which cells among the coarse
-   * mesh cells are inverted or severely distorted (see the entry on @ref
-   * GlossDistorted "distorted cells" in the glossary).
+   * mesh cells are inverted or severely distorted (see the entry on
+   * @ref GlossDistorted "distorted cells" in the glossary).
    *
    * Objects of this kind are thrown by the create_triangulation() and
    * execute_coarsening_and_refinement() functions, and they can be caught in
@@ -1916,8 +1917,8 @@ public:
    *
    * @note If the boundary description is sufficiently irregular, it can
    * happen that some of the children produced by mesh refinement are
-   * distorted (see the extensive discussion on @ref GlossDistorted "distorted
-   * cells").
+   * distorted (see the extensive discussion on
+   * @ref GlossDistorted "distorted cells").
    *
    * @note This function is <tt>virtual</tt> to allow derived classes to
    * insert hooks, such as saving refinement flags and the like (see e.g. the
@@ -2099,14 +2100,14 @@ public:
   void save_user_flags (std::vector<bool> &v) const;
 
   /**
-   * Read the information stored by @p save_user_flags.  See also @ref
-   * GlossUserFlags .
+   * Read the information stored by @p save_user_flags.  See also
+   * @ref GlossUserFlags .
    */
   void load_user_flags (std::istream &in);
 
   /**
-   * Read the information stored by @p save_user_flags.  See also @ref
-   * GlossUserFlags .
+   * Read the information stored by @p save_user_flags.  See also
+   * @ref GlossUserFlags .
    */
   void load_user_flags (const std::vector<bool> &v);
 
@@ -2212,8 +2213,8 @@ public:
   void save_user_indices (std::vector<unsigned int> &v) const;
 
   /**
-   * Read the information stored by save_user_indices().  See also @ref
-   * GlossUserData .
+   * Read the information stored by save_user_indices().  See also
+   * @ref GlossUserData .
    */
   void load_user_indices (const std::vector<unsigned int> &v);
 
@@ -2224,8 +2225,8 @@ public:
   void save_user_pointers (std::vector<void *> &v) const;
 
   /**
-   * Read the information stored by save_user_pointers().  See also @ref
-   * GlossUserData .
+   * Read the information stored by save_user_pointers().  See also
+   * @ref GlossUserData .
    */
   void load_user_pointers (const std::vector<void *> &v);
 

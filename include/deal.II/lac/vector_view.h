@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -122,8 +122,8 @@ DEAL_II_NAMESPACE_OPEN
  * @note Instantiations for this template are provided for <tt>@<float@>,
  * @<double@>, @<long double@>, @<std::complex@<float@>@>,
  * @<std::complex@<double@>@>, @<std::complex@<long double@>@></tt>; others
- * can be generated in application programs (see the section on @ref
- * Instantiations in the manual).
+ * can be generated in application programs (see the section on
+ * @ref Instantiations in the manual).
  *
  * @author Luca Heltai, 2009
  */

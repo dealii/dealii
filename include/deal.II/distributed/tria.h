@@ -172,8 +172,8 @@ namespace parallel
      * dealii::Triangulation class but there are a number of difficult
      * algorithms under the hood that ensure we always have a load-balanced,
      * fully distributed mesh. Use of this class is explained in step-40,
-     * step-32, the @ref distributed documentation module, as well as the @ref
-     * distributed_paper . See there for more information. This class
+     * step-32, the @ref distributed documentation module, as well as the
+     * @ref distributed_paper . See there for more information. This class
      * satisfies the requirements outlined in @ref GlossMeshAsAContainer
      * "Meshes as containers".
      *
@@ -325,8 +325,8 @@ namespace parallel
     public:
       /**
        * A typedef that is used to to identify cell iterators. The concept of
-       * iterators is discussed at length in the @ref Iterators "iterators
-       * documentation module".
+       * iterators is discussed at length in the
+       * @ref Iterators "iterators documentation module".
        *
        * The current typedef identifies cells in a triangulation. You can find
        * the exact type it refers to in the base class's own typedef, but it
@@ -343,8 +343,9 @@ namespace parallel
       typedef typename dealii::Triangulation<dim,spacedim>::cell_iterator        cell_iterator;
 
       /**
-       * A typedef that is used to to identify @ref GlossActive "active cell
-       * iterators". The concept of iterators is discussed at length in the
+       * A typedef that is used to to identify
+       * @ref GlossActive "active cell iterators". The concept of iterators
+       * is discussed at length in the
        * @ref Iterators "iterators documentation module".
        *
        * The current typedef identifies active cells in a triangulation. You

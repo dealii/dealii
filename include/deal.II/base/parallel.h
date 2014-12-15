@@ -148,8 +148,8 @@ namespace parallel
    * balanced.
    *
    * For a discussion of the kind of problems to which this function is
-   * applicable, see the @ref threads "Parallel computing with multiple
-   * processors" module.
+   * applicable, see the
+   * @ref threads "Parallel computing with multiple processors" module.
    */
   template <typename InputIterator,
             typename OutputIterator,
@@ -201,8 +201,8 @@ namespace parallel
    * balanced.
    *
    * For a discussion of the kind of problems to which this function is
-   * applicable, see the @ref threads "Parallel computing with multiple
-   * processors" module.
+   * applicable, see the
+   * @ref threads "Parallel computing with multiple processors" module.
    */
   template <typename InputIterator1,
             typename InputIterator2,
@@ -258,8 +258,8 @@ namespace parallel
    * balanced.
    *
    * For a discussion of the kind of problems to which this function is
-   * applicable, see the @ref threads "Parallel computing with multiple
-   * processors" module.
+   * applicable, see the
+   * @ref threads "Parallel computing with multiple processors" module.
    */
   template <typename InputIterator1,
             typename InputIterator2,
@@ -382,8 +382,8 @@ namespace parallel
    * scheduling subranges to CPU resources than on doing actual work.
    *
    * For a discussion of the kind of problems to which this function is
-   * applicable, see also the @ref threads "Parallel computing with multiple
-   * processors" module.
+   * applicable, see also the
+   * @ref threads "Parallel computing with multiple processors" module.
    */
   template <typename RangeType, typename Function>
   void apply_to_subranges (const RangeType                          &begin,
@@ -622,8 +622,8 @@ namespace parallel
    * differ on the order of round-off.
    *
    * For a discussion of the kind of problems to which this function is
-   * applicable, see also the @ref threads "Parallel computing with multiple
-   * processors" module.
+   * applicable, see also the
+   * @ref threads "Parallel computing with multiple processors" module.
    */
   template <typename ResultType, typename RangeType, typename Function>
   ResultType accumulate_from_subranges (const Function &f,

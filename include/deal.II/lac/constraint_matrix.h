@@ -585,8 +585,8 @@ public:
    * thousand or millions of unknowns are involved and for problems with many
    * nonzero elements per row (for example for vector-valued problems or hp
    * finite elements). In this case, it is advisable to use the
-   * BlockCompressedSetSparsityPattern class instead, see for example @ref
-   * step_27 "step-27" and @ref step_31 "step-31".
+   * BlockCompressedSetSparsityPattern class instead, see for example
+   * @ref step_27 "step-27" and @ref step_31 "step-31".
    */
   void condense (BlockCompressedSparsityPattern &sparsity) const;
 
@@ -938,8 +938,8 @@ public:
    * This function simultaneously writes elements into matrix and vector,
    * according to the constraints specified by the calling ConstraintMatrix.
    * This function can correctly handle inhomogeneous constraints as well. For
-   * the parameter use_inhomogeneities_for_rhs see the documentation in @ref
-   * constraints module.
+   * the parameter use_inhomogeneities_for_rhs see the documentation in
+   * @ref constraints module.
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function

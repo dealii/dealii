@@ -401,10 +401,10 @@ namespace GridTools
    *
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
-   * fact be a ghost or artificial cell (see @ref GlossArtificialCell and @ref
-   * GlossGhostCell). If so, many of the operations one may want to do on this
-   * cell (e.g., evaluating the solution) may not be possible and you will
-   * have to decide what to do in that case.
+   * fact be a ghost or artificial cell (see @ref GlossArtificialCell and
+   * @ref GlossGhostCell). If so, many of the operations one may want to do
+   * on this cell (e.g., evaluating the solution) may not be possible and
+   * you will have to decide what to do in that case.
    */
   template <int dim, template <int,int> class Container, int spacedim>
 #ifndef _MSC_VER
@@ -452,10 +452,10 @@ namespace GridTools
    *
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
-   * fact be a ghost or artificial cell (see @ref GlossArtificialCell and @ref
-   * GlossGhostCell). If so, many of the operations one may want to do on this
-   * cell (e.g., evaluating the solution) may not be possible and you will
-   * have to decide what to do in that case.
+   * fact be a ghost or artificial cell (see @ref GlossArtificialCell and
+   * @ref GlossGhostCell). If so, many of the operations one may want to do
+   * on this cell (e.g., evaluating the solution) may not be possible and
+   * you will have to decide what to do in that case.
    */
   template <int dim, template<int, int> class Container, int spacedim>
 #ifndef _MSC_VER
@@ -480,10 +480,10 @@ namespace GridTools
    *
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
-   * fact be a ghost or artificial cell (see @ref GlossArtificialCell and @ref
-   * GlossGhostCell). If so, many of the operations one may want to do on this
-   * cell (e.g., evaluating the solution) may not be possible and you will
-   * have to decide what to do in that case.
+   * fact be a ghost or artificial cell (see @ref GlossArtificialCell and
+   * @ref GlossGhostCell). If so, many of the operations one may want to do
+   * on this cell (e.g., evaluating the solution) may not be possible and
+   * you will have to decide what to do in that case.
    */
   template <int dim, int spacedim>
   std::pair<typename hp::DoFHandler<dim, spacedim>::active_cell_iterator, Point<dim> >
@@ -772,9 +772,9 @@ namespace GridTools
    * couldn't be fixed up for whatever reason. The returned list is therefore
    * a subset of the input argument.
    *
-   * For a definition of the concept of distorted cells, see the @ref
-   * GlossDistorted "glossary entry". The first argument passed to the current
-   * function is typically the exception thrown by the
+   * For a definition of the concept of distorted cells, see the
+   * @ref GlossDistorted "glossary entry". The first argument passed to the
+   * current function is typically the exception thrown by the
    * Triangulation::execute_coarsening_and_refinement function.
    */
   template <int dim, int spacedim>
@@ -913,8 +913,8 @@ namespace GridTools
      * FESystem. If @p first_vector_components is empty the matrix is
      * interpreted as an interpolation matrix with size no_face_dofs $\times$
      * no_face_dofs. For more details see make_periodicity_constraints() and
-     * the glossary @ref GlossPeriodicConstraints "glossary entry on periodic
-     * boundary conditions".
+     * the glossary
+     * @ref GlossPeriodicConstraints "glossary entry on periodic boundary conditions".
      */
     FullMatrix<double> matrix;
 
@@ -1044,9 +1044,8 @@ namespace GridTools
    * DoFs of the second face. If @p first_vector_components is non empty the
    * matrix is interpreted as a rotation matrix that is applied to all vector
    * valued blocks listed in @p first_vector_components of the FESystem. For
-   * more details see make_periodicity_constraints() and the glossary @ref
-   * GlossPeriodicConstraints "glossary entry on periodic boundary
-   * conditions".
+   * more details see make_periodicity_constraints() and the glossary
+   * @ref GlossPeriodicConstraints "glossary entry on periodic boundary conditions".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see @ref GlossMeshAsAContainer).
@@ -1095,16 +1094,15 @@ namespace GridTools
    * DoFs of the second face. If @p first_vector_components is non empty the
    * matrix is interpreted as a rotation matrix that is applied to all vector
    * valued blocks listet in @p first_vector_components of the FESystem. For
-   * more details see make_periodicity_constraints() and the glossary @ref
-   * GlossPeriodicConstraints "glossary entry on periodic boundary
-   * conditions".
+   * more details see make_periodicity_constraints() and the glossary
+   * @ref GlossPeriodicConstraints "glossary entry on periodic boundary conditions".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see @ref GlossMeshAsAContainer).
    *
    * @note This version of collect_periodic_face_pairs() will not work on
-   * meshes with cells not in @ref GlossFaceOrientation "standard
-   * orientation".
+   * meshes with cells not in
+   * @ref GlossFaceOrientation "standard orientation".
    *
    * @author Daniel Arndt, Matthias Maier, 2013, 2014
    */

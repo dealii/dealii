@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,10 +29,11 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class represents a mask that can be used to select individual vector
- * components of a finite element (see also @ref GlossComponentMask "this
- * glossary entry"). It will typically have as many elements as the finite
- * element has vector components, and one can use <code>operator[]</code> to
- * query whether a particular component has been selected.
+ * components of a finite element (see also
+ * @ref GlossComponentMask "this glossary entry"). It will typically have
+ * as many elements as the finite element has vector components, and one
+ * can use <code>operator[]</code> to query whether a particular component
+ * has been selected.
  *
  * Objects of this kind are used in many places where one wants to restrict
  * operations to a certain subset of components, e.g. in

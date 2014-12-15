@@ -69,8 +69,8 @@ namespace hp
 
   /**
    * Manage the distribution and numbering of the degrees of freedom for hp-
-   * FEM algorithms. This class satisfies the requirements outlined in @ref
-   * GlossMeshAsAContainer "Meshes as containers".
+   * FEM algorithms. This class satisfies the requirements outlined in
+   * @ref GlossMeshAsAContainer "Meshes as containers".
    *
    * The purpose of this class is to allow for an enumeration of degrees of
    * freedom in the same way as the ::DoFHandler class, but it allows to use a
@@ -132,9 +132,10 @@ namespace hp
     typedef typename ActiveSelector::active_hex_iterator  active_hex_iterator;
 
     /**
-     * A typedef that is used to to identify @ref GlossActive "active cell
-     * iterators". The concept of iterators is discussed at length in the @ref
-     * Iterators "iterators documentation module".
+     * A typedef that is used to to identify
+     * @ref GlossActive "active cell iterators". The concept of iterators
+     * is discussed at length in the
+     * @ref Iterators "iterators documentation module".
      *
      * The current typedef identifies active cells in a hp::DoFHandler object.
      * While the actual data type of the typedef is hidden behind a few layers
@@ -156,15 +157,16 @@ namespace hp
 
     /**
      * A typedef that is used to to identify cell iterators. The concept of
-     * iterators is discussed at length in the @ref Iterators "iterators
-     * documentation module".
+     * iterators is discussed at length in the
+     * @ref Iterators "iterators documentation module".
      *
      * The current typedef identifies cells in a DoFHandler object. Some of
-     * these cells may in fact be active (see @ref GlossActive "active cell
-     * iterators") in which case they can in fact be asked for the degrees of
-     * freedom that live on them. On the other hand, if the cell is not
-     * active, any such query will result in an error. Note that this is what
-     * distinguishes this typedef from the level_cell_iterator typedef.
+     * these cells may in fact be active (see
+     * @ref GlossActive "active cell iterators") in which case they can in
+     * fact be asked for the degrees of freedom that live on them. On the
+     * other hand, if the cell is not active, any such query will result in
+     * an error. Note that this is what distinguishes this typedef from the
+     * level_cell_iterator typedef.
      *
      * While the actual data type of the typedef is hidden behind a few layers
      * of (unfortunately necessary) indirections, it is in essence

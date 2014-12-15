@@ -108,8 +108,9 @@ private:
    * class and fill the tables with @p interior_weights. Called from the
    * constructor.
    *
-   * See the @ref GlossGeneralizedSupport "glossary entry on generalized
-   * support points" for more information.
+   * See the
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * for more information.
    */
   void initialize_support_points (const unsigned int degree);
 

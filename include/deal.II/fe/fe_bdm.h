@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -98,8 +98,9 @@ private:
   /**
    * Initialize the FiniteElement<dim>::generalized_support_points and
    * FiniteElement<dim>::generalized_face_support_points fields. Called from
-   * the constructor. See the @ref GlossGeneralizedSupport "glossary entry on
-   * generalized support points" for more information.
+   * the constructor. See the
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * for more information.
    */
   void initialize_support_points (const unsigned int rt_degree);
   /**

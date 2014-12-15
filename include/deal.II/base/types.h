@@ -254,8 +254,8 @@ namespace numbers
    * "artificial".
    *
    * See the glossary entries on @ref GlossSubdomainId "subdomain ids" and
-   * @ref GlossArtificialCell "artificial cells" as well as the @ref
-   * distributed module for more information.
+   * @ref GlossArtificialCell "artificial cells" as well as the
+   * @ref distributed module for more information.
    */
   const types::subdomain_id artificial_subdomain_id = static_cast<types::subdomain_id>(-2);
 }

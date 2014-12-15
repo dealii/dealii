@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,8 +101,8 @@ namespace hp
      * collection.  This number must be the same for all elements in the
      * collection.
      *
-     * This function calls FiniteElement::n_components.  See @ref
-     * GlossComponent "the glossary" for more information.
+     * This function calls FiniteElement::n_components.  See
+     * @ref GlossComponent "the glossary" for more information.
      */
     unsigned int n_components () const;
 
@@ -111,15 +111,16 @@ namespace hp
      * collection. While this class ensures that all elements stored in it
      * have the same number of vector components, there is no such guarantees
      * for the number of blocks each element is made up of (an element may
-     * have fewer blocks than vector components; see @ref GlossBlock "the
-     * glossary" for more information). For example, you may have an
-     * FECollection object that stores one copy of an FESystem with
-     * <code>dim</code> FE_Q objects and one copy of an FE_RaviartThomas
-     * element. Both have <code>dim</code> vector components but while the
-     * former has <code>dim</code> blocks the latter has only one.
-     * Consequently, this function will throw an assertion if the number of
-     * blocks is not the same for all elements. If they are the same, this
-     * function returns the result of FiniteElement::n_blocks().
+     * have fewer blocks than vector components; see
+     * @ref GlossBlock "the glossary" for more information). For example,
+     * you may have an FECollection object that stores one copy of an
+     * FESystem with <code>dim</code> FE_Q objects and one copy of an
+     * FE_RaviartThomas element. Both have <code>dim</code> vector
+     * components but while the former has <code>dim</code> blocks the
+     * latter has only one. Consequently, this function will throw an
+     * assertion if the number of blocks is not the same for all elements.
+     * If they are the same, this function returns the result of
+     * FiniteElement::n_blocks().
      */
     unsigned int n_blocks () const;
 
@@ -242,10 +243,11 @@ namespace hp
 
     /**
      * Given a block mask (see @ref GlossBlockMask "this glossary entry"),
-     * produce a component mask (see @ref GlossComponentMask "this glossary
-     * entry") that represents the components that correspond to the blocks
-     * selected in the input argument. This is essentially a conversion
-     * operator from BlockMask to ComponentMask.
+     * produce a component mask (see
+     * @ref GlossComponentMask "this glossary entry") that represents the
+     * components that correspond to the blocks selected in the input
+     * argument. This is essentially a conversion operator from BlockMask
+     * to ComponentMask.
      *
      * @note This function is the equivalent of
      * FiniteElement::component_mask() with the same arguments. It verifies
@@ -314,8 +316,8 @@ namespace hp
     /**
      * Return a component mask with as many elements as this object has vector
      * components and of which exactly the <code>dim*(dim+1)/2</code>
-     * components are true that correspond to the given argument. See @ref
-     * GlossBlockMask "the glossary" for more information.
+     * components are true that correspond to the given argument. See
+     * @ref GlossBlockMask "the glossary" for more information.
      *
      * @note The same caveat applies as to the version of the function above:
      * The extractor object passed as argument must be so that it corresponds
@@ -336,11 +338,12 @@ namespace hp
     block_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
     /**
-     * Given a component mask (see @ref GlossComponentMask "this glossary
-     * entry"), produce a block mask (see @ref GlossBlockMask "this glossary
-     * entry") that represents the blocks that correspond to the components
-     * selected in the input argument. This is essentially a conversion
-     * operator from ComponentMask to BlockMask.
+     * Given a component mask (see
+     * @ref GlossComponentMask "this glossary entry"), produce a block mask
+     * (see @ref GlossBlockMask "this glossary entry") that represents the
+     * blocks that correspond to the components selected in the input
+     * argument. This is essentially a conversion operator from
+     * ComponentMask to BlockMask.
      *
      * @note This function will only succeed if the components referenced by
      * the argument encompasses complete blocks. In other words, if, for

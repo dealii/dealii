@@ -265,13 +265,13 @@ namespace hp
  * <h5>Computing the correct basis from "raw" basis functions</h5>
  *
  * First, already the basis of the shape function space may be difficult to
- * implement for arbitrary order and dimension. On the other hand, if the @ref
- * GlossNodes "node values" are given, then the duality relation between node
- * functionals and basis functions defines the basis. As a result, the shape
- * function space may be defined with arbitrary "raw" basis functions, such
- * that the actual finite element basis is computed from linear combinations
- * of them. The coefficients of these combinations are determined by the
- * duality of node values.
+ * implement for arbitrary order and dimension. On the other hand, if the
+ * @ref GlossNodes "node values" are given, then the duality relation
+ * between node functionals and basis functions defines the basis. As a
+ * result, the shape function space may be defined with arbitrary "raw"
+ * basis functions, such that the actual finite element basis is computed
+ * from linear combinations of them. The coefficients of these combinations
+ * are determined by the duality of node values.
  *
  * Using this matrix allows the construction of the basis of shape functions
  * in two steps.
@@ -290,8 +290,9 @@ namespace hp
  * The function computing the matrix <i>M</i> for you is
  * FETools::compute_node_matrix(). It relies on the existence of
  * #generalized_support_points and implementation of interpolate() with
- * VectorSlice argument. See the @ref GlossGeneralizedSupport "glossary entry
- * on generalized support points" for more information.
+ * VectorSlice argument. See the
+ * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+ * for more information.
  *
  * The piece of code in the constructor of a finite element responsible for
  * this looks like
@@ -892,9 +893,9 @@ public:
    * than one vector-component). For this information, refer to the
    * #system_to_base_table field and the system_to_base_index() function.
    *
-   * The use of this function is explained extensively in the step-8 and @ref
-   * step_20 "step-20" tutorial programs as well as in the @ref vector_valued
-   * module.
+   * The use of this function is explained extensively in the step-8 and
+   * @ref step_20 "step-20" tutorial programs as well as in the
+   * @ref vector_valued module.
    */
   std::pair<unsigned int, unsigned int>
   system_to_component_index (const unsigned int index) const;
@@ -1168,8 +1169,8 @@ public:
   /**
    * Return a component mask with as many elements as this object has vector
    * components and of which exactly the one component is true that
-   * corresponds to the given argument. See @ref GlossComponentMask "the
-   * glossary" for more information.
+   * corresponds to the given argument. See
+   * @ref GlossComponentMask "the glossary" for more information.
    *
    * @param scalar An object that represents a single scalar vector component
    * of this finite element. @return A component mask that is false in all
@@ -1181,8 +1182,8 @@ public:
   /**
    * Return a component mask with as many elements as this object has vector
    * components and of which exactly the <code>dim</code> components are true
-   * that correspond to the given argument. See @ref GlossComponentMask "the
-   * glossary" for more information.
+   * that correspond to the given argument. See
+   * @ref GlossComponentMask "the glossary" for more information.
    *
    * @param vector An object that represents dim vector components of this
    * finite element. @return A component mask that is false in all components
@@ -1194,8 +1195,8 @@ public:
   /**
    * Return a component mask with as many elements as this object has vector
    * components and of which exactly the <code>dim*(dim+1)/2</code> components
-   * are true that correspond to the given argument. See @ref
-   * GlossComponentMask "the glossary" for more information.
+   * are true that correspond to the given argument. See
+   * @ref GlossComponentMask "the glossary" for more information.
    *
    * @param sym_tensor An object that represents dim*(dim+1)/2 components of
    * this finite element that are jointly to be interpreted as forming a
@@ -1207,10 +1208,11 @@ public:
 
   /**
    * Given a block mask (see @ref GlossBlockMask "this glossary entry"),
-   * produce a component mask (see @ref GlossComponentMask "this glossary
-   * entry") that represents the components that correspond to the blocks
-   * selected in the input argument. This is essentially a conversion operator
-   * from BlockMask to ComponentMask.
+   * produce a component mask (see
+   * @ref GlossComponentMask "this glossary entry") that represents the
+   * components that correspond to the blocks selected in the input
+   * argument. This is essentially a conversion operator from BlockMask to
+   * ComponentMask.
    *
    * @param block_mask The mask that selects individual blocks of the finite
    * element @return A mask that selects those components corresponding to the
@@ -1242,8 +1244,8 @@ public:
   /**
    * Return a component mask with as many elements as this object has vector
    * components and of which exactly the <code>dim</code> components are true
-   * that correspond to the given argument. See @ref GlossBlockMask "the
-   * glossary" for more information.
+   * that correspond to the given argument. See
+   * @ref GlossBlockMask "the glossary" for more information.
    *
    * @note The same caveat applies as to the version of the function above:
    * The extractor object passed as argument must be so that it corresponds to
@@ -1275,11 +1277,12 @@ public:
   block_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
   /**
-   * Given a component mask (see @ref GlossComponentMask "this glossary
-   * entry"), produce a block mask (see @ref GlossBlockMask "this glossary
-   * entry") that represents the blocks that correspond to the components
-   * selected in the input argument. This is essentially a conversion operator
-   * from ComponentMask to BlockMask.
+   * Given a component mask (see
+   * @ref GlossComponentMask "this glossary entry"), produce a block mask
+   * (see @ref GlossBlockMask "this glossary entry") that represents the
+   * blocks that correspond to the components selected in the input
+   * argument. This is essentially a conversion operator from ComponentMask
+   * to BlockMask.
    *
    * @note This function will only succeed if the components referenced by the
    * argument encompasses complete blocks. In other words, if, for example,
@@ -1439,8 +1442,9 @@ public:
   /**
    * Return a support point vector for generalized interpolation.
    *
-   * See the @ref GlossGeneralizedSupport "glossary entry on generalized
-   * support points" for more information.
+   * See the
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * for more information.
    */
   const std::vector<Point<dim> > &
   get_generalized_support_points () const;
@@ -1449,8 +1453,9 @@ public:
    * Returns <tt>true</tt> if the class provides nonempty vectors either from
    * get_unit_support_points() or get_generalized_support_points().
    *
-   * See the @ref GlossGeneralizedSupport "glossary entry on generalized
-   * support points" for more information.
+   * See the
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * for more information.
    */
   bool has_generalized_support_points () const;
 

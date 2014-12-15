@@ -1687,9 +1687,9 @@ namespace VectorTools
    * the vector elements $d_K$ for an output vector with as many cells as
    * there are active cells of the triangulation object of the current
    * processor. However, not all active cells are in fact locally owned: some
-   * may be ghost or artificial cells (see @ref GlossGhostCell "here" and @ref
-   * GlossArtificialCell "here"). The vector computed will, in the case of a
-   * distributed triangulation, contain zeros for cells that are not locally
+   * may be ghost or artificial cells (see @ref GlossGhostCell "here" and
+   * @ref GlossArtificialCell "here"). The vector computed will, in the case of
+   * a distributed triangulation, contain zeros for cells that are not locally
    * owned. As a consequence, in order to compute the <i>global</i> $L_2$
    * error (for example), the errors from different processors need to be
    * combined, but this is simple because every processor only computes
