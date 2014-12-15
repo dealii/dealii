@@ -26,10 +26,9 @@ DEAL_II_NAMESPACE_OPEN
 namespace LAPACKSupport
 {
   /**
-   * Most LAPACK functions change the contents of the matrix applied to
-   * to something which is not a matrix anymore. Therefore, LAPACK
-   * matrix classes in <tt>deal.II</tt> have a state flag indicating
-   * what happened to them.
+   * Most LAPACK functions change the contents of the matrix applied to to
+   * something which is not a matrix anymore. Therefore, LAPACK matrix classes
+   * in <tt>deal.II</tt> have a state flag indicating what happened to them.
    *
    * @author Guido Kanschat, 2005
    */
@@ -79,8 +78,8 @@ namespace LAPACKSupport
   }
 
   /**
-   * A matrix can have certain features allowing for optimization, but
-   * hard to test. These are listed here.
+   * A matrix can have certain features allowing for optimization, but hard to
+   * test. These are listed here.
    */
   enum Properties
   {
@@ -128,30 +127,23 @@ namespace LAPACKSupport
   static const int one = 1;
 
   /**
-   * A LAPACK function returned an
-   * error code.
+   * A LAPACK function returned an error code.
    */
   DeclException2(ExcErrorCode, char *, int,
                  << "The function " << arg1 << " returned with an error code " << arg2);
 
   /**
-   * Exception thrown when a matrix
-   * is not in a suitable state for
-   * an operation. For instance, a
-   * LAPACK routine may have left the
-   * matrix in an unusable state,
-   * then vmult does not make sense
-   * anymore.
+   * Exception thrown when a matrix is not in a suitable state for an
+   * operation. For instance, a LAPACK routine may have left the matrix in an
+   * unusable state, then vmult does not make sense anymore.
    */
   DeclException1(ExcState, State,
                  << "The function cannot be called while the matrix is in state "
                  << state_name(arg1));
 
   /**
-   * This exception is thrown if a
-   * certain function is not
-   * implemented in your LAPACK
-   * version.
+   * This exception is thrown if a certain function is not implemented in your
+   * LAPACK version.
    */
   DeclException1(ExcMissing, char *,
                  << "The function "

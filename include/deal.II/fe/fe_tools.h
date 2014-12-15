@@ -51,20 +51,18 @@ class ConstraintMatrix;
 
 /**
  * This namespace offers interpolations and extrapolations of discrete
- * functions of one @p FiniteElement @p fe1 to another @p FiniteElement
- * @p fe2.
+ * functions of one @p FiniteElement @p fe1 to another @p FiniteElement @p
+ * fe2.
  *
- * It also provides the local interpolation matrices that interpolate
- * on each cell. Furthermore it provides the difference matrix
- * $id-I_h$ that is needed for evaluating $(id-I_h)z$ for e.g. the
- * dual solution $z$.
+ * It also provides the local interpolation matrices that interpolate on each
+ * cell. Furthermore it provides the difference matrix $id-I_h$ that is needed
+ * for evaluating $(id-I_h)z$ for e.g. the dual solution $z$.
  *
- * For more information about the <tt>spacedim</tt> template parameter
- * check the documentation of FiniteElement or the one of
- * Triangulation.
+ * For more information about the <tt>spacedim</tt> template parameter check
+ * the documentation of FiniteElement or the one of Triangulation.
  *
- * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat;
- * 2000, 2003, 2004, 2005, 2006
+ * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat; 2000, 2003, 2004,
+ * 2005, 2006
  */
 namespace FETools
 {
@@ -134,9 +132,9 @@ namespace FETools
    * @warning In most cases, you will probably want to use
    * compute_base_renumbering().
    *
-   * Compute the vector required to renumber the dofs of a cell by
-   * component. Furthermore, compute the vector storing the start indices of
-   * each component in the local block vector.
+   * Compute the vector required to renumber the dofs of a cell by component.
+   * Furthermore, compute the vector storing the start indices of each
+   * component in the local block vector.
    *
    * The second vector is organized such that there is a vector for each base
    * element containing the start index for each component served by this base
@@ -152,20 +150,19 @@ namespace FETools
     std::vector<std::vector<unsigned int> > &start_indices);
 
   /**
-   * Compute the vector required to renumber the dofs of a cell by
-   * block. Furthermore, compute the vector storing either the start indices
-   * or the size of each local block vector.
+   * Compute the vector required to renumber the dofs of a cell by block.
+   * Furthermore, compute the vector storing either the start indices or the
+   * size of each local block vector.
    *
    * If the @p bool parameter is true, @p block_data is filled with the start
    * indices of each local block. If it is false, then the block sizes are
    * returned.
    *
-   * The vector <tt>renumbering</tt> will be indexed by the standard
-   * numbering of local degrees of freedom, namely first first vertex,
-   * then second vertex, after vertices lines, quads, and hexes. For
-   * each index, the entry indicates the index which this degree of
-   * freedom receives in a numbering scheme, where the first block is
-   * numbered completely before the second.
+   * The vector <tt>renumbering</tt> will be indexed by the standard numbering
+   * of local degrees of freedom, namely first first vertex, then second
+   * vertex, after vertices lines, quads, and hexes. For each index, the entry
+   * indicates the index which this degree of freedom receives in a numbering
+   * scheme, where the first block is numbered completely before the second.
    */
   template<int dim, int spacedim>
   void compute_block_renumbering (
@@ -217,8 +214,8 @@ namespace FETools
    *
    * This function gives the matrix that transforms a @p fe1 function $z$ to
    * $z-I_hz$ where $I_h$ denotes the interpolation operator from the @p fe1
-   * space to the @p fe2 space. This matrix hence is useful to evaluate
-   * error-representations where $z$ denotes the dual solution.
+   * space to the @p fe2 space. This matrix hence is useful to evaluate error-
+   * representations where $z$ denotes the dual solution.
    */
   template <int dim, typename number, int spacedim>
   void
@@ -269,8 +266,8 @@ namespace FETools
    * For all possible (isotropic and anisotropic) refinement cases compute the
    * embedding matrices from a coarse cell to the child cells. Each column of
    * the resulting matrices contains the representation of a coarse grid basis
-   * function by the fine grid basis; the matrices are split such that there is
-   * one matrix for every child.
+   * function by the fine grid basis; the matrices are split such that there
+   * is one matrix for every child.
    *
    * This function computes the coarse grid function in a sufficiently large
    * number of quadrature points and fits the fine grid functions using least
@@ -371,9 +368,9 @@ namespace FETools
    * data <tt>u<sub>q</sub>, 0 <= q < Q:=quadrature.size()</tt> defined at the
    * quadrature points of a cell, with the points defined by the given
    * <tt>rhs_quadrature</tt> object. We may then want to ask for that finite
-   * element function (on a single cell) <tt>v<sub>h</sub></tt> in the
-   * finite-dimensional space defined by the given FE object that is the
-   * projection of <tt>u</tt> in the following sense:
+   * element function (on a single cell) <tt>v<sub>h</sub></tt> in the finite-
+   * dimensional space defined by the given FE object that is the projection
+   * of <tt>u</tt> in the following sense:
    *
    * Usually, the projection <tt>v<sub>h</sub></tt> is that function that
    * satisfies <tt>(v<sub>h</sub>,w)=(u,w)</tt> for all discrete test
@@ -424,14 +421,14 @@ namespace FETools
    * triangulation. In effect, it therefore doesn't matter if you use a
    * continuous or discontinuous version of the finite element.
    *
-   * It is worth noting that there are a few confusing cases of this
-   * function. The first one is that it really only makes sense to project
-   * onto a finite element that has at most as many degrees of freedom per
-   * cell as there are quadrature points; the projection of N quadrature point
-   * data into a space with M>N unknowns is well-defined, but often yields
-   * funny and non-intuitive results. Secondly, one would think that if the
-   * quadrature point data is defined in the support points of the finite
-   * element, i.e. the quadrature points of <tt>ths_quadrature</tt> equal
+   * It is worth noting that there are a few confusing cases of this function.
+   * The first one is that it really only makes sense to project onto a finite
+   * element that has at most as many degrees of freedom per cell as there are
+   * quadrature points; the projection of N quadrature point data into a space
+   * with M>N unknowns is well-defined, but often yields funny and non-
+   * intuitive results. Secondly, one would think that if the quadrature point
+   * data is defined in the support points of the finite element, i.e. the
+   * quadrature points of <tt>ths_quadrature</tt> equal
    * <tt>fe.get_unit_support_points()</tt>, then the projection should be the
    * identity, i.e. each degree of freedom of the finite element equals the
    * value of the given data in the support point of the corresponding shape
@@ -534,16 +531,16 @@ namespace FETools
    * the same triangulation.
    *
    * If the elements @p fe1 and @p fe2 are either both continuous or both
-   * discontinuous then this interpolation is the usual point
-   * interpolation. The same is true if @p fe1 is a continuous and @p fe2 is a
-   * discontinuous finite element. For the case that @p fe1 is a discontinuous
-   * and @p fe2 is a continuous finite element there is no point interpolation
-   * defined at the discontinuities.  Therefore the meanvalue is taken at the
-   * DoF values on the discontinuities.
+   * discontinuous then this interpolation is the usual point interpolation.
+   * The same is true if @p fe1 is a continuous and @p fe2 is a discontinuous
+   * finite element. For the case that @p fe1 is a discontinuous and @p fe2 is
+   * a continuous finite element there is no point interpolation defined at
+   * the discontinuities.  Therefore the meanvalue is taken at the DoF values
+   * on the discontinuities.
    *
-   * Note that for continuous elements on grids with hanging nodes
-   * (i.e. locally refined grids) this function does not give the expected
-   * output.  Indeed, the resulting output vector does not necessarily respect
+   * Note that for continuous elements on grids with hanging nodes (i.e.
+   * locally refined grids) this function does not give the expected output.
+   * Indeed, the resulting output vector does not necessarily respect
    * continuity requirements at hanging nodes: if, for example, you are
    * interpolating a Q2 field to a Q1 field, then at hanging nodes the output
    * field will have the function value of the input field, which however is
@@ -575,12 +572,12 @@ namespace FETools
    * with hanging nodes (locally refined grids).
    *
    * If the elements @p fe1 and @p fe2 are either both continuous or both
-   * discontinuous then this interpolation is the usual point
-   * interpolation. The same is true if @p fe1 is a continuous and @p fe2 is a
-   * discontinuous finite element. For the case that @p fe1 is a discontinuous
-   * and @p fe2 is a continuous finite element there is no point interpolation
-   * defined at the discontinuities.  Therefore the mean value is taken at the
-   * DoF values at the discontinuities.
+   * discontinuous then this interpolation is the usual point interpolation.
+   * The same is true if @p fe1 is a continuous and @p fe2 is a discontinuous
+   * finite element. For the case that @p fe1 is a discontinuous and @p fe2 is
+   * a continuous finite element there is no point interpolation defined at
+   * the discontinuities.  Therefore the mean value is taken at the DoF values
+   * at the discontinuities.
    */
   template <int dim, int spacedim,
             template <int, int> class DH1,
@@ -627,10 +624,9 @@ namespace FETools
    * Gives the interpolation of the @p dof1-function @p u1 to a @p
    * dof2-function, and interpolates this to a second @p dof1-function named
    * @p u1_interpolated.  @p constraints1 and @p constraints2 are the hanging
-   * node constraints corresponding to @p dof1 and @p dof2,
-   * respectively. These objects are particular important when continuous
-   * elements on grids with hanging nodes (locally refined grids) are
-   * involved.
+   * node constraints corresponding to @p dof1 and @p dof2, respectively.
+   * These objects are particular important when continuous elements on grids
+   * with hanging nodes (locally refined grids) are involved.
    *
    * Furthermore note, that for the specific case when the finite element
    * space corresponding to @p dof1 is a subset of the finite element space
@@ -707,55 +703,51 @@ namespace FETools
    * other:
    *
    * - It interpolates directly from every cell of @p dof1 to the
-   *   corresponding cell of `dof2` using the interpolation matrix of the
-   *   finite element spaces used on these cells and provided by
-   *   the finite element objects involved. This step is done using the
-   *   FETools::interpolate() function.
-   * - It then performs a loop over all non-active cells of `dof2`. If
-   *   such a non-active cell has at least one active child, then we
-   *   call the children of this cell a "patch". We then interpolate
-   *   from the children of this patch to the patch, using the finite
-   *   element space associated with `dof2` and immediately interpolate
-   *   back to the children. In essence, this information throws away
-   *   all information in the solution vector that lives on a scale
-   *   smaller than the patch cell.
-   * - Since we traverse non-active cells from the coarsest to the
-   *   finest levels, we may find patches that correspond to child
-   *   cells of previously treated patches if the mesh had been
-   *   refined adaptively (this cannot happen if the mesh has been
-   *   refined globally because there the children of a patch are
-   *   all active). We also perform the operation described above
-   *   on these patches, but it is easy to see that on patches that
-   *   are children of previously treated patches, the operation is
-   *   now the identity operation (since it interpolates from the
-   *   children of the current patch a function that had previously
-   *   been interpolated to these children from an even coarser patch).
-   *   Consequently, this does not alter the solution vector any more.
+   * corresponding cell of `dof2` using the interpolation matrix of the finite
+   * element spaces used on these cells and provided by the finite element
+   * objects involved. This step is done using the FETools::interpolate()
+   * function. - It then performs a loop over all non-active cells of `dof2`.
+   * If such a non-active cell has at least one active child, then we call the
+   * children of this cell a "patch". We then interpolate from the children of
+   * this patch to the patch, using the finite element space associated with
+   * `dof2` and immediately interpolate back to the children. In essence, this
+   * information throws away all information in the solution vector that lives
+   * on a scale smaller than the patch cell. - Since we traverse non-active
+   * cells from the coarsest to the finest levels, we may find patches that
+   * correspond to child cells of previously treated patches if the mesh had
+   * been refined adaptively (this cannot happen if the mesh has been refined
+   * globally because there the children of a patch are all active). We also
+   * perform the operation described above on these patches, but it is easy to
+   * see that on patches that are children of previously treated patches, the
+   * operation is now the identity operation (since it interpolates from the
+   * children of the current patch a function that had previously been
+   * interpolated to these children from an even coarser patch). Consequently,
+   * this does not alter the solution vector any more.
    *
-   * The name of the function originates from the fact that it can be
-   * used to construct a representation of a function of higher polynomial
-   * degree on a once coarser mesh. For example, if you imagine that you
-   * start with a $Q_1$ function on globally refined mesh, and that @p dof2
-   * is associated with a $Q_2$ element, then this function computes the
-   * equivalent of the operator $I_{2h}^{(2)}$ interpolating the original
-   * piecewise linear function onto a quadratic function on a once coarser
-   * mesh with mesh size $2h$ (but representing this function on the original
-   * mesh with size $h$). If the exact solution is sufficiently smooth,
-   * then $u^\ast=I_{2h}^{(2)}u_h$ is typically a better approximation to
-   * the exact solution $u$ of the PDE than $u_h$ is. In other words, this
-   * function provides a postprocessing step that improves the solution in
-   * a similar way one often obtains by extrapolating a sequence of solutions,
+   * The name of the function originates from the fact that it can be used to
+   * construct a representation of a function of higher polynomial degree on a
+   * once coarser mesh. For example, if you imagine that you start with a
+   * $Q_1$ function on globally refined mesh, and that @p dof2 is associated
+   * with a $Q_2$ element, then this function computes the equivalent of the
+   * operator $I_{2h}^{(2)}$ interpolating the original piecewise linear
+   * function onto a quadratic function on a once coarser mesh with mesh size
+   * $2h$ (but representing this function on the original mesh with size $h$).
+   * If the exact solution is sufficiently smooth, then
+   * $u^\ast=I_{2h}^{(2)}u_h$ is typically a better approximation to the exact
+   * solution $u$ of the PDE than $u_h$ is. In other words, this function
+   * provides a postprocessing step that improves the solution in a similar
+   * way one often obtains by extrapolating a sequence of solutions,
    * explaining the origin of the function's name.
    *
-   * @note The resulting field does not satisfy continuity requirements of
-   * the given finite elements if the algorithm outlined above is used.
-   * When you use continuous elements on grids with hanging nodes, please use
-   * the @p extrapolate function with an additional ConstraintMatrix argument,
-   * see below.
+   * @note The resulting field does not satisfy continuity requirements of the
+   * given finite elements if the algorithm outlined above is used. When you
+   * use continuous elements on grids with hanging nodes, please use the @p
+   * extrapolate function with an additional ConstraintMatrix argument, see
+   * below.
    *
    * @note Since this function operates on patches of cells, it requires that
-   * the underlying grid is refined at least once for every coarse grid cell. If
-   * this is not the case, an exception will be raised.
+   * the underlying grid is refined at least once for every coarse grid cell.
+   * If this is not the case, an exception will be raised.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void extrapolate (const DoFHandler<dim,spacedim> &dof1,
@@ -765,10 +757,10 @@ namespace FETools
 
   /**
    * Gives the patchwise extrapolation of a @p dof1 function @p z1 to a @p
-   * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler objects based on
-   * the same triangulation.  @p constraints is a hanging node constraints
-   * object corresponding to @p dof2. This object is necessary when
-   * interpolating onto continuous elements on grids with hanging nodes
+   * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler objects
+   * based on the same triangulation.  @p constraints is a hanging node
+   * constraints object corresponding to @p dof2. This object is necessary
+   * when interpolating onto continuous elements on grids with hanging nodes
    * (locally refined grids).
    *
    * Otherwise, the function does the same as the other @p extrapolate
@@ -848,14 +840,15 @@ namespace FETools
    * accordingly.
    *
    * The name must be in the form which is returned by the
-   * FiniteElement::get_name function, where dimension template parameters &lt;2&gt; etc. can be
-   * omitted. Alternatively, the explicit number can be replaced by
-   * <tt>dim</tt> or <tt>d</tt>. If a number is given, it <b>must</b> match
-   * the template parameter of this function.
+   * FiniteElement::get_name function, where dimension template parameters
+   * &lt;2&gt; etc. can be omitted. Alternatively, the explicit number can be
+   * replaced by <tt>dim</tt> or <tt>d</tt>. If a number is given, it
+   * <b>must</b> match the template parameter of this function.
    *
-   * The names of FESystem elements follow the pattern <code>FESystem[FE_Base1^p1-FE_Base2^p2]</code>
-   * The powers <code>p1</code> etc. may either be numbers or can be
-   * replaced by <tt>dim</tt> or <tt>d</tt>.
+   * The names of FESystem elements follow the pattern
+   * <code>FESystem[FE_Base1^p1-FE_Base2^p2]</code> The powers <code>p1</code>
+   * etc. may either be numbers or can be replaced by <tt>dim</tt> or
+   * <tt>d</tt>.
    *
    *
    * If no finite element can be reconstructed from this string, an exception
@@ -897,12 +890,12 @@ namespace FETools
    * The format of the @p name parameter should include the name of a finite
    * element. However, it is safe to use either the class name alone or to use
    * the result of FiniteElement::get_name (which includes the space dimension
-   * as well as the polynomial degree), since everything after the first
-   * non-name character will be ignored.
+   * as well as the polynomial degree), since everything after the first non-
+   * name character will be ignored.
    *
-   * The FEFactory object should be an object newly created with
-   * <tt>new</tt>. FETools will take ownership of this object and delete it
-   * once it is not used anymore.
+   * The FEFactory object should be an object newly created with <tt>new</tt>.
+   * FETools will take ownership of this object and delete it once it is not
+   * used anymore.
    *
    * In most cases, if you want objects of type <code>MyFE</code> be created
    * whenever the name <code>my_fe</code> is given to get_fe_from_name, you
@@ -914,9 +907,8 @@ namespace FETools
    * argument, i.e. you should never attempt to destroy it later on. The
    * object will be deleted at the end of the program's lifetime.
    *
-   * If the name of the element is already in use, an exception is
-   * thrown. Thus, functionality of get_fe_from_name() can only be added, not
-   * changed.
+   * If the name of the element is already in use, an exception is thrown.
+   * Thus, functionality of get_fe_from_name() can only be added, not changed.
    *
    * @note This function manipulates a global table (one table for each space
    * dimension). It is thread safe in the sense that every access to this

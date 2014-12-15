@@ -22,8 +22,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Namespace in which an enumeration is declared that denotes the
- * states in which an iterator can be in.
+ * Namespace in which an enumeration is declared that denotes the states in
+ * which an iterator can be in.
  *
  * @ingroup Iterators
  */
@@ -31,8 +31,7 @@ namespace IteratorState
 {
 
   /**
-   *   The three states an iterator can be in: valid, past-the-end and
-   *   invalid.
+   * The three states an iterator can be in: valid, past-the-end and invalid.
    */
   enum IteratorStates
   {

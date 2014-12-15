@@ -130,7 +130,8 @@ namespace FiniteElementDomination
  * to the implementation in a concrete finite element class.
  *
  * @ingroup febase
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003, 2005
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003,
+ * 2005
  */
 template <int dim>
 class FiniteElementData
@@ -156,10 +157,10 @@ public:
    * <li> <i>H<sup>2</sup></i> implies that the function is continuously
    * differentiable over cell boundaries.
    *
-   * <li> <i>L<sup>2</sup></i> indicates that the element is
-   * discontinuous. Since discontinuous elements have no topological couplings
-   * between grid cells and code may actually depend on this property,
-   * <i>L<sup>2</sup></i> conformity is handled in a special way in the sense
+   * <li> <i>L<sup>2</sup></i> indicates that the element is discontinuous.
+   * Since discontinuous elements have no topological couplings between grid
+   * cells and code may actually depend on this property, <i>L<sup>2</sup></i>
+   * conformity is handled in a special way in the sense
    * that it is <b>not</b> implied by any higher conformity.  </ol>
    *
    * In order to test if a finite element conforms to a certain space, use

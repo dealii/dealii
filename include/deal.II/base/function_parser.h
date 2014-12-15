@@ -181,11 +181,11 @@ class FunctionParser : public Function<dim>
 {
 public:
   /**
-   * Constructor for Parsed functions. Its arguments are the same of the
-   * base class Function. The only difference is that this object needs to
-   * be initialized with initialize() method before you can use it. If an
-   * attempt to use this function is made before the initialize() method has
-   * been called, then an exception is thrown.
+   * Constructor for Parsed functions. Its arguments are the same of the base
+   * class Function. The only difference is that this object needs to be
+   * initialized with initialize() method before you can use it. If an attempt
+   * to use this function is made before the initialize() method has been
+   * called, then an exception is thrown.
    */
   FunctionParser (const unsigned int n_components = 1,
                   const double       initial_time = 0.0);
@@ -207,8 +207,7 @@ public:
   typedef ConstMap::iterator ConstMapIterator;
 
   /**
-   * Initialize the function.  This methods accepts the following
-   * parameters:
+   * Initialize the function.  This methods accepts the following parameters:
    *
    * <b>vars</b>: a string with the variables that will be used by the
    * expressions to be evaluated. Note that the variables can have any name
@@ -217,31 +216,30 @@ public:
    * component of the point in which the function is evaluated, the second
    * variable to the second component and so forth. If this function is also
    * time dependent, then it is necessary to specify it by setting the
-   * <tt>time_dependent</tt> parameter to true.  An exception is thrown if
-   * the number of variables specified here is different from dim (if this
-   * function is not time-dependent) or from dim+1 (if it is time-
-   * dependent).
+   * <tt>time_dependent</tt> parameter to true.  An exception is thrown if the
+   * number of variables specified here is different from dim (if this
+   * function is not time-dependent) or from dim+1 (if it is time- dependent).
    *
    * <b>expressions</b>: a list of strings containing the expressions that
-   * will be byte compiled by the internal parser (FunctionParser). Note
-   * that the size of this vector must match exactly the number of
-   * components of the FunctionParser, as declared in the constructor. If
-   * this is not the case, an exception is thrown.
+   * will be byte compiled by the internal parser (FunctionParser). Note that
+   * the size of this vector must match exactly the number of components of
+   * the FunctionParser, as declared in the constructor. If this is not the
+   * case, an exception is thrown.
    *
    *
-   * <b>constants</b>: a map of constants used to pass any necessary
-   * constant that we want to specify in our expressions (in the example
-   * above the number pi). An expression is valid if and only if it contains
-   * only defined variables and defined constants (other than the functions
+   * <b>constants</b>: a map of constants used to pass any necessary constant
+   * that we want to specify in our expressions (in the example above the
+   * number pi). An expression is valid if and only if it contains only
+   * defined variables and defined constants (other than the functions
    * specified above). If a constant is given whose name is not valid (eg:
    * <tt>constants["sin"] = 1.5;</tt>) an exception is thrown.
    *
    * <b>time_dependent</b>. If this is a time dependent function, then the
-   * last variable declared in <b>vars</b> is assumed to be the time
-   * variable, and this->get_time() is used to initialize it when evaluating
-   * the function. Naturally the number of variables parsed by the
-   * initialize() method in this case is dim+1. The value of this parameter
-   * defaults to false, i.e. do not consider time.
+   * last variable declared in <b>vars</b> is assumed to be the time variable,
+   * and this->get_time() is used to initialize it when evaluating the
+   * function. Naturally the number of variables parsed by the initialize()
+   * method in this case is dim+1. The value of this parameter defaults to
+   * false, i.e. do not consider time.
    */
   void initialize (const std::string              &vars,
                    const std::vector<std::string> &expressions,
@@ -279,12 +277,11 @@ public:
                    const bool use_degrees = false) DEAL_II_DEPRECATED;
 
   /**
-   * Initialize the function. Same as above, but accepts a string rather
-   * than a vector of strings. If this is a vector valued function, its
-   * components are expected to be separated by a semicolon. An exception is
-   * thrown if this method is called and the number of components
-   * successfully parsed does not match the number of components of the base
-   * function.
+   * Initialize the function. Same as above, but accepts a string rather than
+   * a vector of strings. If this is a vector valued function, its components
+   * are expected to be separated by a semicolon. An exception is thrown if
+   * this method is called and the number of components successfully parsed
+   * does not match the number of components of the base function.
    */
   void initialize (const std::string &vars,
                    const std::string &expression,
@@ -318,18 +315,18 @@ public:
 
   /**
    * A function that returns default names for variables, to be used in the
-   * first argument of the initialize() functions: it returns "x" in 1d,
-   * "x,y" in 2d, and "x,y,z" in 3d.
+   * first argument of the initialize() functions: it returns "x" in 1d, "x,y"
+   * in 2d, and "x,y,z" in 3d.
    */
   static
   std::string
   default_variable_names ();
 
   /**
-   * Return the value of the function at the given point. Unless there is
-   * only one component (i.e. the function is scalar), you should state the
-   * component you want to have evaluated; it defaults to zero, i.e. the
-   * first component.
+   * Return the value of the function at the given point. Unless there is only
+   * one component (i.e. the function is scalar), you should state the
+   * component you want to have evaluated; it defaults to zero, i.e. the first
+   * component.
    */
   virtual double value (const Point<dim>   &p,
                         const unsigned int  component = 0) const;
@@ -338,8 +335,7 @@ public:
    * Return all components of a vector-valued function at the given point @p
    * p.
    *
-   * <tt>values</tt> shall have the right size beforehand, i.e.
-   * #n_components.
+   * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    */
   virtual void vector_value (const Point<dim>   &p,
                              Vector<double>     &values) const;
@@ -374,14 +370,14 @@ private:
   mutable Threads::ThreadLocalStorage<std::vector<mu::Parser> > fp;
 
   /**
-   * An array to keep track of all the constants, required to
-   * initialize fp in each thread.
+   * An array to keep track of all the constants, required to initialize fp in
+   * each thread.
    */
   std::map<std::string, double> constants;
 
   /**
-   * An array for the variable names, required to initialize fp in
-   * each thread.
+   * An array for the variable names, required to initialize fp in each
+   * thread.
    */
   std::vector<std::string> var_names;
 
@@ -392,11 +388,10 @@ private:
   std::vector<std::string> expressions;
 
   /**
-   * Initialize fp and vars on the current thread. This function may
-   * only be called once per thread. A thread can test whether the
-   * function has already been called by testing whether
-   * 'fp.get().size()==0' (not initialized) or >0 (already
-   * initialized).
+   * Initialize fp and vars on the current thread. This function may only be
+   * called once per thread. A thread can test whether the function has
+   * already been called by testing whether 'fp.get().size()==0' (not
+   * initialized) or >0 (already initialized).
    */
   void init_muparser() const;
 #endif
@@ -408,11 +403,11 @@ private:
   bool initialized;
 
   /**
-   * Number of variables. If this is also a function of time, then the
-   * number of variables is dim+1, otherwise it is dim. In the case that
-   * this is a time dependent function, the time is supposed to be the last
-   * variable. If #n_vars is not identical to the number of the variables
-   * parsed by the initialize() method, then an exception is thrown.
+   * Number of variables. If this is also a function of time, then the number
+   * of variables is dim+1, otherwise it is dim. In the case that this is a
+   * time dependent function, the time is supposed to be the last variable. If
+   * #n_vars is not identical to the number of the variables parsed by the
+   * initialize() method, then an exception is thrown.
    */
   unsigned int n_vars;
 };

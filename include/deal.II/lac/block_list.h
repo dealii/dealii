@@ -27,23 +27,20 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * @deprecated This class is experimental and will be
- * removed in a future release.
+ * @deprecated This class is experimental and will be removed in a future
+ * release.
  *
- * A vector of index sets listing the indices of small blocks of a
- * linear system. For each block, the indices in that block are
- * listed.
+ * A vector of index sets listing the indices of small blocks of a linear
+ * system. For each block, the indices in that block are listed.
  *
- * The focus of this class is on small blocks of degrees of freedom
- * associated with a single mesh cell or a small patch. These indices
- * may be contiguous or not and we do not optimize for the case they
- * are. For larger sets, the use of a vector of IndexSet objects might
- * be advisable.
+ * The focus of this class is on small blocks of degrees of freedom associated
+ * with a single mesh cell or a small patch. These indices may be contiguous
+ * or not and we do not optimize for the case they are. For larger sets, the
+ * use of a vector of IndexSet objects might be advisable.
  *
- * BlockList objects can conveniently be initialized with iterator
- * ranges from DoFHandler or MGDoFHandler, using either their cell or
- * multigrid indices. Other initializations are possible to be
- * implemented.
+ * BlockList objects can conveniently be initialized with iterator ranges from
+ * DoFHandler or MGDoFHandler, using either their cell or multigrid indices.
+ * Other initializations are possible to be implemented.
  *
  * @author Guido Kanschat
  * @date 2010
@@ -63,33 +60,23 @@ public:
   typedef block_container::const_iterator const_iterator;
 
   /**
-   * Since SparsityPattern can
-   * handle the tasks of BlockList,
-   * this function allows us to
-   * create one from an already
-   * filled BlockList. A first step
-   * to make BlockList obsolete.
+   * Since SparsityPattern can handle the tasks of BlockList, this function
+   * allows us to create one from an already filled BlockList. A first step to
+   * make BlockList obsolete.
    *
-   * The additional integer
-   * argument is the dimension of
-   * the vector space.
+   * The additional integer argument is the dimension of the vector space.
    */
   void create_sparsity_pattern(SparsityPattern &sparsity, size_type n) const;
 
   /**
-   * Add the indices in
-   * <tt>indices</tt> to block
-   * <tt>block</tt>, eliminating
+   * Add the indices in <tt>indices</tt> to block <tt>block</tt>, eliminating
    * repeated indices.
    */
   void add(size_type block, const std::vector<size_type> &indices);
 
   /**
-   * Add the indices in
-   * <tt>indices</tt> to block
-   * <tt>block</tt>, eliminating
-   * repeated indices. Only add
-   * those indices for which
+   * Add the indices in <tt>indices</tt> to block <tt>block</tt>, eliminating
+   * repeated indices. Only add those indices for which
    * <tt>selected_indices</tt> is true.
    */
   void add(size_type block,
@@ -98,25 +85,18 @@ public:
            size_type offset = 0);
 
   /**
-   * Just set up the correct size
-   * and assign indices to blocks later.
+   * Just set up the correct size and assign indices to blocks later.
    */
   void initialize(size_type n_blocks);
 
   /**
-   * Set up all index sets using an
-   * DoF iterator range. This
-   * function will call
-   * <tt>begin->get_dof_indices()</tt>
-   * with a signature like
-   * DoFCellAccessor::get_dof_indices().
-   * Typically, the iterators will
-   * loop over active cells of a
-   * triangulation.
+   * Set up all index sets using an DoF iterator range. This function will
+   * call <tt>begin->get_dof_indices()</tt> with a signature like
+   * DoFCellAccessor::get_dof_indices(). Typically, the iterators will loop
+   * over active cells of a triangulation.
    *
-   * In addition, the function
-   * needs the total number of
-   * blocks as its first argument.
+   * In addition, the function needs the total number of blocks as its first
+   * argument.
    */
   template <typename ITERATOR>
   void initialize(size_type n_blocks,
@@ -124,22 +104,15 @@ public:
                   const typename identity<ITERATOR>::type end);
 
   /**
-   * @deprecated This function will
-   * move to DoFTools.
+   * @deprecated This function will move to DoFTools.
    *
-   * Set up all index sets using an
-   * DoF iterator range. This
-   * function will call
-   * <tt>begin->get_mg_dof_indices()</tt>
-   * with a signature like
-   * MGDoFCellAccessor::get_mg_dof_indices().
-   * Typically, the iterators loop
-   * over the cells of a single
-   * level or a Triangulation.
+   * Set up all index sets using an DoF iterator range. This function will
+   * call <tt>begin->get_mg_dof_indices()</tt> with a signature like
+   * MGDoFCellAccessor::get_mg_dof_indices(). Typically, the iterators loop
+   * over the cells of a single level or a Triangulation.
    *
-   * In addition, the function
-   * needs the total number of
-   * blocks as its first argument.
+   * In addition, the function needs the total number of blocks as its first
+   * argument.
    */
   template <typename ITERATOR>
   void initialize_mg(size_type n_blocks,
@@ -147,35 +120,21 @@ public:
                      const typename identity<ITERATOR>::type end) DEAL_II_DEPRECATED;
 
   /**
-   * @deprecated This function will
-   * move to DoFTools.
+   * @deprecated This function will move to DoFTools.
    *
-   * Set up all index sets using an
-   * DoF iterator range. This
-   * function will call
-   * <tt>begin->get_dof_indices()</tt>
-   * with a signature like
-   * DoFCellAccessor::get_dof_indices().
-   * Typically, the iterators will
-   * loop over active cells of a
-   * triangulation.
+   * Set up all index sets using an DoF iterator range. This function will
+   * call <tt>begin->get_dof_indices()</tt> with a signature like
+   * DoFCellAccessor::get_dof_indices(). Typically, the iterators will loop
+   * over active cells of a triangulation.
    *
-   * The argument vector
-   * <tt>selected_dofs</tt> should
-   * have the length  of dofs per
-   * cell (thus, this function is
-   * not suitable for hp), and a
-   * true value for each degree of
-   * freedom which should be added
-   * to the index set of this
-   * cell. If you are working on a
-   * single block of a block
-   * system, the <tt>offset</tt> is
-   * the start index of this block.
+   * The argument vector <tt>selected_dofs</tt> should have the length  of
+   * dofs per cell (thus, this function is not suitable for hp), and a true
+   * value for each degree of freedom which should be added to the index set
+   * of this cell. If you are working on a single block of a block system, the
+   * <tt>offset</tt> is the start index of this block.
    *
-   * In addition, the function
-   * needs the total number of
-   * blocks as its first argument.
+   * In addition, the function needs the total number of blocks as its first
+   * argument.
    */
   template <typename ITERATOR>
   void initialize(size_type n_blocks,
@@ -184,35 +143,21 @@ public:
                   const std::vector<bool> &selected_dofs,
                   size_type offset = 0) DEAL_II_DEPRECATED;
   /**
-   * @deprecated This function will
-   * move to DoFTools.
+   * @deprecated This function will move to DoFTools.
    *
-   * Set up all index sets using an
-   * DoF iterator range. This
-   * function will call
-   * <tt>begin->get_mg_dof_indices()</tt>
-   * with a signature like
-   * MGDoFCellAccessor::get_mg_dof_indices().
-   * Typically, the iterators will
-   * loop over cells on a single
-   * level of a triangulation.
+   * Set up all index sets using an DoF iterator range. This function will
+   * call <tt>begin->get_mg_dof_indices()</tt> with a signature like
+   * MGDoFCellAccessor::get_mg_dof_indices(). Typically, the iterators will
+   * loop over cells on a single level of a triangulation.
    *
-   * The argument vector
-   * <tt>selected_dofs</tt> should
-   * have the length  of dofs per
-   * cell (thus, this function is
-   * not suitable for hp), and a
-   * true value for each degree of
-   * freedom which should be added
-   * to the index set of this
-   * cell. If you are working on a
-   * single block of a block
-   * system, the <tt>offset</tt> is
-   * the start index of this block.
+   * The argument vector <tt>selected_dofs</tt> should have the length  of
+   * dofs per cell (thus, this function is not suitable for hp), and a true
+   * value for each degree of freedom which should be added to the index set
+   * of this cell. If you are working on a single block of a block system, the
+   * <tt>offset</tt> is the start index of this block.
    *
-   * In addition, the function
-   * needs the total number of
-   * blocks as its first argument.
+   * In addition, the function needs the total number of blocks as its first
+   * argument.
    */
   template <typename ITERATOR>
   void initialize_mg(size_type n_blocks,
@@ -222,14 +167,10 @@ public:
                      size_type offset = 0) DEAL_II_DEPRECATED;
 
   /**
-   * @deprecated This function will
-   * move to DoFTools.
+   * @deprecated This function will move to DoFTools.
    *
-   * Same as initialize_mg(), but
-   * instead of gathering the
-   * degrees of freedom of a single
-   * cell into a block, gather all
-   * degrees of freedom of a patch
+   * Same as initialize_mg(), but instead of gathering the degrees of freedom
+   * of a single cell into a block, gather all degrees of freedom of a patch
    * around a vertex.
    */
   template <int dim, typename ITERATOR>
@@ -240,11 +181,9 @@ public:
                                     size_type offset = 0) DEAL_II_DEPRECATED;
 
   /**
-   * @deprecated This function will
-   * move to DoFTools.
+   * @deprecated This function will move to DoFTools.
    *
-   * Auxiliary function, counting
-   * the patches around vertices.
+   * Auxiliary function, counting the patches around vertices.
    */
   template <int dim, typename ITERATOR>
   unsigned int count_vertex_patches(
@@ -253,8 +192,7 @@ public:
     bool same_level_only) const DEAL_II_DEPRECATED;
 
   /**
-   * @deprecated This function will
-   * move to DoFTools.
+   * @deprecated This function will move to DoFTools.
    *
    */
   template <int dim, typename ITERATOR>
@@ -280,11 +218,8 @@ public:
    */
   const_iterator end(size_type block) const;
   /**
-   * Return the position of
-   * <tt>index</tt> in
-   * <tt>block</tt>, or
-   * numbers::invalid_size_type,
-   * if the index is not in the block.
+   * Return the position of <tt>index</tt> in <tt>block</tt>, or
+   * numbers::invalid_size_type, if the index is not in the block.
    */
   size_type local_index(size_type block, size_type index) const;
 

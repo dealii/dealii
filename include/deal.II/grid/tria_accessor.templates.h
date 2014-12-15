@@ -286,9 +286,8 @@ namespace internal
   namespace TriaAccessorBase
   {
     /**
-     * Out of a face object, get the
-     * sub-objects of dimensionality
-     * given by the last argument.
+     * Out of a face object, get the sub-objects of dimensionality given by
+     * the last argument.
      */
     template <int dim>
     inline
@@ -337,9 +336,8 @@ namespace internal
     }
 
     /**
-     * This function should never be
-     * used, but we need it for the
-     * template instantiation of TriaAccessorBase<dim,dim,spacedim>::objects() const
+     * This function should never be used, but we need it for the template
+     * instantiation of TriaAccessorBase<dim,dim,spacedim>::objects() const
      */
     template <int dim>
     inline
@@ -352,8 +350,7 @@ namespace internal
     }
 
     /**
-     * Copy the above functions for
-     * cell objects.
+     * Copy the above functions for cell objects.
      */
     template <int structdim, int dim>
     inline
@@ -539,9 +536,7 @@ namespace internal
     struct Implementation
     {
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int dim, int spacedim>
       static
@@ -617,9 +612,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -681,9 +674,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -729,9 +720,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -769,9 +758,7 @@ namespace internal
       }
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int dim, int spacedim>
       static
@@ -906,9 +893,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -945,9 +930,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -983,9 +966,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -1019,9 +1000,7 @@ namespace internal
       }
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int dim, int spacedim>
       static
@@ -1084,8 +1063,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function of same
-       * name in the enclosing class.
+       * Implementation of the function of same name in the enclosing class.
        */
       template <int dim, int spacedim>
       static

@@ -31,34 +31,32 @@ template<int,int> class DoFHandler;
 template<int,int> class MGDoFHandler;
 
 /**
- * A collection of functions and classes for the mesh loops that are
- * an ubiquitous part of each finite element program.
+ * A collection of functions and classes for the mesh loops that are an
+ * ubiquitous part of each finite element program.
  *
  * The workhorse of this namespace is the loop() function, which implements a
- * completely generic loop over all mesh cells. Since the calls to
- * loop() are error-prone due to its generality, for many applications
- * it is advisable to derive a class from MeshWorker::LocalIntegrator
- * and use the less general integration_loop() instead.
+ * completely generic loop over all mesh cells. Since the calls to loop() are
+ * error-prone due to its generality, for many applications it is advisable to
+ * derive a class from MeshWorker::LocalIntegrator and use the less general
+ * integration_loop() instead.
  *
- * The loop() depends on certain objects handed to it as
- * arguments. These objects are of two types, info objects like
- * DoFInfo and IntegrationInfo and worker objects like LocalWorker and
- * IntegrationWorker.
+ * The loop() depends on certain objects handed to it as arguments. These
+ * objects are of two types, info objects like DoFInfo and IntegrationInfo and
+ * worker objects like LocalWorker and IntegrationWorker.
  *
- * Worker objects usually do two different jobs: first, they compute
- * the local contribution of a cell or face to the global
- * operation. Second, they assemble this local contribution into the
- * global result, whether a functional, a form or a bilinear
- * form. While the first job is particular to the problem being
- * solved, the second is generic and only depends on the data
- * structures. Therefore, base classes for workers assembling into
- * global data are provided in the namespace Assembler.
+ * Worker objects usually do two different jobs: first, they compute the local
+ * contribution of a cell or face to the global operation. Second, they
+ * assemble this local contribution into the global result, whether a
+ * functional, a form or a bilinear form. While the first job is particular to
+ * the problem being solved, the second is generic and only depends on the
+ * data structures. Therefore, base classes for workers assembling into global
+ * data are provided in the namespace Assembler.
  *
  * <h3>Template argument types</h3>
  *
- * The functions loop() and cell_action() take some arguments which
- * are template parameters. Let us list the minimum requirements for
- * these classes here and describe their properties.
+ * The functions loop() and cell_action() take some arguments which are
+ * template parameters. Let us list the minimum requirements for these classes
+ * here and describe their properties.
  *
  * <h4>ITERATOR</h4>
  *
@@ -67,9 +65,9 @@ template<int,int> class MGDoFHandler;
  *
  * <h4>DOFINFO</h4>
  *
- * For an example implementation, refer to the class template DoFInfo.
- * In order to work with cell_action() and loop(), DOFINFO needs to
- * follow the following interface.
+ * For an example implementation, refer to the class template DoFInfo. In
+ * order to work with cell_action() and loop(), DOFINFO needs to follow the
+ * following interface.
  * @code
  * class DOFINFO
  * {
@@ -93,25 +91,24 @@ template<int,int> class MGDoFHandler;
  * };
  * @endcode
  *
- * The three private functions are called by DoFInfoBox and should not
- * be needed elsewhere. Obviously, they can be made public and then
- * the friend declaration at the end may be missing.
+ * The three private functions are called by DoFInfoBox and should not be
+ * needed elsewhere. Obviously, they can be made public and then the friend
+ * declaration at the end may be missing.
  *
  * Additionally, you will need at least one public constructor. Furthermore
- * DOFINFO is pretty useless yet: functions to interface with
- * INTEGRATIONINFO and ASSEMBLER are needed.
+ * DOFINFO is pretty useless yet: functions to interface with INTEGRATIONINFO
+ * and ASSEMBLER are needed.
  *
- * DOFINFO objects are gathered in a DoFInfoBox. In those objects, we
- * store the results of local operations on each cell and its
- * faces. Once all this information has been gathered, an ASSEMBLER is
- * used to assemble it into golbal data.
+ * DOFINFO objects are gathered in a DoFInfoBox. In those objects, we store
+ * the results of local operations on each cell and its faces. Once all this
+ * information has been gathered, an ASSEMBLER is used to assemble it into
+ * golbal data.
  *
  * <h4>INFOBOX</h4>
  *
- * This type is exemplified in IntegrationInfoBox. It collects the
- * input data for actions on cells and faces in INFO objects (see
- * below). It provides the following interface to loop() and
- * cell_action():
+ * This type is exemplified in IntegrationInfoBox. It collects the input data
+ * for actions on cells and faces in INFO objects (see below). It provides the
+ * following interface to loop() and cell_action():
  *
  * @code
  * class INFOBOX
@@ -131,20 +128,20 @@ template<int,int> class MGDoFHandler;
  * };
  * @endcode
  *
- * The main purpose of this class is gathering the five INFO objects,
- * which contain the temporary data used on each cell or face. The
- * requirements on these objects are listed below. Here, we only note
- * that there need to be these 5 objects with the names listed above.
+ * The main purpose of this class is gathering the five INFO objects, which
+ * contain the temporary data used on each cell or face. The requirements on
+ * these objects are listed below. Here, we only note that there need to be
+ * these 5 objects with the names listed above.
  *
- * The two function templates are call back functions called in
- * cell_action(). The first is called before the faces are worked on,
- * the second after the faces.
+ * The two function templates are call back functions called in cell_action().
+ * The first is called before the faces are worked on, the second after the
+ * faces.
  *
  * <h4>INFO</h4>
  *
- * See IntegrationInfo for an example of these objects. They contain
- * the temporary data needed on each cell or face to compute the
- * result. The MeshWorker only uses the interface
+ * See IntegrationInfo for an example of these objects. They contain the
+ * temporary data needed on each cell or face to compute the result. The
+ * MeshWorker only uses the interface
  *
  * @code
  * class INFO
@@ -156,22 +153,20 @@ template<int,int> class MGDoFHandler;
  *
  * <h3>Simplified interfaces</h3>
  *
- * Since the loop() is fairly general, a specialization
- * integration_loop() is available, which is a wrapper around loop()
- * with a simplified interface.
+ * Since the loop() is fairly general, a specialization integration_loop() is
+ * available, which is a wrapper around loop() with a simplified interface.
  *
- * The integration_loop() function loop takes most of the information
- * that it needs to pass to loop() from an IntegrationInfoBox
- * object. Its use is explained in step-12, but in
- * short it requires functions that do the local integration on a
- * cell, interior or boundary face, and it needs an object (called
- * "assembler") that copies these local contributions into the global
+ * The integration_loop() function loop takes most of the information that it
+ * needs to pass to loop() from an IntegrationInfoBox object. Its use is
+ * explained in step-12, but in short it requires functions that do the local
+ * integration on a cell, interior or boundary face, and it needs an object
+ * (called "assembler") that copies these local contributions into the global
  * matrix and right hand side objects.
  *
- * Before we can run the integration loop, we have to initialize
- * several data structures in our IntegrationWorker and assembler
- * objects. For instance, we have to decide on the quadrature rule or
- * we may need more than the default update flags.
+ * Before we can run the integration loop, we have to initialize several data
+ * structures in our IntegrationWorker and assembler objects. For instance, we
+ * have to decide on the quadrature rule or we may need more than the default
+ * update flags.
  *
  * @ingroup MeshWorker
  * @ingroup Integrators
@@ -182,32 +177,30 @@ namespace MeshWorker
 {
   /**
    * The class providing the scrapbook to fill with results of local
-   * integration. Depending on the task the mesh worker loop is
-   * performing, local results can be of different types. They have
-   * in common that they are the result of local integration over a cell
-   * or face. Their actual type is determined by the Assember using
-   * them. It is also the assembler setting the arrays of local results
-   * to the sizes needed. Here is a list of the provided data types and
-   * the assembers using them:
+   * integration. Depending on the task the mesh worker loop is performing,
+   * local results can be of different types. They have in common that they
+   * are the result of local integration over a cell or face. Their actual
+   * type is determined by the Assember using them. It is also the assembler
+   * setting the arrays of local results to the sizes needed. Here is a list
+   * of the provided data types and the assembers using them:
    *
    * <ol>
-   * <li> n_values() numbers accessed with value(), and stored in the
-   * data member #J.
+   * <li> n_values() numbers accessed with value(), and stored in the data
+   * member #J.
    *
-   * <li> n_vectors() vectors of the length of dofs on this cell,
-   * accessed by vector(), and stored in #R.
-   * <li> n_matrices() matrices of dimension dofs per cell in each
-   * direction, accessed by matrix() with second argument
-   * <tt>false</tt>. These are stored in #M1, and they are the matrices
-   * coupling degrees of freedom in the same cell. For fluxes across
-   * faces, there is an additional set #M2 of matrices of the same size, but
-   * the dimension of the matrices being according to the degrees of
-   * freedom on both cells. These are accessed with matrix(), using the
-   * second argument <tt>true</tt>.
+   * <li> n_vectors() vectors of the length of dofs on this cell, accessed by
+   * vector(), and stored in #R.
+   * <li> n_matrices() matrices of dimension dofs per cell in each direction,
+   * accessed by matrix() with second argument <tt>false</tt>. These are
+   * stored in #M1, and they are the matrices coupling degrees of freedom in
+   * the same cell. For fluxes across faces, there is an additional set #M2 of
+   * matrices of the same size, but the dimension of the matrices being
+   * according to the degrees of freedom on both cells. These are accessed
+   * with matrix(), using the second argument <tt>true</tt>.
    * </ol>
    *
-   * The local matrices initialized by reinit() of the info object and
-   * then assembled into the global system by Assembler classes.
+   * The local matrices initialized by reinit() of the info object and then
+   * assembled into the global system by Assembler classes.
    *
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009
@@ -219,8 +212,7 @@ namespace MeshWorker
     /**
      * The number of scalar values.
      *
-     * This number is set to a
-     * nonzero value by Assember::CellsAndFaces
+     * This number is set to a nonzero value by Assember::CellsAndFaces
      *
      */
     unsigned int n_values () const;
@@ -228,9 +220,7 @@ namespace MeshWorker
     /**
      * The number of vectors.
      *
-     * This number is set to a
-     * nonzero value by
-     * Assember::ResidualSimple and
+     * This number is set to a nonzero value by Assember::ResidualSimple and
      * Assember::ResidualLocalBlocksToGlobalBlocks.
      */
     unsigned int n_vectors () const;
@@ -241,27 +231,22 @@ namespace MeshWorker
     unsigned int n_matrices () const;
 
     /**
-     * The number of quadrature
-     * points in quadrature_values().
+     * The number of quadrature points in quadrature_values().
      */
     unsigned int n_quadrature_points() const;
 
     /**
-     * The number of values in each
-     * quadrature point in
-     * quadrature_values().
+     * The number of values in each quadrature point in quadrature_values().
      */
     unsigned int n_quadrature_values() const;
 
     /**
-     * Access scalar value at index
-     * @p i.
+     * Access scalar value at index @p i.
      */
     number &value(unsigned int i);
 
     /**
-     * Read scalar value at index
-     * @p i.
+     * Read scalar value at index @p i.
      */
     number value(unsigned int i) const;
 
@@ -276,35 +261,23 @@ namespace MeshWorker
     const BlockVector<number> &vector(unsigned int i) const;
 
     /**
-     * Access matrix at index @p
-     * i. For results on internal
-     * faces, a true value for @p
-     * external refers to the flux
-     * between cells, while false
-     * refers to entries coupling
-     * inside the cell.
+     * Access matrix at index @p i. For results on internal faces, a true
+     * value for @p external refers to the flux between cells, while false
+     * refers to entries coupling inside the cell.
      */
     MatrixBlock<FullMatrix<number> > &matrix(unsigned int i, bool external = false);
 
     /**
-     * Read matrix at index @p
-     * i. For results on internal
-     * faces, a true value for @p
-     * external refers to the flux
-     * between cells, while false
-     * refers to entries coupling
-     * inside the cell.
+     * Read matrix at index @p i. For results on internal faces, a true value
+     * for @p external refers to the flux between cells, while false refers to
+     * entries coupling inside the cell.
      */
     const MatrixBlock<FullMatrix<number> > &matrix(unsigned int i, bool external = false) const;
 
     /**
-     * Access to the vector
-     * #quadrature_data of data
-     * in quadrature points,
-     * organized such that there is
-     * a vector for each point,
-     * containing one entry for
-     * each component.
+     * Access to the vector #quadrature_data of data in quadrature points,
+     * organized such that there is a vector for each point, containing one
+     * entry for each component.
      */
     Table<2, number> &quadrature_values();
 
@@ -333,18 +306,18 @@ namespace MeshWorker
     void initialize_vectors(const unsigned int n);
 
     /**
-     * Allocate @p n local matrices. Additionally, set their block row
-     * and column coordinates to zero. The matrices themselves are
-     * resized by reinit().
+     * Allocate @p n local matrices. Additionally, set their block row and
+     * column coordinates to zero. The matrices themselves are resized by
+     * reinit().
      *
      * @note This function is usually only called by the assembler.
      */
     void initialize_matrices(unsigned int n, bool both);
 
     /**
-     * Allocate a local matrix for each of the global ones in @p
-     * matrices. Additionally, set their block row and column
-     * coordinates. The matrices themselves are resized by reinit().
+     * Allocate a local matrix for each of the global ones in @p matrices.
+     * Additionally, set their block row and column coordinates. The matrices
+     * themselves are resized by reinit().
      *
      * @note This function is usually only called by the assembler.
      */
@@ -353,34 +326,26 @@ namespace MeshWorker
                              bool both);
 
     /**
-     * Allocate a local matrix
-     * for each of the global
-     * level objects in @p
-     * matrices. Additionally,
-     * set their block row and
-     * column coordinates. The
-     * matrices themselves are
-     * resized by reinit().
+     * Allocate a local matrix for each of the global level objects in @p
+     * matrices. Additionally, set their block row and column coordinates. The
+     * matrices themselves are resized by reinit().
      *
-     * @note This function is
-     * usually only called by the
-     * assembler.
+     * @note This function is usually only called by the assembler.
      */
     template <class MATRIX>
     void initialize_matrices(const MGMatrixBlockVector<MATRIX> &matrices,
                              bool both);
 
     /**
-     * Initialize quadrature values to <tt>nv</tt> values in
-     * <tt>np</tt> quadrature points.
+     * Initialize quadrature values to <tt>nv</tt> values in <tt>np</tt>
+     * quadrature points.
      */
     void initialize_quadrature(unsigned int np, unsigned int nv);
 
     /**
-     * Reinitialize matrices for new cell. Does not resize any of the
-     * data vectors stored in this object, but resizes the vectors in
-     * #R and the matrices in #M1 and #M2 for hp and sets them to
-     * zero.
+     * Reinitialize matrices for new cell. Does not resize any of the data
+     * vectors stored in this object, but resizes the vectors in #R and the
+     * matrices in #M1 and #M2 for hp and sets them to zero.
      */
     void reinit(const BlockIndices &local_sizes);
 
@@ -407,20 +372,20 @@ namespace MeshWorker
     std::vector<number> J;
 
     /**
-     * The local vectors. This field is public, so that local
-     * integrators can write to it.
+     * The local vectors. This field is public, so that local integrators can
+     * write to it.
      */
     std::vector<BlockVector<number> > R;
 
     /**
-     * The local matrices coupling degrees of freedom in the cell
-     * itself or within the first cell on a face.
+     * The local matrices coupling degrees of freedom in the cell itself or
+     * within the first cell on a face.
      */
     std::vector<MatrixBlock<FullMatrix<number> > > M1;
 
     /**
-     * The local matrices coupling test functions on the cell with
-     * trial functions on the other cell.
+     * The local matrices coupling test functions on the cell with trial
+     * functions on the other cell.
      *
      * Only used on interior faces.
      */

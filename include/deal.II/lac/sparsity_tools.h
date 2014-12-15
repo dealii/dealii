@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
  * patterns, such as renumbering rows and columns (or degrees of freedom if
  * you want) according to the connectivity, or partitioning degrees of
  * freedom.
-*/
+ */
 namespace SparsityTools
 {
   /**
@@ -103,11 +103,11 @@ namespace SparsityTools
    * These algorithms have one major drawback: they require a good starting
    * node, i.e. node that will have number zero in the output array. A
    * starting node forming the initial level of nodes can thus be given by the
-   * user, e.g. by exploiting knowledge of the actual topology of the
-   * domain. It is also possible to give several starting indices, which may
-   * be used to simulate a simple upstream numbering (by giving the inflow
-   * nodes as starting values) or to make preconditioning faster (by letting
-   * the Dirichlet boundary indices be starting points).
+   * user, e.g. by exploiting knowledge of the actual topology of the domain.
+   * It is also possible to give several starting indices, which may be used
+   * to simulate a simple upstream numbering (by giving the inflow nodes as
+   * starting values) or to make preconditioning faster (by letting the
+   * Dirichlet boundary indices be starting points).
    *
    * If no starting index is given, one is chosen automatically, namely one
    * with the smallest coordination number (the coordination number is the
@@ -165,9 +165,9 @@ namespace SparsityTools
 
   /**
    * similar to the function above, but includes support for
-   * BlockCompressedSimpleSparsityPattern.
-   * @p owned_set_per_cpu is typically DoFHandler::locally_owned_dofs_per_processor
-   * and @p myrange are locally_relevant_dofs.
+   * BlockCompressedSimpleSparsityPattern. @p owned_set_per_cpu is typically
+   * DoFHandler::locally_owned_dofs_per_processor and @p myrange are
+   * locally_relevant_dofs.
    */
   template <class CSP_t>
   void distribute_sparsity_pattern(CSP_t &csp,
@@ -208,7 +208,7 @@ namespace SparsityTools
 }
 
 /**
- *@}
+ * @}
  */
 
 DEAL_II_NAMESPACE_CLOSE

@@ -52,13 +52,14 @@ namespace internal
       static const std::size_t  n_cell_type_bits = 2;
 
       /**
-       * Determines how many types of different cells can be detected at
-       * most. Corresponds to the number of bits we reserved for it.
+       * Determines how many types of different cells can be detected at most.
+       * Corresponds to the number of bits we reserved for it.
        */
       static const unsigned int n_cell_types = 1U<<n_cell_type_bits;
 
       /**
-       * An abbreviation for the length of vector lines of the current data type.
+       * An abbreviation for the length of vector lines of the current data
+       * type.
        */
       static const unsigned int n_vector_elements = VectorizedArray<Number>::n_array_elements;
 
@@ -188,9 +189,9 @@ namespace internal
         /**
          * Stores the diagonal part of the gradient of the inverse Jacobian
          * transformation. The first index runs over the derivatives
-         * $\partial^2/\partial x_i^2$, the second over the space
-         * coordinate. Needed for computing the Laplacian of FE functions on
-         * the real cell. Uses a separate storage from the off-diagonal part
+         * $\partial^2/\partial x_i^2$, the second over the space coordinate.
+         * Needed for computing the Laplacian of FE functions on the real
+         * cell. Uses a separate storage from the off-diagonal part
          * $\partial^2/\partial x_i \partial x_j, i\neq j$ because that is
          * only needed for computing a full Hessian.
          */

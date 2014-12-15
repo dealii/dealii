@@ -25,17 +25,17 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * In this namespace a number of classes is declared that may be used
- * as filters in the FilteredIterator class. The filters either check
- * for binary information (for example, the IteratorFilters::Active
- * filter class checks whether the object pointed to is active), or
- * for valued information by comparison with prescribed values (for
- * example, the LevelEqualTo filter class checks whether the level of
- * the object pointed to by the iterator under consideration is equal
- * to a value that was given to the filter upon construction.
+ * In this namespace a number of classes is declared that may be used as
+ * filters in the FilteredIterator class. The filters either check for binary
+ * information (for example, the IteratorFilters::Active filter class checks
+ * whether the object pointed to is active), or for valued information by
+ * comparison with prescribed values (for example, the LevelEqualTo filter
+ * class checks whether the level of the object pointed to by the iterator
+ * under consideration is equal to a value that was given to the filter upon
+ * construction.
  *
- * For examples of use of these classes as well as requirements on
- * filters see the general description of the FilteredIterator class.
+ * For examples of use of these classes as well as requirements on filters see
+ * the general description of the FilteredIterator class.
  *
  * @ingroup Iterators
  * @author Wolfgang Bangerth, 2002
@@ -43,8 +43,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace IteratorFilters
 {
   /**
-   * Filter that evaluates to true if either the iterator points to an
-   * active object or an iterator past the end.
+   * Filter that evaluates to true if either the iterator points to an active
+   * object or an iterator past the end.
    *
    * @ingroup Iterators
    */
@@ -52,17 +52,17 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Evaluate the iterator and return true if the object is active
-     * or past the end.
+     * Evaluate the iterator and return true if the object is active or past
+     * the end.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
   };
 
   /**
-   * Filter that evaluates to true if either the iterator points to an
-   * object for which the user flag is set or an iterator past the
-   * end. See @ref GlossUserFlags for information about user flags.
+   * Filter that evaluates to true if either the iterator points to an object
+   * for which the user flag is set or an iterator past the end. See @ref
+   * GlossUserFlags for information about user flags.
    *
    * @ingroup Iterators
    */
@@ -70,8 +70,8 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Evaluate the iterator and return true if the object has a set
-     * user flag or past the end.
+     * Evaluate the iterator and return true if the object has a set user flag
+     * or past the end.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
@@ -79,9 +79,9 @@ namespace IteratorFilters
 
 
   /**
-   * Filter that evaluates to true if either the iterator points to an
-   * object for which the user flag is not set or an iterator past the
-   * end. Inverse filter to the previous class.
+   * Filter that evaluates to true if either the iterator points to an object
+   * for which the user flag is not set or an iterator past the end. Inverse
+   * filter to the previous class.
    *
    * @ingroup Iterators
    */
@@ -89,8 +89,8 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Evaluate the iterator and return true if the object has an
-     * unset user flag or past the end.
+     * Evaluate the iterator and return true if the object has an unset user
+     * flag or past the end.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
@@ -98,9 +98,9 @@ namespace IteratorFilters
 
 
   /**
-   * Filter for iterators that evaluates to true if either the
-   * iterator is past the end or the level of the object pointed to is
-   * equal to a value given to the constructor.
+   * Filter for iterators that evaluates to true if either the iterator is
+   * past the end or the level of the object pointed to is equal to a value
+   * given to the constructor.
    *
    * @ingroup Iterators
    */
@@ -108,15 +108,15 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Constructor. Store the level which iterators shall have to be
-     * evaluated to true.
+     * Constructor. Store the level which iterators shall have to be evaluated
+     * to true.
      */
     LevelEqualTo (const unsigned int level);
 
     /**
-     * Evaluation operator. Returns true if either the level of the
-     * object pointed to is equal to the stored value or the iterator
-     * is past the end.
+     * Evaluation operator. Returns true if either the level of the object
+     * pointed to is equal to the stored value or the iterator is past the
+     * end.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
@@ -131,10 +131,10 @@ namespace IteratorFilters
 
 
   /**
-   * Filter for iterators that evaluates to true if either the
-   * iterator is past the end or the subdomain id of the object
-   * pointed to is equal to a value given to the constructor, assuming
-   * that the iterator allows querying for a subdomain id).
+   * Filter for iterators that evaluates to true if either the iterator is
+   * past the end or the subdomain id of the object pointed to is equal to a
+   * value given to the constructor, assuming that the iterator allows
+   * querying for a subdomain id).
    *
    * @ingroup Iterators
    */
@@ -142,15 +142,15 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Constructor. Store the subdomain which iterators shall have to
-     * be evaluated to true.
+     * Constructor. Store the subdomain which iterators shall have to be
+     * evaluated to true.
      */
     SubdomainEqualTo (const types::subdomain_id subdomain_id);
 
     /**
-     * Evaluation operator. Returns true if either the subdomain of
-     * the object pointed to is equal to the stored value or the
-     * iterator is past the end.
+     * Evaluation operator. Returns true if either the subdomain of the object
+     * pointed to is equal to the stored value or the iterator is past the
+     * end.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
@@ -165,12 +165,12 @@ namespace IteratorFilters
 
 
   /**
-   * Filter for iterators that evaluates to true if a cell is owned by
-   * the current processor, i.e., if it is a @ref
-   * GlossLocallyOwnedCell "locally owned cell".
+   * Filter for iterators that evaluates to true if a cell is owned by the
+   * current processor, i.e., if it is a @ref GlossLocallyOwnedCell "locally
+   * owned cell".
    *
-   * This class is used in step-32, in connection with the methods of
-   * the @ref distributed module.
+   * This class is used in step-32, in connection with the methods of the @ref
+   * distributed module.
    *
    * @ingroup Iterators
    */
@@ -187,8 +187,8 @@ namespace IteratorFilters
 
 
   /**
-   * Filter for iterators that evaluates to true if th level subdomain
-   * id of a cell is equal to the current processor id.
+   * Filter for iterators that evaluates to true if th level subdomain id of a
+   * cell is equal to the current processor id.
    *
    * @ingroup Iterators
    */
@@ -196,8 +196,8 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Evaluation operator. Returns true if the level subdomain id of
-     * the cell is equal to the current processor id.
+     * Evaluation operator. Returns true if the level subdomain id of the cell
+     * is equal to the current processor id.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
@@ -207,31 +207,28 @@ namespace IteratorFilters
 
 /**
  * This class provides a certain view on a range of triangulation or
- * DoFHandler iterators by only iterating over elements that satisfy a
- * given filter (called a <em>predicate</em>, following the notation
- * of the C++ standard library). Once initialized with a predicate and
- * a value for the iterator, a filtered iterator hops to the next or
- * previous element that satisfies the predicate if operators ++ or --
- * are invoked. Intermediate iterator values that lie in between but
- * do not satisfy the predicate are skipped. It is thus very simple to
- * write loops over a certain class of objects without the need to
- * explicitely write down the condition they have to satisfy in each
- * loop iteration. This in particular is helpful if functions are
- * called with a pair of iterators denoting a range on which they
- * shall act, by choosing a filtered iterator instead of usual ones.
+ * DoFHandler iterators by only iterating over elements that satisfy a given
+ * filter (called a <em>predicate</em>, following the notation of the C++
+ * standard library). Once initialized with a predicate and a value for the
+ * iterator, a filtered iterator hops to the next or previous element that
+ * satisfies the predicate if operators ++ or -- are invoked. Intermediate
+ * iterator values that lie in between but do not satisfy the predicate are
+ * skipped. It is thus very simple to write loops over a certain class of
+ * objects without the need to explicitely write down the condition they have
+ * to satisfy in each loop iteration. This in particular is helpful if
+ * functions are called with a pair of iterators denoting a range on which
+ * they shall act, by choosing a filtered iterator instead of usual ones.
  *
- * This class is used in step-18 and
- * step-32.
+ * This class is used in step-18 and step-32.
  *
  *
  * <h3>Predicates</h3>
  *
- * The object that represent the condition an iterator has to satisfy
- * only have to provide an interface that allows to call the
- * evaluation operator, i.e. <code>bool operator() (const
- * BaseIterator&)</code>. This includes function pointers as well as
- * classes that implement an <code>bool operator ()(const
- * BaseIterator&)</code>. Then, the FilteredIterator will skip all
+ * The object that represent the condition an iterator has to satisfy only
+ * have to provide an interface that allows to call the evaluation operator,
+ * i.e. <code>bool operator() (const BaseIterator&)</code>. This includes
+ * function pointers as well as classes that implement an <code>bool operator
+ * ()(const BaseIterator&)</code>. Then, the FilteredIterator will skip all
  * objects where the return value of this function is <code>false</code>.
  *
  *
@@ -262,10 +259,10 @@ namespace IteratorFilters
  * @code
  *   std::bind2nd (std::ptr_fun(&level_equal_to<active_cell_iterator>), 3)
  * @endcode
- * is another valid predicate (here: a function that returns true if
- * either the iterator is past the end or the level is equal to the
- * second argument; this second argument is bound to a fixed value
- * using the @p std::bind2nd function).
+ * is another valid predicate (here: a function that returns true if either
+ * the iterator is past the end or the level is equal to the second argument;
+ * this second argument is bound to a fixed value using the @p std::bind2nd
+ * function).
  *
  * Finally, classes can be predicates. The following class is one:
  * @code
@@ -278,8 +275,8 @@ namespace IteratorFilters
  *       }
  *   };
  * @endcode
- * and objects of this type can be used as predicates. Likewise, this
- * more complicated one can also be used:
+ * and objects of this type can be used as predicates. Likewise, this more
+ * complicated one can also be used:
  * @code
  *   class SubdomainEqualTo
  *   {
@@ -296,56 +293,54 @@ namespace IteratorFilters
  *       const types::subdomain_id subdomain_id;
  *   };
  * @endcode
- * Objects like <code>SubdomainEqualTo(3)</code> can then be used as predicates.
+ * Objects like <code>SubdomainEqualTo(3)</code> can then be used as
+ * predicates.
  *
- * Since whenever a predicate is evaluated it is checked that the
- * iterator checked is actually valid (i.e. not past the end), no
- * checks for this case have to be performed inside predicates.
+ * Since whenever a predicate is evaluated it is checked that the iterator
+ * checked is actually valid (i.e. not past the end), no checks for this case
+ * have to be performed inside predicates.
  *
- * A number of filter classes are already implemented in the
- * IteratorFilters namespace, but writing different ones is
- * simple following the examples above.
+ * A number of filter classes are already implemented in the IteratorFilters
+ * namespace, but writing different ones is simple following the examples
+ * above.
  *
  *
  * <h3>Initialization of filtered iterators</h3>
  *
- * Filtered iterators are given a predicate at construction time which
- * cannot be changed any more. This behaviour would be expected if the
- * predicate would have been given as a template parameter to the
- * class, but since that would make the declaration of filtered
- * iterators a nightmare, we rather give the predicate as an
- * unchangeable entity to the constructor. Note that one can assign a
- * filtered iterator with one predicate to another filtered iterator
- * with another type; yet, this does <em>not</em> change the predicate
- * of the assigned-to iterator, only the pointer indicating the
+ * Filtered iterators are given a predicate at construction time which cannot
+ * be changed any more. This behaviour would be expected if the predicate
+ * would have been given as a template parameter to the class, but since that
+ * would make the declaration of filtered iterators a nightmare, we rather
+ * give the predicate as an unchangeable entity to the constructor. Note that
+ * one can assign a filtered iterator with one predicate to another filtered
+ * iterator with another type; yet, this does <em>not</em> change the
+ * predicate of the assigned-to iterator, only the pointer indicating the
  * iterator is changed.
  *
  * If a filtered iterator is not assigned a value of the underlying
- * (unfiltered) iterator type, the default value is taken. If,
- * however, a value is given to the constructor, that value has either
- * to be past the end, or has to satisfy the predicate. For example,
- * if the predicate only evaluates to true if the level of an object
- * is equal to three, then <code>tria.begin_active(3)</code> would be a valid
- * choice while <code>tria.begin()</code> would not since the latter also
- * returns iterators to non-active cells which always start at level
- * 0.
+ * (unfiltered) iterator type, the default value is taken. If, however, a
+ * value is given to the constructor, that value has either to be past the
+ * end, or has to satisfy the predicate. For example, if the predicate only
+ * evaluates to true if the level of an object is equal to three, then
+ * <code>tria.begin_active(3)</code> would be a valid choice while
+ * <code>tria.begin()</code> would not since the latter also returns iterators
+ * to non-active cells which always start at level 0.
  *
- * Since one often only has some iterator and wants to set a filtered
- * iterator to the first one that satisfies a predicate (for example,
- * the first one for which the user flag is set, or the first one with
- * a given subdomain id), there are assignement functions
- * #set_to_next_positive and #set_to_previous_positive that
- * assign the next or last previous iterator that satisfies the
- * predicate, i.e. they follow the list of iterators in either
- * direction until they find a matching one (or the past-the-end
+ * Since one often only has some iterator and wants to set a filtered iterator
+ * to the first one that satisfies a predicate (for example, the first one for
+ * which the user flag is set, or the first one with a given subdomain id),
+ * there are assignement functions #set_to_next_positive and
+ * #set_to_previous_positive that assign the next or last previous iterator
+ * that satisfies the predicate, i.e. they follow the list of iterators in
+ * either direction until they find a matching one (or the past-the-end
  * iterator). Like the <code>operator=</code> they return the resulting value
  * of the filtered iterator.
  *
  *
  * <h3>Examples</h3>
  *
- * The following call counts the number of active cells that
- * have a set user flag:
+ * The following call counts the number of active cells that have a set user
+ * flag:
  * @code
  *   FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
  *      begin (IteratorFilters::UserFlagSet()),
@@ -354,10 +349,10 @@ namespace IteratorFilters
  *   end = tria.end();
  *   n_flagged_cells = std::distance (begin, end);
  * @endcode
- * Note that by the @p set_to_next_positive call the first cell with
- * a set user flag was assigned to the @p begin iterator. For the
- * end iterator, no such call was necessary, since the past-the-end
- * iterator always satisfies all predicates.
+ * Note that by the @p set_to_next_positive call the first cell with a set
+ * user flag was assigned to the @p begin iterator. For the end iterator, no
+ * such call was necessary, since the past-the-end iterator always satisfies
+ * all predicates.
  *
  * The same can be achieved by the following snippet, though harder to read:
  * @code
@@ -367,13 +362,12 @@ namespace IteratorFilters
  *                            .set_to_next_positive(tria.begin_active()),
  *                     FI(IteratorFilters::UserFlagSet(), tria.end()));
  * @endcode
- * It relies on the fact that if we create an unnamed filtered
- * iterator with a given predicate but no iterator value and assign it
- * the next positive value with respect to this predicate, it returns
- * itself which is then used as the first parameter to the
- * @p std::distance function. This procedure is not necessary for the
- * end element to this function here, since the past-the-end iterator
- * always satisfies the predicate so that we can assign this value to
+ * It relies on the fact that if we create an unnamed filtered iterator with a
+ * given predicate but no iterator value and assign it the next positive value
+ * with respect to this predicate, it returns itself which is then used as the
+ * first parameter to the @p std::distance function. This procedure is not
+ * necessary for the end element to this function here, since the past-the-end
+ * iterator always satisfies the predicate so that we can assign this value to
  * the filtered iterator directly in the constructor.
  *
  * Finally, the following loop only assembles the matrix on cells with
@@ -387,11 +381,10 @@ namespace IteratorFilters
  *   assemble_local_matrix (cell);
  * @endcode
  *
- * Since comparison between filtered and unfiltered iterators is
- * defined, we could as well have let the @p endc variable in the
- * last example be of type
- * Triangulation::active_cell_iterator since it is unchanged
- * and its value does not depend on the filter.
+ * Since comparison between filtered and unfiltered iterators is defined, we
+ * could as well have let the @p endc variable in the last example be of type
+ * Triangulation::active_cell_iterator since it is unchanged and its value
+ * does not depend on the filter.
  *
  * @ingroup grid
  * @ingroup Iterators
@@ -402,56 +395,41 @@ class FilteredIterator : public BaseIterator
 {
 public:
   /**
-   * Typedef to the accessor type
-   * of the underlying iterator.
+   * Typedef to the accessor type of the underlying iterator.
    */
   typedef typename BaseIterator::AccessorType AccessorType;
 
   /**
-   * Constructor. Set the iterator
-   * to the default state and use
-   * the given predicate for
-   * filtering subsequent
-   * assignement and iteration.
+   * Constructor. Set the iterator to the default state and use the given
+   * predicate for filtering subsequent assignement and iteration.
    */
   template <typename Predicate>
   FilteredIterator (Predicate p);
 
   /**
-   * Constructor. Use the given
-   * predicate for filtering and
-   * initialize the iterator with
-   * the given value.
+   * Constructor. Use the given predicate for filtering and initialize the
+   * iterator with the given value.
    *
-   * If the initial value @p bi does
-   * not satisfy the predicate @p p
-   * then it is advanced until we
-   * either hit the the
-   * past-the-end iterator, or the
-   * predicate is satisfied. This
-   * allows, for example, to write
-   * code like
+   * If the initial value @p bi does not satisfy the predicate @p p then it is
+   * advanced until we either hit the the past-the-end iterator, or the
+   * predicate is satisfied. This allows, for example, to write code like
    * @code
    *   FilteredIterator<typename Triangulation<dim>::active_cell_iterator>
    *     cell (IteratorFilters::SubdomainEqualTo(13),
    *           triangulation.begin_active());
    * @endcode
    *
-   * If the cell
-   * <code>triangulation.begin_active()</code>
-   * does not have a subdomain_id
-   * equal to 13, then the iterator
-   * will automatically be advanced
-   * to the first cell that has.
+   * If the cell <code>triangulation.begin_active()</code> does not have a
+   * subdomain_id equal to 13, then the iterator will automatically be
+   * advanced to the first cell that has.
    */
   template <typename Predicate>
   FilteredIterator (Predicate           p,
                     const BaseIterator &bi);
 
   /**
-   * Copy constructor. Copy the
-   * predicate and iterator value
-   * of the given argument.
+   * Copy constructor. Copy the predicate and iterator value of the given
+   * argument.
    */
   FilteredIterator (const FilteredIterator &fi);
 
@@ -461,164 +439,111 @@ public:
   ~FilteredIterator ();
 
   /**
-   * Assignment operator. Copy the
-   * iterator value of the
-   * argument, but as discussed in
-   * the class documentation, the
-   * predicate of the argument is
-   * not copied. The iterator value
-   * underlying the argument has to
-   * satisfy the predicate of the
-   * object assigned to, as given
-   * at its construction time.
+   * Assignment operator. Copy the iterator value of the argument, but as
+   * discussed in the class documentation, the predicate of the argument is
+   * not copied. The iterator value underlying the argument has to satisfy the
+   * predicate of the object assigned to, as given at its construction time.
    */
   FilteredIterator &operator = (const FilteredIterator &fi);
 
   /**
-   * Assignment operator. Copy the
-   * iterator value of the
-   * argument, and keep the
-   * predicate of this object. The
-   * given iterator value has to
-   * satisfy the predicate of the
-   * object assigned to, as given
-   * at its construction time.
+   * Assignment operator. Copy the iterator value of the argument, and keep
+   * the predicate of this object. The given iterator value has to satisfy the
+   * predicate of the object assigned to, as given at its construction time.
    */
   FilteredIterator &operator = (const BaseIterator &fi);
 
   /**
-   * Search for the next iterator
-   * from @p bi onwards that
-   * satisfies the predicate of
-   * this object and assign it to
-   * this object.
+   * Search for the next iterator from @p bi onwards that satisfies the
+   * predicate of this object and assign it to this object.
    *
-   * Since filtered iterators are
-   * automatically converted to the
-   * underlying base iterator type,
-   * you can also give a filtered
-   * iterator as argument to this
-   * function.
+   * Since filtered iterators are automatically converted to the underlying
+   * base iterator type, you can also give a filtered iterator as argument to
+   * this function.
    */
   FilteredIterator &
   set_to_next_positive (const BaseIterator &bi);
 
   /**
-   * As above, but search for the
-   * previous iterator from @p bi
-   * backwards that satisfies the
-   * predicate of this object and
-   * assign it to this object.
+   * As above, but search for the previous iterator from @p bi backwards that
+   * satisfies the predicate of this object and assign it to this object.
    *
-   * Since filtered iterators are
-   * automatically converted to the
-   * underlying base iterator type,
-   * you can also give a filtered
-   * iterator as argument to this
-   * function.
+   * Since filtered iterators are automatically converted to the underlying
+   * base iterator type, you can also give a filtered iterator as argument to
+   * this function.
    */
   FilteredIterator &
   set_to_previous_positive (const BaseIterator &bi);
 
   /**
-   * Compare for equality of the
-   * underlying iterator values of
-   * this and the given object.
+   * Compare for equality of the underlying iterator values of this and the
+   * given object.
    *
-   * We do not compare for equality
-   * of the predicates.
+   * We do not compare for equality of the predicates.
    */
   bool operator == (const FilteredIterator &fi) const;
 
   /**
-   * Compare for equality of the
-   * underlying iterator value of
-   * this object with the given
-   * object.
+   * Compare for equality of the underlying iterator value of this object with
+   * the given object.
    *
-   * The predicate of this object
-   * is irrelevant for this
-   * operation.
+   * The predicate of this object is irrelevant for this operation.
    */
   bool operator == (const BaseIterator &fi) const;
 
   /**
-   * Compare for inequality of the
-   * underlying iterator values of
-   * this and the given object.
+   * Compare for inequality of the underlying iterator values of this and the
+   * given object.
    *
-   * We do not compare for equality
-   * of the predicates.
+   * We do not compare for equality of the predicates.
    */
   bool operator != (const FilteredIterator &fi) const;
 
   /**
-   * Compare for inequality of the
-   * underlying iterator value of
-   * this object with the given
-   * object.
+   * Compare for inequality of the underlying iterator value of this object
+   * with the given object.
    *
-   * The predicate of this object
-   * is irrelevant for this
-   * operation.
+   * The predicate of this object is irrelevant for this operation.
    */
   bool operator != (const BaseIterator &fi) const;
 
   /**
-   * Compare for ordering of the
-   * underlying iterator values of
-   * this and the given object.
+   * Compare for ordering of the underlying iterator values of this and the
+   * given object.
    *
-   * We do not compare the
-   * predicates.
+   * We do not compare the predicates.
    */
   bool operator <  (const FilteredIterator &fi) const;
 
   /**
-   * Compare for ordering of the
-   * underlying iterator value of
-   * this object with the given
-   * object.
+   * Compare for ordering of the underlying iterator value of this object with
+   * the given object.
    *
-   * The predicate of this object
-   * is irrelevant for this
-   * operation.
+   * The predicate of this object is irrelevant for this operation.
    */
   bool operator <  (const BaseIterator &fi) const;
 
   /**
-   * Prefix advancement operator:
-   * move to the next iterator
-   * value satisfying the predicate
-   * and return the new iterator
-   * value.
+   * Prefix advancement operator: move to the next iterator value satisfying
+   * the predicate and return the new iterator value.
    */
   FilteredIterator &operator ++ ();
 
   /**
-   * Postfix advancement operator:
-   * move to the next iterator
-   * value satisfying the predicate
-   * and return the old iterator
-   * value.
+   * Postfix advancement operator: move to the next iterator value satisfying
+   * the predicate and return the old iterator value.
    */
   FilteredIterator   operator ++ (int);
 
   /**
-   * Prefix decrement operator:
-   * move to the previous iterator
-   * value satisfying the predicate
-   * and return the new iterator
-   * value.
+   * Prefix decrement operator: move to the previous iterator value satisfying
+   * the predicate and return the new iterator value.
    */
   FilteredIterator &operator -- ();
 
   /**
-   * Postfix advancement operator:
-   * move to the previous iterator
-   * value satisfying the predicate
-   * and return the old iterator
-   * value.
+   * Postfix advancement operator: move to the previous iterator value
+   * satisfying the predicate and return the old iterator value.
    */
   FilteredIterator   operator -- (int);
 
@@ -634,19 +559,11 @@ public:
 private:
 
   /**
-   * Base class to encapsulate a
-   * predicate object. Since
-   * predicates can be of different
-   * types and we do not want to
-   * code these types into the
-   * template parameter list of the
-   * filtered iterator class, we
-   * use a base class with an
-   * abstract function and
-   * templatized derived classes
-   * that implement the use of
-   * actual predicate types through
-   * the virtual function.
+   * Base class to encapsulate a predicate object. Since predicates can be of
+   * different types and we do not want to code these types into the template
+   * parameter list of the filtered iterator class, we use a base class with
+   * an abstract function and templatized derived classes that implement the
+   * use of actual predicate types through the virtual function.
    *
    * @ingroup Iterators
    */
@@ -654,42 +571,30 @@ private:
   {
   public:
     /**
-     * Mark the destructor
-     * virtual to allow
-     * destruction through
-     * pointers to the base
-     * class.
+     * Mark the destructor virtual to allow destruction through pointers to
+     * the base class.
      */
     virtual ~PredicateBase () {}
 
     /**
-     * Abstract function which in
-     * derived classes denotes
-     * the evaluation of the
-     * predicate on the give
-     * iterator.
+     * Abstract function which in derived classes denotes the evaluation of
+     * the predicate on the give iterator.
      */
     virtual bool operator () (const BaseIterator &bi) const = 0;
 
     /**
-     * Generate a copy of this
-     * object, i.e. of the actual
-     * type of this pointer.
+     * Generate a copy of this object, i.e. of the actual type of this
+     * pointer.
      */
     virtual PredicateBase *clone () const = 0;
   };
 
 
   /**
-   * Actual implementation of the
-   * above abstract base class. Use
-   * a template parameter to denote
-   * the actual type of the
-   * predicate and store a copy of
-   * it. When the virtual function
-   * is called evaluate the given
-   * iterator with the stored copy
-   * of the predicate.
+   * Actual implementation of the above abstract base class. Use a template
+   * parameter to denote the actual type of the predicate and store a copy of
+   * it. When the virtual function is called evaluate the given iterator with
+   * the stored copy of the predicate.
    *
    * @ingroup Iterators
    */
@@ -698,23 +603,18 @@ private:
   {
   public:
     /**
-     * Constructor. Take a
-     * predicate and store a copy
-     * of it.
+     * Constructor. Take a predicate and store a copy of it.
      */
     PredicateTemplate (const Predicate &predicate);
 
     /**
-     * Evaluate the iterator with
-     * the stored copy of the
-     * predicate.
+     * Evaluate the iterator with the stored copy of the predicate.
      */
     virtual bool operator () (const BaseIterator &bi) const;
 
     /**
-     * Generate a copy of this
-     * object, i.e. of the actual
-     * type of this pointer.
+     * Generate a copy of this object, i.e. of the actual type of this
+     * pointer.
      */
     virtual PredicateBase *clone () const;
 
@@ -726,10 +626,8 @@ private:
   };
 
   /**
-   * Pointer to an object that
-   * encapsulated the actual data
-   * type of the predicate given to
-   * the constructor.
+   * Pointer to an object that encapsulated the actual data type of the
+   * predicate given to the constructor.
    */
   const PredicateBase *predicate;
 
@@ -738,14 +636,13 @@ private:
 
 
 /**
- * Create an object of type FilteredIterator given the base iterator
- * and predicate.  This function makes the creation of temporary
- * objects (for example as function arguments) a lot simpler because
- * one does not have to explicitly specify the type of the base
- * iterator by hand -- it is deduced automatically here.
+ * Create an object of type FilteredIterator given the base iterator and
+ * predicate.  This function makes the creation of temporary objects (for
+ * example as function arguments) a lot simpler because one does not have to
+ * explicitly specify the type of the base iterator by hand -- it is deduced
+ * automatically here.
  *
- * @author Wolfgang Bangerth
- * @relates FilteredIterator
+ * @author Wolfgang Bangerth @relates FilteredIterator
  */
 template <typename BaseIterator, typename Predicate>
 FilteredIterator<BaseIterator>

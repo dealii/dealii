@@ -33,9 +33,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   /**
-   * An output operator writing a separate file in each step and
-   * writing the vectors as finite element functions with respect to a
-   * given DoFHandler.
+   * An output operator writing a separate file in each step and writing the
+   * vectors as finite element functions with respect to a given DoFHandler.
    */
   template <class VECTOR, int dim, int spacedim=dim>
   class DoFOutputOperator : public OutputOperator<VECTOR>

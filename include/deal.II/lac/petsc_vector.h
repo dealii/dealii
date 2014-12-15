@@ -39,11 +39,11 @@ namespace PETScWrappers
   /**
    * Implementation of a sequential vector class based on PETSC. All the
    * functionality is actually in the base class, except for the calls to
-   * generate a sequential vector. This is possible since PETSc only works on an
-   * abstract vector type and internally distributes to functions that do the
-   * actual work depending on the actual vector type (much like using virtual
-   * functions). Only the functions creating a vector of specific type differ,
-   * and are implemented in this particular class.
+   * generate a sequential vector. This is possible since PETSc only works on
+   * an abstract vector type and internally distributes to functions that do
+   * the actual work depending on the actual vector type (much like using
+   * virtual functions). Only the functions creating a vector of specific type
+   * differ, and are implemented in this particular class.
    *
    * @ingroup Vectors
    * @author Wolfgang Bangerth, 2004
@@ -57,176 +57,128 @@ namespace PETScWrappers
     typedef types::global_dof_index size_type;
 
     /**
-     * A variable that indicates whether this vector
-     * supports distributed data storage. If true, then
-     * this vector also needs an appropriate compress()
-     * function that allows communicating recent set or
-     * add operations to individual elements to be communicated
-     * to other processors.
+     * A variable that indicates whether this vector supports distributed data
+     * storage. If true, then this vector also needs an appropriate compress()
+     * function that allows communicating recent set or add operations to
+     * individual elements to be communicated to other processors.
      *
-     * For the current class, the variable equals
-     * false, since it does not support parallel data storage.
-     * If you do need parallel data storage, use
-     * PETScWrappers::MPI::Vector.
+     * For the current class, the variable equals false, since it does not
+     * support parallel data storage. If you do need parallel data storage,
+     * use PETScWrappers::MPI::Vector.
      */
     static const bool supports_distributed_data = false;
 
     /**
-     * Default constructor. Initialize the
-     * vector as empty.
+     * Default constructor. Initialize the vector as empty.
      */
     Vector ();
 
     /**
-     * Constructor. Set dimension to
-     * @p n and initialize all
-     * elements with zero.
+     * Constructor. Set dimension to @p n and initialize all elements with
+     * zero.
      *
-     * The constructor is made explicit to
-     * avoid accidents like this:
-     * <tt>v=0;</tt>. Presumably, the user wants
-     * to set every element of the vector to
-     * zero, but instead, what happens is
-     * this call: <tt>v=Vector@<number@>(0);</tt>,
-     * i.e. the vector is replaced by one of
+     * The constructor is made explicit to avoid accidents like this:
+     * <tt>v=0;</tt>. Presumably, the user wants to set every element of the
+     * vector to zero, but instead, what happens is this call:
+     * <tt>v=Vector@<number@>(0);</tt>, i.e. the vector is replaced by one of
      * length zero.
      */
     explicit Vector (const size_type n);
 
     /**
-     * Copy-constructor from deal.II
-     * vectors. Sets the dimension to that
-     * of the given vector, and copies all
-     * elements.
+     * Copy-constructor from deal.II vectors. Sets the dimension to that of
+     * the given vector, and copies all elements.
      */
     template <typename Number>
     explicit Vector (const dealii::Vector<Number> &v);
 
     /**
-     * Construct it from an existing PETSc
-     * Vector of type Vec. Note: this does
-     * not copy the contents and just keeps
-     * a pointer. You need to make sure the
-     * vector is not used twice at the same
-     * time or destroyed while in use. This
-     * class does not destroy the PETSc
-     * object. Handle with care!
+     * Construct it from an existing PETSc Vector of type Vec. Note: this does
+     * not copy the contents and just keeps a pointer. You need to make sure
+     * the vector is not used twice at the same time or destroyed while in
+     * use. This class does not destroy the PETSc object. Handle with care!
      */
     explicit Vector (const Vec &v);
 
     /**
-     * Copy-constructor the values from a
-     * PETSc wrapper vector class.
+     * Copy-constructor the values from a PETSc wrapper vector class.
      */
     Vector (const Vector &v);
 
     /**
-     * Copy-constructor: copy the values
-     * from a PETSc wrapper parallel vector
+     * Copy-constructor: copy the values from a PETSc wrapper parallel vector
      * class.
      *
-     * Note that due to the communication
-     * model of MPI, @em all processes have
-     * to actually perform this operation,
-     * even if they do not use the
-     * result. It is not sufficient if only
-     * one processor tries to copy the
-     * elements from the other processors
-     * over to its own process space.
+     * Note that due to the communication model of MPI, @em all processes have
+     * to actually perform this operation, even if they do not use the result.
+     * It is not sufficient if only one processor tries to copy the elements
+     * from the other processors over to its own process space.
      */
     explicit Vector (const MPI::Vector &v);
 
     /**
-     * Copy the given vector. Resize the
-     * present vector if necessary.
+     * Copy the given vector. Resize the present vector if necessary.
      */
     Vector &operator = (const Vector &v);
 
     /**
-     * Copy all the elements of the
-     * parallel vector @p v into this
-     * local vector. Note that due to the
-     * communication model of MPI, @em all
-     * processes have to actually perform
-     * this operation, even if they do not
-     * use the result. It is not sufficient
-     * if only one processor tries to copy
-     * the elements from the other
-     * processors over to its own process
+     * Copy all the elements of the parallel vector @p v into this local
+     * vector. Note that due to the communication model of MPI, @em all
+     * processes have to actually perform this operation, even if they do not
+     * use the result. It is not sufficient if only one processor tries to
+     * copy the elements from the other processors over to its own process
      * space.
      */
     Vector &operator = (const MPI::Vector &v);
 
     /**
-     * Set all components of the vector to
-     * the given number @p s. Simply pass
-     * this down to the base class, but we
-     * still need to declare this function
-     * to make the example given in the
-     * discussion about making the
+     * Set all components of the vector to the given number @p s. Simply pass
+     * this down to the base class, but we still need to declare this function
+     * to make the example given in the discussion about making the
      * constructor explicit work.
      *
-     * Since the semantics of assigning a
-     * scalar to a vector are not
-     * immediately clear, this operator
-     * should really only be used if you
-     * want to set the entire vector to
-     * zero. This allows the intuitive
-     * notation <tt>v=0</tt>. Assigning
-     * other values is deprecated and may
-     * be disallowed in the future.
+     * Since the semantics of assigning a scalar to a vector are not
+     * immediately clear, this operator should really only be used if you want
+     * to set the entire vector to zero. This allows the intuitive notation
+     * <tt>v=0</tt>. Assigning other values is deprecated and may be
+     * disallowed in the future.
      */
     Vector &operator = (const PetscScalar s);
 
     /**
-     * Copy the values of a deal.II vector
-     * (as opposed to those of the PETSc
-     * vector wrapper class) into this
-     * object.
+     * Copy the values of a deal.II vector (as opposed to those of the PETSc
+     * vector wrapper class) into this object.
      */
     template <typename number>
     Vector &operator = (const dealii::Vector<number> &v);
 
     /**
-     * Change the dimension of the vector
-     * to @p N. It is unspecified how
-     * resizing the vector affects the
-     * memory allocation of this object;
-     * i.e., it is not guaranteed that
-     * resizing it to a smaller size
-     * actually also reduces memory
-     * consumption, or if for efficiency
-     * the same amount of memory is used
-     * for less data.
+     * Change the dimension of the vector to @p N. It is unspecified how
+     * resizing the vector affects the memory allocation of this object; i.e.,
+     * it is not guaranteed that resizing it to a smaller size actually also
+     * reduces memory consumption, or if for efficiency the same amount of
+     * memory is used for less data.
      *
-     * If @p fast is false, the vector is
-     * filled by zeros. Otherwise, the
-     * elements are left an unspecified
-     * state.
+     * If @p fast is false, the vector is filled by zeros. Otherwise, the
+     * elements are left an unspecified state.
      */
     void reinit (const size_type N,
                  const bool      fast = false);
 
     /**
-     * Change the dimension to that of the
-     * vector @p v. The same applies as
+     * Change the dimension to that of the vector @p v. The same applies as
      * for the other reinit() function.
      *
-     * The elements of @p v are not
-     * copied, i.e.  this function is the
-     * same as calling <tt>reinit (v.size(),
-     * fast)</tt>.
+     * The elements of @p v are not copied, i.e.  this function is the same as
+     * calling <tt>reinit (v.size(), fast)</tt>.
      */
     void reinit (const Vector &v,
                  const bool    fast = false);
 
   protected:
     /**
-     * Create a vector of length @p n. For
-     * this class, we create a sequential
-     * vector. @p n denotes the total
-     * size of the vector to be
-     * created.
+     * Create a vector of length @p n. For this class, we create a sequential
+     * vector. @p n denotes the total size of the vector to be created.
      */
     void create_vector (const size_type n);
   };
@@ -237,9 +189,9 @@ namespace PETScWrappers
 
 
   /**
-   * Global function @p swap which overloads the default implementation
-   * of the C++ standard library which uses a temporary object. The
-   * function simply exchanges the data of the two vectors.
+   * Global function @p swap which overloads the default implementation of the
+   * C++ standard library which uses a temporary object. The function simply
+   * exchanges the data of the two vectors.
    *
    * @relates PETScWrappers::Vector
    * @author Wolfgang Bangerth, 2004

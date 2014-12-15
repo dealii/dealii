@@ -482,9 +482,9 @@ namespace VectorTools
   namespace internal
   {
     /**
-     * Interpolate zero boundary values. We don't need to worry about a mapping
-     * here because the function we evaluate for the DoFs is zero in the mapped
-     * locations as well as in the original, unmapped locations
+     * Interpolate zero boundary values. We don't need to worry about a
+     * mapping here because the function we evaluate for the DoFs is zero in
+     * the mapped locations as well as in the original, unmapped locations
      */
     template <class DH>
     void
@@ -694,8 +694,8 @@ namespace VectorTools
 
 
     /**
-     * Return whether the boundary values try to constrain a degree of
-     * freedom that is already constrained to something else
+     * Return whether the boundary values try to constrain a degree of freedom
+     * that is already constrained to something else
      */
     bool constraints_and_b_v_are_compatible (const ConstraintMatrix   &constraints,
                                              std::map<types::global_dof_index,double> &boundary_values)
@@ -2412,10 +2412,8 @@ namespace VectorTools
   namespace internal
   {
     /**
-     * A structure that stores the dim DoF
-     * indices that correspond to a
-     * vector-valued quantity at a single
-     * support point.
+     * A structure that stores the dim DoF indices that correspond to a
+     * vector-valued quantity at a single support point.
      */
     template <int dim>
     struct VectorDoFTuple
@@ -2467,18 +2465,13 @@ namespace VectorTools
 
 
     /**
-     * Add the constraint
-     * $\vec n \cdot \vec u = inhom$
-     * to the list of constraints.
+     * Add the constraint $\vec n \cdot \vec u = inhom$ to the list of
+     * constraints.
      *
-     * Here, $\vec u$ is represented
-     * by the set of given DoF
-     * indices, and $\vec n$ by the
-     * vector specified as the second
-     * argument.
+     * Here, $\vec u$ is represented by the set of given DoF indices, and
+     * $\vec n$ by the vector specified as the second argument.
      *
-     * The function does not add constraints
-     * if a degree of freedom is already
+     * The function does not add constraints if a degree of freedom is already
      * constrained in the constraints object.
      */
     template <int dim>
@@ -2692,20 +2685,14 @@ namespace VectorTools
 
 
     /**
-     * Add the constraint $(\vec u-\vec u_\Gamma) \|
-     * \vec t$ to the list of
-     * constraints. In 2d, this is a
-     * single constraint, in 3d these
-     * are two constraints
+     * Add the constraint $(\vec u-\vec u_\Gamma) \| \vec t$ to the list of
+     * constraints. In 2d, this is a single constraint, in 3d these are two
+     * constraints
      *
-     * Here, $\vec u$ is represented
-     * by the set of given DoF
-     * indices, and $\vec t$ by the
-     * vector specified as the second
-     * argument.
+     * Here, $\vec u$ is represented by the set of given DoF indices, and
+     * $\vec t$ by the vector specified as the second argument.
      *
-     * The function does not add constraints
-     * if a degree of freedom is already
+     * The function does not add constraints if a degree of freedom is already
      * constrained in the constraints object.
      */
     template <int dim>
@@ -2764,11 +2751,8 @@ namespace VectorTools
 
 
     /**
-     * Given a vector, compute a set
-     * of dim-1 vectors that are
-     * orthogonal to the first one
-     * and mutually orthonormal as
-     * well.
+     * Given a vector, compute a set of dim-1 vectors that are orthogonal to
+     * the first one and mutually orthonormal as well.
      */
     template <int dim>
     void

@@ -41,13 +41,13 @@ DEAL_II_NAMESPACE_OPEN
  * VectorizedArray and derived data types. It allocates memory aligned to
  * addresses of a vectorized data type (in order to avoid segmentation faults
  * when a variable of type VectorizedArray which the compiler assumes to be
- * aligned to certain memory addresses does not actually follow these
- * rules). This could also be achieved by proving std::vector with a
- * user-defined allocator. On the other hand, writing an own small vector
- * class lets us implement parallel copy and move operations with TBB, insert
- * deal.II-style assertions, and cut some unnecessary functionality. Note that
- * this vector is a bit more memory-consuming than std::vector because of
- * alignment, so it is recommended to only use this vector on long vectors.
+ * aligned to certain memory addresses does not actually follow these rules).
+ * This could also be achieved by proving std::vector with a user-defined
+ * allocator. On the other hand, writing an own small vector class lets us
+ * implement parallel copy and move operations with TBB, insert deal.II-style
+ * assertions, and cut some unnecessary functionality. Note that this vector
+ * is a bit more memory-consuming than std::vector because of alignment, so it
+ * is recommended to only use this vector on long vectors.
  *
  * @p author Katharina Kormann, Martin Kronbichler, 2011
  */
@@ -228,15 +228,15 @@ public:
   size_type memory_consumption () const;
 
   /**
-   * Write the data of this object to
-   * a stream for the purpose of serialization.
+   * Write the data of this object to a stream for the purpose of
+   * serialization.
    */
   template <class Archive>
   void save (Archive &ar, const unsigned int version) const;
 
   /**
-   * Read the data of this object
-   * from a stream for the purpose of serialization.
+   * Read the data of this object from a stream for the purpose of
+   * serialization.
    */
   template <class Archive>
   void load (Archive &ar, const unsigned int version);
@@ -265,15 +265,15 @@ private:
 // ------------------------------- inline functions --------------------------
 
 /**
- * This namespace defines the copy and set functions used in
- * AlignedVector. These functions operate in parallel when there are enough
- * elements in the vector.
+ * This namespace defines the copy and set functions used in AlignedVector.
+ * These functions operate in parallel when there are enough elements in the
+ * vector.
  */
 namespace internal
 {
   /**
-   * Move and class that actually issues the copy commands in
-   * AlignedVector. This class is based on the specialized for loop base class
+   * Move and class that actually issues the copy commands in AlignedVector.
+   * This class is based on the specialized for loop base class
    * ParallelForLoop in parallel.h whose purpose is the following: When
    * calling a parallel for loop on AlignedVector with apply_to_subranges, it
    * generates different code for every different argument we might choose (as

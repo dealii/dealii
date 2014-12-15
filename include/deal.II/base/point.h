@@ -56,18 +56,15 @@ class Point : public Tensor<1,dim,Number>
 {
 public:
   /**
-   * Standard constructor. Creates
-   * an object that corresponds to the origin, i.e., all coordinates
-   * are set to zero.
+   * Standard constructor. Creates an object that corresponds to the origin,
+   * i.e., all coordinates are set to zero.
    */
   Point ();
 
   /**
-   * Constructor. Initialize all
-   * entries to zero if
-   * <tt>initialize==true</tt> (in which case it is equivalent to the default
-   * constructor) or leaves the elements uninitialized if
-   * <tt>initialize==false</tt>.
+   * Constructor. Initialize all entries to zero if <tt>initialize==true</tt>
+   * (in which case it is equivalent to the default constructor) or leaves the
+   * elements uninitialized if <tt>initialize==false</tt>.
    */
   explicit Point (const bool initialize);
 
@@ -77,55 +74,46 @@ public:
   Point (const Tensor<1,dim,Number> &);
 
   /**
-   *  Constructor for one dimensional
-   *  points. This function is only
-   *  implemented for <tt>dim==1</tt> since
-   *  the usage is considered unsafe for
-   *  points with <tt>dim!=1</tt> as it would leave some components
-   *  of the point coordinates uninitialized.
+   * Constructor for one dimensional points. This function is only implemented
+   * for <tt>dim==1</tt> since the usage is considered unsafe for points with
+   * <tt>dim!=1</tt> as it would leave some components of the point
+   * coordinates uninitialized.
    */
   explicit Point (const Number x);
 
   /**
-   *  Constructor for two dimensional
-   *  points. This function is only
-   *  implemented for <tt>dim==2</tt> since
-   *  the usage is considered unsafe for
-   *  points with <tt>dim!=2</tt> as it would leave some components
-   *  of the point coordinates uninitialized (if dim>2) or would
-   *  not use some arguments (if dim<2).
+   * Constructor for two dimensional points. This function is only implemented
+   * for <tt>dim==2</tt> since the usage is considered unsafe for points with
+   * <tt>dim!=2</tt> as it would leave some components of the point
+   * coordinates uninitialized (if dim>2) or would not use some arguments (if
+   * dim<2).
    */
   Point (const Number x,
          const Number y);
 
   /**
-   *  Constructor for three dimensional
-   *  points. This function is only
-   *  implemented for <tt>dim==3</tt> since
-   *  the usage is considered unsafe for
-   *  points with <tt>dim!=3</tt> as it would leave some components
-   *  of the point coordinates uninitialized (if dim>3) or would
-   *  not use some arguments (if dim<3).
+   * Constructor for three dimensional points. This function is only
+   * implemented for <tt>dim==3</tt> since the usage is considered unsafe for
+   * points with <tt>dim!=3</tt> as it would leave some components of the
+   * point coordinates uninitialized (if dim>3) or would not use some
+   * arguments (if dim<3).
    */
   Point (const Number x,
          const Number y,
          const Number z);
 
   /**
-   * Return a unit vector in
-   * coordinate direction <tt>i</tt>.
+   * Return a unit vector in coordinate direction <tt>i</tt>.
    */
   static Point<dim,Number> unit_vector(const unsigned int i);
 
   /**
-   *  Read access to the <tt>index</tt>th
-   *  coordinate.
+   * Read access to the <tt>index</tt>th coordinate.
    */
   Number   operator () (const unsigned int index) const;
 
   /**
-   *  Read and write access to the
-   *  <tt>index</tt>th coordinate.
+   * Read and write access to the <tt>index</tt>th coordinate.
    */
   Number &operator () (const unsigned int index);
 
@@ -135,18 +123,14 @@ public:
    */
 
   /**
-   *  Add two point vectors. If possible,
-   *  use <tt>operator +=</tt> instead
-   *  since this does not need to copy a
-   *  point at least once.
+   * Add two point vectors. If possible, use <tt>operator +=</tt> instead
+   * since this does not need to copy a point at least once.
    */
   Point<dim,Number>   operator + (const Tensor<1,dim,Number> &) const;
 
   /**
-   *  Subtract two point vectors. If
-   *  possible, use <tt>operator +=</tt>
-   *  instead since this does not need to
-   *  copy a point at least once.
+   * Subtract two point vectors. If possible, use <tt>operator +=</tt> instead
+   * since this does not need to copy a point at least once.
    */
   Point<dim,Number>   operator - (const Tensor<1,dim,Number> &) const;
 
@@ -156,49 +140,40 @@ public:
   Point<dim,Number>   operator - () const;
 
   /**
-   *  Multiply by a factor. If possible,
-   *  use <tt>operator *=</tt> instead
-   *  since this does not need to copy a
-   *  point at least once.
+   * Multiply by a factor. If possible, use <tt>operator *=</tt> instead since
+   * this does not need to copy a point at least once.
    *
-   * There is a commutative complement to this
-   * function also
+   * There is a commutative complement to this function also
    */
   Point<dim,Number>   operator * (const Number) const;
 
   /**
-   *  Returns the scalar product of two
-   *  vectors.
+   * Returns the scalar product of two vectors.
    */
   Number       operator * (const Tensor<1,dim,Number> &) const;
 
   /**
-   *  Divide by a factor. If possible, use
-   *  <tt>operator /=</tt> instead since
-   *  this does not need to copy a point at
-   *  least once.
+   * Divide by a factor. If possible, use <tt>operator /=</tt> instead since
+   * this does not need to copy a point at least once.
    */
   Point<dim,Number>   operator / (const Number) const;
 
   /**
-   *  Returns the scalar product of this
-   *  point vector with itself, i.e. the
-   *  square, or the square of the norm.
+   * Returns the scalar product of this point vector with itself, i.e. the
+   * square, or the square of the norm.
    */
   Number              square () const;
 
   /**
-   * Returns the Euclidian distance of
-   * <tt>this</tt> point to the point
-   * <tt>p</tt>, i.e. the <tt>l_2</tt> norm
-   * of the difference between the vectors
-   * representing the two points.
+   * Returns the Euclidian distance of <tt>this</tt> point to the point
+   * <tt>p</tt>, i.e. the <tt>l_2</tt> norm of the difference between the
+   * vectors representing the two points.
    */
   Number distance (const Point<dim,Number> &p) const;
 
   /**
-   * Read or write the data of this object to or
-   * from a stream for the purpose of serialization
+   * Read or write the data of this object to or from a stream for the purpose
+   * of serialization
    */
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version);
@@ -423,8 +398,7 @@ Point<dim,Number>::serialize(Archive &ar, const unsigned int)
 
 
 /**
- * Global operator scaling a point vector by a scalar.
- * @relates Point
+ * Global operator scaling a point vector by a scalar. @relates Point
  */
 template <int dim, typename Number>
 inline
@@ -437,8 +411,7 @@ Point<dim,Number> operator * (const Number             factor,
 
 
 /**
- * Global operator scaling a point vector by a scalar.
- * @relates Point
+ * Global operator scaling a point vector by a scalar. @relates Point
  */
 template <int dim>
 inline
@@ -451,9 +424,8 @@ Point<dim,double> operator * (const double             factor,
 
 
 /**
- * Output operator for points. Print the elements consecutively,
- * with a space in between.
- * @relates Point
+ * Output operator for points. Print the elements consecutively, with a space
+ * in between. @relates Point
  */
 template <int dim, typename Number>
 inline
@@ -470,9 +442,8 @@ std::ostream &operator << (std::ostream            &out,
 
 
 /**
- * Output operator for points. Print the elements consecutively,
- * with a space in between.
- * @relates Point
+ * Output operator for points. Print the elements consecutively, with a space
+ * in between. @relates Point
  */
 template <int dim, typename Number>
 inline
@@ -489,9 +460,9 @@ std::istream &operator >> (std::istream      &in,
 #ifndef DOXYGEN
 
 /**
- * Output operator for points of dimension 1. This is implemented
- * specialized from the general template in order to avoid a compiler
- * warning that the loop is empty.
+ * Output operator for points of dimension 1. This is implemented specialized
+ * from the general template in order to avoid a compiler warning that the
+ * loop is empty.
  */
 template <typename Number>
 inline

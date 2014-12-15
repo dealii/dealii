@@ -34,16 +34,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace
 {
   /**
-   * Adjust vectors on all levels to
-   * correct size.  Here, we just
-   * count the numbers of degrees
-   * of freedom on each level and
-   * @p reinit each level vector
-   * to this length.
-   * For compatibility reasons with
-   * the next function
-   * the target_component is added
-   * here but is not used.
+   * Adjust vectors on all levels to correct size.  Here, we just count the
+   * numbers of degrees of freedom on each level and @p reinit each level
+   * vector to this length. For compatibility reasons with the next function
+   * the target_component is added here but is not used.
    */
   template <int dim, typename number, int spacedim>
   void
@@ -61,14 +55,10 @@ namespace
   }
 
   /**
-   * Adjust vectors on all levels to
-   * correct size.  Here, we just
-   * count the numbers of degrees
-   * of freedom on each level and
-   * @p reinit each level vector
-   * to this length. The target_component
-   * is handed to MGTools::count_dofs_per_block.
-   * See for documentation there.
+   * Adjust vectors on all levels to correct size.  Here, we just count the
+   * numbers of degrees of freedom on each level and @p reinit each level
+   * vector to this length. The target_component is handed to
+   * MGTools::count_dofs_per_block. See for documentation there.
    */
   template <int dim, typename number, int spacedim>
   void
@@ -107,12 +97,9 @@ namespace
 
 #ifdef DEAL_II_WITH_TRILINOS
   /**
-   * Adjust vectors on all levels to
-   * correct size.  Here, we just
-   * count the numbers of degrees
-   * of freedom on each level and
-   * @p reinit each level vector
-   * to this length.
+   * Adjust vectors on all levels to correct size.  Here, we just count the
+   * numbers of degrees of freedom on each level and @p reinit each level
+   * vector to this length.
    */
   template <int dim, int spacedim>
   void

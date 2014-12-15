@@ -1233,9 +1233,7 @@ namespace VectorTools
    * revolves around the question what the normal vector is. Consider the
    * following situation:
    *
-   * <p ALIGN="center">
-   * @image html no_normal_flux_1.png
-   * </p>
+   * <p ALIGN="center"> @image html no_normal_flux_1.png </p>
    *
    * Here, we have two cells that use a bilinear mapping (i.e. MappingQ1).
    * Consequently, for each of the cells, the normal vector is perpendicular
@@ -1262,9 +1260,7 @@ namespace VectorTools
    *
    * Unfortunately, this is not quite enough. Consider the situation here:
    *
-   * <p ALIGN="center">
-   * @image html no_normal_flux_2.png
-   * </p>
+   * <p ALIGN="center"> @image html no_normal_flux_2.png </p>
    *
    * If again the top and right edges approximate a curved boundary, and the
    * left boundary a separate boundary (for example straight) so that the
@@ -1287,9 +1283,7 @@ namespace VectorTools
    * we have considered above, is discretized with the following mesh, then we
    * get into trouble:
    *
-   * <p ALIGN="center">
-   * @image html no_normal_flux_3.png
-   * </p>
+   * <p ALIGN="center"> @image html no_normal_flux_3.png </p>
    *
    * Here, the algorithm assumes that the boundary does not have a corner at
    * the point where faces $F1$ and $F2$ join because at that point there are
@@ -1313,9 +1307,7 @@ namespace VectorTools
    * The situation is more complicated in 3d. Consider the following case
    * where we want to compute the constraints at the marked vertex:
    *
-   * <p ALIGN="center">
-   * @image html no_normal_flux_4.png
-   * </p>
+   * <p ALIGN="center"> @image html no_normal_flux_4.png </p>
    *
    * Here, we get four different normal vectors, one from each of the four
    * faces that meet at the vertex. Even though they may form a complete set
@@ -1354,10 +1346,8 @@ namespace VectorTools
    * on a circle and on a sphere to which the constraints computed by this
    * function have been applied:
    *
-   * <p ALIGN="center">
-   * @image html no_normal_flux_5.png
-   * @image html no_normal_flux_6.png
-   * </p>
+   * <p ALIGN="center"> @image html no_normal_flux_5.png @image html
+   * no_normal_flux_6.png </p>
    *
    * The vectors fields are not physically reasonable but the tangentiality
    * constraint is clearly enforced. The fact that the vector fields are zero
@@ -1658,8 +1648,8 @@ namespace VectorTools
    * @param[in] fe_function A vector with nodal values representing the
    * numerical approximation $u_h$. This vector needs to correspond to the
    * finite element space represented by @p dof.
-   * @param[in] exact_solution The exact solution that is used to compute
-   * the error.
+   * @param[in] exact_solution The exact solution that is used to compute the
+   * error.
    * @param[out] difference The vector of values $d_K$ computed as above.
    * @param[in] q The quadrature formula used to approximate the integral
    * shown above. Note that some quadrature formulas are more useful than

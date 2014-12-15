@@ -40,7 +40,7 @@ template <typename> class Vector;
 
 /**
  * @addtogroup TrilinosWrappers
- *@{
+ * @{
  */
 namespace TrilinosWrappers
 {
@@ -68,9 +68,9 @@ namespace TrilinosWrappers
   }
 
   /**
-   * Namespace for Trilinos vector classes that work in parallel over
-   * MPI. This namespace is restricted to vectors only, whereas matrices
-   * are always MPI based when run on more than one processor.
+   * Namespace for Trilinos vector classes that work in parallel over MPI.
+   * This namespace is restricted to vectors only, whereas matrices are always
+   * MPI based when run on more than one processor.
    *
    * @ingroup TrilinosWrappers
    * @author Martin Kronbichler, Wolfgang Bangerth, 2008
@@ -80,78 +80,77 @@ namespace TrilinosWrappers
     class BlockVector;
 
     /**
-     * This class implements a wrapper to use the Trilinos distributed
-     * vector class Epetra_FEVector. This class is derived from the
+     * This class implements a wrapper to use the Trilinos distributed vector
+     * class Epetra_FEVector. This class is derived from the
      * TrilinosWrappers::VectorBase class and provides all functionality
      * included there.
      *
      * Note that Trilinos only guarantees that operations do what you expect
-     * if the function @p GlobalAssemble has been called after vector
-     * assembly in order to distribute the data. This is necessary since
-     * some processes might have accumulated data of elements that are not
-     * owned by themselves, but must be sent to the owning process. In order
-     * to avoid using the wrong data, you need to call Vector::compress()
-     * before you actually use the vectors.
+     * if the function @p GlobalAssemble has been called after vector assembly
+     * in order to distribute the data. This is necessary since some processes
+     * might have accumulated data of elements that are not owned by
+     * themselves, but must be sent to the owning process. In order to avoid
+     * using the wrong data, you need to call Vector::compress() before you
+     * actually use the vectors.
      *
      * <h3>Parallel communication model</h3>
      *
      * The parallel functionality of Trilinos is built on top of the Message
      * Passing Interface (MPI). MPI's communication model is built on
-     * collective communications: if one process wants something from
-     * another, that other process has to be willing to accept this
-     * communication. A process cannot query data from another process by
-     * calling a remote function, without that other process expecting such
-     * a transaction. The consequence is that most of the operations in the
-     * base class of this class have to be called collectively. For example,
-     * if you want to compute the l2 norm of a parallel vector, @em all
-     * processes across which this vector is shared have to call the @p
-     * l2_norm function. If you don't do this, but instead only call the @p
-     * l2_norm function on one process, then the following happens: This one
-     * process will call one of the collective MPI functions and wait for
-     * all the other processes to join in on this. Since the other processes
-     * don't call this function, you will either get a time-out on the first
-     * process, or, worse, by the time the next a callto a Trilinos function
-     * generates an MPI message on the other processes, you will get a
-     * cryptic message that only a subset of processes attempted a
-     * communication. These bugs can be very hard to figure out, unless you
-     * are well-acquainted with the communication model of MPI, and know
-     * which functions may generate MPI messages.
+     * collective communications: if one process wants something from another,
+     * that other process has to be willing to accept this communication. A
+     * process cannot query data from another process by calling a remote
+     * function, without that other process expecting such a transaction. The
+     * consequence is that most of the operations in the base class of this
+     * class have to be called collectively. For example, if you want to
+     * compute the l2 norm of a parallel vector, @em all processes across
+     * which this vector is shared have to call the @p l2_norm function. If
+     * you don't do this, but instead only call the @p l2_norm function on one
+     * process, then the following happens: This one process will call one of
+     * the collective MPI functions and wait for all the other processes to
+     * join in on this. Since the other processes don't call this function,
+     * you will either get a time-out on the first process, or, worse, by the
+     * time the next a callto a Trilinos function generates an MPI message on
+     * the other processes, you will get a cryptic message that only a subset
+     * of processes attempted a communication. These bugs can be very hard to
+     * figure out, unless you are well-acquainted with the communication model
+     * of MPI, and know which functions may generate MPI messages.
      *
-     * One particular case, where an MPI message may be generated
-     * unexpectedly is discussed below.
+     * One particular case, where an MPI message may be generated unexpectedly
+     * is discussed below.
      *
      *
      * <h3>Accessing individual elements of a vector</h3>
      *
-     * Trilinos does of course allow read access to individual
-     * elements of a vector, but in the distributed case only to
-     * elements that are stored locally. We implement this through
-     * calls like <tt>d=vec(i)</tt>. However, if you access an element
-     * outside the locally stored range, an exception is generated.
+     * Trilinos does of course allow read access to individual elements of a
+     * vector, but in the distributed case only to elements that are stored
+     * locally. We implement this through calls like <tt>d=vec(i)</tt>.
+     * However, if you access an element outside the locally stored range, an
+     * exception is generated.
      *
      * In contrast to read access, Trilinos (and the respective deal.II
      * wrapper classes) allow to write (or add) to individual elements of
      * vectors, even if they are stored on a different process. You can do
      * this by writing into or adding to elements using the syntax
-     * <tt>vec(i)=d</tt> or <tt>vec(i)+=d</tt>,
-     * or similar operations. There is one catch, however, that may lead to
-     * very confusing error messages: Trilinos requires application programs
-     * to call the compress() function when they switch from performing a set of
-     * operations that add to elements, to performing a set of operations
-     * that write to elements. The reasoning is that all processes
-     * might accumulate addition operations to elements, even if multiple
-     * processes write to the same elements. By the time we call compress()
-     * the next time, all these additions are executed. However, if one
-     * process adds to an element, and another overwrites to it, the order
-     * of execution would yield non-deterministic behavior if we don't make
-     * sure that a synchronization with compress() happens in between.
+     * <tt>vec(i)=d</tt> or <tt>vec(i)+=d</tt>, or similar operations. There
+     * is one catch, however, that may lead to very confusing error messages:
+     * Trilinos requires application programs to call the compress() function
+     * when they switch from performing a set of operations that add to
+     * elements, to performing a set of operations that write to elements. The
+     * reasoning is that all processes might accumulate addition operations to
+     * elements, even if multiple processes write to the same elements. By the
+     * time we call compress() the next time, all these additions are
+     * executed. However, if one process adds to an element, and another
+     * overwrites to it, the order of execution would yield non-deterministic
+     * behavior if we don't make sure that a synchronization with compress()
+     * happens in between.
      *
      * In order to make sure these calls to compress() happen at the
-     * appropriate time, the deal.II wrappers keep a state variable that
-     * store which is the presently allowed operation: additions or
-     * writes. If it encounters an operation of the opposite kind, it calls
-     * compress() and flips the state. This can sometimes lead to very
-     * confusing behavior, in code that may for example look like this:
+     * appropriate time, the deal.II wrappers keep a state variable that store
+     * which is the presently allowed operation: additions or writes. If it
+     * encounters an operation of the opposite kind, it calls compress() and
+     * flips the state. This can sometimes lead to very confusing behavior, in
+     * code that may for example look like this:
      *
      * @code
      * TrilinosWrappers::Vector vector;
@@ -171,17 +170,16 @@ namespace TrilinosWrappers
      *
      * This code can run into trouble: by the time we see the first addition
      * operation, we need to flush the overwrite buffers for the vector, and
-     * the deal.II library will do so by calling compress(). However, it
-     * will only do so for all processes that actually do an addition -- if
-     * the condition is never true for one of the processes, then this one
-     * will not get to the actual compress() call, whereas all the other
-     * ones do. This gets us into trouble, since all the other processes
-     * hang in the call to flush the write buffers, while the one other
-     * process advances to the call to compute the l2 norm. At this time,
-     * you will get an error that some operation was attempted by only a
-     * subset of processes. This behavior may seem surprising, unless you
-     * know that write/addition operations on single elements may trigger
-     * this behavior.
+     * the deal.II library will do so by calling compress(). However, it will
+     * only do so for all processes that actually do an addition -- if the
+     * condition is never true for one of the processes, then this one will
+     * not get to the actual compress() call, whereas all the other ones do.
+     * This gets us into trouble, since all the other processes hang in the
+     * call to flush the write buffers, while the one other process advances
+     * to the call to compute the l2 norm. At this time, you will get an error
+     * that some operation was attempted by only a subset of processes. This
+     * behavior may seem surprising, unless you know that write/addition
+     * operations on single elements may trigger this behavior.
      *
      * The problem described here may be avoided by placing additional calls
      * to compress(), or making sure that all processes do the same type of
@@ -194,41 +192,41 @@ namespace TrilinosWrappers
      * Parallel vectors come in two kinds: without and with ghost elements.
      * Vectors without ghost elements uniquely partition the vector elements
      * between processors: each vector entry has exactly one processor that
-     * owns it. For such vectors, you can read those elements that
-     * the processor you are currently on owns, and you can write into
-     * any element whether you own it or not: if you don't own it, the
-     * value written or added to a vector element will be shipped to the
-     * processor that owns this vector element the next time you call
-     * compress(), as described above.
+     * owns it. For such vectors, you can read those elements that the
+     * processor you are currently on owns, and you can write into any element
+     * whether you own it or not: if you don't own it, the value written or
+     * added to a vector element will be shipped to the processor that owns
+     * this vector element the next time you call compress(), as described
+     * above.
      *
-     * What we call a 'ghosted' vector (see
-     * @ref GlossGhostedVector "vectors with ghost elements")
-     * is simply a view of the
-     * parallel vector where the element distributions overlap. The 'ghosted'
-     * Trilinos vector in itself has no idea of which entries are ghosted and
-     * which are locally owned. In fact, a ghosted vector
-     * may not even store all of the elements a non-ghosted vector would
-     * store on the current processor.  Consequently, for Trilinos vectors,
-     * there is no notion of an 'owner' of vector elements in the way we
-     * have it in the the non-ghost case view.
+     * What we call a 'ghosted' vector (see @ref GlossGhostedVector "vectors
+     * with ghost elements") is simply a view of the parallel vector where the
+     * element distributions overlap. The 'ghosted' Trilinos vector in itself
+     * has no idea of which entries are ghosted and which are locally owned.
+     * In fact, a ghosted vector may not even store all of the elements a non-
+     * ghosted vector would store on the current processor.  Consequently, for
+     * Trilinos vectors, there is no notion of an 'owner' of vector elements
+     * in the way we have it in the the non-ghost case view.
      *
      * This explains why we do not allow writing into ghosted vectors on the
      * Trilinos side: Who would be responsible for taking care of the
      * duplicated entries, given that there is not such information as locally
-     * owned indices? In other words, since a processor doesn't know which other
-     * processors own an element, who would it send a value to if one were to write
-     * to it? The only possibility would be to send this information to <i>all</i>
-     * other processors, but that is clearly not practical. Thus, we only allow
-     * reading from ghosted vectors, which however we do very often.
+     * owned indices? In other words, since a processor doesn't know which
+     * other processors own an element, who would it send a value to if one
+     * were to write to it? The only possibility would be to send this
+     * information to <i>all</i> other processors, but that is clearly not
+     * practical. Thus, we only allow reading from ghosted vectors, which
+     * however we do very often.
      *
      * So how do you fill a ghosted vector if you can't write to it? This only
-     * happens through the assignment with a non-ghosted vector. It can go both ways
-     * (non-ghosted is assigned to a ghosted vector, and a ghosted vector is assigned
-     * to a non-ghosted one; the latter one typically only requires taking out
-     * the locally owned part as most often ghosted vectors store a superset of
-     * elements of non-ghosted ones). In general, you send data around with that
-     * operation and it all depends on the different views of the two vectors.
-     * Trilinos also allows you to get subvectors out of a big vector that way.
+     * happens through the assignment with a non-ghosted vector. It can go
+     * both ways (non-ghosted is assigned to a ghosted vector, and a ghosted
+     * vector is assigned to a non-ghosted one; the latter one typically only
+     * requires taking out the locally owned part as most often ghosted
+     * vectors store a superset of elements of non-ghosted ones). In general,
+     * you send data around with that operation and it all depends on the
+     * different views of the two vectors. Trilinos also allows you to get
+     * subvectors out of a big vector that way.
      *
      *
      * <h3>Thread safety of Trilinos vectors</h3>
@@ -337,8 +335,8 @@ namespace TrilinosWrappers
        * Copy operator from a given localized vector (present on all
        * processes) in TrilinosWrappers format to the current distributed
        * vector. This function assumes that the calling vector (left hand
-       * object) already is of the same size as the right hand side
-       * vector. Otherwise, an exception will be thrown.
+       * object) already is of the same size as the right hand side vector.
+       * Otherwise, an exception will be thrown.
        */
       Vector &
       operator = (const ::dealii::TrilinosWrappers::Vector &V);
@@ -368,9 +366,9 @@ namespace TrilinosWrappers
        * then queried from the input vector. Note that you should not write to
        * the resulting vector any more, since the some data can be stored
        * several times on different processors, leading to unpredictable
-       * results. In particular, such a vector cannot be used for
-       * matrix-vector products as for example done during the solution of
-       * linear systems.
+       * results. In particular, such a vector cannot be used for matrix-
+       * vector products as for example done during the solution of linear
+       * systems.
        */
       void import_nonlocal_data_for_fe
       (const dealii::TrilinosWrappers::SparseMatrix &matrix,
@@ -387,9 +385,9 @@ namespace TrilinosWrappers
        * all we need to generate a parallel vector.
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -402,9 +400,9 @@ namespace TrilinosWrappers
        * sets the partitioning details.
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -416,9 +414,9 @@ namespace TrilinosWrappers
        * %parallel partitioning.
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -431,9 +429,9 @@ namespace TrilinosWrappers
        * and generates a new one based on the input map.
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -445,9 +443,9 @@ namespace TrilinosWrappers
        * the given vector, and copies all elements.
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -466,9 +464,9 @@ namespace TrilinosWrappers
        * need to generate a %parallel vector.
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -478,10 +476,10 @@ namespace TrilinosWrappers
       /**
        * Creates a ghosted parallel vector.
        *
-       * Depending on whether the @p ghost argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * Depending on whether the @p ghost argument uniquely subdivides
+       * elements among processors or not, the resulting vector may or may not
+       * have ghost elements. See the general documentation of this class for
+       * more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -496,9 +494,9 @@ namespace TrilinosWrappers
        * MPI communicator that set the partitioning details.
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -511,9 +509,9 @@ namespace TrilinosWrappers
        * the given vector, and copies all the elements.
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -530,9 +528,9 @@ namespace TrilinosWrappers
        *
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -544,14 +542,13 @@ namespace TrilinosWrappers
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning. In addition
        * to just specifying one index set as in all the other methods above,
-       * this method allows to supply an additional set of ghost
-       * entries. There are two different versions of a vector that can be
-       * created. If the flag @p vector_writable is set to @p false, the
-       * vector only allows read access to the joint set of @p
-       * parallel_partitioning and @p ghost_entries. The effect of the reinit
-       * method is then equivalent to calling the other reinit method with an
-       * index set containing both the locally owned entries and the ghost
-       * entries.
+       * this method allows to supply an additional set of ghost entries.
+       * There are two different versions of a vector that can be created. If
+       * the flag @p vector_writable is set to @p false, the vector only
+       * allows read access to the joint set of @p parallel_partitioning and
+       * @p ghost_entries. The effect of the reinit method is then equivalent
+       * to calling the other reinit method with an index set containing both
+       * the locally owned entries and the ghost entries.
        *
        * If the flag @p vector_writable is set to true, this creates an
        * alternative storage scheme for ghost elements that allows multiple
@@ -559,9 +556,9 @@ namespace TrilinosWrappers
        * one thread is allowed to write into the ghost entries at a time).
        *
        * Depending on whether the @p ghost_entries argument uniquely
-       * subdivides elements among processors or not, the resulting vector
-       * may or may not have ghost elements. See the general documentation of
-       * this class for more information.
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
        *
        * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
@@ -579,9 +576,9 @@ namespace TrilinosWrappers
 
 
     /**
-     * Global function @p swap which overloads the default implementation
-     * of the C++ standard library which uses a temporary object. The
-     * function simply exchanges the data of the two vectors.
+     * Global function @p swap which overloads the default implementation of
+     * the C++ standard library which uses a temporary object. The function
+     * simply exchanges the data of the two vectors.
      *
      * @relates TrilinosWrappers::MPI::Vector
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008
@@ -673,10 +670,10 @@ namespace TrilinosWrappers
 
   /**
    * This class is a specialization of a Trilinos vector to a localized
-   * version. The purpose of this class is to provide a copy interface
-   * from the possibly parallel Vector class to a local vector on each
-   * processor, in order to be able to access all elements in the vector
-   * or to apply certain deal.II functions.
+   * version. The purpose of this class is to provide a copy interface from
+   * the possibly parallel Vector class to a local vector on each processor,
+   * in order to be able to access all elements in the vector or to apply
+   * certain deal.II functions.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Vectors
@@ -715,24 +712,24 @@ namespace TrilinosWrappers
     explicit Vector (const size_type n);
 
     /**
-     * This constructor takes as input the number of elements in the
-     * vector. If the map is not localized, i.e., if there are some elements
-     * that are not present on all processes, only the global size of the map
-     * will be taken and a localized map will be generated internally.
-     * In other words, which element of the @p partitioning argument
-     * are set is in fact ignored, the only thing that matters is the size of
-     * the index space described by this argument.
+     * This constructor takes as input the number of elements in the vector.
+     * If the map is not localized, i.e., if there are some elements that are
+     * not present on all processes, only the global size of the map will be
+     * taken and a localized map will be generated internally. In other words,
+     * which element of the @p partitioning argument are set is in fact
+     * ignored, the only thing that matters is the size of the index space
+     * described by this argument.
      */
     explicit Vector (const Epetra_Map &partitioning);
 
     /**
-     * This constructor takes as input the number of elements in the
-     * vector. If the index set is not localized, i.e., if there are some
-     * elements that are not present on all processes, only the global size of
-     * the index set will be taken and a localized version will be generated
-     * internally. In other words, which element of the @p partitioning argument
-     * are set is in fact ignored, the only thing that matters is the size of
-     * the index space described by this argument.
+     * This constructor takes as input the number of elements in the vector.
+     * If the index set is not localized, i.e., if there are some elements
+     * that are not present on all processes, only the global size of the
+     * index set will be taken and a localized version will be generated
+     * internally. In other words, which element of the @p partitioning
+     * argument are set is in fact ignored, the only thing that matters is the
+     * size of the index space described by this argument.
      */
     explicit Vector (const IndexSet &partitioning,
                      const MPI_Comm &communicator = MPI_COMM_WORLD);
@@ -766,9 +763,9 @@ namespace TrilinosWrappers
      * <tt>fast</tt> determines whether the vector should be filled with zero
      * or left untouched.
      *
-     * Which element of the @p input_map argument
-     * are set is in fact ignored, the only thing that matters is the size of
-     * the index space described by this argument.
+     * Which element of the @p input_map argument are set is in fact ignored,
+     * the only thing that matters is the size of the index space described by
+     * this argument.
      */
     void reinit (const Epetra_Map &input_map,
                  const bool        fast = false);
@@ -782,9 +779,9 @@ namespace TrilinosWrappers
      * <tt>fast</tt> determines whether the vector should be filled with zero
      * (false) or left untouched (true).
      *
-     * Which element of the @p input_map argument
-     * are set is in fact ignored, the only thing that matters is the size of
-     * the index space described by this argument.
+     * Which element of the @p input_map argument are set is in fact ignored,
+     * the only thing that matters is the size of the index space described by
+     * this argument.
      */
     void reinit (const IndexSet   &input_map,
                  const MPI_Comm   &communicator = MPI_COMM_WORLD,
@@ -807,8 +804,8 @@ namespace TrilinosWrappers
     Vector &operator = (const TrilinosScalar s);
 
     /**
-     * Sets the left hand argument to the (parallel) Trilinos
-     * Vector. Equivalent to the @p reinit function.
+     * Sets the left hand argument to the (parallel) Trilinos Vector.
+     * Equivalent to the @p reinit function.
      */
     Vector &
     operator = (const MPI::Vector &V);
@@ -847,9 +844,9 @@ namespace TrilinosWrappers
 
 
   /**
-   * Global function @p swap which overloads the default implementation
-   * of the C++ standard library which uses a temporary object. The
-   * function simply exchanges the data of the two vectors.
+   * Global function @p swap which overloads the default implementation of the
+   * C++ standard library which uses a temporary object. The function simply
+   * exchanges the data of the two vectors.
    *
    * @relates TrilinosWrappers::Vector
    * @author Martin Kronbichler, Wolfgang Bangerth, 2008

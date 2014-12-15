@@ -48,22 +48,19 @@ namespace TrilinosWrappers
 
 
   /**
-   * An implementation of block vectors based on the vector class
-   * implemented in TrilinosWrappers. While the base class provides for
-   * most of the interface, this class handles the actual allocation of
-   * vectors and provides functions that are specific to the underlying
-   * vector type.
+   * An implementation of block vectors based on the vector class implemented
+   * in TrilinosWrappers. While the base class provides for most of the
+   * interface, this class handles the actual allocation of vectors and
+   * provides functions that are specific to the underlying vector type.
    *
    * In contrast to the class MPI::BlockVector, this class is based on a
-   * localized version of the vectors, which means that the whole vector
-   * is stored on each processor. Note that matrix vector products with
-   * this block vector class do only work in case the program is run on
-   * only one processor, since the Trilinos matrices are inherently
-   * parallel.
+   * localized version of the vectors, which means that the whole vector is
+   * stored on each processor. Note that matrix vector products with this
+   * block vector class do only work in case the program is run on only one
+   * processor, since the Trilinos matrices are inherently parallel.
    *
    * @ingroup Vectors
-   * @ingroup TrilinosWrappers
-   * @see @ref GlossBlockLA "Block (linear algebra)"
+   * @ingroup TrilinosWrappers @see @ref GlossBlockLA "Block (linear algebra)"
    * @author Martin Kronbichler, 2008
    */
   class BlockVector : public BlockVectorBase<Vector>
@@ -157,13 +154,13 @@ namespace TrilinosWrappers
     ~BlockVector ();
 
     /**
-    * use compress(VectorOperation) instead
-    *
-    * @deprecated
-    *
-    * See @ref GlossCompress "Compressing distributed objects" for more
-    * information.
-    */
+     * use compress(VectorOperation) instead
+     *
+     * @deprecated
+     *
+     * See @ref GlossCompress "Compressing distributed objects" for more
+     * information.
+     */
     void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
 
     /**
@@ -223,12 +220,10 @@ namespace TrilinosWrappers
      * index sets given in the input argument, according to the global size of
      * the individual components described in the index set, and using a given
      * MPI communicator. The MPI communicator is useful when data exchange
-     * with a distributed vector based on the same initialization is
-     * intended. In that case, the same communicator is used for data
-     * exchange.
+     * with a distributed vector based on the same initialization is intended.
+     * In that case, the same communicator is used for data exchange.
      *
-     * If <tt>fast==false</tt>, the vector
-     * is filled with zeros.
+     * If <tt>fast==false</tt>, the vector is filled with zeros.
      */
     void reinit (const std::vector<IndexSet> &partitioning,
                  const MPI_Comm              &communicator = MPI_COMM_WORLD,
@@ -239,16 +234,14 @@ namespace TrilinosWrappers
      * elements in the first argument, and with the respective sizes. Since no
      * distribution map is given, all vectors are local vectors.
      *
-     * If <tt>fast==false</tt>, the vector
-     * is filled with zeros.
+     * If <tt>fast==false</tt>, the vector is filled with zeros.
      */
     void reinit (const std::vector<size_type> &N,
                  const bool                    fast=false);
 
     /**
-     * Reinitialize the vector in the same way as the given to a
-     * distributed block vector. The elements will be copied in this
-     * process.
+     * Reinitialize the vector in the same way as the given to a distributed
+     * block vector. The elements will be copied in this process.
      */
     void reinit (const MPI::BlockVector &V);
 
@@ -261,10 +254,10 @@ namespace TrilinosWrappers
      *
      * Note that you must call this (or the other reinit() functions)
      * function, rather than calling the reinit() functions of an individual
-     * block, to allow the block vector to update its caches of vector
-     * sizes. If you call reinit() on one of the blocks, then subsequent
-     * actions on this object may yield unpredictable results since they may
-     * be routed to the wrong block.
+     * block, to allow the block vector to update its caches of vector sizes.
+     * If you call reinit() on one of the blocks, then subsequent actions on
+     * this object may yield unpredictable results since they may be routed to
+     * the wrong block.
      */
     void reinit (const BlockVector &V,
                  const bool fast = false);
@@ -466,9 +459,9 @@ namespace TrilinosWrappers
 
 
   /**
-   * Global function which overloads the default implementation
-   * of the C++ standard library which uses a temporary object. The
-   * function simply exchanges the data of the two vectors.
+   * Global function which overloads the default implementation of the C++
+   * standard library which uses a temporary object. The function simply
+   * exchanges the data of the two vectors.
    *
    * @relates TrilinosWrappers::BlockVector
    * @author Martin Kronbichler, 2008

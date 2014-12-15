@@ -48,10 +48,8 @@ class TensorProductPolynomialsConst : public TensorProductPolynomials<dim>
 {
 public:
   /**
-   * Access to the dimension of
-   * this object, for checking and
-   * automatic setting of dimension
-   * in other classes.
+   * Access to the dimension of this object, for checking and automatic
+   * setting of dimension in other classes.
    */
   static const unsigned int dimension = dim;
 

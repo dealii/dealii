@@ -73,51 +73,48 @@ namespace internals
  * constraints is extensively described in the @ref constraints module. The
  * class is meant to deal with a limited number of constraints relative to the
  * total number of degrees of freedom, for example a few per cent up to maybe
- * 30 per cent; and with a linear combination of <i>M</i> other degrees of freedom
- * where <i>M</i> is also relatively small (no larger than at most around the
- * average number of entries per row of a linear system). It is <em>not</em>
- * meant to describe full rank linear systems.
+ * 30 per cent; and with a linear combination of <i>M</i> other degrees of
+ * freedom where <i>M</i> is also relatively small (no larger than at most
+ * around the average number of entries per row of a linear system). It is
+ * <em>not</em> meant to describe full rank linear systems.
  *
  * The algorithms used in the implementation of this class are described in
  * some detail in the @ref hp_paper "hp paper". There is also a significant
- * amount of documentation on how to use this class in the
- * @ref constraints module.
+ * amount of documentation on how to use this class in the @ref constraints
+ * module.
  *
  *
  * <h3>Description of constraints</h3>
  *
  * Each "line" in objects of this class corresponds to one constrained degree
- * of freedom, with the number of the line being <i>i</i>, entered by
- * using add_line() or add_lines(). The entries in
- * this line are pairs of the form
+ * of freedom, with the number of the line being <i>i</i>, entered by using
+ * add_line() or add_lines(). The entries in this line are pairs of the form
  * (<i>j</i>,<i>a<sub>ij</sub></i>), which are added by add_entry() or
- * add_entries(). The organization is essentially a
- * SparsityPattern, but with only a few lines containing nonzero
- * elements, and  therefore no data wasted on the others. For each
- * line, which has been added by the mechanism above, an elimination
- * of the constrained degree of freedom of the form
+ * add_entries(). The organization is essentially a SparsityPattern, but with
+ * only a few lines containing nonzero elements, and  therefore no data wasted
+ * on the others. For each line, which has been added by the mechanism above,
+ * an elimination of the constrained degree of freedom of the form
  * @f[
  *  x_i = \sum_j a_{ij} x_j + b_i
  * @f]
  * is performed, where <i>b<sub>i</sub></i> is optional and set by
- * set_inhomogeneity(). Thus, if a constraint is formulated for
- * instance as a zero mean value of several degrees of freedom, one of
- * the degrees has to be chosen to be eliminated.
+ * set_inhomogeneity(). Thus, if a constraint is formulated for instance as a
+ * zero mean value of several degrees of freedom, one of the degrees has to be
+ * chosen to be eliminated.
  *
- * Note that the constraints are linear
- * in the <i>x<sub>i</sub></i>, and that there might be a constant (non-homogeneous) term in
- * the constraint. This is exactly the form we need for hanging node
- * constraints, where we need to constrain one degree of freedom in terms of
- * others. There are other conditions of this form possible, for example for
- * implementing mean value conditions as is done in the step-11
- * tutorial program. The name of the class stems from the fact that these
- * constraints can be represented in matrix form as <b>X</b> <i>x</i> = <i>b</i>, and this object
- * then describes the matrix <b>X</b> (and the vector <i>b</i>;
- * originally, the ConstraintMatrix class was only meant to handle homogenous
- * constraints where <i>b</i>=0, thus the name). The most frequent way to
- * create/fill objects of this type is using the
- * DoFTools::make_hanging_node_constraints() function. The use of these
- * objects is first explained in step-6.
+ * Note that the constraints are linear in the <i>x<sub>i</sub></i>, and that
+ * there might be a constant (non-homogeneous) term in the constraint. This is
+ * exactly the form we need for hanging node constraints, where we need to
+ * constrain one degree of freedom in terms of others. There are other
+ * conditions of this form possible, for example for implementing mean value
+ * conditions as is done in the step-11 tutorial program. The name of the
+ * class stems from the fact that these constraints can be represented in
+ * matrix form as <b>X</b> <i>x</i> = <i>b</i>, and this object then describes
+ * the matrix <b>X</b> (and the vector <i>b</i>; originally, the
+ * ConstraintMatrix class was only meant to handle homogenous constraints
+ * where <i>b</i>=0, thus the name). The most frequent way to create/fill
+ * objects of this type is using the DoFTools::make_hanging_node_constraints()
+ * function. The use of these objects is first explained in step-6.
  *
  * Objects of the present type are organized in lines (rows), but only those
  * lines are stored where constraints are present. New constraints are added
@@ -128,14 +125,13 @@ namespace internals
  * been added, you need to call close(), which compresses the storage format
  * and sorts the entries.
  *
- * @note Many of the algorithms this class implements are discussed in
- * the @ref hp_paper . The algorithms are also related to those shown
- * in <i>M. S. Shephard: Linear multipoint constraints applied via
- * transformation as part of a direct stiffness assembly process. Int. J.
- * Numer. Meth. Engrg., vol. 20 (1984), pp. 2107-2112.</i>, with the
- * difference that the algorithms shown there completely eliminated
- * constrained degrees of freedom, whereas we usually keep them as part
- * of the linear system.
+ * @note Many of the algorithms this class implements are discussed in the
+ * @ref hp_paper . The algorithms are also related to those shown in <i>M. S.
+ * Shephard: Linear multipoint constraints applied via transformation as part
+ * of a direct stiffness assembly process. Int. J. Numer. Meth. Engrg., vol.
+ * 20 (1984), pp. 2107-2112.</i>, with the difference that the algorithms
+ * shown there completely eliminated constrained degrees of freedom, whereas
+ * we usually keep them as part of the linear system.
  *
  * @ingroup dofs
  * @ingroup constraints
@@ -180,10 +176,9 @@ public:
   /**
    * Constructor. The supplied IndexSet defines which indices might be
    * constrained inside this ConstraintMatrix. In a calculation with a
-   * parallel::distributed::DoFHandler one should use
-   * locally_relevant_dofs. The IndexSet allows the ConstraintMatrix to save
-   * memory. Otherwise internal data structures for all possible indices will
-   * be created.
+   * parallel::distributed::DoFHandler one should use locally_relevant_dofs.
+   * The IndexSet allows the ConstraintMatrix to save memory. Otherwise
+   * internal data structures for all possible indices will be created.
    */
   ConstraintMatrix (const IndexSet &local_constraints = IndexSet());
 
@@ -193,10 +188,10 @@ public:
   ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
 
   /**
-   * clear() the ConstraintMatrix object and supply an IndexSet with lines that
-   * may be constrained. This function is only relevant in the distributed
-   * case to supply a different IndexSet. Otherwise this routine is equivalent
-   * to calling clear(). See the constructor for details.
+   * clear() the ConstraintMatrix object and supply an IndexSet with lines
+   * that may be constrained. This function is only relevant in the
+   * distributed case to supply a different IndexSet. Otherwise this routine
+   * is equivalent to calling clear(). See the constructor for details.
    */
   void reinit (const IndexSet &local_constraints = IndexSet());
 
@@ -256,11 +251,10 @@ public:
    * This function essentially exists to allow adding several constraints of
    * the form <i>x<sub>i</sub></i>=0 all at once, where the set of indices
    * <i>i</i> for which these constraints should be added are given by the
-   * argument of this function. On the other hand, just as if the
-   * single-argument add_line() function were called repeatedly, the
-   * constraints can later be modified to include linear dependencies using
-   * the add_entry() function as well as inhomogeneities using
-   * set_inhomogeneity().
+   * argument of this function. On the other hand, just as if the single-
+   * argument add_line() function were called repeatedly, the constraints can
+   * later be modified to include linear dependencies using the add_entry()
+   * function as well as inhomogeneities using set_inhomogeneity().
    */
   void add_lines (const std::vector<bool> &lines);
 
@@ -271,11 +265,10 @@ public:
    * This function essentially exists to allow adding several constraints of
    * the form <i>x<sub>i</sub></i>=0 all at once, where the set of indices
    * <i>i</i> for which these constraints should be added are given by the
-   * argument of this function. On the other hand, just as if the
-   * single-argument add_line() function were called repeatedly, the
-   * constraints can later be modified to include linear dependencies using
-   * the add_entry() function as well as inhomogeneities using
-   * set_inhomogeneity().
+   * argument of this function. On the other hand, just as if the single-
+   * argument add_line() function were called repeatedly, the constraints can
+   * later be modified to include linear dependencies using the add_entry()
+   * function as well as inhomogeneities using set_inhomogeneity().
    */
   void add_lines (const std::set<size_type> &lines);
 
@@ -286,19 +279,18 @@ public:
    * This function essentially exists to allow adding several constraints of
    * the form <i>x<sub>i</sub></i>=0 all at once, where the set of indices
    * <i>i</i> for which these constraints should be added are given by the
-   * argument of this function. On the other hand, just as if the
-   * single-argument add_line() function were called repeatedly, the
-   * constraints can later be modified to include linear dependencies using
-   * the add_entry() function as well as inhomogeneities using
-   * set_inhomogeneity().
+   * argument of this function. On the other hand, just as if the single-
+   * argument add_line() function were called repeatedly, the constraints can
+   * later be modified to include linear dependencies using the add_entry()
+   * function as well as inhomogeneities using set_inhomogeneity().
    */
   void add_lines (const IndexSet &lines);
 
   /**
    * Add an entry to a given line. The list of lines is searched from the back
    * to the front, so clever programming would add a new line (which is pushed
-   * to the back) and immediately afterwards fill the entries of that
-   * line. This way, no expensive searching is needed.
+   * to the back) and immediately afterwards fill the entries of that line.
+   * This way, no expensive searching is needed.
    *
    * If an entry with the same indices as the one this function call denotes
    * already exists, then this function simply returns provided that the value
@@ -320,7 +312,7 @@ public:
   /**
    * Set an imhomogeneity to the constraint line <i>i</i>, according to the
    * discussion in the general class description.
-  *
+   *
    * @note the line needs to be added with one of the add_line() calls first.
    */
   void set_inhomogeneity (const size_type line,
@@ -352,17 +344,17 @@ public:
    * Merge the constraints represented by the object given as argument into
    * the constraints represented by this object. Both objects may or may not
    * be closed (by having their function close() called before). If this
-   * object was closed before, then it will be closed afterwards as
-   * well. Note, however, that if the other argument is closed, then merging
-   * may be significantly faster.
+   * object was closed before, then it will be closed afterwards as well.
+   * Note, however, that if the other argument is closed, then merging may be
+   * significantly faster.
    *
    * Using the default value of the second arguments, the constraints in each
    * of the two objects (the old one represented by this object and the
    * argument) may not refer to the same degree of freedom, i.e. a degree of
    * freedom that is constrained in one object may not be constrained in the
-   * second. If this is nevertheless the case, an exception is
-   * thrown. However, this behavior can be changed by providing a different
-   * value for the second argument.
+   * second. If this is nevertheless the case, an exception is thrown.
+   * However, this behavior can be changed by providing a different value for
+   * the second argument.
    */
   void merge (const ConstraintMatrix &other_constraints,
               const MergeConflictBehavior merge_conflict_behavior = no_conflicts_allowed);
@@ -438,8 +430,8 @@ public:
                                  const size_type index2) const;
 
   /**
-   * Return the maximum number of other dofs that one dof is constrained
-   * to. For example, in 2d a hanging node is constrained only to its two
+   * Return the maximum number of other dofs that one dof is constrained to.
+   * For example, in 2d a hanging node is constrained only to its two
    * neighbors, so the returned value would be 2. However, for higher order
    * elements and/or higher dimensions, or other types of constraints, this
    * number is no more obvious.
@@ -450,8 +442,8 @@ public:
   size_type max_constraint_indirections () const;
 
   /**
-   * Returns <tt>true</tt> in case the dof is constrained and there is a
-   * non-trivial inhomogeneous valeus set to the dof.
+   * Returns <tt>true</tt> in case the dof is constrained and there is a non-
+   * trivial inhomogeneous valeus set to the dof.
    */
   bool is_inhomogeneously_constrained (const size_type index) const;
 
@@ -618,9 +610,9 @@ public:
    *
    * The constraint matrix object must be closed to call this function.
    *
-   * @deprecated The functions converting an uncondensed matrix into
-   * its condensed form are deprecated. Use the functions doing the
-   * in-place condensation leaving the size of the linear system unchanged.
+   * @deprecated The functions converting an uncondensed matrix into its
+   * condensed form are deprecated. Use the functions doing the in-place
+   * condensation leaving the size of the linear system unchanged.
    */
   template<typename number>
   void condense (const SparseMatrix<number> &uncondensed,
@@ -645,9 +637,8 @@ public:
    * Vector<float>, Vector<double>, BlockVector<tt><...></tt>, a PETSc or
    * Trilinos vector wrapper class, or any other type having the same
    * interface. Note that this function does not take any inhomogeneity into
-   * account and throws an exception in case there are any
-   * inhomogeneities. Use the function using both a matrix and vector for that
-   * case.
+   * account and throws an exception in case there are any inhomogeneities.
+   * Use the function using both a matrix and vector for that case.
    *
    * @note This function does not work for MPI vectors. Use condense() with
    * two vector arguments instead.
@@ -674,9 +665,9 @@ public:
    *
    * The constraint matrix object must be closed to call this function.
    *
-   * @deprecated The functions converting an uncondensed matrix into
-   * its condensed form are deprecated. Use the functions doing the
-   * in-place condensation leaving the size of the linear system unchanged.
+   * @deprecated The functions converting an uncondensed matrix into its
+   * condensed form are deprecated. Use the functions doing the in-place
+   * condensation leaving the size of the linear system unchanged.
    */
   template<typename number, class VectorType>
   void condense (const SparseMatrix<number> &uncondensed_matrix,
@@ -749,11 +740,11 @@ public:
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function
-   * call is only thread-safe if the underlying global vector allows
-   * for simultaneous access and the access is not to rows with the same
-   * global index at the same time. This needs to be made sure from the
-   * caller's site. There is no locking mechanism inside this method to
-   * prevent data races.
+   * call is only thread-safe if the underlying global vector allows for
+   * simultaneous access and the access is not to rows with the same global
+   * index at the same time. This needs to be made sure from the caller's
+   * site. There is no locking mechanism inside this method to prevent data
+   * races.
    */
   template <class InVector, class OutVector>
   void
@@ -798,11 +789,11 @@ public:
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function
-   * call is only thread-safe if the underlying global vector allows
-   * for simultaneous access and the access is not to rows with the same
-   * global index at the same time. This needs to be made sure from the
-   * caller's site. There is no locking mechanism inside this method to
-   * prevent data races.
+   * call is only thread-safe if the underlying global vector allows for
+   * simultaneous access and the access is not to rows with the same global
+   * index at the same time. This needs to be made sure from the caller's
+   * site. There is no locking mechanism inside this method to prevent data
+   * races.
    */
   template <typename VectorType>
   void
@@ -842,11 +833,11 @@ public:
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function
-   * call is only thread-safe if the underlying global vector allows
-   * for simultaneous access and the access is not to rows with the same
-   * global index at the same time. This needs to be made sure from the
-   * caller's site. There is no locking mechanism inside this method to
-   * prevent data races.
+   * call is only thread-safe if the underlying global vector allows for
+   * simultaneous access and the access is not to rows with the same global
+   * index at the same time. This needs to be made sure from the caller's
+   * site. There is no locking mechanism inside this method to prevent data
+   * races.
    */
   template <typename ForwardIteratorVec, typename ForwardIteratorInd,
             class VectorType>
@@ -878,32 +869,30 @@ public:
    * corresponding to constrained nodes. Thus, if a degree of freedom in @p
    * local_dof_indices is constrained, we distribute the corresponding entries
    * in the matrix, but also add the absolute value of the diagonal entry of
-   * the local matrix to the corresponding entry in the global
-   * matrix. Assuming the discretized operator is positive definite,
-   * this guarantees that the diagonal entry is always
-   * non-zero, positive, and of the same order of magnitude as the other
-   * entries of the matrix. On the other hand, when solving a source
-   * problem $Au=f$ the exact value of the diagonal element is not
-   * important, since the value of
-   * the respective degree of freedom will be overwritten by the distribute()
-   * call later on anyway.
+   * the local matrix to the corresponding entry in the global matrix.
+   * Assuming the discretized operator is positive definite, this guarantees
+   * that the diagonal entry is always non-zero, positive, and of the same
+   * order of magnitude as the other entries of the matrix. On the other hand,
+   * when solving a source problem $Au=f$ the exact value of the diagonal
+   * element is not important, since the value of the respective degree of
+   * freedom will be overwritten by the distribute() call later on anyway.
    *
-   * @note The procedure described above adds an unforeseeable number
-   * of artificial eigenvalues to the spectrum of the
-   * matrix. Therefore, it is recommended to use the equivalent
-   * function with two local index vectors in such a case.
+   * @note The procedure described above adds an unforeseeable number of
+   * artificial eigenvalues to the spectrum of the matrix. Therefore, it is
+   * recommended to use the equivalent function with two local index vectors
+   * in such a case.
    *
-   * By using this function to distribute local contributions to the
-   * global object, one saves the call to the condense function after the
-   * vectors and matrices are fully assembled.
+   * By using this function to distribute local contributions to the global
+   * object, one saves the call to the condense function after the vectors and
+   * matrices are fully assembled.
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function
-   * call is only thread-safe if the underlying global matrix allows
-   * for simultaneous access and the access is not to rows with the same
-   * global index at the same time. This needs to be made sure from the
-   * caller's site. There is no locking mechanism inside this method to
-   * prevent data races.
+   * call is only thread-safe if the underlying global matrix allows for
+   * simultaneous access and the access is not to rows with the same global
+   * index at the same time. This needs to be made sure from the caller's
+   * site. There is no locking mechanism inside this method to prevent data
+   * races.
    */
   template <typename MatrixType>
   void
@@ -913,16 +902,15 @@ public:
 
   /**
    * Does almost the same as the function above but can treat general
-   * rectangular matrices.  The main difference to achieve this is
-   * that the diagonal entries in constrained rows are left untouched
-   * instead of being filled with arbitrary values.
+   * rectangular matrices.  The main difference to achieve this is that the
+   * diagonal entries in constrained rows are left untouched instead of being
+   * filled with arbitrary values.
    *
-   * Since the diagonal entries corresponding to eliminated degrees of
-   * freedom are not set, the result may have a zero eigenvalue, if
-   * applied to a square matrix. This has to be considered when
-   * solving the resulting problems. For solving a source problem
-   * $Au=f$, it is possible to set the diagonal entry after building
-   * the matrix by a piece of code of the form
+   * Since the diagonal entries corresponding to eliminated degrees of freedom
+   * are not set, the result may have a zero eigenvalue, if applied to a
+   * square matrix. This has to be considered when solving the resulting
+   * problems. For solving a source problem $Au=f$, it is possible to set the
+   * diagonal entry after building the matrix by a piece of code of the form
    *
    * @code
    *   for (unsigned int i=0;i<matrix.m();++i)
@@ -930,15 +918,14 @@ public:
    *       matrix.diag_element(i) = 1.;
    * @endcode
    *
-   * The value of one which is used here is arbitrary, but in the
-   * context of Krylov space methods uncritical, since it corresponds
-   * to an invariant subspace. If the other matrix entries are smaller
-   * or larger by a factor close to machine accuracy, it may be
-   * advisable to adjust it.
+   * The value of one which is used here is arbitrary, but in the context of
+   * Krylov space methods uncritical, since it corresponds to an invariant
+   * subspace. If the other matrix entries are smaller or larger by a factor
+   * close to machine accuracy, it may be advisable to adjust it.
    *
-   * For solving eigenvalue problems, this will only add one spurious
-   * zero eigenvalue (with a multiplicity that is possibly greater
-   * than one). Taking this into account, nothing else has to be changed.
+   * For solving eigenvalue problems, this will only add one spurious zero
+   * eigenvalue (with a multiplicity that is possibly greater than one).
+   * Taking this into account, nothing else has to be changed.
    */
   template <typename MatrixType>
   void
@@ -949,10 +936,10 @@ public:
 
   /**
    * This function simultaneously writes elements into matrix and vector,
-   * according to the constraints specified by the calling
-   * ConstraintMatrix. This function can correctly handle inhomogeneous
-   * constraints as well. For the parameter use_inhomogeneities_for_rhs see
-   * the documentation in @ref constraints module.
+   * according to the constraints specified by the calling ConstraintMatrix.
+   * This function can correctly handle inhomogeneous constraints as well. For
+   * the parameter use_inhomogeneities_for_rhs see the documentation in @ref
+   * constraints module.
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function
@@ -987,9 +974,9 @@ public:
    * that.
    *
    * Because the function only allocates entries in a sparsity pattern, all it
-   * needs to know are the degrees of freedom that couple to each
-   * other. Unlike the previous function, no actual values are written, so the
-   * second input argument is not necessary here.
+   * needs to know are the degrees of freedom that couple to each other.
+   * Unlike the previous function, no actual values are written, so the second
+   * input argument is not necessary here.
    *
    * The third argument to this function, keep_constrained_entries determines
    * whether the function shall allocate entries in the sparsity pattern at
@@ -1078,9 +1065,9 @@ public:
    */
 
   /**
-   * Re-distribute the elements of the vector @p condensed to @p
-   * uncondensed. It is the user's responsibility to guarantee that all
-   * entries of @p uncondensed be zero!
+   * Re-distribute the elements of the vector @p condensed to @p uncondensed.
+   * It is the user's responsibility to guarantee that all entries of @p
+   * uncondensed be zero!
    *
    * This function undoes the action of @p condense somehow, but it should be
    * noted that it is not the inverse of @p condense.
@@ -1293,9 +1280,9 @@ private:
    * To make things worse, traversing the list of existing constraints
    * requires reads from many different places in memory. Thus, in large 3d
    * applications, the add_line() function showed up very prominently in the
-   * overall compute time, mainly because it generated a lot of cache
-   * misses. This should also be fixed by using the O(1) algorithm to access
-   * the fields of this array.
+   * overall compute time, mainly because it generated a lot of cache misses.
+   * This should also be fixed by using the O(1) algorithm to access the
+   * fields of this array.
    *
    * The field is useful in a number of other contexts as well, e.g. when one
    * needs random access to the constraints as in all the functions that apply

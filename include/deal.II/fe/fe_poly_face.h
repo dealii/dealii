@@ -28,12 +28,12 @@ DEAL_II_NAMESPACE_OPEN
  * @warning This class is not sufficiently tested yet!
  *
  * This class gives a unified framework for the implementation of
- * FiniteElement classes only located on faces of the mesh. They are
- * based on polynomial spaces like the TensorProductPolynomials or a
- * PolynomialSpace classes.
+ * FiniteElement classes only located on faces of the mesh. They are based on
+ * polynomial spaces like the TensorProductPolynomials or a PolynomialSpace
+ * classes.
  *
- * Every class that implements the following functions can be used as
- * template parameter POLY.
+ * Every class that implements the following functions can be used as template
+ * parameter POLY.
  *
  * @code
  * double compute_value (const unsigned int i,
@@ -47,15 +47,14 @@ DEAL_II_NAMESPACE_OPEN
  * which cannot be implemented by this class but are left for implementation
  * in derived classes.
  *
- * Furthermore, this class assumes that shape functions of the
- * FiniteElement under consideration do <em>not</em> depend on the
- * actual shape of the cells in real space, i.e. update_once()
- * includes <tt>update_values</tt>. For FiniteElements whose shape
- * functions depend on the cells in real space, the update_once() and
- * update_each() functions must be overloaded.
+ * Furthermore, this class assumes that shape functions of the FiniteElement
+ * under consideration do <em>not</em> depend on the actual shape of the cells
+ * in real space, i.e. update_once() includes <tt>update_values</tt>. For
+ * FiniteElements whose shape functions depend on the cells in real space, the
+ * update_once() and update_each() functions must be overloaded.
  *
  * @author Guido Kanschat, 2009
- **/
+ */
 template <class POLY, int dim=POLY::dimension+1, int spacedim=dim>
 class FE_PolyFace : public FiniteElement<dim,spacedim>
 {
@@ -68,106 +67,72 @@ public:
                const std::vector<bool> &restriction_is_additive_flags);
 
   /**
-   * Return the polynomial degree
-   * of this finite element,
-   * i.e. the value passed to the
-   * constructor.
+   * Return the polynomial degree of this finite element, i.e. the value
+   * passed to the constructor.
    */
   unsigned int get_degree () const;
 
   /**
-   * Return the value of the
-   * <tt>i</tt>th shape function at
-   * the point <tt>p</tt>. See the
-   * FiniteElement base class
-   * for more information about the
-   * semantics of this function.
+   * Return the value of the <tt>i</tt>th shape function at the point
+   * <tt>p</tt>. See the FiniteElement base class for more information about
+   * the semantics of this function.
    */
 //    virtual double shape_value (const unsigned int i,
 //                              const Point<dim> &p) const;
 
   /**
-   * Return the value of the
-   * <tt>component</tt>th vector
-   * component of the <tt>i</tt>th
-   * shape function at the point
-   * <tt>p</tt>. See the
-   * FiniteElement base class
-   * for more information about the
-   * semantics of this function.
+   * Return the value of the <tt>component</tt>th vector component of the
+   * <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
    *
-   * Since this element is scalar,
-   * the returned value is the same
-   * as if the function without the
-   * <tt>_component</tt> suffix
-   * were called, provided that the
-   * specified component is zero.
+   * Since this element is scalar, the returned value is the same as if the
+   * function without the <tt>_component</tt> suffix were called, provided
+   * that the specified component is zero.
    */
 //    virtual double shape_value_component (const unsigned int i,
 //                                        const Point<dim> &p,
 //                                        const unsigned int component) const;
 
   /**
-   * Return the gradient of the
-   * <tt>i</tt>th shape function at
-   * the point <tt>p</tt>. See the
-   * FiniteElement base class
-   * for more information about the
-   * semantics of this function.
+   * Return the gradient of the <tt>i</tt>th shape function at the point
+   * <tt>p</tt>. See the FiniteElement base class for more information about
+   * the semantics of this function.
    */
 //    virtual Tensor<1,dim> shape_grad (const unsigned int  i,
 //                                    const Point<dim>   &p) const;
 
   /**
-   * Return the gradient of the
-   * <tt>component</tt>th vector
-   * component of the <tt>i</tt>th
-   * shape function at the point
-   * <tt>p</tt>. See the
-   * FiniteElement base class
-   * for more information about the
-   * semantics of this function.
+   * Return the gradient of the <tt>component</tt>th vector component of the
+   * <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
    *
-   * Since this element is scalar,
-   * the returned value is the same
-   * as if the function without the
-   * <tt>_component</tt> suffix
-   * were called, provided that the
-   * specified component is zero.
+   * Since this element is scalar, the returned value is the same as if the
+   * function without the <tt>_component</tt> suffix were called, provided
+   * that the specified component is zero.
    */
 //    virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
 //                                              const Point<dim> &p,
 //                                              const unsigned int component) const;
 
   /**
-   * Return the tensor of second
-   * derivatives of the
-   * <tt>i</tt>th shape function at
-   * point <tt>p</tt> on the unit
-   * cell. See the
-   * FiniteElement base class
-   * for more information about the
-   * semantics of this function.
+   * Return the tensor of second derivatives of the <tt>i</tt>th shape
+   * function at point <tt>p</tt> on the unit cell. See the FiniteElement base
+   * class for more information about the semantics of this function.
    */
 //    virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
 //                                         const Point<dim> &p) const;
 
   /**
-   * Return the second derivative
-   * of the <tt>component</tt>th
-   * vector component of the
-   * <tt>i</tt>th shape function at
-   * the point <tt>p</tt>. See the
-   * FiniteElement base class
-   * for more information about the
-   * semantics of this function.
+   * Return the second derivative of the <tt>component</tt>th vector component
+   * of the <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
    *
-   * Since this element is scalar,
-   * the returned value is the same
-   * as if the function without the
-   * <tt>_component</tt> suffix
-   * were called, provided that the
-   * specified component is zero.
+   * Since this element is scalar, the returned value is the same as if the
+   * function without the <tt>_component</tt> suffix were called, provided
+   * that the specified component is zero.
    */
 //    virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
 //                                                   const Point<dim> &p,
@@ -221,54 +186,32 @@ protected:
 
 
   /**
-   * Determine the values that need
-   * to be computed on the unit
-   * cell to be able to compute all
-   * values required by
-   * <tt>flags</tt>.
+   * Determine the values that need to be computed on the unit cell to be able
+   * to compute all values required by <tt>flags</tt>.
    *
-   * For the purpuse of this
-   * function, refer to the
-   * documentation in
+   * For the purpuse of this function, refer to the documentation in
    * FiniteElement.
    *
-   * This class assumes that shape
-   * functions of this
-   * FiniteElement do <em>not</em>
-   * depend on the actual shape of
-   * the cells in real
-   * space. Therefore, the effect
-   * in this element is as follows:
-   * if <tt>update_values</tt> is
-   * set in <tt>flags</tt>, copy it
-   * to the result. All other flags
-   * of the result are cleared,
-   * since everything else must be
+   * This class assumes that shape functions of this FiniteElement do
+   * <em>not</em> depend on the actual shape of the cells in real space.
+   * Therefore, the effect in this element is as follows: if
+   * <tt>update_values</tt> is set in <tt>flags</tt>, copy it to the result.
+   * All other flags of the result are cleared, since everything else must be
    * computed for each cell.
    */
   virtual UpdateFlags update_once (const UpdateFlags flags) const;
 
   /**
-   * Determine the values that need
-   * to be computed on every cell
-   * to be able to compute all
-   * values required by
-   * <tt>flags</tt>.
+   * Determine the values that need to be computed on every cell to be able to
+   * compute all values required by <tt>flags</tt>.
    *
-   * For the purpuse of this
-   * function, refer to the
-   * documentation in
+   * For the purpuse of this function, refer to the documentation in
    * FiniteElement.
    *
-   * This class assumes that shape
-   * functions of this
-   * FiniteElement do <em>not</em>
-   * depend on the actual shape of
-   * the cells in real
-   * space.
+   * This class assumes that shape functions of this FiniteElement do
+   * <em>not</em> depend on the actual shape of the cells in real space.
    *
-   * The effect in this element is
-   * as follows:
+   * The effect in this element is as follows:
    * <ul>
    *
    * <li> if <tt>update_gradients</tt> is set, the result will contain
@@ -292,46 +235,30 @@ protected:
   /**
    * Fields of cell-independent data.
    *
-   * For information about the
-   * general purpose of this class,
-   * see the documentation of the
-   * base class.
+   * For information about the general purpose of this class, see the
+   * documentation of the base class.
    */
   class InternalData : public FiniteElement<dim,spacedim>::InternalDataBase
   {
   public:
     /**
-     * Array with shape function
-     * values in quadrature
-     * points on one face. There is one
-     * row for each shape
-     * function, containing
-     * values for each quadrature
-     * point.
+     * Array with shape function values in quadrature points on one face.
+     * There is one row for each shape function, containing values for each
+     * quadrature point.
      *
-     * In this array, we store
-     * the values of the shape
-     * function in the quadrature
-     * points on one face of the unit
-     * cell. Since these values
-     * do not change under
-     * transformation to the real
-     * cell, we only need to copy
-     * them over when visiting a
-     * concrete cell.
+     * In this array, we store the values of the shape function in the
+     * quadrature points on one face of the unit cell. Since these values do
+     * not change under transformation to the real cell, we only need to copy
+     * them over when visiting a concrete cell.
      *
-     * In particular, we can
-     * simply copy the same set
-     * of values to each of the
+     * In particular, we can simply copy the same set of values to each of the
      * faces.
      */
     std::vector<std::vector<double> > shape_values;
   };
 
   /**
-   * The polynomial space. Its type
-   * is given by the template
-   * parameter POLY.
+   * The polynomial space. Its type is given by the template parameter POLY.
    */
   POLY poly_space;
 };

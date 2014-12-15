@@ -50,7 +50,8 @@ namespace internal
      * templates is a little more complicated. See the @ref Iterators module
      * for more information.
      *
-     * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998, 2003, 2008, 2010
+     * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998,
+     * 2003, 2008, 2010
      */
     template <template <int, int> class DH, int spacedim, bool lda>
     struct Iterators<DH<1, spacedim>, lda>
@@ -91,7 +92,8 @@ namespace internal
      * templates is a little more complicated. See the @ref Iterators module
      * for more information.
      *
-     * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998, 2003, 2008, 2010
+     * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998,
+     * 2003, 2008, 2010
      */
     template <template <int, int> class DH, int spacedim, bool lda>
     struct Iterators<DH<2, spacedim>, lda>
@@ -132,7 +134,8 @@ namespace internal
      * templates is a little more complicated. See the @ref Iterators module
      * for more information.
      *
-     * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998, 2003, 2008, 2010
+     * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998,
+     * 2003, 2008, 2010
      */
     template <template <int, int> class DH, int spacedim, bool lda>
     struct Iterators<DH<3, spacedim>, lda>

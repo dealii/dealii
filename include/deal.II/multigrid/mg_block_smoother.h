@@ -36,10 +36,10 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * General smoother class for block vectors. This class gives complete
- * freedom to the choice of a block smoother by being initialized with
- * a matrix and a smoother object. Therefore, the smoother object for
- * each level must be constructed by hand.
+ * General smoother class for block vectors. This class gives complete freedom
+ * to the choice of a block smoother by being initialized with a matrix and a
+ * smoother object. Therefore, the smoother object for each level must be
+ * constructed by hand.
  *
  * @author Guido Kanschat, 2005
  */
@@ -49,8 +49,7 @@ class MGSmootherBlock
 {
 public:
   /**
-   * Constructor. Sets memory and
-   * smoothing parameters.
+   * Constructor. Sets memory and smoothing parameters.
    */
   MGSmootherBlock(VectorMemory<BlockVector<number> > &mem,
                   const unsigned int steps = 1,
@@ -60,26 +59,17 @@ public:
                   const bool reverse = false);
 
   /**
-   * Initialize for matrices. The
-   * parameter <tt>matrices</tt> can be
-   * any object having functions
-   * <tt>get_minlevel()</tt> and
-   * <tt>get_maxlevel()</tt> as well as
-   * an <tt>operator[]</tt> returning a
+   * Initialize for matrices. The parameter <tt>matrices</tt> can be any
+   * object having functions <tt>get_minlevel()</tt> and
+   * <tt>get_maxlevel()</tt> as well as an <tt>operator[]</tt> returning a
    * reference to @p MATRIX.
    *
-   * The same convention is used
-   * for the parameter
-   * <tt>smoothers</tt>, such that
-   * <tt>operator[]</tt> returns
-   * the object doing the
-   * block-smoothing on a single
-   * level.
+   * The same convention is used for the parameter <tt>smoothers</tt>, such
+   * that <tt>operator[]</tt> returns the object doing the block-smoothing on
+   * a single level.
    *
-   * This function stores pointers
-   * to the level matrices and
-   * smoothing operator for each
-   * level.
+   * This function stores pointers to the level matrices and smoothing
+   * operator for each level.
    */
   template <class MGMATRIX, class MGRELAX>
   void initialize (const MGMATRIX &matrices,
@@ -91,46 +81,34 @@ public:
   void clear ();
 
   /**
-   * Modify the number of smoothing
-   * steps on finest level.
+   * Modify the number of smoothing steps on finest level.
    */
   void set_steps (const unsigned int);
 
   /**
-   * Switch on/off variable
-   * smoothing.
+   * Switch on/off variable smoothing.
    */
   void set_variable (const bool);
 
   /**
-   * Switch on/off symmetric
-   * smoothing.
+   * Switch on/off symmetric smoothing.
    */
   void set_symmetric (const bool);
 
   /**
-   * Switch on/off transposed. This
-   * is mutually exclusive with
-   * reverse().
+   * Switch on/off transposed. This is mutually exclusive with reverse().
    */
   void set_transpose (const bool);
 
   /**
-   * Switch on/off reversed. This
-   * is mutually exclusive with
-   * transpose().
+   * Switch on/off reversed. This is mutually exclusive with transpose().
    */
   void set_reverse (const bool);
 
   /**
-   * Implementation of the
-   * interface for @p Multigrid.
-   * This function does nothing,
-   * which by comparison with the
-   * definition of this function
-   * means that the the smoothing
-   * operator equals the null
-   * operator.
+   * Implementation of the interface for @p Multigrid. This function does
+   * nothing, which by comparison with the definition of this function means
+   * that the the smoothing operator equals the null operator.
    */
   virtual void smooth (const unsigned int         level,
                        BlockVector<number>       &u,

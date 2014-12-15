@@ -28,10 +28,12 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class collects the basic methods used in FE_Q and FE_Q_DG0. There is
- * no public constructor for this class as it is not functional as a
- * stand-alone. The completion of definitions is left to the derived classes.
+ * no public constructor for this class as it is not functional as a stand-
+ * alone. The completion of definitions is left to the derived classes.
  *
- * @author Wolfgang Bangerth, 1998, 2003; Guido Kanschat, 2001; Ralf Hartmann, 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008; Martin Kronbichler, 2008, 2013
+ * @author Wolfgang Bangerth, 1998, 2003; Guido Kanschat, 2001; Ralf Hartmann,
+ * 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008;
+ * Martin Kronbichler, 2008, 2013
  */
 template <class POLY, int dim=POLY::dimension, int spacedim=dim>
 class FE_Q_Base : public FE_Poly<POLY,dim,spacedim>
@@ -154,10 +156,10 @@ public:
    *
    * To explain the concept, consider the case where we would like to know
    * whether a degree of freedom on a face, for example as part of an FESystem
-   * element, is primitive. Unfortunately, the
-   * is_primitive() function in the FiniteElement class takes a cell index, so
-   * we would need to find the cell index of the shape function that
-   * corresponds to the present face index. This function does that.
+   * element, is primitive. Unfortunately, the is_primitive() function in the
+   * FiniteElement class takes a cell index, so we would need to find the cell
+   * index of the shape function that corresponds to the present face index.
+   * This function does that.
    *
    * Code implementing this would then look like this:
    * @code
@@ -169,19 +171,18 @@ public:
    * actual faces can be in their standard ordering with respect to the cell
    * under consideration, or can be flipped, oriented, etc.
    *
-   * @param face_dof_index The index of the degree of freedom on a face.
-   *   This index must be between zero and dofs_per_face.
-   * @param face The number of the face this degree of freedom lives on.
-   *   This number must be between zero and GeometryInfo::faces_per_cell.
-   * @param face_orientation One part of the description of the orientation
-   *   of the face. See @ref GlossFaceOrientation .
-   * @param face_flip One part of the description of the orientation
-   *   of the face. See @ref GlossFaceOrientation .
-   * @param face_rotation One part of the description of the orientation
-   *   of the face. See @ref GlossFaceOrientation .
-   * @return The index of this degree of freedom within the set
-   *   of degrees of freedom on the entire cell. The returned value
-   *   will be between zero and dofs_per_cell.
+   * @param face_dof_index The index of the degree of freedom on a face. This
+   * index must be between zero and dofs_per_face.
+   * @param face The number of the face this degree of freedom lives on. This
+   * number must be between zero and GeometryInfo::faces_per_cell.
+   * @param face_orientation One part of the description of the orientation of
+   * the face. See @ref GlossFaceOrientation .
+   * @param face_flip One part of the description of the orientation of the
+   * face. See @ref GlossFaceOrientation .
+   * @param face_rotation One part of the description of the orientation of
+   * the face. See @ref GlossFaceOrientation . @return The index of this
+   * degree of freedom within the set of degrees of freedom on the entire
+   * cell. The returned value will be between zero and dofs_per_cell.
    */
   virtual
   unsigned int face_to_cell_index (const unsigned int face_dof_index,
@@ -213,37 +214,35 @@ public:
   virtual bool hp_constraints_are_implemented () const;
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code
-   * first assigns the degrees of freedom of each of these FEs
-   * different global indices. It then calls this function to find out
-   * which of them should get identical values, and consequently can
-   * receive the same global DoF index. This function therefore
-   * returns a list of identities between DoFs of the present finite
-   * element object with the DoFs of @p fe_other, which is a reference
-   * to a finite element object representing one of the other finite
-   * elements active on this particular vertex. The function computes
-   * which of the degrees of freedom of the two finite element objects
-   * are equivalent, both numbered between zero and the corresponding
-   * value of dofs_per_vertex of the two finite elements. The first
-   * index of each pair denotes one of the vertex dofs of the present
-   * element, whereas the second is the corresponding index of the
-   * other finite element.
+   * If, on a vertex, several finite elements are active, the hp code first
+   * assigns the degrees of freedom of each of these FEs different global
+   * indices. It then calls this function to find out which of them should get
+   * identical values, and consequently can receive the same global DoF index.
+   * This function therefore returns a list of identities between DoFs of the
+   * present finite element object with the DoFs of @p fe_other, which is a
+   * reference to a finite element object representing one of the other finite
+   * elements active on this particular vertex. The function computes which of
+   * the degrees of freedom of the two finite element objects are equivalent,
+   * both numbered between zero and the corresponding value of dofs_per_vertex
+   * of the two finite elements. The first index of each pair denotes one of
+   * the vertex dofs of the present element, whereas the second is the
+   * corresponding index of the other finite element.
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
-   * Same as hp_vertex_dof_indices(), except that the function treats
-   * degrees of freedom on lines.
+   * Same as hp_vertex_dof_indices(), except that the function treats degrees
+   * of freedom on lines.
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
-   * Same as hp_vertex_dof_indices(), except that the function treats
-   * degrees of freedom on quads.
+   * Same as hp_vertex_dof_indices(), except that the function treats degrees
+   * of freedom on quads.
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
@@ -285,15 +284,15 @@ protected:
   void initialize_constraints (const std::vector<Point<1> > &points);
 
   /**
-  * Initialize the @p unit_support_points field of the FiniteElement
-  * class. Called from initialize().
-  */
+   * Initialize the @p unit_support_points field of the FiniteElement class.
+   * Called from initialize().
+   */
   void initialize_unit_support_points (const std::vector<Point<1> > &points);
 
   /**
-  * Initialize the @p unit_face_support_points field of the FiniteElement
-  * class. Called from initialize().
-  */
+   * Initialize the @p unit_face_support_points field of the FiniteElement
+   * class. Called from initialize().
+   */
   void initialize_unit_face_support_points (const std::vector<Point<1> > &points);
 
   /**

@@ -37,10 +37,9 @@ namespace internal
     template <typename Number> struct ConstraintValues;
 
     /**
-     * A struct that collects all information
-     * related to parallelization with threads:
-     * The work is subdivided into tasks that can
-     * be done independently.
+     * A struct that collects all information related to parallelization with
+     * threads: The work is subdivided into tasks that can be done
+     * independently.
      */
     struct TaskInfo
     {
@@ -50,14 +49,12 @@ namespace internal
       TaskInfo ();
 
       /**
-       * Clears all the data fields and resets them
-       * to zero.
+       * Clears all the data fields and resets them to zero.
        */
       void clear ();
 
       /**
-       * Returns the memory consumption of
-       * the class.
+       * Returns the memory consumption of the class.
        */
       std::size_t memory_consumption () const;
 
@@ -85,9 +82,8 @@ namespace internal
 
 
     /**
-     * A struct that collects all information
-     * related to the size of the problem and MPI
-     * parallelization.
+     * A struct that collects all information related to the size of the
+     * problem and MPI parallelization.
      */
     struct SizeInfo
     {
@@ -97,23 +93,20 @@ namespace internal
       SizeInfo ();
 
       /**
-       * Clears all data fields and resets the sizes
-       * to zero.
+       * Clears all data fields and resets the sizes to zero.
        */
       void clear();
 
       /**
-       * Prints minimum, average, and
-       * maximal memory consumption over the
-       * MPI processes.
+       * Prints minimum, average, and maximal memory consumption over the MPI
+       * processes.
        */
       template <typename STREAM>
       void print_memory_statistics (STREAM     &out,
                                     std::size_t data_length) const;
 
       /**
-       * Determines the position of cells
-       * with ghosts for distributed-memory
+       * Determines the position of cells with ghosts for distributed-memory
        * calculations.
        */
       void make_layout (const unsigned int n_active_cells_in,
@@ -128,9 +121,8 @@ namespace internal
       unsigned int vectorization_length;
 
       /**
-       * index sets to describe the layout of cells:
-       * locally owned cells and locally active
-       * cells
+       * index sets to describe the layout of cells: locally owned cells and
+       * locally active cells
        */
       IndexSet locally_owned_cells;
       IndexSet ghost_cells;
@@ -150,15 +142,16 @@ namespace internal
 
 
     /**
-     * A class that is used to compare floating point arrays (e.g. std::vectors,
-     * Tensor<1,dim>, etc.). The idea of this class is to consider two arrays as
-     * equal if they are the same within a given tolerance. We use this
-     * comparator class within an std::map<> of the given arrays. Note that this
-     * comparison operator does not satisfy all the mathematical properties one
-     * usually wants to have (consider e.g. the numbers a=0, b=0.1, c=0.2 with
-     * tolerance 0.15; the operator gives a<c, but neither of a<b? or b<c? is
-     * satisfied). This is not a problem in the use cases for this class, but be
-     * careful when using it in other contexts.
+     * A class that is used to compare floating point arrays (e.g.
+     * std::vectors, Tensor<1,dim>, etc.). The idea of this class is to
+     * consider two arrays as equal if they are the same within a given
+     * tolerance. We use this comparator class within an std::map<> of the
+     * given arrays. Note that this comparison operator does not satisfy all
+     * the mathematical properties one usually wants to have (consider e.g.
+     * the numbers a=0, b=0.1, c=0.2 with tolerance 0.15; the operator gives
+     * a<c, but neither of a<b? or b<c? is satisfied). This is not a problem
+     * in the use cases for this class, but be careful when using it in other
+     * contexts.
      */
     template<typename Number>
     struct FPArrayComparator

@@ -31,8 +31,8 @@ template <int dim, typename Number> struct FunctionMap;
 
 
 /**
- * Collection of boundary constraints and refinement edge constraints
- * for level vectors.
+ * Collection of boundary constraints and refinement edge constraints for
+ * level vectors.
  *
  * @ingroup mg
  */
@@ -42,10 +42,9 @@ public:
 
   typedef std::vector<std::set<types::global_dof_index> >::size_type size_dof;
   /**
-   * Fill the internal data structures with hanging node constraints
-   * extracted from the dof handler object. Works with natural
-   * boundary conditions only. There exists a sister function setting
-   * up boundary constraints as well.
+   * Fill the internal data structures with hanging node constraints extracted
+   * from the dof handler object. Works with natural boundary conditions only.
+   * There exists a sister function setting up boundary constraints as well.
    *
    * This function ensures that on every level, degrees of freedom at interior
    * edges of a refinement level are treated corrected but leaves degrees of
@@ -74,8 +73,7 @@ public:
   void clear();
 
   /**
-   * Determine whether a dof index is subject to a boundary
-   * constraint.
+   * Determine whether a dof index is subject to a boundary constraint.
    */
   bool is_boundary_index (const unsigned int level,
                           const types::global_dof_index index) const;
@@ -94,19 +92,17 @@ public:
                            const types::global_dof_index index) const;
 
   /**
-   * @deprecated Use is_boundary_index() instead. The logic behind
-   * this function here is unclear and for practical purposes, the
-   * other is needed.
+   * @deprecated Use is_boundary_index() instead. The logic behind this
+   * function here is unclear and for practical purposes, the other is needed.
    *
-   * Determine whether a dof index is subject to a boundary
-   * constraint.
+   * Determine whether a dof index is subject to a boundary constraint.
    */
   bool at_refinement_edge_boundary (const unsigned int level,
                                     const types::global_dof_index index) const DEAL_II_DEPRECATED;
 
   /**
-   * Return the indices of dofs for each level that are subject to
-   * boundary constraints.
+   * Return the indices of dofs for each level that are subject to boundary
+   * constraints.
    */
   const std::vector<std::set<types::global_dof_index> > &
   get_boundary_indices () const;
@@ -115,34 +111,34 @@ public:
    * @deprecated Use at_refinement_edge() if possible, else
    * get_refinement_edge_indices(unsigned int).
    *
-   * Return the indices of dofs for each level that lie on the
-   * refinement edge (i.e. are on faces between cells of this level
-   * and cells on the level below).
+   * Return the indices of dofs for each level that lie on the refinement edge
+   * (i.e. are on faces between cells of this level and cells on the level
+   * below).
    */
   const std::vector<std::vector<bool> > &
   get_refinement_edge_indices () const DEAL_II_DEPRECATED;
 
   /**
-   * Return the indices of dofs on the given level that lie on an
-   * refinement edge (dofs on faces to neighbors that are coarser)
+   * Return the indices of dofs on the given level that lie on an refinement
+   * edge (dofs on faces to neighbors that are coarser)
    */
   const IndexSet &
   get_refinement_edge_indices (unsigned int level) const;
 
   /**
-   * @deprecated Use at_refinement_edge_boundary() if possible, else
-   * use get_refinement_edge_boundary_indices().
+   * @deprecated Use at_refinement_edge_boundary() if possible, else use
+   * get_refinement_edge_boundary_indices().
    *
-   * Return the indices of dofs for each level that are in the
-   * intersection of the sets returned by get_boundary_indices() and
+   * Return the indices of dofs for each level that are in the intersection of
+   * the sets returned by get_boundary_indices() and
    * get_refinement_edge_indices().
    */
   const std::vector<std::vector<bool> > &
   get_refinement_edge_boundary_indices () const DEAL_II_DEPRECATED;
 
   /**
-   * @deprecated The function is_boundary_index() now returns false if
-   * no boundary values are set.
+   * @deprecated The function is_boundary_index() now returns false if no
+   * boundary values are set.
    *
    * Return if boundary_indices need to be set or not.
    */
@@ -156,8 +152,8 @@ private:
   std::vector<std::set<types::global_dof_index> > boundary_indices;
 
   /**
-   * The degrees of freedom on the refinement edge between a level and
-   * coarser cells.
+   * The degrees of freedom on the refinement edge between a level and coarser
+   * cells.
    */
   std::vector<IndexSet> refinement_edge_indices;
 

@@ -23,13 +23,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * STL conforming iterator for constant
- * and non-constant matrices.
+ * STL conforming iterator for constant and non-constant matrices.
  *
- * This iterator is abstracted from
- * the actual matrix type and can be
- * used for any matrix having the
- * required ACCESSOR type.
+ * This iterator is abstracted from the actual matrix type and can be used for
+ * any matrix having the required ACCESSOR type.
  *
  * @author Guido Kanschat, 2006, based on previous a implementation
  */
@@ -43,33 +40,23 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Typedef for the matrix type
-   * (including constness) we are to
-   * operate on.
+   * Typedef for the matrix type (including constness) we are to operate on.
    */
   typedef typename ACCESSOR::MatrixType MatrixType;
 
   /**
-   * Constructor. Create an
-   * iterator into the matrix
-   * <tt>matrix</tt> for the given
-   * <tt>row</tt> and the
-   * <tt>index</tt> within it.
+   * Constructor. Create an iterator into the matrix <tt>matrix</tt> for the
+   * given <tt>row</tt> and the <tt>index</tt> within it.
    */
   MatrixIterator (MatrixType      *matrix,
                   const size_type  row = 0,
                   const size_type  index = 0);
 
   /**
-   * Copy from another matrix
-   * iterator. Mostly implemented
-   * to allow initialization of a
-   * constant iterator from a non
-   * constant, this function only
-   * requires that a conversion
-   * from the other iterator's
-   * accessor to this accessor
-   * object is possible.
+   * Copy from another matrix iterator. Mostly implemented to allow
+   * initialization of a constant iterator from a non constant, this function
+   * only requires that a conversion from the other iterator's accessor to
+   * this accessor object is possible.
    */
   template <class OtherAccessor>
   MatrixIterator(const MatrixIterator<OtherAccessor> &other);
@@ -95,8 +82,7 @@ public:
   const ACCESSOR *operator-> () const;
 
   /**
-   * Comparison. True, if
-   * both accessors are equal.
+   * Comparison. True, if both accessors are equal.
    */
   bool operator == (const MatrixIterator &) const;
 
@@ -106,35 +92,27 @@ public:
   bool operator != (const MatrixIterator &) const;
 
   /**
-   * Comparison operator. Result is
-   * true if either the first row
-   * number is smaller or if the row
-   * numbers are equal and the first
-   * index is smaller.
+   * Comparison operator. Result is true if either the first row number is
+   * smaller or if the row numbers are equal and the first index is smaller.
    *
-   * This function is only valid if
-   * both iterators point into the same
-   * matrix.
+   * This function is only valid if both iterators point into the same matrix.
    */
   bool operator < (const MatrixIterator &) const;
 
   /**
-   * Comparison operator. Works in the
-   * same way as above operator, just
-   * the other way round.
+   * Comparison operator. Works in the same way as above operator, just the
+   * other way round.
    */
   bool operator > (const MatrixIterator &) const;
 
 private:
   /**
-   * Store an object of the
-   * accessor class.
+   * Store an object of the accessor class.
    */
   ACCESSOR accessor;
 
   /**
-   * Allow other iterators access
-   * to private data.
+   * Allow other iterators access to private data.
    */
   template <class OtherAccessor> friend class MatrixIterator;
 };

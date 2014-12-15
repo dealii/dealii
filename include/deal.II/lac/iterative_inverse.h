@@ -26,20 +26,17 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * Implementation of the inverse of a matrix, using an iterative
- * method.
+ * Implementation of the inverse of a matrix, using an iterative method.
  *
- * The function vmult() of this class starts an iterative solver in
- * order to approximate the action of the inverse matrix.
+ * The function vmult() of this class starts an iterative solver in order to
+ * approximate the action of the inverse matrix.
  *
- * Krylov space methods like SolverCG or SolverBicgstab
- * become inefficient if solution down to machine accuracy is
- * needed. This is due to the fact, that round-off errors spoil the
- * orthogonality of the vector sequences. Therefore, a nested
- * iteration of two methods is proposed: The outer method is
- * SolverRichardson, since it is robust with respect to round-of
- * errors. The inner loop is an appropriate Krylov space method, since
- * it is fast.
+ * Krylov space methods like SolverCG or SolverBicgstab become inefficient if
+ * solution down to machine accuracy is needed. This is due to the fact, that
+ * round-off errors spoil the orthogonality of the vector sequences.
+ * Therefore, a nested iteration of two methods is proposed: The outer method
+ * is SolverRichardson, since it is robust with respect to round-of errors.
+ * The inner loop is an appropriate Krylov space method, since it is fast.
  *
  * @code
  * // Declare related objects
@@ -63,11 +60,11 @@ DEAL_II_NAMESPACE_OPEN
  * outer_iteration.solve (A, x, b, precondition);
  * @endcode
  *
- * Each time we call the inner loop, reduction of the residual by a
- * factor <tt>1.e-2</tt> is attempted. Since the right hand side vector of
- * the inner iteration is the residual of the outer loop, the relative
- * errors are far from machine accuracy, even if the errors of the
- * outer loop are in the range of machine accuracy.
+ * Each time we call the inner loop, reduction of the residual by a factor
+ * <tt>1.e-2</tt> is attempted. Since the right hand side vector of the inner
+ * iteration is the residual of the outer loop, the relative errors are far
+ * from machine accuracy, even if the errors of the outer loop are in the
+ * range of machine accuracy.
  *
  * @ingroup Matrix2
  * @author Guido Kanschat
@@ -78,17 +75,14 @@ class IterativeInverse : public Subscriptor
 {
 public:
   /**
-   * Initialization
-   * function. Provide a matrix and
-   * preconditioner for the solve in
-   * vmult().
+   * Initialization function. Provide a matrix and preconditioner for the
+   * solve in vmult().
    */
   template <class MATRIX, class PRECONDITION>
   void initialize (const MATRIX &, const PRECONDITION &);
 
   /**
-   * Delete the pointers to matrix
-   * and preconditioner.
+   * Delete the pointers to matrix and preconditioner.
    */
   void clear();
 
@@ -98,18 +92,16 @@ public:
   void vmult (VECTOR &dst, const VECTOR &src) const;
 
   /**
-   * Solve for right hand side <tt>src</tt>, but allow for the fact
-   * that the vectors given to this function have different type from
-   * the vectors used by the inner solver.
+   * Solve for right hand side <tt>src</tt>, but allow for the fact that the
+   * vectors given to this function have different type from the vectors used
+   * by the inner solver.
    */
   template <class VECTOR2>
   void vmult (VECTOR2 &dst, const VECTOR2 &src) const;
 
   /**
-   * The solver, which allows
-   * selection of the actual solver
-   * as well as adjuxtment of
-   * parameters.
+   * The solver, which allows selection of the actual solver as well as
+   * adjuxtment of parameters.
    */
   SolverSelector<VECTOR> solver;
 
