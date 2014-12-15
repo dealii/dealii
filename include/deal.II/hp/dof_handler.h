@@ -440,8 +440,6 @@ namespace hp
      */
     active_cell_iterator end_active (const unsigned int level) const;
 
-    /*@}*/
-
     /**
      *  @name Cell iterator functions returning ranges of iterators
      */
@@ -532,7 +530,9 @@ namespace hp
      */
     IteratorRange<active_cell_iterator> active_cell_iterators_on_level (const unsigned int level) const;
 
-    /*@}*/
+    /*
+     * @}
+     */
 
     /*---------------------------------------*/
 

@@ -53,9 +53,9 @@ template <typename number> class SparseMatrix;
 namespace GridGenerator
 {
   /**
-   *  @name Creating meshes for basic geometries
+   * @name Creating meshes for basic geometries
+   * @{
    */
-  /*@{*/
 
   /**
    * Initialize the given triangulation with a hypercube (line in 1D,
@@ -655,13 +655,12 @@ namespace GridGenerator
                 const double        R,
                 const double        r);
 
-  /**
+  /*
    * @}
    */
+
   /**
-   *  @name Creating meshes from other meshes
-   */
-  /**
+   * @name Creating meshes from other meshes
    * @{
    */
 
@@ -802,14 +801,14 @@ namespace GridGenerator
   void flatten_triangulation(const Triangulation<dim,spacedim1> &in_tria,
                              Triangulation<dim,spacedim2> &out_tria);
 
-  /**
+  /*
    * @}
    */
 
   /**
-   *  @name Creating lower-dimensional meshes from parts of higher-dimensional meshes
+   * @name Creating lower-dimensional meshes from parts of higher-dimensional meshes
+   * @{
    */
-  /*@{*/
 
 
 #ifdef _MSC_VER
@@ -922,12 +921,12 @@ namespace GridGenerator
                              const std::set<types::boundary_id> &boundary_ids
                              = std::set<types::boundary_id>());
 
-  /*@}*/
+  /*
+   * @}
+   */
 
   /**
-   *  @name Deprecated functions
-   */
-  /**
+   * @name Deprecated functions
    * @{
    */
 
@@ -959,13 +958,12 @@ namespace GridGenerator
                                const std::map<unsigned int,Point<dim> > &new_points,
                                const Function<dim> *coefficient = 0) DEAL_II_DEPRECATED;
 
-  /**
+  /*
    * @}
    */
+
   /**
-   *  @name Exceptions
-   */
-  /**
+   * @name Exceptions
    * @{
    */
 
@@ -987,6 +985,10 @@ namespace GridGenerator
                   int,
                   << "The vector of repetitions  must have "
                   << arg1 <<" elements.");
+
+  /*
+   * @}
+   */
 }
 
 

@@ -651,6 +651,7 @@ namespace DoFTools
   /**
    * @}
    */
+
   /**
    * @name Hanging nodes and other constraints
    * @{
@@ -802,7 +803,9 @@ namespace DoFTools
                                              const InterGridMap<DoFHandler<dim,spacedim> >          &coarse_to_fine_grid_map,
                                              std::vector<std::map<types::global_dof_index, float> > &transfer_representation);
 
-  //@}
+  /**
+   * @}
+   */
 
 
   /**
@@ -1150,9 +1153,6 @@ namespace DoFTools
    const ComponentMask                   &component_mask = ComponentMask()) DEAL_II_DEPRECATED;
 
 
-  //@}
-
-
   /**
    * Take a vector of values which live on cells (e.g. an error per
    * cell) and distribute it to the dofs in such a way that a finite
@@ -1194,6 +1194,7 @@ namespace DoFTools
   /**
    * @}
    */
+
   /**
    * @name Identifying subsets of degrees of freedom with particular properties
    * @{

@@ -2051,11 +2051,11 @@ public:
   void distort_random (const double factor,
                        const bool   keep_boundary=true) DEAL_II_DEPRECATED;
 
-
   /**
-   *  @name Mesh refinement
+   * @name Mesh refinement
+   * @{
    */
-  /*@{*/
+
   /**
    *  Flag all active cells for refinement.  This will refine all
    *  cells of all levels which are not already refined (i.e. only
@@ -2148,12 +2148,15 @@ public:
    * need them afterwards.
    */
   bool prepare_coarsening_and_refinement ();
-  /** @} */
+
+  /*
+   * @}
+   */
 
   /**
-   *  @name Keeping up with what happens to a triangulation
+   * @name Keeping up with what happens to a triangulation
+   * @{
    */
-  /** @{ */
 
   /**
    *  Add a RefinementListener. Adding listeners to the Triangulation
@@ -2204,12 +2207,15 @@ public:
    */
   mutable Signals signals;
 
-  /*@}*/
+  /*
+   * @}
+   */
 
   /**
-   *  @name History of a triangulation
+   * @name History of a triangulation
+   * @{
    */
-  /*@{*/
+
   /**
    *  Save the addresses of the cells which are flagged for refinement
    *  to @p out.  For usage, read the general documentation for this
@@ -2259,13 +2265,16 @@ public:
    * (as opposed to only isotropic) refinement.
    */
   bool get_anisotropic_refinement_flag() const;
-  /*@}*/
 
+  /*
+   * @}
+   */
 
   /**
-   *  @name User data
+   * @name User data
+   * @{
    */
-  /*@{*/
+
   /**
    *  Clear all user flags.  See also @ref GlossUserFlags .
    */
@@ -2492,13 +2501,16 @@ public:
    * GlossUserData .
    */
   void load_user_pointers_hex (const std::vector<void *> &v);
-  /*@}*/
 
+  /*
+   * @}
+   */
 
   /**
-   *  @name Cell iterator functions
+   * @name Cell iterator functions
+   * @{
    */
-  /*@{*/
+
   /**
    *  Iterator to the first used cell on level @p level.
    */
@@ -2547,7 +2559,6 @@ public:
    *  Return an iterator pointing to the last active cell.
    */
   active_cell_iterator last_active () const;
-  /*@}*/
 
   /**
    *  @name Cell iterator functions returning ranges of iterators
@@ -2635,15 +2646,18 @@ public:
    */
   IteratorRange<active_cell_iterator> active_cell_iterators_on_level (const unsigned int level) const;
 
-  /*@}*/
+  /*
+   * @}
+   */
 
   /*---------------------------------------*/
   /*---------------------------------------*/
 
   /**
-   *  @name Face iterator functions
+   * @name Face iterator functions
+   * @{
    */
-  /*@{*/
+
   /**
    *  Iterator to the first used face.
    */
@@ -2659,15 +2673,15 @@ public:
    *  iterators with past-the-end or before-the-beginning states.
    */
   face_iterator        end_face () const;
-  /*@}*/
 
-
-  /*---------------------------------------*/
+  /*
+   * @}
+   */
 
   /**
    * @name Information about the triangulation
+   * @{
    */
-  /*@{*/
 
   /**
    * In the following, most functions are provided in two versions,
@@ -2923,12 +2937,15 @@ public:
    * those cells that are owned by the current processor.
    */
   virtual types::subdomain_id locally_owned_subdomain () const;
-  /*@}*/
+
+  /*
+   * @}
+   */
 
   /**
-   *  @name Internal information about the number of objects
+   * @name Internal information about the number of objects
+   * @{
    */
-  /*@{*/
 
   /**
    * Total number of lines, used or unused.
@@ -3083,7 +3100,9 @@ public:
    */
   unsigned int n_raw_faces () const;
 
-  /*@}*/
+  /*
+   * @}
+   */
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of
@@ -3131,9 +3150,10 @@ public:
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 
   /**
-   *  @name Exceptions
+   * @name Exceptions
+   * @{
    */
-  /*@{*/
+
   /**
    *  Exception @ingroup Exceptions
    */
@@ -3172,7 +3192,11 @@ public:
    * Exception @ingroup Exceptions
    */
   DeclException0 (ExcNonOrientableTriangulation);
-  /*@}*/
+
+  /*
+   * @}
+   */
+
 protected:
   /**
    *  Do some smoothing in the process of refining the
@@ -3212,9 +3236,10 @@ protected:
 
 private:
   /**
-   *  @name Cell iterator functions for internal use
+   * @name Cell iterator functions for internal use
+   * @{
    */
-  /*@{*/
+
   /**
    * Declare a number of iterator types for raw iterators, i.e.,
    * iterators that also iterate over holes in the list of cells left
@@ -3242,14 +3267,15 @@ private:
    * <tt>end()</tt>.
    */
   raw_cell_iterator    end_raw (const unsigned int level) const;
-  /*@}*/
 
-  /*---------------------------------------*/
+  /*
+   * @}
+   */
 
   /**
-   *  @name Line iterator functions for internal use
+   * @name Line iterator functions for internal use
+   * @{
    */
-  /*@{*/
 
   /**
    *  Iterator to the first line, used or not, on level @p level. If a
@@ -3278,15 +3304,16 @@ private:
    *  iterators with past-the-end or before-the-beginning states.
    */
   line_iterator        end_line () const;
-  /*@}*/
 
-  /*---------------------------------------*/
+  /*
+   * @}
+   */
 
   /**
-   *  @name Quad iterator functions for internal use
+   * @name Quad iterator functions for internal use
+   * @{
    */
-  /*@{
-   */
+
   /**
    *  Iterator to the first quad, used or not, on the given level. If
    *  a level has no quads, a past-the-end iterator is returned.  If
@@ -3315,15 +3342,16 @@ private:
    */
   quad_iterator
   end_quad () const;
-  /*@}*/
 
-  /*---------------------------------------*/
+  /*
+   * @}
+   */
 
   /**
-   *  @name Hex iterator functions for internal use
+   * @name Hex iterator functions for internal use
+   * @{
    */
-  /*@{
-   */
+
   /**
    *  Iterator to the first hex, used or not, on level @p level. If a
    *  level has no hexs, a past-the-end iterator is returned.
@@ -3349,7 +3377,10 @@ private:
    */
   hex_iterator
   end_hex () const;
-  /*@}*/
+
+  /*
+   * @}
+   */
 
 
   /**
