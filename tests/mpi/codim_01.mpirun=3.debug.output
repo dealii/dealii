@@ -152,14 +152,18 @@ DEAL:0:2-3::Checksum: 296355976
           8 8 8
         </DataArray>
       </Cells>
-      <CellData Scalars="mpirank,treeid">
-        <DataArray type="Int32" Name="mpirank" format="ascii">
-          0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-          0 0 0
-        </DataArray>
+      <CellData Scalars="treeid,level,mpirank">
         <DataArray type="Int32" Name="treeid" format="ascii">
           0 0 0 0 0 0 0 1 1 1 1 2 2 2 2 3 3 3 3 4
           4 4 4
+        </DataArray>
+        <DataArray type="UInt8" Name="level" format="ascii">
+          2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+          1 1 1
+        </DataArray>
+        <DataArray type="Int32" Name="mpirank" format="ascii">
+          0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+          0 0 0
         </DataArray>
       </CellData>
       <PointData>
@@ -324,12 +328,15 @@ DEAL:1:2-3::Checksum: 0
           8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8
         </DataArray>
       </Cells>
-      <CellData Scalars="mpirank,treeid">
-        <DataArray type="Int32" Name="mpirank" format="ascii">
-          1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-        </DataArray>
+      <CellData Scalars="treeid,level,mpirank">
         <DataArray type="Int32" Name="treeid" format="ascii">
           5 5 5 5 6 6 6 6 7 7 7 7 8 8 8 8 9 9 9 9
+        </DataArray>
+        <DataArray type="UInt8" Name="level" format="ascii">
+          1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+        </DataArray>
+        <DataArray type="Int32" Name="mpirank" format="ascii">
+          1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
         </DataArray>
       </CellData>
       <PointData>
@@ -516,14 +523,18 @@ DEAL:2:2-3::Checksum: 0
           8 8 8 8
         </DataArray>
       </Cells>
-      <CellData Scalars="mpirank,treeid">
-        <DataArray type="Int32" Name="mpirank" format="ascii">
-          2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-          2 2 2 2
-        </DataArray>
+      <CellData Scalars="treeid,level,mpirank">
         <DataArray type="Int32" Name="treeid" format="ascii">
           10 10 10 10 11 11 11 11 12 12 12 12 13 13 13 13 14 14 14 14
           15 15 15 15
+        </DataArray>
+        <DataArray type="UInt8" Name="level" format="ascii">
+          1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+          1 1 1 1
+        </DataArray>
+        <DataArray type="Int32" Name="mpirank" format="ascii">
+          2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+          2 2 2 2
         </DataArray>
       </CellData>
       <PointData>
