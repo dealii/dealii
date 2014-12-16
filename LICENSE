@@ -2,7 +2,7 @@
 This directory contains the deal.II library.
 
 The deal.II library is copyrighted by the deal.II authors. This term
-refers to the people listed in the file doc/authors.html.
+refers to the people listed in the file AUTHORS.
 
 The deal.II library is free software; you can use it, redistribute it,
 and/or modify it under the terms of the GNU Lesser General Public
