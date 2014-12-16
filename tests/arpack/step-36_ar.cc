@@ -51,6 +51,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 namespace Step36
 {
@@ -264,6 +265,10 @@ namespace Step36
   }
 
 
+  bool my_compare(std::complex<double> a, std::complex<double> b)
+  {
+    return a.real() < b.real();
+  }
 
   template <int dim>
   void EigenvalueProblem<dim>::run ()
@@ -273,6 +278,8 @@ namespace Step36
     assemble_system ();
 
     const std::pair<unsigned int, double> res = solve ();
+
+    std::sort(eigenvalues.begin(), eigenvalues.end(), my_compare);
 
     for (unsigned int i=0; i<eigenvalues.size(); ++i)
       deallog << "      Eigenvalue " << i

@@ -87,3 +87,14 @@ s/written by deal\.II \d+\.\d+\.(pre|\d+)/written by deal.II x.y.z/;
 # To deal with these issues, we simply delete these lines
 s/.*<PCellData Scalars.*\n//g;
 s/.*<PDataArray type.*(mpirank|level).*\n//g;
+
+#
+# Different boost versions output output the opening bracket for json
+# output on a new line. Thus always transform
+#     "label": {
+#
+# into
+#     "label":
+#     {
+#
+s/^(\s*)(".*":) \{$/\1\2\n\1\{/;
