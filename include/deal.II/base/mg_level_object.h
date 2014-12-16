@@ -25,14 +25,13 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * An array with an object for each level.  The purpose of this class
- * is mostly to store objects and allow access by level number, even
- * if the lower levels are not used and therefore have no object at
- * all; this is done by simply shifting the given index by the minimum
- * level we have stored.
+ * An array with an object for each level.  The purpose of this class is
+ * mostly to store objects and allow access by level number, even if the lower
+ * levels are not used and therefore have no object at all; this is done by
+ * simply shifting the given index by the minimum level we have stored.
  *
- * In most cases, the objects which are stored on each levels, are
- * either matrices or vectors.
+ * In most cases, the objects which are stored on each levels, are either
+ * matrices or vectors.
  *
  * @ingroup mg
  * @ingroup data
@@ -43,10 +42,8 @@ class MGLevelObject : public Subscriptor
 {
 public:
   /**
-   * Constructor allowing to
-   * initialize the number of
-   * levels. By default, the object
-   * is created empty.
+   * Constructor allowing to initialize the number of levels. By default, the
+   * object is created empty.
    */
   MGLevelObject (const unsigned int minlevel = 0,
                  const unsigned int maxlevel = 0);
@@ -57,37 +54,27 @@ public:
   Object &operator[] (const unsigned int level);
 
   /**
-   * Access object on level
-   * @p level. Constant version.
+   * Access object on level @p level. Constant version.
    */
   const Object &operator[] (const unsigned int level) const;
 
   /**
-   * Delete all previous contents
-   * of this object and reset its
-   * size according to the values
-   * of @p new_minlevel and
-   * @p new_maxlevel.
+   * Delete all previous contents of this object and reset its size according
+   * to the values of @p new_minlevel and @p new_maxlevel.
    */
   void resize (const unsigned int new_minlevel,
                const unsigned int new_maxlevel);
 
   /**
-   * Call <tt>operator = (s)</tt>
-   * on all objects stored by this
-   * object.  This is particularly
-   * useful for
-   * e.g. <tt>Object==Vector@<T@></tt>
+   * Call <tt>operator = (s)</tt> on all objects stored by this object.  This
+   * is particularly useful for e.g. <tt>Object==Vector@<T@></tt>
    */
   MGLevelObject<Object> &operator = (const double d);
 
   /**
-   * Call @p clear on all objects
-   * stored by this object. This
-   * function is only implemented
-   * for some @p Object classes,
-   * e.g. the PreconditionBlockSOR
-   * and similar classes.
+   * Call @p clear on all objects stored by this object. This function is only
+   * implemented for some @p Object classes, e.g. the PreconditionBlockSOR and
+   * similar classes.
    */
   void clear();
 

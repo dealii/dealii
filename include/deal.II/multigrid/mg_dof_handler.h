@@ -40,21 +40,22 @@ namespace internal
 
 
 /**
- * @deprecated All functionality of this class has been moved to
- * DoFHandler. Thus, this class is only a wrapper left in the library
- * for compatibility reasons.
+ * @deprecated All functionality of this class has been moved to DoFHandler.
+ * Thus, this class is only a wrapper left in the library for compatibility
+ * reasons.
  *
- * This class manages degrees of freedom for a multilevel hierarchy of
- * grids. It does mostly the same as does the @p DoDHandler class,
- * but it uses a separate enumeration of the degrees of freedom on
- * each level. For example, a vertex has several DoF numbers, one for
- * each level of the triangulation on which it exists.
+ * This class manages degrees of freedom for a multilevel hierarchy of grids.
+ * It does mostly the same as does the @p DoDHandler class, but it uses a
+ * separate enumeration of the degrees of freedom on each level. For example,
+ * a vertex has several DoF numbers, one for each level of the triangulation
+ * on which it exists.
  *
- * @todo This class has not yet been implemented for the use in the codimension
- * one case (<tt>spacedim != dim </tt>).
+ * @todo This class has not yet been implemented for the use in the
+ * codimension one case (<tt>spacedim != dim </tt>).
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, 1998, 1999 Markus Bürg, Timo Heister, Guido Kanschat, 2012
+ * @author Wolfgang Bangerth, 1998, 1999 Markus Bürg, Timo Heister, Guido
+ * Kanschat, 2012
  */
 template <int dim, int spacedim=dim>
 class MGDoFHandler : public DoFHandler<dim,spacedim>
@@ -81,23 +82,21 @@ public:
   typedef typename IteratorSelector::active_face_iterator active_face_iterator;
 
   /**
-   * Make the dimension and the space_dimension available
-   * in function templates.
+   * Make the dimension and the space_dimension available in function
+   * templates.
    */
   static const unsigned int dimension = dim;
 
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Default constructor, which
-   * will require a call to
-   * initialize() later to set the Triangulation.
+   * Default constructor, which will require a call to initialize() later to
+   * set the Triangulation.
    */
   MGDoFHandler ();
 
   /**
-   * Constructor. Take @p tria as
-   * the triangulation to work on.
+   * Constructor. Take @p tria as the triangulation to work on.
    */
   MGDoFHandler (const Triangulation<dim, spacedim> &tria);
 
@@ -107,46 +106,33 @@ public:
   virtual ~MGDoFHandler ();
 
   /**
-   * Go through the triangulation
-   * and distribute the degrees of
-   * freedoms needed for the given
-   * finite element according to
-   * the given distribution
-   * method. We first call the
-   * DoFHandler's function
-   * and then distribute the
+   * Go through the triangulation and distribute the degrees of freedoms
+   * needed for the given finite element according to the given distribution
+   * method. We first call the DoFHandler's function and then distribute the
    * levelwise numbers.
    *
-   * A copy of the transferred
-   * finite element is stored.
+   * A copy of the transferred finite element is stored.
    */
   virtual void distribute_dofs (const FiniteElement<dim,spacedim> &);
 
   /**
-   *  @name Cell iterator functions
+   * @name Cell iterator functions
    */
   /*@{*/
   /**
-   * Iterator to the first used
-   * cell on level @p level.
+   * Iterator to the first used cell on level @p level.
    */
   cell_iterator        begin       (const unsigned int level = 0) const;
 
   /**
-   * Iterator past the end; this
-   * iterator serves for
-   * comparisons of iterators with
-   * past-the-end or
-   * before-the-beginning states.
+   * Iterator past the end; this iterator serves for comparisons of iterators
+   * with past-the-end or before-the-beginning states.
    */
   cell_iterator        end () const;
 
   /**
-   * Return an iterator which is
-   * the first iterator not on
-   * level. If @p level is the
-   * last level, then this returns
-   * <tt>end()</tt>.
+   * Return an iterator which is the first iterator not on level. If @p level
+   * is the last level, then this returns <tt>end()</tt>.
    */
   cell_iterator        end (const unsigned int level) const;
 

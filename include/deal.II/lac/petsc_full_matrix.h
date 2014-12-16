@@ -37,11 +37,11 @@ namespace PETScWrappers
   /**
    * Implementation of a sequential dense matrix class based on PETSC. All the
    * functionality is actually in the base class, except for the calls to
-   * generate a sequential dense matrix. This is possible since PETSc only works
-   * on an abstract matrix type and internally distributes to functions that do
-   * the actual work depending on the actual matrix type (much like using
-   * virtual functions). Only the functions creating a matrix of specific type
-   * differ, and are implemented in this particular class.
+   * generate a sequential dense matrix. This is possible since PETSc only
+   * works on an abstract matrix type and internally distributes to functions
+   * that do the actual work depending on the actual matrix type (much like
+   * using virtual functions). Only the functions creating a matrix of
+   * specific type differ, and are implemented in this particular class.
    *
    * @ingroup Matrix1
    * @author Wolfgang Bangerth, 2004
@@ -70,18 +70,18 @@ namespace PETScWrappers
 
 
     /**
-     * Throw away the present matrix and generate one that has the
-     * same properties as if it were created by the constructor of
-     * this class with the same argument list as the present function.
+     * Throw away the present matrix and generate one that has the same
+     * properties as if it were created by the constructor of this class with
+     * the same argument list as the present function.
      */
     void reinit (const size_type m,
                  const size_type n);
 
 
     /**
-     * Return a reference to the MPI communicator object in use with
-     * this matrix. Since this is a sequential matrix, it returns the
-     * MPI_COMM_SELF communicator.
+     * Return a reference to the MPI communicator object in use with this
+     * matrix. Since this is a sequential matrix, it returns the MPI_COMM_SELF
+     * communicator.
      */
     virtual const MPI_Comm &get_mpi_communicator () const;
 
@@ -89,8 +89,8 @@ namespace PETScWrappers
 
     /**
      * Do the actual work for the respective reinit() function and the
-     * matching constructor, i.e. create a matrix. Getting rid of the
-     * previous matrix is left to the caller.
+     * matching constructor, i.e. create a matrix. Getting rid of the previous
+     * matrix is left to the caller.
      */
     void do_reinit (const size_type m,
                     const size_type n);

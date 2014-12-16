@@ -17,8 +17,7 @@
 #define __deal2__exceptions_h
 
 /**
- * @file
- * Here, the deal.II exception handling is located.
+ * @file Here, the deal.II exception handling is located.
  */
 
 #include <deal.II/base/config.h>
@@ -31,13 +30,13 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * This class is the base class for all exception classes. Do not use
- * its methods and variables directly since the interface and
- * mechanism may be subject to change. Rather create new exception
- * classes using the <tt>DeclException</tt> macro family.
+ * This class is the base class for all exception classes. Do not use its
+ * methods and variables directly since the interface and mechanism may be
+ * subject to change. Rather create new exception classes using the
+ * <tt>DeclException</tt> macro family.
  *
- * See the @ref Exceptions module for more details on this class and
- * what can be done with classes derived from it.
+ * See the @ref Exceptions module for more details on this class and what can
+ * be done with classes derived from it.
  *
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
@@ -61,9 +60,9 @@ public:
   virtual ~ExceptionBase () throw();
 
   /**
-   * Set the file name and line of where the exception appeared as
-   * well as the violated condition and the name of the exception as
-   * a char pointer. This function also populates the stacktrace.
+   * Set the file name and line of where the exception appeared as well as the
+   * violated condition and the name of the exception as a char pointer. This
+   * function also populates the stacktrace.
    */
   void set_fields (const char *file,
                    const int   line,
@@ -88,14 +87,14 @@ public:
   void print_exc_data (std::ostream &out) const;
 
   /**
-   * Print more specific information about the exception which
-   * occurred. Overload this function in your own exception classes.
+   * Print more specific information about the exception which occurred.
+   * Overload this function in your own exception classes.
    */
   virtual void print_info (std::ostream &out) const;
 
   /**
-   * Print a stacktrace, if one has been recorded previously, to the
-   * given stream.
+   * Print a stacktrace, if one has been recorded previously, to the given
+   * stream.
    */
   void print_stack_trace (std::ostream &out) const;
 
@@ -126,14 +125,14 @@ protected:
   const char  *exc;
 
   /**
-   * A backtrace to the position where the problem happened, if the
-   * system supports this.
+   * A backtrace to the position where the problem happened, if the system
+   * supports this.
    */
   mutable char **stacktrace;
 
   /**
-   * The number of stacktrace frames that are stored in the previous
-   * variable. Zero if the system does not support stack traces.
+   * The number of stacktrace frames that are stored in the previous variable.
+   * Zero if the system does not support stack traces.
    */
   int n_stacktrace_frames;
 
@@ -151,8 +150,8 @@ private:
   void generate_message() const;
 
   /**
-   * A pointer to the c_string that will be printed by what(). It is
-   * populated by generate_message()
+   * A pointer to the c_string that will be printed by what(). It is populated
+   * by generate_message()
    */
   mutable std::string what_str;
 };
@@ -160,8 +159,8 @@ private:
 
 
 /**
- * In this namespace, functions in connection with the Assert and
- * AssertThrow mechanism are declared.
+ * In this namespace, functions in connection with the Assert and AssertThrow
+ * mechanism are declared.
  *
  * @ingroup Exceptions
  */
@@ -172,12 +171,11 @@ namespace deal_II_exceptions
    * Set a string that is printed upon output of the message indicating a
    * triggered <tt>Assert</tt> statement. This string, which is printed in
    * addition to the usual output may indicate information that is otherwise
-   * not readily available unless we are using a debugger. For example,
-   * with distributed programs on cluster computers, the output of all
-   * processes is redirected to the same console window. In this case,
-   * it is convenient to set as additional name the name of the host on
-   * which the program runs, so that one can see in which instance of the
-   * program the exception occurred.
+   * not readily available unless we are using a debugger. For example, with
+   * distributed programs on cluster computers, the output of all processes is
+   * redirected to the same console window. In this case, it is convenient to
+   * set as additional name the name of the host on which the program runs, so
+   * that one can see in which instance of the program the exception occurred.
    *
    * The string pointed to by the argument is copied, so doesn't need to be
    * stored after the call to this function.
@@ -188,33 +186,32 @@ namespace deal_II_exceptions
   void set_additional_assert_output (const char *const p);
 
   /**
-   * Calling this function disables printing a stacktrace along with
-   * the other output printed when an exception occurs. Most of the time,
-   * you will want to see such a stacktrace; suppressing it, however, is
-   * useful if one wants to compare the output of a program across different
-   * machines and systems, since the stacktrace shows memory addresses
-   * and library names/paths that depend on the exact setup of a machine.
+   * Calling this function disables printing a stacktrace along with the other
+   * output printed when an exception occurs. Most of the time, you will want
+   * to see such a stacktrace; suppressing it, however, is useful if one wants
+   * to compare the output of a program across different machines and systems,
+   * since the stacktrace shows memory addresses and library names/paths that
+   * depend on the exact setup of a machine.
    */
   void suppress_stacktrace_in_exceptions ();
 
   /**
-   * Calling this function switches off the use of <tt>std::abort()</tt>
-   * when an exception is created using the Assert() macro. Instead, the
-   * Exception will be thrown using 'throw', so it can be caught if
-   * desired. Generally, you want to abort the execution of a program when
-   * Assert() is called, but it needs to be switched off if you want to log
-   * all exceptions created, or if you want to test if an assertion is
-   * working correctly. This is done for example in regression tests.
-   * Please note that some fatal errors will still call abort(), e.g. when
-   * an exception is caught during exception handling.
+   * Calling this function switches off the use of <tt>std::abort()</tt> when
+   * an exception is created using the Assert() macro. Instead, the Exception
+   * will be thrown using 'throw', so it can be caught if desired. Generally,
+   * you want to abort the execution of a program when Assert() is called, but
+   * it needs to be switched off if you want to log all exceptions created, or
+   * if you want to test if an assertion is working correctly. This is done
+   * for example in regression tests. Please note that some fatal errors will
+   * still call abort(), e.g. when an exception is caught during exception
+   * handling.
    */
   void disable_abort_on_exception ();
 
   /**
-   * The functions in this namespace are in connection with the Assert
-   * and AssertThrow mechanism but are solely for internal purposes and
-   * are not for use outside the exception handling and throwing
-   * mechanism.
+   * The functions in this namespace are in connection with the Assert and
+   * AssertThrow mechanism but are solely for internal purposes and are not
+   * for use outside the exception handling and throwing mechanism.
    *
    * @ingroup Exceptions
    */
@@ -225,15 +222,15 @@ namespace deal_II_exceptions
      * Conditionally abort the program.
      *
      * Depending on whether disable_abort_on_exception was called, this
-     * function either aborts the program flow by printing the error
-     * message provided by @p exc and calling <tt>std::abort()</tt>, or
-     * throws @p exc instead (if @p nothrow is set to <tt>false</tt>).
+     * function either aborts the program flow by printing the error message
+     * provided by @p exc and calling <tt>std::abort()</tt>, or throws @p exc
+     * instead (if @p nothrow is set to <tt>false</tt>).
      *
-     * If the boolean @p nothrow is set to true and
-     * disable_abort_on_exception was called, the exception type is just
-     * printed to deallog and program flow continues. This is useful if
-     * throwing an exception is prohibited (e.g. in a destructor with
-     * <tt>noexcept(true)</tt> or <tt>throw()</tt>).
+     * If the boolean @p nothrow is set to true and disable_abort_on_exception
+     * was called, the exception type is just printed to deallog and program
+     * flow continues. This is useful if throwing an exception is prohibited
+     * (e.g. in a destructor with <tt>noexcept(true)</tt> or
+     * <tt>throw()</tt>).
      */
     void abort (const ExceptionBase &exc, bool nothrow = false);
 
@@ -248,8 +245,8 @@ namespace deal_II_exceptions
     };
 
     /**
-     * This routine does the main work for the exception generation
-     * mechanism used in the <tt>Assert</tt> macro.
+     * This routine does the main work for the exception generation mechanism
+     * used in the <tt>Assert</tt> macro.
      *
      * @ref ExceptionBase
      */
@@ -285,9 +282,9 @@ namespace deal_II_exceptions
 
 
 /**
- * This is the main routine in the exception mechanism for debug mode
- * error checking. It asserts that a certain condition is fulfilled,
- * otherwise issues an error and aborts the program.
+ * This is the main routine in the exception mechanism for debug mode error
+ * checking. It asserts that a certain condition is fulfilled, otherwise
+ * issues an error and aborts the program.
  *
  * See the <tt>ExceptionBase</tt> class for more information.
  *
@@ -310,12 +307,12 @@ namespace deal_II_exceptions
 
 
 /**
- * A variant of the <tt>Assert</tt> macro above that exhibits the same
- * runtime behaviour as long as disable_abort_on_exception was not called.
+ * A variant of the <tt>Assert</tt> macro above that exhibits the same runtime
+ * behaviour as long as disable_abort_on_exception was not called.
  *
- * However, if disable_abort_on_exception was called, this macro merely
- * prints the exception that would be thrown to deallog and continues
- * normally without throwing an exception.
+ * However, if disable_abort_on_exception was called, this macro merely prints
+ * the exception that would be thrown to deallog and continues normally
+ * without throwing an exception.
  *
  * See the <tt>ExceptionBase</tt> class for more information.
  *
@@ -339,9 +336,9 @@ namespace deal_II_exceptions
 
 
 /**
- * This is the main routine in the exception mechanism for run-time
- * mode error checking. It assert that a certain condition is
- * fulfilled, otherwise issues an error and aborts the program.
+ * This is the main routine in the exception mechanism for run-time mode error
+ * checking. It assert that a certain condition is fulfilled, otherwise issues
+ * an error and aborts the program.
  *
  * See the <tt>ExceptionBase</tt> class for more information.
  *
@@ -382,8 +379,8 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase with one
- * additional parameter.
+ * Declare an exception class derived from ExceptionBase with one additional
+ * parameter.
  *
  * @ingroup Exceptions
  */
@@ -401,8 +398,8 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase with
- * two additional parameters.
+ * Declare an exception class derived from ExceptionBase with two additional
+ * parameters.
  *
  * @ingroup Exceptions
  */
@@ -422,8 +419,8 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase with
- * three additional parameters.
+ * Declare an exception class derived from ExceptionBase with three additional
+ * parameters.
  *
  * @ingroup Exceptions
  */
@@ -444,8 +441,8 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase with
- * four additional parameters.
+ * Declare an exception class derived from ExceptionBase with four additional
+ * parameters.
  *
  * @ingroup Exceptions
  */
@@ -468,8 +465,8 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase with
- * five additional parameters.
+ * Declare an exception class derived from ExceptionBase with five additional
+ * parameters.
  *
  * @ingroup Exceptions
  */
@@ -506,8 +503,8 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase with one
- * additional parameter.
+ * Declare an exception class derived from ExceptionBase with one additional
+ * parameter.
  *
  * @ingroup Exceptions
  */
@@ -516,8 +513,8 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase with two
- * additional parameters.
+ * Declare an exception class derived from ExceptionBase with two additional
+ * parameters.
  *
  * @ingroup Exceptions
  */
@@ -526,8 +523,8 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase with three
- * additional parameters.
+ * Declare an exception class derived from ExceptionBase with three additional
+ * parameters.
  *
  * @ingroup Exceptions
  */
@@ -536,8 +533,8 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase with four
- * additional parameters.
+ * Declare an exception class derived from ExceptionBase with four additional
+ * parameters.
  *
  * @ingroup Exceptions
  */
@@ -546,8 +543,8 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase with five
- * additional parameters.
+ * Declare an exception class derived from ExceptionBase with five additional
+ * parameters.
  *
  * @ingroup Exceptions
  */
@@ -558,10 +555,10 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare some exceptions that occur over and over. This way, you can
- * simply use these exceptions, instead of having to declare them locally
- * in your class. The namespace in which these exceptions are declared is
- * later included into the global namespace by
+ * Declare some exceptions that occur over and over. This way, you can simply
+ * use these exceptions, instead of having to declare them locally in your
+ * class. The namespace in which these exceptions are declared is later
+ * included into the global namespace by
  * @code
  * using namespace StandardExceptions;
  * @endcode
@@ -588,9 +585,9 @@ namespace StandardExceptions
   /**
    * Exception raised if a number is not finite.
    *
-   * This exception should be used to catch infinite or not a number
-   * results of arithmetic operations that do not result from a division by
-   * zero (use ExcDivideByZero for those).
+   * This exception should be used to catch infinite or not a number results
+   * of arithmetic operations that do not result from a division by zero (use
+   * ExcDivideByZero for those).
    */
   DeclException0 (ExcNumberNotFinite);
 
@@ -600,9 +597,8 @@ namespace StandardExceptions
   DeclException0 (ExcOutOfMemory);
 
   /**
-   * A memory handler reached a point where all allocated objects should
-   * have been released. Since this exception is thrown, some were still
-   * allocated.
+   * A memory handler reached a point where all allocated objects should have
+   * been released. Since this exception is thrown, some were still allocated.
    */
   DeclException1 (ExcMemoryLeak, int,
                   << "Destroying memory handler while " << arg1
@@ -616,59 +612,57 @@ namespace StandardExceptions
   /**
    * An error occurred opening the named file.
    *
-   * The constructor takes a single argument of type <tt>char*</tt>
-   * naming the file.
+   * The constructor takes a single argument of type <tt>char*</tt> naming the
+   * file.
    */
   DeclException1 (ExcFileNotOpen,
                   char *,
                   << "Could not open file " << arg1);
 
   /**
-   * Exception denoting a part of the library or application program that
-   * has not yet been implemented. In many cases, this only indicates that
-   * there wasn't much need for something yet, not that this is difficult
-   * to implement. It is therefore quite worth the effort to take a look
-   * at the corresponding place and see whether it can be implemented
-   * without too much effort.
+   * Exception denoting a part of the library or application program that has
+   * not yet been implemented. In many cases, this only indicates that there
+   * wasn't much need for something yet, not that this is difficult to
+   * implement. It is therefore quite worth the effort to take a look at the
+   * corresponding place and see whether it can be implemented without too
+   * much effort.
    */
   DeclException0 (ExcNotImplemented);
 
   /**
-   * This exception usually indicates that some condition which the
-   * programmer thinks must be satisfied at a certain point in an algorithm,
-   * is not fulfilled. This might be due to some programming error above,
-   * due to changes to the algorithm that did not preserve this assertion,
-   * or due to assumptions the programmer made that are not valid at all
-   * (i.e. the exception is thrown although there is no error here). Within
-   * the library, this exception is most often used when we write some kind
-   * of complicated algorithm and are not yet sure whether we got it right;
-   * we then put in assertions after each part of the algorithm that check
-   * for some conditions that should hold there, and throw an exception
-   * if they do not.
+   * This exception usually indicates that some condition which the programmer
+   * thinks must be satisfied at a certain point in an algorithm, is not
+   * fulfilled. This might be due to some programming error above, due to
+   * changes to the algorithm that did not preserve this assertion, or due to
+   * assumptions the programmer made that are not valid at all (i.e. the
+   * exception is thrown although there is no error here). Within the library,
+   * this exception is most often used when we write some kind of complicated
+   * algorithm and are not yet sure whether we got it right; we then put in
+   * assertions after each part of the algorithm that check for some
+   * conditions that should hold there, and throw an exception if they do not.
    *
-   * We usually leave in these assertions even after we are confident
-   * that the implementation is correct, since if someone later changes
-   * or extends the algorithm, these exceptions will indicate to him if he
-   * violates assumptions that are used later in the algorithm. Furthermore,
-   * it sometimes happens that an algorithm does not work in very rare
-   * corner cases. These cases will then be trapped sooner or later by the
-   * exception, so that the algorithm can then be fixed for these cases
-   * as well.
+   * We usually leave in these assertions even after we are confident that the
+   * implementation is correct, since if someone later changes or extends the
+   * algorithm, these exceptions will indicate to him if he violates
+   * assumptions that are used later in the algorithm. Furthermore, it
+   * sometimes happens that an algorithm does not work in very rare corner
+   * cases. These cases will then be trapped sooner or later by the exception,
+   * so that the algorithm can then be fixed for these cases as well.
    */
   DeclException0 (ExcInternalError);
 
   /**
-   * This exception is used in functions that may not be called (i.e. in
-   * pure functions) but could not be declared pure since the class is
-   * intended to be used anyway, even though the respective function may
-   * only be called if a derived class is used.
+   * This exception is used in functions that may not be called (i.e. in pure
+   * functions) but could not be declared pure since the class is intended to
+   * be used anyway, even though the respective function may only be called if
+   * a derived class is used.
    */
   DeclException0 (ExcPureFunctionCalled);
 
   /**
-   * Used for constructors that are disabled. Examples are copy
-   * constructors and assignment operators of large objects, which are
-   * only allowed for empty objects.
+   * Used for constructors that are disabled. Examples are copy constructors
+   * and assignment operators of large objects, which are only allowed for
+   * empty objects.
    */
   DeclException0 (ExcInvalidConstructorCall);
 
@@ -683,8 +677,8 @@ namespace StandardExceptions
   DeclException0 (ExcInvalidState);
 
   /**
-   * This exception is raised if a functionality is not possible in the
-   * given dimension. Mostly used to throw function calls in 1d.
+   * This exception is raised if a functionality is not possible in the given
+   * dimension. Mostly used to throw function calls in 1d.
    *
    * The constructor takes a single <tt>int</tt>, denoting the dimension.
    */
@@ -704,19 +698,19 @@ namespace StandardExceptions
   DeclException0(ExcEmptyObject);
 
   /**
-   * This exception is raised whenever the sizes of two objects were
-   * assumed to be equal, but were not.
+   * This exception is raised whenever the sizes of two objects were assumed
+   * to be equal, but were not.
    *
-   * Parameters to the constructor are the first and second size, both of
-   * type <tt>int</tt>.
+   * Parameters to the constructor are the first and second size, both of type
+   * <tt>int</tt>.
    */
   DeclException2 (ExcDimensionMismatch,
                   std::size_t, std::size_t,
                   << "Dimension " << arg1 << " not equal to " << arg2);
 
   /**
-   * The first dimension should be either equal to the second or the
-   * third, but it is neither.
+   * The first dimension should be either equal to the second or the third,
+   * but it is neither.
    */
   DeclException3 (ExcDimensionMismatch2,
                   int, int, int,
@@ -724,15 +718,15 @@ namespace StandardExceptions
                   << " nor to " << arg3);
 
   /**
-   * This exception is one of the most often used ones, and indicates
-   * that an index is not within the expected range. For example, you
-   * might try to access an element of a vector which does not exist.
+   * This exception is one of the most often used ones, and indicates that an
+   * index is not within the expected range. For example, you might try to
+   * access an element of a vector which does not exist.
    *
    * The constructor takes three <tt>int</tt>, namely
    * <ol>
-   *   <li> the violating index
-   *   <li> the lower bound
-   *   <li> the upper bound plus one
+   * <li> the violating index
+   * <li> the lower bound
+   * <li> the upper bound plus one
    * </ol>
    */
   DeclException3 (ExcIndexRange,
@@ -741,8 +735,8 @@ namespace StandardExceptions
                   << arg3 << "[");
 
   /**
-   * This generic exception will allow(enforce) the user to specify
-   * the type of indices which adds type safety to the program.
+   * This generic exception will allow(enforce) the user to specify the type
+   * of indices which adds type safety to the program.
    */
   template<typename T>
   DeclException3 (ExcIndexRangeType,
@@ -768,8 +762,8 @@ namespace StandardExceptions
                   << arg2);
 
   /**
-   * This exception indicates that the first argument should be an
-   * integer multiple of the second, but is not.
+   * This exception indicates that the first argument should be an integer
+   * multiple of the second, but is not.
    */
   DeclException2 (ExcNotMultiple,
                   int, int,
@@ -777,34 +771,33 @@ namespace StandardExceptions
                   << " has remainder different from zero");
 
   /**
-   * This exception is thrown if the iterator you access has corrupted
-   * data. It might for instance be, that the container it refers does
-   * not have an entry at the point the iterator refers.
+   * This exception is thrown if the iterator you access has corrupted data.
+   * It might for instance be, that the container it refers does not have an
+   * entry at the point the iterator refers.
    *
    * Typically, this will be an internal error of deal.II, because the
-   * increment and decrement operators should never yield an invalid
-   * iterator.
+   * increment and decrement operators should never yield an invalid iterator.
    */
   DeclException0 (ExcInvalidIterator);
 
   /**
-   * This exception is thrown if the iterator you incremented or
-   * decremented was already at its final state.
+   * This exception is thrown if the iterator you incremented or decremented
+   * was already at its final state.
    */
   DeclException0 (ExcIteratorPastEnd);
 
   /**
-   * This exception works around a design flaw in the
-   * <tt>DeclException0</tt> macro: exceptions declared through
-   * DeclException0 do not allow one to specify a message that is displayed
-   * when the exception is raised, as opposed to the other exceptions which
-   * allow to show a text along with the given parameters.
+   * This exception works around a design flaw in the <tt>DeclException0</tt>
+   * macro: exceptions declared through DeclException0 do not allow one to
+   * specify a message that is displayed when the exception is raised, as
+   * opposed to the other exceptions which allow to show a text along with the
+   * given parameters.
    *
    * When throwing this exception, you can give a message as a
-   * <tt>std::string</tt> as argument to the exception that is then
-   * displayed. The argument can, of course, be constructed at run-time,
-   * for example including the name of a file that can't be opened, or
-   * any other text you may want to assemble from different pieces.
+   * <tt>std::string</tt> as argument to the exception that is then displayed.
+   * The argument can, of course, be constructed at run-time, for example
+   * including the name of a file that can't be opened, or any other text you
+   * may want to assemble from different pieces.
    */
   DeclException1 (ExcMessage,
                   std::string,
@@ -816,11 +809,11 @@ namespace StandardExceptions
   DeclException0 (ExcGhostsPresent);
 
   /**
-   * Some of our numerical classes allow for setting alll entries to
-   * zero using the assignment operator <tt>=</tt>.
+   * Some of our numerical classes allow for setting alll entries to zero
+   * using the assignment operator <tt>=</tt>.
    *
-   * In many cases, this assignment operator makes sense <b>only</b>
-   * for the argument zero. In other cases, this exception is thrown.
+   * In many cases, this assignment operator makes sense <b>only</b> for the
+   * argument zero. In other cases, this exception is thrown.
    */
   DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
 
@@ -848,8 +841,8 @@ namespace StandardExceptions
  * Special assertion for dimension mismatch.
  *
  * Since this is used very often and always repeats the arguments, we
- * introduce this special assertion for ExcDimensionMismatch in order
- * to keep the user codes shorter.
+ * introduce this special assertion for ExcDimensionMismatch in order to keep
+ * the user codes shorter.
  *
  * @ingroup Exceptions
  * @author Guido Kanschat 2007
@@ -859,9 +852,8 @@ namespace StandardExceptions
 
 
 /**
- * Special assertion, testing whether <tt>vec</tt> has size
- * <tt>dim1</tt>, and each entry of the vector has the
- * size <tt>dim2</tt>
+ * Special assertion, testing whether <tt>vec</tt> has size <tt>dim1</tt>, and
+ * each entry of the vector has the size <tt>dim2</tt>
  *
  * @ingroup Exceptions
  * @author Guido Kanschat 2010
@@ -874,12 +866,12 @@ namespace StandardExceptions
  * Special assertion for index range of nonnegative indices.
  *
  * Since this is used very often and always repeats the arguments, we
- * introduce this special assertion for ExcIndexRange in order
- * to keep the user codes shorter.
+ * introduce this special assertion for ExcIndexRange in order to keep the
+ * user codes shorter.
  *
- * Called wit arguments <tt>index</tt> and <tt>range</tt> it asserts
- * that <tt>index&lt;range</tt> and throws
- * ExcIndexRange(index,0,range) if it fails.
+ * Called wit arguments <tt>index</tt> and <tt>range</tt> it asserts that
+ * <tt>index&lt;range</tt> and throws ExcIndexRange(index,0,range) if it
+ * fails.
  *
  * @ingroup Exceptions
  * @author Guido Kanschat 2007

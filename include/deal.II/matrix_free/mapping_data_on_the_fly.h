@@ -60,8 +60,9 @@ namespace internal
     public:
       /**
        * Constructor, similar to FEValues. Since this class only evaluates the
-       * geometry, no finite element has to be specified and the simplest element,
-       * FE_Nothing, is used internally for the underlying FEValues object.
+       * geometry, no finite element has to be specified and the simplest
+       * element, FE_Nothing, is used internally for the underlying FEValues
+       * object.
        */
       MappingDataOnTheFly (const Mapping<dim> &mapping,
                            const Quadrature<1> &quadrature,
@@ -91,16 +92,16 @@ namespace internal
 
       /**
        * Return a reference to the underlying FEValues object that evaluates
-       * certain quantities (only mapping-related ones like Jacobians or mapped
-       * quadrature points are accessible, as no finite element data is actually
-       * used).
+       * certain quantities (only mapping-related ones like Jacobians or
+       * mapped quadrature points are accessible, as no finite element data is
+       * actually used).
        */
       const FEValues<dim> &get_fe_values () const;
 
       /**
-       * Return a vector of inverse transpose Jacobians. For compatibility with
-       * FEEvaluation, it returns tensors of vectorized arrays, even though all
-       * components are equal.
+       * Return a vector of inverse transpose Jacobians. For compatibility
+       * with FEEvaluation, it returns tensors of vectorized arrays, even
+       * though all components are equal.
        */
       const AlignedVector<Tensor<2,dim,VectorizedArray<Number> > > &
       get_inverse_jacobians() const;
@@ -114,17 +115,17 @@ namespace internal
       get_JxW_values() const;
 
       /**
-       * Return a vector of quadrature points in real space on the given
-       * cell. For compatibility with FEEvaluation, it returns tensors of
-       * vectorized arrays, even though all components are equal.
+       * Return a vector of quadrature points in real space on the given cell.
+       * For compatibility with FEEvaluation, it returns tensors of vectorized
+       * arrays, even though all components are equal.
        */
       const AlignedVector<Point<dim,VectorizedArray<Number> > > &
       get_quadrature_points() const;
 
       /**
-       * Return a vector of quadrature points in real space on the given
-       * cell. For compatibility with FEEvaluation, it returns tensors of
-       * vectorized arrays, even though all components are equal.
+       * Return a vector of quadrature points in real space on the given cell.
+       * For compatibility with FEEvaluation, it returns tensors of vectorized
+       * arrays, even though all components are equal.
        */
       const AlignedVector<Tensor<1,dim,VectorizedArray<Number> > > &
       get_normal_vectors() const;

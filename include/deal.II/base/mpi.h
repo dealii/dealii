@@ -281,41 +281,42 @@ namespace Utilities
                         char ** &argv) /*DEAL_II_DEPRECATED*/;
 
       /**
-       * Initialize MPI (and, if deal.II was configured to use it, PETSc)
-       * and set the number of threads used by deal.II (via the underlying
+       * Initialize MPI (and, if deal.II was configured to use it, PETSc) and
+       * set the number of threads used by deal.II (via the underlying
        * Threading Building Blocks library) to the given parameter.
        *
-       * @param[in,out] argc A reference to the 'argc' argument passed to main. This
-       *   argument is used to initialize MPI (and, possibly, PETSc) as they
-       *   read arguments from the command line.
-       * @param[in,out] argv A reference to the 'argv' argument passed to main.
-       * @param[in] max_num_threads The maximal number of threads this MPI process
-       *   should utilize. If this argument is set to
-       *   numbers::invalid_unsigned_int, the number of threads is determined by
-       *   automatically in the following way: the number of
-       *   threads to run on this MPI process is set in such a way that all of
-       *   the cores in your node are spoken for. In other words, if you
-       *   have started one MPI process per node, setting this argument is
-       *   equivalent to setting it to the number of cores present in the node
-       *   this MPI process runs on. If you have started as many MPI
-       *   processes per node as there are cores on each node, then
-       *   this is equivalent to passing 1 as the argument. On the
-       *   other hand, if, for example, you start 4 MPI processes
-       *   on each 16-core node, then this option will start 4 worker
-       *   threads for each node. If you start 3 processes on an 8 core
-       *   node, then they will start 3, 3 and 2 threads, respectively.
+       * @param[in,out] argc A reference to the 'argc' argument passed to
+       * main. This argument is used to initialize MPI (and, possibly, PETSc)
+       * as they read arguments from the command line.
+       * @param[in,out] argv A reference to the 'argv' argument passed to
+       * main.
+       * @param[in] max_num_threads The maximal number of threads this MPI
+       * process should utilize. If this argument is set to
+       * numbers::invalid_unsigned_int, the number of threads is determined by
+       * automatically in the following way: the number of threads to run on
+       * this MPI process is set in such a way that all of the cores in your
+       * node are spoken for. In other words, if you have started one MPI
+       * process per node, setting this argument is equivalent to setting it
+       * to the number of cores present in the node this MPI process runs on.
+       * If you have started as many MPI processes per node as there are cores
+       * on each node, then this is equivalent to passing 1 as the argument.
+       * On the other hand, if, for example, you start 4 MPI processes on each
+       * 16-core node, then this option will start 4 worker threads for each
+       * node. If you start 3 processes on an 8 core node, then they will
+       * start 3, 3 and 2 threads, respectively.
        *
-       * @note This function calls MultithreadInfo::set_thread_limit()
-       * with either @p max_num_threads or, following the discussion above, a
-       * number of threads equal to the number of cores allocated to this
-       * MPI process. However, MultithreadInfo::set_thread_limit() in turn also
-       * evaluates the environment variable DEAL_II_NUM_THREADS. Finally, the worker
-       * threads can only be created on cores to which the current MPI process has
-       * access to; some MPI implementations limit the number of cores each process
-       * has access to to one or a subset of cores in order to ensure better cache
-       * behavior. Consequently, the number of threads that will really be created
-       * will be the minimum of the argument passed here, the environment variable
-       * (if set), and the number of cores accessible to the thread.
+       * @note This function calls MultithreadInfo::set_thread_limit() with
+       * either @p max_num_threads or, following the discussion above, a
+       * number of threads equal to the number of cores allocated to this MPI
+       * process. However, MultithreadInfo::set_thread_limit() in turn also
+       * evaluates the environment variable DEAL_II_NUM_THREADS. Finally, the
+       * worker threads can only be created on cores to which the current MPI
+       * process has access to; some MPI implementations limit the number of
+       * cores each process has access to to one or a subset of cores in order
+       * to ensure better cache behavior. Consequently, the number of threads
+       * that will really be created will be the minimum of the argument
+       * passed here, the environment variable (if set), and the number of
+       * cores accessible to the thread.
        */
       MPI_InitFinalize (int    &argc,
                         char ** &argv,

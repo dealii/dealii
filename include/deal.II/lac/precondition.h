@@ -49,23 +49,22 @@ namespace parallel
 
 
 /**
- * No preconditioning.  This class helps you, if you want to use a
- * linear solver without preconditioning. All solvers in LAC require a
- * preconditioner. Therefore, you must use the identity provided here
- * to avoid preconditioning. It can be used in the following way:
+ * No preconditioning.  This class helps you, if you want to use a linear
+ * solver without preconditioning. All solvers in LAC require a
+ * preconditioner. Therefore, you must use the identity provided here to avoid
+ * preconditioning. It can be used in the following way:
  *
- @code
-  SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              cg (solver_control);
-  cg.solve (system_matrix, solution, system_rhs,
-            PreconditionIdentity());
- @endcode
+ * @code
+ * SolverControl           solver_control (1000, 1e-12);
+ * SolverCG<>              cg (solver_control);
+ * cg.solve (system_matrix, solution, system_rhs,
+ *          PreconditionIdentity());
+ * @endcode
  *
- * See the step-3 tutorial program for an example and
- * additional explanations.
+ * See the step-3 tutorial program for an example and additional explanations.
  *
- * Alternatively, the IdentityMatrix class can be used to precondition
- * in this way.
+ * Alternatively, the IdentityMatrix class can be used to precondition in this
+ * way.
  *
  * @author Guido Kanschat, 1999
  */
@@ -128,14 +127,14 @@ public:
 
 
 /**
- * Preconditioning with Richardson's method. This preconditioner just
- * scales the vector with a constant relaxation factor provided by the
- * AdditionalData object.
+ * Preconditioning with Richardson's method. This preconditioner just scales
+ * the vector with a constant relaxation factor provided by the AdditionalData
+ * object.
  *
- * In Krylov-space methods, this preconditioner should not have any
- * effect. Using SolverRichardson, the two relaxation parameters will
- * be just multiplied. Still, this class is useful in multigrid
- * smoother objects (MGSmootherRelaxation).
+ * In Krylov-space methods, this preconditioner should not have any effect.
+ * Using SolverRichardson, the two relaxation parameters will be just
+ * multiplied. Still, this class is useful in multigrid smoother objects
+ * (MGSmootherRelaxation).
  *
  * @author Guido Kanschat, 2005
  */
@@ -223,15 +222,15 @@ private:
  * Preconditioner using a matrix-builtin function.  This class forms a
  * preconditioner suitable for the LAC solver classes. Since many
  * preconditioning methods are based on matrix entries, these have to be
- * implemented as member functions of the underlying matrix
- * implementation. This class now is intended to allow easy access to these
- * member functions from LAC solver classes.
+ * implemented as member functions of the underlying matrix implementation.
+ * This class now is intended to allow easy access to these member functions
+ * from LAC solver classes.
  *
- * It seems that all builtin preconditioners have a relaxation
- * parameter, so please use PreconditionRelaxation for these.
+ * It seems that all builtin preconditioners have a relaxation parameter, so
+ * please use PreconditionRelaxation for these.
  *
- * You will usually not want to create a named object of this type,
- * although possible. The most common use is like this:
+ * You will usually not want to create a named object of this type, although
+ * possible. The most common use is like this:
  * @code
  *    SolverGMRES<SparseMatrix<double>,
  *                Vector<double> >      gmres(control,memory,500);
@@ -240,16 +239,16 @@ private:
  *                 PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >
  *                 (matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
- * This creates an unnamed object to be passed as the fourth parameter to
- * the solver function of the SolverGMRES class. It assumes that the
- * SparseMatrix class has a function <tt>precondition_Jacobi</tt> taking two
- * vectors (source and destination) as parameters (Actually, there is no
- * function like that, the existing function takes a third parameter,
- * denoting the relaxation parameter; this example is therefore only meant to
- * illustrate the general idea).
+ * This creates an unnamed object to be passed as the fourth parameter to the
+ * solver function of the SolverGMRES class. It assumes that the SparseMatrix
+ * class has a function <tt>precondition_Jacobi</tt> taking two vectors
+ * (source and destination) as parameters (Actually, there is no function like
+ * that, the existing function takes a third parameter, denoting the
+ * relaxation parameter; this example is therefore only meant to illustrate
+ * the general idea).
  *
- * Note that due to the default template parameters, the above example
- * could be written shorter as follows:
+ * Note that due to the default template parameters, the above example could
+ * be written shorter as follows:
  * @code
  *    ...
  *    gmres.solve (matrix, solution, right_hand_side,
@@ -298,9 +297,9 @@ private:
 
 
 /**
- * Base class for other preconditioners.
- * Here, only some common features Jacobi, SOR and SSOR preconditioners
- * are implemented. For preconditioning, refer to derived classes.
+ * Base class for other preconditioners. Here, only some common features
+ * Jacobi, SOR and SSOR preconditioners are implemented. For preconditioning,
+ * refer to derived classes.
  *
  * @author Guido Kanschat, 2000
  */
@@ -353,9 +352,9 @@ protected:
 
 
 /**
- * Jacobi preconditioner using matrix built-in function.  The
- * <tt>MATRIX</tt> class used is required to have a function
- * <tt>precondition_Jacobi(VECTOR&, const VECTOR&, double</tt>)
+ * Jacobi preconditioner using matrix built-in function.  The <tt>MATRIX</tt>
+ * class used is required to have a function <tt>precondition_Jacobi(VECTOR&,
+ * const VECTOR&, double</tt>)
  *
  * @code
  *     // Declare related objects
@@ -412,25 +411,23 @@ public:
  * SOR preconditioner using matrix built-in function.
  *
  * Assuming the matrix <i>A = D + L + U</i> is split into its diagonal
- * <i>D</i> as well as the strict lower and upper triangles <i>L</i>
- * and <i>U</i>, then the SOR preconditioner with relaxation parameter
- * <i>r</i> is
+ * <i>D</i> as well as the strict lower and upper triangles <i>L</i> and
+ * <i>U</i>, then the SOR preconditioner with relaxation parameter <i>r</i> is
  * @f[
  *  P^{-1} = r (D+rL)^{-1}.
  * @f]
- * It is this operator <i>P<sup>-1</sup></i>, which is implemented by
- * vmult() through forward substitution. Analogously, Tvmult()
- * implements the operation of <i>r(D+rU)<sup>-1</sup></i>.
+ * It is this operator <i>P<sup>-1</sup></i>, which is implemented by vmult()
+ * through forward substitution. Analogously, Tvmult() implements the
+ * operation of <i>r(D+rU)<sup>-1</sup></i>.
  *
  * The SOR iteration itself can be directly written as
  * @f[
  *  x^{k+1} = x^k - r D^{-1} \bigl(L x^{k+1} + U x^k - b\bigr).
  * @f]
- * Using the right hand side <i>b</i> and the previous iterate
- * <i>x</i>, this is the operation implemented by step().
+ * Using the right hand side <i>b</i> and the previous iterate <i>x</i>, this
+ * is the operation implemented by step().
  *
- * The MATRIX
- * class used is required to have functions
+ * The MATRIX class used is required to have functions
  * <tt>precondition_SOR(VECTOR&, const VECTOR&, double)</tt> and
  * <tt>precondition_TSOR(VECTOR&, const VECTOR&, double)</tt>.
  *
@@ -486,9 +483,9 @@ public:
 
 
 /**
- * SSOR preconditioner using matrix built-in function.  The
- * <tt>MATRIX</tt> class used is required to have a function
- * <tt>precondition_SSOR(VECTOR&, const VECTOR&, double)</tt>
+ * SSOR preconditioner using matrix built-in function.  The <tt>MATRIX</tt>
+ * class used is required to have a function <tt>precondition_SSOR(VECTOR&,
+ * const VECTOR&, double)</tt>
  *
  * @code
  *     // Declare related objects
@@ -570,9 +567,9 @@ private:
 
 /**
  * Permuted SOR preconditioner using matrix built-in function.  The
- * <tt>MATRIX</tt> class used is required to have functions
- * <tt>PSOR(VECTOR&, const VECTOR&, double)</tt> and
- * <tt>TPSOR(VECTOR&, const VECTOR&, double)</tt>.
+ * <tt>MATRIX</tt> class used is required to have functions <tt>PSOR(VECTOR&,
+ * const VECTOR&, double)</tt> and <tt>TPSOR(VECTOR&, const VECTOR&,
+ * double)</tt>.
  *
  * @code
  *     // Declare related objects
@@ -650,25 +647,22 @@ private:
 
 
 /**
- * @deprecated This class has been superseded by IterativeInverse,
- * which is more flexible and easier to use.
+ * @deprecated This class has been superseded by IterativeInverse, which is
+ * more flexible and easier to use.
  *
- * Preconditioner using an iterative solver.  This preconditioner uses
- * a fully initialized LAC iterative solver for the approximate
- * inverse of the matrix. Naturally, this solver needs another
- * preconditionig method.
+ * Preconditioner using an iterative solver.  This preconditioner uses a fully
+ * initialized LAC iterative solver for the approximate inverse of the matrix.
+ * Naturally, this solver needs another preconditionig method.
  *
- * Usually, the use of ReductionControl is preferred over the use of
- * the basic SolverControl in defining this solver.
+ * Usually, the use of ReductionControl is preferred over the use of the basic
+ * SolverControl in defining this solver.
  *
- * Krylov space methods like SolverCG or SolverBicgstab
- * become inefficient if soution down to machine accuracy is
- * needed. This is due to the fact, that round-off errors spoil the
- * orthogonality of the vector sequences. Therefore, a nested
- * iteration of two methods is proposed: The outer method is
- * SolverRichardson, since it is robust with respect to round-of
- * errors. The inner loop is an appropriate Krylov space method, since
- * it is fast.
+ * Krylov space methods like SolverCG or SolverBicgstab become inefficient if
+ * soution down to machine accuracy is needed. This is due to the fact, that
+ * round-off errors spoil the orthogonality of the vector sequences.
+ * Therefore, a nested iteration of two methods is proposed: The outer method
+ * is SolverRichardson, since it is robust with respect to round-of errors.
+ * The inner loop is an appropriate Krylov space method, since it is fast.
  *
  * @code
  *     // Declare related objects
@@ -677,7 +671,7 @@ private:
  * Vector<double> x;
  * Vector<double> b;
  * GrowingVectorMemory<Vector<double> > mem;
-
+ *
  * ReductionControl inner_control (10, 1.e-30, 1.e-2)
  * SolverCG<Vector<double> > inner_iteration (inner_control, mem);
  * PreconditionSSOR <SparseMatrix<double> > inner_precondition;
@@ -692,11 +686,11 @@ private:
  * outer_iteration.solve (A, x, b, precondition);
  * @endcode
  *
- * Each time we call the inner loop, reduction of the residual by a
- * factor <tt>1.e-2</tt> is attempted. Since the right hand side vector of
- * the inner iteration is the residual of the outer loop, the relative
- * errors are far from machine accuracy, even if the errors of the
- * outer loop are in the range of machine accuracy.
+ * Each time we call the inner loop, reduction of the residual by a factor
+ * <tt>1.e-2</tt> is attempted. Since the right hand side vector of the inner
+ * iteration is the residual of the outer loop, the relative errors are far
+ * from machine accuracy, even if the errors of the outer loop are in the
+ * range of machine accuracy.
  *
  * @author Guido Kanschat, 1999
  */
@@ -745,13 +739,13 @@ private:
 /**
  * @deprecated Use ProductMatrix instead.
  *
- * Matrix with preconditioner.
- * Given a matrix $A$ and a preconditioner $P$, this class implements a new matrix
- * with the matrix-vector product $PA$. It needs an auxiliary vector for that.
+ * Matrix with preconditioner. Given a matrix $A$ and a preconditioner $P$,
+ * this class implements a new matrix with the matrix-vector product $PA$. It
+ * needs an auxiliary vector for that.
  *
- * By this time, this is considered a temporary object to be plugged
- * into eigenvalue solvers. Therefore, no SmartPointer is used for
- * <tt>A</tt> and <tt>P</tt>.
+ * By this time, this is considered a temporary object to be plugged into
+ * eigenvalue solvers. Therefore, no SmartPointer is used for <tt>A</tt> and
+ * <tt>P</tt>.
  *
  * @author Guido Kanschat, 2000
  */
@@ -800,13 +794,12 @@ private:
 
 
 /**
- * Preconditioning with a Chebyshev polynomial for symmetric positive
- * definite matrices. This preconditioner is similar to a Jacobi
- * preconditioner if the degree variable is set to one, otherwise some
- * higher order polynomial corrections are used. This preconditioner needs
- * access to the diagonal of the matrix its acts on and needs a respective
- * <tt>vmult</tt> implemention. However, it does not need to explicitly know
- * the matrix entries.
+ * Preconditioning with a Chebyshev polynomial for symmetric positive definite
+ * matrices. This preconditioner is similar to a Jacobi preconditioner if the
+ * degree variable is set to one, otherwise some higher order polynomial
+ * corrections are used. This preconditioner needs access to the diagonal of
+ * the matrix its acts on and needs a respective <tt>vmult</tt> implemention.
+ * However, it does not need to explicitly know the matrix entries.
  *
  * This class is useful e.g. in multigrid smoother objects, since it is
  * trivially %parallel (assuming that matrix-vector products are %parallel).

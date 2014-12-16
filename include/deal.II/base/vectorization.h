@@ -1273,53 +1273,52 @@ private:
 
 
 /**
- * This generic class defines a unified interface to a vectorized data
- * type. For general template arguments, this class simply corresponds to
- * the template argument. For example, VectorizedArray<long double> is
- * nothing else but a wrapper around <tt>long double</tt> with exactly one
- * data field of type <tt>long double</tt> and overloaded arithmetic
- * operations. This means that <tt>VectorizedArray<ComplicatedType></tt> has
- * a similar layout as ComplicatedType, provided that ComplicatedType
- * defines basic arithmetic operations. For floats and doubles, an array of
- * numbers are packed together, though. The number of elements packed
- * together depend on the computer system and compiler flags that are used
- * for compilation of deal.II. The fundamental idea of these packed data
- * types is to use one single CPU instruction to perform arithmetic
- * operations on the whole array using the processor's vector units. Most
- * computer systems by 2010 standards will use an array of two doubles and
- * four floats, respectively (this corresponds to the SSE/SSE2 data sets)
- * when compiling deal.II on 64-bit operating systems. On Intel Sandy Bridge
- * processors and newer or AMD Bulldozer processors and newer, four doubles
- * and eight floats are used when deal.II is configured e.g. using gcc with
- * --with-cpu=native or --with-cpu=corei7-avx. On compilations with AVX-512
- * support, eight doubles and sixteen floats are used.
+ * This generic class defines a unified interface to a vectorized data type.
+ * For general template arguments, this class simply corresponds to the
+ * template argument. For example, VectorizedArray<long double> is nothing
+ * else but a wrapper around <tt>long double</tt> with exactly one data field
+ * of type <tt>long double</tt> and overloaded arithmetic operations. This
+ * means that <tt>VectorizedArray<ComplicatedType></tt> has a similar layout
+ * as ComplicatedType, provided that ComplicatedType defines basic arithmetic
+ * operations. For floats and doubles, an array of numbers are packed
+ * together, though. The number of elements packed together depend on the
+ * computer system and compiler flags that are used for compilation of
+ * deal.II. The fundamental idea of these packed data types is to use one
+ * single CPU instruction to perform arithmetic operations on the whole array
+ * using the processor's vector units. Most computer systems by 2010 standards
+ * will use an array of two doubles and four floats, respectively (this
+ * corresponds to the SSE/SSE2 data sets) when compiling deal.II on 64-bit
+ * operating systems. On Intel Sandy Bridge processors and newer or AMD
+ * Bulldozer processors and newer, four doubles and eight floats are used when
+ * deal.II is configured e.g. using gcc with --with-cpu=native or --with-
+ * cpu=corei7-avx. On compilations with AVX-512 support, eight doubles and
+ * sixteen floats are used.
  *
- * This behavior of this class is made similar to the basic data types
- * double and float. The definition of a vectorized array does not
- * initialize the data field but rather leaves it undefined, as is the case
- * for double and float. However, when calling something like
- * VectorizedArray<double> a = VectorizedArray<double>(), it sets all numbers in this
- * field to zero. In other words, this class is a plain old data (POD) type
- * which has an equivalent C representation and can e.g. be safely copied
- * with std::memcpy. This POD layout is also necessary for ensuring correct
- * alignment of data with address boundaries when collected in a vector
- * (i.e., when the first element in a vector is properly aligned, all
- * subsequent elements will be correctly aligned, too).
+ * This behavior of this class is made similar to the basic data types double
+ * and float. The definition of a vectorized array does not initialize the
+ * data field but rather leaves it undefined, as is the case for double and
+ * float. However, when calling something like VectorizedArray<double> a =
+ * VectorizedArray<double>(), it sets all numbers in this field to zero. In
+ * other words, this class is a plain old data (POD) type which has an
+ * equivalent C representation and can e.g. be safely copied with std::memcpy.
+ * This POD layout is also necessary for ensuring correct alignment of data
+ * with address boundaries when collected in a vector (i.e., when the first
+ * element in a vector is properly aligned, all subsequent elements will be
+ * correctly aligned, too).
  *
  * Note that for proper functioning of this class, certain data alignment
- * rules must be respected. This is because the computer expects the
- * starting address of a VectorizedArray<double> field at specific addresses
- * in memory (usually, the address of the vectorized array should be a
- * multiple of the length of the array in bytes). Otherwise, a segmentation
- * fault or a severe loss of performance might occur. When creating a single
- * data field on the stack like <tt>VectorizedArray<double> a =
- * VectorizedArray<double>()</tt>, the compiler will take care of data
- * alignment automatically. However, when allocating a long vector of
- * VectorizedArray<double> data, one needs to respect these rules. Use the
- * class AlignedVector or data containers based on AlignedVector (such as
- * Table) for this purpose. It is a class very similar to
- * std::vector otherwise but always makes sure that data is correctly
- * aligned.
+ * rules must be respected. This is because the computer expects the starting
+ * address of a VectorizedArray<double> field at specific addresses in memory
+ * (usually, the address of the vectorized array should be a multiple of the
+ * length of the array in bytes). Otherwise, a segmentation fault or a severe
+ * loss of performance might occur. When creating a single data field on the
+ * stack like <tt>VectorizedArray<double> a = VectorizedArray<double>()</tt>,
+ * the compiler will take care of data alignment automatically. However, when
+ * allocating a long vector of VectorizedArray<double> data, one needs to
+ * respect these rules. Use the class AlignedVector or data containers based
+ * on AlignedVector (such as Table) for this purpose. It is a class very
+ * similar to std::vector otherwise but always makes sure that data is
+ * correctly aligned.
  *
  * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
  */
@@ -1934,8 +1933,8 @@ namespace std
 
 
   /**
-   * Computes the tangent of a vectorized data field. The result is returned as
-   * vectorized array in the form <tt>{tan(x[0]), tan(x[1]), ...,
+   * Computes the tangent of a vectorized data field. The result is returned
+   * as vectorized array in the form <tt>{tan(x[0]), tan(x[1]), ...,
    * tan(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -1956,8 +1955,8 @@ namespace std
 
 
   /**
-   * Computes the exponential of a vectorized data field. The result is returned
-   * as vectorized array in the form <tt>{exp(x[0]), exp(x[1]), ...,
+   * Computes the exponential of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{exp(x[0]), exp(x[1]), ...,
    * exp(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -2000,9 +1999,9 @@ namespace std
 
 
   /**
-   * Computes the square root of a vectorized data field. The result is returned
-   * as vectorized array in the form <tt>{sqrt(x[0]), sqrt(x[1]), ...,
-   * sqrt(x[n_array_elements-1])}</tt>.
+   * Computes the square root of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{sqrt(x[0]), sqrt(x[1]),
+   * ..., sqrt(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
    */

@@ -26,11 +26,10 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * A class that is used to denote a collection of iterators that can
- * be expressed in terms of a range of iterators characterized by a begin
- * and an end iterator. As is common in C++, these ranges are specified as
- * half open intervals defined by a begin iterator and a one-past-the-end
- * iterator.
+ * A class that is used to denote a collection of iterators that can be
+ * expressed in terms of a range of iterators characterized by a begin and an
+ * end iterator. As is common in C++, these ranges are specified as half open
+ * intervals defined by a begin iterator and a one-past-the-end iterator.
  *
  * The purpose of this class is so that classes such as Triangulation and
  * DoFHandler can return ranges of cell iterators using an object of the
@@ -38,35 +37,35 @@ DEAL_II_NAMESPACE_OPEN
  * object can then be used in a range-based for loop as supported by C++11,
  * see also @ref CPP11 "C++11 standard".
  *
- * For example, such a loop could look like this if the goal is to set
- * the user flag on every active cell:
+ * For example, such a loop could look like this if the goal is to set the
+ * user flag on every active cell:
  * @code
  *   Triangulation<dim> triangulation;
  *   ...
  *   for (auto cell : triangulation.active_cell_iterators())
  *     cell->set_user_flag();
  * @endcode
- * In other words, the <code>cell</code> objects are iterators, and the
- * range object returned by Triangulation::active_cell_iterators() and
- * similar functions are conceptually thought of as <i>collections of
- * iterators</i>.
+ * In other words, the <code>cell</code> objects are iterators, and the range
+ * object returned by Triangulation::active_cell_iterators() and similar
+ * functions are conceptually thought of as <i>collections of iterators</i>.
  *
- * Of course, the class may also be used to denote other iterator
- * ranges using different kinds of iterators into other containers.
+ * Of course, the class may also be used to denote other iterator ranges using
+ * different kinds of iterators into other containers.
  *
  *
  * <h3>Class design: Motivation</h3>
  *
- * Informally, the way the C++11 standard describes
- * <a href="http://en.wikipedia.org/wiki/C%2B%2B11#Range-based_for_loop">range-based
- * for loops</a> works as follows: A <i>range-based for loop</i> of the form
+ * Informally, the way the C++11 standard describes <a
+ * href="http://en.wikipedia.org/wiki/C%2B%2B11#Range-based_for_loop">range-
+ * based for loops</a> works as follows: A <i>range-based for loop</i> of the
+ * form
  * @code
  *   Container c;
  *   for (auto v : c)
  *     statement;
  * @endcode
- * where <code>c</code> is a container or collection, is equivalent to the following
- * loop:
+ * where <code>c</code> is a container or collection, is equivalent to the
+ * following loop:
  * @code
  *   Container c;
  *   for (auto tmp=c.begin(); tmp!=c.end(); ++tmp)
@@ -75,38 +74,37 @@ DEAL_II_NAMESPACE_OPEN
  *       statement;
  *     }
  * @endcode
- * In other words, the compiler introduces a temporary variable that <i>iterates</i>
- * over the elements of the container or collection, and the original variable
- * <code>v</code> that appeared in the range-based for loop represents the
- * <i>dereferenced</i> state of these iterators -- in other words, the
- * <i>elements</i> of the collection.
+ * In other words, the compiler introduces a temporary variable that
+ * <i>iterates</i> over the elements of the container or collection, and the
+ * original variable <code>v</code> that appeared in the range-based for loop
+ * represents the <i>dereferenced</i> state of these iterators -- in other
+ * words, the <i>elements</i> of the collection.
  *
- * In the context of loops over cells, we typically want to retain the fact that
- * the loop variable is an iterator, not a value. This is because in deal.II,
- * we never actually use the <i>dereferenced state</i> of a cell iterator:
- * conceptually, it would represent a cell, and technically it is implemented
- * by classes such as CellAccessor and DoFCellAccessor, but these classes are
- * never used explicitly. Consequently, what we would like is that a call
- * such as Triangulation::active_cell_iterators() returns an object that
- * represents a <i>collection of iterators</i> of the kind
- * <code>{begin, begin+1, ..., end-1}</code>. This is conveniently expressed
- * as the half open interval <code>[begin,end)</code>. The loop variable in the
- * range-based for loop would then take on each of these iterators in turn.
+ * In the context of loops over cells, we typically want to retain the fact
+ * that the loop variable is an iterator, not a value. This is because in
+ * deal.II, we never actually use the <i>dereferenced state</i> of a cell
+ * iterator: conceptually, it would represent a cell, and technically it is
+ * implemented by classes such as CellAccessor and DoFCellAccessor, but these
+ * classes are never used explicitly. Consequently, what we would like is that
+ * a call such as Triangulation::active_cell_iterators() returns an object
+ * that represents a <i>collection of iterators</i> of the kind <code>{begin,
+ * begin+1, ..., end-1}</code>. This is conveniently expressed as the half
+ * open interval <code>[begin,end)</code>. The loop variable in the range-
+ * based for loop would then take on each of these iterators in turn.
  *
  *
  * <h3>Class design: Implementation</h3>
  *
- * To represent the desired semantics as outlined above, this class
- * stores a half-open range of iterators <code>[b,e)</code> of
- * the given template type. Secondly, the class needs to provide begin()
- * and end() functions in such a way that if you <i>dereference</i> the
- * result of IteratorRange::begin(), you get the <code>b</code> iterator.
- * Furthermore, you must be able to increment the object returned by
- * IteratorRange::begin() so that <code>*(++begin()) == b+1</code>.
- * In other words, IteratorRange::begin() must return an iterator that
- * when dereferenced returns an iterator of the template type
- * <code>Iterator</code>: It is an iterator over iterators in the same
- * sense as if you had a pointer into an array of pointers.
+ * To represent the desired semantics as outlined above, this class stores a
+ * half-open range of iterators <code>[b,e)</code> of the given template type.
+ * Secondly, the class needs to provide begin() and end() functions in such a
+ * way that if you <i>dereference</i> the result of IteratorRange::begin(),
+ * you get the <code>b</code> iterator. Furthermore, you must be able to
+ * increment the object returned by IteratorRange::begin() so that
+ * <code>*(++begin()) == b+1</code>. In other words, IteratorRange::begin()
+ * must return an iterator that when dereferenced returns an iterator of the
+ * template type <code>Iterator</code>: It is an iterator over iterators in
+ * the same sense as if you had a pointer into an array of pointers.
  *
  * This is implemented in the form of the IteratorRange::IteratorOverIterators
  * class.
@@ -119,37 +117,36 @@ class IteratorRange
 {
 public:
   /**
-   * A class that implements the semantics of iterators over iterators
-   * as discussed in the design sections of the IteratorRange class.
+   * A class that implements the semantics of iterators over iterators as
+   * discussed in the design sections of the IteratorRange class.
    */
   class IteratorOverIterators : public std::iterator<std::forward_iterator_tag, Iterator,
     typename Iterator::difference_type>
   {
   public:
     /**
-     * Typedef the elements of the collection to give them a name that is
-     * more distinct.
+     * Typedef the elements of the collection to give them a name that is more
+     * distinct.
      */
     typedef Iterator BaseIterator;
 
     /**
-     * Constructor. Initialize this iterator-over-iterator in
-     * such a way that it points to the given argument.
+     * Constructor. Initialize this iterator-over-iterator in such a way that
+     * it points to the given argument.
      *
-     * @param iterator An iterator to which this object
-     *   is supposed to point.
+     * @param iterator An iterator to which this object is supposed to point.
      */
     IteratorOverIterators (const BaseIterator &iterator);
 
     /**
-     * Dereferencing operator.
-     * @return The iterator within the collection currently pointed to.
+     * Dereferencing operator. @return The iterator within the collection
+     * currently pointed to.
      */
     BaseIterator operator* () const;
 
     /**
-     * Dereferencing operator.
-     * @return The iterator within the collection currently pointed to.
+     * Dereferencing operator. @return The iterator within the collection
+     * currently pointed to.
      */
     const BaseIterator *operator-> () const;
 
@@ -168,10 +165,9 @@ public:
 
     /**
      * Comparison operator
-     * @param i_o_i Another iterator over iterators.
-     * @return Returns whether the current iterator points to a
-     *   different object than the iterator represented by the
-     *   argument.
+     * @param i_o_i Another iterator over iterators. @return Returns whether
+     * the current iterator points to a different object than the iterator
+     * represented by the argument.
      */
     bool operator != (const IteratorOverIterators &i_o_i);
 
@@ -189,9 +185,9 @@ public:
   typedef Iterator iterator;
 
   /**
-   * Default constructor. Create a range represented by two
-   * default constructed iterators. This range is likely (depending
-   * on the type of the iterators) empty.
+   * Default constructor. Create a range represented by two default
+   * constructed iterators. This range is likely (depending on the type of the
+   * iterators) empty.
    */
   IteratorRange();
 
@@ -200,7 +196,7 @@ public:
    *
    * @param[in] begin An iterator pointing to the first element of the range
    * @param[in] end   An iterator pointing past the last element represented
-   *   by this range.
+   * by this range.
    */
   IteratorRange (const iterator begin,
                  const iterator end);
@@ -211,8 +207,8 @@ public:
   IteratorOverIterators begin();
 
   /**
-   * Return the iterator pointing to the element past the last
-   * element of this range.
+   * Return the iterator pointing to the element past the last element of this
+   * range.
    */
   IteratorOverIterators end();
 

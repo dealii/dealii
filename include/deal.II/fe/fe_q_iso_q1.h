@@ -33,8 +33,8 @@ DEAL_II_NAMESPACE_OPEN
  * with @p p subdivisions in each coordinate direction. It yields an element
  * with the same number of degrees of freedom as the @p Qp elements but using
  * linear interpolation instead of higher order one. This type of element is
- * also called macro element in the literature as it really consists of several
- * smaller elements, namely <i>p</i><tt><sup>dim</sup></tt>.
+ * also called macro element in the literature as it really consists of
+ * several smaller elements, namely <i>p</i><tt><sup>dim</sup></tt>.
  *
  * The numbering of degrees of freedom is done in exactly the same way as in
  * FE_Q of degree @p p. See there for a detailed description on how degrees of
@@ -67,19 +67,18 @@ DEAL_II_NAMESPACE_OPEN
  * not higher order elements. </li>
  *
  * <li> Stokes/Navier Stokes systems as the one discussed in step-22 could be
- * solved with Q2-iso-Q1 elements for velocities instead of Q2
- * elements. Combined with Q1 pressures they give a stable mixed element
- * pair. However, they perform worse than the standard approach in most
- * situations.  </li>
+ * solved with Q2-iso-Q1 elements for velocities instead of Q2 elements.
+ * Combined with Q1 pressures they give a stable mixed element pair. However,
+ * they perform worse than the standard approach in most situations.  </li>
  *
  * <li> Preconditioning systems of FE_Q systems of higher order @p p with a
  * preconditioner based on @p Qp-iso-Q1 elements: Some preconditioners like
- * algebraic multigrid perform much better with linear elements than with higher
- * order elements because they often implicitly assume a sparse connectivity
- * between entries. Then, creating a preconditioner matrix based on these
- * elements yields the same number of degrees of freedom (and a spectrally
- * equivalent linear system), which can be combined with a (high order) system
- * matrix in an iterative solver like CG.  </li>
+ * algebraic multigrid perform much better with linear elements than with
+ * higher order elements because they often implicitly assume a sparse
+ * connectivity between entries. Then, creating a preconditioner matrix based
+ * on these elements yields the same number of degrees of freedom (and a
+ * spectrally equivalent linear system), which can be combined with a (high
+ * order) system matrix in an iterative solver like CG.  </li>
  * </ol>
  *
  * <h3>Appropriate integration</h3>

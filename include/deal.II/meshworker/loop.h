@@ -90,7 +90,8 @@ namespace MeshWorker
      */
     bool own_cells;
     /**
-     * Loop over cells not owned by this process. Defaults to <code>false</code>.
+     * Loop over cells not owned by this process. Defaults to
+     * <code>false</code>.
      */
     bool ghost_cells;
 
@@ -102,23 +103,20 @@ namespace MeshWorker
     };
 
     /**
-     * Loop over faces between a locally owned cell and a ghost cell:
-     * - never: do not assembly these faces
-     * - one: only one of the processes will assemble these faces (
-     * from the finer side or the process with the lower mpi rank)
-     * - both: both processes will assemble these faces
-     * Note that these faces are never assembled from both sides on a single
-     * process.
-     * Default is one.
+     * Loop over faces between a locally owned cell and a ghost cell: - never:
+     * do not assembly these faces - one: only one of the processes will
+     * assemble these faces ( from the finer side or the process with the
+     * lower mpi rank) - both: both processes will assemble these faces Note
+     * that these faces are never assembled from both sides on a single
+     * process. Default is one.
      */
     FaceOption faces_to_ghost;
 
     /**
-     * Loop over faces between two locally owned cells:
-     * - never: do not assemble face terms
-     * - one: assemble once (always coming from the finer side)
-     * - both: assemble each face twice (not implemented for hanging nodes!)
-     * Default is one.
+     * Loop over faces between two locally owned cells: - never: do not
+     * assemble face terms - one: assemble once (always coming from the finer
+     * side) - both: assemble each face twice (not implemented for hanging
+     * nodes!) Default is one.
      */
     FaceOption own_faces;
 
@@ -133,29 +131,27 @@ namespace MeshWorker
 
 
   /**
-   * The function called by loop() to perform the required actions on a
-   * cell and its faces. The three functions <tt>cell_worker</tt>,
+   * The function called by loop() to perform the required actions on a cell
+   * and its faces. The three functions <tt>cell_worker</tt>,
    * <tt>boundary_worker</tt> and <tt>face_worker</tt> are the same ones
-   * handed to loop(). While there we only run the loop over all cells,
-   * here, we do a single cell and, if necessary, its faces, interior
-   * and boundary.
+   * handed to loop(). While there we only run the loop over all cells, here,
+   * we do a single cell and, if necessary, its faces, interior and boundary.
    *
-   * Upon return, the DoFInfo objects in the DoFInfoBox are filled with
-   * the data computed on the cell and each of the faces. Thus, after
-   * the execution of this function, we are ready to call
-   * DoFInfoBox::assemble() to distribute the local data into global
-   * data.
+   * Upon return, the DoFInfo objects in the DoFInfoBox are filled with the
+   * data computed on the cell and each of the faces. Thus, after the
+   * execution of this function, we are ready to call DoFInfoBox::assemble()
+   * to distribute the local data into global data.
    *
    * @param cell is the cell we work on
-   * @param dof_info is the object into which local results are
-   * entered. It is expected to have been set up for the right types of
-   * data.
-   * @param info is the object containing additional data only needed
-   * for internal processing.
+   * @param dof_info is the object into which local results are entered. It is
+   * expected to have been set up for the right types of data.
+   * @param info is the object containing additional data only needed for
+   * internal processing.
    * @param cell_worker defines the local action on each cell.
    * @param boundary_worker defines the local action on boundary faces
    * @param face_worker defines the local action on interior faces.
-   * @param loop_control control structure to specify what actions should be performed.
+   * @param loop_control control structure to specify what actions should be
+   * performed.
    *
    * @ingroup MeshWorker
    * @author Guido Kanschat
@@ -356,16 +352,15 @@ namespace MeshWorker
 
 
   /**
-   * The main work function of this namespace. It is a loop over all
-   * cells in an iterator range, in which cell_action() is called for
-   * each cell. Unilaterally refined interior faces are handled
-   * automatically by the loop.
-   * Most of the work in this loop is done in cell_action(), which also
-   * receives most of the parameters of this function. See the
-   * documentation there for more details.
+   * The main work function of this namespace. It is a loop over all cells in
+   * an iterator range, in which cell_action() is called for each cell.
+   * Unilaterally refined interior faces are handled automatically by the
+   * loop. Most of the work in this loop is done in cell_action(), which also
+   * receives most of the parameters of this function. See the documentation
+   * there for more details.
    *
-   * If you don't want anything to be done on cells, interior or boundary faces
-   * to happen, simply pass the Null pointer to one of the function
+   * If you don't want anything to be done on cells, interior or boundary
+   * faces to happen, simply pass the Null pointer to one of the function
    * arguments.
    *
    * @ingroup MeshWorker
@@ -451,8 +446,8 @@ namespace MeshWorker
   }
 
   /**
-   * @deprecated The simplification in this loop is
-   * insignificant. Therefore, it is recommended to use loop() instead.
+   * @deprecated The simplification in this loop is insignificant. Therefore,
+   * it is recommended to use loop() instead.
    *
    * Simplified interface for loop() if specialized for integration.
    *
@@ -502,8 +497,8 @@ namespace MeshWorker
 
 
   /**
-   * Simplified interface for loop() if specialized for integration,
-   * using the virtual functions in LocalIntegrator.
+   * Simplified interface for loop() if specialized for integration, using the
+   * virtual functions in LocalIntegrator.
    *
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009

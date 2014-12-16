@@ -123,8 +123,7 @@ namespace Polynomials
     unsigned int n_intervals;
 
     /**
-     * Stores the index of the current polynomial in the range of
-     * intervals.
+     * Stores the index of the current polynomial in the range of intervals.
      */
     unsigned int interval;
 

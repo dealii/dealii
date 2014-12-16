@@ -33,39 +33,36 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Quasi-minimal residual method for symmetric matrices.
  *
- * The QMRS method is supposed to solve symmetric indefinite linear
- * systems with symmetric, not necessarily definite preconditioners.
- * This version of QMRS is adapted from
- * Freund/Nachtigal: Software for simplified Lanczos and QMR
- * algorithms, Appl. Num. Math. 19 (1995), pp. 319-341
+ * The QMRS method is supposed to solve symmetric indefinite linear systems
+ * with symmetric, not necessarily definite preconditioners. This version of
+ * QMRS is adapted from Freund/Nachtigal: Software for simplified Lanczos and
+ * QMR algorithms, Appl. Num. Math. 19 (1995), pp. 319-341
  *
  * This version is for right preconditioning only, since then only the
- * preconditioner is used: left preconditioning seems to require the
- * inverse.
+ * preconditioner is used: left preconditioning seems to require the inverse.
  *
- * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the Solver base class.
+ * For the requirements on matrices and vectors in order to work with this
+ * class, see the documentation of the Solver base class.
  *
- * Like all other solver classes, this class has a local structure called
- * @p AdditionalData which is used to pass additional parameters to the
- * solver, like damping parameters or the number of temporary vectors. We
- * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the @p SolverSelector and
- * other classes much easier and guarantees that these will continue to
- * work even if number or type of the additional parameters for a certain
- * solver changes.
+ * Like all other solver classes, this class has a local structure called @p
+ * AdditionalData which is used to pass additional parameters to the solver,
+ * like damping parameters or the number of temporary vectors. We use this
+ * additional structure instead of passing these values directly to the
+ * constructor because this makes the use of the @p SolverSelector and other
+ * classes much easier and guarantees that these will continue to work even if
+ * number or type of the additional parameters for a certain solver changes.
  *
- * However, since the QMRS method does not need additional data, the respective
- * structure is empty and does not offer any functionality. The constructor
- * has a default argument, so you may call it without the additional
- * parameter.
+ * However, since the QMRS method does not need additional data, the
+ * respective structure is empty and does not offer any functionality. The
+ * constructor has a default argument, so you may call it without the
+ * additional parameter.
  *
  *
  * <h3>Observing the progress of linear solver iterations</h3>
  *
- * The solve() function of this class uses the mechanism described
- * in the Solver base class to determine convergence. This mechanism
- * can also be used to observe the progress of the iteration.
+ * The solve() function of this class uses the mechanism described in the
+ * Solver base class to determine convergence. This mechanism can also be used
+ * to observe the progress of the iteration.
  *
  *
  * @author Guido Kanschat, 1999
@@ -75,33 +72,23 @@ class SolverQMRS : public Solver<VECTOR>
 {
 public:
   /**
-   * Standardized data struct to
-   * pipe additional data to the
-   * solver.
+   * Standardized data struct to pipe additional data to the solver.
    *
-   * There are two possibilities to compute
-   * the residual: one is an estimate using
-   * the computed value @p tau. The other
-   * is exact computation using another matrix
-   * vector multiplication.
+   * There are two possibilities to compute the residual: one is an estimate
+   * using the computed value @p tau. The other is exact computation using
+   * another matrix vector multiplication.
    *
-   * QMRS, is susceptible to
-   * breakdowns, so we need a
-   * parameter telling us, which
-   * numbers are considered
-   * zero. The proper breakdown
-   * criterion is very unclear, so
-   * experiments may be necessary
-   * here.
+   * QMRS, is susceptible to breakdowns, so we need a parameter telling us,
+   * which numbers are considered zero. The proper breakdown criterion is very
+   * unclear, so experiments may be necessary here.
    */
   struct AdditionalData
   {
     /**
      * Constructor.
      *
-     * The default is no exact residual
-     * computation and breakdown
-     * parameter 1e-16.
+     * The default is no exact residual computation and breakdown parameter
+     * 1e-16.
      */
     AdditionalData(bool exact_residual = false,
                    double breakdown=1.e-16) :
@@ -128,16 +115,14 @@ public:
               const AdditionalData &data=AdditionalData());
 
   /**
-   * Constructor. Use an object of
-   * type GrowingVectorMemory as
-   * a default to allocate memory.
+   * Constructor. Use an object of type GrowingVectorMemory as a default to
+   * allocate memory.
    */
   SolverQMRS (SolverControl        &cn,
               const AdditionalData &data=AdditionalData());
 
   /**
-   * Solve the linear system $Ax=b$
-   * for x.
+   * Solve the linear system $Ax=b$ for x.
    */
   template<class MATRIX, class PRECONDITIONER>
   void
@@ -147,13 +132,9 @@ public:
          const PRECONDITIONER &precondition);
 
   /**
-   * Interface for derived class.
-   * This function gets the current
-   * iteration vector, the residual
-   * and the update vector in each
-   * step. It can be used for a
-   * graphical output of the
-   * convergence history.
+   * Interface for derived class. This function gets the current iteration
+   * vector, the residual and the update vector in each step. It can be used
+   * for a graphical output of the convergence history.
    */
   virtual void print_vectors(const unsigned int step,
                              const VECTOR &x,
@@ -161,16 +142,13 @@ public:
                              const VECTOR &d) const;
 protected:
   /**
-   * Implementation of the computation of
-   * the norm of the residual.
+   * Implementation of the computation of the norm of the residual.
    */
   virtual double criterion();
 
   /**
-   * Temporary vectors, allocated through
-   * the @p VectorMemory object at the start
-   * of the actual solution process and
-   * deallocated at the end.
+   * Temporary vectors, allocated through the @p VectorMemory object at the
+   * start of the actual solution process and deallocated at the end.
    */
   VECTOR *Vv;
   VECTOR *Vp;
@@ -187,14 +165,10 @@ protected:
   const VECTOR *Vb;
 
   /**
-   * Within the iteration loop, the
-   * square of the residual vector is
-   * stored in this variable. The
-   * function @p criterion uses this
-   * variable to compute the convergence
-   * value, which in this class is the
-   * norm of the residual vector and thus
-   * the square root of the @p res2 value.
+   * Within the iteration loop, the square of the residual vector is stored in
+   * this variable. The function @p criterion uses this variable to compute
+   * the convergence value, which in this class is the norm of the residual
+   * vector and thus the square root of the @p res2 value.
    */
   double res2;
 
@@ -206,8 +180,8 @@ protected:
 private:
 
   /**
-   * A structure returned by the iterate() function representing
-   * what it found is happening during the iteration.
+   * A structure returned by the iterate() function representing what it found
+   * is happening during the iteration.
    */
   struct IterationResult
   {
@@ -220,8 +194,8 @@ private:
 
 
   /**
-   * The iteration loop itself. The function returns a structure
-   * indicating what happened in this function.
+   * The iteration loop itself. The function returns a structure indicating
+   * what happened in this function.
    */
   template<class MATRIX, class PRECONDITIONER>
   IterationResult

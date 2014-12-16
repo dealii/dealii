@@ -50,9 +50,8 @@ template <typename> class MatrixIterator;
 namespace BlockMatrixIterators
 {
   /**
-   * Base class for block matrix
-   * accessors, implementing the
-   * stepping through a matrix.
+   * Base class for block matrix accessors, implementing the stepping through
+   * a matrix.
    */
   template <class BlockMatrix>
   class AccessorBase
@@ -64,47 +63,38 @@ namespace BlockMatrixIterators
     typedef types::global_dof_index size_type;
 
     /**
-     * Typedef the value type of the
-     * matrix we point into.
+     * Typedef the value type of the matrix we point into.
      */
     typedef typename BlockMatrix::value_type value_type;
 
     /**
-     * Initialize data fields to
-     * default values.
+     * Initialize data fields to default values.
      */
     AccessorBase ();
 
     /**
-     * Block row of the
-     * element represented by
-     * this object.
+     * Block row of the element represented by this object.
      */
     unsigned int block_row() const;
 
     /**
-     * Block column of the
-     * element represented by
-     * this object.
+     * Block column of the element represented by this object.
      */
     unsigned int block_column() const;
 
   protected:
     /**
-     * Block row into which we presently
-     * point.
+     * Block row into which we presently point.
      */
     unsigned int row_block;
 
     /**
-     * Block column into which we
-     * presently point.
+     * Block column into which we presently point.
      */
     unsigned int col_block;
 
     /**
-     * Let the iterator class be a
-     * friend.
+     * Let the iterator class be a friend.
      */
     template <typename>
     friend class MatrixIterator;
@@ -113,16 +103,14 @@ namespace BlockMatrixIterators
 
 
   /**
-   * Accessor classes in
-   * block matrices.
+   * Accessor classes in block matrices.
    */
   template <class BlockMatrix, bool ConstNess>
   class Accessor;
 
 
   /**
-   * Block matrix accessor for non
-   * const matrices.
+   * Block matrix accessor for non const matrices.
    */
   template <class BlockMatrix>
   class Accessor<BlockMatrix, false>
@@ -136,50 +124,39 @@ namespace BlockMatrixIterators
     typedef types::global_dof_index size_type;
 
     /**
-     * Type of the matrix used in
-     * this accessor.
+     * Type of the matrix used in this accessor.
      */
     typedef BlockMatrix MatrixType;
 
     /**
-     * Typedef the value type of the
-     * matrix we point into.
+     * Typedef the value type of the matrix we point into.
      */
     typedef typename BlockMatrix::value_type value_type;
 
     /**
-     * Constructor. Since we use
-     * accessors only for read
-     * access, a const matrix
-     * pointer is sufficient.
+     * Constructor. Since we use accessors only for read access, a const
+     * matrix pointer is sufficient.
      *
-     * Place the iterator at the
-     * beginning of the given row of the
-     * matrix, or create the end pointer
-     * if @p row equals the total number
-     * of rows in the matrix.
+     * Place the iterator at the beginning of the given row of the matrix, or
+     * create the end pointer if @p row equals the total number of rows in the
+     * matrix.
      */
     Accessor (BlockMatrix *m,
               const size_type row,
               const size_type col);
 
     /**
-     * Row number of the element
-     * represented by this
-     * object.
+     * Row number of the element represented by this object.
      */
     size_type row() const;
 
     /**
-     * Column number of the
-     * element represented by
-     * this object.
+     * Column number of the element represented by this object.
      */
     size_type column() const;
 
     /**
-     * Value of the entry at the
-     * current position.
+     * Value of the entry at the current position.
      */
     value_type value() const;
 
@@ -195,8 +172,7 @@ namespace BlockMatrixIterators
     BlockMatrix *matrix;
 
     /**
-     * Iterator of the underlying matrix
-     * class.
+     * Iterator of the underlying matrix class.
      */
     typename BlockMatrix::BlockType::iterator base_iterator;
 
@@ -206,8 +182,7 @@ namespace BlockMatrixIterators
     void advance ();
 
     /**
-     * Compare this accessor with another
-     * one for equality.
+     * Compare this accessor with another one for equality.
      */
     bool operator == (const Accessor &a) const;
 
@@ -216,9 +191,8 @@ namespace BlockMatrixIterators
   };
 
   /**
-   * Block matrix accessor for
-   * constant matrices, implementing
-   * the stepping through a matrix.
+   * Block matrix accessor for constant matrices, implementing the stepping
+   * through a matrix.
    */
   template <class BlockMatrix>
   class Accessor<BlockMatrix, true>
@@ -232,56 +206,44 @@ namespace BlockMatrixIterators
     typedef types::global_dof_index size_type;
 
     /**
-     * Type of the matrix used in
-     * this accessor.
+     * Type of the matrix used in this accessor.
      */
     typedef const BlockMatrix MatrixType;
 
     /**
-     * Typedef the value type of the
-     * matrix we point into.
+     * Typedef the value type of the matrix we point into.
      */
     typedef typename BlockMatrix::value_type value_type;
 
     /**
-     * Constructor. Since we use
-     * accessors only for read
-     * access, a const matrix
-     * pointer is sufficient.
+     * Constructor. Since we use accessors only for read access, a const
+     * matrix pointer is sufficient.
      *
-     * Place the iterator at the
-     * beginning of the given row of the
-     * matrix, or create the end pointer
-     * if @p row equals the total number
-     * of rows in the matrix.
+     * Place the iterator at the beginning of the given row of the matrix, or
+     * create the end pointer if @p row equals the total number of rows in the
+     * matrix.
      */
     Accessor (const BlockMatrix *m,
               const size_type row,
               const size_type col);
 
     /**
-     * Initalize const accessor
-     * from non const accessor.
+     * Initalize const accessor from non const accessor.
      */
     Accessor(const Accessor<BlockMatrix, false> &);
 
     /**
-     * Row number of the element
-     * represented by this
-     * object.
+     * Row number of the element represented by this object.
      */
     size_type row() const;
 
     /**
-     * Column number of the
-     * element represented by
-     * this object.
+     * Column number of the element represented by this object.
      */
     size_type column() const;
 
     /**
-     * Value of the entry at the
-     * current position.
+     * Value of the entry at the current position.
      */
     value_type value() const;
   protected:
@@ -291,8 +253,7 @@ namespace BlockMatrixIterators
     const BlockMatrix *matrix;
 
     /**
-     * Iterator of the underlying matrix
-     * class.
+     * Iterator of the underlying matrix class.
      */
     typename BlockMatrix::BlockType::const_iterator base_iterator;
 
@@ -302,14 +263,12 @@ namespace BlockMatrixIterators
     void advance ();
 
     /**
-     * Compare this accessor with another
-     * one for equality.
+     * Compare this accessor with another one for equality.
      */
     bool operator == (const Accessor &a) const;
 
     /**
-     * Let the iterator class be a
-     * friend.
+     * Let the iterator class be a friend.
      */
     template <typename>
     friend class dealii::MatrixIterator;
@@ -328,25 +287,24 @@ namespace BlockMatrixIterators
  * blocks of this matrix is the type of the template argument, and can, for
  * example be the usual SparseMatrix or PETScWrappers::SparseMatrix.
  *
- * In addition to the usual matrix access and linear algebra
- * functions, there are functions block() which allow access to the
- * different blocks of the matrix. This may, for example, be of help
- * when you want to implement Schur complement methods, or block
- * preconditioners, where each block belongs to a specific component
- * of the equation you are presently discretizing.
+ * In addition to the usual matrix access and linear algebra functions, there
+ * are functions block() which allow access to the different blocks of the
+ * matrix. This may, for example, be of help when you want to implement Schur
+ * complement methods, or block preconditioners, where each block belongs to a
+ * specific component of the equation you are presently discretizing.
  *
- * Note that the numbers of blocks and rows are implicitly determined
- * by the sparsity pattern objects used.
+ * Note that the numbers of blocks and rows are implicitly determined by the
+ * sparsity pattern objects used.
  *
  * Objects of this type are frequently used when a system of differential
- * equations has solutions with variables that fall into different
- * classes. For example, solutions of the Stokes or Navier-Stokes equations
- * have @p dim velocity components and one pressure component. In this case,
- * it may make sense to consider the linear system of equations as a system of
- * 2x2 blocks, and one can construct preconditioners or solvers based on this
- * 2x2 block structure. This class can help you in these cases, as it allows
- * to view the matrix alternatively as one big matrix, or as a number of
- * individual blocks.
+ * equations has solutions with variables that fall into different classes.
+ * For example, solutions of the Stokes or Navier-Stokes equations have @p dim
+ * velocity components and one pressure component. In this case, it may make
+ * sense to consider the linear system of equations as a system of 2x2 blocks,
+ * and one can construct preconditioners or solvers based on this 2x2 block
+ * structure. This class can help you in these cases, as it allows to view the
+ * matrix alternatively as one big matrix, or as a number of individual
+ * blocks.
  *
  *
  * <h3>Inheriting from this class</h3>
@@ -361,14 +319,13 @@ namespace BlockMatrixIterators
  *
  *
  * Most of the functions take a vector or block vector argument. These
- * functions can, in general, only successfully be compiled if the
- * individual blocks of this matrix implement the respective functions
- * operating on the vector type in question. For example, if you have
- * a block sparse matrix over deal.II SparseMatrix objects, then you
- * will likely not be able to form the matrix-vector multiplication
- * with a block vector over PETScWrappers::SparseMatrix objects. If
- * you attempt anyway, you will likely get a number of compiler
- * errors.
+ * functions can, in general, only successfully be compiled if the individual
+ * blocks of this matrix implement the respective functions operating on the
+ * vector type in question. For example, if you have a block sparse matrix
+ * over deal.II SparseMatrix objects, then you will likely not be able to form
+ * the matrix-vector multiplication with a block vector over
+ * PETScWrappers::SparseMatrix objects. If you attempt anyway, you will likely
+ * get a number of compiler errors.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
@@ -382,14 +339,12 @@ class BlockMatrixBase : public Subscriptor
 {
 public:
   /**
-   * Typedef the type of the underlying
-   * matrix.
+   * Typedef the type of the underlying matrix.
    */
   typedef MatrixType BlockType;
 
   /**
-   * Type of matrix entries. In analogy to
-   * the STL container classes.
+   * Type of matrix entries. In analogy to the STL container classes.
    */
   typedef typename BlockType::value_type value_type;
   typedef value_type             *pointer;
@@ -418,39 +373,24 @@ public:
   ~BlockMatrixBase ();
 
   /**
-   * Copy the given matrix to this
-   * one.  The operation throws an
-   * error if the sparsity patterns
-   * of the two involved matrices
-   * do not point to the same
-   * object, since in this case the
-   * copy operation is
-   * cheaper. Since this operation
-   * is notheless not for free, we
-   * do not make it available
-   * through operator=(), since
-   * this may lead to unwanted
-   * usage, e.g. in copy arguments
-   * to functions, which should
-   * really be arguments by
-   * reference.
+   * Copy the given matrix to this one.  The operation throws an error if the
+   * sparsity patterns of the two involved matrices do not point to the same
+   * object, since in this case the copy operation is cheaper. Since this
+   * operation is notheless not for free, we do not make it available through
+   * operator=(), since this may lead to unwanted usage, e.g. in copy
+   * arguments to functions, which should really be arguments by reference.
    *
-   * The source matrix may be a
-   * matrix of arbitrary type, as
-   * long as its data type is
-   * convertible to the data type
-   * of this matrix.
+   * The source matrix may be a matrix of arbitrary type, as long as its data
+   * type is convertible to the data type of this matrix.
    *
-   * The function returns a
-   * reference to <tt>this</tt>.
+   * The function returns a reference to <tt>this</tt>.
    */
   template <class BlockMatrixType>
   BlockMatrixBase &
   copy_from (const BlockMatrixType &source);
 
   /**
-   * Access the block with the
-   * given coordinates.
+   * Access the block with the given coordinates.
    */
   BlockType &
   block (const unsigned int row,
@@ -458,86 +398,61 @@ public:
 
 
   /**
-   * Access the block with the
-   * given coordinates. Version for
-   * constant objects.
+   * Access the block with the given coordinates. Version for constant
+   * objects.
    */
   const BlockType &
   block (const unsigned int row,
          const unsigned int column) const;
 
   /**
-   * Return the dimension of the
-   * image space.  To remember: the
-   * matrix is of dimension
-   * $m \times n$.
+   * Return the dimension of the image space.  To remember: the matrix is of
+   * dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the
-   * range space.  To remember: the
-   * matrix is of dimension
-   * $m \times n$.
+   * Return the dimension of the range space.  To remember: the matrix is of
+   * dimension $m \times n$.
    */
   size_type n () const;
 
 
   /**
-   * Return the number of blocks in
-   * a column. Returns zero if no
-   * sparsity pattern is presently
-   * associated to this matrix.
+   * Return the number of blocks in a column. Returns zero if no sparsity
+   * pattern is presently associated to this matrix.
    */
   unsigned int n_block_rows () const;
 
   /**
-   * Return the number of blocks in
-   * a row. Returns zero if no
-   * sparsity pattern is presently
-   * associated to this matrix.
+   * Return the number of blocks in a row. Returns zero if no sparsity pattern
+   * is presently associated to this matrix.
    */
   unsigned int n_block_cols () const;
 
   /**
-   * Set the element <tt>(i,j)</tt>
-   * to <tt>value</tt>. Throws an
-   * error if the entry does not
-   * exist or if <tt>value</tt> is
-   * not a finite number. Still, it
-   * is allowed to store zero
-   * values in non-existent fields.
+   * Set the element <tt>(i,j)</tt> to <tt>value</tt>. Throws an error if the
+   * entry does not exist or if <tt>value</tt> is not a finite number. Still,
+   * it is allowed to store zero values in non-existent fields.
    */
   void set (const size_type i,
             const size_type j,
             const value_type value);
 
   /**
-   * Set all elements given in a
-   * FullMatrix into the sparse matrix
-   * locations given by
-   * <tt>indices</tt>. In other words,
-   * this function writes the elements
-   * in <tt>full_matrix</tt> into the
-   * calling matrix, using the
-   * local-to-global indexing specified
-   * by <tt>indices</tt> for both the
-   * rows and the columns of the
-   * matrix. This function assumes a
-   * quadratic sparse matrix and a
-   * quadratic full_matrix, the usual
-   * situation in FE calculations.
+   * Set all elements given in a FullMatrix into the sparse matrix locations
+   * given by <tt>indices</tt>. In other words, this function writes the
+   * elements in <tt>full_matrix</tt> into the calling matrix, using the
+   * local-to-global indexing specified by <tt>indices</tt> for both the rows
+   * and the columns of the matrix. This function assumes a quadratic sparse
+   * matrix and a quadratic full_matrix, the usual situation in FE
+   * calculations.
    *
-   * The optional parameter
-   * <tt>elide_zero_values</tt> can be
-   * used to specify whether zero
-   * values should be set anyway or
-   * they should be filtered away (and
-   * not change the previous content in
-   * the respective element if it
-   * exists). The default value is
-   * <tt>false</tt>, i.e., even zero
-   * values are treated.
+   * The optional parameter <tt>elide_zero_values</tt> can be used to specify
+   * whether zero values should be set anyway or they should be filtered away
+   * (and not change the previous content in the respective element if it
+   * exists). The default value is <tt>false</tt>, i.e., even zero values are
+   * treated.
    */
   template <typename number>
   void set (const std::vector<size_type> &indices,
@@ -545,11 +460,9 @@ public:
             const bool                    elide_zero_values = false);
 
   /**
-   * Same function as before, but now
-   * including the possibility to use
-   * rectangular full_matrices and
-   * different local-to-global indexing
-   * on rows and columns, respectively.
+   * Same function as before, but now including the possibility to use
+   * rectangular full_matrices and different local-to-global indexing on rows
+   * and columns, respectively.
    */
   template <typename number>
   void set (const std::vector<size_type> &row_indices,
@@ -558,22 +471,14 @@ public:
             const bool                    elide_zero_values = false);
 
   /**
-   * Set several elements in the
-   * specified row of the matrix with
-   * column indices as given by
-   * <tt>col_indices</tt> to the
-   * respective value.
+   * Set several elements in the specified row of the matrix with column
+   * indices as given by <tt>col_indices</tt> to the respective value.
    *
-   * The optional parameter
-   * <tt>elide_zero_values</tt> can be
-   * used to specify whether zero
-   * values should be set anyway or
-   * they should be filtered away (and
-   * not change the previous content in
-   * the respective element if it
-   * exists). The default value is
-   * <tt>false</tt>, i.e., even zero
-   * values are treated.
+   * The optional parameter <tt>elide_zero_values</tt> can be used to specify
+   * whether zero values should be set anyway or they should be filtered away
+   * (and not change the previous content in the respective element if it
+   * exists). The default value is <tt>false</tt>, i.e., even zero values are
+   * treated.
    */
   template <typename number>
   void set (const size_type row,
@@ -582,20 +487,13 @@ public:
             const bool                    elide_zero_values = false);
 
   /**
-   * Set several elements to values
-   * given by <tt>values</tt> in a
-   * given row in columns given by
-   * col_indices into the sparse
-   * matrix.
+   * Set several elements to values given by <tt>values</tt> in a given row in
+   * columns given by col_indices into the sparse matrix.
    *
-   * The optional parameter
-   * <tt>elide_zero_values</tt> can be
-   * used to specify whether zero
-   * values should be inserted anyway
-   * or they should be filtered
-   * away. The default value is
-   * <tt>false</tt>, i.e., even zero
-   * values are inserted/replaced.
+   * The optional parameter <tt>elide_zero_values</tt> can be used to specify
+   * whether zero values should be inserted anyway or they should be filtered
+   * away. The default value is <tt>false</tt>, i.e., even zero values are
+   * inserted/replaced.
    */
   template <typename number>
   void set (const size_type  row,
@@ -605,44 +503,27 @@ public:
             const bool       elide_zero_values = false);
 
   /**
-   * Add <tt>value</tt> to the
-   * element (<i>i,j</i>).  Throws
-   * an error if the entry does not
-   * exist or if <tt>value</tt> is
-   * not a finite number. Still, it
-   * is allowed to store zero
-   * values in non-existent fields.
+   * Add <tt>value</tt> to the element (<i>i,j</i>).  Throws an error if the
+   * entry does not exist or if <tt>value</tt> is not a finite number. Still,
+   * it is allowed to store zero values in non-existent fields.
    */
   void add (const size_type i,
             const size_type j,
             const value_type value);
 
   /**
-   * Add all elements given in a
-   * FullMatrix<double> into sparse
-   * matrix locations given by
-   * <tt>indices</tt>. In other words,
-   * this function adds the elements in
-   * <tt>full_matrix</tt> to the
-   * respective entries in calling
-   * matrix, using the local-to-global
-   * indexing specified by
-   * <tt>indices</tt> for both the rows
-   * and the columns of the
-   * matrix. This function assumes a
-   * quadratic sparse matrix and a
-   * quadratic full_matrix, the usual
-   * situation in FE calculations.
+   * Add all elements given in a FullMatrix<double> into sparse matrix
+   * locations given by <tt>indices</tt>. In other words, this function adds
+   * the elements in <tt>full_matrix</tt> to the respective entries in calling
+   * matrix, using the local-to-global indexing specified by <tt>indices</tt>
+   * for both the rows and the columns of the matrix. This function assumes a
+   * quadratic sparse matrix and a quadratic full_matrix, the usual situation
+   * in FE calculations.
    *
-   * The optional parameter
-   * <tt>elide_zero_values</tt> can be
-   * used to specify whether zero
-   * values should be added anyway or
-   * these should be filtered away and
-   * only non-zero data is added. The
-   * default value is <tt>true</tt>,
-   * i.e., zero values won't be added
-   * into the matrix.
+   * The optional parameter <tt>elide_zero_values</tt> can be used to specify
+   * whether zero values should be added anyway or these should be filtered
+   * away and only non-zero data is added. The default value is <tt>true</tt>,
+   * i.e., zero values won't be added into the matrix.
    */
   template <typename number>
   void add (const std::vector<size_type> &indices,
@@ -650,11 +531,9 @@ public:
             const bool                    elide_zero_values = true);
 
   /**
-   * Same function as before, but now
-   * including the possibility to use
-   * rectangular full_matrices and
-   * different local-to-global indexing
-   * on rows and columns, respectively.
+   * Same function as before, but now including the possibility to use
+   * rectangular full_matrices and different local-to-global indexing on rows
+   * and columns, respectively.
    */
   template <typename number>
   void add (const std::vector<size_type> &row_indices,
@@ -663,21 +542,13 @@ public:
             const bool                    elide_zero_values = true);
 
   /**
-   * Set several elements in the
-   * specified row of the matrix with
-   * column indices as given by
-   * <tt>col_indices</tt> to the
-   * respective value.
+   * Set several elements in the specified row of the matrix with column
+   * indices as given by <tt>col_indices</tt> to the respective value.
    *
-   * The optional parameter
-   * <tt>elide_zero_values</tt> can be
-   * used to specify whether zero
-   * values should be added anyway or
-   * these should be filtered away and
-   * only non-zero data is added. The
-   * default value is <tt>true</tt>,
-   * i.e., zero values won't be added
-   * into the matrix.
+   * The optional parameter <tt>elide_zero_values</tt> can be used to specify
+   * whether zero values should be added anyway or these should be filtered
+   * away and only non-zero data is added. The default value is <tt>true</tt>,
+   * i.e., zero values won't be added into the matrix.
    */
   template <typename number>
   void add (const size_type row,
@@ -686,21 +557,13 @@ public:
             const bool                    elide_zero_values = true);
 
   /**
-   * Add an array of values given by
-   * <tt>values</tt> in the given
-   * global matrix row at columns
-   * specified by col_indices in the
-   * sparse matrix.
+   * Add an array of values given by <tt>values</tt> in the given global
+   * matrix row at columns specified by col_indices in the sparse matrix.
    *
-   * The optional parameter
-   * <tt>elide_zero_values</tt> can be
-   * used to specify whether zero
-   * values should be added anyway or
-   * these should be filtered away and
-   * only non-zero data is added. The
-   * default value is <tt>true</tt>,
-   * i.e., zero values won't be added
-   * into the matrix.
+   * The optional parameter <tt>elide_zero_values</tt> can be used to specify
+   * whether zero values should be added anyway or these should be filtered
+   * away and only non-zero data is added. The default value is <tt>true</tt>,
+   * i.e., zero values won't be added into the matrix.
    */
   template <typename number>
   void add (const size_type  row,
@@ -711,81 +574,53 @@ public:
             const bool       col_indices_are_sorted = false);
 
   /**
-   * Add <tt>matrix</tt> scaled by
-   * <tt>factor</tt> to this matrix,
-   * i.e. the matrix
-   * <tt>factor*matrix</tt> is added to
-   * <tt>this</tt>. If the sparsity
-   * pattern of the calling matrix does
-   * not contain all the elements in
-   * the sparsity pattern of the input
-   * matrix, this function will throw
-   * an exception.
+   * Add <tt>matrix</tt> scaled by <tt>factor</tt> to this matrix, i.e. the
+   * matrix <tt>factor*matrix</tt> is added to <tt>this</tt>. If the sparsity
+   * pattern of the calling matrix does not contain all the elements in the
+   * sparsity pattern of the input matrix, this function will throw an
+   * exception.
    */
   void add (const value_type                   factor,
             const BlockMatrixBase<MatrixType> &matrix);
 
   /**
-   * Return the value of the entry
-   * (i,j).  This may be an
-   * expensive operation and you
-   * should always take care where
-   * to call this function.  In
-   * order to avoid abuse, this
-   * function throws an exception
-   * if the wanted element does not
-   * exist in the matrix.
+   * Return the value of the entry (i,j).  This may be an expensive operation
+   * and you should always take care where to call this function.  In order to
+   * avoid abuse, this function throws an exception if the wanted element does
+   * not exist in the matrix.
    */
   value_type operator () (const size_type i,
                           const size_type j) const;
 
   /**
-   * This function is mostly like
-   * operator()() in that it
-   * returns the value of the
-   * matrix entry <tt>(i,j)</tt>. The only
-   * difference is that if this
-   * entry does not exist in the
-   * sparsity pattern, then instead
-   * of raising an exception, zero
-   * is returned. While this may be
-   * convenient in some cases, note
-   * that it is simple to write
-   * algorithms that are slow
-   * compared to an optimal
-   * solution, since the sparsity
-   * of the matrix is not used.
+   * This function is mostly like operator()() in that it returns the value of
+   * the matrix entry <tt>(i,j)</tt>. The only difference is that if this
+   * entry does not exist in the sparsity pattern, then instead of raising an
+   * exception, zero is returned. While this may be convenient in some cases,
+   * note that it is simple to write algorithms that are slow compared to an
+   * optimal solution, since the sparsity of the matrix is not used.
    */
   value_type el (const size_type i,
                  const size_type j) const;
 
   /**
-   * Return the main diagonal element in
-   * the <i>i</i>th row. This function
-   * throws an error if the matrix is not
-   * quadratic and also if the diagonal
-   * blocks of the matrix are not
-   * quadratic.
+   * Return the main diagonal element in the <i>i</i>th row. This function
+   * throws an error if the matrix is not quadratic and also if the diagonal
+   * blocks of the matrix are not quadratic.
    *
-   * This function is considerably
-   * faster than the operator()(),
-   * since for quadratic matrices, the
-   * diagonal entry may be the
-   * first to be stored in each row
-   * and access therefore does not
-   * involve searching for the
-   * right column number.
+   * This function is considerably faster than the operator()(), since for
+   * quadratic matrices, the diagonal entry may be the first to be stored in
+   * each row and access therefore does not involve searching for the right
+   * column number.
    */
   value_type diag_element (const size_type i) const;
 
   /**
-   * Call the compress() function on all
-   * the subblocks of the matrix.
-  *
-  *
-  * See @ref GlossCompress "Compressing
-  * distributed objects" for more
-  * information.
+   * Call the compress() function on all the subblocks of the matrix.
+   *
+   *
+   * See @ref GlossCompress "Compressing distributed objects" for more
+   * information.
    */
   void compress (::dealii::VectorOperation::values operation);
 
@@ -795,72 +630,50 @@ public:
   void compress () DEAL_II_DEPRECATED;
 
   /**
-   * Multiply the entire matrix by a
-   * fixed factor.
+   * Multiply the entire matrix by a fixed factor.
    */
   BlockMatrixBase &operator *= (const value_type factor);
 
   /**
-   * Divide the entire matrix by a
-   * fixed factor.
+   * Divide the entire matrix by a fixed factor.
    */
   BlockMatrixBase &operator /= (const value_type factor);
 
   /**
-   * Adding Matrix-vector
-   * multiplication. Add $M*src$ on
-   * $dst$ with $M$ being this
-   * matrix.
+   * Adding Matrix-vector multiplication. Add $M*src$ on $dst$ with $M$ being
+   * this matrix.
    */
   template <class BlockVectorType>
   void vmult_add (BlockVectorType       &dst,
                   const BlockVectorType &src) const;
 
   /**
-   * Adding Matrix-vector
-   * multiplication. Add
-   * <i>M<sup>T</sup>src</i> to
-   * <i>dst</i> with <i>M</i> being
-   * this matrix. This function
-   * does the same as vmult_add()
-   * but takes the transposed
-   * matrix.
+   * Adding Matrix-vector multiplication. Add <i>M<sup>T</sup>src</i> to
+   * <i>dst</i> with <i>M</i> being this matrix. This function does the same
+   * as vmult_add() but takes the transposed matrix.
    */
   template <class BlockVectorType>
   void Tvmult_add (BlockVectorType       &dst,
                    const BlockVectorType &src) const;
 
   /**
-   * Return the norm of the vector
-   * <i>v</i> with respect to the
-   * norm induced by this matrix,
-   * i.e. <i>v<sup>T</sup>Mv)</i>. This
-   * is useful, e.g. in the finite
-   * element context, where the
-   * <i>L<sup>T</sup></i>-norm of a
-   * function equals the matrix
-   * norm with respect to the mass
-   * matrix of the vector
-   * representing the nodal values
-   * of the finite element
-   * function. Note that even
-   * though the function's name
-   * might suggest something
-   * different, for historic
-   * reasons not the norm but its
-   * square is returned, as defined
+   * Return the norm of the vector <i>v</i> with respect to the norm induced
+   * by this matrix, i.e. <i>v<sup>T</sup>Mv)</i>. This is useful, e.g. in the
+   * finite element context, where the <i>L<sup>T</sup></i>-norm of a function
+   * equals the matrix norm with respect to the mass matrix of the vector
+   * representing the nodal values of the finite element function. Note that
+   * even though the function's name might suggest something different, for
+   * historic reasons not the norm but its square is returned, as defined
    * above by the scalar product.
    *
-   * Obviously, the matrix needs to
-   * be square for this operation.
+   * Obviously, the matrix needs to be square for this operation.
    */
   template <class BlockVectorType>
   value_type
   matrix_norm_square (const BlockVectorType &v) const;
 
   /**
-   * Compute the matrix scalar
-   * product $\left(u,Mv\right)$.
+   * Compute the matrix scalar product $\left(u,Mv\right)$.
    */
   template <class BlockVectorType>
   value_type
@@ -868,9 +681,7 @@ public:
                          const BlockVectorType &v) const;
 
   /**
-   * Compute the residual
-   * <i>r=b-Ax</i>. Write the
-   * residual into <tt>dst</tt>.
+   * Compute the residual <i>r=b-Ax</i>. Write the residual into <tt>dst</tt>.
    */
   template <class BlockVectorType>
   value_type residual (BlockVectorType       &dst,
@@ -878,21 +689,16 @@ public:
                        const BlockVectorType &b) const;
 
   /**
-   * Print the matrix to the given
-   * stream, using the format
-   * <tt>(line,col) value</tt>, i.e. one
-   * nonzero entry of the matrix per
-   * line. The optional flag outputs the
-   * sparsity pattern in a different style
-   * according to the underlying
-   * sparsematrix type.
+   * Print the matrix to the given stream, using the format <tt>(line,col)
+   * value</tt>, i.e. one nonzero entry of the matrix per line. The optional
+   * flag outputs the sparsity pattern in a different style according to the
+   * underlying sparsematrix type.
    */
   void print (std::ostream &out,
               const bool    alternative_output = false) const;
 
   /**
-   * STL-like iterator with the
-   * first entry.
+   * STL-like iterator with the first entry.
    */
   iterator begin ();
 
@@ -902,8 +708,7 @@ public:
   iterator end ();
 
   /**
-   * STL-like iterator with the
-   * first entry of row <tt>r</tt>.
+   * STL-like iterator with the first entry of row <tt>r</tt>.
    */
   iterator begin (const size_type r);
 
@@ -912,8 +717,7 @@ public:
    */
   iterator end (const size_type r);
   /**
-   * STL-like iterator with the
-   * first entry.
+   * STL-like iterator with the first entry.
    */
   const_iterator begin () const;
 
@@ -923,8 +727,7 @@ public:
   const_iterator end () const;
 
   /**
-   * STL-like iterator with the
-   * first entry of row <tt>r</tt>.
+   * STL-like iterator with the first entry of row <tt>r</tt>.
    */
   const_iterator begin (const size_type r) const;
 
@@ -934,29 +737,26 @@ public:
   const_iterator end (const size_type r) const;
 
   /**
-   * Return a reference to the underlying
-   * BlockIndices data of the rows.
+   * Return a reference to the underlying BlockIndices data of the rows.
    */
   const BlockIndices &get_row_indices () const;
 
   /**
-   * Return a reference to the underlying
-   * BlockIndices data of the columns.
+   * Return a reference to the underlying BlockIndices data of the columns.
    */
   const BlockIndices &get_column_indices () const;
 
   /**
-   * Determine an estimate for the memory
-   * consumption (in bytes) of this
-   * object. Note that only the memory
-   * reserved on the current processor is
-   * returned in case this is called in
-   * an MPI-based program.
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object. Note that only the memory reserved on the current processor is
+   * returned in case this is called in an MPI-based program.
    */
   std::size_t memory_consumption () const;
 
-  /** @addtogroup Exceptions
-   * @{ */
+  /**
+   * @addtogroup Exceptions
+   * @{
+   */
 
   /**
    * Exception
@@ -975,22 +775,15 @@ public:
   //@}
 protected:
   /**
-   * Release all memory and return
-   * to a state just like after
-   * having called the default
-   * constructor. It also forgets
-   * the sparsity pattern it was
+   * Release all memory and return to a state just like after having called
+   * the default constructor. It also forgets the sparsity pattern it was
    * previously tied to.
    *
-   * This calls clear for all
-   * sub-matrices and then resets this
-   * object to have no blocks at all.
+   * This calls clear for all sub-matrices and then resets this object to have
+   * no blocks at all.
    *
-   * This function is protected
-   * since it may be necessary to
-   * release additional structures.
-   * A derived class can make it
-   * public again, if it is
+   * This function is protected since it may be necessary to release
+   * additional structures. A derived class can make it public again, if it is
    * sufficient.
    */
   void clear ();
@@ -1007,79 +800,48 @@ protected:
   Table<2,SmartPointer<BlockType, BlockMatrixBase<MatrixType> > > sub_objects;
 
   /**
-   * This function collects the
-   * sizes of the sub-objects and
-   * stores them in internal
-   * arrays, in order to be able to
-   * relay global indices into the
-   * matrix to indices into the
-   * subobjects. You *must* call
-   * this function each time after
-   * you have changed the size of
-   * the sub-objects.
+   * This function collects the sizes of the sub-objects and stores them in
+   * internal arrays, in order to be able to relay global indices into the
+   * matrix to indices into the subobjects. You *must* call this function each
+   * time after you have changed the size of the sub-objects.
    *
-   * Derived classes should call this
-   * function whenever the size of the
-   * sub-objects has changed and the @p
-   * X_block_indices arrays need to be
-   * updated.
+   * Derived classes should call this function whenever the size of the sub-
+   * objects has changed and the @p X_block_indices arrays need to be updated.
    *
-   * Note that this function is not public
-   * since not all derived classes need to
-   * export its interface. For example, for
-   * the usual deal.II SparseMatrix class,
-   * the sizes are implicitly determined
-   * whenever reinit() is called, and
-   * individual blocks cannot be
-   * resized. For that class, this function
-   * therefore does not have to be
-   * public. On the other hand, for the
-   * PETSc classes, there is no associated
-   * sparsity pattern object that
-   * determines the block sizes, and for
-   * these the function needs to be
-   * publicly available. These classes
-   * therefore export this function.
+   * Note that this function is not public since not all derived classes need
+   * to export its interface. For example, for the usual deal.II SparseMatrix
+   * class, the sizes are implicitly determined whenever reinit() is called,
+   * and individual blocks cannot be resized. For that class, this function
+   * therefore does not have to be public. On the other hand, for the PETSc
+   * classes, there is no associated sparsity pattern object that determines
+   * the block sizes, and for these the function needs to be publicly
+   * available. These classes therefore export this function.
    */
   void collect_sizes ();
 
   /**
-   * Matrix-vector multiplication:
-   * let $dst = M*src$ with $M$
-   * being this matrix.
+   * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
+   * matrix.
    *
-   * Due to problems with deriving template
-   * arguments between the block and
-   * non-block versions of the vmult/Tvmult
-   * functions, the actual functions are
-   * implemented in derived classes, with
-   * implementations forwarding the calls
-   * to the implementations provided here
-   * under a unique name for which template
-   * arguments can be derived by the
-   * compiler.
+   * Due to problems with deriving template arguments between the block and
+   * non-block versions of the vmult/Tvmult functions, the actual functions
+   * are implemented in derived classes, with implementations forwarding the
+   * calls to the implementations provided here under a unique name for which
+   * template arguments can be derived by the compiler.
    */
   template <class BlockVectorType>
   void vmult_block_block (BlockVectorType       &dst,
                           const BlockVectorType &src) const;
 
   /**
-   * Matrix-vector
-   * multiplication. Just like the
-   * previous function, but only
-   * applicable if the matrix has
-   * only one block column.
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block column.
    *
-   * Due to problems with deriving template
-   * arguments between the block and
-   * non-block versions of the vmult/Tvmult
-   * functions, the actual functions are
-   * implemented in derived classes, with
-   * implementations forwarding the calls
-   * to the implementations provided here
-   * under a unique name for which template
-   * arguments can be derived by the
-   * compiler.
+   * Due to problems with deriving template arguments between the block and
+   * non-block versions of the vmult/Tvmult functions, the actual functions
+   * are implemented in derived classes, with implementations forwarding the
+   * calls to the implementations provided here under a unique name for which
+   * template arguments can be derived by the compiler.
    */
   template <class BlockVectorType,
             class VectorType>
@@ -1087,22 +849,14 @@ protected:
                              const VectorType &src) const;
 
   /**
-   * Matrix-vector
-   * multiplication. Just like the
-   * previous function, but only
-   * applicable if the matrix has
-   * only one block row.
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block row.
    *
-   * Due to problems with deriving template
-   * arguments between the block and
-   * non-block versions of the vmult/Tvmult
-   * functions, the actual functions are
-   * implemented in derived classes, with
-   * implementations forwarding the calls
-   * to the implementations provided here
-   * under a unique name for which template
-   * arguments can be derived by the
-   * compiler.
+   * Due to problems with deriving template arguments between the block and
+   * non-block versions of the vmult/Tvmult functions, the actual functions
+   * are implemented in derived classes, with implementations forwarding the
+   * calls to the implementations provided here under a unique name for which
+   * template arguments can be derived by the compiler.
    */
   template <class BlockVectorType,
             class VectorType>
@@ -1110,67 +864,43 @@ protected:
                              const BlockVectorType &src) const;
 
   /**
-   * Matrix-vector
-   * multiplication. Just like the
-   * previous function, but only
-   * applicable if the matrix has
-   * only one block.
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block.
    *
-   * Due to problems with deriving template
-   * arguments between the block and
-   * non-block versions of the vmult/Tvmult
-   * functions, the actual functions are
-   * implemented in derived classes, with
-   * implementations forwarding the calls
-   * to the implementations provided here
-   * under a unique name for which template
-   * arguments can be derived by the
-   * compiler.
+   * Due to problems with deriving template arguments between the block and
+   * non-block versions of the vmult/Tvmult functions, the actual functions
+   * are implemented in derived classes, with implementations forwarding the
+   * calls to the implementations provided here under a unique name for which
+   * template arguments can be derived by the compiler.
    */
   template <class VectorType>
   void vmult_nonblock_nonblock (VectorType       &dst,
                                 const VectorType &src) const;
 
   /**
-   * Matrix-vector multiplication:
-   * let $dst = M^T*src$ with $M$
-   * being this matrix. This
-   * function does the same as
-   * vmult() but takes the
-   * transposed matrix.
+   * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
+   * matrix. This function does the same as vmult() but takes the transposed
+   * matrix.
    *
-   * Due to problems with deriving template
-   * arguments between the block and
-   * non-block versions of the vmult/Tvmult
-   * functions, the actual functions are
-   * implemented in derived classes, with
-   * implementations forwarding the calls
-   * to the implementations provided here
-   * under a unique name for which template
-   * arguments can be derived by the
-   * compiler.
+   * Due to problems with deriving template arguments between the block and
+   * non-block versions of the vmult/Tvmult functions, the actual functions
+   * are implemented in derived classes, with implementations forwarding the
+   * calls to the implementations provided here under a unique name for which
+   * template arguments can be derived by the compiler.
    */
   template <class BlockVectorType>
   void Tvmult_block_block (BlockVectorType       &dst,
                            const BlockVectorType &src) const;
 
   /**
-   * Matrix-vector
-   * multiplication. Just like the
-   * previous function, but only
-   * applicable if the matrix has
-   * only one block row.
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block row.
    *
-   * Due to problems with deriving template
-   * arguments between the block and
-   * non-block versions of the vmult/Tvmult
-   * functions, the actual functions are
-   * implemented in derived classes, with
-   * implementations forwarding the calls
-   * to the implementations provided here
-   * under a unique name for which template
-   * arguments can be derived by the
-   * compiler.
+   * Due to problems with deriving template arguments between the block and
+   * non-block versions of the vmult/Tvmult functions, the actual functions
+   * are implemented in derived classes, with implementations forwarding the
+   * calls to the implementations provided here under a unique name for which
+   * template arguments can be derived by the compiler.
    */
   template <class BlockVectorType,
             class VectorType>
@@ -1178,22 +908,14 @@ protected:
                               const VectorType &src) const;
 
   /**
-   * Matrix-vector
-   * multiplication. Just like the
-   * previous function, but only
-   * applicable if the matrix has
-   * only one block column.
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block column.
    *
-   * Due to problems with deriving template
-   * arguments between the block and
-   * non-block versions of the vmult/Tvmult
-   * functions, the actual functions are
-   * implemented in derived classes, with
-   * implementations forwarding the calls
-   * to the implementations provided here
-   * under a unique name for which template
-   * arguments can be derived by the
-   * compiler.
+   * Due to problems with deriving template arguments between the block and
+   * non-block versions of the vmult/Tvmult functions, the actual functions
+   * are implemented in derived classes, with implementations forwarding the
+   * calls to the implementations provided here under a unique name for which
+   * template arguments can be derived by the compiler.
    */
   template <class BlockVectorType,
             class VectorType>
@@ -1201,22 +923,14 @@ protected:
                               const BlockVectorType &src) const;
 
   /**
-   * Matrix-vector
-   * multiplication. Just like the
-   * previous function, but only
-   * applicable if the matrix has
-   * only one block.
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block.
    *
-   * Due to problems with deriving template
-   * arguments between the block and
-   * non-block versions of the vmult/Tvmult
-   * functions, the actual functions are
-   * implemented in derived classes, with
-   * implementations forwarding the calls
-   * to the implementations provided here
-   * under a unique name for which template
-   * arguments can be derived by the
-   * compiler.
+   * Due to problems with deriving template arguments between the block and
+   * non-block versions of the vmult/Tvmult functions, the actual functions
+   * are implemented in derived classes, with implementations forwarding the
+   * calls to the implementations provided here under a unique name for which
+   * template arguments can be derived by the compiler.
    */
   template <class VectorType>
   void Tvmult_nonblock_nonblock (VectorType       &dst,
@@ -1226,20 +940,15 @@ protected:
 protected:
 
   /**
-   * Some matrix types, in particular PETSc,
-   * need to synchronize set and add
-   * operations. This has to be done for all
-   * matrices in the BlockMatrix.
-   * This routine prepares adding of elements
-   * by notifying all blocks. Called by all
-   * internal routines before adding
-   * elements.
+   * Some matrix types, in particular PETSc, need to synchronize set and add
+   * operations. This has to be done for all matrices in the BlockMatrix. This
+   * routine prepares adding of elements by notifying all blocks. Called by
+   * all internal routines before adding elements.
    */
   void prepare_add_operation();
 
   /**
-   * Notifies all blocks to let them prepare
-   * for setting elements, see
+   * Notifies all blocks to let them prepare for setting elements, see
    * prepare_add_operation().
    */
   void prepare_set_operation();
@@ -1248,57 +957,47 @@ protected:
 private:
 
   /**
-   * A structure containing some fields used by the
-   * set() and add() functions that is used to pre-sort
-   * the input fields. Since one can reasonably expect
-   * to call set() and add() from multiple threads at once
-   * as long as the matrix indices that are touched are
-   * disjoint, these temporary data fields need to be
-   * guarded by a mutex; the structure therefore contains such
-   * a mutex as a member variable.
+   * A structure containing some fields used by the set() and add() functions
+   * that is used to pre-sort the input fields. Since one can reasonably
+   * expect to call set() and add() from multiple threads at once as long as
+   * the matrix indices that are touched are disjoint, these temporary data
+   * fields need to be guarded by a mutex; the structure therefore contains
+   * such a mutex as a member variable.
    */
   struct TemporaryData
   {
     /**
-     * Temporary vector for counting the
-     * elements written into the
-     * individual blocks when doing a
-     * collective add or set.
+     * Temporary vector for counting the elements written into the individual
+     * blocks when doing a collective add or set.
      */
     std::vector<size_type> counter_within_block;
 
     /**
-     * Temporary vector for column
-     * indices on each block when writing
-     * local to global data on each
-     * sparse matrix.
+     * Temporary vector for column indices on each block when writing local to
+     * global data on each sparse matrix.
      */
     std::vector<std::vector<size_type> > column_indices;
 
     /**
-     * Temporary vector for storing the
-     * local values (they need to be
-     * reordered when writing local to
-     * global).
+     * Temporary vector for storing the local values (they need to be
+     * reordered when writing local to global).
      */
     std::vector<std::vector<double> > column_values;
 
     /**
-     * A mutex variable used to guard access to the member
-     * variables of this structure;
+     * A mutex variable used to guard access to the member variables of this
+     * structure;
      */
     Threads::Mutex mutex;
 
     /**
-     * Copy operator. This is needed because the default copy
-     * operator of this class is deleted (since Threads::Mutex is
-     * not copyable) and hence the default copy operator of the
-     * enclosing class is also deleted.
+     * Copy operator. This is needed because the default copy operator of this
+     * class is deleted (since Threads::Mutex is not copyable) and hence the
+     * default copy operator of the enclosing class is also deleted.
      *
-     * The implementation here simply does nothing -- TemporaryData
-     * objects are just scratch objects that are resized at the
-     * beginning of their use, so there is no point actually copying
-     * anything.
+     * The implementation here simply does nothing -- TemporaryData objects
+     * are just scratch objects that are resized at the beginning of their
+     * use, so there is no point actually copying anything.
      */
     TemporaryData &operator = (const TemporaryData &)
     {
@@ -1307,18 +1006,16 @@ private:
   };
 
   /**
-   * A set of scratch arrays that can be used by the add()
-   * and set() functions that take pointers to data to
-   * pre-sort indices before use. Access from multiple threads
-   * is synchronized via the mutex variable that is part of the
-   * structure.
+   * A set of scratch arrays that can be used by the add() and set() functions
+   * that take pointers to data to pre-sort indices before use. Access from
+   * multiple threads is synchronized via the mutex variable that is part of
+   * the structure.
    */
   TemporaryData temporary_data;
 
   /**
-   * Make the iterator class a
-   * friend. We have to work around
-   * a compiler bug here again.
+   * Make the iterator class a friend. We have to work around a compiler bug
+   * here again.
    */
   template <typename, bool>
   friend class BlockMatrixIterators::Accessor;

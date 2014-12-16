@@ -39,22 +39,20 @@ namespace internal
      *
      * <h3>Information for all DoFObjects classes</h3>
      *
-     * The DoFObjects classes store the global indices of the
-     * degrees of freedom for each cell on a certain level. The global
-     * index or number of a degree of freedom is the zero-based index of
-     * the according value in the solution vector and the row and column
-     * index in the global matrix or the multigrid matrix for this
-     * level. These indices refer to the unconstrained vectors and
-     * matrices, where we have not taken account of the constraints
-     * introduced by hanging nodes.
+     * The DoFObjects classes store the global indices of the degrees of
+     * freedom for each cell on a certain level. The global index or number of
+     * a degree of freedom is the zero-based index of the according value in
+     * the solution vector and the row and column index in the global matrix
+     * or the multigrid matrix for this level. These indices refer to the
+     * unconstrained vectors and matrices, where we have not taken account of
+     * the constraints introduced by hanging nodes.
      *
-     * Since vertices are not associated with a particular level, the
-     * indices associated with vertices are not stored in the DoFObjects
-     * classes but rather in the DoFHandler::vertex_dofs array.
+     * Since vertices are not associated with a particular level, the indices
+     * associated with vertices are not stored in the DoFObjects classes but
+     * rather in the DoFHandler::vertex_dofs array.
      *
-     * The DoFObjects classes are not used directly, but objects
-     * of theses classes are included in the DoFLevel and
-     * DoFFaces classes.
+     * The DoFObjects classes are not used directly, but objects of theses
+     * classes are included in the DoFLevel and DoFFaces classes.
      *
      * @ingroup dofs
      * @author Tobias Leicht, 2006
@@ -64,38 +62,23 @@ namespace internal
     {
     public:
       /**
-       * Store the global indices of
-       * the degrees of freedom.
+       * Store the global indices of the degrees of freedom.
        */
       std::vector<types::global_dof_index> dofs;
 
     public:
       /**
-       * Set the global index of
-       * the @p local_index-th
-       * degree of freedom located
-       * on the object with number @p
-       * obj_index to the value
-       * given by the last
-       * argument. The @p
-       * dof_handler argument is
-       * used to access the finite
-       * element that is to be used
-       * to compute the location
-       * where this data is stored.
+       * Set the global index of the @p local_index-th degree of freedom
+       * located on the object with number @p obj_index to the value given by
+       * the last argument. The @p dof_handler argument is used to access the
+       * finite element that is to be used to compute the location where this
+       * data is stored.
        *
-       * The third argument, @p
-       * fe_index, must equal
-       * zero. It is otherwise
-       * unused, but we retain the
-       * argument so that we can
-       * use the same interface for
-       * non-hp and hp finite
-       * element methods, in effect
-       * making it possible to
-       * share the DoFAccessor
-       * class hierarchy between hp
-       * and non-hp classes.
+       * The third argument, @p fe_index, must equal zero. It is otherwise
+       * unused, but we retain the argument so that we can use the same
+       * interface for non-hp and hp finite element methods, in effect making
+       * it possible to share the DoFAccessor class hierarchy between hp and
+       * non-hp classes.
        */
       template <int dh_dim, int spacedim>
       void
@@ -106,29 +89,16 @@ namespace internal
                      const types::global_dof_index       global_index);
 
       /**
-       * Return the global index of
-       * the @p local_index-th
-       * degree of freedom located
-       * on the object with number @p
-       * obj_index. The @p
-       * dof_handler argument is
-       * used to access the finite
-       * element that is to be used
-       * to compute the location
-       * where this data is stored.
+       * Return the global index of the @p local_index-th degree of freedom
+       * located on the object with number @p obj_index. The @p dof_handler
+       * argument is used to access the finite element that is to be used to
+       * compute the location where this data is stored.
        *
-       * The third argument, @p
-       * fe_index, must equal
-       * zero. It is otherwise
-       * unused, but we retain the
-       * argument so that we can
-       * use the same interface for
-       * non-hp and hp finite
-       * element methods, in effect
-       * making it possible to
-       * share the DoFAccessor
-       * class hierarchy between hp
-       * and non-hp classes.
+       * The third argument, @p fe_index, must equal zero. It is otherwise
+       * unused, but we retain the argument so that we can use the same
+       * interface for non-hp and hp finite element methods, in effect making
+       * it possible to share the DoFAccessor class hierarchy between hp and
+       * non-hp classes.
        */
       template <int dh_dim, int spacedim>
       types::global_dof_index
@@ -138,11 +108,8 @@ namespace internal
                      const unsigned int       local_index) const;
 
       /**
-       * Return the value 1. The
-       * meaning of this function
-       * becomes clear by looking
-       * at what the corresponding
-       * functions in the classes
+       * Return the value 1. The meaning of this function becomes clear by
+       * looking at what the corresponding functions in the classes
        * internal::hp::DoFObjects
        */
       template <int dh_dim, int spacedim>
@@ -151,10 +118,8 @@ namespace internal
                            const types::global_dof_index       index) const;
 
       /**
-       * Similar to the function
-       * above. Assert that the
-       * given index is zero, and
-       * then return true.
+       * Similar to the function above. Assert that the given index is zero,
+       * and then return true.
        */
       template <int dh_dim, int spacedim>
       bool
@@ -163,26 +128,22 @@ namespace internal
                           const unsigned int       fe_index) const;
 
       /**
-       * Determine an estimate for the
-       * memory consumption (in bytes)
-       * of this object.
+       * Determine an estimate for the memory consumption (in bytes) of this
+       * object.
        */
       std::size_t memory_consumption () const;
 
       /**
-       * Read or write the data of this object to or
-       * from a stream for the purpose of serialization
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
        */
       template <class Archive>
       void serialize(Archive &ar,
                      const unsigned int version);
 
       /**
-       * Make the DoFHandler and
-       * MGDoFHandler classes a
-       * friend, so that they can
-       * resize arrays as
-       * necessary.
+       * Make the DoFHandler and MGDoFHandler classes a friend, so that they
+       * can resize arrays as necessary.
        */
       template <int> friend class DoFLevel;
       template <int> friend class DoFFaces;

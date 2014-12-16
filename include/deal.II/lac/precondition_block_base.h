@@ -33,20 +33,19 @@ template <typename number> class FullMatrix;
 template <typename number> class Vector;
 
 /**
- * A class storing the inverse diagonal blocks for block
- * preconditioners and block relaxation methods.
+ * A class storing the inverse diagonal blocks for block preconditioners and
+ * block relaxation methods.
  *
- * This class does the book keeping for preconditioners and relaxation
- * methods based on inverting blocks on the diagonal of a matrix.
- * It allows us to either store all diagonal blocks and their
- * inverses or the same block for each entry, and it keeps track of
- * the choice. Thus, after initializing it and filling the inverse
- * diagonal blocks correctly, a derived class can use inverse() with
- * an integer argument referring to the block number.
+ * This class does the book keeping for preconditioners and relaxation methods
+ * based on inverting blocks on the diagonal of a matrix. It allows us to
+ * either store all diagonal blocks and their inverses or the same block for
+ * each entry, and it keeps track of the choice. Thus, after initializing it
+ * and filling the inverse diagonal blocks correctly, a derived class can use
+ * inverse() with an integer argument referring to the block number.
  *
- * Additionally, it allows the storage of the original diagonal
- * blocks, not only the inverses. These are for instance used in the
- * intermediate step of the SSOR preconditioner.
+ * Additionally, it allows the storage of the original diagonal blocks, not
+ * only the inverses. These are for instance used in the intermediate step of
+ * the SSOR preconditioner.
  *
  * @author Guido Kanschat
  * @date 2010
@@ -61,33 +60,28 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Choose a method for inverting
-   * the blocks, and thus the data
-   * type for the inverses.
+   * Choose a method for inverting the blocks, and thus the data type for the
+   * inverses.
    */
   enum Inversion
   {
     /**
-     * Use the standard
-     * Gauss-Jacobi method
-     * implemented in FullMatrix::inverse().
+     * Use the standard Gauss-Jacobi method implemented in
+     * FullMatrix::inverse().
      */
     gauss_jordan,
     /**
-     * Use QR decomposition of
-     * the Householder class.
+     * Use QR decomposition of the Householder class.
      */
     householder,
     /**
-     * Use the singular value
-     * decomposition of LAPACKFullMatrix.
+     * Use the singular value decomposition of LAPACKFullMatrix.
      */
     svd
   };
 
   /**
-   * Constructor initializing
-   * default values.
+   * Constructor initializing default values.
    */
   PreconditionBlockBase(bool store_diagonals = false,
                         Inversion method = gauss_jordan);
@@ -98,62 +92,45 @@ public:
   ~PreconditionBlockBase();
 
   /**
-   * Deletes the inverse diagonal
-   * block matrices if existent hence
-   * leaves the class in the state
-   * that it had directly after
-   * calling the constructor.
+   * Deletes the inverse diagonal block matrices if existent hence leaves the
+   * class in the state that it had directly after calling the constructor.
    */
   void clear();
 
   /**
-   * Resize to this number of
-   * diagonal blocks with the given
-   * block size. If
-   * <tt>compress</tt> is true,
-   * then only one block will be
-   * stored.
+   * Resize to this number of diagonal blocks with the given block size. If
+   * <tt>compress</tt> is true, then only one block will be stored.
    */
   void reinit(unsigned int nblocks, size_type blocksize, bool compress,
               Inversion method = gauss_jordan);
 
   /**
-   * Tell the class that inverses
-   * are computed.
+   * Tell the class that inverses are computed.
    */
   void inverses_computed(bool are_they);
 
   /**
-   * Use only the inverse of the
-   * first diagonal block to save
-   * memory and computation time.
+   * Use only the inverse of the first diagonal block to save memory and
+   * computation time.
    *
-   * Possible applications:
-   * computing on a cartesian grid,
-   * all diagonal blocks are the
-   * same or all diagonal blocks
-   * are at least similar and
-   * inversion of one of them still
-   * yields a preconditioner.
+   * Possible applications: computing on a cartesian grid, all diagonal blocks
+   * are the same or all diagonal blocks are at least similar and inversion of
+   * one of them still yields a preconditioner.
    */
   void set_same_diagonal ();
 
   /**
-   * Does the matrix use only one
-   * diagonal block?
+   * Does the matrix use only one diagonal block?
    */
   bool same_diagonal () const;
 
   /**
-   * Check, whether diagonal blocks
-   * (not their inverses)
-   * should be stored.
+   * Check, whether diagonal blocks (not their inverses) should be stored.
    */
   bool store_diagonals() const;
 
   /**
-   * Return true, if inverses are
-   * ready for use.
+   * Return true, if inverses are ready for use.
    */
   bool inverses_ready () const;
 
@@ -168,107 +145,86 @@ public:
   unsigned int size() const;
 
   /**
-   * Read-only access to entries.
-   * This function is only possible
-   * if the inverse diagonal blocks
-   * are stored.
+   * Read-only access to entries. This function is only possible if the
+   * inverse diagonal blocks are stored.
    */
   number el(size_type i, size_type j) const;
 
   /**
-   * Multiply with the inverse
-   * block at position <tt>i</tt>.
+   * Multiply with the inverse block at position <tt>i</tt>.
    */
   template <typename number2>
   void inverse_vmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
-   * Multiply with the transposed inverse
-   * block at position <tt>i</tt>.
+   * Multiply with the transposed inverse block at position <tt>i</tt>.
    */
   template <typename number2>
   void inverse_Tvmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
-   * Access to the inverse diagonal
-   * blocks if Inversion is #gauss_jordan.
+   * Access to the inverse diagonal blocks if Inversion is #gauss_jordan.
    */
   FullMatrix<number> &inverse (size_type i);
 
   /**
-   * Access to the inverse diagonal
-   * blocks if Inversion is #householder.
+   * Access to the inverse diagonal blocks if Inversion is #householder.
    */
   Householder<number> &inverse_householder (size_type i);
 
   /**
-   * Access to the inverse diagonal
-   * blocks if Inversion is #householder.
+   * Access to the inverse diagonal blocks if Inversion is #householder.
    */
   LAPACKFullMatrix<number> &inverse_svd (size_type i);
 
   /**
-   * Access to the inverse diagonal
-   * blocks.
+   * Access to the inverse diagonal blocks.
    */
   const FullMatrix<number> &inverse (size_type i) const;
 
   /**
-   * Access to the inverse diagonal
-   * blocks if Inversion is #householder.
+   * Access to the inverse diagonal blocks if Inversion is #householder.
    */
   const Householder<number> &inverse_householder (size_type i) const;
 
   /**
-   * Access to the inverse diagonal
-   * blocks if Inversion is #householder.
+   * Access to the inverse diagonal blocks if Inversion is #householder.
    */
   const LAPACKFullMatrix<number> &inverse_svd (size_type i) const;
 
   /**
-   * Access to the diagonal
-   * blocks.
+   * Access to the diagonal blocks.
    */
   FullMatrix<number> &diagonal (size_type i);
 
   /**
-   * Access to the diagonal
-   * blocks.
+   * Access to the diagonal blocks.
    */
   const FullMatrix<number> &diagonal (size_type i) const;
 
   /**
-   * Print some statistics about
-   * the inverses to @p deallog. Output depends
-   * on #Inversion. It is richest
-   * for svd, where we obtain
-   * statistics on extremal
-   * singular values and condition
-   * numbers.
+   * Print some statistics about the inverses to @p deallog. Output depends on
+   * #Inversion. It is richest for svd, where we obtain statistics on extremal
+   * singular values and condition numbers.
    */
   void log_statistics () const;
 
   /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object.
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
    */
   std::size_t memory_consumption () const;
 
   /**
-   * You are trying to access a
-   * diagonal block (not its
-   * inverse), but you decided not
-   * to store the diagonal blocks.
+   * You are trying to access a diagonal block (not its inverse), but you
+   * decided not to store the diagonal blocks.
    */
   DeclException0 (ExcDiagonalsNotStored);
 
   /**
-   * You are accessing a diagonal
-   * block, assuming that it has a certain
-   * type. But, the method used for
-   * inverting the diagonal blocks
-   * does not use this type
+   * You are accessing a diagonal block, assuming that it has a certain type.
+   * But, the method used for inverting the diagonal blocks does not use this
+   * type
    */
   DeclException0 (ExcInverseNotAvailable);
 
@@ -280,51 +236,31 @@ protected:
 
 private:
   /**
-   * The number of (inverse)
-   * diagonal blocks, if only one
-   * is stored.
+   * The number of (inverse) diagonal blocks, if only one is stored.
    */
   unsigned int n_diagonal_blocks;
 
   /**
-   * Storage of the inverse
-   * matrices of the diagonal
-   * blocks matrices as
-   * <tt>FullMatrix<number></tt>
-   * matrices, if Inversion
-   * #gauss_jordan is used. Using
-   * <tt>number=float</tt> saves
-   * memory in comparison with
-   * <tt>number=double</tt>, but
-   * may introduce numerical instability.
+   * Storage of the inverse matrices of the diagonal blocks matrices as
+   * <tt>FullMatrix<number></tt> matrices, if Inversion #gauss_jordan is used.
+   * Using <tt>number=float</tt> saves memory in comparison with
+   * <tt>number=double</tt>, but may introduce numerical instability.
    */
   std::vector<FullMatrix<number> > var_inverse_full;
 
   /**
-   * Storage of the inverse
-   * matrices of the diagonal
-   * blocks matrices as
-   * <tt>Householder</tt>
-   * matrices if Inversion
-   * #householder is used. Using
-   * <tt>number=float</tt> saves
-   * memory in comparison with
-   * <tt>number=double</tt>, but
-   * may introduce numerical instability.
+   * Storage of the inverse matrices of the diagonal blocks matrices as
+   * <tt>Householder</tt> matrices if Inversion #householder is used. Using
+   * <tt>number=float</tt> saves memory in comparison with
+   * <tt>number=double</tt>, but may introduce numerical instability.
    */
   std::vector<Householder<number> > var_inverse_householder;
 
   /**
-   * Storage of the inverse
-   * matrices of the diagonal
-   * blocks matrices as
-   * <tt>LAPACKFullMatrix</tt>
-   * matrices if Inversion
-   * #svd is used. Using
-   * <tt>number=float</tt> saves
-   * memory in comparison with
-   * <tt>number=double</tt>, but
-   * may introduce numerical instability.
+   * Storage of the inverse matrices of the diagonal blocks matrices as
+   * <tt>LAPACKFullMatrix</tt> matrices if Inversion #svd is used. Using
+   * <tt>number=float</tt> saves memory in comparison with
+   * <tt>number=double</tt>, but may introduce numerical instability.
    */
   std::vector<LAPACKFullMatrix<number> > var_inverse_svd;
 
@@ -337,21 +273,18 @@ private:
 
 
   /**
-   * This is true, if the field
-   * #var_diagonal is to be used.
+   * This is true, if the field #var_diagonal is to be used.
    */
   bool var_store_diagonals;
 
   /**
-   * This is true, if only one
-   * inverse is stored.
+   * This is true, if only one inverse is stored.
    */
   bool var_same_diagonal;
 
   /**
-   * The inverse matrices are
-   * usable. Set by the parent
-   * class via inverses_computed().
+   * The inverse matrices are usable. Set by the parent class via
+   * inverses_computed().
    */
   bool var_inverses_ready;
 };

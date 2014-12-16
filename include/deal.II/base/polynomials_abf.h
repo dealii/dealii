@@ -32,19 +32,17 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This class implements the <i>H<sup>div</sup></i>-conforming,
- * vector-valued Arnold-Boffi-Falk polynomials as described in the
- * article by Arnold-Boffi-Falk:
- * Quadrilateral H(div) finite elements, SIAM J. Numer. Anal.
- * Vol.42, No.6, pp.2429-2451
+ * This class implements the <i>H<sup>div</sup></i>-conforming, vector-valued
+ * Arnold-Boffi-Falk polynomials as described in the article by Arnold-Boffi-
+ * Falk: Quadrilateral H(div) finite elements, SIAM J. Numer. Anal. Vol.42,
+ * No.6, pp.2429-2451
  *
  *
- * The ABF polynomials are constructed such that the
- * divergence is in the tensor product polynomial space
- * <i>Q<sub>k</sub></i>. Therefore, the polynomial order of each
- * component must be two orders higher in the corresponding direction,
- * yielding the polynomial spaces <i>(Q<sub>k+2,k</sub>,
- * Q<sub>k,k+2</sub>)</i> and <i>(Q<sub>k+2,k,k</sub>,
+ * The ABF polynomials are constructed such that the divergence is in the
+ * tensor product polynomial space <i>Q<sub>k</sub></i>. Therefore, the
+ * polynomial order of each component must be two orders higher in the
+ * corresponding direction, yielding the polynomial spaces
+ * <i>(Q<sub>k+2,k</sub>, Q<sub>k,k+2</sub>)</i> and <i>(Q<sub>k+2,k,k</sub>,
  * Q<sub>k,k+2,k</sub>, Q<sub>k,k,k+2</sub>)</i> in 2D and 3D, resp.
  *
  * @ingroup Polynomials
@@ -56,15 +54,12 @@ class PolynomialsABF
 {
 public:
   /**
-   * Constructor. Creates all basis
-   * functions for Raviart-Thomas polynomials
+   * Constructor. Creates all basis functions for Raviart-Thomas polynomials
    * of given degree.
    *
-   * @arg k: the degree of the
-   * Raviart-Thomas-space, which is the degree
-   * of the largest tensor product
-   * polynomial space
-   * <i>Q<sub>k</sub></i> contained.
+   * @arg k: the degree of the Raviart-Thomas-space, which is the degree of
+   * the largest tensor product polynomial space <i>Q<sub>k</sub></i>
+   * contained.
    */
   PolynomialsABF (const unsigned int k);
 
@@ -74,28 +69,16 @@ public:
   ~PolynomialsABF ();
 
   /**
-   * Computes the value and the
-   * first and second derivatives
-   * of each Raviart-Thomas
-   * polynomial at @p unit_point.
+   * Computes the value and the first and second derivatives of each Raviart-
+   * Thomas polynomial at @p unit_point.
    *
-   * The size of the vectors must
-   * either be zero or equal
-   * <tt>n()</tt>.  In the
-   * first case, the function will
-   * not compute these values.
+   * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
+   * the first case, the function will not compute these values.
    *
-   * If you need values or
-   * derivatives of all tensor
-   * product polynomials then use
-   * this function, rather than
-   * using any of the
-   * <tt>compute_value</tt>,
-   * <tt>compute_grad</tt> or
-   * <tt>compute_grad_grad</tt>
-   * functions, see below, in a
-   * loop over all tensor product
-   * polynomials.
+   * If you need values or derivatives of all tensor product polynomials then
+   * use this function, rather than using any of the <tt>compute_value</tt>,
+   * <tt>compute_grad</tt> or <tt>compute_grad_grad</tt> functions, see below,
+   * in a loop over all tensor product polynomials.
    */
   void compute (const Point<dim>            &unit_point,
                 std::vector<Tensor<1,dim> > &values,
@@ -108,54 +91,42 @@ public:
   unsigned int n () const;
 
   /**
-   * Returns the degree of the ABF
-   * space, which is two less than
-   * the highest polynomial degree.
+   * Returns the degree of the ABF space, which is two less than the highest
+   * polynomial degree.
    */
   unsigned int degree () const;
 
   /**
-   * Return the name of the space,
-   * which is <tt>ABF</tt>.
+   * Return the name of the space, which is <tt>ABF</tt>.
    */
   std::string name () const;
 
   /**
-   * Return the number of
-   * polynomials in the space
-   * <TT>RT(degree)</tt> without
-   * requiring to build an object
-   * of PolynomialsABF. This is
-   * required by the FiniteElement
-   * classes.
+   * Return the number of polynomials in the space <TT>RT(degree)</tt> without
+   * requiring to build an object of PolynomialsABF. This is required by the
+   * FiniteElement classes.
    */
   static unsigned int compute_n_pols(unsigned int degree);
 
 private:
   /**
-   * The degree of this object as
-   * given to the constructor.
+   * The degree of this object as given to the constructor.
    */
   const unsigned int my_degree;
 
   /**
-   * An object representing the
-   * polynomial space for a single
-   * component. We can re-use it by
-   * rotating the coordinates of
-   * the evaluation point.
+   * An object representing the polynomial space for a single component. We
+   * can re-use it by rotating the coordinates of the evaluation point.
    */
   AnisotropicPolynomials<dim> *polynomial_space;
 
   /**
-   * Number of Raviart-Thomas
-   * polynomials.
+   * Number of Raviart-Thomas polynomials.
    */
   unsigned int n_pols;
 
   /**
-   * A mutex that guards the
-   * following scratch arrays.
+   * A mutex that guards the following scratch arrays.
    */
   mutable Threads::Mutex mutex;
 

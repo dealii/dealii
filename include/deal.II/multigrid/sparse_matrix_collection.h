@@ -30,8 +30,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace mg
 {
   /**
-   * Handler and storage for all five SparseMatrix object involved in
-   * using multigrid with local refinement.
+   * Handler and storage for all five SparseMatrix object involved in using
+   * multigrid with local refinement.
    *
    * @author Baerbel Janssen, Guido Kanschat
    * @date 2013

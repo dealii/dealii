@@ -1584,9 +1584,9 @@ namespace internals
    * Since each thread gets its private version of scratch data out of the
    * ThreadLocalStorage, no conflicting access can occur. For this to be
    * valid, we need to make sure that no call within
-   * distribute_local_to_global is made that by itself can spawn
-   * tasks. Otherwise, we might end up in a situation where several threads
-   * fight for the data.
+   * distribute_local_to_global is made that by itself can spawn tasks.
+   * Otherwise, we might end up in a situation where several threads fight for
+   * the data.
    *
    * Access to the scratch data is only through the accessor class which
    * handles the access as well as marking the data as used.

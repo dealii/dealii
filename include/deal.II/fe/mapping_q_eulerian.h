@@ -34,32 +34,29 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * This class is an extension of the MappingQ1Eulerian
- * class to higher order Qp mappings.  It is useful
- * when one wants to calculate shape function information on
- * a domain that is deforming as the computation proceeds.
+ * This class is an extension of the MappingQ1Eulerian class to higher order
+ * Qp mappings.  It is useful when one wants to calculate shape function
+ * information on a domain that is deforming as the computation proceeds.
  *
  * <h3>Usage</h3>
  *
- * The constructor of this class takes three arguments: the polynomial
- * degree of the desire Qp mapping, a reference to
- * the vector that defines the mapping from the initial
- * configuration to the current configuration, and a reference to the
- * DoFHandler. The most common case is to use the solution
- * vector for the problem under consideration as the shift vector.
- * The key reqirement is that the number of components
- * of the given vector field be equal to (or possibly greater than) the
- * number of space dimensions. If there are more components than space
- * dimensions (for example, if one is working with a coupled problem
- * where there are additional solution variables), the
- * first <tt>dim</tt> components are assumed to represent the displacement
- * field, and the remaining components are ignored.  If this assumption
- * does not hold one may need to set up a separate DoFHandler on
+ * The constructor of this class takes three arguments: the polynomial degree
+ * of the desire Qp mapping, a reference to the vector that defines the
+ * mapping from the initial configuration to the current configuration, and a
+ * reference to the DoFHandler. The most common case is to use the solution
+ * vector for the problem under consideration as the shift vector. The key
+ * reqirement is that the number of components of the given vector field be
+ * equal to (or possibly greater than) the number of space dimensions. If
+ * there are more components than space dimensions (for example, if one is
+ * working with a coupled problem where there are additional solution
+ * variables), the first <tt>dim</tt> components are assumed to represent the
+ * displacement field, and the remaining components are ignored.  If this
+ * assumption does not hold one may need to set up a separate DoFHandler on
  * the triangulation and associate the desired shift vector to it.
  *
- * Typically, the DoFHandler operates on a finite element that
- * is constructed as a system element (FESystem) from continuous FE_Q()
- * objects. An example is shown below:
+ * Typically, the DoFHandler operates on a finite element that is constructed
+ * as a system element (FESystem) from continuous FE_Q() objects. An example
+ * is shown below:
  * @code
  *    FESystem<dim> fe(FE_Q<dim>(2), dim, FE_Q<dim>(1), 1);
  *    DoFHandler<dim> dof_handler(triangulation);
@@ -68,24 +65,24 @@ DEAL_II_NAMESPACE_OPEN
  *    MappingQEulerian<dim> q2_mapping(2,soln_vector,dof_handler);
  * @endcode
  *
- * In this example, our element consists of <tt>(dim+1)</tt> components.
- * Only the first <tt>dim</tt> components will be used, however, to define
- * the Q2 mapping.  The remaining components are ignored.
+ * In this example, our element consists of <tt>(dim+1)</tt> components. Only
+ * the first <tt>dim</tt> components will be used, however, to define the Q2
+ * mapping.  The remaining components are ignored.
  *
- * Note that it is essential to call the distribute_dofs(...) function
- * before constructing a mapping object.
+ * Note that it is essential to call the distribute_dofs(...) function before
+ * constructing a mapping object.
  *
  * Also note that since the vector of shift values and the dof handler are
- * only associated to this object at construction time, you have to
- * make sure that whenever you use this object, the given objects
- * still represent valid data.
+ * only associated to this object at construction time, you have to make sure
+ * that whenever you use this object, the given objects still represent valid
+ * data.
  *
- * To enable the use of the MappingQ1Eulerian class also in the context
- * of parallel codes using the PETSc wrapper classes, the type of
- * the vector can be specified as template parameter <tt>EulerVectorType</tt>
- * Not specifying this template argument in applications using the PETSc
- * vector classes leads to the construction of a copy of the vector
- * which is not acccessible afterwards!
+ * To enable the use of the MappingQ1Eulerian class also in the context of
+ * parallel codes using the PETSc wrapper classes, the type of the vector can
+ * be specified as template parameter <tt>EulerVectorType</tt> Not specifying
+ * this template argument in applications using the PETSc vector classes leads
+ * to the construction of a copy of the vector which is not acccessible
+ * afterwards!
  *
  * @author Joshua White, 2008
  */

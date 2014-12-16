@@ -38,15 +38,14 @@ template <int dim, int spacedim> class MappingQ;
  * This finite element implements complete polynomial spaces, that is,
  * $d$-dimensional polynomials of order $k$.
  *
- * The polynomials are not mapped. Therefore, they are constant,
- * linear, quadratic, etc. on any grid cell.
+ * The polynomials are not mapped. Therefore, they are constant, linear,
+ * quadratic, etc. on any grid cell.
  *
- * Since the polynomials are evaluated at the quadrature points of the
- * actual grid cell, no grid transfer and interpolation matrices are
- * available.
+ * Since the polynomials are evaluated at the quadrature points of the actual
+ * grid cell, no grid transfer and interpolation matrices are available.
  *
- * The purpose of this class is experimental, therefore the
- * implementation will remain incomplete.
+ * The purpose of this class is experimental, therefore the implementation
+ * will remain incomplete.
  *
  * Besides, this class is not implemented for the codimension one case
  * (<tt>spacedim != dim</tt>).
@@ -58,50 +57,32 @@ class FE_DGPNonparametric : public FiniteElement<dim,spacedim>
 {
 public:
   /**
-   * Constructor for tensor product
-   * polynomials of degree @p k.
+   * Constructor for tensor product polynomials of degree @p k.
    */
   FE_DGPNonparametric (const unsigned int k);
 
   /**
-   * Return a string that uniquely
-   * identifies a finite
-   * element. This class returns
-   * <tt>FE_DGPNonparametric<dim>(degree)</tt>,
-   * with @p dim and @p degree
-   * replaced by appropriate
-   * values.
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_DGPNonparametric<dim>(degree)</tt>, with @p dim and @p
+   * degree replaced by appropriate values.
    */
   virtual std::string get_name () const;
 
   /**
-   * Return the value of the
-   * @p ith shape function at the
-   * point @p p. See the
-   * FiniteElement base
-   * class for more information
-   * about the semantics of this
+   * Return the value of the @p ith shape function at the point @p p. See the
+   * FiniteElement base class for more information about the semantics of this
    * function.
    */
   virtual double shape_value (const unsigned int i,
                               const Point<dim> &p) const;
 
   /**
-   * Return the value of the
-   * @p componentth vector
-   * component of the @p ith shape
-   * function at the point
-   * @p p. See the
-   * FiniteElement base
-   * class for more information
-   * about the semantics of this
-   * function.
+   * Return the value of the @p componentth vector component of the @p ith
+   * shape function at the point @p p. See the FiniteElement base class for
+   * more information about the semantics of this function.
    *
-   * Since this element is scalar,
-   * the returned value is the same
-   * as if the function without the
-   * @p _component suffix were
-   * called, provided that the
+   * Since this element is scalar, the returned value is the same as if the
+   * function without the @p _component suffix were called, provided that the
    * specified component is zero.
    */
   virtual double shape_value_component (const unsigned int i,
@@ -109,33 +90,20 @@ public:
                                         const unsigned int component) const;
 
   /**
-   * Return the gradient of the
-   * @p ith shape function at the
-   * point @p p. See the
-   * FiniteElement base
-   * class for more information
-   * about the semantics of this
-   * function.
+   * Return the gradient of the @p ith shape function at the point @p p. See
+   * the FiniteElement base class for more information about the semantics of
+   * this function.
    */
   virtual Tensor<1,dim> shape_grad (const unsigned int  i,
                                     const Point<dim>   &p) const;
 
   /**
-   * Return the gradient of the
-   * @p componentth vector
-   * component of the @p ith shape
-   * function at the point
-   * @p p. See the
-   * FiniteElement base
-   * class for more information
-   * about the semantics of this
-   * function.
+   * Return the gradient of the @p componentth vector component of the @p ith
+   * shape function at the point @p p. See the FiniteElement base class for
+   * more information about the semantics of this function.
    *
-   * Since this element is scalar,
-   * the returned value is the same
-   * as if the function without the
-   * @p _component suffix were
-   * called, provided that the
+   * Since this element is scalar, the returned value is the same as if the
+   * function without the @p _component suffix were called, provided that the
    * specified component is zero.
    */
   virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
@@ -143,34 +111,20 @@ public:
                                               const unsigned int component) const;
 
   /**
-   * Return the tensor of second
-   * derivatives of the @p ith
-   * shape function at point @p p
-   * on the unit cell.  See the
-   * FiniteElement base
-   * class for more information
-   * about the semantics of this
-   * function.
+   * Return the tensor of second derivatives of the @p ith shape function at
+   * point @p p on the unit cell.  See the FiniteElement base class for more
+   * information about the semantics of this function.
    */
   virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
                                          const Point<dim> &p) const;
 
   /**
-   * Return the second derivative
-   * of the @p componentth vector
-   * component of the @p ith shape
-   * function at the point
-   * @p p. See the
-   * FiniteElement base
-   * class for more information
-   * about the semantics of this
-   * function.
+   * Return the second derivative of the @p componentth vector component of
+   * the @p ith shape function at the point @p p. See the FiniteElement base
+   * class for more information about the semantics of this function.
    *
-   * Since this element is scalar,
-   * the returned value is the same
-   * as if the function without the
-   * @p _component suffix were
-   * called, provided that the
+   * Since this element is scalar, the returned value is the same as if the
+   * function without the @p _component suffix were called, provided that the
    * specified component is zero.
    */
   virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
@@ -178,32 +132,20 @@ public:
                                                    const unsigned int component) const;
 
   /**
-   * Return the polynomial degree
-   * of this finite element,
-   * i.e. the value passed to the
-   * constructor.
+   * Return the polynomial degree of this finite element, i.e. the value
+   * passed to the constructor.
    */
   unsigned int get_degree () const;
 
   /**
-   * Return the matrix
-   * interpolating from a face of
-   * of one element to the face of
-   * the neighboring element.
-   * The size of the matrix is
-   * then <tt>source.dofs_per_face</tt> times
-   * <tt>this->dofs_per_face</tt>.
+   * Return the matrix interpolating from a face of of one element to the face
+   * of the neighboring element. The size of the matrix is then
+   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>.
    *
-   * Derived elements will have to
-   * implement this function. They
-   * may only provide interpolation
-   * matrices for certain source
-   * finite elements, for example
-   * those from the same family. If
-   * they don't implement
-   * interpolation from a given
-   * element, then they must throw
-   * an exception of type
+   * Derived elements will have to implement this function. They may only
+   * provide interpolation matrices for certain source finite elements, for
+   * example those from the same family. If they don't implement interpolation
+   * from a given element, then they must throw an exception of type
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
    */
   virtual void
@@ -211,24 +153,14 @@ public:
                                  FullMatrix<double>       &matrix) const;
 
   /**
-   * Return the matrix
-   * interpolating from a face of
-   * of one element to the face of
-   * the neighboring element.
-   * The size of the matrix is
-   * then <tt>source.dofs_per_face</tt> times
-   * <tt>this->dofs_per_face</tt>.
+   * Return the matrix interpolating from a face of of one element to the face
+   * of the neighboring element. The size of the matrix is then
+   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>.
    *
-   * Derived elements will have to
-   * implement this function. They
-   * may only provide interpolation
-   * matrices for certain source
-   * finite elements, for example
-   * those from the same family. If
-   * they don't implement
-   * interpolation from a given
-   * element, then they must throw
-   * an exception of type
+   * Derived elements will have to implement this function. They may only
+   * provide interpolation matrices for certain source finite elements, for
+   * example those from the same family. If they don't implement interpolation
+   * from a given element, then they must throw an exception of type
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
    */
   virtual void
@@ -242,76 +174,65 @@ public:
    */
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code
-   * first assigns the degrees of freedom of each of these FEs
-   * different global indices. It then calls this function to find out
-   * which of them should get identical values, and consequently can
-   * receive the same global DoF index. This function therefore
-   * returns a list of identities between DoFs of the present finite
-   * element object with the DoFs of @p fe_other, which is a reference
-   * to a finite element object representing one of the other finite
-   * elements active on this particular vertex. The function computes
-   * which of the degrees of freedom of the two finite element objects
-   * are equivalent, both numbered between zero and the corresponding
-   * value of dofs_per_vertex of the two finite elements. The first
-   * index of each pair denotes one of the vertex dofs of the present
-   * element, whereas the second is the corresponding index of the
-   * other finite element.
+   * If, on a vertex, several finite elements are active, the hp code first
+   * assigns the degrees of freedom of each of these FEs different global
+   * indices. It then calls this function to find out which of them should get
+   * identical values, and consequently can receive the same global DoF index.
+   * This function therefore returns a list of identities between DoFs of the
+   * present finite element object with the DoFs of @p fe_other, which is a
+   * reference to a finite element object representing one of the other finite
+   * elements active on this particular vertex. The function computes which of
+   * the degrees of freedom of the two finite element objects are equivalent,
+   * both numbered between zero and the corresponding value of dofs_per_vertex
+   * of the two finite elements. The first index of each pair denotes one of
+   * the vertex dofs of the present element, whereas the second is the
+   * corresponding index of the other finite element.
    *
-   * This being a discontinuous element, the set of such constraints
-   * is of course empty.
+   * This being a discontinuous element, the set of such constraints is of
+   * course empty.
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
-   * Same as hp_vertex_dof_indices(), except that the function treats
-   * degrees of freedom on lines.
+   * Same as hp_vertex_dof_indices(), except that the function treats degrees
+   * of freedom on lines.
    *
-   * This being a discontinuous element, the set of such constraints
-   * is of course empty.
+   * This being a discontinuous element, the set of such constraints is of
+   * course empty.
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
-   * Same as hp_vertex_dof_indices(), except that the function treats
-   * degrees of freedom on quads.
+   * Same as hp_vertex_dof_indices(), except that the function treats degrees
+   * of freedom on quads.
    *
-   * This being a discontinuous element, the set of such constraints
-   * is of course empty.
+   * This being a discontinuous element, the set of such constraints is of
+   * course empty.
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
-   * Return whether this element
-   * implements its hanging node
-   * constraints in the new way,
-   * which has to be used to make
-   * elements "hp compatible".
+   * Return whether this element implements its hanging node constraints in
+   * the new way, which has to be used to make elements "hp compatible".
    *
-   * For the FE_DGPNonparametric class the
-   * result is always true (independent of
-   * the degree of the element), as it has
-   * no hanging nodes (being a
+   * For the FE_DGPNonparametric class the result is always true (independent
+   * of the degree of the element), as it has no hanging nodes (being a
    * discontinuous element).
    */
   virtual bool hp_constraints_are_implemented () const;
 
   /**
-   * Return whether this element dominates
-   * the one given as argument when they
-   * meet at a common face,
-   * whether it is the other way around,
-   * whether neither dominates, or if
-   * either could dominate.
+   * Return whether this element dominates the one given as argument when they
+   * meet at a common face, whether it is the other way around, whether
+   * neither dominates, or if either could dominate.
    *
-   * For a definition of domination, see
-   * FiniteElementBase::Domination and in
+   * For a definition of domination, see FiniteElementBase::Domination and in
    * particular the @ref hp_paper "hp paper".
    */
   virtual
@@ -330,62 +251,45 @@ public:
                                     const unsigned int face_index) const;
 
   /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object.
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
    *
-   * This function is made virtual,
-   * since finite element objects
-   * are usually accessed through
-   * pointers to their base class,
-   * rather than the class itself.
+   * This function is made virtual, since finite element objects are usually
+   * accessed through pointers to their base class, rather than the class
+   * itself.
    */
   virtual std::size_t memory_consumption () const;
 
 
 private:
   /**
-   * Declare a nested class which
-   * will hold static definitions of
-   * various matrices such as
-   * constraint and embedding
-   * matrices. The definition of
-   * the various static fields are
-   * in the files <tt>fe_dgp_[123]d.cc</tt>
-   * in the source directory.
+   * Declare a nested class which will hold static definitions of various
+   * matrices such as constraint and embedding matrices. The definition of the
+   * various static fields are in the files <tt>fe_dgp_[123]d.cc</tt> in the
+   * source directory.
    */
   struct Matrices
   {
     /**
-     * Pointers to the embedding
-     * matrices, one for each
-     * polynomial degree starting
-     * from constant elements
+     * Pointers to the embedding matrices, one for each polynomial degree
+     * starting from constant elements
      */
     static const double *const embedding[][GeometryInfo<dim>::max_children_per_cell];
 
     /**
-     * Number of elements (first
-     * index) the above field
-     * has. Equals the highest
-     * polynomial degree plus one
-     * for which the embedding
-     * matrices have been
-     * computed.
+     * Number of elements (first index) the above field has. Equals the
+     * highest polynomial degree plus one for which the embedding matrices
+     * have been computed.
      */
     static const unsigned int n_embedding_matrices;
 
     /**
-     * As @p embedding but for
-     * projection matrices.
+     * As @p embedding but for projection matrices.
      */
     static const double *const projection_matrices[][GeometryInfo<dim>::max_children_per_cell];
 
     /**
-     * As
-     * @p n_embedding_matrices
-     * but for projection
-     * matrices.
+     * As @p n_embedding_matrices but for projection matrices.
      */
     static const unsigned int n_projection_matrices;
   };
@@ -393,18 +297,15 @@ private:
 protected:
 
   /**
-   * @p clone function instead of
-   * a copy constructor.
+   * @p clone function instead of a copy constructor.
    *
-   * This function is needed by the
-   * constructors of @p FESystem.
+   * This function is needed by the constructors of @p FESystem.
    */
   virtual FiniteElement<dim,spacedim> *clone() const;
 
   /**
-   * Prepare internal data
-   * structures and fill in values
-   * independent of the cell.
+   * Prepare internal data structures and fill in values independent of the
+   * cell.
    */
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
@@ -413,9 +314,7 @@ protected:
             const Quadrature<dim> &quadrature) const ;
 
   /**
-   * Implementation of the same
-   * function in
-   * FiniteElement.
+   * Implementation of the same function in FiniteElement.
    */
   virtual void
   fill_fe_values (const Mapping<dim,spacedim> &mapping,
@@ -427,9 +326,7 @@ protected:
                   CellSimilarity::Similarity                       &cell_similarity) const;
 
   /**
-   * Implementation of the same
-   * function in
-   * FiniteElement.
+   * Implementation of the same function in FiniteElement.
    */
   virtual void
   fill_fe_face_values (const Mapping<dim,spacedim> &mapping,
@@ -441,9 +338,7 @@ protected:
                        FEValuesData<dim,spacedim> &data) const ;
 
   /**
-   * Implementation of the same
-   * function in
-   * FiniteElement.
+   * Implementation of the same function in FiniteElement.
    */
   virtual void
   fill_fe_subface_values (const Mapping<dim,spacedim> &mapping,
@@ -458,53 +353,32 @@ protected:
 private:
 
   /**
-   * Only for internal use. Its
-   * full name is
-   * @p get_dofs_per_object_vector
-   * function and it creates the
-   * @p dofs_per_object vector that is
-   * needed within the constructor to
-   * be passed to the constructor of
-   * @p FiniteElementData.
+   * Only for internal use. Its full name is @p get_dofs_per_object_vector
+   * function and it creates the @p dofs_per_object vector that is needed
+   * within the constructor to be passed to the constructor of @p
+   * FiniteElementData.
    */
   static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
 
   /**
-   * Given a set of flags indicating
-   * what quantities are requested
-   * from a @p FEValues object,
-   * return which of these can be
-   * precomputed once and for
-   * all. Often, the values of
-   * shape function at quadrature
-   * points can be precomputed, for
-   * example, in which case the
-   * return value of this function
-   * would be the logical and of
-   * the input @p flags and
-   * @p update_values.
+   * Given a set of flags indicating what quantities are requested from a @p
+   * FEValues object, return which of these can be precomputed once and for
+   * all. Often, the values of shape function at quadrature points can be
+   * precomputed, for example, in which case the return value of this function
+   * would be the logical and of the input @p flags and @p update_values.
    *
-   * For the present kind of finite
-   * element, this is exactly the
-   * case.
+   * For the present kind of finite element, this is exactly the case.
    */
   virtual UpdateFlags update_once (const UpdateFlags flags) const;
 
   /**
-   * This is the opposite to the
-   * above function: given a set of
-   * flags indicating what we want
-   * to know, return which of these
-   * need to be computed each time
-   * we visit a new cell.
+   * This is the opposite to the above function: given a set of flags
+   * indicating what we want to know, return which of these need to be
+   * computed each time we visit a new cell.
    *
-   * If for the computation of one
-   * quantity something else is
-   * also required (for example, we
-   * often need the covariant
-   * transformation when gradients
-   * need to be computed), include
-   * this in the result as well.
+   * If for the computation of one quantity something else is also required
+   * (for example, we often need the covariant transformation when gradients
+   * need to be computed), include this in the result as well.
    */
   virtual UpdateFlags update_each (const UpdateFlags flags) const;
 
@@ -514,19 +388,15 @@ private:
   const unsigned int degree;
 
   /**
-   * Pointer to an object
-   * representing the polynomial
-   * space used here.
+   * Pointer to an object representing the polynomial space used here.
    */
   const PolynomialSpace<dim> polynomial_space;
 
   /**
    * Fields of cell-independent data.
    *
-   * For information about the
-   * general purpose of this class,
-   * see the documentation of the
-   * base class.
+   * For information about the general purpose of this class, see the
+   * documentation of the base class.
    */
   class InternalData : public FiniteElement<dim,spacedim>::InternalDataBase
   {
@@ -543,9 +413,7 @@ private:
   template <int, int> friend class FE_DGPNonparametric;
 
   /**
-   * Allows @p MappingQ class to
-   * access to build_renumbering
-   * function.
+   * Allows @p MappingQ class to access to build_renumbering function.
    */
   template <int, int> friend class MappingQ;
 //    friend class MappingQ<dim>;

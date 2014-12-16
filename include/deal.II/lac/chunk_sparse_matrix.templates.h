@@ -52,11 +52,9 @@ namespace internal
     typedef types::global_dof_index size_type;
 
     /**
-     * Add the result of multiplying a chunk
-     * of size chunk_size times chunk_size by
-     * a source vector fragment of size
-     * chunk_size to the destination vector
-     * fragment.
+     * Add the result of multiplying a chunk of size chunk_size times
+     * chunk_size by a source vector fragment of size chunk_size to the
+     * destination vector fragment.
      */
     template <typename MatrixIterator,
               typename SrcIterator,
