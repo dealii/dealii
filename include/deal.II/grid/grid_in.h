@@ -389,8 +389,7 @@ public:
 
   /**
    * Read grid data from an msh file, either version 1 or version 2 of that
-   * file format. The GMSH formats are documented at http://www.geuz.org/gmsh/
-   * .
+   * file format. The GMSH formats are documented at http://www.geuz.org/gmsh/ .
    *
    * @note The input function of deal.II does not distinguish between newline
    * and other whitespace. Therefore, deal.II will be able to read files in a

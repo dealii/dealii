@@ -401,8 +401,8 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF,
 
 
 /**
- * Similar to previous apply_transformation. It computes $T*DF^{t}$ @relates
- * DerivativeForm
+ * Similar to previous apply_transformation. It computes $T*DF^{t}$.
+ * @relates DerivativeForm
  * @author Sebastian Pauletti, 2011
  */
 //rank=2

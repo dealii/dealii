@@ -200,7 +200,7 @@ namespace GridGenerator
                               const bool                                colorize=false);
 
   /**
-   * A parallelogram. The first corner point is the origin. The <tt>dim</tt>
+   * A parallelogram. The first corner point is the origin. The @p dim
    * adjacent points are the ones given in the second argument and the fourth
    * point will be the sum of these two vectors.  Colorizing is done in the
    * same way as in hyper_rectangle().
@@ -225,7 +225,7 @@ namespace GridGenerator
                  const bool           colorize=false) DEAL_II_DEPRECATED;
 
   /**
-   * A parallelepiped. The first corner point is the origin. The <tt>dim</tt>
+   * A parallelepiped. The first corner point is the origin. The @p dim
    * adjacent points are vectors describing the edges of the parallelepiped
    * with respect to the origin. Additional points are sums of these dim
    * vectors. Colorizing is done according to hyper_rectangle().
@@ -246,10 +246,10 @@ namespace GridGenerator
 
   /**
    * A subdivided parallelepiped. The first corner point is the origin. The
-   * <tt>dim</tt> adjacent points are vectors describing the edges of the
+   * @p dim adjacent points are vectors describing the edges of the
    * parallelepiped with respect to the origin. Additional points are sums of
    * these dim vectors. The variable @p n_subdivisions designates the number
-   * of subdivisions in each of the <tt>dim</tt> directions. Colorizing is
+   * of subdivisions in each of the @p dim directions. Colorizing is
    * done according to hyper_rectangle().
    *
    * @note The triangulation needs to be void upon calling this function.
@@ -263,7 +263,7 @@ namespace GridGenerator
 
   /**
    * A subdivided parallelepiped, ie. the same as above, but where the number
-   * of subdivisions in each of the <tt>dim</tt> directions may vary.
+   * of subdivisions in each of the @p dim directions may vary.
    * Colorizing is done according to hyper_rectangle().
    *
    * @note The triangulation needs to be void upon calling this function.
@@ -303,7 +303,7 @@ namespace GridGenerator
 
   /**
    * Initialize the given triangulation with a hyperball, i.e. a circle or a
-   * ball around <tt>center</tt> with given <tt>radius</tt>.
+   * ball around @p center with given @p radius.
    *
    * In order to avoid degenerate cells at the boundaries, the circle is
    * triangulated by five cells, the ball by seven cells. The diameter of the
@@ -321,7 +321,7 @@ namespace GridGenerator
                    const double        radius = 1.);
 
   /**
-   * This class produces a half hyper-ball around <tt>center</tt>, which
+   * This class produces a half hyper-ball around @p center, which
    * contains four elements in 2d and 6 in 3d. The cut plane is perpendicular
    * to the <i>x</i>-axis.
    *
@@ -456,7 +456,8 @@ namespace GridGenerator
    * direction to form 6 cells), 12 for the rhombic dodecahedron, and 96 (see
    * below). These give rise to the following meshes upon one refinement:
    *
-   * @image html hypershell3d-6.png @image html hypershell3d-12.png
+   * @image html hypershell3d-6.png
+   * @image html hypershell3d-12.png
    *
    * Neither of these meshes is particularly good since one ends up with
    * poorly shaped cells at the inner edge upon refinement. For example, this
@@ -474,7 +475,8 @@ namespace GridGenerator
    * that the doubled radial lines on the cross section are artifacts of the
    * visualization):
    *
-   * @image html hyper_shell_12_cut.png @image html hyper_shell_96_cut.png
+   * @image html hyper_shell_12_cut.png
+   * @image html hyper_shell_96_cut.png
    *
    * A different way to approach the problem with distorted cells is to attach
    * appropriate manifold descriptions to the geometry created by this
@@ -732,14 +734,14 @@ namespace GridGenerator
   /**
    * Given an input triangulation @p in_tria, this function makes a new flat
    * triangulation @p out_tria which contains a single level with all active
-   * cells of the input triangulation. If spacedim1 and spacedim2 are
+   * cells of the input triangulation. If @p spacedim1 and @p spacedim2 are
    * different, only the smallest spacedim components of the vertices are
    * copied over. This is useful to create a Triangulation<2,3> out of a
    * Triangulation<2,2>, or to project a Triangulation<2,3> into a
    * Triangulation<2,2>, by neglecting the z components of the vertices.
    *
    * No internal checks are performed on the vertices, which are assumed to
-   * make sense topologically in the target #spacedim2 dimensional space. If
+   * make sense topologically in the target @p spacedim2 dimensional space. If
    * this is not the case, you will encounter problems when using the
    * triangulation later on.
    *

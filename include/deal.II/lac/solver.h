@@ -280,11 +280,19 @@ template <typename number> class Vector;
  * @endcode
  * Using this, the slot will then generate files that when visualized look
  * like this over the course of iterations zero to five: <table> <tr> <td>
- * @image html "cg-monitor-smoothing-0.png" </td> <td> @image html "cg-
- * monitor-smoothing-1.png" </td> <td> @image html "cg-monitor-
- * smoothing-2.png" </td> </tr> <tr> <td> @image html "cg-monitor-
- * smoothing-3.png" </td> <td> @image html "cg-monitor-smoothing-4.png" </td>
- * <td> @image html "cg-monitor-smoothing-5.png" </td> </tr> </table>
+ * @image html "cg-monitor-smoothing-0.png"
+ * </td> <td>
+ * @image html "cg-monitor-smoothing-1.png"
+ * </td> <td>
+ * @image html "cg-monitor-smoothing-2.png"
+ * </td> </tr> <tr> <td>
+ * @image html "cg-monitor-smoothing-3.png"
+ * </td> <td>
+ * @image html "cg-monitor-smoothing-4.png"
+ * </td>
+ * <td>
+ * @image html "cg-monitor-smoothing-5.png"
+ * </td> </tr> </table>
  *
  * @ingroup Solvers
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005,

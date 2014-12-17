@@ -2094,8 +2094,7 @@ public:
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
-   * The output vector is resized if necessary.  See also @ref GlossUserFlags
-   * .
+   * The output vector is resized if necessary.  See also @ref GlossUserFlags .
    */
   void save_user_flags (std::vector<bool> &v) const;
 
@@ -2123,8 +2122,7 @@ public:
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
-   * The output vector is resized if necessary.  See also @ref GlossUserFlags
-   * .
+   * The output vector is resized if necessary.  See also @ref GlossUserFlags .
    */
   void save_user_flags_line (std::vector<bool> &v) const;
 
@@ -2150,8 +2148,7 @@ public:
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
-   * The output vector is resized if necessary.  See also @ref GlossUserFlags
-   * .
+   * The output vector is resized if necessary.  See also @ref GlossUserFlags .
    */
   void save_user_flags_quad (std::vector<bool> &v) const;
 
@@ -2178,8 +2175,7 @@ public:
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
-   * The output vector is resized if necessary.  See also @ref GlossUserFlags
-   * .
+   * The output vector is resized if necessary.  See also @ref GlossUserFlags .
    */
   void save_user_flags_hex (std::vector<bool> &v) const;
 
