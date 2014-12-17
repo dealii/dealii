@@ -16,6 +16,7 @@
 
 for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
 {
+  template class RungeKutta<V<S> >;
   template class ExplicitRungeKutta<V<S> >;
   template class ImplicitRungeKutta<V<S> >;
   template class EmbeddedExplicitRungeKutta<V<S> >;
@@ -23,6 +24,7 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
 
 for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
 {
+  template class RungeKutta<parallel::distributed::V<S> >;
   template class ExplicitRungeKutta<parallel::distributed::V<S> >;
   template class ImplicitRungeKutta<parallel::distributed::V<S> >;
   template class EmbeddedExplicitRungeKutta<parallel::distributed::V<S> >;
@@ -30,6 +32,7 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
 
 for (V : EXTERNAL_SEQUENTIAL_VECTORS)
 {
+  template class RungeKutta<V>;
   template class ExplicitRungeKutta<V>;
   template class ImplicitRungeKutta<V>;
   template class EmbeddedExplicitRungeKutta<V>;
@@ -37,6 +40,7 @@ for (V : EXTERNAL_SEQUENTIAL_VECTORS)
 
 for (V : EXTERNAL_PARALLEL_VECTORS)
 {
+  template class RungeKutta<V>;
   template class ExplicitRungeKutta<V>;
   template class ImplicitRungeKutta<V>;
   template class EmbeddedExplicitRungeKutta<V>;
