@@ -251,9 +251,9 @@
  * From a usage point of view, ghosted vectors are typically used for
  * data output, postprocessing, error estimation, input in
  * integration. This is because in these operations, one typically
- * needs access not only to @ref GlossLocallyOwnedDofs "locally owned dofs"
- * but also to @ref GlossLocallyActiveDofs "locally active dofs"
- * and sometimes to @ref GlossLocallyRelevantDofs "locally relevant dofs",
+ * needs access not only to @ref GlossLocallyOwnedDof "locally owned dofs"
+ * but also to @ref GlossLocallyActiveDof "locally active dofs"
+ * and sometimes to @ref GlossLocallyRelevantDof "locally relevant dofs",
  * and their values may not be stored in non-ghosted vectors on the
  * processor that needs them. The operations listed above also only
  * require read-only access to vectors, and ghosted vectors are therefore
