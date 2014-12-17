@@ -331,7 +331,7 @@ private:
  * \subset R^{\text{chartdim}} \f] (the pull_back() function).
  *
  * The get_new_point() function of the ChartManifold class is implemented by
- * calling the pull_back() method for all #surrounding_points, computing their
+ * calling the pull_back() method for all <tt>surrounding_points</tt>, computing their
  * weighted average in the chartdim Euclidean space, and calling the
  * push_forward() method with the resulting point, i.e., \f[ p^{\text{new}} =
  * F(\sum_i w_i F^{-1}(p_i)).  \f]
@@ -340,33 +340,33 @@ private:
  * pull_back() methods. All other functions required by mappings will then be
  * provided by this class.
  *
- * The dimension arguments #chartdim, #dim and #spacedim must satisfy the
+ * The dimension arguments @p chartdim, @p dim and @p spacedim must satisfy the
  * following relationships:
  *   @code
  *      dim <= spacedim
  *      chartdim <= spacedim
  *   @endcode
- * However, there is no a priori relationship between #dim and #chartdim. For
+ * However, there is no a priori relationship between @p dim and @p chartdim. For
  * example, if you want to describe a mapping for an edge (a 1d object) in a
  * 2d triangulation embedded in 3d space, you could do so by parameterizing it
  * via a line
  *   @f[
  *      F: [0,1] \rightarrow {\mathbb R}^3
  *   @f]
- * in which case #chartdim is 1. On the other hand, there is no reason why one
+ * in which case @p chartdim is 1. On the other hand, there is no reason why one
  * can't describe this as a mapping
  *   @f[
  *      F: {\mathbb R}^3 \rightarrow {\mathbb R}^3
  *   @f]
  * in such a way that the line $[0,1]\times \{0\}\times \{0\}$ happens to be
- * mapped onto the edge in question. Here, #chartdim is 3. This may seem
+ * mapped onto the edge in question. Here, @p chartdim is 3. This may seem
  * cumbersome but satisfies the requirements of an invertible function $F$
  * just fine as long as it is possible to get from the edge to the pull-back
  * space and then back again. Finally, given that we are dealing with a 2d
  * triangulation in 3d, one will often have a mapping from, say, the 2d unit
  * square or unit disk to the domain in 3d space, and the edge in question may
  * simply be the mapped edge of the unit domain in 2d space. In this case,
- * #chartdim is 2.
+ * @p chartdim is 2.
  *
  * @ingroup manifold
  *

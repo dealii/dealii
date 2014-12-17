@@ -246,9 +246,11 @@ DEAL_II_NAMESPACE_OPEN
  * ordering than with another one, then this means that the actual solver is
  * actually several times faster.
  *
- * <table> <tr> <td> @image html "reorder_sparsity_step_31_original.png" </td>
- * <td> @image html "reorder_sparsity_step_31_random.png" </td> <td> @image
- * html "reorder_sparsity_step_31_deal_cmk.png" </td> </tr> <tr> <td>
+ * <table> <tr>
+ * <td> @image html "reorder_sparsity_step_31_original.png" </td>
+ * <td> @image html "reorder_sparsity_step_31_random.png" </td>
+ * <td> @image html "reorder_sparsity_step_31_deal_cmk.png" </td>
+ * </tr> <tr> <td>
  * Enumeration as produced by deal.II's DoFHandler::distribute_dofs function
  * and no further reordering apart from the component-wise one.
  *
@@ -272,9 +274,10 @@ DEAL_II_NAMESPACE_OPEN
  * With this renumbering, we needed an average of 57.3 iterations for the
  * testcase outlined above, and a runtime of 6min10s. </td> </td> </tr>
  *
- * <tr> <td> @image html "reorder_sparsity_step_31_boost_cmk.png" </td> <td>
- * @image html "reorder_sparsity_step_31_boost_king.png" </td> <td> @image
- * html "reorder_sparsity_step_31_boost_md.png" </td> </tr> <tr> <td> Cuthill-
+ * <tr> <td> @image html "reorder_sparsity_step_31_boost_cmk.png" </td>
+ * <td> @image html "reorder_sparsity_step_31_boost_king.png" </td>
+ * <td> @image html "reorder_sparsity_step_31_boost_md.png" </td>
+ * </tr> <tr> <td> Cuthill-
  * McKee enumeration as produced by calling the BOOST implementation of the
  * algorithm provided by DoFRenumbering::boost::Cuthill_McKee after
  * DoFHandler::distribute_dofs.

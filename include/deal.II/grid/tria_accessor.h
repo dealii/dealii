@@ -1204,12 +1204,12 @@ public:
 
   /**
    * Returns a point belonging to the Manifold<dim,spacedim> where this object
-   * lives, given its parametric coordinates on the reference #structdim cell.
+   * lives, given its parametric coordinates on the reference @p structdim cell.
    * This function queries the underlying manifold object, and can be used to
    * obtain the exact geometrical location of arbitrary points on this object.
    *
    * Notice that the argument @p coordinates are the coordinates on the
-   * <emph>reference cell</emph>, given in reference coordinates. In other
+   * <em>reference cell</em>, given in reference coordinates. In other
    * words, the argument provides a weighting between the different vertices.
    * For example, for lines, calling this function with argument Point<1>(.5),
    * is equivalent to asking the line for its center.
