@@ -1210,7 +1210,7 @@ namespace Functions
      * Constructor
      * @param interval_endpoints The left and right end points of the
      * (uniformly subdivided) intervals in each of the coordinate directions.
-     * @param n_subdivisions The number of subintervals of the subintervals in
+     * @param n_subintervals The number of subintervals in
      * each coordinate direction. A value of one for a coordinate means that
      * the interval is considered as one subinterval consisting of the entire
      * range. A value of two means that there are two subintervals each with

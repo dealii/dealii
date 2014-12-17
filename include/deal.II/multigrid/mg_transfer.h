@@ -263,7 +263,7 @@ private:
    * the ones where the global degree of freedom is locally owned and the
    * level degree of freedom is not.
    *
-   * Organization of the data is like for #copy_indices_mine.
+   * Organization of the data is like for @p copy_indices_mine.
    */
   std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
   copy_indices_to_me;
@@ -273,7 +273,7 @@ private:
    * the ones where the level degree of freedom is locally owned and the
    * global degree of freedom is not.
    *
-   * Organization of the data is like for #copy_indices_mine.
+   * Organization of the data is like for @p copy_indices_mine.
    */
   std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
   copy_indices_from_me;
