@@ -114,8 +114,7 @@ namespace Step36
     stiffness_matrix.reinit (sparsity_pattern);
     mass_matrix.reinit (sparsity_pattern);
 
-    eigenfunctions
-    .resize (5);
+    eigenfunctions.resize (8);
     for (unsigned int i=0; i<eigenfunctions.size (); ++i)
       eigenfunctions[i].reinit (dof_handler.n_dofs ());
 
@@ -281,7 +280,7 @@ namespace Step36
 
     std::sort(eigenvalues.begin(), eigenvalues.end(), my_compare);
 
-    for (unsigned int i=0; i<eigenvalues.size(); ++i)
+    for (unsigned int i = 0; i < 5 && i < eigenvalues.size(); ++i)
       deallog << "      Eigenvalue " << i
               << " : " << eigenvalues[i]
               << std::endl;
@@ -301,14 +300,10 @@ int main (int argc, char **argv)
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
+      deallog.depth_console (0);
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-      {
-        deallog.depth_console (0);
-
-        EigenvalueProblem<2> problem ("");
-        problem.run ();
-      }
+      EigenvalueProblem<2> problem ("");
+      problem.run ();
     }
 
   catch (std::exception &exc)
