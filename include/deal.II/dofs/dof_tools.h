@@ -1856,7 +1856,7 @@ namespace DoFTools
    * C++, the compiler can not determine the type of <code>DH</code> from the
    * function call. You need to specify it as an explicit template argument
    * following the function name.
-   * @param patch[in] A collection of cells within an object of type DH
+   * @param patch A collection of cells within an object of type DH
    * @return The number of degrees of freedom associated with the cells of
    * this patch.
    *
@@ -1908,7 +1908,7 @@ namespace DoFTools
    * C++, the compiler can not determine the type of <code>DH</code> from the
    * function call. You need to specify it as an explicit template argument
    * following the function name.
-   * @param patch[in] A collection of cells within an object of type DH
+   * @param patch A collection of cells within an object of type DH
    * @return A list of those global degrees of freedom located on the patch,
    * as defined above.
    *
