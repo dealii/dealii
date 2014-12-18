@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -810,7 +810,8 @@ namespace internal
           else
             next_free_single=pos+1;
         }
-      else
+
+      if (reverse_order_next_free_single)
         {
           // second sweep, use all slots, even
           // in pairs
