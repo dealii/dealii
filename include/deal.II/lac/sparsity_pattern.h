@@ -1304,7 +1304,7 @@ public:
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
   /**
-   * @addtogroup Exceptions
+   * @addtogroup Exceptions @name Exceptions
    * @{
    */
   /**

@@ -522,8 +522,8 @@ namespace GridTools
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see @ref GlossMeshAsAContainer).
-   * @param[in] cell An iterator pointing to a cell of the mesh container.
-   * @param[out] active_neighbors A list of active descendants of the given
+   * @param cell[in] An iterator pointing to a cell of the mesh container.
+   * @param active_neighbors[out] A list of active descendants of the given
    * cell
    */
   template <class Container>
@@ -810,7 +810,7 @@ namespace GridTools
    * determine the type of <code>Container</code> from the function call. You
    * need to specify it as an explicit template argument following the
    * function name.
-   * @param[in] cell An iterator pointing to a cell of the mesh container.
+   * @param cell[in] An iterator pointing to a cell of the mesh container.
    * @return A list of active cells that form the patch around the given cell
    *
    * @note Patches are often used in defining error estimators that require
@@ -933,7 +933,7 @@ namespace GridTools
    * between its vertices can be achieved via an orthogonal equality relation.
    *
    * Hereby, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal,
-   * if $M\cdot v_1 + offset - v_2$ is parallel to the unit vector in
+   * if $M\cdot v_1 + offset - v_2</code> is parallel to the unit vector in
    * unit direction @p direction. If the parameter @p matrix is a reference to
    * a spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is
    * the identity matrix.

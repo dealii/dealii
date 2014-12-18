@@ -16,6 +16,10 @@
 #ifndef __deal2__exceptions_h
 #define __deal2__exceptions_h
 
+/**
+ * @file Here, the deal.II exception handling is located.
+ */
+
 #include <deal.II/base/config.h>
 
 #include <exception>

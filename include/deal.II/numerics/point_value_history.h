@@ -423,8 +423,8 @@ public:
    * Return a @p Vector with the indices of selected points flagged with a 1.
    * This method is mainly for testing and verifying that the class is working
    * correctly. By passing this vector to a DataOut object, the user can
-   * verify that the positions returned by @p get_points
-   * agree with the positions that @p DataOut interprets from
+   * verify that the positions returned by @p PointValueHistory< dim
+   * >::get_points agree with the positions that @p DataOut interprets from
    * the @p Vector returned. The code snippet below demonstrates how this
    * could be done:
    * @code
@@ -446,12 +446,14 @@ public:
 
 
   /**
-   * @deprecated
+   * Depreciated:
    *
    * This function only exists for backward compatibility as this is the
    * interface provided by previous versions of the library. The function
    * mark_support_locations replaces it and reflects the fact that the
    * locations marked are actually the support points.
+   *
+   * @deprecated
    */
   Vector<double> mark_locations() DEAL_II_DEPRECATED;
 
@@ -466,7 +468,7 @@ public:
   void get_support_locations (std::vector <std::vector<Point <dim> > > &locations);
 
   /**
-   * @deprecated
+   * Depreciated:
    *
    * This function only exists for backward compatibility as this is the
    * interface provided by previous versions of the library. The function

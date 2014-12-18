@@ -197,9 +197,9 @@ class FunctionManifold : public ChartManifold<dim, spacedim, chartdim>
 public:
   /**
    * Explicit functions constructor. Takes a push_forward function of spacedim
-   * components, and a pull_back function of @p chartdim components. See the
+   * components, and a pull_back function of chartdim components. See the
    * documentation of the base class ChartManifold for the meaning of the
-   * optional @p periodicity argument.
+   * optional #periodicity argument.
    *
    * The tolerance argument is used in debug mode to actually check that the
    * two functions are one the inverse of the other.
@@ -212,8 +212,8 @@ public:
   /**
    * Expressions constructor. Takes the expressions of the push_forward
    * function of spacedim components, and of the pull_back function of
-   * @p chartdim components. See the documentation of the base class
-   * ChartManifold for the meaning of the optional @p periodicity argument.
+   * chartdim components. See the documentation of the base class
+   * ChartManifold for the meaning of the optional #periodicity argument.
    *
    * The strings should be the readable by the default constructor of the
    * FunctionParser classes. You can specify custom variable expressions with
@@ -237,17 +237,17 @@ public:
   ~FunctionManifold();
 
   /**
-   * Given a point in the @p chartdim coordinate system, uses the
-   * push_forward_function to compute the push_forward of points in @p chartdim
-   * space dimensions to @p spacedim space dimensions.
+   * Given a point in the chartdim coordinate system, uses the
+   * push_forward_function to compute the push_forward of points in #chardim
+   * space dimensions to #spacedim space dimensions.
    */
   virtual Point<spacedim>
   push_forward(const Point<chartdim> &chart_point) const;
 
   /**
    * Given a point in the spacedim coordinate system, uses the
-   * pull_back_function to compute the pull_back of points in @p spacedim space
-   * dimensions to @p chartdim space dimensions.
+   * pull_back_function to compute the pull_back of points in #spacedim space
+   * dimensions to #chartdim space dimensions.
    */
   virtual Point<chartdim>
   pull_back(const Point<spacedim> &space_point) const;
@@ -280,7 +280,7 @@ private:
   /**
    * Check ownership of the smart pointers. Indicates whether this class is
    * the owner of the objects pointed to by the previous two member variables.
-   * This value is set in the constructor of the class. If @p true, then the
+   * This value is set in the constructor of the class. If #true, then the
    * destructor will delete the function objects pointed to be the two
    * pointers.
    */

@@ -414,13 +414,13 @@ public:
 
   /**
    * Initialize with a SolverControl object. The result will emulate
-   * SolverControl by setting @p reduce to zero.
+   * SolverControl by setting #reduce to zero.
    */
   ReductionControl (const SolverControl &c);
 
   /**
    * Assign a SolverControl object to ReductionControl. The result of the
-   * assignment will emulate SolverControl by setting @p reduce to zero.
+   * assignment will emulate SolverControl by setting #reduce to zero.
    */
   ReductionControl &operator= (const SolverControl &c);
 

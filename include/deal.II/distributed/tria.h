@@ -71,7 +71,7 @@ namespace internal
     /**
      * A structure whose explicit specializations contain typedefs to the
      * relevant p4est_* and p8est_* types. Using this structure, for example
-     * by saying <tt>types<dim>::connectivity</tt> we can write code in
+     * by saying <code>types@<dim@>::connectivity</code> we can write code in
      * a dimension independent way, either referring to p4est_connectivity_t
      * or p8est_connectivity_t, depending on template argument.
      */

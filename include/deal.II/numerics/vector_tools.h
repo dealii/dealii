@@ -1346,10 +1346,8 @@ namespace VectorTools
    * on a circle and on a sphere to which the constraints computed by this
    * function have been applied:
    *
-   * <p ALIGN="center">
-   * @image html no_normal_flux_5.png
-   * @image html no_normal_flux_6.png
-   * </p>
+   * <p ALIGN="center"> @image html no_normal_flux_5.png @image html
+   * no_normal_flux_6.png </p>
    *
    * The vectors fields are not physically reasonable but the tangentiality
    * constraint is clearly enforced. The fact that the vector fields are zero

@@ -186,8 +186,7 @@ private:
  * This will produce the following meshes after the two refinements we
  * perform, in 2d and 3d, respectively:
  *
- * @image html cone_2d.png
- * @image html cone_3d.png
+ * @image html cone_2d.png @image html cone_3d.png
  *
  * @author Markus B&uuml;rg, 2009
  */

@@ -82,7 +82,7 @@ namespace Utilities
    * template parameters: dim (the topological dimension of the object) and
    * spacedim (the dimension of the embedding Euclidean space).  Since in all
    * deal.II classes, by default spacedim is equal to dimension, the above
-   * string is usually contracted to "<dim>", instead of "<dim,spacedim>". This
+   * string is usually contracted to <dim>, instead of <dim,spacedim>. This
    * function returns a string containing "dim" if dim is equal to spacedim,
    * otherwhise it returns "dim,spacedim".
    */
