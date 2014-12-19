@@ -174,12 +174,51 @@ void test ()
   ubb = bb;
 
   SolverControl control (1000, 1e-13);
-
   SolverCG<BlockVector<double> > bcg(control, SolverCG<BlockVector<double> >::AdditionalData());
-  bcg.solve(Bb, bx, bb, PreconditionIdentity());
+
+  switch (dim)
+    {
+    case 1:
+      check_solver_within_range(
+        bcg.solve(Bb, bx, bb, PreconditionIdentity()),
+        control.last_step(), 112, 114);
+      break;
+    case 2:
+      check_solver_within_range(
+        bcg.solve(Bb, bx, bb, PreconditionIdentity()),
+        control.last_step(), 60, 62);
+      break;
+    case 3:
+      check_solver_within_range(
+        bcg.solve(Bb, bx, bb, PreconditionIdentity()),
+        control.last_step(), 24, 26);
+      break;
+    default:
+      Assert(false, ExcNotImplemented());
+    }
 
   SolverCG<Vector<double> > cg(control, SolverCG<Vector<double> >::AdditionalData());
-  cg.solve(B, x, b, PreconditionIdentity());
+
+  switch (dim)
+    {
+    case 1:
+      check_solver_within_range(
+        cg.solve(B, x, b, PreconditionIdentity()),
+        control.last_step(), 112, 114);
+      break;
+    case 2:
+      check_solver_within_range(
+        cg.solve(B, x, b, PreconditionIdentity()),
+        control.last_step(), 60, 62);
+      break;
+    case 3:
+      check_solver_within_range(
+        cg.solve(B, x, b, PreconditionIdentity()),
+        control.last_step(), 24, 26);
+      break;
+    default:
+      Assert(false, ExcNotImplemented());
+    }
 
   deallog << "Sparse Factorization" << std::endl;
   SparseDirectUMFPACK umfpack, umfpackb;
