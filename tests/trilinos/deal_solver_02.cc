@@ -52,27 +52,14 @@ check_solve( SOLVER &solver,
   f = 1.;
   try
     {
-      deallog.depth_file(0);
-      solver.solve(A,u,f,P);
-      deallog.depth_file(3);
+      check_solver_within_range(
+        solver.solve(A,u,f,P),
+        solver_control.last_step(), 49, 51);
     }
   catch (std::exception &e)
     {
-      deallog.depth_file(3);
       deallog << e.what() << std::endl;
       abort ();
-    }
-
-  const unsigned int steps = solver_control.last_step();
-  if (steps >= 49 && steps <= 51)
-    {
-      deallog << "Solver stopped within 49 - 51 iterations"
-              << std::endl;
-    }
-  else
-    {
-      deallog << "Solver stopped after " << solver_control.last_step()
-              << " iterations" << std::endl;
     }
 }
 

@@ -111,7 +111,7 @@ public:
               const MDt &Dt,
               const MC &C,
               VectorMemory<BlockVector<double> > &mem,
-              const std::vector<unsigned int> &signature = std::vector<unsigned int>(0));
+              const std::vector<types::global_dof_index> &signature = std::vector<types::global_dof_index>(0));
 
   /**
    * Do block elimination of the right hand side. Given right hand sides for
@@ -207,7 +207,7 @@ SchurMatrix<MA_inverse, MB, MDt, MC>
               const MDt &Dt,
               const MC &C,
               VectorMemory<BlockVector<double> > &mem,
-              const std::vector<unsigned int> &signature)
+              const std::vector<types::global_dof_index> &signature)
   : Ainv(&Ainv), B(&B), Dt(&Dt), C(&C),
     mem(mem),
     signature(signature),
