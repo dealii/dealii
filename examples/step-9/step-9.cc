@@ -1,7 +1,6 @@
 /* ---------------------------------------------------------------------
- * $Id$
  *
- * Copyright (C) 2000 - 2013 by the deal.II authors
+ * Copyright (C) 2000 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -515,7 +514,7 @@ namespace Step9
 
     template <int dim>
     static
-    void estimate_cell (const SynchronousIterators<std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,
+    void estimate_cell (const SynchronousIterators<std_cxx11::tuple<typename DoFHandler<dim>::active_cell_iterator,
                         Vector<float>::iterator> >     &cell,
                         EstimateScratchData<dim>       &scratch_data,
                         const EstimateCopyData         &copy_data);
@@ -976,7 +975,7 @@ namespace Step9
   template <int dim>
   GradientEstimation::EstimateScratchData<dim>::
   EstimateScratchData (const FiniteElement<dim> &fe,
-                         const Vector<double>     &solution)
+                       const Vector<double>     &solution)
     :
     fe_midpoint_value(fe,
                       QMidpoint<dim> (),
@@ -1027,19 +1026,19 @@ namespace Step9
             ExcInvalidVectorLength (error_per_cell.size(),
                                     dof_handler.get_tria().n_active_cells()));
 
-    typedef std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator>
+    typedef std_cxx11::tuple<typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator>
     IteratorTuple;
 
     SynchronousIterators<IteratorTuple>
     begin_sync_it (IteratorTuple (dof_handler.begin_active(),
                                   error_per_cell.begin())),
-    end_sync_it (IteratorTuple (dof_handler.end(),
-                                error_per_cell.end()));
+                                                       end_sync_it (IteratorTuple (dof_handler.end(),
+                                                           error_per_cell.end()));
 
     WorkStream::run (begin_sync_it,
                      end_sync_it,
                      &GradientEstimation::template estimate_cell<dim>,
-                     std_cxx1x::function<void (const EstimateCopyData &)> (),
+                     std_cxx11::function<void (const EstimateCopyData &)> (),
                      EstimateScratchData<dim> (dof_handler.get_fe(),
                                                solution),
                      EstimateCopyData ());
@@ -1078,12 +1077,12 @@ namespace Step9
   // passing the following as the third argument when calling WorkStream::run
   // above:
   // @code
-  //    std_cxx1x::function<void (const SynchronousIterators<IteratorTuple> &,
+  //    std_cxx11::function<void (const SynchronousIterators<IteratorTuple> &,
   //                              EstimateScratchData<dim>                  &,
   //                              EstimateCopyData                          &)>
-  //      (std_cxx1x::bind (&GradientEstimation::template estimate_cell<dim>,
-  //                        std_cxx1x::_1,
-  //                        std_cxx1x::_2))
+  //      (std_cxx11::bind (&GradientEstimation::template estimate_cell<dim>,
+  //                        std_cxx11::_1,
+  //                        std_cxx11::_2))
   // @endcode
   // This creates a function object taking three arguments, but when it calls
   // the underlying function object, it simply only uses the first and second
@@ -1094,10 +1093,10 @@ namespace Step9
   // Now for the details:
   template <int dim>
   void
-  GradientEstimation::estimate_cell (const SynchronousIterators<std_cxx1x::tuple<typename DoFHandler<dim>::active_cell_iterator,
-                                                                                 Vector<float>::iterator> > &cell,
+  GradientEstimation::estimate_cell (const SynchronousIterators<std_cxx11::tuple<typename DoFHandler<dim>::active_cell_iterator,
+                                     Vector<float>::iterator> > &cell,
                                      EstimateScratchData<dim>                                               &scratch_data,
-                                     const EstimateCopyData                                                 &)
+                                     const EstimateCopyData &)
   {
     // We need space for the tensor <code>Y</code>, which is the sum of
     // outer products of the y-vectors.
@@ -1112,7 +1111,7 @@ namespace Step9
     active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
                               GeometryInfo<dim>::max_children_per_face);
 
-    typename DoFHandler<dim>::active_cell_iterator cell_it(std_cxx1x::get<0>(cell.iterators));
+    typename DoFHandler<dim>::active_cell_iterator cell_it(std_cxx11::get<0>(cell.iterators));
 
     // First initialize the <code>FEValues</code> object, as well as the
     // <code>Y</code> tensor:
@@ -1147,14 +1146,14 @@ namespace Step9
     // neighbors, of course.
     active_neighbors.clear ();
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-      if (! std_cxx1x::get<0>(cell.iterators)->at_boundary(face_no))
+      if (! std_cxx11::get<0>(cell.iterators)->at_boundary(face_no))
         {
           // First define an abbreviation for the iterator to the face and
           // the neighbor
           const typename DoFHandler<dim>::face_iterator
-          face = std_cxx1x::get<0>(cell.iterators)->face(face_no);
+          face = std_cxx11::get<0>(cell.iterators)->face(face_no);
           const typename DoFHandler<dim>::cell_iterator
-          neighbor = std_cxx1x::get<0>(cell.iterators)->neighbor(face_no);
+          neighbor = std_cxx11::get<0>(cell.iterators)->neighbor(face_no);
 
           // Then check whether the neighbor is active. If it is, then it
           // is on the same level or one level coarser (if we are not in
@@ -1197,7 +1196,7 @@ namespace Step9
                   // as an internal error. We therefore use a predefined
                   // exception class to throw here.
                   Assert (neighbor_child->neighbor(face_no==0 ? 1 : 0)
-                          ==std_cxx1x::get<0>(cell.iterators),ExcInternalError());
+                          ==std_cxx11::get<0>(cell.iterators),ExcInternalError());
 
                   // If the check succeeded, we push the active neighbor
                   // we just found to the stack we keep:
@@ -1208,7 +1207,7 @@ namespace Step9
                 // `behind' the subfaces of the current face
                 for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
                   active_neighbors.push_back (
-                    std_cxx1x::get<0>(cell.iterators)->neighbor_child_on_subface(face_no,subface_no));
+                    std_cxx11::get<0>(cell.iterators)->neighbor_child_on_subface(face_no,subface_no));
             }
         }
 
@@ -1311,7 +1310,7 @@ namespace Step9
     // at the second element of the pair of iterators, which requires
     // slightly awkward syntax but is not otherwise particularly
     // difficult:
-    *(std_cxx1x::get<1>(cell.iterators)) = (std::pow(std_cxx1x::get<0>(cell.iterators)->diameter(),
+    *(std_cxx11::get<1>(cell.iterators)) = (std::pow(std_cxx11::get<0>(cell.iterators)->diameter(),
                                                      1+1.0*dim/2) *
                                             std::sqrt(gradient.square()));
 

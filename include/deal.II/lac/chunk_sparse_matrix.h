@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -295,8 +294,8 @@ namespace ChunkSparseMatrixIterators
     MatrixType;
 
     /**
-     * A typedef for the type you get when you dereference an iterator
-     * of the current kind.
+     * A typedef for the type you get when you dereference an iterator of the
+     * current kind.
      */
     typedef
     const Accessor<number,Constness> &value_type;
@@ -365,10 +364,10 @@ namespace ChunkSparseMatrixIterators
     bool operator > (const Iterator &) const;
 
     /**
-     * Return the distance between the current iterator and the argument.
-     * The distance is given by how many times one has to apply operator++
-     * to the current iterator to get the argument (for a positive return
-     * value), or operator-- (for a negative return value).
+     * Return the distance between the current iterator and the argument. The
+     * distance is given by how many times one has to apply operator++ to the
+     * current iterator to get the argument (for a positive return value), or
+     * operator-- (for a negative return value).
      */
     int operator - (const Iterator &p) const;
 
@@ -389,13 +388,12 @@ namespace ChunkSparseMatrixIterators
 
 
 /**
- * Sparse matrix. This class implements the function to store values
- * in the locations of a sparse matrix denoted by a
- * SparsityPattern. The separation of sparsity pattern and values is
- * done since one can store data elements of different type in these
- * locations without the SparsityPattern having to know this, and more
- * importantly one can associate more than one matrix with the same
- * sparsity pattern.
+ * Sparse matrix. This class implements the function to store values in the
+ * locations of a sparse matrix denoted by a SparsityPattern. The separation
+ * of sparsity pattern and values is done since one can store data elements of
+ * different type in these locations without the SparsityPattern having to
+ * know this, and more importantly one can associate more than one matrix with
+ * the same sparsity pattern.
  *
  * The use of this class is demonstrated in step-51.
  *
@@ -415,17 +413,16 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Type of matrix entries. In analogy to
-   * the STL container classes.
+   * Type of matrix entries. In analogy to the STL container classes.
    */
   typedef number value_type;
 
   /**
    * Declare a type that has holds real-valued numbers with the same precision
    * as the template argument to this class. If the template argument of this
-   * class is a real data type, then real_type equals the template
-   * argument. If the template argument is a std::complex type then real_type
-   * equals the type underlying the complex numbers.
+   * class is a real data type, then real_type equals the template argument.
+   * If the template argument is a std::complex type then real_type equals the
+   * type underlying the complex numbers.
    *
    * This typedef is used to represent the return type of norms.
    */
@@ -761,9 +758,9 @@ public:
 
   /**
    * Return the value of the entry (<i>i,j</i>).  This may be an expensive
-   * operation and you should always take care where to call this function.
-   * In order to avoid abuse, this function throws an exception if the
-   * required element does not exist in the matrix.
+   * operation and you should always take care where to call this function. In
+   * order to avoid abuse, this function throws an exception if the required
+   * element does not exist in the matrix.
    *
    * In case you want a function that returns zero instead (for entries that
    * are not in the sparsity pattern of the matrix), use the el() function.
@@ -832,8 +829,8 @@ public:
    * this matrix.
    *
    * Note that while this function can operate on all vectors that offer
-   * iterator classes, it is only really effective for objects of type @ref
-   * Vector. For all classes for which iterating over elements, or random
+   * iterator classes, it is only really effective for objects of type
+   * @ref Vector. For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.
@@ -850,8 +847,8 @@ public:
    * takes the transposed matrix.
    *
    * Note that while this function can operate on all vectors that offer
-   * iterator classes, it is only really effective for objects of type @ref
-   * Vector. For all classes for which iterating over elements, or random
+   * iterator classes, it is only really effective for objects of type
+   * @ref Vector. For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.
@@ -867,8 +864,8 @@ public:
    * <i>M</i> being this matrix.
    *
    * Note that while this function can operate on all vectors that offer
-   * iterator classes, it is only really effective for objects of type @ref
-   * Vector. For all classes for which iterating over elements, or random
+   * iterator classes, it is only really effective for objects of type
+   * @ref Vector. For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.
@@ -885,8 +882,8 @@ public:
    * as vmult_add() but takes the transposed matrix.
    *
    * Note that while this function can operate on all vectors that offer
-   * iterator classes, it is only really effective for objects of type @ref
-   * Vector. For all classes for which iterating over elements, or random
+   * iterator classes, it is only really effective for objects of type
+   * @ref Vector. For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.
@@ -1256,10 +1253,10 @@ public:
   void block_write (std::ostream &out) const;
 
   /**
-   * Read data that has previously been written by block_write() from a
-   * file. This is done using the inverse operations to the above function, so
-   * it is reasonably fast because the bitstream is not interpreted except for
-   * a few numbers up front.
+   * Read data that has previously been written by block_write() from a file.
+   * This is done using the inverse operations to the above function, so it is
+   * reasonably fast because the bitstream is not interpreted except for a few
+   * numbers up front.
    *
    * The object is resized on this operation, and all previous contents are
    * lost. Note, however, that no checks are performed whether new data and
@@ -1273,8 +1270,10 @@ public:
    */
   void block_read (std::istream &in);
 //@}
-  /** @addtogroup Exceptions
-   * @{ */
+  /**
+   * @addtogroup Exceptions
+   * @{
+   */
 
   /**
    * Exception
@@ -1339,8 +1338,7 @@ private:
   template <typename somenumber> friend class ChunkSparseMatrix;
 
   /**
-   * Also give access to internal details to the iterator/accessor
-   * classes.
+   * Also give access to internal details to the iterator/accessor classes.
    */
   template <typename,bool> friend class ChunkSparseMatrixIterators::Iterator;
   template <typename,bool> friend class ChunkSparseMatrixIterators::Accessor;

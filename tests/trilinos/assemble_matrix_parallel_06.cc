@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2009 - 2013 by the deal.II authors
 //
@@ -254,9 +253,9 @@ void LaplaceProblem<dim>::setup_system ()
   CellFilter begin(IteratorFilters::LocallyOwnedCell(),dof_handler.begin_active());
   CellFilter end(IteratorFilters::LocallyOwnedCell(),dof_handler.end());
   graph = GraphColoring::make_graph_coloring(begin,end,
-        static_cast<std_cxx1x::function<std::vector<types::global_dof_index>
+        static_cast<std_cxx11::function<std::vector<types::global_dof_index>
         (FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> const &)> >
-        (std_cxx1x::bind(&LaplaceProblem<dim>::get_conflict_indices, this,std_cxx1x::_1)));
+        (std_cxx11::bind(&LaplaceProblem<dim>::get_conflict_indices, this,std_cxx11::_1)));
 
   TrilinosWrappers::BlockSparsityPattern csp(2,2);
   std::vector<IndexSet> locally_owned(2), relevant_set(2);
@@ -383,16 +382,16 @@ void LaplaceProblem<dim>::assemble_test ()
 
   WorkStream::
     run (graph,
-         std_cxx1x::bind (&LaplaceProblem<dim>::
+         std_cxx11::bind (&LaplaceProblem<dim>::
                           local_assemble,
                           this,
-                          std_cxx1x::_1,
-                          std_cxx1x::_2,
-                          std_cxx1x::_3),
-         std_cxx1x::bind (&LaplaceProblem<dim>::
+                          std_cxx11::_1,
+                          std_cxx11::_2,
+                          std_cxx11::_3),
+         std_cxx11::bind (&LaplaceProblem<dim>::
                           copy_local_to_global,
                           this,
-                          std_cxx1x::_1),
+                          std_cxx11::_1),
          Assembly::Scratch::Data<dim>(fe, quadrature),
          Assembly::Copy::Data (false),
          2*multithread_info.n_threads(),

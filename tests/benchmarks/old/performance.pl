@@ -1,4 +1,3 @@
-# $Id$
 #
 # Copyright (C) 2001 by the deal.II authors
 #

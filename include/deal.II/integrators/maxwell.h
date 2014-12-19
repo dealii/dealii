@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -31,11 +30,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace LocalIntegrators
 {
   /**
-   * @brief Local integrators related to curl operators and their
-   * traces.
+   * @brief Local integrators related to curl operators and their traces.
    *
-   * We use the following conventions for curl
-   * operators. First, in three space dimensions
+   * We use the following conventions for curl operators. First, in three
+   * space dimensions
    *
    * @f[
    * \nabla\times \mathbf u = \begin{pmatrix}
@@ -47,9 +45,9 @@ namespace LocalIntegrators
    *
    * In two space dimensions, the curl is obtained by extending a vector
    * <b>u</b> to $(u_1, u_2, 0)^T$ and a scalar <i>p</i> to $(0,0,p)^T$.
-   * Computing the nonzero components, we obtain the scalar
-   * curl of a vector function and the vector curl of a scalar
-   * function. The current implementation exchanges the sign and we have:
+   * Computing the nonzero components, we obtain the scalar curl of a vector
+   * function and the vector curl of a scalar function. The current
+   * implementation exchanges the sign and we have:
    * @f[
    *  \nabla \times \mathbf u = \partial_1 u_2 - \partial 2 u_1,
    *  \qquad
@@ -65,9 +63,9 @@ namespace LocalIntegrators
   namespace Maxwell
   {
     /**
-     * Auxiliary function. Given the tensors of <tt>dim</tt> second derivatives,
-     * compute the curl of the curl of a vector function. The result in
-     * two and three dimensions is:
+     * Auxiliary function. Given the tensors of <tt>dim</tt> second
+     * derivatives, compute the curl of the curl of a vector function. The
+     * result in two and three dimensions is:
      * @f[
      * \nabla\times\nabla\times \mathbf u = \begin{pmatrix}
      * \partial_1\partial_2 u_2 - \partial_2^2 u_1 \\
@@ -84,8 +82,8 @@ namespace LocalIntegrators
      * \end{pmatrix}
      * @f]
      *
-     * @note The third tensor argument is not used in two dimensions and
-     * can for instance duplicate one of the previous.
+     * @note The third tensor argument is not used in two dimensions and can
+     * for instance duplicate one of the previous.
      *
      * @author Guido Kanschat
      * @date 2011
@@ -116,14 +114,14 @@ namespace LocalIntegrators
     }
 
     /**
-     * Auxiliary function. Given <tt>dim</tt> tensors of first
-     * derivatives and a normal vector, compute the tangential curl
+     * Auxiliary function. Given <tt>dim</tt> tensors of first derivatives and
+     * a normal vector, compute the tangential curl
      * @f[
      * \mathbf n \times \nabla \times u.
      * @f]
      *
-     * @note The third tensor argument is not used in two dimensions and
-     * can for instance duplicate one of the previous.
+     * @note The third tensor argument is not used in two dimensions and can
+     * for instance duplicate one of the previous.
      *
      * @author Guido Kanschat
      * @date 2011
@@ -213,13 +211,13 @@ namespace LocalIntegrators
      * \int_Z \nabla\!\times\! u \cdot v \,dx.
      * @f]
      *
-     * This is the standard curl operator in 3D and the scalar curl in
-     * 2D. The vector curl operator can be obtained by exchanging test and
-     * trial functions.
+     * This is the standard curl operator in 3D and the scalar curl in 2D. The
+     * vector curl operator can be obtained by exchanging test and trial
+     * functions.
      *
      * @author Guido Kanschat
      * @date 2011
-    */
+     */
     template <int dim>
     void curl_matrix (
       FullMatrix<double> &M,
@@ -255,10 +253,8 @@ namespace LocalIntegrators
     }
 
     /**
-     * The matrix for weak boundary
-     * condition of Nitsche type for
-     * the tangential component in
-     * Maxwell systems.
+     * The matrix for weak boundary condition of Nitsche type for the
+     * tangential component in Maxwell systems.
      *
      * @f[
      * \int_F \biggl( 2\gamma
@@ -318,8 +314,7 @@ namespace LocalIntegrators
         }
     }
     /**
-     * The product of two tangential
-     * traces,
+     * The product of two tangential traces,
      * @f[
      * \int_F (u\times n)(v\times n)
      * \, ds.
@@ -372,8 +367,7 @@ namespace LocalIntegrators
     }
 
     /**
-     * The interior penalty fluxes
-     * for Maxwell systems.
+     * The interior penalty fluxes for Maxwell systems.
      *
      * @f[
      * \int_F \biggl( \gamma
@@ -383,9 +377,9 @@ namespace LocalIntegrators
      * n\}\{\nu \nabla\times u\}
      * \biggr)\;dx
      * @f]
-    *
-    * @author Guido Kanschat
-    * @date 2011
+     *
+     * @author Guido Kanschat
+     * @date 2011
      */
     template <int dim>
     inline void ip_curl_matrix (

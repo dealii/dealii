@@ -86,7 +86,6 @@ void MeshConversion::greeting ()
   std::cout << "*** Date:   June 2010, September 2011                                            ***" << std::endl;
   std::cout << "*** References:                                                                  ***" << std::endl;
   std::cout << "***    http://www.dealii.org/developer/doxygen/deal.II/structGeometryInfo.html   ***" << std::endl;
-  std::cout << "***    http://people.scs.fsu.edu/~burkardt/html/ucd_format.html                  ***" << std::endl;
   std::cout << "***    http://people.scs.fsu.edu/~burkardt/data/ucd/ucd.html                     ***" << std::endl;
   std::cout << "***    http://www.cprogramming.com/tutorial/string.html                          ***" << std::endl;
   std::cout << "***    http://www.codeguru.com/forum/showthread.php?t=231054                     ***" << std::endl;
@@ -445,8 +444,6 @@ bool MeshConversion::write_out_avs_ucd (void)
   output << "# Mesh type: AVS UCD" << std::endl;
   output << "# Input file name: " << input_file_name << std::endl;
 
-  // ========================================================
-  // http://people.scs.fsu.edu/~burkardt/html/ucd_format.html
   // ========================================================
   // ASCII UCD File Format
   // The input file cannot contain blank lines or lines with leading blanks. Comments, if present, must precede all data in the file. Comments within the data will cause read errors. The general order of the data is as follows:

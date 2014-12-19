@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +23,10 @@
 
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
+
+#ifndef _MSC_VER
+#  include <mm_malloc.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -58,14 +61,14 @@ namespace parallel
           Assert (((allocated_size > 0 && val != 0) ||
                    val == 0), ExcInternalError());
           if (val != 0)
-            delete [] val;
-          val = new Number[new_alloc_size];
+            _mm_free(val);
+          val = static_cast<Number *>(_mm_malloc (sizeof(Number)*new_alloc_size, 64));
           allocated_size = new_alloc_size;
         }
       else if (new_alloc_size == 0)
         {
           if (val != 0)
-            delete [] val;
+            _mm_free(val);
           val = 0;
           allocated_size = 0;
         }
@@ -153,7 +156,7 @@ namespace parallel
                             const MPI_Comm  communicator)
     {
       // set up parallel partitioner with index sets and communicator
-      std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner
+      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner
       (new Utilities::MPI::Partitioner (locally_owned_indices,
                                         ghost_indices, communicator));
       reinit (new_partitioner);
@@ -168,7 +171,7 @@ namespace parallel
     {
       // set up parallel partitioner with index sets and communicator
       IndexSet ghost_indices(locally_owned_indices.size());
-      std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner
+      std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner
       (new Utilities::MPI::Partitioner (locally_owned_indices,
                                         ghost_indices, communicator));
       reinit (new_partitioner);
@@ -178,7 +181,7 @@ namespace parallel
 
     template <typename Number>
     void
-    Vector<Number>::reinit (const std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in)
+    Vector<Number>::reinit (const std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in)
     {
       clear_mpi_requests();
       partitioner = partitioner_in;

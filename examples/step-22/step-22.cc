@@ -1,5 +1,4 @@
 /* ---------------------------------------------------------------------
- * $Id$
  *
  * Copyright (C) 2008 - 2014 by the deal.II authors
  *
@@ -149,7 +148,7 @@ namespace Step22
     // in how many places a preconditioner object is still referenced, it can
     // never create a memory leak, and can never produce a dangling pointer to
     // an already destroyed object:
-    std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
+    std_cxx11::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
   };
 
   // @sect3{Boundary values and right hand side}
@@ -674,17 +673,17 @@ namespace Step22
 
                   }
 
-		// For the right-hand side we use the fact that the shape
-		// functions are only non-zero in one component (because our
-		// elements are primitive).  Instead of multiplying the tensor
-		// representing the dim+1 values of shape function i with the
-		// whole right-hand side vector, we only look at the only
-		// non-zero component. The Function
-		// FiniteElement::system_to_component_index(i) will return
-		// which component this shape function lives in (0=x velocity,
-		// 1=y velocity, 2=pressure in 2d), which we use to pick out
-		// the correct component of the right-hand side vector to
-		// multiply with.
+                // For the right-hand side we use the fact that the shape
+                // functions are only non-zero in one component (because our
+                // elements are primitive).  Instead of multiplying the tensor
+                // representing the dim+1 values of shape function i with the
+                // whole right-hand side vector, we only look at the only
+                // non-zero component. The Function
+                // FiniteElement::system_to_component_index(i) will return
+                // which component this shape function lives in (0=x velocity,
+                // 1=y velocity, 2=pressure in 2d), which we use to pick out
+                // the correct component of the right-hand side vector to
+                // multiply with.
 
                 const unsigned int component_i =
                   fe.system_to_component_index(i).first;
@@ -735,7 +734,7 @@ namespace Step22
     std::cout << "   Computing preconditioner..." << std::endl << std::flush;
 
     A_preconditioner
-      = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
+      = std_cxx11::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
     A_preconditioner->initialize (system_matrix.block(0,0),
                                   typename InnerPreconditioner<dim>::type::AdditionalData());
 

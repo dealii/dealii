@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,9 +66,9 @@ namespace FiniteElementDomination
    * are then implemented in the FiniteElement::compare_for_line_domination()
    * function.
    *
-   * Note that there are situations where neither side dominates. The @ref
-   * hp_paper "hp paper" lists two case, with the simpler one being that a
-   * $Q_2\times Q_1$ vector-valued element (i.e. a
+   * Note that there are situations where neither side dominates. The
+   * @ref hp_paper "hp paper" lists two case, with the simpler one being
+   * that a $Q_2\times Q_1$ vector-valued element (i.e. a
    * <code>FESystem(FE_Q(2),1,FE_Q(1),1)</code>) meets a $Q_1\times Q_2$
    * element: here, for each of the two vector-components, we can define a
    * domination relationship, but it is different for the two components.
@@ -131,7 +130,8 @@ namespace FiniteElementDomination
  * to the implementation in a concrete finite element class.
  *
  * @ingroup febase
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003, 2005
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003,
+ * 2005
  */
 template <int dim>
 class FiniteElementData
@@ -157,10 +157,10 @@ public:
    * <li> <i>H<sup>2</sup></i> implies that the function is continuously
    * differentiable over cell boundaries.
    *
-   * <li> <i>L<sup>2</sup></i> indicates that the element is
-   * discontinuous. Since discontinuous elements have no topological couplings
-   * between grid cells and code may actually depend on this property,
-   * <i>L<sup>2</sup></i> conformity is handled in a special way in the sense
+   * <li> <i>L<sup>2</sup></i> indicates that the element is discontinuous.
+   * Since discontinuous elements have no topological couplings between grid
+   * cells and code may actually depend on this property, <i>L<sup>2</sup></i>
+   * conformity is handled in a special way in the sense
    * that it is <b>not</b> implied by any higher conformity.  </ol>
    *
    * In order to test if a finite element conforms to a certain space, use

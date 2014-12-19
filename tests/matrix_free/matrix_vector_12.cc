@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2013 by the deal.II authors
 //
@@ -88,7 +87,7 @@ public:
   {
     for (unsigned int i=0; i<dst.size(); ++i)
       dst[i] = 0;
-    const std_cxx1x::function<void(const MatrixFree<dim,Number> &,
+    const std_cxx11::function<void(const MatrixFree<dim,Number> &,
                                    std::vector<parallel::distributed::Vector<Number> > &,
                                    const std::vector<parallel::distributed::Vector<Number> > &,
                                    const std::pair<unsigned int,unsigned int> &)>

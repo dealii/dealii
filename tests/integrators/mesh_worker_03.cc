@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -315,13 +314,13 @@ int main ()
   FE_DGP<2> dgp1(1);
   FE_Q<2> q1(1);
 
-  std::vector<std_cxx1x::shared_ptr<FiniteElement<2> > > fe2;
-  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new FE_DGP<2>(0)));
-  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new FESystem<2>(dgp0,3)));
-  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new FESystem<2>(dgp1,2)));
-  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new FESystem<2>(q1,2)));
-  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new FESystem<2>(dgp0,1,q1,1)));
-//  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));
+  std::vector<std_cxx11::shared_ptr<FiniteElement<2> > > fe2;
+  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new FE_DGP<2>(0)));
+  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new FESystem<2>(dgp0,3)));
+  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new FESystem<2>(dgp1,2)));
+  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new FESystem<2>(q1,2)));
+  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new FESystem<2>(dgp0,1,q1,1)));
+//  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));
 
   for (unsigned int i=0; i<fe2.size(); ++i)
     test(*fe2[i]);

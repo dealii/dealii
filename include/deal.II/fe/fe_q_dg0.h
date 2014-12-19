@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2012 - 2014 by the deal.II authors
 //
@@ -29,28 +28,29 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Implementation of a scalar Lagrange finite element @p Qp+DG0 that yields the
- * finite element space of continuous, piecewise polynomials of degree @p p in
- * each coordinate direction plus the space of locally constant functions.
- * This class is realized using tensor product polynomials based on equidistant
- * or given support points.
+ * Implementation of a scalar Lagrange finite element @p Qp+DG0 that yields
+ * the finite element space of continuous, piecewise polynomials of degree @p
+ * p in each coordinate direction plus the space of locally constant
+ * functions. This class is realized using tensor product polynomials based on
+ * equidistant or given support points.
  *
  * The standard constructor of this class takes the degree @p p of this finite
  * element. Alternatively, it can take a quadrature formula @p points defining
- * the support points of the Lagrange interpolation in one coordinate direction.
+ * the support points of the Lagrange interpolation in one coordinate
+ * direction.
  *
  * For more information about the <tt>spacedim</tt> template parameter check
  * the documentation of FiniteElement or the one of Triangulation.
  *
- * For more information regarding this element see:
- * Boffi, D., et al. "Local Mass Conservation of Stokes Finite Elements."
- * Journal of Scientific Computing (2012): 1-18.
+ * For more information regarding this element see: Boffi, D., et al. "Local
+ * Mass Conservation of Stokes Finite Elements." Journal of Scientific
+ * Computing (2012): 1-18.
  *
  * <h3>Implementation</h3>
  *
  * The constructor creates a TensorProductPolynomials object that includes the
- * tensor product of @p LagrangeEquidistant polynomials of degree @p p plus the
- * locally constant function. This @p TensorProductPolynomialsConst object
+ * tensor product of @p LagrangeEquidistant polynomials of degree @p p plus
+ * the locally constant function. This @p TensorProductPolynomialsConst object
  * provides all values and derivatives of the shape functions. In case a
  * quadrature rule is given, the constructor creates a
  * TensorProductPolynomialsConst object that includes the tensor product of @p
@@ -63,13 +63,12 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
  * The original ordering of the shape functions represented by the
- * TensorProductPolynomialsConst is a tensor product
- * numbering. However, the shape functions on a cell are renumbered
- * beginning with the shape functions whose support points are at the
- * vertices, then on the line, on the quads, and finally (for 3d) on
- * the hexes. Finally there is a support point for the discontinuous shape
- * function in the middle of the cell. To be explicit, these numberings are
- * listed in the following:
+ * TensorProductPolynomialsConst is a tensor product numbering. However, the
+ * shape functions on a cell are renumbered beginning with the shape functions
+ * whose support points are at the vertices, then on the line, on the quads,
+ * and finally (for 3d) on the hexes. Finally there is a support point for the
+ * discontinuous shape function in the middle of the cell. To be explicit,
+ * these numberings are listed in the following:
  *
  * <h4>Q1 elements</h4>
  * <ul>
@@ -101,19 +100,19 @@ DEAL_II_NAMESPACE_OPEN
  *     0-------1        0-------1
  *   @endverbatim
  *
- *   The respective coordinate values of the support points of the degrees
- *   of freedom are as follows:
- *   <ul>
- *   <li> Index 0: <tt>[ 0,  0, 0]</tt>;
- *   <li> Index 1: <tt>[ 1,  0, 0]</tt>;
- *   <li> Index 2: <tt>[ 0,  1, 0]</tt>;
- *   <li> Index 3: <tt>[ 1,  1, 0]</tt>;
- *   <li> Index 4: <tt>[ 0,  0, 1]</tt>;
- *   <li> Index 5: <tt>[ 1,  0, 1]</tt>;
- *   <li> Index 6: <tt>[ 0,  1, 1]</tt>;
- *   <li> Index 7: <tt>[ 1,  1, 1]</tt>;
- *   <li> Index 8: <tt>[1/2, 1/2, 1/2]</tt>;
- *   </ul>
+ * The respective coordinate values of the support points of the degrees of
+ * freedom are as follows:
+ * <ul>
+ * <li> Index 0: <tt>[ 0,  0, 0]</tt>;
+ * <li> Index 1: <tt>[ 1,  0, 0]</tt>;
+ * <li> Index 2: <tt>[ 0,  1, 0]</tt>;
+ * <li> Index 3: <tt>[ 1,  1, 0]</tt>;
+ * <li> Index 4: <tt>[ 0,  0, 1]</tt>;
+ * <li> Index 5: <tt>[ 1,  0, 1]</tt>;
+ * <li> Index 6: <tt>[ 0,  1, 1]</tt>;
+ * <li> Index 7: <tt>[ 1,  1, 1]</tt>;
+ * <li> Index 8: <tt>[1/2, 1/2, 1/2]</tt>;
+ * </ul>
  * </ul>
  * <h4>Q2 elements</h4>
  * <ul>
@@ -121,7 +120,7 @@ DEAL_II_NAMESPACE_OPEN
  *   @verbatim
  *      0---2---1
  *   @endverbatim
- *   Index 3 has the same coordinates as index 2
+ * Index 3 has the same coordinates as index 2
  *
  * <li> 2D case:
  *   @verbatim
@@ -131,7 +130,7 @@ DEAL_II_NAMESPACE_OPEN
  *      |       |
  *      0---6---1
  *   @endverbatim
- *   Index 9 has the same coordinates as index 2
+ * Index 9 has the same coordinates as index 2
  *
  * <li> 3D case:
  *   @verbatim
@@ -157,40 +156,40 @@ DEAL_II_NAMESPACE_OPEN
  *     |/       /       |       |/
  *     *-------*        *-------*
  *   @endverbatim
- *   The center vertices have number 26 and 27.
+ * The center vertices have number 26 and 27.
  *
- *   The respective coordinate values of the support points of the degrees
- *   of freedom are as follows:
- *   <ul>
- *   <li> Index 0: <tt>[0, 0, 0]</tt>;
- *   <li> Index 1: <tt>[1, 0, 0]</tt>;
- *   <li> Index 2: <tt>[0, 1, 0]</tt>;
- *   <li> Index 3: <tt>[1, 1, 0]</tt>;
- *   <li> Index 4: <tt>[0, 0, 1]</tt>;
- *   <li> Index 5: <tt>[1, 0, 1]</tt>;
- *   <li> Index 6: <tt>[0, 1, 1]</tt>;
- *   <li> Index 7: <tt>[1, 1, 1]</tt>;
- *   <li> Index 8: <tt>[0, 1/2, 0]</tt>;
- *   <li> Index 9: <tt>[1, 1/2, 0]</tt>;
- *   <li> Index 10: <tt>[1/2, 0, 0]</tt>;
- *   <li> Index 11: <tt>[1/2, 1, 0]</tt>;
- *   <li> Index 12: <tt>[0, 1/2, 1]</tt>;
- *   <li> Index 13: <tt>[1, 1/2, 1]</tt>;
- *   <li> Index 14: <tt>[1/2, 0, 1]</tt>;
- *   <li> Index 15: <tt>[1/2, 1, 1]</tt>;
- *   <li> Index 16: <tt>[0, 0, 1/2]</tt>;
- *   <li> Index 17: <tt>[1, 0, 1/2]</tt>;
- *   <li> Index 18: <tt>[0, 1, 1/2]</tt>;
- *   <li> Index 19: <tt>[1, 1, 1/2]</tt>;
- *   <li> Index 20: <tt>[0, 1/2, 1/2]</tt>;
- *   <li> Index 21: <tt>[1, 1/2, 1/2]</tt>;
- *   <li> Index 22: <tt>[1/2, 0, 1/2]</tt>;
- *   <li> Index 23: <tt>[1/2, 1, 1/2]</tt>;
- *   <li> Index 24: <tt>[1/2, 1/2, 0]</tt>;
- *   <li> Index 25: <tt>[1/2, 1/2, 1]</tt>;
- *   <li> Index 26: <tt>[1/2, 1/2, 1/2]</tt>;
- *   <li> Index 27: <tt>[1/2, 1/2, 1/2]</tt>;
- *   </ul>
+ * The respective coordinate values of the support points of the degrees of
+ * freedom are as follows:
+ * <ul>
+ * <li> Index 0: <tt>[0, 0, 0]</tt>;
+ * <li> Index 1: <tt>[1, 0, 0]</tt>;
+ * <li> Index 2: <tt>[0, 1, 0]</tt>;
+ * <li> Index 3: <tt>[1, 1, 0]</tt>;
+ * <li> Index 4: <tt>[0, 0, 1]</tt>;
+ * <li> Index 5: <tt>[1, 0, 1]</tt>;
+ * <li> Index 6: <tt>[0, 1, 1]</tt>;
+ * <li> Index 7: <tt>[1, 1, 1]</tt>;
+ * <li> Index 8: <tt>[0, 1/2, 0]</tt>;
+ * <li> Index 9: <tt>[1, 1/2, 0]</tt>;
+ * <li> Index 10: <tt>[1/2, 0, 0]</tt>;
+ * <li> Index 11: <tt>[1/2, 1, 0]</tt>;
+ * <li> Index 12: <tt>[0, 1/2, 1]</tt>;
+ * <li> Index 13: <tt>[1, 1/2, 1]</tt>;
+ * <li> Index 14: <tt>[1/2, 0, 1]</tt>;
+ * <li> Index 15: <tt>[1/2, 1, 1]</tt>;
+ * <li> Index 16: <tt>[0, 0, 1/2]</tt>;
+ * <li> Index 17: <tt>[1, 0, 1/2]</tt>;
+ * <li> Index 18: <tt>[0, 1, 1/2]</tt>;
+ * <li> Index 19: <tt>[1, 1, 1/2]</tt>;
+ * <li> Index 20: <tt>[0, 1/2, 1/2]</tt>;
+ * <li> Index 21: <tt>[1, 1/2, 1/2]</tt>;
+ * <li> Index 22: <tt>[1/2, 0, 1/2]</tt>;
+ * <li> Index 23: <tt>[1/2, 1, 1/2]</tt>;
+ * <li> Index 24: <tt>[1/2, 1/2, 0]</tt>;
+ * <li> Index 25: <tt>[1/2, 1/2, 1]</tt>;
+ * <li> Index 26: <tt>[1/2, 1/2, 1/2]</tt>;
+ * <li> Index 27: <tt>[1/2, 1/2, 1/2]</tt>;
+ * </ul>
  * </ul>
  * <h4>Q3 elements</h4>
  * <ul>
@@ -216,7 +215,7 @@ DEAL_II_NAMESPACE_OPEN
  *   @verbatim
  *      0--2--3--4--1
  *   @endverbatim
- *   Index 5 has the same coordinates as index 3
+ * Index 5 has the same coordinates as index 3
  *
  * <li> 2D case:
  *   @verbatim
@@ -230,7 +229,7 @@ DEAL_II_NAMESPACE_OPEN
  *      |           |
  *      0--10-11-12-1
  *   @endverbatim
- *   Index 21 has the same coordinates as index 20
+ * Index 21 has the same coordinates as index 20
  * </ul>
  *
  */
@@ -328,8 +327,8 @@ protected:
 private:
 
   /**
-   * Returns the restriction_is_additive flags.
-   * Only the last component is true.
+   * Returns the restriction_is_additive flags. Only the last component is
+   * true.
    */
   static std::vector<bool> get_riaf_vector(const unsigned int degree);
 

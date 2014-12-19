@@ -1,5 +1,4 @@
 /* ---------------------------------------------------------------------
- * $Id$
  *
  * Copyright (C) 2000 - 2013 by the deal.II authors
  *
@@ -444,10 +443,10 @@ void Step6<dim>::assemble_system ()
       // @p cell_rhs into the global objects.
       cell->get_dof_indices (local_dof_indices);
       constraints.distribute_local_to_global (cell_matrix,
-					      cell_rhs,
-					      local_dof_indices,
-					      system_matrix,
-					      system_rhs);
+                                              cell_rhs,
+                                              local_dof_indices,
+                                              system_matrix,
+                                              system_rhs);
     }
   // Now we are done assembling the linear system. The constraint matrix took
   // care of applying the boundary conditions and also eliminated hanging node

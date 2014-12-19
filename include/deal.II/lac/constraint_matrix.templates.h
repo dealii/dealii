@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2013 by the deal.II authors
 //
@@ -73,82 +72,14 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 
 template<class VectorType>
 void
-ConstraintMatrix::condense (const VectorType &uncondensed,
-                            VectorType       &condensed) const
+ConstraintMatrix::condense (const VectorType &vec_ghosted,
+                            VectorType       &vec) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
-  AssertDimension (condensed.size()+n_constraints(), uncondensed.size());
 
-  // store for each line of the
-  // vector its new line number after
-  // compression. If the shift is -1,
-  // this line will be condensed away
-  std::vector<int> new_line;
-
-  new_line.reserve (uncondensed.size());
-
-  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  size_type                                   shift           = 0;
-  size_type n_rows = uncondensed.size();
-
-  if (next_constraint == lines.end())
-    // if no constraint is to be handled
-    for (size_type row=0; row!=n_rows; ++row)
-      new_line.push_back (row);
-  else
-    for (size_type row=0; row!=n_rows; ++row)
-      if (row == next_constraint->line)
-        {
-          // this line is constrained
-          new_line.push_back (-1);
-          // note that @p lines is ordered
-          ++shift;
-          ++next_constraint;
-          if (next_constraint == lines.end())
-            // nothing more to do; finish rest
-            // of loop
-            {
-              for (size_type i=row+1; i<n_rows; ++i)
-                new_line.push_back (i-shift);
-              break;
-            };
-        }
-      else
-        new_line.push_back (row-shift);
-
-
-  next_constraint = lines.begin();
-  // note: in this loop we need not check
-  // whether @p next_constraint is a valid
-  // iterator, since @p next_constraint is
-  // only evaluated so often as there are
-  // entries in new_line[*] which tells us
-  // which constraints exist
-  for (size_type row=0; row<uncondensed.size(); ++row)
-    if (new_line[row] != -1)
-      // line not constrained
-      // copy entry
-      condensed(new_line[row]) += uncondensed(row);
-
-    else
-      // line must be distributed
-      {
-        for (size_type q=0; q!=next_constraint->entries.size(); ++q)
-          condensed(new_line[next_constraint->entries[q].first])
-          +=
-            uncondensed(row) * next_constraint->entries[q].second;
-
-        ++next_constraint;
-      };
-}
-
-
-
-template <class VectorType>
-void
-ConstraintMatrix::condense (VectorType &vec) const
-{
-  Assert (sorted == true, ExcMatrixNotClosed());
+  // if this is called with different arguments, we need to copy the data over:
+  if (&vec != &vec_ghosted)
+    vec = vec_ghosted;
 
   // distribute all entries, and set them to zero. do so in
   // two loops because in the first one we need to add to elements
@@ -166,7 +97,7 @@ ConstraintMatrix::condense (VectorType &vec) const
               ExcMessage ("Inhomogeneous constraint cannot be condensed "
                           "without any matrix specified."));
 
-      const typename VectorType::value_type old_value = vec(constraint_line->line);
+      const typename VectorType::value_type old_value = vec_ghosted(constraint_line->line);
       for (size_type q=0; q!=constraint_line->entries.size(); ++q)
         if (vec.in_local_range(constraint_line->entries[q].first) == true)
           vec(constraint_line->entries[q].first)
@@ -184,6 +115,15 @@ ConstraintMatrix::condense (VectorType &vec) const
       vec(constraint_line->line) = 0.;
 
   vec.compress(VectorOperation::insert);
+}
+
+
+
+template <class VectorType>
+void
+ConstraintMatrix::condense (VectorType &vec) const
+{
+  condense(vec, vec);
 }
 
 
@@ -1644,9 +1584,9 @@ namespace internals
    * Since each thread gets its private version of scratch data out of the
    * ThreadLocalStorage, no conflicting access can occur. For this to be
    * valid, we need to make sure that no call within
-   * distribute_local_to_global is made that by itself can spawn
-   * tasks. Otherwise, we might end up in a situation where several threads
-   * fight for the data.
+   * distribute_local_to_global is made that by itself can spawn tasks.
+   * Otherwise, we might end up in a situation where several threads fight for
+   * the data.
    *
    * Access to the scratch data is only through the accessor class which
    * handles the access as well as marking the data as used.
@@ -2798,7 +2738,7 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
         sparsity_pattern.add_entries(actual_dof_indices[i],
                                      actual_dof_indices.begin(),
                                      actual_dof_indices.end(),
-                                   true);
+                                     true);
 
       // need to add the whole row and column structure in case we keep
       // constrained entries. Unfortunately, we can't use the nice matrix

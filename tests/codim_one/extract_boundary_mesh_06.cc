@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -44,7 +43,7 @@ void test ()
   GridGenerator::hyper_cube(volume_mesh);
   volume_mesh.refine_global(1);
   surface_to_volume_mapping
-    = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh);
+    = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
   boundary_mesh.refine_global(1);
 
   for (Triangulation<dim,spacedim>::active_cell_iterator

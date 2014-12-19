@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,6 +93,7 @@
  *   The classes that describe triangulations and cells are located
  *   and documented in the @ref grid module. Iterators are described
  *   in the @ref Iterators module.
+ *
  *   <li> <b>Finite Element</b>: Finite element classes describe the
  *   properties of a finite element space as defined on the unit
  *   cell. This includes, for example, how many degrees of freedom are
@@ -103,6 +103,7 @@
  *   points on the unit cell.
  *
  *   The finite element classes are described in the @ref feall module.
+ *
  *   <li> <b>%Quadrature</b>: As with finite elements, quadrature
  *   objects are defined on the unit cell. They only describe the
  *   location of quadrature points on the unit cell, and the weights
@@ -110,6 +111,7 @@
  *
  *   The documentation of the classes describing particular quadrature
  *   formulas is found in the @ref Quadrature module.
+ *
  *   <li> <b>%DoFHandler</b>: %DoFHandler objects are the confluence
  *   of triangulations and finite elements: the finite element class
  *   describes how many degrees of freedom it needs per vertex, line,
@@ -155,6 +157,7 @@
  *   imply constraints on degrees of freedom, such as for hanging nodes
  *   or nodes at which boundary conditions apply; dealing with such
  *   constraints is described in the @ref constraints module.
+ *
  *   <li> <b>%Mapping</b>: The next step in a finite element program
  *   is that one would want to compute matrix and right hand side
  *   entries or other quantities on each cell of a triangulation,
@@ -168,6 +171,7 @@
  *   derivative and Jacobian determinants.
  *
  *   These classes are all described in the @ref mapping module.
+ *
  *   <li> <b>%FEValues</b>: The next step is to actually take a finite
  *   element and evaluate its shape functions and their gradients at
  *   the points defined by a quadrature formula when mapped to the
@@ -195,6 +199,7 @@
  *   cells, and FESubfaceValues for evaluation on parts of faces of
  *   cells. All these classes are described in the @ref feaccess
  *   module.
+ *
  *   <li> <b>Linear Systems</b>: If one knows how to evaluate the
  *   values and gradients of shape functions on individual cells using
  *   FEValues and friends, and knows how to get the global numbers of
@@ -209,12 +214,14 @@
  *   of classes for this purpose, as well as with interfaces to other
  *   software packages that offer similar functionality. Documentation
  *   to this end can be found in the @ref LAC module.
+ *
  *   <li> <b>Linear Solvers</b>: In order to determine the solution of
  *   a finite-dimensional, linear system of equations, one needs
  *   linear solvers. In finite element applications, they are
  *   frequently iterative, but sometimes one may also want to use
  *   direct or sparse direct solvers. deal.II has quite a number of
  *   these. They are documented in the @ref Solvers module.
+ *
  *   <li> <b>Output</b>: Finally, once one has obtained a solution of
  *   a finite element problem on a given triangulation, one will often
  *   want to postprocess it using a visualization program. This

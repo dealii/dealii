@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2013 by the deal.II authors
 //
@@ -53,7 +52,7 @@ TensorFunction<rank, dim, Number>::value (const Point<dim,Number> &) const
 template <int rank, int dim, typename Number>
 void
 TensorFunction<rank, dim, Number>::value_list (const std::vector<Point<dim,Number> > &points,
-                                       std::vector<value_type>        &values) const
+                                               std::vector<value_type>        &values) const
 {
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
@@ -75,7 +74,7 @@ TensorFunction<rank, dim, Number>::gradient (const Point<dim,Number> &) const
 template <int rank, int dim, typename Number>
 void
 TensorFunction<rank, dim, Number>::gradient_list (const std::vector<Point<dim,Number> >   &points,
-                                          std::vector<gradient_type> &gradients) const
+                                                  std::vector<gradient_type> &gradients) const
 {
   Assert (gradients.size() == points.size(),
           ExcDimensionMismatch(gradients.size(), points.size()));
@@ -93,7 +92,7 @@ TensorFunction<rank, dim, Number>::gradient_list (const std::vector<Point<dim,Nu
 
 template <int rank, int dim, typename Number>
 ConstantTensorFunction<rank, dim, Number>::ConstantTensorFunction (const Tensor<rank, dim, Number> &value,
-								   const Number initial_time)
+    const Number initial_time)
   :
   TensorFunction<rank, dim, Number> (initial_time),
   _value(value)
@@ -116,7 +115,7 @@ ConstantTensorFunction<rank, dim, Number>::value (const Point<dim,Number> &/*poi
 template <int rank, int dim, typename Number>
 void
 ConstantTensorFunction<rank, dim, Number>::value_list (const std::vector<Point<dim,Number> > &points,
-                                               std::vector<typename TensorFunction<rank, dim, Number>::value_type> &values) const
+                                                       std::vector<typename TensorFunction<rank, dim, Number>::value_type> &values) const
 {
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
@@ -139,7 +138,7 @@ ConstantTensorFunction<rank, dim, Number>::gradient (const Point<dim,Number> &) 
 template <int rank, int dim, typename Number>
 void
 ConstantTensorFunction<rank, dim, Number>::gradient_list (const std::vector<Point<dim,Number> >   &points,
-                                                  std::vector<typename TensorFunction<rank, dim, Number>::gradient_type> &gradients) const
+                                                          std::vector<typename TensorFunction<rank, dim, Number>::gradient_type> &gradients) const
 {
   Assert (gradients.size() == points.size(),
           ExcDimensionMismatch(gradients.size(), points.size()));

@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2014 by the deal.II authors
 //
@@ -116,9 +115,9 @@ double my5(double const t)
 }
 
 void test(TimeStepping::RungeKutta<Vector<double> > &solver,
-    std_cxx1x::function<Vector<double> (double const, Vector<double> const &)> f,
-    std_cxx1x::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
-    std_cxx1x::function<double (double const)> my)
+    std_cxx11::function<Vector<double> (double const, Vector<double> const &)> f,
+    std_cxx11::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
+    std_cxx11::function<double (double const)> my)
 {
   unsigned int n_time_steps = 1;
   unsigned int size = 1;
@@ -143,9 +142,9 @@ void test(TimeStepping::RungeKutta<Vector<double> > &solver,
 }
 
 void test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
-    std_cxx1x::function<Vector<double> (double const, Vector<double> const &)> f,
-    std_cxx1x::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
-    std_cxx1x::function<double (double const)> my)
+    std_cxx11::function<Vector<double> (double const, Vector<double> const &)> f,
+    std_cxx11::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
+    std_cxx11::function<double (double const)> my)
 {
   double initial_time = 0.0, final_time = 1.0;
   double time_step = 1.0;

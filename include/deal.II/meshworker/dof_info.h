@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +19,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/meshworker/local_results.h>
@@ -31,36 +30,36 @@ DEAL_II_NAMESPACE_OPEN
 namespace MeshWorker
 {
   template <int dim, class DOFINFO> class DoFInfoBox;
+
+
   /**
-   * A class containing information on geometry and degrees of freedom
-   * of a mesh object.
+   * A class containing information on geometry and degrees of freedom of a
+   * mesh object.
    *
-   * The information in these objects is usually used by one of the
-   * Assembler classes. It is also the kind of information which is
-   * needed in mesh based matrices (often referred to as matrix free
-   * methods).
+   * The information in these objects is usually used by one of the Assembler
+   * classes. It is also the kind of information which is needed in mesh based
+   * matrices (often referred to as matrix free methods).
    *
    * In addition to the information on degrees of freedom stored in this
-   * class, it also provides the local computation space for the worker
-   * object operating on it in LocalResults. This base class will automatically
-   * be reinitialized on each cell, but initial setup is up to the user and
+   * class, it also provides the local computation space for the worker object
+   * operating on it in LocalResults. This base class will automatically be
+   * reinitialized on each cell, but initial setup is up to the user and
    * should be done when initialize() for this class is called.
    *
-   * This class operates in two different modes, corresponding to the
-   * data models discussed in the Assembler namespace documentation.
+   * This class operates in two different modes, corresponding to the data
+   * models discussed in the Assembler namespace documentation.
    *
    * The choice of the local data model is triggered by the vector
    * BlockInfo::local_renumbering, which in turn is usually filled by
-   * BlockInfo::initialize_local(). If this function has been used, or
-   * the vector has been changed from zero-length, then local dof
-   * indices stored in this object will automatically be renumbered to
-   * reflect local block structure. This means, the first entries in
-   * @p indices will refer to the first block of the system, then comes
-   * the second block and so on.
+   * BlockInfo::initialize_local(). If this function has been used, or the
+   * vector has been changed from zero-length, then local dof indices stored
+   * in this object will automatically be renumbered to reflect local block
+   * structure. This means, the first entries in @p indices will refer to the
+   * first block of the system, then comes the second block and so on.
    *
-   * The BlockInfo object is stored as a pointer. Therefore, if the
-   * block structure changes, for instance because of mesh refinement,
-   * the DoFInfo class will automatically use the new structures.
+   * The BlockInfo object is stored as a pointer. Therefore, if the block
+   * structure changes, for instance because of mesh refinement, the DoFInfo
+   * class will automatically use the new structures.
    *
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009
@@ -76,25 +75,18 @@ namespace MeshWorker
     typename Triangulation<dim, spacedim>::face_iterator face;
 
     /**
-     * The number of the current
-     * face on the current cell.
+     * The number of the current face on the current cell.
      *
-     * This number is
-     * deal_II_numbers::invalid_unsigned_int
-     * if the info object was
-     * initialized with a cell.
+     * This number is deal_II_numbers::invalid_unsigned_int if the info object
+     * was initialized with a cell.
      */
-
     unsigned int face_number;
+
     /**
-     * The number of the current
-     * subface on the current
-     * face
+     * The number of the current subface on the current face
      *
-     * This number is
-     * deal_II_numbers::invalid_unsigned_int
-     * if the info object was not
-     * initialized with a subface.
+     * This number is deal_II_numbers::invalid_unsigned_int if the info object
+     * was not initialized with a subface.
      */
     unsigned int sub_number;
 
@@ -105,28 +97,24 @@ namespace MeshWorker
     std::vector<types::global_dof_index> indices;
 
     /**
-     * The DoF indices on the current cell, organized by local blocks.
-     * The size of this vector is zero, unless local blocks are used.
+     * The DoF indices on the current cell, organized by local blocks. The
+     * size of this vector is zero, unless local blocks are used.
      */
     std::vector<std::vector<types::global_dof_index> > indices_by_block;
 
     /**
-     * Constructor setting the
-     * #block_info pointer.
+     * Constructor setting the #block_info pointer.
      */
     DoFInfo(const BlockInfo &block_info);
 
     /**
-     * Constructor
-     * leaving the #block_info
-     * pointer empty, but setting
-     * the #aux_local_indices.
+     * Constructor leaving the #block_info pointer empty, but setting the
+     * #aux_local_indices.
      */
     DoFInfo (const DoFHandler<dim, spacedim> &dof_handler);
 
     /**
-     * Set the current cell and
-     * fill @p indices.
+     * Set the current cell and fill @p indices.
      */
     template <class DHCellIterator>
     void reinit(const DHCellIterator &c);
@@ -140,8 +128,7 @@ namespace MeshWorker
                 const unsigned int face_no);
 
     /**
-     * Set the current subface and fill @p indices if the #cell
-     * changed.
+     * Set the current subface and fill @p indices if the #cell changed.
      */
     template <class DHCellIterator, class DHFaceIterator>
     void reinit(const DHCellIterator &c,
@@ -150,16 +137,16 @@ namespace MeshWorker
                 const unsigned int subface_no);
 
     /**
-     * Switch to a new face of the same cell. Does not change @p
-     * indices and does not reset data in LocalResults.
+     * Switch to a new face of the same cell. Does not change @p indices and
+     * does not reset data in LocalResults.
      */
     template <class DHFaceIterator>
     void set_face (const DHFaceIterator &f,
                    const unsigned int face_no);
 
     /**
-     * Switch to a new subface of the same cell. Does not change @p
-     * indices and does not reset data in LocalResults.
+     * Switch to a new subface of the same cell. Does not change @p indices
+     * and does not reset data in LocalResults.
      */
     template <class DHFaceIterator>
     void set_subface (const DHFaceIterator &f,
@@ -173,20 +160,21 @@ namespace MeshWorker
     SmartPointer<const BlockInfo,DoFInfo<dim,spacedim> > block_info;
 
     /**
-     * The structure refers to a cell with level data instead of
-     * active data.
+     * The structure refers to a cell with level data instead of active data.
      */
     bool level_cell;
+
   private:
     /**
-     * Standard constructor, not setting any block indices. Use of
-     * this constructor is not recommended, but it is needed for the
-     * arrays in DoFInfoBox.
+     * Standard constructor, not setting any block indices. Use of this
+     * constructor is not recommended, but it is needed for the arrays in
+     * DoFInfoBox.
      */
     DoFInfo ();
 
     /// Set up local block indices
     void set_block_indices ();
+
     /// Fill index vector with active indices
     template <class DHCellIterator>
     void get_indices(const DHCellIterator &c);
@@ -195,12 +183,9 @@ namespace MeshWorker
     std::vector<types::global_dof_index> indices_org;
 
     /**
-     * An auxiliary local
-     * BlockIndices object created
-     * if #block_info is not set.
-     * It contains just a single
-     * block of the size of
-     * degrees of freedom per cell.
+     * An auxiliary local BlockIndices object created if #block_info is not
+     * set. It contains just a single block of the size of degrees of freedom
+     * per cell.
      */
     BlockIndices aux_local_indices;
 
@@ -209,30 +194,28 @@ namespace MeshWorker
 
 
   /**
-  * A class bundling the MeshWorker::DoFInfo objects used on a cell.
-  *
-  * @todo Currently, we are storing an object for the cells and two for
-  * each face. We could gather all face data pertaining to the cell
-  * itself in one object, saving a bit of memory and a few operations,
-  * but sacrificing some cleanliness.
-  *
-  * @ingroup MeshWorker
-  * @author Guido Kanschat, 2010
-  */
+   * A class bundling the MeshWorker::DoFInfo objects used on a cell.
+   *
+   * @todo Currently, we are storing an object for the cells and two for each
+   * face. We could gather all face data pertaining to the cell itself in one
+   * object, saving a bit of memory and a few operations, but sacrificing some
+   * cleanliness.
+   *
+   * @ingroup MeshWorker
+   * @author Guido Kanschat, 2010
+   */
   template <int dim, class DOFINFO>
   class DoFInfoBox
   {
   public:
     /**
-     * Constructor copying the seed
-     * into all other objects.
+     * Constructor copying the seed into all other objects.
      */
     DoFInfoBox(const DOFINFO &seed);
 
     /**
-     * Copy constructor, taking
-     * #cell and using it as a seed
-     * in the other constructor.
+     * Copy constructor, taking #cell and using it as a seed in the other
+     * constructor.
      */
     DoFInfoBox(const DoFInfoBox<dim, DOFINFO> &);
 
@@ -242,13 +225,9 @@ namespace MeshWorker
     void reset();
 
     /**
-     * After all info objects have
-     * been filled appropriately,
-     * use the ASSEMBLER object
-     * to assemble them into the
-     * global data. See
-     * MeshWorker::Assembler for
-     * available classes.
+     * After all info objects have been filled appropriately, use the
+     * ASSEMBLER object to assemble them into the global data. See
+     * MeshWorker::Assembler for available classes.
      */
     template <class ASSEMBLER>
     void assemble(ASSEMBLER &ass) const;
@@ -273,21 +252,19 @@ namespace MeshWorker
     DOFINFO exterior[GeometryInfo<dim>::faces_per_cell];
 
     /**
-     * A set of flags, indicating
-     * whether data on an interior
-     * face is available.
+     * A set of flags, indicating whether data on an interior face is
+     * available.
      */
     bool interior_face_available[GeometryInfo<dim>::faces_per_cell];
+
     /**
-     * A set of flags, indicating
-     * whether data on an exterior
-     * face is available.
+     * A set of flags, indicating whether data on an exterior face is
+     * available.
      */
     bool exterior_face_available[GeometryInfo<dim>::faces_per_cell];
 
     /**
-     * A flag to specify if the current object has been set to a valid
-     * cell.
+     * A flag to specify if the current object has been set to a valid cell.
      */
     bool cell_valid;
   };
@@ -296,6 +273,8 @@ namespace MeshWorker
 
   template <int dim, int spacedim, typename number>
   DoFInfo<dim,spacedim,number>::DoFInfo(const DoFHandler<dim,spacedim> &dof_handler)
+    :
+    level_cell (false)
   {
     std::vector<types::global_dof_index> aux(1);
     aux[0] = dof_handler.get_fe().dofs_per_cell;
@@ -459,7 +438,7 @@ namespace MeshWorker
   inline void
   DoFInfoBox<dim, DOFINFO>::reset ()
   {
-      cell_valid = false;
+    cell_valid = false;
     for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
       {
         interior_face_available[i] = false;

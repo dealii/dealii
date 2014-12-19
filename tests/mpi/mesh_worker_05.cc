@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -104,9 +103,9 @@ test_simple(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 //                typename identity<ITERATOR>::type end,
 //                DOFINFO &dinfo,
 //                INFOBOX &info,
-//                const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
-//                const std_cxx1x::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
-//                const std_cxx1x::function<void (DOFINFO &, DOFINFO &,
+//                const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
+//                const std_cxx11::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
+//                const std_cxx11::function<void (DOFINFO &, DOFINFO &,
 //                                                typename INFOBOX::CellInfo &,
 //                                                typename INFOBOX::CellInfo &)> &face_worker,
 //                ASSEMBLER &assembler,
@@ -124,9 +123,9 @@ test_simple(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 //  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
 //    (dofs.begin_active(), dofs.end(),
 //   dof_info, info_box,
-//       std_cxx1x::bind (&Integrator<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
-//   std_cxx1x::bind (&Integrator<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
-//   std_cxx1x::bind (&Integrator<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
+//       std_cxx11::bind (&Integrator<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
+//   std_cxx11::bind (&Integrator<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
+//   std_cxx11::bind (&Integrator<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
 //     local,
 //     lctrl);
 }

@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,35 +32,41 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Bicgstab algorithm by van der Vorst.
  *
- * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the Solver base class.
+ * For the requirements on matrices and vectors in order to work with this
+ * class, see the documentation of the Solver base class.
  *
- * Like all other solver classes, this class has a local structure called
- * @p AdditionalData which is used to pass additional parameters to the
- * solver, like damping parameters or the number of temporary vectors. We
- * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the @p SolverSelector and
- * other classes much easier and guarantees that these will continue to
- * work even if number or type of the additional parameters for a certain
- * solver changes.
+ * Like all other solver classes, this class has a local structure called @p
+ * AdditionalData which is used to pass additional parameters to the solver,
+ * like damping parameters or the number of temporary vectors. We use this
+ * additional structure instead of passing these values directly to the
+ * constructor because this makes the use of the @p SolverSelector and other
+ * classes much easier and guarantees that these will continue to work even if
+ * number or type of the additional parameters for a certain solver changes.
  *
- * The Bicgstab-method has two additional parameters: the first is a
- * boolean, deciding whether to compute the actual residual in each step (@p
- * true) or to use the length of the computed orthogonal residual (@p
- * false). Note that computing the residual causes a third
- * matrix-vector-multiplication, though no additional preconditioning, in
- * each step. The reason for doing this is, that the size of the
- * orthogonalized residual computed during the iteration may be larger by
- * orders of magnitude than the true residual. This is due to numerical
- * instabilities related to badly conditioned matrices. Since this
+ * The Bicgstab-method has two additional parameters: the first is a boolean,
+ * deciding whether to compute the actual residual in each step (@p true) or
+ * to use the length of the computed orthogonal residual (@p false). Note that
+ * computing the residual causes a third matrix-vector-multiplication, though
+ * no additional preconditioning, in each step. The reason for doing this is,
+ * that the size of the orthogonalized residual computed during the iteration
+ * may be larger by orders of magnitude than the true residual. This is due to
+ * numerical instabilities related to badly conditioned matrices. Since this
  * instability results in a bad stopping criterion, the default for this
  * parameter is @p true. Whenever the user knows that the estimated residual
- * works reasonably as well, the flag should be set to @p false in order
- * to increase the performance of the solver.
+ * works reasonably as well, the flag should be set to @p false in order to
+ * increase the performance of the solver.
  *
- * The second parameter is the size of a breakdown criterion. It is
- * difficult to find a general good criterion, so if things do not
- * work for you, try to change this value.
+ * The second parameter is the size of a breakdown criterion. It is difficult
+ * to find a general good criterion, so if things do not work for you, try to
+ * change this value.
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described in the
+ * Solver base class to determine convergence. This mechanism can also be used
+ * to observe the progress of the iteration.
+ *
  */
 template <class VECTOR = Vector<double> >
 class SolverBicgstab : public Solver<VECTOR>
@@ -227,18 +232,50 @@ private:
   SolverControl::State start(const MATRIX &A);
 
   /**
-   * The iteration loop itself.
+   * A structure returned by the iterate() function representing what it found
+   * is happening during the iteration.
+   */
+  struct IterationResult
+  {
+    bool                 breakdown;
+    SolverControl::State state;
+    unsigned int         last_step;
+    double               last_residual;
+
+    IterationResult (const bool breakdown,
+                     const SolverControl::State state,
+                     const unsigned int         last_step,
+                     const double               last_residual);
+  };
+
+  /**
+   * The iteration loop itself. The function returns a structure indicating
+   * what happened in this function.
    */
   template<class MATRIX, class PRECONDITIONER>
-  bool
-  iterate(const MATRIX &A, const PRECONDITIONER &precondition);
-
+  IterationResult
+  iterate(const MATRIX &A,
+          const PRECONDITIONER &precondition);
 };
 
 /*@}*/
 /*-------------------------Inline functions -------------------------------*/
 
 #ifndef DOXYGEN
+
+
+template<class VECTOR>
+SolverBicgstab<VECTOR>::IterationResult::IterationResult(const bool breakdown,
+                                                         const SolverControl::State state,
+                                                         const unsigned int         last_step,
+                                                         const double               last_residual)
+  :
+  breakdown (breakdown),
+  state (state),
+  last_step (last_step),
+  last_residual (last_residual)
+{}
+
 
 template<class VECTOR>
 SolverBicgstab<VECTOR>::SolverBicgstab (SolverControl &cn,
@@ -290,7 +327,7 @@ SolverBicgstab<VECTOR>::start(const MATRIX &A)
   Vr->sadd(-1.,1.,*Vb);
   res = Vr->l2_norm();
 
-  return this->control().check(step, res);
+  return this->iteration_status(step, res, *Vx);
 }
 
 
@@ -307,7 +344,7 @@ SolverBicgstab<VECTOR>::print_vectors(const unsigned int,
 
 template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
-bool
+typename SolverBicgstab<VECTOR>::IterationResult
 SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
                                 const PRECONDITIONER &precondition)
 {
@@ -350,17 +387,21 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
 //TODO:[?] Find better breakdown criterion
 
       if (std::fabs(alpha) > 1.e10)
-        return true;
+        return IterationResult(true, state, step, res);
 
-      r.add(-alpha, v);
+      res = std::sqrt(r.add_and_dot(-alpha, v, r));
 
       // check for early success, see the lac/bicgstab_early testcase as to
       // why this is necessary
-      if (this->control().check(step, r.l2_norm()) == SolverControl::success)
+      //
+      // note: the vector *Vx we pass to the iteration_status signal here is only
+      // the current approximation, not the one we will return with,
+      // which will be x=*Vx + alpha*y
+      if (this->iteration_status(step, res, *Vx) == SolverControl::success)
         {
           Vx->add(alpha, y);
           print_vectors(step, *Vx, r, y);
-          return false;
+          return IterationResult(false, SolverControl::success, step, res);
         }
 
       precondition.vmult(z,r);
@@ -368,18 +409,20 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
       rhobar = t*r;
       omega = rhobar/(t*t);
       Vx->add(alpha, y, omega, z);
-      r.add(-omega, t);
 
       if (additional_data.exact_residual)
-        res = criterion(A, *Vx, *Vb);
+        {
+          r.add(-omega, t);
+          res = criterion(A, *Vx, *Vb);
+        }
       else
-        res = r.l2_norm();
+        res = std::sqrt(r.add_and_dot(-omega, t, r));
 
-      state = this->control().check(step, res);
+      state = this->iteration_status(step, res, *Vx);
       print_vectors(step, *Vx, r, y);
     }
   while (state == SolverControl::iterate);
-  return false;
+  return IterationResult(false, state, step, res);
 }
 
 
@@ -412,17 +455,21 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
 
   step = 0;
 
-  bool state;
+  IterationResult state(false,SolverControl::failure,0,0);
 
+  // iterate while the inner iteration returns a breakdown
   do
     {
       if (step != 0)
         deallog << "Restart step " << step << std::endl;
       if (start(A) == SolverControl::success)
-        break;
+        {
+          state.state = SolverControl::success;
+          break;
+        }
       state = iterate(A, precondition);
     }
-  while (state);
+  while (state.breakdown == true);
 
   this->memory.free(Vr);
   this->memory.free(Vrbar);
@@ -435,9 +482,9 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
   deallog.pop();
 
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  AssertThrow(state.state == SolverControl::success,
+              SolverControl::NoConvergence (state.last_step,
+                                            state.last_residual));
   // otherwise exit as normal
 }
 

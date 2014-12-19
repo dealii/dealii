@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2003 - 2013 by the deal.II authors
 //
@@ -71,7 +70,7 @@ namespace hp
                           "same number of vector components!"));
 
     finite_elements
-    .push_back (std_cxx1x::shared_ptr<const FiniteElement<dim,spacedim> >(new_fe.clone()));
+    .push_back (std_cxx11::shared_ptr<const FiniteElement<dim,spacedim> >(new_fe.clone()));
   }
 
 

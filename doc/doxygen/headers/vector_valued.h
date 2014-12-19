@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2008 - 2014 by the deal.II authors
 //
@@ -715,7 +714,7 @@
                        2 *
                        (phi_i_symmgrad * phi_j_symmgrad) *
                        mu_values[q_point]) *
-                      fe_values.JxW(q_point));
+                      fe_values.JxW(q_point);
               }
           }
  * @endcode

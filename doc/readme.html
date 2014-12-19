@@ -8,7 +8,6 @@
     <link href="screen.css" rel="StyleSheet"/>
     <meta name="copyright" content="Copyright (C) 1998 - 2014 by the deal.II Authors"/>
     <meta name="date" content="$Date$"/>
-    <meta name="svn_id" content="$Id$"/>
     <meta name="keywords" content="deal.II"/>
   </head>
 
@@ -423,9 +422,7 @@
     a single machine, but only when using clusters of computers and linear
     algebra packages PETSc or Trilinos.
     To use this option with PETSc, PESTc must be compiled
-    with the option <code>--with-64-bit-indices</code>. To use this option
-    with Trilinos, Trilinos 11.2 or later is needed (there is a bug in
-    Trilinos 11.0 that prevents the use of 64bit indices).
+    with the option <code>--with-64-bit-indices</code>.
   </p>
       </li>
     </ul>
@@ -463,7 +460,7 @@
           e.g. ending in <code>-dev</code> or <code>-devel</code>.
           After that <code>cmake</code> will automatically find the
           library and use it.</b>
-      </li>
+	</li>
         <li>
           Configuring the interface to a self compiled package,
           say <code>foo</code> can usually be done by specifying
@@ -598,6 +595,29 @@
 	</p>
       </dd>
 
+
+      <dt>
+	<a name="opencascade"></a>
+	<a href="http://www.opencascade.org/">OpenCASCADE</a>
+      </dt>
+      <dd>
+	Open CASCADE Technology is a software development kit for
+	applications dealing with 3D CAD data, freely available in
+	open source. Our internal interface works with the legacy
+	version of OpenCASCADE, which you can download and install
+	from the official website, as well as with the OpenCASCADE
+	Community Edition (OCE, available at
+	<a href="https://github.com/tpaviot/oce">https://github.com/tpaviot/oce</a>),
+	which offers a cmake 
+	interface for its compilation. Alternatively, you can
+	install one of the many external applications that ship with
+	OpenCASCADE internally (for example 
+	<a href="http://www.salome-platform.org/">SALOME</a>, or 
+	<a href="http://www.freecadweb.org/">FreeCAD</a>). Further
+	installation instructions can be
+	found <a href="external-libs/opencascade.html"
+	target="body">here</a>.
+      </dd>
 
       <dt><a name="netcdf"></a><a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a></dt>
       <dd>

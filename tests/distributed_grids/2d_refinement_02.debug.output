@@ -7,8 +7,6 @@ DEAL:2d::Checksum: 845349260
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -46,8 +44,6 @@ DEAL:2d::Checksum: 3572237133
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -85,8 +81,6 @@ DEAL:2d::Checksum: 85461166
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -124,8 +118,6 @@ DEAL:2d::Checksum: 3376286008
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -163,8 +155,6 @@ DEAL:2d::Checksum: 3159296977
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -202,8 +192,6 @@ DEAL:2d::Checksum: 2423393502
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -241,8 +229,6 @@ DEAL:2d::Checksum: 1740180971
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -280,8 +266,6 @@ DEAL:2d::Checksum: 4005236580
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -319,8 +303,6 @@ DEAL:2d::Checksum: 2695303719
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -358,8 +340,6 @@ DEAL:2d::Checksum: 1187058508
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -397,8 +377,6 @@ DEAL:2d::Checksum: 1372132310
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>

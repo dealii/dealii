@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2006 - 2013 by the deal.II authors
 //
@@ -113,8 +112,8 @@ mass_assembler(const typename Triangulation<dim>::active_cell_iterator &cell,
   // this appears to be the key: the following two ways both overwrite some
   // of the memory in which we store the quadrature point location.
   parallel::apply_to_subranges(0U, copy_data.cell_rhs.size(),
-                               std_cxx1x::bind(&zero_subrange, std_cxx1x::_1, std_cxx1x::_2,
-                                               std_cxx1x::ref(copy_data.cell_rhs)), 1);
+                               std_cxx11::bind(&zero_subrange, std_cxx11::_1, std_cxx11::_2,
+                                               std_cxx11::ref(copy_data.cell_rhs)), 1);
 
   Assert(q == data.x_fe_values.quadrature_point(0),
          ExcInternalError());
@@ -152,7 +151,7 @@ do_project()
       copy_data.cell_rhs.resize(8);
       WorkStream::run(triangulation.begin_active(), triangulation.end(),
                       &mass_assembler<dim>,
-                      std_cxx1x::bind(&copy_local_to_global, std_cxx1x::_1, &sum),
+                      std_cxx11::bind(&copy_local_to_global, std_cxx11::_1, &sum),
                       assembler_data, copy_data, 8, 1);
 
       Assert (std::fabs(sum-288.) < 1e-12, ExcInternalError());

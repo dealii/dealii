@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2004 - 2013 by the deal.II authors
 //
@@ -49,16 +48,16 @@ public:
     return DataOut<dim>::get_dataset_names();
   }
 
-  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
+  std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
   get_vector_data_ranges () const
   {
     // if we have enough components for a
     // vector solution, make the last dim
     // components a vector
-    std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
+    std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
     retval;
     if (get_dataset_names().size() >= dim)
-      retval.push_back (std_cxx1x::tuple
+      retval.push_back (std_cxx11::tuple
                         <unsigned int, unsigned int, std::string>
                         (get_dataset_names().size()-dim,
                          get_dataset_names().size()-1,
@@ -85,7 +84,7 @@ public:
     return DataOutReader<dim>::get_dataset_names();
   }
 
-  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
+  std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
   get_vector_data_ranges () const
   {
     return DataOutReader<dim>::get_vector_data_ranges ();
@@ -136,23 +135,23 @@ check_this (const DoFHandler<dim> &dof_handler,
           ExcInternalError());
   for (unsigned int i=0; i<data_out.get_vector_data_ranges().size(); ++i)
     {
-      deallog << std_cxx1x::get<0>(data_out.get_vector_data_ranges()[i])
+      deallog << std_cxx11::get<0>(data_out.get_vector_data_ranges()[i])
               << ' '
-              << std_cxx1x::get<1>(data_out.get_vector_data_ranges()[i])
+              << std_cxx11::get<1>(data_out.get_vector_data_ranges()[i])
               << ' '
-              << std_cxx1x::get<2>(data_out.get_vector_data_ranges()[i])
+              << std_cxx11::get<2>(data_out.get_vector_data_ranges()[i])
               << std::endl;
-      Assert (std_cxx1x::get<0>(data_out.get_vector_data_ranges()[i])
+      Assert (std_cxx11::get<0>(data_out.get_vector_data_ranges()[i])
               ==
-              std_cxx1x::get<0>(reader.get_vector_data_ranges()[i]),
+              std_cxx11::get<0>(reader.get_vector_data_ranges()[i]),
               ExcInternalError());
-      Assert (std_cxx1x::get<1>(data_out.get_vector_data_ranges()[i])
+      Assert (std_cxx11::get<1>(data_out.get_vector_data_ranges()[i])
               ==
-              std_cxx1x::get<1>(reader.get_vector_data_ranges()[i]),
+              std_cxx11::get<1>(reader.get_vector_data_ranges()[i]),
               ExcInternalError());
-      Assert (std_cxx1x::get<2>(data_out.get_vector_data_ranges()[i])
+      Assert (std_cxx11::get<2>(data_out.get_vector_data_ranges()[i])
               ==
-              std_cxx1x::get<2>(reader.get_vector_data_ranges()[i]),
+              std_cxx11::get<2>(reader.get_vector_data_ranges()[i]),
               ExcInternalError());
     }
 

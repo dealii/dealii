@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2003 - 2013 by the deal.II authors
 //
@@ -415,7 +414,7 @@ FE_RaviartThomas<dim>::get_constant_modes() const
   for (unsigned int d=0; d<dim; ++d)
     components.push_back(d);
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, components);
+         (constant_modes, components);
 }
 
 

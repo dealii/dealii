@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2003 - 2013 by the deal.II authors
 //
@@ -387,9 +386,9 @@ void MGTransferComponentBase::build_matrices (
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
       prolongation_sparsities
-      .push_back (std_cxx1x::shared_ptr<BlockSparsityPattern> (new BlockSparsityPattern));
+      .push_back (std_cxx11::shared_ptr<BlockSparsityPattern> (new BlockSparsityPattern));
       prolongation_matrices
-      .push_back (std_cxx1x::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrix<double>));
+      .push_back (std_cxx11::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrix<double>));
     }
 
   // two fields which will store the

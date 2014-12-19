@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2009 - 2013 by the deal.II authors
 //
@@ -35,7 +34,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/bind.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -85,11 +84,11 @@ namespace parallel
 
       offset
         = tria->register_data_attach(size,
-                                     std_cxx1x::bind(&SolutionTransfer<dim, VECTOR, DH>::pack_callback,
+                                     std_cxx11::bind(&SolutionTransfer<dim, VECTOR, DH>::pack_callback,
                                                      this,
-                                                     std_cxx1x::_1,
-                                                     std_cxx1x::_2,
-                                                     std_cxx1x::_3));
+                                                     std_cxx11::_1,
+                                                     std_cxx11::_2,
+                                                     std_cxx11::_3));
 
     }
 
@@ -168,12 +167,12 @@ namespace parallel
       Assert (tria != 0, ExcInternalError());
 
       tria->notify_ready_to_unpack(offset,
-                                   std_cxx1x::bind(&SolutionTransfer<dim, VECTOR, DH>::unpack_callback,
+                                   std_cxx11::bind(&SolutionTransfer<dim, VECTOR, DH>::unpack_callback,
                                                    this,
-                                                   std_cxx1x::_1,
-                                                   std_cxx1x::_2,
-                                                   std_cxx1x::_3,
-                                                   std_cxx1x::ref(all_out)));
+                                                   std_cxx11::_1,
+                                                   std_cxx11::_2,
+                                                   std_cxx11::_3,
+                                                   std_cxx11::ref(all_out)));
 
 
       for (typename std::vector<VECTOR *>::iterator it=all_out.begin();

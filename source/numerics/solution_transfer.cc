@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2014 by the deal.II authors
 //
@@ -94,7 +93,8 @@ void SolutionTransfer<dim, VECTOR, DH>::prepare_for_pure_refinement()
       // out of the data vectors and prolonging
       // them to the children
       cell->get_dof_indices(indices_on_cell[i]);
-      cell_map[std::make_pair(cell->level(),cell->index())].indices_ptr=&indices_on_cell[i];
+      cell_map[std::make_pair(cell->level(),cell->index())]
+        = Pointerstruct(&indices_on_cell[i], cell->active_fe_index());
     }
   prepared_for=pure_refinement;
 }
@@ -135,11 +135,11 @@ SolutionTransfer<dim, VECTOR, DH>::refine_interpolate(const VECTOR &in,
         // which is both done by one
         // function
         {
-	  const unsigned int this_fe_index = pointerstruct->second.active_fe_index;
+          const unsigned int this_fe_index = pointerstruct->second.active_fe_index;
           const unsigned int dofs_per_cell=cell->get_dof_handler().get_fe()[this_fe_index].dofs_per_cell;
           local_values.reinit(dofs_per_cell, true);
 
-	  // make sure that the size of the
+          // make sure that the size of the
           // stored indices is the same as
           // dofs_per_cell. this is kind of a
           // test if we use the same fe in the
@@ -259,7 +259,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
   unsigned int n_cells_to_coarsen=0;
   unsigned int n_cells_to_stay_or_refine=0;
   for (typename DH::active_cell_iterator act_cell = dof_handler->begin_active();
-      act_cell!=dof_handler->end(); ++act_cell)
+       act_cell!=dof_handler->end(); ++act_cell)
     {
       if (act_cell->coarsen_flag_set())
         ++n_cells_to_coarsen;
@@ -271,7 +271,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
 
   unsigned int n_coarsen_fathers=0;
   for (typename DH::cell_iterator cell=dof_handler->begin();
-      cell!=dof_handler->end(); ++cell)
+       cell!=dof_handler->end(); ++cell)
     if (!cell->active() && cell->child(0)->coarsen_flag_set())
       ++n_coarsen_fathers;
   Assert(n_cells_to_coarsen>=2*n_coarsen_fathers, ExcInternalError());
@@ -298,7 +298,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
   // the 'coarsen_fathers' cells 'n_cf',
   unsigned int n_sr=0, n_cf=0;
   for (typename DH::cell_iterator cell=dof_handler->begin();
-      cell!=dof_handler->end(); ++cell)
+       cell!=dof_handler->end(); ++cell)
     {
       // CASE 1: active cell that remains as it is
       if (cell->active() && !cell->coarsen_flag_set())

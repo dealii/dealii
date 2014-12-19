@@ -1,7 +1,6 @@
 ## ---------------------------------------------------------------------
-## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -31,10 +30,17 @@
 #
 # General configuration for cmake:
 #
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-IF(NOT ${CMAKE_VERSION} VERSION_LESS 3.0.0)
-  CMAKE_POLICY(SET CMP0026 OLD) # enable target LOCATION property
-  CMAKE_POLICY(SET CMP0037 OLD) # allow to override the generic 'help' target
+
+IF(POLICY CMP0026)
+  # enable target LOCATION property
+  CMAKE_POLICY(SET CMP0026 OLD)
+ENDIF()
+
+IF(POLICY CMP0037)
+  # allow to override "test" target for quick tests
+  CMAKE_POLICY(SET CMP0037 OLD)
 ENDIF()
 
 MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
@@ -88,13 +94,10 @@ INCLUDE(setup_compiler_flags)
 # Include information about bundled libraries:
 #
 IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  FILE(GLOB _check_files "bundled/*.cmake")
-  LIST(SORT _check_files)
-  FOREACH(_file ${_check_files})
-    MESSAGE(STATUS "")
-    MESSAGE(STATUS "Include ${_file}")
-    INCLUDE(${_file})
-  ENDFOREACH()
+  SET(_file ${CMAKE_SOURCE_DIR}/bundled/setup_bundled.cmake)
+  MESSAGE(STATUS "")
+  MESSAGE(STATUS "Include ${_file}")
+  INCLUDE(${_file})
 ENDIF()
 
 #
@@ -125,8 +128,11 @@ ENDFOREACH()
 INCLUDE(setup_custom_targets)
 INCLUDE(setup_finalize)
 INCLUDE(setup_write_config)
-#INCLUDE(setup_sanity_checks)
 
+#
+# CPack configuration
+#
+INCLUDE(setup_cpack)
 
 ########################################################################
 #                                                                      #
@@ -153,7 +159,11 @@ ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
 
-IF(DEAL_II_HAVE_TESTS_DIRECTORY)
+#
+# Do not configure testsuite on Windows targets because posix shell and
+# commands like 'test', '> /dev/null', 'rm', etc. are not available
+#
+IF(DEAL_II_HAVE_TESTS_DIRECTORY AND NOT DEAL_II_MSVC)
   ADD_SUBDIRECTORY(tests)
 ENDIF()
 

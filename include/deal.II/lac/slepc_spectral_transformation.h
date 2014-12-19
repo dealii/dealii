@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2009 - 2013 by the deal.II authors
 //
@@ -23,7 +22,7 @@
 
 #ifdef DEAL_II_WITH_SLEPC
 
-#  include <deal.II/base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/base/std_cxx11/shared_ptr.h>
 #  include <deal.II/lac/exceptions.h>
 
 #  include <petscksp.h>
@@ -36,15 +35,13 @@ namespace SLEPcWrappers
 {
 
   /**
-   * Base class for spectral transformation classes using the SLEPc
-   * solvers which are selected based on flags passed to the spectral
-   * transformation.
+   * Base class for spectral transformation classes using the SLEPc solvers
+   * which are selected based on flags passed to the spectral transformation.
    *
-   * <code>SLEPcWrappers::TransformationXXX</code>, where
-   * <code>XXX</code> is your favourite transformation type, can then
-   * be implemented in application codes in the following way for
-   * <code>XXX=INVERT</code> with the solver object
-   * <code>eigensolver</code>:
+   * <code>SLEPcWrappers::TransformationXXX</code>, where <code>XXX</code> is
+   * your favourite transformation type, can then be implemented in
+   * application codes in the following way for <code>XXX=INVERT</code> with
+   * the solver object <code>eigensolver</code>:
    * @code
    *  // Set a transformation, this one shifts the eigenspectrum by 3.142..
    *  SLEPcWrappers::TransformationShift::AdditionalData additional_data (3.142);
@@ -62,7 +59,7 @@ namespace SLEPcWrappers
    *
    * @ingroup SLEPcWrappers
    * @author Toby D. Young 2009, 2013
-   **/
+   */
   class TransformationBase
   {
   public:
@@ -78,10 +75,19 @@ namespace SLEPcWrappers
     virtual ~TransformationBase ();
 
     /**
-     * Record the EPS object that is associated
-     * to the spectral transformation
+     * Record the EPS object that is associated to the spectral transformation
      */
     void set_context (EPS &eps);
+
+    /**
+     * Set a flag to indicate how the transformed matrices are being stored in
+     * the spectral transformations.
+     *
+     * The possible values are given by the enumerator STMatMode in the SLEPc
+     * library http://www.grycap.upv.es/slepc/documentation/current/docs/manua
+     * lpages/ST/STMatMode.html
+     */
+    void set_matrix_mode(const STMatMode mode);
 
   protected:
 
@@ -90,17 +96,11 @@ namespace SLEPcWrappers
   private:
 
     /**
-     * Objects of this type are
-     * explicitly created, but are
-     * destroyed when the surrounding
-     * solver object goes out of scope,
-     * or when we assign a new value to
-     * the pointer to this object. The
-     * respective Destroy functions are
-     * therefore written into the
-     * destructor of this object, even
-     * though the object does not have
-     * a constructor.
+     * Objects of this type are explicitly created, but are destroyed when the
+     * surrounding solver object goes out of scope, or when we assign a new
+     * value to the pointer to this object. The respective Destroy functions
+     * are therefore written into the destructor of this object, even though
+     * the object does not have a constructor.
      */
     struct TransformationData
     {
@@ -111,18 +111,18 @@ namespace SLEPcWrappers
       ~TransformationData ();
 
       /**
-       * Objects for Eigenvalue Problem
-       * Solver.
+       * Objects for Eigenvalue Problem Solver.
        */
       ST st;
     };
 
-    std_cxx1x::shared_ptr<TransformationData> transformation_data;
+    std_cxx11::shared_ptr<TransformationData> transformation_data;
+
+    std_cxx11::shared_ptr<STMatMode> mat_mode;
   };
 
   /**
-   * An implementation of the transformation interface using the SLEPc
-   * Shift.
+   * An implementation of the transformation interface using the SLEPc Shift.
    *
    * @ingroup SLEPcWrappers
    * @author Toby D. Young 2009
@@ -132,16 +132,13 @@ namespace SLEPcWrappers
   public:
 
     /**
-     * Standardized data struct to
-     * pipe additional data to the
-     * solver.
+     * Standardized data struct to pipe additional data to the solver.
      */
     struct AdditionalData
     {
 
       /**
-       * Constructor. By default, set the
-       * shift parameter to zero.
+       * Constructor. By default, set the shift parameter to zero.
        */
       AdditionalData (const double shift_parameter = 0);
 
@@ -161,24 +158,20 @@ namespace SLEPcWrappers
   protected:
 
     /**
-     * Store a copy of the flags for this
-     * particular solver.
+     * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Spectral
-     * Transformation context object,
-     * and sets the type of spectral
-     * transformationthat is
-     * appropriate for this class.
+     * Function that takes a Spectral Transformation context object, and sets
+     * the type of spectral transformationthat is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };
 
   /**
-   * An implementation of the transformation interface using the SLEPc
-   * Shift and Invert.
+   * An implementation of the transformation interface using the SLEPc Shift
+   * and Invert.
    *
    * @ingroup SLEPcWrappers
    * @author Toby D. Young 2009
@@ -188,15 +181,12 @@ namespace SLEPcWrappers
   public:
 
     /**
-     * Standardized data struct to
-     * pipe additional data to the
-     * solver.
+     * Standardized data struct to pipe additional data to the solver.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, set the
-       * shift parameter to zero.
+       * Constructor. By default, set the shift parameter to zero.
        */
       AdditionalData (const double shift_parameter = 0);
 
@@ -215,24 +205,21 @@ namespace SLEPcWrappers
   protected:
 
     /**
-     * Store a copy of the flags for this
-     * particular solver.
+     * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Spectral
-     * Transformation context object,
-     * and sets the type of spectral
-     * transformationthat is
-     * appropriate for this class.
+     * Function that takes a Spectral Transformation context object, and sets
+     * the type of spectral transformationthat is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };
 
   /**
    * An implementation of the transformation interface using the SLEPc
-   * Spectrum Folding.
+   * Spectrum Folding. This transformation type has been removed in SLEPc
+   * 3.5.0 and thus cannot be used in the newer versions.
    *
    * @ingroup SLEPcWrappers
    * @author Toby D. Young 2009
@@ -242,15 +229,12 @@ namespace SLEPcWrappers
   public:
 
     /**
-     * Standardized data struct to
-     * pipe additional data to the
-     * solver.
+     * Standardized data struct to pipe additional data to the solver.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, set the
-       * shift parameter to zero.
+       * Constructor. By default, set the shift parameter to zero.
        */
       AdditionalData (const double shift_parameter = 0);
 
@@ -269,24 +253,19 @@ namespace SLEPcWrappers
   protected:
 
     /**
-     * Store a copy of the flags for this
-     * particular solver.
+     * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Spectral
-     * Transformation context object,
-     * and sets the type of spectral
-     * transformationthat is
-     * appropriate for this class.
+     * Function that takes a Spectral Transformation context object, and sets
+     * the type of spectral transformationthat is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };
 
   /**
-   * An implementation of the transformation interface using the SLEPc
-   * Cayley.
+   * An implementation of the transformation interface using the SLEPc Cayley.
    *
    * @ingroup SLEPcWrappers
    * @author Toby D. Young 2009
@@ -296,14 +275,12 @@ namespace SLEPcWrappers
   public:
 
     /**
-     * Standardized data struct to pipe
-     * additional data to the solver.
+     * Standardized data struct to pipe additional data to the solver.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. Requires two shift
-       * parameters
+       * Constructor. Requires two shift parameters
        */
       AdditionalData (const double shift_parameter     = 0,
                       const double antishift_parameter = 0);
@@ -325,17 +302,13 @@ namespace SLEPcWrappers
   protected:
 
     /**
-     * Store a copy of the flags for this
-     * particular solver.
+     * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Spectral
-     * Transformation context object,
-     * and sets the type of spectral
-     * transformationthat is
-     * appropriate for this class.
+     * Function that takes a Spectral Transformation context object, and sets
+     * the type of spectral transformationthat is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };

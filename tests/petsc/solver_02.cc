@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +33,9 @@
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_solve( SOLVER &solver, const MATRIX &A,
+check_solve( SOLVER &solver,
+	     const SolverControl &solver_control,
+	     const MATRIX &A,
              VECTOR &u, VECTOR &f, const PRECONDITION &P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
@@ -53,7 +54,7 @@ check_solve( SOLVER &solver, const MATRIX &A,
       deallog << "Exception: " << e.get_exc_name() << std::endl;
     }
 
-  deallog << "Solver stopped after " << solver.control().last_step()
+  deallog << "Solver stopped after " << solver_control.last_step()
           << " iterations" << std::endl;
 }
 
@@ -89,7 +90,7 @@ int main(int argc, char **argv)
 
     PETScWrappers::SolverChebychev solver(control);
     PETScWrappers::PreconditionJacobi preconditioner(A);
-    check_solve (solver, A,u,f, preconditioner);
+    check_solve (solver, control, A,u,f, preconditioner);
   }
 
 }

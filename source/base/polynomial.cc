@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2014 by the deal.II authors
 //
@@ -360,7 +359,7 @@ namespace Polynomials
     // need to transform p into standard form as
     // well if necessary. copy the polynomial to
     // do this
-    std_cxx1x::shared_ptr<Polynomial<number> > q_data;
+    std_cxx11::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = 0;
     if (p.in_lagrange_product_form == true)
       {
@@ -404,7 +403,7 @@ namespace Polynomials
     // need to transform p into standard form as
     // well if necessary. copy the polynomial to
     // do this
-    std_cxx1x::shared_ptr<Polynomial<number> > q_data;
+    std_cxx11::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = 0;
     if (p.in_lagrange_product_form == true)
       {
@@ -440,7 +439,7 @@ namespace Polynomials
     // need to transform p into standard form as
     // well if necessary. copy the polynomial to
     // do this
-    std_cxx1x::shared_ptr<Polynomial<number> > q_data;
+    std_cxx11::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = 0;
     if (p.in_lagrange_product_form == true)
       {
@@ -587,7 +586,7 @@ namespace Polynomials
     if (degree() == 0)
       return Monomial<number>(0, 0.);
 
-    std_cxx1x::shared_ptr<Polynomial<number> > q_data;
+    std_cxx11::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = 0;
     if (in_lagrange_product_form == true)
       {
@@ -613,7 +612,7 @@ namespace Polynomials
   {
     // no simple form possible for Lagrange
     // polynomial on product form
-    std_cxx1x::shared_ptr<Polynomial<number> > q_data;
+    std_cxx11::shared_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = 0;
     if (in_lagrange_product_form == true)
       {
@@ -833,9 +832,9 @@ namespace Polynomials
 
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
-  std::vector<std_cxx1x::shared_ptr<const std::vector<double> > >
+  std::vector<std_cxx11::shared_ptr<const std::vector<double> > >
   Legendre::recursive_coefficients(20);
-  std::vector<std_cxx1x::shared_ptr<const std::vector<double> > >
+  std::vector<std_cxx11::shared_ptr<const std::vector<double> > >
   Legendre::shifted_coefficients(20);
 
 
@@ -877,7 +876,7 @@ namespace Polynomials
     if ((recursive_coefficients.size() < k+1) ||
         ((recursive_coefficients.size() >= k+1) &&
          (recursive_coefficients[k] ==
-          std_cxx1x::shared_ptr<const std::vector<double> >())))
+          std_cxx11::shared_ptr<const std::vector<double> >())))
       // no, then generate the
       // respective coefficients
       {
@@ -925,9 +924,9 @@ namespace Polynomials
             // would appear if we used plain
             // pointers.
             recursive_coefficients[0] =
-              std_cxx1x::shared_ptr<const std::vector<double> >(c0);
+              std_cxx11::shared_ptr<const std::vector<double> >(c0);
             recursive_coefficients[1] =
-              std_cxx1x::shared_ptr<const std::vector<double> >(c1);
+              std_cxx11::shared_ptr<const std::vector<double> >(c1);
 
             // Compute polynomials
             // orthogonal on [0,1]
@@ -939,8 +938,8 @@ namespace Polynomials
             Polynomial<double>::shift<SHIFT_TYPE> (*c1, -1.);
             Polynomial<double>::scale(*c1, 2.);
             Polynomial<double>::multiply(*c1, std::sqrt(3.));
-            shifted_coefficients[0]=std_cxx1x::shared_ptr<const std::vector<double> >(c0);
-            shifted_coefficients[1]=std_cxx1x::shared_ptr<const std::vector<double> >(c1);
+            shifted_coefficients[0]=std_cxx11::shared_ptr<const std::vector<double> >(c0);
+            shifted_coefficients[1]=std_cxx11::shared_ptr<const std::vector<double> >(c1);
           }
         else
           {
@@ -975,7 +974,7 @@ namespace Polynomials
             // const pointer in the
             // coefficients array
             recursive_coefficients[k] =
-              std_cxx1x::shared_ptr<const std::vector<double> >(ck);
+              std_cxx11::shared_ptr<const std::vector<double> >(ck);
             // and compute the
             // coefficients for [0,1]
             ck = new std::vector<double>(*ck);
@@ -983,7 +982,7 @@ namespace Polynomials
             Polynomial<double>::scale(*ck, 2.);
             Polynomial<double>::multiply(*ck, std::sqrt(2.*k+1.));
             shifted_coefficients[k] =
-              std_cxx1x::shared_ptr<const std::vector<double> >(ck);
+              std_cxx11::shared_ptr<const std::vector<double> >(ck);
           };
       };
   }
@@ -1110,7 +1109,7 @@ namespace Polynomials
 
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
-  std::vector<std_cxx1x::shared_ptr<const std::vector<double> > >
+  std::vector<std_cxx11::shared_ptr<const std::vector<double> > >
   Hierarchical::recursive_coefficients(20);
 
 
@@ -1187,9 +1186,9 @@ namespace Polynomials
             // now make these arrays
             // const
             recursive_coefficients[0] =
-              std_cxx1x::shared_ptr<const std::vector<double> >(c0);
+              std_cxx11::shared_ptr<const std::vector<double> >(c0);
             recursive_coefficients[1] =
-              std_cxx1x::shared_ptr<const std::vector<double> >(c1);
+              std_cxx11::shared_ptr<const std::vector<double> >(c1);
           }
         else if (k==2)
           {
@@ -1206,7 +1205,7 @@ namespace Polynomials
             (*c2)[2] =   4.*a;
 
             recursive_coefficients[2] =
-              std_cxx1x::shared_ptr<const std::vector<double> >(c2);
+              std_cxx11::shared_ptr<const std::vector<double> >(c2);
           }
         else
           {
@@ -1250,7 +1249,7 @@ namespace Polynomials
             // const pointer in the
             // coefficients array
             recursive_coefficients[k] =
-              std_cxx1x::shared_ptr<const std::vector<double> >(ck);
+              std_cxx11::shared_ptr<const std::vector<double> >(ck);
           };
       };
   }

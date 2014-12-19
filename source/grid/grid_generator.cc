@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2014 by the deal.II authors
 //
@@ -31,12 +30,15 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/intergrid_map.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/numerics/matrix_tools.h>
+
+#include <deal.II/distributed/tria.h>
 
 #include <iostream>
 #include <cmath>
@@ -408,7 +410,7 @@ namespace GridGenerator
   void hyper_cube (Triangulation<dim,spacedim> &tria,
                    const double                 left,
                    const double                 right,
-		   const bool                   colorize)
+                   const bool                   colorize)
   {
     Assert (left < right,
             ExcMessage ("Invalid left-to-right bounds of hypercube"));
@@ -773,9 +775,9 @@ namespace GridGenerator
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize)
   {
-    // Equalise number of subdivisions in each dim-direction, heir
+    // Equalise number of subdivisions in each dim-direction, their
     // validity will be checked later
-    unsigned int (n_subdivisions_) [dim];
+    unsigned int n_subdivisions_ [dim];
     for (unsigned int i=0; i<dim; ++i)
       n_subdivisions_[i] = n_subdivisions;
 
@@ -788,7 +790,11 @@ namespace GridGenerator
   template<int dim>
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
-                             const unsigned int    ( n_subdivisions) [dim],
+#ifndef _MSC_VER
+                             const unsigned int(&n_subdivisions)[dim],
+#else
+                             const unsigned int *n_subdivisions,
+#endif
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize)
   {
@@ -3413,8 +3419,8 @@ namespace GridGenerator
     SubCellData subcell_data;
     std::vector<unsigned int> considered_vertices;
     GridTools::delete_duplicated_vertices (vertices, cells,
-					   subcell_data,
-					   considered_vertices);
+                                           subcell_data,
+                                           considered_vertices);
 
     // reorder the cells to ensure that they satisfy the convention for
     // edge and face directions
@@ -3422,6 +3428,56 @@ namespace GridGenerator
     result.clear ();
     result.create_triangulation (vertices, cells, subcell_data);
   }
+
+
+  template <int dim, int spacedim>
+  void
+  create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
+                              const Triangulation<dim, spacedim> &triangulation_2,
+                              Triangulation<dim, spacedim>       &result)
+  {
+    Assert (GridTools::have_same_coarse_mesh (triangulation_1, triangulation_2),
+            ExcMessage ("The two input triangulations are not derived from "
+                        "the same coarse mesh as required."));
+
+    // first copy triangulation_1, and
+    // then do as many iterations as
+    // there are levels in
+    // triangulation_2 to refine
+    // additional cells. since this is
+    // the maximum number of
+    // refinements to get from the
+    // coarse grid to triangulation_2,
+    // it is clear that this is also
+    // the maximum number of
+    // refinements to get from any cell
+    // on triangulation_1 to
+    // triangulation_2
+    result.clear ();
+    result.copy_triangulation (triangulation_1);
+    for (unsigned int iteration=0; iteration<triangulation_2.n_levels();
+         ++iteration)
+      {
+        InterGridMap<Triangulation<dim, spacedim> > intergrid_map;
+        intergrid_map.make_mapping (result, triangulation_2);
+
+        bool any_cell_flagged = false;
+        for (typename Triangulation<dim, spacedim>::active_cell_iterator
+             result_cell = result.begin_active();
+             result_cell != result.end(); ++result_cell)
+          if (intergrid_map[result_cell]->has_children())
+            {
+              any_cell_flagged = true;
+              result_cell->set_refine_flag ();
+            }
+
+        if (any_cell_flagged == false)
+          break;
+        else
+          result.execute_coarsening_and_refinement();
+      }
+  }
+
 
 
   void
@@ -3592,7 +3648,7 @@ namespace GridGenerator
     // fill these maps using the data
     // given by new_points
     typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin_active(),
-        endc=dof_handler.end();
+                                            endc=dof_handler.end();
     for (; cell!=endc; ++cell)
       {
         for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
@@ -3602,17 +3658,17 @@ namespace GridGenerator
             // loop over all vertices of the cell and see if it is listed in the map
             // given as first argument of the function
             for (unsigned int vertex_no=0;
-                vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
+                 vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
               {
                 const unsigned int vertex_index=face->vertex_index(vertex_no);
 
                 const typename std::map<unsigned int,Point<dim> >::const_iterator map_iter
-                = new_points.find(vertex_index);
+                  = new_points.find(vertex_index);
 
                 if (map_iter!=map_end)
                   for (unsigned int i=0; i<dim; ++i)
                     m[i].insert(std::pair<unsigned int,double> (
-                        face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
+                                  face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
               }
           }
       }
@@ -3866,6 +3922,257 @@ namespace GridGenerator
             }
       }
   }
+
+  template <int dim, int spacedim1, int spacedim2>
+  void flatten_triangulation(const Triangulation<dim, spacedim1> &in_tria,
+                             Triangulation<dim,spacedim2> &out_tria)
+  {
+    const parallel::distributed::Triangulation<dim, spacedim1> *pt =
+      dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim1> *>(&in_tria);
+
+    Assert (pt == NULL,
+            ExcMessage("Cannot use this function on parallel::distributed::Triangulation."));
+
+    std::vector<Point<spacedim2> > v;
+    std::vector<CellData<dim> > cells;
+    SubCellData subcelldata;
+
+    const unsigned int spacedim = std::min(spacedim1,spacedim2);
+    const std::vector<Point<spacedim1> > &in_vertices = in_tria.get_vertices();
+
+    v.resize(in_vertices.size());
+    for (unsigned int i=0; i<in_vertices.size(); ++i)
+      for (unsigned int d=0; d<spacedim; ++d)
+        v[i][d] = in_vertices[i][d];
+
+    cells.resize(in_tria.n_active_cells());
+    typename Triangulation<dim,spacedim1>::active_cell_iterator
+    cell = in_tria.begin_active(),
+    endc = in_tria.end();
+
+    for (unsigned int id=0; cell != endc; ++cell, ++id)
+      {
+        for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+          cells[id].vertices[i] = cell->vertex_index(i);
+        cells[id].material_id = cell->material_id();
+        cells[id].manifold_id = cell->manifold_id();
+      }
+
+    if (dim>1)
+      {
+        typename Triangulation<dim,spacedim1>::active_face_iterator
+        face = in_tria.begin_active_face(),
+        endf = in_tria.end_face();
+
+        // Face counter for both dim == 2 and dim == 3
+        unsigned int f=0;
+        switch (dim)
+          {
+          case 2:
+          {
+            subcelldata.boundary_lines.resize(in_tria.n_active_faces());
+            for (; face != endf; ++face)
+              if (face->at_boundary())
+                {
+                  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
+                    subcelldata.boundary_lines[f].vertices[i] = face->vertex_index(i);
+                  subcelldata.boundary_lines[f].boundary_id = face->boundary_indicator();
+                  subcelldata.boundary_lines[f].manifold_id = face->manifold_id();
+                  ++f;
+                }
+            subcelldata.boundary_lines.resize(f);
+          }
+          break;
+          case 3:
+          {
+            subcelldata.boundary_quads.resize(in_tria.n_active_faces());
+            for (; face != endf; ++face)
+              if (face->at_boundary())
+                {
+                  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
+                    subcelldata.boundary_quads[f].vertices[i] = face->vertex_index(i);
+                  subcelldata.boundary_quads[f].boundary_id = face->boundary_indicator();
+                  subcelldata.boundary_quads[f].manifold_id = face->manifold_id();
+                  ++f;
+                }
+            subcelldata.boundary_quads.resize(f);
+          }
+          break;
+          default:
+            Assert(false, ExcInternalError());
+          }
+      }
+    out_tria.create_triangulation(v, cells, subcelldata);
+  }
+
+
+
+  // This anonymous namespace contains utility functions to extract the
+  // triangulation from any container such as DoFHandler
+  // and the like
+  namespace
+  {
+    template<int dim, int spacedim>
+    const Triangulation<dim, spacedim> &
+    get_tria(const Triangulation<dim, spacedim> &tria)
+    {
+      return tria;
+    }
+
+    template<int dim, int spacedim>
+    const Triangulation<dim, spacedim> &
+    get_tria(const parallel::distributed::Triangulation<dim, spacedim> &tria)
+    {
+      return tria;
+    }
+
+    template<int dim, template<int, int> class Container, int spacedim>
+    const Triangulation<dim,spacedim> &
+    get_tria(const Container<dim,spacedim> &container)
+    {
+      return container.get_tria();
+    }
+
+
+    template<int dim, int spacedim>
+    Triangulation<dim, spacedim> &
+    get_tria(Triangulation<dim, spacedim> &tria)
+    {
+      return tria;
+    }
+
+    template<int dim, int spacedim>
+    Triangulation<dim, spacedim> &
+    get_tria(parallel::distributed::Triangulation<dim, spacedim> &tria)
+    {
+      return tria;
+    }
+
+    template<int dim, template<int, int> class Container, int spacedim>
+    const Triangulation<dim,spacedim> &
+    get_tria(Container<dim,spacedim> &container)
+    {
+      return container.get_tria();
+    }
+  }
+
+
+
+  template <template <int,int> class Container, int dim, int spacedim>
+#ifndef _MSC_VER
+  std::map<typename Container<dim-1,spacedim>::cell_iterator,
+      typename Container<dim,spacedim>::face_iterator>
+#else
+  typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
+#endif
+      extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
+                             Container<dim-1,spacedim>     &surface_mesh,
+                             const std::set<types::boundary_id> &boundary_ids)
+  {
+// This function works using the following assumption:
+//    Triangulation::create_triangulation(...) will create cells that preserve
+//    the order of cells passed in using the CellData argument; also,
+//    that it will not reorder the vertices.
+
+    std::map<typename Container<dim-1,spacedim>::cell_iterator,
+        typename Container<dim,spacedim>::face_iterator>
+        surface_to_volume_mapping;
+
+    const unsigned int boundary_dim = dim-1; //dimension of the boundary mesh
+
+    // First create surface mesh and mapping
+    // from only level(0) cells of volume_mesh
+    std::vector<typename Container<dim,spacedim>::face_iterator>
+    mapping;  // temporary map for level==0
+
+
+    std::vector< bool > touched (get_tria(volume_mesh).n_vertices(), false);
+    std::vector< CellData< boundary_dim > > cells;
+    std::vector< Point<spacedim> >      vertices;
+
+    std::map<unsigned int,unsigned int> map_vert_index; //volume vertex indices to surf ones
+
+    unsigned int v_index;
+    CellData< boundary_dim > c_data;
+
+    for (typename Container<dim,spacedim>::cell_iterator
+         cell = volume_mesh.begin(0);
+         cell != volume_mesh.end(0);
+         ++cell)
+      for (unsigned int i=0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+        {
+          const typename Container<dim,spacedim>::face_iterator
+          face = cell->face(i);
+
+          if ( face->at_boundary()
+               &&
+               (boundary_ids.empty() ||
+                ( boundary_ids.find(face->boundary_indicator()) != boundary_ids.end())) )
+            {
+              for (unsigned int j=0;
+                   j<GeometryInfo<boundary_dim>::vertices_per_cell; ++j)
+                {
+                  v_index = face->vertex_index(j);
+
+                  if ( !touched[v_index] )
+                    {
+                      vertices.push_back(face->vertex(j));
+                      map_vert_index[v_index] = vertices.size() - 1;
+                      touched[v_index] = true;
+                    }
+
+                  c_data.vertices[j] = map_vert_index[v_index];
+                  c_data.material_id = static_cast<types::material_id>(face->boundary_indicator());
+                }
+
+              cells.push_back(c_data);
+              mapping.push_back(face);
+            }
+        }
+
+    // create level 0 surface triangulation
+    Assert (cells.size() > 0, ExcMessage ("No boundary faces selected"));
+    const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
+    .create_triangulation (vertices, cells, SubCellData());
+
+    // Make the actual mapping
+    for (typename Container<dim-1,spacedim>::active_cell_iterator
+         cell = surface_mesh.begin(0);
+         cell!=surface_mesh.end(0); ++cell)
+      surface_to_volume_mapping[cell] = mapping.at(cell->index());
+
+    do
+      {
+        bool changed = false;
+
+        for (typename Container<dim-1,spacedim>::active_cell_iterator
+             cell = surface_mesh.begin_active(); cell!=surface_mesh.end(); ++cell)
+          if (surface_to_volume_mapping[cell]->has_children() == true )
+            {
+              cell->set_refine_flag ();
+              changed = true;
+            }
+
+        if (changed)
+          {
+            const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
+            .execute_coarsening_and_refinement();
+
+            for (typename Container<dim-1,spacedim>::cell_iterator
+                 surface_cell = surface_mesh.begin(); surface_cell!=surface_mesh.end(); ++surface_cell)
+              for (unsigned int c=0; c<surface_cell->n_children(); c++)
+                if (surface_to_volume_mapping.find(surface_cell->child(c)) == surface_to_volume_mapping.end())
+                  surface_to_volume_mapping[surface_cell->child(c)]
+                    = surface_to_volume_mapping[surface_cell]->child(c);
+          }
+        else
+          break;
+      }
+    while (true);
+
+    return surface_to_volume_mapping;
+  }
+
 }
 
 // explicit instantiations

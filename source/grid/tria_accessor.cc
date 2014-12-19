@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2014 by the deal.II authors
 //
@@ -21,13 +20,15 @@
 #include <deal.II/grid/tria_accessor.templates.h>
 #include <deal.II/grid/tria_iterator.templates.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/quadrature.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 // anonymous namespace for helper functions
 namespace
@@ -970,6 +971,45 @@ namespace
   }
 
 
+  // a 2d face in 3d space
+  double measure (const dealii::TriaAccessor<2,3,3> &accessor)
+  {
+    // If the face is planar, the diagonal from vertex 0 to vertex 3,
+    // v_03, should be in the plane P_012 of vertices 0, 1 and 2.  Get
+    // the normal vector of P_012 and test if v_03 is orthogonal to
+    // that. If so, the face is planar and computing its area is simple.
+    const Point<3> v01 = accessor.vertex(1) - accessor.vertex(0);
+    const Point<3> v02 = accessor.vertex(2) - accessor.vertex(0);
+
+    Point<3> normal;
+    cross_product(normal, v01, v02);
+
+    const Point<3> v03 = accessor.vertex(3) - accessor.vertex(0);
+
+    // check whether v03 does not lie in the plane of v01 and v02
+    // (i.e., whether the face is not planar). we do so by checking
+    // whether the triple product (v01 x v02) * v03 forms a positive
+    // volume relative to |v01|*|v02|*|v03|. the test checks the
+    // squares of these to avoid taking norms/square roots:
+    if (std::abs((v03 * normal) * (v03 * normal) /
+                 (v03.square() * v01.square() * v02.square()))
+        >=
+        1e-24)
+      {
+        Assert (false,
+                ExcMessage("Computing the measure of a nonplanar face is not implemented!"));
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+    // the face is planar. then its area is 1/2 of the norm of the
+    // cross product of the two diagonals
+    const Point<3> v12 = accessor.vertex(2) - accessor.vertex(1);
+    Point<3> twice_area;
+    cross_product(twice_area, v03, v12);
+    return 0.5 * twice_area.norm();
+  }
+
+
 
   template <int structdim, int dim, int spacedim>
   double
@@ -978,7 +1018,43 @@ namespace
     // catch-all for all cases not explicitly
     // listed above
     Assert (false, ExcNotImplemented());
-    return -1e10;
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
+
+  template <int dim, int spacedim>
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<1, dim, spacedim> &obj)
+  {
+    TriaIterator<TriaAccessor<1,dim,spacedim> > it(obj);
+    return obj.get_manifold().get_new_point_on_line(it);
+  }
+
+  template <int dim, int spacedim>
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<2, dim, spacedim> &obj)
+  {
+    TriaIterator<TriaAccessor<2,dim,spacedim> > it(obj);
+    return obj.get_manifold().get_new_point_on_quad(it);
+  }
+
+  template <int dim, int spacedim>
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<3, dim, spacedim> &obj)
+  {
+    TriaIterator<TriaAccessor<3,dim,spacedim> > it(obj);
+    return obj.get_manifold().get_new_point_on_hex(it);
+  }
+
+  template <int structdim, int dim, int spacedim>
+  Point<spacedim> get_new_point_on_object(const TriaAccessor<structdim, dim, spacedim> &obj,
+                                          const bool use_laplace)
+  {
+    if (use_laplace == false)
+      return get_new_point_on_object(obj);
+    else
+      {
+        TriaRawIterator<TriaAccessor<structdim, dim, spacedim> > it(obj);
+        Quadrature<spacedim> quadrature = Manifolds::get_default_quadrature(it, use_laplace);
+        return obj.get_manifold().get_new_point(quadrature);
+      }
   }
 }
 
@@ -1110,15 +1186,56 @@ set_all_manifold_ids (const types::manifold_id manifold_ind) const
     for (unsigned int c=0; c<this->n_children(); ++c)
       this->child(c)->set_all_manifold_ids (manifold_ind);
 
-				   // for hexes also set manifold_id
-				   // of bounding quads and lines
-  
-				   // Six bonding quads
-  for(unsigned int i=0; i<6; ++i)
+  // for hexes also set manifold_id
+  // of bounding quads and lines
+
+  // Six bonding quads
+  for (unsigned int i=0; i<6; ++i)
     this->quad(i)->set_manifold_id(manifold_ind);
-				   // Twelve bounding lines
+  // Twelve bounding lines
   for (unsigned int i=0; i<12; ++i)
     this->line(i)->set_manifold_id (manifold_ind);
+}
+
+
+template <int structdim, int dim, int spacedim>
+Point<spacedim>
+TriaAccessor<structdim, dim, spacedim>::intermediate_point (const Point<structdim> &coordinates) const
+{
+  // We use an FE_Q<structdim>(1) to extract the "weights" of each
+  // vertex, used to get a point from the manifold.
+  static FE_Q<structdim> fe(1);
+
+  // Surrounding points and weights.
+  std::vector<Point<spacedim> > p(GeometryInfo<structdim>::vertices_per_cell);
+  std::vector<double>   w(GeometryInfo<structdim>::vertices_per_cell);
+
+  for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+    {
+      p[i] = this->vertex(i);
+      w[i] = fe.shape_value(i, coordinates);
+    }
+
+  Quadrature<spacedim> quadrature(p, w);
+  return this->get_manifold().get_new_point(quadrature);
+}
+
+
+template <int structdim, int dim, int spacedim>
+Point<spacedim>
+TriaAccessor<structdim, dim, spacedim>::center (const bool respect_manifold,
+                                                const bool use_laplace) const
+{
+  if (respect_manifold == false)
+    {
+      Assert(use_laplace == false, ExcNotImplemented());
+      Point<spacedim> p;
+      for (unsigned int v=0; v<GeometryInfo<structdim>::vertices_per_cell; ++v)
+        p += vertex(v);
+      return p/GeometryInfo<structdim>::vertices_per_cell;
+    }
+  else
+    return get_new_point_on_object(*this, use_laplace);
 }
 
 

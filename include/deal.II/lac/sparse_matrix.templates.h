@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2014 by the deal.II authors
 //
@@ -38,7 +37,7 @@
 #include <cmath>
 #include <vector>
 #include <numeric>
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/bind.h>
 
 
 
@@ -164,9 +163,9 @@ SparseMatrix<number>::operator = (const double d)
     (cols->n_nonzero_elements()+m()) / m();
   if (matrix_size>grain_size)
     parallel::apply_to_subranges (0U, matrix_size,
-                                  std_cxx1x::bind(&internal::SparseMatrix::template
+                                  std_cxx11::bind(&internal::SparseMatrix::template
                                                   zero_subrange<number>,
-                                                  std_cxx1x::_1, std_cxx1x::_2,
+                                                  std_cxx11::_1, std_cxx11::_2,
                                                   val),
                                   grain_size);
   else if (matrix_size > 0)
@@ -715,14 +714,14 @@ SparseMatrix<number>::vmult (OutVector &dst,
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
   parallel::apply_to_subranges (0U, m(),
-                                std_cxx1x::bind (&internal::SparseMatrix::vmult_on_subrange
+                                std_cxx11::bind (&internal::SparseMatrix::vmult_on_subrange
                                                  <number,InVector,OutVector>,
-                                                 std_cxx1x::_1, std_cxx1x::_2,
+                                                 std_cxx11::_1, std_cxx11::_2,
                                                  val,
                                                  cols->rowstart,
                                                  cols->colnums,
-                                                 std_cxx1x::cref(src),
-                                                 std_cxx1x::ref(dst),
+                                                 std_cxx11::cref(src),
+                                                 std_cxx11::ref(dst),
                                                  false),
                                 internal::SparseMatrix::minimum_parallel_grain_size);
 }
@@ -770,14 +769,14 @@ SparseMatrix<number>::vmult_add (OutVector &dst,
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
   parallel::apply_to_subranges (0U, m(),
-                                std_cxx1x::bind (&internal::SparseMatrix::vmult_on_subrange
+                                std_cxx11::bind (&internal::SparseMatrix::vmult_on_subrange
                                                  <number,InVector,OutVector>,
-                                                 std_cxx1x::_1, std_cxx1x::_2,
+                                                 std_cxx11::_1, std_cxx11::_2,
                                                  val,
                                                  cols->rowstart,
                                                  cols->colnums,
-                                                 std_cxx1x::cref(src),
-                                                 std_cxx1x::ref(dst),
+                                                 std_cxx11::cref(src),
+                                                 std_cxx11::ref(dst),
                                                  true),
                                 internal::SparseMatrix::minimum_parallel_grain_size);
 }
@@ -811,15 +810,12 @@ namespace internal
   namespace SparseMatrix
   {
     /**
-     * Perform a vmult using the SparseMatrix
-     * data structures, but only using a
-     * subinterval for the row indices.
+     * Perform a vmult using the SparseMatrix data structures, but only using
+     * a subinterval for the row indices.
      *
-     * In the sequential case, this function
-     * is called on all rows, in the parallel
-     * case it may be called on a subrange,
-     * at the discretion of the task
-     * scheduler.
+     * In the sequential case, this function is called on all rows, in the
+     * parallel case it may be called on a subrange, at the discretion of the
+     * task scheduler.
      */
     template <typename number,
               typename InVector>
@@ -858,11 +854,11 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber> &v) const
 
   return
     parallel::accumulate_from_subranges<number>
-    (std_cxx1x::bind (&internal::SparseMatrix::matrix_norm_sqr_on_subrange
+    (std_cxx11::bind (&internal::SparseMatrix::matrix_norm_sqr_on_subrange
                       <number,Vector<somenumber> >,
-                      std_cxx1x::_1, std_cxx1x::_2,
+                      std_cxx11::_1, std_cxx11::_2,
                       val, cols->rowstart, cols->colnums,
-                      std_cxx1x::cref(v)),
+                      std_cxx11::cref(v)),
      0, m(),
      internal::SparseMatrix::minimum_parallel_grain_size);
 }
@@ -874,15 +870,12 @@ namespace internal
   namespace SparseMatrix
   {
     /**
-     * Perform a vmult using the SparseMatrix
-     * data structures, but only using a
-     * subinterval for the row indices.
+     * Perform a vmult using the SparseMatrix data structures, but only using
+     * a subinterval for the row indices.
      *
-     * In the sequential case, this function
-     * is called on all rows, in the parallel
-     * case it may be called on a subrange,
-     * at the discretion of the task
-     * scheduler.
+     * In the sequential case, this function is called on all rows, in the
+     * parallel case it may be called on a subrange, at the discretion of the
+     * task scheduler.
      */
     template <typename number,
               typename InVector>
@@ -923,12 +916,12 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber> &u,
 
   return
     parallel::accumulate_from_subranges<number>
-    (std_cxx1x::bind (&internal::SparseMatrix::matrix_scalar_product_on_subrange
+    (std_cxx11::bind (&internal::SparseMatrix::matrix_scalar_product_on_subrange
                       <number,Vector<somenumber> >,
-                      std_cxx1x::_1, std_cxx1x::_2,
+                      std_cxx11::_1, std_cxx11::_2,
                       val, cols->rowstart, cols->colnums,
-                      std_cxx1x::cref(u),
-                      std_cxx1x::cref(v)),
+                      std_cxx11::cref(u),
+                      std_cxx11::cref(v)),
      0, m(),
      internal::SparseMatrix::minimum_parallel_grain_size);
 }
@@ -1051,7 +1044,7 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
             &B.val[new_cols-&sp_B.colnums[sp_B.rowstart[0]]];
           const numberB *const end_cols = &B.val[sp_B.rowstart[col+1]];
           for (; B_val_ptr != end_cols; ++B_val_ptr)
-            *new_ptr++ = A_val * *B_val_ptr * (use_vector ? V(col) : 1);
+            *new_ptr++ = A_val **B_val_ptr * (use_vector ? V(col) : 1);
 
           C.add (i, new_ptr-&new_entries[0], new_cols, &new_entries[0],
                  false, true);
@@ -1257,15 +1250,12 @@ namespace internal
   namespace SparseMatrix
   {
     /**
-     * Perform a vmult using the SparseMatrix
-     * data structures, but only using a
-     * subinterval for the row indices.
+     * Perform a vmult using the SparseMatrix data structures, but only using
+     * a subinterval for the row indices.
      *
-     * In the sequential case, this function
-     * is called on all rows, in the parallel
-     * case it may be called on a subrange,
-     * at the discretion of the task
-     * scheduler.
+     * In the sequential case, this function is called on all rows, in the
+     * parallel case it may be called on a subrange, at the discretion of the
+     * task scheduler.
      */
     template <typename number,
               typename InVector,
@@ -1312,13 +1302,13 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 
   return
     std::sqrt (parallel::accumulate_from_subranges<number>
-               (std_cxx1x::bind (&internal::SparseMatrix::residual_sqr_on_subrange
+               (std_cxx11::bind (&internal::SparseMatrix::residual_sqr_on_subrange
                                  <number,Vector<somenumber>,Vector<somenumber> >,
-                                 std_cxx1x::_1, std_cxx1x::_2,
+                                 std_cxx11::_1, std_cxx11::_2,
                                  val, cols->rowstart, cols->colnums,
-                                 std_cxx1x::cref(u),
-                                 std_cxx1x::cref(b),
-                                 std_cxx1x::ref(dst)),
+                                 std_cxx11::cref(u),
+                                 std_cxx11::cref(b),
+                                 std_cxx11::ref(dst)),
                 0, m(),
                 internal::SparseMatrix::minimum_parallel_grain_size));
 }

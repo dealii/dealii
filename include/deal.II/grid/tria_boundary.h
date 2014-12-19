@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +25,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/point.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/manifold.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -34,20 +34,20 @@ template <int dim, int space_dim> class Triangulation;
 
 
 /**
- *   This class is used to represent a boundary to a triangulation.
- *   When a triangulation creates a new vertex on the boundary of the
- *   domain, it determines the new vertex' coordinates through the
- *   following code (here in two dimensions):
+ * This class is used to represent a boundary to a triangulation. When a
+ * triangulation creates a new vertex on the boundary of the domain, it
+ * determines the new vertex' coordinates through the following code (here in
+ * two dimensions):
  *   @code
  *     ...
  *     Point<2> new_vertex = boundary.get_new_point_on_line (line);
  *     ...
  *   @endcode
- *   @p line denotes the line at the boundary that shall be refined
- *   and for which we seek the common point of the two child lines.
+ * @p line denotes the line at the boundary that shall be refined and for
+ * which we seek the common point of the two child lines.
  *
- *   In 3D, a new vertex may be placed on the middle of a line or on
- *   the middle of a side. Respectively, the library calls
+ * In 3D, a new vertex may be placed on the middle of a line or on the middle
+ * of a side. Respectively, the library calls
  *   @code
  *     ...
  *     Point<3> new_line_vertices[4]
@@ -57,32 +57,32 @@ template <int dim, int space_dim> class Triangulation;
  *           boundary.get_new_point_on_line (face->line(3))  };
  *     ...
  *   @endcode
- *   to get the four midpoints of the lines bounding the quad at the
- *   boundary, and after that
+ * to get the four midpoints of the lines bounding the quad at the boundary,
+ * and after that
  *   @code
  *     ...
  *     Point<3> new_quad_vertex = boundary.get_new_point_on_quad (face);
  *     ...
  *   @endcode
- *   to get the midpoint of the face. It is guaranteed that this order
- *   (first lines, then faces) holds, so you can use information from
- *   the children of the four lines of a face, since these already exist
- *   at the time the midpoint of the face is to be computed.
+ * to get the midpoint of the face. It is guaranteed that this order (first
+ * lines, then faces) holds, so you can use information from the children of
+ * the four lines of a face, since these already exist at the time the
+ * midpoint of the face is to be computed.
  *
- *   Since iterators are passed to the functions, you may use information
- *   about boundary indicators and the like, as well as all other information
- *   provided by these objects.
+ * Since iterators are passed to the functions, you may use information about
+ * boundary indicators and the like, as well as all other information provided
+ * by these objects.
  *
- *   There are specialisations, StraightBoundary, which places
- *   the new point right into the middle of the given points, and
- *   HyperBallBoundary creating a hyperball with given radius
- *   around a given center point.
+ * There are specializations, StraightBoundary, which places the new point
+ * right into the middle of the given points, and HyperBallBoundary creating a
+ * hyperball with given radius around a given center point.
  *
  * @ingroup boundary
- * @author Wolfgang Bangerth, 1999, 2001, 2009, Ralf Hartmann, 2001, 2008
+ * @author Wolfgang Bangerth, 1999, 2001, 2009, Ralf Hartmann, 2001, 2008,
+ * Luca Heltai, 2014
  */
 template <int dim, int spacedim=dim>
-class Boundary : public Subscriptor
+class Boundary : public FlatManifold<dim, spacedim>
 {
 public:
 
@@ -105,42 +105,6 @@ public:
    */
   virtual ~Boundary ();
 
-  /**
-   * Return the point which shall become the new middle vertex of the two
-   * children of a regular line. In 2D, this line is a line at the boundary,
-   * while in 3d, it is bounding a face at the boundary (the lines therefore
-   * is also on the boundary).
-   */
-  virtual
-  Point<spacedim>
-  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const = 0;
-
-  /**
-   * Return the point which shall become the common point of the four children
-   * of a quad at the boundary in three or more spatial dimensions. This
-   * function therefore is only useful in at least three dimensions and should
-   * not be called for lower dimensions.
-   *
-   * This function is called after the four lines bounding the given @p quad
-   * are refined, so you may want to use the information provided by
-   * <tt>quad->line(i)->child(j)</tt>, <tt>i=0...3</tt>, <tt>j=0,1</tt>.
-   *
-   * Because in 2D, this function is not needed, it is not made pure virtual,
-   * to avoid the need to overload it.  The default implementation throws an
-   * error in any case, however.
-   */
-  virtual
-  Point<spacedim>
-  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
-
-  /**
-   * Depending on <tt>dim=2</tt> or <tt>dim=3</tt> this function calls the
-   * get_new_point_on_line or the get_new_point_on_quad function. It throws an
-   * exception for <tt>dim=1</tt>. This wrapper allows dimension independent
-   * programming.
-   */
-  Point<spacedim>
-  get_new_point_on_face (const typename Triangulation<dim,spacedim>::face_iterator &face) const;
 
   /**
    * Return intermediate points on a line spaced according to the interior
@@ -214,9 +178,9 @@ public:
    * have a kink at the vertices itself).
    *
    * @note Implementations of this function should be able to assume that the
-   * point p lies within or close to the face described by the first
-   * argument. In turn, callers of this function should ensure that this is in
-   * fact the case.
+   * point p lies within or close to the face described by the first argument.
+   * In turn, callers of this function should ensure that this is in fact the
+   * case.
    */
   virtual
   Tensor<1,spacedim>
@@ -225,8 +189,8 @@ public:
 
   /**
    * Compute the normal vectors to the boundary at each vertex of the given
-   * face. It is not required that the normal vectors be normed
-   * somehow. Neither is it required that the normals actually point outward.
+   * face. It is not required that the normal vectors be normed somehow.
+   * Neither is it required that the normals actually point outward.
    *
    * This function is needed to compute data for C1 mappings. The default
    * implementation is to throw an error, so you need not overload this
@@ -304,7 +268,7 @@ private:
   /**
    * Point generator for the intermediate points on a boundary.
    */
-  mutable std::vector<std_cxx1x::shared_ptr<QGaussLobatto<1> > > points;
+  mutable std::vector<std_cxx11::shared_ptr<QGaussLobatto<1> > > points;
 
   /**
    * Mutex for protecting the points array.
@@ -315,19 +279,18 @@ private:
 
 
 /**
- *   Specialization of Boundary<dim,spacedim>, which places the new point
- *   right into the middle of the given points. The middle is defined
- *   as the arithmetic mean of the points.
+ * Specialization of Boundary<dim,spacedim>, which places the new point right
+ * into the middle of the given points. The middle is defined as the
+ * arithmetic mean of the points.
  *
- *   This class does not really describe a boundary in the usual
- *   sense. By placing new points in the middle of old ones, it rather
- *   assumes that the boundary of the domain is given by the
- *   polygon/polyhedron defined by the boundary of the initial coarse
- *   triangulation.
+ * This class does not really describe a boundary in the usual sense. By
+ * placing new points in the middle of old ones, it rather assumes that the
+ * boundary of the domain is given by the polygon/polyhedron defined by the
+ * boundary of the initial coarse triangulation.
  *
- *   @ingroup boundary
+ * @ingroup boundary
  *
- *   @author Wolfgang Bangerth, 1998, 2001, Ralf Hartmann, 2001
+ * @author Wolfgang Bangerth, 1998, 2001, Ralf Hartmann, 2001
  */
 template <int dim, int spacedim=dim>
 class StraightBoundary : public Boundary<dim,spacedim>
@@ -465,33 +428,16 @@ public:
 #ifndef DOXYGEN
 
 template <>
-Point<1>
-Boundary<1,1>::
-get_new_point_on_face (const Triangulation<1,1>::face_iterator &) const;
-
-template <>
 void
 Boundary<1,1>::
 get_intermediate_points_on_face (const Triangulation<1,1>::face_iterator &,
                                  std::vector<Point<1> > &) const;
 
 template <>
-Point<2>
-Boundary<1,2>::
-get_new_point_on_face (const Triangulation<1,2>::face_iterator &) const;
-
-template <>
 void
 Boundary<1,2>::
 get_intermediate_points_on_face (const Triangulation<1,2>::face_iterator &,
                                  std::vector<Point<2> > &) const;
-
-
-
-template <>
-Point<3>
-Boundary<1,3>::
-get_new_point_on_face (const Triangulation<1,3>::face_iterator &) const;
 
 template <>
 void

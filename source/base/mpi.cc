@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2005 - 2014 by the deal.II authors
 //
@@ -187,8 +186,7 @@ namespace Utilities
 
     namespace
     {
-      // custom MIP_Op for
-      // calculate_collective_mpi_min_max_avg
+      // custom MIP_Op for calculate_collective_mpi_min_max_avg
       void max_reduce ( const void *in_lhs_,
                         void *inout_rhs_,
                         int *len,
@@ -207,7 +205,7 @@ namespace Utilities
           }
         else if (inout_rhs->min == in_lhs->min)
           {
-            // choose lower cpu index when tied to make operator cumutative
+            // choose lower cpu index when tied to make operator commutative
             if (inout_rhs->min_index > in_lhs->min_index)
               inout_rhs->min_index = in_lhs->min_index;
           }
@@ -219,7 +217,7 @@ namespace Utilities
           }
         else if (inout_rhs->max == in_lhs->max)
           {
-            // choose lower cpu index when tied to make operator cumutative
+            // choose lower cpu index when tied to make operator commutative
             if (inout_rhs->max_index > in_lhs->max_index)
               inout_rhs->max_index = in_lhs->max_index;
           }
@@ -232,7 +230,11 @@ namespace Utilities
     min_max_avg(const double my_value,
                 const MPI_Comm &mpi_communicator)
     {
-      MinMaxAvg result;
+      // To avoid uninitialized values on some MPI implementations, provide
+      // result with a default value already...
+      MinMaxAvg result = { 0., std::numeric_limits<double>::max(),
+                           -std::numeric_limits<double>::max(), 0, 0, 0.
+                         };
 
       const unsigned int my_id
         = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
@@ -292,7 +294,6 @@ namespace Utilities
 
 
 
-
     MinMaxAvg
     min_max_avg(const double my_value,
                 const MPI_Comm &)
@@ -319,7 +320,76 @@ namespace Utilities
       :
       owns_mpi (true)
     {
-      do_init(argc, argv, max_num_threads);
+      do_init(argc, argv);
+
+      if (max_num_threads != numbers::invalid_unsigned_int)
+        {
+          // set maximum number of threads (also respecting the environment
+          // variable that the called function evaluates) based on what
+          // the user asked
+          multithread_info.set_thread_limit(max_num_threads);
+        }
+      else
+        // user wants automatic choice
+        {
+#ifdef DEAL_II_WITH_MPI
+          // we need to figure out how many MPI processes there
+          // are on the current node, as well as how many CPU cores
+          // we have. for the first task, check what get_hostname()
+          // returns and then to an allgather so each processor
+          // gets the answer
+          //
+          // in calculating the length of the string, don't forget the
+          // terminating \0 on C-style strings
+          const std::string hostname = Utilities::System::get_hostname();
+          const unsigned int max_hostname_size = Utilities::MPI::max (hostname.size()+1,
+                                                                      MPI_COMM_WORLD);
+          std::vector<char> hostname_array (max_hostname_size);
+          std::copy (hostname.c_str(), hostname.c_str()+hostname.size()+1,
+                     hostname_array.begin());
+
+          std::vector<char> all_hostnames(max_hostname_size *
+                                          MPI::n_mpi_processes(MPI_COMM_WORLD));
+          MPI_Allgather (&hostname_array[0], max_hostname_size, MPI_CHAR,
+                         &all_hostnames[0], max_hostname_size, MPI_CHAR,
+                         MPI_COMM_WORLD);
+
+          // search how often our own hostname appears and the
+          // how-manyth instance the current process represents
+          unsigned int n_local_processes=0;
+          unsigned int nth_process_on_host = 0;
+          for (unsigned int i=0; i<MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+            if (std::string (&all_hostnames[0] + i*max_hostname_size) == hostname)
+              {
+                ++n_local_processes;
+                if (i <= MPI::this_mpi_process (MPI_COMM_WORLD))
+                  ++nth_process_on_host;
+              }
+          Assert (nth_process_on_host > 0, ExcInternalError());
+
+
+          // compute how many cores each process gets. if the number does
+          // not divide evenly, then we get one more core if we are
+          // among the first few processes
+          //
+          // if the number would be zero, round up to one since every
+          // process needs to have at least one thread
+          const unsigned int n_threads
+            = std::max(multithread_info.n_cpus / n_local_processes
+                       +
+                       (nth_process_on_host <= multithread_info.n_cpus % n_local_processes
+                        ?
+                        1
+                        :
+                        0),
+                       1U);
+#else
+          const unsigned int n_threads = multithread_info.n_cpus;
+#endif
+
+          // finally set this number of threads
+          multithread_info.set_thread_limit(n_threads);
+        }
     }
 
 
@@ -330,14 +400,17 @@ namespace Utilities
       :
       owns_mpi (true)
     {
-      do_init(argc, argv, 1);
+      do_init(argc, argv);
+
+      // set maximum number of threads (also respecting the environment
+      // variable that the called function evaluates)
+      multithread_info.set_thread_limit(1);
     }
 
 
     void
     MPI_InitFinalize::do_init(int    &argc,
-                              char ** &argv,
-                              const unsigned int max_num_threads)
+                              char ** &argv)
     {
       static bool constructor_has_already_run = false;
       Assert (constructor_has_already_run == false,
@@ -388,10 +461,6 @@ namespace Utilities
 #endif
 
       constructor_has_already_run = true;
-
-      // set maximum number of threads (also respecting the environment
-      // variable that the called function evaluates)
-      multithread_info.set_thread_limit(max_num_threads);
     }
 
 

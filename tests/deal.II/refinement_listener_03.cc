@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2006 - 2013 by the deal.II authors
 //
@@ -92,49 +91,49 @@ void test ()
 
   boost::signals2::connection connections_1[5]
     = {tria_1.signals.pre_refinement
-       .connect (std_cxx1x::bind (&pre_refinement_notification<dim,dim>,
+       .connect (std_cxx11::bind (&pre_refinement_notification<dim,dim>,
                                   "tria_1",
-                                  std_cxx1x::cref(tria_1))),
+                                  std_cxx11::cref(tria_1))),
        tria_1.signals.post_refinement
-       .connect (std_cxx1x::bind (&post_refinement_notification<dim,dim>,
+       .connect (std_cxx11::bind (&post_refinement_notification<dim,dim>,
                                   "tria_1",
-                                  std_cxx1x::cref(tria_1))),
+                                  std_cxx11::cref(tria_1))),
        tria_1.signals.create
-       .connect (std_cxx1x::bind (&create_notification<dim,dim>,
+       .connect (std_cxx11::bind (&create_notification<dim,dim>,
                                   "tria_1",
-                                  std_cxx1x::cref(tria_1))),
+                                  std_cxx11::cref(tria_1))),
        tria_1.signals.copy
-       .connect (std_cxx1x::bind (&copy_notification<dim,dim>,
+       .connect (std_cxx11::bind (&copy_notification<dim,dim>,
                                   "tria_1",
-                                  std_cxx1x::_1,
-                                  std_cxx1x::cref(tria_1))),
+                                  std_cxx11::_1,
+                                  std_cxx11::cref(tria_1))),
        tria_1.signals.any_change
-       .connect (std_cxx1x::bind (&any_change_notification<dim,dim>,
+       .connect (std_cxx11::bind (&any_change_notification<dim,dim>,
                                   "tria_1",
-                                  std_cxx1x::cref(tria_1)))
+                                  std_cxx11::cref(tria_1)))
       };
   boost::signals2::connection connections_2[5]
     = {tria_2.signals.pre_refinement
-       .connect (std_cxx1x::bind (&pre_refinement_notification<dim,dim>,
+       .connect (std_cxx11::bind (&pre_refinement_notification<dim,dim>,
                                   "tria_2",
-                                  std_cxx1x::cref(tria_2))),
+                                  std_cxx11::cref(tria_2))),
        tria_2.signals.post_refinement
-       .connect (std_cxx1x::bind (&post_refinement_notification<dim,dim>,
+       .connect (std_cxx11::bind (&post_refinement_notification<dim,dim>,
                                   "tria_2",
-                                  std_cxx1x::cref(tria_2))),
+                                  std_cxx11::cref(tria_2))),
        tria_2.signals.create
-       .connect (std_cxx1x::bind (&create_notification<dim,dim>,
+       .connect (std_cxx11::bind (&create_notification<dim,dim>,
                                   "tria_2",
-                                  std_cxx1x::cref(tria_2))),
+                                  std_cxx11::cref(tria_2))),
        tria_2.signals.copy
-       .connect (std_cxx1x::bind (&copy_notification<dim,dim>,
+       .connect (std_cxx11::bind (&copy_notification<dim,dim>,
                                   "tria_2",
-                                  std_cxx1x::_1,
-                                  std_cxx1x::cref(tria_2))),
+                                  std_cxx11::_1,
+                                  std_cxx11::cref(tria_2))),
        tria_2.signals.any_change
-       .connect (std_cxx1x::bind (&any_change_notification<dim,dim>,
+       .connect (std_cxx11::bind (&any_change_notification<dim,dim>,
                                   "tria_2",
-                                  std_cxx1x::cref(tria_2)))
+                                  std_cxx11::cref(tria_2)))
       };
 
 

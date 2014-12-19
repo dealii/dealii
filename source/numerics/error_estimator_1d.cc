@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2014 by the deal.II authors
 //
@@ -39,7 +38,7 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/numerics/error_estimator.h>
 
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/bind.h>
 
 #include <numeric>
 #include <algorithm>

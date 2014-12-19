@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -528,44 +527,32 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
   for (unsigned int i=0; i<criteria.size(); ++i)
     tmp[i] = i;
 
-  qsort_index(criteria,tmp,0,criteria.size()-1);
+  qsort_index (criteria, tmp, 0, criteria.size()-1);
 
-  double s0 = (1.-std::pow(2.,-1.*order)) * criteria(tmp[0]);
-  double E  = criteria.l1_norm();
+  double expected_error_reduction = 0;
+  const double original_error     = criteria.l1_norm();
 
-  unsigned int N = criteria.size();
-  unsigned int M = 0;
+  const unsigned int N = criteria.size();
 
-  // The first M cells are refined
-  // to minimize the expected error
-  // multiplied with the expected
-  // number of cells to the power of
-  // 2 * expected order of the finite
-  // element space divided by the dimension
-  // of the discretized space.
-  // We assume that the error is
-  // decreased by (1-2^(-order)) a_K if the cell
-  // K with error indicator a_K is
-  // refined and 'order' ist the expected
-  // order of convergence.
-  // The expected number of cells is
-  // N+(2^d-1)*M (N is the current number
-  // of cells)
-  double min =std::pow( ((std::pow(2.,dim)-1)*(1.+M)+N),(double) order/dim) * (E-s0);
+  // minimize the cost functional discussed in the documentation
+  double min_cost = std::numeric_limits<double>::max();
+  unsigned int min_arg = 0;
 
-  unsigned int minArg = N-1;
-
-  for (M=1; M<criteria.size(); ++M)
+  for (unsigned int M = 0; M<criteria.size(); ++M)
     {
-      s0 += (1-std::pow(2.,-1.*order)) * criteria(tmp[M]);
+      expected_error_reduction += (1-std::pow(2.,-1.*order)) * criteria(tmp[M]);
 
-      if ( std::pow(((std::pow(2.,dim)-1)*(1+M)+N), (double) order/dim) * (E-s0) <= min)
+      const double cost = std::pow(((std::pow(2.,dim)-1)*(1+M)+N),
+                                   (double)order/dim) *
+                          (original_error-expected_error_reduction);
+      if (cost <= min_cost)
         {
-          min =  std::pow(((std::pow(2.,dim)-1)*(1+M)+N), (double) order/dim) * (E-s0);
-          minArg = M;
+          min_cost = cost;
+          min_arg = M;
         }
     }
-  refine(tria,criteria,criteria(tmp[minArg]));
+
+  refine (tria, criteria, criteria(tmp[min_arg]));
 }
 
 

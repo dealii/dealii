@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -44,12 +43,12 @@ print_dofs (const DoFHandler<dim> &dof)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   std::vector<types::global_dof_index> v (fe.dofs_per_cell);
-  std_cxx1x::shared_ptr<FEValues<dim> > fevalues;
+  std_cxx11::shared_ptr<FEValues<dim> > fevalues;
 
   if (fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
-      fevalues = std_cxx1x::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_q_points));
+      fevalues = std_cxx11::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_q_points));
     }
 
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();

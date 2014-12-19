@@ -1,7 +1,6 @@
 ## ---------------------------------------------------------------------
-## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II Authors
+## Copyright (C) 2012 - 2014 by the deal.II Authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -19,6 +18,10 @@
 # Prepare tutorial.h:
 #
 
+file(GLOB DEAL_II_STEPS_BUILDSON
+  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/builds-on
+  )
+
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
   COMMAND ${PERL_EXECUTABLE}
@@ -29,6 +32,7 @@ ADD_CUSTOM_COMMAND(
     > ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
   DEPENDS
     ${DEAL_II_STEPS}
+    ${DEAL_II_STEPS_BUILDSON}
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
   )
 

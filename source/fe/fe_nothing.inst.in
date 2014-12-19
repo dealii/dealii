@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2013 by the deal.II authors
 //
@@ -16,8 +15,10 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
   {
-    template class FE_Nothing<deal_II_dimension>;
+#if deal_II_dimension <= deal_II_space_dimension
+    template class FE_Nothing<deal_II_dimension,deal_II_space_dimension>;
+#endif
   }
 

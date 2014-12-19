@@ -1,7 +1,6 @@
 ## ---------------------------------------------------------------------
-## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -40,12 +39,12 @@
 IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
 
   IF("${DEAL_II_CXX11_FLAG}" STREQUAL "")
+    CHECK_CXX_COMPILER_FLAG("-std=c++0x" DEAL_II_HAVE_FLAG_stdcxx0x)
     CHECK_CXX_COMPILER_FLAG("-std=c++11" DEAL_II_HAVE_FLAG_stdcxx11)
     IF(DEAL_II_HAVE_FLAG_stdcxx11)
       SET(DEAL_II_CXX11_FLAG "-std=c++11")
-    ELSEIF(DEAL_II_HAVE_FLAG_stdcxx11)
-      CHECK_CXX_COMPILER_FLAG("-std=c++0x" DEAL_II_HAVE_FLAG_stdcxx0x)
-      SET(DEAL_II_CXX11_FLAG "-std=x++0x")
+    ELSEIF(DEAL_II_HAVE_FLAG_stdcxx0x)
+      SET(DEAL_II_CXX11_FLAG "-std=c++0x")
     ENDIF()
   ENDIF()
 
@@ -187,6 +186,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
     int main() { return 0; }
     "
     DEAL_II_HAVE_CXX11_ICCNUMERICLIMITSBUG_OK)
+
 
   #
   # icc-14.0.0 has an astonishing bug [1] where it hits an internal compiler

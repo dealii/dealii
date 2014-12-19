@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2011 - 2014 by the deal.II authors
 //
@@ -40,13 +39,13 @@ namespace internal
      * based on the given element type.
      */
     enum ElementType
-      {
-        tensor_general,
-        tensor_symmetric,
-        truncated_tensor,
-        tensor_symmetric_plus_dg0,
-        tensor_gausslobatto
-      };
+    {
+      tensor_general,
+      tensor_symmetric,
+      truncated_tensor,
+      tensor_symmetric_plus_dg0,
+      tensor_gausslobatto
+    };
 
     /**
      * The class that stores the shape functions, gradients and Hessians
@@ -75,9 +74,9 @@ namespace internal
       /**
        * Initializes the data fields. Takes a one-dimensional quadrature
        * formula and a finite element as arguments and evaluates the shape
-       * functions, gradients and Hessians on the one-dimensional unit
-       * cell. This function assumes that the finite element is derived from a
-       * one-dimensional element by a tensor product and that the zeroth shape
+       * functions, gradients and Hessians on the one-dimensional unit cell.
+       * This function assumes that the finite element is derived from a one-
+       * dimensional element by a tensor product and that the zeroth shape
        * function in zero evaluates to one.
        */
       template <int dim>
@@ -96,7 +95,7 @@ namespace internal
        * type.
        */
       ElementType element_type;
-          
+
       /**
        * Stores the shape values of the 1D finite element evaluated on all 1D
        * quadrature points in vectorized format, i.e., as an array of
@@ -132,8 +131,8 @@ namespace internal
       AlignedVector<VectorizedArray<Number> > shape_val_evenodd;
 
       /**
-       * Stores the shape gradients in a different format, namely the
-       * so-called even-odd scheme where the symmetries in shape_gradients are
+       * Stores the shape gradients in a different format, namely the so-
+       * called even-odd scheme where the symmetries in shape_gradients are
        * used for faster evaluation.
        */
       AlignedVector<VectorizedArray<Number> > shape_gra_evenodd;

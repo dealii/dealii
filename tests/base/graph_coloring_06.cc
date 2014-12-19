@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2003 - 2013 by the deal.II authors
 //
@@ -76,7 +75,7 @@ void check()
     coloring
     = GraphColoring::make_graph_coloring(dof_handler.begin_active(),
 					 dof_handler.end(),
-					 std_cxx1x::function<std::vector<types::global_dof_index>
+					 std_cxx11::function<std::vector<types::global_dof_index>
 					 (typename DoFHandler<dim>::active_cell_iterator const &)>
 					 (&get_conflict_indices_cfem<dim>));
 

@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -422,7 +421,7 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS; deal_II_space_di
       void
       ParallelDataBase<deal_II_dimension,deal_II_space_dimension>::
       reinit_all_fe_values<dealii::DH<deal_II_dimension,deal_II_space_dimension> >
-      (std::vector<std_cxx1x::shared_ptr<DataEntryBase<dealii::DH<deal_II_dimension,deal_II_space_dimension> > > > &dof_data,
+      (std::vector<std_cxx11::shared_ptr<DataEntryBase<dealii::DH<deal_II_dimension,deal_II_space_dimension> > > > &dof_data,
        const dealii::Triangulation<deal_II_dimension,deal_II_space_dimension>::cell_iterator &cell,
        const unsigned int face);
 #endif

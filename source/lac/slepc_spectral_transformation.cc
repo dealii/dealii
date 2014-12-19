@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2009 - 2013 by the deal.II authors
 //
@@ -51,6 +50,19 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
 
     set_transformation_type(transformation_data->st);
+
+    // if mat_mode has been set,
+    // pass it to ST object
+    if (mat_mode.get() != 0)
+      {
+        int ierr = STSetMatMode(transformation_data->st,*(mat_mode.get()) );
+        AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
+      }
+  }
+
+  void TransformationBase::set_matrix_mode(const STMatMode mode)
+  {
+    mat_mode.reset (new STMatMode(mode));
   }
 
   /* ------------------- TransformationShift --------------------- */
@@ -122,12 +134,19 @@ namespace SLEPcWrappers
   void
   TransformationSpectrumFolding::set_transformation_type (ST &st) const
   {
+#if DEAL_II_PETSC_VERSION_LT(3,5,0)
     int ierr;
     ierr = STSetType (st, const_cast<char *>(STFOLD));
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
 
     ierr = STSetShift (st, additional_data.shift_parameter);
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
+#else
+    // PETSc/SLEPc version must be < 3.5.0.
+    Assert ((false),
+            ExcMessage ("Folding transformation has been removed in SLEPc 3.5.0 and newer."
+                        "You cannot use this transformation anymore."));
+#endif
   }
 
   /* ------------------- TransformationCayley --------------------- */

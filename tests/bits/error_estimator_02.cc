@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2004 - 2013 by the deal.II authors
 //
@@ -154,7 +153,7 @@ check ()
   // number
   KellyErrorEstimator<dim>::estimate (mapping, dof, q_face, neumann_bc,
                                       v, error1);
-  const double scaling_factor = 10000.*error1.size()/error1.l1_norm();
+  const double scaling_factor = 500000./error1.linfty_norm();
   error1 *= scaling_factor;
 
   deallog << "Estimated error indicators:" << std::endl;
@@ -171,7 +170,7 @@ check ()
       KellyErrorEstimator<dim>::estimate (mapping, dof, q_face, neumann_bc,
                                           v, this_error,
                                           std::vector<bool>(), 0,
-                                          multithread_info.n_default_threads,
+                                          multithread_info.n_threads(),
                                           numbers::invalid_unsigned_int,
                                           material);
       this_error *= scaling_factor;

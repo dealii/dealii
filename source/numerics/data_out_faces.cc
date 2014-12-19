@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2014 by the deal.II authors
 //
@@ -41,7 +40,7 @@ namespace internal
                   const unsigned int n_subdivisions,
                   const std::vector<unsigned int> &n_postprocessor_outputs,
                   const Mapping<dim,spacedim> &mapping,
-                  const std::vector<std_cxx1x::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
+                  const std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                   const UpdateFlags update_flags)
       :
       internal::DataOut::
@@ -79,7 +78,7 @@ DataOutFaces<dim,DH>::DataOutFaces(const bool so)
   surface_only(so)
 {
   Assert (dim == DH::dimension,
-	  ExcNotImplemented());
+          ExcNotImplemented());
 }
 
 
@@ -334,11 +333,11 @@ void DataOutFaces<dim,DH>::build_patches (const Mapping<dimension> &mapping,
   // now build the patches in parallel
   WorkStream::run (&all_faces[0],
                    &all_faces[0]+all_faces.size(),
-                   std_cxx1x::bind(&DataOutFaces<dim,DH>::build_one_patch,
-                                   this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
-                   std_cxx1x::bind(&internal::DataOutFaces::
+                   std_cxx11::bind(&DataOutFaces<dim,DH>::build_one_patch,
+                                   this, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3),
+                   std_cxx11::bind(&internal::DataOutFaces::
                                    append_patch_to_list<dim,space_dimension>,
-                                   std_cxx1x::_1, std_cxx1x::ref(this->patches)),
+                                   std_cxx11::_1, std_cxx11::ref(this->patches)),
                    thread_data,
                    sample_patch);
 }

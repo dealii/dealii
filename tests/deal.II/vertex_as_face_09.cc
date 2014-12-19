@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -37,7 +36,7 @@ void test ()
 
   Triangulation<1,2> tria;
 
-  GridTools::extract_boundary_mesh (volume_mesh, tria);
+  GridGenerator::extract_boundary_mesh (volume_mesh, tria);
 
   deallog << "n_cells = " << tria.n_active_cells() << std::endl;
   deallog << "n_boundary_ids = " << tria.get_boundary_indicators ().size()

@@ -1,0 +1,68 @@
+
+%!PS-Adobe-2.0 EPSF-1.2
+%%Title: deal.II Output
+%%Creator: the deal.II library
+
+%%BoundingBox: 0 0 301 319
+/m {moveto} bind def
+/x {lineto stroke} bind def
+/b {0 0 0 setrgbcolor} def
+/r {1 0 0 setrgbcolor} def
+%%EndProlog
+
+0.500000 setlinewidth
+b 0.00000 40.1924 m 80.3848 109.808 x
+b 139.230 0.00000 m 219.615 69.6152 x
+b 0.00000 40.1924 m 139.230 0.00000 x
+b 80.3848 109.808 m 219.615 69.6152 x
+b 5.15256e-15 179.423 m 160.770 318.653 x
+b 139.230 139.230 m 300.000 278.461 x
+b 5.15256e-15 179.423 m 139.230 139.230 x
+b 160.770 318.653 m 300.000 278.461 x
+b 0.00000 40.1924 m 5.15256e-15 179.423 x
+b 139.230 0.00000 m 139.230 139.230 x
+b 80.3848 109.808 m 160.770 318.653 x
+b 219.615 69.6152 m 300.000 278.461 x
+showpage
+DEAL::Planar
+Face	Exact	Measure
+DEAL::0	1.5000	1.5000
+DEAL::1	1.5000	1.5000
+DEAL::2	1.0000	1.0000
+DEAL::3	1.4142	1.4142
+DEAL::4	1.0000	1.0000
+DEAL::5	2.0000	2.0000
+%!PS-Adobe-2.0 EPSF-1.2
+%%Title: deal.II Output
+%%Creator: the deal.II library
+
+%%BoundingBox: 0 0 301 531
+/m {moveto} bind def
+/x {lineto stroke} bind def
+/b {0 0 0 setrgbcolor} def
+/r {1 0 0 setrgbcolor} def
+%%EndProlog
+
+0.500000 setlinewidth
+b 0.00000 54.9038 m 109.808 150.000 x
+b 190.192 0.00000 m 300.000 95.0962 x
+b 0.00000 54.9038 m 190.192 0.00000 x
+b 109.808 150.000 m 300.000 95.0962 x
+b 7.03853e-15 245.096 m 109.808 530.385 x
+b 190.192 380.385 m 300.000 285.289 x
+b 7.03853e-15 245.096 m 190.192 380.385 x
+b 109.808 530.385 m 300.000 285.289 x
+b 0.00000 54.9038 m 7.03853e-15 245.096 x
+b 190.192 0.00000 m 190.192 380.385 x
+b 109.808 150.000 m 109.808 530.385 x
+b 300.000 95.0962 m 300.000 285.289 x
+showpage
+DEAL::Twisted
+Face	Exact	Measure
+DEAL::0	1.5000	1.5000
+DEAL::1	1.5000	1.5000
+DEAL::2	1.5000	1.5000
+DEAL::3	1.5000	1.5000
+DEAL::4	1.0000	1.0000
+DEAL::5	1.6667	nan
+DEAL::

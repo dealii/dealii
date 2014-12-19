@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -39,13 +38,13 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Power method (von Mises) for eigenvalue computations.
  *
- * This method determines the largest eigenvalue of a matrix by
- * applying increasing powers of this matrix to a vector. If there is
- * an eigenvalue $l$ with dominant absolute value, the iteration vectors
- * will become aligned to its eigenspace and $Ax = lx$.
+ * This method determines the largest eigenvalue of a matrix by applying
+ * increasing powers of this matrix to a vector. If there is an eigenvalue $l$
+ * with dominant absolute value, the iteration vectors will become aligned to
+ * its eigenspace and $Ax = lx$.
  *
- * A shift parameter allows to shift the spectrum, so it is possible
- * to compute the smallest eigenvalue, too.
+ * A shift parameter allows to shift the spectrum, so it is possible to
+ * compute the smallest eigenvalue, too.
  *
  * Convergence of this method is known to be slow.
  *
@@ -61,17 +60,13 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Standardized data struct to
-   * pipe additional data to the
-   * solver.
+   * Standardized data struct to pipe additional data to the solver.
    */
   struct AdditionalData
   {
     /**
-     * Shift parameter. This
-     * parameter allows to shift
-     * the spectrum to compute a
-     * different eigenvalue.
+     * Shift parameter. This parameter allows to shift the spectrum to compute
+     * a different eigenvalue.
      */
     double shift;
     /**
@@ -97,15 +92,10 @@ public:
   virtual ~EigenPower ();
 
   /**
-   * Power method. @p x is the
-   * (not necessarily normalized,
-   * but nonzero) start vector for
-   * the power method. After the
-   * iteration, @p value is the
-   * approximated eigenvalue and
-   * @p x is the corresponding
-   * eigenvector, normalized with
-   * respect to the l2-norm.
+   * Power method. @p x is the (not necessarily normalized, but nonzero) start
+   * vector for the power method. After the iteration, @p value is the
+   * approximated eigenvalue and @p x is the corresponding eigenvector,
+   * normalized with respect to the l2-norm.
    */
   template <class MATRIX>
   void
@@ -123,25 +113,23 @@ protected:
 /**
  * Inverse iteration (Wieland) for eigenvalue computations.
  *
- * This class implements an adaptive version of the inverse iteration by Wieland.
+ * This class implements an adaptive version of the inverse iteration by
+ * Wieland.
  *
- * There are two choices for the stopping criterion: by default, the
- * norm of the residual $A x - l x$ is computed. Since this might not
- * converge to zero for non-symmetric matrices with non-trivial Jordan
- * blocks, it can be replaced by checking the difference of successive
- * eigenvalues. Use AdditionalData::use_residual for switching
- * this option.
+ * There are two choices for the stopping criterion: by default, the norm of
+ * the residual $A x - l x$ is computed. Since this might not converge to zero
+ * for non-symmetric matrices with non-trivial Jordan blocks, it can be
+ * replaced by checking the difference of successive eigenvalues. Use
+ * AdditionalData::use_residual for switching this option.
  *
- * Usually, the initial guess entering this method is updated after
- * each step, replacing it with the new approximation of the
- * eigenvalue. Using a parameter AdditionalData::relaxation
- * between 0 and 1, this update can be damped. With relaxation
- * parameter 0, no update is performed. This damping allows for slower
- * adaption of the shift value to make sure that the method converges
- * to the eigenvalue closest to the initial guess. This can be aided
- * by the parameter AdditionalData::start_adaption, which
- * indicates the first iteration step in which the shift value should
- * be adapted.
+ * Usually, the initial guess entering this method is updated after each step,
+ * replacing it with the new approximation of the eigenvalue. Using a
+ * parameter AdditionalData::relaxation between 0 and 1, this update can be
+ * damped. With relaxation parameter 0, no update is performed. This damping
+ * allows for slower adaption of the shift value to make sure that the method
+ * converges to the eigenvalue closest to the initial guess. This can be aided
+ * by the parameter AdditionalData::start_adaption, which indicates the first
+ * iteration step in which the shift value should be adapted.
  *
  * @author Guido Kanschat, 2000, 2003
  */
@@ -155,9 +143,7 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Standardized data struct to
-   * pipe additional data to the
-   * solver.
+   * Standardized data struct to pipe additional data to the solver.
    */
   struct AdditionalData
   {
@@ -167,8 +153,7 @@ public:
     double relaxation;
 
     /**
-     * Start step of adaptive
-     * shift parameter.
+     * Start step of adaptive shift parameter.
      */
     unsigned int start_adaption;
     /**
@@ -203,16 +188,10 @@ public:
   virtual ~EigenInverse ();
 
   /**
-   * Inverse method. @p value is
-   * the start guess for the
-   * eigenvalue and @p x is the
-   * (not necessarily normalized,
-   * but nonzero) start vector for
-   * the power method. After the
-   * iteration, @p value is the
-   * approximated eigenvalue and
-   * @p x is the corresponding
-   * eigenvector, normalized with
+   * Inverse method. @p value is the start guess for the eigenvalue and @p x
+   * is the (not necessarily normalized, but nonzero) start vector for the
+   * power method. After the iteration, @p value is the approximated
+   * eigenvalue and @p x is the corresponding eigenvector, normalized with
    * respect to the l2-norm.
    */
   template <class MATRIX>
@@ -274,7 +253,8 @@ EigenPower<VECTOR>::solve (double       &value,
   A.vmult (y,x);
 
   // Main loop
-  for (int iter=0; conv==SolverControl::iterate; iter++)
+  int iter=0;
+  for (; conv==SolverControl::iterate; iter++)
     {
       y.add(additional_data.shift, x);
 
@@ -308,7 +288,7 @@ EigenPower<VECTOR>::solve (double       &value,
 
       // Check the change of the eigenvalue
       // Brrr, this is not really a good criterion
-      conv = this->control().check (iter, std::fabs(1./length-1./old_length));
+      conv = this->iteration_status (iter, std::fabs(1./length-1./old_length), x);
     }
 
   this->memory.free(Vy);
@@ -317,9 +297,9 @@ EigenPower<VECTOR>::solve (double       &value,
   deallog.pop();
 
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  AssertThrow(conv == SolverControl::success, SolverControl::NoConvergence (iter,
+              std::fabs(1./length-1./old_length)));
+
   // otherwise exit as normal
 }
 
@@ -379,7 +359,9 @@ EigenInverse<VECTOR>::solve (double       &value,
   x.scale(1./length);
 
   // Main loop
-  for (size_type iter=0; conv==SolverControl::iterate; iter++)
+  double res = -std::numeric_limits<double>::max();
+  size_type iter=0;
+  for (; conv==SolverControl::iterate; iter++)
     {
       solver.solve (A_s, y, x, prec);
 
@@ -421,13 +403,14 @@ EigenInverse<VECTOR>::solve (double       &value,
           y.equ (value, x);
           A.vmult(r,x);
           r.sadd(-1., value, x);
-          double res = r.l2_norm();
+          res = r.l2_norm();
           // Check the residual
-          conv = this->control().check (iter, res);
+          conv = this->iteration_status (iter, res, x);
         }
       else
         {
-          conv = this->control().check (iter, std::fabs(1./value-1./old_value));
+          res = std::fabs(1./value-1./old_value);
+          conv = this->iteration_status (iter, res, x);
         }
       old_value = value;
     }
@@ -439,9 +422,9 @@ EigenInverse<VECTOR>::solve (double       &value,
 
   // in case of failure: throw
   // exception
-  if (this->control().last_check() != SolverControl::success)
-    throw SolverControl::NoConvergence (this->control().last_step(),
-                                        this->control().last_value());
+  AssertThrow (conv == SolverControl::success,
+               SolverControl::NoConvergence (iter,
+                                             res));
   // otherwise exit as normal
 }
 

@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2014 by the deal.II authors
 //
@@ -31,34 +30,33 @@ class ParameterHandler;
 /*@{*/
 
 /**
- * Control class for iterative solvers.
+ * Control class to determine convergence of iterative solvers.
  *
- * Used by iterative methods to determine whether the iteration should
- * be continued. To this respect, the virtual function <tt>check()</tt> is
- * called in each iteration with the current iteration step and the
- * value indicating convergence (usually the residual).
+ * Used by iterative methods to determine whether the iteration should be
+ * continued. To this end, the virtual function <tt>check()</tt> is called in
+ * each iteration with the current iteration step and the value indicating
+ * convergence (usually the residual).
  *
- * After the iteration has terminated, the functions @p last_value and
- * @p last_step can be used to obtain information about the final state
- * of the iteration.
+ * After the iteration has terminated, the functions last_value() and
+ * last_step() can be used to obtain information about the final state of the
+ * iteration.
  *
- * <tt>check()</tt> can be replaced in derived classes to allow for more
- * sophisticated tests.
+ * check() can be replaced in derived classes to allow for more sophisticated
+ * tests.
  *
  *
- * <h3>State</h3>
- * The return states of the check function are of type #State,
- * which is an enum local to this class. It indicates the state the
- * solver is in.
+ * <h3>State</h3> The return states of the check function are of type #State,
+ * which is an enum local to this class. It indicates the state the solver is
+ * in.
  *
  * The possible values of State are
  * <ul>
  * <li> <tt>iterate = 0</tt>: continue the iteration.
  * <li> @p success: the goal is reached, the iterative method can terminate
- *       successfully.
- * <li> @p failure: the iterative method should stop because convergence
- *       could not be achieved or at least was not achieved within the given
- *       maximal number of iterations.
+ * successfully.
+ * <li> @p failure: the iterative method should stop because convergence could
+ * not be achieved or at least was not achieved within the given maximal
+ * number of iterations.
  * </ul>
  *
  * @author Guido Kanschat
@@ -84,9 +82,9 @@ public:
 
 
   /**
-   * Class to be thrown upon failing convergence of an iterative solver,
-   * when either the number of iterations exceeds the limit or the residual
-   * fails to reach the desired limit, e.g. in the case of a break-down.
+   * Class to be thrown upon failing convergence of an iterative solver, when
+   * either the number of iterations exceeds the limit or the residual fails
+   * to reach the desired limit, e.g. in the case of a break-down.
    *
    * The residual in the last iteration, as well as the iteration number of
    * the last step are stored in this object and can be recovered upon
@@ -107,21 +105,21 @@ public:
     {
       out << "Iterative method reported convergence failure in step "
           << last_step << ". The residual in the last step was " << last_residual
-	  << ".\n\n"
-	  << "This error message can indicate that you have simply not allowed "
-	  << "a sufficiently large number of iterations for your iterative solver "
-	  << "to converge. This often happens when you increase the size of your "
-	  << "problem. In such cases, the last residual will likely still be very "
-	  << "small, and you can make the error go away by increasing the allowed "
-	  << "number of iterations when setting up the SolverControl object that "
-	  << "determines the maximal number of iterations you allow."
-	  << "\n\n"
-	  << "The other situation where this error may occur is when your matrix "
-	  << "is not invertible (e.g., your matrix has a null-space), or if you "
-	  << "try to apply the wrong solver to a matrix (e.g., using CG for a "
-	  << "matrix that is not symmetric or not positive definite). In these "
-	  << "cases, the residual in the last iteration is likely going to be large."
-	  << std::endl;
+          << ".\n\n"
+          << "This error message can indicate that you have simply not allowed "
+          << "a sufficiently large number of iterations for your iterative solver "
+          << "to converge. This often happens when you increase the size of your "
+          << "problem. In such cases, the last residual will likely still be very "
+          << "small, and you can make the error go away by increasing the allowed "
+          << "number of iterations when setting up the SolverControl object that "
+          << "determines the maximal number of iterations you allow."
+          << "\n\n"
+          << "The other situation where this error may occur is when your matrix "
+          << "is not invertible (e.g., your matrix has a null-space), or if you "
+          << "try to apply the wrong solver to a matrix (e.g., using CG for a "
+          << "matrix that is not symmetric or not positive definite). In these "
+          << "cases, the residual in the last iteration is likely going to be large."
+          << std::endl;
     }
 
     /**
@@ -139,14 +137,14 @@ public:
 
   /**
    * Constructor. The parameters @p n and @p tol are the maximum number of
-   * iteration steps before failure and the tolerance to determine success
-   * of the iteration.
+   * iteration steps before failure and the tolerance to determine success of
+   * the iteration.
    *
    * @p log_history specifies whether the history (i.e. the value to be
    * checked and the number of the iteration step) shall be printed to @p
    * deallog stream.  Default is: do not print. Similarly, @p log_result
-   * specifies the whether the final result is logged to @p deallog.
-   * Default is yes.
+   * specifies the whether the final result is logged to @p deallog. Default
+   * is yes.
    */
   SolverControl (const unsigned int n           = 100,
                  const double       tol         = 1.e-10,
@@ -170,26 +168,25 @@ public:
   void parse_parameters (ParameterHandler &param);
 
   /**
-   * Decide about success or failure of an iteration.  This function gets
-   * the current iteration step to determine, whether the allowed number of
-   * steps has been exceeded and returns @p failure in this case. If @p
-   * check_value is below the prescribed tolerance, it returns @p success.
-   * In all other cases @p iterate is returned to suggest continuation of
-   * the iterative procedure.
+   * Decide about success or failure of an iteration.  This function gets the
+   * current iteration step to determine, whether the allowed number of steps
+   * has been exceeded and returns @p failure in this case. If @p check_value
+   * is below the prescribed tolerance, it returns @p success. In all other
+   * cases @p iterate is returned to suggest continuation of the iterative
+   * procedure.
    *
    * The iteration is also aborted if the residual becomes a denormalized
-   * value (@p NaN). Note, however, that this check is only performed if
-   * the @p isnan function is provided by the operating system, which is
-   * not always true. The @p configure scripts checks for this and sets the
-   * flag @p HAVE_ISNAN in the file <tt>Make.global_options</tt> if this
-   * function was found.
+   * value (@p NaN). Note, however, that this check is only performed if the
+   * @p isnan function is provided by the operating system, which is not
+   * always true. The @p configure scripts checks for this and sets the flag
+   * @p HAVE_ISNAN in the file <tt>Make.global_options</tt> if this function
+   * was found.
    *
-   * <tt>check()</tt> additionally preserves @p step and @p check_value.
-   * These values are accessible by <tt>last_value()</tt> and
-   * <tt>last_step()</tt>.
+   * <tt>check()</tt> additionally preserves @p step and @p check_value. These
+   * values are accessible by <tt>last_value()</tt> and <tt>last_step()</tt>.
    *
-   * Derived classes may overload this function, e.g. to log the
-   * convergence indicators (@p check_value) or to do other computations.
+   * Derived classes may overload this function, e.g. to log the convergence
+   * indicators (@p check_value) or to do other computations.
    */
   virtual State check (const unsigned int step,
                        const double   check_value);
@@ -249,8 +246,7 @@ public:
   double set_tolerance (const double);
 
   /**
-   * Enables writing residuals of each step into a vector for later
-   * analysis.
+   * Enables writing residuals of each step into a vector for later analysis.
    */
   void enable_history_data();
 
@@ -301,9 +297,9 @@ public:
   bool log_result () const;
 
   /**
-   * This exception is thrown if a function operating on the vector of
-   * history data of a SolverControl object id called, but storage of
-   * history data was not enabled by enable_history_data().
+   * This exception is thrown if a function operating on the vector of history
+   * data of a SolverControl object id called, but storage of history data was
+   * not enabled by enable_history_data().
    */
   DeclException0(ExcHistoryDataRequired);
 
@@ -375,14 +371,13 @@ protected:
   bool         m_log_result;
 
   /**
-   * Control over the storage of history data. Set by
-   * enable_history_data().
+   * Control over the storage of history data. Set by enable_history_data().
    */
   bool         history_data_enabled;
 
   /**
-   * Vector storing the result after each iteration step for later
-   * statistical analysis.
+   * Vector storing the result after each iteration step for later statistical
+   * analysis.
    *
    * Use of this vector is enabled by enable_history_data().
    */
@@ -391,16 +386,15 @@ protected:
 
 
 /**
- * Specialization of @p SolverControl which returns @p success if either
- * the specified tolerance is achieved or if the initial residual (or
- * whatever criterion was chosen by the solver class) is reduced by a
- * given factor. This is useful in cases where you don't want to solve
- * exactly, but rather want to gain two digits or if the maximal
- * number of iterations is achieved.  For example: The maximal number
- * of iterations is 20, the reduction factor is 1% und the tolerance
- * is 0.1%. The initial residual is 2.5. The process will break if 20
- * iteration are comleted or the new residual is less then 2.5*1% or
- * if it is less then 0.1%.
+ * Specialization of @p SolverControl which returns @p success if either the
+ * specified tolerance is achieved or if the initial residual (or whatever
+ * criterion was chosen by the solver class) is reduced by a given factor.
+ * This is useful in cases where you don't want to solve exactly, but rather
+ * want to gain two digits or if the maximal number of iterations is achieved.
+ * For example: The maximal number of iterations is 20, the reduction factor
+ * is 1% und the tolerance is 0.1%. The initial residual is 2.5. The process
+ * will break if 20 iteration are comleted or the new residual is less then
+ * 2.5*1% or if it is less then 0.1%.
  *
  * @author Guido Kanschat
  */
@@ -408,9 +402,9 @@ class ReductionControl : public SolverControl
 {
 public:
   /**
-   * Constructor.  Provide the reduction factor in addition to arguments
-   * that have the same meaning as those of the constructor of the
-   * SolverControl constructor.
+   * Constructor.  Provide the reduction factor in addition to arguments that
+   * have the same meaning as those of the constructor of the SolverControl
+   * constructor.
    */
   ReductionControl (const unsigned int maxiter = 100,
                     const double   tolerance   = 1.e-10,
@@ -420,13 +414,13 @@ public:
 
   /**
    * Initialize with a SolverControl object. The result will emulate
-   * SolverControl by setting #reduce to zero.
+   * SolverControl by setting @p reduce to zero.
    */
   ReductionControl (const SolverControl &c);
 
   /**
    * Assign a SolverControl object to ReductionControl. The result of the
-   * assignment will emulate SolverControl by setting #reduce to zero.
+   * assignment will emulate SolverControl by setting @p reduce to zero.
    */
   ReductionControl &operator= (const SolverControl &c);
 
@@ -447,9 +441,9 @@ public:
   void parse_parameters (ParameterHandler &param);
 
   /**
-   * Decide about success or failure of an iteration.  This function calls
-   * the one in the base class, but sets the tolerance to <tt>reduction *
-   * initial value</tt> upon the first iteration.
+   * Decide about success or failure of an iteration.  This function calls the
+   * one in the base class, but sets the tolerance to <tt>reduction * initial
+   * value</tt> upon the first iteration.
    */
   virtual State check (const unsigned int step,
                        const double   check_value);
@@ -471,22 +465,21 @@ protected:
   double reduce;
 
   /**
-   * Reduced tolerance. Stop iterations if either this value is achieved or
-   * if the base class indicates success.
+   * Reduced tolerance. Stop iterations if either this value is achieved or if
+   * the base class indicates success.
    */
   double reduced_tol;
 };
 
 /**
  * Specialization of @p SolverControl which returns @p success if a given
- * number of iteration was performed, irrespective of the actual
- * residual. This is useful in cases where you don't want to solve exactly,
- * but rather want to perform a fixed number of iterations, e.g. in an inner
- * solver. The arguments given to this class are exactly the same as for the
- * SolverControl class and the solver terminates similarly when one of the
- * given tolerance or the maximum iteration count were reached. The only
- * difference to SolverControl is that the solver returns success in the
- * latter case.
+ * number of iteration was performed, irrespective of the actual residual.
+ * This is useful in cases where you don't want to solve exactly, but rather
+ * want to perform a fixed number of iterations, e.g. in an inner solver. The
+ * arguments given to this class are exactly the same as for the SolverControl
+ * class and the solver terminates similarly when one of the given tolerance
+ * or the maximum iteration count were reached. The only difference to
+ * SolverControl is that the solver returns success in the latter case.
  *
  * @author Martin Kronbichler
  */

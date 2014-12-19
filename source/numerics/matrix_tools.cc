@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2014 by the deal.II authors
 //
@@ -676,9 +675,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (&MatrixCreator::internal::
+                     std_cxx11::bind (&MatrixCreator::internal::
                                       copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-                                      std_cxx1x::_1, &matrix, (Vector<double> *)0),
+                                      std_cxx11::_1, &matrix, (Vector<double> *)0),
                      assembler_data,
                      copy_data);
   }
@@ -732,9 +731,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind(&MatrixCreator::internal::
+                     std_cxx11::bind(&MatrixCreator::internal::
                                      copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-                                     std_cxx1x::_1, &matrix, &rhs_vector),
+                                     std_cxx11::_1, &matrix, &rhs_vector),
                      assembler_data,
                      copy_data);
   }
@@ -786,9 +785,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (&MatrixCreator::internal::
+                     std_cxx11::bind (&MatrixCreator::internal::
                                       copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-                                      std_cxx1x::_1, &matrix, (Vector<double> *)0),
+                                      std_cxx11::_1, &matrix, (Vector<double> *)0),
                      assembler_data,
                      copy_data);
   }
@@ -839,9 +838,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (&MatrixCreator::internal::
+                     std_cxx11::bind (&MatrixCreator::internal::
                                       copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-                                      std_cxx1x::_1, &matrix, &rhs_vector),
+                                      std_cxx11::_1, &matrix, &rhs_vector),
                      assembler_data,
                      copy_data);
   }
@@ -1204,22 +1203,22 @@ namespace MatrixCreator
     MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,spacedim> > copy_data;
 
     WorkStream::run(dof.begin_active(),dof.end(),
-                    static_cast<std_cxx1x::function<void (typename DoFHandler<dim,spacedim>::active_cell_iterator
+                    static_cast<std_cxx11::function<void (typename DoFHandler<dim,spacedim>::active_cell_iterator
                                                           const &,MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                                           MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,spacedim> > &)> >
-                    (std_cxx1x::bind(&create_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,std_cxx1x::_2,
-                                     std_cxx1x::_3,
-                                     std_cxx1x::cref(mapping),std_cxx1x::cref(fe),std_cxx1x::cref(q),
-                                     std_cxx1x::cref(boundary_functions),coefficient,
-                                     std_cxx1x::cref(component_mapping))),
-                    static_cast<std_cxx1x::function<void (MatrixCreator::internal::AssemblerBoundary
-                                                          ::CopyData<DoFHandler<dim,spacedim> > const &)> > (std_cxx1x::bind(
+                    (std_cxx11::bind(&create_boundary_mass_matrix_1<dim,spacedim>,std_cxx11::_1,std_cxx11::_2,
+                                     std_cxx11::_3,
+                                     std_cxx11::cref(mapping),std_cxx11::cref(fe),std_cxx11::cref(q),
+                                     std_cxx11::cref(boundary_functions),coefficient,
+                                     std_cxx11::cref(component_mapping))),
+                    static_cast<std_cxx11::function<void (MatrixCreator::internal::AssemblerBoundary
+                                                          ::CopyData<DoFHandler<dim,spacedim> > const &)> > (std_cxx11::bind(
                                                                 &copy_boundary_mass_matrix_1<dim,spacedim>,
-                                                                std_cxx1x::_1,
-                                                                std_cxx1x::cref(boundary_functions),
-                                                                std_cxx1x::cref(dof_to_boundary_mapping),
-                                                                std_cxx1x::ref(matrix),
-                                                                std_cxx1x::ref(rhs_vector))),
+                                                                std_cxx11::_1,
+                                                                std_cxx11::cref(boundary_functions),
+                                                                std_cxx11::cref(dof_to_boundary_mapping),
+                                                                std_cxx11::ref(matrix),
+                                                                std_cxx11::ref(rhs_vector))),
                     scratch,
                     copy_data);
   }
@@ -1619,22 +1618,22 @@ namespace MatrixCreator
     MatrixCreator::internal::AssemblerBoundary::CopyData<hp::DoFHandler<dim,spacedim> > copy_data;
 
     WorkStream::run(dof.begin_active(),dof.end(),
-                    static_cast<std_cxx1x::function<void (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
+                    static_cast<std_cxx11::function<void (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
                                                           const &,MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                                           MatrixCreator::internal::AssemblerBoundary::CopyData<hp::DoFHandler<dim,spacedim> > &)> >
-                    (std_cxx1x::bind( &create_hp_boundary_mass_matrix_1<dim,spacedim>,std_cxx1x::_1,std_cxx1x::_2,
-                                      std_cxx1x::_3,
-                                      std_cxx1x::cref(mapping),std_cxx1x::cref(fe_collection),std_cxx1x::cref(q),
-                                      std_cxx1x::cref(boundary_functions),coefficient,
-                                      std_cxx1x::cref(component_mapping))),
-                    static_cast<std_cxx1x::function<void (MatrixCreator::internal::AssemblerBoundary
+                    (std_cxx11::bind( &create_hp_boundary_mass_matrix_1<dim,spacedim>,std_cxx11::_1,std_cxx11::_2,
+                                      std_cxx11::_3,
+                                      std_cxx11::cref(mapping),std_cxx11::cref(fe_collection),std_cxx11::cref(q),
+                                      std_cxx11::cref(boundary_functions),coefficient,
+                                      std_cxx11::cref(component_mapping))),
+                    static_cast<std_cxx11::function<void (MatrixCreator::internal::AssemblerBoundary
                                                           ::CopyData<hp::DoFHandler<dim,spacedim> > const &)> > (
-                      std_cxx1x::bind( &copy_hp_boundary_mass_matrix_1<dim,spacedim>,
-                                       std_cxx1x::_1,
-                                       std_cxx1x::cref(boundary_functions),
-                                       std_cxx1x::cref(dof_to_boundary_mapping),
-                                       std_cxx1x::ref(matrix),
-                                       std_cxx1x::ref(rhs_vector))),
+                      std_cxx11::bind( &copy_hp_boundary_mass_matrix_1<dim,spacedim>,
+                                       std_cxx11::_1,
+                                       std_cxx11::cref(boundary_functions),
+                                       std_cxx11::cref(dof_to_boundary_mapping),
+                                       std_cxx11::ref(matrix),
+                                       std_cxx11::ref(rhs_vector))),
                     scratch,
                     copy_data);
   }
@@ -1690,9 +1689,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (&MatrixCreator::internal::
+                     std_cxx11::bind (&MatrixCreator::internal::
                                       copy_local_to_global<SparseMatrix<double>, Vector<double> >,
-                                      std_cxx1x::_1,
+                                      std_cxx11::_1,
                                       &matrix,
                                       (Vector<double> *)NULL),
                      assembler_data,
@@ -1747,9 +1746,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (&MatrixCreator::internal::
+                     std_cxx11::bind (&MatrixCreator::internal::
                                       copy_local_to_global<SparseMatrix<double>, Vector<double> >,
-                                      std_cxx1x::_1,
+                                      std_cxx11::_1,
                                       &matrix,
                                       &rhs_vector),
                      assembler_data,
@@ -1802,9 +1801,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (&MatrixCreator::internal::
+                     std_cxx11::bind (&MatrixCreator::internal::
                                       copy_local_to_global<SparseMatrix<double>, Vector<double> >,
-                                      std_cxx1x::_1,
+                                      std_cxx11::_1,
                                       &matrix,
                                       (Vector<double> *)0),
                      assembler_data,
@@ -1856,9 +1855,9 @@ namespace MatrixCreator
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
                      &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-                     std_cxx1x::bind (&MatrixCreator::internal::
+                     std_cxx11::bind (&MatrixCreator::internal::
                                       copy_local_to_global<SparseMatrix<double>, Vector<double> >,
-                                      std_cxx1x::_1,
+                                      std_cxx11::_1,
                                       &matrix,
                                       &rhs_vector),
                      assembler_data,
@@ -2033,10 +2032,10 @@ namespace MatrixTools
                         &&
                         (p->column() == dof_number),
                         ExcMessage("This function is trying to access an element of the "
-                            "matrix that doesn't seem to exist. Are you using a "
-                            "nonsymmetric sparsity pattern? If so, you are not "
-                            "allowed to set the eliminate_column argument of this "
-                            "function, see the documentation."));
+                                   "matrix that doesn't seem to exist. Are you using a "
+                                   "nonsymmetric sparsity pattern? If so, you are not "
+                                   "allowed to set the eliminate_column argument of this "
+                                   "function, see the documentation."));
 
                 // correct right hand side
                 right_hand_side(row) -= p->value() /
@@ -2339,7 +2338,7 @@ namespace MatrixTools
         if (boundary_values.size() > 0)
           {
             const std::pair<types::global_dof_index, types::global_dof_index> local_range
-            = matrix.local_range();
+              = matrix.local_range();
             Assert (local_range == right_hand_side.local_range(),
                     ExcInternalError());
             Assert (local_range == solution.local_range(),
@@ -2361,9 +2360,9 @@ namespace MatrixTools
             // have to eliminate on this processor
             std::vector<types::global_dof_index> constrained_rows;
             for (std::map<types::global_dof_index,double>::const_iterator
-                dof  = boundary_values.begin();
-                dof != boundary_values.end();
-                ++dof)
+                 dof  = boundary_values.begin();
+                 dof != boundary_values.end();
+                 ++dof)
               if ((dof->first >= local_range.first) &&
                   (dof->first < local_range.second))
                 constrained_rows.push_back (dof->first);
@@ -2384,9 +2383,9 @@ namespace MatrixTools
             std::vector<types::global_dof_index> indices;
             std::vector<PetscScalar>  solution_values;
             for (std::map<types::global_dof_index,double>::const_iterator
-                dof  = boundary_values.begin();
-                dof != boundary_values.end();
-                ++dof)
+                 dof  = boundary_values.begin();
+                 dof != boundary_values.end();
+                 ++dof)
               if ((dof->first >= local_range.first) &&
                   (dof->first < local_range.second))
                 {
@@ -2402,14 +2401,14 @@ namespace MatrixTools
 
             right_hand_side.set (indices, solution_values);
           }
-	else
-	  {
+        else
+          {
             // clear_rows() is a collective operation so we still have to call
             // it:
             std::vector<types::global_dof_index> constrained_rows;
             matrix.clear_rows (constrained_rows, 1.);
-	  }
-	
+          }
+
         // clean up
         matrix.compress ();
         solution.compress (VectorOperation::insert);
@@ -2556,81 +2555,81 @@ namespace MatrixTools
         // jump straight to the compress() calls that we still have
         // to perform because they are collective operations
         if (boundary_values.size() > 0)
-	  {
-	    const std::pair<types::global_dof_index, types::global_dof_index> local_range
-	      = matrix.local_range();
-	    Assert (local_range == right_hand_side.local_range(),
-		    ExcInternalError());
-	    Assert (local_range == solution.local_range(),
-		    ExcInternalError());
+          {
+            const std::pair<types::global_dof_index, types::global_dof_index> local_range
+              = matrix.local_range();
+            Assert (local_range == right_hand_side.local_range(),
+                    ExcInternalError());
+            Assert (local_range == solution.local_range(),
+                    ExcInternalError());
 
-	    // we have to read and write from this
-	    // matrix (in this order). this will only
-	    // work if we compress the matrix first,
-	    // done here
-	    matrix.compress ();
+            // we have to read and write from this
+            // matrix (in this order). this will only
+            // work if we compress the matrix first,
+            // done here
+            matrix.compress ();
 
-	    // determine the first nonzero diagonal
-	    // entry from within the part of the
-	    // matrix that we can see. if we can't
-	    // find such an entry, take one
-	    TrilinosScalar average_nonzero_diagonal_entry = 1;
-	    for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
-	      if (matrix.diag_element(i) != 0)
-		{
-		  average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
-		  break;
-		}
+            // determine the first nonzero diagonal
+            // entry from within the part of the
+            // matrix that we can see. if we can't
+            // find such an entry, take one
+            TrilinosScalar average_nonzero_diagonal_entry = 1;
+            for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
+              if (matrix.diag_element(i) != 0)
+                {
+                  average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
+                  break;
+                }
 
-	    // figure out which rows of the matrix we
-	    // have to eliminate on this processor
-	    std::vector<types::global_dof_index> constrained_rows;
-	    for (std::map<types::global_dof_index,double>::const_iterator
-		   dof  = boundary_values.begin();
-		 dof != boundary_values.end();
-		 ++dof)
-	      if ((dof->first >= local_range.first) &&
-		  (dof->first < local_range.second))
-		constrained_rows.push_back (dof->first);
+            // figure out which rows of the matrix we
+            // have to eliminate on this processor
+            std::vector<types::global_dof_index> constrained_rows;
+            for (std::map<types::global_dof_index,double>::const_iterator
+                 dof  = boundary_values.begin();
+                 dof != boundary_values.end();
+                 ++dof)
+              if ((dof->first >= local_range.first) &&
+                  (dof->first < local_range.second))
+                constrained_rows.push_back (dof->first);
 
-	    // then eliminate these rows and
-	    // set their diagonal entry to
-	    // what we have determined
-	    // above. if the value already is
-	    // nonzero, it will be preserved,
-	    // in accordance with the basic
-	    // matrix classes in deal.II.
-	    matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
+            // then eliminate these rows and
+            // set their diagonal entry to
+            // what we have determined
+            // above. if the value already is
+            // nonzero, it will be preserved,
+            // in accordance with the basic
+            // matrix classes in deal.II.
+            matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
-	    std::vector<types::global_dof_index> indices;
-	    std::vector<TrilinosScalar>  solution_values;
-	    for (std::map<types::global_dof_index,double>::const_iterator
-		   dof  = boundary_values.begin();
-		 dof != boundary_values.end();
-		 ++dof)
-	      if ((dof->first >= local_range.first) &&
-		  (dof->first < local_range.second))
-		{
-		  indices.push_back (dof->first);
-		  solution_values.push_back (dof->second);
-		}
-	    solution.set (indices, solution_values);
+            std::vector<types::global_dof_index> indices;
+            std::vector<TrilinosScalar>  solution_values;
+            for (std::map<types::global_dof_index,double>::const_iterator
+                 dof  = boundary_values.begin();
+                 dof != boundary_values.end();
+                 ++dof)
+              if ((dof->first >= local_range.first) &&
+                  (dof->first < local_range.second))
+                {
+                  indices.push_back (dof->first);
+                  solution_values.push_back (dof->second);
+                }
+            solution.set (indices, solution_values);
 
-	    // now also set appropriate
-	    // values for the rhs
-	    for (unsigned int i=0; i<solution_values.size(); ++i)
-	      solution_values[i] *= matrix.diag_element(indices[i]);
+            // now also set appropriate
+            // values for the rhs
+            for (unsigned int i=0; i<solution_values.size(); ++i)
+              solution_values[i] *= matrix.diag_element(indices[i]);
 
-	    right_hand_side.set (indices, solution_values);
-	  }
-	else
-	  {
+            right_hand_side.set (indices, solution_values);
+          }
+        else
+          {
             // clear_rows() is a collective operation so we still have to call
             // it:
-	    std::vector<types::global_dof_index> constrained_rows;
-	    matrix.clear_rows (constrained_rows, 1.);
-	  }
-	
+            std::vector<types::global_dof_index> constrained_rows;
+            matrix.clear_rows (constrained_rows, 1.);
+          }
+
         // clean up
         matrix.compress ();
         solution.compress (VectorOperation::insert);

@@ -88,10 +88,141 @@ $M$ is the mass matrix. The solution to the eigenvalue problem is an
 eigenspectrum $\varepsilon_{h,\ell}$, with associated eigenfunctions
 $\Psi_\ell=\sum_j \phi_j\tilde{\psi}_j$.
 
-It is this form of the eigenvalue problem that involves both matrices
-$A$ and $M$ that we will solve in the current tutorial program. We
-will want to solve it for the lowermost few eigenvalue/eigenfunction
-pairs.
+
+<h3>Eigenvalues and Dirichlet boundary conditions</h3>
+
+In this program, we use Dirichlet boundary conditions for the wave
+function $\Psi$. What this means, from the perspective of a finite
+element code, is that only the interior degrees of freedom are real
+degrees of <i>freedom</i>: the ones on the boundary are not free but
+are forced to have a zero value, after all. On the other hand, the
+finite element method gains much of its power and simplicity from
+the fact that we just do the same thing on every cell, without
+having to think too much about where a cell is, whether it bounds
+on a less refined cell and consequently has a hanging node, or is 
+adjacent to the boundary. All such checks would make the assembly
+of finite element linear systems unbearably difficult to write and
+even more so to read. 
+
+Consequently, of course, when you distribute degrees of freedom with
+your DoFHandler object, you don't care whether some of the degrees
+of freedom you enumerate are at a Dirichlet boundary. They all get
+numbers. We just have to take care of these degrees of freedom at a
+later time when we apply boundary values. There are two basic ways
+of doing this (either using MatrixTools::apply_boundary_values() 
+<i>after</i> assembling the linear system, or using
+ConstraintMatrix::distribute_local_to_global() <i>during</i> assembly;
+see the @ref constraints "constraints module" for more information),
+but both result in the same: a linear system that has a total
+number of rows equal to the number of <i>all</i> degrees of freedom,
+including those that lie on the boundary. However, degrees of 
+freedom that are constrained by Dirichlet conditions are separated
+from the rest of the linear system by zeroing out the corresponding
+row and column, putting a single positive entry on the diagonal,
+and the corresponding Dirichlet value on the right hand side.
+
+If you assume for a moment that we had renumbered degrees of freedom
+in such a way that all of those on the Dirichlet boundary come last,
+then the linear system we would get when solving a regular PDE with
+a right hand side would look like this:
+@f{align*}
+  \begin{pmatrix}
+    A_i & 0 \\ 0 & D_b
+  \end{pmatrix}
+  \begin{pmatrix}
+    U_i \\ U_b
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    F_i \\ F_b
+  \end{pmatrix}.
+@f}
+Here, subscripts $i$ and $b$ correspond to interior and boundary 
+degrees of freedom, respectively. The interior degrees of freedom
+satisfy the linear system $A_i U_i=F_i$ which yields the correct
+solution in the interior, and boundary values are determined by
+$U_b = D_b^{-1} F_b$ where $D_b$ is a diagonal matrix that results
+from the process of eliminating boundary degrees of freedom, and
+$F_b$ is chosen in such a way that $U_{b,j}=D_{b,jj}^{-1} F_{b,j}$
+has the correct boundary values for every boundary degree of freedom
+$j$. (For the curious, the entries of the 
+matrix $D_b$ result from adding modified local contributions to the
+global matrix where for the local matrices the diagonal elements, if non-zero, 
+are set to their absolute value; otherwise, they are set to the average of  
+absolute values of the diagonal. This process guarantees that the entries
+of $D_b$ are positive and of a size comparable to the rest of the diagonal
+entries, ensuring that the resulting matrix does not incur unreasonable
+losses of accuracy due to roundoff involving matrix entries of drastically
+different size. The actual values that end up on the diagonal are difficult
+to predict and you should treat them as arbitrary and unpredictable, but
+positive.)
+
+For "regular" linear systems, this all leads to the correct solution.
+On the other hand, for eigenvalue problems, this is not so trivial.
+There, eliminating boundary values affects both matrices
+$A$ and $M$ that we will solve with in the current tutorial program.
+After elimination of boundary values, we then receive an eigenvalue
+problem that can be partitioned like this:
+@f{align*}
+  \begin{pmatrix}
+    A_i & 0 \\ 0 & D_A
+  \end{pmatrix}
+  \begin{pmatrix}
+    \tilde\Psi_i \\ \tilde\Psi_b
+  \end{pmatrix}
+  =
+  \epsilon_h
+  \begin{pmatrix}
+    M_i & 0 \\ 0 & D_M
+  \end{pmatrix}
+  \begin{pmatrix}
+    \tilde\Psi_i \\ \tilde\Psi_b
+  \end{pmatrix}.
+@f}
+This form makes it clear that there are two sets of eigenvalues:
+the ones we care about, and spurious eigenvalues from the
+separated problem
+@f[
+  D_A \tilde \Psi_b = \epsilon_h D_M \Psi_b.
+@f]
+These eigenvalues are spurious since they result from an eigenvalue
+system that operates only on boundary nodes -- nodes that are not
+real degrees of <i>freedom</i>.
+Of course, since the two matrices $D_A,D_M$ are diagonal, we can
+exactly quantify these spurious eigenvalues: they are
+$\varepsilon_{h,j}=A_{jj}/M_{jj}$ (where the indices
+$j$ corresponds exactly to the degrees of freedom that are constrained
+by Dirichlet boundary values).
+
+So how does one deal with them? The fist part is to recognize when our
+eigenvalue solver finds one of them. To this end, the program computes
+and prints an interval within which these eigenvalues lie, by computing
+the minimum and maximum of the expression $\varepsilon_{h,j}=A_{jj}/M_{jj}$
+over all constrained degrees of freedom. In the program below, this
+already suffices: we find that this interval lies outside the set of
+smallest eigenvalues and corresponding eigenfunctions we are interested
+in and compute, so there is nothing we need to do here.
+
+On the other hand, it may happen that we find that one of the eigenvalues
+we compute in this program happens to be in this interval, and in that
+case we would not know immediately whether it is a spurious or a true
+eigenvalue. In that case, one could simply scale the diagonal elements of
+either matrix after computing the two matrices, 
+thus shifting them away from the frequency of interest in the eigen-spectrum.
+This can be done by using the following code, making sure that all spurious
+eigenvalues are exactly equal to $1.234\cdot 10^5$:
+@code
+    for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
+      if (constraints.is_constrained(i))
+        {
+          stiffness_matrix.set(i, i, 1.234e5);
+          mass_matrix.set(i, i, 1);
+        }
+@endcode 
+However, this strategy is not pursued here as the spurious eigenvalues
+we get from our program as-is happen to be greater than the lowest 
+five that we will calculate and are interested in.
+
 
 <h3>Implementation details</h3>
 

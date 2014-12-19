@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +23,9 @@ namespace MeshWorker
 {
   template <int dim, int spacedim, typename number>
   DoFInfo<dim,spacedim,number>::DoFInfo(const BlockInfo &info)
-    : block_info(&info, typeid(*this).name())
+    :
+    block_info(&info, typeid(*this).name()),
+    level_cell (false)
   {
     indices_by_block.resize(info.local().size());
     for (unsigned int i=0; i<indices_by_block.size(); ++i)

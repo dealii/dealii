@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -41,7 +40,7 @@ void test ()
   GridGenerator::hyper_cube(volume_mesh);
 
   Triangulation<dim-1,dim> tria;
-  GridTools::extract_boundary_mesh (volume_mesh, tria);
+  GridGenerator::extract_boundary_mesh (volume_mesh, tria);
 
   FE_Q<dim-1,dim> fe (1);
   DoFHandler<dim-1,dim> dh(tria);

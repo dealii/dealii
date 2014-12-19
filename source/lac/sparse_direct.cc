@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -377,14 +376,14 @@ SparseDirectUMFPACK::clear ()
 template <class Matrix>
 void SparseDirectUMFPACK::factorize (const Matrix &)
 {
-  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
+  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but you configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
 }
 
 
 void
 SparseDirectUMFPACK::solve (Vector<double> &, bool) const
 {
-  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
+  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but you configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
 }
 
 
@@ -392,7 +391,7 @@ SparseDirectUMFPACK::solve (Vector<double> &, bool) const
 void
 SparseDirectUMFPACK::solve (BlockVector<double> &, bool) const
 {
-  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
+  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but you configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
 }
 
 
@@ -402,7 +401,7 @@ SparseDirectUMFPACK::solve (const Matrix &,
                             Vector<double> &,
                             bool)
 {
-  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
+  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but you configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
 }
 
 
@@ -413,7 +412,7 @@ SparseDirectUMFPACK::solve (const Matrix &,
                             BlockVector<double> &,
                             bool)
 {
-  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
+  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but you configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
 }
 
 #endif

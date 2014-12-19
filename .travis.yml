@@ -1,0 +1,12 @@
+language: C++
+
+compiler: 
+- gcc
+
+before_install: ./contrib/utilities/setup_astyle.sh 
+
+script: ./contrib/utilities/check_indentation.sh 
+
+branches:
+  only:
+    - master

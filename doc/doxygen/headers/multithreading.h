@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2006 - 2014 by the deal.II authors
 //
@@ -492,21 +491,21 @@
                               Vector       &dst) const
     {
       parallel::transform (dst.begin(), dst.end(),
-                           std_cxx1x::bind (&SparseMatrix::vmult_one_row,
+                           std_cxx11::bind (&SparseMatrix::vmult_one_row,
                                         this,
-                                        std_cxx1x::cref(src),
-                                        std_cxx1x::ref(dst),
-                                        std_cxx1x::_1),
+                                        std_cxx11::cref(src),
+                                        std_cxx11::ref(dst),
+                                        std_cxx11::_1),
                            200);
     }
  * @endcode
  * Note how we use <a
- * href="http://www.boost.org/doc/libs/1_37_0/libs/bind/bind.html">std_cxx1x::bind</a>
+ * href="http://www.boost.org/doc/libs/1_37_0/libs/bind/bind.html">std_cxx11::bind</a>
  * to <i>bind</i> certain arguments to the <code>vmult_one_row</code>
  * function, leaving one argument open and thus allowing the
  * parallel::transform function to consider the passed function argument as
  * unary. Also note that we need to make the source and destination vectors as
- * (const) references to prevent std_cxx1x::bind from passing them by value
+ * (const) references to prevent std_cxx11::bind from passing them by value
  * (implying a copy for <code>src</code> and writing the result into a
  * temporary copy of <code>dst</code>, neither of which is what we desired).
  * Finally, notice the grainsize of a minimum of 200 rows of a matrix that
@@ -548,11 +547,11 @@
                               Vector       &dst) const
     {
        parallel::apply_to_subranges (0, n_rows(),
-                                     std_cxx1x::bind (vmult_on_subrange,
+                                     std_cxx11::bind (vmult_on_subrange,
                                                   this,
-                                                  std_cxx1x::_1, std_cxx1x::_2,
-                                                  std_cxx1x::cref(src),
-                                                  std_cxx1x::ref(dst)),
+                                                  std_cxx11::_1, std_cxx11::_2,
+                                                  std_cxx11::cref(src),
+                                                  std_cxx11::ref(dst)),
                                      200);
     }
  * @endcode
@@ -623,10 +622,10 @@
       return
         std::sqrt
         (parallel::accumulate_from_subranges (0, n_rows(),
-                                              std_cxx1x::bind (mat_norm_sqr_on_subrange,
+                                              std_cxx11::bind (mat_norm_sqr_on_subrange,
                                                            this,
-                                                           std_cxx1x::_1, std_cxx1x::_2,
-                                                           std_cxx1x::cref(x)),
+                                                           std_cxx11::_1, std_cxx11::_2,
+                                                           std_cxx11::cref(x)),
                                               200));
     }
  * @endcode
@@ -1034,25 +1033,25 @@
      // ...is the same as:
      WorkStream::run (dof_handler.begin_active(),
                       dof_handler.end(),
-                      std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell,
+                      std_cxx11::bind(&MyClass<dim>::assemble_on_one_cell,
                                       *this,
-                                      std_cxx1x::_1,
-                                      std_cxx1x::_2,
-                                      std_cxx1x::_3),
-                      std_cxx1x::bind(&MyClass<dim>::copy_local_to_global,
+                                      std_cxx11::_1,
+                                      std_cxx11::_2,
+                                      std_cxx11::_3),
+                      std_cxx11::bind(&MyClass<dim>::copy_local_to_global,
                                       *this,
-                                      std_cxx1x::_1),
+                                      std_cxx11::_1),
                       per_task_data);
  * @endcode
- * Note how <code>std_cxx1x::bind</code> produces a function object that takes three
+ * Note how <code>std_cxx11::bind</code> produces a function object that takes three
  * arguments by binding the member function to the <code>*this</code>
- * object. <code>std_cxx1x::_1, std_cxx1x::_2</code> and <code>std_cxx1x::_3</code> are placeholders for the first,
+ * object. <code>std_cxx11::_1, std_cxx11::_2</code> and <code>std_cxx11::_3</code> are placeholders for the first,
  * second and third argument that can be specified later on. In other words, for
  * example if <code>p</code> is the result of the first call to
- * <code>std_cxx1x::bind</code>, then the call <code>p(cell, scratch_data,
+ * <code>std_cxx11::bind</code>, then the call <code>p(cell, scratch_data,
  * per_task_data)</code> will result in executing
  * <code>this-@>assemble_on_one_cell (cell, scratch_data, per_task_data)</code>,
- * i.e. <code>std_cxx1x::bind</code> has bound the object to the function pointer
+ * i.e. <code>std_cxx11::bind</code> has bound the object to the function pointer
  * but left the three arguments open for later.
  *
  * Similarly, let us assume that <code>MyClass::assemble_on_one_cell</code>
@@ -1074,24 +1073,24 @@
  * @code
      WorkStream::run (dof_handler.begin_active(),
                       dof_handler.end(),
-                      std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell,
+                      std_cxx11::bind(&MyClass<dim>::assemble_on_one_cell,
                                       *this,
                                       current_solution,
-                                      std_cxx1x::_1,
-                                      std_cxx1x::_2,
-                                      std_cxx1x::_3,
+                                      std_cxx11::_1,
+                                      std_cxx11::_2,
+                                      std_cxx11::_3,
                                       previous_time+time_step),
-                      std_cxx1x::bind(&MyClass<dim>::copy_local_to_global,
+                      std_cxx11::bind(&MyClass<dim>::copy_local_to_global,
                                       *this,
-                                      std_cxx1x::_1),
+                                      std_cxx11::_1),
                       per_task_data);
  * @endcode
  * Here, we bind the object, the linearization point argument, and the
  * current time argument to the function before we hand it off to
  * WorkStream::run(). WorkStream::run() will then simply call the
  * function with the cell and scratch and per task objects which will be filled
- * in at the positions indicated by <code>std_cxx1x::_1, std_cxx1x::_2</code>
- * and <code>std_cxx1x::_3</code>.
+ * in at the positions indicated by <code>std_cxx11::_1, std_cxx11::_2</code>
+ * and <code>std_cxx11::_3</code>.
  *
  * There are refinements to the WorkStream::run function shown above.
  * For example, one may realize that the basic idea above can only scale

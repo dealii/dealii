@@ -1,5 +1,4 @@
 ## ---------------------------------------------------------------------
-## $Id$
 ##
 ## Copyright (C) 2012 - 2013 by the deal.II authors
 ##
@@ -28,6 +27,7 @@
 #   DEAL_II_HAVE_SSE2                    *)
 #   DEAL_II_HAVE_AVX                     *)
 #   DEAL_II_HAVE_AVX512                  *)
+#   DEAL_II_HAVE_OPENMP_SIMD             *)
 #   DEAL_II_COMPILER_VECTORIZATION_LEVEL
 #
 # *)
@@ -54,6 +54,17 @@ ELSE()
 ENDIF()
 
 
+#
+# Check whether the compiler allows for vectorization and that
+# vectorization actually works on the given CPU. For this test, we use
+# compiler intrinsics similar to what is used in the deal.II library and
+# check whether the arithmetic operations are correctly performed on
+# examples where all numbers are exactly represented as floating point
+# numbers.
+#
+# - Matthias Maier, rewritten 2012
+#
+
 IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   #
   # Take care that the following tests are rerun if CMAKE_REQUIRED_FLAGS
@@ -62,22 +73,12 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   IF(NOT "${CMAKE_REQUIRED_FLAGS}" STREQUAL "${DEAL_II_CHECK_CPU_FEATURES_SAVED}")
     UNSET(DEAL_II_HAVE_SSE2 CACHE)
     UNSET(DEAL_II_HAVE_AVX CACHE)
+    UNSET(DEAL_II_HAVE_AVX512 CACHE)
   ENDIF()
   SET(DEAL_II_CHECK_CPU_FEATURES_SAVED
     "${CMAKE_REQUIRED_FLAGS}" CACHE INTERNAL "" FORCE
     )
 
-
-  #
-  # Check whether the compiler allows for vectorization and that
-  # vectorization actually works on the given CPU. For this test, we use
-  # compiler intrinsics similar to what is used in the deal.II library and
-  # check whether the arithmetic operations are correctly performed on
-  # examples where all numbers are exactly represented as floating point
-  # numbers.
-  #
-  # - Matthias Maier, rewritten 2012
-  #
   CHECK_CXX_SOURCE_RUNS(
     "
     #include <emmintrin.h>
@@ -107,7 +108,6 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     }
     "
     DEAL_II_HAVE_SSE2)
-
 
   CHECK_CXX_SOURCE_RUNS(
     "
@@ -179,4 +179,31 @@ ELSEIF(DEAL_II_HAVE_SSE2)
   SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 1)
 ELSE()
   SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 0)
+ENDIF()
+
+
+#
+# OpenMP 4.0 can be used for vectorization (supported by gcc-4.9.1 and
+# later). Only the vectorization instructions
+# are allowed, the threading must done through TBB.
+#
+
+IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    CHECK_CXX_COMPILER_FLAG("-openmp-simd" DEAL_II_HAVE_OPENMP_SIMD)
+  ELSE()
+    CHECK_CXX_COMPILER_FLAG("-fopenmp-simd" DEAL_II_HAVE_OPENMP_SIMD)
+  ENDIF()
+ENDIF()
+
+IF(DEAL_II_HAVE_OPENMP_SIMD)
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    ADD_FLAGS(DEAL_II_CXX_FLAGS "-openmp-simd")
+    ADD_FLAGS(DEAL_II_LINKER_FLAGS "-openmp")
+  ELSE()
+    ADD_FLAGS(DEAL_II_CXX_FLAGS "-fopenmp-simd")
+  ENDIF()
+  SET(DEAL_II_OPENMP_SIMD_PRAGMA "_Pragma(\"omp simd\")")
+ELSE()
+  SET(DEAL_II_OPENMP_SIMD_PRAGMA " ")
 ENDIF()

@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -297,9 +296,9 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console (0);
 
-  std::vector<std_cxx1x::shared_ptr<FiniteElement<2> > > fe2;
-  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new  FE_DGP<2>(1)));
-//  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));
+  std::vector<std_cxx11::shared_ptr<FiniteElement<2> > > fe2;
+  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new  FE_DGP<2>(1)));
+//  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));
 
   for (unsigned int i=0; i<fe2.size(); ++i)
     test(*fe2[i]);

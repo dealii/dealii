@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2011 - 2014 by the deal.II authors
 //
@@ -78,7 +77,7 @@ namespace internal
           dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>(fe);
 
         const FE_Poly<TensorProductPolynomials<dim,Polynomials::
-          PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
+        PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
           dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
           Polynomials::PiecewisePolynomial<double> >,dim,dim>*> (fe);
 
@@ -117,15 +116,27 @@ namespace internal
             // and invert back
             std::vector<unsigned int> scalar_inv =
               Utilities::invert_permutation(scalar_lexicographic);
-            std::vector<unsigned int> lexicographic (fe_in.dofs_per_cell);
-            for (unsigned int comp=0; comp<fe_in.n_components(); ++comp)
+            std::vector<unsigned int> lexicographic(fe_in.dofs_per_cell,
+                                                    numbers::invalid_unsigned_int);
+            unsigned int components_before = 0;
+            for (unsigned int e=0; e<base_element_number; ++e)
+              components_before += fe_in.element_multiplicity(e);
+            for (unsigned int comp=0;
+                 comp<fe_in.element_multiplicity(base_element_number); ++comp)
               for (unsigned int i=0; i<scalar_inv.size(); ++i)
-                lexicographic[fe_in.component_to_system_index(comp,i)]
+                lexicographic[fe_in.component_to_system_index(comp+components_before,i)]
                   = scalar_inv.size () * comp + scalar_inv[i];
 
-            // invert numbering again
-            lexicographic_numbering =
-              Utilities::invert_permutation(lexicographic);
+            // invert numbering again. Need to do it manually because we might
+            // have undefined blocks
+            lexicographic_numbering.resize(fe_in.element_multiplicity(base_element_number)*fe->dofs_per_cell);
+            for (unsigned int i=0; i<lexicographic.size(); ++i)
+              if (lexicographic[i] != numbers::invalid_unsigned_int)
+                {
+                  AssertIndexRange(lexicographic[i],
+                                   lexicographic_numbering.size());
+                  lexicographic_numbering[lexicographic[i]] = i;
+                }
           }
 
         // to evaluate 1D polynomials, evaluate along the line where y=z=0,
@@ -258,7 +269,7 @@ namespace internal
         for (unsigned int j=0; j<n_q_points_1d; ++j)
           if (std::fabs(shape_values[i*n_q_points_1d+j][0] -
                         shape_values[(n_dofs_1d-i)*n_q_points_1d
-                                                 -j-1][0]) > zero_tol)
+                                     -j-1][0]) > zero_tol)
             return false;
 
       // shape values should be zero at x=0.5 for all basis functions except
@@ -267,10 +278,10 @@ namespace internal
         {
           for (unsigned int i=0; i<n_dofs_1d/2; ++i)
             if (std::fabs(shape_values[i*n_q_points_1d+
-                                                   n_q_points_1d/2][0]) > zero_tol)
+                                       n_q_points_1d/2][0]) > zero_tol)
               return false;
           if (std::fabs(shape_values[(n_dofs_1d/2)*n_q_points_1d+
-                                                 n_q_points_1d/2][0]-1.)> zero_tol)
+                                     n_q_points_1d/2][0]-1.)> zero_tol)
             return false;
         }
 
@@ -280,11 +291,11 @@ namespace internal
         for (unsigned int j=0; j<n_q_points_1d; ++j)
           if (std::fabs(shape_gradients[i*n_q_points_1d+j][0] +
                         shape_gradients[(n_dofs_1d-i)*n_q_points_1d-
-                                                    j-1][0]) > zero_tol)
+                                        j-1][0]) > zero_tol)
             return false;
       if (n_dofs_1d%2 == 1 && n_q_points_1d%2 == 1)
         if (std::fabs(shape_gradients[(n_dofs_1d/2)*n_q_points_1d+
-                                                  (n_q_points_1d/2)][0]) > zero_tol)
+                                      (n_q_points_1d/2)][0]) > zero_tol)
           return false;
 
       // symmetry for Laplacian
@@ -292,7 +303,7 @@ namespace internal
         for (unsigned int j=0; j<n_q_points_1d; ++j)
           if (std::fabs(shape_hessians[i*n_q_points_1d+j][0] -
                         shape_hessians[(n_dofs_1d-i)*n_q_points_1d-
-                                                   j-1][0]) > zero_tol)
+                                       j-1][0]) > zero_tol)
             return false;
 
       const unsigned int stride = (n_q_points_1d+1)/2;
@@ -362,7 +373,7 @@ namespace internal
           else
             {
               if (std::fabs(shape_values[i*n_points_1d+
-                                                     j][0]-1.)>zero_tol)
+                                         j][0]-1.)>zero_tol)
                 return false;
             }
       for (unsigned int i=1; i<n_points_1d-1; ++i)
@@ -384,7 +395,7 @@ namespace internal
       std::size_t memory = sizeof(*this);
       memory += MemoryConsumption::memory_consumption(shape_values);
       memory += MemoryConsumption::memory_consumption(shape_gradients);
-      memory += MemoryConsumption::memory_consumption(shape_hessians); 
+      memory += MemoryConsumption::memory_consumption(shape_hessians);
       memory += MemoryConsumption::memory_consumption(shape_val_evenodd);
       memory += MemoryConsumption::memory_consumption(shape_gra_evenodd);
       memory += MemoryConsumption::memory_consumption(shape_hes_evenodd);

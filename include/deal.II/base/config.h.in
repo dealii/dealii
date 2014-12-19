@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2012 - 2014 by the deal.II authors
 //
@@ -51,6 +50,13 @@
 #define DEAL_II_VERSION_MINOR @DEAL_II_VERSION_MINOR@
 #define DEAL_II_MINOR @DEAL_II_VERSION_MINOR@
 
+#define DEAL_II_VERSION_GTE(major,minor,subminor) \
+ ((DEAL_II_VERSION_MAJOR * 10000 + \
+    DEAL_II_VERSION_MINOR * 100 + \
+     DEAL_II_VERSION_SUBMINOR) \
+    >=  \
+    (major)*10000 + (minor)*100 + (subminor))
+
 
 /********************************************
  * Configured in check_1_compiler_features: *
@@ -99,9 +105,15 @@
 #cmakedefine DEAL_II_WORDS_BIGENDIAN
 
 /** Equal to 0 in the generic case, equal to 1 if CPU compiled for supports
- * SSE2, equal to 2 if CPU compiled for supports AVX
+ * SSE2, equal to 2 if CPU compiled for supports AVX, equal to 3 if AVX512
+ * support is available
  */
 #define DEAL_II_COMPILER_VECTORIZATION_LEVEL @DEAL_II_COMPILER_VECTORIZATION_LEVEL@
+
+/** If openmp simd support is available this string contains the
+ * corresponding pragma directive
+ */
+#define DEAL_II_OPENMP_SIMD_PRAGMA @DEAL_II_OPENMP_SIMD_PRAGMA@
 
 
 /***************************************
@@ -552,6 +564,20 @@
 #ifdef DEAL_II_WITH_UMFPACK
 /** Compatibility definition (with naming from deal.II < 8.0): */
 #  define HAVE_LIBUMFPACK
+#endif
+
+
+/**********************************************
+ * Configured in configure_opencascade.cmake: *
+ **********************************************/
+
+#cmakedefine DEAL_II_WITH_OPENCASCADE
+
+
+// Some systems require including mpi.h before stdio.h which happens in
+// types.h
+#if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
+#  include <mpi.h>
 #endif
 
 

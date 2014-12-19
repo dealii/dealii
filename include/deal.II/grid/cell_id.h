@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2014 by the deal.II authors
 //
@@ -49,8 +48,8 @@ DEAL_II_NAMESPACE_OPEN
  * exposed on purpose).
  *
  * @todo Does it make sense to implement a more efficient representation
- * (internally and/or as a string)? If yes, something like a 64bit int
- * as in p4est would be a good option.
+ * (internally and/or as a string)? If yes, something like a 64bit int as in
+ * p4est would be a good option.
  */
 class CellId
 {

@@ -1,6 +1,5 @@
 
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2013 by the deal.II authors
 //
@@ -21,8 +20,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/thread_management.h>
-#include <deal.II/base/std_cxx1x/function.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/base/std_cxx11/function.h>
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
@@ -41,11 +39,11 @@ namespace GraphColoring
   {
     /**
      * Given two sets of indices that are assumed to be sorted, determine
-     * whether they will have a nonempty intersection. The actual intersection is
-     * not computed.
+     * whether they will have a nonempty intersection. The actual intersection
+     * is not computed.
      * @param indices1 A set of indices, assumed sorted.
-     * @param indices2 A set of indices, assumed sorted.
-     * @return Whether the two sets of indices do have a nonempty intersection.
+     * @param indices2 A set of indices, assumed sorted. @return Whether the
+     * two sets of indices do have a nonempty intersection.
      */
     inline
     bool
@@ -76,32 +74,32 @@ namespace GraphColoring
 
 
     /**
-     * Create a partitioning of the given range of iterators using a simplified
-     * version of the Cuthill-McKee algorithm (Breadth First Search algorithm).
-     * The function creates partitions that contain "zones" of iterators
-     * where the first partition contains the first iterator, the second
-     * zone contains all those iterators that have conflicts with the single
-     * element in the first zone, the third zone contains those iterators that
-     * have conflicts with the iterators of the second zone and have not previously
-     * been assigned to a zone, etc. If the iterators represent cells, then this
-     * generates partitions that are like onion shells around the very first
-     * cell. Note that elements in each zone may conflict with other elements in
-     * the same zone.
+     * Create a partitioning of the given range of iterators using a
+     * simplified version of the Cuthill-McKee algorithm (Breadth First Search
+     * algorithm). The function creates partitions that contain "zones" of
+     * iterators where the first partition contains the first iterator, the
+     * second zone contains all those iterators that have conflicts with the
+     * single element in the first zone, the third zone contains those
+     * iterators that have conflicts with the iterators of the second zone and
+     * have not previously been assigned to a zone, etc. If the iterators
+     * represent cells, then this generates partitions that are like onion
+     * shells around the very first cell. Note that elements in each zone may
+     * conflict with other elements in the same zone.
      *
-     * The question whether two iterators conflict is determined by a user-provided
-     * function. The meaning of this function is discussed in the documentation of
-     * the GraphColoring::make_graph_coloring() function.
+     * The question whether two iterators conflict is determined by a user-
+     * provided function. The meaning of this function is discussed in the
+     * documentation of the GraphColoring::make_graph_coloring() function.
      *
      * @param[in] begin The first element of a range of iterators for which a
-     *      partitioning is sought.
+     * partitioning is sought.
      * @param[in] end The element past the end of the range of iterators.
-     * @param[in] get_conflict_indices A user defined function object returning
-     *      a set of indicators that are descriptive of what represents a
-     *      conflict. See above for a more thorough discussion.
-     * @return A set of sets of iterators (where sets are represented by
-     *      std::vector for efficiency). Each element of the outermost set
-     *      corresponds to the iterators pointing to objects that are in the
-     *      same partition (i.e., the same zone).
+     * @param[in] get_conflict_indices A user defined function object
+     * returning a set of indicators that are descriptive of what represents a
+     * conflict. See above for a more thorough discussion. @return A set of
+     * sets of iterators (where sets are represented by std::vector for
+     * efficiency). Each element of the outermost set corresponds to the
+     * iterators pointing to objects that are in the same partition (i.e., the
+     * same zone).
      *
      * @author Martin Kronbichler, Bruno Turcksin
      */
@@ -109,7 +107,7 @@ namespace GraphColoring
     std::vector<std::vector<Iterator> >
     create_partitioning(const Iterator &begin,
                         const typename identity<Iterator>::type &end,
-                        const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices)
+                        const std_cxx11::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices)
     {
       // Number of iterators.
       unsigned int n_iterators = 0;
@@ -191,28 +189,27 @@ namespace GraphColoring
 
     /**
      * This function uses DSATUR (Degree SATURation) to color the elements of
-     * a set. DSATUR works as follows:
-     *   -# Arrange the vertices by decreasing order of degrees.
-     *   -# Color a vertex of maximal degree with color 1.
-     *   -# Choose a vertex with a maximal saturation degree. If there is equality,
-     *      choose any vertex of maximal degree in the uncolored subgraph.
-     *   -# Color the chosen vertex with the least possible (lowest numbered) color.
-     *   -# If all the vertices are colored, stop. Otherwise, return to 3.
+     * a set. DSATUR works as follows: -# Arrange the vertices by decreasing
+     * order of degrees. -# Color a vertex of maximal degree with color 1. -#
+     * Choose a vertex with a maximal saturation degree. If there is equality,
+     * choose any vertex of maximal degree in the uncolored subgraph. -# Color
+     * the chosen vertex with the least possible (lowest numbered) color. -#
+     * If all the vertices are colored, stop. Otherwise, return to 3.
      *
      * @param[in] partition The set of iterators that should be colored.
-     * @param[in] get_conflict_indices A user defined function object returning
-     *      a set of indicators that are descriptive of what represents a
-     *      conflict. See above for a more thorough discussion.
-     * @param[out] partition_coloring A set of sets of iterators (where sets are represented by
-     *      std::vector for efficiency). Each element of the outermost set
-     *      corresponds to the iterators pointing to objects that are in the
-     *      same partition (have the same color) and consequently do not
-     *      conflict. The elements of different sets may conflict.
+     * @param[in] get_conflict_indices A user defined function object
+     * returning a set of indicators that are descriptive of what represents a
+     * conflict. See above for a more thorough discussion.
+     * @param[out] partition_coloring A set of sets of iterators (where sets
+     * are represented by std::vector for efficiency). Each element of the
+     * outermost set corresponds to the iterators pointing to objects that are
+     * in the same partition (have the same color) and consequently do not
+     * conflict. The elements of different sets may conflict.
      */
     template <typename Iterator>
     void
     make_dsatur_coloring(std::vector<Iterator> &partition,
-                         const std_cxx1x::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices,
+                         const std_cxx11::function<std::vector<types::global_dof_index> (const Iterator &)> &get_conflict_indices,
                          std::vector<std::vector<Iterator> > &partition_coloring)
     {
       partition_coloring.clear ();
@@ -301,12 +298,13 @@ namespace GraphColoring
 
 
     /**
-     * Given a partition-coloring graph, i.e., a set of zones (partitions) each
-     * of which is colored, produce a combined coloring for the entire set of
-     * iterators. This is possible because any color on an
-     * even (resp. odd) zone does not conflict with any color of any other even
-     * (resp. odd) zone. Consequently, we can combine colors from all even and all
-     * odd zones. This function tries to create colors of similar number of elements.
+     * Given a partition-coloring graph, i.e., a set of zones (partitions)
+     * each of which is colored, produce a combined coloring for the entire
+     * set of iterators. This is possible because any color on an even (resp.
+     * odd) zone does not conflict with any color of any other even (resp.
+     * odd) zone. Consequently, we can combine colors from all even and all
+     * odd zones. This function tries to create colors of similar number of
+     * elements.
      */
     template <typename Iterator>
     std::vector<std::vector<Iterator> >
@@ -433,57 +431,59 @@ namespace GraphColoring
 
 
   /**
-   * Create a partitioning of the given range of iterators so that
-   * iterators that point to conflicting objects will be placed
-   * into different partitions, where the question whether two objects conflict
-   * is determined by a user-provided function.
+   * Create a partitioning of the given range of iterators so that iterators
+   * that point to conflicting objects will be placed into different
+   * partitions, where the question whether two objects conflict is determined
+   * by a user-provided function.
    *
    * This function can also be considered as a graph coloring: each object
-   * pointed to by an iterator is considered to be a node and there is an
-   * edge between each two nodes that conflict. The graph coloring algorithm
-   * then assigns a color to each node in such a way that two nodes connected
-   * by an edge do not have the same color.
+   * pointed to by an iterator is considered to be a node and there is an edge
+   * between each two nodes that conflict. The graph coloring algorithm then
+   * assigns a color to each node in such a way that two nodes connected by an
+   * edge do not have the same color.
    *
-   * A typical use case for this function is in assembling a matrix in parallel.
-   * There, one would like to assemble local contributions on different cells
-   * at the same time (an operation that is purely local and so requires
-   * no synchronization) but then we need to add these local contributions
-   * to the global matrix. In general, the contributions from different cells
-   * may be to the same matrix entries if the cells share degrees of freedom
-   * and, consequently, can not happen at the same time unless we want to
-   * risk a race condition (see http://en.wikipedia.org/wiki/Race_condition ).
-   * Thus, we call these two cells in conflict, and we can only allow operations
-   * in parallel from cells that do not conflict. In other words, two cells
-   * are in conflict if the set of matrix entries (for example characterized
-   * by the rows) have a nonempty intersection.
+   * A typical use case for this function is in assembling a matrix in
+   * parallel. There, one would like to assemble local contributions on
+   * different cells at the same time (an operation that is purely local and
+   * so requires no synchronization) but then we need to add these local
+   * contributions to the global matrix. In general, the contributions from
+   * different cells may be to the same matrix entries if the cells share
+   * degrees of freedom and, consequently, can not happen at the same time
+   * unless we want to risk a race condition (see
+   * http://en.wikipedia.org/wiki/Race_condition ). Thus, we call these two
+   * cells in conflict, and we can only allow operations in parallel from
+   * cells that do not conflict. In other words, two cells are in conflict if
+   * the set of matrix entries (for example characterized by the rows) have a
+   * nonempty intersection.
    *
-   * In this generality, computing the graph of conflicts would require calling
-   * a function that determines whether two iterators (or the two objects they
-   * represent) conflict, and calling it for every pair of iterators, i.e.,
-   * $\frac 12 N (N-1)$ times. This is too expensive in general. A better
-   * approach is to require a user-defined function that returns for every
-   * iterator it is called for a set of indicators of some kind that characterize
-   * a conflict; two iterators are in conflict if their conflict indicator sets
-   * have a nonempty intersection. In the example of assembling a matrix,
-   * the conflict indicator set would contain the indices of all degrees of
-   * freedom on the cell pointed to (in the case of continuous Galerkin methods)
-   * or the union of indices of degree of freedom on the current cell and all
-   * cells adjacent to the faces of the current cell (in the case of
-   * discontinuous Galerkin methods, because there one computes face integrals
-   * coupling the degrees of freedom connected by a common face -- see step-12).
+   * In this generality, computing the graph of conflicts would require
+   * calling a function that determines whether two iterators (or the two
+   * objects they represent) conflict, and calling it for every pair of
+   * iterators, i.e., $\frac 12 N (N-1)$ times. This is too expensive in
+   * general. A better approach is to require a user-defined function that
+   * returns for every iterator it is called for a set of indicators of some
+   * kind that characterize a conflict; two iterators are in conflict if their
+   * conflict indicator sets have a nonempty intersection. In the example of
+   * assembling a matrix, the conflict indicator set would contain the indices
+   * of all degrees of freedom on the cell pointed to (in the case of
+   * continuous Galerkin methods) or the union of indices of degree of freedom
+   * on the current cell and all cells adjacent to the faces of the current
+   * cell (in the case of discontinuous Galerkin methods, because there one
+   * computes face integrals coupling the degrees of freedom connected by a
+   * common face -- see step-12).
    *
    * @note The conflict set returned by the user defined function passed as
-   * third argument needs to accurately describe <i>all</i> degrees of
-   * freedom for which anything is written into the matrix or right hand side.
-   * In other words, if the writing happens through a function like
-   * ConstraintMatrix::copy_local_to_global(), then the set of conflict indices
-   * must actually contain not only the degrees of freedom on the current
-   * cell, but also those they are linked to by constraints such as hanging
-   * nodes.
+   * third argument needs to accurately describe <i>all</i> degrees of freedom
+   * for which anything is written into the matrix or right hand side. In
+   * other words, if the writing happens through a function like
+   * ConstraintMatrix::copy_local_to_global(), then the set of conflict
+   * indices must actually contain not only the degrees of freedom on the
+   * current cell, but also those they are linked to by constraints such as
+   * hanging nodes.
    *
-   * In other situations, the conflict indicator sets may represent
-   * something different altogether -- it is up to the caller of this function
-   * to describe what it means for two iterators to conflict. Given this,
+   * In other situations, the conflict indicator sets may represent something
+   * different altogether -- it is up to the caller of this function to
+   * describe what it means for two iterators to conflict. Given this,
    * computing conflict graph edges can be done significantly more cheaply
    * than with ${\cal O}(N^2)$ operations.
    *
@@ -495,16 +495,16 @@ namespace GraphColoring
    * Turcksin, Kronbichler and Bangerth, see @ref workstream_paper .
    *
    * @param[in] begin The first element of a range of iterators for which a
-   *      coloring is sought.
+   * coloring is sought.
    * @param[in] end The element past the end of the range of iterators.
    * @param[in] get_conflict_indices A user defined function object returning
-   *      a set of indicators that are descriptive of what represents a
-   *      conflict. See above for a more thorough discussion.
-   * @return A set of sets of iterators (where sets are represented by
-   *      std::vector for efficiency). Each element of the outermost set
-   *      corresponds to the iterators pointing to objects that are in the
-   *      same partition (have the same color) and consequently do not
-   *      conflict. The elements of different sets may conflict.
+   * a set of indicators that are descriptive of what represents a conflict.
+   * See above for a more thorough discussion. @return A set of sets of
+   * iterators (where sets are represented by std::vector for efficiency).
+   * Each element of the outermost set corresponds to the iterators pointing
+   * to objects that are in the same partition (have the same color) and
+   * consequently do not conflict. The elements of different sets may
+   * conflict.
    *
    * @author Martin Kronbichler, Bruno Turcksin
    */
@@ -512,7 +512,7 @@ namespace GraphColoring
   std::vector<std::vector<Iterator> >
   make_graph_coloring(const Iterator &begin,
                       const typename identity<Iterator>::type &end,
-                      const std_cxx1x::function<std::vector<types::global_dof_index> (const typename identity<Iterator>::type &)> &get_conflict_indices)
+                      const std_cxx11::function<std::vector<types::global_dof_index> (const typename identity<Iterator>::type &)> &get_conflict_indices)
   {
     Assert (begin != end, ExcMessage ("GraphColoring is not prepared to deal with empty ranges!"));
 

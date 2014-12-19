@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2013 by the deal.II authors
 //
@@ -217,7 +216,7 @@ void TimeDependent::end_sweep ()
   void (TimeDependent::*p) (const unsigned int, const unsigned int)
     = &TimeDependent::end_sweep;
   parallel::apply_to_subranges (0U, timesteps.size(),
-                                std_cxx1x::bind (p, this, std_cxx1x::_1, std_cxx1x::_2),
+                                std_cxx11::bind (p, this, std_cxx11::_1, std_cxx11::_2),
                                 1);
 }
 

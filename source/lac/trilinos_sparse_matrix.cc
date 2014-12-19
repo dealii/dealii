@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2008 - 2014 by the deal.II authors
 //
@@ -393,12 +392,13 @@ namespace TrilinosWrappers
     nonlocal_matrix.reset();
     nonlocal_matrix_exporter.reset();
 
-    // check whether we need to update the
-    // partitioner or can just copy the data:
-    // in case we have the same distribution,
-    // we can just copy the data.
-    if (local_range() == m.local_range())
-      *matrix = *m.matrix;
+    // check whether we need to update the partitioner or can just copy the
+    // data: in case we have the same distribution, we can just copy the data.
+    if (&matrix->Graph() == &m.matrix->Graph() && m.matrix->Filled())
+      {
+        std::memcpy(matrix->ExpertExtractValues(), m.matrix->ExpertExtractValues(),
+                    matrix->NumMyNonzeros()*sizeof(*matrix->ExpertExtractValues()));
+      }
     else
       {
         column_space_map.reset (new Epetra_Map (m.domain_partitioner()));
@@ -411,7 +411,7 @@ namespace TrilinosWrappers
     if (m.nonlocal_matrix.get() != 0)
       nonlocal_matrix.reset(new Epetra_CrsMatrix(Copy, m.nonlocal_matrix->Graph()));
 
-    compress();
+    matrix->FillComplete(*column_space_map, matrix->RowMap());
   }
 
 
@@ -529,7 +529,7 @@ namespace TrilinosWrappers
     // that tells how the domain dofs of the matrix will be distributed). for
     // only one processor, we can directly assign the columns as well. Compare
     // this with bug # 4123 in the Sandia Bugzilla.
-    std_cxx1x::shared_ptr<Epetra_CrsGraph> graph;
+    std_cxx11::shared_ptr<Epetra_CrsGraph> graph;
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
                                         &n_entries_per_row[0], true));
@@ -656,7 +656,7 @@ namespace TrilinosWrappers
     Epetra_Map off_processor_map(-1, ghost_rows.size(), &ghost_rows[0],
                                  0, input_row_map.Comm());
 
-    std_cxx1x::shared_ptr<Epetra_CrsGraph> graph, nonlocal_graph;
+    std_cxx11::shared_ptr<Epetra_CrsGraph> graph, nonlocal_graph;
     if (input_row_map.Comm().NumProc() > 1)
       {
         graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
@@ -986,7 +986,7 @@ namespace TrilinosWrappers
         nonlocal_matrix->FillComplete(*column_space_map, matrix->RowMap());
         if (nonlocal_matrix_exporter.get() == 0)
           nonlocal_matrix_exporter.reset
-            (new Epetra_Export(nonlocal_matrix->RowMap(), matrix->RowMap()));
+          (new Epetra_Export(nonlocal_matrix->RowMap(), matrix->RowMap()));
         ierr = matrix->Export(*nonlocal_matrix, *nonlocal_matrix_exporter, mode);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
         ierr = matrix->FillComplete(*column_space_map, matrix->RowMap());
@@ -1530,21 +1530,14 @@ namespace TrilinosWrappers
 
     int ierr;
 
-    // If both matrices have been transformed
-    // to local index space (in Trilinos
-    // speak: they are filled), we're having
-    // matrices based on the same indices
-    // with the same number of nonzeros
-    // (actually, we'd need sparsity pattern,
-    // but that is too expensive to check),
-    // we can extract views of the column
-    // data on both matrices and simply
-    // manipulate the values that are
-    // addressed by the pointers.
+    // If both matrices have been transformed to local index space (in
+    // Trilinos speak: they are filled) and the matrices are based on the same
+    // sparsity pattern, we can extract views of the column data on both
+    // matrices and simply manipulate the values that are addressed by the
+    // pointers.
     if (matrix->Filled() == true &&
         rhs.matrix->Filled() == true &&
-        this->local_range() == local_range &&
-        matrix->NumMyNonzeros() == rhs.matrix->NumMyNonzeros())
+        &matrix->Graph() == &rhs.matrix->Graph())
       for (size_type row=local_range.first;
            row < local_range.second; ++row)
         {
@@ -1558,14 +1551,11 @@ namespace TrilinosWrappers
           int n_entries, rhs_n_entries;
           TrilinosScalar *value_ptr, *rhs_value_ptr;
 
-          // In debug mode, we want to check
-          // whether the indices really are the
-          // same in the calling matrix and the
-          // input matrix. The reason for doing
-          // this only in debug mode is that both
-          // extracting indices and comparing
-          // indices is relatively slow compared to
-          // just working with the values.
+          // In debug mode, we want to check whether the indices really are
+          // the same in the calling matrix and the input matrix. The reason
+          // for doing this only in debug mode is that both extracting indices
+          // and comparing indices is relatively slow compared to just working
+          // with the values.
 #ifdef DEBUG
           int *index_ptr, *rhs_index_ptr;
           ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,
@@ -1580,8 +1570,7 @@ namespace TrilinosWrappers
           matrix->ExtractMyRowView (row_local, n_entries, value_ptr);
 #endif
 
-          AssertThrow (n_entries == rhs_n_entries,
-                       ExcDimensionMismatch (n_entries, rhs_n_entries));
+          AssertDimension (n_entries, rhs_n_entries);
 
           for (TrilinosWrappers::types::int_type i=0; i<n_entries; ++i)
             {
@@ -1592,13 +1581,10 @@ namespace TrilinosWrappers
 #endif
             }
         }
-    // If we have different sparsity patterns
-    // (expressed by a different number of
-    // nonzero elements), we have to be more
-    // careful and extract a copy of the row
-    // data, multiply it by the factor and
-    // then add it to the matrix using the
-    // respective add() function.
+    // If we have different sparsity patterns, we have to be more careful (in
+    // particular when we use multiple processors) and extract a copy of the
+    // row data, multiply it by the factor and then add it to the matrix using
+    // the respective add() function.
     else
       {
         int max_row_length = 0;
@@ -1608,58 +1594,36 @@ namespace TrilinosWrappers
             = std::max (max_row_length,rhs.matrix->NumGlobalEntries(row));
 
         std::vector<TrilinosScalar> values (max_row_length);
-
-        if (matrix->Filled() == true && rhs.matrix->Filled() == true &&
-            this->local_range() == local_range)
-          for (size_type row=local_range.first;
-               row < local_range.second; ++row)
-            {
-              std::vector<int> column_indices (max_row_length);
-              const int row_local =
-                matrix->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row));
-              int n_entries;
-
-              ierr = rhs.matrix->ExtractMyRowCopy (row_local, max_row_length,
-                                                   n_entries,
-                                                   &values[0],
-                                                   &column_indices[0]);
-              Assert (ierr == 0, ExcTrilinosError(ierr));
-
-              for (TrilinosWrappers::types::int_type i=0; i<n_entries; ++i)
-                values[i] *= factor;
-
-              TrilinosScalar *value_ptr = &values[0];
-
-              ierr = matrix->SumIntoMyValues (row_local, n_entries, value_ptr,
-                                              &column_indices[0]);
-              Assert (ierr == 0, ExcTrilinosError(ierr));
-            }
-        else
+        std::vector<TrilinosWrappers::types::int_type> column_indices (max_row_length);
+        for (size_type row=local_range.first;
+             row < local_range.second; ++row)
           {
-            //TODO check that is normal that column_indices in the if is an
-            //int while the column_indices in the else is a
-            //TrilinosWrappers::types::int_type
-            std::vector<TrilinosWrappers::types::int_type> column_indices (max_row_length);
-            for (size_type row=local_range.first;
-                 row < local_range.second; ++row)
-              {
-                int n_entries;
-                ierr = rhs.matrix->Epetra_CrsMatrix::ExtractGlobalRowCopy
-                       ((TrilinosWrappers::types::int_type)row, max_row_length,
-                        n_entries, &values[0], &column_indices[0]);
-                Assert (ierr == 0, ExcTrilinosError(ierr));
+            int n_entries;
+            ierr = rhs.matrix->Epetra_CrsMatrix::ExtractGlobalRowCopy
+                   (static_cast<TrilinosWrappers::types::int_type>(row),
+                    max_row_length, n_entries, &values[0], &column_indices[0]);
+            Assert (ierr == 0, ExcTrilinosError(ierr));
 
-                for (TrilinosWrappers::types::int_type i=0; i<n_entries; ++i)
-                  values[i] *= factor;
+            // Filter away zero elements
+            unsigned int n_actual_entries = 0.;
+            for (int i=0; i<n_entries; ++i)
+              if (std::abs(values[i]) != 0.)
+                {
+                  column_indices[n_actual_entries] = column_indices[i];
+                  values[n_actual_entries++] = values[i] * factor;
+                }
 
-                ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues
-                       ((TrilinosWrappers::types::int_type)row, n_entries,
-                        &values[0], &column_indices[0]);
-                Assert (ierr == 0, ExcTrilinosError(ierr));
-              }
-            compress ();
-
+            ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues
+                   (static_cast<TrilinosWrappers::types::int_type>(row),
+                    n_actual_entries, &values[0], &column_indices[0]);
+            Assert (ierr == 0,
+                    ExcMessage("Adding the entries from the other matrix "
+                               "failed, possibly because the sparsity pattern "
+                               "of that matrix includes more elements than the "
+                               "calling matrix, which is not allowed."));
           }
+        compress (VectorOperation::add);
+
       }
   }
 

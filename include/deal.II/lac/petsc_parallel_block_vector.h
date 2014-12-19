@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2004 - 2013 by the deal.II authors
 //
@@ -44,39 +43,35 @@ namespace PETScWrappers
 
     /**
      * An implementation of block vectors based on the parallel vector class
-     * implemented in PETScWrappers. While the base class provides for most of the
-     * interface, this class handles the actual allocation of vectors and provides
-     * functions that are specific to the underlying vector type.
+     * implemented in PETScWrappers. While the base class provides for most of
+     * the interface, this class handles the actual allocation of vectors and
+     * provides functions that are specific to the underlying vector type.
      *
      * The model of distribution of data is such that each of the blocks is
-     * distributed across all MPI processes named in the MPI communicator. I.e. we
-     * don't just distribute the whole vector, but each component. In the
-     * constructors and reinit() functions, one therefore not only has to specify
-     * the sizes of the individual blocks, but also the number of elements of each
-     * of these blocks to be stored on the local process.
+     * distributed across all MPI processes named in the MPI communicator.
+     * I.e. we don't just distribute the whole vector, but each component. In
+     * the constructors and reinit() functions, one therefore not only has to
+     * specify the sizes of the individual blocks, but also the number of
+     * elements of each of these blocks to be stored on the local process.
      *
-     * @ingroup Vectors
-     * @see @ref GlossBlockLA "Block (linear algebra)"
+     * @ingroup Vectors @see @ref GlossBlockLA "Block (linear algebra)"
      * @author Wolfgang Bangerth, 2004
      */
     class BlockVector : public BlockVectorBase<Vector>
     {
     public:
       /**
-       * Typedef the base class for simpler
-       * access to its own typedefs.
+       * Typedef the base class for simpler access to its own typedefs.
        */
       typedef BlockVectorBase<Vector> BaseClass;
 
       /**
-       * Typedef the type of the underlying
-       * vector.
+       * Typedef the type of the underlying vector.
        */
       typedef BaseClass::BlockType  BlockType;
 
       /**
-       * Import the typedefs from the base
-       * class.
+       * Import the typedefs from the base class.
        */
       typedef BaseClass::value_type      value_type;
       typedef BaseClass::pointer         pointer;
@@ -88,19 +83,15 @@ namespace PETScWrappers
       typedef BaseClass::const_iterator  const_iterator;
 
       /**
-       * Default constructor. Generate an
-       * empty vector without any blocks.
+       * Default constructor. Generate an empty vector without any blocks.
        */
       BlockVector ();
 
       /**
-       *  Constructor. Generate a block
-       *  vector with @p n_blocks blocks,
-       *  each of which is a parallel
-       *  vector across @p communicator
-       *  with @p block_size elements of
-       *  which @p local_size elements are
-       *  stored on the present process.
+       * Constructor. Generate a block vector with @p n_blocks blocks, each of
+       * which is a parallel vector across @p communicator with @p block_size
+       * elements of which @p local_size elements are stored on the present
+       * process.
        */
       explicit BlockVector (const unsigned int  n_blocks,
                             const MPI_Comm     &communicator,
@@ -108,32 +99,25 @@ namespace PETScWrappers
                             const size_type     local_size);
 
       /**
-       * Copy-Constructor. Set all the
-       * properties of the parallel vector
-       * to those of the given argument and
-       * copy the elements.
+       * Copy-Constructor. Set all the properties of the parallel vector to
+       * those of the given argument and copy the elements.
        */
       BlockVector (const BlockVector  &V);
 
       /**
-       * Constructor. Set the number of
-       * blocks to
-       * <tt>block_sizes.size()</tt> and
-       * initialize each block with
-       * <tt>block_sizes[i]</tt> zero
-       * elements. The individual blocks
-       * are distributed across the given
-       * communicator, and each store
-       * <tt>local_elements[i]</tt>
-       * elements on the present process.
+       * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>
+       * and initialize each block with <tt>block_sizes[i]</tt> zero elements.
+       * The individual blocks are distributed across the given communicator,
+       * and each store <tt>local_elements[i]</tt> elements on the present
+       * process.
        */
       BlockVector (const std::vector<size_type> &block_sizes,
                    const MPI_Comm               &communicator,
                    const std::vector<size_type> &local_elements);
 
       /**
-       * Create a BlockVector with parallel_partitioning.size() blocks,
-       * each initialized with the given IndexSet.
+       * Create a BlockVector with parallel_partitioning.size() blocks, each
+       * initialized with the given IndexSet.
        */
       explicit BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                             const MPI_Comm &communicator = MPI_COMM_WORLD);
@@ -153,63 +137,43 @@ namespace PETScWrappers
       ~BlockVector ();
 
       /**
-       * Copy operator: fill all components
-       * of the vector that are locally
+       * Copy operator: fill all components of the vector that are locally
        * stored with the given scalar value.
        */
       BlockVector &operator = (const value_type s);
 
       /**
-       * Copy operator for arguments of the
-       * same type.
+       * Copy operator for arguments of the same type.
        */
       BlockVector &
       operator= (const BlockVector &V);
 
       /**
-       * Copy the given sequential
-       * (non-distributed) block vector
-       * into the present parallel block
-       * vector. It is assumed that they
-       * have the same size, and this
-       * operation does not change the
-       * partitioning of the parallel
-       * vectors by which its elements are
-       * distributed across several MPI
-       * processes. What this operation
-       * therefore does is to copy that
-       * chunk of the given vector @p v
-       * that corresponds to elements of
-       * the target vector that are stored
-       * locally, and copies them, for each
-       * of the individual blocks of this
-       * object. Elements that are not
-       * stored locally are not touched.
+       * Copy the given sequential (non-distributed) block vector into the
+       * present parallel block vector. It is assumed that they have the same
+       * size, and this operation does not change the partitioning of the
+       * parallel vectors by which its elements are distributed across several
+       * MPI processes. What this operation therefore does is to copy that
+       * chunk of the given vector @p v that corresponds to elements of the
+       * target vector that are stored locally, and copies them, for each of
+       * the individual blocks of this object. Elements that are not stored
+       * locally are not touched.
        *
-       * This being a parallel vector, you
-       * must make sure that @em all
-       * processes call this function at
-       * the same time. It is not possible
-       * to change the local part of a
-       * parallel vector on only one
-       * process, independent of what other
-       * processes do, with this function.
+       * This being a parallel vector, you must make sure that @em all
+       * processes call this function at the same time. It is not possible to
+       * change the local part of a parallel vector on only one process,
+       * independent of what other processes do, with this function.
        */
       BlockVector &
       operator = (const PETScWrappers::BlockVector &v);
 
       /**
-       * Reinitialize the BlockVector to
-       * contain @p n_blocks of size @p
-       * block_size, each of which stores
-       * @p local_size elements
-       * locally. The @p communicator
-       * argument denotes which MPI channel
-       * each of these blocks shall
-       * communicate.
+       * Reinitialize the BlockVector to contain @p n_blocks of size @p
+       * block_size, each of which stores @p local_size elements locally. The
+       * @p communicator argument denotes which MPI channel each of these
+       * blocks shall communicate.
        *
-       * If <tt>fast==false</tt>, the vector
-       * is filled with zeros.
+       * If <tt>fast==false</tt>, the vector is filled with zeros.
        */
       void reinit (const unsigned int  n_blocks,
                    const MPI_Comm     &communicator,
@@ -218,39 +182,23 @@ namespace PETScWrappers
                    const bool fast = false);
 
       /**
-       * Reinitialize the BlockVector such
-       * that it contains
-       * <tt>block_sizes.size()</tt>
-       * blocks. Each block is
-       * reinitialized to dimension
-       * <tt>block_sizes[i]</tt>. Each of
-       * them stores
-       * <tt>local_sizes[i]</tt> elements
-       * on the present process.
+       * Reinitialize the BlockVector such that it contains
+       * <tt>block_sizes.size()</tt> blocks. Each block is reinitialized to
+       * dimension <tt>block_sizes[i]</tt>. Each of them stores
+       * <tt>local_sizes[i]</tt> elements on the present process.
        *
-       * If the number of blocks is the
-       * same as before this function
-       * was called, all vectors remain
-       * the same and reinit() is
-       * called for each vector.
+       * If the number of blocks is the same as before this function was
+       * called, all vectors remain the same and reinit() is called for each
+       * vector.
        *
-       * If <tt>fast==false</tt>, the vector
-       * is filled with zeros.
+       * If <tt>fast==false</tt>, the vector is filled with zeros.
        *
-       * Note that you must call this
-       * (or the other reinit()
-       * functions) function, rather
-       * than calling the reinit()
-       * functions of an individual
-       * block, to allow the block
-       * vector to update its caches of
-       * vector sizes. If you call
-       * reinit() of one of the
-       * blocks, then subsequent
-       * actions on this object may
-       * yield unpredictable results
-       * since they may be routed to
-       * the wrong block.
+       * Note that you must call this (or the other reinit() functions)
+       * function, rather than calling the reinit() functions of an individual
+       * block, to allow the block vector to update its caches of vector
+       * sizes. If you call reinit() of one of the blocks, then subsequent
+       * actions on this object may yield unpredictable results since they may
+       * be routed to the wrong block.
        */
       void reinit (const std::vector<size_type> &block_sizes,
                    const MPI_Comm               &communicator,
@@ -258,30 +206,18 @@ namespace PETScWrappers
                    const bool                    fast=false);
 
       /**
-       * Change the dimension to that
-       * of the vector <tt>V</tt>. The same
-       * applies as for the other
-       * reinit() function.
+       * Change the dimension to that of the vector <tt>V</tt>. The same
+       * applies as for the other reinit() function.
        *
-       * The elements of <tt>V</tt> are not
-       * copied, i.e.  this function is
-       * the same as calling <tt>reinit
-       * (V.size(), fast)</tt>.
+       * The elements of <tt>V</tt> are not copied, i.e.  this function is the
+       * same as calling <tt>reinit (V.size(), fast)</tt>.
        *
-       * Note that you must call this
-       * (or the other reinit()
-       * functions) function, rather
-       * than calling the reinit()
-       * functions of an individual
-       * block, to allow the block
-       * vector to update its caches of
-       * vector sizes. If you call
-       * reinit() on one of the
-       * blocks, then subsequent
-       * actions on this object may
-       * yield unpredictable results
-       * since they may be routed to
-       * the wrong block.
+       * Note that you must call this (or the other reinit() functions)
+       * function, rather than calling the reinit() functions of an individual
+       * block, to allow the block vector to update its caches of vector
+       * sizes. If you call reinit() on one of the blocks, then subsequent
+       * actions on this object may yield unpredictable results since they may
+       * be routed to the wrong block.
        */
       void reinit (const BlockVector &V,
                    const bool         fast=false);
@@ -301,15 +237,10 @@ namespace PETScWrappers
                    const MPI_Comm              &communicator);
 
       /**
-       * Change the number of blocks to
-       * <tt>num_blocks</tt>. The individual
-       * blocks will get initialized with
-       * zero size, so it is assumed that
-       * the user resizes the
-       * individual blocks by herself
-       * in an appropriate way, and
-       * calls <tt>collect_sizes</tt>
-       * afterwards.
+       * Change the number of blocks to <tt>num_blocks</tt>. The individual
+       * blocks will get initialized with zero size, so it is assumed that the
+       * user resizes the individual blocks by herself in an appropriate way,
+       * and calls <tt>collect_sizes</tt> afterwards.
        */
       void reinit (const unsigned int num_blocks);
 
@@ -319,41 +250,27 @@ namespace PETScWrappers
       bool has_ghost_elements() const;
 
       /**
-       * Return a reference to the MPI
-       * communicator object in use with
-       * this vector.
+       * Return a reference to the MPI communicator object in use with this
+       * vector.
        */
       const MPI_Comm &get_mpi_communicator () const;
 
       /**
-       * Swap the contents of this
-       * vector and the other vector
-       * <tt>v</tt>. One could do this
-       * operation with a temporary
-       * variable and copying over the
-       * data elements, but this
-       * function is significantly more
-       * efficient since it only swaps
-       * the pointers to the data of
-       * the two vectors and therefore
-       * does not need to allocate
-       * temporary storage and move
-       * data around.
+       * Swap the contents of this vector and the other vector <tt>v</tt>. One
+       * could do this operation with a temporary variable and copying over
+       * the data elements, but this function is significantly more efficient
+       * since it only swaps the pointers to the data of the two vectors and
+       * therefore does not need to allocate temporary storage and move data
+       * around.
        *
-       * Limitation: right now this
-       * function only works if both
-       * vectors have the same number
-       * of blocks. If needed, the
-       * numbers of blocks should be
+       * Limitation: right now this function only works if both vectors have
+       * the same number of blocks. If needed, the numbers of blocks should be
        * exchanged, too.
        *
-       * This function is analog to the
-       * the swap() function of all C++
-       * standard containers. Also,
-       * there is a global function
-       * swap(u,v) that simply calls
-       * <tt>u.swap(v)</tt>, again in analogy
-       * to standard functions.
+       * This function is analog to the the swap() function of all C++
+       * standard containers. Also, there is a global function swap(u,v) that
+       * simply calls <tt>u.swap(v)</tt>, again in analogy to standard
+       * functions.
        */
       void swap (BlockVector &v);
 
@@ -603,9 +520,9 @@ namespace PETScWrappers
 
 
     /**
-     * Global function which overloads the default implementation
-     * of the C++ standard library which uses a temporary object. The
-     * function simply exchanges the data of the two vectors.
+     * Global function which overloads the default implementation of the C++
+     * standard library which uses a temporary object. The function simply
+     * exchanges the data of the two vectors.
      *
      * @relates PETScWrappers::MPI::BlockVector
      * @author Wolfgang Bangerth, 2000

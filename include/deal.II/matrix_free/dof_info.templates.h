@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2011 - 2013 by the deal.II authors
 //
@@ -609,7 +608,7 @@ no_constraint:
           std::swap (new_active_fe_index, cell_active_fe_index);
         }
 
-      std::vector<std_cxx1x::array<unsigned int, 3> > new_row_starts;
+      std::vector<std_cxx11::array<unsigned int, 3> > new_row_starts;
       std::vector<unsigned int> new_dof_indices;
       std::vector<std::pair<unsigned short,unsigned short> >
       new_constraint_indicator;
@@ -831,7 +830,7 @@ no_constraint:
       // nothing here, assume all cells to belong to the zero partition (that
       // we otherwise use for MPI boundary cells)
       unsigned int start_up = 0,
-        start_nonboundary = numbers::invalid_unsigned_int;
+                   start_nonboundary = numbers::invalid_unsigned_int;
       if (task_info.use_coloring_only == false)
         {
           start_nonboundary =
@@ -1924,7 +1923,7 @@ not_connect:
     DoFInfo::memory_consumption () const
     {
       std::size_t memory = sizeof(*this);
-      memory += (row_starts.capacity()*sizeof(std_cxx1x::array<unsigned int,3>));
+      memory += (row_starts.capacity()*sizeof(std_cxx11::array<unsigned int,3>));
       memory += MemoryConsumption::memory_consumption (dof_indices);
       memory += MemoryConsumption::memory_consumption (row_starts_plain_indices);
       memory += MemoryConsumption::memory_consumption (plain_dof_indices);
@@ -1942,7 +1941,7 @@ not_connect:
     {
       out << "       Memory row starts indices:    ";
       size_info.print_memory_statistics
-      (out, (row_starts.capacity()*sizeof(std_cxx1x::array<unsigned int, 3>)));
+      (out, (row_starts.capacity()*sizeof(std_cxx11::array<unsigned int, 3>)));
       out << "       Memory dof indices:           ";
       size_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (dof_indices));

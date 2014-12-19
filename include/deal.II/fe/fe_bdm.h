@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,18 +38,18 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @todo Restriction matrices are missing.
  *
- * The matching pressure space for FE_BDM of order <i>k</i> is the
- * element FE_DGP of order <i>k</i>.
+ * The matching pressure space for FE_BDM of order <i>k</i> is the element
+ * FE_DGP of order <i>k</i>.
  *
- * The BDM element of order @p p has <i>p+1</i> degrees of freedom on
- * each face. These are implemented as the function values in the
- * <i>p+1</i> Gauss points on each face.
+ * The BDM element of order @p p has <i>p+1</i> degrees of freedom on each
+ * face. These are implemented as the function values in the <i>p+1</i> Gauss
+ * points on each face.
  *
  * Additionally, for order greater or equal 2, we have additional
  * <i>p(p-1)</i>, the number of vector valued polynomials in
- * <i>P<sub>p</sub></i>, interior degrees of freedom. These are the
- * vector function values in the first <i>p(p-1)/2</i> of the
- * <i>p<sup>2</sup></i> Gauss points in the cell.
+ * <i>P<sub>p</sub></i>, interior degrees of freedom. These are the vector
+ * function values in the first <i>p(p-1)/2</i> of the <i>p<sup>2</sup></i>
+ * Gauss points in the cell.
  */
 template <int dim>
 class FE_BDM
@@ -59,19 +58,14 @@ class FE_BDM
 {
 public:
   /**
-   * Constructor for the BDM
-   * element of degree @p p.
+   * Constructor for the BDM element of degree @p p.
    */
   FE_BDM (const unsigned int p);
 
   /**
-   * Return a string that uniquely
-   * identifies a finite
-   * element. This class returns
-   * <tt>FE_BDM<dim>(degree)</tt>, with
-   * @p dim and @p degree
-   * replaced by appropriate
-   * values.
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_BDM<dim>(degree)</tt>, with @p dim and @p degree replaced
+   * by appropriate values.
    */
   virtual std::string get_name () const;
 
@@ -87,45 +81,32 @@ public:
     const VectorSlice<const std::vector<std::vector<double> > > &values) const;
 private:
   /**
-   * Only for internal use. Its
-   * full name is
-   * @p get_dofs_per_object_vector
-   * function and it creates the
-   * @p dofs_per_object vector that is
-   * needed within the constructor to
-   * be passed to the constructor of
-   * @p FiniteElementData.
+   * Only for internal use. Its full name is @p get_dofs_per_object_vector
+   * function and it creates the @p dofs_per_object vector that is needed
+   * within the constructor to be passed to the constructor of @p
+   * FiniteElementData.
    */
   static std::vector<unsigned int>
   get_dpo_vector (const unsigned int degree);
 
   /**
-   * Compute the vector used for
-   * the
-   * @p restriction_is_additive
-   * field passed to the base
-   * class's constructor.
+   * Compute the vector used for the @p restriction_is_additive field passed
+   * to the base class's constructor.
    */
   static std::vector<bool>
   get_ria_vector (const unsigned int degree);
   /**
-   * Initialize the
-   * FiniteElement<dim>::generalized_support_points
-   * and FiniteElement<dim>::generalized_face_support_points
-   * fields. Called from the
-   * constructor.
-  * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
-  * for more information.
+   * Initialize the FiniteElement<dim>::generalized_support_points and
+   * FiniteElement<dim>::generalized_face_support_points fields. Called from
+   * the constructor. See the
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * for more information.
    */
   void initialize_support_points (const unsigned int rt_degree);
   /**
-   * The values in the interior
-   * support points of the
-   * polynomials needed as test
-   * functions. The outer vector is
-   * indexed by quadrature points,
-   * the inner by the test
-   * function.
+   * The values in the interior support points of the polynomials needed as
+   * test functions. The outer vector is indexed by quadrature points, the
+   * inner by the test function.
    */
   std::vector<std::vector<double> > test_values;
 };

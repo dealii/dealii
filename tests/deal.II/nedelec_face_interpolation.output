@@ -1,0 +1,5 @@
+
+DEAL::Testing FE_Nedelec<3>(0) vs. FE_Nedelec<3>(1)
+DEAL::OK
+DEAL::Testing FE_Nedelec<3>(1) vs. FE_Nedelec<3>(2)
+DEAL::OK

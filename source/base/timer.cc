@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -161,10 +160,10 @@ double Timer::stop ()
 
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
-      double time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
-                    - start_wall_time;
+      last_lap_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
+                      - start_wall_time;
 #elif defined(DEAL_II_MSVC)
-      double time = windows::wall_clock() - start_wall_time;
+      last_lap_time = windows::wall_clock() - start_wall_time;
       cumulative_time += windows::cpu_clock() - start_time;
 #else
 #  error Unsupported platform. Porting not finished.
@@ -174,15 +173,31 @@ double Timer::stop ()
       if (sync_wall_time && Utilities::System::job_supports_mpi())
         {
           this->mpi_data
-            = Utilities::MPI::min_max_avg (time, mpi_communicator);
-
-          cumulative_wall_time += this->mpi_data.max;
+            = Utilities::MPI::min_max_avg (last_lap_time, mpi_communicator);
+          last_lap_time = this->mpi_data.max;
+          cumulative_wall_time += last_lap_time;
         }
       else
 #endif
-        cumulative_wall_time += time;
+        cumulative_wall_time += last_lap_time;
     }
   return cumulative_time;
+}
+
+
+
+double Timer::get_lap_time() const
+{
+  // time already has the difference
+  // between the last start()/stop()
+  // cycle.
+#ifdef DEAL_II_WITH_MPI
+  if (Utilities::System::job_supports_mpi())
+    return Utilities::MPI::max (last_lap_time, mpi_communicator);
+  else
+#endif
+    return last_lap_time;
+
 }
 
 
@@ -256,6 +271,7 @@ double Timer::wall_time () const
 
 void Timer::reset ()
 {
+  last_lap_time = 0.;
   cumulative_time = 0.;
   cumulative_wall_time = 0.;
   running         = false;
@@ -355,6 +371,10 @@ TimerOutput::enter_subsection (const std::string &section_name)
 #ifdef DEAL_II_WITH_MPI
       if (mpi_communicator != MPI_COMM_SELF)
         {
+          // create a new timer for this section. the second argument
+          // will ensure that we have an MPI barrier before starting
+          // and stopping a timer, and this ensures that we get the
+          // maximum run time for this section over all processors
           sections[section_name].timer = Timer(mpi_communicator, true);
         }
 #endif
@@ -401,11 +421,9 @@ TimerOutput::leave_subsection (const std::string &section_name)
   sections[actual_section_name].total_wall_time
   += sections[actual_section_name].timer.wall_time();
 
-  // get cpu time. on MPI systems, add
-  // the local contributions. we could
-  // do that also in the Timer class
-  // itself, but we didn't initialize
-  // the Timers here according to that
+  // get cpu time. on MPI systems, add the local contributions. we
+  // could do that also in the Timer class itself, but we didn't
+  // initialize the Timers here according to that
   double cpu_time = sections[actual_section_name].timer();
   sections[actual_section_name].total_cpu_time
   += (Utilities::System::job_supports_mpi()
@@ -414,8 +432,7 @@ TimerOutput::leave_subsection (const std::string &section_name)
       :
       cpu_time);
 
-  // in case we have to print out
-  // something, do that here...
+  // in case we have to print out something, do that here...
   if ((output_frequency == every_call || output_frequency == every_call_and_summary)
       && output_is_enabled == true)
     {

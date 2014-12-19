@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -684,6 +683,17 @@ hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int> > ();
     }
+  else if (fe_other.dofs_per_face == 0)
+    {
+      // if the other element has no elements on faces at all,
+      // then it would be impossible to enforce any kind of
+      // continuity even if we knew exactly what kind of element
+      // we have -- simply because the other element declares
+      // that it is discontinuous because it has no DoFs on
+      // its faces. in that case, just state that we have no
+      // constraints to declare
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
   else
     {
       Assert (false, ExcNotImplemented());
@@ -733,6 +743,17 @@ hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
     {
       // the FE_Nothing has no degrees of freedom, so there are no
       // equivalencies to be recorded
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+  else if (fe_other.dofs_per_face == 0)
+    {
+      // if the other element has no elements on faces at all,
+      // then it would be impossible to enforce any kind of
+      // continuity even if we knew exactly what kind of element
+      // we have -- simply because the other element declares
+      // that it is discontinuous because it has no DoFs on
+      // its faces. in that case, just state that we have no
+      // constraints to declare
       return std::vector<std::pair<unsigned int, unsigned int> > ();
     }
   else
@@ -788,6 +809,17 @@ hp_quad_dof_identities (const FiniteElement<dim,spacedim>        &fe_other) cons
     {
       // the FE_Nothing has no degrees of freedom, so there are no
       // equivalencies to be recorded
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+  else if (fe_other.dofs_per_face == 0)
+    {
+      // if the other element has no elements on faces at all,
+      // then it would be impossible to enforce any kind of
+      // continuity even if we knew exactly what kind of element
+      // we have -- simply because the other element declares
+      // that it is discontinuous because it has no DoFs on
+      // its faces. in that case, just state that we have no
+      // constraints to declare
       return std::vector<std::pair<unsigned int, unsigned int> > ();
     }
   else
@@ -1503,7 +1535,7 @@ FE_Q_Base<POLY,dim,spacedim>::get_constant_modes () const
   AssertDimension(this->dofs_per_cell, Utilities::fixed_power<dim>(this->degree+1));
   constant_modes.fill(true);
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, std::vector<unsigned int>(1, 0));
+         (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 

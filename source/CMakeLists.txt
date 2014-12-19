@@ -1,5 +1,4 @@
 ## ---------------------------------------------------------------------
-## $Id$
 ##
 ## Copyright (C) 2012 - 2013 by the deal.II authors
 ##
@@ -48,6 +47,7 @@ ADD_SUBDIRECTORY(algorithms)
 ADD_SUBDIRECTORY(integrators)
 ADD_SUBDIRECTORY(matrix_free)
 ADD_SUBDIRECTORY(meshworker)
+ADD_SUBDIRECTORY(opencascade)
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${build} build_lowercase)

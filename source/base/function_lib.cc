@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2013 by the deal.II authors
 //
@@ -2276,8 +2275,8 @@ namespace Functions
                         const Point<1>        &xi)
     {
       return ((1-xi[0])*data_values[ix[0]]
-                                    +
-                                    xi[0]*data_values[ix[0]+1]);
+              +
+              xi[0]*data_values[ix[0]+1]);
     }
 
     double interpolate (const Table<2,double> &data_values,
@@ -2318,11 +2317,11 @@ namespace Functions
 
   template <int dim>
   InterpolatedTensorProductGridData<dim>::
-  InterpolatedTensorProductGridData(const std_cxx1x::array<std::vector<double>,dim> &coordinate_values,
+  InterpolatedTensorProductGridData(const std_cxx11::array<std::vector<double>,dim> &coordinate_values,
                                     const Table<dim,double>                         &data_values)
-  :
-  coordinate_values (coordinate_values),
-  data_values (data_values)
+    :
+    coordinate_values (coordinate_values),
+    data_values (data_values)
   {
     for (unsigned int d=0; d<dim; ++d)
       {
@@ -2330,7 +2329,7 @@ namespace Functions
                 ExcMessage ("Coordinate arrays must have at least two coordinate values!"));
         for (unsigned int i=0; i<coordinate_values[d].size()-1; ++i)
           Assert (coordinate_values[d][i] < coordinate_values[d][i+1],
-              ExcMessage ("Coordinate arrays must be sorted in strictly ascending order."));
+                  ExcMessage ("Coordinate arrays must be sorted in strictly ascending order."));
 
         Assert (data_values.size()[d] == coordinate_values[d].size(),
                 ExcMessage ("Data and coordinate tables do not have the same size."));
@@ -2345,7 +2344,7 @@ namespace Functions
                                                 const unsigned int component) const
   {
     Assert (component == 0,
-        ExcMessage ("This is a scalar function object, the component can only be zero."));
+            ExcMessage ("This is a scalar function object, the component can only be zero."));
 
     // find out where this data point lies, relative to the given
     // points. if we run all the way to the end of the range,
@@ -2368,9 +2367,8 @@ namespace Functions
         // to consider the last box which has index size()-2
         if (ix[d] == coordinate_values[d].size())
           ix[d] = coordinate_values[d].size()-2;
-        else
-          if (ix[d] > 0)
-            --ix[d];
+        else if (ix[d] > 0)
+          --ix[d];
       }
 
     // now compute the relative point within the interval/rectangle/box
@@ -2390,13 +2388,13 @@ namespace Functions
 
   template <int dim>
   InterpolatedUniformGridData<dim>::
-  InterpolatedUniformGridData(const std_cxx1x::array<std::pair<double,double>,dim> &interval_endpoints,
-                              const std_cxx1x::array<unsigned int,dim>             &n_subintervals,
+  InterpolatedUniformGridData(const std_cxx11::array<std::pair<double,double>,dim> &interval_endpoints,
+                              const std_cxx11::array<unsigned int,dim>             &n_subintervals,
                               const Table<dim,double>                              &data_values)
-  :
-  interval_endpoints (interval_endpoints),
-  n_subintervals (n_subintervals),
-  data_values (data_values)
+    :
+    interval_endpoints (interval_endpoints),
+    n_subintervals (n_subintervals),
+    data_values (data_values)
   {
     for (unsigned int d=0; d<dim; ++d)
       {
@@ -2418,7 +2416,7 @@ namespace Functions
                                           const unsigned int component) const
   {
     Assert (component == 0,
-        ExcMessage ("This is a scalar function object, the component can only be zero."));
+            ExcMessage ("This is a scalar function object, the component can only be zero."));
 
     // find out where this data point lies, relative to the given
     // subdivision points
@@ -2442,12 +2440,12 @@ namespace Functions
     for (unsigned int d=0; d<dim; ++d)
       {
         const double delta_x = ((interval_endpoints[d].second - interval_endpoints[d].first) /
-                                n_subintervals[d]);	
-	p_unit[d] = std::max(std::min((p[d]-interval_endpoints[d].first-ix[d]*delta_x)/delta_x,
-				      1.),
-			     0.);
+                                n_subintervals[d]);
+        p_unit[d] = std::max(std::min((p[d]-interval_endpoints[d].first-ix[d]*delta_x)/delta_x,
+                                      1.),
+                             0.);
       }
-    
+
     return interpolate (data_values, ix, p_unit);
   }
 

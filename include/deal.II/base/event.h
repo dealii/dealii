@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -29,13 +28,13 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   /**
-   * Objects of this kind are used to notify interior applications of
-   * changes provoked by an outer loop. They are handed to the
-   * application through Operator::notify() and it is up to the
-   * actual application how to handle them.
+   * Objects of this kind are used to notify interior applications of changes
+   * provoked by an outer loop. They are handed to the application through
+   * Operator::notify() and it is up to the actual application how to handle
+   * them.
    *
-   * Event is organized as an extensible binary enumerator. Every class
-   * can add its own events using assign(). A typical code example is
+   * Event is organized as an extensible binary enumerator. Every class can
+   * add its own events using assign(). A typical code example is
    *
    * @code
    * class A
@@ -50,26 +49,20 @@ namespace Algorithms
   {
   public:
     /**
-     * This function registers a
-     * new event type and assigns a
-     * unique identifier to it. The
-     * result of this function
-     * should be stored for later
-     * use.
+     * This function registers a new event type and assigns a unique
+     * identifier to it. The result of this function should be stored for
+     * later use.
      */
     static Event assign (const char *name);
 
     /**
-     * If you forgot to store the
-     * result of assign, here is
-     * how to retrieve it knowing
-     * the name.
+     * If you forgot to store the result of assign, here is how to retrieve it
+     * knowing the name.
      */
 //      static Event find(const std::string& name);
 
     /**
-     * Constructor, generating a
-     * clear Event.
+     * Constructor, generating a clear Event.
      */
     Event ();
 
@@ -94,15 +87,13 @@ namespace Algorithms
     Event &operator -= (const Event &event);
 
     /**
-     * Test whether all the flags
-     * set in the other Event are
-     * also set in this one.
+     * Test whether all the flags set in the other Event are also set in this
+     * one.
      */
     bool test (const Event &event) const;
 
     /**
-     * Return <tt>true</tt> if any
-     * event is set.
+     * Return <tt>true</tt> if any event is set.
      */
     bool any () const;
 
@@ -120,11 +111,8 @@ namespace Algorithms
 
   private:
     /**
-     * Sometimes, actions have to
-     * be taken by all
-     * means. Therefore, if this
-     * value is true, test() always
-     * returns true.
+     * Sometimes, actions have to be taken by all means. Therefore, if this
+     * value is true, test() always returns true.
      */
     bool all_true;
 
@@ -146,27 +134,22 @@ namespace Algorithms
   namespace Events
   {
     /**
-     * The program has just started
-     * and everything should be
-     * new.
+     * The program has just started and everything should be new.
      */
     extern const Event initial;
-    
+
     /**
      * The mesh has changed.
      */
     extern const Event remesh;
-    
+
     /**
-     * The current derivative leads
-     * to slow convergence of
-     * Newton's method.
+     * The current derivative leads to slow convergence of Newton's method.
      */
     extern const Event bad_derivative;
 
     /**
-     * The time stepping scheme
-     * starts a new time step.
+     * The time stepping scheme starts a new time step.
      */
     extern const Event new_time;
 
@@ -300,8 +283,7 @@ namespace Algorithms
 
 
   /**
-   * Output shift operator for
-   * events. Calls Event::print().
+   * Output shift operator for events. Calls Event::print().
    *
    * @relates Event
    */

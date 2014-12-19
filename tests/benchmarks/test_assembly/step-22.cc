@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2008 - 2013 by the deal.II authors
 //
@@ -177,7 +176,7 @@ namespace Step22
     // memory leak, and can never produce a
     // dangling pointer to an already
     // destroyed object:
-    std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
+    std_cxx11::shared_ptr<typename InnerPreconditioner<dim>::type> A_preconditioner;
 
     TimerOutput timer;
   };
@@ -954,7 +953,7 @@ namespace Step22
     std::cout << "   Computing preconditioner..." << std::endl << std::flush;
 
     A_preconditioner
-      = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
+      = std_cxx11::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
     A_preconditioner->initialize (system_matrix.block(0,0),
                                   typename InnerPreconditioner<dim>::type::AdditionalData());
 

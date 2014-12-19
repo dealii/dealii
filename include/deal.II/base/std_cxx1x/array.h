@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,32 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__std_cxx1x_array_h
-#define __deal2__std_cxx1x_array_h
+// this file is deprecated. simply include the one we use now
+#include "../std_cxx11/array.h"
 
-
-#include <deal.II/base/config.h>
-
-#ifdef DEAL_II_WITH_CXX11
-
-#  include <array>
+// then allow using the old namespace name instead of the new one
 DEAL_II_NAMESPACE_OPEN
-namespace std_cxx1x
-{
-  using std::array;
-}
+namespace std_cxx1x = std_cxx11;
 DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-#include <boost/array.hpp>
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx1x
-{
-  using boost::array;
-}
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
-
-#endif

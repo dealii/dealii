@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2002 - 2013 by the deal.II authors
 //
@@ -25,15 +24,13 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * The transpose of a given matrix.  This auxiliary class swaps the
- * effect ov vmult() and Tvmult() as well as vmult_add() and
- * Tvmult_add().
+ * The transpose of a given matrix.  This auxiliary class swaps the effect ov
+ * vmult() and Tvmult() as well as vmult_add() and Tvmult_add().
  *
  * The implementation is analogous to the class PointerMatrix.
  *
- * @note The transposed matrix is never actually assembled. Instead,
- * only the matrix vector multiplication is performed in a transposed
- * way.
+ * @note The transposed matrix is never actually assembled. Instead, only the
+ * matrix vector multiplication is performed in a transposed way.
  *
  * @ingroup Matrix2
  * @author Guido Kanschat, 2006
@@ -44,32 +41,24 @@ class
 {
 public:
   /**
-   * Constructor.  The pointer in the
-   * argument is stored in this
-   * class. As usual, the lifetime of
-   * <tt>*M</tt> must be longer than the
-   * one of the PointerMatrix.
+   * Constructor.  The pointer in the argument is stored in this class. As
+   * usual, the lifetime of <tt>*M</tt> must be longer than the one of the
+   * PointerMatrix.
    *
-   * If <tt>M</tt> is zero, no
-   * matrix is stored.
+   * If <tt>M</tt> is zero, no matrix is stored.
    */
   TransposeMatrix (const MATRIX *M=0);
 
   /**
-   * Constructor. The name argument
-   * is used to identify the
-   * SmartPointer for this object.
+   * Constructor. The name argument is used to identify the SmartPointer for
+   * this object.
    */
   TransposeMatrix(const char *name);
 
   /**
-   * Constructor. <tt>M</tt> points
-   * to a matrix which must live
-   * longer than the
-   * TransposeMatrix. The name
-   * argument is used to identify
-   * the SmartPointer for this
-   * object.
+   * Constructor. <tt>M</tt> points to a matrix which must live longer than
+   * the TransposeMatrix. The name argument is used to identify the
+   * SmartPointer for this object.
    */
   TransposeMatrix(const MATRIX *M,
                   const char *name);
@@ -78,16 +67,13 @@ public:
   virtual void clear();
 
   /**
-   * Return whether the object is
-   * empty.
+   * Return whether the object is empty.
    */
   bool empty () const;
 
   /**
-   * Assign a new matrix
-   * pointer. Deletes the old pointer
-   * and releases its matrix.
-   * @see SmartPointer
+   * Assign a new matrix pointer. Deletes the old pointer and releases its
+   * matrix. @see SmartPointer
    */
   const TransposeMatrix &operator= (const MATRIX *M);
 
@@ -104,15 +90,13 @@ public:
                        const VECTOR &src) const;
 
   /**
-   * Matrix-vector product, adding to
-   * <tt>dst</tt>.
+   * Matrix-vector product, adding to <tt>dst</tt>.
    */
   virtual void vmult_add (VECTOR &dst,
                           const VECTOR &src) const;
 
   /**
-   * Tranposed matrix-vector product,
-   * adding to <tt>dst</tt>.
+   * Tranposed matrix-vector product, adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VECTOR &dst,
                            const VECTOR &src) const;

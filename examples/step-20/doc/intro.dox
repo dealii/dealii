@@ -439,14 +439,14 @@ class SchurComplement
 {
   public:
     SchurComplement (const BlockSparseMatrix<double> &A,
-                     const InverseMatrix             &Minv);
+                     const IterativeInverse<Vector<double> > &Minv);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix>              m_inverse;
+    const SmartPointer<const IterativeInverse<Vector<double> > > m_inverse;
 
     mutable Vector<double> tmp1, tmp2;
 };
@@ -483,7 +483,13 @@ matrix and the mass matrix, respectively:
 template <int dim>
 void MixedLaplaceProblem<dim>::solve ()
 {
-  const InverseMatrix m_inverse (system_matrix.block(0,0));
+  PreconditionIdentity identity;
+  IterativeInverse<Vector<double> > m_inverse;
+  m_inverse.initialize(system_matrix.block(0,0), identity);
+  m_inverse.solver.select("cg");
+  static ReductionControl inner_control(1000, 0., 1.e-13);
+  m_inverse.solver.set_control(inner_control);
+
   Vector<double> tmp (solution.block(0).size());
 
   {
@@ -600,8 +606,11 @@ the approximate Schur complement, i.e. we need code like this:
     ApproximateSchurComplement
       approximate_schur_complement (system_matrix);
 
-    InverseMatrix<ApproximateSchurComplement>
-      preconditioner (approximate_schur_complement)
+    IterativeInverse<Vector<double> >
+      preconditioner;
+    preconditioner.initialize(approximate_schur_complement, identity);
+    preconditioner.solver.select("cg");
+    preconditioner.solver.set_control(inner_control);
 @endcode
 
 That's all!
@@ -622,12 +631,15 @@ look like this:
     ApproximateSchurComplement
       approximate_schur_complement (system_matrix);
 
-    InverseMatrix<ApproximateSchurComplement>
-      preconditioner (approximate_schur_complement);
+    IterativeInverse<Vector<double> >
+      preconditioner;
+    preconditioner.initialize(approximate_schur_complement, identity);
+    preconditioner.solver.select("cg");
+    preconditioner.solver.set_control(inner_control);
 
-    SolverControl solver_control (system_matrix.block(0,0).m(),
-                                  1e-6*schur_rhs.l2_norm());
-    SolverCG<>    cg (solver_control);
+    SolverControl solver_control (solution.block(1).size(),
+                                  1e-12*schur_rhs.l2_norm());
+    SolverCG<> cg (solver_control);
 
     cg.solve (schur_complement, solution.block(1), schur_rhs,
               preconditioner);

@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2014 by the deal.II authors
 //
@@ -24,24 +23,21 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A finite element, which is the trace of FE_Q elements, that is
- * a tensor product of polynomials on the faces,
- * undefined in the interior of the cells and continuous. The basis functions on
- * the faces are from Polynomials::LagrangeEquidistant
+ * A finite element, which is the trace of FE_Q elements, that is a tensor
+ * product of polynomials on the faces, undefined in the interior of the cells
+ * and continuous. The basis functions on the faces are from
+ * Polynomials::LagrangeEquidistant
  *
- * This finite element is the trace space of FE_Q on the
- * faces.
+ * This finite element is the trace space of FE_Q on the faces.
  *
- * @note Since these are only finite elements on faces, only
- * FEFaceValues and FESubfaceValues will be able to extract reasonable
- * values from any face polynomial. In order to make the use of
- * FESystem simpler, FEValues objects will not fail using this finite
- * element space, but all shape function values extracted will equal
- * to zero.
+ * @note Since these are only finite elements on faces, only FEFaceValues and
+ * FESubfaceValues will be able to extract reasonable values from any face
+ * polynomial. In order to make the use of FESystem simpler, FEValues objects
+ * will not fail using this finite element space, but all shape function
+ * values extracted will equal to zero.
  *
- * @todo Polynomials::LagrangeEquidistant should be and will be
- * replaced by Polynomials::LagrangeGaussLobatto as soon as such a
- * polynomial set exists.
+ * @todo Polynomials::LagrangeEquidistant should be and will be replaced by
+ * Polynomials::LagrangeGaussLobatto as soon as such a polynomial set exists.
  * @todo so far, hanging nodes are not implemented
  *
  */
@@ -51,26 +47,18 @@ class FE_TraceQ : public FE_PolyFace<TensorProductPolynomials<dim-1>, dim, space
 {
 public:
   /**
-   * Constructor for tensor product
-   * polynomials of degree
-   * <tt>p</tt>. The shape
-   * functions created using this
-   * constructor correspond to
-   * Legendre polynomials in each
-   * coordinate direction.
+   * Constructor for tensor product polynomials of degree <tt>p</tt>. The
+   * shape functions created using this constructor correspond to Legendre
+   * polynomials in each coordinate direction.
    */
   FE_TraceQ(unsigned int p);
 
   virtual FiniteElement<dim,spacedim> *clone() const;
 
   /**
-   * Return a string that uniquely
-   * identifies a finite
-   * element. This class returns
-   * <tt>FE_DGQ<dim>(degree)</tt>, with
-   * <tt>dim</tt> and <tt>degree</tt>
-   * replaced by appropriate
-   * values.
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_DGQ<dim>(degree)</tt>, with <tt>dim</tt> and
+   * <tt>degree</tt> replaced by appropriate values.
    */
   virtual std::string get_name () const;
 
@@ -90,8 +78,7 @@ public:
 
 private:
   /**
-   * Return vector with dofs per
-   * vertex, line, quad, hex.
+   * Return vector with dofs per vertex, line, quad, hex.
    */
   static std::vector<unsigned int> get_dpo_vector (const unsigned int deg);
 };

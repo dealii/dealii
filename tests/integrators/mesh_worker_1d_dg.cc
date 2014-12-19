@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -21,7 +20,7 @@
 #include <deal.II/meshworker/assembler.h>
 #include <deal.II/meshworker/loop.h>
 
-#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -255,12 +254,12 @@ namespace Advection
     MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
     (dof_handler.begin_active(), dof_handler.end(),
      dof_info, info_box,
-     std_cxx1x::bind(&AdvectionProblem<dim>::integrate_cell_term,
-                     this, std_cxx1x::_1, std_cxx1x::_2),
-     std_cxx1x::bind(&AdvectionProblem<dim>::integrate_boundary_term,
-                     this, std_cxx1x::_1, std_cxx1x::_2),
-     std_cxx1x::bind(&AdvectionProblem<dim>::integrate_face_term,
-                     this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
+     std_cxx11::bind(&AdvectionProblem<dim>::integrate_cell_term,
+                     this, std_cxx11::_1, std_cxx11::_2),
+     std_cxx11::bind(&AdvectionProblem<dim>::integrate_boundary_term,
+                     this, std_cxx11::_1, std_cxx11::_2),
+     std_cxx11::bind(&AdvectionProblem<dim>::integrate_face_term,
+                     this, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
      assembler, true);
 
   }//assemble_system

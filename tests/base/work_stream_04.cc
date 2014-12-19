@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2008 - 2013 by the deal.II authors
 //
@@ -49,13 +48,13 @@ void test ()
   // first run with only a worker
   WorkStream::run (v.begin(), v.end(),
                    &foo,
-                   std_cxx1x::function<void(const unsigned int&)>(),
+                   std_cxx11::function<void(const unsigned int&)>(),
                    ScratchData(),
                    0U);
   
   // next run with only a copier
   WorkStream::run (v.begin(), v.end(),
-                   std_cxx1x::function<void(const std::vector<unsigned int>::iterator,
+                   std_cxx11::function<void(const std::vector<unsigned int>::iterator,
                                             ScratchData&,unsigned int&)>(),
                    &bar,
                    ScratchData(),

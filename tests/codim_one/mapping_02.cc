@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -45,7 +44,7 @@ void test ()
   Triangulation<dim-1,dim> boundary_mesh;
   boundary_mesh.set_boundary (0, surface_description);
 
-  GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh);
+  GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
 
   QGauss<dim-1> quadrature(dim == 2 ? 3 : 2);
   MappingQ<dim-1,dim> mapping(2);

@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2013 by the deal.II authors
 //
@@ -42,7 +41,7 @@ namespace internal
                   const unsigned int n_subdivisions,
                   const std::vector<unsigned int> &n_postprocessor_outputs,
                   const Mapping<dim,spacedim> &mapping,
-                  const std::vector<std_cxx1x::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
+                  const std::vector<std_cxx11::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                   const UpdateFlags update_flags,
                   const std::vector<std::vector<unsigned int> > &cell_to_patch_index_map)
       :
@@ -448,11 +447,11 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
   if (all_cells.size() > 0)
     WorkStream::run (&all_cells[0],
                      &all_cells[0]+all_cells.size(),
-                     std_cxx1x::bind(&DataOut<dim,DH>::build_one_patch,
-                                     this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3,
-                                     curved_cell_region,std_cxx1x::ref(this->patches)),
+                     std_cxx11::bind(&DataOut<dim,DH>::build_one_patch,
+                                     this, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3,
+                                     curved_cell_region,std_cxx11::ref(this->patches)),
                      // no copy-local-to-global function needed here
-                     std_cxx1x::function<void (const ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &)>(),
+                     std_cxx11::function<void (const ::dealii::DataOutBase::Patch<DH::dimension, DH::space_dimension> &)>(),
                      thread_data,
                      sample_patch,
                      // experimenting shows that we can make things run a bit

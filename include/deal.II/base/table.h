@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2002 - 2014 by the deal.II authors
 //
@@ -45,41 +44,37 @@ namespace internal
 {
 
   /**
-   * @internal
-   * Have a namespace in which we declare some classes that are used to
-   * access the elements of tables using the <tt>operator[]</tt>. These are
-   * quite technical, since they have to do their work recursively (due
-   * to the fact that the number of indices is not known, we have to
-   * return an iterator into the next lower dimension object if we
-   * access one object, until we are on the lowest level and can
-   * actually return a reference to the stored data type itself).  This
-   * is so technical that you will not usually want to look at these
-   * classes at all, except possibly for educational reasons.  None of
-   * the classes herein has a interface that you should use explicitly
-   * in your programs (except, of course, through access to the elements
-   * of tables with <tt>operator[]</tt>, which generates temporary objects of
-   * the types of this namespace).
+   * @internal Have a namespace in which we declare some classes that are used
+   * to access the elements of tables using the <tt>operator[]</tt>. These are
+   * quite technical, since they have to do their work recursively (due to the
+   * fact that the number of indices is not known, we have to return an
+   * iterator into the next lower dimension object if we access one object,
+   * until we are on the lowest level and can actually return a reference to
+   * the stored data type itself).  This is so technical that you will not
+   * usually want to look at these classes at all, except possibly for
+   * educational reasons.  None of the classes herein has a interface that you
+   * should use explicitly in your programs (except, of course, through access
+   * to the elements of tables with <tt>operator[]</tt>, which generates
+   * temporary objects of the types of this namespace).
    *
    * @author Wolfgang Bangerth, 2002
    */
   namespace TableBaseAccessors
   {
     /**
-     * @internal
-     * Have a class which declares some nested typedefs, depending on its
-     * template parameters. The general template declares nothing, but
+     * @internal Have a class which declares some nested typedefs, depending
+     * on its template parameters. The general template declares nothing, but
      * there are more useful specializations regaring the last parameter
-     * indicating constness of the table for which accessor objects are to
-     * be generated in this namespace.
+     * indicating constness of the table for which accessor objects are to be
+     * generated in this namespace.
      */
     template <int N, typename T, bool Constness>
     struct Types
     {};
 
     /**
-     * @internal
-     * Have a class which declares some nested typedefs, depending on its
-     * template parameters. Specialization for accessors to constant
+     * @internal Have a class which declares some nested typedefs, depending
+     * on its template parameters. Specialization for accessors to constant
      * objects.
      */
     template <int N, typename T> struct Types<N,T,true>
@@ -95,10 +90,9 @@ namespace internal
     };
 
     /**
-     * @internal
-     * Have a class which declares some nested typedefs, depending on its
-     * template parameters. Specialization for accessors to non-constant
-     * objects.
+     * @internal Have a class which declares some nested typedefs, depending
+     * on its template parameters. Specialization for accessors to non-
+     * constant objects.
      */
     template <int N, typename T> struct Types<N,T,false>
     {
@@ -114,41 +108,40 @@ namespace internal
 
 
     /**
-     * @internal
-     * Class that acts as accessor to subobjects of tables of type
-     * <tt>Table<N,T></tt>. The template parameter <tt>C</tt> may be either true or
-     * false, and indicates whether the objects worked on are constant or
-     * not (i.e. write access is only allowed if the value is false).
+     * @internal Class that acts as accessor to subobjects of tables of type
+     * <tt>Table<N,T></tt>. The template parameter <tt>C</tt> may be either
+     * true or false, and indicates whether the objects worked on are constant
+     * or not (i.e. write access is only allowed if the value is false).
      *
-     * Since with <tt>N</tt> indices, the effect of applying <tt>operator[]</tt> is
-     * getting access to something we <tt>N-1</tt> indices, we have to
-     * implement these accessor classes recursively, with stopping when we
-     * have only one index left. For the latter case, a specialization of
-     * this class is declared below, where calling <tt>operator[]</tt> gives
-     * you access to the objects actually stored by the table. In the
-     * value given to the index operator needs to be checked whether it is
-     * inside its bounds, for which we need to know which index of the
-     * table we are actually accessing presently. This is done through the
-     * template parameter <tt>P</tt>: it indicates, how many remaining indices
-     * there are. For a vector, <tt>P</tt> may only be one (and then the
-     * specialization below is used). For a table this value may be two,
-     * and when using <tt>operator[]</tt>, an object with <tt>P=1</tt> emerges.
+     * Since with <tt>N</tt> indices, the effect of applying
+     * <tt>operator[]</tt> is getting access to something we <tt>N-1</tt>
+     * indices, we have to implement these accessor classes recursively, with
+     * stopping when we have only one index left. For the latter case, a
+     * specialization of this class is declared below, where calling
+     * <tt>operator[]</tt> gives you access to the objects actually stored by
+     * the table. In the value given to the index operator needs to be checked
+     * whether it is inside its bounds, for which we need to know which index
+     * of the table we are actually accessing presently. This is done through
+     * the template parameter <tt>P</tt>: it indicates, how many remaining
+     * indices there are. For a vector, <tt>P</tt> may only be one (and then
+     * the specialization below is used). For a table this value may be two,
+     * and when using <tt>operator[]</tt>, an object with <tt>P=1</tt>
+     * emerges.
      *
      * The value of <tt>P</tt> is also used to determine the stride: this
      * object stores a pointer indicating the beginning of the range of
      * objects that it may access. When we apply <tt>operator[]</tt> on this
-     * object, the resulting new accessor may only access a subset of
-     * these elements, and to know which subset we need to know the
-     * dimensions of the table and the present index, which is indicated
-     * by <tt>P</tt>.
+     * object, the resulting new accessor may only access a subset of these
+     * elements, and to know which subset we need to know the dimensions of
+     * the table and the present index, which is indicated by <tt>P</tt>.
      *
      * As stated for the entire namespace, you will not usually have to do
-     * with these classes directly, and should not try to use their
-     * interface directly as it may change without notice. In fact, since
-     * the constructors are made private, you will not even be able to
-     * generate objects of this class, as they are only thought as
-     * temporaries for access to elements of the table class, not for
-     * passing them around as arguments of functions, etc.
+     * with these classes directly, and should not try to use their interface
+     * directly as it may change without notice. In fact, since the
+     * constructors are made private, you will not even be able to generate
+     * objects of this class, as they are only thought as temporaries for
+     * access to elements of the table class, not for passing them around as
+     * arguments of functions, etc.
      *
      * @author Wolfgang Bangerth, 2002
      */
@@ -163,51 +156,37 @@ namespace internal
 
     private:
       /**
-       * Constructor. Take a pointer
-       * to the table object to know
-       * about the sizes of the
-       * various dimensions, and a
-       * pointer to the subset of
-       * data we may access.
+       * Constructor. Take a pointer to the table object to know about the
+       * sizes of the various dimensions, and a pointer to the subset of data
+       * we may access.
        */
       Accessor (const TableType &table,
                 const iterator    data);
 
       /**
-       * Default constructor. Not
-       * needed, and invisible, so
-       * private.
+       * Default constructor. Not needed, and invisible, so private.
        */
       Accessor ();
 
     public:
 
       /**
-       * Copy constructor. This constructor
-       * is public so that one can pass
-       * sub-tables to functions as
-       * arguments, as in
-       * <code>f(table[i])</code>.
+       * Copy constructor. This constructor is public so that one can pass
+       * sub-tables to functions as arguments, as in <code>f(table[i])</code>.
        *
-       * Using this constructor is risky if
-       * accessors are stored longer than
-       * the table it points to. Don't do
-       * this.
+       * Using this constructor is risky if accessors are stored longer than
+       * the table it points to. Don't do this.
        */
       Accessor (const Accessor &a);
 
       /**
-       * Index operator. Performs a
-       * range check.
+       * Index operator. Performs a range check.
        */
       Accessor<N,T,C,P-1> operator [] (const unsigned int i) const;
 
       /**
-       * Exception for range
-       * check. Do not use global
-       * exception since this way we
-       * can output which index is
-       * the wrong one.
+       * Exception for range check. Do not use global exception since this way
+       * we can output which index is the wrong one.
        */
       DeclException3 (ExcIndexRange, int, int, int,
                       << "Index " << N-P+1 << "has a value of "
@@ -215,12 +194,9 @@ namespace internal
                       << arg2 << "," << arg3 << "[");
     private:
       /**
-       * Store the data given to the
-       * constructor. There are no
-       * non-const member functions
-       * of this class, so there is
-       * no reason not to make these
-       * elements constant.
+       * Store the data given to the constructor. There are no non-const
+       * member functions of this class, so there is no reason not to make
+       * these elements constant.
        */
       const TableType &table;
       const iterator   data;
@@ -241,12 +217,11 @@ namespace internal
 
 
     /**
-     * @internal
-     * Accessor class for tables. This is the specialization for the last
-     * index, which actually allows access to the elements of the table,
-     * rather than recursively returning access objects for further
-     * subsets. The same holds for this specialization as for the general
-     * template; see there for more information.
+     * @internal Accessor class for tables. This is the specialization for the
+     * last index, which actually allows access to the elements of the table,
+     * rather than recursively returning access objects for further subsets.
+     * The same holds for this specialization as for the general template; see
+     * there for more information.
      *
      * @author Wolfgang Bangerth, 2002
      */
@@ -255,13 +230,9 @@ namespace internal
     {
     public:
       /**
-       * Typedef constant and
-       * non-constant iterator
-       * types to the elements of
-       * this row, as well as all
-       * the other types usually
-       * required for the standard
-       * library algorithms.
+       * Typedef constant and non-constant iterator types to the elements of
+       * this row, as well as all the other types usually required for the
+       * standard library algorithms.
        */
       typedef typename Types<N,T,C>::value_type value_type;
 
@@ -275,98 +246,68 @@ namespace internal
       typedef ptrdiff_t difference_type;
 
       /**
-       * Import a typedef from the
-       * switch class above.
+       * Import a typedef from the switch class above.
        */
       typedef typename Types<N,T,C>::TableType    TableType;
 
     private:
 
       /**
-       * Constructor. Take an iterator
-       * to the table object to know
-       * about the sizes of the
-       * various dimensions, and a
-       * iterator to the subset of
-       * data we may access (which in
-       * this particular case is only
-       * one row).
+       * Constructor. Take an iterator to the table object to know about the
+       * sizes of the various dimensions, and a iterator to the subset of data
+       * we may access (which in this particular case is only one row).
        *
-       * The constructor is made
-       * private in order to prevent
-       * you having such objects
-       * around. The only way to
-       * create such objects is via
-       * the <tt>Table</tt> class, which
-       * only generates them as
-       * temporary objects. This
-       * guarantees that the accessor
-       * objects go out of scope
-       * earlier than the mother
-       * object, avoid problems with
-       * data consistency.
+       * The constructor is made private in order to prevent you having such
+       * objects around. The only way to create such objects is via the
+       * <tt>Table</tt> class, which only generates them as temporary objects.
+       * This guarantees that the accessor objects go out of scope earlier
+       * than the mother object, avoid problems with data consistency.
        */
       Accessor (const TableType &table,
                 const iterator    data);
 
       /**
-       * Default constructor. Not needed,
-       * so private.
+       * Default constructor. Not needed, so private.
        */
       Accessor ();
 
     public:
       /**
-       * Copy constructor. This constructor
-       * is public so that one can pass
-       * sub-tables to functions as
-       * arguments, as in
-       * <code>f(table[i])</code>.
+       * Copy constructor. This constructor is public so that one can pass
+       * sub-tables to functions as arguments, as in <code>f(table[i])</code>.
        *
-       * Using this constructor is risky if
-       * accessors are stored longer than
-       * the table it points to. Don't do
-       * this.
+       * Using this constructor is risky if accessors are stored longer than
+       * the table it points to. Don't do this.
        */
       Accessor (const Accessor &a);
 
 
       /**
-       * Index operator. Performs a
-       * range check.
+       * Index operator. Performs a range check.
        */
       reference operator [] (const unsigned int) const;
 
       /**
-       * Return the length of one row,
-       * i.e. the number of elements
-       * corresponding to the last
-       * index of the table object.
+       * Return the length of one row, i.e. the number of elements
+       * corresponding to the last index of the table object.
        */
       unsigned int size () const;
 
       /**
-       * Return an iterator to the
-       * first element of this
-       * row.
+       * Return an iterator to the first element of this row.
        */
       iterator begin () const;
 
       /**
-       * Return an interator to the
-       * element past the end of
-       * this row.
+       * Return an interator to the element past the end of this row.
        */
       iterator end () const;
 
     private:
       /**
-       * Store the data given to the
-       * constructor. There are no
-       * non-const member functions
-       * of this class, so there is
-       * no reason not to make these
-       * elements constant.
+       * Store the data given to the constructor. There are no non-const
+       * member functions of this class, so there is no reason not to make
+       * these elements constant.
        */
       const TableType &table;
       const iterator   data;
@@ -391,75 +332,67 @@ namespace internal
 
 
 /**
- * General class holding an array of objects of templated type in
- * multiple dimensions. If the template parameter indicating the
- * number of dimensions is one, then this is more or less a vector, if
- * it is two then it is a matrix, and so on.
+ * General class holding an array of objects of templated type in multiple
+ * dimensions. If the template parameter indicating the number of dimensions
+ * is one, then this is more or less a vector, if it is two then it is a
+ * matrix, and so on.
  *
- * Previously, this data type was emulated in this library by
- * constructs like <tt>std::vector<std::vector<T>></tt>, or even higher
- * nested constructs.  However, this has the disadvantage that it is
- * hard to initialize, and most importantly that it is very
- * inefficient if all rows have the same size (which is the usual
- * case), since then the memory for each row is allocated
+ * Previously, this data type was emulated in this library by constructs like
+ * <tt>std::vector<std::vector<T>></tt>, or even higher nested constructs.
+ * However, this has the disadvantage that it is hard to initialize, and most
+ * importantly that it is very inefficient if all rows have the same size
+ * (which is the usual case), since then the memory for each row is allocated
  * independently, both wasting time and memory. This can be made more
- * efficient by allocating only one chunk of memory for the entire
- * object.
+ * efficient by allocating only one chunk of memory for the entire object.
  *
- * Therefore, this data type was invented. Its implementation is
- * rather straightforward, with two exceptions. The first thing to
- * think about is how to pass the size in each of the coordinate
- * directions to the object; this is done using the TableIndices
- * class. Second, how to access the individual elements. The basic
- * problem here is that we would like to make the number of arguments
- * to be passed to the constructor as well as the access functions
- * dependent on the template parameter <tt>N</tt> indicating the number of
- * dimensions. Of course, this is not possible.
+ * Therefore, this data type was invented. Its implementation is rather
+ * straightforward, with two exceptions. The first thing to think about is how
+ * to pass the size in each of the coordinate directions to the object; this
+ * is done using the TableIndices class. Second, how to access the individual
+ * elements. The basic problem here is that we would like to make the number
+ * of arguments to be passed to the constructor as well as the access
+ * functions dependent on the template parameter <tt>N</tt> indicating the
+ * number of dimensions. Of course, this is not possible.
  *
- * The way out of the first problem (and partly the second one as
- * well) is to have a common base class TableBase and a derived class
- * for each value of <tt>N</tt>.  This derived class has a constructor
- * with the correct number of arguments, namely <tt>N</tt>. These then
- * transform their arguments into the data type the base class (this
- * class in fact) uses in the constructor as well as in
- * element access through operator() functions.
+ * The way out of the first problem (and partly the second one as well) is to
+ * have a common base class TableBase and a derived class for each value of
+ * <tt>N</tt>.  This derived class has a constructor with the correct number
+ * of arguments, namely <tt>N</tt>. These then transform their arguments into
+ * the data type the base class (this class in fact) uses in the constructor
+ * as well as in element access through operator() functions.
  *
- * The second problem is that we would like to allow access through a
- * sequence of <tt>operator[]</tt> calls. This mostly because, as said,
- * this class is a replacement for previous use of nested
- * <tt>std::vector</tt> objects, where we had to use the <tt>operator[]</tt>
- * access function recursively until we were at the innermost
- * object. Emulating this behavior without losing the ability to do
- * index checks, and in particular without losing performance is
- * possible but nontrivial, and done in the TableBaseAccessors
- * namespace.
+ * The second problem is that we would like to allow access through a sequence
+ * of <tt>operator[]</tt> calls. This mostly because, as said, this class is a
+ * replacement for previous use of nested <tt>std::vector</tt> objects, where
+ * we had to use the <tt>operator[]</tt> access function recursively until we
+ * were at the innermost object. Emulating this behavior without losing the
+ * ability to do index checks, and in particular without losing performance is
+ * possible but nontrivial, and done in the TableBaseAccessors namespace.
  *
  *
  * <h3>Comparison with the Tensor class</h3>
  *
- * In some way, this class is similar to the Tensor class, in
- * that it templatizes on the number of dimensions. However, there are
- * two major differences. The first is that the Tensor class
- * stores only numeric values (as <tt>double</tt>s), while the Table
- * class stores arbitrary objects. The second is that the Tensor
- * class has fixed dimensions, also given as a template argument, while
- * this class can handle arbitrary dimensions, which may also be
- * different between different indices.
+ * In some way, this class is similar to the Tensor class, in that it
+ * templatizes on the number of dimensions. However, there are two major
+ * differences. The first is that the Tensor class stores only numeric values
+ * (as <tt>double</tt>s), while the Table class stores arbitrary objects. The
+ * second is that the Tensor class has fixed dimensions, also given as a
+ * template argument, while this class can handle arbitrary dimensions, which
+ * may also be different between different indices.
  *
- * This has two consequences. First, since the size is not known at
- * compile time, it has to do explicit memory allocating. Second, the
- * layout of individual elements is not known at compile time, so
- * access is slower than for the Tensor class where the number
- * of elements are their location is known at compile time and the
- * compiler can optimize with this knowledge (for example when
- * unrolling loops). On the other hand, this class is of course more
- * flexible, for example when you want a two-dimensional table with
- * the number of rows equal to the number of degrees of freedom on a
- * cell, and the number of columns equal to the number of quadrature
- * points. Both numbers may only be known at run-time, so a flexible
- * table is needed here. Furthermore, you may want to store, say, the
- * gradients of shape functions, so the data type is not a single
- * scalar value, but a tensor itself.
+ * This has two consequences. First, since the size is not known at compile
+ * time, it has to do explicit memory allocating. Second, the layout of
+ * individual elements is not known at compile time, so access is slower than
+ * for the Tensor class where the number of elements are their location is
+ * known at compile time and the compiler can optimize with this knowledge
+ * (for example when unrolling loops). On the other hand, this class is of
+ * course more flexible, for example when you want a two-dimensional table
+ * with the number of rows equal to the number of degrees of freedom on a
+ * cell, and the number of columns equal to the number of quadrature points.
+ * Both numbers may only be known at run-time, so a flexible table is needed
+ * here. Furthermore, you may want to store, say, the gradients of shape
+ * functions, so the data type is not a single scalar value, but a tensor
+ * itself.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002.
@@ -469,25 +402,20 @@ class TableBase : public Subscriptor
 {
 public:
   /**
-   * Default constructor. Set all
-   * dimensions to zero.
+   * Default constructor. Set all dimensions to zero.
    */
   TableBase ();
 
   /**
-   * Constructor. Initialize the
-   * array with the given
-   * dimensions in each index
+   * Constructor. Initialize the array with the given dimensions in each index
    * component.
    */
   TableBase (const TableIndices<N> &sizes);
 
   /**
-   * Constructor. Initialize the
-   * array with the given
-   * dimensions in each index
-   * component, and then initialize the elements of the table using the
-   * second and third argument by calling fill(entries,C_style_indexing).
+   * Constructor. Initialize the array with the given dimensions in each index
+   * component, and then initialize the elements of the table using the second
+   * and third argument by calling fill(entries,C_style_indexing).
    */
   template <typename InputIterator>
   TableBase (const TableIndices<N> &sizes,
@@ -495,15 +423,13 @@ public:
              const bool      C_style_indexing = true);
 
   /**
-   * Copy constructor. Performs a
-   * deep copy.
+   * Copy constructor. Performs a deep copy.
    */
   TableBase (const TableBase<N,T> &src);
 
   /**
-   * Copy constructor. Performs a
-   * deep copy from a table object
-   * storing some other data type.
+   * Copy constructor. Performs a deep copy from a table object storing some
+   * other data type.
    */
   template <typename T2>
   TableBase (const TableBase<N,T2> &src);
@@ -514,156 +440,124 @@ public:
   ~TableBase ();
 
   /**
-   * Assignment operator.
-   * Copy all elements of <tt>src</tt>
-   * into the matrix. The size is
-   * adjusted if needed.
+   * Assignment operator. Copy all elements of <tt>src</tt> into the matrix.
+   * The size is adjusted if needed.
    *
-   * We can't use the other, templatized
-   * version since if we don't declare
-   * this one, the compiler will happily
-   * generate a predefined copy
-   * operator which is not what we want.
+   * We can't use the other, templatized version since if we don't declare
+   * this one, the compiler will happily generate a predefined copy operator
+   * which is not what we want.
    */
   TableBase<N,T> &operator = (const TableBase<N,T> &src);
 
   /**
-   * Copy operator.
-   * Copy all elements of <tt>src</tt>
-   * into the array. The size is
-   * adjusted if needed.
+   * Copy operator. Copy all elements of <tt>src</tt> into the array. The size
+   * is adjusted if needed.
    *
-   * This function requires that the
-   * type <tt>T2</tt> is convertible to
+   * This function requires that the type <tt>T2</tt> is convertible to
    * <tt>T</tt>.
    */
   template<typename T2>
   TableBase<N,T> &operator = (const TableBase<N,T2> &src);
 
   /**
-   *  Test for equality of two tables.
+   * Test for equality of two tables.
    */
   bool operator == (const TableBase<N,T> &T2)  const;
 
   /**
-   * Set all entries to their
-   * default value (i.e. copy them
-   * over with default constructed
-   * objects). Do not change the
-   * size of the table, though.
+   * Set all entries to their default value (i.e. copy them over with default
+   * constructed objects). Do not change the size of the table, though.
    */
   void reset_values ();
 
   /**
-   * Set the dimensions of this object to
-   * the sizes given in the argument, and
-   * newly allocate the required
-   * memory. If <tt>fast</tt> is set to
-   * <tt>false</tt>, previous content is
-   * deleted, otherwise the memory is not
+   * Set the dimensions of this object to the sizes given in the argument, and
+   * newly allocate the required memory. If <tt>fast</tt> is set to
+   * <tt>false</tt>, previous content is deleted, otherwise the memory is not
    * touched.
    */
   void reinit (const TableIndices<N> &new_size,
                const bool             fast = false);
 
   /**
-   * Size of the table in direction
-   * <tt>i</tt>.
+   * Size of the table in direction <tt>i</tt>.
    */
   unsigned int size (const unsigned int i) const;
 
   /**
-   * Return the sizes of this
-   * object in each direction.
+   * Return the sizes of this object in each direction.
    */
   const TableIndices<N> &size () const;
 
   /**
-   * Return the number of elements
-   * stored in this object, which
-   * is the product of the
-   * extensions in each dimension.
+   * Return the number of elements stored in this object, which is the product
+   * of the extensions in each dimension.
    */
   unsigned int n_elements () const;
 
   /**
-   * Return whether the object is
-   * empty, i.e. one of the
-   * directions is zero. This is
-   * equivalent to
-   * <tt>n_elements()==0</tt>.
+   * Return whether the object is empty, i.e. one of the directions is zero.
+   * This is equivalent to <tt>n_elements()==0</tt>.
    */
   bool empty () const;
 
   /**
-   * Fill this table (which is assumed to already have the correct
-   * size) from a source given by dereferencing the given forward
-   * iterator (which could, for example, be a pointer to the first
-   * element of an array, or an inserting std::istream_iterator). The
-   * second argument denotes whether the elements pointed to are
-   * arranged in a way that corresponds to the last index running
-   * fastest or slowest. The default is to use C-style indexing
-   * where the last index runs fastest (as opposed to Fortran-style
-   * where the first index runs fastest when traversing multidimensional
-   * arrays. For example, if you try to fill an object of type
-   * Table<2,T>, then calling this function with the default
-   * value for the second argument will result in the equivalent of
-   * doing
+   * Fill this table (which is assumed to already have the correct size) from
+   * a source given by dereferencing the given forward iterator (which could,
+   * for example, be a pointer to the first element of an array, or an
+   * inserting std::istream_iterator). The second argument denotes whether the
+   * elements pointed to are arranged in a way that corresponds to the last
+   * index running fastest or slowest. The default is to use C-style indexing
+   * where the last index runs fastest (as opposed to Fortran-style where the
+   * first index runs fastest when traversing multidimensional arrays. For
+   * example, if you try to fill an object of type Table<2,T>, then calling
+   * this function with the default value for the second argument will result
+   * in the equivalent of doing
    * @code
    *   Table<2,T> t;
    *   for (unsigned int i=0; i<t.sizes()[0]; ++i)
    *     for (unsigned int j=0; j<t.sizes()[1]; ++j)
    *       t[i][j] = *entries++;
    * @endcode
-   * On the other hand, if the second argument to this function is false,
-   * then this would result in code of the following form:
+   * On the other hand, if the second argument to this function is false, then
+   * this would result in code of the following form:
    * @code
    *   Table<2,T> t;
    *   for (unsigned int j=0; j<t.sizes()[1]; ++j)
    *     for (unsigned int i=0; i<t.sizes()[0]; ++i)
    *       t[i][j] = *entries++;
    * @endcode
-   * Note the switched order in which we fill the table elements by
-   * traversing the given set of iterators.
+   * Note the switched order in which we fill the table elements by traversing
+   * the given set of iterators.
    *
-   * @param entries An iterator to a set of elements from which to
-   *   initialize this table. It is assumed that iterator can be
-   *   incremented and dereferenced a sufficient number of times
-   *   to fill this table.
-   * @param C_style_indexing If true, run over elements of the
-   *   table with the last index changing fastest as we dereference
-   *   subsequent elements of the input range. If false, change
-   *   the first index fastest.
+   * @param entries An iterator to a set of elements from which to initialize
+   * this table. It is assumed that iterator can be incremented and
+   * dereferenced a sufficient number of times to fill this table.
+   * @param C_style_indexing If true, run over elements of the table with the
+   * last index changing fastest as we dereference subsequent elements of the
+   * input range. If false, change the first index fastest.
    */
   template <typename InputIterator>
   void fill (InputIterator entries,
              const bool      C_style_indexing = true);
 
   /**
-   * Fill all table entries with
-   * the same value.
+   * Fill all table entries with the same value.
    */
   void fill (const T &value);
 
   /**
-   * Return a read-write reference
-   * to the indicated element.
+   * Return a read-write reference to the indicated element.
    */
   typename AlignedVector<T>::reference
   operator () (const TableIndices<N> &indices);
 
   /**
-   * Return the value of the
-   * indicated element as a
-   * read-only reference.
+   * Return the value of the indicated element as a read-only reference.
    *
-   * We return the requested value
-   * as a constant reference rather
-   * than by value since this
-   * object may hold data types
-   * that may be large, and we
-   * don't know here whether
-   * copying is expensive or not.
+   * We return the requested value as a constant reference rather than by
+   * value since this object may hold data types that may be large, and we
+   * don't know here whether copying is expensive or not.
    */
   typename AlignedVector<T>::const_reference
   operator () (const TableIndices<N> &indices) const;
@@ -696,56 +590,36 @@ public:
 
 protected:
   /**
-   * Return the position of the
-   * indicated element within the
-   * array of elements stored one
-   * after the other. This function
-   * does no index checking.
+   * Return the position of the indicated element within the array of elements
+   * stored one after the other. This function does no index checking.
    */
   unsigned int position (const TableIndices<N> &indices) const;
 
   /**
-   * Return a read-write reference
-   * to the indicated element.
+   * Return a read-write reference to the indicated element.
    *
-   * This function does no bounds
-   * checking and is only to be
-   * used internally and in
-   * functions already checked.
+   * This function does no bounds checking and is only to be used internally
+   * and in functions already checked.
    */
   typename AlignedVector<T>::reference el (const TableIndices<N> &indices);
 
   /**
-   * Return the value of the
-   * indicated element as a
-   * read-only reference.
+   * Return the value of the indicated element as a read-only reference.
    *
-   * This function does no bounds
-   * checking and is only to be
-   * used internally and in
-   * functions already checked.
+   * This function does no bounds checking and is only to be used internally
+   * and in functions already checked.
    *
-   * We return the requested value
-   * as a constant reference rather
-   * than by value since this
-   * object may hold data types
-   * that may be large, and we
-   * don't know here whether
-   * copying is expensive or not.
+   * We return the requested value as a constant reference rather than by
+   * value since this object may hold data types that may be large, and we
+   * don't know here whether copying is expensive or not.
    */
   typename AlignedVector<T>::const_reference el (const TableIndices<N> &indices) const;
 
   /**
-   * @deprecated This function
-   * accesses data directly and
-   * should not be used!
+   * @deprecated This function accesses data directly and should not be used!
    *
-   * Direct read-only access to
-   * data field. Used by
-   * <tt>FullMatrix</tt> of the LAC
-   * sublibrary (there even with a
-   * cast from const), otherwise,
-   * keep away!
+   * Direct read-only access to data field. Used by <tt>FullMatrix</tt> of the
+   * LAC sublibrary (there even with a cast from const), otherwise, keep away!
    */
   typename AlignedVector<T>::const_pointer data () const DEAL_II_DEPRECATED;
 
@@ -756,29 +630,26 @@ protected:
   AlignedVector<T> values;
 
   /**
-   * Size in each direction of the
-   * table.
+   * Size in each direction of the table.
    */
   TableIndices<N> table_size;
 
   /**
-   * Make all other table classes
-   * friends.
+   * Make all other table classes friends.
    */
   template <int, typename> friend class TableBase;
 };
 
 
 /**
- * A class representing a table with arbitrary but fixed number of
- * indices. This general template implements some additional functions
- * over those provided by the TableBase class, such as indexing
- * functions taking the correct number of arguments, etc.
+ * A class representing a table with arbitrary but fixed number of indices.
+ * This general template implements some additional functions over those
+ * provided by the TableBase class, such as indexing functions taking the
+ * correct number of arguments, etc.
  *
- * Rather than this general template, these functions are implemented
- * in partial specializations of this class, with fixed numbers of
- * dimensions. See there, and in the documentation of the base class
- * for more information.
+ * Rather than this general template, these functions are implemented in
+ * partial specializations of this class, with fixed numbers of dimensions.
+ * See there, and in the documentation of the base class for more information.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
@@ -790,14 +661,13 @@ class Table : public TableBase<N,T>
 
 
 /**
- * A class representing a one-dimensional table, i.e. a vector-like
- * class. Since the C++ library has a vector class, there is probably
- * not much need for this particular class, but since it is so simple
- * to implement on top of the template base class, we provide it
- * anyway.
+ * A class representing a one-dimensional table, i.e. a vector-like class.
+ * Since the C++ library has a vector class, there is probably not much need
+ * for this particular class, but since it is so simple to implement on top of
+ * the template base class, we provide it anyway.
  *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
+ * For the rationale of this class, and a description of the interface, see
+ * the base class.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
@@ -807,21 +677,18 @@ class Table<1,T> : public TableBase<1,T>
 {
 public:
   /**
-   * Default constructor. Set all
-   * dimensions to zero.
+   * Default constructor. Set all dimensions to zero.
    */
   Table ();
 
   /**
-   * Constructor. Pass down the
-   * given dimension to the base
-   * class.
+   * Constructor. Pass down the given dimension to the base class.
    */
   Table (const unsigned int size);
 
   /**
-   * Constructor. Create a table with a given size and initialize it from
-   * a set of iterators.
+   * Constructor. Create a table with a given size and initialize it from a
+   * set of iterators.
    *
    * This function is entirely equivalent to creating a table <code>t</code>
    * of the given size and then calling
@@ -831,8 +698,8 @@ public:
    * on it, using the TableBase::fill() function where the arguments are
    * explained in more detail. The point, however, is that that is only
    * possible if the table can be changed after running the constructor,
-   * whereas calling the current constructor allows sizing and initializing
-   * an object right away so that it can be marked const.
+   * whereas calling the current constructor allows sizing and initializing an
+   * object right away so that it can be marked const.
    *
    * Using this constructor, you can do things like this:
    * @code
@@ -849,14 +716,12 @@ public:
    *
    *
    * @param size The size of this one-dimensional table.
-   * @param entries An iterator to a set of elements from which to
-   *   initialize this table. It is assumed that iterator can be
-   *   incremented and dereferenced a sufficient number of times
-   *   to fill this table.
-   * @param C_style_indexing If true, run over elements of the
-   *   table with the last index changing fastest as we dereference
-   *   subsequent elements of the input range. If false, change
-   *   the first index fastest.
+   * @param entries An iterator to a set of elements from which to initialize
+   * this table. It is assumed that iterator can be incremented and
+   * dereferenced a sufficient number of times to fill this table.
+   * @param C_style_indexing If true, run over elements of the table with the
+   * last index changing fastest as we dereference subsequent elements of the
+   * input range. If false, change the first index fastest.
    */
   template <typename InputIterator>
   Table (const unsigned int size,
@@ -864,59 +729,43 @@ public:
          const bool      C_style_indexing = true);
 
   /**
-   * Access operator. Since this is
-   * a one-dimensional object, this
-   * simply accesses the requested
-   * data element. Returns a
-   * read-only reference.
+   * Access operator. Since this is a one-dimensional object, this simply
+   * accesses the requested data element. Returns a read-only reference.
    */
   typename AlignedVector<T>::const_reference
   operator [] (const unsigned int i) const;
 
   /**
-   * Access operator. Since this is
-   * a one-dimensional object, this
-   * simply accesses the requested
-   * data element. Returns a
-   * read-write reference.
+   * Access operator. Since this is a one-dimensional object, this simply
+   * accesses the requested data element. Returns a read-write reference.
    */
   typename AlignedVector<T>::reference
   operator [] (const unsigned int i);
 
   /**
-   * Access operator. Since this is
-   * a one-dimensional object, this
-   * simply accesses the requested
-   * data element. Returns a
-   * read-only reference.
+   * Access operator. Since this is a one-dimensional object, this simply
+   * accesses the requested data element. Returns a read-only reference.
    */
   typename AlignedVector<T>::const_reference
   operator () (const unsigned int i) const;
 
   /**
-   * Access operator. Since this is
-   * a one-dimensional object, this
-   * simply accesses the requested
-   * data element. Returns a
-   * read-write reference.
+   * Access operator. Since this is a one-dimensional object, this simply
+   * accesses the requested data element. Returns a read-write reference.
    */
   typename AlignedVector<T>::reference
   operator () (const unsigned int i);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::reference
   operator () (const TableIndices<1> &indices);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::const_reference
   operator () (const TableIndices<1> &indices) const;
@@ -925,14 +774,14 @@ public:
 
 
 /**
- * A class representing a two-dimensional table, i.e. a matrix of
- * objects (not necessarily only numbers).
+ * A class representing a two-dimensional table, i.e. a matrix of objects (not
+ * necessarily only numbers).
  *
- * For the rationale of this class, and a description of the
- * interface, see the base class. Since this serves as the base class
- * of the full matrix classes in this library, and to keep a minimal
- * compatibility with a predecessor class (<tt>vector2d</tt>), some
- * additional functions are provided.
+ * For the rationale of this class, and a description of the interface, see
+ * the base class. Since this serves as the base class of the full matrix
+ * classes in this library, and to keep a minimal compatibility with a
+ * predecessor class (<tt>vector2d</tt>), some additional functions are
+ * provided.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
@@ -942,22 +791,19 @@ class Table<2,T> : public TableBase<2,T>
 {
 public:
   /**
-   * Default constructor. Set all
-   * dimensions to zero.
+   * Default constructor. Set all dimensions to zero.
    */
   Table ();
 
   /**
-   * Constructor. Pass down the
-   * given dimensions to the base
-   * class.
+   * Constructor. Pass down the given dimensions to the base class.
    */
   Table (const unsigned int size1,
          const unsigned int size2);
 
   /**
-   * Constructor. Create a table with a given size and initialize it from
-   * a set of iterators.
+   * Constructor. Create a table with a given size and initialize it from a
+   * set of iterators.
    *
    * This function is entirely equivalent to creating a table <code>t</code>
    * of the given size and then calling
@@ -967,8 +813,8 @@ public:
    * on it, using the TableBase::fill() function where the arguments are
    * explained in more detail. The point, however, is that that is only
    * possible if the table can be changed after running the constructor,
-   * whereas calling the current constructor allows sizing and initializing
-   * an object right away so that it can be marked const.
+   * whereas calling the current constructor allows sizing and initializing an
+   * object right away so that it can be marked const.
    *
    * Using this constructor, you can do things like this:
    * @code
@@ -986,14 +832,12 @@ public:
    *
    * @param size1 The size of this table in the first dimension.
    * @param size2 The size of this table in the second dimension.
-   * @param entries An iterator to a set of elements from which to
-   *   initialize this table. It is assumed that iterator can be
-   *   incremented and dereferenced a sufficient number of times
-   *   to fill this table.
-   * @param C_style_indexing If true, run over elements of the
-   *   table with the last index changing fastest as we dereference
-   *   subsequent elements of the input range. If false, change
-   *   the first index fastest.
+   * @param entries An iterator to a set of elements from which to initialize
+   * this table. It is assumed that iterator can be incremented and
+   * dereferenced a sufficient number of times to fill this table.
+   * @param C_style_indexing If true, run over elements of the table with the
+   * last index changing fastest as we dereference subsequent elements of the
+   * input range. If false, change the first index fastest.
    */
   template <typename InputIterator>
   Table (const unsigned int size1,
@@ -1002,53 +846,37 @@ public:
          const bool      C_style_indexing = true);
 
   /**
-   * Reinitialize the object. This
-   * function is mostly here for
-   * compatibility with the earlier
-   * <tt>vector2d</tt> class. Passes
-   * down to the base class by
-   * converting the arguments to
-   * the data type requested by the
-   * base class.
+   * Reinitialize the object. This function is mostly here for compatibility
+   * with the earlier <tt>vector2d</tt> class. Passes down to the base class
+   * by converting the arguments to the data type requested by the base class.
    */
   void reinit (const unsigned int size1,
                const unsigned int size2,
                const bool         fast = false);
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested row of this
-   * two-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested row of
+   * this two-dimensional table. Range checks are performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<2,T,true,1>
   operator [] (const unsigned int i) const;
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested row of this
-   * two-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested row of
+   * this two-dimensional table. Range checks are performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<2,T,false,1>
   operator [] (const unsigned int i);
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   typename AlignedVector<T>::const_reference
   operator () (const unsigned int i,
@@ -1056,95 +884,69 @@ public:
 
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   typename AlignedVector<T>::reference
   operator () (const unsigned int i,
                const unsigned int j);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::reference
   operator () (const TableIndices<2> &indices);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::const_reference
   operator () (const TableIndices<2> &indices) const;
 
 
   /**
-   * Number of rows. This function
-   * really makes only sense since
-   * we have a two-dimensional
-   * object here.
+   * Number of rows. This function really makes only sense since we have a
+   * two-dimensional object here.
    */
   unsigned int n_rows () const;
 
   /**
-   * Number of columns. This function
-   * really makes only sense since
-   * we have a two-dimensional
-   * object here.
+   * Number of columns. This function really makes only sense since we have a
+   * two-dimensional object here.
    */
   unsigned int n_cols () const;
 
 protected:
   /**
-   * Return a read-write reference
-   * to the element <tt>(i,j)</tt>.
+   * Return a read-write reference to the element <tt>(i,j)</tt>.
    *
-   * This function does no bounds
-   * checking and is only to be
-   * used internally and in
-   * functions already checked.
+   * This function does no bounds checking and is only to be used internally
+   * and in functions already checked.
    *
-   * These functions are mainly
-   * here for compatibility with a
-   * former implementation of these
-   * table classes for 2d arrays,
-   * then called <tt>vector2d</tt>.
+   * These functions are mainly here for compatibility with a former
+   * implementation of these table classes for 2d arrays, then called
+   * <tt>vector2d</tt>.
    */
   typename AlignedVector<T>::reference el (const unsigned int i,
                                            const unsigned int j);
 
   /**
-   * Return the value of the
-   * element <tt>(i,j)</tt> as a
-   * read-only reference.
+   * Return the value of the element <tt>(i,j)</tt> as a read-only reference.
    *
-   * This function does no bounds
-   * checking and is only to be
-   * used internally and in
-   * functions already checked.
+   * This function does no bounds checking and is only to be used internally
+   * and in functions already checked.
    *
-   * We return the requested value
-   * as a constant reference rather
-   * than by value since this
-   * object may hold data types
-   * that may be large, and we
-   * don't know here whether
-   * copying is expensive or not.
+   * We return the requested value as a constant reference rather than by
+   * value since this object may hold data types that may be large, and we
+   * don't know here whether copying is expensive or not.
    *
-   * These functions are mainly
-   * here for compatibility with a
-   * former implementation of these
-   * table classes for 2d arrays,
-   * then called <tt>vector2d</tt>.
+   * These functions are mainly here for compatibility with a former
+   * implementation of these table classes for 2d arrays, then called
+   * <tt>vector2d</tt>.
    */
   typename AlignedVector<T>::const_reference el (const unsigned int i,
                                                  const unsigned int j) const;
@@ -1153,11 +955,11 @@ protected:
 
 
 /**
- * A class representing a three-dimensional table of objects (not
- * necessarily only numbers).
+ * A class representing a three-dimensional table of objects (not necessarily
+ * only numbers).
  *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
+ * For the rationale of this class, and a description of the interface, see
+ * the base class.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
@@ -1167,23 +969,20 @@ class Table<3,T> : public TableBase<3,T>
 {
 public:
   /**
-   * Default constructor. Set all
-   * dimensions to zero.
+   * Default constructor. Set all dimensions to zero.
    */
   Table ();
 
   /**
-   * Constructor. Pass down the
-   * given dimensions to the base
-   * class.
+   * Constructor. Pass down the given dimensions to the base class.
    */
   Table (const unsigned int size1,
          const unsigned int size2,
          const unsigned int size3);
 
   /**
-   * Constructor. Create a table with a given size and initialize it from
-   * a set of iterators.
+   * Constructor. Create a table with a given size and initialize it from a
+   * set of iterators.
    *
    * This function is entirely equivalent to creating a table <code>t</code>
    * of the given size and then calling
@@ -1193,11 +992,11 @@ public:
    * on it, using the TableBase::fill() function where the arguments are
    * explained in more detail. The point, however, is that that is only
    * possible if the table can be changed after running the constructor,
-   * whereas calling the current constructor allows sizing and initializing
-   * an object right away so that it can be marked const.
+   * whereas calling the current constructor allows sizing and initializing an
+   * object right away so that it can be marked const.
    *
-   * Using this constructor, you can do things like this (shown here for
-   * a two-dimensional table, but the same works for the current class):
+   * Using this constructor, you can do things like this (shown here for a
+   * two-dimensional table, but the same works for the current class):
    * @code
    *   const double values[] = { 1, 2, 3, 4, 5, 6 };
    *   const Table<2,double> t(2, 3, entries, true);
@@ -1214,14 +1013,12 @@ public:
    * @param size1 The size of this table in the first dimension.
    * @param size2 The size of this table in the second dimension.
    * @param size3 The size of this table in the third dimension.
-   * @param entries An iterator to a set of elements from which to
-   *   initialize this table. It is assumed that iterator can be
-   *   incremented and dereferenced a sufficient number of times
-   *   to fill this table.
-   * @param C_style_indexing If true, run over elements of the
-   *   table with the last index changing fastest as we dereference
-   *   subsequent elements of the input range. If false, change
-   *   the first index fastest.
+   * @param entries An iterator to a set of elements from which to initialize
+   * this table. It is assumed that iterator can be incremented and
+   * dereferenced a sufficient number of times to fill this table.
+   * @param C_style_indexing If true, run over elements of the table with the
+   * last index changing fastest as we dereference subsequent elements of the
+   * input range. If false, change the first index fastest.
    */
   template <typename InputIterator>
   Table (const unsigned int size1,
@@ -1231,41 +1028,30 @@ public:
          const bool      C_style_indexing = true);
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested two-dimensional
-   * subobject of this
-   * three-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested two-
+   * dimensional subobject of this three-dimensional table. Range checks are
+   * performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<3,T,true,2>
   operator [] (const unsigned int i) const;
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested two-dimensional
-   * subobject of this
-   * three-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested two-
+   * dimensional subobject of this three-dimensional table. Range checks are
+   * performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<3,T,false,2>
   operator [] (const unsigned int i);
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   typename AlignedVector<T>::const_reference operator () (const unsigned int i,
                                                           const unsigned int j,
@@ -1273,31 +1059,24 @@ public:
 
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   typename AlignedVector<T>::reference operator () (const unsigned int i,
                                                     const unsigned int j,
                                                     const unsigned int k);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::reference operator () (const TableIndices<3> &indices);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::const_reference operator () (const TableIndices<3> &indices) const;
 };
@@ -1305,11 +1084,11 @@ public:
 
 
 /**
- * A class representing a four-dimensional table of objects (not
- * necessarily only numbers).
+ * A class representing a four-dimensional table of objects (not necessarily
+ * only numbers).
  *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
+ * For the rationale of this class, and a description of the interface, see
+ * the base class.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
@@ -1319,15 +1098,12 @@ class Table<4,T> : public TableBase<4,T>
 {
 public:
   /**
-   * Default constructor. Set all
-   * dimensions to zero.
+   * Default constructor. Set all dimensions to zero.
    */
   Table ();
 
   /**
-   * Constructor. Pass down the
-   * given dimensions to the base
-   * class.
+   * Constructor. Pass down the given dimensions to the base class.
    */
   Table (const unsigned int size1,
          const unsigned int size2,
@@ -1335,41 +1111,30 @@ public:
          const unsigned int size4);
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested three-dimensional
-   * subobject of this
-   * four-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested three-
+   * dimensional subobject of this four-dimensional table. Range checks are
+   * performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<4,T,true,3>
   operator [] (const unsigned int i) const;
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested three-dimensional
-   * subobject of this
-   * four-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested three-
+   * dimensional subobject of this four-dimensional table. Range checks are
+   * performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<4,T,false,3>
   operator [] (const unsigned int i);
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   typename AlignedVector<T>::const_reference operator () (const unsigned int i,
                                                           const unsigned int j,
@@ -1378,13 +1143,10 @@ public:
 
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   typename AlignedVector<T>::reference operator () (const unsigned int i,
                                                     const unsigned int j,
@@ -1392,19 +1154,15 @@ public:
                                                     const unsigned int l);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::reference
   operator () (const TableIndices<4> &indices);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::const_reference
   operator () (const TableIndices<4> &indices) const;
@@ -1413,11 +1171,11 @@ public:
 
 
 /**
- * A class representing a five-dimensional table of objects (not
- * necessarily only numbers).
+ * A class representing a five-dimensional table of objects (not necessarily
+ * only numbers).
  *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
+ * For the rationale of this class, and a description of the interface, see
+ * the base class.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
@@ -1427,15 +1185,12 @@ class Table<5,T> : public TableBase<5,T>
 {
 public:
   /**
-   * Default constructor. Set all
-   * dimensions to zero.
+   * Default constructor. Set all dimensions to zero.
    */
   Table ();
 
   /**
-   * Constructor. Pass down the
-   * given dimensions to the base
-   * class.
+   * Constructor. Pass down the given dimensions to the base class.
    */
   Table (const unsigned int size1,
          const unsigned int size2,
@@ -1444,41 +1199,30 @@ public:
          const unsigned int size5);
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested four-dimensional
-   * subobject of this
-   * five-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested four-
+   * dimensional subobject of this five-dimensional table. Range checks are
+   * performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<5,T,true,4>
   operator [] (const unsigned int i) const;
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested four-dimensional
-   * subobject of this
-   * five-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested four-
+   * dimensional subobject of this five-dimensional table. Range checks are
+   * performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<5,T,false,4>
   operator [] (const unsigned int i);
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   typename AlignedVector<T>::const_reference operator () (const unsigned int i,
                                                           const unsigned int j,
@@ -1487,13 +1231,10 @@ public:
                                                           const unsigned int m) const;
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   typename AlignedVector<T>::reference operator () (const unsigned int i,
                                                     const unsigned int j,
@@ -1502,19 +1243,15 @@ public:
                                                     const unsigned int m);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::reference
   operator () (const TableIndices<5> &indices);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::const_reference
   operator () (const TableIndices<5> &indices) const;
@@ -1523,11 +1260,11 @@ public:
 
 
 /**
- * A class representing a six-dimensional table of objects (not
- * necessarily only numbers).
+ * A class representing a six-dimensional table of objects (not necessarily
+ * only numbers).
  *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
+ * For the rationale of this class, and a description of the interface, see
+ * the base class.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
@@ -1537,15 +1274,12 @@ class Table<6,T> : public TableBase<6,T>
 {
 public:
   /**
-   * Default constructor. Set all
-   * dimensions to zero.
+   * Default constructor. Set all dimensions to zero.
    */
   Table ();
 
   /**
-   * Constructor. Pass down the
-   * given dimensions to the base
-   * class.
+   * Constructor. Pass down the given dimensions to the base class.
    */
   Table (const unsigned int size1,
          const unsigned int size2,
@@ -1555,41 +1289,30 @@ public:
          const unsigned int size6);
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested five-dimensional
-   * subobject of this
-   * six-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested five-
+   * dimensional subobject of this six-dimensional table. Range checks are
+   * performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<6,T,true,5>
   operator [] (const unsigned int i) const;
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested five-dimensional
-   * subobject of this
-   * six-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested five-
+   * dimensional subobject of this six-dimensional table. Range checks are
+   * performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<6,T,false,5>
   operator [] (const unsigned int i);
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   typename AlignedVector<T>::const_reference operator () (const unsigned int i,
                                                           const unsigned int j,
@@ -1599,13 +1322,10 @@ public:
                                                           const unsigned int n) const;
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   typename AlignedVector<T>::reference operator () (const unsigned int i,
                                                     const unsigned int j,
@@ -1615,19 +1335,15 @@ public:
                                                     const unsigned int n);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::reference
   operator () (const TableIndices<6> &indices);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::const_reference
   operator () (const TableIndices<6> &indices) const;
@@ -1635,11 +1351,11 @@ public:
 
 
 /**
- * A class representing a seven-dimensional table of objects (not
- * necessarily only numbers).
+ * A class representing a seven-dimensional table of objects (not necessarily
+ * only numbers).
  *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
+ * For the rationale of this class, and a description of the interface, see
+ * the base class.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
@@ -1649,15 +1365,12 @@ class Table<7,T> : public TableBase<7,T>
 {
 public:
   /**
-   * Default constructor. Set all
-   * dimensions to zero.
+   * Default constructor. Set all dimensions to zero.
    */
   Table ();
 
   /**
-   * Constructor. Pass down the
-   * given dimensions to the base
-   * class.
+   * Constructor. Pass down the given dimensions to the base class.
    */
   Table (const unsigned int size1,
          const unsigned int size2,
@@ -1668,41 +1381,30 @@ public:
          const unsigned int size7);
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested six-dimensional
-   * subobject of this
-   * seven-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested six-
+   * dimensional subobject of this seven-dimensional table. Range checks are
+   * performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<7,T,true,6>
   operator [] (const unsigned int i) const;
 
   /**
-   * Access operator. Generate an
-   * object that accesses the
-   * requested six-dimensional
-   * subobject of this
-   * seven-dimensional table. Range
-   * checks are performed.
+   * Access operator. Generate an object that accesses the requested six-
+   * dimensional subobject of this seven-dimensional table. Range checks are
+   * performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<7,T,false,6>
   operator [] (const unsigned int i);
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   typename AlignedVector<T>::const_reference operator () (const unsigned int i,
                                                           const unsigned int j,
@@ -1713,13 +1415,10 @@ public:
                                                           const unsigned int o) const;
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   typename AlignedVector<T>::reference operator () (const unsigned int i,
                                                     const unsigned int j,
@@ -1730,19 +1429,15 @@ public:
                                                     const unsigned int o);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::reference
   operator () (const TableIndices<7> &indices);
 
   /**
-   * Make the corresponding
-   * operator () from the TableBase
-   * base class available also in
-   * this class.
+   * Make the corresponding operator () from the TableBase base class
+   * available also in this class.
    */
   typename AlignedVector<T>::const_reference
   operator () (const TableIndices<7> &indices) const;
@@ -1756,9 +1451,9 @@ public:
  * convention). The only real difference is therefore really in the storage
  * format.
  *
- * This class copies the functions of Table<2,T>, but the element
- * access and the dimensions will be for the transpose ordering of the
- * data field in TableBase.
+ * This class copies the functions of Table<2,T>, but the element access and
+ * the dimensions will be for the transpose ordering of the data field in
+ * TableBase.
  *
  * @ingroup data
  * @author Guido Kanschat, 2005
@@ -1768,118 +1463,85 @@ class TransposeTable : public TableBase<2,T>
 {
 public:
   /**
-   * Default constructor. Set all
-   * dimensions to zero.
+   * Default constructor. Set all dimensions to zero.
    */
   TransposeTable ();
 
   /**
-   * Constructor. Pass down the
-   * given dimensions to the base
-   * class.
+   * Constructor. Pass down the given dimensions to the base class.
    */
   TransposeTable (const unsigned int size1,
                   const unsigned int size2);
 
   /**
-   * Reinitialize the object. This
-   * function is mostly here for
-   * compatibility with the earlier
-   * <tt>vector2d</tt> class. Passes
-   * down to the base class by
-   * converting the arguments to
-   * the data type requested by the
-   * base class.
+   * Reinitialize the object. This function is mostly here for compatibility
+   * with the earlier <tt>vector2d</tt> class. Passes down to the base class
+   * by converting the arguments to the data type requested by the base class.
    */
   void reinit (const unsigned int size1,
                const unsigned int size2,
                const bool         fast = false);
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * only allows read access.
+   * This version of the function only allows read access.
    */
   typename AlignedVector<T>::const_reference operator () (const unsigned int i,
                                                           const unsigned int j) const;
 
   /**
-   * Direct access to one element
-   * of the table by specifying all
-   * indices at the same time. Range
-   * checks are performed.
+   * Direct access to one element of the table by specifying all indices at
+   * the same time. Range checks are performed.
    *
-   * This version of the function
-   * allows read-write access.
+   * This version of the function allows read-write access.
    */
   typename AlignedVector<T>::reference operator () (const unsigned int i,
                                                     const unsigned int j);
 
   /**
-   * Number of rows. This function
-   * really makes only sense since
-   * we have a two-dimensional
-   * object here.
+   * Number of rows. This function really makes only sense since we have a
+   * two-dimensional object here.
    */
   unsigned int n_rows () const;
 
   /**
-   * Number of columns. This function
-   * really makes only sense since
-   * we have a two-dimensional
-   * object here.
+   * Number of columns. This function really makes only sense since we have a
+   * two-dimensional object here.
    */
   unsigned int n_cols () const;
 
 protected:
   /**
-   * Return a read-write reference
-   * to the element <tt>(i,j)</tt>.
+   * Return a read-write reference to the element <tt>(i,j)</tt>.
    *
-   * This function does no bounds
-   * checking and is only to be
-   * used internally and in
-   * functions already checked.
+   * This function does no bounds checking and is only to be used internally
+   * and in functions already checked.
    *
-   * These functions are mainly
-   * here for compatibility with a
-   * former implementation of these
-   * table classes for 2d arrays,
-   * then called <tt>vector2d</tt>.
+   * These functions are mainly here for compatibility with a former
+   * implementation of these table classes for 2d arrays, then called
+   * <tt>vector2d</tt>.
    */
   typename AlignedVector<T>::reference el (const unsigned int i,
-                                         const unsigned int j);
+                                           const unsigned int j);
 
   /**
-   * Return the value of the
-   * element <tt>(i,j)</tt> as a
-   * read-only reference.
+   * Return the value of the element <tt>(i,j)</tt> as a read-only reference.
    *
-   * This function does no bounds
-   * checking and is only to be
-   * used internally and in
-   * functions already checked.
+   * This function does no bounds checking and is only to be used internally
+   * and in functions already checked.
    *
-   * We return the requested value
-   * as a constant reference rather
-   * than by value since this
-   * object may hold data types
-   * that may be large, and we
-   * don't know here whether
-   * copying is expensive or not.
+   * We return the requested value as a constant reference rather than by
+   * value since this object may hold data types that may be large, and we
+   * don't know here whether copying is expensive or not.
    *
-   * These functions are mainly
-   * here for compatibility with a
-   * former implementation of these
-   * table classes for 2d arrays,
-   * then called <tt>vector2d</tt>.
+   * These functions are mainly here for compatibility with a former
+   * implementation of these table classes for 2d arrays, then called
+   * <tt>vector2d</tt>.
    */
   typename AlignedVector<T>::const_reference el (const unsigned int i,
-                                               const unsigned int j) const;
+                                                 const unsigned int j) const;
 };
 
 
@@ -2282,7 +1944,7 @@ namespace internal
 
     template <typename InputIterator, typename T, int N>
     void fill_Fortran_style (InputIterator,
-                             TableBase<N,T>  &)
+                             TableBase<N,T> &)
     {
       Assert (false, ExcNotImplemented());
     }
@@ -2302,7 +1964,7 @@ TableBase<N,T>::fill (InputIterator entries,
 
   if (C_style_indexing)
     for (typename AlignedVector<T>::iterator p = values.begin();
-        p != values.end(); ++p)
+         p != values.end(); ++p)
       *p = *entries++;
   else
     internal::Table::fill_Fortran_style (entries, *this);
@@ -3461,9 +3123,9 @@ Table<7,T>::operator () (const TableIndices<7> &indices)
 
 
 /**
- * Global function @p swap which overloads the default implementation
- * of the C++ standard library which uses a temporary object. The
- * function simply exchanges the data of the two tables.
+ * Global function @p swap which overloads the default implementation of the
+ * C++ standard library which uses a temporary object. The function simply
+ * exchanges the data of the two tables.
  *
  * @author Martin Kronbichler, 2013
  */

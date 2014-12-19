@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2009 - 2013 by the deal.II authors
 //
@@ -119,7 +118,9 @@ FE_FaceQ<dim,spacedim>::get_name () const
   // particular format of the string this function returns, so they have to be
   // kept in synch
   std::ostringstream namebuf;
-  namebuf << "FE_FaceQ<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_FaceQ<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << this->degree << ")";
 
   return namebuf.str();
 }
@@ -296,7 +297,7 @@ FE_FaceQ<dim,spacedim>::get_constant_modes () const
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     constant_modes(0,i) = true;
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, std::vector<unsigned int>(1, 0));
+         (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 
@@ -337,7 +338,9 @@ FE_FaceQ<1,spacedim>::get_name () const
   // particular format of the string this function returns, so they have to be
   // kept in synch
   std::ostringstream namebuf;
-  namebuf << "FE_FaceQ<1>(" << this->degree << ")";
+  namebuf << "FE_FaceQ<"
+          << Utilities::dim_string(1,spacedim)
+          << ">(" << this->degree << ")";
 
   return namebuf.str();
 }
@@ -424,7 +427,7 @@ FE_FaceQ<1,spacedim>::get_constant_modes () const
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     constant_modes(0,i) = true;
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, std::vector<unsigned int>(1,0));
+         (constant_modes, std::vector<unsigned int>(1,0));
 }
 
 
@@ -471,7 +474,7 @@ typename Mapping<1,spacedim>::InternalDataBase *
 FE_FaceQ<1,spacedim>::get_face_data (
   const UpdateFlags update_flags,
   const Mapping<1,spacedim> &,
-  const Quadrature<0>& quadrature) const
+  const Quadrature<0> &quadrature) const
 {
   // generate a new data object and initialize some fields
   typename Mapping<1,spacedim>::InternalDataBase *data =
@@ -503,7 +506,7 @@ typename Mapping<1,spacedim>::InternalDataBase *
 FE_FaceQ<1,spacedim>::get_subface_data (
   const UpdateFlags flags,
   const Mapping<1,spacedim> &mapping,
-  const Quadrature<0>& quadrature) const
+  const Quadrature<0> &quadrature) const
 {
   return get_face_data (flags, mapping, quadrature);
 }
@@ -532,7 +535,7 @@ FE_FaceQ<1,spacedim>::fill_fe_face_values (
   const Mapping<1,spacedim> &,
   const typename Triangulation<1,spacedim>::cell_iterator &,
   const unsigned int face,
-  const Quadrature<0>& quadrature,
+  const Quadrature<0> &quadrature,
   typename Mapping<1,spacedim>::InternalDataBase &,
   typename Mapping<1,spacedim>::InternalDataBase &fedata,
   FEValuesData<1,spacedim> &data) const
@@ -556,7 +559,7 @@ FE_FaceQ<1,spacedim>::fill_fe_subface_values (
   const typename Triangulation<1,spacedim>::cell_iterator &,
   const unsigned int ,
   const unsigned int ,
-  const Quadrature<0>& ,
+  const Quadrature<0> &,
   typename Mapping<1,spacedim>::InternalDataBase &,
   typename Mapping<1,spacedim>::InternalDataBase &,
   FEValuesData<1,spacedim> &) const
@@ -596,7 +599,9 @@ FE_FaceP<dim,spacedim>::get_name () const
   // particular format of the string this function returns, so they have to be
   // kept in synch
   std::ostringstream namebuf;
-  namebuf << "FE_FaceP<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_FaceP<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << this->degree << ")";
 
   return namebuf.str();
 }
@@ -789,7 +794,7 @@ FE_FaceP<dim,spacedim>::get_constant_modes () const
   for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
     constant_modes(0, face*this->dofs_per_face) = true;
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, std::vector<unsigned int>(1, 0));
+         (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 
@@ -810,7 +815,9 @@ FE_FaceP<1,spacedim>::get_name () const
   // particular format of the string this function returns, so they have to be
   // kept in synch
   std::ostringstream namebuf;
-  namebuf << "FE_FaceP<1>(" << this->degree << ")";
+  namebuf << "FE_FaceP<"
+          << Utilities::dim_string(1,spacedim)
+          << ">(" << this->degree << ")";
 
   return namebuf.str();
 }

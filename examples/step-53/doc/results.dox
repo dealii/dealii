@@ -1,2 +1,282 @@
 <h1>Results</h1>
 
+Running the program produces a mesh file <code>mesh.vtu</code> that we can
+visualize with any of the usual visualization programs that can read the VTU
+file format. If one just looks at the mesh itself, it is actually very difficult
+to see anything that doesn't just look like a perfectly round piece of a
+sphere (though if one modified the program so that it does produce a sphere and
+looked at them at the same time, the difference between the overall sphere and
+WGS 84 shape is quite apparent). Apparently, Earth is actually quite a flat place.
+Of course we already know this from satellite pictures. 
+However, we can tease out something more by
+coloring cells by their volume. This both produces slight variations in hue
+along the top surface and something for the visualization programs to apply
+their shading algorithms to (because the top surfaces of the cells are now no
+longer just tangential to a sphere but tilted):
+
+<img src="http://www.dealii.org/images/steps/developer/step-53.mesh.png" alt="">
+
+Yet, at least as far as visualizations are concerned, this is still not too
+impressive. Rather, let us visualize things in a way so that we show the
+actual elevation along the top surface. In other words, we want a picture like
+this, with an incredible amount of detail:
+
+<img src="http://www.dealii.org/images/steps/developer/step-53.topo.png" alt="">
+
+A zoom-in of this picture shows the vertical displacement quite clearly (here,
+looking from the West-Northwest over the rift valley, the triple peaks
+of 
+<a href="http://en.wikipedia.org/wiki/Mount_Stanley">Mount Stanley</a>,
+<a href="http://en.wikipedia.org/wiki/Mount_Speke">Mount Speke</a>, and
+<a href="http://en.wikipedia.org/wiki/Mount_Baker_%28Uganda%29">Mount Baker</a>
+in the
+<a href="http://en.wikipedia.org/wiki/Rwenzori_Mountains">Rwenzori Range</a>,
+<a href="http://en.wikipedia.org/wiki/Lake_George_%28Uganda%29">Lake
+George</a>
+and toward the great flatness of
+<a href="http://en.wikipedia.org/wiki/Lake_Victoria">Lake Victoria</a>):
+
+<img src="http://www.dealii.org/images/steps/developer/step-53.topozoom.png" alt="">
+
+
+These image were produced with three small modifications: 
+<ol>
+  <li> An additional seventh mesh refinement towards the top surface for the
+  first of these two pictures, and a total of nine for the second. In the
+  second image, the horizontal mesh size is approximately 1.5km, and just
+  under 1km in vertical direction. (The picture was also created using a
+  more resolved data set; however, it is too big to distribute as part of
+  the tutorial.)
+  
+  <li> The addition of the following function that, given a point 
+  <code>x</code> computes the elevation by converting the point to
+  reference WGS 84 coordinates and only keeping the depth variable (the
+  function is, consequently, a simplified version of the
+  <code>AfricaGeometry::pull_back_wgs84()</code> function):
+
+@code
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
+
+
+double get_elevation (const Point<3> &x)
+  {
+    const double R           = 6378137;
+    const double ellipticity = 8.1819190842622e-2;
+
+    const double b     = std::sqrt(R * R * (1 - ellipticity * ellipticity));
+    const double ep    = std::sqrt((R * R - b * b) / (b * b));
+    const double p     = std::sqrt(x(0) * x(0) + x(1) * x(1));
+    const double th    = std::atan2(R * x(2), b * p);
+    const double theta = std::atan2((x(2) + ep * ep * b * std::sin(th) * std::sin(th) * std::sin(th)),
+                                      (p - (ellipticity * ellipticity * R  * (std::cos(th) * std::cos(th) * std::cos(th)))));
+    const double R_bar = R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) * std::sin(theta)));
+    const double R_plus_d = p / std::cos(theta);
+
+    return R_plus_d - R_bar;
+  }
+@endcode
+
+  <li>Adding the following piece to the bottom of the <code>run()</code> function:
+
+@code
+      FE_Q<3>       fe(1);
+      DoFHandler<3> dof_handler (triangulation);
+      dof_handler.distribute_dofs(fe);
+
+      Vector<double> elevation (dof_handler.n_dofs());
+      {
+        std::map<unsigned int,double> boundary_values;
+        VectorTools::interpolate_boundary_values(dof_handler,
+                                                 5,
+                                                 ScalarFunctionFromFunctionObject<3>(get_elevation),
+                                                 boundary_values);
+        for (std::map<unsigned int,double>::const_iterator p = boundary_values.begin(); 
+             p!=boundary_values.end(); ++p)
+          elevation[p->first] = p->second;
+      }
+
+      DataOut<3>    data_out;
+      data_out.attach_dof_handler(dof_handler);
+      data_out.add_data_vector (elevation, "elevation");
+      data_out.build_patches();
+
+      std::ofstream out ("data.vtu");
+      data_out.write_vtu (out);
+@endcode
+</ol>
+This last piece of code first creates a $Q_1$ finite element space on the mesh.
+It then (ab)uses VectorTools::interpolate_boundary_values() to evaluate the
+elevation function for every node at the top boundary (the one with boundary
+indicator 5). We here wrap the call to <code>get_elevation()</code> with the
+ScalarFunctionFromFunctionObject class to make a regular C++ function look
+like an object of a class derived from the Function class that we want
+to use in VectorTools::interpolate_boundary_values(). Having so gotten a list
+of degrees of freedom located at the top boundary and corresponding elevation
+values, we just go down this list and set these elevations in the 
+<code>elevation</code> vector (leaving all interior degrees of freedom at
+their original zero value). This vector is then output using DataOut as
+usual and can be visualized as shown above.
+
+
+<h3>Issues with adaptively refined meshes generated this way</h3>
+
+If you zoomed in on the mesh shown above and looked closely enough, you would
+find that at hanging nodes, the two small edges connecting to the hanging
+nodes are not in exactly the same location as the large edge of the
+neighboring cell. This can be shown more clearly by using a different surface
+description in which we enlarge the vertical topography to enhance the effect
+(courtesy of Alexander Grayver):
+
+<img src="http://www.dealii.org/images/steps/developer/step-53.smooth-geometry.png" alt="">
+
+So what is happening here? Partly, this is only a result of visualization, but
+there is an underlying real cause as well:
+
+<ul>
+  <li>When you visualize a mesh using any of the common visualization
+  programs, what they really show you is just a set of edges that are plotted
+  as straight lines in three-dimensional space. This is so because almost all
+  data file formats for visualizing data only describe hexahedral cells as a
+  collection of eight vertices in 3d space, and do not allow to any more
+  complicated descriptions. (This is the main reason why
+  DataOut::build_patches() takes an argument that can be set to something
+  larger than one.) These linear edges may be the edges of the cell you do
+  actual computations on, or they may not, depending on what kind of mapping
+  you use when you do your integrations using FEValues. By default, of course,
+  FEValues uses a linear mapping (i.e., an object of class MappingQ1) and in
+  that case a 3d cell is indeed described exclusively by its 8 vertices and
+  the volume it fills is a trilinear interpolation between these points,
+  resulting in linear edges. But, you could also have used tri-quadratic,
+  tri-cubic, or even higher order mappings and in these cases the volume of
+  each cell will be bounded by quadratic, cubic or higher order polynomial
+  curves. Yet, you only get to see these with linear edges in the
+  visualization program because, as mentioned, file formats do not allow to
+  describe the real geometry of cells.
+
+  <li>That said, let us for simplicity assume that you are indeed using a
+  trilinear mapping, then the image shown above is a faithful representation
+  of the cells on which you form your integrals. In this case, indeed the
+  small cells at a hanging nodes do not, in general, snugly fit against the
+  large cell but leave a gap or may intersect the larger cell. Why is this?
+  Because when the triangulation needs a new vertex on an edge it wants to
+  refine, it asks the manifold description where this new vertex is supposed
+  to be, and the manifold description duly returns such a point by (in the
+  case of a geometry derived from ChartManifold) pulling the adjacent points
+  of the line back to the reference domain, averaging their locations, and
+  pushing forward this new location to the real domain. But this new location
+  is not usually along a straight line (in real space) between the adjacent
+  vertices and consequently the two small straight lines forming the refined
+  edge do not lie exactly on the one large straight line forming the unrefined
+  side of the hanging node.
+</ul>
+
+The situation is slightly more complicated if you use a higher order mapping
+using the MappingQ class, but not fundamentally different. Let's take a
+quadratic mapping for the moment (nothing fundamental changes with even higher
+order mappings). Then you need to imagine each edge of the cells you integrate
+on as a quadratic curve despite the fact that you will never actually see it
+plotted that way by a visualization program. But imagine it that way for a
+second. So which quadratic curve does MappingQ take? It is the quadratic curve
+that goes through the two vertices at the end of the edge as well as a point
+in the middle that it queries from the manifold. In the case of the long edge
+on the unrefined side, that's of course exactly the location of the hanging
+node, so the quadratic curve describing the long edge does go through the
+hanging node, unlike in the case of the linear mapping. But the two small
+edges are also quadratic curves; for example, the left small edge will go
+through the left vertex of the long edge and the hanging node, plus a point it
+queries halfway in between from the manifold. Because, as before, the point
+the manifold returns halfway along the left small edge is rarely exactly on
+the quadratic curve describing the long edge, the quadratic short edge will
+typically not coincide with the left half of the quadratic long edge, and the
+same is true for the right short edge. In other words, again, the geometries
+of the large cell and its smaller neighbors at hanging nodes do not touch
+snuggly.
+
+This all begs two questions: first, does it matter, and second, could this be
+fixed. Let us discuss these in the following:
+
+<ul>
+  <li>Does it matter? It is almost certainly true that this depends on the
+  equation you are solving. For example, it is known that solving the Euler
+  equations of gas dynamics on complex geometries requires highly accurate
+  boundary descriptions to ensure convergence of quantities that are measure
+  the flow close to the boundary. On the other hand, equations with elliptic
+  components (e.g., the Laplace or Stokes equations) are typically rather
+  forgiving of these issues: one does quadrature anyway to approximate
+  integrals, and further approximating the geometry may not do as much harm as
+  one could fear given that the volume of the overlaps or gaps at every
+  hanging node is only ${\cal O}(h^d)$ even with a linear mapping and ${\cal
+  O}(h^{d+p-1})$ for a mapping of degree $p$. (You can see this by considering
+  that in 2d the gap/overlap is a triangle with base $h$ and height ${\cal
+  O}(h)$; in 3d, it is a pyramid-like structure with base area $h^2$ and
+  height ${\cal O}(h)$. Similar considerations apply for higher order mappings
+  where the height of the gaps/overlaps is ${\cal O}(h^p)$.) In other words,
+  if you use a linear mapping with linear elements, the error in the volume
+  you integrate over is already at the same level as the integration error
+  using the usual Gauss quadrature. Of course, for higher order elements one
+  would have to choose matching mapping objects.
+
+  Another point of view on why it is probably not worth worrying too much
+  about the issue is that there is certainly no narrative in the community of
+  numerical analysts that these issues are a major concern one needs to watch
+  out for when using complex geometries. If it does not seem to be discussed
+  often among practitioners, if ever at all, then it is at least not something
+  people have identified as a common problem.
+
+  This issue is not dissimilar to having hanging nodes at curved boundaries
+  where the geometry description of the boundary typically pulls a hanging
+  node onto the boundary whereas the large edge remains straight, making the
+  adjacent small and large cells not match each other. Although this behavior
+  existed in deal.II since its beginning, 15 years before manifold
+  descriptions became available, it did not ever come up in mailing list
+  discussions or conversations with colleagues.
+
+  <li>Could it be fixed? In principle, yes, but it's a complicated
+  issue. Let's assume for the moment that we would only ever use the MappingQ1
+  class, i.e., linear mappings. In that case, whenever the triangulation class
+  requires a new vertex along an edge that would become a hanging node, it
+  would just take the mean value of the adjacent vertices <i>in real
+  space</i>, i.e., without asking the manifold description. This way, the
+  point lies on the long straight edge and the two short straight edges would
+  match the one long edge. Only when all adjacent cells have been refined and
+  the point is no longer a hanging node would we replace its coordinates by
+  coordinates we get by a manifold. This may be awkward to implement, but it
+  would certainly be possible.
+
+  The more complicated issue arises because people may want to use a higher
+  order MappingQ object. In that case, the Triangulation class may freely
+  choose the location of the hanging node (because the quadratic curve for the
+  long edge can be chosen in such a way that it goes through the hanging node)
+  but the MappingQ class, when determining the location of mid-edge points
+  must make sure that if the edge is one half of a long edge of a neighboring
+  coarser cell, then the midpoint cannot be obtained from the manifold but
+  must be chosen along the long quadratic edge. For cubic (and all other odd)
+  mappings, the matter is again a bit complicated because one typically
+  arranges the cubic edge to go through points 1/3 and 2/3 along the edge, and
+  thus necessarily through the hanging node, but this could probably be worked
+  out. In any case, even then, there are two problems with this:
+
+  - When refining the triangulation, the Triangulation class can not know what
+    mapping will be used. In fact it is not uncommon for a triangulation to be
+    used differently in different contexts within the same program. If the
+    mapping used determines whether we can freely choose a point or not, how,
+    then, should the triangulation locate new vertices?
+  - Mappings are purely local constructs: they only work on a cell in
+    isolation, and this is one of the important features of the finite element
+    method. Having to ask whether one of the vertices of an edge is a hanging
+    node requires querying the neighborhood of a cell; furthermore, such a
+    query does not just involve the 6 face neighbors of a cell in 3d, but may
+    require traversing a possibly very large number of other cells that
+    connect to an edge. Even if it can be done, one still needs to do
+    different things depending on how the neighborhood looks like, producing
+    code that is likely very complex, hard to maintain, and possibly slow.
+
+  Consequently, at least for the moment, none of these ideas are
+  implemented. This leads to the undesirable consequence of discontinuous
+  geometries, but, as discussed above, the effects of this do not appear to
+  pose problem in actual practice.
+
+</ul>

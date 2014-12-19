@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2013 by the deal.II authors
 //
@@ -30,10 +29,8 @@ namespace internal
   namespace DoFHandler
   {
     /**
-     * A structure used by the
-     * DoFHandler classes to store
-     * information about the degrees
-     * of freedom they deal with.
+     * A structure used by the DoFHandler classes to store information about
+     * the degrees of freedom they deal with.
      */
     struct NumberCache
     {
@@ -43,9 +40,8 @@ namespace internal
       NumberCache ();
 
       /**
-       * Determine an estimate for the
-       * memory consumption (in bytes) of
-       * this object.
+       * Determine an estimate for the memory consumption (in bytes) of this
+       * object.
        */
       std::size_t memory_consumption () const;
 
@@ -55,58 +51,41 @@ namespace internal
       void clear ();
 
       /**
-       * Total number of dofs,
-       * accumulated over all
-       * processors that may
+       * Total number of dofs, accumulated over all processors that may
        * participate on this mesh.
        */
       types::global_dof_index n_global_dofs;
 
       /**
-       * Number of dofs owned by
-       * this MPI process. If this
-       * is a sequential
-       * computation, then this
-       * equals n_global_dofs.
+       * Number of dofs owned by this MPI process. If this is a sequential
+       * computation, then this equals n_global_dofs.
        */
       types::global_dof_index n_locally_owned_dofs;
 
       /**
-       * An index set denoting the
-       * set of locally owned
-       * dofs. If this is a
-       * sequential computation,
-       * then it contains the
-       * entire range
+       * An index set denoting the set of locally owned dofs. If this is a
+       * sequential computation, then it contains the entire range
        * [0,n_global_dofs).
        */
       IndexSet locally_owned_dofs;
 
       /**
-       * The number of dofs owned
-       * by each of the various MPI
-       * processes. If this is a
-       * sequential job, then the
-       * vector contains a single
-       * element equal to
-       * n_global_dofs.
+       * The number of dofs owned by each of the various MPI processes. If
+       * this is a sequential job, then the vector contains a single element
+       * equal to n_global_dofs.
        */
       std::vector<types::global_dof_index> n_locally_owned_dofs_per_processor;
 
       /**
-       * The dofs owned by each of
-       * the various MPI
-       * processes. If this is a
-       * sequential job, then the
-       * vector has a single
-       * element equal to
+       * The dofs owned by each of the various MPI processes. If this is a
+       * sequential job, then the vector has a single element equal to
        * locally_owned_dofs.
        */
       std::vector<IndexSet> locally_owned_dofs_per_processor;
 
       /**
-       * Read or write the data of this object to or
-       * from a stream for the purpose of serialization
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
        */
       template <class Archive>
       void serialize (Archive &ar,

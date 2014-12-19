@@ -1,5 +1,4 @@
 /* ---------------------------------------------------------------------
- * $Id$
  *
  * Copyright (C) 2009 - 2013 by the deal.II authors
  *
@@ -511,7 +510,7 @@ namespace Step35
     // the iterators stored internally is moved up one step as well, thereby
     // always staying in sync. As it so happens, there is a deal.II class that
     // facilitates this sort of thing.
-    typedef std_cxx1x::tuple< typename DoFHandler<dim>::active_cell_iterator,
+    typedef std_cxx11::tuple< typename DoFHandler<dim>::active_cell_iterator,
             typename DoFHandler<dim>::active_cell_iterator
             > IteratorTuple;
 
@@ -892,11 +891,11 @@ namespace Step35
                                  InitGradScratchData &scratch,
                                  InitGradPerTaskData &data)
   {
-    scratch.fe_val_vel.reinit (std_cxx1x::get<0> (SI.iterators));
-    scratch.fe_val_pres.reinit (std_cxx1x::get<1> (SI.iterators));
+    scratch.fe_val_vel.reinit (std_cxx11::get<0> (SI.iterators));
+    scratch.fe_val_pres.reinit (std_cxx11::get<1> (SI.iterators));
 
-    std_cxx1x::get<0> (SI.iterators)->get_dof_indices (data.vel_local_dof_indices);
-    std_cxx1x::get<1> (SI.iterators)->get_dof_indices (data.pres_local_dof_indices);
+    std_cxx11::get<0> (SI.iterators)->get_dof_indices (data.vel_local_dof_indices);
+    std_cxx11::get<1> (SI.iterators)->get_dof_indices (data.pres_local_dof_indices);
 
     data.local_grad = 0.;
     for (unsigned int q=0; q<scratch.nqp; ++q)

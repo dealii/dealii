@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2013 by the deal.II authors
 //
@@ -111,7 +110,7 @@ namespace Step22
     BlockVector<double> solution;
     BlockVector<double> system_rhs;
 
-    std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>
+    std_cxx11::shared_ptr<typename InnerPreconditioner<dim>::type>
     A_preconditioner;
 
     ConvergenceTable convergence_table;
@@ -627,7 +626,7 @@ namespace Step22
       }
 
     A_preconditioner
-      = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new
+      = std_cxx11::shared_ptr<typename InnerPreconditioner<dim>::type>(new
           typename InnerPreconditioner<dim>::type());
     A_preconditioner->initialize (system_matrix.block(0,0),
                                   typename

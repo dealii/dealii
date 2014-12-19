@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2006 - 2013 by the deal.II authors
 //
@@ -51,7 +50,7 @@ void check(DataOutBase::DXFlags flags,
   names[3] = "x4";
   names[4] = "i";
 
-  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
+  std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > vectors;
 
   DataOutBase::write_dx(patches, names, vectors, flags, out);
 }
@@ -69,7 +68,7 @@ void check_cont(unsigned int ncells,
 
   std::vector<std::string> names(1);
   names[0] = "CutOff";
-  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
+  std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > vectors;
   DataOutBase::write_dx(patches, names, vectors, flags, out);
 }
 

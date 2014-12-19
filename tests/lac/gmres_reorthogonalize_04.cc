@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2013 by the deal.II authors
 //
@@ -88,7 +87,7 @@ int main()
   deallog.push("double");
   test<double>();
   deallog.pop();
-  deallog.threshold_double(1.e-4);
+  deallog.threshold_double(2.e-4);
   deallog.push("float");
   test<float>();
   deallog.pop();

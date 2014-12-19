@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2009 - 2013 by the deal.II authors
 //
@@ -37,10 +36,9 @@ namespace parallel
 
     /**
      * Collection of functions controlling refinement and coarsening of
-     * parallel::distributed::Triangulation objects. This namespace
-     * provides similar functionality to the dealii::GridRefinement
-     * namespace, except that it works for meshes that are parallel and
-     * distributed.
+     * parallel::distributed::Triangulation objects. This namespace provides
+     * similar functionality to the dealii::GridRefinement namespace, except
+     * that it works for meshes that are parallel and distributed.
      *
      * @ingroup grid
      * @author Wolfgang Bangerth, 2009
@@ -48,39 +46,24 @@ namespace parallel
     namespace GridRefinement
     {
       /**
-       * Like
-       * dealii::GridRefinement::refine_and_coarsen_fixed_number,
-       * but for parallel distributed
-       * triangulation.
+       * Like dealii::GridRefinement::refine_and_coarsen_fixed_number, but for
+       * parallel distributed triangulation.
        *
-       * The vector of criteria needs to be a
-       * vector of refinement criteria for
-       * all cells active on the current
-       * triangulation,
-       * i.e. <code>tria.n_active_cells()</code>
-       * (and not
-       * <code>tria.n_locally_owned_active_cells()</code>). However,
-       * the function will only look at the
-       * indicators that correspond to those
-       * cells that are actually locally
-       * owned, and ignore the indicators for
-       * all other cells. The function will
-       * then coordinate among all processors
-       * that store part of the triangulation
-       * so that at the end @p
-       * top_fraction_of_cells are refined,
-       * where the fraction is enforced as a
-       * fraction of
-       * Triangulation::n_global_active_cells,
-       * not
-       * Triangulation::n_locally_active_cells
-       * on each processor individually. In
-       * other words, it may be that on some
-       * processors, no cells are refined at
-       * all.
+       * The vector of criteria needs to be a vector of refinement criteria
+       * for all cells active on the current triangulation, i.e.
+       * <code>tria.n_active_cells()</code> (and not
+       * <code>tria.n_locally_owned_active_cells()</code>). However, the
+       * function will only look at the indicators that correspond to those
+       * cells that are actually locally owned, and ignore the indicators for
+       * all other cells. The function will then coordinate among all
+       * processors that store part of the triangulation so that at the end @p
+       * top_fraction_of_cells are refined, where the fraction is enforced as
+       * a fraction of Triangulation::n_global_active_cells, not
+       * Triangulation::n_locally_active_cells on each processor individually.
+       * In other words, it may be that on some processors, no cells are
+       * refined at all.
        *
-       * The same is true for the fraction of
-       * cells that is coarsened.
+       * The same is true for the fraction of cells that is coarsened.
        */
       template <int dim, class Vector, int spacedim>
       void
@@ -91,39 +74,24 @@ namespace parallel
         const double                bottom_fraction_of_cells);
 
       /**
-       * Like
-       * dealii::GridRefinement::refine_and_coarsen_fixed_fraction,
-       * but for parallel distributed
-       * triangulation.
+       * Like dealii::GridRefinement::refine_and_coarsen_fixed_fraction, but
+       * for parallel distributed triangulation.
        *
-       * The vector of criteria needs to be a
-       * vector of refinement criteria for
-       * all cells active on the current
-       * triangulation,
-       * <code>tria.n_active_cells()</code>
-       * (and not
-       * <code>tria.n_locally_owned_active_cells()</code>). However,
-       * the function will only look at the
-       * indicators that correspond to those
-       * cells that are actually locally
-       * owned, and ignore the indicators for
-       * all other cells. The function will
-       * then coordinate among all processors
-       * that store part of the triangulation
-       * so that at the end the smallest
-       * fraction of
-       * Triangulation::n_global_active_cells
-       * (not
-       * Triangulation::n_locally_active_cells
-       * on each processor individually) is
-       * refined that together make up a
-       * total of @p top_fraction_of_error of
-       * the total error. In other words, it
-       * may be that on some processors, no
-       * cells are refined at all.
+       * The vector of criteria needs to be a vector of refinement criteria
+       * for all cells active on the current triangulation,
+       * <code>tria.n_active_cells()</code> (and not
+       * <code>tria.n_locally_owned_active_cells()</code>). However, the
+       * function will only look at the indicators that correspond to those
+       * cells that are actually locally owned, and ignore the indicators for
+       * all other cells. The function will then coordinate among all
+       * processors that store part of the triangulation so that at the end
+       * the smallest fraction of Triangulation::n_global_active_cells (not
+       * Triangulation::n_locally_active_cells on each processor individually)
+       * is refined that together make up a total of @p top_fraction_of_error
+       * of the total error. In other words, it may be that on some
+       * processors, no cells are refined at all.
        *
-       * The same is true for the fraction of
-       * cells that is coarsened.
+       * The same is true for the fraction of cells that is coarsened.
        */
       template <int dim, class Vector, int spacedim>
       void

@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2005 - 2013 by the deal.II authors
 //
@@ -42,40 +41,34 @@ class TableIndicesBase
 {
 public:
   /**
-   * Access the value of the
-   * <tt>i</tt>th index.
+   * Access the value of the <tt>i</tt>th index.
    */
   unsigned int operator[] (const unsigned int i) const;
 
   /**
-   * Write access the value of the
-   * <tt>i</tt>th index.
+   * Write access the value of the <tt>i</tt>th index.
    */
   unsigned int &operator[] (const unsigned int i);
 
   /**
-   * Compare two index fields for
-   * equality.
+   * Compare two index fields for equality.
    */
   bool operator == (const TableIndicesBase<N> &other) const;
 
   /**
-   * Compare two index fields for
-   * inequality.
+   * Compare two index fields for inequality.
    */
   bool operator != (const TableIndicesBase<N> &other) const;
 
   /**
-   * Sort the indices in ascending
-   * order. While this operation is not
-   * very useful for Table objects, it is
-   * used for the SymmetricTensor class.
+   * Sort the indices in ascending order. While this operation is not very
+   * useful for Table objects, it is used for the SymmetricTensor class.
    */
   void sort ();
 
   /**
-   * Write or read the data of this object to or
-   * from a stream for the purpose of serialization.
+   * Write or read the data of this object to or from a stream for the purpose
+   * of serialization.
    */
   template <class Archive>
   void serialize (Archive &ar, const unsigned int version);
@@ -89,16 +82,14 @@ protected:
 
 
 /**
- * Array of indices of fixed size used for the TableBase
- * class.
+ * Array of indices of fixed size used for the TableBase class.
  *
- * This is the general template, and has no implementation. There are
- * a number of specializations that are actually implemented (one for
- * each used value of <tt>N</tt>), which only differ in the way they
- * implement their constructors (they take <tt>N</tt> arguments, something
- * that cannot be represented by a general template). Actual storage
- * of and access to data is done by the TableIndicesBase base
- * class of a specializations.
+ * This is the general template, and has no implementation. There are a number
+ * of specializations that are actually implemented (one for each used value
+ * of <tt>N</tt>), which only differ in the way they implement their
+ * constructors (they take <tt>N</tt> arguments, something that cannot be
+ * represented by a general template). Actual storage of and access to data is
+ * done by the TableIndicesBase base class of a specializations.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
@@ -107,15 +98,12 @@ template <int N>
 class TableIndices : public TableIndicesBase<N>
 {
   /**
-   * Standard constructor, setting
-   * all indices to zero.
+   * Standard constructor, setting all indices to zero.
    */
   TableIndices();
   /**
-   * The actual constructor, taking
-   * @p N arguments of type
-   * <tt>unsigned int</tt> to
-   * initialize the index object.
+   * The actual constructor, taking @p N arguments of type <tt>unsigned
+   * int</tt> to initialize the index object.
    */
   TableIndices(...);
 };
@@ -123,14 +111,12 @@ class TableIndices : public TableIndicesBase<N>
 
 
 /**
- * Array of indices of fixed size used for the TableBase
- * class.
+ * Array of indices of fixed size used for the TableBase class.
  *
- * This is the specialization for a one-dimensional table, i.e. a
- * vector. This class only differs in the non-default constructors
- * from the other specializations. Actual storage of and access to
- * data is done by the TableIndicesBase base class of a
- * specializations.
+ * This is the specialization for a one-dimensional table, i.e. a vector. This
+ * class only differs in the non-default constructors from the other
+ * specializations. Actual storage of and access to data is done by the
+ * TableIndicesBase base class of a specializations.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
@@ -140,14 +126,12 @@ class TableIndices<1> : public TableIndicesBase<1>
 {
 public:
   /**
-   * Default constructor. Set all
-   * indices to zero.
+   * Default constructor. Set all indices to zero.
    */
   TableIndices ();
 
   /**
-   * Constructor. Set indices to
-   * the given values.
+   * Constructor. Set indices to the given values.
    */
   TableIndices (const unsigned int index1);
 };
@@ -156,13 +140,12 @@ public:
 //the constructors into the class template
 
 /**
- * Array of indices of fixed size used for the TableBase
- * class.
+ * Array of indices of fixed size used for the TableBase class.
  *
- * This is the specialization for a two-dimensional table. This class
- * only differs in the non-default constructors from the other
- * specializations. Actual storage of and access to data is done by
- * the TableIndicesBase base class of a specializations.
+ * This is the specialization for a two-dimensional table. This class only
+ * differs in the non-default constructors from the other specializations.
+ * Actual storage of and access to data is done by the TableIndicesBase base
+ * class of a specializations.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
@@ -172,25 +155,17 @@ class TableIndices<2> : public TableIndicesBase<2>
 {
 public:
   /**
-   * Default constructor. Set all
-   * indices to zero.
+   * Default constructor. Set all indices to zero.
    */
   TableIndices ();
 
   /**
-   * Constructor. Set indices to
-   * the given values.
+   * Constructor. Set indices to the given values.
    *
-   * The default values for the
-   * second and subsequent
-   * arguments are necessary for
-   * some neat template tricks in
-   * SymmetricTensor where we only
-   * want to set the first index
-   * and construct the subsequent
-   * ones later on, i.e. for the
-   * moment we don't care about the
-   * later indices.
+   * The default values for the second and subsequent arguments are necessary
+   * for some neat template tricks in SymmetricTensor where we only want to
+   * set the first index and construct the subsequent ones later on, i.e. for
+   * the moment we don't care about the later indices.
    */
   TableIndices (const unsigned int index1,
                 const unsigned int index2 = numbers::invalid_unsigned_int);
@@ -199,13 +174,12 @@ public:
 
 
 /**
- * Array of indices of fixed size used for the TableBase
- * class.
+ * Array of indices of fixed size used for the TableBase class.
  *
- * This is the specialization for a three-dimensional table. This class
- * only differs in the non-default constructors from the other
- * specializations. Actual storage of and access to data is done by
- * the TableIndicesBase base class of a specializations.
+ * This is the specialization for a three-dimensional table. This class only
+ * differs in the non-default constructors from the other specializations.
+ * Actual storage of and access to data is done by the TableIndicesBase base
+ * class of a specializations.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
@@ -215,25 +189,17 @@ class TableIndices<3> : public TableIndicesBase<3>
 {
 public:
   /**
-   * Default constructor. Set all
-   * indices to zero.
+   * Default constructor. Set all indices to zero.
    */
   TableIndices ();
 
   /**
-   * Constructor. Set indices to
-   * the given values.
+   * Constructor. Set indices to the given values.
    *
-   * The default values for the
-   * second and subsequent
-   * arguments are necessary for
-   * some neat template tricks in
-   * SymmetricTensor where we only
-   * want to set the first index
-   * and construct the subsequent
-   * ones later on, i.e. for the
-   * moment we don't care about the
-   * later indices.
+   * The default values for the second and subsequent arguments are necessary
+   * for some neat template tricks in SymmetricTensor where we only want to
+   * set the first index and construct the subsequent ones later on, i.e. for
+   * the moment we don't care about the later indices.
    */
   TableIndices (const unsigned int index1,
                 const unsigned int index2 = numbers::invalid_unsigned_int,
@@ -242,13 +208,12 @@ public:
 
 
 /**
- * Array of indices of fixed size used for the TableBase
- * class.
+ * Array of indices of fixed size used for the TableBase class.
  *
- * This is the specialization for a four-dimensional table. This class
- * only differs in the non-default constructors from the other
- * specializations. Actual storage of and access to data is done by
- * the TableIndicesBase base class of a specializations.
+ * This is the specialization for a four-dimensional table. This class only
+ * differs in the non-default constructors from the other specializations.
+ * Actual storage of and access to data is done by the TableIndicesBase base
+ * class of a specializations.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
@@ -258,25 +223,17 @@ class TableIndices<4> : public TableIndicesBase<4>
 {
 public:
   /**
-   * Default constructor. Set all
-   * indices to zero.
+   * Default constructor. Set all indices to zero.
    */
   TableIndices ();
 
   /**
-   * Constructor. Set indices to
-   * the given values.
+   * Constructor. Set indices to the given values.
    *
-   * The default values for the
-   * second and subsequent
-   * arguments are necessary for
-   * some neat template tricks in
-   * SymmetricTensor where we only
-   * want to set the first index
-   * and construct the subsequent
-   * ones later on, i.e. for the
-   * moment we don't care about the
-   * later indices.
+   * The default values for the second and subsequent arguments are necessary
+   * for some neat template tricks in SymmetricTensor where we only want to
+   * set the first index and construct the subsequent ones later on, i.e. for
+   * the moment we don't care about the later indices.
    */
   TableIndices (const unsigned int index1,
                 const unsigned int index2 = numbers::invalid_unsigned_int,
@@ -286,13 +243,12 @@ public:
 
 
 /**
- * Array of indices of fixed size used for the TableBase
- * class.
+ * Array of indices of fixed size used for the TableBase class.
  *
- * This is the specialization for a five-dimensional table. This class
- * only differs in the non-default constructors from the other
- * specializations. Actual storage of and access to data is done by
- * the TableIndicesBase base class of a specializations.
+ * This is the specialization for a five-dimensional table. This class only
+ * differs in the non-default constructors from the other specializations.
+ * Actual storage of and access to data is done by the TableIndicesBase base
+ * class of a specializations.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
@@ -302,25 +258,17 @@ class TableIndices<5> : public TableIndicesBase<5>
 {
 public:
   /**
-   * Default constructor. Set all
-   * indices to zero.
+   * Default constructor. Set all indices to zero.
    */
   TableIndices ();
 
   /**
-   * Constructor. Set indices to
-   * the given values.
+   * Constructor. Set indices to the given values.
    *
-   * The default values for the
-   * second and subsequent
-   * arguments are necessary for
-   * some neat template tricks in
-   * SymmetricTensor where we only
-   * want to set the first index
-   * and construct the subsequent
-   * ones later on, i.e. for the
-   * moment we don't care about the
-   * later indices.
+   * The default values for the second and subsequent arguments are necessary
+   * for some neat template tricks in SymmetricTensor where we only want to
+   * set the first index and construct the subsequent ones later on, i.e. for
+   * the moment we don't care about the later indices.
    */
   TableIndices (const unsigned int index1,
                 const unsigned int index2 = numbers::invalid_unsigned_int,
@@ -331,13 +279,12 @@ public:
 
 
 /**
- * Array of indices of fixed size used for the TableBase
- * class.
+ * Array of indices of fixed size used for the TableBase class.
  *
- * This is the specialization for a six-dimensional table. This class
- * only differs in the non-default constructors from the other
- * specializations. Actual storage of and access to data is done by
- * the TableIndicesBase base class of a specializations.
+ * This is the specialization for a six-dimensional table. This class only
+ * differs in the non-default constructors from the other specializations.
+ * Actual storage of and access to data is done by the TableIndicesBase base
+ * class of a specializations.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
@@ -347,25 +294,17 @@ class TableIndices<6> : public TableIndicesBase<6>
 {
 public:
   /**
-   * Default constructor. Set all
-   * indices to zero.
+   * Default constructor. Set all indices to zero.
    */
   TableIndices ();
 
   /**
-   * Constructor. Set indices to
-   * the given values.
+   * Constructor. Set indices to the given values.
    *
-   * The default values for the
-   * second and subsequent
-   * arguments are necessary for
-   * some neat template tricks in
-   * SymmetricTensor where we only
-   * want to set the first index
-   * and construct the subsequent
-   * ones later on, i.e. for the
-   * moment we don't care about the
-   * later indices.
+   * The default values for the second and subsequent arguments are necessary
+   * for some neat template tricks in SymmetricTensor where we only want to
+   * set the first index and construct the subsequent ones later on, i.e. for
+   * the moment we don't care about the later indices.
    */
   TableIndices (const unsigned int index1,
                 const unsigned int index2 = numbers::invalid_unsigned_int,
@@ -377,13 +316,12 @@ public:
 
 
 /**
- * Array of indices of fixed size used for the TableBase
- * class.
+ * Array of indices of fixed size used for the TableBase class.
  *
- * This is the specialization for a seven-dimensional table. This
- * class only differs in the non-default constructors from the other
- * specializations. Actual storage of and access to data is done by
- * the TableIndicesBase base class of a specializations.
+ * This is the specialization for a seven-dimensional table. This class only
+ * differs in the non-default constructors from the other specializations.
+ * Actual storage of and access to data is done by the TableIndicesBase base
+ * class of a specializations.
  *
  * @ingroup data
  * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
@@ -393,25 +331,17 @@ class TableIndices<7> : public TableIndicesBase<7>
 {
 public:
   /**
-   * Default constructor. Set all
-   * indices to zero.
+   * Default constructor. Set all indices to zero.
    */
   TableIndices ();
 
   /**
-   * Constructor. Set indices to
-   * the given values.
+   * Constructor. Set indices to the given values.
    *
-   * The default values for the
-   * second and subsequent
-   * arguments are necessary for
-   * some neat template tricks in
-   * SymmetricTensor where we only
-   * want to set the first index
-   * and construct the subsequent
-   * ones later on, i.e. for the
-   * moment we don't care about the
-   * later indices.
+   * The default values for the second and subsequent arguments are necessary
+   * for some neat template tricks in SymmetricTensor where we only want to
+   * set the first index and construct the subsequent ones later on, i.e. for
+   * the moment we don't care about the later indices.
    */
   TableIndices (const unsigned int index1,
                 const unsigned int index2 = numbers::invalid_unsigned_int,

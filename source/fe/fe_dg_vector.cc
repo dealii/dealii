@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -41,7 +40,9 @@ FE_DGNedelec<dim, spacedim>::get_name () const
   // have to be kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_DGNedelec<" << dim << ',' << spacedim << ">(" << this->degree-1 << ")";
+  namebuf << "FE_DGNedelec<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << this->degree-1 << ")";
 
   return namebuf.str();
 }
@@ -65,7 +66,9 @@ FE_DGRaviartThomas<dim, spacedim>::get_name () const
   // have to be kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_DGRaviartThomas<" << dim << ',' << spacedim << ">(" << this->degree-1 << ")";
+  namebuf << "FE_DGRaviartThomas<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << this->degree-1 << ")";
 
   return namebuf.str();
 }
@@ -89,7 +92,9 @@ FE_DGBDM<dim, spacedim>::get_name () const
   // have to be kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_DGBDM<" << dim << ',' << spacedim << ">(" << this->degree-1 << ")";
+  namebuf << "FE_DGBDM<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << this->degree-1 << ")";
 
   return namebuf.str();
 }

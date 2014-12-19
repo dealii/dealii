@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2013 by the deal.II authors
 //
@@ -34,18 +33,6 @@ Boundary<dim, spacedim>::~Boundary ()
 {}
 
 
-
-template <int dim, int spacedim>
-Point<spacedim>
-Boundary<dim, spacedim>::
-get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &) const
-{
-  Assert (false, ExcPureFunctionCalled());
-  return Point<spacedim>();
-}
-
-
-
 template <int dim, int spacedim>
 void
 Boundary<dim, spacedim>::
@@ -64,26 +51,6 @@ get_intermediate_points_on_quad (const typename Triangulation<dim, spacedim>::qu
                                  std::vector<Point<spacedim> > &) const
 {
   Assert (false, ExcPureFunctionCalled());
-}
-
-
-
-template <int dim, int spacedim>
-Point<spacedim>
-Boundary<dim,spacedim>::
-get_new_point_on_face (const typename Triangulation<dim,spacedim>::face_iterator &face) const
-{
-  Assert (dim>1, ExcImpossibleInDim(dim));
-
-  switch (dim)
-    {
-    case 2:
-      return get_new_point_on_line (face);
-    case 3:
-      return get_new_point_on_quad (face);
-    }
-
-  return Point<spacedim>();
 }
 
 
@@ -109,17 +76,6 @@ get_intermediate_points_on_face (const typename Triangulation<dim,spacedim>::fac
 }
 
 
-
-template <>
-Point<1>
-Boundary<1,1>::
-get_new_point_on_face (const Triangulation<1,1>::face_iterator &) const
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return Point<1>();
-}
-
-
 template <>
 void
 Boundary<1,1>::
@@ -130,17 +86,6 @@ get_intermediate_points_on_face (const Triangulation<1,1>::face_iterator &,
 }
 
 
-
-template <>
-Point<2>
-Boundary<1,2>::
-get_new_point_on_face (const Triangulation<1,2>::face_iterator &) const
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return Point<2>();
-}
-
-
 template <>
 void
 Boundary<1,2>::
@@ -148,17 +93,6 @@ get_intermediate_points_on_face (const Triangulation<1,2>::face_iterator &,
                                  std::vector<Point<2> > &) const
 {
   Assert (false, ExcImpossibleInDim(1));
-}
-
-
-
-template <>
-Point<3>
-Boundary<1,3>::
-get_new_point_on_face (const Triangulation<1,3>::face_iterator &) const
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return Point<3>();
 }
 
 
@@ -263,7 +197,7 @@ get_line_support_points (const unsigned int n_intermediate_points) const
       // another thread might have created points in the meantime
       if (points[n_intermediate_points].get() == 0)
         {
-          std_cxx1x::shared_ptr<QGaussLobatto<1> >
+          std_cxx11::shared_ptr<QGaussLobatto<1> >
           quadrature (new QGaussLobatto<1>(n_intermediate_points+2));
           points[n_intermediate_points] = quadrature;
         }
@@ -375,10 +309,9 @@ namespace
 template <int dim, int spacedim>
 Point<spacedim>
 StraightBoundary<dim, spacedim>::
-get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &) const
+get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterator &quad) const
 {
-  Assert (false, ExcImpossibleInDim(dim));
-  return Point<spacedim>();
+  return FlatManifold<dim,spacedim>::get_new_point_on_quad(quad);
 }
 
 

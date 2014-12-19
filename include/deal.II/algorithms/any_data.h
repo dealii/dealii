@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2014 by the deal.II authors
 //
@@ -32,8 +31,8 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Store any amount of any type of data accessible by an identifier string.
  *
- * @todo Deprecate access by index after NamedData has been deprecated
- * for long enough, then change to a map.
+ * @todo Deprecate access by index after NamedData has been deprecated for
+ * long enough, then change to a map.
  */
 class AnyData :
   public Subscriptor
@@ -57,11 +56,10 @@ public:
   /**
    * @brief Access to stored data object by name.
    *
-   * Find the object with given name, try to convert it to
-   * <tt>type</tt> and return it. This function throws an exception
-   * if either the name does not exist or if the conversion
-   * fails. If such an exception is not desired, use try_read()
-   * instead.
+   * Find the object with given name, try to convert it to <tt>type</tt> and
+   * return it. This function throws an exception if either the name does not
+   * exist or if the conversion fails. If such an exception is not desired,
+   * use try_read() instead.
    */
   template <typename type>
   type entry (const std::string &name);
@@ -69,11 +67,10 @@ public:
   /**
    * @brief Read-only access to stored data object by name.
    *
-   * Find the object with given name, try to convert it to
-   * <tt>type</tt> and return it. This function throws an exception
-   * if either the name does not exist or if the conversion
-   * fails. If such an exception is not desired, use try_read()
-   * instead.
+   * Find the object with given name, try to convert it to <tt>type</tt> and
+   * return it. This function throws an exception if either the name does not
+   * exist or if the conversion fails. If such an exception is not desired,
+   * use try_read() instead.
    */
   template <typename type>
   const type entry (const std::string &name) const;
@@ -81,14 +78,13 @@ public:
   /**
    * @brief Dedicated read only access by name.
    *
-   * For a constant object, this function equals entry(). For a
-   * non-const object, it forces read only access to the data. In
-   * particular, it throws an exception if the object is not found
-   * or cannot be converted to type.  If such an exception is not
-   * desired, use try_read() instead.
+   * For a constant object, this function equals entry(). For a non-const
+   * object, it forces read only access to the data. In particular, it throws
+   * an exception if the object is not found or cannot be converted to type.
+   * If such an exception is not desired, use try_read() instead.
    *
-   * @warning Do not use this function for stored objects which are
-   * pointers. Use read_ptr() instead!
+   * @warning Do not use this function for stored objects which are pointers.
+   * Use read_ptr() instead!
    */
   template <typename type>
   const type read (const std::string &name) const;
@@ -96,19 +92,18 @@ public:
   /**
    * @brief Dedicated read only access by name for pointer data.
    *
-   * If the stored data object is a pointer to a constant object, the logic
-   * of access becomes fairly complicated. Namely, the standard read
-   * function may fail, depending on whether it was a const pointer
-   * or a regular pointer. This function fixes the logic and
-   * ascertains that the object does not become mutable by accident.
+   * If the stored data object is a pointer to a constant object, the logic of
+   * access becomes fairly complicated. Namely, the standard read function may
+   * fail, depending on whether it was a const pointer or a regular pointer.
+   * This function fixes the logic and ascertains that the object does not
+   * become mutable by accident.
    */
   template <typename type>
   const type *read_ptr (const std::string &name) const;
 
   /**
-   * Perform the same action as read_ptr(), but do not throw an
-   * exception if the pointer does not exist. Return a null pointer
-   * instead.
+   * Perform the same action as read_ptr(), but do not throw an exception if
+   * the pointer does not exist. Return a null pointer instead.
    */
   template <typename type>
   const type *try_read_ptr (const std::string &name) const;
@@ -116,10 +111,9 @@ public:
   /**
    * @brief Dedicated read only access by name without exceptions.
    *
-   * This function tries to find the name in the list and return a
-   * pointer to the associated object. If either the name is not
-   * found or the object cannot be converted to the return type, a
-   * null pointer is returned.
+   * This function tries to find the name in the list and return a pointer to
+   * the associated object. If either the name is not found or the object
+   * cannot be converted to the return type, a null pointer is returned.
    */
   template <typename type>
   const type *try_read (const std::string &name) const;
@@ -156,17 +150,16 @@ public:
   /**
    * @brief Find index of a named object
    *
-   * Try to find the objecty and return its index in the list. Throw
-   * an exception if the object has not been found.
+   * Try to find the objecty and return its index in the list. Throw an
+   * exception if the object has not been found.
    */
   unsigned int find(const std::string &name) const;
 
   /**
    * @brief Try to find index of a named object
    *
-   * Try to find the objecty and return its index in the
-   * list. returns numbers::invalid_unsigned_int if the name was not
-   * found.
+   * Try to find the objecty and return its index in the list. returns
+   * numbers::invalid_unsigned_int if the name was not found.
    */
   unsigned int try_find(const std::string &name) const;
 
@@ -176,8 +169,8 @@ public:
 
   /// List the contents to a stream
   template <class STREAM>
-  void list (STREAM& os) const;
-    
+  void list (STREAM &os) const;
+
   /// Conversion from old NamedData
   template <typename type>
   AnyData(const NamedData<type> &);
@@ -194,9 +187,8 @@ public:
                  << " must coincide");
 
   /**
-   * Exception indicating that a function expected a vector to have a
-   * certain name, but NamedData had a different name in that
-   * position.
+   * Exception indicating that a function expected a vector to have a certain
+   * name, but NamedData had a different name in that position.
    */
   DeclException2(ExcNameMismatch, int, std::string,
                  << "Name at position " << arg1 << " is not equal to " << arg2);
@@ -472,14 +464,14 @@ AnyData::merge(const AnyData &other)
 
 template <class STREAM>
 inline
-void AnyData::list(STREAM& os) const
+void AnyData::list(STREAM &os) const
 {
-  for (unsigned int i=0;i<names.size();++i)
+  for (unsigned int i=0; i<names.size(); ++i)
     {
       os << i
-	 << '\t' << names[i]
-	 << '\t' << data[i].type().name()
-	 << std::endl;
+         << '\t' << names[i]
+         << '\t' << data[i].type().name()
+         << std::endl;
     }
 }
 

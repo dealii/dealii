@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2013 by the deal.II authors
 //
@@ -40,20 +39,17 @@ namespace internal
     struct NumberCache;
 
     /**
-     * A namespace in which we define
-     * classes that describe how to
-     * distribute and renumber
-     * degrees of freedom.
+     * A namespace in which we define classes that describe how to distribute
+     * and renumber degrees of freedom.
      */
     namespace Policy
     {
       struct Implementation;
 
       /**
-       * A class that implements policies for
-       * how the DoFHandler::distribute_dofs
-       * and DoFHandler::renumber_dofs
-       * functions should work.
+       * A class that implements policies for how the
+       * DoFHandler::distribute_dofs and DoFHandler::renumber_dofs functions
+       * should work.
        */
       template <int dim, int spacedim>
       class PolicyBase
@@ -65,8 +61,7 @@ namespace internal
         virtual ~PolicyBase ();
 
         /**
-         * Distribute degrees of freedom on
-         * the object given as last argument.
+         * Distribute degrees of freedom on the object given as last argument.
          */
         virtual
         NumberCache
@@ -81,8 +76,7 @@ namespace internal
                             std::vector<NumberCache> &number_caches) const = 0;
 
         /**
-         * Renumber degrees of freedom as
-         * specified by the first argument.
+         * Renumber degrees of freedom as specified by the first argument.
          */
         virtual
         NumberCache
@@ -92,18 +86,15 @@ namespace internal
 
 
       /**
-       * This class implements the
-       * default policy for sequential
-       * operations, i.e. for the case where
-       * all cells get degrees of freedom.
+       * This class implements the default policy for sequential operations,
+       * i.e. for the case where all cells get degrees of freedom.
        */
       template <int dim, int spacedim>
       class Sequential : public PolicyBase<dim,spacedim>
       {
       public:
         /**
-         * Distribute degrees of freedom on
-         * the object given as last argument.
+         * Distribute degrees of freedom on the object given as last argument.
          */
         virtual
         NumberCache
@@ -118,8 +109,7 @@ namespace internal
                             std::vector<NumberCache> &number_caches) const;
 
         /**
-         * Renumber degrees of freedom as
-         * specified by the first argument.
+         * Renumber degrees of freedom as specified by the first argument.
          */
         virtual
         NumberCache
@@ -129,19 +119,15 @@ namespace internal
 
 
       /**
-       * This class implements the
-       * policy for operations when
-       * we use a
-       * parallel::distributed::Triangulation
-       * object.
+       * This class implements the policy for operations when we use a
+       * parallel::distributed::Triangulation object.
        */
       template <int dim, int spacedim>
       class ParallelDistributed : public PolicyBase<dim,spacedim>
       {
       public:
         /**
-         * Distribute degrees of freedom on
-         * the object given as last argument.
+         * Distribute degrees of freedom on the object given as last argument.
          */
         virtual
         NumberCache
@@ -156,8 +142,7 @@ namespace internal
                             std::vector<NumberCache> &number_caches) const;
 
         /**
-         * Renumber degrees of freedom as
-         * specified by the first argument.
+         * Renumber degrees of freedom as specified by the first argument.
          */
         virtual
         NumberCache

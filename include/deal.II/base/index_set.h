@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2009 - 2014 by the deal.II authors
 //
@@ -40,17 +39,16 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * A class that represents a subset of indices among a larger set. For
- * example, it can be used to denote the set of degrees of freedom
- * within the range $[0,\text{dof\_handler.n\_dofs})$ that belongs to
- * a particular subdomain, or those among all degrees of freedom that
- * are stored on a particular processor in a distributed parallel
- * computation.
+ * example, it can be used to denote the set of degrees of freedom within the
+ * range $[0,\text{dof\_handler.n\_dofs})$ that belongs to a particular
+ * subdomain, or those among all degrees of freedom that are stored on a
+ * particular processor in a distributed parallel computation.
  *
- * This class can represent a collection of half-open ranges of
- * indices as well as individual elements. For practical purposes it
- * also stores the overall range these indices can assume. In other
- * words, you need to specify the size of the index space
- * $[0,\text{size})$ of which objects of this class are a subset.
+ * This class can represent a collection of half-open ranges of indices as
+ * well as individual elements. For practical purposes it also stores the
+ * overall range these indices can assume. In other words, you need to specify
+ * the size of the index space $[0,\text{size})$ of which objects of this
+ * class are a subset.
  *
  * The data structures used in this class along with a rationale can be found
  * in the @ref distributed_paper "Distributed Computing paper".
@@ -320,8 +318,8 @@ public:
                   << " is not an element of this set.");
 
   /**
-   * Write or read the data of this object to or
-   * from a stream for the purpose of serialization
+   * Write or read the data of this object to or from a stream for the purpose
+   * of serialization
    */
   template <class Archive>
   void serialize (Archive &ar, const unsigned int version);
@@ -343,22 +341,22 @@ private:
     types::global_dof_index nth_index_in_set;
 
     /**
-     * Default constructor. Since there is no useful choice for
-     * a default constructed interval, this constructor simply
-     * creates something that resembles an invalid range. We
-     * need this constructor for serialization purposes, but the
-     * invalid range should be filled with something read from
-     * the archive before it is used, so we should hopefully
-     * never get to see an invalid range in the wild.
-     **/
+     * Default constructor. Since there is no useful choice for a default
+     * constructed interval, this constructor simply creates something that
+     * resembles an invalid range. We need this constructor for serialization
+     * purposes, but the invalid range should be filled with something read
+     * from the archive before it is used, so we should hopefully never get to
+     * see an invalid range in the wild.
+     */
     Range ();
 
     /**
      * Constructor. Create a half-open interval with the given indices.
      *
      * @param i1 Left end point of the interval.
-     * @param i2 First index greater than the last index of the indicated range.
-     **/
+     * @param i2 First index greater than the last index of the indicated
+     * range.
+     */
     Range (const types::global_dof_index i1,
            const types::global_dof_index i2);
 
@@ -437,10 +435,10 @@ private:
    * This integer caches the index of the largest range in @p ranges. This
    * gives <tt>O(1)</tt> access to the range with most elements, while general
    * access costs <tt>O(log(n_ranges))</tt>. The largest range is needed for
-   * the methods @p is_element(), @p index_within_set(), @p
-   * nth_index_in_set. In many applications, the largest range contains most
-   * elements (the locally owned range), whereas there are only a few other
-   * elements (ghosts).
+   * the methods @p is_element(), @p index_within_set(), @p nth_index_in_set.
+   * In many applications, the largest range contains most elements (the
+   * locally owned range), whereas there are only a few other elements
+   * (ghosts).
    */
   mutable types::global_dof_index largest_range;
 
@@ -452,16 +450,15 @@ private:
 
 
 /**
- * Create and return an index set of size $N$ that contains every
- * single index within this range. In essence, this function
- * returns an index set created by
+ * Create and return an index set of size $N$ that contains every single index
+ * within this range. In essence, this function returns an index set created
+ * by
  * @code
  *  IndexSet is (N);
  *  is.add_range(0, N);
  * @endcode
- * This function exists so that one can create and initialize
- * index sets that are complete in one step, or so one can write
- * code like
+ * This function exists so that one can create and initialize index sets that
+ * are complete in one step, or so one can write code like
  * @code
  *   if (my_index_set == complete_index_set(my_index_set.size())
  *     ...

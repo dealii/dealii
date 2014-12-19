@@ -1,5 +1,4 @@
 /* ---------------------------------------------------------------------
- * $Id$
  *
  * Copyright (C) 2002 - 2014 by the deal.II authors
  *
@@ -573,15 +572,15 @@ namespace Step14
 
       WorkStream::run(dof_handler.begin_active(),
                       dof_handler.end(),
-                      std_cxx1x::bind(&Solver<dim>::local_assemble_matrix,
+                      std_cxx11::bind(&Solver<dim>::local_assemble_matrix,
                                       this,
-                                      std_cxx1x::_1,
-                                      std_cxx1x::_2,
-                                      std_cxx1x::_3),
-                      std_cxx1x::bind(&Solver<dim>::copy_local_to_global,
+                                      std_cxx11::_1,
+                                      std_cxx11::_2,
+                                      std_cxx11::_3),
+                      std_cxx11::bind(&Solver<dim>::copy_local_to_global,
                                       this,
-                                      std_cxx1x::_1,
-                                      std_cxx1x::ref(linear_system)),
+                                      std_cxx11::_1,
+                                      std_cxx11::ref(linear_system)),
                       AssemblyScratchData(*fe, *quadrature),
                       AssemblyCopyData());
 
@@ -2055,7 +2054,7 @@ namespace Step14
       // in step-9:
       void estimate_error (Vector<float> &error_indicators) const;
 
-      void estimate_on_one_cell (const SynchronousIterators<std_cxx1x::tuple<
+      void estimate_on_one_cell (const SynchronousIterators<std_cxx11::tuple<
                                  active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
                                  WeightedResidualScratchData                     &scratch_data,
                                  WeightedResidualCopyData                        &copy_data,
@@ -2066,7 +2065,7 @@ namespace Step14
       // interiors, on those faces that have no hanging nodes, and on those
       // faces with hanging nodes, respectively:
       void
-      integrate_over_cell (const SynchronousIterators<std_cxx1x::tuple<
+      integrate_over_cell (const SynchronousIterators<std_cxx11::tuple<
                            active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
                            const Vector<double>                            &primal_solution,
                            const Vector<double>                            &dual_weights,
@@ -2504,7 +2503,7 @@ namespace Step14
                                .get_tria().n_active_cells());
 
       typedef
-      std_cxx1x::tuple<active_cell_iterator,Vector<float>::iterator>
+      std_cxx11::tuple<active_cell_iterator,Vector<float>::iterator>
       IteratorTuple;
 
       SynchronousIterators<IteratorTuple>
@@ -2516,13 +2515,13 @@ namespace Step14
 
       WorkStream::run(cell_and_error_begin,
                       cell_and_error_end,
-                      std_cxx1x::bind(&WeightedResidual<dim>::estimate_on_one_cell,
+                      std_cxx11::bind(&WeightedResidual<dim>::estimate_on_one_cell,
                                       this,
-                                      std_cxx1x::_1,
-                                      std_cxx1x::_2,
-                                      std_cxx1x::_3,
-                                      std_cxx1x::ref(face_integrals)),
-                      std_cxx1x::function<void (const WeightedResidualCopyData &)>(),
+                                      std_cxx11::_1,
+                                      std_cxx11::_2,
+                                      std_cxx11::_3,
+                                      std_cxx11::ref(face_integrals)),
+                      std_cxx11::function<void (const WeightedResidualCopyData &)>(),
                       WeightedResidualScratchData (primal_solver,
                                                    dual_solver,
                                                    primal_solution,
@@ -2563,7 +2562,7 @@ namespace Step14
     template <int dim>
     void
     WeightedResidual<dim>::
-    estimate_on_one_cell (const SynchronousIterators<std_cxx1x::tuple<
+    estimate_on_one_cell (const SynchronousIterators<std_cxx11::tuple<
                           active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
                           WeightedResidualScratchData                       &scratch_data,
                           WeightedResidualCopyData                          &copy_data,
@@ -2572,7 +2571,7 @@ namespace Step14
       // First task on each cell is to compute the cell residual
       // contributions of this cell, and put them into the
       // <code>error_indicators</code> variable:
-      active_cell_iterator cell = std_cxx1x::get<0>(cell_and_error.iterators);
+      active_cell_iterator cell = std_cxx11::get<0>(cell_and_error.iterators);
 
       integrate_over_cell (cell_and_error,
                            scratch_data.primal_solution,
@@ -2651,7 +2650,7 @@ namespace Step14
     // the cell terms:
     template <int dim>
     void WeightedResidual<dim>::
-    integrate_over_cell (const SynchronousIterators<std_cxx1x::tuple<
+    integrate_over_cell (const SynchronousIterators<std_cxx11::tuple<
                          active_cell_iterator,Vector<float>::iterator> >   &cell_and_error,
                          const Vector<double>                              &primal_solution,
                          const Vector<double>                              &dual_weights,
@@ -2661,7 +2660,7 @@ namespace Step14
       // error estimation formula: first get the right hand side and Laplacian
       // of the numerical solution at the quadrature points for the cell
       // residual,
-      cell_data.fe_values.reinit (std_cxx1x::get<0>(cell_and_error.iterators));
+      cell_data.fe_values.reinit (std_cxx11::get<0>(cell_and_error.iterators));
       cell_data.right_hand_side
       ->value_list (cell_data.fe_values.get_quadrature_points(),
                     cell_data.rhs_values);
@@ -2679,7 +2678,7 @@ namespace Step14
         sum += ((cell_data.rhs_values[p]+cell_data.cell_laplacians[p]) *
                 cell_data.dual_weights[p] *
                 cell_data.fe_values.JxW (p));
-      *(std_cxx1x::get<1>(cell_and_error.iterators)) += sum;
+      *(std_cxx11::get<1>(cell_and_error.iterators)) += sum;
     }
 
 

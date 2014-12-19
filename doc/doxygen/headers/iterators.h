@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013, 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +19,7 @@
 
 deal.II has several classes which are understood conceptionally as
 meshes. Apart from the obvious Triangulation, these are, for example,
-DoFHandler, hp::DoFHandler and MGDoFHandler. All of those define a set
+DoFHandler and hp::DoFHandler. All of those define a set
 of iterators, allowing the user to traverse the whole mesh, i.e. the
 set of cells, faces, edges, etc that comprise the mesh, or portions of
 it. These iterators are all in a sense derived from the TriaIterator
@@ -270,8 +269,8 @@ of accessor classes:
 
 Except to look up member documentation, you will not usually have to deal with
 the actual class names listed above. Rather, one uses the typedefs provided by
-the container classes Triangulation, DoFHandler, hp::DoFHandler and
-MGDoFHandler, as well as the function that generate such objects:
+the container classes Triangulation, DoFHandler and hp::DoFHandler, as well
+as the function that generate such objects:
 
 <table border=1>
   <tr>
@@ -296,12 +295,6 @@ MGDoFHandler, as well as the function that generate such objects:
     <th>hp::DoFHandler</th>
     <td>typename hp::DoFHandler::cell_iterator</td>
     <td>hp_dof_handler.begin()</td>
-  </tr>
-
-  <tr>
-    <th>MGDoFHandler</th>
-    <td>typename MGDoFHandler::cell_iterator</td>
-    <td>mg_dof_handler.begin()</td>
   </tr>
 </table>
 
@@ -329,12 +322,6 @@ MGDoFHandler, as well as the function that generate such objects:
     <th>hp::DoFHandler</th>
     <td>typename hp::DoFHandler::face_iterator</td>
     <td>hp_dof_handler.begin_face()</td>
-  </tr>
-
-  <tr>
-    <th>MGDoFHandler</th>
-    <td>typename MGDoFHandler::face_iterator</td>
-    <td>mg_dof_handler.begin_face()</td>
   </tr>
 </table>
 
@@ -365,12 +352,6 @@ Likewise, active iterators have the following properties:
     <td>typename hp::DoFHandler::active_cell_iterator</td>
     <td>hp_dof_handler.begin_active()</td>
   </tr>
-
-  <tr>
-    <th>MGDoFHandler</th>
-    <td>typename MGDoFHandler::active_cell_iterator</td>
-    <td>mg_dof_handler.begin_active()</td>
-  </tr>
 </table>
 
 
@@ -398,12 +379,6 @@ Likewise, active iterators have the following properties:
     <td>typename hp::DoFHandler::active_face_iterator</td>
     <td>hp_dof_handler.begin_active_face()</td>
   </tr>
-
-  <tr>
-    <th>MGDoFHandler</th>
-    <td>typename MGDoFHandler::active_face_iterator</td>
-    <td>mg_dof_handler.begin_active_face()</td>
-  </tr>
 </table>
 
 
@@ -426,11 +401,6 @@ stated in the
   internal::DoFHandler::Iterators<DH<2,spacedim> >, and
   internal::DoFHandler::Iterators<DH<3,spacedim> > classes for DoFHandler
   and hp::DoFHandler iterators,
-
-- internal::MGDoFHandler::Iterators<1,spacedim>,
-  internal::MGDoFHandler::Iterators<2,spacedim>, and
-  internal::MGDoFHandler::Iterators<3,spacedim> classes for MGDoFHandler
-  iterators.
 
 
 @section IteratorAccessorInternals Iterator and accessor internals

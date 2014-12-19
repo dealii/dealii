@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -22,7 +21,7 @@
 #include <deal.II/meshworker/assembler.h>
 #include <deal.II/meshworker/loop.h>
 
-#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx11/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -149,9 +148,9 @@ test_simple(MGDoFHandler<dim> &mgdofs)
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
   (dofs.begin_active(), dofs.end(),
    dof_info, info_box,
-   std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
-   std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
-   std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
+   std_cxx11::bind (&Local<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
+   std_cxx11::bind (&Local<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
+   std_cxx11::bind (&Local<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
    assembler, true);
 
   for (unsigned int i=0; i<v.size(); ++i)
@@ -203,9 +202,9 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console (0);
 
-  std::vector<std_cxx1x::shared_ptr<FiniteElement<2> > > fe2;
-  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new  FE_DGP<2>(1)));
-  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));
+  std::vector<std_cxx11::shared_ptr<FiniteElement<2> > > fe2;
+  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new  FE_DGP<2>(1)));
+  fe2.push_back(std_cxx11::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));
 
   for (unsigned int i=0; i<fe2.size(); ++i)
     test(*fe2[i]);

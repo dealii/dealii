@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2013 by the deal.II authors
 //
@@ -62,7 +61,7 @@
 
 #include <fstream>
 #include <sstream>
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/bind.h>
 
 using namespace dealii;
 
@@ -265,7 +264,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
       MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> > (
         dof.begin(l), dof.end(l),
         dof_info, info_box,
-        std_cxx1x::bind(&OutputCreator<dim>::cell, &matrix_integrator, std_cxx1x::_1, std_cxx1x::_2),
+        std_cxx11::bind(&OutputCreator<dim>::cell, &matrix_integrator, std_cxx11::_1, std_cxx11::_2),
         0,
         0,
         assembler);

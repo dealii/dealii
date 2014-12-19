@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2003 - 2013 by the deal.II authors
 //
@@ -24,15 +23,15 @@
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace mg
 {
   /**
-   * Handler and storage for all five SparseMatrix object involved in
-   * using multigrid with local refinement.
+   * Handler and storage for all five SparseMatrix object involved in using
+   * multigrid with local refinement.
    *
    * @author Baerbel Janssen, Guido Kanschat
    * @date 2013

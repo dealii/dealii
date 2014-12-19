@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2003 - 2013 by the deal.II authors
 //
@@ -22,7 +21,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx11/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -45,23 +44,19 @@ namespace mg
   {
   public:
     /**
-     * Default constructor for an
-     * empty object.
+     * Default constructor for an empty object.
      */
     Matrix();
 
     /**
-     * Constructor setting up
-     * pointers to the matrices in
-     * <tt>M</tt> by calling initialize().
+     * Constructor setting up pointers to the matrices in <tt>M</tt> by
+     * calling initialize().
      */
     template <class MATRIX>
     Matrix(const MGLevelObject<MATRIX> &M);
 
     /**
-     * Initialize the object such
-     * that the level
-     * multiplication uses the
+     * Initialize the object such that the level multiplication uses the
      * matrices in <tt>M</tt>
      */
     template <class MATRIX>
@@ -83,7 +78,7 @@ namespace mg
      */
     std::size_t memory_consumption () const;
   private:
-    MGLevelObject<std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > > matrices;
+    MGLevelObject<std_cxx11::shared_ptr<PointerMatrixBase<VECTOR> > > matrices;
   };
 
 }
@@ -118,13 +113,12 @@ private:
 
 
 /**
- * Multilevel matrix selecting from block matrices. This class
- * implements the interface defined by MGMatrixBase.  The
- * template parameter @p MATRIX should be a block matrix class like
- * BlockSparseMatrix or @p BlockSparseMatrixEZ. Then, this
- * class stores a pointer to a MGLevelObject of this matrix
- * class. In each @p vmult, the block selected on initialization will
- * be multiplied with the vector provided.
+ * Multilevel matrix selecting from block matrices. This class implements the
+ * interface defined by MGMatrixBase.  The template parameter @p MATRIX should
+ * be a block matrix class like BlockSparseMatrix or @p BlockSparseMatrixEZ.
+ * Then, this class stores a pointer to a MGLevelObject of this matrix class.
+ * In each @p vmult, the block selected on initialization will be multiplied
+ * with the vector provided.
  *
  * @author Guido Kanschat, 2002
  */
@@ -133,61 +127,48 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >
 {
 public:
   /**
-   * Constructor. @p row and
-   * @p col are the coordinate of
-   * the selected block. The other
-   * argument is handed over to the
-   * @p SmartPointer constructor.
+   * Constructor. @p row and @p col are the coordinate of the selected block.
+   * The other argument is handed over to the @p SmartPointer constructor.
    */
   MGMatrixSelect (const unsigned int row = 0,
                   const unsigned int col = 0,
                   MGLevelObject<MATRIX> *matrix = 0);
 
   /**
-   * Set the matrix object to be
-   * used. The matrix object must
-   * exist longer as the
-   * @p MGMatrix object, since
-   * only a pointer is stored.
+   * Set the matrix object to be used. The matrix object must exist longer as
+   * the @p MGMatrix object, since only a pointer is stored.
    */
   void set_matrix (MGLevelObject<MATRIX> *M);
 
   /**
-   * Select the block for
-   * multiplication.
+   * Select the block for multiplication.
    */
   void select_block (const unsigned int row,
                      const unsigned int col);
 
   /**
-   * Matrix-vector-multiplication on
-   * a certain level.
+   * Matrix-vector-multiplication on a certain level.
    */
   virtual void vmult (const unsigned int level,
                       Vector<number> &dst,
                       const Vector<number> &src) const;
 
   /**
-   * Adding matrix-vector-multiplication on
-   * a certain level.
+   * Adding matrix-vector-multiplication on a certain level.
    */
   virtual void vmult_add (const unsigned int level,
                           Vector<number> &dst,
                           const Vector<number> &src) const;
 
   /**
-   * Transpose
-   * matrix-vector-multiplication on
-   * a certain level.
+   * Transpose matrix-vector-multiplication on a certain level.
    */
   virtual void Tvmult (const unsigned int level,
                        Vector<number> &dst,
                        const Vector<number> &src) const;
 
   /**
-   * Adding transpose
-   * matrix-vector-multiplication on
-   * a certain level.
+   * Adding transpose matrix-vector-multiplication on a certain level.
    */
   virtual void Tvmult_add (const unsigned int level,
                            Vector<number> &dst,
@@ -223,7 +204,7 @@ namespace mg
   {
     matrices.resize(p.min_level(), p.max_level());
     for (unsigned int level=p.min_level(); level <= p.max_level(); ++level)
-      matrices[level] = std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(p[level], VECTOR()));
+      matrices[level] = std_cxx11::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(p[level], VECTOR()));
   }
 
 

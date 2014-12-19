@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2014 by the deal.II authors
 //
@@ -19,7 +18,7 @@
 #include <deal.II/grid/grid_reordering_internal.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/bind.h>
 
 #include <algorithm>
 #include <set>
@@ -382,9 +381,9 @@ namespace internal
       std::transform(inquads.begin(),
                      inquads.end(),
                      std::back_inserter(mquads),
-                     std_cxx1x::bind(build_quad_from_vertices,
-                                     std_cxx1x::_1,
-                                     std_cxx1x::cref(sides)) );
+                     std_cxx11::bind(build_quad_from_vertices,
+                                     std_cxx11::_1,
+                                     std_cxx11::cref(sides)) );
 
       // Assign the quads to their sides also.
       int qctr = 0;

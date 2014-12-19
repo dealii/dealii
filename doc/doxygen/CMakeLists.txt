@@ -1,7 +1,6 @@
 ## ---------------------------------------------------------------------
-## $Id$
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -89,33 +88,48 @@ ADD_CUSTOM_COMMAND(
 #
 # Finalize the doxygen configuration:
 #
-file(GLOB _doxygen_input
+
+SET(_doxygen_input
+  ${CMAKE_CURRENT_SOURCE_DIR}/headers/
+)
+
+LIST(APPEND _doxygen_input
+  ${CMAKE_SOURCE_DIR}/include/
+  ${CMAKE_BINARY_DIR}/include/
+  ${CMAKE_SOURCE_DIR}/doc/news/
+  ${CMAKE_CURRENT_BINARY_DIR}/tutorial/tutorial.h
+  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/
+  )
+
+SET(_doxygen_image_path
+  ${CMAKE_CURRENT_SOURCE_DIR}/images
+  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/images
+  ${CMAKE_CURRENT_BINARY_DIR}/images
+  )
+
+file(GLOB _doxygen_depend
   ${CMAKE_CURRENT_SOURCE_DIR}/headers/*.h
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/*.h
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/main.cpp
   ${CMAKE_SOURCE_DIR}/doc/news/*.h
   ${CMAKE_SOURCE_DIR}/include/deal.II/**/*.h
   )
-LIST(APPEND _doxygen_input
+LIST(APPEND _doxygen_depend
   ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
   ${CMAKE_CURRENT_BINARY_DIR}/tutorial/tutorial.h
   )
 FOREACH(_step ${DEAL_II_STEPS})
   GET_FILENAME_COMPONENT(_step "${_step}" NAME)
+  LIST(APPEND _doxygen_depend
+    ${CMAKE_CURRENT_BINARY_DIR}/tutorial/${_step}.h
+    )
   LIST(APPEND _doxygen_input
     ${CMAKE_CURRENT_BINARY_DIR}/tutorial/${_step}.h
     )
 ENDFOREACH()
-TO_STRING(_doxygen_input_string ${_doxygen_input})
 
-file(GLOB _doxygen_image_path
-  ${CMAKE_CURRENT_SOURCE_DIR}/images
-  ${CMAKE_SOURCE_DIR}/examples/*/doc
-  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/images
-
-  ${CMAKE_CURRENT_BINARY_DIR}/images
-  )
 TO_STRING(_doxygen_image_path_string ${_doxygen_image_path})
+TO_STRING(_doxygen_input_string ${_doxygen_input})
 
 FILE(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
   "
@@ -139,7 +153,7 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${CMAKE_CURRENT_BINARY_DIR}/header.html
     ${CMAKE_CURRENT_BINARY_DIR}/footer.html
-    ${_doxygen_input}
+    ${_doxygen_depend}
   COMMENT "Generating documentation via doxygen."
   VERBATIM
   )

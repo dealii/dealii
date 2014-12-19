@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,18 +38,16 @@ template <typename number> class SparseMatrix;
 
 
 /**
- * This class acts as an intermediate form of the
- * SparsityPattern class. From the interface it mostly
- * represents a SparsityPattern object that is kept compressed
- * at all times. However, since the final sparsity pattern is not
- * known while constructing it, keeping the pattern compressed at all
- * times can only be achieved at the expense of either increased
- * memory or run time consumption upon use. The main purpose of this
- * class is to avoid some memory bottlenecks, so we chose to implement
- * it memory conservative. The chosen data format is too unsuited
- * to be used for actual matrices, though. It is therefore necessary to first
- * copy the data of this object over to an object of type
- * SparsityPattern before using it in actual matrices.
+ * This class acts as an intermediate form of the SparsityPattern class. From
+ * the interface it mostly represents a SparsityPattern object that is kept
+ * compressed at all times. However, since the final sparsity pattern is not
+ * known while constructing it, keeping the pattern compressed at all times
+ * can only be achieved at the expense of either increased memory or run time
+ * consumption upon use. The main purpose of this class is to avoid some
+ * memory bottlenecks, so we chose to implement it memory conservative. The
+ * chosen data format is too unsuited to be used for actual matrices, though.
+ * It is therefore necessary to first copy the data of this object over to an
+ * object of type SparsityPattern before using it in actual matrices.
  *
  * Another viewpoint is that this class does not need up front allocation of a
  * certain amount of memory, but grows as necessary.  An extensive description
@@ -62,10 +59,9 @@ template <typename number> class SparseMatrix;
  * <h3>Interface</h3>
  *
  * Since this class is intended as an intermediate replacement of the
- * SparsityPattern class, it has mostly the same interface, with
- * small changes where necessary. In particular, the add()
- * function, and the functions inquiring properties of the sparsity
- * pattern are the same.
+ * SparsityPattern class, it has mostly the same interface, with small changes
+ * where necessary. In particular, the add() function, and the functions
+ * inquiring properties of the sparsity pattern are the same.
  *
  *
  * <h3>Usage</h3>
@@ -84,8 +80,9 @@ template <typename number> class SparseMatrix;
  *
  * <h3>Notes</h3>
  *
- * There are several, exchangeable variations of this class, see @ref Sparsity,
- * section '"Dynamic" or "compressed" sparsity patterns' for more information.
+ * There are several, exchangeable variations of this class, see
+ * @ref Sparsity, section '"Dynamic" or "compressed" sparsity patterns' for
+ * more information.
  *
  * @author Timo Heister, 2008
  */
@@ -219,13 +216,13 @@ public:
 
   /**
    * Print the sparsity of the matrix in a format that @p gnuplot understands
-   * and which can be used to plot the sparsity pattern in a graphical
-   * way. The format consists of pairs <tt>i j</tt> of nonzero elements, each
-   * representing one entry of this matrix, one per line of the output
-   * file. Indices are counted from zero on, as usual. Since sparsity patterns
-   * are printed in the same way as matrices are displayed, we print the
-   * negative of the column index, which means that the <tt>(0,0)</tt> element
-   * is in the top left rather than in the bottom left corner.
+   * and which can be used to plot the sparsity pattern in a graphical way.
+   * The format consists of pairs <tt>i j</tt> of nonzero elements, each
+   * representing one entry of this matrix, one per line of the output file.
+   * Indices are counted from zero on, as usual. Since sparsity patterns are
+   * printed in the same way as matrices are displayed, we print the negative
+   * of the column index, which means that the <tt>(0,0)</tt> element is in
+   * the top left rather than in the bottom left corner.
    *
    * Print the sparsity pattern in gnuplot by setting the data style to dots
    * or points and use the @p plot command.
@@ -258,8 +255,8 @@ public:
                            const size_type index) const;
 
   /**
-   * Return an iterator that can loop over all entries in the given
-   * row. Dereferencing the iterator yields a column index.
+   * Return an iterator that can loop over all entries in the given row.
+   * Dereferencing the iterator yields a column index.
    */
   row_iterator row_begin (const size_type row) const;
 

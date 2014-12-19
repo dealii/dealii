@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2004 - 2013 by the deal.II authors
 //
@@ -214,13 +213,25 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator = (const PetscScalar s)
   {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
     //TODO[TH]: assert(is_compressed())
 
-    const int ierr = VecSet (vector, s);
+    int ierr = VecSet (vector, s);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    if (has_ghost_elements())
+      {
+        Vec ghost = PETSC_NULL;
+        ierr = VecGhostGetLocalForm(vector, &ghost);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        ierr = VecSet (ghost, s);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        ierr = VecGhostRestoreLocalForm(vector, &ghost);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
 
     return *this;
   }
@@ -361,6 +372,17 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return result;
+  }
+
+
+
+  PetscScalar
+  VectorBase::add_and_dot (const PetscScalar a,
+                           const VectorBase &V,
+                           const VectorBase &W)
+  {
+    this->add(a, V);
+    return *this * W;
   }
 
 
@@ -814,7 +836,7 @@ namespace PETScWrappers
 
   void
   VectorBase::add (const PetscScalar a,
-                   const VectorBase     &v)
+                   const VectorBase &v)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());

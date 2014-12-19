@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -17,7 +16,7 @@
 
 /*
  Code for testing the function
- GridTools::extract_boundary_mesh (...).
+ GridGenerator::extract_boundary_mesh (...).
  We test that the order of cells and the orientation
  of the vertices is consistent between the two meshes.
 
@@ -117,7 +116,7 @@ int main ()
     Triangulation<dim-1,dim> boundary_mesh;
 
     surface_to_volume_mapping
-      = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh);
+      = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
 
     if (!test_vertices_orientation(boundary_mesh, surface_to_volume_mapping,2))
       Assert (false, ExcInternalError());

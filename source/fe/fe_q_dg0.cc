@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2012 - 2013 by the deal.II authors
 //
@@ -133,7 +132,9 @@ FE_Q_DG0<dim,spacedim>::get_name () const
       }
 
   if (type == true)
-    namebuf << "FE_Q_DG0<" << dim << ">(" << this->degree << ")";
+    namebuf << "FE_Q_DG0<"
+            << Utilities::dim_string(dim,spacedim)
+            << ">(" << this->degree << ")";
   else
     {
 
@@ -147,9 +148,13 @@ FE_Q_DG0<dim,spacedim>::get_name () const
             break;
           }
       if (type == true)
-        namebuf << "FE_Q_DG0<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
+        namebuf << "FE_Q_DG0<"
+                << Utilities::dim_string(dim,spacedim)
+                << ">(QGaussLobatto(" << this->degree+1 << "))";
       else
-        namebuf << "FE_Q_DG0<" << dim << ">(QUnknownNodes(" << this->degree << "))";
+        namebuf << "FE_Q_DG0<"
+                << Utilities::dim_string(dim,spacedim)
+                << ">(QUnknownNodes(" << this->degree << "))";
     }
   return namebuf.str();
 }
@@ -322,7 +327,7 @@ FE_Q_DG0<dim,spacedim>::get_constant_modes () const
   constant_modes(1, this->dofs_per_cell-1) = true;
 
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, std::vector<unsigned int> (2, 0));
+         (constant_modes, std::vector<unsigned int> (2, 0));
 }
 
 

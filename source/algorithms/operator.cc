@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2010 - 2013 by the deal.II authors
 //
@@ -39,18 +38,18 @@ namespace Algorithms
 {
   OperatorBase::~OperatorBase()
   {}
-  
+
   void OperatorBase::notify(const Event &e)
   {
     notifications += e;
   }
-  
+
   void
   OperatorBase::clear_events ()
   {
     notifications.clear();
   }
-  
+
 
 #include "operator.inst"
 }

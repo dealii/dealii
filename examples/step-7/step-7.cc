@@ -1,5 +1,4 @@
 /* ---------------------------------------------------------------------
- * $Id$
  *
  * Copyright (C) 2000 - 2013 by the deal.II authors
  *
@@ -976,7 +975,7 @@ namespace Step7
   template <int dim>
   void HelmholtzProblem<dim>::run ()
   {
-	const unsigned int n_cycles = (refinement_mode==global_refinement)?5:9;
+    const unsigned int n_cycles = (refinement_mode==global_refinement)?5:9;
     for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
       {
         if (cycle == 0)

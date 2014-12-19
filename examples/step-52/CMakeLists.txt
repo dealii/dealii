@@ -19,11 +19,14 @@ SET(TARGET_SRC
   ${TARGET}.cc
   )
 
+# Define the output that should be cleaned:
+SET(CLEAN_UP_FILES *.vtu)
+
 # Usually, you will not need to modify anything beyond this point...
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
-FIND_PACKAGE(deal.II 8.2 QUIET
+FIND_PACKAGE(deal.II 8.3 QUIET
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 IF(NOT ${deal.II_FOUND})

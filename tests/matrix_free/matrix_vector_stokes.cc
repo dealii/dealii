@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2013 by the deal.II authors
 //
@@ -85,17 +84,16 @@ public:
 
         for (unsigned int q=0; q<velocity.n_q_points; ++q)
           {
-            SymmetricTensor<2,dim,vector_t> sym_grad_u =
-              velocity.get_symmetric_gradient (q);
+            Tensor<2,dim,vector_t> grad_u = velocity.get_gradient (q);
             vector_t pres = pressure.get_value(q);
-            vector_t div = -velocity.get_divergence(q);
+            vector_t div = -trace(grad_u);
             pressure.submit_value   (div, q);
 
             // subtract p * I
             for (unsigned int d=0; d<dim; ++d)
-              sym_grad_u[d][d] -= pres;
+              grad_u[d][d] -= pres;
 
-            velocity.submit_symmetric_gradient(sym_grad_u, q);
+            velocity.submit_gradient(grad_u, q);
           }
 
         velocity.integrate (false,true);
@@ -221,9 +219,9 @@ void test ()
     const FEValuesExtractors::Vector velocities (0);
     const FEValuesExtractors::Scalar pressure (dim);
 
-    std::vector<SymmetricTensor<2,dim> > phi_grads_u (dofs_per_cell);
-    std::vector<double>                  div_phi_u   (dofs_per_cell);
-    std::vector<double>                  phi_p       (dofs_per_cell);
+    std::vector<Tensor<2,dim> > phi_grad_u (dofs_per_cell);
+    std::vector<double>         div_phi_u  (dofs_per_cell);
+    std::vector<double>         phi_p      (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -237,16 +235,16 @@ void test ()
           {
             for (unsigned int k=0; k<dofs_per_cell; ++k)
               {
-                phi_grads_u[k] = fe_values[velocities].symmetric_gradient (k, q);
-                div_phi_u[k]   = fe_values[velocities].divergence (k, q);
-                phi_p[k]       = fe_values[pressure].value (k, q);
+                phi_grad_u[k] = fe_values[velocities].gradient (k, q);
+                div_phi_u[k]  = fe_values[velocities].divergence (k, q);
+                phi_p[k]      = fe_values[pressure].value (k, q);
               }
 
             for (unsigned int i=0; i<dofs_per_cell; ++i)
               {
                 for (unsigned int j=0; j<=i; ++j)
                   {
-                    local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
+                    local_matrix(i,j) += (scalar_product(phi_grad_u[i], phi_grad_u[j])
                                           - div_phi_u[i] * phi_p[j]
                                           - phi_p[i] * div_phi_u[j])
                                          * fe_values.JxW(q);

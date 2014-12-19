@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2014 by the deal.II authors
 //
@@ -618,8 +617,8 @@ namespace DoFTools
                           (neighbor->subdomain_id() != cell->subdomain_id()))
                         {
                           constraints.add_entries_local_to_global
-                            (dofs_on_other_cell, dofs_on_this_cell,
-                             sparsity, keep_constrained_dofs);
+                          (dofs_on_other_cell, dofs_on_this_cell,
+                           sparsity, keep_constrained_dofs);
                           if (neighbor->subdomain_id() != cell->subdomain_id())
                             constraints.add_entries_local_to_global
                             (dofs_on_other_cell, sparsity, keep_constrained_dofs);

@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2003 - 2013 by the deal.II authors
 //
@@ -26,32 +25,31 @@ template <bool, typename> struct constraint_and_return_value;
 
 
 /**
- * This specialization of the general template for the case of a
- * <tt>true</tt> first template argument declares a local typedef <tt>type</tt>
- * to the second template argument. It is used in order to construct
- * constraints on template arguments in template (and member template)
- * functions. The negative specialization is missing.
+ * This specialization of the general template for the case of a <tt>true</tt>
+ * first template argument declares a local typedef <tt>type</tt> to the
+ * second template argument. It is used in order to construct constraints on
+ * template arguments in template (and member template) functions. The
+ * negative specialization is missing.
  *
- * Here's how the trick works, called SFINAE (substitution failure is
- * not an error): The C++ standard prescribes that a template function
- * is only considered in a call, if all parts of its signature can be
- * instantiated with the template parameter replaced by the respective
- * types/values in this particular call. Example:
+ * Here's how the trick works, called SFINAE (substitution failure is not an
+ * error): The C++ standard prescribes that a template function is only
+ * considered in a call, if all parts of its signature can be instantiated
+ * with the template parameter replaced by the respective types/values in this
+ * particular call. Example:
  * @code
  *   template <typename T>
  *   typename T::type  foo(T) {...};
  *   ...
  *   foo(1);
  * @endcode
- * The compiler should detect that in this call, the template
- * parameter T must be identified with the type "int". However,
- * the return type T::type does not exist. The trick now is
- * that this is not considered an error: this template is simply
- * not considered, the compiler keeps on looking for another
- * possible function foo.
+ * The compiler should detect that in this call, the template parameter T must
+ * be identified with the type "int". However, the return type T::type does
+ * not exist. The trick now is that this is not considered an error: this
+ * template is simply not considered, the compiler keeps on looking for
+ * another possible function foo.
  *
- * The idea is then to make the return type un-instantiatable if
- * certain constraints on the template types are not satisfied:
+ * The idea is then to make the return type un-instantiatable if certain
+ * constraints on the template types are not satisfied:
  * @code
  *   template <bool, typename> struct constraint_and_return_value;
  *   template <typename T> struct constraint_and_return_value<true,T> {
@@ -73,11 +71,11 @@ template <bool, typename> struct constraint_and_return_value;
  *   typename constraint_and_return_value<int_or_double<T>::value,void>::type
  *   f (T);
  * @endcode
- * which can only be instantiated if T=int or T=double. A call to
- * f('c') will just fail with a compiler error: "no instance of
- * f(char) found". On the other hand, if the predicate in the first
- * argument to the constraint_and_return_value template is true, then
- * the return type is just the second type in the template.
+ * which can only be instantiated if T=int or T=double. A call to f('c') will
+ * just fail with a compiler error: "no instance of f(char) found". On the
+ * other hand, if the predicate in the first argument to the
+ * constraint_and_return_value template is true, then the return type is just
+ * the second type in the template.
  *
  * @author Wolfgang Bangerth, 2003
  */
@@ -96,14 +94,14 @@ template <typename T> struct constraint_and_return_value<true,T>
  *   template <typename T> void f(T, T);
  * @endcode
  * then it can't be called in an expression like <code>f(1, 3.141)</code>
- * because the type <code>T</code> of the template can not be deduced
- * in a unique way from the types of the arguments. However, if the
- * template is written as
+ * because the type <code>T</code> of the template can not be deduced in a
+ * unique way from the types of the arguments. However, if the template is
+ * written as
  * @code
  *   template <typename T> void f(T, typename identity<T>::type);
  * @endcode
- * then the call becomes valid: the type <code>T</code> is not deducible
- * from the second argument to the function, so only the first argument
+ * then the call becomes valid: the type <code>T</code> is not deducible from
+ * the second argument to the function, so only the first argument
  * participates in template type resolution.
  *
  * The context for this feature is as follows: consider
@@ -122,9 +120,9 @@ template <typename T> struct constraint_and_return_value<true,T>
  * template type <code>A</code> should be <code>double</code> (from the
  * signature of the function given as first argument to
  * <code>forward_call</code>, or <code>int</code> because the expression
- * <code>1</code> has that type. Of course, what we would like the compiler
- * to do is simply cast the <code>1</code> to <code>double</code>. We can
- * achieve this by writing the code as follows:
+ * <code>1</code> has that type. Of course, what we would like the compiler to
+ * do is simply cast the <code>1</code> to <code>double</code>. We can achieve
+ * this by writing the code as follows:
  * @code
  * template <typename RT, typename A>
  * void forward_call(RT (*p) (A), typename identity<A>::type a)  { p(a); }
@@ -168,21 +166,17 @@ struct identity
 struct PointerComparison
 {
   /**
-   * Comparison function for pointers of
-   * the same type. Returns @p true if the
+   * Comparison function for pointers of the same type. Returns @p true if the
    * two pointers are equal.
    */
   template <typename T>
   static bool equal (const T *p1, const T *p2);
 
   /**
-   * Comparison function for pointers of
-   * different types. The C++ language does
-   * not allow comparing these pointers
-   * using <tt>operator==</tt>. However,
-   * since the two pointers have different
-   * types, we know that they can't be the
-   * same, so we always return @p false.
+   * Comparison function for pointers of different types. The C++ language
+   * does not allow comparing these pointers using <tt>operator==</tt>.
+   * However, since the two pointers have different types, we know that they
+   * can't be the same, so we always return @p false.
    */
   template <typename T, typename U>
   static bool equal (const T *, const U *);
@@ -193,8 +187,8 @@ struct PointerComparison
 namespace internal
 {
   /**
-   * A type that is sometimes used for template tricks. For example, in
-   * some situations one would like to do this:
+   * A type that is sometimes used for template tricks. For example, in some
+   * situations one would like to do this:
    *
    * @code
    *   template <int dim>
@@ -215,8 +209,8 @@ namespace internal
    * @endcode
    *
    * The problem is: the language doesn't allow us to specialize
-   * <code>X::f()</code> without specializing the outer class first. One
-   * of the common tricks is therefore to use something like this:
+   * <code>X::f()</code> without specializing the outer class first. One of
+   * the common tricks is therefore to use something like this:
    *
    * @code
    *   template <int N> struct int2type {};
@@ -244,9 +238,9 @@ namespace internal
    * @endcode
    *
    * Note that we have replaced specialization of <code>X::f()</code> by
-   * overloading, but that from inside the function <code>g()</code>, we
-   * can still select which of the different <code>X::f()</code> we want
-   * based on the <code>subdim</code> template argument.
+   * overloading, but that from inside the function <code>g()</code>, we can
+   * still select which of the different <code>X::f()</code> we want based on
+   * the <code>subdim</code> template argument.
    *
    * @author Wolfgang Bangerth, 2006
    */
@@ -268,8 +262,8 @@ namespace internal
 
 
 /**
- * A type that can be used to determine whether two types are equal.
- * It allows to write code like
+ * A type that can be used to determine whether two types are equal. It allows
+ * to write code like
  * @code
  *   template <typename T>
  *   void Vector<T>::some_operation () {
@@ -291,9 +285,9 @@ struct types_are_equal
 
 
 /**
- * Partial specialization of the general template for the case that
- * both template arguments are equal. See the documentation of the
- * general template for more information.
+ * Partial specialization of the general template for the case that both
+ * template arguments are equal. See the documentation of the general template
+ * for more information.
  */
 template <typename T>
 struct types_are_equal<T,T>

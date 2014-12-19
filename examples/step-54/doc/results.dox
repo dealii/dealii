@@ -1,0 +1,92 @@
+<h1>Results</h1>
+
+The program execution produces a series of mesh files <code>3d_mesh_*.vtk</code> 
+that we can visualize with any of the usual visualization programs that can read the VTK
+file format. 
+
+The following table illustrates the results obtained employing the normal projection strategy. The first two
+rows of the table show side views of the grids obtained for progressive levels
+of refinement, overlain on a very fine rendering of the exact geometry. The
+dark and light red areas simply indicate whether the current mesh or the fine
+geometry is closer to the observer; the distinction does not carry any
+particularly deep meaning. The last row
+of pictures depict front views (mirrored to both sides of the geometry) of the
+same grids shown in the second row.
+
+
+<table style="width:90%">
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.common_0.png" alt="" width="400"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_1.png" alt="" width="400"></td>		
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_2.png" alt="" width="400"></td>
+  </tr>
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_3.png" alt="" width="400"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_4.png" alt="" width="400"></td>		
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_5.png" alt="" width="400"></td>
+  </tr>
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_front_3.png" alt="" width="400"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_front_4.png" alt="" width="400"></td>		
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_front_5.png" alt="" width="400"></td>
+  </tr>
+</table>
+
+As can be seen in the pictures---and as we anticipated---the normal refinement strategy is unable to produce nicely shaped elements
+when applied to surfaces with significant curvature changes. This is
+particularly apparent at the bulb of the hull where all new points have been
+placed in the upper part of the bulb and the lower part remains completely
+unresolved.
+
+The following table, which is arranged as the previous one, illustrates
+the results obtained adopting the directional projection approach, in which the projection direction selected was the y-axis (which
+is indicated with a small yellow arrow at the bottom left of each image).
+
+
+<table style="width:90%">
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.common_0.png" alt="" width="400"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_1.png" alt="" width="400"></td>		
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_2.png" alt="" width="400"></td>
+  </tr>
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_3.png" alt="" width="400"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_4.png" alt="" width="400"></td>		
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_5.png" alt="" width="400"></td>
+  </tr>
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_front_3.png" alt="" width="400"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_front_4.png" alt="" width="400"></td>		
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.directional_front_5.png" alt="" width="400"></td>
+  </tr>
+</table>
+
+The images confirm that the quality of the mesh obtained with a directional projection is sensibly higher than that obtained projecting along the
+surface normal. Yet, a number of elements elongated in the y-direction are observed around the bottom of the bulb, where the surface is almost parallel to the
+direction chosen for the projection. 
+
+The final test shows results using instead the projection normal to the faces:
+
+<table style="width:90%">
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.common_0.png" alt="" width="400"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_1.png" alt="" width="400"></td>		
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_2.png" alt="" width="400"></td>
+  </tr>
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_3.png" alt="" width="400"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_4.png" alt="" width="400"></td>		
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_5.png" alt="" width="400"></td>
+  </tr>
+  <tr>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_front_3.png" alt="" width="400"></td>
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_front_4.png" alt="" width="400"></td>		
+    <td><img src="http://www.dealii.org/images/steps/developer/step-54.normal_to_mesh_front_5.png" alt="" width="400"></td>
+  </tr>
+</table>
+
+The pictures confirm that the normal to mesh projection approach leads to grids that remain evenly spaced
+throughtout the refinement steps. At the same time, these meshes represent rather well the original geometry even in the bottom region
+of the bulb, which is not well recovered employing the directional projector or the normal projector.
+ 
+

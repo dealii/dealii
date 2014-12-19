@@ -1,5 +1,4 @@
 /* ---------------------------------------------------------------------
- * $Id$
  *
  * Copyright (C) 2013 by the deal.II authors
  *
@@ -134,7 +133,7 @@ namespace Step26
     {}
 
     virtual double value (const Point<dim> &p,
-			  const unsigned int component = 0) const;
+                          const unsigned int component = 0) const;
 
   private:
     const double period;
@@ -144,7 +143,7 @@ namespace Step26
 
   template<int dim>
   double RightHandSide<dim>::value (const Point<dim> &p,
-				    const unsigned int component) const
+                                    const unsigned int component) const
   {
     Assert (component == 0, ExcInternalError());
     Assert (dim == 2, ExcNotImplemented());
@@ -177,14 +176,14 @@ namespace Step26
   {
   public:
     virtual double value (const Point<dim>  &p,
-			  const unsigned int component = 0) const;
+                          const unsigned int component = 0) const;
   };
 
 
-  
+
   template<int dim>
   double BoundaryValues<dim>::value (const Point<dim> &/*p*/,
-				     const unsigned int component) const
+                                     const unsigned int component) const
   {
     Assert(component == 0, ExcInternalError());
     return 0;

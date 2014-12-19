@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2014 by the deal.II authors
 //
@@ -17,7 +16,7 @@
 #ifndef __deal2__time_stepping_templates_h
 #define __deal2__time_stepping_templates_h
 
-#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/time_stepping.h>
 
@@ -31,8 +30,9 @@ namespace TimeStepping
 
   template <typename VECTOR>
   double RungeKutta<VECTOR>::evolve_one_time_step(
-    std::vector<std_cxx1x::function<VECTOR (const double, const VECTOR &)> > &F,
-    std::vector<std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> > & J_inverse,
+    std::vector<std_cxx11::function<VECTOR (const double, const VECTOR &)> > &F,
+    std::vector<std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> > &J_inverse,
+
     double t,
     double delta_t,
     VECTOR &y)
@@ -137,8 +137,8 @@ namespace TimeStepping
 
   template <typename VECTOR>
   double ExplicitRungeKutta<VECTOR>::evolve_one_time_step(
-    std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
-    std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+    std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
+    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
     double t,
     double delta_t,
     VECTOR &y)
@@ -150,7 +150,7 @@ namespace TimeStepping
 
   template <typename VECTOR>
   double ExplicitRungeKutta<VECTOR>::evolve_one_time_step(
-    std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
+    std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
     double t,
     double delta_t,
     VECTOR &y)
@@ -161,7 +161,7 @@ namespace TimeStepping
 
     // Linear combinations of the stages.
     for (unsigned int i=0; i<this->n_stages; ++i)
-      y.sadd(1.,delta_t*this->b[i],f_stages[i]);
+      y.sadd(1.,delta_t *this->b[i],f_stages[i]);
 
     return (t+delta_t);
   }
@@ -178,7 +178,7 @@ namespace TimeStepping
 
   template <typename VECTOR>
   void ExplicitRungeKutta<VECTOR>::compute_stages(
-    std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
+    std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
     const double t,
     const double delta_t,
     const VECTOR &y,
@@ -188,7 +188,7 @@ namespace TimeStepping
       {
         VECTOR Y(y);
         for (unsigned int j=0; j<i; ++j)
-          Y.sadd(1.,delta_t*this->a[i][j],f_stages[j]);
+          Y.sadd(1.,delta_t *this->a[i][j],f_stages[j]);
         // Evaluate the function f at the point (t+c[i]*delta_t,Y).
         f_stages[i] = f(t+this->c[i]*delta_t,Y);
       }
@@ -280,8 +280,8 @@ namespace TimeStepping
 
   template <typename VECTOR>
   double ImplicitRungeKutta<VECTOR>::evolve_one_time_step(
-    std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
-    std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+    std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
+    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
     double t,
     double delta_t,
     VECTOR &y)
@@ -296,7 +296,7 @@ namespace TimeStepping
       {
         y = old_y;
         for (unsigned int i=0; i<this->n_stages; ++i)
-          y.sadd(1.,delta_t*this->b[i],f_stages[i]);
+          y.sadd(1.,delta_t *this->b[i],f_stages[i]);
       }
 
     return (t+delta_t);
@@ -323,8 +323,8 @@ namespace TimeStepping
 
   template <typename VECTOR>
   void ImplicitRungeKutta<VECTOR>::compute_stages(
-    std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
-    std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+    std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
+    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
     double t,
     double delta_t,
     VECTOR &y,
@@ -335,14 +335,14 @@ namespace TimeStepping
       {
         VECTOR old_y(z);
         for (unsigned int j=0; j<i; ++j)
-          old_y.sadd(1.,delta_t*this->a[i][j],f_stages[j]);
+          old_y.sadd(1.,delta_t *this->a[i][j],f_stages[j]);
 
         // Solve the nonlinear system using Newton's method
         const double new_t = t+this->c[i]*delta_t;
         const double new_delta_t = this->a[i][i]*delta_t;
-        newton_solve(std_cxx1x::bind(&ImplicitRungeKutta<VECTOR>::compute_residual,this,f,new_t,new_delta_t,
-                                     std_cxx1x::cref(old_y),std_cxx1x::_1,std_cxx1x::ref(f_stages[i]),std_cxx1x::_2),
-                     std_cxx1x::bind(id_minus_tau_J_inverse,new_t,new_delta_t,std_cxx1x::_1),y);
+        newton_solve(std_cxx11::bind(&ImplicitRungeKutta<VECTOR>::compute_residual,this,f,new_t,new_delta_t,
+                                     std_cxx11::cref(old_y),std_cxx11::_1,std_cxx11::ref(f_stages[i]),std_cxx11::_2),
+                     std_cxx11::bind(id_minus_tau_J_inverse,new_t,new_delta_t,std_cxx11::_1),y);
       }
   }
 
@@ -350,8 +350,8 @@ namespace TimeStepping
 
   template <typename VECTOR>
   void ImplicitRungeKutta<VECTOR>::newton_solve(
-    std_cxx1x::function<void (const VECTOR &,VECTOR &)> get_residual,
-    std_cxx1x::function<VECTOR (const VECTOR &)> id_minus_tau_J_inverse,
+    std_cxx11::function<void (const VECTOR &,VECTOR &)> get_residual,
+    std_cxx11::function<VECTOR (const VECTOR &)> id_minus_tau_J_inverse,
     VECTOR &y)
   {
     VECTOR residual(y);
@@ -376,7 +376,7 @@ namespace TimeStepping
 
   template <typename VECTOR>
   void ImplicitRungeKutta<VECTOR>::compute_residual(
-    std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
+    std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
     double t,
     double delta_t,
     const VECTOR &old_y,
@@ -673,8 +673,8 @@ namespace TimeStepping
 
   template <typename VECTOR>
   double EmbeddedExplicitRungeKutta<VECTOR>::evolve_one_time_step(
-    std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
-    std_cxx1x::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+    std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
+    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
     double t,
     double delta_t,
     VECTOR &y)
@@ -686,7 +686,7 @@ namespace TimeStepping
 
   template <typename VECTOR>
   double EmbeddedExplicitRungeKutta<VECTOR>::evolve_one_time_step(
-    std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
+    std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
     double t, double delta_t, VECTOR &y)
   {
     bool done = false;
@@ -705,8 +705,8 @@ namespace TimeStepping
 
         for (unsigned int i=0; i<this->n_stages; ++i)
           {
-            y.sadd(1.,delta_t*this->b1[i],f_stages[i]);
-            error.sadd(1.,delta_t*(b2[i]-b1[i]),f_stages[i]);
+            y.sadd(1.,delta_t *this->b1[i],f_stages[i]);
+            error.sadd(1.,delta_t *(b2[i]-b1[i]),f_stages[i]);
           }
 
         error_norm = error.l2_norm();
@@ -715,7 +715,7 @@ namespace TimeStepping
           {
             done = true;
             // Increase the guessed time step
-            double new_delta_t = delta_t*coarsen_param;
+            double new_delta_t = delta_t *coarsen_param;
             // Check that the guessed time step is smaller than the maximum time
             // step allowed.
             if (new_delta_t>max_delta_t)
@@ -801,7 +801,7 @@ namespace TimeStepping
 
   template <typename VECTOR>
   void EmbeddedExplicitRungeKutta<VECTOR>::compute_stages(
-    std_cxx1x::function<VECTOR (const double, const VECTOR &)> f,
+    std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
     const double t,
     const double delta_t,
     const VECTOR &y,
@@ -825,7 +825,7 @@ namespace TimeStepping
       {
         Y = y;
         for (unsigned int j = 0; j < i; ++j)
-          Y.sadd(1.0,delta_t*this->a[i][j],f_stages[j]);
+          Y.sadd(1.0,delta_t *this->a[i][j],f_stages[j]);
         f_stages[i] = f(t+this->c[i]*delta_t,Y);
       }
   }

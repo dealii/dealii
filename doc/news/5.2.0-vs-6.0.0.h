@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2013, 2014 by the deal.II authors
 //
@@ -46,10 +45,8 @@ inconvenience this causes.
    (GK 2007/08/22)
    </p>
 
-  <li> <p>Changed: Implementing gradients for the class <code
-  class="class">FunctionDerivative</code>, it became evident that its enums for
-  difference formulas clashed with those of <code
-  class="class">AutoDerivativeFunction</code>. Therefore, only the latter
+  <li> <p>Changed: Implementing gradients for the class <code>FunctionDerivative</code>, it became evident that its enums for
+  difference formulas clashed with those of <code>AutoDerivativeFunction</code>. Therefore, only the latter
   survived.
   <br>
   (GK 2007/08/02)
@@ -86,28 +83,15 @@ inconvenience this causes.
 
   <li> <p>
        Changed: Lower dimensional objects have been removed from the
-       hierarchical structure of levels in <code
-       class="class">TriaLevel</code>. Faces, i.e. lines in 2D and
+       hierarchical structure of levels in <code>TriaLevel</code>. Faces, i.e. lines in 2D and
        lines and quads in 3D, have no associated level
        anymore. Therefore, the level argument of some iterator
-       functions have been removed. The affected functions are <code
-       class="class">Triangulation</code>:: <code
-       class="member">begin_raw_face</code>, <code
-       class="member">begin_face</code>, <code
-       class="member">begin_active_face</code> and all <code
-       class="member">last_*_face</code> or <code
-       class="member">end_*_face</code> functions, no matter whether
+       functions have been removed. The affected functions are <code>Triangulation::begin_raw_face</code>, <code>begin_face</code>, <code>begin_active_face</code> and all <code>last_*_face</code> or <code>end_*_face</code> functions, no matter whether
        raw, used or active. Also effected are the direct iterator
-       functions which are related to faces like <code
-       class="member">begin_line</code> in 2D and 3D or <code
-       class="member">begin_quad</code> in 3D. Again, the same applies
-       to <code>last_*</code> and <code
-       class="member">end_*</code>.
+       functions which are related to faces like <code>begin_line</code> in 2D and 3D or <code>begin_quad</code> in 3D. Again, the same applies
+       to <code>last_*</code> and <code>end_*</code>.
        <br>
-       The respective functions in <code
-       class="class">DoFHandler</code>, <code
-       class="class">hp::DoFHandler</code> and <code
-       class="class">MGDoFHandler</code> have been changed
+       The respective functions in <code>DoFHandler</code>, <code>hp::DoFHandler</code> and <code>MGDoFHandler</code> have been changed
        accordingly.
        <br>
        Nested loops with an outer loop over all levels and an inner
@@ -120,8 +104,7 @@ inconvenience this causes.
 
   <li> <p>
        Changed: In order to facilitate the implementation of hp finite
-       elements, the ordering of boundary DoFs returned by <code 
-       class="member">DoFTools::map_dof_to_boundary_indices</code> has been
+       elements, the ordering of boundary DoFs returned by <code>DoFTools::map_dof_to_boundary_indices</code> has been
        changed. Fortunately, this is a rarely used function so that the effect
        should be limited to only a few programs.
        <br> 
@@ -129,8 +112,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Changed: The <code
-       class="member">distribute_local_to_global</code> functions have
+       Changed: The <code>distribute_local_to_global</code> functions have
        been moved from the classes implementing accessors to arbitrary
        objects in the triangulation to the cell accessors, to
        facilitate the implementation of hp methods. That means
@@ -142,12 +124,9 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Changed: The template argument of the <code
-       class="class">InterGridMap</code> class has been changed. Code
-       like e.g. <code
-       class="class">InterGridMap&lt;DoFHandler,2&gt;</code> must be
-       replaced by <code
-       class="class">InterGridMap&lt;DoFHandler&lt;2&gt; &gt;</code>.
+       Changed: The template argument of the <code>InterGridMap</code> class has been changed. Code
+       like e.g. <code>InterGridMap&lt;DoFHandler,2&gt;</code> must be
+       replaced by <code>InterGridMap&lt;DoFHandler&lt;2&gt; &gt;</code>.
        <br> 
        (RH 2006/02/27)
        </p>
@@ -209,17 +188,13 @@ inconvenience this causes.
        possible. For more information on the new numbering scheme, see
        the <a
        href="http://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2005/000827.html">announcement</a>
-       on the mailing list.  <br> The ordering of vertices in <code
-       class="class">CellData</code> given to the <code
-       class="member">Triangulation::create_triangulation</code>
+       on the mailing list.  <br> The ordering of vertices in <code>CellData</code> given to the <code>Triangulation::create_triangulation</code>
        function has been changed accordingly. For backward
-       compatibility there is now a new <code
-       class="member">Triangulation::create_triangulation_compatibility</code>
+       compatibility there is now a new <code>Triangulation::create_triangulation_compatibility</code>
        function which takes <code>CellData</code> in the
        old vertex ordering. However, as this function might not be
        supported forever users are advised to change their code to the
-       new numbering scheme and to use the <code
-       class="member">Triangulation::create_triangulation</code>
+       new numbering scheme and to use the <code>Triangulation::create_triangulation</code>
        function.  
        <br> 
        (RH 2005/11/02)
@@ -325,10 +300,8 @@ inconvenience this causes.
 	(WB 2006/08/09)
 	</p> 
 
-  <li> <p> Changed: The default number of subdivisions in the <code
-       class="member">build_patches</code> functions of the DataOut classes is
-       now part of the parameters read by <code
-       class="member">parse_parameters</code>. This default value is used
+  <li> <p> Changed: The default number of subdivisions in the <code>build_patches</code> functions of the DataOut classes is
+       now part of the parameters read by <code>parse_parameters</code>. This default value is used
        whenever patches with zero subdivisions are being built.
        <br>
        (GK 2006/06/18)
@@ -633,8 +606,7 @@ inconvenience this causes.
        (Ralf B. Schulz 2006/05/10)
        </p>
 
-  <li> <p> Improved: <code>DataOutBase</code>::<code
-       class="member">OutputFormat</code> has a new value <tt>none</tt>,
+  <li> <p> Improved: <code>DataOutBase</code>::<code>OutputFormat</code> has a new value <tt>none</tt>,
        writing no output at all. This way, the writing of output files can be
        controlled more easily from parameter files.
        <br>
@@ -655,8 +627,7 @@ inconvenience this causes.
        (WB 2006/03/24)
        </p>
 
-  <li> <p> New: The new <code
-       class="member">deal_II_numbers::is_finite</code> function can
+  <li> <p> New: The new <code>deal_II_numbers::is_finite</code> function can
        be used to check whether a floating point number is finite,
        i.e. neither plus or minus infinite nor NaN (not a number);
        it is in the new include file <tt>base/numbers.h</tt>, which will
@@ -671,15 +642,13 @@ inconvenience this causes.
        (WB 2006/03/14)
        </p>
 
-  <li> <p> Improved: The function <code>Subscriptor</code>::<code
-       class="member">list_subscribers</code> logs all current subscribers of an
+  <li> <p> Improved: The function <code>Subscriptor</code>::<code>list_subscribers</code> logs all current subscribers of an
        object to <tt>deallog</tt>.
        <br>
        (GK 2006/03/08)
        </p>
 
-  <li> <p>Fixed: Writing a denormal "NaN" through <code
-       class="class">LogStream</code> objects such as 
+  <li> <p>Fixed: Writing a denormal "NaN" through <code>LogStream</code> objects such as 
        <code>deallog</code> erroneously printed zero, rather
        than "nan". This is now fixed.
        <br>
@@ -730,8 +699,7 @@ inconvenience this causes.
        (WB 2006/02/12)
        </p>
 
-  <li> <p>Improved: A new function <code>TableBase</code>::<code
-       class="member">fill</code>, filling the whole table with the same
+  <li> <p>Improved: A new function <code>TableBase</code>::<code>fill</code>, filling the whole table with the same
        element has been introduced.
        <br>
        (GK 2006/01/18)
@@ -761,16 +729,14 @@ inconvenience this causes.
 
   <li> <p>
        Fixed: The computation of <code>HMIN</code> and
-       <code>HMAX</code> in <code
-       class="member">DataOutBase::write_povray</code> has been
+       <code>HMAX</code> in <code>DataOutBase::write_povray</code> has been
        wrong. This is now fixed.
        <br>
        (RH 2005/11/02)
        </p>
 
   <li> <p>
-       Fixed: <code
-       class="member">DataOutBase&lt;2,3&gt;::write_tecplot_binary</code>
+       Fixed: <code>DataOutBase&lt;2,3&gt;::write_tecplot_binary</code>
        did not write the <code>z</code> coordinates. This is now
        fixed.
        <br>
@@ -778,21 +744,15 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: The <tt>tecplot_binary</tt> <code
-       class="class">OutputFormat</code> has been added to <code
-       class="member">DataOutBase::get_output_format_names</code>. Now
-       an exception will be raised if <code
-       class="member">write_tecplot_binary</code> is invoked without
-       specifying the filename through the <code
-       class="class">DataOutBase::TecplotFlags</code> interface.
+       Fixed: The <tt>tecplot_binary</tt> <code>OutputFormat</code> has been added to <code>DataOutBase::get_output_format_names</code>. Now
+       an exception will be raised if <code>write_tecplot_binary</code> is invoked without
+       specifying the filename through the <code>DataOutBase::TecplotFlags</code> interface.
        <br> 
        (RH 2005/09/23)
        </p>
 
   <li> <p>
-       New: There are now new <code
-       class="member">get_n_mpi_processes</code> and <code
-       class="member">get_this_mpi_process</code> functions in the
+       New: There are now new <code>get_n_mpi_processes</code> and <code>get_this_mpi_process</code> functions in the
        <code>Utilities::System</code> namespace. In case
        of a code not running in parallel, they simply return 1 and 0,
        respectively.
@@ -807,8 +767,7 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
-  <li> <p>Changed: The <code
-       class="class">CompressedBlockSparsityPattern</code> has been renamed to
+  <li> <p>Changed: The <code>CompressedBlockSparsityPattern</code> has been renamed to
        <code>BlockCompressedSparsityPattern</code> to be
        consistent, since the "block" part builds on the "compressed sparsity
        pattern", not the other way around. The old name remains as a typedef,
@@ -818,11 +777,9 @@ inconvenience this causes.
        </p>
 
   <li> <p>New: The <code>CompressedSetSparsityPattern</code>
-       class is an alternative to the <code
-       class="class">CompressedSparsityPattern</code> class that appears to be
+       class is an alternative to the <code>CompressedSparsityPattern</code> class that appears to be
        better suited for problems that have many entries per row. There is also
-       a block version, <code
-       class="class">BlockCompressedSetSparsityPattern</code>. The two new
+       a block version, <code>BlockCompressedSetSparsityPattern</code>. The two new
        classes can used in all places where a regular compressed sparsity
        pattern can also be used.
        <br>
@@ -840,8 +797,7 @@ inconvenience this causes.
        to run the sparse direct solver as a separate program (the
        <code>detached_ma27</code> program) rather than as part of the current
        program in order to be able to run several instances of it in parallel
-       during multithreaded computations. However, the destructor of the <code
-       class="member">SparseDirectMA27</code> class had a bug that when using
+       during multithreaded computations. However, the destructor of the <code>SparseDirectMA27</code> class had a bug that when using
        this detached mode led to a segmentation fault. This is now fixed.
        <br>
        (WB 2007/02/09)
@@ -869,8 +825,7 @@ inconvenience this causes.
        (Florian Prill 2006/12/18)
        </p>
 
-  <li> <p>Improved: The <code
-       class="class">SparsityPattern</code> class would produce
+  <li> <p>Improved: The <code>SparsityPattern</code> class would produce
        segmentation faults if one tried to allocate a matrix with more
        than about 4.2 billion elements (i.e. the number that one can
        store in a 32-bit unsigned integer). This is now fixed: if you
@@ -887,18 +842,15 @@ inconvenience this causes.
        (WB 2006/12/14)
        </p>
 
-  <li> <p>New: The class <code
-       class="class">PointerMatrixVector</code> implements the functions
-       <code>vmult</code> and <code
-       class="member">Tvmult</code> for a <i>1xn</i>-matrix represented by
+  <li> <p>New: The class <code>PointerMatrixVector</code> implements the functions
+       <code>vmult</code> and <code>Tvmult</code> for a <i>1xn</i>-matrix represented by
        a single vector.
        <br>
        (GK 2006/09/17)
        </p>
 
   <li> <p>Improved: The class <code>SolverCG</code> can
-       now estimate the condition number of the linear system using <code
-       class="class">TridiagonalMatrix</code> and LAPACK.
+       now estimate the condition number of the linear system using <code>TridiagonalMatrix</code> and LAPACK.
        <br>
        (GK 2006/09/06)
        </p>  
@@ -924,22 +876,19 @@ inconvenience this causes.
        (GK 2006/07/07)
        </p>  
 
-  <li> <p>New: There is now a function <code
-       class="member">FullMatrix::trace</code> that does what its name suggests
+  <li> <p>New: There is now a function <code>FullMatrix::trace</code> that does what its name suggests
        it does.
        <br>
        (WB 2006/06/16)
        </p>
   
   <li> <p>Improved: <code>PointerMatrixAux</code> now has a
-       default constructor and a function for setting the <code
-       class="class">VectorMemory</code> object.
+       default constructor and a function for setting the <code>VectorMemory</code> object.
        <br>
        (GK 2006/06/14)
        </p>
   
-  <li> <p>Fixed: <code
-       class="member">FullMatrix::print</code> would yield a link error
+  <li> <p>Fixed: <code>FullMatrix::print</code> would yield a link error
        when used with <code>std::ofstream</code> since an explicit
        instantiation was missing. The function has now been moved to
        the header file and made inline so that it is always visible,
@@ -948,24 +897,21 @@ inconvenience this causes.
        (WB 2006/06/07)
        </p>
   
-  <li> <p> Improved: The <code
-       class="class">SparseDirectUMFPACK</code> solver can now also be
+  <li> <p> Improved: The <code>SparseDirectUMFPACK</code> solver can now also be
        used with sparse matrices with elements of type float, as well
        as with block matrices with types float and double.
        <br> 
        (WB 2006/04/25)
        </p>
 
-  <li> <p> New: The function <code
-       class="member">BlockSparsityPattern::row_length</code> adds up
+  <li> <p> New: The function <code>BlockSparsityPattern::row_length</code> adds up
        the row lengths of the individual blocks of a block matrix for
        a given row.
        <br> 
        (WB 2006/04/25)
        </p>
   
-  <li> <p> New: There is a new class <code
-       class="class">IdentityMatrix</code> that represents an
+  <li> <p> New: There is a new class <code>IdentityMatrix</code> that represents an
        efficient version of the matrix with ones on the diagonal and
        zeros everywhere else. The main usefulness of this matrix lies
        in the fact that most other important matrix classes have
@@ -976,17 +922,14 @@ inconvenience this causes.
        (WB 2006/04/24)
        </p>
   
-  <li> <p> New: There are now assignment operators from <code
-       class="class">BlockVector</code> to <code
-       class="class">Vector</code> and back.
+  <li> <p> New: There are now assignment operators from <code>BlockVector</code> to <code>Vector</code> and back.
        <br>
        (WB 2006/03/30)
        </p>
 
   <li> <p> Improved: <code>BlockSparsityPattern</code> can be
        initialized directly using the vector generated by
-       <code>DoFTools</code>::<code
-       class="member">compute_row_length_vector</code>.
+       <code>DoFTools</code>::<code>compute_row_length_vector</code>.
        <br>
        (GK 2006/03/30)
        </p>
@@ -1002,20 +945,16 @@ inconvenience this causes.
        </p>  
 
   <li> <p>
-       Changed: There are new <code
-       class="class">FullMatrix</code>::<code
-       class="member">equ</code> functions which assign <tt>this</tt>
+       Changed: There are new <code>FullMatrix</code>::<code>equ</code> functions which assign <tt>this</tt>
        matrix to the linear combination of one, two or three
-       matrices. Also there is now a new <code
-       class="class">Vector</code>::<code>equ</code>
+       matrices. Also there is now a new <code>Vector</code>::<code>equ</code>
        function for three vectors.
        <br>
        (RH 2006/02/21)
        </p>  
 
   <li> <p>
-       Fixed: The <code
-       class="class">SolverMinRes</code> class did not work
+       Fixed: The <code>SolverMinRes</code> class did not work
        with the <code>BlockVector</code> class.
        This is now fixed.
        <br>
@@ -1023,32 +962,21 @@ inconvenience this causes.
        </p>  
 
   <li> <p>
-       Changed: There are now new <code
-       class="class">FullMatrix</code>::<code
-       class="member">add</code> functions which add two and three
+       Changed: There are now new <code>FullMatrix</code>::<code>add</code> functions which add two and three
        scaled matrices.
        <br>
        (RH 2006/02/16)
        </p>  
 
   <li> <p>
-       Changed: The matrix classes <code
-       class="class">FullMatrix</code>, <code
-       class="class">SparseMatrix</code>, <code
-       class="class">SparseMatrixEZ</code> and <code
-       class="class">BlockMatrixBase</code> now have an <code
-       class="member">add</code> function analogous to the <code
-       class="member">add</code> of vector classes. The old <code
-       class="member">add_scaled</code> functions are now deprecated.
+       Changed: The matrix classes <code>FullMatrix</code>, <code>SparseMatrix</code>, <code>SparseMatrixEZ</code> and <code>BlockMatrixBase</code> now have an <code>add</code> function analogous to the <code>add</code> of vector classes. The old <code>add_scaled</code> functions are now deprecated.
        <br>
        (RH 2006/02/16)
        </p>  
 
   <li> <p>       
-       Improved: <code>BlockMatrixArray</code>::<code
-       class="member">enter_aux</code> allows using matrices without
-       adding vector multiplication by using <code
-       class="class">PointerMatrixAux</code>.
+       Improved: <code>BlockMatrixArray</code>::<code>enter_aux</code> allows using matrices without
+       adding vector multiplication by using <code>PointerMatrixAux</code>.
        <br>
        (GK 2006/02/02)
        </p>  
@@ -1074,8 +1002,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: All solver classes took an argument of type <code
-       class="class">VectorMemory</code> which they use to allocate
+       New: All solver classes took an argument of type <code>VectorMemory</code> which they use to allocate
        memory for temporary vectors. A clever implementation of this
        class might allow reusing temporary vectors, and thus reduce
        the overhead of repeatedly allocating and freeing
@@ -1190,9 +1117,7 @@ inconvenience this causes.
        (Luca Heltai 2007/05/15)
        </p>
 
-  <li> <p>New: The classes <code
-  class="class">MGTransferBlockSelect</code> and <code
-  class="class">MGTransferBlock</code> allow for transfer of multigrid
+  <li> <p>New: The classes <code>MGTransferBlockSelect</code> and <code>MGTransferBlock</code> allow for transfer of multigrid
   vectors for single blocks of a system and for several blocks.
   <br>
   (GK 2007/04/26)
@@ -1255,16 +1180,14 @@ inconvenience this causes.
        (WB 2007/02/20)
        </p>
 
-   <li> <p>New: Added function <code>GridGenerator</code>::<code 
-        class="member">hyper_cube_with_cylindrical_hole</code> that produces 
+   <li> <p>New: Added function <code>GridGenerator</code>::<code >hyper_cube_with_cylindrical_hole</code> that produces 
 	a square with a circular hole in the middle in 2d, and extrudes it
 	along the z-direction between 0 and L. 
         <br>
         (Luca Heltai 2007/02/15)
         </p>
 
-   <li> <p>Workaround: The class <code>GridOut</code>::<code 
-        class="member">write_msh</code> produces a mesh which can be visualized
+   <li> <p>Workaround: The class <code>GridOut</code>::<code >write_msh</code> produces a mesh which can be visualized
 	in the Gmsh reader. A bug in Gmsh prevented the boundary indicator to
 	be properly visualized. The boundary indicator was added to the
 	material flag of the faces (which is ignored when reading back the
@@ -1275,8 +1198,7 @@ inconvenience this causes.
         </p>
 
 
-   <li> <p>Fixed: The function <code>DoFTools</code>::<code 
-       class="member">distribute_cell_to_dof_vector</code> produced
+   <li> <p>Fixed: The function <code>DoFTools</code>::<code >distribute_cell_to_dof_vector</code> produced
        wrong results if the vector into which the result is to be
        stored contained nonzero values. This is now fixed.
        <br>
@@ -1291,8 +1213,7 @@ inconvenience this causes.
        (WB 2007/02/09)
        </p>
 
-   <li> <p>Fixed: <code>MatrixCreator</code>::<code 
-       class="member">create_mass_matrix</code> and <code>
+   <li> <p>Fixed: <code>MatrixCreator</code>::<code >create_mass_matrix</code> and <code>
        create_laplace_matrix</code> computed wrong values for the right 
        hand sides. This has been fixed. 
        <br>
@@ -1304,19 +1225,13 @@ inconvenience this causes.
        defaults to <tt>false</tt>. It is set to <tt>true</tt> if the
        coordinates of the points defining the subdivision of a patch
        are appended to the <tt>data</tt> table contained in a
-       <code>Patch</code>. This way, <code
-       class="class">DataOut</code>::<code
-       class="member">build_patches()</code> can use a <code
-       class="class">Mapping</code> to represent curved boundaries,
+       <code>Patch</code>. This way, <code>DataOut</code>::<code>build_patches()</code> can use a <code>Mapping</code> to represent curved boundaries,
        especially for higher order elements. This change corresponds
        to an extension of the intermediate format for graphics.
        <br>
        Fixed: Using the given <code>Mapping</code> to
-       obtain function values in <code
-       class="class">DataOut</code>::<code
-       class="member">build_patches()</code> also fixes a bug for
-       <code>FE_RaviartThomas</code> and <code
-       class="class">FE_ABF</code>elements, which need to evaluate the
+       obtain function values in <code>DataOut</code>::<code>build_patches()</code> also fixes a bug for
+       <code>FE_RaviartThomas</code> and <code>FE_ABF</code>elements, which need to evaluate the
        function values on the real (mapped) cell.
        <br>
        (Tobias Leicht 2007/01/30)
@@ -1325,16 +1240,14 @@ inconvenience this causes.
   <li> <p> Fixed: On faces with wrong <code>face_orientation</code> the dofs
        have to reordered in order to be combined with the correct shape
        functions. This is only relevant for continuous elements in 3D. At least for
-       <code>FE_Q</code> and systems of <code
-       class="class">FE_Q</code> this works now, for other finite elements the
+       <code>FE_Q</code> and systems of <code>FE_Q</code> this works now, for other finite elements the
        reordering vector still has to be implemented.
        <br>
        (Tobias Leicht, 2007/01/17)
        </p>
 
   <li> <p>
-       Fixed: The <code>Triangulation</code>::<code
-       class="member">execute_coarsening_and_refinement</code> function has to
+       Fixed: The <code>Triangulation</code>::<code>execute_coarsening_and_refinement</code> function has to
        discard coarsening flags in 2d and 3d if a neighbor of a flagged cell is
        refined or will be refined, in order to avoid that we end up with
        neighboring cells that differ in refinement by two levels. The function
@@ -1376,9 +1289,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Extended: So far, the <code
-       class="class">GridReordering</code>::<code
-       class="member">invert_all_cells_of_negative_grid</code>
+       Extended: So far, the <code>GridReordering</code>::<code>invert_all_cells_of_negative_grid</code>
        function did nothing in 2d. Now, it inverts cells from
        clockwise to counterclockwise sense (in the old numbering
        scheme).
@@ -1387,9 +1298,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: There is now a function <code
-       class="class">GridTools</code>::<code
-       class="member">delete_duplicated_vertices</code> that deletes
+       New: There is now a function <code>GridTools</code>::<code>delete_duplicated_vertices</code> that deletes
        duplicate vertices which can occur if structured grids are read
        into deal.II, leading to unwanted interior
        boundaries. In order to reduce the effort of the quadratic
@@ -1400,9 +1309,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: There are now two new functions <code
-       class="class">GridGenerator</code>::<code
-       class="member">subdivided_hyper_rectangle</code> that produces
+       New: There are now two new functions <code>GridGenerator</code>::<code>subdivided_hyper_rectangle</code> that produces
        a non-uniformly subdivided rectangle, ideally suited for graded
        meshes. One of these functions is able to create meshes with holes. 
        <br>
@@ -1416,12 +1323,8 @@ inconvenience this causes.
        (Florian Prill 2006/10/31)
        </p>
 
-  <li> <p> Improved: The lookup mechanism in <code
-       class="class">FETools</code>::<code
-       class="member">get_fe_from_name</code> has been changed, so
-       additional custom finite elements can be added using <code
-       class="class">FETools</code>::<code
-       class="member">add_fe_name</code>. In the course of this
+  <li> <p> Improved: The lookup mechanism in <code>FETools</code>::<code>get_fe_from_name</code> has been changed, so
+       additional custom finite elements can be added using <code>FETools</code>::<code>add_fe_name</code>. In the course of this
        change, the implementation of the lookup mechanism has been
        simplified.
        <br>
@@ -1429,9 +1332,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: There is a new functions <code
-       class="class">GridTools</code>::<code
-       class="member">create_union_triangulation</code>
+       New: There is a new functions <code>GridTools</code>::<code>create_union_triangulation</code>
        that generates a triangulation that contains the respectively
        finest cells of two input triangulations.
        <br> 
@@ -1451,21 +1352,16 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: There are new functions <code
-       class="member">GridTools::minimal_cell_diameter</code> and <code
-       class="member">GridTools::maximal_cell_diameter</code>, with obvious
+       New: There are new functions <code>GridTools::minimal_cell_diameter</code> and <code>GridTools::maximal_cell_diameter</code>, with obvious
        functionality. 
        <br> 
        (WB 2006/09/06)
        </p>
 
   <li> <p>
-       Changed: The functions <code
-       class="member">FETools::compute_embedding_matrices</code>,
-       <code
-       class="member">FETools::compute_face_embedding_matrices</code>, and
-       <code
-       class="member">FETools::compute_projection_matrices</code>
+       Changed: The functions <code>FETools::compute_embedding_matrices</code>,
+       <code>FETools::compute_face_embedding_matrices</code>, and
+       <code>FETools::compute_projection_matrices</code>
        (mostly used in internal computations in setting up finite
        element objects) previously took pointers to the first element
        of an array of matrices as arguments. This isn't type-safe, and
@@ -1484,26 +1380,18 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Extended: <code 
-		 class="class">DerivativeApproximation</code> now offers access to the
+       Extended: <code >DerivativeApproximation</code> now offers access to the
        full tensor of derivatives of orders one, two and three. This
-       information can be requested for a single cell by means of the <code 
-		 class="class">DerivativeApproximation</code><code
-       class="member">::approximate_derivative_tensor</code> function. If the
-       norm of this tensor is required later on, the new <code 
-		 class="class">DerivativeApproximation</code><code
-       class="member">::derivative_norm</code> function can be used. Note, that
+       information can be requested for a single cell by means of the <code>DerivativeApproximation</code><code>::approximate_derivative_tensor</code> function. If the
+       norm of this tensor is required later on, the new <code >DerivativeApproximation</code><code>::derivative_norm</code> function can be used. Note, that
        for second order derivatives, this returns the largest eigenvalue
-       instead of the Frobenius norm, which is returned by the <code 
-		 class="class">Tensor&lt;rank_,dim&gt;</code><code
-       class="member">::norm</code> function.
+       instead of the Frobenius norm, which is returned by the <code >Tensor&lt;rank_,dim&gt;</code><code>::norm</code> function.
        <br> 
        (Tobias Leicht 2006/08/03)
        </p>
 
   <li> <p>
-       Fixed: <code 
-		 class="class">DerivativeApproximation</code> offers approximated
+       Fixed: <code >DerivativeApproximation</code> offers approximated
        derivatives of a discrete function. The symmetrization of the derivative
        tensor is now done at the right place, i.e. the derivative itself is
        symmetrized instead of an intermediate tensor. This should improve the
@@ -1514,8 +1402,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: The <code 
-		 class="member">DataOut::build_patches</code> and similar
+       Fixed: The <code >DataOut::build_patches</code> and similar
        functions in the related <code>DataOut*</code> classes allowed to pass
        zero as the second argument (denoting the number of threads to use if
        multithreading is enabled). This led to no output being created at
@@ -1525,8 +1412,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: The new function <code>FiniteElementBase</code>::<code
-       class="member">n_dofs_per_object</code> returns either
+       New: The new function <code>FiniteElementBase</code>::<code>n_dofs_per_object</code> returns either
        <code>dofs_per_vertex</code>, <code>dofs_per_line</code>,
        <code>dofs_per_quad</code>, ..., depending on the explicitly
        specified function template argument. This is often useful for
@@ -1536,8 +1422,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: <code 
-		 class="member">Triangulation&lt;dim&gt;::fix_coarsen_flags</code>
+       Fixed: <code >Triangulation&lt;dim&gt;::fix_coarsen_flags</code>
        has been modified to allow coarsening in all possible cases. Up
        to now, coarsening was forbidden, if the neighbor cell was not refined
        but had the <code>refine_flag</code> set, whereas it was allowed, if
@@ -1550,11 +1435,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: There are now new internal <code
-       class="class">TriaObjectAccessor&lt;1,dim&gt;</code>::<code
-       class="member">lines()</code> and <code
-       class="class">TriaObjectAccessor&lt;2,dim&gt;</code>::<code
-       class="member">quads()</code> functions. By using these
+       New: There are now new internal <code>TriaObjectAccessor&lt;1,dim&gt;</code>::<code>lines()</code> and <code>TriaObjectAccessor&lt;2,dim&gt;</code>::<code>quads()</code> functions. By using these
        functions, 30 function specializations could be removed,
        significantly reducing code duplication.
        <br>
@@ -1562,8 +1443,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: Function <code>VectorTools</code>::<code
-       class="member">create_point_source_vector</code> to calculate the projection
+       New: Function <code>VectorTools</code>::<code>create_point_source_vector</code> to calculate the projection
        of a Dirac pulse on the base functions. This models a point source as
        used in the calculations of Green's functions and can also be used to
        extract the value of a finite element solution in a single point.
@@ -1572,11 +1452,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Changed: Functions <code
-       class="class">VectorTools</code>::<code
-       class="member">point_value</code> and <code
-       class="class">VectorTools</code>::<code
-       class="member">point_difference</code> using the old interface
+       Changed: Functions <code>VectorTools</code>::<code>point_value</code> and <code>VectorTools</code>::<code>point_difference</code> using the old interface
        without boundary mapping were replaced by wrapper functions
        calling the new versions.
        <br> 
@@ -1584,8 +1460,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Changed: The old version of <code>GridTools</code>::<code
-       class="member">find_active_cell_around_point</code> has been replaced
+       Changed: The old version of <code>GridTools</code>::<code>find_active_cell_around_point</code> has been replaced
        by a wrapper function for backward compatibility. The wrapper calls the
        new version of this function, and it is highly recommended to use the new
        version as it automatically delivers also the local coordinate of the
@@ -1596,11 +1471,8 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Improved: The functions <code>VectorTools</code>::<code
-       class="member">point_value</code> and <code>VectorTools</code>::<code
-       class="member">point_difference</code> now can also use arbitrary
-       mappings, using the new <code>GridTools</code>::<code
-       class="member">find_active_cell_around_point</code> algorithm.
+       Improved: The functions <code>VectorTools</code>::<code>point_value</code> and <code>VectorTools</code>::<code>point_difference</code> now can also use arbitrary
+       mappings, using the new <code>GridTools</code>::<code>find_active_cell_around_point</code> algorithm.
        <br> 
        (Ralf B. Schulz, 2006/05/11)
        </p>
@@ -1634,8 +1506,7 @@ inconvenience this causes.
        (WB 2006/05/01)
        </p>
   
-  <li> <p> Fixed: second derivatives where not computed correctly in <code
-       class="class">FEFaceValuesBase</code>, i.e. when evaluating
+  <li> <p> Fixed: second derivatives where not computed correctly in <code>FEFaceValuesBase</code>, i.e. when evaluating
        second derivatives on faces of cells. This is now fixed. Using
        second derivatives evaluated at quadrature points within a cell
        was not affected by this problem.
@@ -1699,8 +1570,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: There is a new function <code>FiniteElement</code>::<code
-       class="member">face_to_equivalent_cell_index</code> that can
+       New: There is a new function <code>FiniteElement</code>::<code>face_to_equivalent_cell_index</code> that can
        convert a face index of a degree of freedom into a
        corresponding cell index.
        <br> 
@@ -1708,91 +1578,60 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: There are now functions <code>VectorTools</code>::<code
-       class="member">point_value</code> that evaluate the value of a
+       New: There are now functions <code>VectorTools</code>::<code>point_value</code> that evaluate the value of a
        finite element function at a given point inside the domain.
        <br> 
        (WB 2006/03/06)
        </p>
 
   <li> <p> Improved: <code>GridOut</code> now has functions for
-       declaring and parsing parameters in a <code
-       class="class">ParameterHandler</code>, like used in <code
-       class="class">DataOut_Interface</code> for a long time.
+       declaring and parsing parameters in a <code>ParameterHandler</code>, like used in <code>DataOut_Interface</code> for a long time.
        <br>
        (GK 2006/03/06)
        </p>
 
   <li> <p>
-       Improved: The <code>Triangulation</code>, <code
-       class="class">PersistentTriangulation</code>, <code
-       class="class">DoFHandler</code>, <code
-       class="class">hp::DoFHandler</code> and <code
-       class="class">MGDoFHandler</code> classes now all have a <code
-       class="member">dimension</code> variable which allows to ask
+       Improved: The <code>Triangulation</code>, <code>PersistentTriangulation</code>, <code>DoFHandler</code>, <code>hp::DoFHandler</code> and <code>MGDoFHandler</code> classes now all have a <code>dimension</code> variable which allows to ask
        the template argument <tt>dim</tt> by
-       <class="class">SomeClass</code>::<code
-       class="member">dimension</code>.
+       <code>SomeClass::dimension</code>.
        <br> 
        (RH 2006/02/27)
        </p>
 
   <li> <p>
-       Fixed: When used, the copy constructor of <code
-       class="class">MappingQ</code> would lead to memory
+       Fixed: When used, the copy constructor of <code>MappingQ</code> would lead to memory
        corruption. This is now fixed.
        <br> 
        (RH 2006/02/23)
        </p>
 
   <li> <p>
-       New: There is now a <code
-       class="class">StaticMappingQ1</code>::<code
-       class="member">mapping</code> object of type <code
-       class="class">MappingQ1</code> which is used in several parts
-       of the library. This way multiple creation and storage of <code
-       class="class">MappingQ1</code> objects can be avoided.
+       New: There is now a <code>StaticMappingQ1</code>::<code>mapping</code> object of type <code>MappingQ1</code> which is used in several parts
+       of the library. This way multiple creation and storage of <code>MappingQ1</code> objects can be avoided.
        <br>
-       Similar to <code>StaticMappingQ1</code>::<code
-       class="member">mapping</code> there is now also an object <code
-       class="class">hp::StaticMappingQ1</code>::<code
-       class="member">mapping_collection</code> of type <code
-       class="class">MappingCollection</code>.
+       Similar to <code>StaticMappingQ1</code>::<code>mapping</code> there is now also an object <code>hp::StaticMappingQ1</code>::<code>mapping_collection</code> of type <code>MappingCollection</code>.
        <br>
        (RH 2006/02/21)
        </p>
 
   <li> <p>
-       New: There is now a <code>GridOut</code>::<code
-       class="member">write_gmsh</code> function to write in the gmsh 
+       New: There is now a <code>GridOut</code>::<code>write_gmsh</code> function to write in the gmsh 
        format. It has the same features of the write_ucd one. 
        <br> 
        (Luca Heltai 2006/02/17)
        </p>
 
   <li> <p>
-       Changed: The <code>hp::FECollection</code>::<code
-       class="member">get_fe</code>, <code
-       class="class">hp::QCollection</code>::<code
-       class="member">get_quadrature</code> and <code
-       class="class">hp::MappingCollection</code>::<code
-       class="member">get_mapping</code> functions are now renamed to
+       Changed: The <code>hp::FECollection</code>::<code>get_fe</code>, <code>hp::QCollection</code>::<code>get_quadrature</code> and <code>hp::MappingCollection</code>::<code>get_mapping</code> functions are now renamed to
        the standard <code>operator[]</code>
-       function. Similarly, the <code
-       class="class">FECollection</code>::<code
-       class="member">n_finite_elements</code>, <code
-       class="class">QCollection</code>::<code
-       class="member">n_quadratures</code> and <code
-       class="class">MappingCollection</code>::<code
-       class="member">n_mappings</code> functions are now renamed to
+       function. Similarly, the <code>FECollection</code>::<code>n_finite_elements</code>, <code>QCollection</code>::<code>n_quadratures</code> and <code>MappingCollection</code>::<code>n_mappings</code> functions are now renamed to
        the standard <code>size()</code> function.
        <br> 
        (RH 2006/02/10)
        </p>
 
   <li> <p>
-       Improved: <code>GridGenerator</code>::<code
-       class="member">half_hyper_ball</code> now is implemented also 
+       Improved: <code>GridGenerator</code>::<code>half_hyper_ball</code> now is implemented also 
        in three dimensions, and the boundary now is colored with 0 and one 
        respectively on the curved and plane.
        <br> 
@@ -1809,9 +1648,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: The <code>MGDoFHandler</code>::<code
-       class="member">distribute_dofs</code> and <code
-       class="member">renumber</code> functions could not handle
+       Fixed: The <code>MGDoFHandler</code>::<code>distribute_dofs</code> and <code>renumber</code> functions could not handle
        coarsened grids (unused vertices, faces and cells). This is now
        fixed.
        <br> 
@@ -1836,8 +1673,7 @@ inconvenience this causes.
 
   <li> <p>
        Improved: A new <code>TriaAccessor::ExcCellHasNoChildren</code>
-       exception will be raised if the <code
-       class="member">TriaObjectAccessor::child_index</code> function
+       exception will be raised if the <code>TriaObjectAccessor::child_index</code> function
        is invoked for cells without children.
        <br> 
        (RH 2005/12/09)
@@ -1854,26 +1690,22 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       New: There is now a new <code
-       class="member">Triangulation::get_boundary_indicators</code>
+       New: There is now a new <code>Triangulation::get_boundary_indicators</code>
        function.
        <br> 
        (RH 2005/09/30)
        </p>
 
   <li> <p>
-       New: There is now a new <code
-       class="member">GridTools::delete_unused_vertices</code>
-       function. Previously a <tt>private</tt> function in <code
-       class="class">GridIn</code> it has now been moved to and made
+       New: There is now a new <code>GridTools::delete_unused_vertices</code>
+       function. Previously a <tt>private</tt> function in <code>GridIn</code> it has now been moved to and made
        <tt>public</tt> in <code>GridTools</code>.
        <br> 
        (RH 2005/09/28)
        </p>
 
   <li> <p>
-       New: The <code
-       class="member">GridIn&lt;dim&gt;::read_netcdf(string
+       New: The <code>GridIn&lt;dim&gt;::read_netcdf(string
        &filename)</code> function reads grids from NetCDF files. The
        only data format currently supported is the <tt>TAU grid
        format</tt>.
@@ -1882,8 +1714,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: The <code
-       class="member">GridIn&lt;dim&gt;::read(filename, format)</code>
+       Fixed: The <code>GridIn&lt;dim&gt;::read(filename, format)</code>
        function ran into an exception when called with
        <tt>Default</tt> format and a filename which does not include
        <tt>/</tt>. This is now fixed.

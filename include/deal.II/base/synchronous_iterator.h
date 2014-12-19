@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2008 - 2013 by the deal.II authors
 //
@@ -21,36 +20,26 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 
-#include <deal.II/base/std_cxx1x/tuple.h>
+#include <deal.II/base/std_cxx11/tuple.h>
 
 #include <iterator>
 
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A class that represents a set of
- * iterators each of which are
- * incremented by one at the same
- * time. This is typically used in calls
- * like <code>std::transform(a.begin(),
- * a.end(), b.begin(), functor);</code>
- * where we have synchronous iterators
- * marching through the containers
- * <code>a,b</code>. If an object of this
- * type represents the end of a range,
- * only the first element is considered
- * (we only have <code>a.end()</code>,
+ * A class that represents a set of iterators each of which are incremented by
+ * one at the same time. This is typically used in calls like
+ * <code>std::transform(a.begin(), a.end(), b.begin(), functor);</code> where
+ * we have synchronous iterators marching through the containers
+ * <code>a,b</code>. If an object of this type represents the end of a range,
+ * only the first element is considered (we only have <code>a.end()</code>,
  * not <code>b.end()</code>)
  *
- * The template argument of the current
- * class shall be of type
- * <code>std_cxx1x::tuple</code> with
- * arguments equal to the iterator types.
+ * The template argument of the current class shall be of type
+ * <code>std_cxx11::tuple</code> with arguments equal to the iterator types.
  *
- * This type, and the helper functions
- * associated with it, are used as the
- * Value concept for the blocked_range
- * type of the Threading Building Blocks.
+ * This type, and the helper functions associated with it, are used as the
+ * Value concept for the blocked_range type of the Threading Building Blocks.
  *
  * @author Wolfgang Bangerth, 2008
  */
@@ -68,8 +57,7 @@ struct SynchronousIterators
   SynchronousIterators (const SynchronousIterators &i);
 
   /**
-   * Storage for the iterators
-   * represented by the current class.
+   * Storage for the iterators represented by the current class.
    */
   Iterators iterators;
 };
@@ -96,12 +84,9 @@ SynchronousIterators (const SynchronousIterators &i)
 
 
 /**
- * Return whether the first element of
- * the first argument is less than the
- * first element of the second
- * argument. Since the objects compared
- * march forward all elements at the same
- * time, comparing the first element is
+ * Return whether the first element of the first argument is less than the
+ * first element of the second argument. Since the objects compared march
+ * forward all elements at the same time, comparing the first element is
  * sufficient.
  */
 template <typename Iterators>
@@ -110,18 +95,15 @@ bool
 operator< (const SynchronousIterators<Iterators> &a,
            const SynchronousIterators<Iterators> &b)
 {
-  return std_cxx1x::get<0>(a.iterators) < std_cxx1x::get<0>(b.iterators);
+  return std_cxx11::get<0>(a.iterators) < std_cxx11::get<0>(b.iterators);
 }
 
 
 
 /**
- * Return the distance between the first
- * and the second argument. Since the
- * objects compared march forward all
- * elements at the same time,
- * differencing the first element is
- * sufficient.
+ * Return the distance between the first and the second argument. Since the
+ * objects compared march forward all elements at the same time, differencing
+ * the first element is sufficient.
  */
 template <typename Iterators>
 inline
@@ -129,11 +111,11 @@ std::size_t
 operator- (const SynchronousIterators<Iterators> &a,
            const SynchronousIterators<Iterators> &b)
 {
-  Assert (std::distance (std_cxx1x::get<0>(b.iterators),
-                         std_cxx1x::get<0>(a.iterators)) >= 0,
+  Assert (std::distance (std_cxx11::get<0>(b.iterators),
+                         std_cxx11::get<0>(a.iterators)) >= 0,
           ExcInternalError());
-  return std::distance (std_cxx1x::get<0>(b.iterators),
-                        std_cxx1x::get<0>(a.iterators));
+  return std::distance (std_cxx11::get<0>(b.iterators),
+                        std_cxx11::get<0>(a.iterators));
 }
 
 
@@ -142,11 +124,11 @@ operator- (const SynchronousIterators<Iterators> &a,
  */
 template <typename I1, typename I2>
 inline
-void advance (std_cxx1x::tuple<I1,I2> &t,
+void advance (std_cxx11::tuple<I1,I2> &t,
               const unsigned int       n)
 {
-  std::advance (std_cxx1x::get<0>(t), n);
-  std::advance (std_cxx1x::get<1>(t), n);
+  std::advance (std_cxx11::get<0>(t), n);
+  std::advance (std_cxx11::get<1>(t), n);
 }
 
 /**
@@ -154,12 +136,12 @@ void advance (std_cxx1x::tuple<I1,I2> &t,
  */
 template <typename I1, typename I2, typename I3>
 inline
-void advance (std_cxx1x::tuple<I1,I2,I3> &t,
+void advance (std_cxx11::tuple<I1,I2,I3> &t,
               const unsigned int          n)
 {
-  std::advance (std_cxx1x::get<0>(t), n);
-  std::advance (std_cxx1x::get<1>(t), n);
-  std::advance (std_cxx1x::get<2>(t), n);
+  std::advance (std_cxx11::get<0>(t), n);
+  std::advance (std_cxx11::get<1>(t), n);
+  std::advance (std_cxx11::get<2>(t), n);
 }
 
 /**
@@ -168,13 +150,13 @@ void advance (std_cxx1x::tuple<I1,I2,I3> &t,
 template <typename I1, typename I2,
           typename I3, typename I4>
 inline
-void advance (std_cxx1x::tuple<I1,I2,I3, I4> &t,
+void advance (std_cxx11::tuple<I1,I2,I3, I4> &t,
               const unsigned int              n)
 {
-  std::advance (std_cxx1x::get<0>(t), n);
-  std::advance (std_cxx1x::get<1>(t), n);
-  std::advance (std_cxx1x::get<2>(t), n);
-  std::advance (std_cxx1x::get<3>(t), n);
+  std::advance (std_cxx11::get<0>(t), n);
+  std::advance (std_cxx11::get<1>(t), n);
+  std::advance (std_cxx11::get<2>(t), n);
+  std::advance (std_cxx11::get<3>(t), n);
 }
 
 
@@ -184,10 +166,10 @@ void advance (std_cxx1x::tuple<I1,I2,I3, I4> &t,
  */
 template <typename I1, typename I2>
 inline
-void advance_by_one (std_cxx1x::tuple<I1,I2> &t)
+void advance_by_one (std_cxx11::tuple<I1,I2> &t)
 {
-  ++std_cxx1x::get<0>(t);
-  ++std_cxx1x::get<1>(t);
+  ++std_cxx11::get<0>(t);
+  ++std_cxx11::get<1>(t);
 }
 
 /**
@@ -195,11 +177,11 @@ void advance_by_one (std_cxx1x::tuple<I1,I2> &t)
  */
 template <typename I1, typename I2, typename I3>
 inline
-void advance_by_one (std_cxx1x::tuple<I1,I2,I3> &t)
+void advance_by_one (std_cxx11::tuple<I1,I2,I3> &t)
 {
-  ++std_cxx1x::get<0>(t);
-  ++std_cxx1x::get<1>(t);
-  ++std_cxx1x::get<2>(t);
+  ++std_cxx11::get<0>(t);
+  ++std_cxx11::get<1>(t);
+  ++std_cxx11::get<2>(t);
 }
 
 /**
@@ -208,19 +190,18 @@ void advance_by_one (std_cxx1x::tuple<I1,I2,I3> &t)
 template <typename I1, typename I2,
           typename I3, typename I4>
 inline
-void advance_by_one (std_cxx1x::tuple<I1,I2,I3,I4> &t)
+void advance_by_one (std_cxx11::tuple<I1,I2,I3,I4> &t)
 {
-  ++std_cxx1x::get<0>(t);
-  ++std_cxx1x::get<1>(t);
-  ++std_cxx1x::get<2>(t);
-  ++std_cxx1x::get<3>(t);
+  ++std_cxx11::get<0>(t);
+  ++std_cxx11::get<1>(t);
+  ++std_cxx11::get<2>(t);
+  ++std_cxx11::get<3>(t);
 }
 
 
 
 /**
- * Advance the elements of this iterator
- * by $n$.
+ * Advance the elements of this iterator by $n$.
  */
 template <typename Iterators>
 inline
@@ -234,8 +215,7 @@ operator + (const SynchronousIterators<Iterators> &a,
 }
 
 /**
- * Advance the elements of this iterator
- * by 1.
+ * Advance the elements of this iterator by 1.
  */
 template <typename Iterators>
 inline
@@ -248,10 +228,8 @@ operator ++ (SynchronousIterators<Iterators> &a)
 
 
 /**
- * Compare synch iterators for
- * inequality. Since they march in synch,
- * comparing only the first element is
- * sufficient.
+ * Compare synch iterators for inequality. Since they march in synch,
+ * comparing only the first element is sufficient.
  */
 template <typename Iterators>
 inline
@@ -259,8 +237,8 @@ bool
 operator != (const SynchronousIterators<Iterators> &a,
              const SynchronousIterators<Iterators> &b)
 {
-  return (std_cxx1x::get<0>(a.iterators) !=
-          std_cxx1x::get<0>(b.iterators));
+  return (std_cxx11::get<0>(a.iterators) !=
+          std_cxx11::get<0>(b.iterators));
 }
 
 DEAL_II_NAMESPACE_CLOSE

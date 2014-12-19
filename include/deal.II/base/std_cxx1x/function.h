@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,32 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__std_cxx1x_function_h
-#define __deal2__std_cxx1x_function_h
+// this file is deprecated. simply include the one we use now
+#include "../std_cxx11/function.h"
 
-
-#include <deal.II/base/config.h>
-
-#ifdef DEAL_II_WITH_CXX11
-
-#  include <functional>
+// then allow using the old namespace name instead of the new one
 DEAL_II_NAMESPACE_OPEN
-namespace std_cxx1x
-{
-  using std::function;
-}
+namespace std_cxx1x = std_cxx11;
 DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-#include <boost/function.hpp>
-DEAL_II_NAMESPACE_OPEN
-namespace std_cxx1x
-{
-  using boost::function;
-}
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
-
-#endif

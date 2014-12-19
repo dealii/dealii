@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,22 +50,20 @@ namespace TrilinosWrappers
   {
     /**
      * An implementation of block vectors based on the vector class
-     * implemented in TrilinosWrappers. While the base class provides for
-     * most of the interface, this class handles the actual allocation of
-     * vectors and provides functions that are specific to the underlying
-     * vector type.
+     * implemented in TrilinosWrappers. While the base class provides for most
+     * of the interface, this class handles the actual allocation of vectors
+     * and provides functions that are specific to the underlying vector type.
      *
-     * The model of distribution of data is such that each of the blocks
-     * is distributed across all MPI processes named in the MPI
-     * communicator. I.e. we don't just distribute the whole vector, but
-     * each component. In the constructors and reinit() functions, one
-     * therefore not only has to specify the sizes of the individual
-     * blocks, but also the number of elements of each of these blocks to
-     * be stored on the local process.
+     * The model of distribution of data is such that each of the blocks is
+     * distributed across all MPI processes named in the MPI communicator.
+     * I.e. we don't just distribute the whole vector, but each component. In
+     * the constructors and reinit() functions, one therefore not only has to
+     * specify the sizes of the individual blocks, but also the number of
+     * elements of each of these blocks to be stored on the local process.
      *
      * @ingroup Vectors
-     * @ingroup TrilinosWrappers
-     * @see @ref GlossBlockLA "Block (linear algebra)"
+     * @ingroup TrilinosWrappers @see
+     * @ref GlossBlockLA "Block (linear algebra)"
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
      */
     class BlockVector : public BlockVectorBase<Vector>
@@ -165,9 +162,9 @@ namespace TrilinosWrappers
       /**
        * Another copy function. This one takes a deal.II block vector and
        * copies it into a TrilinosWrappers block vector. Note that the number
-       * of blocks has to be the same in the vector as in the input
-       * vector. Use the reinit() command for resizing the BlockVector or for
-       * changing the internal structure of the block components.
+       * of blocks has to be the same in the vector as in the input vector.
+       * Use the reinit() command for resizing the BlockVector or for changing
+       * the internal structure of the block components.
        *
        * Since Trilinos only works on doubles, this function is limited to
        * accept only one possible number type in the deal.II vector.
@@ -201,14 +198,13 @@ namespace TrilinosWrappers
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning. In addition
        * to just specifying one index set as in all the other methods above,
-       * this method allows to supply an additional set of ghost
-       * entries. There are two different versions of a vector that can be
-       * created. If the flag @p vector_writable is set to @p false, the
-       * vector only allows read access to the joint set of @p
-       * parallel_partitioning and @p ghost_entries. The effect of the reinit
-       * method is then equivalent to calling the other reinit method with an
-       * index set containing both the locally owned entries and the ghost
-       * entries.
+       * this method allows to supply an additional set of ghost entries.
+       * There are two different versions of a vector that can be created. If
+       * the flag @p vector_writable is set to @p false, the vector only
+       * allows read access to the joint set of @p parallel_partitioning and
+       * @p ghost_entries. The effect of the reinit method is then equivalent
+       * to calling the other reinit method with an index set containing both
+       * the locally owned entries and the ghost entries.
        *
        * If the flag @p vector_writable is set to true, this creates an
        * alternative storage scheme for ghost elements that allows multiple
@@ -259,9 +255,9 @@ namespace TrilinosWrappers
        * then queried from the input vector. Note that you should not write to
        * the resulting vector any more, since the some data can be stored
        * several times on different processors, leading to unpredictable
-       * results. In particular, such a vector cannot be used for
-       * matrix-vector products as for example done during the solution of
-       * linear systems.
+       * results. In particular, such a vector cannot be used for matrix-
+       * vector products as for example done during the solution of linear
+       * systems.
        */
       void import_nonlocal_data_for_fe (const TrilinosWrappers::BlockSparseMatrix &m,
                                         const BlockVector                         &v);
@@ -294,6 +290,8 @@ namespace TrilinosWrappers
 
       /**
        * Returns if this Vector contains ghost elements.
+       *
+       * @see @ref GlossGhostedVector "vectors with ghost elements"
        */
       bool has_ghost_elements() const;
 
@@ -482,9 +480,9 @@ namespace TrilinosWrappers
 
 
     /**
-     * Global function which overloads the default implementation
-     * of the C++ standard library which uses a temporary object. The
-     * function simply exchanges the data of the two vectors.
+     * Global function which overloads the default implementation of the C++
+     * standard library which uses a temporary object. The function simply
+     * exchanges the data of the two vectors.
      *
      * @relates TrilinosWrappers::MPI::BlockVector
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008

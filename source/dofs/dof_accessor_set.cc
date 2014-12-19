@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2014 by the deal.II authors
 //
@@ -112,9 +111,9 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
 
       for (unsigned int child=0; child<this->n_children(); ++child)
         {
-	  if (tmp.size() > 0)
-	    fe.get_prolongation_matrix(child, this->refinement_case())
-	      .vmult (tmp, local_values);
+          if (tmp.size() > 0)
+            fe.get_prolongation_matrix(child, this->refinement_case())
+            .vmult (tmp, local_values);
           this->child(child)->set_dof_values_by_interpolation (tmp, values, fe_index);
         }
     }

@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2008 - 2013 by the deal.II authors
 //
@@ -49,13 +48,13 @@ namespace ChunkSparsityPatternIterators
   class Iterator;
 
   /**
-   * Accessor class for iterators into sparsity patterns. This class is
-   * also the base class for both const and non-const accessor classes
-   * into sparse matrices.
+   * Accessor class for iterators into sparsity patterns. This class is also
+   * the base class for both const and non-const accessor classes into sparse
+   * matrices.
    *
-   * Note that this class only allows read access to elements, providing
-   * their row and column number. It does not allow modifying the
-   * sparsity pattern itself.
+   * Note that this class only allows read access to elements, providing their
+   * row and column number. It does not allow modifying the sparsity pattern
+   * itself.
    *
    * @author Martin Kronbichler
    * @date 2013
@@ -97,8 +96,8 @@ namespace ChunkSparsityPatternIterators
      * entries are valid. However, before compression, the sparsity pattern
      * allocated some memory to be used while still adding new nonzero
      * entries; if you create iterators in this phase of the sparsity
-     * pattern's lifetime, you will iterate over elements that are not
-     * valid. If this is so, then this function will return false.
+     * pattern's lifetime, you will iterate over elements that are not valid.
+     * If this is so, then this function will return false.
      */
     bool is_valid_entry () const;
 
@@ -215,9 +214,9 @@ namespace ChunkSparsityPatternIterators
 
 
 /**
- * Structure representing the sparsity pattern of a sparse matrix.
- * This class is an example of the "static" type of @ref Sparsity.
- * It uses the compressed row storage (CSR) format to store data.
+ * Structure representing the sparsity pattern of a sparse matrix. This class
+ * is an example of the "static" type of @ref Sparsity. It uses the compressed
+ * row storage (CSR) format to store data.
  *
  * The use of this class is demonstrated in step-51.
  *
@@ -288,9 +287,8 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows
-   * @arg n number of columns
-   * @arg max_per_row maximum number of nonzero entries per row
+   * @arg m number of rows @arg n number of columns @arg max_per_row maximum
+   * number of nonzero entries per row
    */
   ChunkSparsityPattern (const size_type m,
                         const size_type n,
@@ -298,8 +296,8 @@ public:
                         const size_type chunk_size);
 
   /**
-   * @deprecated This constructor is deprecated. Use the version
-   * without the last argument
+   * @deprecated This constructor is deprecated. Use the version without the
+   * last argument
    */
   ChunkSparsityPattern (const size_type m,
                         const size_type n,
@@ -310,10 +308,9 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows
-   * @arg n number of columns
-   * @arg row_lengths possible number of nonzero entries for each row.  This
-   * vector must have one entry for each row.
+   * @arg m number of rows @arg n number of columns @arg row_lengths possible
+   * number of nonzero entries for each row.  This vector must have one entry
+   * for each row.
    */
   ChunkSparsityPattern (const size_type m,
                         const size_type n,
@@ -321,8 +318,8 @@ public:
                         const size_type chunk_size);
 
   /**
-   * @deprecated This constructor is deprecated. Use the version
-   * without the last argument
+   * @deprecated This constructor is deprecated. Use the version without the
+   * last argument
    */
   ChunkSparsityPattern (const size_type               m,
                         const size_type               n,
@@ -345,17 +342,17 @@ public:
   /**
    * Initialize a quadratic matrix.
    *
-   * @arg m number of rows and columns
-   * @arg row_lengths possible number of nonzero entries for each row.  This
-   * vector must have one entry for each row.
+   * @arg m number of rows and columns @arg row_lengths possible number of
+   * nonzero entries for each row.  This vector must have one entry for each
+   * row.
    */
   ChunkSparsityPattern (const size_type                m,
                         const std::vector<size_type>  &row_lengths,
                         const size_type                chunk_size);
 
   /**
-   * @deprecated This constructor is deprecated. Use the version
-   * without the last argument
+   * @deprecated This constructor is deprecated. Use the version without the
+   * last argument
    */
   ChunkSparsityPattern (const size_type               m,
                         const std::vector<size_type> &row_lengths,
@@ -388,8 +385,8 @@ public:
                const size_type chunk_size);
 
   /**
-   * @deprecated This function is deprecated. Use the function
-   * without the last argument
+   * @deprecated This function is deprecated. Use the function without the
+   * last argument
    */
   void reinit (const size_type m,
                const size_type n,
@@ -407,11 +404,8 @@ public:
    * allocated if the new size extends the old one. This is done to save time
    * and to avoid fragmentation of the heap.
    *
-   * If the number of rows equals
-   * the number of columns then
-   * diagonal elements are stored
-   * first in each row to allow
-   * optimized access in relaxation
+   * If the number of rows equals the number of columns then diagonal elements
+   * are stored first in each row to allow optimized access in relaxation
    * methods of SparseMatrix.
    */
   void reinit (const size_type m,
@@ -420,8 +414,8 @@ public:
                const size_type chunk_size);
 
   /**
-   * @deprecated This function is deprecated. Use the function
-   * without the last argument
+   * @deprecated This function is deprecated. Use the function without the
+   * last argument
    */
   void reinit (const size_type                m,
                const size_type                n,
@@ -438,8 +432,8 @@ public:
                const size_type chunk_size);
 
   /**
-   * @deprecated This function is deprecated. Use the function
-   * without the last argument
+   * @deprecated This function is deprecated. Use the function without the
+   * last argument
    */
   void reinit (const size_type m,
                const size_type n,
@@ -545,8 +539,8 @@ public:
                   const size_type chunk_size);
 
   /**
-   * @deprecated This function is deprecated. Use the function
-   * without the last argument
+   * @deprecated This function is deprecated. Use the function without the
+   * last argument
    */
   template <typename ForwardIterator>
   void copy_from (const size_type       n_rows,
@@ -558,17 +552,17 @@ public:
 
   /**
    * Copy data from an object of type CompressedSparsityPattern,
-   * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern.
-   * Previous content of this object is lost, and the sparsity pattern is in
-   * compressed mode afterwards.
+   * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern. Previous
+   * content of this object is lost, and the sparsity pattern is in compressed
+   * mode afterwards.
    */
   template <typename SparsityType>
   void copy_from (const SparsityType &csp,
                   const size_type     chunk_size);
 
   /**
-   * @deprecated This function is deprecated. Use the function
-   * without the last argument
+   * @deprecated This function is deprecated. Use the function without the
+   * last argument
    */
   template <typename SparsityType>
   void copy_from (const SparsityType &csp,
@@ -587,8 +581,8 @@ public:
                   const size_type chunk_size);
 
   /**
-   * @deprecated This function is deprecated. Use the function
-   * without the last argument
+   * @deprecated This function is deprecated. Use the function without the
+   * last argument
    */
   template <typename number>
   void copy_from (const FullMatrix<number> &matrix,
@@ -705,8 +699,8 @@ public:
    * Determine whether the matrix uses the special convention for quadratic
    * matrices that the diagonal entries are stored first in each row.
    *
-   * @deprecated The function always returns true if the matrix is
-   * square and false if it is not.
+   * @deprecated The function always returns true if the matrix is square and
+   * false if it is not.
    */
   bool optimize_diagonal () const DEAL_II_DEPRECATED;
 
@@ -715,7 +709,8 @@ public:
    * explicitly, or if the sparsity pattern contains elements that have been
    * added through other means (implicitly) while building it. For the current
    * class, the result is true if and only if it is square because it then
-   * unconditionally stores the diagonal entries whether they have been added explicitly or not.
+   * unconditionally stores the diagonal entries whether they have been added
+   * explicitly or not.
    *
    * This function mainly serves the purpose of describing the current class
    * in cases where several kinds of sparsity patterns can be passed as
@@ -768,10 +763,10 @@ public:
   void block_write (std::ostream &out) const;
 
   /**
-   * Read data that has previously been written by block_write() from a
-   * file. This is done using the inverse operations to the above function, so
-   * it is reasonably fast because the bitstream is not interpreted except for
-   * a few numbers up front.
+   * Read data that has previously been written by block_write() from a file.
+   * This is done using the inverse operations to the above function, so it is
+   * reasonably fast because the bitstream is not interpreted except for a few
+   * numbers up front.
    *
    * The object is resized on this operation, and all previous contents are
    * lost.
@@ -810,8 +805,10 @@ public:
    */
   std::size_t memory_consumption () const;
 
-  /** @addtogroup Exceptions
-   * @{ */
+  /**
+   * @addtogroup Exceptions
+   * @{
+   */
   /**
    * Exception
    */

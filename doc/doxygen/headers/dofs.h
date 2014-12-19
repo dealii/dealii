@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,8 +23,7 @@
  * finite element class and allocated degrees of freedom on each cell
  * of the triangulation as required for the finite element space
  * described by the finite element object. There are other variants of
- * the DoFHandler class such as hp::DoFHandler,
- * parallel::distributed::DoFHandler and MGDoFHandler that do similar
+ * the DoFHandler class such as hp::DoFHandler that do similar
  * things for more special cases.
  *
  * DoFHandler objects are used together with objects of type FiniteElement

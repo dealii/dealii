@@ -1,0 +1,100 @@
+
+DEAL::Testing dim=2, spacedim=2
+DEAL::Cell: 1.0
+DEAL::Face 6 is OK!
+DEAL::Face 12 is OK!
+DEAL::Face 4 is OK!
+DEAL::Face 14 is OK!
+DEAL::Cell: 1.1
+DEAL::Face 12 is OK!
+DEAL::Face 8 is OK!
+DEAL::Face 5 is OK!
+DEAL::Face 15 is OK!
+DEAL::Cell: 1.2
+DEAL::Face 7 is OK!
+DEAL::Face 13 is OK!
+DEAL::Face 14 is OK!
+DEAL::Face 10 is OK!
+DEAL::Cell: 1.3
+DEAL::Face 13 is OK!
+DEAL::Face 9 is OK!
+DEAL::Face 15 is OK!
+DEAL::Face 11 is OK!
+DEAL::Testing dim=2, spacedim=3
+DEAL::Cell: 1.0
+DEAL::Face 6 is OK!
+DEAL::Face 12 is OK!
+DEAL::Face 4 is OK!
+DEAL::Face 14 is OK!
+DEAL::Cell: 1.1
+DEAL::Face 12 is OK!
+DEAL::Face 8 is OK!
+DEAL::Face 5 is OK!
+DEAL::Face 15 is OK!
+DEAL::Cell: 1.2
+DEAL::Face 7 is OK!
+DEAL::Face 13 is OK!
+DEAL::Face 14 is OK!
+DEAL::Face 10 is OK!
+DEAL::Cell: 1.3
+DEAL::Face 13 is OK!
+DEAL::Face 9 is OK!
+DEAL::Face 15 is OK!
+DEAL::Face 11 is OK!
+DEAL::Testing dim=3, spacedim=3
+DEAL::Cell: 1.0
+DEAL::Face 14 is OK!
+DEAL::Face 41 is OK!
+DEAL::Face 6 is OK!
+DEAL::Face 37 is OK!
+DEAL::Face 10 is OK!
+DEAL::Face 33 is OK!
+DEAL::Cell: 1.1
+DEAL::Face 41 is OK!
+DEAL::Face 18 is OK!
+DEAL::Face 8 is OK!
+DEAL::Face 35 is OK!
+DEAL::Face 11 is OK!
+DEAL::Face 32 is OK!
+DEAL::Cell: 1.2
+DEAL::Face 15 is OK!
+DEAL::Face 40 is OK!
+DEAL::Face 37 is OK!
+DEAL::Face 22 is OK!
+DEAL::Face 12 is OK!
+DEAL::Face 31 is OK!
+DEAL::Cell: 1.3
+DEAL::Face 40 is OK!
+DEAL::Face 19 is OK!
+DEAL::Face 35 is OK!
+DEAL::Face 24 is OK!
+DEAL::Face 13 is OK!
+DEAL::Face 30 is OK!
+DEAL::Cell: 1.4
+DEAL::Face 16 is OK!
+DEAL::Face 39 is OK!
+DEAL::Face 7 is OK!
+DEAL::Face 36 is OK!
+DEAL::Face 33 is OK!
+DEAL::Face 26 is OK!
+DEAL::Cell: 1.5
+DEAL::Face 39 is OK!
+DEAL::Face 20 is OK!
+DEAL::Face 9 is OK!
+DEAL::Face 34 is OK!
+DEAL::Face 32 is OK!
+DEAL::Face 27 is OK!
+DEAL::Cell: 1.6
+DEAL::Face 17 is OK!
+DEAL::Face 38 is OK!
+DEAL::Face 36 is OK!
+DEAL::Face 23 is OK!
+DEAL::Face 31 is OK!
+DEAL::Face 28 is OK!
+DEAL::Cell: 1.7
+DEAL::Face 38 is OK!
+DEAL::Face 21 is OK!
+DEAL::Face 34 is OK!
+DEAL::Face 25 is OK!
+DEAL::Face 30 is OK!
+DEAL::Face 29 is OK!

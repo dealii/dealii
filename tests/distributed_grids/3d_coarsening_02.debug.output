@@ -6,8 +6,6 @@ DEAL:3d::Checksum: 353044419
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -44,8 +42,6 @@ DEAL:3d::Checksum: 4074805283
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -82,8 +78,6 @@ DEAL:3d::Checksum: 3041338616
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -120,8 +114,6 @@ DEAL:3d::Checksum: 272602556
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -158,8 +150,6 @@ DEAL:3d::Checksum: 1092886437
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -196,8 +186,6 @@ DEAL:3d::Checksum: 2787894795
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>

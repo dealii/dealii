@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,10 +47,10 @@ namespace internal
   {
 
     /**
-     * General template for information belonging to the geometrical objects of a
-     * triangulation, i.e. lines, quads, hexahedra...  Apart from the vector of
-     * objects additional information is included, namely vectors indicating the
-     * children, the used-status, user-flags, material-ids..
+     * General template for information belonging to the geometrical objects
+     * of a triangulation, i.e. lines, quads, hexahedra...  Apart from the
+     * vector of objects additional information is included, namely vectors
+     * indicating the children, the used-status, user-flags, material-ids..
      *
      * Objects of these classes are included in the TriaLevel and TriaFaces
      * classes.
@@ -69,79 +68,56 @@ namespace internal
       TriaObjects();
 
       /**
-       *  Vector of the objects belonging to
-       *  this level. The index of the object
-       *  equals the index in this container.
+       * Vector of the objects belonging to this level. The index of the
+       * object equals the index in this container.
        */
       std::vector<G> cells;
 
       /**
-       *  Index of the even children of an object.
-       *  Since when objects are refined, all
-       *  children are created at the same
-       *  time, they are appended to the list
-       *  at least in pairs after each other.
-       *  We therefore only store the index
-       *  of the even children, the uneven
-       *  follow immediately afterwards.
+       * Index of the even children of an object. Since when objects are
+       * refined, all children are created at the same time, they are appended
+       * to the list at least in pairs after each other. We therefore only
+       * store the index of the even children, the uneven follow immediately
+       * afterwards.
        *
-       *  If an object has no children, -1 is
-       *  stored in this list. An object is
-       *  called active if it has no
-       *  children. The function
-       *  TriaAccessorBase::has_children()
-       *  tests for this.
+       * If an object has no children, -1 is stored in this list. An object is
+       * called active if it has no children. The function
+       * TriaAccessorBase::has_children() tests for this.
        */
       std::vector<int>  children;
 
       /**
-       * Store the refinement
-       * case each of the
-       * cells is refined
-       * with. This vector
-       * might be replaced by
-       * vector<vector<bool> >
-       * (dim, vector<bool>
-       * (n_cells)) which is
-       * more memory efficient.
+       * Store the refinement case each of the cells is refined with. This
+       * vector might be replaced by vector<vector<bool> > (dim, vector<bool>
+       * (n_cells)) which is more memory efficient.
        */
       std::vector<RefinementCase<G::dimension> > refinement_cases;
 
       /**
-       *  Vector storing whether an object is
-       *  used in the @p cells vector.
+       * Vector storing whether an object is used in the @p cells vector.
        *
-       *  Since it is difficult to delete
-       *  elements in a @p vector, when an
-       *  element is not needed any more
-       *  (e.g. after derefinement), it is
-       *  not deleted from the list, but
-       *  rather the according @p used flag
-       *  is set to @p false.
+       * Since it is difficult to delete elements in a @p vector, when an
+       * element is not needed any more (e.g. after derefinement), it is not
+       * deleted from the list, but rather the according @p used flag is set
+       * to @p false.
        */
       std::vector<bool> used;
 
       /**
-       *  Make available a field for user data,
-       *  one bit per object. This field is usually
-       *  used when an operation runs over all
-       *  cells and needs information whether
-       *  another cell (e.g. a neighbor) has
-       *  already been processed.
+       * Make available a field for user data, one bit per object. This field
+       * is usually used when an operation runs over all cells and needs
+       * information whether another cell (e.g. a neighbor) has already been
+       * processed.
        *
-       *  You can clear all used flags using
-       *  dealii::Triangulation::clear_user_flags().
+       * You can clear all used flags using
+       * dealii::Triangulation::clear_user_flags().
        */
       std::vector<bool> user_flags;
 
 
       /**
-       * We use this union to store
-       * boundary and material
-       * data. Because only one one
-       * out of these two is
-       * actually needed here, we
-       * use an union.
+       * We use this union to store boundary and material data. Because only
+       * one one out of these two is actually needed here, we use an union.
        */
       struct BoundaryOrMaterialId
       {
@@ -158,18 +134,14 @@ namespace internal
         BoundaryOrMaterialId ();
 
         /**
-         * Return the size of objects
-         * of this kind.
+         * Return the size of objects of this kind.
          */
         static
         std::size_t memory_consumption ();
 
         /**
-         * Read or write the data
-         * of this object to or
-         * from a stream for the
-         * purpose of
-         * serialization
+         * Read or write the data of this object to or from a stream for the
+         * purpose of serialization
          */
         template <class Archive>
         void serialize(Archive &ar,
@@ -177,118 +149,73 @@ namespace internal
       };
 
       /**
-       * Store boundary and material data. For
-       * example, in one dimension, this field
-       * stores the material id of a line, which
-       * is a number between 0 and
-       * numbers::invalid_material_id-1. In more
-       * than one dimension, lines have no
-       * material id, but they may be at the
-       * boundary; then, we store the
-       * boundary indicator in this field,
-       * which denotes to which part of the
-       * boundary this line belongs and which
-       * boundary conditions hold on this
-       * part. The boundary indicator also
-       * is a number between zero and
-       * numbers::internal_face_boundary_id-1;
-       * the id numbers::internal_face_boundary_id
-       * is reserved for lines
-       * in the interior and may be used
-       * to check whether a line is at the
-       * boundary or not, which otherwise
-       * is not possible if you don't know
-       * which cell it belongs to.
+       * Store boundary and material data. For example, in one dimension, this
+       * field stores the material id of a line, which is a number between 0
+       * and numbers::invalid_material_id-1. In more than one dimension, lines
+       * have no material id, but they may be at the boundary; then, we store
+       * the boundary indicator in this field, which denotes to which part of
+       * the boundary this line belongs and which boundary conditions hold on
+       * this part. The boundary indicator also is a number between zero and
+       * numbers::internal_face_boundary_id-1; the id
+       * numbers::internal_face_boundary_id is reserved for lines in the
+       * interior and may be used to check whether a line is at the boundary
+       * or not, which otherwise is not possible if you don't know which cell
+       * it belongs to.
        */
       std::vector<BoundaryOrMaterialId> boundary_or_material_id;
 
       /**
-       * Store manifold ids. This field
-       * stores the manifold id of each object, which
-       * is a number between 0 and
-       * numbers::invalid_manifold_id-1. 
+       * Store manifold ids. This field stores the manifold id of each object,
+       * which is a number between 0 and numbers::invalid_manifold_id-1.
        */
       std::vector<types::manifold_id> manifold_id;
 
       /**
-       *  Assert that enough space
-       *  is allocated to
-       *  accommodate
-       *  <code>new_objs_in_pairs</code>
-       *  new objects, stored in
-       *  pairs, plus
-       *  <code>new_obj_single</code>
-       *  stored individually.
-       *  This function does not
-       *  only call
-       *  <code>vector::reserve()</code>,
-       *  but does really append
-       *  the needed elements.
+       * Assert that enough space is allocated to accommodate
+       * <code>new_objs_in_pairs</code> new objects, stored in pairs, plus
+       * <code>new_obj_single</code> stored individually. This function does
+       * not only call <code>vector::reserve()</code>, but does really append
+       * the needed elements.
        *
-       *  In 2D e.g. refined lines have to be
-       *  stored in pairs, whereas new lines in the
-       *  interior of refined cells can be stored as
-       *  single lines.
+       * In 2D e.g. refined lines have to be stored in pairs, whereas new
+       * lines in the interior of refined cells can be stored as single lines.
        */
       void reserve_space (const unsigned int new_objs_in_pairs,
                           const unsigned int new_objs_single = 0);
 
       /**
-       * Return an iterator to the
-       * next free slot for a
-       * single object. This
-       * function is only used by
-       * dealii::Triangulation::execute_refinement()
+       * Return an iterator to the next free slot for a single object. This
+       * function is only used by dealii::Triangulation::execute_refinement()
        * in 3D.
        *
-       * @warning Interestingly,
-       * this function is not used
-       * for 1D or 2D
-       * triangulations, where it
-       * seems the authors of the
-       * refinement function insist
-       * on reimplementing its
-       * contents.
+       * @warning Interestingly, this function is not used for 1D or 2D
+       * triangulations, where it seems the authors of the refinement function
+       * insist on reimplementing its contents.
        *
-       * @todo This function is
-       * not instantiated for the
-       * codim-one case
+       * @todo This function is not instantiated for the codim-one case
        */
       template <int dim, int spacedim>
       dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
       next_free_single_object (const dealii::Triangulation<dim,spacedim> &tria);
 
       /**
-       * Return an iterator to the
-       * next free slot for a pair
-       * of objects. This
-       * function is only used by
-       * dealii::Triangulation::execute_refinement()
+       * Return an iterator to the next free slot for a pair of objects. This
+       * function is only used by dealii::Triangulation::execute_refinement()
        * in 3D.
        *
-       * @warning Interestingly,
-       * this function is not used
-       * for 1D or 2D
-       * triangulations, where it
-       * seems the authors of the
-       * refinement function insist
-       * on reimplementing its
-       * contents.
+       * @warning Interestingly, this function is not used for 1D or 2D
+       * triangulations, where it seems the authors of the refinement function
+       * insist on reimplementing its contents.
        *
-       * @todo This function is
-       * not instantiated for the
-       * codim-one case
+       * @todo This function is not instantiated for the codim-one case
        */
       template <int dim, int spacedim>
       dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
       next_free_pair_object (const dealii::Triangulation<dim,spacedim> &tria);
 
       /**
-       * Return an iterator to the
-       * next free slot for a pair
-       * of hexes. Only implemented
-       * for
-       * <code>G=Hexahedron</code>.
+       * Return an iterator to the next free slot for a pair of hexes. Only
+       * implemented for <code>G=Hexahedron</code>.
        */
       template <int dim, int spacedim>
       typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator
@@ -296,37 +223,23 @@ namespace internal
                      const unsigned int               level);
 
       /**
-       *  Clear all the data contained in this object.
+       * Clear all the data contained in this object.
        */
       void clear();
 
       /**
-       * The orientation of the
-       * face number <code>face</code>
-       * of the cell with number
-       * <code>cell</code>. The return
-       * value is <code>true</code>, if
-       * the normal vector points
-       * the usual way
-       * (GeometryInfo::unit_normal_orientation)
-       * and <code>false</code> else.
+       * The orientation of the face number <code>face</code> of the cell with
+       * number <code>cell</code>. The return value is <code>true</code>, if
+       * the normal vector points the usual way
+       * (GeometryInfo::unit_normal_orientation) and <code>false</code> else.
        *
-       * The result is always
-       * <code>true</code> in this
-       * class, but derived classes
-       * will reimplement this.
+       * The result is always <code>true</code> in this class, but derived
+       * classes will reimplement this.
        *
-       * @warning There is a bug in
-       * the class hierarchy right
-       * now. Avoid ever calling
-       * this function through a
-       * reference, since you might
-       * end up with the base class
-       * function instead of the
-       * derived class. Still, we
-       * do not want to make it
-       * virtual for efficiency
-       * reasons.
+       * @warning There is a bug in the class hierarchy right now. Avoid ever
+       * calling this function through a reference, since you might end up
+       * with the base class function instead of the derived class. Still, we
+       * do not want to make it virtual for efficiency reasons.
        */
       bool face_orientation(const unsigned int cell, const unsigned int face) const;
 
@@ -357,10 +270,8 @@ namespace internal
       void clear_user_data(const unsigned int i);
 
       /**
-       * Clear all user pointers or
-       * indices and reset their
-       * type, such that the next
-       * access may be aither or.
+       * Clear all user pointers or indices and reset their type, such that
+       * the next access may be aither or.
        */
       void clear_user_data();
 
@@ -370,32 +281,28 @@ namespace internal
       void clear_user_flags();
 
       /**
-       *  Check the memory consistency of the
-       *  different containers. Should only be
-       *  called with the prepro flag @p DEBUG
-       *  set. The function should be called from
-       *  the functions of the higher
-       *  TriaLevel classes.
+       * Check the memory consistency of the different containers. Should only
+       * be called with the prepro flag @p DEBUG set. The function should be
+       * called from the functions of the higher TriaLevel classes.
        */
       void monitor_memory (const unsigned int true_dimension) const;
 
       /**
-       * Determine an estimate for the
-       * memory consumption (in bytes)
-       * of this object.
+       * Determine an estimate for the memory consumption (in bytes) of this
+       * object.
        */
       std::size_t memory_consumption () const;
 
       /**
-       * Read or write the data of this object to or
-       * from a stream for the purpose of serialization
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
        */
       template <class Archive>
       void serialize(Archive &ar,
                      const unsigned int version);
 
       /**
-       *  Exception
+       * Exception
        */
       DeclException3 (ExcMemoryWasted,
                       char *, int, int,
@@ -403,7 +310,7 @@ namespace internal
                       << arg2 << " elements, but it`s capacity is "
                       << arg3 << ".");
       /**
-       *  Exception
+       * Exception
        * @ingroup Exceptions
        */
       DeclException2 (ExcMemoryInexact,
@@ -412,7 +319,7 @@ namespace internal
                       << arg2 << ", which is not as expected.");
 
       /**
-       *  Exception
+       * Exception
        */
       DeclException2 (ExcWrongIterator,
                       char *, char *,
@@ -420,13 +327,9 @@ namespace internal
                       "but you can only ask for " << arg2 <<"_iterators.");
 
       /**
-       * dealii::Triangulation objects can
-       * either access a user
-       * pointer or a user
-       * index. What you tried to
-       * do is trying to access one
-       * of those after using the
-       * other.
+       * dealii::Triangulation objects can either access a user pointer or a
+       * user index. What you tried to do is trying to access one of those
+       * after using the other.
        *
        * @ingroup Exceptions
        */
@@ -449,8 +352,7 @@ namespace internal
       bool reverse_order_next_free_single;
 
       /**
-       * The data type storing user
-       * pointers or user indices.
+       * The data type storing user pointers or user indices.
        */
       struct UserData
       {
@@ -473,8 +375,7 @@ namespace internal
         }
 
         /**
-         * Write the data of this object
-         * to a stream for the purpose of
+         * Write the data of this object to a stream for the purpose of
          * serialization.
          */
         template <class Archive>
@@ -482,9 +383,7 @@ namespace internal
       };
 
       /**
-       * Enum descibing the
-       * possible types of
-       * userdata.
+       * Enum descibing the possible types of userdata.
        */
       enum UserDataType
       {
@@ -498,94 +397,57 @@ namespace internal
 
 
       /**
-       * Pointer which is not used by the
-       * library but may be accessed and set
-       * by the user to handle data local to
-       * a line/quad/etc.
+       * Pointer which is not used by the library but may be accessed and set
+       * by the user to handle data local to a line/quad/etc.
        */
       std::vector<UserData> user_data;
 
       /**
-       * In order to avoid
-       * confusion between user
-       * pointers and indices, this
-       * enum is set by the first
-       * function accessing either
-       * and subsequent access will
-       * not be allowed to change
-       * the type of data accessed.
+       * In order to avoid confusion between user pointers and indices, this
+       * enum is set by the first function accessing either and subsequent
+       * access will not be allowed to change the type of data accessed.
        */
       mutable UserDataType user_data_type;
     };
 
     /**
-     * For hexahedra the data of TriaObjects needs to be extended, as we can obtain faces
-     * (quads) in non-standard-orientation, therefore we declare a class TriaObjectsHex, which
-     * additionally contains a bool-vector of the face-orientations.
+     * For hexahedra the data of TriaObjects needs to be extended, as we can
+     * obtain faces (quads) in non-standard-orientation, therefore we declare
+     * a class TriaObjectsHex, which additionally contains a bool-vector of
+     * the face-orientations.
      */
     class TriaObjectsHex : public TriaObjects<TriaObject<3> >
     {
     public:
       /**
-       * The orientation of the
-       * face number <code>face</code>
-       * of the cell with number
-       * <code>cell</code>. The return
-       * value is <code>true</code>, if
-       * the normal vector points
-       * the usual way
-       * (GeometryInfo::unit_normal_orientation)
-       * and <code>false</code> if they
-       * point in opposite
-       * direction.
+       * The orientation of the face number <code>face</code> of the cell with
+       * number <code>cell</code>. The return value is <code>true</code>, if
+       * the normal vector points the usual way
+       * (GeometryInfo::unit_normal_orientation) and <code>false</code> if
+       * they point in opposite direction.
        */
       bool face_orientation(const unsigned int cell, const unsigned int face) const;
 
 
       /**
-       * For edges, we enforce a
-       * standard convention that
-       * opposite edges should be
-       * parallel. Now, that's
-       * enforcable in most cases,
-       * and we have code that
-       * makes sure that if a mesh
-       * allows this to happen,
-       * that we have this
-       * convention. We also know
-       * that it is always possible
-       * to have opposite faces
-       * have parallel normal
-       * vectors. (For both things,
-       * see the Agelek, Anderson,
-       * Bangerth, Barth paper
-       * mentioned in the
+       * For edges, we enforce a standard convention that opposite edges
+       * should be parallel. Now, that's enforcable in most cases, and we have
+       * code that makes sure that if a mesh allows this to happen, that we
+       * have this convention. We also know that it is always possible to have
+       * opposite faces have parallel normal vectors. (For both things, see
+       * the Agelek, Anderson, Bangerth, Barth paper mentioned in the
        * publications list.)
        *
-       * The problem is that we
-       * originally had another
-       * condition, namely that
-       * faces 0, 2 and 6 have
-       * normals that point into
-       * the cell, while the other
-       * faces have normals that
-       * point outward. It turns
-       * out that this is not
-       * always possible. In
-       * effect, we have to store
-       * whether the normal vector
-       * of each face of each cell
-       * follows this convention or
-       * not. If this is so, then
-       * this variable stores a
-       * @p true value, otherwise
-       * a @p false value.
+       * The problem is that we originally had another condition, namely that
+       * faces 0, 2 and 6 have normals that point into the cell, while the
+       * other faces have normals that point outward. It turns out that this
+       * is not always possible. In effect, we have to store whether the
+       * normal vector of each face of each cell follows this convention or
+       * not. If this is so, then this variable stores a @p true value,
+       * otherwise a @p false value.
        *
-       * In effect, this field has
-       * <code>6*n_cells</code> elements,
-       * being the number of cells
-       * times the six faces each
-       * has.
+       * In effect, this field has <code>6*n_cells</code> elements, being the
+       * number of cells times the six faces each has.
        */
       std::vector<bool> face_orientations;
 
@@ -600,41 +462,34 @@ namespace internal
       std::vector<bool> face_rotations;
 
       /**
-       *  Assert that enough space is
-       *  allocated to accommodate
-       *  <code>new_objs</code> new objects.
-       *  This function does not only call
-       *  <code>vector::reserve()</code>, but
-       *  does really append the needed
-       *  elements.
+       * Assert that enough space is allocated to accommodate
+       * <code>new_objs</code> new objects. This function does not only call
+       * <code>vector::reserve()</code>, but does really append the needed
+       * elements.
        */
       void reserve_space (const unsigned int new_objs);
 
       /**
-       *  Clear all the data contained in this object.
+       * Clear all the data contained in this object.
        */
       void clear();
 
       /**
-       *  Check the memory consistency of the
-       *  different containers. Should only be
-       *  called with the prepro flag @p DEBUG
-       *  set. The function should be called from
-       *  the functions of the higher
-       *  TriaLevel classes.
+       * Check the memory consistency of the different containers. Should only
+       * be called with the prepro flag @p DEBUG set. The function should be
+       * called from the functions of the higher TriaLevel classes.
        */
       void monitor_memory (const unsigned int true_dimension) const;
 
       /**
-       * Determine an estimate for the
-       * memory consumption (in bytes)
-       * of this object.
+       * Determine an estimate for the memory consumption (in bytes) of this
+       * object.
        */
       std::size_t memory_consumption () const;
 
       /**
-       * Read or write the data of this object to or
-       * from a stream for the purpose of serialization
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
        */
       template <class Archive>
       void serialize(Archive &ar,
@@ -643,82 +498,61 @@ namespace internal
 
 
     /**
-     * For quadrilaterals in 3D the data of TriaObjects needs to be extended, as we
-     * can obtain faces (quads) with lines in non-standard-orientation, therefore we
-     * declare a class TriaObjectsQuad3D, which additionally contains a bool-vector
-     * of the line-orientations.
+     * For quadrilaterals in 3D the data of TriaObjects needs to be extended,
+     * as we can obtain faces (quads) with lines in non-standard-orientation,
+     * therefore we declare a class TriaObjectsQuad3D, which additionally
+     * contains a bool-vector of the line-orientations.
      */
     class TriaObjectsQuad3D: public TriaObjects<TriaObject<2> >
     {
     public:
       /**
-       * The orientation of the
-       * face number <code>face</code>
-       * of the cell with number
-       * <code>cell</code>. The return
-       * value is <code>true</code>, if
-       * the normal vector points
-       * the usual way
-       * (GeometryInfo::unit_normal_orientation)
-       * and <code>false</code> if they
-       * point in opposite
-       * direction.
+       * The orientation of the face number <code>face</code> of the cell with
+       * number <code>cell</code>. The return value is <code>true</code>, if
+       * the normal vector points the usual way
+       * (GeometryInfo::unit_normal_orientation) and <code>false</code> if
+       * they point in opposite direction.
        */
       bool face_orientation(const unsigned int cell, const unsigned int face) const;
 
 
       /**
-       * In effect, this field has
-       * <code>4*n_quads</code> elements,
-       * being the number of quads
-       * times the four lines each
-       * has.
+       * In effect, this field has <code>4*n_quads</code> elements, being the
+       * number of quads times the four lines each has.
        */
       std::vector<bool> line_orientations;
 
       /**
-       *  Assert that enough space
-       *  is allocated to
-       *  accommodate
-       *  <code>new_quads_in_pairs</code>
-       *  new quads, stored in
-       *  pairs, plus
-       *  <code>new_quads_single</code>
-       *  stored individually.
-       *  This function does not
-       *  only call
-       *  <code>vector::reserve()</code>,
-       *  but does really append
-       *  the needed elements.
+       * Assert that enough space is allocated to accommodate
+       * <code>new_quads_in_pairs</code> new quads, stored in pairs, plus
+       * <code>new_quads_single</code> stored individually. This function does
+       * not only call <code>vector::reserve()</code>, but does really append
+       * the needed elements.
        */
       void reserve_space (const unsigned int new_quads_in_pairs,
                           const unsigned int new_quads_single = 0);
 
       /**
-       *  Clear all the data contained in this object.
+       * Clear all the data contained in this object.
        */
       void clear();
 
       /**
-       *  Check the memory consistency of the
-       *  different containers. Should only be
-       *  called with the prepro flag @p DEBUG
-       *  set. The function should be called from
-       *  the functions of the higher
-       *  TriaLevel classes.
+       * Check the memory consistency of the different containers. Should only
+       * be called with the prepro flag @p DEBUG set. The function should be
+       * called from the functions of the higher TriaLevel classes.
        */
       void monitor_memory (const unsigned int true_dimension) const;
 
       /**
-       * Determine an estimate for the
-       * memory consumption (in bytes)
-       * of this object.
+       * Determine an estimate for the memory consumption (in bytes) of this
+       * object.
        */
       std::size_t memory_consumption () const;
 
       /**
-       * Read or write the data of this object to or
-       * from a stream for the purpose of serialization
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
        */
       template <class Archive>
       void serialize(Archive &ar,
@@ -941,6 +775,85 @@ namespace internal
     {
       return line_orientations[cell * GeometryInfo<2>::faces_per_cell
                                + face];
+    }
+
+
+//----------------------------------------------------------------------//
+
+    template <class G>
+    template <int dim, int spacedim>
+    dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
+    TriaObjects<G>::next_free_single_object (const dealii::Triangulation<dim,spacedim> &tria)
+    {
+      // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+
+      int pos=next_free_single,
+          last=used.size()-1;
+      if (!reverse_order_next_free_single)
+        {
+          // first sweep forward, only use really single slots, do not use
+          // pair slots
+          for (; pos<last; ++pos)
+            if (!used[pos])
+              if (used[++pos])
+                {
+                  // this was a single slot
+                  pos-=1;
+                  break;
+                }
+          if (pos>=last)
+            {
+              reverse_order_next_free_single=true;
+              next_free_single=used.size()-1;
+              pos=used.size()-1;
+            }
+          else
+            next_free_single=pos+1;
+        }
+
+      if (reverse_order_next_free_single)
+        {
+          // second sweep, use all slots, even
+          // in pairs
+          for (; pos>=0; --pos)
+            if (!used[pos])
+              break;
+          if (pos>0)
+            next_free_single=pos-1;
+          else
+            // no valid single object anymore
+            return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, -1, -1);
+        }
+
+      return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, 0, pos);
+    }
+
+
+
+    template <class G>
+    template <int dim, int spacedim>
+    dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
+    TriaObjects<G>::next_free_pair_object (const dealii::Triangulation<dim,spacedim> &tria)
+    {
+      // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+
+      int pos=next_free_pair,
+          last=used.size()-1;
+      for (; pos<last; ++pos)
+        if (!used[pos])
+          if (!used[++pos])
+            {
+              // this was a pair slot
+              pos-=1;
+              break;
+            }
+      if (pos>=last)
+        // no free slot
+        return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, -1, -1);
+      else
+        next_free_pair=pos+2;
+
+      return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, 0, pos);
     }
 
 

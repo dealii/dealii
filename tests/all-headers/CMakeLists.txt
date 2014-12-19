@@ -1,7 +1,6 @@
 ## ---------------------------------------------------------------------
-## $Id$
 ##
-## Copyright (C) 2013 by the deal.II authors
+## Copyright (C) 2013 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -29,23 +28,20 @@ INCLUDE(${DEAL_II_TARGET_CONFIG})
 
 SET(_category all-headers)
 
-FILE(GLOB_RECURSE _header ${DEAL_II_SOURCE_DIR}/include/deal.II/*.h)
+#
+# Glob together all header files and strip SOURCE_DIR/include/deal.II to
+# get a correct relative path:
+#
+FILE(GLOB_RECURSE _headers RELATIVE ${DEAL_II_SOURCE_DIR}/include/deal.II
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/*.h
+  )
 
-FOREACH(_full_file ${_header})
-  GET_FILENAME_COMPONENT(_file ${_full_file} NAME)
-
-  # TODO: A more sophisticated way to get the relative include path:
-  GET_FILENAME_COMPONENT(_path ${_full_file} PATH)
-  GET_FILENAME_COMPONENT(_path ${_path} NAME)
-  IF("${_path}" STREQUAL "std_cxx1x")
-    SET(_path "base/std_cxx1x")
-  ENDIF()
-
+FOREACH(_header ${_headers})
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
     STRING(TOLOWER ${_build} _build_lowercase)
 
-    SET(_test ${_category}/${_path}/${_file}.${_build_lowercase})
-    STRING(REGEX REPLACE "\\/" "-" _target ${_path}/${_file}.${_build_lowercase})
+    SET(_test ${_category}/${_header}.${_build_lowercase})
+    STRING(REGEX REPLACE "\\/" "-" _target ${_header}.${_build_lowercase})
 
     # Respect TEST_PICKUP_REGEX:
     IF( "${TEST_PICKUP_REGEX}" STREQUAL "" OR
@@ -76,7 +72,7 @@ FOREACH(_full_file ${_header})
         INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
         )
       SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-        COMPILE_DEFINITIONS HEADER=<deal.II/${_path}/${_file}>
+        COMPILE_DEFINITIONS HEADER=<deal.II/${_header}>
         )
 
       ADD_CUSTOM_TARGET(${_target}.build

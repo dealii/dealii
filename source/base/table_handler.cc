@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2013 by the deal.II authors
 //
@@ -664,6 +663,20 @@ void TableHandler::write_tex (std::ostream &out, const bool with_header) const
   out   << "\\end{table}" << std::endl;
   if (with_header)
     out << "\\end{document}" << std::endl;
+}
+
+
+void TableHandler::clear()
+{
+
+  columns.clear();
+  supercolumns.clear();
+  column_order.clear();
+  tex_supercaptions.clear();
+
+  tex_table_label.clear();
+  tex_table_caption.clear();
+
 }
 
 

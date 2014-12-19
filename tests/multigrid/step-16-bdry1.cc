@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2003 - 2013 by the deal.II authors
 //
@@ -592,7 +591,7 @@ void LaplaceProblem<dim>::run ()
       assemble_multigrid (true);
 
       solve ();
-      output_results (cycle);
+      // output_results (cycle);
     }
 }
 

@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +22,7 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 #include <deal.II/base/utilities.h>
-#  include <deal.II/base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/base/std_cxx11/shared_ptr.h>
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/vector.h>
@@ -50,7 +49,7 @@ template <typename number> class Vector;
 
 /**
  * @addtogroup TrilinosWrappers
- *@{
+ * @{
  */
 namespace TrilinosWrappers
 {
@@ -62,8 +61,8 @@ namespace TrilinosWrappers
    */
 
   /**
-   * A namespace for internal implementation details of the
-   * TrilinosWrapper members.
+   * A namespace for internal implementation details of the TrilinosWrapper
+   * members.
    *
    * @ingroup TrilinosWrappers
    */
@@ -159,20 +158,6 @@ namespace TrilinosWrappers
                       << "An error with error number " << arg1
                       << " occurred while calling a Trilinos function");
 
-      /**
-       * Exception
-       */
-      DeclException3 (ExcAccessToNonLocalElement,
-                      size_type, size_type, size_type,
-                      << "You tried to access element " << arg1
-                      << " of a distributed vector, but this element is not stored "
-                      << "on the current processor. Note: The elements stored "
-                      << "on the current processor are within the range "
-                      << arg2 << " through " << arg3
-                      << " but Trilinos vectors need not store contiguous "
-                      << "ranges on each processor, and not every element in "
-                      << "this range may in fact be stored locally.");
-
     private:
       /**
        * Point to the vector we are referencing.
@@ -197,31 +182,29 @@ namespace TrilinosWrappers
 
 
   /**
-   * Base class for the two types of Trilinos vectors, the distributed
-   * memory vector MPI::Vector and a localized vector Vector. The latter
-   * is designed for use in either serial implementations or as a
-   * localized copy on each processor.  The implementation of this class
-   * is based on the Trilinos vector class Epetra_FEVector, the (parallel)
-   * partitioning of which is governed by an Epetra_Map. This means that
-   * the vector type is generic and can be done in this base class, while
-   * the definition of the partition map (and hence, the constructor and
-   * reinit function) will have to be done in the derived classes. The
-   * Epetra_FEVector is precisely the kind of vector we deal with all the
-   * time - we probably get it from some assembly process, where also
-   * entries not locally owned might need to written and hence need to be
-   * forwarded to the owner. The only requirement for this class to work
-   * is that Trilinos is installed with the same compiler as is used for
-   * compilation of deal.II.
+   * Base class for the two types of Trilinos vectors, the distributed memory
+   * vector MPI::Vector and a localized vector Vector. The latter is designed
+   * for use in either serial implementations or as a localized copy on each
+   * processor.  The implementation of this class is based on the Trilinos
+   * vector class Epetra_FEVector, the (parallel) partitioning of which is
+   * governed by an Epetra_Map. This means that the vector type is generic and
+   * can be done in this base class, while the definition of the partition map
+   * (and hence, the constructor and reinit function) will have to be done in
+   * the derived classes. The Epetra_FEVector is precisely the kind of vector
+   * we deal with all the time - we probably get it from some assembly
+   * process, where also entries not locally owned might need to written and
+   * hence need to be forwarded to the owner. The only requirement for this
+   * class to work is that Trilinos is installed with the same compiler as is
+   * used for compilation of deal.II.
    *
-   * The interface of this class is modeled after the existing Vector
-   * class in deal.II. It has almost the same member functions, and is
-   * often exchangable. However, since Trilinos only supports a single
-   * scalar type (double), it is not templated, and only works with that
-   * type.
+   * The interface of this class is modeled after the existing Vector class in
+   * deal.II. It has almost the same member functions, and is often
+   * exchangable. However, since Trilinos only supports a single scalar type
+   * (double), it is not templated, and only works with that type.
    *
-   * Note that Trilinos only guarantees that operations do what you expect
-   * if the function @p GlobalAssemble has been called after vector
-   * assembly in order to distribute the data. Therefore, you need to call
+   * Note that Trilinos only guarantees that operations do what you expect if
+   * the function @p GlobalAssemble has been called after vector assembly in
+   * order to distribute the data. Therefore, you need to call
    * Vector::compress() before you actually use the vectors.
    *
    * @ingroup TrilinosWrappers
@@ -282,10 +265,10 @@ namespace TrilinosWrappers
                  const bool        fast = false);
 
     /**
-     * Compress the underlying representation of the Trilinos object,
-     * i.e. flush the buffers of the vector object if it has any. This
-     * function is necessary after writing into a vector element-by-element
-     * and before anything else can be done on it.
+     * Compress the underlying representation of the Trilinos object, i.e.
+     * flush the buffers of the vector object if it has any. This function is
+     * necessary after writing into a vector element-by-element and before
+     * anything else can be done on it.
      *
      * The (defaulted) argument can be used to specify the compress mode
      * (<code>Add</code> or <code>Insert</code>) in case the vector has not
@@ -293,20 +276,20 @@ namespace TrilinosWrappers
      * argument is ignored if the vector has been added or written to since
      * the last time compress() was called.
      *
-     * See @ref GlossCompress "Compressing distributed objects"
-     * for more information.
+     * See @ref GlossCompress "Compressing distributed objects" for more
+     * information.
      */
     void compress (::dealii::VectorOperation::values operation);
 
     /**
-     * @deprecated: Use the compress(VectorOperation::values) function
-     * above instead.
+     * @deprecated: Use the compress(VectorOperation::values) function above
+     * instead.
      */
     void compress() DEAL_II_DEPRECATED;
 
     /**
-    * @deprecated Use compress(dealii::VectorOperation::values) instead.
-    */
+     * @deprecated Use compress(dealii::VectorOperation::values) instead.
+     */
     void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
 
     /**
@@ -392,18 +375,16 @@ namespace TrilinosWrappers
      * <code>i</code> is the first element of the vector stored on this
      * processor, corresponding to the half open interval $[i,i+n)$
      *
-     * @note The description above is true most of the time, but
-     * not always. In particular, Trilinos vectors need not store
-     * contiguous ranges of elements such as $[i,i+n)$. Rather, it
-     * can store vectors where the elements are distributed in
-     * an arbitrary way across all processors and each processor
-     * simply stores a particular subset, not necessarily contiguous.
-     * In this case, this function clearly makes no sense since it
-     * could, at best, return a range that includes all elements
-     * that are stored locally. Thus, the function only succeeds
-     * if the locally stored range is indeed contiguous. It will
-     * trigger an assertion if the local portion of the vector
-     * is not contiguous.
+     * @note The description above is true most of the time, but not always.
+     * In particular, Trilinos vectors need not store contiguous ranges of
+     * elements such as $[i,i+n)$. Rather, it can store vectors where the
+     * elements are distributed in an arbitrary way across all processors and
+     * each processor simply stores a particular subset, not necessarily
+     * contiguous. In this case, this function clearly makes no sense since it
+     * could, at best, return a range that includes all elements that are
+     * stored locally. Thus, the function only succeeds if the locally stored
+     * range is indeed contiguous. It will trigger an assertion if the local
+     * portion of the vector is not contiguous.
      */
     std::pair<size_type, size_type> local_range () const;
 
@@ -411,21 +392,20 @@ namespace TrilinosWrappers
      * Return whether @p index is in the local range or not, see also
      * local_range().
      *
-     * @note The same limitation for the applicability of this
-     * function applies as listed in the documentation of local_range().
+     * @note The same limitation for the applicability of this function
+     * applies as listed in the documentation of local_range().
      */
     bool in_local_range (const size_type index) const;
 
     /**
-     * Return an index set that describes which elements of this vector
-     * are owned by the current processor. Note that this index set does
-     * not include elements this vector may store locally as ghost
-     * elements but that are in fact owned by another processor.
-     * As a consequence, the index sets returned on different
-     * processors if this is a distributed vector will form disjoint
-     * sets that add up to the complete index set.
-     * Obviously, if a vector is created on only one processor, then
-     * the result would satisfy
+     * Return an index set that describes which elements of this vector are
+     * owned by the current processor. Note that this index set does not
+     * include elements this vector may store locally as ghost elements but
+     * that are in fact owned by another processor. As a consequence, the
+     * index sets returned on different processors if this is a distributed
+     * vector will form disjoint sets that add up to the complete index set.
+     * Obviously, if a vector is created on only one processor, then the
+     * result would satisfy
      * @code
      *   vec.locally_owned_elements() == complete_index_set (vec.size())
      * @endcode
@@ -435,6 +415,8 @@ namespace TrilinosWrappers
     /**
      * Return if the vector contains ghost elements. This answer is true if
      * there are ghost elements on at least one process.
+     *
+     * @see @ref GlossGhostedVector "vectors with ghost elements"
      */
     bool has_ghost_elements() const;
 
@@ -482,8 +464,27 @@ namespace TrilinosWrappers
     real_type linfty_norm () const;
 
     /**
-     * Return whether the vector contains only elements with value
-     * zero. This is a collective operation. This function is expensive, because
+     * Performs a combined operation of a vector addition and a subsequent
+     * inner product, returning the value of the inner product. In other
+     * words, the result of this function is the same as if the user called
+     * @code
+     * this->add(a, V);
+     * return_value = *this * W;
+     * @endcode
+     *
+     * The reason this function exists is for compatibility with deal.II's own
+     * vector classes which can implement this functionality with less memory
+     * transfer. However, for Trilinos vectors such a combined operation is
+     * not natively supported and thus the cost is completely equivalent as
+     * calling the two methods separately.
+     */
+    TrilinosScalar add_and_dot (const TrilinosScalar a,
+                                const VectorBase    &V,
+                                const VectorBase    &W);
+
+    /**
+     * Return whether the vector contains only elements with value zero. This
+     * is a collective operation. This function is expensive, because
      * potentially all elements have to be checked.
      */
     bool all_zero () const;
@@ -504,13 +505,24 @@ namespace TrilinosWrappers
 
     /**
      * Provide access to a given element, both read and write.
+     *
+     * When using a vector distributed with MPI, this operation only makes
+     * sense for elements that are actually present on the calling processor.
+     * Otherwise, an exception is thrown. This is different from the
+     * <code>el()</code> function below that always succeeds (but returns zero
+     * on non-local elements).
      */
     reference
     operator () (const size_type index);
 
     /**
-     * Provide read-only access to an element. This is equivalent to the
-     * <code>el()</code> command.
+     * Provide read-only access to an element.
+     *
+     * When using a vector distributed with MPI, this operation only makes
+     * sense for elements that are actually present on the calling processor.
+     * Otherwise, an exception is thrown. This is different from the
+     * <code>el()</code> function below that always succeeds (but returns zero
+     * on non-local elements).
      */
     TrilinosScalar
     operator () (const size_type index) const;
@@ -524,8 +536,7 @@ namespace TrilinosWrappers
     operator [] (const size_type index);
 
     /**
-     * Provide read-only access to an element. This is equivalent to the
-     * <code>el()</code> command.
+     * Provide read-only access to an element.
      *
      * Exactly the same as operator().
      */
@@ -534,8 +545,8 @@ namespace TrilinosWrappers
 
     /**
      * A collective get operation: instead of getting individual elements of a
-     * vector, this function allows to get a whole set of elements at
-     * once. The indices of the elements to be read are stated in the first
+     * vector, this function allows to get a whole set of elements at once.
+     * The indices of the elements to be read are stated in the first
      * argument, the corresponding values are returned in the second.
      */
     void extract_subvector_to (const std::vector<size_type> &indices,
@@ -553,8 +564,10 @@ namespace TrilinosWrappers
     /**
      * Return the value of the vector entry <i>i</i>. Note that this function
      * does only work properly when we request a data stored on the local
-     * processor. The function will throw an exception in case the elements
-     * sits on another process.
+     * processor. In case the elements sits on another process, this function
+     * returns 0 which might or might not be appropriate in a given situation.
+     * If you rely on consistent results, use the access functions () or []
+     * that throw an assertion in case a non-local element is used.
      */
     TrilinosScalar el (const size_type index) const;
 
@@ -571,14 +584,14 @@ namespace TrilinosWrappers
     iterator begin ();
 
     /**
-     * Return constant iterator to the start of the locally owned elements
-     * of the vector.
+     * Return constant iterator to the start of the locally owned elements of
+     * the vector.
      */
     const_iterator begin () const;
 
     /**
-     * Return an iterator pointing to the element past the end of the array
-     * of locally owned entries.
+     * Return an iterator pointing to the element past the end of the array of
+     * locally owned entries.
      */
     iterator end ();
 
@@ -598,9 +611,9 @@ namespace TrilinosWrappers
 
     /**
      * A collective set operation: instead of setting individual elements of a
-     * vector, this function allows to set a whole set of elements at
-     * once. The indices of the elements to be set are stated in the first
-     * argument, the corresponding values in the second.
+     * vector, this function allows to set a whole set of elements at once.
+     * The indices of the elements to be set are stated in the first argument,
+     * the corresponding values in the second.
      */
     void set (const std::vector<size_type>    &indices,
               const std::vector<TrilinosScalar>  &values);
@@ -677,9 +690,10 @@ namespace TrilinosWrappers
      * then it is possible to add data from a vector that uses a different
      * map, i.e., a vector whose elements are split across processors
      * differently. This may include vectors with ghost elements, for example.
-     * In general, however, adding vectors with a different element-to-processor
-     * map requires communicating data among processors and, consequently,
-     * is a slower operation than when using vectors using the same map.
+     * In general, however, adding vectors with a different element-to-
+     * processor map requires communicating data among processors and,
+     * consequently, is a slower operation than when using vectors using the
+     * same map.
      */
     void add (const VectorBase &V,
               const bool        allow_different_maps = false);
@@ -793,8 +807,8 @@ namespace TrilinosWrappers
     const Epetra_Map &vector_partitioner () const;
 
     /**
-     *  Output of vector in user-defined format in analogy to the
-     *  dealii::Vector<number> class.
+     * Output of vector in user-defined format in analogy to the
+     * dealii::Vector class.
      */
     void print (const char *format = 0) const;
 
@@ -858,12 +872,17 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException3 (ExcAccessToNonlocalElement,
-                    size_type, size_type, size_type,
+    DeclException4 (ExcAccessToNonLocalElement,
+                    size_type, size_type, size_type, size_type,
                     << "You tried to access element " << arg1
-                    << " of a distributed vector, but only entries "
-                    << arg2 << " through " << arg3
-                    << " are stored locally and can be accessed.");
+                    << " of a distributed vector, but this element is not stored "
+                    << "on the current processor. Note: There are "
+                    << arg2 << " elements stored "
+                    << "on the current processor from within the range "
+                    << arg3 << " through " << arg4
+                    << " but Trilinos vectors need not store contiguous "
+                    << "ranges on each processor, and not every element in "
+                    << "this range may in fact be stored locally.");
 
 
   private:
@@ -893,19 +912,18 @@ namespace TrilinosWrappers
     bool has_ghosts;
 
     /**
-     * Pointer to the actual Epetra vector object. This may represent a
-     * vector that is in fact distributed among multiple processors. The
-     * object requires an existing Epetra_Map for
-     * storing data when setting it up.
+     * Pointer to the actual Epetra vector object. This may represent a vector
+     * that is in fact distributed among multiple processors. The object
+     * requires an existing Epetra_Map for storing data when setting it up.
      */
-    std_cxx1x::shared_ptr<Epetra_FEVector> vector;
+    std_cxx11::shared_ptr<Epetra_FEVector> vector;
 
     /**
      * A vector object in Trilinos to be used for collecting the non-local
      * elements if the vector was constructed with an additional IndexSet
      * describing ghost elements.
      */
-    std_cxx1x::shared_ptr<Epetra_MultiVector> nonlocal_vector;
+    std_cxx11::shared_ptr<Epetra_MultiVector> nonlocal_vector;
 
     /**
      * Make the reference class a friend.
@@ -921,9 +939,9 @@ namespace TrilinosWrappers
 // ------------------- inline and template functions --------------
 
   /**
-   * Global function swap which overloads the default implementation of
-   * the C standard library which uses a temporary object. The function
-   * simply exchanges the data of the two vectors.
+   * Global function swap which overloads the default implementation of the C
+   * standard library which uses a temporary object. The function simply
+   * exchanges the data of the two vectors.
    *
    * @relates TrilinosWrappers::VectorBase
    * @author Martin Kronbichler, Wolfgang Bangerth, 2008
@@ -1223,10 +1241,6 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator = (const TrilinosScalar s)
   {
-    // if we have ghost values, do not allow
-    // writing to this vector at all.
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
     const int ierr = vector->PutScalar(s);
@@ -1383,10 +1397,10 @@ namespace TrilinosWrappers
             // use pre-allocated vector for non-local entries if it exists for
             // addition operation
             const TrilinosWrappers::types::int_type my_row = nonlocal_vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(row));
-            Assert(my_row != -1, 
+            Assert(my_row != -1,
                    ExcMessage("Attempted to write into off-processor vector entry "
                               "that has not be specified as being writable upon "
-                               "initialization"));
+                              "initialization"));
             (*nonlocal_vector)[0][my_row] += values[i];
             compressed = false;
           }
@@ -1565,6 +1579,18 @@ namespace TrilinosWrappers
 
 
 
+  inline
+  TrilinosScalar
+  VectorBase::add_and_dot (const TrilinosScalar a,
+                           const VectorBase &V,
+                           const VectorBase &W)
+  {
+    this->add(a, V);
+    return *this * W;
+  }
+
+
+
   // inline also scalar products, vector
   // additions etc. since they are all
   // representable by a single Trilinos
@@ -1709,17 +1735,16 @@ namespace TrilinosWrappers
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
-    if(local_size() == v.local_size())
-    {
-      const int ierr = vector->Update(1., *(v.vector), s);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    }
+    if (local_size() == v.local_size())
+      {
+        const int ierr = vector->Update(1., *(v.vector), s);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
     else
-    {
-      VectorBase tmp = v;
-      tmp *= s;
-      this->add(tmp, true);
-    }
+      {
+        (*this) *= s;
+        this->add(v, true);
+      }
   }
 
 
@@ -1738,18 +1763,18 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
-    if(local_size() == v.local_size())
-    {
-      const int ierr = vector->Update(a, *(v.vector), s);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    }
+    if (local_size() == v.local_size())
+      {
+        const int ierr = vector->Update(a, *(v.vector), s);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
     else
-    {
-      (*this)*=s;
-      VectorBase tmp = v;
-      tmp *= a;
-      this->add(tmp, true);
-    }
+      {
+        (*this) *= s;
+        VectorBase tmp = v;
+        tmp *= a;
+        this->add(tmp, true);
+      }
   }
 
 
@@ -1772,26 +1797,26 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
-    
-    if(local_size() == v.local_size() && local_size() == w.local_size())
-    {
-      const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-    }
+
+    if (local_size() == v.local_size() && local_size() == w.local_size())
+      {
+        const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
     else
-    {
-      (*this)*=s;
       {
-        VectorBase tmp = v;
-        tmp *= a;
-        this->add(tmp, true);
+        (*this)*=s;
+        {
+          VectorBase tmp = v;
+          tmp *= a;
+          this->add(tmp, true);
+        }
+        {
+          VectorBase tmp = w;
+          tmp *= b;
+          this->add(tmp, true);
+        }
       }
-      {
-        VectorBase tmp = w;
-        tmp *= b;
-        this->add(tmp, true);
-      }
-    }
   }
 
 
@@ -1820,39 +1845,39 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
     Assert (numbers::is_finite(c), ExcNumberNotFinite());
 
-    if(local_size() == v.local_size()
-       && local_size() == w.local_size()
-       && local_size() == x.local_size())
-    {
-      // Update member can only
-      // input two other vectors so
-      // do it in two steps
-      const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-      
-      const int jerr = vector->Update(c, *(x.vector), 1.);
-      Assert (jerr == 0, ExcTrilinosError(jerr));
-      (void)jerr; // removes -Wunused-parameter warning in optimized mode
-    }
+    if (local_size() == v.local_size()
+        && local_size() == w.local_size()
+        && local_size() == x.local_size())
+      {
+        // Update member can only
+        // input two other vectors so
+        // do it in two steps
+        const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+        const int jerr = vector->Update(c, *(x.vector), 1.);
+        Assert (jerr == 0, ExcTrilinosError(jerr));
+        (void)jerr; // removes -Wunused-parameter warning in optimized mode
+      }
     else
-    {
-      (*this)*=s;
       {
-        VectorBase tmp = v;
-        tmp *= a;
-        this->add(tmp, true);
+        (*this)*=s;
+        {
+          VectorBase tmp = v;
+          tmp *= a;
+          this->add(tmp, true);
+        }
+        {
+          VectorBase tmp = w;
+          tmp *= b;
+          this->add(tmp, true);
+        }
+        {
+          VectorBase tmp = x;
+          tmp *= c;
+          this->add(tmp, true);
+        }
       }
-      {
-        VectorBase tmp = w;
-        tmp *= b;
-        this->add(tmp, true);
-      }
-      {
-        VectorBase tmp = x;
-        tmp *= c;
-        this->add(tmp, true);
-      }
-    }
   }
 
 

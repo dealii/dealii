@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2014 by the deal.II authors
 //
@@ -37,33 +36,36 @@ template <typename number> class SparseMatrix;
  * This namespace provides a collection of functions for generating
  * triangulations for some basic geometries.
  *
- * Some of these functions receive a flag @p colorize. If this is
- * set, parts of the boundary receive different boundary indicators
- * (@ref GlossBoundaryIndicator),
- * allowing them to be distinguished for the purpose of attaching geometry
- * objects and evaluating different boundary conditions.
+ * Some of these functions receive a flag @p colorize. If this is set, parts
+ * of the boundary receive different boundary indicators (
+ * @ref GlossBoundaryIndicator), allowing them to be distinguished for the
+ * purpose of attaching geometry objects and evaluating different boundary
+ * conditions.
  *
  * This namespace also provides a function
  * GridGenerator::laplace_transformation that smoothly transforms a domain
- * into another one. This can be used to
- * transform basic geometries to more complicated ones, like a
- * shell to a grid of an airfoil, for example.
+ * into another one. This can be used to transform basic geometries to more
+ * complicated ones, like a shell to a grid of an airfoil, for example.
  *
  * @ingroup grid
  */
 namespace GridGenerator
 {
   /**
-   * Initialize the given triangulation with a hypercube (line in 1D,
-   * square in 2D, etc) consisting of exactly one cell. The hypercube
-   * volume is the tensor product interval
-   * \f$ [left,right]^{\text{dim}}\f$ in the present number of
-   * dimensions, where the limits are given as arguments. They default
-   * to zero and unity, then producing the unit hypercube. If the
-   * argument `colorize` is false, all boundary indicators are set to
-   * zero ("not colorized") for 2d and 3d. If it is true, the boundary
-   * is colorized as in hyper_rectangle(). In 1d the indicators are
-   * always colorized, see hyper_rectangle().
+   * @name Creating meshes for basic geometries
+   * @{
+   */
+
+  /**
+   * Initialize the given triangulation with a hypercube (line in 1D, square
+   * in 2D, etc) consisting of exactly one cell. The hypercube volume is the
+   * tensor product interval $[left,right]^{\text{dim}}$ in the present number
+   * of dimensions, where the limits are given as arguments. They default to
+   * zero and unity, then producing the unit hypercube. If the argument
+   * `colorize` is false, all boundary indicators are set to zero ("not
+   * colorized") for 2d and 3d. If it is true, the boundary is colorized as in
+   * hyper_rectangle(). In 1d the indicators are always colorized, see
+   * hyper_rectangle().
    *
    * @image html hyper_cubes.png
    *
@@ -77,7 +79,7 @@ namespace GridGenerator
   void hyper_cube (Triangulation<dim,spacedim>  &tria,
                    const double                  left = 0.,
                    const double                  right= 1.,
-		   const bool                    colorize= false);
+                   const bool                    colorize= false);
 
   /**
    * Same as hyper_cube(), but with the difference that not only one cell is
@@ -186,8 +188,8 @@ namespace GridGenerator
    * material_id argument is a dim-dimensional array that, for each cell,
    * indicates which material_id should be set. In addition, and this is the
    * major new functionality, if the material_id of a cell is <tt>(unsigned
-   * char)(-1)</tt>, then that cell is deleted from the triangulation,
-   * i.e. the domain will have a void there.
+   * char)(-1)</tt>, then that cell is deleted from the triangulation, i.e.
+   * the domain will have a void there.
    */
   template <int dim>
   void
@@ -198,7 +200,7 @@ namespace GridGenerator
                               const bool                                colorize=false);
 
   /**
-   * A parallelogram. The first corner point is the origin. The <tt>dim</tt>
+   * A parallelogram. The first corner point is the origin. The @p dim
    * adjacent points are the ones given in the second argument and the fourth
    * point will be the sum of these two vectors.  Colorizing is done in the
    * same way as in hyper_rectangle().
@@ -223,21 +225,18 @@ namespace GridGenerator
                  const bool           colorize=false) DEAL_II_DEPRECATED;
 
   /**
-   * A parallelepiped. The first corner point is the origin. The
-   * <tt>dim</tt> adjacent points are vectors describing the edges of
-   * the parallelepiped with respect to the origin. Additional points
-   * are sums of these dim vectors. Colorizing is done according to
-   * hyper_rectangle().
+   * A parallelepiped. The first corner point is the origin. The @p dim
+   * adjacent points are vectors describing the edges of the parallelepiped
+   * with respect to the origin. Additional points are sums of these dim
+   * vectors. Colorizing is done according to hyper_rectangle().
    *
-   * @note This function silently reorders the vertices on the cells
-   * to lexiographic ordering (see
-   * <code>GridReordering::reorder_grid</code>). In other words, if
-   * reodering of the vertices does occur, the ordering of vertices in
-   * the array of <code>corners</code> will no longer refer to the
+   * @note This function silently reorders the vertices on the cells to
+   * lexiographic ordering (see <code>GridReordering::reorder_grid</code>). In
+   * other words, if reodering of the vertices does occur, the ordering of
+   * vertices in the array of <code>corners</code> will no longer refer to the
    * same triangulation.
    *
-   * @note The triangulation needs to be void upon calling this
-   * function.
+   * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim>
   void
@@ -246,16 +245,14 @@ namespace GridGenerator
                   const bool          colorize = false);
 
   /**
-   * A subdivided parallelepiped. The first corner point is the
-   * origin. The <tt>dim</tt> adjacent points are vectors describing
-   * the edges of the parallelepiped with respect to the
-   * origin. Additional points are sums of these dim vectors. The
-   * variable @p n_subdivisions designates the number of subdivisions
-   * in each of the <tt>dim</tt> directions. Colorizing is done
-   * according to hyper_rectangle().
+   * A subdivided parallelepiped. The first corner point is the origin. The
+   * @p dim adjacent points are vectors describing the edges of the
+   * parallelepiped with respect to the origin. Additional points are sums of
+   * these dim vectors. The variable @p n_subdivisions designates the number
+   * of subdivisions in each of the @p dim directions. Colorizing is
+   * done according to hyper_rectangle().
    *
-   * @note The triangulation needs to be void upon calling this
-   * function.
+   * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim>
   void
@@ -265,17 +262,20 @@ namespace GridGenerator
                              const bool           colorize = false);
 
   /**
-   * A subdivided parallelepiped, ie. the same as above, but where the
-   * number of subdivisions in each of the <tt>dim</tt> directions may
-   * vary. Colorizing is done according to hyper_rectangle().
+   * A subdivided parallelepiped, ie. the same as above, but where the number
+   * of subdivisions in each of the @p dim directions may vary.
+   * Colorizing is done according to hyper_rectangle().
    *
-   * @note The triangulation needs to be void upon calling this
-   * function.
+   * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim>
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
-                             const unsigned int  (n_subdivisions) [dim],
+#ifndef _MSC_VER
+                             const unsigned int(&n_subdivisions)[dim],
+#else
+                             const unsigned int *n_subdivisions,
+#endif
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize = false);
 
@@ -303,7 +303,7 @@ namespace GridGenerator
 
   /**
    * Initialize the given triangulation with a hyperball, i.e. a circle or a
-   * ball around <tt>center</tt> with given <tt>radius</tt>.
+   * ball around @p center with given @p radius.
    *
    * In order to avoid degenerate cells at the boundaries, the circle is
    * triangulated by five cells, the ball by seven cells. The diameter of the
@@ -321,7 +321,7 @@ namespace GridGenerator
                    const double        radius = 1.);
 
   /**
-   * This class produces a half hyper-ball around <tt>center</tt>, which
+   * This class produces a half hyper-ball around @p center, which
    * contains four elements in 2d and 6 in 3d. The cut plane is perpendicular
    * to the <i>x</i>-axis.
    *
@@ -396,11 +396,10 @@ namespace GridGenerator
 
   /**
    * Initialize the given triangulation with a hyper-L (in 2d or 3d)
-   *  consisting of exactly
-   * <tt>2^dim-1</tt> cells. It produces the hypercube with the interval
-   * [<i>left,right</i>] without the hypercube made out of the interval
-   * [<i>(a+b)/2,b</i>]. This will result in the classical L-shape in 2d.
-   * The shape will look like the following in 3d:
+   * consisting of exactly <tt>2^dim-1</tt> cells. It produces the hypercube
+   * with the interval [<i>left,right</i>] without the hypercube made out of
+   * the interval [<i>(a+b)/2,b</i>]. This will result in the classical
+   * L-shape in 2d. The shape will look like the following in 3d:
    *
    * @image html hyper_l.png
    *
@@ -424,10 +423,9 @@ namespace GridGenerator
    * y=left</tt> to the center of the square at <tt>x=y=(left+right)/2</tt>.
    *
    * In 3d, the 2d domain is just extended in the <i>z</i>-direction, such
-   * that a plane cuts the lower half of a rectangle in two.
-
-   * This function is declared to exist for triangulations of all space
-   * dimensions, but throws an error if called in 1d.
+   * that a plane cuts the lower half of a rectangle in two.  This function is
+   * declared to exist for triangulations of all space dimensions, but throws
+   * an error if called in 1d.
    *
    * @note The triangulation needs to be void upon calling this function.
    */
@@ -453,10 +451,10 @@ namespace GridGenerator
    * is zero (as is the default), then it is computed adaptively such that the
    * resulting elements have the least aspect ratio.
    *
-   * In 3d, only two different numbers are meaningful, 6 for a surface based
-   * on a hexahedron (i.e. 6 panels on the inner sphere extruded in radial
-   * direction to form 6 cells) and 12 for the rhombic dodecahedron. These
-   * give rise to the following meshes upon one refinement:
+   * In 3d, only certain numbers are allowed, 6 for a surface based on a
+   * hexahedron (i.e. 6 panels on the inner sphere extruded in radial
+   * direction to form 6 cells), 12 for the rhombic dodecahedron, and 96 (see
+   * below). These give rise to the following meshes upon one refinement:
    *
    * @image html hypershell3d-6.png
    * @image html hypershell3d-12.png
@@ -467,7 +465,7 @@ namespace GridGenerator
    *
    * @image html hyper_shell_6_cross_plane.png
    *
-   * The mesh generated with <code>n_cells=6</code> is better but still not
+   * The mesh generated with <code>n_cells=12</code> is better but still not
    * good. As a consequence, you may also specify <code>n_cells=96</code> as a
    * third option. The mesh generated in this way is based on a once refined
    * version of the one with <code>n_cells=12</code>, where all internal nodes
@@ -479,6 +477,13 @@ namespace GridGenerator
    *
    * @image html hyper_shell_12_cut.png
    * @image html hyper_shell_96_cut.png
+   *
+   * A different way to approach the problem with distorted cells is to attach
+   * appropriate manifold descriptions to the geometry created by this
+   * function. In the current context, this would involve the
+   * SphericalManifold class. An example of how this works and what it leads
+   * to is shown in the documentation of the
+   * @ref manifold "documentation module on manifolds".
    *
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
@@ -583,8 +588,7 @@ namespace GridGenerator
    * @param R The radius of the circle, which forms the middle line of the
    * torus containing the loop of cells. Must be greater than @p r.
    *
-   * @param r The inner radius of the
-   * torus.
+   * @param r The inner radius of the torus.
    */
   void torus (Triangulation<2,3> &tria,
               const double        R,
@@ -596,24 +600,18 @@ namespace GridGenerator
    * in the middle. Square and circle are centered at the origin. In 3d, this
    * geometry is extruded in $z$ direction to the interval $[0,L]$.
    *
-   *  @image html cubes_hole.png
+   * @image html cubes_hole.png
    *
    * It is implemented in 2d and 3d, and takes the following arguments:
    *
-   * @arg @p inner_radius: radius of the
-   *    internal hole
-   * @arg @p  outer_radius: half of the edge length of the square
-   * @arg @p L: extension in @p z-direction (only used in 3d)
-   * @arg @p repetitions: number of subdivisions
-   *      along the @p z-direction
-   * @arg @p colorize: whether to assign different
-   *     boundary indicators to different faces.
-   *    The colors are given in lexicographic
-   *    ordering for the flat faces (0 to 3 in 2d,
-   *    0 to 5 in 3d) plus the curved hole
-   *    (4 in 2d, and 6 in 3d).
-   *    If @p colorize is set to false, then flat faces
-   *    get the number 0 and the hole gets number 1.
+   * @arg @p inner_radius: radius of the internal hole @arg @p  outer_radius:
+   * half of the edge length of the square @arg @p L: extension in @p
+   * z-direction (only used in 3d) @arg @p repetitions: number of subdivisions
+   * along the @p z-direction @arg @p colorize: whether to assign different
+   * boundary indicators to different faces. The colors are given in
+   * lexicographic ordering for the flat faces (0 to 3 in 2d, 0 to 5 in 3d)
+   * plus the curved hole (4 in 2d, and 6 in 3d). If @p colorize is set to
+   * false, then flat faces get the number 0 and the hole gets number 1.
    */
   template<int dim>
   void hyper_cube_with_cylindrical_hole (
@@ -629,9 +627,12 @@ namespace GridGenerator
    * together again. This results in a kind of moebius-loop.
    *
    * @param tria        The triangulation to be worked on.
-   * @param n_cells     The number of cells in the loop. Must be greater than 4.
-   * @param n_rotations The number of rotations (Pi/2 each) to be performed before glueing the loop together.
-   * @param R           The radius of the circle, which forms the middle line of the torus containing the loop of cells. Must be greater than @p r.
+   * @param n_cells     The number of cells in the loop. Must be greater than
+   * 4.
+   * @param n_rotations The number of rotations (Pi/2 each) to be performed
+   * before glueing the loop together.
+   * @param R           The radius of the circle, which forms the middle line
+   * of the torus containing the loop of cells. Must be greater than @p r.
    * @param r           The radius of the cylinder bend together as loop.
    */
   void moebius (Triangulation<3,3> &tria,
@@ -639,6 +640,15 @@ namespace GridGenerator
                 const unsigned int  n_rotations,
                 const double        R,
                 const double        r);
+
+  /*
+   * @}
+   */
+
+  /**
+   * @name Creating meshes from other meshes
+   * @{
+   */
 
   /**
    * Given the two triangulations specified as the first two arguments, create
@@ -668,7 +678,7 @@ namespace GridGenerator
    *
    * @note For a related operation on refined meshes when both meshes are
    * derived from the same coarse mesh, see
-   * GridTools::create_union_triangulation .
+   * GridGenerator::create_union_triangulation().
    */
   template <int dim, int spacedim>
   void
@@ -676,13 +686,44 @@ namespace GridGenerator
                         const Triangulation<dim, spacedim> &triangulation_2,
                         Triangulation<dim, spacedim>       &result);
 
+  /**
+   * Given the two triangulations specified as the first two arguments, create
+   * the triangulation that contains the finest cells of both triangulation
+   * and store it in the third parameter. Previous content of @p result will
+   * be deleted.
+   *
+   * @note This function is intended to create an adaptively refined
+   * triangulation that contains the <i>most refined cells</i> from two input
+   * triangulations that were derived from the <i>same</i> coarse grid by
+   * adaptive refinement. This is an operation sometimes needed when one
+   * solves for two variables of a coupled problem on separately refined
+   * meshes on the same domain (for example because these variables have
+   * boundary layers in different places) but then needs to compute something
+   * that involves both variables or wants to output the result into a single
+   * file. In both cases, in order not to lose information, the two solutions
+   * can not be interpolated onto the respectively other mesh because that may
+   * be coarser than the ones on which the variable was computed. Rather, one
+   * needs to have a mesh for the domain that is at least as fine as each of
+   * the two initial meshes. This function computes such a mesh.
+   *
+   * @note If you want to create a mesh that is the merger of two other coarse
+   * meshes, for example in order to compose a mesh for a complicated geometry
+   * from meshes for simpler geometries, then this is not the function for
+   * you. Instead, consider GridGenerator::merge_triangulations().
+   */
+  template <int dim, int spacedim>
+  void
+  create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
+                              const Triangulation<dim, spacedim> &triangulation_2,
+                              Triangulation<dim, spacedim>       &result);
+
 
   /**
-   * Take a 2d Triangulation that is being extruded in z direction
-   * by the total height of @p height using @p n_slices slices (minimum is 2).
-   * The boundary indicators of the faces of @p input are going to be assigned
-   * to the corresponding side walls in z direction. The bottom and top
-   * get the next two free boundary indicators.
+   * Take a 2d Triangulation that is being extruded in z direction by the
+   * total height of @p height using @p n_slices slices (minimum is 2). The
+   * boundary indicators of the faces of @p input are going to be assigned to
+   * the corresponding side walls in z direction. The bottom and top get the
+   * next two free boundary indicators.
    */
   void
   extrude_triangulation (const Triangulation<2, 2> &input,
@@ -691,10 +732,133 @@ namespace GridGenerator
                          Triangulation<3,3>        &result);
 
   /**
+   * Given an input triangulation @p in_tria, this function makes a new flat
+   * triangulation @p out_tria which contains a single level with all active
+   * cells of the input triangulation. If @p spacedim1 and @p spacedim2 are
+   * different, only the smallest spacedim components of the vertices are
+   * copied over. This is useful to create a Triangulation<2,3> out of a
+   * Triangulation<2,2>, or to project a Triangulation<2,3> into a
+   * Triangulation<2,2>, by neglecting the z components of the vertices.
+   *
+   * No internal checks are performed on the vertices, which are assumed to
+   * make sense topologically in the target @p spacedim2 dimensional space. If
+   * this is not the case, you will encounter problems when using the
+   * triangulation later on.
+   *
+   * All informations about cell manifold_ids and material ids are copied from
+   * one triangulation to the other, and only the boundary manifold_ids and
+   * boundary_ids are copied over from the faces of @p in_tria to the faces of
+   * @p out_tria. If you need to specify manifold ids on interior faces, they
+   * have to be specified manually after the triangulation is created.
+   *
+   * This function will fail if the input Triangulation is of type
+   * parallel::distributed::Triangulation, as well as when the input
+   * Triangulation contains hanging nodes.
+   *
+   * @author Luca Heltai, 2014
+   */
+  template <int dim, int spacedim1, int spacedim2>
+  void flatten_triangulation(const Triangulation<dim,spacedim1> &in_tria,
+                             Triangulation<dim,spacedim2> &out_tria);
+
+  /*
+   * @}
+   */
+
+  /**
+   * @name Creating lower-dimensional meshes from parts of higher-dimensional
+   * meshes
+   * @{
+   */
+
+
+#ifdef _MSC_VER
+  // Microsoft's VC++ has a bug where it doesn't want to recognize that
+  // an implementation (definition) of the extract_boundary_mesh function
+  // matches a declaration. This can apparently only be avoided by
+  // doing some contortion with the return type using the following
+  // intermediate type. This is only used when using MS VC++ and uses
+  // the direct way of doing it otherwise
+  template <template <int,int> class Container, int dim, int spacedim>
+  struct ExtractBoundaryMesh
+  {
+    typedef
+    std::map<typename Container<dim-1,spacedim>::cell_iterator,
+        typename Container<dim,spacedim>::face_iterator>
+        return_type;
+  };
+#endif
+
+  /**
+   * This function implements a boundary subgrid extraction.  Given a
+   * <dim,spacedim>-Triangulation (the "volume mesh") the function extracts a
+   * subset of its boundary (the "surface mesh").  The boundary to be
+   * extracted is specified by a list of boundary_ids.  If none is specified
+   * the whole boundary will be extracted. The function is used in step-38.
+   *
+   * The function also builds a mapping linking the cells on the surface mesh
+   * to the corresponding faces on the volume one. This mapping is the return
+   * value of the function.
+   *
+   * @note The function builds the surface mesh by creating a coarse mesh from
+   * the selected faces of the coarse cells of the volume mesh. It copies the
+   * boundary indicators of these faces to the cells of the coarse surface
+   * mesh. The surface mesh is then refined in the same way as the faces of
+   * the volume mesh are. In order to ensure that the surface mesh has the
+   * same vertices as the volume mesh, it is therefore important that you
+   * assign appropriate boundary objects through Triangulation::set_boundary
+   * to the surface mesh object before calling this function. If you don't,
+   * the refinement will happen under the assumption that all faces are
+   * straight (i.e using the StraightBoundary class) rather than any curved
+   * boundary object you may want to use to determine the location of new
+   * vertices.
+   *
+   *
+   * @tparam Container A type that satisfies the requirements of a mesh
+   * container (see @ref GlossMeshAsAContainer). The map that is returned will
+   * be between cell iterators pointing into the container describing the
+   * surface mesh and face iterators of the volume mesh container. If the
+   * Container argument is DoFHandler of hp::DoFHandler, then the function
+   * will re-build the triangulation underlying the second argument and return
+   * a map between appropriate iterators into the Container arguments.
+   * However, the function will not actually distribute degrees of freedom on
+   * this newly created surface mesh.
+   *
+   * @note The algorithm outlined above assumes that all faces on higher
+   * refinement levels always have exactly the same boundary indicator as
+   * their parent face. Consequently, we can start with coarse level faces and
+   * build the surface mesh based on that. It would not be very difficult to
+   * extend the function to also copy boundary indicators from finer level
+   * faces to their corresponding surface mesh cells, for example to
+   * accommodate different geometry descriptions in the case of curved
+   * boundaries.
+   */
+  template <template <int,int> class Container, int dim, int spacedim>
+#ifndef _MSC_VER
+  std::map<typename Container<dim-1,spacedim>::cell_iterator,
+      typename Container<dim,spacedim>::face_iterator>
+#else
+  typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
+#endif
+      extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
+                             Container<dim-1,spacedim>     &surface_mesh,
+                             const std::set<types::boundary_id> &boundary_ids
+                             = std::set<types::boundary_id>());
+
+  /*
+   * @}
+   */
+
+  /**
+   * @name Deprecated functions
+   * @{
+   */
+
+  /**
    * This function transforms the @p Triangulation @p tria smoothly to a
-   * domain that is described by the boundary points in the map @p
-   * new_points. This map maps the point indices to the boundary points in the
-   * transformed domain.
+   * domain that is described by the boundary points in the map @p new_points.
+   * This map maps the point indices to the boundary points in the transformed
+   * domain.
    *
    * Note, that the @p Triangulation is changed in-place, therefore you don't
    * need to keep two triangulations, but the given triangulation is changed
@@ -702,14 +866,13 @@ namespace GridGenerator
    *
    * In 1d, this function is not currently implemented.
    *
-   * An optional @p coefficient for the Laplace problem an be used to control the amount of
-   * mesh deformation in different parts of the domain.
-   * Larger values make cells less prone to deformation (effectively increasing their stiffness).
-   * The coefficient is evaluated in the coordinate system of the old,
-   * undeformed configuration of the triangulation as input, i.e., before
-   * the transformation is applied.
-   * Should this function be provided, sensible results can only be expected if
-   * all coefficients are positive.
+   * An optional @p coefficient for the Laplace problem an be used to control
+   * the amount of mesh deformation in different parts of the domain. Larger
+   * values make cells less prone to deformation (effectively increasing their
+   * stiffness). The coefficient is evaluated in the coordinate system of the
+   * old, undeformed configuration of the triangulation as input, i.e., before
+   * the transformation is applied. Should this function be provided, sensible
+   * results can only be expected if all coefficients are positive.
    *
    * @deprecated This function has been moved to GridTools::laplace_transform
    */
@@ -717,6 +880,15 @@ namespace GridGenerator
   void laplace_transformation (Triangulation<dim> &tria,
                                const std::map<unsigned int,Point<dim> > &new_points,
                                const Function<dim> *coefficient = 0) DEAL_II_DEPRECATED;
+
+  /*
+   * @}
+   */
+
+  /**
+   * @name Exceptions
+   * @{
+   */
 
   /**
    * Exception
@@ -736,6 +908,10 @@ namespace GridGenerator
                   int,
                   << "The vector of repetitions  must have "
                   << arg1 <<" elements.");
+
+  /*
+   * @}
+   */
 }
 
 

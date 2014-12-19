@@ -1,5 +1,4 @@
 /* ---------------------------------------------------------------------
- * $Id$
  *
  * Copyright (C) 2007 - 2013 by the deal.II authors
  *
@@ -530,8 +529,8 @@ namespace Step31
     double                              old_time_step;
     unsigned int                        timestep_number;
 
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
+    std_cxx11::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
+    std_cxx11::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
 
     bool                                rebuild_stokes_matrix;
     bool                                rebuild_temperature_matrices;
@@ -1176,7 +1175,7 @@ namespace Step31
 
     assemble_stokes_preconditioner ();
 
-    Amg_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>
+    Amg_preconditioner = std_cxx11::shared_ptr<TrilinosWrappers::PreconditionAMG>
                          (new TrilinosWrappers::PreconditionAMG());
 
     std::vector<std::vector<bool> > constant_modes;
@@ -1212,7 +1211,7 @@ namespace Step31
     // (IC) factorization preconditioner, which is designed for symmetric
     // matrices. We could have also chosen an SSOR preconditioner with
     // relaxation factor around 1.2, but IC is cheaper for our example. We
-    // wrap the preconditioners into a <code>std_cxx1x::shared_ptr</code>
+    // wrap the preconditioners into a <code>std_cxx11::shared_ptr</code>
     // pointer, which makes it easier to recreate the preconditioner next time
     // around since we do not have to care about destroying the previously
     // used object.
@@ -1223,7 +1222,7 @@ namespace Step31
     Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
                                    amg_data);
 
-    Mp_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>
+    Mp_preconditioner = std_cxx11::shared_ptr<TrilinosWrappers::PreconditionIC>
                         (new TrilinosWrappers::PreconditionIC());
     Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1,1));
 

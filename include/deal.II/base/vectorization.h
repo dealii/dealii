@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2011 - 2014 by the deal.II authors
 //
@@ -70,7 +69,7 @@ DEAL_II_NAMESPACE_OPEN
 // for safety, also check that __AVX512F__ is defined in case the user manually
 // set some conflicting compile flags which prevent compilation
 
-#if DEAL_II_COMPILER_VECTORIZATION_LEVEL == 3  && defined(__AVX512F__)
+#if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3  && defined(__AVX512F__)
 
 /**
  * Specialization of VectorizedArray class for double and AVX-512.
@@ -90,7 +89,7 @@ public:
   VectorizedArray &
   operator = (const double x)
   {
-    data = _mm512_set_pd(x, x, x, x, x, x, x, x);
+    data = _mm512_set1_pd(x);
     return *this;
   }
 
@@ -121,7 +120,9 @@ public:
   operator += (const VectorizedArray &vec)
   {
     // if the compiler supports vector arithmetics, we can simply use +=
-    // operator on the given data type. Otherwise, we need to use the built-in
+    // operator on the given data type. this allows the compiler to combine
+    // additions with multiplication (fused multiply-add) if those
+    // instructions are available. Otherwise, we need to use the built-in
     // intrinsic command for __m512d
 #ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
     data += vec.data;
@@ -177,7 +178,7 @@ public:
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
-  void load (const double* ptr)
+  void load (const double *ptr)
   {
     data = _mm512_loadu_pd (ptr);
   }
@@ -188,7 +189,7 @@ public:
    * 64 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  void store (double* ptr) const
+  void store (double *ptr) const
   {
     _mm512_storeu_pd (ptr, data);
   }
@@ -221,10 +222,17 @@ private:
   {
     // to compute the absolute value, perform bitwise andnot with -0. This
     // will leave all value and exponent bits unchanged but force the sign
-    // value to +.
-    __m256d mask = _mm512_set_pd (-0., -0., -0., -0., -0., -0., -0., -0.);
+    // value to +. As opposed to AVX and SSE2, there is no andnot operation on
+    // double data types in AVX-512. Thus, need to separately work with
+    // 256-bit data fields.
+    __m256d mask = _mm256_set1_pd (-0.);
+    __m256d in[2];
+    in[0] = *(reinterpret_cast<__m256d *>(&data));
+    in[0] = _m256_andnot_pd(mask, in[0]);
+    in[1] = *(reinterpret_cast<__m256d *>(&data)+1);
+    in[1] = _m256_andnot_pd(mask, in[1]);
     VectorizedArray res;
-    res.data = _mm512_andnot_pd(mask, data);
+    res.data = _mm512_loadu_pd(reinterpret_cast<double *>(&in[0]));
     return res;
   }
 
@@ -285,7 +293,7 @@ public:
   VectorizedArray &
   operator = (const float x)
   {
-    data = _mm512_set_ps(x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x);
+    data = _mm512_set1_ps(x);
     return *this;
   }
 
@@ -315,6 +323,11 @@ public:
   VectorizedArray &
   operator += (const VectorizedArray &vec)
   {
+    // if the compiler supports vector arithmetics, we can simply use +=
+    // operator on the given data type. this allows the compiler to combine
+    // additions with multiplication (fused multiply-add) if those
+    // instructions are available. Otherwise, we need to use the built-in
+    // intrinsic command for __m512d
 #ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
     data += vec.data;
 #else
@@ -369,7 +382,7 @@ public:
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
-  void load (const float* ptr)
+  void load (const float *ptr)
   {
     data = _mm512_loadu_ps (ptr);
   }
@@ -380,7 +393,7 @@ public:
    * 64 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
-  void store (float* ptr) const
+  void store (float *ptr) const
   {
     _mm512_storeu_ps (ptr, data);
   }
@@ -412,14 +425,19 @@ private:
   VectorizedArray
   get_abs () const
   {
-    // to compute the absolute value, perform
-    // bitwise andnot with -0. This will leave all
-    // value and exponent bits unchanged but force
-    // the sign value to +.
-    __m256 mask = _mm512_setzero_ps (-0.f, -0.f, -0.f, -0.f, -0.f, -0.f, -0.f, -0.f,
-                                     -0.f, -0.f, -0.f, -0.f, -0.f, -0.f, -0.f, -0.f);
+    // to compute the absolute value, perform bitwise andnot with -0. This
+    // will leave all value and exponent bits unchanged but force the sign
+    // value to +. As opposed to AVX and SSE, there is no andnot operation on
+    // double data types in AVX-512. Thus, need to separately work with
+    // 256-bit data fields.
+    __m256 mask = _mm256_set1_ps (-0.f);
+    __m256 in[2];
+    in[0] = *(reinterpret_cast<__m256 *>(&data));
+    in[0] = _m256_andnot_ps(mask, in[0]);
+    in[1] = *(reinterpret_cast<__m256 *>(&data)+1);
+    in[1] = _m256_andnot_ps(mask, in[1]);
     VectorizedArray res;
-    res.data = _mm512_andnot_ps(mask, data);
+    res.data = _mm512_loadu_ps(reinterpret_cast<float *>(&in[0]));
     return res;
   }
 
@@ -462,7 +480,7 @@ private:
 
 
 
-#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL == 2  && defined(__AVX__)
+#elif DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2  && defined(__AVX__)
 
 /**
  * Specialization of VectorizedArray class for double and AVX.
@@ -472,14 +490,12 @@ class VectorizedArray<double>
 {
 public:
   /**
-   * This gives the number of vectors collected
-   * in this class.
+   * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 4;
 
   /**
-   * This function can be used to set all data
-   * fields to a given scalar.
+   * This function can be used to set all data fields to a given scalar.
    */
   VectorizedArray &
   operator = (const double x)
@@ -514,11 +530,11 @@ public:
   VectorizedArray &
   operator += (const VectorizedArray &vec)
   {
-    // if the compiler supports vector
-    // arithmetics, we can simply use += operator
-    // on the given data type. Otherwise, we need
-    // to use the built-in intrinsic command for
-    // __m256d
+    // if the compiler supports vector arithmetics, we can simply use +=
+    // operator on the given data type. this allows the compiler to combine
+    // additions with multiplication (fused multiply-add) if those
+    // instructions are available. Otherwise, we need to use the built-in
+    // intrinsic command for __m256d
 #ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
     data += vec.data;
 #else
@@ -573,7 +589,7 @@ public:
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
-  void load (const double* ptr)
+  void load (const double *ptr)
   {
     data = _mm256_loadu_pd (ptr);
   }
@@ -584,22 +600,21 @@ public:
    * 32 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  void store (double* ptr) const
+  void store (double *ptr) const
   {
     _mm256_storeu_pd (ptr, data);
   }
 
   /**
-   * Actual data field. Since this class
-   * represents a POD data type, it remains
-   * public.
+   * Actual data field. Since this class represents a POD data type, it
+   * remains public.
    */
   __m256d data;
 
 private:
   /**
-   * Returns the square root of this field. Not
-   * for use in user code. Use sqrt(x) instead.
+   * Returns the square root of this field. Not for use in user code. Use
+   * sqrt(x) instead.
    */
   VectorizedArray
   get_sqrt () const
@@ -610,17 +625,15 @@ private:
   }
 
   /**
-   * Returns the absolute value of this
-   * field. Not for use in user code. Use
+   * Returns the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
   get_abs () const
   {
-    // to compute the absolute value, perform
-    // bitwise andnot with -0. This will leave all
-    // value and exponent bits unchanged but force
-    // the sign value to +.
+    // to compute the absolute value, perform bitwise andnot with -0. This
+    // will leave all value and exponent bits unchanged but force the sign
+    // value to +.
     __m256d mask = _mm256_set1_pd (-0.);
     VectorizedArray res;
     res.data = _mm256_andnot_pd(mask, data);
@@ -628,9 +641,8 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this
-   * field and another one. Not for use in user
-   * code. Use max(x,y) instead.
+   * Returns the component-wise maximum of this field and another one. Not for
+   * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
   get_max (const VectorizedArray &other) const
@@ -641,9 +653,8 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this
-   * field and another one. Not for use in user
-   * code. Use min(x,y) instead.
+   * Returns the component-wise minimum of this field and another one. Not for
+   * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
   get_min (const VectorizedArray &other) const
@@ -676,14 +687,12 @@ class VectorizedArray<float>
 {
 public:
   /**
-   * This gives the number of vectors collected
-   * in this class.
+   * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 8;
 
   /**
-   * This function can be used to set all data
-   * fields to a given scalar.
+   * This function can be used to set all data fields to a given scalar.
    */
   VectorizedArray &
   operator = (const float x)
@@ -718,6 +727,11 @@ public:
   VectorizedArray &
   operator += (const VectorizedArray &vec)
   {
+    // if the compiler supports vector arithmetics, we can simply use +=
+    // operator on the given data type. this allows the compiler to combine
+    // additions with multiplication (fused multiply-add) if those
+    // instructions are available. Otherwise, we need to use the built-in
+    // intrinsic command for __m256d
 #ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
     data += vec.data;
 #else
@@ -772,7 +786,7 @@ public:
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
-  void load (const float* ptr)
+  void load (const float *ptr)
   {
     data = _mm256_loadu_ps (ptr);
   }
@@ -783,23 +797,22 @@ public:
    * 32 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
-  void store (float* ptr) const
+  void store (float *ptr) const
   {
     _mm256_storeu_ps (ptr, data);
   }
 
   /**
-   * Actual data field. Since this class
-   * represents a POD data type, it remains
-   * public.
+   * Actual data field. Since this class represents a POD data type, it
+   * remains public.
    */
   __m256 data;
 
 private:
 
   /**
-   * Returns the square root of this field. Not
-   * for use in user code. Use sqrt(x) instead.
+   * Returns the square root of this field. Not for use in user code. Use
+   * sqrt(x) instead.
    */
   VectorizedArray
   get_sqrt () const
@@ -808,18 +821,17 @@ private:
     res.data = _mm256_sqrt_ps(data);
     return res;
   }
+
   /**
-   * Returns the absolute value of this
-   * field. Not for use in user code. Use
+   * Returns the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
   get_abs () const
   {
-    // to compute the absolute value, perform
-    // bitwise andnot with -0. This will leave all
-    // value and exponent bits unchanged but force
-    // the sign value to +.
+    // to compute the absolute value, perform bitwise andnot with -0. This
+    // will leave all value and exponent bits unchanged but force the sign
+    // value to +.
     __m256 mask = _mm256_set1_ps (-0.f);
     VectorizedArray res;
     res.data = _mm256_andnot_ps(mask, data);
@@ -827,9 +839,8 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this
-   * field and another one. Not for use in user
-   * code. Use max(x,y) instead.
+   * Returns the component-wise maximum of this field and another one. Not for
+   * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
   get_max (const VectorizedArray &other) const
@@ -840,9 +851,8 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this
-   * field and another one. Not for use in user
-   * code. Use min(x,y) instead.
+   * Returns the component-wise minimum of this field and another one. Not for
+   * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
   get_min (const VectorizedArray &other) const
@@ -882,16 +892,13 @@ class VectorizedArray<double>
 {
 public:
   /**
-   * This gives the number of vectors collected
-   * in this class.
+   * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 2;
 
   /**
-   * This function can be used to set all data
-   * fields to a given scalar.
+   * This function can be used to set all data fields to a given scalar.
    */
-
   VectorizedArray &
   operator = (const double x)
   {
@@ -979,7 +986,7 @@ public:
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
-  void load (const double* ptr)
+  void load (const double *ptr)
   {
     data = _mm_loadu_pd (ptr);
   }
@@ -990,22 +997,21 @@ public:
    * 16 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  void store (double* ptr) const
+  void store (double *ptr) const
   {
     _mm_storeu_pd (ptr, data);
   }
 
   /**
-   * Actual data field. Since this class
-   * represents a POD data type, it remains
-   * public.
+   * Actual data field. Since this class represents a POD data type, it
+   * remains public.
    */
   __m128d data;
 
 private:
   /**
-   * Returns the square root of this field. Not
-   * for use in user code. Use sqrt(x) instead.
+   * Returns the square root of this field. Not for use in user code. Use
+   * sqrt(x) instead.
    */
   VectorizedArray
   get_sqrt () const
@@ -1016,9 +1022,8 @@ private:
   }
 
   /**
-   * Returns the absolute value of this
-   * field. Not for use in user code. Use abs(x)
-   * instead.
+   * Returns the absolute value of this field. Not for use in user code. Use
+   * abs(x) instead.
    */
   VectorizedArray
   get_abs () const
@@ -1034,9 +1039,8 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this
-   * field and another one. Not for use in user
-   * code. Use max(x,y) instead.
+   * Returns the component-wise maximum of this field and another one. Not for
+   * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
   get_max (const VectorizedArray &other) const
@@ -1047,9 +1051,8 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this
-   * field and another one. Not for use in user
-   * code. Use min(x,y) instead.
+   * Returns the component-wise minimum of this field and another one. Not for
+   * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
   get_min (const VectorizedArray &other) const
@@ -1082,14 +1085,12 @@ class VectorizedArray<float>
 {
 public:
   /**
-   * This gives the number of vectors collected
-   * in this class.
+   * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 4;
 
   /**
-   * This function can be used to set all data
-   * fields to a given scalar.
+   * This function can be used to set all data fields to a given scalar.
    */
 
   VectorizedArray &
@@ -1179,7 +1180,7 @@ public:
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
-  void load (const float* ptr)
+  void load (const float *ptr)
   {
     data = _mm_loadu_ps (ptr);
   }
@@ -1190,22 +1191,21 @@ public:
    * 16 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
-  void store (float* ptr) const
+  void store (float *ptr) const
   {
     _mm_storeu_ps (ptr, data);
   }
 
   /**
-   * Actual data field. Since this class
-   * represents a POD data type, it remains
-   * public.
+   * Actual data field. Since this class represents a POD data type, it
+   * remains public.
    */
   __m128 data;
 
 private:
   /**
-   * Returns the square root of this field. Not
-   * for use in user code. Use sqrt(x) instead.
+   * Returns the square root of this field. Not for use in user code. Use
+   * sqrt(x) instead.
    */
   VectorizedArray
   get_sqrt () const
@@ -1216,17 +1216,15 @@ private:
   }
 
   /**
-   * Returns the absolute value of this
-   * field. Not for use in user code. Use
+   * Returns the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
   get_abs () const
   {
-    // to compute the absolute value, perform
-    // bitwise andnot with -0. This will leave all
-    // value and exponent bits unchanged but force
-    // the sign value to +.
+    // to compute the absolute value, perform bitwise andnot with -0. This
+    // will leave all value and exponent bits unchanged but force the sign
+    // value to +.
     __m128 mask = _mm_set1_ps (-0.f);
     VectorizedArray res;
     res.data = _mm_andnot_ps(mask, data);
@@ -1234,9 +1232,8 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this
-   * field and another one. Not for use in user
-   * code. Use max(x,y) instead.
+   * Returns the component-wise maximum of this field and another one. Not for
+   * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
   get_max (const VectorizedArray &other) const
@@ -1247,9 +1244,8 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this
-   * field and another one. Not for use in user
-   * code. Use min(x,y) instead.
+   * Returns the component-wise minimum of this field and another one. Not for
+   * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
   get_min (const VectorizedArray &other) const
@@ -1277,51 +1273,52 @@ private:
 
 
 /**
- * This generic class defines a unified interface to a vectorized data
- * type. For general template arguments, this class simply corresponds to
- * the template argument. For example, VectorizedArray<long double> is
- * nothing else but a wrapper around <tt>long double</tt> with exactly one
- * data field of type <tt>long double</tt> and overloaded arithmetic
- * operations. This means that <tt>VectorizedArray<ComplicatedType></tt> has
- * a similar layout as ComplicatedType, provided that ComplicatedType
- * defines basic arithmetic operations. For floats and doubles, an array of
- * numbers are packed together, though. The number of elements packed
- * together depend on the computer system and compiler flags that are used
- * for compilation of deal.II. The fundamental idea of these packed data
- * types is to use one single CPU instruction to perform arithmetic
- * operations on the whole array using the processor's vector units. Most
- * computer systems by 2010 standards will use an array of two doubles and
- * four floats, respectively (this corresponds to the SSE/SSE2 data sets)
- * when compiling deal.II on 64-bit operating systems. On Intel Sandy Bridge
- * processors and newer or AMD Bulldozer processors and newer, four doubles
- * and eight floats are used when deal.II is configured e.g. using gcc with
- * --with-cpu=native or --with-cpu=corei7-avx.
+ * This generic class defines a unified interface to a vectorized data type.
+ * For general template arguments, this class simply corresponds to the
+ * template argument. For example, VectorizedArray<long double> is nothing
+ * else but a wrapper around <tt>long double</tt> with exactly one data field
+ * of type <tt>long double</tt> and overloaded arithmetic operations. This
+ * means that <tt>VectorizedArray<ComplicatedType></tt> has a similar layout
+ * as ComplicatedType, provided that ComplicatedType defines basic arithmetic
+ * operations. For floats and doubles, an array of numbers are packed
+ * together, though. The number of elements packed together depend on the
+ * computer system and compiler flags that are used for compilation of
+ * deal.II. The fundamental idea of these packed data types is to use one
+ * single CPU instruction to perform arithmetic operations on the whole array
+ * using the processor's vector units. Most computer systems by 2010 standards
+ * will use an array of two doubles and four floats, respectively (this
+ * corresponds to the SSE/SSE2 data sets) when compiling deal.II on 64-bit
+ * operating systems. On Intel Sandy Bridge processors and newer or AMD
+ * Bulldozer processors and newer, four doubles and eight floats are used when
+ * deal.II is configured e.g. using gcc with --with-cpu=native or --with-
+ * cpu=corei7-avx. On compilations with AVX-512 support, eight doubles and
+ * sixteen floats are used.
  *
- * This behavior of this class is made similar to the basic data types
- * double and float. The definition of a vectorized array does not
- * initialize the data field but rather leaves it undefined, as is the case
- * for double and float. However, when calling something like
- * VectorizedArray<double> a = VectorizedArray<double>(), it sets all numbers in this
- * field to zero. In other words, this class is a plain old data (POD) type
- * which has an equivalent C representation and can e.g. be safely copied
- * with std::memcpy. This POD layout is also necessary for ensuring correct
- * alignment of data with address boundaries when collected in a vector
- * (i.e., when the first element in a vector is properly aligned, all
- * subsequent elements will be correctly aligned, too).
+ * This behavior of this class is made similar to the basic data types double
+ * and float. The definition of a vectorized array does not initialize the
+ * data field but rather leaves it undefined, as is the case for double and
+ * float. However, when calling something like VectorizedArray<double> a =
+ * VectorizedArray<double>(), it sets all numbers in this field to zero. In
+ * other words, this class is a plain old data (POD) type which has an
+ * equivalent C representation and can e.g. be safely copied with std::memcpy.
+ * This POD layout is also necessary for ensuring correct alignment of data
+ * with address boundaries when collected in a vector (i.e., when the first
+ * element in a vector is properly aligned, all subsequent elements will be
+ * correctly aligned, too).
  *
  * Note that for proper functioning of this class, certain data alignment
- * rules must be respected. This is because the computer expects the
- * starting address of a VectorizedArray<double> field at specific addresses
- * in memory (usually, the address of the vectorized array should be a
- * multiple of the length of the array in bytes). Otherwise, a segmentation
- * fault or a severe loss of performance might occur. When creating a single
- * data field on the stack like <tt>VectorizedArray<double> a =
- * VectorizedArray<double>()</tt>, the compiler will take care of data
- * alignment automatically. However, when allocating a long vector of
- * VectorizedArray<double> data, one needs to respect these rules. Use the
- * class AlignedVector for this purpose. It is a class very similar to
- * std::vector otherwise but always makes sure that data is correctly
- * aligned.
+ * rules must be respected. This is because the computer expects the starting
+ * address of a VectorizedArray<double> field at specific addresses in memory
+ * (usually, the address of the vectorized array should be a multiple of the
+ * length of the array in bytes). Otherwise, a segmentation fault or a severe
+ * loss of performance might occur. When creating a single data field on the
+ * stack like <tt>VectorizedArray<double> a = VectorizedArray<double>()</tt>,
+ * the compiler will take care of data alignment automatically. However, when
+ * allocating a long vector of VectorizedArray<double> data, one needs to
+ * respect these rules. Use the class AlignedVector or data containers based
+ * on AlignedVector (such as Table) for this purpose. It is a class very
+ * similar to std::vector otherwise but always makes sure that data is
+ * correctly aligned.
  *
  * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
  */
@@ -1330,21 +1327,16 @@ class VectorizedArray
 {
 public:
   /**
-   * This gives the number of vectors collected
-   * in this class.
+   * This gives the number of vectors collected in this class.
    */
   static const unsigned int n_array_elements = 1;
 
-  // POD means that there should be no
-  // user-defined constructors, destructors and
-  // copy functions (the standard is somewhat
-  // relaxed in C++2011, though).
+  // POD means that there should be no user-defined constructors, destructors
+  // and copy functions (the standard is somewhat relaxed in C++2011, though).
 
   /**
-   * This function assigns a scalar to this
-   * class.
+   * This function assigns a scalar to this class.
    */
-
   VectorizedArray &
   operator = (const Number scalar)
   {
@@ -1353,8 +1345,7 @@ public:
   }
 
   /**
-   * Access operator (only valid with component
-   * 0)
+   * Access operator (only valid with component 0)
    */
   Number &
   operator [] (const unsigned int comp)
@@ -1364,8 +1355,7 @@ public:
   }
 
   /**
-   * Constant access operator (only valid with
-   * component 0)
+   * Constant access operator (only valid with component 0)
    */
   const Number &
   operator [] (const unsigned int comp) const
@@ -1420,7 +1410,7 @@ public:
    * in the vectorized array, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  void load (const Number* ptr)
+  void load (const Number *ptr)
   {
     data = *ptr;
   }
@@ -1431,22 +1421,21 @@ public:
    * the amount of bytes in the vectorized array, as opposed to casting a
    * double address to VectorizedArray<double>*.
    */
-  void store (Number* ptr) const
+  void store (Number *ptr) const
   {
     *ptr = data;
   }
 
   /**
-   * Actual data field. Since this class
-   * represents a POD data type, it is declared
-   * public.
+   * Actual data field. Since this class represents a POD data type, it is
+   * declared public.
    */
   Number data;
 
 private:
   /**
-   * Returns the square root of this field. Not
-   * for use in user code. Use sqrt(x) instead.
+   * Returns the square root of this field. Not for use in user code. Use
+   * sqrt(x) instead.
    */
   VectorizedArray
   get_sqrt () const
@@ -1457,8 +1446,7 @@ private:
   }
 
   /**
-   * Returns the absolute value of this
-   * field. Not for use in user code. Use
+   * Returns the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
   VectorizedArray
@@ -1470,9 +1458,8 @@ private:
   }
 
   /**
-   * Returns the component-wise maximum of this
-   * field and another one. Not for use in user
-   * code. Use max(x,y) instead.
+   * Returns the component-wise maximum of this field and another one. Not for
+   * use in user code. Use max(x,y) instead.
    */
   VectorizedArray
   get_max (const VectorizedArray &other) const
@@ -1483,9 +1470,8 @@ private:
   }
 
   /**
-   * Returns the component-wise minimum of this
-   * field and another one. Not for use in user
-   * code. Use min(x,y) instead.
+   * Returns the component-wise minimum of this field and another one. Not for
+   * use in user code. Use min(x,y) instead.
    */
   VectorizedArray
   get_min (const VectorizedArray &other) const
@@ -1910,10 +1896,10 @@ namespace std
   sin (const ::dealii::VectorizedArray<Number> &x)
   {
     // put values in an array and later read in that array with an unaligned
-    // read. This should safe some instructions as compared to directly
+    // read. This should save some instructions as compared to directly
     // setting the individual elements and also circumvents a compiler
-    // optimization bug in gcc-4.6 (see also deal.II developers list from
-    // April 2014, topic "matrix_free/step-48 Test").
+    // optimization bug in gcc-4.6 with SSE2 (see also deal.II developers list
+    // from April 2014, topic "matrix_free/step-48 Test").
     Number values[::dealii::VectorizedArray<Number>::n_array_elements];
     for (unsigned int i=0; i<dealii::VectorizedArray<Number>::n_array_elements; ++i)
       values[i] = std::sin(x[i]);
@@ -1947,8 +1933,8 @@ namespace std
 
 
   /**
-   * Computes the tangent of a vectorized data field. The result is returned as
-   * vectorized array in the form <tt>{tan(x[0]), tan(x[1]), ...,
+   * Computes the tangent of a vectorized data field. The result is returned
+   * as vectorized array in the form <tt>{tan(x[0]), tan(x[1]), ...,
    * tan(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -1969,8 +1955,8 @@ namespace std
 
 
   /**
-   * Computes the exponential of a vectorized data field. The result is returned
-   * as vectorized array in the form <tt>{exp(x[0]), exp(x[1]), ...,
+   * Computes the exponential of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{exp(x[0]), exp(x[1]), ...,
    * exp(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
@@ -2013,9 +1999,9 @@ namespace std
 
 
   /**
-   * Computes the square root of a vectorized data field. The result is returned
-   * as vectorized array in the form <tt>{sqrt(x[0]), sqrt(x[1]), ...,
-   * sqrt(x[n_array_elements-1])}</tt>.
+   * Computes the square root of a vectorized data field. The result is
+   * returned as vectorized array in the form <tt>{sqrt(x[0]), sqrt(x[1]),
+   * ..., sqrt(x[n_array_elements-1])}</tt>.
    *
    * @relates VectorizedArray
    */
@@ -2025,6 +2011,29 @@ namespace std
   sqrt (const ::dealii::VectorizedArray<Number> &x)
   {
     return x.get_sqrt();
+  }
+
+
+
+  /**
+   * Raises the given number @p x to the power @p p for a vectorized data
+   * field. The result is returned as vectorized array in the form
+   * <tt>{pow(x[0],p), pow(x[1],p), ..., pow(x[n_array_elements-1],p)}</tt>.
+   *
+   * @relates VectorizedArray
+   */
+  template <typename Number>
+  inline
+  ::dealii::VectorizedArray<Number>
+  pow (const ::dealii::VectorizedArray<Number> &x,
+       const Number p)
+  {
+    Number values[::dealii::VectorizedArray<Number>::n_array_elements];
+    for (unsigned int i=0; i<dealii::VectorizedArray<Number>::n_array_elements; ++i)
+      values[i] = std::pow(x[i], p);
+    ::dealii::VectorizedArray<Number> out;
+    out.load(&values[0]);
+    return out;
   }
 
 

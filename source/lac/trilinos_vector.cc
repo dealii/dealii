@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2008 - 2013 by the deal.II authors
 //
@@ -309,7 +308,7 @@ namespace TrilinosWrappers
       Epetra_Map new_map (v.size(), n_elements, &global_ids[0], 0,
                           v.block(0).vector_partitioner().Comm());
 
-      std_cxx1x::shared_ptr<Epetra_FEVector> actual_vec;
+      std_cxx11::shared_ptr<Epetra_FEVector> actual_vec;
       if ( import_data == true )
         actual_vec.reset (new Epetra_FEVector (new_map));
       else
@@ -411,7 +410,7 @@ namespace TrilinosWrappers
 
       if (v.nonlocal_vector.get() != 0)
         nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
-      
+
       return *this;
     }
 

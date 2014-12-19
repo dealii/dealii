@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -48,7 +47,7 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> > &patches,
   DataOutBase::VtkFlags vtkflags;
   DataOutBase::Deal_II_IntermediateFlags deal_II_intermediateflags;
 
-  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
+  std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > vectors;
 
   WRITE(dx);
   if (dim==2)

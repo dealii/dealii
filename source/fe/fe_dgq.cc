@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2001 - 2013 by the deal.II authors
 //
@@ -224,7 +223,9 @@ FE_DGQ<dim, spacedim>::get_name () const
   // have to be kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_DGQ<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << this->degree << ")";
   return namebuf.str();
 }
 
@@ -499,10 +500,10 @@ FE_DGQ<dim,spacedim>
       if (refinement_case == RefinementCase<dim>::isotropic_refinement)
         {
           std::vector<std::vector<FullMatrix<double> > >
-            isotropic_matrices(RefinementCase<dim>::isotropic_refinement);
+          isotropic_matrices(RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().
-            resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-                   FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
+          resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+                 FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
           if (dim == spacedim)
             FETools::compute_embedding_matrices (*this, isotropic_matrices, true);
           else
@@ -565,15 +566,15 @@ FE_DGQ<dim,spacedim>
       if (refinement_case == RefinementCase<dim>::isotropic_refinement)
         {
           std::vector<std::vector<FullMatrix<double> > >
-            isotropic_matrices(RefinementCase<dim>::isotropic_refinement);
+          isotropic_matrices(RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().
-            resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-                   FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
+          resize(GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+                 FullMatrix<double>(this->dofs_per_cell, this->dofs_per_cell));
           if (dim == spacedim)
             FETools::compute_projection_matrices (*this, isotropic_matrices, true);
           else
             FETools::compute_projection_matrices (FE_DGQ<dim>(this->degree),
-                                                 isotropic_matrices, true);
+                                                  isotropic_matrices, true);
           this_nonconst.restriction[refinement_case-1].swap(isotropic_matrices.back());
         }
       else
@@ -616,16 +617,12 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
 hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 {
-  // there are no such constraints for DGQ
-  // elements at all
-  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
-    return
-      std::vector<std::pair<unsigned int, unsigned int> > ();
-  else
-    {
-      Assert (false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int> > ();
-    }
+  // this element is discontinuous, so by definition there can
+  // be no identities between its dofs and those of any neighbor
+  // (of whichever type the neighbor may be -- after all, we have
+  // no face dofs on this side to begin with)
+  return
+    std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
 
@@ -635,16 +632,12 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
 hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 {
-  // there are no such constraints for DGQ
-  // elements at all
-  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
-    return
-      std::vector<std::pair<unsigned int, unsigned int> > ();
-  else
-    {
-      Assert (false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int> > ();
-    }
+  // this element is discontinuous, so by definition there can
+  // be no identities between its dofs and those of any neighbor
+  // (of whichever type the neighbor may be -- after all, we have
+  // no face dofs on this side to begin with)
+  return
+    std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
 
@@ -654,16 +647,12 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
 hp_quad_dof_identities (const FiniteElement<dim, spacedim>        &fe_other) const
 {
-  // there are no such constraints for DGQ
-  // elements at all
-  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
-    return
-      std::vector<std::pair<unsigned int, unsigned int> > ();
-  else
-    {
-      Assert (false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int> > ();
-    }
+  // this element is discontinuous, so by definition there can
+  // be no identities between its dofs and those of any neighbor
+  // (of whichever type the neighbor may be -- after all, we have
+  // no face dofs on this side to begin with)
+  return
+    std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
 
@@ -672,14 +661,10 @@ template <int dim, int spacedim>
 FiniteElementDomination::Domination
 FE_DGQ<dim, spacedim>::compare_for_face_domination (const FiniteElement<dim, spacedim> &fe_other) const
 {
-  // check whether both are discontinuous
-  // elements, see the description of
-  // FiniteElementDomination::Domination
-  if (dynamic_cast<const FE_DGQ<dim, spacedim>*>(&fe_other) != 0)
-    return FiniteElementDomination::no_requirements;
-
-  Assert (false, ExcNotImplemented());
-  return FiniteElementDomination::neither_element_dominates;
+  // this is a discontinuous element, so by definition there will
+  // be no constraints wherever this element comes together with
+  // any other kind of element
+  return FiniteElementDomination::no_requirements;
 }
 
 
@@ -778,7 +763,7 @@ FE_DGQ<dim,spacedim>::get_constant_modes () const
   Table<2,bool> constant_modes(1, this->dofs_per_cell);
   constant_modes.fill(true);
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
-    (constant_modes, std::vector<unsigned int>(1, 0));
+         (constant_modes, std::vector<unsigned int>(1, 0));
 }
 
 

@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2009 - 2013 by the deal.II authors
 //
@@ -255,9 +254,9 @@ void LaplaceProblem<dim>::setup_system ()
   constraints.close ();
 
   graph = GraphColoring::make_graph_coloring(dof_handler.begin_active(),dof_handler.end(),
-                                             static_cast<std_cxx1x::function<std::vector<types::global_dof_index>
+                                             static_cast<std_cxx11::function<std::vector<types::global_dof_index>
                                              (typename hp::DoFHandler<dim>::active_cell_iterator const &)> >
-                                             (std_cxx1x::bind(&LaplaceProblem<dim>::get_conflict_indices, this,std_cxx1x::_1)));
+                                             (std_cxx11::bind(&LaplaceProblem<dim>::get_conflict_indices, this,std_cxx11::_1)));
 
 
   CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
@@ -356,16 +355,16 @@ void LaplaceProblem<dim>::assemble_test ()
 
   WorkStream::
     run (graph,
-         std_cxx1x::bind (&LaplaceProblem<dim>::
+         std_cxx11::bind (&LaplaceProblem<dim>::
                           local_assemble,
                           this,
-                          std_cxx1x::_1,
-                          std_cxx1x::_2,
-                          std_cxx1x::_3),
-         std_cxx1x::bind (&LaplaceProblem<dim>::
+                          std_cxx11::_1,
+                          std_cxx11::_2,
+                          std_cxx11::_3),
+         std_cxx11::bind (&LaplaceProblem<dim>::
                           copy_local_to_global,
                           this,
-                          std_cxx1x::_1),
+                          std_cxx11::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
          Assembly::Copy::Data (),
          2*multithread_info.n_threads(),

@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -103,53 +102,57 @@ namespace internal
 }
 
 /**
- * Implementation of the Restarted Preconditioned Direct Generalized
- * Minimal Residual Method. The stopping criterion is the norm of the
- * residual.
+ * Implementation of the Restarted Preconditioned Direct Generalized Minimal
+ * Residual Method. The stopping criterion is the norm of the residual.
  *
- * The AdditionalData structure contains the number of temporary
- * vectors used. The size of the Arnoldi basis is this number minus
- * three. Additionally, it allows you to choose between right or left
- * preconditioning. The default is left preconditioning. Finally it
- * includes a flag indicating whether or not the default residual is
- * used as stopping criterion.
-
+ * The AdditionalData structure contains the number of temporary vectors used.
+ * The size of the Arnoldi basis is this number minus three. Additionally, it
+ * allows you to choose between right or left preconditioning. The default is
+ * left preconditioning. Finally it includes a flag indicating whether or not
+ * the default residual is used as stopping criterion.
+ *
+ *
  * <h3>Left versus right preconditioning</h3>
  *
  * @p AdditionalData allows you to choose between left and right
- * preconditioning. As expected, this switches between solving for the
- * systems <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i>,
- * respectively.
+ * preconditioning. As expected, this switches between solving for the systems
+ * <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i>, respectively.
  *
- * A second consequence is the type of residual which is used to
- * measure convergence. With left preconditioning, this is the
- * <b>preconditioned</b> residual, while with right preconditioning,
- * it is the residual of the unpreconditioned system.
+ * A second consequence is the type of residual which is used to measure
+ * convergence. With left preconditioning, this is the <b>preconditioned</b>
+ * residual, while with right preconditioning, it is the residual of the
+ * unpreconditioned system.
  *
  * Optionally, this behavior can be overridden by using the flag
- * AdditionalData::use_default_residual. A <tt>true</tt> value refers
- * to the behavior described in the previous paragraph, while
- * <tt>false</tt> reverts it. Be aware though that additional
- * residuals have to be computed in this case, impeding the overall
- * performance of the solver.
+ * AdditionalData::use_default_residual. A <tt>true</tt> value refers to the
+ * behavior described in the previous paragraph, while <tt>false</tt> reverts
+ * it. Be aware though that additional residuals have to be computed in this
+ * case, impeding the overall performance of the solver.
+ *
  *
  * <h3>The size of the Arnoldi basis</h3>
  *
- * The maximal basis size is controlled by
- * AdditionalData::max_n_tmp_vectors, and it is this number minus 2.
- * If the number of iteration steps exceeds this number, all basis
- * vectors are discarded and the iteration starts anew from the
- * approximation obtained so far.
+ * The maximal basis size is controlled by AdditionalData::max_n_tmp_vectors,
+ * and it is this number minus 2. If the number of iteration steps exceeds
+ * this number, all basis vectors are discarded and the iteration starts anew
+ * from the approximation obtained so far.
  *
- * Note that the minimizing property of GMRes only pertains to the
- * Krylov space spanned by the Arnoldi basis. Therefore, restarted
- * GMRes is <b>not</b> minimizing anymore. The choice of the basis
- * length is a trade-off between memory consumption and convergence
- * speed, since a longer basis means minimization over a larger
- * space.
+ * Note that the minimizing property of GMRes only pertains to the Krylov
+ * space spanned by the Arnoldi basis. Therefore, restarted GMRes is
+ * <b>not</b> minimizing anymore. The choice of the basis length is a trade-
+ * off between memory consumption and convergence speed, since a longer basis
+ * means minimization over a larger space.
  *
- * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the Solver base class.
+ * For the requirements on matrices and vectors in order to work with this
+ * class, see the documentation of the Solver base class.
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described in the
+ * Solver base class to determine convergence. This mechanism can also be used
+ * to observe the progress of the iteration.
+ *
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
  */
@@ -165,8 +168,8 @@ public:
     /**
      * Constructor. By default, set the number of temporary vectors to 30,
      * i.e. do a restart every 28 iterations. Also set preconditioning from
-     * left, the residual of the stopping criterion to the default
-     * residual, and re-orthogonalization only if necessary.
+     * left, the residual of the stopping criterion to the default residual,
+     * and re-orthogonalization only if necessary.
      */
     AdditionalData (const unsigned int max_n_tmp_vectors = 30,
                     const bool right_preconditioning = false,
@@ -196,8 +199,8 @@ public:
     bool use_default_residual;
 
     /**
-     * Flag to force re-orthogonalization of orthonormal basis in every
-     * step. If set to false, the solver automatically checks for loss of
+     * Flag to force re-orthogonalization of orthonormal basis in every step.
+     * If set to false, the solver automatically checks for loss of
      * orthogonality every 5 iterations and enables re-orthogonalization only
      * if necessary.
      */
@@ -266,12 +269,12 @@ protected:
 
   /**
    * Orthogonalize the vector @p vv against the @p dim (orthogonal) vectors
-   * given by the first argument using the modified Gram-Schmidt
-   * algorithm. The factors used for orthogonalization are stored in @p h. The
-   * boolean @p re_orthogonalize specifies whether the modified Gram-Schmidt
-   * algorithm should be applied twice. The algorithm checks loss of
-   * orthogonality in the procedure every fifth step and sets the flag to true
-   * in that case. All subsequent iterations use re-orthogonalization.
+   * given by the first argument using the modified Gram-Schmidt algorithm.
+   * The factors used for orthogonalization are stored in @p h. The boolean @p
+   * re_orthogonalize specifies whether the modified Gram-Schmidt algorithm
+   * should be applied twice. The algorithm checks loss of orthogonality in
+   * the procedure every fifth step and sets the flag to true in that case.
+   * All subsequent iterations use re-orthogonalization.
    */
   static double
   modified_gram_schmidt (const internal::SolverGMRES::TmpVectors<VECTOR> &orthogonal_vectors,
@@ -304,17 +307,16 @@ private:
  * preconditioning method.
  *
  * This version of the GMRES method allows for the use of a different
- * preconditioner in each iteration step. Therefore, it is also more
- * robust with respect to inaccurate evaluation of the
- * preconditioner. An important application is also the use of a
- * Krylov space method inside the preconditioner.
+ * preconditioner in each iteration step. Therefore, it is also more robust
+ * with respect to inaccurate evaluation of the preconditioner. An important
+ * application is also the use of a Krylov space method inside the
+ * preconditioner.
  *
- * FGMRES needs two vectors in each iteration steps yielding a total
- * of <tt>2 * SolverFGMRESAdditionalData::max_basis_size+1</tt>
- * auxiliary vectors.
+ * FGMRES needs two vectors in each iteration steps yielding a total of
+ * <tt>2 * SolverFGMRESAdditionalData::max_basis_size+1</tt> auxiliary vectors.
  *
- * Caveat: documentation of this class is not up to date. There are
- * also a few parameters of GMRES we would like to introduce here.
+ * Caveat: documentation of this class is not up to date. There are also a few
+ * parameters of GMRES we would like to introduce here.
  *
  * @author Guido Kanschat, 2003
  */
@@ -529,6 +531,7 @@ SolverGMRES<VECTOR>::modified_gram_schmidt (const internal::SolverGMRES::TmpVect
                                             Vector<double>     &h,
                                             bool               &re_orthogonalize)
 {
+  Assert(dim > 0, ExcInternalError());
   const unsigned int inner_iteration = dim - 1;
 
   // need initial norm for detection of re-orthogonalization, see below
@@ -537,11 +540,10 @@ SolverGMRES<VECTOR>::modified_gram_schmidt (const internal::SolverGMRES::TmpVect
     norm_vv_start = vv.l2_norm();
 
   // Orthogonalization
-  for (unsigned int i=0 ; i<dim ; ++i)
-    {
-      h(i) = vv * orthogonal_vectors[i];
-      vv.add(-h(i), orthogonal_vectors[i]);
-    };
+  h(0) = vv * orthogonal_vectors[0];
+  for (unsigned int i=1 ; i<dim ; ++i)
+    h(i) = vv.add_and_dot(-h(i-1), orthogonal_vectors[i-1], orthogonal_vectors[i]);
+  double norm_vv = std::sqrt(vv.add_and_dot(-h(dim-1), orthogonal_vectors[dim-1], vv));
 
   // Re-orthogonalization if loss of orthogonality detected. For the test, use
   // a strategy discussed in C. T. Kelley, Iterative Methods for Linear and
@@ -552,7 +554,6 @@ SolverGMRES<VECTOR>::modified_gram_schmidt (const internal::SolverGMRES::TmpVect
   // previous vectors, which indicates loss of precision.
   if (re_orthogonalize == false && inner_iteration % 5 == 4)
     {
-      const double norm_vv = vv.l2_norm();
       if (norm_vv > 10. * norm_vv_start *
           std::sqrt(std::numeric_limits<typename VECTOR::value_type>::epsilon()))
         return norm_vv;
@@ -566,14 +567,18 @@ SolverGMRES<VECTOR>::modified_gram_schmidt (const internal::SolverGMRES::TmpVect
     }
 
   if (re_orthogonalize == true)
-    for (unsigned int i=0 ; i<dim ; ++i)
-      {
-        double htmp = vv * orthogonal_vectors[i];
-        h(i) += htmp;
-        vv.add(-htmp, orthogonal_vectors[i]);
-      }
+    {
+      double htmp = vv * orthogonal_vectors[0];
+      h(0) += htmp;
+      for (unsigned int i=1 ; i<dim ; ++i)
+        {
+          htmp = vv.add_and_dot(-htmp, orthogonal_vectors[i-1], orthogonal_vectors[i]);
+          h(i) += htmp;
+        }
+      norm_vv = std::sqrt(vv.add_and_dot(-htmp, orthogonal_vectors[dim-1], vv));
+    }
 
-  return vv.l2_norm();
+  return norm_vv;
 }
 
 
@@ -624,6 +629,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
   unsigned int dim = 0;
 
   SolverControl::State iteration_state = SolverControl::iterate;
+  double last_res = -std::numeric_limits<double>::max();
 
   // switch to determine whether we want a left or a right preconditioner. at
   // present, left is default, but both ways are implemented
@@ -684,8 +690,8 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
       // check here, the next scaling operation would produce garbage
       if (use_default_residual)
         {
-          iteration_state = this->control().check (
-                              accumulated_iterations, rho);
+          last_res = rho;
+          iteration_state = this->iteration_status (accumulated_iterations, rho, x);
 
           if (iteration_state != SolverControl::iterate)
             break;
@@ -703,8 +709,8 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
             precondition.vmult(*r,v);
 
           double res = r->l2_norm();
-          iteration_state = this->control().check (
-                              accumulated_iterations, res);
+          last_res = res;
+          iteration_state = this->iteration_status (accumulated_iterations, res, x);
 
           if (iteration_state != SolverControl::iterate)
             {
@@ -742,7 +748,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
             {
               precondition.vmult(p, tmp_vectors[inner_iteration]);
               A.vmult(vv,p);
-            };
+            }
 
           dim = inner_iteration+1;
 
@@ -762,7 +768,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
             for (unsigned int i=0; i<dim+1; ++i)
               H_orig(i,inner_iteration) = h(i);
 
-          //  Transformation into triagonal structure
+          //  Transformation into tridiagonal structure
           givens_rotation(h,gamma,ci,si,inner_iteration);
 
           //  append vector on matrix
@@ -773,8 +779,10 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
           rho = std::fabs(gamma(dim));
 
           if (use_default_residual)
-            iteration_state = this->control().check (
-                                accumulated_iterations, rho);
+            {
+              last_res = rho;
+              iteration_state = this->iteration_status (accumulated_iterations, rho, x);
+            }
           else
             {
               deallog << "default_res=" << rho << std::endl;
@@ -807,17 +815,18 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
               if (left_precondition)
                 {
                   const double res=r->l2_norm();
+                  last_res = res;
 
-                  iteration_state = this->control().check (
-                                      accumulated_iterations, res);
+                  iteration_state = this->iteration_status (accumulated_iterations, res, x);
                 }
               else
                 {
                   precondition.vmult(*x_, *r);
                   const double preconditioned_res=x_->l2_norm();
+                  last_res = preconditioned_res;
 
-                  iteration_state = this->control().check (
-                                      accumulated_iterations, preconditioned_res);
+                  iteration_state = this->iteration_status (accumulated_iterations,
+                                                            preconditioned_res, x);
                 }
             }
         };
@@ -879,11 +888,11 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
     }
 
   deallog.pop();
+
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
-  // otherwise exit as normal
+  AssertThrow(iteration_state == SolverControl::success,
+              SolverControl::NoConvergence (accumulated_iterations,
+                                            last_res));
 }
 
 
@@ -953,6 +962,7 @@ SolverFGMRES<VECTOR>::solve (
   Vector<double> y;
 
   // Iteration starts here
+  double res = -std::numeric_limits<double>::max();
 
   VECTOR *aux = this->memory.alloc();
   aux->reinit(x);
@@ -962,8 +972,9 @@ SolverFGMRES<VECTOR>::solve (
       aux->sadd(-1., 1., b);
 
       double beta = aux->l2_norm();
-      if (this->control().check(accumulated_iterations,beta)
-          == SolverControl::success)
+      res = beta;
+      iteration_state = this->iteration_status(accumulated_iterations, res, x);
+      if (iteration_state == SolverControl::success)
         break;
 
       H.reinit(basis_size+1, basis_size);
@@ -981,12 +992,10 @@ SolverFGMRES<VECTOR>::solve (
           A.vmult(*aux, z[j]);
 
           // Gram-Schmidt
-          for (unsigned int i=0; i<=j; ++i)
-            {
-              H(i,j) = *aux * v[i];
-              aux->add(-H(i,j), v[i]);
-            }
-          H(j+1,j) = a = aux->l2_norm();
+          H(0,j) = *aux * v[0];
+          for (unsigned int i=1; i<=j; ++i)
+            H(i,j) = aux->add_and_dot(-H(i-1,j), v[i-1], v[i]);
+          H(j+1,j) = a = std::sqrt(aux->add_and_dot(-H(j,j), v[j], *aux));
 
           // Compute projected solution
 
@@ -997,17 +1006,22 @@ SolverFGMRES<VECTOR>::solve (
               y.reinit(j);
               projected_rhs(0) = beta;
               H1.fill(H);
+
+              // check convergence. note that the vector 'x' we pass to the
+              // criterion is not the final solution we compute if we
+              // decide to jump out of the iteration (we update 'x' again
+              // right after the current loop)
               Householder<double> house(H1);
-              double res = house.least_squares(y, projected_rhs);
-              iteration_state = this->control().check(++accumulated_iterations, res);
+              res = house.least_squares(y, projected_rhs);
+              iteration_state = this->iteration_status(++accumulated_iterations, res, x);
               if (iteration_state != SolverControl::iterate)
                 break;
             }
         }
+
       // Update solution vector
       for (unsigned int j=0; j<y.size(); ++j)
         x.add(y(j), z[j]);
-
     }
   while (iteration_state == SolverControl::iterate);
 
@@ -1015,9 +1029,9 @@ SolverFGMRES<VECTOR>::solve (
 
   deallog.pop();
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  if (iteration_state != SolverControl::success)
+    AssertThrow(false, SolverControl::NoConvergence (accumulated_iterations,
+                                                     res));
 }
 
 #endif // DOXYGEN

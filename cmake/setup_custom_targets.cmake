@@ -1,5 +1,4 @@
 ## ---------------------------------------------------------------------
-## $Id$
 ##
 ## Copyright (C) 2013 by the deal.II authors
 ##
@@ -77,6 +76,21 @@ FOREACH(_component compat_files documentation examples mesh_converter parameter_
   ENDIF()
 ENDFOREACH()
 
+IF(NOT DEAL_II_COMPONENT_PACKAGE)
+  ADD_CUSTOM_TARGET(package
+    COMMAND
+         ${CMAKE_COMMAND} -E echo ''
+      && ${CMAKE_COMMAND} -E echo ''
+      && ${CMAKE_COMMAND} -E echo '***************************************************************************'
+      && ${CMAKE_COMMAND} -E echo "**  Error: Could not generate binary package. The component is disabled."
+      && ${CMAKE_COMMAND} -E echo "**  Please reconfigure with -DDEAL_II_COMPONENT_PACKAGE=ON"
+      && ${CMAKE_COMMAND} -E echo '***************************************************************************'
+      && ${CMAKE_COMMAND} -E echo ''
+      && ${CMAKE_COMMAND} -E echo ''
+      && false
+    )
+ENDIF()
+
 #
 # Provide an "info" target to print a help message:
 #
@@ -95,24 +109,11 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #    all            - compile the library and all enabled components
 #    clean          - remove all generated files
 #    install        - install into CMAKE_INSTALL_PREFIX
-")
-
-IF(CMAKE_GENERATOR MATCHES "Ninja")
-  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"#    info           - print this help message
+#
+#    info           - print this help message
 #    help           - print a list of valid top level targets
 #
-")
-ELSE()
-  FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"#    info           - print this help message in the toplevel directory,
-#                     otherwise print a list of targets (in subdirectories)
-#
-")
-ENDIF()
-
-FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-"#    edit_cache     - run ccmake for changing (cached) configuration variables
+#    edit_cache     - run ccmake for changing (cached) configuration variables
 #                     and reruns the configure and generate phases of CMake
 #    rebuild_cache  - rerun the configure and generate phases of CMake
 #
@@ -122,6 +123,7 @@ FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #    library        - ${_description_string} component 'library'
 #    mesh_converter - ${_description_string} component 'mesh_converter'
 #    parameter_gui  - ${_description_string} component 'parameter_gui'
+#    package        - build binary package
 #
 #    test           - run a minimal set of tests
 #
@@ -136,13 +138,3 @@ FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 ADD_CUSTOM_TARGET(info
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
   )
-
-#
-# In case of the Unix Makefiles generator it is safe to override the
-# default 'help' target, which is - frankly - quite unhelpful.
-#
-IF(CMAKE_GENERATOR MATCHES "Unix Makefiles")
-  ADD_CUSTOM_TARGET(help
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
-    )
-ENDIF()

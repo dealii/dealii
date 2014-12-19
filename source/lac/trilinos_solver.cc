@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2008 - 2013 by the deal.II authors
 //
@@ -464,10 +463,10 @@ namespace TrilinosWrappers
     AssertThrow(
       Factory.Query(additional_data.solver_type.c_str()),
       ExcMessage (std::string ("You tried to select the solver type <") +
-                      additional_data.solver_type +
-                      "> but this solver is not supported by Trilinos either "
-                      "because it does not exist, or because Trilinos was not "
-                      "configured for its use.")
+                  additional_data.solver_type +
+                  "> but this solver is not supported by Trilinos either "
+                  "because it does not exist, or because Trilinos was not "
+                  "configured for its use.")
     );
 
     solver.reset (

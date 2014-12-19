@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2011 - 2014 by the deal.II authors
 //
@@ -31,19 +30,19 @@ DEAL_II_NAMESPACE_OPEN
 namespace MatrixFreeOperators
 {
   /**
-   * This class implements the operation of the action of the inverse of a mass
-   * matrix on an element for the special case of an evaluation object with as
-   * many quadrature points as there are cell degrees of freedom. It uses
-   * algorithms from FEEvaluation and produces the exact mass matrix for DGQ
-   * elements. This algorithm uses tensor products of inverse 1D shape matrices
-   * over quadrature points, so the inverse operation is exactly as expensive as
-   * applying the forward operator on each cell. Of course, for continuous
-   * finite elements this operation does not produce the inverse of a mass
-   * operation as the coupling between the elements cannot be considered by this
-   * operation.
+   * This class implements the operation of the action of the inverse of a
+   * mass matrix on an element for the special case of an evaluation object
+   * with as many quadrature points as there are cell degrees of freedom. It
+   * uses algorithms from FEEvaluation and produces the exact mass matrix for
+   * DGQ elements. This algorithm uses tensor products of inverse 1D shape
+   * matrices over quadrature points, so the inverse operation is exactly as
+   * expensive as applying the forward operator on each cell. Of course, for
+   * continuous finite elements this operation does not produce the inverse of
+   * a mass operation as the coupling between the elements cannot be
+   * considered by this operation.
    *
-   * The equation may contain variable coefficients, so the user is required to
-   * provide an array for the inverse of the local coefficient (this class
+   * The equation may contain variable coefficients, so the user is required
+   * to provide an array for the inverse of the local coefficient (this class
    * provide a helper method 'fill_inverse_JxW_values' to get the inverse of a
    * constant-coefficient operator).
    *
@@ -63,9 +62,9 @@ namespace MatrixFreeOperators
      * Applies the inverse mass matrix operation on an input array. It is
      * assumed that the passed input and output arrays are of correct size,
      * namely FEEval::dofs_per_cell * n_components long. The inverse of the
-     * local coefficient (also containing the inverse JxW values) must be passed
-     * as first argument. Passing more than one component in the coefficient is
-     * allowed.
+     * local coefficient (also containing the inverse JxW values) must be
+     * passed as first argument. Passing more than one component in the
+     * coefficient is allowed.
      */
     void apply(const AlignedVector<VectorizedArray<Number> > &inverse_coefficient,
                const unsigned int             n_actual_components,
@@ -172,8 +171,8 @@ namespace MatrixFreeOperators
     Assert(dim == 2 || dim == 3, ExcNotImplemented());
 
     internal::EvaluatorTensorProduct<internal::evaluate_evenodd,dim,fe_degree,
-                                     fe_degree+1, VectorizedArray<Number> >
-      evaluator(inverse_shape, inverse_shape, inverse_shape);
+             fe_degree+1, VectorizedArray<Number> >
+             evaluator(inverse_shape, inverse_shape, inverse_shape);
 
     const unsigned int shift_coefficient =
       inverse_coefficients.size() > dofs_per_cell ? dofs_per_cell : 0;
@@ -181,8 +180,8 @@ namespace MatrixFreeOperators
     VectorizedArray<Number> temp_data_field[dofs_per_cell];
     for (unsigned int d=0; d<n_actual_components; ++d)
       {
-        const VectorizedArray<Number>* in = in_array+d*dofs_per_cell;
-        VectorizedArray<Number>* out = out_array+d*dofs_per_cell;
+        const VectorizedArray<Number> *in = in_array+d*dofs_per_cell;
+        VectorizedArray<Number> *out = out_array+d*dofs_per_cell;
         // Need to select 'apply' method with hessian slot because values
         // assume symmetries that do not exist in the inverse shapes
         evaluator.template hessians<0,false,false> (in, temp_data_field);

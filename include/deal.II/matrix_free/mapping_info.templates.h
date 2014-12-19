@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2011 - 2014 by the deal.II authors
 //
@@ -192,7 +191,7 @@ namespace internal
               current_data.n_q_points.push_back (n_q_points);
 
               current_data.n_q_points_face.push_back
-              (Utilities::fixed_power<dim-1>(n_q_points_1d[q]));
+              (dim>1 ? Utilities::fixed_power<dim-1>(n_q_points_1d[q]) : 1);
               current_data.quadrature.push_back
               (Quadrature<dim>(quad[my_q][q]));
               current_data.face_quadrature.push_back
@@ -241,7 +240,7 @@ namespace internal
           // hp::DoFHandler<dim>::active_cell_iterator, we need to manually
           // select the correct finite element, so just hold a vector of
           // FEValues
-          std::vector<std_cxx1x::shared_ptr<FEValues<dim> > >
+          std::vector<std_cxx11::shared_ptr<FEValues<dim> > >
           fe_values (current_data.quadrature.size());
           UpdateFlags update_flags_feval =
             (update_flags & update_inverse_jacobians ? update_jacobians : update_default) |

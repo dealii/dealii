@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2008 - 2013 by the deal.II authors
 //
@@ -76,7 +75,7 @@ void test ()
     v.push_back (i);
 
   WorkStream::run (GraphColoring::make_graph_coloring (v.begin(), v.end(),
-						       std_cxx1x::function<std::vector<types::global_dof_index>
+						       std_cxx11::function<std::vector<types::global_dof_index>
 									   (const std::vector<unsigned int>::iterator &)>
 						       (&conflictor)),
 		   &worker, &copier,

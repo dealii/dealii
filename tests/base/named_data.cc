@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -57,17 +56,17 @@ test_selector(const NamedData<DATA> &data)
 void
 test_shared_pointer()
 {
-  NamedData<std_cxx1x::shared_ptr<double> > data;
+  NamedData<std_cxx11::shared_ptr<double> > data;
   deallog << "const" << data.is_const() << std::endl;
-  std_cxx1x::shared_ptr<double> p = std_cxx1x::shared_ptr<double>(new double);
+  std_cxx11::shared_ptr<double> p = std_cxx11::shared_ptr<double>(new double);
   data.add(p, "P1");
-  p = std_cxx1x::shared_ptr<double>(new double);
+  p = std_cxx11::shared_ptr<double>(new double);
   data.add(p, "P2");
-  p = std_cxx1x::shared_ptr<double>(new double);
+  p = std_cxx11::shared_ptr<double>(new double);
   data.add(p, "P3");
-  p = std_cxx1x::shared_ptr<double>(new double);
+  p = std_cxx11::shared_ptr<double>(new double);
   data.add(p, "P4");
-  p = std_cxx1x::shared_ptr<double>(new double);
+  p = std_cxx11::shared_ptr<double>(new double);
   data.add(p, "P5");
 
   for (unsigned int i=0; i<data.size(); ++i)

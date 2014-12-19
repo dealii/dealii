@@ -1,5 +1,4 @@
 ## ---------------------------------------------------------------------
-## $Id$
 ##
 ## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
@@ -59,47 +58,48 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
 #
 # Disable some warnings that lead to a lot of false positives:
 #
-#   -w68   integer conversion resulted in a change of sign
-#          (triggers a lot in functionparser)
-#   -w175  subscript out of range
-#   -w135  class template "dealii::FE_Q_Base<POLY, dim, spacedim>"
-#          has no member "Implementation"
-#          (the compiler is objectively wrong since the warning
-#           triggers also on code of the form
-#           class FE_Q_Base {
-#             struct Implementation; // forward declaration
-#             friend struct Implementation;
-#           };)
-#   -w177  declared but not referenced
-#   -w191  type qualifier is meaningless on cast type
-#          Warnings from this warn about code like this:
-#             static_cast<T const * const>(p)
-#          There are many places in boost that do this kind of stuff
-#   -w193  zero used for undefined preprocessing identifier "..."
-#          This happens when using undefined preprocessor names in
-#          conditions such as
-#            #if (abc && def)
-#          instead of
-#            #if (defined(abc) && defined(def))
-#          The standard says that in such cases, the undefined symbol
-#          is assumed to be zero. The warning is in principle
-#          useful, but the pattern appears exceedingly often in the TBB
-#   -w279  controlling expression is constant
-#   -w327  NULL reference is not allowed
-#          (the compiler is correct here in that statements like
-#           *static_cast<int*>(0) are not allowed to initialize
-#           references; however, it's the only useful way to do
-#           so if you need an invalid value for a reference)
-#   -w383  value copied to temporary, reference to temporary used
-#   -w981  operands are evaluated in unspecified order
-#   -w1418 external function definition with no prior declaration
-#          (happens in boost)
-#   -w1478 deprecation warning
-#   -w1572 floating-point equality and inequality comparisons are unreliable
-#   -w2259 non-pointer conversion from "double" to "float" may
-#          lose significant bits
-#   -w21   type qualifiers are meaningless in this declaration
-#   -w2536 type qualifiers are meaningless here
+#   -w68    integer conversion resulted in a change of sign
+#           (triggers a lot in functionparser)
+#   -w175   subscript out of range
+#   -w135   class template "dealii::FE_Q_Base<POLY, dim, spacedim>"
+#           has no member "Implementation"
+#           (the compiler is objectively wrong since the warning
+#            triggers also on code of the form
+#            class FE_Q_Base {
+#              struct Implementation; // forward declaration
+#              friend struct Implementation;
+#            };)
+#   -w177   declared but not referenced
+#   -w191   type qualifier is meaningless on cast type
+#           Warnings from this warn about code like this:
+#              static_cast<T const * const>(p)
+#           There are many places in boost that do this kind of stuff
+#   -w193   zero used for undefined preprocessing identifier "..."
+#           This happens when using undefined preprocessor names in
+#           conditions such as
+#             #if (abc && def)
+#           instead of
+#             #if (defined(abc) && defined(def))
+#           The standard says that in such cases, the undefined symbol
+#           is assumed to be zero. The warning is in principle
+#           useful, but the pattern appears exceedingly often in the TBB
+#   -w279   controlling expression is constant
+#   -w327   NULL reference is not allowed
+#           (the compiler is correct here in that statements like
+#            *static_cast<int*>(0) are not allowed to initialize
+#            references; however, it's the only useful way to do
+#            so if you need an invalid value for a reference)
+#   -w383   value copied to temporary, reference to temporary used
+#   -w981   operands are evaluated in unspecified order
+#   -w1418  external function definition with no prior declaration
+#           (happens in boost)
+#   -w1478  deprecation warning
+#   -w1572  floating-point equality and inequality comparisons are unreliable
+#   -w2259  non-pointer conversion from "double" to "float" may
+#           lose significant bits
+#   -w21    type qualifiers are meaningless in this declaration
+#   -w2536  type qualifiers are meaningless here
+#   -w15531 A portion of SIMD loop is serialized
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd68")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd135")
@@ -117,8 +117,10 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1572")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2259")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd21")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15531")
 
 
+#
 # Also disable the following warnings that we frequently
 # trigger writing dimension independent code:
 #   -w111 statement is unreachable
@@ -130,11 +132,11 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2536")
 #         that is executed only for one specific dimension
 #   -w280 selector expression is constant
 #         When writing 'switch(dim)'
+#
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd111")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd128")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd185")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd280")
-
 
 
 IF(DEAL_II_STATIC_EXECUTABLE)

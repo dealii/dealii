@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2005 - 2013 by the deal.II authors
 //
@@ -794,10 +793,10 @@ namespace Step51
 
       WorkStream::run(dof_handler_u_post.begin_active(),
                       dof_handler_u_post.end(),
-                      std_cxx1x::bind (&HDG<dim>::postprocess_one_cell,
-                                       std_cxx1x::ref(*this),
-                                       std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
-                      std_cxx1x::function<void(const unsigned int &)>(),
+                      std_cxx11::bind (&HDG<dim>::postprocess_one_cell,
+                                       std_cxx11::ref(*this),
+                                       std_cxx11::_1, std_cxx11::_2, std_cxx11::_3),
+                      std_cxx11::function<void(const unsigned int &)>(),
                       scratch,
                       0U);
     }
@@ -938,7 +937,7 @@ namespace Step51
   template <int dim>
   void HDG<dim>::run ()
   {
-    for (unsigned int cycle=0; cycle<12-3*dim; ++cycle)
+    for (unsigned int cycle=0; cycle<11-3*dim; ++cycle)
       {
         refine_grid (cycle);
         setup_system ();
@@ -948,11 +947,11 @@ namespace Step51
         output_results (cycle);
       }
 
-    convergence_table.set_precision("val L2", 3);
+    convergence_table.set_precision("val L2", 2);
     convergence_table.set_scientific("val L2", true);
-    convergence_table.set_precision("grad L2", 3);
+    convergence_table.set_precision("grad L2", 2);
     convergence_table.set_scientific("grad L2", true);
-    convergence_table.set_precision("val L2-post", 3);
+    convergence_table.set_precision("val L2-post", 2);
     convergence_table.set_scientific("val L2-post", true);
 
     convergence_table

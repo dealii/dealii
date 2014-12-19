@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2006 - 2013 by the deal.II authors
 //
@@ -48,7 +47,7 @@ void check(DataOutBase::GnuplotFlags flags,
   names[2] = "x3";
   names[3] = "x4";
   names[4] = "i";
-  std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vectors;
+  std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > vectors;
   DataOutBase::write_gnuplot(patches, names, vectors, flags, out);
 }
 

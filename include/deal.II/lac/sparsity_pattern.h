@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2000 - 2013 by the deal.II authors
 //
@@ -105,9 +104,9 @@ namespace SparsityPatternIterators
   typedef types::global_dof_index size_type;
 
   /**
-   * Accessor class for iterators into sparsity patterns. This class is
-   * also the base class for both const and non-const accessor classes
-   * into sparse matrices.
+   * Accessor class for iterators into sparsity patterns. This class is also
+   * the base class for both const and non-const accessor classes into sparse
+   * matrices.
    *
    * Note that this class only allows read access to elements, providing their
    * row and column number (or alternatively the index within the complete
@@ -148,8 +147,9 @@ namespace SparsityPatternIterators
     size_type row () const;
 
     /**
-     * Index within the current row of the element represented by this object. This function
-     * can only be called for entries for which is_valid_entry() is true.
+     * Index within the current row of the element represented by this object.
+     * This function can only be called for entries for which is_valid_entry()
+     * is true.
      */
     size_type index () const;
 
@@ -165,8 +165,8 @@ namespace SparsityPatternIterators
      * entries are valid. However, before compression, the sparsity pattern
      * allocated some memory to be used while still adding new nonzero
      * entries; if you create iterators in this phase of the sparsity
-     * pattern's lifetime, you will iterate over elements that are not
-     * valid. If this is so, then this function will return false.
+     * pattern's lifetime, you will iterate over elements that are not valid.
+     * If this is so, then this function will return false.
      */
     bool is_valid_entry () const;
 
@@ -220,12 +220,12 @@ namespace SparsityPatternIterators
   /**
    * STL conforming iterator walking over the elements of a sparsity pattern.
    *
-   * The typical use for these iterators is to iterate over the elements of
-   * a sparsity pattern (or, since they also serve as the basis for iterating
-   * over the elements of an associated matrix, over the elements of a sparse matrix)
-   * or over the elements of individual rows. Note that there is no guarantee
-   * that the elements of a row are actually traversed in an order in which
-   * columns monotonically increase. See the documentation of the
+   * The typical use for these iterators is to iterate over the elements of a
+   * sparsity pattern (or, since they also serve as the basis for iterating
+   * over the elements of an associated matrix, over the elements of a sparse
+   * matrix) or over the elements of individual rows. Note that there is no
+   * guarantee that the elements of a row are actually traversed in an order
+   * in which columns monotonically increase. See the documentation of the
    * SparsityPattern class for more information.
    *
    * @note This class operates directly on the internal data structures of the
@@ -236,10 +236,10 @@ namespace SparsityPatternIterators
    * matrix with $N$ row). As a consequence, when you design algorithms that
    * use these iterators, it is common practice to not loop over <i>all</i>
    * elements of a sparsity pattern at once, but to have an outer loop over
-   * all rows and within this loop iterate over the elements of this row.
-   * This way, you only ever need to dereference the iterator to obtain
-   * the column indices whereas the (expensive) lookup of the row index
-   * can be avoided by using the loop index instead.
+   * all rows and within this loop iterate over the elements of this row. This
+   * way, you only ever need to dereference the iterator to obtain the column
+   * indices whereas the (expensive) lookup of the row index can be avoided by
+   * using the loop index instead.
    */
   class Iterator
   {
@@ -303,10 +303,10 @@ namespace SparsityPatternIterators
     bool operator < (const Iterator &) const;
 
     /**
-     * Return the distance between the current iterator and the argument.
-     * The distance is given by how many times one has to apply operator++
-     * to the current iterator to get the argument (for a positive return
-     * value), or operator-- (for a negative return value).
+     * Return the distance between the current iterator and the argument. The
+     * distance is given by how many times one has to apply operator++ to the
+     * current iterator to get the argument (for a positive return value), or
+     * operator-- (for a negative return value).
      */
     int operator - (const Iterator &p) const;
 
@@ -321,29 +321,29 @@ namespace SparsityPatternIterators
 
 
 /**
- * Structure representing the sparsity pattern of a sparse matrix.
- * This class is an example of the "static" type of @ref Sparsity.
- * It uses the compressed row storage (CSR) format to store data.
+ * Structure representing the sparsity pattern of a sparse matrix. This class
+ * is an example of the "static" type of @ref Sparsity. It uses the compressed
+ * row storage (CSR) format to store data.
  *
  * The elements of a SparsityPattern, corresponding to the places where
  * SparseMatrix objects can store nonzero entries, are stored row-by-row.
  * Within each row, elements are generally stored left-to-right in increasing
- * column index order; the exception to this rule is that if the matrix
- * is square (n_rows() == n_columns()), then the diagonal entry is stored
- * as the first element in each row to make operations like applying a
- * Jacobi or SSOR preconditioner faster. As a consequence, if you traverse
- * the elements of a row of a SparsityPattern with the help of iterators into
- * this object (using SparsityPattern::begin and SparsityPattern::end) you
- * will find that the elements are not sorted by column index within each row
- * whenever the matrix is square (the first item will be the diagonal, followed
- * by the other entries sorted by column index).
+ * column index order; the exception to this rule is that if the matrix is
+ * square (n_rows() == n_columns()), then the diagonal entry is stored as the
+ * first element in each row to make operations like applying a Jacobi or SSOR
+ * preconditioner faster. As a consequence, if you traverse the elements of a
+ * row of a SparsityPattern with the help of iterators into this object (using
+ * SparsityPattern::begin and SparsityPattern::end) you will find that the
+ * elements are not sorted by column index within each row whenever the matrix
+ * is square (the first item will be the diagonal, followed by the other
+ * entries sorted by column index).
  *
- * @note While this class forms the basis upon which SparseMatrix
- * objects base their storage format, and thus plays a central role in
- * setting up linear systems, it is rarely set up directly due to the
- * way it stores its information. Rather, one typically goes through
- * an intermediate format first, see for example the step-2 tutorial
- * program as well as the documentation module @ref Sparsity.
+ * @note While this class forms the basis upon which SparseMatrix objects base
+ * their storage format, and thus plays a central role in setting up linear
+ * systems, it is rarely set up directly due to the way it stores its
+ * information. Rather, one typically goes through an intermediate format
+ * first, see for example the step-2 tutorial program as well as the
+ * documentation module @ref Sparsity.
  *
  * @author Wolfgang Bangerth, Guido Kanschat and others
  */
@@ -401,8 +401,8 @@ public:
   static const size_type invalid_entry = numbers::invalid_size_type;
 
   /**
-   * @name Construction and setup
-   * Constructors, destructor; functions initializing, copying and filling an object.
+   * @name Construction and setup Constructors, destructor; functions
+   * initializing, copying and filling an object.
    */
 // @{
   /**
@@ -432,9 +432,8 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows
-   * @arg n number of columns
-   * @arg max_per_row maximum number of nonzero entries per row
+   * @arg m number of rows @arg n number of columns @arg max_per_row maximum
+   * number of nonzero entries per row
    */
   SparsityPattern (const size_type m,
                    const size_type n,
@@ -444,10 +443,9 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows
-   * @arg n number of columns
-   * @arg row_lengths possible number of nonzero entries for each row.  This
-   * vector must have one entry for each row.
+   * @arg m number of rows @arg n number of columns @arg row_lengths possible
+   * number of nonzero entries for each row.  This vector must have one entry
+   * for each row.
    */
   SparsityPattern (const size_type               m,
                    const size_type               n,
@@ -467,9 +465,9 @@ public:
   /**
    * Initialize a quadratic matrix.
    *
-   * @arg m number of rows and columns
-   * @arg row_lengths possible number of nonzero entries for each row.  This
-   * vector must have one entry for each row.
+   * @arg m number of rows and columns @arg row_lengths possible number of
+   * nonzero entries for each row.  This vector must have one entry for each
+   * row.
    */
   SparsityPattern (const size_type               m,
                    const std::vector<unsigned int> &row_lengths);
@@ -479,8 +477,8 @@ public:
    *
    * This constructs objects intended for the application of the ILU(n)-method
    * or other incomplete decompositions.  Therefore, additional to the
-   * original entry structure, space for <tt>extra_off_diagonals</tt>
-   * side-diagonals is provided on both sides of the main diagonal.
+   * original entry structure, space for <tt>extra_off_diagonals</tt> side-
+   * diagonals is provided on both sides of the main diagonal.
    *
    * <tt>max_per_row</tt> is the maximum number of nonzero elements per row
    * which this structure is to hold. It is assumed that this number is
@@ -489,8 +487,8 @@ public:
    * will usually want to give the same number as you gave for
    * <tt>original</tt> plus the number of side diagonals times two. You may
    * however give a larger value if you wish to add further nonzero entries
-   * for the decomposition based on other criteria than their being on
-   * side-diagonals.
+   * for the decomposition based on other criteria than their being on side-
+   * diagonals.
    *
    * This function requires that <tt>original</tt> refers to a quadratic
    * matrix structure.  It must be compressed. The matrix structure is not
@@ -651,8 +649,8 @@ public:
   /**
    * Copy data from an object of type CompressedSparsityPattern,
    * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern. Although
-   * not a compressed sparsity pattern, this function is also instantiated
-   * if the argument is of type SparsityPattern (i.e., the current class).
+   * not a compressed sparsity pattern, this function is also instantiated if
+   * the argument is of type SparsityPattern (i.e., the current class).
    * Previous content of this object is lost, and the sparsity pattern is in
    * compressed mode afterwards.
    */
@@ -715,8 +713,8 @@ public:
    * iterator can be used to walk over all nonzero entries of the sparsity
    * pattern.
    *
-   * Note the discussion in the general documentation of this class about
-   * the order in which elements are accessed.
+   * Note the discussion in the general documentation of this class about the
+   * order in which elements are accessed.
    */
   iterator begin () const;
 
@@ -755,7 +753,7 @@ public:
    */
 // @{
   /**
-   *  Test for equality of two SparsityPatterns.
+   * Test for equality of two SparsityPatterns.
    */
   bool operator == (const SparsityPattern &)  const;
 
@@ -851,13 +849,13 @@ public:
    * complexity of this function is <i>log(m)</i> if the sparsity pattern is
    * compressed.
    *
-   * @note This function is not cheap since it has to search through all
-   * of the elements of the given row <tt>i</tt> to find whether index
-   * <tt>j</tt> exists. Thus, it is more expensive than necessary in cases
-   * where you want to loop over all of the nonzero elements of this
-   * sparsity pattern (or of a sparse matrix associated with it) or of a
-   * single row. In such cases, it is more efficient to use iterators over
-   * the elements of the sparsity pattern or of the sparse matrix.
+   * @note This function is not cheap since it has to search through all of
+   * the elements of the given row <tt>i</tt> to find whether index <tt>j</tt>
+   * exists. Thus, it is more expensive than necessary in cases where you want
+   * to loop over all of the nonzero elements of this sparsity pattern (or of
+   * a sparse matrix associated with it) or of a single row. In such cases, it
+   * is more efficient to use iterators over the elements of the sparsity
+   * pattern or of the sparse matrix.
    */
   size_type operator() (const size_type i,
                         const size_type j) const;
@@ -899,9 +897,8 @@ public:
    * i.e. <tt>column_number(row,0)==row</tt>.
    *
    * If the sparsity pattern is already compressed, then (except for the
-   * diagonal element), the entries are sorted by columns,
-   * i.e. <tt>column_number(row,i)</tt> <tt><</tt>
-   * <tt>column_number(row,i+1)</tt>.
+   * diagonal element), the entries are sorted by columns, i.e.
+   * <tt>column_number(row,i)</tt> <tt><</tt> <tt>column_number(row,i+1)</tt>.
    */
   size_type column_number (const size_type row,
                            const unsigned int index) const;
@@ -925,10 +922,10 @@ public:
   void block_write (std::ostream &out) const;
 
   /**
-   * Read data that has previously been written by block_write() from a
-   * file. This is done using the inverse operations to the above function, so
-   * it is reasonably fast because the bitstream is not interpreted except for
-   * a few numbers up front.
+   * Read data that has previously been written by block_write() from a file.
+   * This is done using the inverse operations to the above function, so it is
+   * reasonably fast because the bitstream is not interpreted except for a few
+   * numbers up front.
    *
    * The object is resized on this operation, and all previous contents are
    * lost.
@@ -984,13 +981,12 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows
-   * @arg n number of columns
-   * @arg max_per_row maximum number of nonzero entries per row
-   * @arg optimize_diagonal This parameter is ignored.
+   * @arg m number of rows @arg n number of columns @arg max_per_row maximum
+   * number of nonzero entries per row @arg optimize_diagonal This parameter
+   * is ignored.
    *
-   * @deprecated Use the constructor without the last argument since
-   *   it is ignored.
+   * @deprecated Use the constructor without the last argument since it is
+   * ignored.
    */
   SparsityPattern (const size_type m,
                    const size_type n,
@@ -1000,14 +996,12 @@ public:
   /**
    * Initialize a rectangular matrix.
    *
-   * @arg m number of rows
-   * @arg n number of columns
-   * @arg row_lengths possible number of nonzero entries for each row.  This
-   * vector must have one entry for each row.
-   * @arg optimize_diagonal This argument is ignored.
+   * @arg m number of rows @arg n number of columns @arg row_lengths possible
+   * number of nonzero entries for each row.  This vector must have one entry
+   * for each row. @arg optimize_diagonal This argument is ignored.
    *
-   * @deprecated Use the constructor without the last argument since
-   *   it is ignored.
+   * @deprecated Use the constructor without the last argument since it is
+   * ignored.
    */
   SparsityPattern (const size_type               m,
                    const size_type               n,
@@ -1017,13 +1011,12 @@ public:
   /**
    * Initialize a quadratic matrix.
    *
-   * @arg m number of rows and columns
-   * @arg row_lengths possible number of nonzero entries for each row.  This
-   * vector must have one entry for each row.
-   * @arg optimize_diagonal This argument is ignored.
+   * @arg m number of rows and columns @arg row_lengths possible number of
+   * nonzero entries for each row.  This vector must have one entry for each
+   * row. @arg optimize_diagonal This argument is ignored.
    *
-   * @deprecated Use the constructor without the last argument since
-   *   it is ignored.
+   * @deprecated Use the constructor without the last argument since it is
+   * ignored.
    */
   SparsityPattern (const size_type               m,
                    const std::vector<unsigned int> &row_lengths,
@@ -1045,7 +1038,7 @@ public:
    * optimized access in relaxation methods of SparseMatrix.
    *
    * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
+   * version of this function without the last argument.
    */
   void reinit (const size_type               m,
                const size_type               n,
@@ -1057,7 +1050,7 @@ public:
    * Same as above, but with a VectorSlice argument instead.
    *
    * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
+   * version of this function without the last argument.
    */
   void reinit (const size_type                                   m,
                const size_type                                   n,
@@ -1073,7 +1066,7 @@ public:
    * function.
    *
    * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
+   * version of this function without the last argument.
    */
   void reinit (const size_type m,
                const size_type n,
@@ -1157,7 +1150,7 @@ public:
    * iterators that point to such pairs.
    *
    * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
+   * version of this function without the last argument.
    */
   template <typename ForwardIterator>
   void copy_from (const size_type       n_rows,
@@ -1168,12 +1161,12 @@ public:
 
   /**
    * Copy data from an object of type CompressedSparsityPattern,
-   * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern.
-   * Previous content of this object is lost, and the sparsity pattern is in
-   * compressed mode afterwards.
+   * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern. Previous
+   * content of this object is lost, and the sparsity pattern is in compressed
+   * mode afterwards.
    *
    * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
+   * version of this function without the last argument.
    */
   template <typename CompressedSparsityType>
   void copy_from (const CompressedSparsityType &csp,
@@ -1188,7 +1181,7 @@ public:
    * compressed mode afterwards.
    *
    * @deprecated The last argument of this function is ignored. Use the
-   *     version of this function without the last argument.
+   * version of this function without the last argument.
    */
   template <typename number>
   void copy_from (const FullMatrix<number> &matrix,
@@ -1202,8 +1195,8 @@ public:
    * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
    * that case.
    *
-   * @deprecated Use the iterators provided by the begin() and end()
-   * functions instead.
+   * @deprecated Use the iterators provided by the begin() and end() functions
+   * instead.
    */
   row_iterator row_begin (const size_type r) const DEAL_II_DEPRECATED;
 
@@ -1215,8 +1208,8 @@ public:
    * particular the case if it is the end iterator for the last row of a
    * matrix.
    *
-   * @deprecated Use the iterators provided by the begin() and end()
-   * functions instead.
+   * @deprecated Use the iterators provided by the begin() and end() functions
+   * instead.
    */
   row_iterator row_end (const size_type r) const DEAL_II_DEPRECATED;
 
@@ -1224,8 +1217,8 @@ public:
    * Determine whether the matrix uses the special convention for quadratic
    * matrices that the diagonal entries are stored first in each row.
    *
-   * @deprecated The function always returns true if the matrix is
-   * square and false if it is not.
+   * @deprecated The function always returns true if the matrix is square and
+   * false if it is not.
    */
   bool optimize_diagonal () const DEAL_II_DEPRECATED;
 
@@ -1310,9 +1303,10 @@ public:
 // @}
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
-  /** @addtogroup Exceptions
-   * @name Exceptions
-   * @{ */
+  /**
+   * @addtogroup Exceptions
+   * @{
+   */
   /**
    * You tried to add an element to a row, but there was no space left.
    */
@@ -1453,8 +1447,7 @@ private:
   friend class ChunkSparsityPattern;
 
   /**
-   * Also give access to internal details to the iterator/accessor
-   * classes.
+   * Also give access to internal details to the iterator/accessor classes.
    */
   friend class SparsityPatternIterators::Iterator;
   friend class SparsityPatternIterators::Accessor;

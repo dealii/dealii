@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2009 - 2013 by the deal.II authors
 //
@@ -94,8 +93,8 @@ PointValueHistory<dim>::PointValueHistory (const DoFHandler<dim> &dof_handler,
     = std::vector<std::vector <double> > (n_indep, std::vector <double> (0));
   indep_names = std::vector <std::string> ();
 
-  tria_listener = dof_handler.get_tria().signals.any_change.connect (std_cxx1x::bind (&PointValueHistory<dim>::tria_change_listener,
-                  std_cxx1x::ref(*this)));
+  tria_listener = dof_handler.get_tria().signals.any_change.connect (std_cxx11::bind (&PointValueHistory<dim>::tria_change_listener,
+                  std_cxx11::ref(*this)));
 }
 
 
@@ -124,8 +123,8 @@ PointValueHistory<dim>::PointValueHistory (const PointValueHistory &point_value_
   // Presume subscribe new instance?
   if (have_dof_handler)
     {
-      tria_listener = dof_handler->get_tria().signals.any_change.connect (std_cxx1x::bind     (&PointValueHistory<dim>::tria_change_listener,
-                      std_cxx1x::ref(*this)));
+      tria_listener = dof_handler->get_tria().signals.any_change.connect (std_cxx11::bind     (&PointValueHistory<dim>::tria_change_listener,
+                      std_cxx11::ref(*this)));
     }
 }
 
@@ -156,8 +155,8 @@ PointValueHistory<dim>::operator= (const PointValueHistory &point_value_history)
   // Presume subscribe new instance?
   if (have_dof_handler)
     {
-      tria_listener = dof_handler->get_tria().signals.any_change.connect (std_cxx1x::bind     (&PointValueHistory<dim>::tria_change_listener,
-                      std_cxx1x::ref(*this)));
+      tria_listener = dof_handler->get_tria().signals.any_change.connect (std_cxx11::bind     (&PointValueHistory<dim>::tria_change_listener,
+                      std_cxx11::ref(*this)));
     }
 
   return * this;
@@ -994,7 +993,7 @@ void PointValueHistory<dim>
             }
 
           for (std::map <std::string, std::vector <std::vector <double> > >::iterator
-              data_store_begin = data_store.begin (); data_store_begin != data_store.end (); ++data_store_begin)
+               data_store_begin = data_store.begin (); data_store_begin != data_store.end (); ++data_store_begin)
             {
               typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(data_store_begin->first);
               unsigned int n_stored = mask->second.n_selected_components();
@@ -1029,7 +1028,7 @@ void PointValueHistory<dim>
                 }
 
               for (std::map <std::string, std::vector <std::vector <double> > >::iterator
-                    data_store_begin = data_store.begin ();
+                   data_store_begin = data_store.begin ();
                    data_store_begin != data_store.end (); ++data_store_begin)
                 {
                   typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(data_store_begin->first);

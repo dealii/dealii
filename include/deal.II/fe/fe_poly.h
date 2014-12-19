@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 2004 - 2013 by the deal.II authors
 //
@@ -30,8 +29,8 @@ DEAL_II_NAMESPACE_OPEN
  * FiniteElement classes based on polynomial spaces like the
  * TensorProductPolynomials or PolynomialSpace classes.
  *
- * Every class conforming to the following interface can be used as
- * template parameter POLY.
+ * Every class conforming to the following interface can be used as template
+ * parameter POLY.
  *
  * @code
  * static const unsigned int dimension;
@@ -48,24 +47,22 @@ DEAL_II_NAMESPACE_OPEN
  * Example classes are TensorProductPolynomials, PolynomialSpace or
  * PolynomialsP.
  *
- * This class is not a fully implemented FiniteElement class. Instead
- * there are several pure virtual functions declared in the
- * FiniteElement and FiniteElement classes which cannot
- * implemented by this class but are left for implementation in
- * derived classes.
+ * This class is not a fully implemented FiniteElement class. Instead there
+ * are several pure virtual functions declared in the FiniteElement and
+ * FiniteElement classes which cannot implemented by this class but are left
+ * for implementation in derived classes.
  *
- * Furthermore, this class assumes that shape functions of the
- * FiniteElement under consideration do <em>not</em> depend on the
- * actual shape of the cells in real space, i.e. update_once()
- * includes <tt>update_values</tt>. For FiniteElements whose shape
- * functions depend on the cells in real space, the update_once() and
- * update_each() functions must be overloaded.
+ * Furthermore, this class assumes that shape functions of the FiniteElement
+ * under consideration do <em>not</em> depend on the actual shape of the cells
+ * in real space, i.e. update_once() includes <tt>update_values</tt>. For
+ * FiniteElements whose shape functions depend on the cells in real space, the
+ * update_once() and update_each() functions must be overloaded.
  *
- * @todo Since nearly all functions for spacedim != dim are
- * specialized, this class needs cleaning up.
+ * @todo Since nearly all functions for spacedim != dim are specialized, this
+ * class needs cleaning up.
  *
  * @author Ralf Hartmann 2004, Guido Kanschat, 2009
- **/
+ */
 template <class POLY, int dim=POLY::dimension, int spacedim=dim>
 class FE_Poly : public FiniteElement<dim,spacedim>
 {
@@ -208,11 +205,11 @@ protected:
    * FiniteElement.
    *
    * This class assumes that shape functions of this FiniteElement do
-   * <em>not</em> depend on the actual shape of the cells in real
-   * space. Therefore, the effect in this element is as follows: if
-   * <tt>update_values</tt> is set in <tt>flags</tt>, copy it to the
-   * result. All other flags of the result are cleared, since everything else
-   * must be computed for each cell.
+   * <em>not</em> depend on the actual shape of the cells in real space.
+   * Therefore, the effect in this element is as follows: if
+   * <tt>update_values</tt> is set in <tt>flags</tt>, copy it to the result.
+   * All other flags of the result are cleared, since everything else must be
+   * computed for each cell.
    */
   virtual UpdateFlags update_once (const UpdateFlags flags) const;
 

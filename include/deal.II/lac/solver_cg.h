@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2014 by the deal.II authors
 //
@@ -46,38 +45,45 @@ class PreconditionIdentity;
  * solution vector must be passed as template argument, and defaults to
  * dealii::Vector<double>.
  *
- * Like all other solver classes, this class has a local structure
- * called @p AdditionalData which is used to pass additional
- * parameters to the solver. For this class, there is (among other things)
- * a switch allowing for additional output for the computation of
- * eigenvalues of the matrix.
+ * Like all other solver classes, this class has a local structure called @p
+ * AdditionalData which is used to pass additional parameters to the solver.
+ * For this class, there is (among other things) a switch allowing for
+ * additional output for the computation of eigenvalues of the matrix.
  *
- * @note This version of CG is taken from D. Braess's book "Finite
- * Elements". It requires a symmetric preconditioner (i.e., for example, SOR
- * is not a possible choice).
+ * @note This version of CG is taken from D. Braess's book "Finite Elements".
+ * It requires a symmetric preconditioner (i.e., for example, SOR is not a
+ * possible choice).
+ *
  *
  * <h3>Eigenvalue computation</h3>
  *
  * The cg-method performs an orthogonal projection of the original
- * preconditioned linear system to another system of smaller
- * dimension. Furthermore, the projected matrix @p T is
- * tri-diagonal. Since the projection is orthogonal, the eigenvalues
- * of @p T approximate those of the original preconditioned matrix
- * @p PA. In fact, after @p n steps, where @p n is the dimension of
- * the original system, the eigenvalues of both matrices are
- * equal. But, even for small numbers of iteration steps, the
- * condition number of @p T is a good estimate for the one of @p PA.
+ * preconditioned linear system to another system of smaller dimension.
+ * Furthermore, the projected matrix @p T is tri-diagonal. Since the
+ * projection is orthogonal, the eigenvalues of @p T approximate those of the
+ * original preconditioned matrix @p PA. In fact, after @p n steps, where @p n
+ * is the dimension of the original system, the eigenvalues of both matrices
+ * are equal. But, even for small numbers of iteration steps, the condition
+ * number of @p T is a good estimate for the one of @p PA.
  *
- * With the coefficients @p alpha and @p beta written to the log
- * file if <tt>AdditionalData::log_coefficients = true</tt>, the matrix
- * @p T_m after @p m steps is the tri-diagonal matrix with diagonal
- * elements <tt>1/alpha_0</tt>, <tt>1/alpha_1 + beta_0/alpha_0</tt>, ...,
+ * With the coefficients @p alpha and @p beta written to the log file if
+ * <tt>AdditionalData::log_coefficients = true</tt>, the matrix @p T_m after
+ * @p m steps is the tri-diagonal matrix with diagonal elements
+ * <tt>1/alpha_0</tt>, <tt>1/alpha_1 + beta_0/alpha_0</tt>, ...,
  * <tt>1/alpha_{m-1</tt>+beta_{m-2}/alpha_{m-2}} and off-diagonal elements
  * <tt>sqrt(beta_0)/alpha_0</tt>, ..., <tt>sqrt(beta_{m-2</tt>)/alpha_{m-2}}.
  * The eigenvalues of this matrix can be computed by postprocessing.
  *
- * See Y. Saad: "Iterative methods for Sparse Linear Systems", section
- * 6.7.3 for details.
+ * @see Y. Saad: "Iterative methods for Sparse Linear Systems", section 6.7.3
+ * for details.
+ *
+ *
+ * <h3>Observing the progress of linear solver iterations</h3>
+ *
+ * The solve() function of this class uses the mechanism described in the
+ * Solver base class to determine convergence. This mechanism can also be used
+ * to observe the progress of the iteration.
+ *
  *
  * @author W. Bangerth, G. Kanschat, R. Becker and F.-T. Suttmeier
  */
@@ -91,48 +97,39 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Standardized data struct to pipe
-   * additional data to the solver.
+   * Standardized data struct to pipe additional data to the solver.
    */
   struct AdditionalData
   {
     /**
-     * Write coefficients alpha and beta
-     * to the log file for later use in
+     * Write coefficients alpha and beta to the log file for later use in
      * eigenvalue estimates.
      */
     bool log_coefficients;
 
     /**
-     * Compute the condition
-     * number of the projected
-     * matrix.
+     * Compute the condition number of the projected matrix.
      *
      * @note Requires LAPACK support.
      */
     bool compute_condition_number;
 
     /**
-     * Compute the condition
-     * number of the projected
-     * matrix in each step.
+     * Compute the condition number of the projected matrix in each step.
      *
      * @note Requires LAPACK support.
      */
     bool compute_all_condition_numbers;
 
     /**
-     * Compute all eigenvalues of
-     * the projected matrix.
+     * Compute all eigenvalues of the projected matrix.
      *
      * @note Requires LAPACK support.
      */
     bool compute_eigenvalues;
 
     /**
-     * Constructor. Initialize data
-     * fields.  Confer the description of
-     * those.
+     * Constructor. Initialize data fields.  Confer the description of those.
      */
     AdditionalData (const bool log_coefficients = false,
                     const bool compute_condition_number = false,
@@ -148,9 +145,8 @@ public:
             const AdditionalData &data = AdditionalData());
 
   /**
-   * Constructor. Use an object of
-   * type GrowingVectorMemory as
-   * a default to allocate memory.
+   * Constructor. Use an object of type GrowingVectorMemory as a default to
+   * allocate memory.
    */
   SolverCG (SolverControl        &cn,
             const AdditionalData &data=AdditionalData());
@@ -161,8 +157,7 @@ public:
   virtual ~SolverCG ();
 
   /**
-   * Solve the linear system $Ax=b$
-   * for x.
+   * Solve the linear system $Ax=b$ for x.
    */
   template <class MATRIX, class PRECONDITIONER>
   void
@@ -173,21 +168,15 @@ public:
 
 protected:
   /**
-   * Implementation of the computation of
-   * the norm of the residual. This can be
-   * replaced by a more problem oriented
-   * functional in a derived class.
+   * Implementation of the computation of the norm of the residual. This can
+   * be replaced by a more problem oriented functional in a derived class.
    */
   virtual double criterion();
 
   /**
-   * Interface for derived class.
-   * This function gets the current
-   * iteration vector, the residual
-   * and the update vector in each
-   * step. It can be used for a
-   * graphical output of the
-   * convergence history.
+   * Interface for derived class. This function gets the current iteration
+   * vector, the residual and the update vector in each step. It can be used
+   * for a graphical output of the convergence history.
    */
   virtual void print_vectors(const unsigned int step,
                              const VECTOR &x,
@@ -195,24 +184,18 @@ protected:
                              const VECTOR &d) const;
 
   /**
-   * Temporary vectors, allocated through
-   * the @p VectorMemory object at the start
-   * of the actual solution process and
-   * deallocated at the end.
+   * Temporary vectors, allocated through the @p VectorMemory object at the
+   * start of the actual solution process and deallocated at the end.
    */
   VECTOR *Vr;
   VECTOR *Vp;
   VECTOR *Vz;
 
   /**
-   * Within the iteration loop, the
-   * square of the residual vector is
-   * stored in this variable. The
-   * function @p criterion uses this
-   * variable to compute the convergence
-   * value, which in this class is the
-   * norm of the residual vector and thus
-   * the square root of the @p res2 value.
+   * Within the iteration loop, the square of the residual vector is stored in
+   * this variable. The function @p criterion uses this variable to compute
+   * the convergence value, which in this class is the norm of the residual
+   * vector and thus the square root of the @p res2 value.
    */
   double res2;
 
@@ -333,6 +316,9 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   std::vector<double> diagonal;
   std::vector<double> offdiagonal;
 
+  int  it=0;
+  double res = -std::numeric_limits<double>::max();
+
   try
     {
       // define some aliases for simpler access
@@ -345,10 +331,8 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
       g.reinit(x, true);
       d.reinit(x, true);
       h.reinit(x, true);
-      // Implementation taken from the DEAL
-      // library
-      int  it=0;
-      double res,gh,alpha,beta;
+
+      double gh,alpha,beta;
 
       // compute residual. if vector is
       // zero, then short-circuit the
@@ -362,8 +346,8 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
         g.equ(-1.,b);
       res = g.l2_norm();
 
-      conv = this->control().check(0,res);
-      if (conv)
+      conv = this->iteration_status(0, res, x);
+      if (conv != SolverControl::iterate)
         {
           cleanup();
           return;
@@ -392,13 +376,12 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
           Assert(alpha != 0., ExcDivideByZero());
           alpha = gh/alpha;
 
-          g.add(alpha,h);
           x.add(alpha,d);
-          res = g.l2_norm();
+          res = std::sqrt(g.add_and_dot(alpha, h, g));
 
           print_vectors(it, x, g, d);
 
-          conv = this->control().check(it,res);
+          conv = this->iteration_status(it, res, x);
           if (conv != SolverControl::iterate)
             break;
 
@@ -482,9 +465,8 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   // Deallocate Memory
   cleanup();
   // in case of failure: throw exception
-  if (this->control().last_check() != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (this->control().last_step(),
-                                                     this->control().last_value()));
+  if (conv != SolverControl::success)
+    AssertThrow(false, SolverControl::NoConvergence (it, res));
   // otherwise exit as normal
 }
 

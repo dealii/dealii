@@ -1,0 +1,94 @@
+
+DEAL::Size 4 Unknowns 9
+DEAL::SOR-diff:0
+DEAL:cg::Starting value 3.000
+DEAL:cg::   -- 0 3.000
+DEAL:cg::   Norm=0
+DEAL:cg::   Mean=0
+DEAL:cg::   -- 1 0.7126
+DEAL:cg::   Norm=2.432
+DEAL:cg::   Mean=0.8020
+DEAL:cg::   -- 2 0.06314
+DEAL:cg::   Norm=2.493
+DEAL:cg::   Mean=0.8194
+DEAL:cg::   -- 3 0.001494
+DEAL:cg::   Norm=2.494
+DEAL:cg::   Mean=0.8194
+DEAL:cg::Convergence step 4 value 6.018e-05
+DEAL:cg::   -- 4 6.018e-05
+DEAL:cg::   Norm=2.494
+DEAL:cg::   Mean=0.8194
+DEAL:GMRES::Starting value 1.920
+DEAL:GMRES::   -- 0 1.920
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL:GMRES::   -- 1 0.1979
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL:GMRES::   -- 2 0.009469
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL:GMRES::Convergence step 3 value 0.0003574
+DEAL:GMRES::   -- 3 0.0003574
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL::Size 12 Unknowns 121
+DEAL::SOR-diff:0
+DEAL:cg::Starting value 11.00
+DEAL:cg::   -- 0 11.00
+DEAL:cg::   Norm=0
+DEAL:cg::   Mean=0
+DEAL:cg::   -- 1 12.13
+DEAL:cg::   Norm=50.48
+DEAL:cg::   Mean=4.496
+DEAL:cg::   -- 2 4.992
+DEAL:cg::   Norm=68.00
+DEAL:cg::   Mean=5.737
+DEAL:cg::   -- 3 1.090
+DEAL:cg::   Norm=70.78
+DEAL:cg::   Mean=5.884
+DEAL:cg::   -- 4 0.1907
+DEAL:cg::   Norm=70.88
+DEAL:cg::   Mean=5.889
+DEAL:cg::   -- 5 0.04614
+DEAL:cg::   Norm=70.89
+DEAL:cg::   Mean=5.889
+DEAL:cg::   -- 6 0.007982
+DEAL:cg::   Norm=70.88
+DEAL:cg::   Mean=5.889
+DEAL:cg::   -- 7 0.001234
+DEAL:cg::   Norm=70.88
+DEAL:cg::   Mean=5.889
+DEAL:cg::Convergence step 8 value 0.0005816
+DEAL:cg::   -- 8 0.0005816
+DEAL:cg::   Norm=70.88
+DEAL:cg::   Mean=5.889
+DEAL:GMRES::Starting value 13.27
+DEAL:GMRES::   -- 0 13.27
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL:GMRES::   -- 1 7.177
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL:GMRES::   -- 2 2.514
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL:GMRES::   -- 3 0.4482
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL:GMRES::   -- 4 0.1000
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL:GMRES::   -- 5 0.01999
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL:GMRES::   -- 6 0.002554
+DEAL:GMRES::   Norm=0
+DEAL:GMRES::   Mean=0
+DEAL:GMRES::   -- 6 0.002554
+DEAL:GMRES::   Norm=70.88
+DEAL:GMRES::   Mean=5.889
+DEAL:GMRES::Convergence step 7 value 0.0008206
+DEAL:GMRES::   -- 7 0.0008206
+DEAL:GMRES::   Norm=70.88
+DEAL:GMRES::   Mean=5.889

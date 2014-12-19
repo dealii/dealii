@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1999 - 2013 by the deal.II authors
 //
@@ -45,14 +44,14 @@ namespace parallel
 
 
     /**
-     * An implementation of block vectors based on distribued deal.II
-     * vectors. While the base class provides for most of the interface, this
-     * class handles the actual allocation of vectors and provides functions that
+     * An implementation of block vectors based on distribued deal.II vectors.
+     * While the base class provides for most of the interface, this class
+     * handles the actual allocation of vectors and provides functions that
      * are specific to the underlying vector type.
      *
-     * @note Instantiations for this template are provided for <tt>@<float@> and
-     * @<double@></tt>; others can be generated in application programs (see the
-     * section on @ref Instantiations in the manual).
+     * @note Instantiations for this template are provided for <tt>@<float@>
+     * and @<double@></tt>; others can be generated in application programs
+     * (see the section on @ref Instantiations in the manual).
      *
      * @see @ref GlossBlockLA "Block (linear algebra)"
      * @author Katharina Kormann, Martin Kronbichler, 2011
@@ -85,14 +84,14 @@ namespace parallel
       typedef typename BaseClass::const_iterator  const_iterator;
 
       /**
-       *  Constructor. There are three ways to use this constructor. First,
-       *  without any arguments, it generates an object with no blocks. Given
-       *  one argument, it initializes <tt>num_blocks</tt> blocks, but these
-       *  blocks have size zero. The third variant finally initializes all
-       *  blocks to the same size <tt>block_size</tt>.
+       * Constructor. There are three ways to use this constructor. First,
+       * without any arguments, it generates an object with no blocks. Given
+       * one argument, it initializes <tt>num_blocks</tt> blocks, but these
+       * blocks have size zero. The third variant finally initializes all
+       * blocks to the same size <tt>block_size</tt>.
        *
-       *  Confer the other constructor further down if you intend to use
-       *  blocks of different sizes.
+       * Confer the other constructor further down if you intend to use blocks
+       * of different sizes.
        */
       explicit BlockVector (const size_type num_blocks = 0,
                             const size_type block_size = 0);
@@ -129,8 +128,8 @@ namespace parallel
       BlockVector (const std::vector<size_type> &block_sizes);
 
       /**
-       * Construct a block vector with an IndexSet for the local range
-       * and ghost entries for each block.
+       * Construct a block vector with an IndexSet for the local range and
+       * ghost entries for each block.
        */
       BlockVector (const std::vector<IndexSet> &local_ranges,
                    const std::vector<IndexSet> &ghost_indices,
@@ -305,10 +304,9 @@ namespace parallel
       bool has_ghost_elements() const;
 
       /**
-       * Return whether the vector contains only elements with value
-       * zero. This function is mainly for internal consistency checks and
-       * should seldom be used when not in debug mode since it uses quite some
-       * time.
+       * Return whether the vector contains only elements with value zero.
+       * This function is mainly for internal consistency checks and should
+       * seldom be used when not in debug mode since it uses quite some time.
        */
       bool all_zero () const;
 
@@ -379,10 +377,30 @@ namespace parallel
       real_type linfty_norm () const;
 
       /**
+       * Performs a combined operation of a vector addition and a subsequent
+       * inner product, returning the value of the inner product. In other
+       * words, the result of this function is the same as if the user called
+       * @code
+       * this->add(a, V);
+       * return_value = *this * W;
+       * @endcode
+       *
+       * The reason this function exists is that this operation involves less
+       * memory transfer than calling the two functions separately. This
+       * method only needs to load three vectors, @p this, @p V, @p W, whereas
+       * calling separate methods means to load the calling vector @p this
+       * twice. Since most vector operations are memory transfer limited, this
+       * reduces the time by 25\% (or 50\% if @p W equals @p this).
+       */
+      Number add_and_dot (const Number               a,
+                          const BlockVector<Number> &V,
+                          const BlockVector<Number> &W);
+
+      /**
        * Scale each element of the vector by the given factor.
        *
-       * This function is deprecated and will be removed in a future
-       * version. Use <tt>operator *=</tt> and <tt>operator /=</tt> instead.
+       * This function is deprecated and will be removed in a future version.
+       * Use <tt>operator *=</tt> and <tt>operator /=</tt> instead.
        *
        * @deprecated Use <tt>operator*=</tt> instead.
        */
@@ -414,8 +432,10 @@ namespace parallel
        */
       void swap (BlockVector<Number> &v);
 
-      /** @addtogroup Exceptions
-       * @{ */
+      /**
+       * @addtogroup Exceptions
+       * @{
+       */
 
       /**
        * Exception
@@ -929,7 +949,28 @@ namespace parallel
 
     template <typename Number>
     inline
-    void BlockVector<Number>::swap (BlockVector<Number> &v)
+    Number
+    BlockVector<Number>::add_and_dot (const Number               a,
+                                      const BlockVector<Number> &V,
+                                      const BlockVector<Number> &W)
+    {
+      Number local_result = Number();
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result += this->block(i).add_and_dot_local(a, V.block(i), W.block(i));
+
+      if (this->block(0).partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result,
+                                    this->block(0).partitioner->get_communicator());
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    inline
+    void
+    BlockVector<Number>::swap (BlockVector<Number> &v)
     {
       Assert (this->n_blocks() == v.n_blocks(),
               ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
@@ -967,9 +1008,9 @@ namespace parallel
 } // end of namespace parallel
 
 /**
- * Global function which overloads the default implementation
- * of the C++ standard library which uses a temporary object. The
- * function simply exchanges the data of the two vectors.
+ * Global function which overloads the default implementation of the C++
+ * standard library which uses a temporary object. The function simply
+ * exchanges the data of the two vectors.
  *
  * @relates BlockVector
  * @author Katharina Kormann, Martin Kronbichler, 2011

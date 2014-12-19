@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id$
 //
 // Copyright (C) 1998 - 2014 by the deal.II authors
 //
@@ -805,11 +804,11 @@ namespace FEValuesViews
                   // we're in 2d, so the formula for the curl is simple:
                   if (shape_function_data[shape_function].single_nonzero_component_index == 0)
                     for (unsigned int q_point = 0;
-                        q_point < n_quadrature_points; ++q_point)
+                         q_point < n_quadrature_points; ++q_point)
                       curls[q_point][0] -= value * (*shape_gradient_ptr++)[1];
                   else
                     for (unsigned int q_point = 0;
-                        q_point < n_quadrature_points; ++q_point)
+                         q_point < n_quadrature_points; ++q_point)
                       curls[q_point][0] += value * (*shape_gradient_ptr++)[0];
                 }
               else
@@ -966,38 +965,37 @@ namespace FEValuesViews
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
-        if (shape_function_data[shape_function].is_nonzero_shape_function_component)
-          {
-            const int snc = shape_function_data[shape_function].single_nonzero_component;
+        {
+          const int snc = shape_function_data[shape_function].single_nonzero_component;
 
-            if (snc == -2)
-              // shape function is zero for the selected components
-              continue;
+          if (snc == -2)
+            // shape function is zero for the selected components
+            continue;
 
-            const double value = dof_values(shape_function);
-            if (value == 0.)
-              continue;
+          const double value = dof_values(shape_function);
+          if (value == 0.)
+            continue;
 
-            if (snc != -1)
-              {
-                const unsigned int comp =
-                  shape_function_data[shape_function].single_nonzero_component_index;
-                const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
-                  &shape_hessians[snc][0];
-                for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                  laplacians[q_point][comp] += value * trace(*shape_hessian_ptr++);
-              }
-            else
-              for (unsigned int d=0; d<spacedim; ++d)
-                if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
-                  {
-                    const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
-                      &shape_hessians[shape_function_data[shape_function].
-                                      row_index[d]][0];
-                    for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                      laplacians[q_point][d] += value * trace(*shape_hessian_ptr++);
-                  }
-          }
+          if (snc != -1)
+            {
+              const unsigned int comp =
+                shape_function_data[shape_function].single_nonzero_component_index;
+              const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
+                &shape_hessians[snc][0];
+              for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
+                laplacians[q_point][comp] += value * trace(*shape_hessian_ptr++);
+            }
+          else
+            for (unsigned int d=0; d<spacedim; ++d)
+              if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+                {
+                  const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
+                    &shape_hessians[shape_function_data[shape_function].
+                                    row_index[d]][0];
+                  for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
+                    laplacians[q_point][d] += value * trace(*shape_hessian_ptr++);
+                }
+        }
     }
 
 
@@ -2259,7 +2257,7 @@ namespace internal
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     if (dofs_per_cell == 0)
       return;
-    
+
     const unsigned int n_quadrature_points = shape_values.n_cols();
     const unsigned int n_components = fe.n_components();
 
@@ -3255,8 +3253,8 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
           invalidate_present_cell();
           tria_listener =
             cell->get_triangulation().signals.any_change.connect
-            (std_cxx1x::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
-                              std_cxx1x::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
+            (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
+                              std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
         }
     }
   else
@@ -3266,8 +3264,8 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
       // changes
       tria_listener =
         cell->get_triangulation().signals.post_refinement.connect
-        (std_cxx1x::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
-                          std_cxx1x::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
+        (std_cxx11::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
+                          std_cxx11::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
     }
 }
 
@@ -3473,7 +3471,7 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
 template <int dim, int spacedim>
 template <class DH, bool lda>
 void
-FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > cell)
+FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > &cell)
 {
   // assert that the finite elements
   // passed to the constructor and
@@ -3648,7 +3646,7 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 template <int dim, int spacedim>
 template <class DH, bool lda>
 void
-FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > cell,
+FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > &cell,
                                     const unsigned int face_no)
 {
   // assert that the finite elements
@@ -3804,7 +3802,7 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
 template <int dim, int spacedim>
 template <class DH, bool lda>
-void FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > cell,
+void FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > &cell,
                                             const unsigned int         face_no,
                                             const unsigned int         subface_no)
 {
