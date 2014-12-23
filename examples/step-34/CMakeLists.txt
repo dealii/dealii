@@ -37,7 +37,7 @@ ENDIF()
 #
 # Are all dependencies fullfilled?
 #
-IF(NOT DEAL_II_WITH_FUNCTIONPARSER)
+IF(NOT DEAL_II_WITH_MUPARSER)
   MESSAGE(FATAL_ERROR "
 Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
     DEAL_II_WITH_FUNCTIONPARSER = ON
