@@ -5,7 +5,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <title>The deal.II Testsuite</title>
   <link href="../screen.css" rel="StyleSheet">
-  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 by the deal.II Authors">
+  <meta name="copyright" content="Copyright (C) 1998 - 2014 by the deal.II Authors">
   <meta name="date" content="$Date$">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
   <meta http-equiv="content-language" content="en">
@@ -16,7 +16,7 @@
     <h1>The deal.II Testsuite</h1>
 
     <p>
-      The deal.II testsuite consists of two parts:
+      The deal.II testsuite consists of two parts: 
       <i>build tests</i> and the
       <i>regression testsuite</i>. While the build tests
       are used to check that the
@@ -28,16 +28,17 @@
     </p>
 
     <p>
-      deal.II has a testsuite that currently has (mid-2014), some 3,400
-      small programs (growing by roughly one per day) that we run every
-      time we make a change to make sure that no existing functionality is
-      broken. The expected output for every test is stored in an output
-      file, and when you run a test you are notified if a test produces
-      different output. These days, every time we add a significant piece
-      of functionality, we add at least one new test to the testsuite, and
-      we also do so if we fix a bug, in both cases to make sure that future
-      changes do not break what we have just checked in. Machines running
-      tests send results back home and these are then converted into
+      deal.II has a testsuite that has, at the time this article is written
+      (mid-2013), some 2,900 small programs (growing by roughly one per day)
+      that we run every time we make a change to make sure that no existing
+      functionality is broken. The expected output for every test is stored in
+      an <code>*.output</code>, and when you run a test you are notified if a
+      test produces different output. These days, every time we add a
+      significant piece of functionality, we add at least one new test to the
+      testsuite, and we also do so if we fix a bug, in both cases to make sure
+      that future changes do not break what we have just checked in. Machines
+      running tests send results
+      back home and these are then converted into
       <a href="http://cdash.kyomu.43-1.org/index.php?project=deal.II"
       target="body">a webpage showing the status of our regression tests</a>.
     </p>
@@ -46,6 +47,10 @@
       <ol>
         <li><a href="#quick">Quick instructions</a></li>
         <li><a href="#setup">Setting up the testsuite</a></li>
+        <ol>
+          <li><a href="#setupdownload">Downloading the testsuite</a></li>
+          <li><a href="#setupconfigure">Preparing the testsuite</a></li>
+        </ol>
         <li><a href="#run">Running the testsuite</a></li>
         <ol>
           <li><a href="#runoutput">How to interpret the output</a></li>
@@ -66,8 +71,8 @@
         </ol>
         <li><a href="#submit">Submitting test results</a></li>
         <li><a href="#build_tests">Build tests</a></li>
-          <ol>
-            <li><a href="#dedicatedbuilds">Dedicated build tests</a></li>
+	  <ol>
+	    <li><a href="#dedicatedbuilds">Dedicated build tests</a></li>
           </ol>
       </ol>
     </div>
@@ -78,12 +83,10 @@
     <p>
       If you're impatient, use the following commands:
 <pre>
-$ mkdir new_directory
-$ cd new_directory
-$ svn checkout https://svn.dealii.org/trunk .
-$ mkdir build
-$ cd build
-$ cmake ../deal.II
+$ git clone https://github.com/dealii/dealii
+$ mkdir dealii/build
+$ cd dealii/build
+$ cmake ..
 $ make -j16
 $ make -j16 setup_tests
 $ ctest -j16
@@ -95,15 +98,22 @@ $ ctest -j16
     <a name="setup"></a>
     <h2>Setting up the testsuite</h2>
 
-    <p> In order to run it, you need to checkout the git repository with
-    the development version of deal.II. If you haven't already done this
-    clone the repository via:
-<pre>
-$ git clone https://github.com/dealii/dealii.git
-</pre>
-    More information about the git repository is available on the <a
-      href=http://www.dealii.org/download.html>homepage</a>.
+    <p> In order to run it, you need to download and set up the testsuite
+      first. The following paragraphs detail how to do that.
     </p>
+
+    <a name="setupdownload"></a>
+    <h3>Downloading the testsuite</h3>
+
+    <p>
+    Just download the current development sources:
+<pre>
+$ git clone https://github.com/dealii/dealii
+</pre>
+    </p>
+
+    <a name="setupconfigure"></a>
+    <h3>Preparing the testsuite</h3>
 
     <p>
       To enable the testsuite, configure and build deal.II in a build
@@ -590,7 +600,7 @@ category/test.expect=run.output
 <pre>
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 by the deal.II Authors
+// Copyright (C) 2014 by the deal.II Authors
 //
 // This file is part of the deal.II library.
 //
@@ -689,19 +699,6 @@ $ ctest -V -R "category/my_new_test"
 </pre>
     </p>
 
-
-    <h4>Checking in</h4>
-
-    <p>
-      Tests are a way to make sure everything keeps working. If they aren't
-      automated, they are no good. We are therefore very interested in
-      getting new tests. Talk to us in the discussion group! Writing
-      testcases is a worthy and laudable task, and we would like to
-      encourage it by giving people the opportunity to contribute!
-    </p>
-
-
-
     <a name="layoutaddcategory"></a>
     <h2>Adding new categories</h2>
 
@@ -717,8 +714,6 @@ PROJECT(testsuite CXX)
 INCLUDE(${DEAL_II_TARGET_CONFIG})
 DEAL_II_PICKUP_TESTS()
 </pre>
-
-
 
     <a name="submit"></a>
     <h2>Submitting test results</h2>
@@ -752,9 +747,7 @@ ctest -D&lt;variable&gt;=&lt;value&gt; [...]
       script:
 <pre>
 CTEST_SOURCE_DIRECTORY
-  - The source directory of deal.II (usually ending in "[...]/deal.II"
-    (equivalent to https://svn.dealii.org/trunk/deal.II)
-    Note: This is _not_ the test directory ending in "[...]/tests"
+  - The source directory of deal.II
   - If unspecified, "../deal.II" and "../../" relative to the location
     of this script is used. If this is not a source directory, an error
     thrown.
@@ -776,16 +769,17 @@ TRACK
   - The track the test should be submitted to. Defaults to "Experimental".
     Possible values are:
 
-    "Experimental"     - all tests that are not specifically "build" tests
-                         should go into this track
+    "Experimental"     - all tests that are not specifically "build" or
+                         "regression" tests should go into this track
 
-    "Build Tests"      - Build tests that configure and build in a clean
-                         directory and run exactly all build tests matching
-                         "build_tests/.*"
+    "Build Tests"      - Build tests that configure and build in a
+                         clean directory and run the build tests
+                         "build_tests/*"
+
+    "Nightly"          - Reserved for nightly regression tests for
+                         build bots on various architectures
 
     "Regression Tests" - Reserved for the regression tester
-
-    "Continuous"       - Reserved for the regression tester
 
 CONFIG_FILE
   - A configuration file (see docs/development/Config.sample)
@@ -825,11 +819,10 @@ MAKEOPTS
       users with configurations not found on the <a
       href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash page</a> to
       participate. Assuming you checked out deal.II into the directory
-      <code>deal.II</code>, running it is as simple as:
+      <code>dealii</code>, running it is as simple as:
 <pre>
-cd deal.II
-mkdir build
-cd build
+mkdir dealii/build
+cd dealii/build
 ctest -j4 -S ../cmake/scripts/run_buildtest.cmake
 </pre>
     </p>
@@ -843,7 +836,7 @@ ctest -j4 -S ../cmake/scripts/run_buildtest.cmake
 
     <p>
       <b>Note:</b> Build tests require the designated build directory to be
-      completely empty If you want to specify a build configuration for
+      completely empty. If you want to specify a build configuration for
       cmake use a <a href="../users/Config.sample">configuration file</a>
       to preseed the cache as explained <a href="#submit">above</a>:
 <pre>
