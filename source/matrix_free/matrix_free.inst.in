@@ -31,5 +31,14 @@ for (deal_II_dimension : DIMENSIONS)
 
   template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,double>;
   template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,float>;
+
+#ifndef DEAL_II_MSVC
+  template void internal::MatrixFreeFunctions::ShapeInfo<double>::reinit
+  <deal_II_dimension>(const Quadrature<1> &, const FiniteElement
+                      <deal_II_dimension,deal_II_dimension> &, const unsigned int);
+  template void internal::MatrixFreeFunctions::ShapeInfo<float>::reinit
+  <deal_II_dimension>(const Quadrature<1> &, const FiniteElement
+                      <deal_II_dimension,deal_II_dimension> &, const unsigned int);
+#endif
 }
 
