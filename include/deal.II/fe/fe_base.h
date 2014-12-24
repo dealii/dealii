@@ -161,7 +161,8 @@ public:
    * Since discontinuous elements have no topological couplings between grid
    * cells and code may actually depend on this property, <i>L<sup>2</sup></i>
    * conformity is handled in a special way in the sense
-   * that it is <b>not</b> implied by any higher conformity.  </ol>
+   * that it is <b>not</b> implied by any higher conformity.
+   * </ol>
    *
    * In order to test if a finite element conforms to a certain space, use
    * FiniteElementData<dim>::conforms().

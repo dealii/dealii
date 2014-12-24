@@ -2840,7 +2840,9 @@ public:
    */
 
   /**
-   * Exception @ingroup Exceptions
+   * Exception
+   *
+   * @ingroup Exceptions
    */
   DeclException1 (ExcInvalidLevel,
                   int,
@@ -2874,7 +2876,9 @@ public:
                   << "You tried to do something on level " << arg1
                   << ", but this level is empty.");
   /**
-   * Exception @ingroup Exceptions
+   * Exception
+   *
+   * @ingroup Exceptions
    */
   DeclException0 (ExcNonOrientableTriangulation);
 

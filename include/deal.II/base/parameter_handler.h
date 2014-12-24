@@ -1437,8 +1437,11 @@ namespace Patterns
  *
  * Given this explanation, the code above will lead to a hierarchical
  * representation of data that looks like this (the content of files is
- * indicated at the right in a different font): @image html
- * parameter_handler.png Once parameters have been read in, the contents of
+ * indicated at the right in a different font):
+ *
+ * @image html parameter_handler.png
+ *
+ * Once parameters have been read in, the contents of
  * the <code>value</code> "files" may be different while the other files
  * remain untouched.
  *
