@@ -12,7 +12,7 @@ import sys
 import string
 wrapper = textwrap.TextWrapper()
 
-# take an array of lines and wrap them to 78 columns and let each lines start
+# take an array of lines and wrap them to 78 columns and let each line start
 # with @p startwith
 def wrap_block(lines, startwith):
     longline = " ".join(lines)
@@ -87,12 +87,16 @@ def format_block(lines, infostr=""):
     idx = string.find(lines[0],"/**")
     start = lines[0][:idx]+" * "
     
-    out = [lines[0]]
+    out = [lines[0].rstrip()]
     idx = 1
     endidx = len(lines)-1
     curlines = []
 
-    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@deprecated"]
+    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@deprecated", "@image"]
+
+    # subset of ops_startline that does not want stuff from the next line appended
+    # to this.
+    ops_also_end_paragraph = ["@image"]
 
     ops_separate_line = ["<ol>", "</ol>", "<ul>", "</ul>", "@{", "@}", "<br>"]
 
@@ -115,7 +119,10 @@ def format_block(lines, infostr=""):
                 for it in ops_startline:
                     if it in thisline:
                         print ("%s warning %s not at start of line"%(infostr, it), file=sys.stderr)
-            curlines.append(lines[idx])
+            if one_in(ops_startline, lines[idx]):
+                out.append(lines[idx].rstrip())
+            else:
+                curlines.append(lines[idx])
         elif one_in(["@code", "@verbatim", "@f["], lines[idx]):
             if curlines!=[]:
                 out.extend(wrap_block(remove_junk(curlines), start))
@@ -293,6 +300,18 @@ lineO = ["    /**", \
          "     * @addtogroup Exceptions", \
          "     * @{", \
          "     */"]
+assert(format_block(lineI)==lineO)
+
+lineI = [" /** ", \
+         "  *   bla", \
+         "  * @image testing.png", \
+         "  *  blub", \
+         "  */"]
+lineO = [" /**", \
+         "  * bla", \
+         "  * @image testing.png", \
+         "  * blub", \
+         "  */"]
 assert(format_block(lineI)==lineO)
 
 
