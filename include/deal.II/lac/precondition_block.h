@@ -359,10 +359,6 @@ protected:
    * The inverse permutation vector
    */
   std::vector<size_type> inverse_permutation;
-
-  /**
-   * Flag for diagonal compression. @ref set_same_diagonal()
-   */
 };
 
 
