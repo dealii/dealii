@@ -56,7 +56,7 @@ s/^DEAL.*::_.*\n//g;
 
 # Normalize version string by replacing (for example) 'written by
 # deal.II 8.1.pre' by written by 'written by deal.II x.y.z'
-s/written by deal\.II \d+\.\d+\.(pre|rc|\d+)/written by deal.II x.y.z/;
+s/written by deal\.II \d+\.\d+\.(pre|rc\d*|\d+)/written by deal.II x.y.z/;
 
 
 # different p4est versions output different text in VTU output. For
