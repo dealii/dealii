@@ -2018,8 +2018,8 @@ namespace DoFTools
   /**
    * This function is a version of the above map_dofs_to_support_points
    * function that doesn't simply return a vector of support points (see this
-   * @ref GlossSupport "glossary entry") with one entry for each global
-   * degree of freedom, but instead a map that maps from the DoFs index to its
+   * @ref GlossSupport "glossary entry") with one entry for each global degree
+   * of freedom, but instead a map that maps from the DoFs index to its
    * location. The point of this function is that it is also usable in cases
    * where the DoFHandler is based on a parallel::distributed::Triangulation
    * object. In such cases, each processor will not be able to determine the
@@ -2028,8 +2028,7 @@ namespace DoFTools
    * were known. As a consequence, this function constructs a map from those
    * DoFs for which we can know the locations (namely, those DoFs that are
    * locally relevant (see
-   * @ref GlossLocallyRelevantDof "locally relevant DoFs") to their
-   * locations.
+   * @ref GlossLocallyRelevantDof "locally relevant DoFs") to their locations.
    *
    * For non-distributed triangulations, the map returned as @p support_points
    * is of course dense, i.e., every DoF is to be found in it.

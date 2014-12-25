@@ -135,11 +135,11 @@ struct SubCellData;
  * fairly simple to extend it.
  *
  * <li> <tt>Gmsh 1.0 mesh</tt> format: this format is used by the @p GMSH mesh
- * generator (see http://www.geuz.org/gmsh/). The documentation in the @p
- * GMSH manual explains how to generate meshes compatible with the deal.II
- * library (i.e. quads rather than triangles). In order to use this format,
- * Gmsh has to output the file in the old format 1.0. This is done adding the
- * line "Mesh.MshFileVersion = 1" to the input file.
+ * generator (see http://www.geuz.org/gmsh/). The documentation in the @p GMSH
+ * manual explains how to generate meshes compatible with the deal.II library
+ * (i.e. quads rather than triangles). In order to use this format, Gmsh has
+ * to output the file in the old format 1.0. This is done adding the line
+ * "Mesh.MshFileVersion = 1" to the input file.
  *
  * <li> <tt>Gmsh 2.0 mesh</tt> format: this is a variant of the above format.
  * The read_msh() function automatically determines whether an input file is

@@ -669,16 +669,15 @@ public:
    * parallel::distributed::Triangulation object. There, refining a mesh
    * always involves a re-partitioning. In other words, vertices of locally
    * owned cells (see
-   * @ref GlossLocallyOwnedCell "this glossary entry") that you may have
-   * moved to a different location on one processor may be moved to a
-   * different processor upon mesh refinement (even if these particular cells
-   * were not refined) which will re-create their position based on the
-   * position of the coarse cells they previously had, not based on the
-   * position these vertices had on the processor that previously owned them.
-   * In other words, in parallel computations, you will probably have to move
-   * nodes explicitly after every mesh refinement because vertex positions may
-   * or may not be preserved across the re-partitioning that accompanies mesh
-   * refinement.
+   * @ref GlossLocallyOwnedCell "this glossary entry") that you may have moved
+   * to a different location on one processor may be moved to a different
+   * processor upon mesh refinement (even if these particular cells were not
+   * refined) which will re-create their position based on the position of the
+   * coarse cells they previously had, not based on the position these
+   * vertices had on the processor that previously owned them. In other words,
+   * in parallel computations, you will probably have to move nodes explicitly
+   * after every mesh refinement because vertex positions may or may not be
+   * preserved across the re-partitioning that accompanies mesh refinement.
    */
   Point<spacedim> &vertex (const unsigned int i) const;
 

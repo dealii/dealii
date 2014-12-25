@@ -1218,8 +1218,7 @@ public:
 
   /**
    * Given a block mask (see
-   * @ref GlossBlockMask "this glossary entry"), produce a component mask
-   * (see
+   * @ref GlossBlockMask "this glossary entry"), produce a component mask (see
    * @ref GlossComponentMask "this glossary entry") that represents the
    * components that correspond to the blocks selected in the input argument.
    * This is essentially a conversion operator from BlockMask to
@@ -1294,8 +1293,7 @@ public:
 
   /**
    * Given a component mask (see
-   * @ref GlossComponentMask "this glossary entry"), produce a block mask
-   * (see
+   * @ref GlossComponentMask "this glossary entry"), produce a block mask (see
    * @ref GlossBlockMask "this glossary entry") that represents the blocks
    * that correspond to the components selected in the input argument. This is
    * essentially a conversion operator from ComponentMask to BlockMask.
