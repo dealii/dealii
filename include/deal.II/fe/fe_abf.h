@@ -60,7 +60,9 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <h3>Interpolation</h3>
  *
- * The @ref GlossInterpolation "interpolation" operators associated with the
+ * The
+ * @ref GlossInterpolation "interpolation"
+ * operators associated with the
  * RT element are constructed such that interpolation and computing the
  * divergence are commuting operations. We require this from interpolating
  * arbitrary functions as well as the #restriction matrices.  It can be
@@ -69,7 +71,9 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <h4>Node values on edges/faces</h4>
  *
- * On edges or faces, the @ref GlossNodes "node values" are the moments of the
+ * On edges or faces, the
+ * @ref GlossNodes "node values"
+ * are the moments of the
  * normal component of the interpolated function with respect to the traces of
  * the RT polynomials. Since the normal trace of the RT space of degree
  * <i>k</i> on an edge/face is the space <i>Q<sub>k</sub></i>, the moments are

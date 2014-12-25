@@ -176,11 +176,15 @@ public:
    * @param face The number of the face this degree of freedom lives on. This
    * number must be between zero and GeometryInfo::faces_per_cell.
    * @param face_orientation One part of the description of the orientation of
-   * the face. See @ref GlossFaceOrientation .
+   * the face. See
+   * @ref GlossFaceOrientation.
    * @param face_flip One part of the description of the orientation of the
-   * face. See @ref GlossFaceOrientation .
+   * face. See
+   * @ref GlossFaceOrientation.
    * @param face_rotation One part of the description of the orientation of
-   * the face. See @ref GlossFaceOrientation . @return The index of this
+   * the face. See
+   * @ref GlossFaceOrientation.
+   * @return The index of this
    * degree of freedom within the set of degrees of freedom on the entire
    * cell. The returned value will be between zero and dofs_per_cell.
    */
@@ -254,7 +258,8 @@ public:
    * neither dominates, or if either could dominate.
    *
    * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the @ref hp_paper "hp paper".
+   * particular the
+   * @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination

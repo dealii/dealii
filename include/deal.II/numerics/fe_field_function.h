@@ -110,7 +110,11 @@ namespace Functions
    * and evaluating the solution at a particular point, not every processor
    * will own the cell at which the solution is evaluated. Rather, it may be
    * that the cell in which this point is found is in fact a ghost or
-   * artificial cell (see @ref GlossArtificialCell and @ref GlossGhostCell).
+   * artificial cell (see
+   * @ref GlossArtificialCell
+   * and
+   * @ref GlossGhostCell
+   * ).
    * If the cell is artificial, we have no access to the solution there and
    * functions that evaluate the solution at such a point will trigger an
    * exception of type FEFieldFunction::ExcPointNotAvailableHere. The same
@@ -190,7 +194,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual void vector_value (const Point<dim> &p,
@@ -208,7 +214,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual double value (const Point< dim >     &p,
@@ -224,7 +232,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual void value_list (const std::vector<Point< dim > >     &points,
@@ -242,7 +252,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual void vector_value_list (const std::vector<Point< dim > >     &points,
@@ -258,7 +270,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual void
@@ -275,7 +289,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual Tensor<1,dim> gradient(const Point< dim > &p,
@@ -289,7 +305,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual void
@@ -305,7 +323,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual void
@@ -320,7 +340,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual double
@@ -334,7 +356,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual void
@@ -347,7 +371,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual void
@@ -361,7 +387,9 @@ namespace Functions
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
      * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see @ref GlossLocallyOwnedCell). See the section in
+     * locally owned cell (see
+     * @ref GlossLocallyOwnedCell
+     * ). See the section in
      * the general documentation of this class for more information.
      */
     virtual void

@@ -35,7 +35,9 @@ DEAL_II_NAMESPACE_OPEN
  * that are possibly of different type. The result is then a vector-valued
  * finite element. %Vector valued elements are discussed in a number of
  * tutorial programs, for example step-8, step-20, step-21, and in particular
- * in the @ref vector_valued module.
+ * in the
+ * @ref vector_valued
+ * module.
  *
  * <h3>FESystem, components and blocks</h3>
  *
@@ -56,7 +58,8 @@ DEAL_II_NAMESPACE_OPEN
  * partial differential equation, the finite element side looks a bit
  * different Since not only FESystem, but also vector-valued elements like
  * FE_RaviartThomas, have several components. The concept needed here is a
- * @ref GlossBlock "block". Each block encompasses the set of degrees of
+ * @ref GlossBlock "block".
+ * Each block encompasses the set of degrees of
  * freedom associated with a single base element of an FESystem, where base
  * elements with multiplicities count multiple times. These blocks are usually
  * addressed using the information in DoFHandler::block_info(). The number of
@@ -430,13 +433,17 @@ public:
    * @param face The number of the face this degree of freedom lives on. This
    * number must be between zero and GeometryInfo::faces_per_cell.
    * @param face_orientation One part of the description of the orientation of
-   * the face. See @ref GlossFaceOrientation .
+   * the face. See
+   * @ref GlossFaceOrientation.
    * @param face_flip One part of the description of the orientation of the
-   * face. See @ref GlossFaceOrientation .
+   * face. See
+   * @ref GlossFaceOrientation.
    * @param face_rotation One part of the description of the orientation of
-   * the face. See @ref GlossFaceOrientation . @return The index of this
-   * degree of freedom within the set of degrees of freedom on the entire
-   * cell. The returned value will be between zero and dofs_per_cell.
+   * the face. See
+   * @ref GlossFaceOrientation.
+   * @return The index of this degree of freedom within the set of degrees of
+   * freedom on the entire cell. The returned value will be between zero and
+   * dofs_per_cell.
    */
   virtual
   unsigned int face_to_cell_index (const unsigned int face_dof_index,
@@ -558,7 +565,8 @@ public:
    * neither dominates, or if either could dominate.
    *
    * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the @ref hp_paper "hp paper".
+   * particular the
+   * @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination

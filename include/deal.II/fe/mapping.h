@@ -614,7 +614,8 @@ private:
    * fields not asked for by FEValues, but computed for efficiency reasons
    * will be notified here.
    *
-   * See @ref UpdateFlagsEssay.
+   * See
+   * @ref UpdateFlagsEssay.
    */
   virtual UpdateFlags update_once (const UpdateFlags) const = 0;
 
@@ -622,7 +623,8 @@ private:
    * The same as update_once(), but for the flags to be updated for each grid
    * cell.
    *
-   * See @ref UpdateFlagsEssay.
+   * See
+   * @ref UpdateFlagsEssay.
    */
   virtual UpdateFlags update_each (const UpdateFlags) const = 0;
 
@@ -692,7 +694,9 @@ private:
 
   /**
    * Performs the same as @p fill_fe_values on a face. Additionally, @p
-   * boundary_form (see @ref GlossBoundaryForm) and @p normal_vectors can be
+   * boundary_form (see
+   * @ref GlossBoundaryForm
+   * ) and @p normal_vectors can be
    * computed on surfaces. Since the boundary form already contains the
    * determinant of the Jacobian of the transformation, it is sometimes more
    * economic to use the boundary form instead of the product of the unit

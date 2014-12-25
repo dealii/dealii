@@ -102,13 +102,16 @@ namespace internal
  * <ol>
  * <li>Firstly, the @p evaluate_field version that does not take a @p
  * DataPostprocessor object selects the nearest support point (see
- * @ref GlossSupport "this entry in the glossary") to a given point to extract
+ * @ref GlossSupport "this entry in the glossary"
+ * ) to a given point to extract
  * data from. This makes the code that needs to be run at each time step
  * very
  * short, since looping over the mesh to extract the needed dof_index can be
  * done just once at the start. However, this method is not suitable for
  * FiniteElement objects that do not assign dofs to actual mesh locations
- * (i.e. FEs without @ref GlossSupport "support points") or if adaptive mesh
+ * (i.e. FEs without
+ * @ref GlossSupport "support points"
+ * ) or if adaptive mesh
  * refinement is used. The reason for the latter restriction is that the
  * location of the closest support point to a given point may change upon mesh
  * refinement. The class will throw an exception if any change to the
@@ -151,8 +154,11 @@ namespace internal
  * </ol>
  *
  * When recording a new mnemonic name, the user must supply a component_mask
- * (see @ref GlossComponentMask "this glossary entry") to indicate the
- * @ref GlossComponent "(vector) components" to be extracted from the given
+ * (see
+ * @ref GlossComponentMask "this glossary entry"
+ * ) to indicate the
+ * @ref GlossComponent "(vector) components"
+ * to be extracted from the given
  * input. If the user simply wants to extract all the components, the mask
  * need not be explicitly supplied to the @p add_field_name method and the
  * default value of the parameter is sufficient. If the @p evaluate_field

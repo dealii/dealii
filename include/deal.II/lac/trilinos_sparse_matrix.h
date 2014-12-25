@@ -1082,8 +1082,9 @@ namespace TrilinosWrappers
      * vector products. This is a collective operation, i.e., it needs to be
      * run on all processors when used in %parallel.
      *
-     * See @ref GlossCompress "Compressing distributed objects" for more
-     * information.
+     * See
+     * @ref GlossCompress "Compressing distributed objects"
+     * for more information.
      */
     void compress (::dealii::VectorOperation::values operation);
 

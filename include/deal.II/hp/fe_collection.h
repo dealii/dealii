@@ -32,8 +32,9 @@ namespace hp
    * hp::DoFHandler. It is thus to a hp::DoFHandler what a FiniteElement is to
    * a ::DoFHandler.
    *
-   * It implements the concepts stated in the @ref hpcollection module
-   * described in the doxygen documentation.
+   * It implements the concepts stated in the
+   * @ref hpcollection
+   * module described in the doxygen documentation.
    *
    * In addition to offering access to the elements of the collection, this
    * class provides access to the maximal number of degrees of freedom per
@@ -102,7 +103,8 @@ namespace hp
      * collection.
      *
      * This function calls FiniteElement::n_components.  See
-     * @ref GlossComponent "the glossary" for more information.
+     * @ref GlossComponent "the glossary"
+     * for more information.
      */
     unsigned int n_components () const;
 
@@ -112,7 +114,8 @@ namespace hp
      * have the same number of vector components, there is no such guarantees
      * for the number of blocks each element is made up of (an element may
      * have fewer blocks than vector components; see
-     * @ref GlossBlock "the glossary" for more information). For example,
+     * @ref GlossBlock "the glossary"
+     * for more information). For example,
      * you may have an FECollection object that stores one copy of an
      * FESystem with <code>dim</code> FE_Q objects and one copy of an
      * FE_RaviartThomas element. Both have <code>dim</code> vector
@@ -242,9 +245,12 @@ namespace hp
     component_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
     /**
-     * Given a block mask (see @ref GlossBlockMask "this glossary entry"),
+     * Given a block mask (see
+     * @ref GlossBlockMask "this glossary entry"
+     * ),
      * produce a component mask (see
-     * @ref GlossComponentMask "this glossary entry") that represents the
+     * @ref GlossComponentMask "this glossary entry"
+     * ) that represents the
      * components that correspond to the blocks selected in the input
      * argument. This is essentially a conversion operator from BlockMask
      * to ComponentMask.
@@ -265,7 +271,9 @@ namespace hp
     /**
      * Return a block mask with as many elements as this object has blocks and
      * of which exactly the one component is true that corresponds to the
-     * given argument. See @ref GlossBlockMask "the glossary" for more
+     * given argument. See
+     * @ref GlossBlockMask "the glossary"
+     * for more
      * information.
      *
      * @note This function will only succeed if the scalar referenced by the
@@ -293,8 +301,9 @@ namespace hp
     /**
      * Return a component mask with as many elements as this object has vector
      * components and of which exactly the <code>dim</code> components are
-     * true that correspond to the given argument. See @ref GlossBlockMask
-     * "the glossary" for more information.
+     * true that correspond to the given argument. See
+     * @ref GlossBlockMask "the glossary"
+     * for more information.
      *
      * @note This function is the equivalent of
      * FiniteElement::component_mask() with the same arguments. It verifies
@@ -317,7 +326,8 @@ namespace hp
      * Return a component mask with as many elements as this object has vector
      * components and of which exactly the <code>dim*(dim+1)/2</code>
      * components are true that correspond to the given argument. See
-     * @ref GlossBlockMask "the glossary" for more information.
+     * @ref GlossBlockMask "the glossary"
+     * for more information.
      *
      * @note The same caveat applies as to the version of the function above:
      * The extractor object passed as argument must be so that it corresponds
@@ -339,8 +349,11 @@ namespace hp
 
     /**
      * Given a component mask (see
-     * @ref GlossComponentMask "this glossary entry"), produce a block mask
-     * (see @ref GlossBlockMask "this glossary entry") that represents the
+     * @ref GlossComponentMask "this glossary entry"
+     * ), produce a block mask
+     * (see
+     * @ref GlossBlockMask "this glossary entry"
+     * ) that represents the
      * blocks that correspond to the components selected in the input
      * argument. This is essentially a conversion operator from
      * ComponentMask to BlockMask.

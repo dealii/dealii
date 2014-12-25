@@ -492,7 +492,8 @@ namespace GraphColoring
    * color.
    *
    * @note The algorithm used in this function is described in a paper by
-   * Turcksin, Kronbichler and Bangerth, see @ref workstream_paper .
+   * Turcksin, Kronbichler and Bangerth, see
+   * @ref workstream_paper.
    *
    * @param[in] begin The first element of a range of iterators for which a
    * coloring is sought.

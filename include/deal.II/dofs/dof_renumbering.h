@@ -163,8 +163,11 @@ DEAL_II_NAMESPACE_OPEN
  * The component_wise() function allows not only to honor enumeration based on
  * vector components, but also allows to group together vector components into
  * "blocks" using a defaulted argument to the various
- * DoFRenumber::component_wise() functions (see @ref GlossComponent vs
- * @ref GlossBlock for a description of the difference). The blocks designated
+ * DoFRenumber::component_wise() functions (see
+ * @ref GlossComponent
+ * vs
+ * @ref GlossBlock
+ * for a description of the difference). The blocks designated
  * through this argument may, but do not have to be, equal to the blocks that
  * the finite element reports. For example, a typical Stokes element would be
  * @code
@@ -684,7 +687,9 @@ namespace DoFRenumbering
    *
    * This function only succeeds if each of the elements in the
    * hp::FECollection attached to the hp::DoFHandler argument has exactly the
-   * same number of blocks (see @ref GlossBlock "the glossary" for more
+   * same number of blocks (see
+   * @ref GlossBlock "the glossary"
+   * for more
    * information). Note that this is not always given: while the
    * hp::FECollection class ensures that all of its elements have the same
    * number of vector components, they need not have the same number of

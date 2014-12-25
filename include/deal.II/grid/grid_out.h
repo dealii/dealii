@@ -311,7 +311,9 @@ namespace GridOutFlags
 
     /**
      * Should lines with a set @p user_flag be drawn in a different color
-     * (red)?  See @ref GlossUserFlags for information about user flags.
+     * (red)?  See
+     * @ref GlossUserFlags
+     * for information about user flags.
      */
     bool color_lines_on_user_flag;
 

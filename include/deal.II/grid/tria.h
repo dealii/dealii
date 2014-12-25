@@ -780,7 +780,8 @@ namespace internal
  * changed using a call of the kind
  * <code>cell-@>face(1)-@>set_boundary_indicator(42);</code>.
  *
- * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+ * @see
+ * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
  *
  *
  * <h3>History of a triangulation</h3>
@@ -836,12 +837,14 @@ namespace internal
  * field can be accessed as all other data using iterators. Normally, this
  * user flag is used if an algorithm walks over all cells and needs
  * information whether another cell, e.g. a neighbor, has already been
- * processed. See @ref GlossUserFlags "the glossary for more information".
+ * processed. See
+ * @ref GlossUserFlags "the glossary for more information".
  *
  * There is another set of user data, which can be either an <tt>unsigned
  * int</tt> or a <tt>void *</tt>, for each line, quad, etc. You can access
  * these through the functions listed under <tt>User data</tt> in the accessor
- * classes. Again, see @ref GlossUserData "the glossary for more information".
+ * classes. Again, see
+ * @ref GlossUserData "the glossary for more information".
  *
  * The value of these user indices or pointers is @p NULL by default. Note
  * that the pointers are not inherited to children upon refinement. Still,
@@ -903,7 +906,8 @@ namespace internal
  * cell. Therefore if your new boundary vertex is too near the center of the
  * old quadrilateral or hexahedron, the distance to the midpoint vertex will
  * become too small, thus generating distorted cells. This issue is discussed
- * extensively in @ref GlossDistorted "distorted cells".
+ * extensively in
+ * @ref GlossDistorted "distorted cells".
  *
  *
  * <h3>Getting notice when a triangulation changes</h3>
@@ -1400,7 +1404,8 @@ public:
 
   /**
    * A typedef that is used to to identify
-   * @ref GlossActive "active cell iterators". The concept of iterators is
+   * @ref GlossActive "active cell iterators".
+   * The concept of iterators is
    * discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
@@ -1524,7 +1529,8 @@ public:
    * A structure that is used as an exception object by the
    * create_triangulation() function to indicate which cells among the coarse
    * mesh cells are inverted or severely distorted (see the entry on
-   * @ref GlossDistorted "distorted cells" in the glossary).
+   * @ref GlossDistorted "distorted cells"
+   * in the glossary).
    *
    * Objects of this kind are thrown by the create_triangulation() and
    * execute_coarsening_and_refinement() functions, and they can be caught in
@@ -1575,7 +1581,9 @@ public:
    * @param check_for_distorted_cells Determines whether the triangulation
    * should check whether any of the cells that are created by
    * create_triangulation() or execute_coarsening_and_refinement() are
-   * distorted (see @ref GlossDistorted "distorted cells"). If set, these two
+   * distorted (see
+   * @ref GlossDistorted "distorted cells"
+   * ). If set, these two
    * functions may throw an exception if they encounter distorted cells.
    */
   Triangulation (const MeshSmoothing smooth_grid = none,
@@ -1652,7 +1660,8 @@ public:
    *
    * @ingroup boundary
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_boundary (const types::manifold_id   number,
                      const Boundary<dim,spacedim> &boundary_object);
@@ -1666,7 +1675,8 @@ public:
    *
    * @ingroup boundary
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_boundary (const types::manifold_id number);
 
@@ -1691,7 +1701,8 @@ public:
    *
    * @ingroup manifold
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   void set_manifold (const types::manifold_id   number,
                      const Manifold<dim,spacedim> &manifold_object);
@@ -1705,7 +1716,8 @@ public:
    *
    * @ingroup manifold
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   void set_manifold (const types::manifold_id number);
 
@@ -1715,7 +1727,8 @@ public:
    *
    * @ingroup boundary
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   const Boundary<dim,spacedim> &get_boundary (const types::manifold_id number) const;
 
@@ -1725,7 +1738,8 @@ public:
    *
    * @ingroup manifold
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   const Manifold<dim,spacedim> &get_manifold (const types::manifold_id number) const;
 
@@ -1737,7 +1751,8 @@ public:
    *
    * @ingroup boundary
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   std::vector<types::boundary_id> get_boundary_indicators() const;
 
@@ -1749,7 +1764,8 @@ public:
    *
    * @ingroup manifold
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   std::vector<types::manifold_id> get_manifold_ids() const;
 
@@ -1800,7 +1816,9 @@ public:
    * If the <code>check_for_distorted_cells</code> flag was specified upon
    * creation of this object, at the very end of its operation, the current
    * function walks over all cells and verifies that none of the cells is
-   * deformed (see the entry on @ref GlossDistorted "distorted cells" in the
+   * deformed (see the entry on
+   * @ref GlossDistorted "distorted cells"
+   * in the
    * glossary), where we call a cell deformed if the determinant of the
    * Jacobian of the mapping from reference cell to real cell is negative at
    * least at one of the vertices (this computation is done using the
@@ -1843,7 +1861,7 @@ public:
 
   /**
    * Revert or flip the direction_flags of a dim<spacedim triangulation, see
-   * @ref GlossDirectionFlag .
+   * @ref GlossDirectionFlag.
    *
    * This function throws an exception if dim equals spacedim.
    */
@@ -2081,213 +2099,246 @@ public:
    */
 
   /**
-   * Clear all user flags.  See also @ref GlossUserFlags .
+   * Clear all user flags.  See also
+   * @ref GlossUserFlags.
    */
   void clear_user_flags ();
 
   /**
    * Save all user flags. See the general documentation for this class and the
    * documentation for the @p save_refine_flags for more details.  See also
-   * @ref GlossUserFlags .
+   * @ref GlossUserFlags.
    */
   void save_user_flags (std::ostream &out) const;
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
-   * The output vector is resized if necessary.  See also @ref GlossUserFlags .
+   * The output vector is resized if necessary.  See also
+   * @ref GlossUserFlags.
    */
   void save_user_flags (std::vector<bool> &v) const;
 
   /**
    * Read the information stored by @p save_user_flags.  See also
-   * @ref GlossUserFlags .
+   * @ref GlossUserFlags.
    */
   void load_user_flags (std::istream &in);
 
   /**
    * Read the information stored by @p save_user_flags.  See also
-   * @ref GlossUserFlags .
+   * @ref GlossUserFlags.
    */
   void load_user_flags (const std::vector<bool> &v);
 
   /**
-   * Clear all user flags on lines.  See also @ref GlossUserFlags .
+   * Clear all user flags on lines.  See also
+   * @ref GlossUserFlags.
    */
   void clear_user_flags_line ();
 
   /**
-   * Save the user flags on lines.  See also @ref GlossUserFlags .
+   * Save the user flags on lines.  See also
+   * @ref GlossUserFlags.
    */
   void save_user_flags_line (std::ostream &out) const;
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
-   * The output vector is resized if necessary.  See also @ref GlossUserFlags .
+   * The output vector is resized if necessary.  See also
+   * @ref GlossUserFlags.
    */
   void save_user_flags_line (std::vector<bool> &v) const;
 
   /**
-   * Load the user flags located on lines.  See also @ref GlossUserFlags .
+   * Load the user flags located on lines.  See also
+   * @ref GlossUserFlags.
    */
   void load_user_flags_line (std::istream &in);
 
   /**
-   * Load the user flags located on lines.  See also @ref GlossUserFlags .
+   * Load the user flags located on lines.  See also
+   * @ref GlossUserFlags.
    */
   void load_user_flags_line (const std::vector<bool> &v);
 
   /**
-   * Clear all user flags on quads.  See also @ref GlossUserFlags .
+   * Clear all user flags on quads.  See also
+   * @ref GlossUserFlags.
    */
   void clear_user_flags_quad ();
 
   /**
-   * Save the user flags on quads.  See also @ref GlossUserFlags .
+   * Save the user flags on quads.  See also
+   * @ref GlossUserFlags.
    */
   void save_user_flags_quad (std::ostream &out) const;
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
-   * The output vector is resized if necessary.  See also @ref GlossUserFlags .
+   * The output vector is resized if necessary.  See also
+   * @ref GlossUserFlags.
    */
   void save_user_flags_quad (std::vector<bool> &v) const;
 
   /**
-   * Load the user flags located on quads.  See also @ref GlossUserFlags .
+   * Load the user flags located on quads.  See also
+   * @ref GlossUserFlags.
    */
   void load_user_flags_quad (std::istream &in);
 
   /**
-   * Load the user flags located on quads.  See also @ref GlossUserFlags .
+   * Load the user flags located on quads.  See also
+   * @ref GlossUserFlags.
    */
   void load_user_flags_quad (const std::vector<bool> &v);
 
 
   /**
-   * Clear all user flags on quads.  See also @ref GlossUserFlags .
+   * Clear all user flags on quads.  See also
+   * @ref GlossUserFlags.
    */
   void clear_user_flags_hex ();
 
   /**
-   * Save the user flags on hexs.  See also @ref GlossUserFlags .
+   * Save the user flags on hexs.  See also
+   * @ref GlossUserFlags.
    */
   void save_user_flags_hex (std::ostream &out) const;
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
-   * The output vector is resized if necessary.  See also @ref GlossUserFlags .
+   * The output vector is resized if necessary.  See also
+   * @ref GlossUserFlags.
    */
   void save_user_flags_hex (std::vector<bool> &v) const;
 
   /**
-   * Load the user flags located on hexs.  See also @ref GlossUserFlags .
+   * Load the user flags located on hexs.  See also
+   * @ref GlossUserFlags.
    */
   void load_user_flags_hex (std::istream &in);
 
   /**
-   * Load the user flags located on hexs.  See also @ref GlossUserFlags .
+   * Load the user flags located on hexs.  See also
+   * @ref GlossUserFlags.
    */
   void load_user_flags_hex (const std::vector<bool> &v);
 
   /**
    * Clear all user pointers and indices and allow the use of both for next
-   * access.  See also @ref GlossUserData .
+   * access.  See also
+   * @ref GlossUserData.
    */
   void clear_user_data ();
 
   /**
    * @deprecated User clear_user_data() instead.
    *
-   * Clear all user pointers.  See also @ref GlossUserData .
+   * Clear all user pointers.  See also
+   * @ref GlossUserData.
    */
   void clear_user_pointers () DEAL_II_DEPRECATED;
 
   /**
    * Save all user indices. The output vector is resized if necessary. See
-   * also @ref GlossUserData .
+   * also
+   * @ref GlossUserData.
    */
   void save_user_indices (std::vector<unsigned int> &v) const;
 
   /**
    * Read the information stored by save_user_indices().  See also
-   * @ref GlossUserData .
+   * @ref GlossUserData.
    */
   void load_user_indices (const std::vector<unsigned int> &v);
 
   /**
    * Save all user pointers. The output vector is resized if necessary.  See
-   * also @ref GlossUserData .
+   * also
+   * @ref GlossUserData.
    */
   void save_user_pointers (std::vector<void *> &v) const;
 
   /**
    * Read the information stored by save_user_pointers().  See also
-   * @ref GlossUserData .
+   * @ref GlossUserData.
    */
   void load_user_pointers (const std::vector<void *> &v);
 
   /**
    * Save the user indices on lines. The output vector is resized if
-   * necessary.  See also @ref GlossUserData .
+   * necessary.  See also
+   * @ref GlossUserData.
    */
   void save_user_indices_line (std::vector<unsigned int> &v) const;
 
   /**
-   * Load the user indices located on lines.  See also @ref GlossUserData .
+   * Load the user indices located on lines.  See also
+   * @ref GlossUserData.
    */
   void load_user_indices_line (const std::vector<unsigned int> &v);
 
   /**
    * Save the user indices on quads. The output vector is resized if
-   * necessary.  See also @ref GlossUserData .
+   * necessary.  See also
+   * @ref GlossUserData.
    */
   void save_user_indices_quad (std::vector<unsigned int> &v) const;
 
   /**
-   * Load the user indices located on quads.  See also @ref GlossUserData .
+   * Load the user indices located on quads.  See also
+   * @ref GlossUserData.
    */
   void load_user_indices_quad (const std::vector<unsigned int> &v);
 
   /**
    * Save the user indices on hexes. The output vector is resized if
-   * necessary.  See also @ref GlossUserData .
+   * necessary.  See also
+   * @ref GlossUserData.
    */
   void save_user_indices_hex (std::vector<unsigned int> &v) const;
 
   /**
-   * Load the user indices located on hexs.  See also @ref GlossUserData .
+   * Load the user indices located on hexs.  See also
+   * @ref GlossUserData.
    */
   void load_user_indices_hex (const std::vector<unsigned int> &v);
   /**
    * Save the user indices on lines. The output vector is resized if
-   * necessary.  See also @ref GlossUserData .
+   * necessary.  See also
+   * @ref GlossUserData.
    */
   void save_user_pointers_line (std::vector<void *> &v) const;
 
   /**
-   * Load the user pointers located on lines.  See also @ref GlossUserData .
+   * Load the user pointers located on lines.  See also
+   * @ref GlossUserData.
    */
   void load_user_pointers_line (const std::vector<void *> &v);
 
   /**
    * Save the user pointers on quads. The output vector is resized if
-   * necessary.  See also @ref GlossUserData .
+   * necessary.  See also
+   * @ref GlossUserData.
    */
   void save_user_pointers_quad (std::vector<void *> &v) const;
 
   /**
-   * Load the user pointers located on quads.  See also @ref GlossUserData .
+   * Load the user pointers located on quads.  See also
+   * @ref GlossUserData.
    */
   void load_user_pointers_quad (const std::vector<void *> &v);
 
   /**
    * Save the user pointers on hexes. The output vector is resized if
-   * necessary.  See also @ref GlossUserData .
+   * necessary.  See also
+   * @ref GlossUserData.
    */
   void save_user_pointers_hex (std::vector<void *> &v) const;
 
   /**
-   * Load the user pointers located on hexs.  See also @ref GlossUserData .
+   * Load the user pointers located on hexs.  See also
+   * @ref GlossUserData.
    */
   void load_user_pointers_hex (const std::vector<void *> &v);
 
@@ -2368,7 +2419,8 @@ public:
   /**
    * Return an iterator range that contains all active cells that make up this
    * triangulation. Such a range is useful to initialize range-based for loops
-   * as supported by C++11, see also @ref CPP11 "C++11 standard".
+   * as supported by C++11, see also
+   * @ref CPP11 "C++11 standard".
    *
    * Range-based for loops are useful in that they require much less code than
    * traditional loops (see <a href="http://en.wikipedia.org/wiki/C%2B%2B11
@@ -3087,7 +3139,9 @@ private:
    * <tt>dim=2,3</tt> and the <tt>quad->user_flags</tt> for <tt>dim=3</tt>.
    *
    * The function returns a list of cells that have produced children that
-   * satisfy the criteria of @ref GlossDistorted "distorted cells" if the
+   * satisfy the criteria of
+   * @ref GlossDistorted "distorted cells"
+   * if the
    * <code>check_for_distorted_cells</code> flag was specified upon creation
    * of this object, at
    */

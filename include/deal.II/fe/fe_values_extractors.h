@@ -32,7 +32,9 @@ DEAL_II_NAMESPACE_OPEN
  * <code>dim</code> elements, and second order symmetric tensors consisting of
  * <code>(dim*dim + dim)/2</code> components
  *
- * See the description of the @ref vector_valued module for examples how to
+ * See the description of the
+ * @ref vector_valued
+ * module for examples how to
  * use the features of this namespace.
  *
  * @ingroup feaccess vector_valued
@@ -44,7 +46,9 @@ namespace FEValuesExtractors
    * result of applying an object of this type to an FEValues, FEFaceValues or
    * FESubfaceValues object is of type FEValuesViews::Scalar. The concept of
    * extractors is defined in the documentation of the namespace
-   * FEValuesExtractors and in the @ref vector_valued module.
+   * FEValuesExtractors and in the
+   * @ref vector_valued
+   * module.
    *
    * @ingroup feaccess vector_valued
    */
@@ -79,7 +83,9 @@ namespace FEValuesExtractors
    * object is of type FEValuesViews::Vector.
    *
    * The concept of extractors is defined in the documentation of the
-   * namespace FEValuesExtractors and in the @ref vector_valued module.
+   * namespace FEValuesExtractors and in the
+   * @ref vector_valued
+   * module.
    *
    * Note that in the current context, a vector is meant in the sense physics
    * uses it: it has <code>spacedim</code> components that behave in specific
@@ -129,7 +135,8 @@ namespace FEValuesExtractors
    * type FEValuesViews::SymmetricTensor.
    *
    * The concept of extractors is defined in the documentation of the
-   * namespace FEValuesExtractors and in the @ref vector_valued module.
+   * namespace FEValuesExtractors and in the
+   * @ref vector_valued module.
    *
    * @ingroup feaccess vector_valued
    *
@@ -170,7 +177,8 @@ namespace FEValuesExtractors
    * FEValuesViews::Tensor.
    *
    * The concept of extractors is defined in the documentation of the
-   * namespace FEValuesExtractors and in the @ref vector_valued module.
+   * namespace FEValuesExtractors and in the
+   * @ref vector_valued module.
    *
    * @ingroup feaccess vector_valued
    *

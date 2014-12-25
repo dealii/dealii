@@ -289,7 +289,8 @@ struct SubCellData;
  * cells it creates as part of the coarse mesh are distorted or not (where
  * distortion here means that the Jacobian of the mapping from the reference
  * cell to the real cell has a non-positive determinant, i.e. the cell is
- * pinched or twisted; see the entry on @ref GlossDistorted "distorted cells"
+ * pinched or twisted; see the entry on
+ * @ref GlossDistorted "distorted cells"
  * in the glossary). If it finds any such cells, it throws an exception. This
  * exception is not caught in the grid reader functions of the current class,
  * and so will propagate through to the function that called it. There, you

@@ -38,7 +38,8 @@ DEAL_II_NAMESPACE_OPEN
  * One special application is a one by one block matrix, allowing to apply the
  * @p vmult of the original matrix (or preconditioner) to a block vector.
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX>

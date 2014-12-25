@@ -35,7 +35,8 @@ DEAL_II_NAMESPACE_OPEN
  * DoFHandler can return ranges of cell iterators using an object of the
  * current type from functions such as Triangulation::cells() and that such an
  * object can then be used in a range-based for loop as supported by C++11,
- * see also @ref CPP11 "C++11 standard".
+ * see also
+ * @ref CPP11 "C++11 standard".
  *
  * For example, such a loop could look like this if the goal is to set the
  * user flag on every active cell:
