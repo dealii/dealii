@@ -119,7 +119,7 @@ def format_block(lines, infostr=""):
                 for it in ops_startline:
                     if it in thisline:
                         print ("%s warning %s not at start of line"%(infostr, it), file=sys.stderr)
-            if one_in(ops_startline, lines[idx]):
+            if one_in(ops_also_end_paragraph, lines[idx]):
                 out.append(lines[idx].rstrip())
             else:
                 curlines.append(lines[idx])
