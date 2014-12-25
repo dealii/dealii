@@ -52,8 +52,7 @@ namespace parallel
      * @note Instantiations for this template are provided for <tt>@<float@>
      * and @<double@></tt>; others can be generated in application programs
      * (see the section on
-     * @ref Instantiations
-     * in the manual).
+     * @ref Instantiations in the manual).
      *
      * @see
      * @ref GlossBlockLA "Block (linear algebra)"
@@ -260,8 +259,8 @@ namespace parallel
        * This function copies the data that has accumulated in the data buffer
        * for ghost indices to the owning processor. For the meaning of the
        * argument @p operation, see the entry on
-       * @ref GlossCompress "Compressing distributed vectors and matrices"
-       * in the glossary.
+       * @ref GlossCompress "Compressing distributed vectors and matrices" in
+       * the glossary.
        *
        * There are two variants for this function. If called with argument @p
        * VectorOperation::add adds all the data accumulated in ghost elements

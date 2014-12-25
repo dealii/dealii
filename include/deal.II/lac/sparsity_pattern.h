@@ -323,9 +323,8 @@ namespace SparsityPatternIterators
 /**
  * Structure representing the sparsity pattern of a sparse matrix. This class
  * is an example of the "static" type of
- * @ref Sparsity.
- * It uses the compressed
- * row storage (CSR) format to store data.
+ * @ref Sparsity. It uses the compressed row storage (CSR) format to store
+ * data.
  *
  * The elements of a SparsityPattern, corresponding to the places where
  * SparseMatrix objects can store nonzero entries, are stored row-by-row.

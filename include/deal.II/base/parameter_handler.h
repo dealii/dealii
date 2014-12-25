@@ -188,17 +188,15 @@ namespace Patterns
   private:
     /**
      * Value of the lower bound. A number that satisfies the
-     * @ref match
-     * operation of this class must be equal to this value or larger, if the
-     * bounds of the interval for a valid range.
+     * @ref match operation of this class must be equal to this value or
+     * larger, if the bounds of the interval for a valid range.
      */
     const int lower_bound;
 
     /**
      * Value of the upper bound. A number that satisfies the
-     * @ref match
-     * operation of this class must be equal to this value or less, if the
-     * bounds of the interval for a valid range.
+     * @ref match operation of this class must be equal to this value or less,
+     * if the bounds of the interval for a valid range.
      */
     const int upper_bound;
 
@@ -282,17 +280,15 @@ namespace Patterns
   private:
     /**
      * Value of the lower bound. A number that satisfies the
-     * @ref match
-     * operation of this class must be equal to this value or larger, if the
-     * bounds of the interval for a valid range.
+     * @ref match operation of this class must be equal to this value or
+     * larger, if the bounds of the interval for a valid range.
      */
     const double lower_bound;
 
     /**
      * Value of the upper bound. A number that satisfies the
-     * @ref match
-     * operation of this class must be equal to this value or less, if the
-     * bounds of the interval for a valid range.
+     * @ref match operation of this class must be equal to this value or less,
+     * if the bounds of the interval for a valid range.
      */
     const double upper_bound;
 
@@ -306,10 +302,9 @@ namespace Patterns
    * Test for the string being one of a sequence of values given like a
    * regular expression. For example, if the string given to the constructor
    * is <tt>"red|blue|black"</tt>, then the
-   * @ref match
-   * function returns
-   * <tt>true</tt> exactly if the string is either "red" or "blue" or "black".
-   * Spaces around the pipe signs do not matter and are eliminated.
+   * @ref match function returns <tt>true</tt> exactly if the string is either
+   * "red" or "blue" or "black". Spaces around the pipe signs do not matter
+   * and are eliminated.
    */
   class Selection : public PatternBase
   {
@@ -892,9 +887,8 @@ namespace Patterns
  * logical structure, and input files may include other files.
  *
  * The ParameterHandler class is discussed in detail in the
- * @ref step_19 "step-19"
- * example program, and is used in more realistic situations in
- * step-29, step-33 and step-34.
+ * @ref step_19 "step-19" example program, and is used in more realistic
+ * situations in step-29, step-33 and step-34.
  *
  * <h3>Declaring entries</h3>
  *
@@ -1448,9 +1442,8 @@ namespace Patterns
  *
  * @image html parameter_handler.png
  *
- * Once parameters have been read in, the contents of
- * the <code>value</code> "files" may be different while the other files
- * remain untouched.
+ * Once parameters have been read in, the contents of the <code>value</code>
+ * "files" may be different while the other files remain untouched.
  *
  * Using the ParameterHandler::print_parameters() function with
  * ParameterHandler::XML as second argument, we can get a complete

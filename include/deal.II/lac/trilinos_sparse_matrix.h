@@ -1083,8 +1083,8 @@ namespace TrilinosWrappers
      * run on all processors when used in %parallel.
      *
      * See
-     * @ref GlossCompress "Compressing distributed objects"
-     * for more information.
+     * @ref GlossCompress "Compressing distributed objects" for more
+     * information.
      */
     void compress (::dealii::VectorOperation::values operation);
 

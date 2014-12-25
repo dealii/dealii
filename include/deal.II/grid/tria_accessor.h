@@ -131,10 +131,9 @@ namespace TriaAccessorExceptions
   DeclException0 (ExcCellNotUsed);
   /**
    * The cell is not an
-   * @ref GlossActive "active"
-   * cell, but it already has
-   * children. Some operations, like setting refinement flags or accessing
-   * degrees of freedom are only possible on active cells.
+   * @ref GlossActive "active" cell, but it already has children. Some
+   * operations, like setting refinement flags or accessing degrees of freedom
+   * are only possible on active cells.
    *
    * @ingroup Exceptions
    */
@@ -651,8 +650,7 @@ public:
    * Of course, doing so requires that you ensure that the new location of the
    * vertex remains useful -- for example, avoiding inverted or otherwise
    * distorted (see also
-   * @ref GlossDistorted "this glossary entry"
-   * ).
+   * @ref GlossDistorted "this glossary entry").
    *
    * @note When a cell is refined, its children inherit the position of the
    * vertex positions of those vertices they share with the mother cell (plus
@@ -671,11 +669,10 @@ public:
    * parallel::distributed::Triangulation object. There, refining a mesh
    * always involves a re-partitioning. In other words, vertices of locally
    * owned cells (see
-   * @ref GlossLocallyOwnedCell "this glossary entry"
-   * ) that
-   * you may have moved to a different location on one processor may be moved
-   * to a different processor upon mesh refinement (even if these particular
-   * cells were not refined) which will re-create their position based on the
+   * @ref GlossLocallyOwnedCell "this glossary entry") that you may have
+   * moved to a different location on one processor may be moved to a
+   * different processor upon mesh refinement (even if these particular cells
+   * were not refined) which will re-create their position based on the
    * position of the coarse cells they previously had, not based on the
    * position these vertices had on the processor that previously owned them.
    * In other words, in parallel computations, you will probably have to move
@@ -962,10 +959,10 @@ public:
    * Return a constant reference to the manifold object used for this object.
    *
    * As explained in
-   * @ref boundary "Boundary and manifold description for triangulations"
-   * , the process involved in finding the appropriate manifold description
-   * involves querying both the manifold or boundary indicators. See there
-   * for more information.
+   * @ref boundary "Boundary and manifold description for triangulations" ,
+   * the process involved in finding the appropriate manifold description
+   * involves querying both the manifold or boundary indicators. See there for
+   * more information.
    */
   const Manifold<dim,spacedim> &get_manifold () const;
 
@@ -1038,43 +1035,37 @@ public:
    */
   /**
    * Read the user flag. See
-   * @ref GlossUserFlags
-   * for more information.
+   * @ref GlossUserFlags for more information.
    */
   bool user_flag_set () const;
 
   /**
    * Set the user flag. See
-   * @ref GlossUserFlags
-   * for more information.
+   * @ref GlossUserFlags for more information.
    */
   void set_user_flag () const;
 
   /**
    * Clear the user flag. See
-   * @ref GlossUserFlags
-   * for more information.
+   * @ref GlossUserFlags for more information.
    */
   void clear_user_flag () const;
 
   /**
    * Set the user flag for this and all descendants. See
-   * @ref GlossUserFlags
-   * for more information.
+   * @ref GlossUserFlags for more information.
    */
   void recursively_set_user_flag () const;
 
   /**
    * Clear the user flag for this and all descendants. See
-   * @ref GlossUserFlags
-   * for more information.
+   * @ref GlossUserFlags for more information.
    */
   void recursively_clear_user_flag () const;
 
   /**
    * Reset the user data to zero, independent if pointer or index. See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   void clear_user_data () const;
 
@@ -1086,15 +1077,13 @@ public:
    * Triangulation::clear_user_data() in between.
    *
    * See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   void set_user_pointer (void *p) const;
 
   /**
    * Reset the user pointer to a @p NULL pointer. See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   void clear_user_pointer () const;
 
@@ -1109,8 +1098,7 @@ public:
    * *a=static_cast<A*>(cell->user_pointer());</tt>.
    *
    * See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   void *user_pointer () const;
 
@@ -1132,16 +1120,14 @@ public:
    * Triangulation::clear_user_data() in between.
    *
    * See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   void recursively_set_user_pointer (void *p) const;
 
   /**
    * Clear the user pointer of this object and all of its descendants. The
    * same holds as said for the recursively_set_user_pointer() function. See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   void recursively_clear_user_pointer () const;
 
@@ -1151,15 +1137,13 @@ public:
    * @note User pointers and user indices are mutually exclusive. Therefore,
    * you can only use one of them, unless you call
    * Triangulation::clear_user_data() in between. See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   void set_user_index (const unsigned int p) const;
 
   /**
    * Reset the user index to 0. See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   void clear_user_index () const;
 
@@ -1171,8 +1155,7 @@ public:
    * Triangulation::clear_user_data() in between.
    *
    * See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   unsigned int user_index () const;
 
@@ -1190,8 +1173,7 @@ public:
    * Triangulation::clear_user_data() in between.
    *
    * See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   void recursively_set_user_index (const unsigned int p) const;
 
@@ -1200,8 +1182,7 @@ public:
    * holds as said for the recursively_set_user_index() function.
    *
    * See
-   * @ref GlossUserData
-   * for more information.
+   * @ref GlossUserData for more information.
    */
   void recursively_clear_user_index () const;
   /**
@@ -1242,15 +1223,16 @@ public:
 
   /**
    * Returns a point belonging to the Manifold<dim,spacedim> where this object
-   * lives, given its parametric coordinates on the reference @p structdim cell.
-   * This function queries the underlying manifold object, and can be used to
-   * obtain the exact geometrical location of arbitrary points on this object.
+   * lives, given its parametric coordinates on the reference @p structdim
+   * cell. This function queries the underlying manifold object, and can be
+   * used to obtain the exact geometrical location of arbitrary points on this
+   * object.
    *
    * Notice that the argument @p coordinates are the coordinates on the
-   * <em>reference cell</em>, given in reference coordinates. In other
-   * words, the argument provides a weighting between the different vertices.
-   * For example, for lines, calling this function with argument Point<1>(.5),
-   * is equivalent to asking the line for its center.
+   * <em>reference cell</em>, given in reference coordinates. In other words,
+   * the argument provides a weighting between the different vertices. For
+   * example, for lines, calling this function with argument Point<1>(.5), is
+   * equivalent to asking the line for its center.
    */
   Point<spacedim> intermediate_point(const Point<structdim> &coordinates) const;
 
@@ -2266,12 +2248,10 @@ public:
    * Return the material id of this cell.
    *
    * For a typical use of this function, see the
-   * @ref step_28 "step-28"
-   * tutorial program.
+   * @ref step_28 "step-28" tutorial program.
    *
    * See the
-   * @ref GlossMaterialId "glossary"
-   * for more information.
+   * @ref GlossMaterialId "glossary" for more information.
    */
   types::material_id material_id () const;
 
@@ -2279,12 +2259,10 @@ public:
    * Set the material id of this cell.
    *
    * For a typical use of this function, see the
-   * @ref step_28 "step-28"
-   * tutorial program.
+   * @ref step_28 "step-28" tutorial program.
    *
    * See the
-   * @ref GlossMaterialId "glossary"
-   * for more information.
+   * @ref GlossMaterialId "glossary" for more information.
    */
   void set_material_id (const types::material_id new_material_id) const;
 
@@ -2293,8 +2271,7 @@ public:
    * children, and so on) to the given value.
    *
    * See the
-   * @ref GlossMaterialId "glossary"
-   * for more information.
+   * @ref GlossMaterialId "glossary" for more information.
    */
   void recursively_set_material_id (const types::material_id new_material_id) const;
   /**
@@ -2312,8 +2289,7 @@ public:
    * Return the subdomain id of this cell.
    *
    * See the
-   * @ref GlossSubdomainId "glossary"
-   * for more information.
+   * @ref GlossSubdomainId "glossary" for more information.
    *
    * @note The subdomain of a cell is a property only defined for active
    * cells, i.e., cells that are not further refined. Consequently, you can
@@ -2328,10 +2304,9 @@ public:
    * Set the subdomain id of this cell.
    *
    * See the
-   * @ref GlossSubdomainId "glossary"
-   * for more information. This
-   * function should not be called if you use a
-   * parallel::distributed::Triangulation object.
+   * @ref GlossSubdomainId "glossary" for more information. This function
+   * should not be called if you use a parallel::distributed::Triangulation
+   * object.
    *
    * @note The subdomain of a cell is a property only defined for active
    * cells, i.e., cells that are not further refined. Consequently, you can
@@ -2365,11 +2340,10 @@ public:
    * intermediate child cells.
    *
    * See the
-   * @ref GlossSubdomainId "glossary"
-   * for more information. This
-   * function should not be called if you use a
-   * parallel::distributed::Triangulation object since there the subdomain id
-   * is implicitly defined by which processor you're on.
+   * @ref GlossSubdomainId "glossary" for more information. This function
+   * should not be called if you use a parallel::distributed::Triangulation
+   * object since there the subdomain id is implicitly defined by which
+   * processor you're on.
    */
   void recursively_set_subdomain_id (const types::subdomain_id new_subdomain_id) const;
   /**
@@ -2424,8 +2398,7 @@ public:
    * a cell).
    *
    * See the
-   * @ref GlossActive "glossary"
-   * for more information.
+   * @ref GlossActive "glossary" for more information.
    */
   bool active () const;
 
@@ -2436,11 +2409,8 @@ public:
    * triangulation is of type parallel::distributed::Triangulation.
    *
    * See the
-   * @ref GlossGhostCell "glossary"
-   * and the
-   * @ref distributed
-   * module
-   * for more information.
+   * @ref GlossGhostCell "glossary" and the
+   * @ref distributed module for more information.
    *
    * @post The returned value is equal to <code>!is_ghost() &&
    * !is_artificial()</code>.
@@ -2468,11 +2438,8 @@ public:
    * value is always false.
    *
    * See the
-   * @ref GlossGhostCell "glossary"
-   * and the
-   * @ref distributed
-   * module
-   * for more information.
+   * @ref GlossGhostCell "glossary" and the
+   * @ref distributed module for more information.
    *
    * @post The returned value is equal to <code>!is_locally_owned() &&
    * !is_artificial()</code>.
@@ -2497,10 +2464,8 @@ public:
    * value is always false.
    *
    * See the
-   * @ref GlossArtificialCell "glossary"
-   * and the
-   * @ref distributed
-   * module for more information.
+   * @ref GlossArtificialCell "glossary" and the
+   * @ref distributed module for more information.
    *
    * @post The returned value is equal to <code>!is_ghost() &&
    * !is_locally_owned()</code>.

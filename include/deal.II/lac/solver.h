@@ -289,8 +289,7 @@ template <typename number> class Vector;
  * @image html "cg-monitor-smoothing-3.png"
  * </td> <td>
  * @image html "cg-monitor-smoothing-4.png"
- * </td>
- * <td>
+ * </td> <td>
  * @image html "cg-monitor-smoothing-5.png"
  * </td> </tr> </table>
  *

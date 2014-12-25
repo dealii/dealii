@@ -62,8 +62,7 @@ namespace TrilinosWrappers
      * elements of each of these blocks to be stored on the local process.
      *
      * @ingroup Vectors
-     * @ingroup TrilinosWrappers
-     * @see
+     * @ingroup TrilinosWrappers @see
      * @ref GlossBlockLA "Block (linear algebra)"
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
      */
@@ -270,8 +269,8 @@ namespace TrilinosWrappers
        * @deprecated
        *
        * See
-       * @ref GlossCompress "Compressing distributed objects"
-       * for more information.
+       * @ref GlossCompress "Compressing distributed objects" for more
+       * information.
        */
       void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
 

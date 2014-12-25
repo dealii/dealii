@@ -38,8 +38,7 @@ template <typename number> class SparseMatrix;
  *
  * Some of these functions receive a flag @p colorize. If this is set, parts
  * of the boundary receive different boundary indicators (
- * @ref GlossBoundaryIndicator
- * ), allowing them to be distinguished for the
+ * @ref GlossBoundaryIndicator), allowing them to be distinguished for the
  * purpose of attaching geometry objects and evaluating different boundary
  * conditions.
  *
@@ -246,12 +245,12 @@ namespace GridGenerator
                   const bool          colorize = false);
 
   /**
-   * A subdivided parallelepiped. The first corner point is the origin. The
-   * @p dim adjacent points are vectors describing the edges of the
+   * A subdivided parallelepiped. The first corner point is the origin. The @p
+   * dim adjacent points are vectors describing the edges of the
    * parallelepiped with respect to the origin. Additional points are sums of
    * these dim vectors. The variable @p n_subdivisions designates the number
-   * of subdivisions in each of the @p dim directions. Colorizing is
-   * done according to hyper_rectangle().
+   * of subdivisions in each of the @p dim directions. Colorizing is done
+   * according to hyper_rectangle().
    *
    * @note The triangulation needs to be void upon calling this function.
    */
@@ -264,8 +263,8 @@ namespace GridGenerator
 
   /**
    * A subdivided parallelepiped, ie. the same as above, but where the number
-   * of subdivisions in each of the @p dim directions may vary.
-   * Colorizing is done according to hyper_rectangle().
+   * of subdivisions in each of the @p dim directions may vary. Colorizing is
+   * done according to hyper_rectangle().
    *
    * @note The triangulation needs to be void upon calling this function.
    */
@@ -322,9 +321,9 @@ namespace GridGenerator
                    const double        radius = 1.);
 
   /**
-   * This class produces a half hyper-ball around @p center, which
-   * contains four elements in 2d and 6 in 3d. The cut plane is perpendicular
-   * to the <i>x</i>-axis.
+   * This class produces a half hyper-ball around @p center, which contains
+   * four elements in 2d and 6 in 3d. The cut plane is perpendicular to the
+   * <i>x</i>-axis.
    *
    * The boundary indicators for the final triangulation are 0 for the curved
    * boundary and 1 for the cut plane.
@@ -817,15 +816,14 @@ namespace GridGenerator
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
-   * @ref GlossMeshAsAContainer
-   * ). The map that is returned will
-   * be between cell iterators pointing into the container describing the
-   * surface mesh and face iterators of the volume mesh container. If the
-   * Container argument is DoFHandler of hp::DoFHandler, then the function
-   * will re-build the triangulation underlying the second argument and return
-   * a map between appropriate iterators into the Container arguments.
-   * However, the function will not actually distribute degrees of freedom on
-   * this newly created surface mesh.
+   * @ref GlossMeshAsAContainer). The map that is returned will be between
+   * cell iterators pointing into the container describing the surface mesh
+   * and face iterators of the volume mesh container. If the Container
+   * argument is DoFHandler of hp::DoFHandler, then the function will re-build
+   * the triangulation underlying the second argument and return a map between
+   * appropriate iterators into the Container arguments. However, the function
+   * will not actually distribute degrees of freedom on this newly created
+   * surface mesh.
    *
    * @note The algorithm outlined above assumes that all faces on higher
    * refinement levels always have exactly the same boundary indicator as

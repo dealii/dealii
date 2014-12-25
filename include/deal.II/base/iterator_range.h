@@ -141,15 +141,13 @@ public:
 
     /**
      * Dereferencing operator.
-     * @return The iterator within the collection
-     * currently pointed to.
+     * @return The iterator within the collection currently pointed to.
      */
     BaseIterator operator* () const;
 
     /**
      * Dereferencing operator.
-     * @return The iterator within the collection
-     * currently pointed to.
+     * @return The iterator within the collection currently pointed to.
      */
     const BaseIterator *operator-> () const;
 
@@ -169,9 +167,8 @@ public:
     /**
      * Comparison operator
      * @param i_o_i Another iterator over iterators.
-     * @return Returns whether
-     * the current iterator points to a different object than the iterator
-     * represented by the argument.
+     * @return Returns whether the current iterator points to a different
+     * object than the iterator represented by the argument.
      */
     bool operator != (const IteratorOverIterators &i_o_i);
 

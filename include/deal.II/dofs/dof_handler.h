@@ -67,8 +67,7 @@ namespace internal
 /**
  * Manage the distribution and numbering of the degrees of freedom for non-
  * multigrid algorithms. This class satisfies the requirements outlined in
- * @ref GlossMeshAsAContainer "Meshes as containers".
- * It is first used in the
+ * @ref GlossMeshAsAContainer "Meshes as containers". It is first used in the
  * step-2 tutorial program.
  *
  * For each vertex, line, quad, etc, this class stores a list of the indices
@@ -128,10 +127,9 @@ namespace internal
  * single processor. However, it can also be of type
  * parallel::distributed::Triangulation (see, for example, step-32, step-40
  * and in particular the
- * @ref distributed
- * module) in which case the DoFHandler
- * object will proceed to only manage degrees of freedom on locally owned and
- * ghost cells. This process is entirely transparent to the used.
+ * @ref distributed module) in which case the DoFHandler object will proceed
+ * to only manage degrees of freedom on locally owned and ghost cells. This
+ * process is entirely transparent to the used.
  *
  *
  * <h3>User defined renumbering schemes</h3>
@@ -199,8 +197,8 @@ public:
 
   /**
    * A typedef that is used to to identify
-   * @ref GlossActive "active cell iterators".
-   * The concept of iterators is discussed at length in the
+   * @ref GlossActive "active cell iterators". The concept of iterators is
+   * discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
    * The current typedef identifies active cells in a DoFHandler object. While
@@ -226,12 +224,11 @@ public:
    *
    * The current typedef identifies cells in a DoFHandler object. Some of
    * these cells may in fact be active (see
-   * @ref GlossActive "active cell iterators"
-   * ) in which case they can in
-   * fact be asked for the degrees of freedom that live on them. On the
-   * other hand, if the cell is not active, any such query will result in
-   * an error. Note that this is what distinguishes this typedef from the
-   * level_cell_iterator typedef.
+   * @ref GlossActive "active cell iterators") in which case they can in fact
+   * be asked for the degrees of freedom that live on them. On the other hand,
+   * if the cell is not active, any such query will result in an error. Note
+   * that this is what distinguishes this typedef from the level_cell_iterator
+   * typedef.
    *
    * While the actual data type of the typedef is hidden behind a few layers
    * of (unfortunately necessary) indirections, it is in essence
@@ -467,8 +464,7 @@ public:
    * @note The same applies to this function as to max_couplings_per_dofs() as
    * regards the performance of this function. Think about one of the dynamic
    * sparsity pattern classes instead (see
-   * @ref Sparsity
-   * ).
+   * @ref Sparsity).
    */
   unsigned int max_couplings_between_boundary_dofs () const;
 
@@ -636,8 +632,8 @@ public:
    *
    * @param[in] level A given level in the refinement hierarchy of this
    * triangulation.
-   * @return The half open range
-   * <code>[this->begin_active(level), this->end(level))</code>
+   * @return The half open range <code>[this->begin_active(level),
+   * this->end(level))</code>
    *
    * @pre level must be less than this->n_levels().
    *
@@ -725,9 +721,8 @@ public:
    *
    * If an FESystem is used in distribute_dofs(), degrees of freedom naturally
    * split into several
-   * @ref GlossBlock "blocks".
-   * For each base element as
-   * many blocks appear as its multiplicity.
+   * @ref GlossBlock "blocks". For each base element as many blocks appear as
+   * its multiplicity.
    *
    * At the end of distribute_dofs(), the number of degrees of freedom in each
    * block is counted, and stored in a BlockInfo object, which can be accessed
