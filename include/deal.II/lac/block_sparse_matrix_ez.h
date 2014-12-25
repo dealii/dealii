@@ -44,7 +44,8 @@ template <typename Number> class BlockVector;
  * functions for the multiplication with BlockVector and access to the
  * individual blocks.
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2002, 2003
  */
 template<typename Number>

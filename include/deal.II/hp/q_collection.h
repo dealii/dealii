@@ -34,8 +34,8 @@ namespace hp
    * as the hp::FECollection implements a collection of finite element
    * classes.
    *
-   * It implements the concepts stated in the @ref hpcollection module
-   * described in the doxygen documentation.
+   * It implements the concepts stated in the
+   * @ref hpcollection module described in the doxygen documentation.
    *
    * @ingroup hp hpcollection
    *

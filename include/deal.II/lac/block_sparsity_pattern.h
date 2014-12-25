@@ -77,7 +77,8 @@ namespace TrilinosWrappers
  * @todo Handle optimization of diagonal elements of the underlying
  * SparsityPattern correctly.
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2000, 2001
  */
 template <class SparsityPatternBase>
@@ -294,7 +295,8 @@ public:
    * Print the sparsity of the matrix in a format that <tt>gnuplot</tt>
    * understands and which can be used to plot the sparsity pattern in a
    * graphical way. This is the same functionality implemented for usual
-   * sparsity patterns, see @ref SparsityPattern.
+   * sparsity patterns, see
+   * @ref SparsityPattern.
    */
   void print_gnuplot (std::ostream &out) const;
 
@@ -381,7 +383,8 @@ private:
  * few additional member functions, but the main interface stems from the base
  * class, see there for more information.
  *
- * This class is an example of the "static" type of @ref Sparsity.
+ * This class is an example of the "static" type of
+ * @ref Sparsity.
  *
  * @author Wolfgang Bangerth, 2000, 2001
  */
@@ -478,10 +481,11 @@ public:
  * information on the interface of this class refer to the base class. The
  * individual blocks are based on the CompressedSparsityPattern class.
  *
- * This class is an example of the "dynamic" type of @ref Sparsity.
+ * This class is an example of the "dynamic" type of
+ * @ref Sparsity.
  *
  * <b>Note:</b> There are several, exchangeable variations of this class, see
- * @ref Sparsity, section 'Dynamic block sparsity patterns' for more
+ * @ref Sparsity , section 'Dynamic block sparsity patterns' for more
  * information.
  *
  * <b>Note:</b> This class used to be called CompressedBlockSparsityPattern.
@@ -596,10 +600,11 @@ typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern DEAL_II_DE
  * CompressedSetSparsityPattern instead of the CompressedSparsityPattern. See
  * the documentation of the BlockCompressedSparsityPattern for examples.
  *
- * This class is an example of the "dynamic" type of @ref Sparsity.
+ * This class is an example of the "dynamic" type of
+ * @ref Sparsity.
  *
- * <b>Note:</b> There are several, exchangeable variations of this class, see
- * @ref Sparsity, section 'Dynamic block sparsity patterns' for more
+ * @note There are several, exchangeable variations of this class, see
+ * @ref Sparsity , section 'Dynamic block sparsity patterns' for more
  * information.
  *
  * @author Wolfgang Bangerth, 2007
@@ -675,10 +680,11 @@ public:
  * CompressedSimpleSparsityPattern instead of the CompressedSparsityPattern.
  * See the documentation of the BlockCompressedSparsityPattern for examples.
  *
- * This class is an example of the "dynamic" type of @ref Sparsity.
+ * This class is an example of the "dynamic" type of
+ * @ref Sparsity.
  *
- * <b>Note:</b> There are several, exchangeable variations of this class, see
- * @ref Sparsity, section 'Dynamic block sparsity patterns' for more
+ * @note There are several, exchangeable variations of this class, see
+ * @ref Sparsity , section 'Dynamic block sparsity patterns' for more
  * information.
  *
  * This class is used in step-22 and step-31.
@@ -767,11 +773,11 @@ public:
  * TrilinosWrappers::SparsityPattern instead of the dealii::SparsityPattern.
  * See the documentation of the BlockSparsityPattern for examples.
  *
- * This class is has properties of the "dynamic" type of @ref Sparsity (in the
- * sense that it can extend the memory if too little elements were allocated),
- * but otherwise is more like the basic deal.II SparsityPattern (in the sense
- * that the method compress() needs to be called before the pattern can be
- * used).
+ * This class is has properties of the "dynamic" type of
+ * @ref Sparsity (in the sense that it can extend the memory if too little
+ * elements were allocated), but otherwise is more like the basic deal.II
+ * SparsityPattern (in the sense that the method compress() needs to be called
+ * before the pattern can be used).
  *
  * This class is used in step-32.
  *

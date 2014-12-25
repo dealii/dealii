@@ -83,11 +83,11 @@ namespace parallel
      * communication of indices. In particular, it stores the communication
      * pattern, rather than having to compute it again for every
      * communication. (For more information on ghost vectors, see also the
-     * @ref GlossGhostedVector "glossary entry on vectors with ghost elements".)
-     * - Besides the usual global access operator () it is also
-     * possible to access vector entries in the local index space with the
-     * function @p local_element(). Locally owned indices are placed first,
-     * [0, local_size()), and then all ghost indices follow after them
+     * @ref GlossGhostedVector "glossary entry on vectors with ghost elements"
+     * .) - Besides the usual global access operator () it is also possible to
+     * access vector entries in the local index space with the function @p
+     * local_element(). Locally owned indices are placed first, [0,
+     * local_size()), and then all ghost indices follow after them
      * contiguously, [local_size(), local_size()+n_ghost_entries()).
      *
      * Functions related to parallel functionality: - The function
@@ -98,7 +98,7 @@ namespace parallel
      * @p insert mode of @p compress() does not set the elements included in
      * ghost entries but simply discards them, assuming that the owning
      * processor has set them to the desired value already. (See also the
-     * @ref GlossCompress "glossary entry on compress".) - The
+     * @ref GlossCompress "glossary entry on compress" .) - The
      * <code>update_ghost_values()</code> function imports the data from the
      * owning processor to the ghost indices in order to provide read access
      * to the data associated with ghosts. - It is possible to split the above
@@ -195,7 +195,8 @@ namespace parallel
        * Vector<Number> argument to create additional vectors with the same
        * parallel layout.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const IndexSet &local_range,
               const IndexSet &ghost_indices,
@@ -253,7 +254,8 @@ namespace parallel
        * Vector<Number> argument to create additional vectors with the same
        * parallel layout.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &local_range,
                    const IndexSet &ghost_indices,
@@ -347,8 +349,9 @@ namespace parallel
       /**
        * This function copies the data that has accumulated in the data buffer
        * for ghost indices to the owning processor. For the meaning of the
-       * argument @p operation, see the entry on @ref GlossCompress
-       * "Compressing distributed vectors and matrices" in the glossary.
+       * argument @p operation, see the entry on
+       * @ref GlossCompress "Compressing distributed vectors and matrices" in
+       * the glossary.
        *
        * There are two variants for this function. If called with argument @p
        * VectorOperation::add adds all the data accumulated in ghost elements
@@ -390,7 +393,8 @@ namespace parallel
        * counting the ghost data more than once. To allow writing to ghost
        * elements again, call zero_out_ghosts().
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void update_ghost_values () const;
 
@@ -477,7 +481,8 @@ namespace parallel
        * still possible (to those entries specified as ghosts during
        * initialization), not that there are no ghost elements at all.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       bool has_ghost_elements() const;
 

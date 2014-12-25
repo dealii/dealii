@@ -51,9 +51,11 @@ namespace TrilinosWrappers
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations in the manual).
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <typename Number>
@@ -166,7 +168,8 @@ public:
    * This functionality only needs to be called if using MPI based vectors and
    * exists in other objects for compatibility.
    *
-   * See @ref GlossCompress "Compressing distributed objects" for more
+   * See
+   * @ref GlossCompress "Compressing distributed objects" for more
    * information.
    */
   void compress (::dealii::VectorOperation::values operation

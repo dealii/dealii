@@ -550,7 +550,8 @@ namespace internal
  * calling collect_sizes(), results may be unpredictable. The debug version
  * does not check consistency here for performance reasons!
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <class VectorType>
@@ -622,7 +623,8 @@ public:
    * This functionality only needs to be called if using MPI based vectors and
    * exists in other objects for compatibility.
    *
-   * See @ref GlossCompress "Compressing distributed objects" for more
+   * See
+   * @ref GlossCompress "Compressing distributed objects" for more
    * information.
    */
   void compress (::dealii::VectorOperation::values operation);

@@ -154,8 +154,9 @@ public:
 
   /**
    * Return the first cell which we want output for. The default
-   * implementation returns the first @ref GlossActive "active cell", but you
-   * might want to return other cells in a derived class.
+   * implementation returns the first
+   * @ref GlossActive "active cell" , but you might want to return other cells
+   * in a derived class.
    */
   virtual cell_iterator first_cell ();
 

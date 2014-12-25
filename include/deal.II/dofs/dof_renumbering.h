@@ -163,7 +163,8 @@ DEAL_II_NAMESPACE_OPEN
  * The component_wise() function allows not only to honor enumeration based on
  * vector components, but also allows to group together vector components into
  * "blocks" using a defaulted argument to the various
- * DoFRenumber::component_wise() functions (see @ref GlossComponent vs
+ * DoFRenumber::component_wise() functions (see
+ * @ref GlossComponent vs
  * @ref GlossBlock for a description of the difference). The blocks designated
  * through this argument may, but do not have to be, equal to the blocks that
  * the finite element reports. For example, a typical Stokes element would be
@@ -246,13 +247,15 @@ DEAL_II_NAMESPACE_OPEN
  * ordering than with another one, then this means that the actual solver is
  * actually several times faster.
  *
- * <table> <tr>
- * <td> @image html "reorder_sparsity_step_31_original.png" </td>
- * <td> @image html "reorder_sparsity_step_31_random.png" </td>
- * <td> @image html "reorder_sparsity_step_31_deal_cmk.png" </td>
- * </tr> <tr> <td>
- * Enumeration as produced by deal.II's DoFHandler::distribute_dofs function
- * and no further reordering apart from the component-wise one.
+ * <table> <tr> <td>
+ * @image html "reorder_sparsity_step_31_original.png"
+ * </td> <td>
+ * @image html "reorder_sparsity_step_31_random.png"
+ * </td> <td>
+ * @image html "reorder_sparsity_step_31_deal_cmk.png"
+ * </td> </tr> <tr> <td> Enumeration as produced by deal.II's
+ * DoFHandler::distribute_dofs function and no further reordering apart from
+ * the component-wise one.
  *
  * With this renumbering, we needed an average of 92.2 iterations for the
  * testcase outlined above, and a runtime of 7min53s. </td> <td> Random
@@ -274,13 +277,15 @@ DEAL_II_NAMESPACE_OPEN
  * With this renumbering, we needed an average of 57.3 iterations for the
  * testcase outlined above, and a runtime of 6min10s. </td> </td> </tr>
  *
- * <tr> <td> @image html "reorder_sparsity_step_31_boost_cmk.png" </td>
- * <td> @image html "reorder_sparsity_step_31_boost_king.png" </td>
- * <td> @image html "reorder_sparsity_step_31_boost_md.png" </td>
- * </tr> <tr> <td> Cuthill-
- * McKee enumeration as produced by calling the BOOST implementation of the
- * algorithm provided by DoFRenumbering::boost::Cuthill_McKee after
- * DoFHandler::distribute_dofs.
+ * <tr> <td>
+ * @image html "reorder_sparsity_step_31_boost_cmk.png"
+ * </td> <td>
+ * @image html "reorder_sparsity_step_31_boost_king.png"
+ * </td> <td>
+ * @image html "reorder_sparsity_step_31_boost_md.png"
+ * </td> </tr> <tr> <td> Cuthill- McKee enumeration as produced by calling the
+ * BOOST implementation of the algorithm provided by
+ * DoFRenumbering::boost::Cuthill_McKee after DoFHandler::distribute_dofs.
  *
  * With this renumbering, we needed an average of 51.7 iterations for the
  * testcase outlined above, and a runtime of 5min52s. </td> <td> King
@@ -310,8 +315,9 @@ DEAL_II_NAMESPACE_OPEN
  * With this renumbering, we needed an average of 58.9 iterations for the
  * testcase outlined above, and a runtime of 6min11s. </td> </tr>
  *
- * <tr> <td> @image html "reorder_sparsity_step_31_downstream.png" </td> <td>
- * </td> <td> </td> </tr> <tr> <td> Downstream enumeration using
+ * <tr> <td>
+ * @image html "reorder_sparsity_step_31_downstream.png"
+ * </td> <td> </td> <td> </td> </tr> <tr> <td> Downstream enumeration using
  * DoFRenumbering::downstream using a direction that points diagonally through
  * the domain.
  *
@@ -670,14 +676,14 @@ namespace DoFRenumbering
    *
    * This function only succeeds if each of the elements in the
    * hp::FECollection attached to the hp::DoFHandler argument has exactly the
-   * same number of blocks (see @ref GlossBlock "the glossary" for more
-   * information). Note that this is not always given: while the
-   * hp::FECollection class ensures that all of its elements have the same
-   * number of vector components, they need not have the same number of
-   * blocks. At the same time, this function here needs to match individual
-   * blocks across elements and therefore requires that elements have the same
-   * number of blocks and that subsequent blocks in one element have the same
-   * meaning as in another element.
+   * same number of blocks (see
+   * @ref GlossBlock "the glossary" for more information). Note that this is
+   * not always given: while the hp::FECollection class ensures that all of
+   * its elements have the same number of vector components, they need not
+   * have the same number of blocks. At the same time, this function here
+   * needs to match individual blocks across elements and therefore requires
+   * that elements have the same number of blocks and that subsequent blocks
+   * in one element have the same meaning as in another element.
    */
   template <int dim>
   void

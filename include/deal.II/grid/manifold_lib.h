@@ -211,8 +211,8 @@ public:
 
   /**
    * Expressions constructor. Takes the expressions of the push_forward
-   * function of spacedim components, and of the pull_back function of
-   * @p chartdim components. See the documentation of the base class
+   * function of spacedim components, and of the pull_back function of @p
+   * chartdim components. See the documentation of the base class
    * ChartManifold for the meaning of the optional @p periodicity argument.
    *
    * The strings should be the readable by the default constructor of the
@@ -238,16 +238,16 @@ public:
 
   /**
    * Given a point in the @p chartdim coordinate system, uses the
-   * push_forward_function to compute the push_forward of points in @p chartdim
-   * space dimensions to @p spacedim space dimensions.
+   * push_forward_function to compute the push_forward of points in @p
+   * chartdim space dimensions to @p spacedim space dimensions.
    */
   virtual Point<spacedim>
   push_forward(const Point<chartdim> &chart_point) const;
 
   /**
    * Given a point in the spacedim coordinate system, uses the
-   * pull_back_function to compute the pull_back of points in @p spacedim space
-   * dimensions to @p chartdim space dimensions.
+   * pull_back_function to compute the pull_back of points in @p spacedim
+   * space dimensions to @p chartdim space dimensions.
    */
   virtual Point<chartdim>
   pull_back(const Point<spacedim> &space_point) const;

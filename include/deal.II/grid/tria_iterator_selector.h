@@ -39,8 +39,8 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 1D case only. See the @ref Iterators
-     * module for more information.
+     * These are the declararions for the 1D case only. See the
+     * @ref Iterators module for more information.
      *
      * A @p line_iterator is typdef'd to an iterator operating on the @p lines
      * member variable of a <tt>Triangulation<1></tt> object. An @p
@@ -88,8 +88,8 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 2D case only. See the @ref Iterators
-     * module for more information.
+     * These are the declararions for the 2D case only. See the
+     * @ref Iterators module for more information.
      *
      * A @p line_iterator is typdef'd to an iterator operating on the @p lines
      * member variable of a <tt>Triangulation<2></tt> object. An @p
@@ -142,8 +142,8 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 3D case only. See the @ref Iterators
-     * module for more information.
+     * These are the declararions for the 3D case only. See the
+     * @ref Iterators module for more information.
      *
      * For the declarations of the data types, more or less the same holds as
      * for lower dimensions (see <tt>Iterators<[12]></tt>). The dimension

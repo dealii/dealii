@@ -122,7 +122,8 @@ template <typename number> class SparseBlockVanka;
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations in the manual).
  *
  * @author Guido Kanschat, Wolfgang Bangerth; 1999, 2000
  */

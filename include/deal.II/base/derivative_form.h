@@ -383,6 +383,7 @@ DerivativeForm<order, dim, spacedim>::memory_consumption ()
  * One of the uses of DerivativeForm is to apply it as a transformation. This
  * is what this function does.  If @p T is DerivativeForm<1,dim,1> it computes
  * $DF * T$, if @p T is DerivativeForm<1,dim,rank> it computes $T*DF^{t}$.
+ *
  * @relates DerivativeForm
  * @author Sebastian Pauletti, 2011
  */
@@ -402,6 +403,7 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF,
 
 /**
  * Similar to previous apply_transformation. It computes $T*DF^{t}$.
+ *
  * @relates DerivativeForm
  * @author Sebastian Pauletti, 2011
  */
@@ -422,6 +424,7 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF,
 
 /**
  * Similar to previous apply_transformation. It computes $DF2*DF1^{t}$
+ *
  * @relates DerivativeForm
  * @author Sebastian Pauletti, 2011
  */
@@ -442,7 +445,9 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF1,
 
 /**
  * Transpose of a rectangular DerivativeForm DF, mostly for compatibility
- * reasons. @relates DerivativeForm
+ * reasons.
+ *
+ * @relates DerivativeForm
  * @author Sebastian Pauletti, 2011
  */
 template <int dim, int spacedim>

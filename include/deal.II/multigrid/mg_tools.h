@@ -89,7 +89,9 @@ namespace MGTools
 
   /**
    * Make a sparsity pattern including fluxes of discontinuous Galerkin
-   * methods. @ref make_sparsity_pattern @ref DoFTools
+   * methods. @see
+   * @ref make_sparsity_pattern and
+   * @ref DoFTools
    */
   template <int dim, class SparsityPattern, int spacedim>
   void

@@ -51,7 +51,8 @@ DEAL_II_NAMESPACE_OPEN
  * class are a subset.
  *
  * The data structures used in this class along with a rationale can be found
- * in the @ref distributed_paper "Distributed Computing paper".
+ * in the
+ * @ref distributed_paper "Distributed Computing paper".
  *
  * @author Wolfgang Bangerth, 2009
  */

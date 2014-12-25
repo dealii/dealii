@@ -313,7 +313,7 @@ private:
  * preconditioner.
  *
  * FGMRES needs two vectors in each iteration steps yielding a total of
- * <tt>2 * SolverFGMRESAdditionalData::max_basis_size+1</tt> auxiliary vectors.
+ * <tt>2*SolverFGMRESAdditionalData::max_basis_size+1</tt> auxiliary vectors.
  *
  * Caveat: documentation of this class is not up to date. There are also a few
  * parameters of GMRES we would like to introduce here.

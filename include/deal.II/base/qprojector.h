@@ -63,10 +63,10 @@ DEAL_II_NAMESPACE_OPEN
  * <tt>cell->face_orientation(face)</tt>), so we have to project quadrature
  * formula onto faces and subfaces in two orientations. (Refer to the
  * documentation of the Triangulation class for a description of the
- * orientation of the different faces, as well as to @ref GlossFaceOrientation
- * "the glossary entry on face orientation" for more information on this.) The
- * DataSetDescriptor member class is used to identify where each dataset
- * starts.
+ * orientation of the different faces, as well as to
+ * @ref GlossFaceOrientation "the glossary entry on face orientation" for more
+ * information on this.) The DataSetDescriptor member class is used to
+ * identify where each dataset starts.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2003, 2005
  */

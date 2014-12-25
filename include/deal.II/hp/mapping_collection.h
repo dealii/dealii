@@ -32,8 +32,8 @@ namespace hp
    * This class implements a collection of mapping objects in the same way as
    * the hp::FECollection implements a collection of finite element classes.
    *
-   * It implements the concepts stated in the @ref hpcollection module
-   * described in the doxygen documentation.
+   * It implements the concepts stated in the
+   * @ref hpcollection module described in the doxygen documentation.
    *
    * Although it is recommended to supply an appropriate mapping for each
    * finite element kind used in a hp-computation, the MappingCollection class
