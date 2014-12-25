@@ -332,8 +332,7 @@ public:
    * dofs on vertex 0, dofs on vertex 1, etc, dofs on line 0, dofs on line 1,
    * etc, dofs on quad 0, etc.) This function is only available on
    * <i>active</i> objects (see
-   * @ref GlossActive "this glossary entry"
-   * ).
+   * @ref GlossActive "this glossary entry").
    *
    * The cells needs to be an active cell (and not artificial in a parallel
    * distributed computation).
@@ -530,8 +529,7 @@ public:
   DeclException0 (ExcMatrixDoesNotMatch);
   /**
    * A function has been called for a cell which should be
-   * @ref GlossActive "active"
-   * , but is refined.
+   * @ref GlossActive "active" , but is refined.
    *
    * @ingroup Exceptions
    */
@@ -837,8 +835,7 @@ public:
    * dofs on vertex 0, dofs on vertex 1, etc, dofs on line 0, dofs on line 1,
    * etc, dofs on quad 0, etc.) This function is only available on
    * <i>active</i> objects (see
-   * @ref GlossActive "this glossary entry"
-   * ).
+   * @ref GlossActive "this glossary entry").
    *
    * The cells needs to be an active cell (and not artificial in a parallel
    * distributed computation).
@@ -1002,8 +999,7 @@ public:
   DeclException0 (ExcMatrixDoesNotMatch);
   /**
    * A function has been called for a cell which should be
-   * @ref GlossActive "active"
-   * , but is refined. 
+   * @ref GlossActive "active" , but is refined.
    *
    * @ingroup Exceptions
    */
@@ -1539,8 +1535,7 @@ public:
    * dofs on vertex 0, dofs on vertex 1, etc, dofs on line 0, dofs on line 1,
    * etc, dofs on quad 0, etc.) This function is only available on
    * <i>active</i> objects (see
-   * @ref GlossActive "this glossary entry"
-   * ).
+   * @ref GlossActive "this glossary entry").
    *
    * @param[out] dof_indices The vector into which the indices will be
    * written. It has to have the right size (namely,

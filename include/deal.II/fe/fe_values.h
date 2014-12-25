@@ -121,9 +121,8 @@ namespace internal
  * elements
  *
  * See the description of the
- * @ref vector_valued
- * module for examples how to
- * use the features of this namespace.
+ * @ref vector_valued module for examples how to use the features of this
+ * namespace.
  *
  * @ingroup feaccess vector_valued
  */
@@ -132,8 +131,7 @@ namespace FEValuesViews
   /**
    * A class representing a view to a single scalar component of a possibly
    * vector-valued finite element. Views are discussed in the
-   * @ref vector_valued
-   * module.
+   * @ref vector_valued module.
    *
    * You get an object of this type if you apply a FEValuesExtractors::Scalar
    * to an FEValues, FEFaceValues or FESubfaceValues object.
@@ -345,8 +343,7 @@ namespace FEValuesViews
    * A class representing a view to a set of <code>spacedim</code> components
    * forming a vector part of a vector-valued finite element. Views are
    * discussed in the
-   * @ref vector_valued
-   * module.
+   * @ref vector_valued module.
    *
    * Note that in the current context, a vector is meant in the sense physics
    * uses it: it has <code>spacedim</code> components that behave in specific
@@ -737,8 +734,7 @@ namespace FEValuesViews
    * A class representing a view to a set of <code>(dim*dim + dim)/2</code>
    * components forming a symmetric second-order tensor from a vector-valued
    * finite element. Views are discussed in the
-   * @ref vector_valued
-   * module.
+   * @ref vector_valued module.
    *
    * This class allows to query the value and divergence of (components of)
    * shape functions and solutions representing symmetric tensors. The
@@ -943,8 +939,7 @@ namespace FEValuesViews
    * A class representing a view to a set of <code>dim*dim</code> components
    * forming a second-order tensor from a vector-valued finite element. Views
    * are discussed in the
-   * @ref vector_valued
-   * module.
+   * @ref vector_valued module.
    *
    * This class allows to query the value and divergence of (components of)
    * shape functions and solutions representing tensors. The divergence of a
@@ -2262,8 +2257,7 @@ public:
    * scalar component of the possibly vector-valued finite element. The
    * concept of views is explained in the documentation of the namespace
    * FEValuesViews and in particular in the
-   * @ref vector_valued
-   * module.
+   * @ref vector_valued module.
    */
   const FEValuesViews::Scalar<dim,spacedim> &
   operator[] (const FEValuesExtractors::Scalar &scalar) const;
@@ -2273,8 +2267,7 @@ public:
    * <code>dim</code> scalar components (i.e. a vector) of the vector-valued
    * finite element. The concept of views is explained in the documentation of
    * the namespace FEValuesViews and in particular in the
-   * @ref vector_valued
-   * module.
+   * @ref vector_valued module.
    */
   const FEValuesViews::Vector<dim,spacedim> &
   operator[] (const FEValuesExtractors::Vector &vector) const;
@@ -2285,8 +2278,7 @@ public:
    * order tensor) of the vector-valued finite element. The concept of views
    * is explained in the documentation of the namespace FEValuesViews and in
    * particular in the
-   * @ref vector_valued
-   * module.
+   * @ref vector_valued module.
    */
   const FEValuesViews::SymmetricTensor<2,dim,spacedim> &
   operator[] (const FEValuesExtractors::SymmetricTensor<2> &tensor) const;
@@ -2297,8 +2289,7 @@ public:
    * <code>(dim*dim)</code> scalar components (i.e. a 2nd order tensor) of the
    * vector-valued finite element. The concept of views is explained in the
    * documentation of the namespace FEValuesViews and in particular in the
-   * @ref vector_valued
-   * module.
+   * @ref vector_valued module.
    */
   const FEValuesViews::Tensor<2,dim,spacedim> &
   operator[] (const FEValuesExtractors::Tensor<2> &tensor) const;

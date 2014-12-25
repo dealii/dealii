@@ -56,8 +56,7 @@ namespace FiniteElementDomination
    * function that is used in the context of hp finite element methods when
    * determining what to do at faces where two different finite elements meet
    * (see the
-   * @ref hp_paper "hp paper"
-   * for a more detailed description of the
+   * @ref hp_paper "hp paper" for a more detailed description of the
    * following). In that case, the degrees of freedom of one side need to be
    * constrained to those on the other side. The determination which side is
    * which is based on the outcome of a comparison for mutual domination: the
@@ -69,9 +68,8 @@ namespace FiniteElementDomination
    * function.
    *
    * Note that there are situations where neither side dominates. The
-   * @ref hp_paper "hp paper"
-   * lists two case, with the simpler one being
-   * that a $Q_2\times Q_1$ vector-valued element (i.e. a
+   * @ref hp_paper "hp paper" lists two case, with the simpler one being that
+   * a $Q_2\times Q_1$ vector-valued element (i.e. a
    * <code>FESystem(FE_Q(2),1,FE_Q(1),1)</code>) meets a $Q_1\times Q_2$
    * element: here, for each of the two vector-components, we can define a
    * domination relationship, but it is different for the two components.
@@ -164,8 +162,8 @@ public:
    * <li> <i>L<sup>2</sup></i> indicates that the element is discontinuous.
    * Since discontinuous elements have no topological couplings between grid
    * cells and code may actually depend on this property, <i>L<sup>2</sup></i>
-   * conformity is handled in a special way in the sense
-   * that it is <b>not</b> implied by any higher conformity.
+   * conformity is handled in a special way in the sense that it is <b>not</b>
+   * implied by any higher conformity.
    * </ol>
    *
    * In order to test if a finite element conforms to a certain space, use
@@ -378,15 +376,13 @@ public:
 
   /**
    * Number of components. See
-   * @ref GlossComponent "the glossary"
-   * for more information.
+   * @ref GlossComponent "the glossary" for more information.
    */
   unsigned int n_components () const;
 
   /**
    * Number of blocks. See
-   * @ref GlossBlock "the glossary"
-   * for more information.
+   * @ref GlossBlock "the glossary" for more information.
    */
   unsigned int n_blocks () const;
 
@@ -431,8 +427,7 @@ protected:
   /**
    * Set the primitivity of the element. This is usually done by the
    * constructor of a derived class.  See
-   * @ref GlossPrimitive "primitive"
-   * for details.
+   * @ref GlossPrimitive "primitive" for details.
    */
   void set_primitivity(const bool value);
 

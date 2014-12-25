@@ -416,8 +416,7 @@ namespace DoFTools
    * variables couple in which equation. For example, if wanted to solve the
    * Stokes equations,
    *
-   * @f{align*} -\Delta \mathbf u + \nabla p &= 0,\\ \text{div}\ u
-   * &= 0 @f}
+   * @f{align*} -\Delta \mathbf u + \nabla p &= 0,\\ \text{div}\ u &= 0 @f}
    *
    * in two space dimensions, using stable Q2/Q1 mixed elements (using the
    * FESystem class), then you don't want all degrees of freedom to couple in
@@ -470,8 +469,7 @@ namespace DoFTools
    * the ConstraintMatrix object as the third argument to the current
    * function. No call to ConstraintMatrix::condense() is then necessary. This
    * process is explained in
-   * @ref step_27 "step-27"
-.
+   * @ref step_27 "step-27".
    *
    * In case the constraints are already taken care of in this function, it is
    * possible to neglect off-diagonal entries in the sparsity pattern. When
@@ -649,9 +647,8 @@ namespace DoFTools
    * global system matrix and right hand side, and to extend the solution
    * vectors from the true degrees of freedom also to the constraint nodes.
    * This function is explained in detail in the
-   * @ref step_6 "step-6"
-   * tutorial
-   * program and is used in almost all following programs as well.
+   * @ref step_6 "step-6" tutorial program and is used in almost all following
+   * programs as well.
    *
    * This function does not clear the constraint matrix object before use, in
    * order to allow adding constraints from different sources to the same
@@ -817,14 +814,13 @@ namespace DoFTools
    * happens.
    *
    * The flags in the @p component_mask (see
-   * @ref GlossComponentMask
-   * ) denote
-   * which components of the finite element space shall be constrained with
-   * periodic boundary conditions. If it is left as specified by the default
-   * value all components are constrained. If it is different from the default
-   * value, it is assumed that the number of entries equals the number of
-   * components of the finite element. This can be used to enforce periodicity
-   * in only one variable in a system of equations.
+   * @ref GlossComponentMask) denote which components of the finite element
+   * space shall be constrained with periodic boundary conditions. If it is
+   * left as specified by the default value all components are constrained. If
+   * it is different from the default value, it is assumed that the number of
+   * entries equals the number of components of the finite element. This can
+   * be used to enforce periodicity in only one variable in a system of
+   * equations.
    *
    * @p face_orientation, @p face_flip and @p face_rotation describe an
    * orientation that should be applied to @p face_1 prior to matching and
@@ -929,7 +925,8 @@ namespace DoFTools
    * interpolation matrix with size no_face_dofs $\times$ no_face_dofs.
    *
    * Detailed information can be found in the see
-   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
+   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
+   * conditions".
    *
    * @todo: Reference to soon be written example step and glossary article.
    *
@@ -966,8 +963,8 @@ namespace DoFTools
    * before.
    *
    * @see
-   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
-   * for further information.
+   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
+   * conditions" for further information.
    *
    * @author Daniel Arndt, Matthias Maier, 2013, 2014
    */
@@ -1007,11 +1004,10 @@ namespace DoFTools
    * happens.
    *
    * The flags in the last parameter, @p component_mask (see
-   * @ref GlossComponentMask
-   * ) denote which components of the finite element space
-   * shall be constrained with periodic boundary conditions. If it is left as
-   * specified by the default value all components are constrained. If it is
-   * different from the default value, it is assumed that the number of
+   * @ref GlossComponentMask) denote which components of the finite element
+   * space shall be constrained with periodic boundary conditions. If it is
+   * left as specified by the default value all components are constrained. If
+   * it is different from the default value, it is assumed that the number of
    * entries equals the number of components in the boundary functions and the
    * finite element, and those components in the given boundary function will
    * be used for which the respective flag was set in the component mask.
@@ -1022,8 +1018,8 @@ namespace DoFTools
    * need more functionality use GridTools::collect_periodic_faces() directly.
    *
    * @see
-   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
-   * for further information.
+   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
+   * conditions" for further information.
    *
    * @author Matthias Maier, 2012
    */
@@ -1060,8 +1056,8 @@ namespace DoFTools
    * need more functionality use GridTools::collect_periodic_faces() directly.
    *
    * @see
-   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
-   * for further information.
+   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
+   * conditions" for further information.
    */
   template<typename DH>
   void
@@ -1188,10 +1184,9 @@ namespace DoFTools
    * then shape functions cannot be associated with a single vector component.
    * In this case, if <em>one</em> shape vector component of this element is
    * flagged in @p component_mask (see
-   * @ref GlossComponentMask
-   * ), then this is
-   * equivalent to selecting <em>all</em> vector components corresponding to
-   * this non-primitive base element.
+   * @ref GlossComponentMask), then this is equivalent to selecting
+   * <em>all</em> vector components corresponding to this non-primitive base
+   * element.
    *
    * @note If the @p blocks argument is true,
    */
@@ -1214,19 +1209,16 @@ namespace DoFTools
    * This function is the equivalent to the DoFTools::extract_dofs() functions
    * above except that the selection of which degrees of freedom to extract is
    * not done based on components (see
-   * @ref GlossComponent
-   * ) but instead based
-   * on whether they are part of a particular block (see
-   * @ref GlossBlock
-   * ). Consequently, the second argument is not a ComponentMask but a BlockMask
-   * object.
+   * @ref GlossComponent) but instead based on whether they are part of a
+   * particular block (see
+   * @ref GlossBlock). Consequently, the second argument is not a
+   * ComponentMask but a BlockMask object.
    *
    * @param dof_handler The DoFHandler object from which to extract degrees of
    * freedom
    * @param block_mask The block mask that describes which blocks to consider
    * (see
-   * @ref GlossBlockMask
-   * )
+   * @ref GlossBlockMask)
    * @param selected_dofs A vector of length DoFHandler::n_dofs() in which
    * those entries are true that correspond to the selected blocks.
    */
@@ -1280,11 +1272,10 @@ namespace DoFTools
    * all boundary indicators are accepted.
    *
    * The size of @p component_mask (see
-   * @ref GlossComponentMask
-   * ) shall equal
-   * the number of components in the finite element used by @p dof. The size
-   * of @p selected_dofs shall equal <tt>dof_handler.n_dofs()</tt>. Previous
-   * contents of this array or overwritten.
+   * @ref GlossComponentMask) shall equal the number of components in the
+   * finite element used by @p dof. The size of @p selected_dofs shall equal
+   * <tt>dof_handler.n_dofs()</tt>. Previous contents of this array or
+   * overwritten.
    *
    * Using the usual convention, if a shape function is non-zero in more than
    * one component (i.e. it is non-primitive), then the element in the
@@ -1303,8 +1294,7 @@ namespace DoFTools
    * live on which cell
    * @param component_mask A mask denoting the vector components of the finite
    * element that should be considered (see also
-   * @ref GlossComponentMask
-   * ).
+   * @ref GlossComponentMask).
    * @param selected_dofs The IndexSet object that is returned and that will
    * contain the indices of degrees of freedom that are located on the
    * boundary (and correspond to the selected vector components and boundary
@@ -1335,15 +1325,13 @@ namespace DoFTools
    * parallel::distributed::Triangulation, then the @p selected_dofs index set
    * will contain only those degrees of freedom on the boundary that belong to
    * the locally relevant set (see
-   * @ref GlossLocallyRelevantDof "locally relevant DoFs"
-   * ).
+   * @ref GlossLocallyRelevantDof "locally relevant DoFs").
    *
    * @param dof_handler The object that describes which degrees of freedom
    * live on which cell
    * @param component_mask A mask denoting the vector components of the finite
    * element that should be considered (see also
-   * @ref GlossComponentMask
-   * ).
+   * @ref GlossComponentMask).
    * @param selected_dofs The IndexSet object that is returned and that will
    * contain the indices of degrees of freedom that are located on the
    * boundary (and correspond to the selected vector components and boundary
@@ -1390,10 +1378,8 @@ namespace DoFTools
   /**
    * Extract a vector that represents the constant modes of the DoFHandler for
    * the components chosen by <tt>component_mask</tt> (see
-   * @ref GlossComponentMask
-   * ).
-   * The constant modes on a discretization are the null
-   * space of a Laplace operator on the selected components with Neumann
+   * @ref GlossComponentMask). The constant modes on a discretization are the
+   * null space of a Laplace operator on the selected components with Neumann
    * boundary conditions applied. The null space is a necessary ingredient for
    * obtaining a good AMG preconditioner when using the class
    * TrilinosWrappers::PreconditionAMG.  Since the ML AMG package only works
@@ -1405,17 +1391,16 @@ namespace DoFTools
    * underlying the given DoFHandler and for most elements, the null space
    * will consist of as many vectors as there are true arguments in
    * <tt>component_mask</tt> (see
-   * @ref GlossComponentMask
-   * ), each of which will
-   * be one in one vector component and zero in all others. However, the
-   * representation of the constant function for e.g. FE_DGP is different (the
-   * first component on each element one, all other components zero), and some
-   * scalar elements may even have two constant modes (FE_Q_DG0). Therefore,
-   * we store this object in a vector of vectors, where the outer vector
-   * contains the collection of the actual constant modes on the DoFHandler.
-   * Each inner vector has as many components as there are (locally owned)
-   * degrees of freedom in the selected components. Note that any matrix
-   * associated with this null space must have been constructed using the same
+   * @ref GlossComponentMask), each of which will be one in one vector
+   * component and zero in all others. However, the representation of the
+   * constant function for e.g. FE_DGP is different (the first component on
+   * each element one, all other components zero), and some scalar elements
+   * may even have two constant modes (FE_Q_DG0). Therefore, we store this
+   * object in a vector of vectors, where the outer vector contains the
+   * collection of the actual constant modes on the DoFHandler. Each inner
+   * vector has as many components as there are (locally owned) degrees of
+   * freedom in the selected components. Note that any matrix associated with
+   * this null space must have been constructed using the same
    * <tt>component_mask</tt> argument, since the numbering of DoFs is done
    * relative to the selected dofs, not to all dofs.
    *
@@ -1489,8 +1474,7 @@ namespace DoFTools
    * indices that live on all locally owned cells (including on the interface
    * to ghost cells). However, it does not contain the DoF indices that are
    * exclusively defined on ghost or artificial cells (see
-   * @ref GlossArtificialCell "the glossary"
-   * ).
+   * @ref GlossArtificialCell "the glossary").
    *
    * The degrees of freedom identified by this function equal those obtained
    * from the dof_indices_with_subdomain_association() function when called
@@ -1508,8 +1492,7 @@ namespace DoFTools
    * is the union of DoFHandler::locally_owned_dofs() and the DoF indices on
    * all ghost cells. In essence, it is the DoF indices on all cells that are
    * not artificial (see
-   * @ref GlossArtificialCell "the glossary"
-   * ).
+   * @ref GlossArtificialCell "the glossary").
    */
   template <class DH>
   void
@@ -1829,10 +1812,9 @@ namespace DoFTools
    * Count the degrees of freedom in each block. This function is similar to
    * count_dofs_per_component(), with the difference that the counting is done
    * by blocks. See
-   * @ref GlossBlock "blocks"
-   * in the glossary for details.
-   * Again the vectors are assumed to have the correct size before calling
-   * this function. If this is not the case, an assertion is thrown.
+   * @ref GlossBlock "blocks" in the glossary for details. Again the vectors
+   * are assumed to have the correct size before calling this function. If
+   * this is not the case, an assertion is thrown.
    *
    * This function is used in the step-22, step-31, and step-32 tutorial
    * programs.
@@ -2002,12 +1984,11 @@ namespace DoFTools
 
   /**
    * Return a list of support points (see this
-   * @ref GlossSupport "glossary entry"
-   * ) for all the degrees of freedom
-   * handled by this DoF handler object. This function, of course, only
-   * works if the finite element object used by the DoF handler object
-   * actually provides support points, i.e. no edge elements or the like.
-   * Otherwise, an exception is thrown.
+   * @ref GlossSupport "glossary entry") for all the degrees of freedom
+   * handled by this DoF handler object. This function, of course, only works
+   * if the finite element object used by the DoF handler object actually
+   * provides support points, i.e. no edge elements or the like. Otherwise, an
+   * exception is thrown.
    *
    * @pre The given array must have a length of as many elements as there are
    * degrees of freedom.
@@ -2037,9 +2018,8 @@ namespace DoFTools
   /**
    * This function is a version of the above map_dofs_to_support_points
    * function that doesn't simply return a vector of support points (see this
-   * @ref GlossSupport "glossary entry"
-   * ) with one entry for each global degree
-   * of freedom, but instead a map that maps from the DoFs index to its
+   * @ref GlossSupport "glossary entry") with one entry for each global
+   * degree of freedom, but instead a map that maps from the DoFs index to its
    * location. The point of this function is that it is also usable in cases
    * where the DoFHandler is based on a parallel::distributed::Triangulation
    * object. In such cases, each processor will not be able to determine the
@@ -2048,8 +2028,8 @@ namespace DoFTools
    * were known. As a consequence, this function constructs a map from those
    * DoFs for which we can know the locations (namely, those DoFs that are
    * locally relevant (see
-   * @ref GlossLocallyRelevantDof "locally relevant DoFs"
-   * ) to their locations.
+   * @ref GlossLocallyRelevantDof "locally relevant DoFs") to their
+   * locations.
    *
    * For non-distributed triangulations, the map returned as @p support_points
    * is of course dense, i.e., every DoF is to be found in it.
@@ -2136,20 +2116,15 @@ namespace DoFTools
    * on the boundary treated here. If there are previously existing
    * constraints for degrees of freedom located on the boundary, then this
    * would constitute a conflict. See the
-   * @ref constraints
-   * module for handling
-   * the case where there are conflicting constraints on individual degrees of
-   * freedom.
+   * @ref constraints module for handling the case where there are conflicting
+   * constraints on individual degrees of freedom.
    * @param component_mask An optional component mask that restricts the
-   * functionality of this function to a subset of an FESystem. For
-   * non-
-   * @ref GlossPrimitive "primitive"
-   * shape functions, any degree of freedom
-   * is affected that belongs to a shape function where at least one of its
+   * functionality of this function to a subset of an FESystem. For non-
+   * @ref GlossPrimitive "primitive" shape functions, any degree of freedom is
+   * affected that belongs to a shape function where at least one of its
    * nonzero components is affected by the component mask (see
-   * @ref GlossComponentMask
-   * ). If this argument is omitted, all components
-   * of the finite element with degrees of freedom at the boundary will be
+   * @ref GlossComponentMask). If this argument is omitted, all components of
+   * the finite element with degrees of freedom at the boundary will be
    * considered.
    *
    * @ingroup constraints

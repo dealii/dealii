@@ -94,8 +94,8 @@ enum MappingType
  * the class is as follows: first, call the functions @p update_once and @p
  * update_each with the update flags you need. This includes the flags needed
  * by the FiniteElement. Then call <tt>get_*_data</tt> and with the or'd
- * results.  This will initialize and return some internal data structures.
- * On the first cell, call <tt>fill_fe_*_values</tt> with the result of @p
+ * results.  This will initialize and return some internal data structures. On
+ * the first cell, call <tt>fill_fe_*_values</tt> with the result of @p
  * update_once. Finally, on each cell, use <tt>fill_fe_*_values</tt> with the
  * result of @p update_each to compute values for a special cell.
  *
@@ -432,7 +432,7 @@ public:
    * Jacobians of spacedim-vector valued differentiable functions are
    * transformed this way.
    * </ul>
-   *  @note It would have been more reasonable to make this transform a
+   * @note It would have been more reasonable to make this transform a
    * template function with the rank in <code>DerivativeForm@<1, dim,
    * rank@></code>. Unfortunately C++ does not allow templatized virtual
    * functions. This is why we identify <code>DerivativeForm@<1, dim,
@@ -479,7 +479,7 @@ public:
    * J^{-1}(\mathbf{\hat x}).
    * @f]
    * </ul>
-   *  @todo The formulas for mapping_covariant_gradient(),
+   * @todo The formulas for mapping_covariant_gradient(),
    * mapping_contravariant_gradient() and mapping_piola_gradient() are only
    * true as stated for linear mappings. If, for example, the mapping is
    * bilinear then there is a missing term associated with the derivative of
@@ -695,12 +695,11 @@ private:
   /**
    * Performs the same as @p fill_fe_values on a face. Additionally, @p
    * boundary_form (see
-   * @ref GlossBoundaryForm
-   * ) and @p normal_vectors can be
-   * computed on surfaces. Since the boundary form already contains the
-   * determinant of the Jacobian of the transformation, it is sometimes more
-   * economic to use the boundary form instead of the product of the unit
-   * normal and the transformed quadrature weight.
+   * @ref GlossBoundaryForm ) and @p normal_vectors can be computed on
+   * surfaces. Since the boundary form already contains the determinant of the
+   * Jacobian of the transformation, it is sometimes more economic to use the
+   * boundary form instead of the product of the unit normal and the
+   * transformed quadrature weight.
    */
   virtual void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,

@@ -119,8 +119,8 @@ namespace GridTools
    * should be used when describing whether cells are bounded by straight or
    * curved faces. The default is to use a $Q_1$ mapping, which corresponds to
    * straight lines bounding the cells.
-   * @return The dim-dimensional measure of
-   * the domain described by the triangulation, as discussed above.
+   * @return The dim-dimensional measure of the domain described by the
+   * triangulation, as discussed above.
    */
   template <int dim, int spacedim>
   double volume (const Triangulation<dim,spacedim> &tria,
@@ -334,8 +334,7 @@ namespace GridTools
    *
    * @param container A variable of a type that satisfies the requirements of
    * a mesh container (see
-   * @ref GlossMeshAsAContainer
-   * ).
+   * @ref GlossMeshAsAContainer).
    * @param p The point for which we want to find the closest vertex.
    * @return The index of the closest vertex found.
    *
@@ -356,12 +355,10 @@ namespace GridTools
    *
    * @param container A variable of a type that satisfies the requirements of
    * a mesh container (see
-   * @ref GlossMeshAsAContainer
-   * ).
+   * @ref GlossMeshAsAContainer).
    * @param vertex_index The index of the vertex for which we try to find
    * adjacent cells.
-   * @return A vector of cells that lie adjacent to the given
-   * vertex.
+   * @return A vector of cells that lie adjacent to the given vertex.
    *
    * @note If the point requested does not lie in any of the cells of the mesh
    * given, then this function throws an exception of type
@@ -396,8 +393,7 @@ namespace GridTools
    *
    * @param container A variable of a type that satisfies the requirements of
    * a mesh container (see
-   * @ref GlossMeshAsAContainer
-   * ).
+   * @ref GlossMeshAsAContainer).
    * @param p The point for which we want to find the surrounding cell.
    * @return An iterator into the mesh container that points to the
    * surrounding cell.
@@ -410,12 +406,10 @@ namespace GridTools
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
    * fact be a ghost or artificial cell (see
-   * @ref GlossArtificialCell
-   * and
-   * @ref GlossGhostCell
-   * ). If so, many of the operations one may want to do
-   * on this cell (e.g., evaluating the solution) may not be possible and
-   * you will have to decide what to do in that case.
+   * @ref GlossArtificialCell and
+   * @ref GlossGhostCell). If so, many of the operations one may want to do
+   * on this cell (e.g., evaluating the solution) may not be possible and you
+   * will have to decide what to do in that case.
    */
   template <int dim, template <int,int> class Container, int spacedim>
 #ifndef _MSC_VER
@@ -447,8 +441,7 @@ namespace GridTools
    * inside a given cell.
    * @param container A variable of a type that satisfies the requirements of
    * a mesh container (see
-   * @ref GlossMeshAsAContainer
-   * ).
+   * @ref GlossMeshAsAContainer).
    * @param p The point for which we want to find the surrounding cell.
    * @return An pair of an iterator into the mesh container that points to the
    * surrounding cell, and of the coordinates of that point inside the cell in
@@ -466,11 +459,10 @@ namespace GridTools
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
    * fact be a ghost or artificial cell (see
-   * @ref GlossArtificialCell
-   * and
-   * @ref GlossGhostCell). If so, many of the operations one may want to do
-   * on this cell (e.g., evaluating the solution) may not be possible and
-   * you will have to decide what to do in that case.
+   * @ref GlossArtificialCell and
+   * @ref GlossGhostCell). If so, many of the operations one may want to do on
+   * this cell (e.g., evaluating the solution) may not be possible and you
+   * will have to decide what to do in that case.
    */
   template <int dim, template<int, int> class Container, int spacedim>
 #ifndef _MSC_VER
@@ -497,9 +489,9 @@ namespace GridTools
    * parallel::distributed::Triangulation object, the cell returned may in
    * fact be a ghost or artificial cell (see
    * @ref GlossArtificialCell and
-   * @ref GlossGhostCell). If so, many of the operations one may want to do
-   * on this cell (e.g., evaluating the solution) may not be possible and
-   * you will have to decide what to do in that case.
+   * @ref GlossGhostCell). If so, many of the operations one may want to do on
+   * this cell (e.g., evaluating the solution) may not be possible and you
+   * will have to decide what to do in that case.
    */
   template <int dim, int spacedim>
   std::pair<typename hp::DoFHandler<dim, spacedim>::active_cell_iterator, Point<dim> >
@@ -672,16 +664,15 @@ namespace GridTools
    * For a triangulation, return a mask that represents which of its vertices
    * are "owned" by the current process in the same way as we talk about
    * locally owned cells or degrees of freedom (see
-   * @ref GlossLocallyOwnedCell
-   * and
-   * @ref GlossLocallyOwnedDof). For the purpose of this function, we
-   * define a locally owned vertex as follows: a vertex is owned by that
-   * processor with the smallest subdomain id (which equals the MPI rank of
-   * that processor) among all owners of cells adjacent to this vertex. In
-   * other words, vertices that are in the interior of a partition of the
-   * triangulation are owned by the owner of this partition; for vertices that
-   * lie on the boundary between two or more partitions, the owner is the
-   * processor with the least subdomain_id among all adjacent subdomains.
+   * @ref GlossLocallyOwnedCell and
+   * @ref GlossLocallyOwnedDof). For the purpose of this function, we define a
+   * locally owned vertex as follows: a vertex is owned by that processor with
+   * the smallest subdomain id (which equals the MPI rank of that processor)
+   * among all owners of cells adjacent to this vertex. In other words,
+   * vertices that are in the interior of a partition of the triangulation are
+   * owned by the owner of this partition; for vertices that lie on the
+   * boundary between two or more partitions, the owner is the processor with
+   * the least subdomain_id among all adjacent subdomains.
    *
    * For sequential triangulations (as opposed to, for example,
    * parallel::distributed::Triangulation), every user vertex is of course
@@ -692,10 +683,9 @@ namespace GridTools
    *
    * @param triangulation The triangulation of which the function evaluates
    * which vertices are locally owned.
-   * @return The subset of vertices, as
-   * described above. The length of the returned array equals
-   * Triangulation.n_vertices() and may, consequently, be larger than
-   * Triangulation::n_used_vertices().
+   * @return The subset of vertices, as described above. The length of the
+   * returned array equals Triangulation.n_vertices() and may, consequently,
+   * be larger than Triangulation::n_used_vertices().
    */
   template <int dim, int spacedim>
   std::vector<bool>
@@ -830,10 +820,9 @@ namespace GridTools
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
-   * @ref GlossMeshAsAContainer). In C++, the compiler can not
-   * determine the type of <code>Container</code> from the function call. You
-   * need to specify it as an explicit template argument following the
-   * function name.
+   * @ref GlossMeshAsAContainer). In C++, the compiler can not determine the
+   * type of <code>Container</code> from the function call. You need to
+   * specify it as an explicit template argument following the function name.
    * @param[in] cell An iterator pointing to a cell of the mesh container.
    * @return A list of active cells that form the patch around the given cell
    *
@@ -938,7 +927,8 @@ namespace GridTools
      * interpreted as an interpolation matrix with size no_face_dofs $\times$
      * no_face_dofs. For more details see make_periodicity_constraints() and
      * the glossary
-     * @ref GlossPeriodicConstraints "glossary entry on periodic boundary conditions".
+     * @ref GlossPeriodicConstraints "glossary entry on periodic boundary
+     * conditions".
      */
     FullMatrix<double> matrix;
 
@@ -957,10 +947,10 @@ namespace GridTools
    * between its vertices can be achieved via an orthogonal equality relation.
    *
    * Hereby, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal,
-   * if $M\cdot v_1 + offset - v_2$ is parallel to the unit vector in
-   * unit direction @p direction. If the parameter @p matrix is a reference to
-   * a spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is
-   * the identity matrix.
+   * if $M\cdot v_1 + offset - v_2$ is parallel to the unit vector in unit
+   * direction @p direction. If the parameter @p matrix is a reference to a
+   * spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is the
+   * identity matrix.
    *
    * If the matching was successful, the _relative_ orientation of @p face1
    * with respect to @p face2 is returned in the bitset @p orientation, where
@@ -1070,7 +1060,8 @@ namespace GridTools
    * matrix is interpreted as a rotation matrix that is applied to all vector
    * valued blocks listed in @p first_vector_components of the FESystem. For
    * more details see make_periodicity_constraints() and the glossary
-   * @ref GlossPeriodicConstraints "glossary entry on periodic boundary conditions".
+   * @ref GlossPeriodicConstraints "glossary entry on periodic boundary
+   * conditions".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
@@ -1122,7 +1113,8 @@ namespace GridTools
    * matrix is interpreted as a rotation matrix that is applied to all vector
    * valued blocks listet in @p first_vector_components of the FESystem. For
    * more details see make_periodicity_constraints() and the glossary
-   * @ref GlossPeriodicConstraints "glossary entry on periodic boundary conditions".
+   * @ref GlossPeriodicConstraints "glossary entry on periodic boundary
+   * conditions".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see

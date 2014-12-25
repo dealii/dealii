@@ -940,8 +940,8 @@ namespace DataOutBase
      * The value of this variable is written into the output file according to
      * the instructions provided in
      * http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
-     * unless it is at its default value of
-     * std::numeric_limits<unsigned int>::min().
+     * unless it is at its default value of std::numeric_limits<unsigned
+     * int>::min().
      */
     unsigned int cycle;
 

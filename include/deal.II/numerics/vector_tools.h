@@ -312,9 +312,7 @@ class ConstraintMatrix;
  * in particular <code>Vector&lt;float&gt;, Vector&lt;double&gt;,
  * BlockVector&lt;float&gt;, BlockVector&lt;double&gt;</code>; others can be
  * generated in application code (see the section on
- * @ref Instantiations
- * in
- * the manual).
+ * @ref Instantiations in the manual).
  *
  * @ingroup numerics
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, 1998, 1999, 2000,
@@ -446,8 +444,7 @@ namespace VectorTools
    * functions onto the finite element space given by the DoFHandler argument
    * where the determination which function to use is made based on the
    * material id (see
-   * @ref GlossMaterialId
-   * ) of each cell.
+   * @ref GlossMaterialId) of each cell.
    *
    * @param mapping        - The mapping to use to determine the location of
    * support points at which the functions are to be evaluated.
@@ -666,12 +663,10 @@ namespace VectorTools
    * in the boundary functions and the finite element, and those components in
    * the given boundary function will be used for which the respective flag
    * was set in the component mask. See also
-   * @ref GlossComponentMask.
-   * As an
-   * example, assume that you are solving the Stokes equations in 2d, with
-   * variables $(u,v,p)$ and that you only want to interpolate boundary values
-   * for the pressure, then the component mask should correspond to
-   * <code>(true,true,false)</code>.
+   * @ref GlossComponentMask. As an example, assume that you are solving the
+   * Stokes equations in 2d, with variables $(u,v,p)$ and that you only want
+   * to interpolate boundary values for the pressure, then the component mask
+   * should correspond to <code>(true,true,false)</code>.
    *
    * @note Whether a component mask has been specified or not, the number of
    * components of the functions in @p function_map must match that of the
@@ -796,12 +791,10 @@ namespace VectorTools
    * in the boundary functions and the finite element, and those components in
    * the given boundary function will be used for which the respective flag
    * was set in the component mask. See also
-   * @ref GlossComponentMask.
-   * As an
-   * example, assume that you are solving the Stokes equations in 2d, with
-   * variables $(u,v,p)$ and that you only want to interpolate boundary values
-   * for the pressure, then the component mask should correspond to
-   * <code>(true,true,false)</code>.
+   * @ref GlossComponentMask. As an example, assume that you are solving the
+   * Stokes equations in 2d, with variables $(u,v,p)$ and that you only want
+   * to interpolate boundary values for the pressure, then the component mask
+   * should correspond to <code>(true,true,false)</code>.
    *
    * @note Whether a component mask has been specified or not, the number of
    * components of the functions in @p function_map must match that of the
@@ -913,9 +906,9 @@ namespace VectorTools
    * @param boundary_functions A map from boundary indicators to pointers to
    * functions that describe the desired values on those parts of the boundary
    * marked with this boundary indicator (see
-   * @ref GlossBoundaryIndicator "Boundary indicator"
-   * ). The projection happens on only those parts of the
-   * boundary whose indicators are represented in this map.
+   * @ref GlossBoundaryIndicator "Boundary indicator"). The projection
+   * happens on only those parts of the boundary whose indicators are
+   * represented in this map.
    * @param q The face quadrature used in the integration necessary to compute
    * the mass matrix and right hand side of the projection.
    * @param boundary_values The result of this function. It is a map
@@ -1728,14 +1721,12 @@ namespace VectorTools
    * there are active cells of the triangulation object of the current
    * processor. However, not all active cells are in fact locally owned: some
    * may be ghost or artificial cells (see
-   * @ref GlossGhostCell "here"
-   * and
-   * @ref GlossArtificialCell "here"
-   * ). The vector computed will, in the case of
-   * a distributed triangulation, contain zeros for cells that are not locally
-   * owned. As a consequence, in order to compute the <i>global</i> $L_2$
-   * error (for example), the errors from different processors need to be
-   * combined, but this is simple because every processor only computes
+   * @ref GlossGhostCell "here" and
+   * @ref GlossArtificialCell "here"). The vector computed will, in the case
+   * of a distributed triangulation, contain zeros for cells that are not
+   * locally owned. As a consequence, in order to compute the <i>global</i>
+   * $L_2$ error (for example), the errors from different processors need to
+   * be combined, but this is simple because every processor only computes
    * contributions for those cells of the global triangulation it locally owns
    * (and these sets are, by definition, mutually disjoint). Consequently, the
    * following piece of code computes the global $L_2$ error across multiple
@@ -2017,11 +2008,10 @@ namespace VectorTools
    * correspond to the pressure, and avoid touching all other components of
    * the vector, such as the velocity components. (Note, however, that the
    * mask is not a
-   * @ref GlossComponentMask
-   * operating on the vector components
-   * of the finite element the solution vector @p v may be associated with;
-   * rather, it is a mask on the entire vector, without reference to what the
-   * vector elements mean.)
+   * @ref GlossComponentMask operating on the vector components of the finite
+   * element the solution vector @p v may be associated with; rather, it is a
+   * mask on the entire vector, without reference to what the vector elements
+   * mean.)
    *
    * The boolean mask @p p_select has an empty vector as default value, which
    * will be interpreted as selecting all vector elements, hence, subtracting

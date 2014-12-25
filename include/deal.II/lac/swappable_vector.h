@@ -47,8 +47,7 @@ DEAL_II_NAMESPACE_OPEN
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
  * section on
- * @ref Instantiations
- * in the manual).
+ * @ref Instantiations in the manual).
  *
  * @author Wolfgang Bangerth, 1999, 2000
  */

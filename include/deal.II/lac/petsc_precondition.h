@@ -115,9 +115,7 @@ namespace PETScWrappers
    * preconditioner.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this
-   * preconditioner may or may not work.
+   * @ref PreconditionerBase for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -176,9 +174,7 @@ namespace PETScWrappers
    * the relevant section of the PETSc manual, but is not implemented here.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this
-   * preconditioner may or may not work.
+   * @ref PreconditionerBase for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -229,9 +225,7 @@ namespace PETScWrappers
    * preconditioner.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this
-   * preconditioner may or may not work.
+   * @ref PreconditionerBase for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -292,9 +286,7 @@ namespace PETScWrappers
    * preconditioner.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this
-   * preconditioner may or may not work.
+   * @ref PreconditionerBase for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -355,9 +347,7 @@ namespace PETScWrappers
    * preconditioner.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this
-   * preconditioner may or may not work.
+   * @ref PreconditionerBase for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -418,9 +408,7 @@ namespace PETScWrappers
    * Cholesky preconditioner.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this
-   * preconditioner may or may not work.
+   * @ref PreconditionerBase for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -481,9 +469,7 @@ namespace PETScWrappers
    * preconditioner.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this
-   * preconditioner may or may not work.
+   * @ref PreconditionerBase for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -545,9 +531,7 @@ namespace PETScWrappers
    * It should provide a convenient interface to another direct solver.
    *
    * See the comment in the base class
-   * @ref PreconditionerBase
-   * for when this
-   * preconditioner may or may not work.
+   * @ref PreconditionerBase for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Oliver Kayser-Herold, 2004

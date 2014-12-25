@@ -120,8 +120,7 @@ template <int dim, int spacedim> class MappingQ;
  * <h3>Interpolation</h3>
  *
  * The
- * @ref GlossInterpolation "interpolation"
- * operators associated with the
+ * @ref GlossInterpolation "interpolation" operators associated with the
  * N&eacute;d&eacute;lec element are constructed such that interpolation and
  * computing the curl are commuting operations on rectangular mesh cells. We
  * require this from interpolating arbitrary functions as well as the
@@ -130,8 +129,7 @@ template <int dim, int spacedim> class MappingQ;
  * <h4>Node values</h4>
  *
  * The
- * @ref GlossNodes "node values"
- * for an element of degree <i>k</i> on the
+ * @ref GlossNodes "node values" for an element of degree <i>k</i> on the
  * reference cell are:
  * <ol>
  * <li> On edges: the moments of the tangential component with respect to
@@ -385,8 +383,8 @@ private:
    * #generalized_face_support_points when computing the integration.
    *
    * See the
-   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
-   * for more information.
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support
+   * points" for more information.
    */
   Table<2, double> boundary_weights;
 
