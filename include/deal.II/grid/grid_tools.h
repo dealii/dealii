@@ -407,8 +407,8 @@ namespace GridTools
    * parallel::distributed::Triangulation object, the cell returned may in
    * fact be a ghost or artificial cell (see
    * @ref GlossArtificialCell and
-   * @ref GlossGhostCell). If so, many of the operations one may want to do
-   * on this cell (e.g., evaluating the solution) may not be possible and you
+   * @ref GlossGhostCell). If so, many of the operations one may want to do on
+   * this cell (e.g., evaluating the solution) may not be possible and you
    * will have to decide what to do in that case.
    */
   template <int dim, template <int,int> class Container, int spacedim>

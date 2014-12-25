@@ -28,11 +28,11 @@ template <int spacedim, typename Number> class Function;
 /**
  * This class declares a local typedef that denotes a mapping between a
  * boundary indicator (see
- * @ref GlossBoundaryIndicator) that is used to describe what kind of
- * boundary condition holds on a particular piece of the boundary, and the
- * function describing the actual function that provides the boundary values
- * on this part of the boundary. This type is required in many functions in
- * the library where, for example, we need to know about the functions
+ * @ref GlossBoundaryIndicator) that is used to describe what kind of boundary
+ * condition holds on a particular piece of the boundary, and the function
+ * describing the actual function that provides the boundary values on this
+ * part of the boundary. This type is required in many functions in the
+ * library where, for example, we need to know about the functions
  * $h_i(\mathbf x)$ used in boundary conditions @f{align*} \mathbf n \cdot
  * \nabla u = h_i \qquad \qquad \text{on}\ \Gamma_i\subset\partial\Omega. @f}
  * An example is the function KellyErrorEstimator::estimate() that allows us

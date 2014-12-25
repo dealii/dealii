@@ -906,9 +906,9 @@ namespace VectorTools
    * @param boundary_functions A map from boundary indicators to pointers to
    * functions that describe the desired values on those parts of the boundary
    * marked with this boundary indicator (see
-   * @ref GlossBoundaryIndicator "Boundary indicator"). The projection
-   * happens on only those parts of the boundary whose indicators are
-   * represented in this map.
+   * @ref GlossBoundaryIndicator "Boundary indicator"). The projection happens
+   * on only those parts of the boundary whose indicators are represented in
+   * this map.
    * @param q The face quadrature used in the integration necessary to compute
    * the mass matrix and right hand side of the projection.
    * @param boundary_values The result of this function. It is a map
