@@ -67,7 +67,8 @@ namespace internal
 /**
  * Manage the distribution and numbering of the degrees of freedom for non-
  * multigrid algorithms. This class satisfies the requirements outlined in
- * @ref GlossMeshAsAContainer "Meshes as containers". It is first used in the
+ * @ref GlossMeshAsAContainer "Meshes as containers".
+ * It is first used in the
  * step-2 tutorial program.
  *
  * For each vertex, line, quad, etc, this class stores a list of the indices
@@ -126,7 +127,9 @@ namespace internal
  * i.e. the class that represents triangulations that entirely reside on a
  * single processor. However, it can also be of type
  * parallel::distributed::Triangulation (see, for example, step-32, step-40
- * and in particular the @ref distributed module) in which case the DoFHandler
+ * and in particular the
+ * @ref distributed
+ * module) in which case the DoFHandler
  * object will proceed to only manage degrees of freedom on locally owned and
  * ghost cells. This process is entirely transparent to the used.
  *
@@ -223,7 +226,8 @@ public:
    *
    * The current typedef identifies cells in a DoFHandler object. Some of
    * these cells may in fact be active (see
-   * @ref GlossActive "active cell iterators") in which case they can in
+   * @ref GlossActive "active cell iterators"
+   * ) in which case they can in
    * fact be asked for the degrees of freedom that live on them. On the
    * other hand, if the cell is not active, any such query will result in
    * an error. Note that this is what distinguishes this typedef from the
@@ -448,7 +452,8 @@ public:
    * use an intermediate compressed sparsity pattern that only allocates
    * memory on demand. Refer to the step-2 and step-11 example programs on how
    * to do this. The problem is also discussed in the documentation of the
-   * module on @ref Sparsity.
+   * module on
+   * @ref Sparsity.
    */
   unsigned int max_couplings_between_dofs () const;
 
@@ -461,7 +466,9 @@ public:
    *
    * @note The same applies to this function as to max_couplings_per_dofs() as
    * regards the performance of this function. Think about one of the dynamic
-   * sparsity pattern classes instead (see @ref Sparsity).
+   * sparsity pattern classes instead (see
+   * @ref Sparsity
+   * ).
    */
   unsigned int max_couplings_between_boundary_dofs () const;
 
@@ -551,7 +558,8 @@ public:
   /**
    * Return an iterator range that contains all active cells that make up this
    * DoFHandler. Such a range is useful to initialize range-based for loops as
-   * supported by C++11, see also @ref CPP11 "C++11 standard".
+   * supported by C++11, see also
+   * @ref CPP11 "C++11 standard".
    *
    * Range-based for loops are useful in that they require much less code than
    * traditional loops (see <a href="http://en.wikipedia.org/wiki/C%2B%2B11
@@ -673,7 +681,8 @@ public:
    * the global number of degrees of freedom, accumulated over all processors.
    *
    * In either case, included in the returned number are those DoFs which are
-   * constrained by hanging nodes, see @ref constraints.
+   * constrained by hanging nodes, see
+   * @ref constraints.
    */
   types::global_dof_index n_dofs () const;
 
@@ -712,7 +721,9 @@ public:
    * Access to an object informing of the block structure of the dof handler.
    *
    * If an FESystem is used in distribute_dofs(), degrees of freedom naturally
-   * split into several @ref GlossBlock "blocks". For each base element as
+   * split into several
+   * @ref GlossBlock "blocks".
+   * For each base element as
    * many blocks appear as its multiplicity.
    *
    * At the end of distribute_dofs(), the number of degrees of freedom in each

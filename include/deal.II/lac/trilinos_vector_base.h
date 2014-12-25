@@ -276,8 +276,9 @@ namespace TrilinosWrappers
      * argument is ignored if the vector has been added or written to since
      * the last time compress() was called.
      *
-     * See @ref GlossCompress "Compressing distributed objects" for more
-     * information.
+     * See
+     * @ref GlossCompress "Compressing distributed objects"
+     * for more information.
      */
     void compress (::dealii::VectorOperation::values operation);
 
@@ -416,7 +417,8 @@ namespace TrilinosWrappers
      * Return if the vector contains ghost elements. This answer is true if
      * there are ghost elements on at least one process.
      *
-     * @see @ref GlossGhostedVector "vectors with ghost elements"
+     * @see
+     * @ref GlossGhostedVector "vectors with ghost elements"
      */
     bool has_ghost_elements() const;
 

@@ -62,7 +62,8 @@ namespace TrilinosWrappers
      * elements of each of these blocks to be stored on the local process.
      *
      * @ingroup Vectors
-     * @ingroup TrilinosWrappers @see
+     * @ingroup TrilinosWrappers
+     * @see
      * @ref GlossBlockLA "Block (linear algebra)"
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
      */
@@ -268,8 +269,9 @@ namespace TrilinosWrappers
        *
        * @deprecated
        *
-       * See @ref GlossCompress "Compressing distributed objects" for more
-       * information.
+       * See
+       * @ref GlossCompress "Compressing distributed objects"
+       * for more information.
        */
       void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
 
@@ -291,7 +293,8 @@ namespace TrilinosWrappers
       /**
        * Returns if this Vector contains ghost elements.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       bool has_ghost_elements() const;
 

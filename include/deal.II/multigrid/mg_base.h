@@ -126,8 +126,11 @@ public:
  * operate on all components of the solution.
  *
  * @note For the following, it is important to realize the difference between
- * a solution @ref GlossComponent "component" and a solution @ref GlossBlock
- * "block". The distinction only applies if vector valued elements are used,
+ * a solution
+ * @ref GlossComponent "component"
+ * and a solution
+ * @ref GlossBlock "block".
+ * The distinction only applies if vector valued elements are used,
  * but is quite important then. This is reflected in the fact that it is not
  * possible right now to use transfer classes based on MGTransferComponentBase
  * for genuine vector valued elements, but descendants of MGTransferBlockBase

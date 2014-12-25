@@ -38,7 +38,8 @@ template <typename number> class SparseMatrix;
  *
  * Some of these functions receive a flag @p colorize. If this is set, parts
  * of the boundary receive different boundary indicators (
- * @ref GlossBoundaryIndicator), allowing them to be distinguished for the
+ * @ref GlossBoundaryIndicator
+ * ), allowing them to be distinguished for the
  * purpose of attaching geometry objects and evaluating different boundary
  * conditions.
  *
@@ -815,7 +816,9 @@ namespace GridGenerator
    *
    *
    * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer). The map that is returned will
+   * container (see
+   * @ref GlossMeshAsAContainer
+   * ). The map that is returned will
    * be between cell iterators pointing into the container describing the
    * surface mesh and face iterators of the volume mesh container. If the
    * Container argument is DoFHandler of hp::DoFHandler, then the function

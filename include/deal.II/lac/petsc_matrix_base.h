@@ -523,8 +523,9 @@ namespace PETScWrappers
      * operations where before only assembly functions were allowed. This
      * function must therefore be called once you have assembled the matrix.
      *
-     * See @ref GlossCompress "Compressing distributed objects" for more
-     * information. more information.
+     * See
+     * @ref GlossCompress "Compressing distributed objects"
+     * for more information.
      */
     void compress (::dealii::VectorOperation::values operation);
 

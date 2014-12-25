@@ -332,7 +332,9 @@ namespace GridTools
    * located closest to a given point.
    *
    * @param container A variable of a type that satisfies the requirements of
-   * a mesh container (see @ref GlossMeshAsAContainer).
+   * a mesh container (see
+   * @ref GlossMeshAsAContainer
+   * ).
    * @param p The point for which we want to find the closest vertex. @return
    * The index of the closest vertex found.
    *
@@ -352,7 +354,9 @@ namespace GridTools
    * vertex of a cell or be a hanging node located on a face or an edge of it.
    *
    * @param container A variable of a type that satisfies the requirements of
-   * a mesh container (see @ref GlossMeshAsAContainer).
+   * a mesh container (see
+   * @ref GlossMeshAsAContainer
+   * ).
    * @param vertex_index The index of the vertex for which we try to find
    * adjacent cells. @return A vector of cells that lie adjacent to the given
    * vertex.
@@ -389,7 +393,9 @@ namespace GridTools
    * additional computational cost.
    *
    * @param container A variable of a type that satisfies the requirements of
-   * a mesh container (see @ref GlossMeshAsAContainer).
+   * a mesh container (see
+   * @ref GlossMeshAsAContainer
+   * ).
    * @param p The point for which we want to find the surrounding cell.
    * @return An iterator into the mesh container that points to the
    * surrounding cell.

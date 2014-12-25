@@ -329,9 +329,12 @@ namespace BlockMatrixIterators
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2000, 2004
  */
 template <typename MatrixType>
@@ -619,8 +622,9 @@ public:
    * Call the compress() function on all the subblocks of the matrix.
    *
    *
-   * See @ref GlossCompress "Compressing distributed objects" for more
-   * information.
+   * See
+   * @ref GlossCompress "Compressing distributed objects"
+   * for more information.
    */
   void compress (::dealii::VectorOperation::values operation);
 

@@ -47,7 +47,8 @@ DEAL_II_NAMESPACE_OPEN
  * uses the Intel Threading Building Blocks (TBB) to load balance the
  * individual subranges onto the available threads. For a lengthy discussion
  * of the rationale of this class, see the
- * @ref threads "Parallel computing with multiple processors" module. It is
+ * @ref threads "Parallel computing with multiple processors"
+ * module. It is
  * used in the tutorial first in step-9, and again in step-13, step-14,
  * step-32 and others.
  *
@@ -150,7 +151,9 @@ namespace WorkStream
      * A namespace for the implementation of details of the WorkStream pattern
      * and function. This namespace holds classes that deal with the second
      * implementation described in the paper by Turcksin, Kronbichler and
-     * Bangerth (see @ref workstream_paper).
+     * Bangerth (see
+     * @ref workstream_paper
+     * ).
      *
      * Even though this implementation is slower than the third implementation
      * discussed in that paper, we need to keep it around for two reasons: (i)
@@ -700,7 +703,9 @@ namespace WorkStream
      * A namespace for the implementation of details of the WorkStream pattern
      * and function. This namespace holds classes that deal with the third
      * implementation described in the paper by Turcksin, Kronbichler and
-     * Bangerth (see @ref workstream_paper).
+     * Bangerth (see
+     * @ref workstream_paper
+     * ).
      */
     namespace Implementation3
     {
@@ -917,7 +922,8 @@ namespace WorkStream
    * This is one of two main functions of the WorkStream concept, doing work
    * as described in the introduction to this namespace. It corresponds to
    * implementation 3 of the paper by Turcksin, Kronbichler and Bangerth, see
-   * @ref workstream_paper . As such, it takes not a range of iterators
+   * @ref workstream_paper.
+   * As such, it takes not a range of iterators
    * described by a begin and end iterator, but a "colored" graph of iterators
    * where each color represents cells for which writing the cell
    * contributions into the global object does not conflict (in other words,
@@ -966,7 +972,8 @@ namespace WorkStream
    * This is one of two main functions of the WorkStream concept, doing work
    * as described in the introduction to this namespace. It corresponds to
    * implementation 2 of the paper by Turcksin, Kronbichler and Bangerth (see
-   * @ref workstream_paper).
+   * @ref workstream_paper
+   * ).
    *
    * This function that can be used for worker and copier objects that are
    * either pointers to non-member functions or objects that allow to be
@@ -1195,7 +1202,9 @@ namespace WorkStream
    * This is a variant of one of the two main functions of the WorkStream
    * concept, doing work as described in the introduction to this namespace.
    * It corresponds to implementation 2 of the paper by Turcksin, Kronbichler
-   * and Bangerth (see @ref workstream_paper).
+   * and Bangerth (see
+   * @ref workstream_paper
+   * ).
    *
    * This is the function that can be used for worker and copier functions
    * that are member functions of a class. If the copier is an empty function,

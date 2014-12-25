@@ -75,8 +75,9 @@ template <typename> class VectorView;
  * It is used in the various compress() functions. They also exist in serial
  * codes for compatibility and are empty there.
  *
- * See @ref GlossCompress "Compressing distributed objects" for more
- * information.
+ * See
+ * @ref GlossCompress "Compressing distributed objects"
+ * for more information.
  */
 struct VectorOperation
 {
@@ -99,7 +100,8 @@ struct VectorOperation
  * @<double@>, @<long double@>, @<std::complex@<float@>@>,
  * @<std::complex@<double@>@>, @<std::complex@<long double@>@></tt>; others
  * can be generated in application programs (see the section on
- * @ref Instantiations in the manual).
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */

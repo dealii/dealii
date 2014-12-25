@@ -311,7 +311,9 @@ class ConstraintMatrix;
  * @note Instantiations for this template are provided for some vector types,
  * in particular <code>Vector&lt;float&gt;, Vector&lt;double&gt;,
  * BlockVector&lt;float&gt;, BlockVector&lt;double&gt;</code>; others can be
- * generated in application code (see the section on @ref Instantiations in
+ * generated in application code (see the section on
+ * @ref Instantiations
+ * in
  * the manual).
  *
  * @ingroup numerics
@@ -443,7 +445,9 @@ namespace VectorTools
    * first interpolate() function in the series. It interpolations a set of
    * functions onto the finite element space given by the DoFHandler argument
    * where the determination which function to use is made based on the
-   * material id (see @ref GlossMaterialId) of each cell.
+   * material id (see
+   * @ref GlossMaterialId
+   * ) of each cell.
    *
    * @param mapping        - The mapping to use to determine the location of
    * support points at which the functions are to be evaluated.
@@ -661,7 +665,9 @@ namespace VectorTools
    * it is assumed that the number of entries equals the number of components
    * in the boundary functions and the finite element, and those components in
    * the given boundary function will be used for which the respective flag
-   * was set in the component mask. See also @ref GlossComponentMask. As an
+   * was set in the component mask. See also
+   * @ref GlossComponentMask.
+   * As an
    * example, assume that you are solving the Stokes equations in 2d, with
    * variables $(u,v,p)$ and that you only want to interpolate boundary values
    * for the pressure, then the component mask should correspond to
@@ -713,7 +719,8 @@ namespace VectorTools
    * previous function, in particular about the use of the component mask and
    * the requires size of the function object.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -730,7 +737,8 @@ namespace VectorTools
    * previous function, in particular about the use of the component mask and
    * the requires size of the function object.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -774,7 +782,8 @@ namespace VectorTools
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains
    * conforming as is needed. See the discussion on conflicting constraints in
-   * the module on @ref constraints .
+   * the module on
+   * @ref constraints.
    *
    * The parameter @p boundary_component corresponds to the number @p
    * boundary_indicator of the face.
@@ -786,7 +795,9 @@ namespace VectorTools
    * it is assumed that the number of entries equals the number of components
    * in the boundary functions and the finite element, and those components in
    * the given boundary function will be used for which the respective flag
-   * was set in the component mask. See also @ref GlossComponentMask. As an
+   * was set in the component mask. See also
+   * @ref GlossComponentMask.
+   * As an
    * example, assume that you are solving the Stokes equations in 2d, with
    * variables $(u,v,p)$ and that you only want to interpolate boundary values
    * for the pressure, then the component mask should correspond to
@@ -830,7 +841,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -849,7 +861,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -899,8 +912,9 @@ namespace VectorTools
    * numbering of degrees of freedom.
    * @param boundary_functions A map from boundary indicators to pointers to
    * functions that describe the desired values on those parts of the boundary
-   * marked with this boundary indicator (see @ref GlossBoundaryIndicator
-   * "Boundary indicator"). The projection happens on only those parts of the
+   * marked with this boundary indicator (see
+   * @ref GlossBoundaryIndicator "Boundary indicator"
+   * ). The projection happens on only those parts of the
    * boundary whose indicators are represented in this map.
    * @param q The face quadrature used in the integration necessary to compute
    * the mass matrix and right hand side of the projection.
@@ -980,7 +994,8 @@ namespace VectorTools
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains
    * conforming as is needed. See the discussion on conflicting constraints in
-   * the module on @ref constraints .
+   * the module on
+   * @ref constraints.
    *
    * If @p component_mapping is empty, it is assumed that the number of
    * components of @p boundary_function matches that of the finite element
@@ -1033,7 +1048,8 @@ namespace VectorTools
    * the Dirichlet conditions should be set first, and then completed by
    * hanging node constraints, in order to make sure that the discretization
    * remains consistent. See the discussion on conflicting constraints in the
-   * module on @ref constraints .
+   * module on
+   * @ref constraints.
    *
    * This function is explicitly written to use with the FE_Nedelec elements.
    * Thus it throws an exception, if it is called with other finite elements.
@@ -1070,7 +1086,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim>
   void project_boundary_values_curl_conforming (const DoFHandler<dim> &dof_handler,
@@ -1085,7 +1102,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim>
   void project_boundary_values_curl_conforming (const hp::DoFHandler<dim> &dof_handler,
@@ -1115,7 +1133,8 @@ namespace VectorTools
    * the Dirichlet conditions should be set first, and then completed by
    * hanging node constraints, in order to make sure that the discretization
    * remains consistent. See the discussion on conflicting constraints in the
-   * module on @ref constraints .
+   * module on
+   * @ref constraints.
    *
    * The argument @p first_vector_component denotes the first vector component
    * in the finite element that corresponds to the vector function $\vec{u}$
@@ -1138,7 +1157,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template<int dim>
   void project_boundary_values_div_conforming (const DoFHandler<dim> &dof_handler,
@@ -1153,7 +1173,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template<int dim>
   void project_boundary_values_div_conforming (const hp::DoFHandler<dim> &dof_handler,
@@ -1224,7 +1245,8 @@ namespace VectorTools
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains
    * conforming as is needed. See the discussion on conflicting constraints in
-   * the module on @ref constraints .
+   * the module on
+   * @ref constraints.
    *
    *
    * <h4>Computing constraints in 2d</h4>
@@ -1366,7 +1388,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, template <int, int> class DH, int spacedim>
   void
@@ -1382,7 +1405,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, template <int, int> class DH, int spacedim>
   void
@@ -1403,7 +1427,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, template <int, int> class DH, int spacedim>
   void
@@ -1419,7 +1444,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, template <int, int> class DH, int spacedim>
   void
@@ -1583,7 +1609,8 @@ namespace VectorTools
    *
    * See the general documentation of this class for further information.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
   void create_boundary_right_hand_side (const Mapping<dim,spacedim>      &mapping,
@@ -1597,7 +1624,8 @@ namespace VectorTools
    * Calls the create_boundary_right_hand_side() function, see above, with
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
   void create_boundary_right_hand_side (const DoFHandler<dim,spacedim>   &dof,
@@ -1609,7 +1637,8 @@ namespace VectorTools
   /**
    * Same as the set of functions above, but for hp objects.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
   void create_boundary_right_hand_side (const hp::MappingCollection<dim,spacedim>      &mapping,
@@ -1624,7 +1653,8 @@ namespace VectorTools
    * single Q1 mapping as collection. This function therefore will only work
    * if the only active fe index in use is zero.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
   void create_boundary_right_hand_side (const hp::DoFHandler<dim,spacedim>   &dof,
@@ -1697,8 +1727,11 @@ namespace VectorTools
    * the vector elements $d_K$ for an output vector with as many cells as
    * there are active cells of the triangulation object of the current
    * processor. However, not all active cells are in fact locally owned: some
-   * may be ghost or artificial cells (see @ref GlossGhostCell "here" and
-   * @ref GlossArtificialCell "here"). The vector computed will, in the case of
+   * may be ghost or artificial cells (see
+   * @ref GlossGhostCell "here"
+   * and
+   * @ref GlossArtificialCell "here"
+   * ). The vector computed will, in the case of
    * a distributed triangulation, contain zeros for cells that are not locally
    * owned. As a consequence, in order to compute the <i>global</i> $L_2$
    * error (for example), the errors from different processors need to be
@@ -1869,7 +1902,8 @@ namespace VectorTools
    * function using a Q1-mapping for cells.
    *
    * This function is used in the "Possibilities for extensions" part of the
-   * results section of @ref step_3 "step-3".
+   * results section of
+   * @ref step_3 "step-3".
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
@@ -1982,7 +2016,9 @@ namespace VectorTools
    * argument is used to denote which components of the solution vector
    * correspond to the pressure, and avoid touching all other components of
    * the vector, such as the velocity components. (Note, however, that the
-   * mask is not a @ref GlossComponentMask operating on the vector components
+   * mask is not a
+   * @ref GlossComponentMask
+   * operating on the vector components
    * of the finite element the solution vector @p v may be associated with;
    * rather, it is a mask on the entire vector, without reference to what the
    * vector elements mean.)
@@ -2022,7 +2058,8 @@ namespace VectorTools
    * numerically using the quadrature formula given as third argument.
    *
    * This function is used in the "Possibilities for extensions" part of the
-   * results section of @ref step_3 "step-3".
+   * results section of
+   * @ref step_3 "step-3".
    *
    * @note The function is most often used when solving a problem whose
    * solution is only defined up to a constant, for example a pure Neumann

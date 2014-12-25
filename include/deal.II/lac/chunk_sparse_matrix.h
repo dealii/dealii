@@ -399,7 +399,9 @@ namespace ChunkSparseMatrixIterators
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Wolfgang Bangerth, 2008
  */
@@ -830,7 +832,8 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.
@@ -848,7 +851,8 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.
@@ -865,7 +869,8 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.
@@ -883,7 +888,8 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random
    * member access is expensive, this function is not efficient. In
    * particular, if you want to multiply with BlockVector objects, you should
    * consider using a BlockChunkSparseMatrix as well.

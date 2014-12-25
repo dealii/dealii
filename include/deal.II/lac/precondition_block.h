@@ -75,7 +75,8 @@ class PreconditionBlockJacobi;
  * for example, <tt>number==double, inverse_type=float</tt> might be a viable
  * choice.
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Ralf Hartmann, Guido Kanschat
  * @date 1999, 2000, 2010
  */
@@ -369,7 +370,9 @@ protected:
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
@@ -635,7 +638,9 @@ private:
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
@@ -790,7 +795,9 @@ protected:
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */

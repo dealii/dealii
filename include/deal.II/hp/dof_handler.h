@@ -88,7 +88,8 @@ namespace hp
    *
    * The whole process of working with objects of this type is explained in
    * step-27. Many of the algorithms this class implements are described in
-   * the @ref hp_paper "hp paper".
+   * the
+   * @ref hp_paper "hp paper".
    *
    *
    * <h3>Active FE indices and their behavior under mesh refinement</h3>
@@ -133,7 +134,8 @@ namespace hp
 
     /**
      * A typedef that is used to to identify
-     * @ref GlossActive "active cell iterators". The concept of iterators
+     * @ref GlossActive "active cell iterators".
+     * The concept of iterators
      * is discussed at length in the
      * @ref Iterators "iterators documentation module".
      *
@@ -162,7 +164,8 @@ namespace hp
      *
      * The current typedef identifies cells in a DoFHandler object. Some of
      * these cells may in fact be active (see
-     * @ref GlossActive "active cell iterators") in which case they can in
+     * @ref GlossActive "active cell iterators"
+     * ) in which case they can in
      * fact be asked for the degrees of freedom that live on them. On the
      * other hand, if the cell is not active, any such query will result in
      * an error. Note that this is what distinguishes this typedef from the
@@ -316,7 +319,8 @@ namespace hp
      * As for ::DoFHandler::max_couplings_between_dofs(), the result of this
      * function is often not very accurate for 3d and/or high polynomial
      * degrees. The consequences are discussed in the documentation of the
-     * module on @ref Sparsity.
+     * module on
+     * @ref Sparsity.
      */
     unsigned int max_couplings_between_dofs () const;
 
@@ -329,7 +333,8 @@ namespace hp
      *
      * @note The same applies to this function as to max_couplings_per_dofs()
      * as regards the performance of this function. Think about one of the
-     * dynamic sparsity pattern classes instead (see @ref Sparsity).
+     * dynamic sparsity pattern classes instead (see
+     * @ref Sparsity).
      */
     unsigned int max_couplings_between_boundary_dofs () const;
 
@@ -394,7 +399,8 @@ namespace hp
     /**
      * Return an iterator range that contains all active cells that make up
      * this DoFHandler. Such a range is useful to initialize range-based for
-     * loops as supported by C++11, see also @ref CPP11 "C++11 standard".
+     * loops as supported by C++11, see also
+     * @ref CPP11 "C++11 standard".
      *
      * Range-based for loops are useful in that they require much less code
      * than traditional loops (see <a
@@ -487,7 +493,8 @@ namespace hp
      * processors.
      *
      * In either case, included in the returned number are those DoFs which
-     * are constrained by hanging nodes, see @ref constraints.
+     * are constrained by hanging nodes, see
+     * @ref constraints.
      */
     types::global_dof_index n_dofs () const;
 

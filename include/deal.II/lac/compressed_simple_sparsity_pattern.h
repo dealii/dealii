@@ -51,10 +51,12 @@ template <typename number> class SparseMatrix;
  *
  * Another viewpoint is that this class does not need up front allocation of a
  * certain amount of memory, but grows as necessary.  An extensive description
- * of sparsity patterns can be found in the documentation of the @ref Sparsity
+ * of sparsity patterns can be found in the documentation of the
+ * @ref Sparsity
  * module.
  *
- * This class is an example of the "dynamic" type of @ref Sparsity.
+ * This class is an example of the "dynamic" type of
+ * @ref Sparsity.
  *
  * <h3>Interface</h3>
  *
@@ -81,7 +83,8 @@ template <typename number> class SparseMatrix;
  * <h3>Notes</h3>
  *
  * There are several, exchangeable variations of this class, see
- * @ref Sparsity, section '"Dynamic" or "compressed" sparsity patterns' for
+ * @ref Sparsity
+ * , section '"Dynamic" or "compressed" sparsity patterns' for
  * more information.
  *
  * @author Timo Heister, 2008

@@ -48,11 +48,15 @@ template <typename number> class SparseMatrix;
  *
  * Another viewpoint is that this class does not need up front allocation of a
  * certain amount of memory, but grows as necessary.  An extensive description
- * of sparsity patterns can be found in the documentation of the @ref Sparsity
+ * of sparsity patterns can be found in the documentation of the
+ * @ref Sparsity
  * module.
  *
- * This class is an example of the "dynamic" type of @ref Sparsity. It is
- * discussed in the step-27 and @ref step_22 "step-22" tutorial programs.
+ * This class is an example of the "dynamic" type of
+ * @ref Sparsity.
+ * It is discussed in the step-27 and
+ * @ref step_22 "step-22"
+ * tutorial programs.
  *
  * <h3>Interface</h3>
  *
@@ -81,7 +85,8 @@ template <typename number> class SparseMatrix;
  * <h3>Notes</h3>
  *
  * There are several, exchangeable variations of this class, see
- * @ref Sparsity, section '"Dynamic" or "compressed" sparsity patterns' for more
+ * @ref Sparsity
+ * , section '"Dynamic" or "compressed" sparsity patterns' for more
  * information.
  *
  * This class is a variation of the CompressedSparsityPattern class. Instead
@@ -90,7 +95,9 @@ template <typename number> class SparseMatrix;
  * solution might not be the fastest in all situations, but seems to work much
  * better than the CompressedSparsityPattern in the context of hp-adaptivity
  * (see for example step-27), or generally when there are many nonzero entries
- * in each row of a matrix (see @ref step_22 "step-22").  On the other hand, a
+ * in each row of a matrix (see
+ * @ref step_22 "step-22"
+ * ).  On the other hand, a
  * benchmark where nonzero entries were randomly inserted into the sparsity
  * pattern revealed that this class is slower by a factor 4-6 in this
  * situation. Hence, currently the suggestion is to carefully analyze which of

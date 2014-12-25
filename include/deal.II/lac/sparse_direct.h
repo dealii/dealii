@@ -41,7 +41,10 @@ DEAL_II_NAMESPACE_OPEN
  * systems, Ax=b, using the Unsymmetric-pattern MultiFrontal method and direct
  * sparse LU factorization. Matrices may have symmetric or unsymmetrix
  * sparsity patterns, and may have unsymmetric entries. The use of this class
- * is explained in the @ref step_22 "step-22" and @ref step_29 "step-29"
+ * is explained in the
+ * @ref step_22 "step-22"
+ * and
+ * @ref step_29 "step-29"
  * tutorial programs.
  *
  * This matrix class implements the usual interface of preconditioners, that

@@ -30,7 +30,8 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class represents a mask that can be used to select individual vector
  * components of a finite element (see also
- * @ref GlossComponentMask "this glossary entry"). It will typically have
+ * @ref GlossComponentMask "this glossary entry"
+ * ). It will typically have
  * as many elements as the finite element has vector components, and one
  * can use <code>operator[]</code> to query whether a particular component
  * has been selected.
@@ -42,7 +43,9 @@ DEAL_II_NAMESPACE_OPEN
  * created by hand, or, simpler, by asking the finite element to generate a
  * component mask from certain selected components using code such as this
  * where we create a mask that only denotes the velocity components of a
- * Stokes element (see @ref vector_valued):
+ * Stokes element (see
+ * @ref vector_valued
+ * ):
  * @code
  *   FESystem<dim> stokes_fe (FE_Q<dim>(2), dim,    // Q2 element for the velocities
  *                            FE_Q<dim>(1), 1);     // Q1 element for the pressure
