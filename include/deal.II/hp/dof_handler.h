@@ -447,7 +447,8 @@ namespace hp
      * in the documentation of active_cell_iterators().
      *
      * @param[in] level A given level in the refinement hierarchy of this
-     * triangulation. @return The half open range <code>[this->begin(level),
+     * triangulation.
+     * @return The half open range <code>[this->begin(level),
      * this->end(level))</code>
      *
      * @pre level must be less than this->n_levels().
@@ -463,7 +464,8 @@ namespace hp
      * in the documentation of active_cell_iterators().
      *
      * @param[in] level A given level in the refinement hierarchy of this
-     * triangulation. @return The half open range
+     * triangulation.
+     * @return The half open range
      * <code>[this->begin_active(level), this->end(level))</code>
      *
      * @pre level must be less than this->n_levels().
