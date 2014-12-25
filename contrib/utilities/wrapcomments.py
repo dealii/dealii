@@ -92,7 +92,7 @@ def format_block(lines, infostr=""):
     endidx = len(lines)-1
     curlines = []
 
-    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@deprecated", "@image"]
+    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@deprecated", "@image", "@ref", "@return"]
 
     # subset of ops_startline that does not want stuff from the next line appended
     # to this.
