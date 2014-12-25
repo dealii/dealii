@@ -1145,7 +1145,8 @@ namespace Functions
      *
      * @param p The point at which the function is to be evaluated.
      * @param component The vector component. Since this function is scalar,
-     * only zero is a valid argument here. @return The interpolated value at
+     * only zero is a valid argument here.
+     * @return The interpolated value at
      * this point. If the point lies outside the set of coordinates, the
      * function is extended by a constant.
      */
@@ -1230,7 +1231,8 @@ namespace Functions
      *
      * @param p The point at which the function is to be evaluated.
      * @param component The vector component. Since this function is scalar,
-     * only zero is a valid argument here. @return The interpolated value at
+     * only zero is a valid argument here.
+     * @return The interpolated value at
      * this point. If the point lies outside the set of coordinates, the
      * function is extended by a constant.
      */

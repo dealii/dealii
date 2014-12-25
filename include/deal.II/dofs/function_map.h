@@ -27,7 +27,9 @@ template <int spacedim, typename Number> class Function;
 
 /**
  * This class declares a local typedef that denotes a mapping between a
- * boundary indicator (see @ref GlossBoundaryIndicator) that is used to
+ * boundary indicator (see
+ * @ref GlossBoundaryIndicator
+ * ) that is used to
  * describe what kind of boundary condition holds on a particular piece of the
  * boundary, and the function describing the actual function that provides the
  * boundary values on this part of the boundary. This type is required in many

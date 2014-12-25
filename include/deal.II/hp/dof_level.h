@@ -228,7 +228,8 @@ namespace internal
        * @param obj_index The number of the cell we are looking at.
        * @param dofs_per_cell The number of DoFs per cell for this cell. This
        * is not used for the hp case but necessary to keep the interface the
-       * same as for the non-hp case. @return A pointer to the first DoF index
+       * same as for the non-hp case.
+       * @return A pointer to the first DoF index
        * for the current cell. The next dofs_per_cell indices are for the
        * current cell.
        */

@@ -118,7 +118,8 @@ namespace GridTools
    * @param mapping An optional argument used to denote the mapping that
    * should be used when describing whether cells are bounded by straight or
    * curved faces. The default is to use a $Q_1$ mapping, which corresponds to
-   * straight lines bounding the cells. @return The dim-dimensional measure of
+   * straight lines bounding the cells.
+   * @return The dim-dimensional measure of
    * the domain described by the triangulation, as discussed above.
    */
   template <int dim, int spacedim>
@@ -335,8 +336,8 @@ namespace GridTools
    * a mesh container (see
    * @ref GlossMeshAsAContainer
    * ).
-   * @param p The point for which we want to find the closest vertex. @return
-   * The index of the closest vertex found.
+   * @param p The point for which we want to find the closest vertex.
+   * @return The index of the closest vertex found.
    *
    * @author Ralf B. Schulz, 2006
    */
@@ -358,7 +359,8 @@ namespace GridTools
    * @ref GlossMeshAsAContainer
    * ).
    * @param vertex_index The index of the vertex for which we try to find
-   * adjacent cells. @return A vector of cells that lie adjacent to the given
+   * adjacent cells.
+   * @return A vector of cells that lie adjacent to the given
    * vertex.
    *
    * @note If the point requested does not lie in any of the cells of the mesh
@@ -508,8 +510,8 @@ namespace GridTools
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see @ref GlossMeshAsAContainer).
-   * @param cell An iterator pointing to a cell of the mesh container. @return
-   * A list of active descendants of the given cell
+   * @param cell An iterator pointing to a cell of the mesh container.
+   * @return A list of active descendants of the given cell
    *
    * @note Since in C++ the type of the Container template argument can not be
    * deduced from a function call, you will have to specify it after the
@@ -677,7 +679,8 @@ namespace GridTools
    * returns.
    *
    * @param triangulation The triangulation of which the function evaluates
-   * which vertices are locally owned. @return The subset of vertices, as
+   * which vertices are locally owned.
+   * @return The subset of vertices, as
    * described above. The length of the returned array equals
    * Triangulation.n_vertices() and may, consequently, be larger than
    * Triangulation::n_used_vertices().

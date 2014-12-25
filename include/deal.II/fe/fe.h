@@ -1189,7 +1189,8 @@ public:
    * for more information.
    *
    * @param scalar An object that represents a single scalar vector component
-   * of this finite element. @return A component mask that is false in all
+   * of this finite element.
+   * @return A component mask that is false in all
    * components except for the one that corresponds to the argument.
    */
   ComponentMask
@@ -1203,7 +1204,8 @@ public:
    * for more information.
    *
    * @param vector An object that represents dim vector components of this
-   * finite element. @return A component mask that is false in all components
+   * finite element.
+   * @return A component mask that is false in all components
    * except for the ones that corresponds to the argument.
    */
   ComponentMask
@@ -1218,7 +1220,8 @@ public:
    *
    * @param sym_tensor An object that represents dim*(dim+1)/2 components of
    * this finite element that are jointly to be interpreted as forming a
-   * symmetric tensor.  @return A component mask that is false in all
+   * symmetric tensor.
+   * @return A component mask that is false in all
    * components except for the ones that corresponds to the argument.
    */
   ComponentMask
@@ -1236,7 +1239,8 @@ public:
    * ComponentMask.
    *
    * @param block_mask The mask that selects individual blocks of the finite
-   * element @return A mask that selects those components corresponding to the
+   * element
+   * @return A mask that selects those components corresponding to the
    * selected blocks of the input argument.
    */
   ComponentMask
@@ -1258,7 +1262,8 @@ public:
    * exception.
    *
    * @param scalar An object that represents a single scalar vector component
-   * of this finite element. @return A component mask that is false in all
+   * of this finite element.
+   * @return A component mask that is false in all
    * components except for the one that corresponds to the argument.
    */
   BlockMask
@@ -1276,7 +1281,8 @@ public:
    * full blocks and does not split blocks of this element.
    *
    * @param vector An object that represents dim vector components of this
-   * finite element. @return A component mask that is false in all components
+   * finite element.
+   * @return A component mask that is false in all components
    * except for the ones that corresponds to the argument.
    */
   BlockMask
@@ -1295,7 +1301,8 @@ public:
    *
    * @param sym_tensor An object that represents dim*(dim+1)/2 components of
    * this finite element that are jointly to be interpreted as forming a
-   * symmetric tensor. @return A component mask that is false in all
+   * symmetric tensor.
+   * @return A component mask that is false in all
    * components except for the ones that corresponds to the argument.
    */
   BlockMask
@@ -1321,7 +1328,8 @@ public:
    * exception.
    *
    * @param component_mask The mask that selects individual components of the
-   * finite element @return A mask that selects those blocks corresponding to
+   * finite element
+   * @return A mask that selects those blocks corresponding to
    * the selected blocks of the input argument.
    */
   BlockMask
