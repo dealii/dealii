@@ -42,7 +42,8 @@ namespace GraphColoring
      * whether they will have a nonempty intersection. The actual intersection
      * is not computed.
      * @param indices1 A set of indices, assumed sorted.
-     * @param indices2 A set of indices, assumed sorted. @return Whether the
+     * @param indices2 A set of indices, assumed sorted.
+     * @return Whether the
      * two sets of indices do have a nonempty intersection.
      */
     inline
@@ -95,7 +96,8 @@ namespace GraphColoring
      * @param[in] end The element past the end of the range of iterators.
      * @param[in] get_conflict_indices A user defined function object
      * returning a set of indicators that are descriptive of what represents a
-     * conflict. See above for a more thorough discussion. @return A set of
+     * conflict. See above for a more thorough discussion.
+     * @return A set of
      * sets of iterators (where sets are represented by std::vector for
      * efficiency). Each element of the outermost set corresponds to the
      * iterators pointing to objects that are in the same partition (i.e., the
@@ -500,7 +502,8 @@ namespace GraphColoring
    * @param[in] end The element past the end of the range of iterators.
    * @param[in] get_conflict_indices A user defined function object returning
    * a set of indicators that are descriptive of what represents a conflict.
-   * See above for a more thorough discussion. @return A set of sets of
+   * See above for a more thorough discussion.
+   * @return A set of sets of
    * iterators (where sets are represented by std::vector for efficiency).
    * Each element of the outermost set corresponds to the iterators pointing
    * to objects that are in the same partition (have the same color) and

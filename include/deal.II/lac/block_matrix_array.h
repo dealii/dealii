@@ -106,7 +106,8 @@ template <typename> class Vector;
  * The remaining code of this sample program concerns preconditioning and is
  * described in the documentation of BlockTrianglePrecondition.
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat
  * @date 2000-2005, 2010
  */

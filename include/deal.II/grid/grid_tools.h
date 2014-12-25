@@ -409,8 +409,11 @@ namespace GridTools
    *
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
-   * fact be a ghost or artificial cell (see @ref GlossArtificialCell and
-   * @ref GlossGhostCell). If so, many of the operations one may want to do
+   * fact be a ghost or artificial cell (see
+   * @ref GlossArtificialCell
+   * and
+   * @ref GlossGhostCell
+   * ). If so, many of the operations one may want to do
    * on this cell (e.g., evaluating the solution) may not be possible and
    * you will have to decide what to do in that case.
    */
@@ -443,7 +446,9 @@ namespace GridTools
    * @param mapping The mapping used to determine whether the given point is
    * inside a given cell.
    * @param container A variable of a type that satisfies the requirements of
-   * a mesh container (see @ref GlossMeshAsAContainer).
+   * a mesh container (see
+   * @ref GlossMeshAsAContainer
+   * ).
    * @param p The point for which we want to find the surrounding cell.
    * @return An pair of an iterator into the mesh container that points to the
    * surrounding cell, and of the coordinates of that point inside the cell in
@@ -460,7 +465,9 @@ namespace GridTools
    *
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
-   * fact be a ghost or artificial cell (see @ref GlossArtificialCell and
+   * fact be a ghost or artificial cell (see
+   * @ref GlossArtificialCell
+   * and
    * @ref GlossGhostCell). If so, many of the operations one may want to do
    * on this cell (e.g., evaluating the solution) may not be possible and
    * you will have to decide what to do in that case.
@@ -488,7 +495,8 @@ namespace GridTools
    *
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
-   * fact be a ghost or artificial cell (see @ref GlossArtificialCell and
+   * fact be a ghost or artificial cell (see
+   * @ref GlossArtificialCell and
    * @ref GlossGhostCell). If so, many of the operations one may want to do
    * on this cell (e.g., evaluating the solution) may not be possible and
    * you will have to decide what to do in that case.
@@ -509,7 +517,8 @@ namespace GridTools
    * (because the cell has no children that may be active).
    *
    * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer).
+   * container (see
+   * @ref GlossMeshAsAContainer).
    * @param cell An iterator pointing to a cell of the mesh container.
    * @return A list of active descendants of the given cell
    *
@@ -529,7 +538,8 @@ namespace GridTools
    * the vector @p active_neighbors.
    *
    * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer).
+   * container (see
+   * @ref GlossMeshAsAContainer).
    * @param[in] cell An iterator pointing to a cell of the mesh container.
    * @param[out] active_neighbors A list of active descendants of the given
    * cell
@@ -661,8 +671,10 @@ namespace GridTools
   /**
    * For a triangulation, return a mask that represents which of its vertices
    * are "owned" by the current process in the same way as we talk about
-   * locally owned cells or degrees of freedom (see @ref GlossLocallyOwnedCell
-   * and @ref GlossLocallyOwnedDof). For the purpose of this function, we
+   * locally owned cells or degrees of freedom (see
+   * @ref GlossLocallyOwnedCell
+   * and
+   * @ref GlossLocallyOwnedDof). For the purpose of this function, we
    * define a locally owned vertex as follows: a vertex is owned by that
    * processor with the smallest subdomain id (which equals the MPI rank of
    * that processor) among all owners of cells adjacent to this vertex. In
@@ -721,7 +733,8 @@ namespace GridTools
    * traversed in one, or both, of the meshes given as arguments.
    *
    * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer).
+   * container (see
+   * @ref GlossMeshAsAContainer).
    */
   template <typename Container>
   std::list<std::pair<typename Container::cell_iterator,
@@ -750,7 +763,8 @@ namespace GridTools
    * triangulations or the classes built on triangulations.
    *
    * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer).
+   * container (see
+   * @ref GlossMeshAsAContainer).
    */
   template <typename Container>
   bool
@@ -815,7 +829,8 @@ namespace GridTools
    * sub-faces to the list to be returned.
    *
    * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer). In C++, the compiler can not
+   * container (see
+   * @ref GlossMeshAsAContainer). In C++, the compiler can not
    * determine the type of <code>Container</code> from the function call. You
    * need to specify it as an explicit template argument following the
    * function name.
@@ -994,7 +1009,8 @@ namespace GridTools
    * @endcode
    *
    * and any combination of that... More information on the topic can be found
-   * in the @ref GlossFaceOrientation "glossary" article.
+   * in the
+   * @ref GlossFaceOrientation "glossary" article.
    *
    * @author Matthias Maier, 2012
    */
@@ -1057,7 +1073,8 @@ namespace GridTools
    * @ref GlossPeriodicConstraints "glossary entry on periodic boundary conditions".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer).
+   * container (see
+   * @ref GlossMeshAsAContainer).
    *
    * @note The created std::vector can be used in
    * DoFTools::make_periodicity_constraints() and in
@@ -1086,7 +1103,8 @@ namespace GridTools
 
   /**
    * This compatibility version of collect_periodic_face_pairs() only works on
-   * grids with cells in @ref GlossFaceOrientation "standard orientation".
+   * grids with cells in
+   * @ref GlossFaceOrientation "standard orientation".
    *
    * Instead of defining a 'first' and 'second' boundary with the help of two
    * boundary_indicators this function defines a 'left' boundary as all faces
@@ -1107,7 +1125,8 @@ namespace GridTools
    * @ref GlossPeriodicConstraints "glossary entry on periodic boundary conditions".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
-   * container (see @ref GlossMeshAsAContainer).
+   * container (see
+   * @ref GlossMeshAsAContainer).
    *
    * @note This version of collect_periodic_face_pairs() will not work on
    * meshes with cells not in
