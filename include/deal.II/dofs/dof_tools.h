@@ -925,8 +925,7 @@ namespace DoFTools
    * interpolation matrix with size no_face_dofs $\times$ no_face_dofs.
    *
    * Detailed information can be found in the see
-   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
-   * conditions".
+   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
    *
    * @todo: Reference to soon be written example step and glossary article.
    *
@@ -963,8 +962,7 @@ namespace DoFTools
    * before.
    *
    * @see
-   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
-   * conditions" for further information.
+   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions" for further information.
    *
    * @author Daniel Arndt, Matthias Maier, 2013, 2014
    */
@@ -1018,8 +1016,7 @@ namespace DoFTools
    * need more functionality use GridTools::collect_periodic_faces() directly.
    *
    * @see
-   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
-   * conditions" for further information.
+   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions" for further information.
    *
    * @author Matthias Maier, 2012
    */
@@ -1056,8 +1053,7 @@ namespace DoFTools
    * need more functionality use GridTools::collect_periodic_faces() directly.
    *
    * @see
-   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary
-   * conditions" for further information.
+   * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions" for further information.
    */
   template<typename DH>
   void

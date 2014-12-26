@@ -82,7 +82,8 @@ template <typename number> class SparseMatrix;
  * <h3>Notes</h3>
  *
  * There are several, exchangeable variations of this class, see
- * @ref Sparsity , section '"Dynamic" or "compressed" sparsity patterns' for
+ * @ref Sparsity,
+ * section '"Dynamic" or "compressed" sparsity patterns' for
  * more information.
  *
  * This class is a variation of the CompressedSparsityPattern class. Instead
@@ -92,7 +93,7 @@ template <typename number> class SparseMatrix;
  * better than the CompressedSparsityPattern in the context of hp-adaptivity
  * (see for example step-27), or generally when there are many nonzero entries
  * in each row of a matrix (see
- * @ref step_22 "step-22").  On the other hand, a benchmark where nonzero
+ * @ref step_22 "step-22"). On the other hand, a benchmark where nonzero
  * entries were randomly inserted into the sparsity pattern revealed that this
  * class is slower by a factor 4-6 in this situation. Hence, currently the
  * suggestion is to carefully analyze which of the CompressedSparsityPattern

@@ -560,7 +560,7 @@ public:
    * elements per row (for example for vector-valued problems or hp finite
    * elements). In this case, it is advisable to use the
    * CompressedSetSparsityPattern class instead, see for example
-   * @ref step_27 "step-27" , or to use the CompressedSimpleSparsityPattern
+   * @ref step_27 "step-27", or to use the CompressedSimpleSparsityPattern
    * class, see for example
    * @ref step_31 "step-31".
    */

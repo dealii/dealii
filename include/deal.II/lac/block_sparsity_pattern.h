@@ -485,7 +485,7 @@ public:
  * @ref Sparsity.
  *
  * <b>Note:</b> There are several, exchangeable variations of this class, see
- * @ref Sparsity , section 'Dynamic block sparsity patterns' for more
+ * @ref Sparsity, section 'Dynamic block sparsity patterns' for more
  * information.
  *
  * <b>Note:</b> This class used to be called CompressedBlockSparsityPattern.
@@ -604,7 +604,7 @@ typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern DEAL_II_DE
  * @ref Sparsity.
  *
  * @note There are several, exchangeable variations of this class, see
- * @ref Sparsity , section 'Dynamic block sparsity patterns' for more
+ * @ref Sparsity, section 'Dynamic block sparsity patterns' for more
  * information.
  *
  * @author Wolfgang Bangerth, 2007
@@ -684,7 +684,7 @@ public:
  * @ref Sparsity.
  *
  * @note There are several, exchangeable variations of this class, see
- * @ref Sparsity , section 'Dynamic block sparsity patterns' for more
+ * @ref Sparsity, section 'Dynamic block sparsity patterns' for more
  * information.
  *
  * This class is used in step-22 and step-31.

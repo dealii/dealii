@@ -132,7 +132,7 @@ namespace internal
       /**
        * One bool per cell to indicate the direction of the normal true:  use
        * orientation from vertex false: revert the orientation. See
-       * @ref GlossDirectionFlag .
+       * @ref GlossDirectionFlag.
        *
        * This is only used for codim==1 meshes.
        */

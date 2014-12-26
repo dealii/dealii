@@ -99,8 +99,7 @@ private:
    * Initialize the FiniteElement<dim>::generalized_support_points and
    * FiniteElement<dim>::generalized_face_support_points fields. Called from
    * the constructor. See the
-   * @ref GlossGeneralizedSupport "glossary entry on generalized support
-   * points" for more information.
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points" for more information.
    */
   void initialize_support_points (const unsigned int rt_degree);
   /**
