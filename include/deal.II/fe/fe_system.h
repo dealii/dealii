@@ -36,7 +36,8 @@ DEAL_II_NAMESPACE_OPEN
  * finite element. %Vector valued elements are discussed in a number of
  * tutorial programs, for example step-8, step-20, step-21, and in particular
  * in the
- * @ref vector_valued module.
+ * @ref vector_valued
+ * module.
  *
  * <h3>FESystem, components and blocks</h3>
  *
@@ -57,12 +58,13 @@ DEAL_II_NAMESPACE_OPEN
  * partial differential equation, the finite element side looks a bit
  * different Since not only FESystem, but also vector-valued elements like
  * FE_RaviartThomas, have several components. The concept needed here is a
- * @ref GlossBlock "block". Each block encompasses the set of degrees of
- * freedom associated with a single base element of an FESystem, where base
- * elements with multiplicities count multiple times. These blocks are usually
- * addressed using the information in DoFHandler::block_info(). The number of
- * blocks of a FESystem object is simply the sum of all multiplicities of base
- * elements and is given by n_blocks().
+ * @ref GlossBlock "block".
+ * Each block encompasses the set of degrees of freedom associated with a
+ * single base element of an FESystem, where base elements with multiplicities
+ * count multiple times. These blocks are usually addressed using the
+ * information in DoFHandler::block_info(). The number of blocks of a FESystem
+ * object is simply the sum of all multiplicities of base elements and is
+ * given by n_blocks().
  *
  * For example, the FESystem for the Taylor-Hood element for the three-
  * dimensional Stokes problem can be built using the code

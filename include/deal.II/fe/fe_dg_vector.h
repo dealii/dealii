@@ -109,7 +109,8 @@ private:
    * constructor.
    *
    * See the
-   * @ref GlossGeneralizedSupport "glossary entry on generalized support points" for more information.
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * for more information.
    */
   void initialize_support_points (const unsigned int degree);
 

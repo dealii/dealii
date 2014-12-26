@@ -624,8 +624,8 @@ public:
    * exists in other objects for compatibility.
    *
    * See
-   * @ref GlossCompress "Compressing distributed objects" for more
-   * information.
+   * @ref GlossCompress "Compressing distributed objects"
+   * for more information.
    */
   void compress (::dealii::VectorOperation::values operation);
 

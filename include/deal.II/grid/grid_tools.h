@@ -406,10 +406,12 @@ namespace GridTools
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
    * fact be a ghost or artificial cell (see
-   * @ref GlossArtificialCell and
-   * @ref GlossGhostCell). If so, many of the operations one may want to do on
-   * this cell (e.g., evaluating the solution) may not be possible and you
-   * will have to decide what to do in that case.
+   * @ref GlossArtificialCell
+   * and
+   * @ref GlossGhostCell).
+   * If so, many of the operations one may want to do on this cell (e.g.,
+   * evaluating the solution) may not be possible and you will have to decide
+   * what to do in that case.
    */
   template <int dim, template <int,int> class Container, int spacedim>
 #ifndef _MSC_VER
@@ -459,10 +461,12 @@ namespace GridTools
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
    * fact be a ghost or artificial cell (see
-   * @ref GlossArtificialCell and
-   * @ref GlossGhostCell). If so, many of the operations one may want to do on
-   * this cell (e.g., evaluating the solution) may not be possible and you
-   * will have to decide what to do in that case.
+   * @ref GlossArtificialCell
+   * and
+   * @ref GlossGhostCell).
+   * If so, many of the operations one may want to do on this cell (e.g.,
+   * evaluating the solution) may not be possible and you will have to decide
+   * what to do in that case.
    */
   template <int dim, template<int, int> class Container, int spacedim>
 #ifndef _MSC_VER
@@ -488,10 +492,12 @@ namespace GridTools
    * @note When applied to a triangulation or DoF handler object based on a
    * parallel::distributed::Triangulation object, the cell returned may in
    * fact be a ghost or artificial cell (see
-   * @ref GlossArtificialCell and
-   * @ref GlossGhostCell). If so, many of the operations one may want to do on
-   * this cell (e.g., evaluating the solution) may not be possible and you
-   * will have to decide what to do in that case.
+   * @ref GlossArtificialCell
+   * and
+   * @ref GlossGhostCell).
+   * If so, many of the operations one may want to do on this cell (e.g.,
+   * evaluating the solution) may not be possible and you will have to decide
+   * what to do in that case.
    */
   template <int dim, int spacedim>
   std::pair<typename hp::DoFHandler<dim, spacedim>::active_cell_iterator, Point<dim> >
@@ -664,15 +670,17 @@ namespace GridTools
    * For a triangulation, return a mask that represents which of its vertices
    * are "owned" by the current process in the same way as we talk about
    * locally owned cells or degrees of freedom (see
-   * @ref GlossLocallyOwnedCell and
-   * @ref GlossLocallyOwnedDof). For the purpose of this function, we define a
-   * locally owned vertex as follows: a vertex is owned by that processor with
-   * the smallest subdomain id (which equals the MPI rank of that processor)
-   * among all owners of cells adjacent to this vertex. In other words,
-   * vertices that are in the interior of a partition of the triangulation are
-   * owned by the owner of this partition; for vertices that lie on the
-   * boundary between two or more partitions, the owner is the processor with
-   * the least subdomain_id among all adjacent subdomains.
+   * @ref GlossLocallyOwnedCell
+   * and
+   * @ref GlossLocallyOwnedDof).
+   * For the purpose of this function, we define a locally owned vertex as
+   * follows: a vertex is owned by that processor with the smallest subdomain
+   * id (which equals the MPI rank of that processor) among all owners of
+   * cells adjacent to this vertex. In other words, vertices that are in the
+   * interior of a partition of the triangulation are owned by the owner of
+   * this partition; for vertices that lie on the boundary between two or more
+   * partitions, the owner is the processor with the least subdomain_id among
+   * all adjacent subdomains.
    *
    * For sequential triangulations (as opposed to, for example,
    * parallel::distributed::Triangulation), every user vertex is of course
@@ -786,9 +794,10 @@ namespace GridTools
    * a subset of the input argument.
    *
    * For a definition of the concept of distorted cells, see the
-   * @ref GlossDistorted "glossary entry". The first argument passed to the
-   * current function is typically the exception thrown by the
-   * Triangulation::execute_coarsening_and_refinement function.
+   * @ref GlossDistorted "glossary entry".
+   * The first argument passed to the current function is typically the
+   * exception thrown by the Triangulation::execute_coarsening_and_refinement
+   * function.
    */
   template <int dim, int spacedim>
   typename Triangulation<dim,spacedim>::DistortedCellList
@@ -820,9 +829,10 @@ namespace GridTools
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
-   * @ref GlossMeshAsAContainer). In C++, the compiler can not determine the
-   * type of <code>Container</code> from the function call. You need to
-   * specify it as an explicit template argument following the function name.
+   * @ref GlossMeshAsAContainer).
+   * In C++, the compiler can not determine the type of <code>Container</code>
+   * from the function call. You need to specify it as an explicit template
+   * argument following the function name.
    * @param[in] cell An iterator pointing to a cell of the mesh container.
    * @return A list of active cells that form the patch around the given cell
    *
@@ -999,7 +1009,8 @@ namespace GridTools
    *
    * and any combination of that... More information on the topic can be found
    * in the
-   * @ref GlossFaceOrientation "glossary" article.
+   * @ref GlossFaceOrientation "glossary"
+   * article.
    *
    * @author Matthias Maier, 2012
    */

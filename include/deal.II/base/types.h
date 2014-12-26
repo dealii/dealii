@@ -31,7 +31,8 @@ namespace types
    * The type used to denote subdomain_ids of cells.
    *
    * See the
-   * @ref GlossSubdomainId "glossary" for more information.
+   * @ref GlossSubdomainId "glossary"
+   * for more information.
    *
    * There is a special value, numbers::invalid_subdomain_id that is used to
    * indicate an invalid value of this type.
@@ -64,8 +65,8 @@ namespace types
    * The data type always indicates an unsigned integer type.
    *
    * See the
-   * @ref GlobalDoFIndex page for guidance on when this type should or should
-   * not be used.
+   * @ref GlobalDoFIndex
+   * page for guidance on when this type should or should not be used.
    */
   // TODO: we should check that unsigned long long int
   // has the same size as uint64_t
@@ -252,7 +253,8 @@ namespace numbers
    * subdomain id that is not to be used.
    *
    * See the
-   * @ref GlossSubdomainId "glossary" for more information.
+   * @ref GlossSubdomainId "glossary"
+   * for more information.
    */
   const types::subdomain_id invalid_subdomain_id = static_cast<types::subdomain_id>(-1);
 
@@ -263,9 +265,12 @@ namespace numbers
    * "artificial".
    *
    * See the glossary entries on
-   * @ref GlossSubdomainId "subdomain ids" and
-   * @ref GlossArtificialCell "artificial cells" as well as the
-   * @ref distributed module for more information.
+   * @ref GlossSubdomainId "subdomain ids"
+   * and
+   * @ref GlossArtificialCell "artificial cells"
+   * as well as the
+   * @ref distributed
+   * module for more information.
    */
   const types::subdomain_id artificial_subdomain_id = static_cast<types::subdomain_id>(-2);
 }

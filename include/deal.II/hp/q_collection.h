@@ -35,7 +35,8 @@ namespace hp
    * classes.
    *
    * It implements the concepts stated in the
-   * @ref hpcollection module described in the doxygen documentation.
+   * @ref hpcollection
+   * module described in the doxygen documentation.
    *
    * @ingroup hp hpcollection
    *

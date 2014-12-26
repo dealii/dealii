@@ -321,7 +321,8 @@ namespace internal
  * independent scalar field, or whether some of them together form logically a
  * vector-field (see the
  * DataComponentInterpretation::DataComponentInterpretation enum, and the
- * @ref step_22 "step-22" tutorial program).
+ * @ref step_22 "step-22"
+ * tutorial program).
  *
  * It should be noted that this class does not copy the vector given to it
  * through the add_data_vector() functions, for memory consumption reasons. It
