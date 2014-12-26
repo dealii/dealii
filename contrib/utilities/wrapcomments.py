@@ -92,7 +92,7 @@ def format_block(lines, infostr=""):
     endidx = len(lines)-1
     curlines = []
 
-    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@deprecated", "@image", "@ref", "@return"]
+    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@deprecated", "@image", "@return"]
 
     # subset of ops_startline that does not want stuff from the next line appended
     # to this.
@@ -110,6 +110,46 @@ def format_block(lines, infostr=""):
                 if it in thisline and thisline!=it:
                     print ("%s warning %s not in separate line"%(infostr, it), file=sys.stderr)
             out.append(start + thisline)
+        elif "@ref" in lines[idx]:
+            # @ref link "some long description"
+            # is special, and we mustn't break it
+            if curlines!=[]:
+                out.extend(wrap_block(remove_junk(curlines), start))
+                curlines=[]
+            thisline = remove_junk([lines[idx]])[0]
+            if not thisline.startswith("@ref"):
+                print ("%s warning %s not at start of line"%(infostr, "@ref"), file=sys.stderr)
+
+            # format:
+            # @ref name "some text" blub
+            # or @ref name blurb
+            withquotes = thisline.split('"')
+            if len(withquotes)==3:
+                thisline = withquotes[0]+'"'+withquotes[1]+'"'
+                remain = withquotes[2]
+                for st in [')', '.', ',', ':']:
+                    if remain.startswith(st):
+                        thisline = thisline + st
+                        remain = remain[1:]
+
+                # do not wrap the @ref line:
+                out.append(start + thisline.strip())
+                if len(withquotes[0].strip().split(' '))!=2:
+                    print ("%s warning @ref line looks broken"%(infostr), file=sys.stderr)     
+            elif len(withquotes)==1:
+                words = thisline.strip().split(" ")
+                if len(words)<2 or len(words[0])==0 or len(words[1])==0:
+                    print ("%s warning @ref line looks broken"%(infostr), file=sys.stderr)     
+                thisline = words[0] + ' ' + words[1]
+                out.append(start + thisline.strip())
+                remain = " ".join(words[2:])
+            else:
+                print ("%s warning @ref quotes are not in single line"%(infostr), file=sys.stderr)
+                remain = ''
+
+            if len(remain)>0:
+                curlines.append(remain)
+            
         elif one_in(ops_startline, lines[idx]):
             if curlines!=[]:
                 out.extend(wrap_block(remove_junk(curlines), start))
@@ -313,6 +353,42 @@ lineO = [" /**", \
          "  * blub", \
          "  */"]
 assert(format_block(lineI)==lineO)
+
+lineI = [" /** ", \
+         "  * @ref a b c d e", \
+         "  * @ref a \"b c\" d dd", \
+         "  */"]
+lineO = [" /**", \
+         "  * @ref a", \
+         "  * b c d e", \
+         "  * @ref a \"b c\"", \
+         "  * d dd", \
+         "  */"]
+assert(format_block(lineI)==lineO)
+
+long = "long "*20
+lineI = [" /** ", \
+         "  * @ref a \""+long+"\" d", \
+         "  */"]
+lineO = [" /**", \
+         "  * @ref a \""+long+"\"", \
+         "  * d", \
+         "  */"]
+assert(format_block(lineI)==lineO)
+
+lineI = [" /** ", \
+         "  * @ref a. c", \
+         "  * @ref a \"b c\". c2", \
+         "  */"]
+lineO = [" /**", \
+         "  * @ref a.", \
+         "  * c", \
+         "  * @ref a \"b c\".", \
+         "  * c2", \
+         "  */"]
+assert(format_block(lineI)==lineO)
+
+
 
 
 # now open the file and do the work

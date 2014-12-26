@@ -49,11 +49,14 @@ template <typename number> class SparseMatrix;
  * Another viewpoint is that this class does not need up front allocation of a
  * certain amount of memory, but grows as necessary.  An extensive description
  * of sparsity patterns can be found in the documentation of the
- * @ref Sparsity module.
+ * @ref Sparsity
+ * module.
  *
  * This class is an example of the "dynamic" type of
- * @ref Sparsity. It is discussed in the step-27 and
- * @ref step_22 "step-22" tutorial programs.
+ * @ref Sparsity.
+ * It is discussed in the step-27 and
+ * @ref step_22 "step-22"
+ * tutorial programs.
  *
  * <h3>Interface</h3>
  *
@@ -82,8 +85,8 @@ template <typename number> class SparseMatrix;
  * <h3>Notes</h3>
  *
  * There are several, exchangeable variations of this class, see
- * @ref Sparsity , section '"Dynamic" or "compressed" sparsity patterns' for
- * more information.
+ * @ref Sparsity,
+ * section '"Dynamic" or "compressed" sparsity patterns' for more information.
  *
  * This class is a variation of the CompressedSparsityPattern class. Instead
  * of using sorted vectors together with a caching algorithm for storing the
@@ -92,12 +95,13 @@ template <typename number> class SparseMatrix;
  * better than the CompressedSparsityPattern in the context of hp-adaptivity
  * (see for example step-27), or generally when there are many nonzero entries
  * in each row of a matrix (see
- * @ref step_22 "step-22").  On the other hand, a benchmark where nonzero
- * entries were randomly inserted into the sparsity pattern revealed that this
- * class is slower by a factor 4-6 in this situation. Hence, currently the
- * suggestion is to carefully analyze which of the CompressedSparsityPattern
- * classes works best in a certain setting. An algorithm which performs
- * equally well in all situations still has to be found.
+ * @ref step_22 "step-22").
+ * On the other hand, a benchmark where nonzero entries were randomly inserted
+ * into the sparsity pattern revealed that this class is slower by a factor
+ * 4-6 in this situation. Hence, currently the suggestion is to carefully
+ * analyze which of the CompressedSparsityPattern classes works best in a
+ * certain setting. An algorithm which performs equally well in all situations
+ * still has to be found.
  *
  *
  * @author Oliver Kayser-Herold, 2007

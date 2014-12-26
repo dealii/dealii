@@ -33,8 +33,8 @@ DEAL_II_NAMESPACE_OPEN
  * <code>(dim*dim + dim)/2</code> components
  *
  * See the description of the
- * @ref vector_valued module for examples how to use the features of this
- * namespace.
+ * @ref vector_valued
+ * module for examples how to use the features of this namespace.
  *
  * @ingroup feaccess vector_valued
  */
@@ -46,7 +46,8 @@ namespace FEValuesExtractors
    * FESubfaceValues object is of type FEValuesViews::Scalar. The concept of
    * extractors is defined in the documentation of the namespace
    * FEValuesExtractors and in the
-   * @ref vector_valued module.
+   * @ref vector_valued
+   * module.
    *
    * @ingroup feaccess vector_valued
    */
@@ -82,7 +83,8 @@ namespace FEValuesExtractors
    *
    * The concept of extractors is defined in the documentation of the
    * namespace FEValuesExtractors and in the
-   * @ref vector_valued module.
+   * @ref vector_valued
+   * module.
    *
    * Note that in the current context, a vector is meant in the sense physics
    * uses it: it has <code>spacedim</code> components that behave in specific
@@ -133,7 +135,8 @@ namespace FEValuesExtractors
    *
    * The concept of extractors is defined in the documentation of the
    * namespace FEValuesExtractors and in the
-   * @ref vector_valued module.
+   * @ref vector_valued
+   * module.
    *
    * @ingroup feaccess vector_valued
    *
@@ -175,7 +178,8 @@ namespace FEValuesExtractors
    *
    * The concept of extractors is defined in the documentation of the
    * namespace FEValuesExtractors and in the
-   * @ref vector_valued module.
+   * @ref vector_valued
+   * module.
    *
    * @ingroup feaccess vector_valued
    *

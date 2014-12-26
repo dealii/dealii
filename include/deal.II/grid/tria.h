@@ -1404,8 +1404,8 @@ public:
 
   /**
    * A typedef that is used to to identify
-   * @ref GlossActive "active cell iterators". The concept of iterators is
-   * discussed at length in the
+   * @ref GlossActive "active cell iterators".
+   * The concept of iterators is discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
    * The current typedef identifies active cells in a triangulation. The
@@ -1528,7 +1528,8 @@ public:
    * A structure that is used as an exception object by the
    * create_triangulation() function to indicate which cells among the coarse
    * mesh cells are inverted or severely distorted (see the entry on
-   * @ref GlossDistorted "distorted cells" in the glossary).
+   * @ref GlossDistorted "distorted cells"
+   * in the glossary).
    *
    * Objects of this kind are thrown by the create_triangulation() and
    * execute_coarsening_and_refinement() functions, and they can be caught in
@@ -1580,8 +1581,9 @@ public:
    * should check whether any of the cells that are created by
    * create_triangulation() or execute_coarsening_and_refinement() are
    * distorted (see
-   * @ref GlossDistorted "distorted cells"). If set, these two functions may
-   * throw an exception if they encounter distorted cells.
+   * @ref GlossDistorted "distorted cells").
+   * If set, these two functions may throw an exception if they encounter
+   * distorted cells.
    */
   Triangulation (const MeshSmoothing smooth_grid = none,
                  const bool check_for_distorted_cells = false);
@@ -1814,10 +1816,10 @@ public:
    * creation of this object, at the very end of its operation, the current
    * function walks over all cells and verifies that none of the cells is
    * deformed (see the entry on
-   * @ref GlossDistorted "distorted cells" in the glossary), where we call a
-   * cell deformed if the determinant of the Jacobian of the mapping from
-   * reference cell to real cell is negative at least at one of the vertices
-   * (this computation is done using the
+   * @ref GlossDistorted "distorted cells"
+   * in the glossary), where we call a cell deformed if the determinant of the
+   * Jacobian of the mapping from reference cell to real cell is negative at
+   * least at one of the vertices (this computation is done using the
    * GeometryInfo::jacobian_determinants_at_vertices function). If there are
    * deformed cells, this function throws an exception of kind
    * DistortedCellList. Since this happens after all data structures have been
@@ -3138,9 +3140,9 @@ private:
    *
    * The function returns a list of cells that have produced children that
    * satisfy the criteria of
-   * @ref GlossDistorted "distorted cells" if the
-   * <code>check_for_distorted_cells</code> flag was specified upon creation
-   * of this object, at
+   * @ref GlossDistorted "distorted cells"
+   * if the <code>check_for_distorted_cells</code> flag was specified upon
+   * creation of this object, at
    */
   DistortedCellList execute_refinement ();
 
