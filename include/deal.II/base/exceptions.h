@@ -32,8 +32,9 @@ DEAL_II_NAMESPACE_OPEN
  * <tt>DeclException</tt> macro family.
  *
  * See the
- * @ref Exceptions module for more details on this class and what can be done
- * with classes derived from it.
+ * @ref Exceptions
+ * module for more details on this class and what can be done with classes
+ * derived from it.
  *
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013

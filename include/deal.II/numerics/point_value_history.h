@@ -102,20 +102,20 @@ namespace internal
  * <ol>
  * <li>Firstly, the @p evaluate_field version that does not take a @p
  * DataPostprocessor object selects the nearest support point (see
- * @ref GlossSupport "this entry in the glossary" ) to a given point to
- * extract data from. This makes the code that needs to be run at each time
- * step very short, since looping over the mesh to extract the needed
- * dof_index can be done just once at the start. However, this method is not
- * suitable for FiniteElement objects that do not assign dofs to actual mesh
- * locations (i.e. FEs without
- * @ref GlossSupport "support points" ) or if adaptive mesh refinement is
- * used. The reason for the latter restriction is that the location of the
- * closest support point to a given point may change upon mesh refinement. The
- * class will throw an exception if any change to the triangulation is made
- * (Although the nearest support point could be re- computed upon mesh
- * refinement, the location of the support point will most likely change
- * slightly, making the interpretation of the data difficult, hence this is
- * not implemented currently.)
+ * @ref GlossSupport "this entry in the glossary"
+ * ) to a given point to extract data from. This makes the code that needs to
+ * be run at each time step very short, since looping over the mesh to extract
+ * the needed dof_index can be done just once at the start. However, this
+ * method is not suitable for FiniteElement objects that do not assign dofs to
+ * actual mesh locations (i.e. FEs without
+ * @ref GlossSupport "support points"
+ * ) or if adaptive mesh refinement is used. The reason for the latter
+ * restriction is that the location of the closest support point to a given
+ * point may change upon mesh refinement. The class will throw an exception if
+ * any change to the triangulation is made (Although the nearest support point
+ * could be re- computed upon mesh refinement, the location of the support
+ * point will most likely change slightly, making the interpretation of the
+ * data difficult, hence this is not implemented currently.)
  *
  * <li> Secondly, @p evaluate_field_at_requested_location calls @p
  * VectorTools::point_value to compute values at the specific point requested.
@@ -152,17 +152,19 @@ namespace internal
  *
  * When recording a new mnemonic name, the user must supply a component_mask
  * (see
- * @ref GlossComponentMask "this glossary entry" ) to indicate the
- * @ref GlossComponent "(vector) components" to be extracted from the given
- * input. If the user simply wants to extract all the components, the mask
- * need not be explicitly supplied to the @p add_field_name method and the
- * default value of the parameter is sufficient. If the @p evaluate_field with
- * a @p DataPostprocessor object is used, the component_mask is interpreted as
- * the mask of the @p DataPostprocessor return vector. The size of this mask
- * can be different to that of the FE space, but must be provided when the @p
- * add_field_name method is called. One variant of the @p add_field_name
- * method allows an unsigned int input to construct a suitable mask, if all
- * values from the @p DataPostprocessor are desired.
+ * @ref GlossComponentMask "this glossary entry"
+ * ) to indicate the
+ * @ref GlossComponent "(vector) components"
+ * to be extracted from the given input. If the user simply wants to extract
+ * all the components, the mask need not be explicitly supplied to the @p
+ * add_field_name method and the default value of the parameter is sufficient.
+ * If the @p evaluate_field with a @p DataPostprocessor object is used, the
+ * component_mask is interpreted as the mask of the @p DataPostprocessor
+ * return vector. The size of this mask can be different to that of the FE
+ * space, but must be provided when the @p add_field_name method is called.
+ * One variant of the @p add_field_name method allows an unsigned int input to
+ * construct a suitable mask, if all values from the @p DataPostprocessor are
+ * desired.
  *
  * The class automatically generates names for the data stored based on the
  * mnemonics supplied. The methods @p add_component_names and @p

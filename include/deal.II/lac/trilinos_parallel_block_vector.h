@@ -269,8 +269,8 @@ namespace TrilinosWrappers
        * @deprecated
        *
        * See
-       * @ref GlossCompress "Compressing distributed objects" for more
-       * information.
+       * @ref GlossCompress "Compressing distributed objects"
+       * for more information.
        */
       void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
 

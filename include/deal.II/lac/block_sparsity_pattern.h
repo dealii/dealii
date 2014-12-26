@@ -485,8 +485,8 @@ public:
  * @ref Sparsity.
  *
  * <b>Note:</b> There are several, exchangeable variations of this class, see
- * @ref Sparsity, section 'Dynamic block sparsity patterns' for more
- * information.
+ * @ref Sparsity,
+ * section 'Dynamic block sparsity patterns' for more information.
  *
  * <b>Note:</b> This class used to be called CompressedBlockSparsityPattern.
  * However, since it's a block wrapper around the CompressedSparsityPattern
@@ -604,8 +604,8 @@ typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern DEAL_II_DE
  * @ref Sparsity.
  *
  * @note There are several, exchangeable variations of this class, see
- * @ref Sparsity, section 'Dynamic block sparsity patterns' for more
- * information.
+ * @ref Sparsity,
+ * section 'Dynamic block sparsity patterns' for more information.
  *
  * @author Wolfgang Bangerth, 2007
  */
@@ -684,8 +684,8 @@ public:
  * @ref Sparsity.
  *
  * @note There are several, exchangeable variations of this class, see
- * @ref Sparsity, section 'Dynamic block sparsity patterns' for more
- * information.
+ * @ref Sparsity,
+ * section 'Dynamic block sparsity patterns' for more information.
  *
  * This class is used in step-22 and step-31.
  *
@@ -774,10 +774,11 @@ public:
  * See the documentation of the BlockSparsityPattern for examples.
  *
  * This class is has properties of the "dynamic" type of
- * @ref Sparsity (in the sense that it can extend the memory if too little
- * elements were allocated), but otherwise is more like the basic deal.II
- * SparsityPattern (in the sense that the method compress() needs to be called
- * before the pattern can be used).
+ * @ref Sparsity
+ * (in the sense that it can extend the memory if too little elements were
+ * allocated), but otherwise is more like the basic deal.II SparsityPattern
+ * (in the sense that the method compress() needs to be called before the
+ * pattern can be used).
  *
  * This class is used in step-32.
  *

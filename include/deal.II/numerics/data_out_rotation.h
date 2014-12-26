@@ -155,8 +155,8 @@ public:
   /**
    * Return the first cell which we want output for. The default
    * implementation returns the first
-   * @ref GlossActive "active cell", but you might want to return other cells
-   * in a derived class.
+   * @ref GlossActive "active cell",
+   * but you might want to return other cells in a derived class.
    */
   virtual cell_iterator first_cell ();
 
@@ -170,7 +170,7 @@ public:
    * guaranteed as long as @p first_cell is also used from the default
    * implementation. Overloading only one of the two functions might not be a
    * good idea.
-  */
+   */
   virtual cell_iterator next_cell (const cell_iterator &cell);
 
   /**

@@ -267,8 +267,8 @@ namespace PETScWrappers
      * anything else can be done on it.
      *
      * See
-     * @ref GlossCompress "Compressing distributed objects" for more
-     * information.
+     * @ref GlossCompress "Compressing distributed objects"
+     * for more information.
      */
     void compress (::dealii::VectorOperation::values operation);
 
