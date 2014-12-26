@@ -200,14 +200,14 @@ namespace TrilinosWrappers
      * above.
      *
      * What we call a 'ghosted' vector (see
-     * @ref GlossGhostedVector "vectors with ghost elements") is simply a
+     * @ref GlossGhostedVector "vectors with ghost elements" ) is simply a
      * view of the parallel vector where the element distributions overlap.
      * The 'ghosted' Trilinos vector in itself has no idea of which entries
-     * are ghosted and which are locally owned. In fact, a ghosted vector
-     * may not even store all of the elements a non- ghosted vector would
-     * store on the current processor.  Consequently, for Trilinos vectors,
-     * there is no notion of an 'owner' of vector elements in the way we
-     * have it in the the non-ghost case view.
+     * are ghosted and which are locally owned. In fact, a ghosted vector may
+     * not even store all of the elements a non- ghosted vector would store on
+     * the current processor.  Consequently, for Trilinos vectors, there is no
+     * notion of an 'owner' of vector elements in the way we have it in the
+     * the non-ghost case view.
      *
      * This explains why we do not allow writing into ghosted vectors on the
      * Trilinos side: Who would be responsible for taking care of the
@@ -390,7 +390,8 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       explicit Vector (const Epetra_Map &parallel_partitioning);
 
@@ -405,7 +406,8 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const Epetra_Map &parallel_partitioning,
               const VectorBase &v);
@@ -419,7 +421,8 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       template <typename number>
       void reinit (const Epetra_Map             &parallel_partitioner,
@@ -434,7 +437,8 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const Epetra_Map &parallel_partitioning,
                    const bool        fast = false);
@@ -448,7 +452,8 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       template <typename Number>
       Vector (const Epetra_Map             &parallel_partitioning,
@@ -469,7 +474,8 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       explicit Vector (const IndexSet &parallel_partitioning,
                        const MPI_Comm &communicator = MPI_COMM_WORLD);
@@ -482,7 +488,8 @@ namespace TrilinosWrappers
        * have ghost elements. See the general documentation of this class for
        * more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const IndexSet &local,
               const IndexSet &ghost,
@@ -499,7 +506,8 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const IndexSet   &parallel_partitioning,
               const VectorBase &v,
@@ -514,7 +522,8 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       template <typename Number>
       Vector (const IndexSet               &parallel_partitioning,
@@ -533,7 +542,8 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &parallel_partitioning,
                    const MPI_Comm &communicator = MPI_COMM_WORLD,
@@ -561,7 +571,8 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &locally_owned_entries,
                    const IndexSet &ghost_entries,

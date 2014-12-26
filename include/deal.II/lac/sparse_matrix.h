@@ -480,7 +480,8 @@ namespace SparseMatrixIterators
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations in the manual).
  *
  * @ingroup Matrix1
  * @author Essentially everyone who has ever worked on deal.II

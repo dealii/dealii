@@ -46,7 +46,8 @@ DEAL_II_NAMESPACE_OPEN
  * blocks, where you have to translate global row and column indices to local
  * ones.
  *
- * @ingroup data @see @ref GlossBlockLA "Block (linear algebra)"
+ * @ingroup data @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2007, 2011
  */
 class BlockIndices : public Subscriptor
@@ -225,7 +226,8 @@ template <typename number>     class BlockSparseMatrixEZ;
  * do things differently depending on whether a template type denotes a
  * regular or a block matrix type.
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2009
  */
 template <typename MatrixType>

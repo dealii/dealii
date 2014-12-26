@@ -89,7 +89,8 @@ DEAL_II_NAMESPACE_OPEN
  *   schur.postprocess (u, p);
  * @endcode
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2000, 2001, 2002
  */
 template <class MA_inverse, class MB, class MDt, class MC>

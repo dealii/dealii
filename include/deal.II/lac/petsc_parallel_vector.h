@@ -153,7 +153,8 @@ namespace PETScWrappers
      * operations at the same time, for example by placing zero additions if
      * necessary.
      *
-     * @see @ref GlossGhostedVector "vectors with ghost elements"
+     * @see
+     * @ref GlossGhostedVector "vectors with ghost elements"
      *
      * @ingroup PETScWrappers
      * @ingroup Vectors
@@ -251,7 +252,8 @@ namespace PETScWrappers
        *
        * @note This operation always creates a ghosted vector.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       explicit Vector (const MPI_Comm     &communicator,
                        const IndexSet   &local,
@@ -270,7 +272,8 @@ namespace PETScWrappers
        *
        * @note This operation always creates a ghosted vector.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const IndexSet &local,
               const IndexSet &ghost,
@@ -376,7 +379,8 @@ namespace PETScWrappers
        * @deprecated Use Vector::reinit(const IndexSet &, const IndexSet &,
        * const MPI_Comm &) instead.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const MPI_Comm     &communicator,
                    const IndexSet   &local,
@@ -385,7 +389,8 @@ namespace PETScWrappers
        * Reinit as a vector without ghost elements. See the constructor with
        * same signature for more details.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &local,
                    const IndexSet &ghost,
@@ -405,7 +410,8 @@ namespace PETScWrappers
        * Reinit as a vector without ghost elements. See constructor with same
        * signature for more details.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &local,
                    const MPI_Comm &communicator);

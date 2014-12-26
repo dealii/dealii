@@ -73,7 +73,8 @@ DEAL_II_NAMESPACE_OPEN
  * flags.
  *
  * The mechanism by which all this is accomplished is also discussed on the
- * page on @ref UpdateFlagsEssay.
+ * page on
+ * @ref UpdateFlagsEssay.
  */
 enum UpdateFlags
 {

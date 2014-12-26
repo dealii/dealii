@@ -60,7 +60,8 @@ namespace TrilinosWrappers
    * processor, since the Trilinos matrices are inherently parallel.
    *
    * @ingroup Vectors
-   * @ingroup TrilinosWrappers @see @ref GlossBlockLA "Block (linear algebra)"
+   * @ingroup TrilinosWrappers @see
+   * @ref GlossBlockLA "Block (linear algebra)"
    * @author Martin Kronbichler, 2008
    */
   class BlockVector : public BlockVectorBase<Vector>
@@ -158,7 +159,8 @@ namespace TrilinosWrappers
      *
      * @deprecated
      *
-     * See @ref GlossCompress "Compressing distributed objects" for more
+     * See
+     * @ref GlossCompress "Compressing distributed objects" for more
      * information.
      */
     void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;

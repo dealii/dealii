@@ -60,7 +60,8 @@ template <int dim, int spacedim> class MappingQ;
  * elements of type FE_DGP(1) or FE_DGPMonomial(1).
  *
  * This can be understood by the following 2-d example: consider the cell with
- * vertices at $(0,0),(1,0),(0,1),(s,s)$: @image html dgp_doesnt_contain_p.png
+ * vertices at $(0,0),(1,0),(0,1),(s,s)$:
+ * @image html dgp_doesnt_contain_p.png
  *
  * For this cell, a bilinear transformation $F$ produces the relations $x=\hat
  * x+\hat x\hat y$ and $y=\hat y+\hat x\hat y$ that correlate reference
@@ -162,7 +163,8 @@ public:
    * neither dominates, or if either could dominate.
    *
    * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the @ref hp_paper "hp paper".
+   * particular the
+   * @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination

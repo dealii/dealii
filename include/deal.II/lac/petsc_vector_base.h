@@ -266,7 +266,8 @@ namespace PETScWrappers
      * necessary after writing into a vector element-by-element and before
      * anything else can be done on it.
      *
-     * See @ref GlossCompress "Compressing distributed objects" for more
+     * See
+     * @ref GlossCompress "Compressing distributed objects" for more
      * information.
      */
     void compress (::dealii::VectorOperation::values operation);
@@ -355,7 +356,8 @@ namespace PETScWrappers
     /**
      * Return if the vector contains ghost elements.
      *
-     * @see @ref GlossGhostedVector "vectors with ghost elements"
+     * @see
+     * @ref GlossGhostedVector "vectors with ghost elements"
      */
     bool has_ghost_elements() const;
 

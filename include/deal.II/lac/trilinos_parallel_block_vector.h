@@ -268,7 +268,8 @@ namespace TrilinosWrappers
        *
        * @deprecated
        *
-       * See @ref GlossCompress "Compressing distributed objects" for more
+       * See
+       * @ref GlossCompress "Compressing distributed objects" for more
        * information.
        */
       void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
@@ -291,7 +292,8 @@ namespace TrilinosWrappers
       /**
        * Returns if this Vector contains ghost elements.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       bool has_ghost_elements() const;
 

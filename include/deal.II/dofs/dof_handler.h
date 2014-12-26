@@ -126,9 +126,10 @@ namespace internal
  * i.e. the class that represents triangulations that entirely reside on a
  * single processor. However, it can also be of type
  * parallel::distributed::Triangulation (see, for example, step-32, step-40
- * and in particular the @ref distributed module) in which case the DoFHandler
- * object will proceed to only manage degrees of freedom on locally owned and
- * ghost cells. This process is entirely transparent to the used.
+ * and in particular the
+ * @ref distributed module) in which case the DoFHandler object will proceed
+ * to only manage degrees of freedom on locally owned and ghost cells. This
+ * process is entirely transparent to the used.
  *
  *
  * <h3>User defined renumbering schemes</h3>
@@ -196,8 +197,8 @@ public:
 
   /**
    * A typedef that is used to to identify
-   * @ref GlossActive "active cell iterators".
-   * The concept of iterators is discussed at length in the
+   * @ref GlossActive "active cell iterators". The concept of iterators is
+   * discussed at length in the
    * @ref Iterators "iterators documentation module".
    *
    * The current typedef identifies active cells in a DoFHandler object. While
@@ -223,11 +224,11 @@ public:
    *
    * The current typedef identifies cells in a DoFHandler object. Some of
    * these cells may in fact be active (see
-   * @ref GlossActive "active cell iterators") in which case they can in
-   * fact be asked for the degrees of freedom that live on them. On the
-   * other hand, if the cell is not active, any such query will result in
-   * an error. Note that this is what distinguishes this typedef from the
-   * level_cell_iterator typedef.
+   * @ref GlossActive "active cell iterators") in which case they can in fact
+   * be asked for the degrees of freedom that live on them. On the other hand,
+   * if the cell is not active, any such query will result in an error. Note
+   * that this is what distinguishes this typedef from the level_cell_iterator
+   * typedef.
    *
    * While the actual data type of the typedef is hidden behind a few layers
    * of (unfortunately necessary) indirections, it is in essence
@@ -448,7 +449,8 @@ public:
    * use an intermediate compressed sparsity pattern that only allocates
    * memory on demand. Refer to the step-2 and step-11 example programs on how
    * to do this. The problem is also discussed in the documentation of the
-   * module on @ref Sparsity.
+   * module on
+   * @ref Sparsity.
    */
   unsigned int max_couplings_between_dofs () const;
 
@@ -461,7 +463,8 @@ public:
    *
    * @note The same applies to this function as to max_couplings_per_dofs() as
    * regards the performance of this function. Think about one of the dynamic
-   * sparsity pattern classes instead (see @ref Sparsity).
+   * sparsity pattern classes instead (see
+   * @ref Sparsity).
    */
   unsigned int max_couplings_between_boundary_dofs () const;
 
@@ -551,7 +554,8 @@ public:
   /**
    * Return an iterator range that contains all active cells that make up this
    * DoFHandler. Such a range is useful to initialize range-based for loops as
-   * supported by C++11, see also @ref CPP11 "C++11 standard".
+   * supported by C++11, see also
+   * @ref CPP11 "C++11 standard".
    *
    * Range-based for loops are useful in that they require much less code than
    * traditional loops (see <a href="http://en.wikipedia.org/wiki/C%2B%2B11
@@ -610,7 +614,8 @@ public:
    * in the documentation of active_cell_iterators().
    *
    * @param[in] level A given level in the refinement hierarchy of this
-   * triangulation. @return The half open range <code>[this->begin(level),
+   * triangulation.
+   * @return The half open range <code>[this->begin(level),
    * this->end(level))</code>
    *
    * @pre level must be less than this->n_levels().
@@ -626,8 +631,9 @@ public:
    * documentation of active_cell_iterators().
    *
    * @param[in] level A given level in the refinement hierarchy of this
-   * triangulation. @return The half open range
-   * <code>[this->begin_active(level), this->end(level))</code>
+   * triangulation.
+   * @return The half open range <code>[this->begin_active(level),
+   * this->end(level))</code>
    *
    * @pre level must be less than this->n_levels().
    *
@@ -642,7 +648,8 @@ public:
    * C++11. See the example in the documentation of active_cell_iterators().
    *
    * @param[in] level A given level in the refinement hierarchy of this
-   * triangulation. @return The half open range <code>[this->begin_mg(level),
+   * triangulation.
+   * @return The half open range <code>[this->begin_mg(level),
    * this->end_mg(level))</code>
    *
    * @pre level must be less than this->n_levels().
@@ -673,7 +680,8 @@ public:
    * the global number of degrees of freedom, accumulated over all processors.
    *
    * In either case, included in the returned number are those DoFs which are
-   * constrained by hanging nodes, see @ref constraints.
+   * constrained by hanging nodes, see
+   * @ref constraints.
    */
   types::global_dof_index n_dofs () const;
 
@@ -712,8 +720,9 @@ public:
    * Access to an object informing of the block structure of the dof handler.
    *
    * If an FESystem is used in distribute_dofs(), degrees of freedom naturally
-   * split into several @ref GlossBlock "blocks". For each base element as
-   * many blocks appear as its multiplicity.
+   * split into several
+   * @ref GlossBlock "blocks". For each base element as many blocks appear as
+   * its multiplicity.
    *
    * At the end of distribute_dofs(), the number of degrees of freedom in each
    * block is counted, and stored in a BlockInfo object, which can be accessed

@@ -75,8 +75,8 @@ template <typename> class VectorView;
  * It is used in the various compress() functions. They also exist in serial
  * codes for compatibility and are empty there.
  *
- * See @ref GlossCompress "Compressing distributed objects" for more
- * information.
+ * See
+ * @ref GlossCompress "Compressing distributed objects" for more information.
  */
 struct VectorOperation
 {

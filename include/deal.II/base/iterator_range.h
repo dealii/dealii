@@ -35,7 +35,8 @@ DEAL_II_NAMESPACE_OPEN
  * DoFHandler can return ranges of cell iterators using an object of the
  * current type from functions such as Triangulation::cells() and that such an
  * object can then be used in a range-based for loop as supported by C++11,
- * see also @ref CPP11 "C++11 standard".
+ * see also
+ * @ref CPP11 "C++11 standard".
  *
  * For example, such a loop could look like this if the goal is to set the
  * user flag on every active cell:
@@ -139,14 +140,14 @@ public:
     IteratorOverIterators (const BaseIterator &iterator);
 
     /**
-     * Dereferencing operator. @return The iterator within the collection
-     * currently pointed to.
+     * Dereferencing operator.
+     * @return The iterator within the collection currently pointed to.
      */
     BaseIterator operator* () const;
 
     /**
-     * Dereferencing operator. @return The iterator within the collection
-     * currently pointed to.
+     * Dereferencing operator.
+     * @return The iterator within the collection currently pointed to.
      */
     const BaseIterator *operator-> () const;
 
@@ -165,9 +166,9 @@ public:
 
     /**
      * Comparison operator
-     * @param i_o_i Another iterator over iterators. @return Returns whether
-     * the current iterator points to a different object than the iterator
-     * represented by the argument.
+     * @param i_o_i Another iterator over iterators.
+     * @return Returns whether the current iterator points to a different
+     * object than the iterator represented by the argument.
      */
     bool operator != (const IteratorOverIterators &i_o_i);
 

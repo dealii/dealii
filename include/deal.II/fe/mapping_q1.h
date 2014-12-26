@@ -470,7 +470,7 @@ protected:
    * <li> Solve the equation A x_hat + b = p for x_hat
    * <li> This x_hat is the initial solution used for the Newton Method.
    * </ul>
-   *  @note if dim<spacedim we first project p onto the plane. @note if dim==1
+   * @note if dim<spacedim we first project p onto the plane. @note if dim==1
    * (for any spacedim) the initial guess is the exact solution and no Newton
    * iteration is needed.   Some details about how we compute the least square
    * plane. We look for a  spacedim x (dim + 1) matrix  X such that  X * M = Y

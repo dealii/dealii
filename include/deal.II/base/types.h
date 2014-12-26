@@ -30,7 +30,8 @@ namespace types
   /**
    * The type used to denote subdomain_ids of cells.
    *
-   * See the @ref GlossSubdomainId "glossary" for more information.
+   * See the
+   * @ref GlossSubdomainId "glossary" for more information.
    *
    * There is a special value, numbers::invalid_subdomain_id that is used to
    * indicate an invalid value of this type.
@@ -62,8 +63,9 @@ namespace types
    *
    * The data type always indicates an unsigned integer type.
    *
-   * See the @ref GlobalDoFIndex page for guidance on when this type should or
-   * should not be used.
+   * See the
+   * @ref GlobalDoFIndex page for guidance on when this type should or should
+   * not be used.
    */
   // TODO: we should check that unsigned long long int
   // has the same size as uint64_t
@@ -109,7 +111,8 @@ namespace types
    * boundary indicator for faces that are in the interior of the domain and
    * therefore not part of any addressable boundary component.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   typedef unsigned char boundary_id;
 
@@ -120,7 +123,8 @@ namespace types
    * There is a special value, numbers::flat_manifold_id that is used to
    * indicate the standard cartesian manifold.
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   typedef unsigned int manifold_id;
 
@@ -204,7 +208,8 @@ namespace numbers
    * We assume that all valid boundary_ids lie in the range [0,
    * invalid_boundary_id).
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   const types::boundary_id invalid_boundary_id = static_cast<types::boundary_id>(-1);
 
@@ -218,7 +223,8 @@ namespace numbers
    * faces that lie in the interior of the domain. You should never try to
    * assign this boundary indicator to anything in user code.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   const types::boundary_id internal_face_boundary_id = static_cast<types::boundary_id>(-1);
 
@@ -227,14 +233,16 @@ namespace numbers
    * We assume that all valid manifold_ids lie in the range [0,
    * invalid_maifold_id).
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   const types::manifold_id invalid_manifold_id = static_cast<types::manifold_id>(-1);
 
   /**
    * A manifold_id we reserve for the default flat Cartesian manifold.
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   const types::manifold_id flat_manifold_id = static_cast<types::manifold_id>(-1);
 
@@ -243,7 +251,8 @@ namespace numbers
    * valid id but is used, for example, for default arguments to indicate a
    * subdomain id that is not to be used.
    *
-   * See the @ref GlossSubdomainId "glossary" for more information.
+   * See the
+   * @ref GlossSubdomainId "glossary" for more information.
    */
   const types::subdomain_id invalid_subdomain_id = static_cast<types::subdomain_id>(-1);
 
@@ -253,7 +262,8 @@ namespace numbers
    * that is kept distributed on many processors. Such cells are called
    * "artificial".
    *
-   * See the glossary entries on @ref GlossSubdomainId "subdomain ids" and
+   * See the glossary entries on
+   * @ref GlossSubdomainId "subdomain ids" and
    * @ref GlossArtificialCell "artificial cells" as well as the
    * @ref distributed module for more information.
    */

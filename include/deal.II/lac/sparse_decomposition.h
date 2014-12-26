@@ -314,8 +314,9 @@ protected:
   /**
    * In the decomposition phase, computes a strengthening factor for the
    * diagonal entry in row <tt>row</tt> with sum of absolute values of its
-   * elements <tt>rowsum</tt>.<br> Note:
-   * The default implementation in SparseLUDecomposition returns
+   * elements <tt>rowsum</tt>.
+   *
+   * @note The default implementation in SparseLUDecomposition returns
    * <tt>strengthen_diagonal</tt>'s value.
    */
   virtual number get_strengthen_diagonal(const number rowsum, const size_type row) const;

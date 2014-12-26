@@ -236,7 +236,8 @@ public:
    * You might give a list of components you want to evaluate, in case the
    * finite element used by the DoFHandler object is vector-valued. You then
    * have to set those entries to true in the bit-vector @p component_mask
-   * (see @ref GlossComponentMask) for which the respective component is to be
+   * (see
+   * @ref GlossComponentMask ) for which the respective component is to be
    * used in the error estimator. The default is to use all components, which
    * is done by either providing a bit-vector with all-set entries, or an
    * empty bit-vector.

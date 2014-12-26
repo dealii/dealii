@@ -929,7 +929,7 @@ namespace DataOutBase
      * the instructions provided in
      * http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
      * unless it is at its default value of
-     * std::numeric_limits<double>::min().
+     * @verbatim std::numeric_limits<unsigned int>::min() @endverbatim.
      */
     double time;
 
@@ -941,7 +941,7 @@ namespace DataOutBase
      * the instructions provided in
      * http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
      * unless it is at its default value of
-     * std::numeric_limits<unsigned int>::min().
+     * @verbatim std::numeric_limits<unsigned int>::min() @endverbatim.
      */
     unsigned int cycle;
 

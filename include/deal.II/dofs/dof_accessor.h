@@ -125,7 +125,8 @@ namespace internal
  * A class that gives access to the degrees of freedom stored in a DoFHandler,
  * MGSoDHandler, or hp::DoFHandler object. Accessors are used to, access the
  * data that pertains to edges, faces, and cells of a triangulation. The
- * concept is explained in more detail in connection to @ref Iterators.
+ * concept is explained in more detail in connection to
+ * @ref Iterators.
  *
  * This class follows mainly the route laid out by the accessor library
  * declared in the triangulation library (TriaAccessor). It enables the user
@@ -330,7 +331,8 @@ public:
    * this object in the standard ordering defined by the finite element (i.e.,
    * dofs on vertex 0, dofs on vertex 1, etc, dofs on line 0, dofs on line 1,
    * etc, dofs on quad 0, etc.) This function is only available on
-   * <i>active</i> objects (see @ref GlossActive "this glossary entry").
+   * <i>active</i> objects (see
+   * @ref GlossActive "this glossary entry").
    *
    * The cells needs to be an active cell (and not artificial in a parallel
    * distributed computation).
@@ -526,8 +528,8 @@ public:
    */
   DeclException0 (ExcMatrixDoesNotMatch);
   /**
-   * A function has been called for a cell which should be active, but is
-   * refined. @ref GlossActive
+   * A function has been called for a cell which should be
+   * @ref GlossActive "active" , but is refined.
    *
    * @ingroup Exceptions
    */
@@ -832,7 +834,8 @@ public:
    * this object in the standard ordering defined by the finite element (i.e.,
    * dofs on vertex 0, dofs on vertex 1, etc, dofs on line 0, dofs on line 1,
    * etc, dofs on quad 0, etc.) This function is only available on
-   * <i>active</i> objects (see @ref GlossActive "this glossary entry").
+   * <i>active</i> objects (see
+   * @ref GlossActive "this glossary entry").
    *
    * The cells needs to be an active cell (and not artificial in a parallel
    * distributed computation).
@@ -995,8 +998,8 @@ public:
    */
   DeclException0 (ExcMatrixDoesNotMatch);
   /**
-   * A function has been called for a cell which should be active, but is
-   * refined. @ref GlossActive
+   * A function has been called for a cell which should be
+   * @ref GlossActive "active" , but is refined.
    *
    * @ingroup Exceptions
    */
@@ -1531,7 +1534,8 @@ public:
    * this object in the standard ordering defined by the finite element (i.e.,
    * dofs on vertex 0, dofs on vertex 1, etc, dofs on line 0, dofs on line 1,
    * etc, dofs on quad 0, etc.) This function is only available on
-   * <i>active</i> objects (see @ref GlossActive "this glossary entry").
+   * <i>active</i> objects (see
+   * @ref GlossActive "this glossary entry").
    *
    * @param[out] dof_indices The vector into which the indices will be
    * written. It has to have the right size (namely,
