@@ -90,8 +90,10 @@ DEAL_II_NAMESPACE_OPEN
  * as an example on how to do this.
  *
  * For further information and explanations on handling the
- * @ref SLEPcWrappers "SLEPcWrappers" , see also the
- * @ref PETScWrappers "PETScWrappers" , on which they depend.
+ * @ref SLEPcWrappers "SLEPcWrappers",
+ * see also the
+ * @ref PETScWrappers "PETScWrappers",
+ * on which they depend.
  *
  * @ingroup SLEPcWrappers
  *

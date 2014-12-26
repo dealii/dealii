@@ -59,7 +59,9 @@ namespace PETScWrappers
    * function, for much the same reason as is documented with the
    * BlockSparsityPattern class.
    *
-   * @ingroup Matrix1 @see @ref GlossBlockLA "Block (linear algebra)"
+   * @ingroup Matrix1
+   * @see
+   * @ref GlossBlockLA "Block (linear algebra)"
    * @author Wolfgang Bangerth, 2004
    */
   class BlockSparseMatrix : public BlockMatrixBase<PETScWrappers::SparseMatrix>

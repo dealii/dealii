@@ -82,9 +82,9 @@ namespace parallel
      * the partitioning is changed again. This allows for efficient parallel
      * communication of indices. In particular, it stores the communication
      * pattern, rather than having to compute it again for every
-     * communication. (For more information on ghost vectors, see also the
-     * @ref GlossGhostedVector "glossary entry on vectors with ghost elements"
-     * .) - Besides the usual global access operator () it is also possible to
+     * communication. For more information on ghost vectors, see also the
+     * @ref GlossGhostedVector "glossary entry on vectors with ghost elements".
+     * Besides the usual global access operator () it is also possible to
      * access vector entries in the local index space with the function @p
      * local_element(). Locally owned indices are placed first, [0,
      * local_size()), and then all ghost indices follow after them
@@ -97,8 +97,8 @@ namespace parallel
      * assembly routine involving ghosts that fill this vector. Note that the
      * @p insert mode of @p compress() does not set the elements included in
      * ghost entries but simply discards them, assuming that the owning
-     * processor has set them to the desired value already. (See also the
-     * @ref GlossCompress "glossary entry on compress" .) - The
+     * processor has set them to the desired value already (See also the
+     * @ref GlossCompress "glossary entry on compress"). The
      * <code>update_ghost_values()</code> function imports the data from the
      * owning processor to the ghost indices in order to provide read access
      * to the data associated with ghosts. - It is possible to split the above

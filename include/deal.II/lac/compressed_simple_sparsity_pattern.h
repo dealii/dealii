@@ -82,7 +82,8 @@ template <typename number> class SparseMatrix;
  * <h3>Notes</h3>
  *
  * There are several, exchangeable variations of this class, see
- * @ref Sparsity , section '"Dynamic" or "compressed" sparsity patterns' for
+ * @ref Sparsity,
+ * section '"Dynamic" or "compressed" sparsity patterns' for
  * more information.
  *
  * @author Timo Heister, 2008

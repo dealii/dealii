@@ -94,7 +94,10 @@ namespace internal
  * complement.
  *
  * @ingroup Matrix2
- * @ingroup vector_valued @see @ref GlossBlockLA "Block (linear algebra)"
+ * @ingroup vector_valued
+ *
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2006
  */
 template <class MATRIX>

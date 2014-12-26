@@ -78,7 +78,7 @@ namespace hp
  * or several
  * @ref GlossComponent "components" of the vector valued function. If the
  * element is
- * @ref GlossPrimitive "primitive" , there is indeed a single component with a
+ * @ref GlossPrimitive "primitive", there is indeed a single component with a
  * nonzero entry for each shape function. This component can be determined by
  * system_to_component_index(), the number of components is
  * FiniteElementData::n_components().
@@ -1458,8 +1458,7 @@ public:
    * Return a support point vector for generalized interpolation.
    *
    * See the
-   * @ref GlossGeneralizedSupport "glossary entry on generalized support
-   * points" for more information.
+   * @ref GlossGeneralizedSupport "glossary entry on generalized points" for more information.
    */
   const std::vector<Point<dim> > &
   get_generalized_support_points () const;
@@ -1469,8 +1468,7 @@ public:
    * get_unit_support_points() or get_generalized_support_points().
    *
    * See the
-   * @ref GlossGeneralizedSupport "glossary entry on generalized support
-   * points" for more information.
+   * @ref GlossGeneralizedSupport "glossary entry on generalized support points" for more information.
    */
   bool has_generalized_support_points () const;
 

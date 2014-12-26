@@ -927,8 +927,7 @@ namespace GridTools
      * interpreted as an interpolation matrix with size no_face_dofs $\times$
      * no_face_dofs. For more details see make_periodicity_constraints() and
      * the glossary
-     * @ref GlossPeriodicConstraints "glossary entry on periodic boundary
-     * conditions".
+     * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
      */
     FullMatrix<double> matrix;
 
@@ -1060,8 +1059,7 @@ namespace GridTools
    * matrix is interpreted as a rotation matrix that is applied to all vector
    * valued blocks listed in @p first_vector_components of the FESystem. For
    * more details see make_periodicity_constraints() and the glossary
-   * @ref GlossPeriodicConstraints "glossary entry on periodic boundary
-   * conditions".
+   * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
@@ -1113,8 +1111,7 @@ namespace GridTools
    * matrix is interpreted as a rotation matrix that is applied to all vector
    * valued blocks listet in @p first_vector_components of the FESystem. For
    * more details see make_periodicity_constraints() and the glossary
-   * @ref GlossPeriodicConstraints "glossary entry on periodic boundary
-   * conditions".
+   * @ref GlossPeriodicConstraints "glossary entry on periodic conditions".
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see

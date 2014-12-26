@@ -529,7 +529,7 @@ public:
   DeclException0 (ExcMatrixDoesNotMatch);
   /**
    * A function has been called for a cell which should be
-   * @ref GlossActive "active" , but is refined.
+   * @ref GlossActive "active", but is refined.
    *
    * @ingroup Exceptions
    */
@@ -999,7 +999,7 @@ public:
   DeclException0 (ExcMatrixDoesNotMatch);
   /**
    * A function has been called for a cell which should be
-   * @ref GlossActive "active" , but is refined.
+   * @ref GlossActive "active", but is refined.
    *
    * @ingroup Exceptions
    */

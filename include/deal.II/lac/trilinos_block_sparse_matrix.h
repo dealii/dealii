@@ -69,7 +69,9 @@ namespace TrilinosWrappers
    * function, for much the same reason as is documented with the
    * BlockSparsityPattern class.
    *
-   * @ingroup Matrix1 @see @ref GlossBlockLA "Block (linear algebra)"
+   * @ingroup Matrix1
+   * @see
+   * @ref GlossBlockLA "Block (linear algebra)"
    * @author Martin Kronbichler, Wolfgang Bangerth, 2008
    */
   class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>
