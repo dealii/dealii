@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -47,10 +47,11 @@
 #     DEAL_II_LINKER_FLAGS_DEBUG
 #     DEAL_II_LINKER_FLAGS_RELEASE
 #
-#     DEAL_II_WITH_64BIT_INDICES
+# Components and miscellaneous options:
 #
-# Miscellaneous options:
+#     DEAL_II_WITH_64BIT_INDICES
 #     DEAL_II_DOXYGEN_USE_MATHJAX
+#     DEAL_II_CPACK_EXTERNAL_LIBS_TREE
 #
 #
 # *)  May also be set via environment variable (CXXFLAGS, LDFLAGS)
@@ -319,35 +320,34 @@ UNSET(ENV{CXXFLAGS})
 UNSET(ENV{LDFLAGS})
 
 
-
 ########################################################################
 #                                                                      #
-#                             Components:                              #
+#                Components and miscellaneous setup:                   #
 #                                                                      #
 ########################################################################
-
-#
-# Configuration option for the 64 bit indices component:
-#
 
 OPTION(DEAL_II_WITH_64BIT_INDICES
   "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
   OFF
   )
 
-
-
-########################################################################
-#                                                                      #
-#                         Miscellaneous setup:                         #
-#                                                                      #
-########################################################################
-
 OPTION(DEAL_II_DOXYGEN_USE_MATHJAX
   "If set to ON, doxygen documentation is generated using mathjax"
   OFF
   )
 MARK_AS_ADVANCED(DEAL_II_DOXYGEN_USE_MATHJAX)
+
+SET(DEAL_II_CPACK_EXTERNAL_LIBS_TREE "" CACHE PATH
+    "Path to tree of external libraries that will be installed in bundle package."
+  )
+MARK_AS_ADVANCED(DEAL_II_CPACK_EXTERNAL_LIBS_TREE)
+
+
+########################################################################
+#                                                                      #
+#                               Finalize:                              #
+#                                                                      #
+########################################################################
 
 #
 # We do not support installation into the binary directory any more ("too
@@ -408,11 +408,3 @@ FOREACH(_var ${_res})
     UNSET(${_var} CACHE)
   ENDIF()
 ENDFOREACH()
-
-# CPack miscellaneous options
-SET(DEAL_II_CPACK_EXTERNAL_LIBS_TREE "" CACHE PATH
-    "Path to tree of external libraries that will be installed in bundle package."
-  )
-MARK_AS_ADVANCED(DEAL_II_CPACK_EXTERNAL_LIBS_TREE)
-
-
