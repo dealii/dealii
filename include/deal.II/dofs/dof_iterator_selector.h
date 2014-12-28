@@ -48,7 +48,8 @@ namespace internal
      * The types have the same meaning as those declared in
      * internal::Triangulation::Iterators<1,spacedim>, only the treatment of
      * templates is a little more complicated. See the
-     * @ref Iterators module for more information.
+     * @ref Iterators
+     * module for more information.
      *
      * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998,
      * 2003, 2008, 2010
@@ -90,7 +91,8 @@ namespace internal
      * The types have the same meaning as those declared in
      * internal::Triangulation::Iterators<2,spacedim>, only the treatment of
      * templates is a little more complicated. See the
-     * @ref Iterators module for more information.
+     * @ref Iterators
+     * module for more information.
      *
      * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998,
      * 2003, 2008, 2010
@@ -132,7 +134,8 @@ namespace internal
      * The types have the same meaning as those declared in
      * internal::Triangulation::Iterators<3,spacedim>, only the treatment of
      * templates is a little more complicated. See the
-     * @ref Iterators module for more information.
+     * @ref Iterators
+     * module for more information.
      *
      * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998,
      * 2003, 2008, 2010

@@ -38,9 +38,9 @@ template <typename number> class SparseMatrix;
  *
  * Some of these functions receive a flag @p colorize. If this is set, parts
  * of the boundary receive different boundary indicators (
- * @ref GlossBoundaryIndicator), allowing them to be distinguished for the
- * purpose of attaching geometry objects and evaluating different boundary
- * conditions.
+ * @ref GlossBoundaryIndicator),
+ * allowing them to be distinguished for the purpose of attaching geometry
+ * objects and evaluating different boundary conditions.
  *
  * This namespace also provides a function
  * GridGenerator::laplace_transformation that smoothly transforms a domain
@@ -816,14 +816,15 @@ namespace GridGenerator
    *
    * @tparam Container A type that satisfies the requirements of a mesh
    * container (see
-   * @ref GlossMeshAsAContainer). The map that is returned will be between
-   * cell iterators pointing into the container describing the surface mesh
-   * and face iterators of the volume mesh container. If the Container
-   * argument is DoFHandler of hp::DoFHandler, then the function will re-build
-   * the triangulation underlying the second argument and return a map between
-   * appropriate iterators into the Container arguments. However, the function
-   * will not actually distribute degrees of freedom on this newly created
-   * surface mesh.
+   * @ref GlossMeshAsAContainer).
+   * The map that is returned will be between cell iterators pointing into the
+   * container describing the surface mesh and face iterators of the volume
+   * mesh container. If the Container argument is DoFHandler of
+   * hp::DoFHandler, then the function will re-build the triangulation
+   * underlying the second argument and return a map between appropriate
+   * iterators into the Container arguments. However, the function will not
+   * actually distribute degrees of freedom on this newly created surface
+   * mesh.
    *
    * @note The algorithm outlined above assumes that all faces on higher
    * refinement levels always have exactly the same boundary indicator as

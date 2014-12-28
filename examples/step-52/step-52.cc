@@ -544,7 +544,7 @@ namespace Step52
   // Embedded methods use a guessed time step. If the error using this time step
   // is too large, the time step will be reduced. If the error is below the
   // threshold, a larger time step will be tried for the next time step.
-  // </code>delta_t_guess</code> is the guessed time step produced by the embedded method.
+  // <code>delta_t_guess</code> is the guessed time step produced by the embedded method.
   unsigned int Diffusion::embedded_explicit_method(const TimeStepping::runge_kutta_method method,
                                                    const unsigned int                     n_time_steps,
                                                    const double                           initial_time,

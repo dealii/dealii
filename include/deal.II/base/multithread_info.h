@@ -30,14 +30,16 @@ DEAL_II_NAMESPACE_OPEN
  * deal.II is compiled with multithreading support, some functions will use
  * multiple threads for their action. Currently the library supports both
  * thread-based and task-based parallelism.
- * @ref threads describes the different uses of each. The default number of
- * threads used for task-based parallel methods is selected automatically by
- * the Threading Building Blocks library. See
- * @ref threads for more information on this.  Thread-based parallel methods
- * need to explicitly created threads and may want to use a number of threads
- * that is related to the number of CPUs in your system. This can be queried
- * using the variable <code> multithread_info.n_cpus; </code> of a global
- * variable <code>multithread_info</code> of this class that, or using <code>
+ * @ref threads
+ * describes the different uses of each. The default number of threads used
+ * for task-based parallel methods is selected automatically by the Threading
+ * Building Blocks library. See
+ * @ref threads
+ * for more information on this.  Thread-based parallel methods need to
+ * explicitly created threads and may want to use a number of threads that is
+ * related to the number of CPUs in your system. This can be queried using the
+ * variable <code> multithread_info.n_cpus; </code> of a global variable
+ * <code>multithread_info</code> of this class that, or using <code>
  * multithread_info.n_threads(); </code>
  *
  * @ingroup threads

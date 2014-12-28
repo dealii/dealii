@@ -481,7 +481,8 @@ namespace SparseMatrixIterators
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
  * section on
- * @ref Instantiations in the manual).
+ * @ref Instantiations
+ * in the manual).
  *
  * @ingroup Matrix1
  * @author Essentially everyone who has ever worked on deal.II
@@ -1068,10 +1069,11 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
-   * member access is expensive, this function is not efficient. In
-   * particular, if you want to multiply with BlockVector objects, you should
-   * consider using a BlockSparseMatrix as well.
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random member
+   * access is expensive, this function is not efficient. In particular, if
+   * you want to multiply with BlockVector objects, you should consider using
+   * a BlockSparseMatrix as well.
    *
    * Source and destination must not be the same vector.
    *
@@ -1088,10 +1090,11 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
-   * member access is expensive, this function is not efficient. In
-   * particular, if you want to multiply with BlockVector objects, you should
-   * consider using a BlockSparseMatrix as well.
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random member
+   * access is expensive, this function is not efficient. In particular, if
+   * you want to multiply with BlockVector objects, you should consider using
+   * a BlockSparseMatrix as well.
    *
    * Source and destination must not be the same vector.
    */
@@ -1105,10 +1108,11 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
-   * member access is expensive, this function is not efficient. In
-   * particular, if you want to multiply with BlockVector objects, you should
-   * consider using a BlockSparseMatrix as well.
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random member
+   * access is expensive, this function is not efficient. In particular, if
+   * you want to multiply with BlockVector objects, you should consider using
+   * a BlockSparseMatrix as well.
    *
    * Source and destination must not be the same vector.
    *
@@ -1125,10 +1129,11 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
-   * member access is expensive, this function is not efficient. In
-   * particular, if you want to multiply with BlockVector objects, you should
-   * consider using a BlockSparseMatrix as well.
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random member
+   * access is expensive, this function is not efficient. In particular, if
+   * you want to multiply with BlockVector objects, you should consider using
+   * a BlockSparseMatrix as well.
    *
    * Source and destination must not be the same vector.
    */

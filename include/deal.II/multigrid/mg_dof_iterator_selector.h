@@ -41,7 +41,8 @@ namespace internal
 
     /**
      * Iterators for MGDofHandler in one dimension. See the
-     * @ref Iterators module for more information.
+     * @ref Iterators
+     * module for more information.
      */
     template <int spacedim>
     class Iterators<1,spacedim>
@@ -75,7 +76,8 @@ namespace internal
 
     /**
      * Iterators for MGDofHandler in two dimensions. See the
-     * @ref Iterators module for more information.
+     * @ref Iterators
+     * module for more information.
      */
     template <int spacedim>
     class Iterators<2,spacedim>
@@ -109,7 +111,8 @@ namespace internal
 
     /**
      * Iterators for MGDofHandler in three dimensions. See the
-     * @ref Iterators module for more information.
+     * @ref Iterators
+     * module for more information.
      */
     template <int spacedim>
     class Iterators<3,spacedim>

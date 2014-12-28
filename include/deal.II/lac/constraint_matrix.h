@@ -71,19 +71,21 @@ namespace internals
  * This class implements dealing with linear (possibly inhomogeneous)
  * constraints on degrees of freedom. The concept and origin of such
  * constraints is extensively described in the
- * @ref constraints module. The class is meant to deal with a limited number
- * of constraints relative to the total number of degrees of freedom, for
- * example a few per cent up to maybe 30 per cent; and with a linear
- * combination of <i>M</i> other degrees of freedom where <i>M</i> is also
- * relatively small (no larger than at most around the average number of
- * entries per row of a linear system). It is <em>not</em> meant to describe
- * full rank linear systems.
+ * @ref constraints
+ * module. The class is meant to deal with a limited number of constraints
+ * relative to the total number of degrees of freedom, for example a few per
+ * cent up to maybe 30 per cent; and with a linear combination of <i>M</i>
+ * other degrees of freedom where <i>M</i> is also relatively small (no larger
+ * than at most around the average number of entries per row of a linear
+ * system). It is <em>not</em> meant to describe full rank linear systems.
  *
  * The algorithms used in the implementation of this class are described in
  * some detail in the
- * @ref hp_paper "hp paper". There is also a significant amount of
- * documentation on how to use this class in the
- * @ref constraints module.
+ * @ref hp_paper "hp paper".
+ * There is also a significant amount of documentation on how to use this
+ * class in the
+ * @ref constraints
+ * module.
  *
  *
  * <h3>Description of constraints</h3>
@@ -128,12 +130,13 @@ namespace internals
  * and sorts the entries.
  *
  * @note Many of the algorithms this class implements are discussed in the
- * @ref hp_paper. The algorithms are also related to those shown in <i>M. S.
- * Shephard: Linear multipoint constraints applied via transformation as part
- * of a direct stiffness assembly process. Int. J. Numer. Meth. Engrg., vol.
- * 20 (1984), pp. 2107-2112.</i>, with the difference that the algorithms
- * shown there completely eliminated constrained degrees of freedom, whereas
- * we usually keep them as part of the linear system.
+ * @ref hp_paper.
+ * The algorithms are also related to those shown in <i>M. S. Shephard: Linear
+ * multipoint constraints applied via transformation as part of a direct
+ * stiffness assembly process. Int. J. Numer. Meth. Engrg., vol. 20 (1984),
+ * pp. 2107-2112.</i>, with the difference that the algorithms shown there
+ * completely eliminated constrained degrees of freedom, whereas we usually
+ * keep them as part of the linear system.
  *
  * @ingroup dofs
  * @ingroup constraints
@@ -560,8 +563,8 @@ public:
    * elements per row (for example for vector-valued problems or hp finite
    * elements). In this case, it is advisable to use the
    * CompressedSetSparsityPattern class instead, see for example
-   * @ref step_27 "step-27" , or to use the CompressedSimpleSparsityPattern
-   * class, see for example
+   * @ref step_27 "step-27",
+   * or to use the CompressedSimpleSparsityPattern class, see for example
    * @ref step_31 "step-31".
    */
   void condense (CompressedSparsityPattern &sparsity) const;
@@ -589,7 +592,8 @@ public:
    * nonzero elements per row (for example for vector-valued problems or hp
    * finite elements). In this case, it is advisable to use the
    * BlockCompressedSetSparsityPattern class instead, see for example
-   * @ref step_27 "step-27" and
+   * @ref step_27 "step-27"
+   * and
    * @ref step_31 "step-31".
    */
   void condense (BlockCompressedSparsityPattern &sparsity) const;
@@ -943,7 +947,8 @@ public:
    * according to the constraints specified by the calling ConstraintMatrix.
    * This function can correctly handle inhomogeneous constraints as well. For
    * the parameter use_inhomogeneities_for_rhs see the documentation in
-   * @ref constraints module.
+   * @ref constraints
+   * module.
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function
@@ -969,13 +974,14 @@ public:
    * sparsity pattern entries.
    *
    * As explained in the
-   * @ref hp_paper "hp paper" and in step-27, first allocating a sparsity
-   * pattern and later coming back and allocating additional entries for those
-   * matrix entries that will be written to due to the elimination of
-   * constrained degrees of freedom (using ConstraintMatrix::condense() ), can
-   * be a very expensive procedure. It is cheaper to allocate these entries
-   * right away without having to do a second pass over the sparsity pattern
-   * object. This function does exactly that.
+   * @ref hp_paper "hp paper"
+   * and in step-27, first allocating a sparsity pattern and later coming back
+   * and allocating additional entries for those matrix entries that will be
+   * written to due to the elimination of constrained degrees of freedom
+   * (using ConstraintMatrix::condense() ), can be a very expensive procedure.
+   * It is cheaper to allocate these entries right away without having to do a
+   * second pass over the sparsity pattern object. This function does exactly
+   * that.
    *
    * Because the function only allocates entries in a sparsity pattern, all it
    * needs to know are the degrees of freedom that couple to each other.

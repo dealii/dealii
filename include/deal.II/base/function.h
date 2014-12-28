@@ -429,8 +429,8 @@ protected:
  * a few vector components, rather than the entire vector-valued solution. In
  * other words, it acts as a component mask with a single component selected
  * (see the
- * @ref GlossComponentMask "the glossary entry on component masks"). See the
- * step-20 tutorial program for a detailed explanation and a use case.
+ * @ref GlossComponentMask "the glossary entry on component masks").
+ * See the step-20 tutorial program for a detailed explanation and a use case.
  *
  * @ingroup functions
  * @author Guido Kanschat, 2000, Wolfgang Bangerth 2006

@@ -695,11 +695,12 @@ private:
   /**
    * Performs the same as @p fill_fe_values on a face. Additionally, @p
    * boundary_form (see
-   * @ref GlossBoundaryForm ) and @p normal_vectors can be computed on
-   * surfaces. Since the boundary form already contains the determinant of the
-   * Jacobian of the transformation, it is sometimes more economic to use the
-   * boundary form instead of the product of the unit normal and the
-   * transformed quadrature weight.
+   * @ref GlossBoundaryForm
+   * ) and @p normal_vectors can be computed on surfaces. Since the boundary
+   * form already contains the determinant of the Jacobian of the
+   * transformation, it is sometimes more economic to use the boundary form
+   * instead of the product of the unit normal and the transformed quadrature
+   * weight.
    */
   virtual void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,

@@ -134,8 +134,8 @@ namespace hp
 
     /**
      * A typedef that is used to to identify
-     * @ref GlossActive "active cell iterators". The concept of iterators is
-     * discussed at length in the
+     * @ref GlossActive "active cell iterators".
+     * The concept of iterators is discussed at length in the
      * @ref Iterators "iterators documentation module".
      *
      * The current typedef identifies active cells in a hp::DoFHandler object.
@@ -163,11 +163,11 @@ namespace hp
      *
      * The current typedef identifies cells in a DoFHandler object. Some of
      * these cells may in fact be active (see
-     * @ref GlossActive "active cell iterators" ) in which case they can in
-     * fact be asked for the degrees of freedom that live on them. On the
-     * other hand, if the cell is not active, any such query will result in an
-     * error. Note that this is what distinguishes this typedef from the
-     * level_cell_iterator typedef.
+     * @ref GlossActive "active cell iterators"
+     * ) in which case they can in fact be asked for the degrees of freedom
+     * that live on them. On the other hand, if the cell is not active, any
+     * such query will result in an error. Note that this is what
+     * distinguishes this typedef from the level_cell_iterator typedef.
      *
      * While the actual data type of the typedef is hidden behind a few layers
      * of (unfortunately necessary) indirections, it is in essence
