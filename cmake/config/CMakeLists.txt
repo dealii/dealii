@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -323,7 +323,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   # yes, as is common for Makefiles.
   #
   COND_SET_TO_YES(DEAL_II_WITH_THREADS MAKEFILE_enablethreads)
-  COND_SET_TO_YES(DEAL_II_WITH_FUNCTIONPARSER MAKEFILE_enableparser)
+  COND_SET_TO_YES(DEAL_II_WITH_MUPARSER MAKEFILE_enableparser)
   COND_SET_TO_YES(BUILD_SHARED_LIBS MAKEFILE_enableshared)
 
   COND_SET_TO_YES(DEAL_II_WITH_ARPACK MAKEFILE_ARPACK)
