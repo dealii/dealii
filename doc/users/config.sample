@@ -193,17 +193,15 @@
 
 
 #
-# Functionparser:
+# Muparser:
 #
-# SET(DEAL_II_WITH_FUNCTIONPARSER TRUE CACHE BOOL
-#   "Build deal.II with support for functionparser"
+# SET(DEAL_II_WITH_MUPARSER TRUE CACHE BOOL
+#   "Build deal.II with support for muparser"
 #   )
 #
-# SET(DEAL_II_FORCE_BUNDLED_FUNCTIONPARSER TRUE CACHE BOOL
-#   "Always use the bundled functionparser library instead of an external one."
+# SET(DEAL_II_FORCE_BUNDLED_MUPARSER TRUE CACHE BOOL
+#   "Always use the bundled muparser library instead of an external one."
 #   )
-#
-# Only support for bundled functionparser is available.
 #
 
 
@@ -609,14 +607,12 @@
 #
 # C++11 support:
 #
-# C++11 support is autodetected. You can explicitly disable C+11 support by
-# specifying
-#
-#   SET(DEAL_II_HAVE_CXX11_FLAG FALSE CACHE BOOL "")
+# SET(DEAL_II_WITH_CXX11 ON CACHE BOOL
+#   "deal.II using C++11 language standard"
+#   )
 #
 # A custom C++11 flag can be set by setting
 #
-#   SET(DEAL_II_HAVE_CXX11_FLAG TRUE CACHE BOOL "")
 #   SET(DEAL_II_CXX11_FLAG "-std=c++0x" CACHE STRING "")
 #
 
