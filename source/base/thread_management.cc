@@ -20,7 +20,7 @@
 #include <iostream>
 #include <list>
 
-#ifdef HAVE_UNISTD_H
+#ifdef DEAL_II_HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
 
@@ -137,7 +137,7 @@ namespace Threads
   {
 #ifdef SYS_gettid
     const pid_t this_id = syscall(SYS_gettid);
-#elif defined(HAVE_UNISTD_H) && defined(HAVE_GETPID)
+#elif defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETPID)
     const pid_t this_id = getpid();
 #else
     const unsigned int this_id = 0;

@@ -27,16 +27,8 @@
 
 #include <string>
 
-// We have to clean up certain name clashes prior to any opencascade header
-// inclusion. Unfortunately, this is clumsy and should be resolved by
-// renaming our very own includes someday...
-// --Maier, 2014
+// opencascade needs "HAVE_CONFIG_H" to be exported...
 #define HAVE_CONFIG_H
-#undef HAVE_SYS_TYPES_H
-#undef HAVE_SYS_TIMES_H
-#undef HAVE_SYS_TIME_H
-#undef HAVE_UNISTD_H
-#undef HAVE_GETHOSTNAME
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Edge.hxx>

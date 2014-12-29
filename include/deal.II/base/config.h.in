@@ -69,20 +69,20 @@
 #cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER
 
 /** Define if the compiler provides __builtin_expect */
-#cmakedefine HAVE_BUILTIN_EXPECT
+#cmakedefine DEAL_II_HAVE_BUILTIN_EXPECT
 
 /** Define if the compiler provides __verbose_terminate_handler */
-#cmakedefine HAVE_VERBOSE_TERMINATE
+#cmakedefine DEAL_II_HAVE_VERBOSE_TERMINATE
 
 /** Define if deal.II is linked against a libc that provides stacktrace
  * debug information that can be printed out in the exception class
  * */
-#cmakedefine HAVE_GLIBC_STACKTRACE
+#cmakedefine DEAL_II_HAVE_GLIBC_STACKTRACE
 
 /** Defined if the std c++ library provides a demangler conforming to the
  * GCC libstdc++ interface.
  */
-#cmakedefine HAVE_LIBSTDCXX_DEMANGLER
+#cmakedefine DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 
 /** If already available, do not define at all. Otherwise, define to
  * __func__ if that is available. In all other cases, indicate that no
@@ -139,10 +139,10 @@
 #cmakedefine DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
 
 /** Defined if isnan is available */
-#cmakedefine HAVE_ISNAN
+#cmakedefine DEAL_II_HAVE_ISNAN
 
 /** Defined if _isnan is available */
-#cmakedefine HAVE_UNDERSCORE_ISNAN
+#cmakedefine DEAL_II_HAVE_UNDERSCORE_ISNAN
 
 /** Defined if std::isfinite is available */
 #cmakedefine DEAL_II_HAVE_ISFINITE
@@ -153,34 +153,34 @@
  ******************************************/
 
 /** Defined if you have the <sys/resource.h> header file */
-#cmakedefine HAVE_SYS_RESOURCE_H
+#cmakedefine DEAL_II_HAVE_SYS_RESOURCE_H
 
 /** Defined if you have the <sys/time.h> header file. */
-#cmakedefine HAVE_SYS_TIME_H
+#cmakedefine DEAL_II_HAVE_SYS_TIME_H
 
 /** Defined if you have the <sys/times.h> header file. */
-#cmakedefine HAVE_SYS_TIMES_H
+#cmakedefine DEAL_II_HAVE_SYS_TIMES_H
 
 /** Defined if you have the <sys/types.h> header file. */
-#cmakedefine HAVE_SYS_TYPES_H
+#cmakedefine DEAL_II_HAVE_SYS_TYPES_H
 
 /** Defined if you have the <unistd.h> header file. */
-#cmakedefine HAVE_UNISTD_H
+#cmakedefine DEAL_II_HAVE_UNISTD_H
 
 /** Defined if you have the "gethostname" function. */
-#cmakedefine HAVE_GETHOSTNAME
+#cmakedefine DEAL_II_HAVE_GETHOSTNAME
 
 /** Defined if you have the "getpid' function. */
-#cmakedefine HAVE_GETPID
+#cmakedefine DEAL_II_HAVE_GETPID
 
 /** Defined if you have the "rand_r" function */
-#cmakedefine HAVE_RAND_R
+#cmakedefine DEAL_II_HAVE_RAND_R
 
 /** Defined if you have the "times" function. */
-#cmakedefine HAVE_TIMES
+#cmakedefine DEAL_II_HAVE_TIMES
 
 /** Defined if you have the "jn" function. */
-#cmakedefine HAVE_JN
+#cmakedefine DEAL_II_HAVE_JN
 
 /** Defined if deal.II was configured on a native Windows platform. */
 #cmakedefine DEAL_II_MSVC
@@ -267,15 +267,13 @@
 #endif
 
 
+
 /***************************************
  * Configured in configure_hdf5.cmake: *
  ***************************************/
 
 #cmakedefine DEAL_II_WITH_HDF5
-#ifdef DEAL_II_WITH_HDF5
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_HAVE_HDF5
-#endif
+
 
 
 /*****************************************
@@ -283,49 +281,6 @@
  *****************************************/
 
 #cmakedefine DEAL_II_WITH_LAPACK
-#ifdef DEAL_II_WITH_LAPACK
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define HAVE_LIBLAPACK
-#  define HAVE_DAXPY_
-#  define HAVE_DGEEVX_
-#  define HAVE_DGEEV_
-#  define HAVE_DGELSD_
-#  define HAVE_DGEMM_
-#  define HAVE_DGEMV_
-#  define HAVE_DGEQRF_
-#  define HAVE_DGESDD_
-#  define HAVE_DGESVD_
-#  define HAVE_DGETRF_
-#  define HAVE_DGETRI_
-#  define HAVE_DGETRS_
-#  define HAVE_DORGQR_
-#  define HAVE_DORMQR_
-#  define HAVE_DSTEV_
-#  define HAVE_DSYEVX_
-#  define HAVE_DSYGV_
-#  define HAVE_DSYGVX_
-#  define HAVE_DTRTRS_
-#  define HAVE_SAXPY_
-#  define HAVE_SGEEVX_
-#  define HAVE_SGEEV_
-#  define HAVE_SGELSD_
-#  define HAVE_SGEMM_
-#  define HAVE_SGEMV_
-#  define HAVE_SGEQRF_
-#  define HAVE_SGESDD_
-#  define HAVE_SGESVD_
-#  define HAVE_SGETRF_
-#  define HAVE_SGETRI_
-#  define HAVE_SGETRS_
-#  define HAVE_SORGQR_
-#  define HAVE_SORMQR_
-#  define HAVE_SSTEV_
-#  define HAVE_SSYEVX_
-#  define HAVE_SSYGV_
-#  define HAVE_SSYGVX_
-#  define HAVE_STRTRS_
-#endif
-
 
 
 /****************************************
@@ -373,10 +328,6 @@
  *****************************************/
 
 #cmakedefine DEAL_II_WITH_NETCDF
-#ifdef DEAL_II_WITH_NETCDF
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define HAVE_LIBNETCDF
-#endif
 
 
 /****************************************
@@ -520,10 +471,6 @@
  *****************************************/
 
 #cmakedefine DEAL_II_WITH_ZLIB
-#ifdef DEAL_II_WITH_ZLIB
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define HAVE_LIBZ
-#endif
 
 
 /*******************************************
@@ -553,10 +500,6 @@
  ******************************************/
 
 #cmakedefine DEAL_II_WITH_UMFPACK
-#ifdef DEAL_II_WITH_UMFPACK
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define HAVE_LIBUMFPACK
-#endif
 
 
 /**********************************************

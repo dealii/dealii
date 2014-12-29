@@ -16,7 +16,7 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 
-#ifdef HAVE_UNISTD_H
+#ifdef DEAL_II_HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
 

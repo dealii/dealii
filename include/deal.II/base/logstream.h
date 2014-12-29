@@ -28,7 +28,7 @@
 #include <cmath>
 #include <sstream>
 
-#ifdef HAVE_SYS_TIMES_H
+#ifdef DEAL_II_HAVE_SYS_TIMES_H
 #  include <sys/times.h>
 #else
 struct tms

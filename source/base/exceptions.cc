@@ -20,11 +20,11 @@
 #include <iostream>
 #include <sstream>
 
-#ifdef HAVE_GLIBC_STACKTRACE
+#ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
 #  include <execinfo.h>
 #endif
 
-#ifdef HAVE_LIBSTDCXX_DEMANGLER
+#ifdef DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #  include <cxxabi.h>
 #endif
 
@@ -112,7 +112,7 @@ void ExceptionBase::set_fields (const char *f,
   // to when we need it (see what() below). This is for performance
   // reasons, as this requires loading libraries and can take in the
   // order of seconds on some machines.
-#ifdef HAVE_GLIBC_STACKTRACE
+#ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
   n_stacktrace_frames = backtrace(raw_stacktrace, 25);
 #endif
 }
@@ -122,7 +122,7 @@ const char *ExceptionBase::what() const throw()
   // If no error c_string was generated so far, do it now:
   if (what_str == "")
     {
-#ifdef HAVE_GLIBC_STACKTRACE
+#ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
       // We have deferred the symbol lookup to this point to avoid costly
       // runtime penalties due to linkage of external libraries by
       // backtrace_symbols.
@@ -213,7 +213,7 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
       // unmangled one (skipping address and offset). treat "main"
       // differently, since it is apparently demangled as "unsigned int"
       // for unknown reasons :-) if we can, demangle the function name
-#ifdef HAVE_LIBSTDCXX_DEMANGLER
+#ifdef DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
       int         status;
       char *p = abi::__cxa_demangle(functionname.c_str(), 0, 0, &status);
 
@@ -354,7 +354,7 @@ DEAL_II_NAMESPACE_CLOSE
 // catch clause in main(), they wonder where that abort may be coming from.
 // The terminate handler then at least says what is missing in their
 // program.
-#ifdef HAVE_VERBOSE_TERMINATE
+#ifdef DEAL_II_HAVE_VERBOSE_TERMINATE
 namespace __gnu_cxx
 {
   extern void __verbose_terminate_handler ();

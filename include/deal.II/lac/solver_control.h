@@ -179,7 +179,7 @@ public:
    * value (@p NaN). Note, however, that this check is only performed if the
    * @p isnan function is provided by the operating system, which is not
    * always true. The @p configure scripts checks for this and sets the flag
-   * @p HAVE_ISNAN in the file <tt>Make.global_options</tt> if this function
+   * @p DEAL_II_HAVE_ISNAN in the file <tt>Make.global_options</tt> if this function
    * was found.
    *
    * <tt>check()</tt> additionally preserves @p step and @p check_value. These
