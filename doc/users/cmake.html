@@ -443,15 +443,19 @@ parameter_gui  - builds and installs the 'parameter_gui' component
       Specifically, the following variables exist (the list may grow
       over time, but names are standardized):
 <pre class="cmake">
+DEAL_II_WITH_64BIT_INDICES
 DEAL_II_WITH_ARPACK
 DEAL_II_WITH_BOOST
-DEAL_II_WITH_FUNCTIONPARSER
+DEAL_II_WITH_BZIP2
+DEAL_II_WITH_CXX11
+DEAL_II_WITH_HDF5
 DEAL_II_WITH_LAPACK
 DEAL_II_WITH_METIS
+DEAL_II_WITH_MPI
 DEAL_II_WITH_MUMPS
 DEAL_II_WITH_MUPARSER
-DEAL_II_WITH_MPI
 DEAL_II_WITH_NETCDF
+DEAL_II_WITH_OPENCASCADE
 DEAL_II_WITH_P4EST
 DEAL_II_WITH_PETSC
 DEAL_II_WITH_SLEPC
@@ -459,7 +463,6 @@ DEAL_II_WITH_THREADS
 DEAL_II_WITH_TRILINOS
 DEAL_II_WITH_UMFPACK
 DEAL_II_WITH_ZLIB
-DEAL_II_WITH_64BIT_INDICES
 </pre>
       They all have standard meaning with the exception of
       two:
@@ -497,7 +500,7 @@ DEAL_II_WITH_64BIT_INDICES
           </p>
         <li>
           <p>
-            <code>DEAL_II_FORCE_BUNDLED_(BOOST|FUNCTIONPARSER|THREADS|UMFPACK)</code>:
+            <code>DEAL_II_FORCE_BUNDLED_(BOOST|MUPARSER|THREADS|UMFPACK)</code>:
           </p>
           <p>
             Forces the use of the bundled library regardless whether

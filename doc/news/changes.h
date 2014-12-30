@@ -57,6 +57,24 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Use CASROOT environment variable as additional hint for
+  opencasacade.
+  <br>
+  (Matthias Maier, 2014/12/29)
+  </li>
+
+  <li> Fixed: Update the run_testsuite.cmake script to also pick up
+  muparser and opencascade configuration.
+  <br>
+  (Matthias Maier, 2014/12/29)
+  </li>
+
+  <li> Fixed: Update several places in the documentation that were not
+  updated from functionparser to muparser. Add several forgotten
+  DEAL_II_WITH_* variables to certain places in the documentation.
+  <br>
+  (Matthias Maier, 2014/12/29)
+  </li>
 </ol>
 
 */
