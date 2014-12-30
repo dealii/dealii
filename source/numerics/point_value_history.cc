@@ -1074,14 +1074,6 @@ Vector<double> PointValueHistory<dim>
 
 
 template <int dim>
-Vector<double> PointValueHistory<dim>
-::mark_locations ()
-{
-  return mark_support_locations ();
-}
-
-
-template <int dim>
 void PointValueHistory<dim>
 ::get_support_locations (std::vector <std::vector<Point <dim> > > &locations)
 {

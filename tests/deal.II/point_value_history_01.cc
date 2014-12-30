@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -156,7 +156,7 @@ void TestPointValueHistory<dim>::run()
   test_copy.add_field_name("Solution");
   std::vector < std::vector <Point <dim> > > selected_locations;
   test_copy.get_points(selected_locations);
-  test_copy.mark_locations();
+  test_copy.mark_support_locations();
   test_copy.close();
   test_copy.start_new_dataset(0.1);
   test_copy.evaluate_field("Solution", solution);
@@ -191,7 +191,7 @@ void TestPointValueHistory<dim>::run()
     std::vector < std::vector <Point <dim> > > selected_locations;
     node_monitor.get_points(selected_locations);
     // write output to a file
-    Vector<double> node_locations = node_monitor.mark_locations();
+    Vector<double> node_locations = node_monitor.mark_support_locations();
     // write output to a file
   }
 

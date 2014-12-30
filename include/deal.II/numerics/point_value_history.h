@@ -446,18 +446,6 @@ public:
    */
   Vector<double> mark_support_locations();
 
-
-  /**
-   * @deprecated
-   *
-   * This function only exists for backward compatibility as this is the
-   * interface provided by previous versions of the library. The function
-   * mark_support_locations replaces it and reflects the fact that the
-   * locations marked are actually the support points.
-   */
-  Vector<double> mark_locations() DEAL_II_DEPRECATED;
-
-
   /**
    * Stores the actual location of each support point selected by the @p
    * add_point(s) method.  This can be used to compare with the point
