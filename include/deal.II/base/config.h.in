@@ -266,15 +266,6 @@
 #  define DEAL_II_USE_ARPACK
 #endif
 
-/*************************************************
- * Configured in configure_functionparser.cmake: *
- *************************************************/
-
-#cmakedefine DEAL_II_WITH_FUNCTIONPARSER
-#ifdef DEAL_II_WITH_FUNCTIONPARSER
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define HAVE_FUNCTIONPARSER
-#endif
 
 /***************************************
  * Configured in configure_hdf5.cmake: *
@@ -285,6 +276,7 @@
 /** Compatibility definition (with naming from deal.II < 8.0): */
 #  define DEAL_II_HAVE_HDF5
 #endif
+
 
 /*****************************************
  * Configured in configure_lapack.cmake: *
