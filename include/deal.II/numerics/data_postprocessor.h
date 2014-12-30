@@ -114,27 +114,11 @@ class DataPostprocessor: public Subscriptor
 {
 public:
   /**
-   * Virtual desctructor for safety. Does not do anything.
+   * Destructor. This function doesn't actually do anything but
+   * is marked as virtual to ensure that data postprocessors can
+   * be destroyed through pointers to the base class.
    */
   virtual ~DataPostprocessor ();
-
-  /**
-   * @deprecated
-   *
-   * This function only exists for backward compatibility as this is the
-   * interface provided by previous versions of the library. The default
-   * implementation of the other function of same name below calls this
-   * function by simply dropping the argument that denotes the evaluation
-   * points. Since this function might at one point go away, you should
-   * overload the other function instead.
-   */
-  virtual
-  void
-  compute_derived_quantities_scalar (const std::vector<double>         &uh,
-                                     const std::vector<Tensor<1,dim> > &duh,
-                                     const std::vector<Tensor<2,dim> > &dduh,
-                                     const std::vector<Point<dim> >    &normals,
-                                     std::vector<Vector<double> >      &computed_quantities) const DEAL_II_DEPRECATED;
 
   /**
    * This is the main function which actually performs the postprocessing. The
@@ -158,24 +142,6 @@ public:
                                      const std::vector<Point<dim> >    &normals,
                                      const std::vector<Point<dim> >    &evaluation_points,
                                      std::vector<Vector<double> >      &computed_quantities) const;
-
-  /**
-   * @deprecated
-   *
-   * This function only exists for backward compatibility as this is the
-   * interface provided by previous versions of the library. The default
-   * implementation of the other function of same name below calls this
-   * function by simply dropping the argument that denotes the evaluation
-   * points. Since this function might at one point go away, you should
-   * overload the other function instead.
-   */
-  virtual
-  void
-  compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-                                     const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                     const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-                                     const std::vector<Point<dim> >                  &normals,
-                                     std::vector<Vector<double> >                    &computed_quantities) const DEAL_II_DEPRECATED;
 
   /**
    * Same as the compute_derived_quantities_scalar() function, but this
