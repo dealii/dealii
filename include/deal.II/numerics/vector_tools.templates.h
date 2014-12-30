@@ -602,7 +602,7 @@ namespace VectorTools
     Assert(u2.size()==dof2.n_dofs(),
            ExcDimensionMismatch(u2.size(),dof2.n_dofs()));
 
-    Vector cache;
+    dealii::Vector<typename Vector::value_type> cache;
 
     // Looping over the finest common
     // mesh, this means that source and
