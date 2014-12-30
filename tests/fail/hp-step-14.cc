@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -453,8 +453,8 @@ namespace LaplaceSolver
     Threads::ThreadMutex mutex;
     Threads::ThreadGroup<> threads;
     for (unsigned int thread=0; thread<n_threads; ++thread)
-      threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
-                 (linear_system,
+      threads += Threads::new_thread (&Solver<dim>::assemble_matrix, *this, 
+                  linear_system,
                   thread_ranges[thread].first,
                   thread_ranges[thread].second,
                   mutex);
@@ -532,7 +532,7 @@ namespace LaplaceSolver
       = &DoFTools::make_hanging_node_constraints;
 
     Threads::Thread<>
-    mhnc_thread = Threads::spawn (mhnc_p)(dof_handler, hanging_node_constraints);
+      mhnc_thread = Threads::new_thread (mhnc_p, dof_handler, hanging_node_constraints);
 
     sparsity_pattern.reinit (dof_handler.n_dofs(),
                              dof_handler.n_dofs(),
@@ -1544,8 +1544,8 @@ namespace LaplaceSolver
   WeightedResidual<dim>::solve_problem ()
   {
     Threads::ThreadGroup<> threads;
-    threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_primal_problem)();
-    threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_dual_problem)();
+    threads += Threads::new_thread (&WeightedResidual<dim>::solve_primal_problem, *this);
+    threads += Threads::new_thread (&WeightedResidual<dim>::solve_dual_problem, *this);
     threads.join_all ();
   }
 
@@ -1687,8 +1687,8 @@ namespace LaplaceSolver
     const unsigned int n_threads = multithread_info.n_default_threads;
     Threads::ThreadGroup<> threads;
     for (unsigned int i=0; i<n_threads; ++i)
-      threads += Threads::spawn (*this, &WeightedResidual<dim>::estimate_some)
-                 (primal_solution,
+      threads += Threads::new_thread (&WeightedResidual<dim>::estimate_some, *this,
+                  primal_solution,
                   dual_weights,
                   n_threads, i,
                   error_indicators,

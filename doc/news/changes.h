@@ -53,6 +53,7 @@ inconvenience this causes.
   - The constructors of classes MGSmoother, MGSmootherRelaxation and
     MGSmootherPrecondition that take a VectorMemory object.
   - Deprecated variants of MeshWorker::loop and MeshWorker::integration_loop.
+  - ThreadManagement::spawn.
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
