@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014, 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,6 +38,22 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: This release removes a number of functions that have long
+  been deprecated and that were previously already marked as
+  deprecated (i.e., they would have yielded warnings by the compiler whenever
+  you tried to use them). Specifically, these are:
+  - TimeDependent::end_sweep (with an argument)
+  - PointValueHistory::mark_locations
+  - The DataPostprocessor::compute_derived_quantities_scalar and
+    DataPostprocessor::compute_derived_quantities_vector functions without
+    evaluation points. If you have
+    data postprocessor classes implemented in your program that overload these
+    functions, you will have to change it in a way that they overload the
+    functions of same name but with the evaluation point argument instead.
+  <br>
+  (Wolfgang Bangerth, 2015/01/04)
+  </li>
+
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
   Those are either entirely removed (for the blas/lapack symbols) or
   renamed to DEAL_II_HAVE_*. This change is done in order to avoid clashes
