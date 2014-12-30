@@ -112,13 +112,17 @@ test_mesh(MGDoFHandler<dim> &mgdofs)
   MeshWorker::Assembler::CellsAndFaces<double> assembler;
   assembler.initialize(out_data, true);
 
+  MeshWorker::LoopControl lctrl;
+  lctrl.cells_first = true;
+  lctrl.own_faces = MeshWorker::LoopControl::one;
+
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, EmptyInfoBox>
   (dofs.begin_active(), dofs.end(),
    dof_info, info_box,
    std_cxx11::bind (&Local<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
    std_cxx11::bind (&Local<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
    std_cxx11::bind (&Local<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
-   assembler, true);
+   assembler, lctrl);
 
   deallog << "  Results cells";
   for (unsigned int i=0; i<n_functionals; ++i)
@@ -140,7 +144,7 @@ test_mesh(MGDoFHandler<dim> &mgdofs)
    std_cxx11::bind (&Local<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
    std_cxx11::bind (&Local<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
    std_cxx11::bind (&Local<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
-   assembler, true);
+   assembler, lctrl);
 
   deallog << "MGResults cells";
   for (unsigned int i=0; i<n_functionals; ++i)

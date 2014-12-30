@@ -42,8 +42,8 @@ inconvenience this causes.
   been deprecated and that were previously already marked as
   deprecated (i.e., they would have yielded warnings by the compiler whenever
   you tried to use them). Specifically, these are:
-  - TimeDependent::end_sweep (with an argument)
-  - PointValueHistory::mark_locations
+  - TimeDependent::end_sweep (with an argument).
+  - PointValueHistory::mark_locations.
   - The DataPostprocessor::compute_derived_quantities_scalar and
     DataPostprocessor::compute_derived_quantities_vector functions without
     evaluation points. If you have
@@ -52,6 +52,7 @@ inconvenience this causes.
     functions of same name but with the evaluation point argument instead.
   - The constructors of classes MGSmoother, MGSmootherRelaxation and
     MGSmootherPrecondition that take a VectorMemory object.
+  - Deprecated variants of MeshWorker::loop and MeshWorker::integration_loop.
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
