@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,13 +81,16 @@ public:
    */
   void set_debug (const unsigned int level);
 
-private:
-  /**
-   * The memory object to be used if none is given to the constructor.
-   */
-  GrowingVectorMemory<VECTOR> my_memory;
-
 protected:
+  /**
+   * A memory object to be used for temporary vectors.
+   *
+   * The object is marked as mutable since we will need to use it
+   * to allocate temporary vectors also in functions that are
+   * const.
+   */
+  mutable GrowingVectorMemory<VECTOR> vector_memory;
+
   /**
    * Number of smoothing steps on the finest level. If no #variable smoothing
    * is chosen, this is the number of steps on all levels.
@@ -116,11 +119,6 @@ protected:
    * Output debugging information to @p deallog if this is nonzero.
    */
   unsigned int debug;
-
-  /**
-   * Memory for auxiliary vectors.
-   */
-  SmartPointer<VectorMemory<VECTOR>, MGSmoother<VECTOR> > mem;
 };
 
 
@@ -544,8 +542,7 @@ MGSmoother<VECTOR>::MGSmoother(
   variable(variable),
   symmetric(symmetric),
   transpose(transpose),
-  debug(0),
-  mem(&my_memory)
+  debug(0)
 {}
 
 
@@ -685,7 +682,7 @@ namespace mg
     return sizeof(*this)
            -sizeof(MGLevelObject<RELAX>)
            + MGLevelObject<RELAX>::memory_consumption()
-           + this->mem->memory_consumption();
+           + this->vector_memory.memory_consumption();
   }
 }
 
@@ -854,7 +851,7 @@ memory_consumption () const
   return sizeof(*this)
          + matrices.memory_consumption()
          + smoothers.memory_consumption()
-         + this->mem->memory_consumption();
+         + this->vector_memory.memory_consumption();
 }
 
 
@@ -1002,8 +999,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
   if (this->variable)
     steps2 *= (1<<(maxlevel-level));
 
-  typename VectorMemory<VECTOR>::Pointer r(*this->mem);
-  typename VectorMemory<VECTOR>::Pointer d(*this->mem);
+  typename VectorMemory<VECTOR>::Pointer r(this->vector_memory);
+  typename VectorMemory<VECTOR>::Pointer d(this->vector_memory);
 
   r->reinit(u,true);
   d->reinit(u,true);
@@ -1069,7 +1066,7 @@ memory_consumption () const
   return sizeof(*this)
          + matrices.memory_consumption()
          + smoothers.memory_consumption()
-         + this->mem->memory_consumption();
+         + this->vector_memory.memory_consumption();
 }
 
 
