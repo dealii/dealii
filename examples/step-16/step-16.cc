@@ -504,11 +504,6 @@ namespace Step16
     // iteration. To this end, we define an appropriate <code>typedef</code>
     // and then setup a smoother object.
     //
-    // Since this smoother needs temporary vectors to store intermediate
-    // results, we need to provide a VectorMemory object. Since these vectors
-    // will be reused over and over, the GrowingVectorMemory is more time
-    // efficient than the PrimitiveVectorMemory class in the current case.
-    //
     // The last step is to initialize the smoother object with our level
     // matrices and to set some smoothing parameters.  The
     // <code>initialize()</code> function can optionally take additional

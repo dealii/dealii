@@ -47,25 +47,12 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 {
 public:
   /**
-   * Constructor. Sets smoothing parameters and creates a private
-   * GrowingVectorMemory object to be used to retrieve vectors.
+   * Constructor.
    */
   MGSmoother(const unsigned int steps = 1,
              const bool variable = false,
              const bool symmetric = false,
              const bool transpose = false);
-
-  /**
-   * @deprecated Since GrowingVectorMemory now uses a joint memory pool, it is
-   * recommended to use the constructor without the memory object.
-   *
-   * Constructor. Sets memory and smoothing parameters.
-   */
-  MGSmoother(VectorMemory<VECTOR> &mem,
-             const unsigned int steps = 1,
-             const bool variable = false,
-             const bool symmetric = false,
-             const bool transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Modify the number of smoothing steps on finest level.
@@ -201,7 +188,7 @@ namespace mg
   {
   public:
     /**
-     * Constructor. Sets memory and smoothing parameters.
+     * Constructor. Sets smoothing parameters.
      */
     SmootherRelaxation(const unsigned int steps = 1,
                        const bool variable = false,
@@ -310,17 +297,6 @@ public:
                        const bool variable = false,
                        const bool symmetric = false,
                        const bool transpose = false);
-
-  /**
-   * Constructor. Sets memory and smoothing parameters.
-   *
-   * @deprecated Use the constructor without the vector memory object
-   */
-  MGSmootherRelaxation(VectorMemory<VECTOR> &mem,
-                       const unsigned int steps = 1,
-                       const bool variable = false,
-                       const bool symmetric = false,
-                       const bool transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Initialize for matrices. This function stores pointers to the level
@@ -452,17 +428,6 @@ public:
                          const bool transpose = false);
 
   /**
-   * Constructor. Sets memory and smoothing parameters.
-   *
-   * @deprecated Use the constructor without the vector memory object
-   */
-  MGSmootherPrecondition(VectorMemory<VECTOR> &mem,
-                         const unsigned int steps = 1,
-                         const bool variable = false,
-                         const bool symmetric = false,
-                         const bool transpose = false) DEAL_II_DEPRECATED;
-
-  /**
    * Initialize for matrices. This function stores pointers to the level
    * matrices and initializes the smoothing operator with the same smoother
    * for each level.
@@ -581,24 +546,6 @@ MGSmoother<VECTOR>::MGSmoother(
   transpose(transpose),
   debug(0),
   mem(&my_memory)
-{}
-
-
-template <class VECTOR>
-inline
-MGSmoother<VECTOR>::MGSmoother(
-  VectorMemory<VECTOR> &mem,
-  const unsigned int steps,
-  const bool variable,
-  const bool symmetric,
-  const bool transpose)
-  :
-  steps(steps),
-  variable(variable),
-  symmetric(symmetric),
-  transpose(transpose),
-  debug(0),
-  mem(&mem)
 {}
 
 
@@ -744,20 +691,6 @@ namespace mg
 
 
 //----------------------------------------------------------------------//
-
-template <class MATRIX, class RELAX, class VECTOR>
-inline
-MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::MGSmootherRelaxation(
-  VectorMemory<VECTOR> &mem,
-  const unsigned int steps,
-  const bool variable,
-  const bool symmetric,
-  const bool transpose)
-  :
-  MGSmoother<VECTOR>(mem, steps, variable, symmetric, transpose)
-{}
-
-
 
 template <class MATRIX, class RELAX, class VECTOR>
 inline
@@ -926,20 +859,6 @@ memory_consumption () const
 
 
 //----------------------------------------------------------------------//
-
-template <class MATRIX, class PRECONDITIONER, class VECTOR>
-inline
-MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::MGSmootherPrecondition(
-  VectorMemory<VECTOR> &mem,
-  const unsigned int steps,
-  const bool variable,
-  const bool symmetric,
-  const bool transpose)
-  :
-  MGSmoother<VECTOR>(mem, steps, variable, symmetric, transpose)
-{}
-
-
 
 template <class MATRIX, class PRECONDITIONER, class VECTOR>
 inline

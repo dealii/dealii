@@ -50,9 +50,9 @@ inconvenience this causes.
     data postprocessor classes implemented in your program that overload these
     functions, you will have to change it in a way that they overload the
     functions of same name but with the evaluation point argument instead.
-  <br>
-  (Wolfgang Bangerth, 2015/01/04)
-  </li>
+  - The constructors of classes MGSmoother, MGSmootherRelaxation and
+    MGSmootherPrecondition that take a VectorMemory object.
+</ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
   Those are either entirely removed (for the blas/lapack symbols) or
