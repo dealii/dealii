@@ -437,24 +437,6 @@ namespace Threads
 
 
   /**
-   * Provide a backward compatible name (we used ThreadMutex up to release
-   * 6.1, but since it is already in a namespace Threads this seems
-   * redundant).
-   *
-   * @deprecated
-   */
-  typedef Mutex ThreadMutex DEAL_II_DEPRECATED;
-
-  /**
-   * Provide a backward compatible name (we used ThreadCondition up to release
-   * 6.1, but since it is already in a namespace Threads this seems
-   * redundant).
-   *
-   * @deprecated
-   */
-  typedef ConditionVariable ThreadCondition DEAL_II_DEPRECATED;
-
-  /**
    * If using POSIX functions, then alias the POSIX wrapper classes to the
    * names we use throughout the library.
    */
@@ -467,7 +449,6 @@ namespace Threads
    * objects. Likewise for the barrier class.
    */
   typedef DummyThreadMutex     Mutex;
-  typedef DummyThreadMutex     ThreadMutex;
 
   /**
    * In non-multithread mode, the mutex and thread management classes are
@@ -475,7 +456,6 @@ namespace Threads
    * objects. Likewise for the barrier class.
    */
   typedef DummyThreadCondition ConditionVariable;
-  typedef DummyThreadCondition ThreadCondition;
 
   /**
    * In non-multithread mode, the mutex and thread management classes are

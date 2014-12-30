@@ -54,6 +54,7 @@ inconvenience this causes.
     MGSmootherPrecondition that take a VectorMemory object.
   - Deprecated variants of MeshWorker::loop and MeshWorker::integration_loop.
   - ThreadManagement::spawn.
+  - Threads::ThreadCondition and Threads::ThreadMutex.
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.

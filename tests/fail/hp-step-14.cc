@@ -377,7 +377,7 @@ namespace LaplaceSolver
     assemble_matrix (LinearSystem                                         &linear_system,
                      const typename hp::DoFHandler<dim>::active_cell_iterator &begin_cell,
                      const typename hp::DoFHandler<dim>::active_cell_iterator &end_cell,
-                     Threads::ThreadMutex                                 &mutex) const;
+                     Threads::Mutex                                 &mutex) const;
   };
 
 
@@ -450,7 +450,7 @@ namespace LaplaceSolver
                                                     dof_handler.end (),
                                                     n_threads);
 
-    Threads::ThreadMutex mutex;
+    Threads::Mutex mutex;
     Threads::ThreadGroup<> threads;
     for (unsigned int thread=0; thread<n_threads; ++thread)
       threads += Threads::new_thread (&Solver<dim>::assemble_matrix, *this, 
@@ -483,7 +483,7 @@ namespace LaplaceSolver
   Solver<dim>::assemble_matrix (LinearSystem                                         &linear_system,
                                 const typename hp::DoFHandler<dim>::active_cell_iterator &begin_cell,
                                 const typename hp::DoFHandler<dim>::active_cell_iterator &end_cell,
-                                Threads::ThreadMutex                                 &mutex) const
+                                Threads::Mutex                                 &mutex) const
   {
     hp::FEValues<dim> fe_values (*fe, *quadrature,
                                  update_gradients | update_JxW_values);
@@ -511,7 +511,7 @@ namespace LaplaceSolver
 
 
         cell->get_dof_indices (local_dof_indices);
-        Threads::ThreadMutex::ScopedLock lock (mutex);
+        Threads::Mutex::ScopedLock lock (mutex);
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=0; j<dofs_per_cell; ++j)
             linear_system.matrix.add (local_dof_indices[i],
