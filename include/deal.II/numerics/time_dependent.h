@@ -571,12 +571,6 @@ public:
   virtual void end_sweep ();
 
   /**
-   * @deprecated Use the function without an argument. @arg n_threads This
-   * argument is ignored.
-   */
-  virtual void end_sweep (const unsigned int n_threads) DEAL_II_DEPRECATED;
-
-  /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */

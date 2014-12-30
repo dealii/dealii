@@ -205,12 +205,6 @@ void TimeDependent::start_sweep (const unsigned int s)
 
 
 
-void TimeDependent::end_sweep (const unsigned int)
-{
-  end_sweep ();
-}
-
-
 void TimeDependent::end_sweep ()
 {
   void (TimeDependent::*p) (const unsigned int, const unsigned int)
