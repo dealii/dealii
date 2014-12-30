@@ -24,6 +24,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
 
 #include <fstream>
@@ -86,7 +87,7 @@ int main ()
             }
       }
 
-  GridGenerator::laplace_transformation (tria, new_points);
+  GridTools::laplace_transform (new_points, tria);
 
 
   GridOut grid_out;

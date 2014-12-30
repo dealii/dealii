@@ -55,6 +55,7 @@ inconvenience this causes.
   - Deprecated variants of MeshWorker::loop and MeshWorker::integration_loop.
   - ThreadManagement::spawn.
   - Threads::ThreadCondition and Threads::ThreadMutex.
+  - GridGenerator::laplace_transformation.
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.

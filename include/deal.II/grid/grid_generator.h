@@ -42,11 +42,6 @@ template <typename number> class SparseMatrix;
  * allowing them to be distinguished for the purpose of attaching geometry
  * objects and evaluating different boundary conditions.
  *
- * This namespace also provides a function
- * GridGenerator::laplace_transformation that smoothly transforms a domain
- * into another one. This can be used to transform basic geometries to more
- * complicated ones, like a shell to a grid of an airfoil, for example.
- *
  * @ingroup grid
  */
 namespace GridGenerator
@@ -846,42 +841,6 @@ namespace GridGenerator
                              Container<dim-1,spacedim>     &surface_mesh,
                              const std::set<types::boundary_id> &boundary_ids
                              = std::set<types::boundary_id>());
-
-  /*
-   * @}
-   */
-
-  /**
-   * @name Deprecated functions
-   * @{
-   */
-
-  /**
-   * This function transforms the @p Triangulation @p tria smoothly to a
-   * domain that is described by the boundary points in the map @p new_points.
-   * This map maps the point indices to the boundary points in the transformed
-   * domain.
-   *
-   * Note, that the @p Triangulation is changed in-place, therefore you don't
-   * need to keep two triangulations, but the given triangulation is changed
-   * (overwritten).
-   *
-   * In 1d, this function is not currently implemented.
-   *
-   * An optional @p coefficient for the Laplace problem an be used to control
-   * the amount of mesh deformation in different parts of the domain. Larger
-   * values make cells less prone to deformation (effectively increasing their
-   * stiffness). The coefficient is evaluated in the coordinate system of the
-   * old, undeformed configuration of the triangulation as input, i.e., before
-   * the transformation is applied. Should this function be provided, sensible
-   * results can only be expected if all coefficients are positive.
-   *
-   * @deprecated This function has been moved to GridTools::laplace_transform
-   */
-  template <int dim>
-  void laplace_transformation (Triangulation<dim> &tria,
-                               const std::map<unsigned int,Point<dim> > &new_points,
-                               const Function<dim> *coefficient = 0) DEAL_II_DEPRECATED;
 
   /*
    * @}
