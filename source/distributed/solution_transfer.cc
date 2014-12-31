@@ -48,11 +48,9 @@ namespace parallel
       :
       dof_handler(&dof, typeid(*this).name())
     {
-      parallel::distributed::Triangulation<dim> *tria
-        = (dynamic_cast<parallel::distributed::Triangulation<dim>*>
-           (const_cast<dealii::Triangulation<dim>*>
-            (&dof_handler->get_tria())));
-      Assert (tria != 0, ExcMessage("parallel::distributed::SolutionTransfer requires a parallel::distributed::Triangulation object."));
+      Assert (dynamic_cast<const parallel::distributed::Triangulation<dim>*>
+              (&dof_handler->get_tria()) != 0,
+              ExcMessage("parallel::distributed::SolutionTransfer requires a parallel::distributed::Triangulation object."));
     }
 
 
