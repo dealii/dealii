@@ -66,13 +66,6 @@ namespace Algorithms
 
   template <class VECTOR>
   void
-  Newton<VECTOR>::initialize (ParameterHandler &param)
-  {
-    parse_parameters(param);
-  }
-
-  template <class VECTOR>
-  void
   Newton<VECTOR>::initialize (OutputOperator<VECTOR> &output)
   {
     data_out = &output;

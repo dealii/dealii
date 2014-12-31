@@ -84,11 +84,6 @@ namespace Algorithms
     void parse_parameters (ParameterHandler &param);
 
     /**
-     * @deprecated Use parse_parameters().
-     */
-    void initialize (ParameterHandler &param) DEAL_II_DEPRECATED;
-
-    /**
      * Initialize the pointer data_out for debugging.
      */
     void initialize (OutputOperator<VECTOR> &output);
