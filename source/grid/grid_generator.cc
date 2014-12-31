@@ -647,37 +647,6 @@ namespace GridGenerator
   }
 
 
-  template<>
-  void
-  parallelogram (Triangulation<1>  &tria,
-                 const Tensor<2,1> &corners,
-                 const bool         colorize)
-  {
-    Assert (false, ExcNotImplemented());
-  }
-
-  template<>
-  void
-  parallelogram (Triangulation<3>  &tria,
-                 const Tensor<2,3> &corners,
-                 const bool         colorize)
-  {
-    Assert (false, ExcNotImplemented());
-  }
-
-
-  template<>
-  void
-  parallelogram (Triangulation<2>  &tria,
-                 const Tensor<2,2> &corners,
-                 const bool         colorize)
-  {
-    // simply pass everything to the other function of same name
-    const Point<2> x[2] = { corners[0], corners[1] };
-    parallelogram (tria, x, colorize);
-  }
-
-
 
 // Parallelepiped implementation in 1d, 2d, and 3d. @note The
 // implementation in 1d is similar to hyper_rectangle(), and in 2d is

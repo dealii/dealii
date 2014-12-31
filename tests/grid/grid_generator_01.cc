@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,7 +95,7 @@ void test(std::ostream &out)
     {
       deallog << "parallelogram" << std::endl;
       Triangulation<dim> tr;
-      Tensor<2,dim> corners;
+      Point<dim> corners[dim];
       corners[0] = p1;
       if (dim>1) corners[1] = p2;
       if (dim>2) corners[2] = p3;

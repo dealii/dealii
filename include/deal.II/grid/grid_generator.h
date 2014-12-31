@@ -211,15 +211,6 @@ namespace GridGenerator
                  const bool          colorize=false);
 
   /**
-   * @deprecated Use the other function of same name.
-   */
-  template <int dim>
-  void
-  parallelogram (Triangulation<dim>  &tria,
-                 const Tensor<2,dim> &corners,
-                 const bool           colorize=false) DEAL_II_DEPRECATED;
-
-  /**
    * A parallelepiped. The first corner point is the origin. The @p dim
    * adjacent points are vectors describing the edges of the parallelepiped
    * with respect to the origin. Additional points are sums of these dim

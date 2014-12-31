@@ -56,6 +56,8 @@ inconvenience this causes.
   - ThreadManagement::spawn.
   - Threads::ThreadCondition and Threads::ThreadMutex.
   - GridGenerator::laplace_transformation.
+  - The version of GridGenerator::parallelogram where the corners are given
+    as a rank-2 tensor rather than as an array of points.
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
