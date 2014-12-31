@@ -57,6 +57,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: VectorTools::interpolate_to_different_mesh() was accidentally
+  only instantiated for dealii::Vector arguments, rather than all vector
+  classes. This is now fixed.
+  <br>
+  (Benjamin Brands, Wolfgang Bangerth, 2014/12/29)
+  </li>
+
   <li> Fixed: Use CASROOT environment variable as additional hint for
   opencasacade.
   <br>
