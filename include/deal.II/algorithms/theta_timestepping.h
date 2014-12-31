@@ -212,11 +212,6 @@ namespace Algorithms
     virtual void operator() (AnyData &out, const AnyData &in);
 
     /**
-     * @deprecated Use  the function with AnyData arguments
-     */
-    virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
-
-    /**
      * Register an event triggered by an outer iteration.
      */
     virtual void notify(const Event &);

@@ -95,7 +95,7 @@ int main()
   outdata.add(p, "value");
   deallog << "Initial: " << value(0) << ' ' << value(1) << std::endl;
   solver.notify(Events::initial);
-  solver(outdata, indata);
+  solver.Operator<Vector<double> >::operator()(outdata, indata);
   deallog << "Result: " << value(0) << ' ' << value(1)
 	  << " Norm " << value.l2_norm() << std::endl;
 }
