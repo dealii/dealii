@@ -38,6 +38,14 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: The config.h file no longer exports HAVE_* definitions.
+  Those are either entirely removed (for the blas/lapack symbols) or
+  renamed to DEAL_II_HAVE_*. This change is done in order to avoid clashes
+  with external projects also exporting HAVE_* definitions in their header
+  files.
+  <br>
+  (Matthias Maier, 2014/12/29)
+  </li>
 </ol>
 
 

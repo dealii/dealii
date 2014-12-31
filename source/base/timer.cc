@@ -25,7 +25,7 @@
 // these includes should probably be properly
 // ./configure'd using the AC_HEADER_TIME macro:
 
-#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
+#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
 #  include <sys/time.h>
 #  include <sys/resource.h>
 #endif
@@ -111,7 +111,7 @@ void Timer::start ()
     MPI_Barrier(mpi_communicator);
 #endif
 
-#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
+#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
 
 //TODO: Break this out into a function like the functions in
 //namespace windows above
@@ -144,7 +144,7 @@ double Timer::stop ()
     {
       running = false;
 
-#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
+#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
 //TODO: Break this out into a function like the functions in
 //namespace windows above
       rusage usage;
@@ -206,7 +206,7 @@ double Timer::operator() () const
 {
   if (running)
     {
-#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
+#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
@@ -251,7 +251,7 @@ double Timer::wall_time () const
 {
   if (running)
     {
-#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
+#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
       return (wall_timer.tv_sec

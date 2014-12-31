@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -546,7 +546,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+#if DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -616,7 +616,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+#if DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -706,7 +706,7 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+#if DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -794,7 +794,7 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+#if DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -1713,8 +1713,7 @@ FullMatrix<number>::gauss_jordan ()
   // works for us (it is usually not
   // efficient to use Lapack for very small
   // matrices):
-#if defined(HAVE_DGETRF_) && defined (HAVE_SGETRF_) && \
-    defined(HAVE_DGETRI_) && defined (HAVE_SGETRI_)
+#if DEAL_II_WITH_LAPACK
   if (types_are_equal<number,double>::value
       ||
       types_are_equal<number,float>::value)

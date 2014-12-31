@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -259,7 +259,7 @@ axpy (const int *, const number1 *, const number2 *, const int *, number3 *, con
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DAXPY_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 axpy (const int *n, const double *alpha, const double *x, const int *incx, double *y, const int *incy)
 {
@@ -274,7 +274,7 @@ axpy (const int *, const double *, const double *, const int *, double *, const 
 #endif
 
 
-#ifdef HAVE_SAXPY_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 axpy (const int *n, const float *alpha, const float *x, const int *incx, float *y, const int *incy)
 {
@@ -297,7 +297,7 @@ gemv (const char *, const int *, const int *, const number1 *, const number2 *, 
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGEMV_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 gemv (const char *trans, const int *m, const int *n, const double *alpha, const double *A, const int *lda, const double *x, const int *incx, const double *b, double *y, const int *incy)
 {
@@ -312,7 +312,7 @@ gemv (const char *, const int *, const int *, const double *, const double *, co
 #endif
 
 
-#ifdef HAVE_SGEMV_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 gemv (const char *trans, const int *m, const int *n, const float *alpha, const float *A, const int *lda, const float *x, const int *incx, const float *b, float *y, const int *incy)
 {
@@ -335,7 +335,7 @@ gemm (const char *, const char *, const int *, const int *, const int *, const n
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGEMM_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 gemm (const char *transa, const char *transb, const int *m, const int *n, const int *k, const double *alpha, const double *A, const int *lda, const double *B, const int *ldb, const double *beta, double *C, const int *ldc)
 {
@@ -350,7 +350,7 @@ gemm (const char *, const char *, const int *, const int *, const int *, const d
 #endif
 
 
-#ifdef HAVE_SGEMM_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 gemm (const char *transa, const char *transb, const int *m, const int *n, const int *k, const float *alpha, const float *A, const int *lda, const float *B, const int *ldb, const float *beta, float *C, const int *ldc)
 {
@@ -373,7 +373,7 @@ getrf (const int *, const int *, number1 *, const int *, int *, int *)
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGETRF_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 getrf (const int *m, const int *n, double *A, const int *lda, int *ipiv, int *info)
 {
@@ -388,7 +388,7 @@ getrf (const int *, const int *, double *, const int *, int *, int *)
 #endif
 
 
-#ifdef HAVE_SGETRF_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 getrf (const int *m, const int *n, float *A, const int *lda, int *ipiv, int *info)
 {
@@ -411,7 +411,7 @@ getrs (const char *, const int *, const int *, const number1 *, const int *, con
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGETRS_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 getrs (const char *trans, const int *n, const int *nrhs, const double *A, const int *lda, const int *ipiv, double *b, const int *ldb, int *info)
 {
@@ -426,7 +426,7 @@ getrs (const char *, const int *, const int *, const double *, const int *, cons
 #endif
 
 
-#ifdef HAVE_SGETRS_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 getrs (const char *trans, const int *n, const int *nrhs, const float *A, const int *lda, const int *ipiv, float *b, const int *ldb, int *info)
 {
@@ -449,7 +449,7 @@ getri (const int *, number1 *, const int *, int *, number2 *, const int *, int *
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGETRI_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 getri (const int *n, double *A, const int *lda, int *ipiv, double *inv_work, const int *lwork, int *info)
 {
@@ -464,7 +464,7 @@ getri (const int *, double *, const int *, int *, double *, const int *, int *)
 #endif
 
 
-#ifdef HAVE_SGETRI_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 getri (const int *n, float *A, const int *lda, int *ipiv, float *inv_work, const int *lwork, int *info)
 {
@@ -487,7 +487,7 @@ geqrf (const int *, const int *, number1 *, const int *, number2 *, number3 *, c
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGEQRF_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 geqrf (const int *m, const int *n, double *A, const int *lda, double *tau, double *work, const int *lwork, int *info)
 {
@@ -502,7 +502,7 @@ geqrf (const int *, const int *, double *, const int *, double *, double *, cons
 #endif
 
 
-#ifdef HAVE_SGEQRF_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 geqrf (const int *m, const int *n, float *A, const int *lda, float *tau, float *work, const int *lwork, int *info)
 {
@@ -525,7 +525,7 @@ ormqr (const char *, const char *, const int *, const int *, const int *, const 
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DORMQR_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 ormqr (const char *side, const char *trans, const int *m, const int *n, const int *k, const double *A, const int *lda, const double *tau, double *B, const int *ldb, double *work, const int *lwork, int *info)
 {
@@ -540,7 +540,7 @@ ormqr (const char *, const char *, const int *, const int *, const int *, const 
 #endif
 
 
-#ifdef HAVE_SORMQR_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 ormqr (const char *side, const char *trans, const int *m, const int *n, const int *k, const float *A, const int *lda, const float *tau, float *B, const int *ldb, float *work, const int *lwork, int *info)
 {
@@ -563,7 +563,7 @@ orgqr (const int *, const int *, const int *, const number1 *, const int *, cons
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DORGQR_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 orgqr (const int *m, const int *n, const int *k, const double *A, const int *lda, const double *tau, double *work, const int *lwork, int *info)
 {
@@ -578,7 +578,7 @@ orgqr (const int *, const int *, const int *, const double *, const int *, const
 #endif
 
 
-#ifdef HAVE_SORGQR_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 orgqr (const int *m, const int *n, const int *k, const float *A, const int *lda, const float *tau, float *work, const int *lwork, int *info)
 {
@@ -601,7 +601,7 @@ trtrs (const char *, const char *, const char *, const int *, const int *, const
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DTRTRS_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 trtrs (const char *uplo, const char *trans, const char *diag, const int *n, const int *n_rhs, const double *A, const int *lda, double *B, const int *ldb, int *info)
 {
@@ -616,7 +616,7 @@ trtrs (const char *, const char *, const char *, const int *, const int *, const
 #endif
 
 
-#ifdef HAVE_STRTRS_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 trtrs (const char *uplo, const char *trans, const char *diag, const int *n, const int *n_rhs, const float *A, const int *lda, float *B, const int *ldb, int *info)
 {
@@ -639,7 +639,7 @@ geev (const char *, const char *, const int *, number1 *, const int *, number2 *
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGEEV_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 geev (const char *jobvl, const char *jobvr, const int *n, double *A, const int *lda, double *lambda_re, double *lambda_im, double *vl, const int *ldvl, double *vr, const int *ldva, double *work, const int *lwork, int *info)
 {
@@ -654,7 +654,7 @@ geev (const char *, const char *, const int *, double *, const int *, double *, 
 #endif
 
 
-#ifdef HAVE_SGEEV_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 geev (const char *jobvl, const char *jobvr, const int *n, float *A, const int *lda, float *lambda_re, float *lambda_im, float *vl, const int *ldvl, float *vr, const int *ldva, float *work, const int *lwork, int *info)
 {
@@ -677,7 +677,7 @@ geevx (const char *, const char *, const char *, const char *, const int *, numb
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGEEVX_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 geevx (const char *balanc, const char *jobvl, const char *jobvr, const char *sense, const int *n, double *A, const int *lda, double *lambda_re, double *lambda_im, double *vl, const int *ldvl, double *vr, const int *ldvr, int *ilo, int *ihi, double *scale, double *abnrm, double *rconde, double *rcondv, double *work, const int *lwork, int *iwork, int *info)
 {
@@ -692,7 +692,7 @@ geevx (const char *, const char *, const char *, const char *, const int *, doub
 #endif
 
 
-#ifdef HAVE_SGEEVX_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 geevx (const char *balanc, const char *jobvl, const char *jobvr, const char *sense, const int *n, float *A, const int *lda, float *lambda_re, float *lambda_im, float *vl, const int *ldvl, float *vr, const int *ldvr, int *ilo, int *ihi, float *scale, float *abnrm, float *rconde, float *rcondv, float *work, const int *lwork, int *iwork, int *info)
 {
@@ -715,7 +715,7 @@ syev (const char *, const char *, const int *, number1 *, const int *, number2 *
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DSYEV_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 syev (const char *jobz, const char *uplo, const int *n, double *A, const int *lda, double *w, double *work, const int *lwork, int *info)
 {
@@ -730,7 +730,7 @@ syev (const char *, const char *, const int *, double *, const int *, double *, 
 #endif
 
 
-#ifdef HAVE_SSYEV_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 syev (const char *jobz, const char *uplo, const int *n, float *A, const int *lda, float *w, float *work, const int *lwork, int *info)
 {
@@ -753,7 +753,7 @@ syevx (const char *, const char *, const char *, const int *, number1 *, const i
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DSYEVX_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 syevx (const char *jobz, const char *range, const char *uplo, const int *n, double *A, const int *lda, const double *vl, const double *vu, const int *il, const int *iu, const double *abstol, int *m, double *w, double *z, const int *ldz, double *work, const int *lwork, int *iwork, int *ifail, int *info)
 {
@@ -768,7 +768,7 @@ syevx (const char *, const char *, const char *, const int *, double *, const in
 #endif
 
 
-#ifdef HAVE_SSYEVX_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 syevx (const char *jobz, const char *range, const char *uplo, const int *n, float *A, const int *lda, const float *vl, const float *vu, const int *il, const int *iu, const float *abstol, int *m, float *w, float *z, const int *ldz, float *work, const int *lwork, int *iwork, int *ifail, int *info)
 {
@@ -791,7 +791,7 @@ sygv (const int *, const char *, const char *, const int *, number1 *, const int
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DSYGV_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 sygv (const int *itype, const char *jobz, const char *uplo, const int *n, double *A, const int *lda, double *B, const int *ldb, double *w, double *work, const int *lwork, int *info)
 {
@@ -806,7 +806,7 @@ sygv (const int *, const char *, const char *, const int *, double *, const int 
 #endif
 
 
-#ifdef HAVE_SSYGV_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 sygv (const int *itype, const char *jobz, const char *uplo, const int *n, float *A, const int *lda, float *B, const int *ldb, float *w, float *work, const int *lwork, int *info)
 {
@@ -829,7 +829,7 @@ sygvx (const int *, const char *, const char *, const char *, const int *, numbe
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DSYGVX_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 sygvx (const int *itype, const char *jobz, const char *range, const char *uplo, const int *n, double *A, const int *lda, double *B, const int *ldb, const double *vl, const double *vu, const int *il, const int *iu, const double *abstol, int *m, double *w, double *z, const int *ldz, double *work, const int *lwork, int *iwork, int *ifail, int *info)
 {
@@ -844,7 +844,7 @@ sygvx (const int *, const char *, const char *, const char *, const int *, doubl
 #endif
 
 
-#ifdef HAVE_SSYGVX_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 sygvx (const int *itype, const char *jobz, const char *range, const char *uplo, const int *n, float *A, const int *lda, float *B, const int *ldb, const float *vl, const float *vu, const int *il, const int *iu, const float *abstol, int *m, float *w, float *z, const int *ldz, float *work, const int *lwork, int *iwork, int *ifail, int *info)
 {
@@ -867,7 +867,7 @@ gesdd (const char *, const int *, const int *, number1 *, const int *, number2 *
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGESDD_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 gesdd (const char *jobz, const int *m, const int *n, double *A, const int *lda, double *s, double *u, const int *ldu, double *vt, const int *ldvt, double *work, const int *lwork, int *iwork, int *info)
 {
@@ -882,7 +882,7 @@ gesdd (const char *, const int *, const int *, double *, const int *, double *, 
 #endif
 
 
-#ifdef HAVE_SGESDD_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 gesdd (const char *jobz, const int *m, const int *n, float *A, const int *lda, float *s, float *u, const int *ldu, float *vt, const int *ldvt, float *work, const int *lwork, int *iwork, int *info)
 {
@@ -905,7 +905,7 @@ gesvd (int *, int *, const int *, const int *, number1 *, const int *, number2 *
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGESVD_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 gesvd (int *jobu, int *jobvt, const int *n, const int *m, double *A, const int *lda, double *s, double *u, const int *ldu, double *vt, const int *ldvt, double *work, const int *lwork, int *info)
 {
@@ -920,7 +920,7 @@ gesvd (int *, int *, const int *, const int *, double *, const int *, double *, 
 #endif
 
 
-#ifdef HAVE_SGESVD_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 gesvd (int *jobu, int *jobvt, const int *n, const int *m, float *A, const int *lda, float *s, float *u, const int *ldu, float *vt, const int *ldvt, float *work, const int *lwork, int *info)
 {
@@ -943,7 +943,7 @@ gelsd (const int *, const int *, const int *, const number1 *, const int *, numb
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DGELSD_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 gelsd (const int *m, const int *n, const int *nrhs, const double *A, const int *lda, double *B, const int *ldb, double *s, const double *rcond, int *rank, double *work, const int *lwork, int *iwork, int *info)
 {
@@ -958,7 +958,7 @@ gelsd (const int *, const int *, const int *, const double *, const int *, doubl
 #endif
 
 
-#ifdef HAVE_SGELSD_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 gelsd (const int *m, const int *n, const int *nrhs, const float *A, const int *lda, float *B, const int *ldb, float *s, const float *rcond, int *rank, float *work, const int *lwork, int *iwork, int *info)
 {
@@ -981,7 +981,7 @@ stev (const char *, const int *, number1 *, number2 *, number3 *, const int *, n
   Assert (false, ExcNotImplemented());
 }
 
-#ifdef HAVE_DSTEV_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 stev (const char *jobz, const int *n, double *d, double *e, double *z, const int *ldz, double *work, int *info)
 {
@@ -996,7 +996,7 @@ stev (const char *, const int *, double *, double *, double *, const int *, doub
 #endif
 
 
-#ifdef HAVE_SSTEV_
+#ifdef DEAL_II_WITH_LAPACK
 inline void
 stev (const char *jobz, const int *n, float *d, float *e, float *z, const int *ldz, float *work, int *info)
 {

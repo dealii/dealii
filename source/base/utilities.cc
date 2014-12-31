@@ -416,7 +416,7 @@ namespace Utilities
     // between threads either, but at least it is reentrant. if you need
     // an exactly reproducible sequence even in multithreaded contexts,
     // then this is probably not the function to use.
-#ifdef HAVE_RAND_R
+#ifdef DEAL_II_HAVE_RAND_R
     static unsigned int seed = 0xabcd1234;
     const double y = 1.0*rand_r(&seed)/RAND_MAX;
 #else
@@ -627,7 +627,7 @@ namespace Utilities
 
     std::string get_hostname ()
     {
-#if defined(HAVE_UNISTD_H) && defined(HAVE_GETHOSTNAME)
+#if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
       const unsigned int N=1024;
       char hostname[N];
       gethostname (&(hostname[0]), N-1);

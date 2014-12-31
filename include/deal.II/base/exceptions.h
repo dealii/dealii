@@ -134,7 +134,7 @@ protected:
    */
   int n_stacktrace_frames;
 
-#ifdef HAVE_GLIBC_STACKTRACE
+#ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
   /**
    * array of pointers that contains the raw stack trace
    */
@@ -344,7 +344,7 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
-#ifdef HAVE_BUILTIN_EXPECT
+#ifdef DEAL_II_HAVE_BUILTIN_EXPECT
 #define AssertThrow(cond, exc)                                              \
   {                                                                           \
     if (__builtin_expect(!(cond), false))                                     \
@@ -352,7 +352,7 @@ namespace deal_II_exceptions
       issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
                   __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
   }
-#else /*ifdef HAVE_BUILTIN_EXPECT*/
+#else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #define AssertThrow(cond, exc)                                              \
   {                                                                           \
     if (!(cond))                                                              \
@@ -360,7 +360,7 @@ namespace deal_II_exceptions
       issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
                   __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
   }
-#endif /*ifdef HAVE_BUILTIN_EXPECT*/
+#endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 
 
 

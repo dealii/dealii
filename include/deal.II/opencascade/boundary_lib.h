@@ -25,16 +25,8 @@
 #include <deal.II/opencascade/utilities.h>
 #include <deal.II/grid/tria_boundary.h>
 
-// We have to clean up certain name clashes prior to any opencascade header
-// inclusion. Unfortunately, this is clumsy and should be resolved by
-// renaming our very own includes someday...
-// --Maier, 2014
+// opencascade needs "HAVE_CONFIG_H" to be exported...
 #define HAVE_CONFIG_H
-#undef HAVE_SYS_TYPES_H
-#undef HAVE_SYS_TIMES_H
-#undef HAVE_SYS_TIME_H
-#undef HAVE_UNISTD_H
-#undef HAVE_GETHOSTNAME
 #include <BRepAdaptor_Curve.hxx>
 #include <Adaptor3d_Curve.hxx>
 #undef HAVE_CONFIG_H
