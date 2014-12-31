@@ -117,7 +117,7 @@ def format_block(lines, infostr=""):
                 out.extend(wrap_block(remove_junk(curlines), start))
                 curlines=[]
             thisline = remove_junk([lines[idx]])[0]
-            if not thisline.startswith("@ref"):
+            if not thisline.startswith("@ref") and not thisline.startswith("(@ref"):
                 print ("%s warning %s not at start of line"%(infostr, "@ref"), file=sys.stderr)
 
             # format:

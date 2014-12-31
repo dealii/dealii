@@ -37,8 +37,8 @@ template <typename number> class SparseMatrix;
  * triangulations for some basic geometries.
  *
  * Some of these functions receive a flag @p colorize. If this is set, parts
- * of the boundary receive different boundary indicators (
- * @ref GlossBoundaryIndicator),
+ * of the boundary receive different boundary indicators
+ * (@ref GlossBoundaryIndicator),
  * allowing them to be distinguished for the purpose of attaching geometry
  * objects and evaluating different boundary conditions.
  *
