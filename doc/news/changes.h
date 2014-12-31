@@ -61,6 +61,12 @@ inconvenience this causes.
   - DataOutBase::create_xdmf_entry with 3 arguments.
   - Algorithms::ThetaTimestepping::operator().
   - Algorithms::Newton::initialize.
+  - MGLevelObject::get_minlevel and MGLevelObject::get_maxlevel.
+  - The versions of FunctionParser::initialize that took a
+    <code>use_degrees</code> or <code>constants</code> argument.
+    The implementation as it is now no longer supports either of
+    these two concepts (since we switched from the FunctionParser
+    library to the muparser library after the deal.II 8.1 release).
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.

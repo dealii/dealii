@@ -89,16 +89,6 @@ public:
   unsigned int max_level () const;
 
   /**
-   * @deprecated Replaced by min_level()
-   */
-  unsigned int get_minlevel () const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Replaced by max_level()
-   */
-  unsigned int get_maxlevel () const DEAL_II_DEPRECATED;
-
-  /**
    * Memory used by this object.
    */
   std::size_t memory_consumption () const;
@@ -185,22 +175,6 @@ MGLevelObject<Object>::clear ()
   typename std::vector<std_cxx11::shared_ptr<Object> >::iterator v;
   for (v = objects.begin(); v != objects.end(); ++v)
     (*v)->clear();
-}
-
-
-template<class Object>
-unsigned int
-MGLevelObject<Object>::get_minlevel () const
-{
-  return minlevel;
-}
-
-
-template<class Object>
-unsigned int
-MGLevelObject<Object>::get_maxlevel () const
-{
-  return minlevel + objects.size() - 1;
 }
 
 

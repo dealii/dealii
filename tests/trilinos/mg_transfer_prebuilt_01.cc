@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,8 +48,8 @@ reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
      (&mg_dof.get_tria()));
   AssertThrow(tria!=NULL, ExcMessage("multigrid with Trilinos vectors only works with distributed Triangulation!"));
 
-  for (unsigned int level=v.get_minlevel();
-       level<=v.get_maxlevel(); ++level)
+  for (unsigned int level=v.min_level();
+       level<=v.max_level(); ++level)
     {
       v[level].reinit(mg_dof.locally_owned_mg_dofs(level), tria->get_communicator());
     }
