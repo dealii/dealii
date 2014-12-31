@@ -2319,14 +2319,6 @@ public:
   void write_deal_II_intermediate (std::ostream &out) const;
 
   /**
-   * Create an XDMFEntry based on the data in this DataOutInterface.
-   * @deprecated: use create_xdmf_entry(DataOutFilter, ...) instead
-   */
-  XDMFEntry create_xdmf_entry (const std::string &h5_filename,
-                               const double cur_time,
-                               MPI_Comm comm) const DEAL_II_DEPRECATED;
-
-  /**
    * Create an XDMFEntry based on the data in the data_filter. This assumes
    * the mesh and solution data were written to a single file. See
    * write_xdmf_file() for an example of usage.

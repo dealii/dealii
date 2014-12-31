@@ -6879,17 +6879,6 @@ write_deal_II_intermediate (std::ostream &out) const
 
 template <int dim, int spacedim>
 XDMFEntry DataOutInterface<dim,spacedim>::
-create_xdmf_entry (const std::string &h5_filename, const double cur_time, MPI_Comm comm) const
-{
-  DataOutBase::DataOutFilter  data_filter(DataOutBase::DataOutFilterFlags(false, true));
-  write_filtered_data(data_filter);
-  return create_xdmf_entry(data_filter, h5_filename, cur_time, comm);
-}
-
-
-
-template <int dim, int spacedim>
-XDMFEntry DataOutInterface<dim,spacedim>::
 create_xdmf_entry (const DataOutBase::DataOutFilter &data_filter,
                    const std::string &h5_filename, const double cur_time, MPI_Comm comm) const
 {
