@@ -546,7 +546,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if DEAL_II_WITH_LAPACK
+#ifdef DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -616,7 +616,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if DEAL_II_WITH_LAPACK
+#ifdef DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -706,7 +706,7 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if DEAL_II_WITH_LAPACK
+#ifdef DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -794,7 +794,7 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if DEAL_II_WITH_LAPACK
+#ifdef DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -1713,7 +1713,7 @@ FullMatrix<number>::gauss_jordan ()
   // works for us (it is usually not
   // efficient to use Lapack for very small
   // matrices):
-#if DEAL_II_WITH_LAPACK
+#ifdef DEAL_II_WITH_LAPACK
   if (types_are_equal<number,double>::value
       ||
       types_are_equal<number,float>::value)
