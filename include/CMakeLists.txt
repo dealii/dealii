@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013, 2015 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,11 +14,15 @@
 ## ---------------------------------------------------------------------
 
 #
-# Configure config.h
+# Configure config.h and revision.h
 #
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/deal.II/base/config.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/deal.II/base/config.h
+  )
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/deal.II/base/revision.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/deal.II/base/revision.h
   )
 
 #

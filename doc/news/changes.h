@@ -56,6 +56,15 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: The build system now queries for git branch name and
+  revision sha1 (and automatically reconfigures if necessary). This
+  information is used to annotate summary.log and detailed.log with the
+  current revision sha1. Further, a header file <deal.II/base/revision.h>
+  is now available that exports the macros: DEAL_II_GIT_BRANCH,
+  DEAL_II_GIT_REVISION, DEAL_II_GIT_REVISION_SHORT.
+  <br>
+  (Matthias Maier, 2015/01/02)
+  </li>
 </ol>
 
 
