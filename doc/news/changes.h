@@ -65,6 +65,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: CMake now also handles and exports the subminor version
+  number correctly ("pre" and "rc?" are replaced by "0").
+  <br>
+  (Matthias Maier, 2015/01/02)
+  </li>
+
   <li> Fixed: VectorTools::interpolate_to_different_mesh() was accidentally
   only instantiated for dealii::Vector arguments, rather than all vector
   classes. This is now fixed.
