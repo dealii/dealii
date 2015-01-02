@@ -69,6 +69,7 @@ inconvenience this causes.
     The implementation as it is now no longer supports either of
     these two concepts (since we switched from the FunctionParser
     library to the muparser library after the deal.II 8.1 release).
+  - DoFRenumbering::downstream_dg.
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
