@@ -41,7 +41,9 @@ inconvenience this causes.
   <li> Removed: This release removes a number of functions that have long
   been deprecated and that were previously already marked as
   deprecated (i.e., they would have yielded warnings by the compiler whenever
-  you tried to use them). Specifically, these are:
+  you tried to use them). In almost all cases, there is a function with same
+  name but different argument list that should be used instead.
+  Specifically, the removed functions are:
   - TimeDependent::end_sweep (with an argument).
   - PointValueHistory::mark_locations.
   - The DataPostprocessor::compute_derived_quantities_scalar and
@@ -70,6 +72,7 @@ inconvenience this causes.
     these two concepts (since we switched from the FunctionParser
     library to the muparser library after the deal.II 8.1 release).
   - DoFRenumbering::downstream_dg.
+  - DoFTools::count_dofs_per_component.
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.

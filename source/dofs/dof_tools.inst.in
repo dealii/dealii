@@ -583,12 +583,6 @@ DoFTools::count_dofs_per_block<MGDoFHandler<deal_II_dimension> > (
 
 template
 void
-DoFTools::count_dofs_per_component<deal_II_dimension> (
-  const DoFHandler<deal_II_dimension>&,
-  std::vector<types::global_dof_index>&, std::vector<unsigned int>);
-
-template
-void
 DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
  const std::set<types::boundary_id> &,

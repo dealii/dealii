@@ -1835,18 +1835,6 @@ namespace DoFTools
                         = std::vector<unsigned int>());
 
   /**
-   * @deprecated See the previous function with the same name for a
-   * description. This function exists for compatibility with older versions
-   * only.
-   */
-  template <int dim, int spacedim>
-  void
-  count_dofs_per_component (const DoFHandler<dim,spacedim>     &dof_handler,
-                            std::vector<types::global_dof_index> &dofs_per_component,
-                            std::vector<unsigned int>  target_component) DEAL_II_DEPRECATED;
-
-
-  /**
    * For each active cell of a DoFHandler or hp::DoFHandler, extract the
    * active finite element index and fill the vector given as second argument.
    * This vector is assumed to have as many entries as there are active cells.
