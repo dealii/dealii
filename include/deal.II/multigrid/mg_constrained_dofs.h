@@ -79,13 +79,6 @@ public:
                           const types::global_dof_index index) const;
 
   /**
-   * @deprecated Determine whether a dof index is at an edge that is not a
-   * refinement edge.
-   */
-  bool non_refinement_edge_index (const unsigned int level,
-                                  const types::global_dof_index index) const DEAL_II_DEPRECATED;
-
-  /**
    * Determine whether a dof index is at the refinement edge.
    */
   bool at_refinement_edge (const unsigned int level,
@@ -233,14 +226,6 @@ MGConstrainedDoFs::is_boundary_index (const unsigned int level,
 
   AssertIndexRange(level, boundary_indices.size());
   return (boundary_indices[level].find(index) != boundary_indices[level].end());
-}
-
-inline
-bool
-MGConstrainedDoFs::non_refinement_edge_index (const unsigned int level,
-                                              const types::global_dof_index index) const
-{
-  return !at_refinement_edge (level, index);
 }
 
 inline

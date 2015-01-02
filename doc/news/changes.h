@@ -76,6 +76,7 @@ inconvenience this causes.
   - DoFTools::make_sparsity_pattern with a vector-of-vector mask.
   - GridOutFlags::XFig::level_color.
   - class BlockList.
+  - MGConstrainedDoFs::non_refinement_edge_index
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
