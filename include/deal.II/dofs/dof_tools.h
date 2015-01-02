@@ -500,18 +500,6 @@ namespace DoFTools
                          const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
 
   /**
-   * @deprecated This is the old form of the previous function. It generates a
-   * table of DoFTools::Coupling values (where a <code>true</code> value in
-   * the mask is translated into a Coupling::always value in the table) and
-   * calls the function above.
-   */
-  template <class DH, class SparsityPattern>
-  void
-  make_sparsity_pattern (const DH                              &dof,
-                         const std::vector<std::vector<bool> > &mask,
-                         SparsityPattern                       &sparsity_pattern) DEAL_II_DEPRECATED;
-
-  /**
    * Construct a sparsity pattern that allows coupling degrees of freedom on
    * two different but related meshes.
    *
@@ -2352,34 +2340,6 @@ namespace DoFTools
   fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh)
   {
     return dh.get_fe()[0].is_primitive();
-  }
-
-
-  template <class DH, class SparsityPattern>
-  inline
-  void
-  make_sparsity_pattern (const DH                              &dof,
-                         const std::vector<std::vector<bool> > &mask,
-                         SparsityPattern                       &sparsity_pattern)
-  {
-    const unsigned int ncomp = dof.get_fe().n_components();
-
-    Assert (mask.size() == ncomp,
-            ExcDimensionMismatch(mask.size(), ncomp));
-    for (unsigned int i=0; i<mask.size(); ++i)
-      Assert (mask[i].size() == ncomp,
-              ExcDimensionMismatch(mask[i].size(), ncomp));
-    // Create a coupling table out of the mask
-    Table<2,DoFTools::Coupling> couplings(ncomp, ncomp);
-    for (unsigned int i=0; i<ncomp; ++i)
-      for (unsigned int j=0; j<ncomp; ++j)
-        if (mask[i][j])
-          couplings(i,j) = always;
-        else
-          couplings(i,j) = none;
-
-    // Call the new function
-    make_sparsity_pattern(dof, couplings, sparsity_pattern);
   }
 
 

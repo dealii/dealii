@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,7 @@
 // check
 //   DoFTools::
 //   make_sparsity_pattern (const DoFHandler<dim> &,
-//                          std::vector<std::vector<bool> > &,
+//                          Table<2,DoFTools::Coupling> &,
 //                      SparsityPattern       &,
 //                          ConstraintMatrix,
 //                          true);

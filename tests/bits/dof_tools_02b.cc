@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,7 @@
 // check
 //   DoFTools::
 //   make_sparsity_pattern (const DoFHandler<dim>     &,
-//                          std::vector<std::vector<bool> > &,
+//                          Table<2,Coupling> &,
 //                      CompressedSparsityPattern &);
 
 std::string output_file_name = "output";
@@ -33,10 +33,12 @@ check_this (const DoFHandler<dim> &dof_handler)
 {
   // set up X-shape mask
   const unsigned int n_components = dof_handler.get_fe().n_components();
-  std::vector<std::vector<bool> > mask (n_components,
-                                        std::vector<bool>(n_components,false));
+  Table<2,DoFTools::Coupling> mask (n_components, n_components);
   for (unsigned int i=0; i<n_components; ++i)
-    mask[i][i] = mask[i][n_components-i-1] = true;
+    for (unsigned int j=0; j<n_components; ++j)
+      mask(i,j) = DoFTools::none;
+  for (unsigned int i=0; i<n_components; ++i)
+    mask[i][i] = mask[i][n_components-i-1] = DoFTools::always;
 
   // create sparsity pattern
   CompressedSparsityPattern sp (dof_handler.n_dofs());

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -127,8 +127,9 @@ check ()
   // create sparsity pattern. note
   // that different components should
   // not couple, so use pattern
-  std::vector<std::vector<bool> > mask (2, std::vector<bool>(2, false));
-  mask[0][0] = mask[1][1] = true;
+  Table<2,DoFTools::Coupling> mask (2, 2);
+  mask(0,0) = mask(1,1) = DoFTools::always;
+  mask(0,1) = mask(1,0) = DoFTools::none;
 
 
 //--------------- Regular sparsity pattern checks -----------------

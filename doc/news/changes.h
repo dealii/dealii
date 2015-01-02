@@ -73,6 +73,7 @@ inconvenience this causes.
     library to the muparser library after the deal.II 8.1 release).
   - DoFRenumbering::downstream_dg.
   - DoFTools::count_dofs_per_component.
+  - DoFTools::make_sparsity_pattern with a vector-of-vector mask.
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
