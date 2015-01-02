@@ -74,6 +74,7 @@ inconvenience this causes.
   - DoFRenumbering::downstream_dg.
   - DoFTools::count_dofs_per_component.
   - DoFTools::make_sparsity_pattern with a vector-of-vector mask.
+  - GridOutFlags::XFig::level_color.
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.

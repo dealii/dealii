@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,6 @@ void test(std::ostream &out)
 
   GridOut go;
   GridOutFlags::XFig xfig_flags;
-  xfig_flags.level_color = false;
   xfig_flags.fill_style = 25;
 
   go.set_flags(xfig_flags);
