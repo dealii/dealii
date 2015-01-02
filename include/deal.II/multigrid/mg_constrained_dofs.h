@@ -85,15 +85,6 @@ public:
                            const types::global_dof_index index) const;
 
   /**
-   * @deprecated Use is_boundary_index() instead. The logic behind this
-   * function here is unclear and for practical purposes, the other is needed.
-   *
-   * Determine whether a dof index is subject to a boundary constraint.
-   */
-  bool at_refinement_edge_boundary (const unsigned int level,
-                                    const types::global_dof_index index) const DEAL_II_DEPRECATED;
-
-  /**
    * Return the indices of dofs for each level that are subject to boundary
    * constraints.
    */
@@ -238,14 +229,6 @@ MGConstrainedDoFs::at_refinement_edge (const unsigned int level,
   return refinement_edge_indices[level].is_element(index);
 }
 
-
-inline
-bool
-MGConstrainedDoFs::at_refinement_edge_boundary (const unsigned int level,
-                                                const types::global_dof_index index) const
-{
-  return is_boundary_index(level, index);
-}
 
 inline
 const std::vector<std::set<types::global_dof_index> > &

@@ -77,6 +77,7 @@ inconvenience this causes.
   - GridOutFlags::XFig::level_color.
   - class BlockList.
   - MGConstrainedDoFs::non_refinement_edge_index
+  - MGConstrainedDoFs::at_refinement_edge_boundary
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
