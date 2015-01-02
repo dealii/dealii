@@ -233,10 +233,6 @@ namespace Algorithms
     void parse_parameters (ParameterHandler &param);
 
     /**
-     * @deprecated Use parse_parameters().
-     */
-    void initialize (ParameterHandler &param) DEAL_II_DEPRECATED;
-    /**
      * The current time in the timestepping scheme.
      */
     double current_time() const;

@@ -60,6 +60,7 @@ inconvenience this causes.
     as a rank-2 tensor rather than as an array of points.
   - DataOutBase::create_xdmf_entry with 3 arguments.
   - Algorithms::ThetaTimestepping::operator().
+  - Algorithms::ThetaTimestepping::initialize.
   - Algorithms::Newton::initialize.
   - MGLevelObject::get_minlevel and MGLevelObject::get_maxlevel.
   - The versions of FunctionParser::initialize that took a
