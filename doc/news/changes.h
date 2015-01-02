@@ -59,6 +59,7 @@ inconvenience this causes.
   - The version of GridGenerator::parallelogram where the corners are given
     as a rank-2 tensor rather than as an array of points.
   - DataOutBase::create_xdmf_entry with 3 arguments.
+  - DataOutBase::write_hdf5_parallel with 2 arguments.
   - Algorithms::ThetaTimestepping::operator().
   - Algorithms::ThetaTimestepping::initialize.
   - Algorithms::Newton::initialize.

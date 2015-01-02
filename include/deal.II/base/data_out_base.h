@@ -2364,14 +2364,6 @@ public:
                         MPI_Comm comm) const;
 
   /**
-   * Write the data in this class without redundancy filtering to a single
-   * HDF5 file containing both the mesh and solution values.
-   * @deprecated: use write_hdf5_parallel(DataOutFilter, ...) instead
-   */
-  void write_hdf5_parallel (const std::string &filename,
-                            MPI_Comm comm) const DEAL_II_DEPRECATED;
-
-  /**
    * Write the data in data_filter to a single HDF5 file containing both the
    * mesh and solution values. Below is an example of how to use this function
    * with the DataOutFilter:
@@ -2385,7 +2377,8 @@ public:
    * @endcode
    */
   void write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
-                            const std::string &filename, MPI_Comm comm) const;
+                            const std::string &filename,
+                            MPI_Comm comm) const;
 
   /**
    * Write the data in data_filter to HDF5 file(s). If write_mesh_file is
@@ -2395,7 +2388,10 @@ public:
    * and solution values.
    */
   void write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
-                            const bool write_mesh_file, const std::string &mesh_filename, const std::string &solution_filename, MPI_Comm comm) const;
+                            const bool write_mesh_file,
+                            const std::string &mesh_filename,
+                            const std::string &solution_filename,
+                            MPI_Comm comm) const;
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of
