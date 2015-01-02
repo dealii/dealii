@@ -43,7 +43,7 @@ inconvenience this causes.
   deprecated (i.e., they would have yielded warnings by the compiler whenever
   you tried to use them). In almost all cases, there is a function with same
   name but different argument list that should be used instead.
-  Specifically, the removed functions are:
+  Specifically, the removed functions and classes are:
   - TimeDependent::end_sweep (with an argument).
   - PointValueHistory::mark_locations.
   - The DataPostprocessor::compute_derived_quantities_scalar and
@@ -75,6 +75,7 @@ inconvenience this causes.
   - DoFTools::count_dofs_per_component.
   - DoFTools::make_sparsity_pattern with a vector-of-vector mask.
   - GridOutFlags::XFig::level_color.
+  - class BlockList.
 </ol>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
