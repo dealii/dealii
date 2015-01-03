@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2013, 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -28,7 +28,6 @@ INSTALL(DIRECTORY deal.II
   DESTINATION ${DEAL_II_INCLUDE_RELDIR}
   COMPONENT library
   FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE
   )
 
 #
@@ -38,6 +37,5 @@ INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/deal.II
   DESTINATION ${DEAL_II_INCLUDE_RELDIR}
   COMPONENT library
   FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE
   )
 

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -25,7 +25,6 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     #
     PATTERN "CMakeFiles*" EXCLUDE
     PATTERN "doc*" EXCLUDE
-    PATTERN ".svn*" EXCLUDE
     #
     # Glob Includes:
     #
