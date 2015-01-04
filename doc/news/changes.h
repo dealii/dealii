@@ -78,7 +78,9 @@ inconvenience this causes.
   - class BlockList.
   - MGConstrainedDoFs::non_refinement_edge_index
   - MGConstrainedDoFs::at_refinement_edge_boundary
-</ol>
+  <br>
+  (Wolfgang Bangerth, 2014/12/29-2015/01/04)
+  </li>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
   Those are either entirely removed (for the blas/lapack symbols) or
