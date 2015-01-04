@@ -98,8 +98,9 @@ inconvenience this causes.
   class.
 - The deprecated constructor of MPI_InitFinalize
 - The MPI support functions in namespace Utilities and Utilities::System.
-- Deprecated members of namespace types
+- Deprecated members of namespace types.
 - Namespace deal_II_numbers.
+- Triangulation::distort_random.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 

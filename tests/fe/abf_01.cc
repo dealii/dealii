@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -609,7 +609,7 @@ int main (int /*argc*/, char **/*argv*/)
 
 
 //   tria_test.refine_global (1);
-//   tria_test.distort_random (0.25);
+//   GridTools::distort_random (0.25, tria_test);
 
   FE_ABF<2> fe (0);
   deallog << "Dofs/cell " << fe.dofs_per_cell

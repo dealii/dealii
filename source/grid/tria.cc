@@ -2789,21 +2789,6 @@ namespace internal
 
 
       /**
-       * Distort a triangulation in
-       * some random way.
-       */
-      template <int dim, int spacedim>
-      static
-      void
-      distort_random (const double                 factor,
-                      const bool                   keep_boundary,
-                      Triangulation<dim,spacedim> &triangulation)
-      {
-        GridTools::distort_random (factor, triangulation, keep_boundary);
-      }
-
-
-      /**
        * Actually delete a cell, or rather all
        * its children, which is the main step for
        * the coarsening process.  This is the
@@ -9142,15 +9127,6 @@ flip_all_direction_flags()
   for (active_cell_iterator cell = begin_active();
        cell != end(); ++cell)
     cell->set_direction_flag (!cell->direction_flag());
-}
-
-
-
-template <int dim, int spacedim>
-void Triangulation<dim, spacedim>::distort_random (const double factor,
-                                                   const bool   keep_boundary)
-{
-  internal::Triangulation::Implementation::distort_random (factor, keep_boundary, *this);
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,6 +30,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q1_eulerian.h>
 
@@ -277,7 +278,7 @@ int main (int /*argc*/, char **/*argv*/)
 
   GridGenerator::subdivided_hyper_rectangle (tria_test, sub_div, p1, p2);
   tria_test.refine_global (2);
-  tria_test.distort_random (0.05);
+  GridTools::distort_random (0.05, tria_test);
 
   // Create a DoFHandler
   FE_RaviartThomas<2> fe (1);

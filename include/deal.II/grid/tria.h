@@ -1773,21 +1773,6 @@ public:
   void flip_all_direction_flags();
 
   /**
-   * Distort the grid by randomly moving around all the vertices of the grid.
-   * The direction of moving is random, while the length of the shift vector
-   * has a value of @p factor times the minimal length of the active lines
-   * adjacent to this vertex. Note that @p factor should obviously be well
-   * below <tt>0.5</tt>.
-   *
-   * If @p keep_boundary is set to @p true (which is the default), then
-   * boundary vertices are not moved.
-   *
-   * @deprecated Use GridTools::distort_random instead.
-   */
-  void distort_random (const double factor,
-                       const bool   keep_boundary=true) DEAL_II_DEPRECATED;
-
-  /**
    * @name Mesh refinement
    * @{
    */
