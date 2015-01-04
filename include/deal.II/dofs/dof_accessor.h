@@ -1588,6 +1588,9 @@ public:
    * @{
    */
 
+  // Necessary for Visual Studio for not to replace the get_fe version with one parameter with the following parameter-less version.
+  using DoFAccessor<DH::dimension, DH, level_dof_access>::get_fe;
+
   /**
    * Return the finite element that is used on the cell pointed to by this
    * iterator. For non-hp DoF handlers, this is of course always the same
@@ -1601,6 +1604,7 @@ public:
    * associated with them without having any degrees of freedom. Consequently,
    * this function will produce an exception when called on non-active cells.
    */
+
   const FiniteElement<DH::dimension,DH::space_dimension> &
   get_fe () const;
 
