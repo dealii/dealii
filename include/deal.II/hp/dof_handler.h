@@ -152,7 +152,7 @@ namespace hp
      *
      * @ingroup Iterators
      */
-    typedef typename ActiveSelector::active_cell_iterator active_cell_iterator;
+    typedef TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > active_cell_iterator;
 
     typedef typename LevelSelector::cell_iterator         level_cell_iterator;
 
@@ -182,7 +182,7 @@ namespace hp
      *
      * @ingroup Iterators
      */
-    typedef typename ActiveSelector::cell_iterator        cell_iterator;
+    typedef TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >        cell_iterator;
 
     typedef typename ActiveSelector::face_iterator        face_iterator;
     typedef typename ActiveSelector::active_face_iterator active_face_iterator;

@@ -1604,7 +1604,6 @@ public:
    * associated with them without having any degrees of freedom. Consequently,
    * this function will produce an exception when called on non-active cells.
    */
-
   const FiniteElement<DH::dimension,DH::space_dimension> &
   get_fe () const;
 
