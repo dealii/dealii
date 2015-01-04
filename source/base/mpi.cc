@@ -394,20 +394,6 @@ namespace Utilities
 
 
 
-
-    MPI_InitFinalize::MPI_InitFinalize (int    &argc,
-                                        char ** &argv)
-      :
-      owns_mpi (true)
-    {
-      do_init(argc, argv);
-
-      // set maximum number of threads (also respecting the environment
-      // variable that the called function evaluates)
-      multithread_info.set_thread_limit(1);
-    }
-
-
     void
     MPI_InitFinalize::do_init(int    &argc,
                               char ** &argv)

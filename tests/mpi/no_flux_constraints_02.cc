@@ -214,7 +214,7 @@ void test()
 int main(int argc, char *argv[])
 {
   {
-    Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv);
+    Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv, numbers::invalid_unsigned_int);
     unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 

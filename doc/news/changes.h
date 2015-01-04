@@ -96,6 +96,7 @@ inconvenience this causes.
   approach to getting notified about what happens to triangulations
   has been superseded by the signals defined by the triangulation
   class.
+- The deprecated constructor of MPI_InitFinalize
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 

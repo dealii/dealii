@@ -69,7 +69,7 @@ void test1 (const bool keep_boundary)
 
 int main (int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
   {

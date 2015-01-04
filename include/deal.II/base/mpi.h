@@ -267,19 +267,6 @@ namespace Utilities
     class MPI_InitFinalize
     {
     public:
-
-      /**
-       * Constructor. Takes the arguments from the command line (in case of
-       * MPI, the number of processes is specified there), and sets up a
-       * respective communicator by calling <tt>MPI_Init()</tt>. This
-       * constructor can only be called once in a program, since MPI cannot be
-       * initialized twice.
-       *
-       * This constructor sets max_num_threads to 1 (see other constructor).
-       */
-      MPI_InitFinalize (int    &argc,
-                        char ** &argv) /*DEAL_II_DEPRECATED*/;
-
       /**
        * Initialize MPI (and, if deal.II was configured to use it, PETSc) and
        * set the number of threads used by deal.II (via the underlying

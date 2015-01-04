@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2013 by the deal.II authors
+ * Copyright (C) 2011 - 2013, 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -668,7 +668,8 @@ int main (int argc, char *argv[])
 
       deallog.depth_console (0);
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
+                                                           numbers::invalid_unsigned_int);
 
       ObstacleProblem<2> obstacle_problem;
       obstacle_problem.run ();
