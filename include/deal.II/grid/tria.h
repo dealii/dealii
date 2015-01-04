@@ -1431,99 +1431,6 @@ public:
 
   typedef typename IteratorSelector::hex_iterator         hex_iterator;
   typedef typename IteratorSelector::active_hex_iterator  active_hex_iterator;
-
-  /**
-   * Base class for refinement listeners. Other classes, which need to be
-   * informed about refinements of the Triangulation, can be derived from
-   * RefinementListener.
-   *
-   * @note The use of this class has been superseded by the signals mechanism.
-   * See the general documentation of the Triangulation class for more
-   * information.
-   *
-   * @deprecated
-   */
-  class RefinementListener
-  {
-  public:
-    /**
-     * Destructor. Does nothing, but is declared virtual because this class
-     * also has virtual functions.
-     *
-     * @note The use of this class has been superseded by the signals
-     * mechanism. See the general documentation of the Triangulation class for
-     * more information.
-     *
-     * @deprecated
-     */
-    virtual ~RefinementListener ();
-
-    /**
-     * Before refinement is actually performed, the triangulation class calls
-     * this method on all objects derived from this class and registered with
-     * the triangulation.
-     *
-     * @note The use of this class has been superseded by the signals
-     * mechanism. See the general documentation of the Triangulation class for
-     * more information.
-     *
-     * @deprecated
-     */
-    virtual
-    void
-    pre_refinement_notification (const Triangulation<dim, spacedim> &tria);
-
-    /**
-     * After refinement is actually performed, the triangulation class calls
-     * this method on all objects derived from this class and registered with
-     * the triangulation.
-     *
-     * @note The use of this class has been superseded by the signals
-     * mechanism. See the general documentation of the Triangulation class for
-     * more information.
-     *
-     * @deprecated
-     */
-    virtual
-    void
-    post_refinement_notification (const Triangulation<dim, spacedim> &tria);
-
-    /**
-     * At the end of a call to copy_triangulation() the Triangulation class
-     * calls this method on all objects derived from this class and registered
-     * with the original Triangulation @p old_tria so that they might
-     * subscribe to the copied one @p new_tria as well, if that is desired. By
-     * default this method does nothing, a different behavior has to be
-     * implemented in derived classes.
-     *
-     * @note The use of this class has been superseded by the signals
-     * mechanism. See the general documentation of the Triangulation class for
-     * more information.
-     *
-     * @deprecated
-     */
-    virtual
-    void
-    copy_notification (const Triangulation<dim, spacedim> &old_tria,
-                       const Triangulation<dim, spacedim> &new_tria);
-
-    /**
-     * At the end of a call to create_triangulation() the Triangulation class
-     * calls this method on all objects derived from this class and registered
-     * with the current Triangulation object. By default this method does
-     * nothing, a different behavior has to be implemented in derived classes.
-     *
-     * @note The use of this class has been superseded by the signals
-     * mechanism. See the general documentation of the Triangulation class for
-     * more information.
-     *
-     * @deprecated
-     */
-    virtual
-    void
-    create_notification (const Triangulation<dim, spacedim> &tria);
-  };
-
   /**
    * A structure that is used as an exception object by the
    * create_triangulation() function to indicate which cells among the coarse
@@ -1981,31 +1888,6 @@ public:
    * @name Keeping up with what happens to a triangulation
    * @{
    */
-
-  /**
-   * Add a RefinementListener. Adding listeners to the Triangulation allows
-   * other classes to be informed when the Triangulation is refined.
-   *
-   * @note The use of this function has been superseded by the signals
-   * mechanism.  See the general documentation of the Triangulation class for
-   * more information.
-   *
-   * @deprecated
-   */
-  void add_refinement_listener (RefinementListener &listener) const DEAL_II_DEPRECATED;
-
-  /**
-   * Remove a RefinementListener. When some class needs no longer to be
-   * informed about refinements, the listener should be removed from the
-   * Triangulation.
-   *
-   * @note The use of this function has been superseded by the signals
-   * mechanism.  See the general documentation of the Triangulation class for
-   * more information.
-   *
-   * @deprecated
-   */
-  void remove_refinement_listener (RefinementListener &listener) const DEAL_II_DEPRECATED;
 
   /**
    * A structure that has boost::signal objects for a number of actions that a
@@ -3252,24 +3134,7 @@ private:
    */
   std::map<unsigned int, types::manifold_id> *vertex_to_manifold_id_map_1d;
 
-
-  /**
-   * A map that correlates each refinement listener that has been added
-   * through the outdated RefinementListener interface via
-   * add_refinement_listener(), with the new-style boost::signal connections
-   * for each of the member function. We need to keep this list around so that
-   * we can later terminate the connection again when someone calls
-   * remove_refinement_listener().
-   *
-   * The data type is a multimap since, although this would be weird, the same
-   * object may add itself multiple times as a listener.
-   */
-  mutable
-  std::multimap<const RefinementListener *, std::vector<boost::signals2::connection> >
-  refinement_listener_map;
-
-  // make a couple of classes
-  // friends
+  // make a couple of classes friends
   template <int,int,int> friend class TriaAccessorBase;
   template <int,int,int> friend class TriaAccessor;
   friend class TriaAccessor<0, 1, spacedim>;

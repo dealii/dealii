@@ -12998,12 +12998,6 @@ Triangulation<dim, spacedim>::memory_consumption () const
 
 
 template<int dim, int spacedim>
-Triangulation<dim, spacedim>::RefinementListener::~RefinementListener ()
-{}
-
-
-
-template<int dim, int spacedim>
 Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList () throw ()
 {
   // don't do anything here. the compiler will automatically convert
@@ -13011,93 +13005,6 @@ Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList () throw ()
   // into abort() in order to satisfy the throw() specification
 }
 
-
-
-
-template<int dim, int spacedim>
-void Triangulation<dim, spacedim>::
-RefinementListener::pre_refinement_notification (const Triangulation<dim, spacedim> &)
-{}
-
-
-
-template<int dim, int spacedim>
-void Triangulation<dim, spacedim>::
-RefinementListener::post_refinement_notification (const Triangulation<dim, spacedim> &)
-{}
-
-
-
-template<int dim, int spacedim>
-void Triangulation<dim, spacedim>::
-RefinementListener::copy_notification (const Triangulation<dim, spacedim> &,
-                                       const Triangulation<dim, spacedim> &)
-{}
-
-
-
-template<int dim, int spacedim>
-void Triangulation<dim, spacedim>::
-RefinementListener::create_notification (const Triangulation<dim, spacedim> &)
-{}
-
-
-
-template<int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::add_refinement_listener (RefinementListener &listener) const
-{
-  // in this compatibility mode with the old-style refinement
-  // listeners, an external class presents itself as one that may or
-  // may not have overloaded all of the functions that the
-  // RefinementListener class has. consequently, we need to connect
-  // each of its functions to the relevant signals. for those
-  // functions that haven't been overloaded, that means that
-  // triggering the signal yields a call to the function in the
-  // RefinementListener base class which simply does nothing
-  std::vector<boost::signals2::connection> connections;
-
-  connections.push_back
-  (signals.create.connect (std_cxx11::bind (&RefinementListener::create_notification,
-                                            std_cxx11::ref(listener),
-                                            std_cxx11::cref(*this))));
-  connections.push_back
-  (signals.copy.connect (std_cxx11::bind (&RefinementListener::copy_notification,
-                                          std_cxx11::ref(listener),
-                                          std_cxx11::cref(*this),
-                                          std_cxx11::_1)));
-  connections.push_back
-  (signals.pre_refinement.connect (std_cxx11::bind (&RefinementListener::pre_refinement_notification,
-                                                    std_cxx11::ref(listener),
-                                                    std_cxx11::cref(*this))));
-  connections.push_back
-  (signals.post_refinement.connect (std_cxx11::bind (&RefinementListener::post_refinement_notification,
-                                                     std_cxx11::ref(listener),
-                                                     std_cxx11::cref(*this))));
-
-  // now push the set of connections into the map
-  refinement_listener_map.insert (std::make_pair(&listener, connections));
-}
-
-
-
-template<int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::remove_refinement_listener (RefinementListener &listener) const
-{
-  Assert (refinement_listener_map.find (&listener) != refinement_listener_map.end(),
-          ExcMessage("You try to remove a refinement listener that does "
-                     "not appear to have been added previously."));
-
-  // get the element of the map, and terminate these connections. then
-  // erase the element from the list
-  std::vector<boost::signals2::connection> connections
-    = refinement_listener_map.find(&listener)->second;
-  for (unsigned int i=0; i<connections.size(); ++i)
-    connections[i].disconnect ();
-
-  refinement_listener_map.erase (refinement_listener_map.find (&listener));
-}
 
 template <>
 const Manifold<2,1> &Triangulation<2, 1>::get_manifold(const types::manifold_id) const

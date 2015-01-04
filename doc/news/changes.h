@@ -92,6 +92,10 @@ inconvenience this causes.
   </li>
 </ol>
 
+- The refinement listener concept of the Triangulation class. This
+  approach to getting notified about what happens to triangulations
+  has been superseded by the signals defined by the triangulation
+  class.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
