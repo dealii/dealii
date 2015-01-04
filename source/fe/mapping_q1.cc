@@ -1028,7 +1028,7 @@ namespace internal
                   {
                     JxW_values[i] = boundary_forms[i].norm() * weights[i];
 
-                    if (subface_no!=deal_II_numbers::invalid_unsigned_int)
+                    if (subface_no!=numbers::invalid_unsigned_int)
                       {
                         const double area_ratio=GeometryInfo<dim>::subface_ratio(
                                                   cell->subface_case(face_no), subface_no);
@@ -1091,7 +1091,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 
   const unsigned int n_q_points = q.size();
 
-  compute_fill_face (cell, face_no, deal_II_numbers::invalid_unsigned_int,
+  compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
                      n_q_points,
                      DataSetDescriptor::face (face_no,
                                               cell->face_orientation(face_no),

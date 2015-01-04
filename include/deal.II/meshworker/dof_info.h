@@ -77,7 +77,7 @@ namespace MeshWorker
     /**
      * The number of the current face on the current cell.
      *
-     * This number is deal_II_numbers::invalid_unsigned_int if the info object
+     * This number is numbers::invalid_unsigned_int if the info object
      * was initialized with a cell.
      */
     unsigned int face_number;
@@ -85,7 +85,7 @@ namespace MeshWorker
     /**
      * The number of the current subface on the current face
      *
-     * This number is deal_II_numbers::invalid_unsigned_int if the info object
+     * This number is numbers::invalid_unsigned_int if the info object
      * was not initialized with a subface.
      */
     unsigned int sub_number;
@@ -308,8 +308,8 @@ namespace MeshWorker
     level_cell = c->is_level_cell();
 
     cell = typename Triangulation<dim,spacedim>::cell_iterator(*c);
-    face_number = deal_II_numbers::invalid_unsigned_int;
-    sub_number = deal_II_numbers::invalid_unsigned_int;
+    face_number = numbers::invalid_unsigned_int;
+    sub_number = numbers::invalid_unsigned_int;
     if (block_info)
       LocalResults<number>::reinit(block_info->local());
     else
@@ -326,7 +326,7 @@ namespace MeshWorker
   {
     face = static_cast<typename Triangulation<dim>::face_iterator> (f);
     face_number = face_no;
-    sub_number = deal_II_numbers::invalid_unsigned_int;
+    sub_number = numbers::invalid_unsigned_int;
   }
 
 

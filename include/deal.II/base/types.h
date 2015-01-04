@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 #include <cstddef>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -38,21 +40,6 @@ namespace types
    * indicate an invalid value of this type.
    */
   typedef unsigned int subdomain_id;
-
-  /**
-   * @deprecated Old name for the typedef above.
-   */
-  typedef subdomain_id subdomain_id_t DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use numbers::invalid_subdomain_id
-   */
-  const unsigned int invalid_subdomain_id DEAL_II_DEPRECATED = static_cast<subdomain_id>(-1);
-
-  /**
-   * @deprecated Use numbers::artificial_subdomain_id
-   */
-  const unsigned int artificial_subdomain_id DEAL_II_DEPRECATED = static_cast<subdomain_id>(-2);
 
 #ifdef DEAL_II_WITH_64BIT_INDICES
   /**
@@ -96,12 +83,6 @@ namespace types
 #  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED
 #endif
 
-
-  /**
-   * @deprecated Use numbers::invalid_dof_index
-   */
-  const global_dof_index invalid_dof_index DEAL_II_DEPRECATED = static_cast<global_dof_index>(-1);
-
   /**
    * The type used to denote boundary indicators associated with every piece
    * of the boundary and, in the case of meshes that describe manifolds in
@@ -129,12 +110,6 @@ namespace types
    */
   typedef unsigned int manifold_id;
 
-
-  /**
-   * @deprecated Old name for the typedef above.
-   */
-  typedef boundary_id boundary_id_t DEAL_II_DEPRECATED;
-
   /**
    * The type used to denote material indicators associated with every cell.
    *
@@ -142,12 +117,6 @@ namespace types
    * indicate an invalid value of this type.
    */
   typedef unsigned char material_id;
-
-  /**
-   * @deprecated Old name for the typedef above.
-   */
-  typedef material_id material_id_t DEAL_II_DEPRECATED;
-
 }
 
 namespace TrilinosWrappers

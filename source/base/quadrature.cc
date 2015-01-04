@@ -628,8 +628,8 @@ QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
   // indices tell, which global coordinate
   // (0->x, 1->y, 2->z) corresponds to which
   // local one
-  unsigned int xi_index   = deal_II_numbers::invalid_unsigned_int,
-               eta_index   = deal_II_numbers::invalid_unsigned_int,
+  unsigned int xi_index   = numbers::invalid_unsigned_int,
+               eta_index   = numbers::invalid_unsigned_int,
                const_index = face_no/2;
   // the xi and eta values have to be scaled
   // (by factor 0.5 or factor 1.0) depending on
@@ -1302,7 +1302,7 @@ subface (const unsigned int face_no,
   // ones.
 
   // first, define an invalid number
-  static const unsigned int e = deal_II_numbers::invalid_unsigned_int;
+  static const unsigned int e = numbers::invalid_unsigned_int;
 
   static const RefinementCase<dim-1>
   equivalent_refine_case[internal::SubfaceCase<dim>::case_isotropic+1][GeometryInfo<3>::max_children_per_face]

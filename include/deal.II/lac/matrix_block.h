@@ -582,8 +582,8 @@ template <class MATRIX>
 inline
 MatrixBlock<MATRIX>::MatrixBlock()
   :
-  row(deal_II_numbers::invalid_size_type),
-  column(deal_II_numbers::invalid_size_type)
+  row(numbers::invalid_size_type),
+  column(numbers::invalid_size_type)
 {}
 
 

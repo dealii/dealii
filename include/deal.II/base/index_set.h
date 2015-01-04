@@ -499,7 +499,7 @@ IndexSet::IndexSet ()
   :
   is_compressed (true),
   index_space_size (0),
-  largest_range (deal_II_numbers::invalid_unsigned_int)
+  largest_range (numbers::invalid_unsigned_int)
 {}
 
 
@@ -509,7 +509,7 @@ IndexSet::IndexSet (const types::global_dof_index size)
   :
   is_compressed (true),
   index_space_size (size),
-  largest_range (deal_II_numbers::invalid_unsigned_int)
+  largest_range (numbers::invalid_unsigned_int)
 {}
 
 
