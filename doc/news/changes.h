@@ -97,6 +97,8 @@ inconvenience this causes.
   has been superseded by the signals defined by the triangulation
   class.
 - The deprecated constructor of MPI_InitFinalize
+- The MPI support functions in namespace Utilities and Utilities::System.
+
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
