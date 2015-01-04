@@ -2097,14 +2097,6 @@ public:
   void clear_user_data ();
 
   /**
-   * @deprecated User clear_user_data() instead.
-   *
-   * Clear all user pointers.  See also
-   * @ref GlossUserData.
-   */
-  void clear_user_pointers () DEAL_II_DEPRECATED;
-
-  /**
    * Save all user indices. The output vector is resized if necessary. See
    * also
    * @ref GlossUserData.

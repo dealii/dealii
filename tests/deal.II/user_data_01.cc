@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -139,7 +139,7 @@ user_pointers(Triangulation<dim> &tr)
   // Fill user pointers with some
   // nonsense. clear them first
   Triangulation<dim> *p = &tr;
-  tr.clear_user_pointers();
+  tr.clear_user_data();
   for (typename Triangulation<dim>::cell_iterator it = tr.begin();
        it != tr.end(); ++it)
     it->set_user_pointer(p++);
@@ -279,7 +279,7 @@ void check()
   tr.refine_global(2);
 
   user_pointers(tr);
-  tr.clear_user_pointers();
+  tr.clear_user_data();
   user_indices(tr);
 }
 

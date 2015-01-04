@@ -9439,15 +9439,6 @@ void Triangulation<dim,spacedim>::clear_user_flags ()
 
 
 template <int dim, int spacedim>
-void Triangulation<dim,spacedim>::clear_user_pointers ()
-{
-  clear_user_data();
-}
-
-
-
-
-template <int dim, int spacedim>
 void Triangulation<dim, spacedim>::save_user_flags (std::ostream &out) const
 {
   save_user_flags_line (out);

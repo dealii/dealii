@@ -101,6 +101,7 @@ inconvenience this causes.
 - Deprecated members of namespace types.
 - Namespace deal_II_numbers.
 - Triangulation::distort_random.
+- Triangulation::clear_user_pointers.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
