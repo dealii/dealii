@@ -2153,8 +2153,6 @@ namespace Step43
     const double global_scaling = c_R * porosity * (global_max_u_F_prime) * global_S_variation /
                                   std::pow(global_Omega_diameter, alpha - 2.);
 
-//    return (beta * (max_velocity_times_dF_dS) * cell_diameter);
-
     return (beta *
             (max_velocity_times_dF_dS) *
             std::min (cell_diameter,
