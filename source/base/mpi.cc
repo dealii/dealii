@@ -317,8 +317,6 @@ namespace Utilities
     MPI_InitFinalize::MPI_InitFinalize (int    &argc,
                                         char ** &argv,
                                         const unsigned int max_num_threads)
-      :
-      owns_mpi (true)
     {
       static bool constructor_has_already_run = false;
       Assert (constructor_has_already_run == false,
@@ -353,7 +351,6 @@ namespace Utilities
       // about these variables
       (void)argc;
       (void)argv;
-      (void)owns_mpi;
 #endif
 
       // we are allowed to call MPI_Init ourselves and PETScInitialize will
@@ -508,7 +505,7 @@ namespace Utilities
 
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
-      if (Utilities::System::job_supports_mpi() == true && owns_mpi == true &&
+      if (Utilities::System::job_supports_mpi() == true &&
           MPI_has_been_started != 0)
         {
           if (std::uncaught_exception())

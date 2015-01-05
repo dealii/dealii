@@ -314,15 +314,6 @@ namespace Utilities
        * MPI process.
        */
       ~MPI_InitFinalize();
-
-    private:
-      /**
-       * This flag tells the class whether it owns the MPI process (i.e., it
-       * has been constructed using the argc/argv input, or it has been
-       * copied). In the former case, the command <tt>MPI_Finalize()</tt> will
-       * be called at destruction.
-       */
-      const bool owns_mpi;
     };
 
     namespace internal
