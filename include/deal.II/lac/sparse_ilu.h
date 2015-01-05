@@ -111,14 +111,6 @@ public:
                   const double                    strengthen_diagonal=0.) DEAL_II_DEPRECATED;
 
   /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions.
-   */
-  template <typename somenumber>
-  void apply_decomposition (Vector<somenumber>       &dst,
-                            const Vector<somenumber> &src) const DEAL_II_DEPRECATED;
-
-  /**
    * Apply the incomplete decomposition, i.e. do one forward-backward step
    * $dst=(LU)^{-1}src$.
    *
@@ -163,18 +155,6 @@ public:
 
 /*@}*/
 //---------------------------------------------------------------------------
-
-template <typename number>
-template <typename somenumber>
-inline
-void
-SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
-                                        const Vector<somenumber> &src) const
-{
-  vmult (dst, src);
-}
-
-
 
 
 DEAL_II_NAMESPACE_CLOSE

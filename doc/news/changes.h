@@ -103,6 +103,7 @@ inconvenience this causes.
 - Triangulation::distort_random.
 - Triangulation::clear_user_pointers.
 - The deprecated constructor of SparseILU.
+- SparseILU::apply_decomposition.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
