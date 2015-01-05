@@ -227,7 +227,7 @@ namespace internal
           vertex_fe_association (dof_handler.finite_elements->size(),
                                  std::vector<bool> (dof_handler.tria->n_vertices(), false));
 
-          for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+          for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
             for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
               vertex_fe_association[cell->active_fe_index()][cell->vertex_index(v)]
@@ -325,8 +325,8 @@ namespace internal
         template <int spacedim>
         static
         types::global_dof_index
-        distribute_dofs_on_cell (const typename dealii::hp::DoFHandler<1,spacedim>::active_cell_iterator &cell,
-                                 types::global_dof_index                                                 next_free_dof)
+        distribute_dofs_on_cell(const TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < 1, spacedim >, false > > &cell,
+                                types::global_dof_index                                                 next_free_dof)
         {
           const unsigned int dim = 1;
 
@@ -370,8 +370,8 @@ namespace internal
         template <int spacedim>
         static
         types::global_dof_index
-        distribute_dofs_on_cell (const typename dealii::hp::DoFHandler<2,spacedim>::active_cell_iterator &cell,
-                                 types::global_dof_index                                                 next_free_dof)
+        distribute_dofs_on_cell(const TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < 2, spacedim >, false > > &cell,
+                                types::global_dof_index                                                 next_free_dof)
         {
           const unsigned int dim = 2;
 
@@ -433,8 +433,8 @@ namespace internal
         template <int spacedim>
         static
         types::global_dof_index
-        distribute_dofs_on_cell (const typename dealii::hp::DoFHandler<3,spacedim>::active_cell_iterator &cell,
-                                 types::global_dof_index                                                 next_free_dof)
+        distribute_dofs_on_cell(const TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < 3, spacedim >, false > > &cell,
+                                types::global_dof_index                                                 next_free_dof)
         {
           const unsigned int dim = 3;
 
@@ -587,7 +587,7 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+              for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -618,7 +618,7 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename DoFHandler<dim,spacedim>::cell_iterator
+              for (TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -715,7 +715,7 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+              for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -746,7 +746,7 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename DoFHandler<dim,spacedim>::cell_iterator
+              for (TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -804,7 +804,7 @@ namespace internal
             // on each level
             unsigned int n_line_slots = 0;
 
-            for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+            for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                  cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
@@ -884,7 +884,7 @@ namespace internal
 
             unsigned int next_free_line_slot = 0;
 
-            for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+            for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                  cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
@@ -1091,7 +1091,7 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+              for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -1122,7 +1122,7 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename DoFHandler<dim,spacedim>::cell_iterator
+              for (TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -1179,7 +1179,7 @@ namespace internal
             // class) we will have to store
             unsigned int n_quad_slots = 0;
 
-            for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+            for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                  cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
@@ -1266,7 +1266,7 @@ namespace internal
 
             unsigned int next_free_quad_slot = 0;
 
-            for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+            for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                  cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
@@ -1420,7 +1420,7 @@ namespace internal
                                    std::vector<bool> (dof_handler.tria->n_raw_lines(),
                                                       false));
 
-              for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+              for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
                    cell=dof_handler.begin_active();
                    cell!=dof_handler.end(); ++cell)
                 for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
@@ -1682,7 +1682,7 @@ namespace hp
   /*------------------------ Cell iterator functions ------------------------*/
 
   template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::cell_iterator
+  TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
   DoFHandler<dim,spacedim>::begin (const unsigned int level) const
   {
     return cell_iterator (*this->get_tria().begin(level),
@@ -1692,7 +1692,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::active_cell_iterator
+  TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
   DoFHandler<dim,spacedim>::begin_active (const unsigned int level) const
   {
     // level is checked in begin
@@ -1708,7 +1708,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::cell_iterator
+  TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
   DoFHandler<dim,spacedim>::end () const
   {
     return cell_iterator (&this->get_tria(),
@@ -1719,7 +1719,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  typename DoFHandler<dim,spacedim>::cell_iterator
+  TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
   DoFHandler<dim,spacedim>::end (const unsigned int level) const
   {
     return (level == this->get_tria().n_levels()-1 ?
@@ -1729,7 +1729,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  typename DoFHandler<dim, spacedim>::active_cell_iterator
+  TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >
   DoFHandler<dim, spacedim>::end_active (const unsigned int level) const
   {
     return (level == this->get_tria().n_levels()-1 ?
@@ -1740,43 +1740,43 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+  IteratorRange<TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > >
   DoFHandler<dim, spacedim>::cell_iterators () const
   {
     return
-      IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+      IteratorRange<TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > >
       (begin(), end());
   }
 
 
   template <int dim, int spacedim>
-  IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+  IteratorRange<TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > >
   DoFHandler<dim, spacedim>::active_cell_iterators () const
   {
     return
-      IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+      IteratorRange<TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > >
       (begin_active(), end());
   }
 
 
 
   template <int dim, int spacedim>
-  IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+  IteratorRange<TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > >
   DoFHandler<dim, spacedim>::cell_iterators_on_level (const unsigned int level) const
   {
     return
-      IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
+      IteratorRange<TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > >
       (begin(level), end(level));
   }
 
 
 
   template <int dim, int spacedim>
-  IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+  IteratorRange<TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > >
   DoFHandler<dim, spacedim>::active_cell_iterators_on_level (const unsigned int level) const
   {
     return
-      IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
+      IteratorRange<TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > >
       (begin_active(level), end_active(level));
   }
 
@@ -1791,7 +1791,7 @@ namespace hp
   {
     Assert (finite_elements != 0, ExcNoFESelected());
 
-    DoFHandler<1,1>::cell_iterator cell;
+    TriaIterator < dealii::DoFCellAccessor < DoFHandler < 1, 1 >, false > > cell;
     types::global_dof_index n = 0;
 
     // search left-most cell
@@ -1824,7 +1824,7 @@ namespace hp
       Assert ((i->first == 0) || (i->first == 1),
               ExcInvalidBoundaryIndicator());
 
-    DoFHandler<1,1>::active_cell_iterator cell;
+    TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < 1, 1 >, false > > cell;
     types::global_dof_index n = 0;
 
     // search left-most cell
@@ -1863,7 +1863,7 @@ namespace hp
       Assert ((*i == 0) || (*i == 1),
               ExcInvalidBoundaryIndicator());
 
-    DoFHandler<1,1>::active_cell_iterator cell;
+    TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < 1, 1 >, false > > cell;
     types::global_dof_index n = 0;
 
     // search left-most cell
@@ -1952,8 +1952,8 @@ namespace hp
     // boundaries of dimension dim-2,
     // and so every boundary line is
     // also part of a boundary face.
-    typename DoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
-                                                            endc = this->end();
+    TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = this->begin_active (),
+                                                                                           endc = this->end();
     for (; cell!=endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
@@ -1986,8 +1986,8 @@ namespace hp
     std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
 
-    typename DoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
-                                                            endc = this->end();
+    TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = this->begin_active (),
+                                                                                           endc = this->end();
     for (; cell!=endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f) &&
@@ -2022,8 +2022,8 @@ namespace hp
     std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
 
-    typename DoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
-                                                            endc = this->end();
+    TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = this->begin_active (),
+                                                                                           endc = this->end();
     for (; cell!=endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f) &&
@@ -2632,7 +2632,7 @@ namespace hp
     // collection is large enough to
     // cover all fe indices presently
     // in use on the mesh
-    for (active_cell_iterator cell = begin_active(); cell != end(); ++cell)
+    for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = begin_active(); cell != end(); ++cell)
       Assert (cell->active_fe_index() < finite_elements->size(),
               ExcInvalidFEIndex (cell->active_fe_index(),
                                  finite_elements->size()));
@@ -2661,8 +2661,8 @@ namespace hp
     // active entities
     {
       types::global_dof_index next_free_dof = 0;
-      active_cell_iterator cell = begin_active(),
-                           endc = end();
+      TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = begin_active(),
+                                                                                             endc = end();
 
       for (; cell != endc; ++cell)
         next_free_dof
@@ -2749,7 +2749,7 @@ namespace hp
     // update the cache used for cell dof indices and compress the data on the levels. do
     // the latter on separate tasks to gain parallelism, starting with the highest
     // level (there is most to do there, so start it first)
-    for (active_cell_iterator cell = begin_active();
+    for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = begin_active();
          cell != end(); ++cell)
       cell->update_cell_dof_indices_cache ();
 
@@ -2812,7 +2812,7 @@ namespace hp
     renumber_dofs_internal (new_numbers, dealii::internal::int2type<dim>());
 
     // update the cache used for cell dof indices
-    for (active_cell_iterator cell = begin_active();
+    for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = begin_active();
          cell != end(); ++cell)
       cell->update_cell_dof_indices_cache ();
 
@@ -2889,7 +2889,7 @@ namespace hp
     const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
     .clear_user_flags_line ();
 
-    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
+    for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = begin_active(); cell!=end(); ++cell)
       for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
         if (cell->line(l)->user_flag_set() == false)
           {
@@ -2942,7 +2942,7 @@ namespace hp
     const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
     .clear_user_flags_quad ();
 
-    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
+    for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = begin_active(); cell!=end(); ++cell)
       for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
         if (cell->quad(q)->user_flag_set() == false)
           {
@@ -2994,7 +2994,7 @@ namespace hp
     const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
     .clear_user_flags_quad ();
 
-    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
+    for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = begin_active(); cell!=end(); ++cell)
       for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
         if (cell->quad(q)->user_flag_set() == false)
           {
@@ -3045,7 +3045,7 @@ namespace hp
     const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
     .clear_user_flags_quad ();
 
-    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
+    for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = begin_active(); cell!=end(); ++cell)
       for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
         if (cell->quad(q)->user_flag_set() == false)
           {
@@ -3100,7 +3100,7 @@ namespace hp
     // cells. stick with the same
     // kind of notation as in the
     // previous functions, though
-    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
+    for (TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > cell = begin_active(); cell!=end(); ++cell)
       if (cell->user_flag_set() == false)
         {
           const hex_iterator hex = cell;
