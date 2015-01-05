@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2013 by the deal.II authors
+ * Copyright (C) 2010 - 2013, 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -2153,8 +2153,6 @@ namespace Step43
     const double global_scaling = c_R * porosity * (global_max_u_F_prime) * global_S_variation /
                                   std::pow(global_Omega_diameter, alpha - 2.);
 
-//    return (beta * (max_velocity_times_dF_dS) * cell_diameter);
-
     return (beta *
             (max_velocity_times_dF_dS) *
             std::min (cell_diameter,
@@ -2241,10 +2239,8 @@ start_time_iteration:
 
 // @sect3{The <code>main()</code> function}
 //
-// The main function looks almost the same as in all other programs. In
-// particular, it is essentially the same as in step-31 where we also explain
-// the need to initialize the MPI subsystem.
-int main (int argc, char *argv[])
+// The main function looks almost the same as in all other programs:
+int main ()
 {
   try
     {
@@ -2252,8 +2248,6 @@ int main (int argc, char *argv[])
       using namespace Step43;
 
       deallog.depth_console (0);
-
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
       TwoPhaseFlowProblem<2> two_phase_flow_problem(1);
       two_phase_flow_problem.run ();
