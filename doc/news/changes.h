@@ -102,6 +102,7 @@ inconvenience this causes.
 - Namespace deal_II_numbers.
 - Triangulation::distort_random.
 - Triangulation::clear_user_pointers.
+- The deprecated constructor of SparseILU.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 

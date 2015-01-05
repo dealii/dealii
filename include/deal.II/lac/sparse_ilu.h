@@ -74,14 +74,6 @@ public:
   SparseILU ();
 
   /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions. Instead, pass the
-   * sparsity pattern that you want used for the decomposition in the
-   * AdditionalData structure.
-   */
-  SparseILU (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
-
-  /**
    * Make SparseLUDecomposition::AdditionalData accessible to this class as
    * well.
    */
