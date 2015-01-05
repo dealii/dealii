@@ -279,7 +279,7 @@ namespace Utilities
        * main.
        * @param[in] max_num_threads The maximal number of threads this MPI
        * process should utilize. If this argument is set to
-       * numbers::invalid_unsigned_int, the number of threads is determined by
+       * numbers::invalid_unsigned_int, the number of threads is determined
        * automatically in the following way: the number of threads to run on
        * this MPI process is set in such a way that all of the cores in your
        * node are spoken for. In other words, if you have started one MPI
