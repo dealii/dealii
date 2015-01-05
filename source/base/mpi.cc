@@ -501,8 +501,6 @@ namespace Utilities
       // when running PETSc, because we initialize MPI ourselves before calling
       // PetscInitialize
 #ifdef DEAL_II_WITH_MPI
-      int mpi_err = 0;
-
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
       if (Utilities::System::job_supports_mpi() == true &&
@@ -516,12 +514,12 @@ namespace Utilities
                         << std::endl;
             }
           else
-            mpi_err = MPI_Finalize();
+            {
+              const int mpi_err = MPI_Finalize();
+              AssertThrow (mpi_err == 0,
+                           ExcMessage ("An error occurred while calling MPI_Finalize()"));
+            }
         }
-
-
-      AssertThrow (mpi_err == 0,
-                   ExcMessage ("An error occurred while calling MPI_Finalize()"));
 #endif
     }
 
