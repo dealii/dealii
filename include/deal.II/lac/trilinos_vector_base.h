@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -281,12 +281,6 @@ namespace TrilinosWrappers
      * for more information.
      */
     void compress (::dealii::VectorOperation::values operation);
-
-    /**
-     * @deprecated: Use the compress(VectorOperation::values) function above
-     * instead.
-     */
-    void compress() DEAL_II_DEPRECATED;
 
     /**
      * @deprecated Use compress(dealii::VectorOperation::values) instead.
@@ -1226,15 +1220,6 @@ namespace TrilinosWrappers
       AssertThrow(false, ExcNotImplemented());
 
     compress(last_action_);
-  }
-
-
-
-  inline
-  void
-  VectorBase::compress ()
-  {
-    compress(VectorOperation::unknown);
   }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,9 +41,9 @@ void test (TrilinosWrappers::Vector &v,
       w(i) = i+1;
     }
 
-  m.compress ();
-  v.compress ();
-  w.compress ();
+  m.compress (VectorOperation::insert);
+  v.compress (VectorOperation::insert);
+  w.compress (VectorOperation::insert);
 
   // x=w-Mv
   const double s = m.residual (x, v, w);

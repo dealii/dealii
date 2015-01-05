@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,8 +95,8 @@ int main(int argc, char **argv)
     TrilinosWrappers::Vector  u(dim);
     f = 1.;
     A.compress ();
-    f.compress ();
-    u.compress ();
+    f.compress (VectorOperation::insert);
+    u.compress (VectorOperation::insert);
 
     GrowingVectorMemory<TrilinosWrappers::Vector> mem;
     SolverMinRes<TrilinosWrappers::Vector> solver(control,mem);

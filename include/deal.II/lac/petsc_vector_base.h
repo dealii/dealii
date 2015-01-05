@@ -273,11 +273,6 @@ namespace PETScWrappers
     void compress (::dealii::VectorOperation::values operation);
 
     /**
-     * @deprecated: use compress(VectorOperation::values) instead.
-     */
-    void compress () DEAL_II_DEPRECATED;
-
-    /**
      * Set all components of the vector to the given number @p s. Simply pass
      * this down to the individual block objects, but we still need to declare
      * this function to make the example given in the discussion about making

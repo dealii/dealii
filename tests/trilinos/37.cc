@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,7 @@ void test (TrilinosWrappers::Vector &v)
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i;
 
-  v.compress ();
+  v.compress (VectorOperation::insert);
 
   v.add (1.);
 

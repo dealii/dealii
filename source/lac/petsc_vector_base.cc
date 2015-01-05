@@ -418,14 +418,6 @@ namespace PETScWrappers
 
 
 
-  void
-  VectorBase::compress ()
-  {
-    compress(VectorOperation::unknown);
-  }
-
-
-
   VectorBase::real_type
   VectorBase::norm_sqr () const
   {

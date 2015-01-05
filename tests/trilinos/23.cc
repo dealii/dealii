@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,8 +43,8 @@ void test (TrilinosWrappers::Vector &v,
         }
     }
 
-  v.compress ();
-  w.compress ();
+  v.compress (VectorOperation::insert);
+  w.compress (VectorOperation::insert);
 
   // make sure the scalar product is zero
   Assert (v*w == product, ExcInternalError());

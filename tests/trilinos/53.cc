@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,10 +36,11 @@ void test (TrilinosWrappers::Vector &v)
       v(i) = i;
       pattern[i] = true;
     }
+  v.compress (VectorOperation::insert);
   for (unsigned int i=0; i<v.size(); i+=1+i)
     v(i) += i;
 
-  v.compress ();
+  v.compress (VectorOperation::add);
 
   // check that they are ok, and this time
   // all of them
