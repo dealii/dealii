@@ -57,14 +57,6 @@ public:
   SparseMIC ();
 
   /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions.  Instead, pass the
-   * sparsity pattern that you want used for the decomposition in the
-   * AdditionalData structure.
-   */
-  SparseMIC (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
-
-  /**
    * Destructor.
    */
   virtual ~SparseMIC();

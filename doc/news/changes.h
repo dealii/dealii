@@ -104,6 +104,7 @@ inconvenience this causes.
 - Triangulation::clear_user_pointers.
 - The deprecated constructor of SparseILU.
 - SparseILU::apply_decomposition.
+- The deprecated constructor of SparseMIC.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
