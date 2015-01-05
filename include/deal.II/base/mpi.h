@@ -323,13 +323,6 @@ namespace Utilities
        * be called at destruction.
        */
       const bool owns_mpi;
-
-
-      /**
-       * A common function called by all of the constructors.
-       */
-      void do_init(int    &argc,
-                   char ** &argv);
     };
 
     namespace internal
