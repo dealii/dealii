@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -40,7 +40,7 @@ ENDFOREACH()
 # used during the configuration stage:
 #
 FOREACH(_flag ${DEAL_II_REMOVED_FLAGS})
-  IF(NOT "${_flag}" STREQUAL "")
+  IF(NOT "${${_flag}}" STREQUAL "")
     MESSAGE(FATAL_ERROR
       "\nInternal configuration error: The variable ${_flag} was set to a "
       "non empty value during the configuration! (The corresponding "
