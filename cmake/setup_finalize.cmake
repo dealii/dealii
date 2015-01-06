@@ -78,7 +78,7 @@ FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES})
 ENDFOREACH()
 
 #
-# Cleanup deal.IITargets.cmake in the build directory:
+# Clean up deal.IITargets.cmake in the build directory:
 #
 FILE(REMOVE
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
