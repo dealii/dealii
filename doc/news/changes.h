@@ -74,6 +74,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Ported: The build system now supports CMake up to version 3.1.
+  <br>
+  (Matthias Maier, 2015/01/06)
+  </li>
+
   <li> Fixed: CMake now also handles and exports the subminor version
   number correctly ("pre" and "rc?" are replaced by "0").
   <br>
