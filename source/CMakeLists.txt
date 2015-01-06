@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -55,13 +55,11 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
   #
   # Combine all ${build} OBJECT targets to a ${build} library:
   #
-  FILE(STRINGS
-    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${build_lowercase}
-    deal_ii_objects_${build_lowercase}
-    )
+
+  GET_PROPERTY(_objects GLOBAL PROPERTY DEAL_II_OBJECTS_${build})
   ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     dummy.cc # Workaround for a bug in the Xcode generator
-    ${deal_ii_objects_${build_lowercase}}
+    ${_objects}
     )
   ADD_DEPENDENCIES(library ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX})
 
