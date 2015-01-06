@@ -78,19 +78,6 @@ FOREACH(_suffix ${DEAL_II_LIST_SUFFIXES})
 ENDFOREACH()
 
 #
-# Cleanup some files used for storing the names of all object targets that
-# will be bundled to the deal.II library.
-# (Right now, i.e. cmake 2.8.8, this is the only reliable way to get
-# information into a global scope...)
-#
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER "${_build}" _build_lowercase)
-  FILE(REMOVE
-    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${_build_lowercase}
-    )
-ENDFOREACH()
-
-#
 # Cleanup deal.IITargets.cmake in the build directory:
 #
 FILE(REMOVE
