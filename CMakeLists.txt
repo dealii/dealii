@@ -118,14 +118,11 @@ ENDFOREACH()
 #
 # Finalize the configuration:
 #
+VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_cpack.cmake)
 VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_custom_targets.cmake)
 VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_finalize.cmake)
+VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_git.cmake)
 VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_write_config.cmake)
-
-#
-# CPack configuration
-#
-VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_cpack.cmake)
 
 ########################################################################
 #                                                                      #
