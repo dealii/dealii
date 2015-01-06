@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -44,9 +44,8 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
       LINKER_LANGUAGE "CXX"
       )
 
-    FILE(APPEND
-      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_${_build_lowercase}
-      "$<TARGET_OBJECTS:${_library}.${_build_lowercase}>\n"
+    SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
+      "$<TARGET_OBJECTS:${_library}.${_build_lowercase}>"
       )
   ENDFOREACH()
 

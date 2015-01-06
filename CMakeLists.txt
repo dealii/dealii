@@ -30,14 +30,19 @@
 #
 # General configuration for cmake:
 #
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-
 MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
 MESSAGE(STATUS "")
 
-IF(POLICY CMP0026)
-  # enable target LOCATION property
-  CMAKE_POLICY(SET CMP0026 OLD)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+
+#
+# We support all policy changes up to version 3.1.0. Thus, explicitly set
+# all policies CMP0001 - CMP0054 to new for version 3.1 (and later) to
+# avoid some unnecessary warnings.
+#
+IF( "${CMAKE_VERSION}" VERSION_EQUAL "3.1" OR
+    "${CMAKE_VERSION}" VERSION_GREATER "3.1" )
+  CMAKE_POLICY(VERSION 3.1.0)
 ENDIF()
 
 IF(POLICY CMP0037)
