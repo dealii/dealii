@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -30,12 +30,18 @@
 #
 # General configuration for cmake:
 #
+MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
-IF(POLICY CMP0026)
-  # enable target LOCATION property
-  CMAKE_POLICY(SET CMP0026 OLD)
+#
+# We support all policy changes up to version 3.1.0. Thus, explicitly set
+# all policies CMP0001 - CMP0054 to new for version 3.1 (and later) to
+# avoid some unnecessary warnings.
+#
+IF( "${CMAKE_VERSION}" VERSION_EQUAL "3.1" OR
+    "${CMAKE_VERSION}" VERSION_GREATER "3.1" )
+  CMAKE_POLICY(VERSION 3.1.0)
 ENDIF()
 
 IF(POLICY CMP0037)
@@ -43,7 +49,6 @@ IF(POLICY CMP0037)
   CMAKE_POLICY(SET CMP0037 OLD)
 ENDIF()
 
-MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
 
 LIST(APPEND CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/cmake/
