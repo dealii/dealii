@@ -843,41 +843,6 @@ namespace DoFRenumbering
               const bool         dof_wise_renumbering = false);
 
   /**
-   * @deprecated Use downstream() instead.
-   */
-  template <class DH>
-  void
-  downstream_dg (DH &dof,
-                 const Point<DH::space_dimension> &direction) DEAL_II_DEPRECATED;
-
-  template <class DH>
-  void
-  downstream_dg (DH &dof,
-                 const Point<DH::space_dimension> &direction)
-  {
-    downstream(dof, direction);
-  }
-
-
-  /**
-   * @deprecated Use downstream() instead.
-   */
-  template <class DH>
-  void
-  downstream_dg (DH &dof,
-                 unsigned int level,
-                 const Point<DH::space_dimension> &direction) DEAL_II_DEPRECATED;
-
-  template <class DH>
-  void
-  downstream_dg (DH &dof,
-                 unsigned int level,
-                 const Point<DH::space_dimension> &direction)
-  {
-    downstream(dof, level, direction);
-  }
-
-  /**
    * Computes the renumbering vector needed by the downstream() function. Does
    * not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.

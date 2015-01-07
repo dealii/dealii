@@ -526,14 +526,6 @@ namespace GridOutFlags
     } color_by;
 
     /**
-     * @deprecated Use the color_by enum instead.
-     *
-     * Change color depending on level. Default is false, therefore, color is
-     * coded by material or boundary id.
-     */
-    bool level_color DEAL_II_DEPRECATED;
-
-    /**
      * Code level to depth. Default is true. If false, color depends on
      * material or boundary id.
      *

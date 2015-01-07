@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -644,7 +644,7 @@ namespace LaplaceSolver
     assemble_matrix (LinearSystem                                         &linear_system,
                      const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
                      const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-                     Threads::ThreadMutex                                 &mutex) const;
+                     Threads::Mutex                                 &mutex) const;
   };
 
 
@@ -717,11 +717,11 @@ namespace LaplaceSolver
                                                     dof_handler.end (),
                                                     n_threads);
 
-    Threads::ThreadMutex mutex;
+    Threads::Mutex mutex;
     Threads::ThreadGroup<> threads;
     for (unsigned int thread=0; thread<n_threads; ++thread)
-      threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
-                 (linear_system,
+      threads += Threads::new_thread (&Solver<dim>::assemble_matrix, *this, 
+                  linear_system,
                   thread_ranges[thread].first,
                   thread_ranges[thread].second,
                   mutex);
@@ -750,7 +750,7 @@ namespace LaplaceSolver
   Solver<dim>::assemble_matrix (LinearSystem                                         &linear_system,
                                 const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
                                 const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-                                Threads::ThreadMutex                                 &mutex) const
+                                Threads::Mutex                                 &mutex) const
   {
     MappingQ<dim> mapping (4);
     FEValues<dim> fe_values (mapping, *fe, *quadrature,
@@ -797,7 +797,7 @@ namespace LaplaceSolver
 
 
         cell->get_dof_indices (local_dof_indices);
-        Threads::ThreadMutex::ScopedLock lock (mutex);
+        Threads::Mutex::ScopedLock lock (mutex);
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=0; j<dofs_per_cell; ++j)
             linear_system.matrix.add (local_dof_indices[i],
@@ -818,7 +818,7 @@ namespace LaplaceSolver
       = &DoFTools::make_hanging_node_constraints;
 
     Threads::Thread<>
-    mhnc_thread = Threads::spawn (mhnc_p)(dof_handler, hanging_node_constraints);
+      mhnc_thread = Threads::new_thread (mhnc_p,dof_handler, hanging_node_constraints);
 
     // make sparsity pattern. since
     // in 3d the usual way just blows
@@ -2734,8 +2734,8 @@ namespace LaplaceSolver
   WeightedResidual<dim>::solve_problem ()
   {
     Threads::ThreadGroup<> threads;
-    threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_primal_problem)();
-    threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_dual_problem)();
+    threads += Threads::new_thread (&WeightedResidual<dim>::solve_primal_problem, *this);
+    threads += Threads::new_thread (&WeightedResidual<dim>::solve_dual_problem,*this);
     threads.join_all ();
   }
 
@@ -3204,8 +3204,8 @@ namespace LaplaceSolver
     const unsigned int n_threads = multithread_info.n_default_threads;
     Threads::ThreadGroup<> threads;
     for (unsigned int i=0; i<n_threads; ++i)
-      threads += Threads::spawn (*this, &WeightedResidual<dim>::estimate_some)
-                 (primal_solution,
+      threads += Threads::new_thread (&WeightedResidual<dim>::estimate_some, *this,
+                  primal_solution,
                   dual_weights,
                   n_threads, i,
                   error_indicators,

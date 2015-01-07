@@ -62,22 +62,6 @@ namespace Algorithms
 
   template <class VECTOR>
   void
-  ThetaTimestepping<VECTOR>::initialize (ParameterHandler &param)
-  {
-    parse_parameters(param);
-  }
-
-
-  template <class VECTOR>
-  void
-  ThetaTimestepping<VECTOR>::operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in)
-  {
-    Operator<VECTOR>::operator() (out, in);
-  }
-
-
-  template <class VECTOR>
-  void
   ThetaTimestepping<VECTOR>::operator() (AnyData &out, const AnyData &in)
   {
     Assert(!adaptive, ExcNotImplemented());

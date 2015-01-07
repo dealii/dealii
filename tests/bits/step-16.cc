@@ -242,8 +242,6 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 template <int dim>
 void LaplaceProblem<dim>::solve ()
 {
-  GrowingVectorMemory<>   vector_memory;
-
   MGTransferPrebuilt<Vector<double> > mg_transfer;
   mg_transfer.build_matrices(mg_dof_handler);
 
@@ -254,7 +252,7 @@ void LaplaceProblem<dim>::solve ()
 
   typedef PreconditionSOR<SparseMatrix<float> > RELAXATION;
   MGSmootherRelaxation<SparseMatrix<float>, RELAXATION, Vector<double> >
-  mg_smoother(vector_memory);
+  mg_smoother;
 
   RELAXATION::AdditionalData smoother_data;
   mg_smoother.initialize(mg_matrices, smoother_data);

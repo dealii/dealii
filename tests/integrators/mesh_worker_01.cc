@@ -145,13 +145,16 @@ test_simple(MGDoFHandler<dim> &mgdofs)
   assembler;
   assembler.initialize(matrix, v);
 
+  MeshWorker::LoopControl lctrl;
+  lctrl.cells_first = true;
+  lctrl.own_faces = MeshWorker::LoopControl::one;
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
   (dofs.begin_active(), dofs.end(),
    dof_info, info_box,
    std_cxx11::bind (&Local<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
    std_cxx11::bind (&Local<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
    std_cxx11::bind (&Local<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
-   assembler, true);
+   assembler, lctrl);
 
   for (unsigned int i=0; i<v.size(); ++i)
     deallog << ' ' << std::setprecision(3) << v(i);

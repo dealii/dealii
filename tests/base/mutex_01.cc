@@ -24,7 +24,7 @@
 #include <deal.II/base/thread_management.h>
 
 
-Threads::ThreadMutex mutex;
+Threads::Mutex mutex;
 
 
 void test ()

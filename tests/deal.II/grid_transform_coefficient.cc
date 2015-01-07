@@ -22,6 +22,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/fe/mapping_q.h>
 
@@ -108,7 +109,7 @@ int main ()
     }
 
   Coefficient<dim> c;
-  GridGenerator::laplace_transformation (tria, new_points, &c);
+  GridTools::laplace_transform (new_points, tria, &c);
   HyperBallBoundary<dim> inner_ball(n_center, n_radius);
   tria.set_boundary(1, inner_ball);
 

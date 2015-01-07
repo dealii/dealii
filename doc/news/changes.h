@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014, 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,6 +38,50 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: This release removes a number of functions that have long
+  been deprecated and that were previously already marked as
+  deprecated (i.e., they would have yielded warnings by the compiler whenever
+  you tried to use them). In almost all cases, there is a function with same
+  name but different argument list that should be used instead.
+  Specifically, the removed functions and classes are:
+  - TimeDependent::end_sweep (with an argument).
+  - PointValueHistory::mark_locations.
+  - The DataPostprocessor::compute_derived_quantities_scalar and
+    DataPostprocessor::compute_derived_quantities_vector functions without
+    evaluation points. If you have
+    data postprocessor classes implemented in your program that overload these
+    functions, you will have to change it in a way that they overload the
+    functions of same name but with the evaluation point argument instead.
+  - The constructors of classes MGSmoother, MGSmootherRelaxation and
+    MGSmootherPrecondition that take a VectorMemory object.
+  - Deprecated variants of MeshWorker::loop and MeshWorker::integration_loop.
+  - ThreadManagement::spawn.
+  - Threads::ThreadCondition and Threads::ThreadMutex.
+  - GridGenerator::laplace_transformation.
+  - The version of GridGenerator::parallelogram where the corners are given
+    as a rank-2 tensor rather than as an array of points.
+  - DataOutBase::create_xdmf_entry with 3 arguments.
+  - DataOutBase::write_hdf5_parallel with 2 arguments.
+  - Algorithms::ThetaTimestepping::operator().
+  - Algorithms::ThetaTimestepping::initialize.
+  - Algorithms::Newton::initialize.
+  - MGLevelObject::get_minlevel and MGLevelObject::get_maxlevel.
+  - The versions of FunctionParser::initialize that took a
+    <code>use_degrees</code> or <code>constants</code> argument.
+    The implementation as it is now no longer supports either of
+    these two concepts (since we switched from the FunctionParser
+    library to the muparser library after the deal.II 8.1 release).
+  - DoFRenumbering::downstream_dg.
+  - DoFTools::count_dofs_per_component.
+  - DoFTools::make_sparsity_pattern with a vector-of-vector mask.
+  - GridOutFlags::XFig::level_color.
+  - class BlockList.
+  - MGConstrainedDoFs::non_refinement_edge_index
+  - MGConstrainedDoFs::at_refinement_edge_boundary
+  <br>
+  (Wolfgang Bangerth, 2014/12/29-2015/01/04)
+  </li>
+
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
   Those are either entirely removed (for the blas/lapack symbols) or
   renamed to DEAL_II_HAVE_*. This change is done in order to avoid clashes

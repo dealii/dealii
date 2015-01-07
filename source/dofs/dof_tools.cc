@@ -1541,18 +1541,6 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim>
-  void
-  count_dofs_per_component (const DoFHandler<dim,spacedim> &dof_handler,
-                            std::vector<types::global_dof_index>      &dofs_per_component,
-                            std::vector<unsigned int>       target_component)
-  {
-    count_dofs_per_component (dof_handler, dofs_per_component,
-                              false, target_component);
-  }
-
-
-
   template <class DH>
   void
   map_dof_to_boundary_indices (const DH                  &dof_handler,

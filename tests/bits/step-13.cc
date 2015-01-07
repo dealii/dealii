@@ -293,7 +293,7 @@ namespace LaplaceSolver
     assemble_matrix (LinearSystem                                         &linear_system,
                      const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
                      const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-                     Threads::ThreadMutex                                 &mutex) const;
+                     Threads::Mutex                                 &mutex) const;
   };
 
 
@@ -364,14 +364,14 @@ namespace LaplaceSolver
                                                     dof_handler.end (),
                                                     n_threads);
 
-    Threads::ThreadMutex mutex;
+    Threads::Mutex mutex;
     Threads::ThreadGroup<> threads;
     for (unsigned int thread=0; thread<n_threads; ++thread)
-      threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
-                 (linear_system,
-                  thread_ranges[thread].first,
-                  thread_ranges[thread].second,
-                  mutex);
+      threads += Threads::new_thread (&Solver<dim>::assemble_matrix, *this,
+				      linear_system,
+				      thread_ranges[thread].first,
+				      thread_ranges[thread].second,
+				      mutex);
 
     assemble_rhs (linear_system.rhs);
     linear_system.hanging_node_constraints.condense (linear_system.rhs);
@@ -399,7 +399,7 @@ namespace LaplaceSolver
   Solver<dim>::assemble_matrix (LinearSystem                                         &linear_system,
                                 const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
                                 const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-                                Threads::ThreadMutex                                 &mutex) const
+                                Threads::Mutex                                 &mutex) const
   {
     FEValues<dim> fe_values (*fe, *quadrature,
                              update_gradients | update_JxW_values);
@@ -428,7 +428,7 @@ namespace LaplaceSolver
 
         cell->get_dof_indices (local_dof_indices);
 
-        Threads::ThreadMutex::ScopedLock lock (mutex);
+        Threads::Mutex::ScopedLock lock (mutex);
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=0; j<dofs_per_cell; ++j)
             linear_system.matrix.add (local_dof_indices[i],
@@ -449,8 +449,8 @@ namespace LaplaceSolver
       = &DoFTools::make_hanging_node_constraints;
 
     Threads::Thread<>
-    mhnc_thread = Threads::spawn (mhnc_p)(dof_handler,
-                                          hanging_node_constraints);
+      mhnc_thread = Threads::new_thread (mhnc_p, dof_handler,
+					 hanging_node_constraints);
 
     sparsity_pattern.reinit (dof_handler.n_dofs(),
                              dof_handler.n_dofs(),
