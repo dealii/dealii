@@ -18,6 +18,7 @@
 #include <deal.II/base/exceptions.h>
 
 #include <boost/math/special_functions/erf.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <algorithm>
 #include <cerrno>
@@ -70,55 +71,18 @@ namespace Utilities
                   << " to the desired type");
 
   std::string
-  int_to_string (const unsigned int i,
-                 const unsigned int digits)
+  int_to_string (const unsigned int value, const unsigned int digits)
   {
-    // if second argument is invalid, then do
-    // not pad the resulting string at all
+    std::string lc_string = boost::lexical_cast<std::string>(value);
+
     if (digits == numbers::invalid_unsigned_int)
-      return int_to_string (i, needed_digits(i));
-
-
-    AssertThrow ( ! ((digits==1 && i>=10)   ||
-                     (digits==2 && i>=100)  ||
-                     (digits==3 && i>=1000) ||
-                     (digits==4 && i>=10000)||
-                     (digits==5 && i>=100000)||
-                     (digits==6 && i>=1000000)||
-                     (digits==7 && i>=10000000)||
-                     (digits==8 && i>=100000000)||
-                     (digits==9 && i>=1000000000)||
-                     (i>=1000000000)),
-                  ExcInvalidNumber2StringConversersion(i, digits));
-
-    std::string s;
-    switch (digits)
+      return lc_string;
+    else if (lc_string.size() < digits)
       {
-      case 10:
-        s += '0' + i/1000000000;
-      case 9:
-        s += '0' + i/100000000;
-      case 8:
-        s += '0' + i/10000000;
-      case 7:
-        s += '0' + i/1000000;
-      case 6:
-        s += '0' + i/100000;
-      case 5:
-        s += '0' + (i%100000)/10000;
-      case 4:
-        s += '0' + (i%10000)/1000;
-      case 3:
-        s += '0' + (i%1000)/100;
-      case 2:
-        s += '0' + (i%100)/10;
-      case 1:
-        s += '0' + i%10;
-        break;
-      default:
-        s += "invalid digits information";
-      };
-    return s;
+        std::string padding(digits - lc_string.size(), '0');
+        lc_string.insert(0, padding);
+      }
+    return lc_string;
   }
 
 
