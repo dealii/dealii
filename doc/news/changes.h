@@ -108,6 +108,9 @@ inconvenience this causes.
   </li>
 </ol>
 
+- In FEValues and related classes, the functions that contain the
+  term <code>2nd_derivatives</code> were removed in favor of those
+  with names containing <code>hessian</code>.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
