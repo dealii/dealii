@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -416,8 +416,8 @@ void MinimizationProblem<1>::refine_grid ()
     {
       fe_values.reinit (cell);
       fe_values.get_present_fe_values().get_function_values (present_solution, local_values);
-      fe_values.get_present_fe_values().get_function_grads (present_solution, local_gradients);
-      fe_values.get_present_fe_values().get_function_2nd_derivatives (present_solution, local_2nd_derivs);
+      fe_values.get_present_fe_values().get_function_gradients (present_solution, local_gradients);
+      fe_values.get_present_fe_values().get_function_hessians (present_solution, local_2nd_derivs);
 
       double cell_residual_norm = 0;
       for (unsigned int q=0; q<quadrature[0].size(); ++q)

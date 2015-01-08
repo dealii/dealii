@@ -1606,14 +1606,6 @@ public:
                  const unsigned int point_no) const;
 
   /**
-   * @deprecated Wrapper for shape_hessian()
-   */
-  const Tensor<2,spacedim> &
-  shape_2nd_derivative (const unsigned int function_no,
-                        const unsigned int point_no) const DEAL_II_DEPRECATED;
-
-
-  /**
    * Return one vector component of the gradient of a shape function at a
    * quadrature point. If the finite element is scalar, then only component
    * zero is allowed and the return value equals that of the shape_hessian()
@@ -1633,15 +1625,6 @@ public:
   shape_hessian_component (const unsigned int function_no,
                            const unsigned int point_no,
                            const unsigned int component) const;
-
-  /**
-   * @deprecated Wrapper for shape_hessian_component()
-   */
-  Tensor<2,spacedim>
-  shape_2nd_derivative_component (const unsigned int function_no,
-                                  const unsigned int point_no,
-                                  const unsigned int component) const DEAL_II_DEPRECATED;
-
 
   //@}
   /// @name Access to values of global finite element fields
@@ -1993,23 +1976,6 @@ public:
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
     VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > > hessians,
     bool quadrature_points_fastest = false) const;
-
-  /**
-   * @deprecated Wrapper for get_function_hessians()
-   */
-  template <class InputVector>
-  void
-  get_function_2nd_derivatives (const InputVector &,
-                                std::vector<Tensor<2,spacedim> > &) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Wrapper for get_function_hessians()
-   */
-  template <class InputVector>
-  void
-  get_function_2nd_derivatives (const InputVector &,
-                                std::vector<std::vector<Tensor<2,spacedim> > > &,
-                                bool = false) const DEAL_II_DEPRECATED;
 
   /**
    * Compute the (scalar) Laplacian (i.e. the trace of the tensor of second
@@ -3943,17 +3909,6 @@ FEValuesBase<dim,spacedim>::shape_hessian (const unsigned int i,
 
 template <int dim, int spacedim>
 inline
-const Tensor<2,spacedim> &
-FEValuesBase<dim,spacedim>::shape_2nd_derivative (const unsigned int i,
-                                                  const unsigned int j) const
-{
-  return shape_hessian(i,j);
-}
-
-
-
-template <int dim, int spacedim>
-inline
 Tensor<2,spacedim>
 FEValuesBase<dim,spacedim>::shape_hessian_component (const unsigned int i,
                                                      const unsigned int j,
@@ -3978,18 +3933,6 @@ FEValuesBase<dim,spacedim>::shape_hessian_component (const unsigned int i,
   const unsigned int
   row = this->shape_function_to_row_table[i * fe->n_components() + component];
   return this->shape_hessians[row][j];
-}
-
-
-
-template <int dim, int spacedim>
-inline
-Tensor<2,spacedim>
-FEValuesBase<dim,spacedim>::shape_2nd_derivative_component (const unsigned int i,
-                                                            const unsigned int j,
-                                                            const unsigned int component) const
-{
-  return shape_hessian_component(i,j,component);
 }
 
 
@@ -4203,33 +4146,6 @@ FEValuesBase<dim,spacedim>::get_function_grads (
   bool q_points_fastest) const
 {
   get_function_gradients(fe_function, indices, values, q_points_fastest);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::
-get_function_2nd_derivatives (const InputVector           &fe_function,
-                              std::vector<Tensor<2,spacedim> > &hessians) const
-{
-  get_function_hessians(fe_function, hessians);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::
-get_function_2nd_derivatives (const InputVector                         &fe_function,
-                              std::vector<std::vector<Tensor<2,spacedim> > > &hessians,
-                              bool quadrature_points_fastest) const
-{
-  get_function_hessians(fe_function, hessians, quadrature_points_fastest);
 }
 
 

@@ -1814,7 +1814,7 @@ namespace LaplaceSolver
     cell_data.right_hand_side
     ->value_list (cell_data.fe_values.get_quadrature_points(),
                   cell_data.rhs_values);
-    cell_data.fe_values.get_function_2nd_derivatives (primal_solution,
+    cell_data.fe_values.get_function_hessians (primal_solution,
                                                       cell_data.cell_grad_grads);
 
     cell_data.fe_values.get_function_values (dual_weights,

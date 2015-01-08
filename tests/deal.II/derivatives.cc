@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -139,8 +139,8 @@ check (const unsigned int level,
       cosine.gradient_list (fe2.get_quadrature_points(), Df);
       cosine.hessian_list (fe2.get_quadrature_points(), DDf);
       fe2.get_function_values (u, u_local);
-      fe2.get_function_grads (u, Du);
-      fe2.get_function_2nd_derivatives (u,DDu);
+      fe2.get_function_gradients (u, Du);
+      fe2.get_function_hessians (u,DDu);
 
       for (unsigned int k=0; k<quadrature.size(); ++k)
         {
