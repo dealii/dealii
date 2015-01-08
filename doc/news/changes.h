@@ -116,6 +116,7 @@ inconvenience this causes.
   the <code>cell_normal_vector</code> functions were replaced by
   <code>normal_vector</code> ones. In all cases, the new functions
   have been around for a while.
+- Vector::scale.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 

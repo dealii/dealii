@@ -706,17 +706,6 @@ public:
              const Vector<Number> &X);
 
   /**
-   * Scale each element of the vector by the given factor.
-   *
-   * @deprecated This function is deprecated and will be removed in a future
-   * version. Use <tt>operator *=</tt> and <tt>operator /=</tt> instead.
-   */
-  void scale (const Number factor) DEAL_II_DEPRECATED
-  {
-    this->operator *= (factor);
-  }
-
-  /**
    * Scale each element of the vector by a constant value.
    *
    * @dealiiOperationIsMultithreaded

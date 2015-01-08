@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -248,7 +248,7 @@ EigenPower<VECTOR>::solve (double       &value,
 
   double length = x.l2_norm ();
   double old_length = 0.;
-  x.scale(1./length);
+  x *= 1./length;
 
   A.vmult (y,x);
 
@@ -356,7 +356,7 @@ EigenInverse<VECTOR>::solve (double       &value,
   double length = x.l2_norm ();
   double old_value = value;
 
-  x.scale(1./length);
+  x *= 1./length;
 
   // Main loop
   double res = -std::numeric_limits<double>::max();
