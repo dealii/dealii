@@ -118,6 +118,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Utilities::int_to_string() produced wrong results if
+  the number of digits specified was ten or greater.
+  <br>
+  (David Wells, 2015/01/08)
+  </li>
+
   <li> Ported: The build system now supports CMake up to version 3.1.
   <br>
   (Matthias Maier, 2015/01/06)
