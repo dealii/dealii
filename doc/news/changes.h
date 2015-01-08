@@ -78,8 +78,24 @@ inconvenience this causes.
   - class BlockList.
   - MGConstrainedDoFs::non_refinement_edge_index
   - MGConstrainedDoFs::at_refinement_edge_boundary
+  - The refinement listener concept of the Triangulation class. This
+    approach to getting notified about what happens to triangulations
+    has been superseded by the signals defined by the triangulation
+    class.
+  - The deprecated constructor of MPI_InitFinalize
+  - The MPI support functions in namespace Utilities and Utilities::System.
+  - Deprecated members of namespace types.
+  - Namespace deal_II_numbers.
+  - Triangulation::distort_random.
+  - Triangulation::clear_user_pointers.
+  - The deprecated constructor of SparseILU.
+  - SparseILU::apply_decomposition.
+  - The deprecated constructor of SparseMIC.
+  - The compress() functions without argument in the various vector
+    classes. You should use the versions with a VectorOperation
+    argument instead.
   <br>
-  (Wolfgang Bangerth, 2014/12/29-2015/01/04)
+  (Wolfgang Bangerth, 2014/12/29-2015/01/08)
   </li>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
@@ -92,22 +108,6 @@ inconvenience this causes.
   </li>
 </ol>
 
-- The refinement listener concept of the Triangulation class. This
-  approach to getting notified about what happens to triangulations
-  has been superseded by the signals defined by the triangulation
-  class.
-- The deprecated constructor of MPI_InitFinalize
-- The MPI support functions in namespace Utilities and Utilities::System.
-- Deprecated members of namespace types.
-- Namespace deal_II_numbers.
-- Triangulation::distort_random.
-- Triangulation::clear_user_pointers.
-- The deprecated constructor of SparseILU.
-- SparseILU::apply_decomposition.
-- The deprecated constructor of SparseMIC.
-- The compress() functions without argument in the various vector
-  classes. You should use the versions with a VectorOperation
-  argument instead.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
