@@ -3148,14 +3148,6 @@ FEValuesBase<dim,spacedim>::get_normal_vectors () const
 
 
 template <int dim, int spacedim>
-const std::vector<Point<spacedim> > &
-FEValuesBase<dim,spacedim>::get_cell_normal_vectors () const
-{
-  return this->get_normal_vectors ();
-}
-
-
-template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::transform (
   std::vector<Tensor<1,spacedim> > &transformed,

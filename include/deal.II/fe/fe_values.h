@@ -2171,21 +2171,6 @@ public:
                   const std::vector<Tensor<1,dim> > &original,
                   MappingType mapping) const;
 
-  /**
-   * @deprecated Use normal_vector() instead.
-   *
-   * Return the outward normal vector to the cell at the <tt>i</tt>th
-   * quadrature point. The length of the vector is normalized to one.
-   */
-  const Point<spacedim> &cell_normal_vector (const unsigned int i) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use get_normal_vectors() instead.
-   *
-   * Returns the vectors normal to the cell in each of the quadrature points.
-   */
-  const std::vector<Point<spacedim> > &get_cell_normal_vectors () const DEAL_II_DEPRECATED;
-
   //@}
 
   /// @name Extractors Methods to extract individual components
@@ -4078,17 +4063,6 @@ FEValuesBase<dim,spacedim>::normal_vector (const unsigned int i) const
 
   return this->normal_vectors[i];
 }
-
-
-
-template <int dim, int spacedim>
-inline
-const Point<spacedim> &
-FEValuesBase<dim,spacedim>::cell_normal_vector (const unsigned int i) const
-{
-  return this->normal_vector(i);
-}
-
 
 
 

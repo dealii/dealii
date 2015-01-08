@@ -112,7 +112,10 @@ inconvenience this causes.
   term <code>2nd_derivatives</code> were removed in favor of those
   with names containing <code>hessian</code>. Similarly, functions
   with names including <code>function_grads</code> were removed in
-  favor of those called <code>function_gradients</code>.
+  favor of those called <code>function_gradients</code>. Finally,
+  the <code>cell_normal_vector</code> functions were replaced by
+  <code>normal_vector</code> ones. In all cases, the new functions
+  have been around for a while.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
