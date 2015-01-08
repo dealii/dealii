@@ -1388,8 +1388,8 @@ namespace Step43
 
     saturation_fe_values.get_function_values (old_saturation_solution, old_saturation_solution_values);
     saturation_fe_values.get_function_values (old_old_saturation_solution, old_old_saturation_solution_values);
-    saturation_fe_values.get_function_grads (old_saturation_solution, old_grad_saturation_solution_values);
-    saturation_fe_values.get_function_grads (old_old_saturation_solution, old_old_grad_saturation_solution_values);
+    saturation_fe_values.get_function_gradients (old_saturation_solution, old_grad_saturation_solution_values);
+    saturation_fe_values.get_function_gradients (old_old_saturation_solution, old_old_grad_saturation_solution_values);
     darcy_fe_values.get_function_values (darcy_solution, present_darcy_solution_values);
 
     const double nu
@@ -1686,8 +1686,8 @@ namespace Step43
       for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
         {
           fe_values.reinit(cell);
-          fe_values.get_function_grads (extrapolated_saturation_solution,
-                                        grad_saturation);
+          fe_values.get_function_gradients (extrapolated_saturation_solution,
+                                            grad_saturation);
 
           refinement_indicators(cell_no) = grad_saturation[0].norm();
         }

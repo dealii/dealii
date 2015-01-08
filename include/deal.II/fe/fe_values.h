@@ -1856,37 +1856,6 @@ public:
                                VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > > gradients,
                                bool quadrature_points_fastest = false) const;
 
-  /**
-   * @deprecated Use get_function_gradients() instead.
-   */
-  template <class InputVector>
-  void get_function_grads (const InputVector      &fe_function,
-                           std::vector<Tensor<1,spacedim> > &gradients) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use get_function_gradients() instead.
-   */
-  template <class InputVector>
-  void get_function_grads (const InputVector               &fe_function,
-                           std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use get_function_gradients() instead.
-   */
-  template <class InputVector>
-  void get_function_grads (const InputVector &fe_function,
-                           const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                           std::vector<Tensor<1,spacedim> > &gradients) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use get_function_gradients() instead.
-   */
-  template <class InputVector>
-  void get_function_grads (const InputVector &fe_function,
-                           const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                           std::vector<std::vector<Tensor<1,spacedim> > > &gradients,
-                           bool quadrature_points_fastest = false) const DEAL_II_DEPRECATED;
-
   //@}
   /// @name Access to second derivatives (Hessian matrices and Laplacians) of global finite element fields
   //@{
@@ -4094,60 +4063,6 @@ FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
 
   return this->inverse_jacobians[i];
 }
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::get_function_grads (const InputVector           &fe_function,
-                                                std::vector<Tensor<1,spacedim> > &gradients) const
-{
-  get_function_gradients(fe_function, gradients);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::get_function_grads (
-  const InputVector &fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<Tensor<1,spacedim> > &values) const
-{
-  get_function_gradients(fe_function, indices, values);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::
-get_function_grads (const InputVector                         &fe_function,
-                    std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const
-{
-  get_function_gradients(fe_function, gradients);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::get_function_grads (
-  const InputVector &fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<std::vector<Tensor<1,spacedim> > > &values,
-  bool q_points_fastest) const
-{
-  get_function_gradients(fe_function, indices, values, q_points_fastest);
-}
-
 
 
 template <int dim, int spacedim>

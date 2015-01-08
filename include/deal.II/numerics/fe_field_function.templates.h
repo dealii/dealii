@@ -139,7 +139,7 @@ namespace Functions
     fe_v.reinit(cell);
     std::vector< std::vector<Tensor<1,dim> > > vgrads
     (1,  std::vector<Tensor<1,dim> >(n_components) );
-    fe_v.get_function_grads(data_vector, vgrads);
+    fe_v.get_function_gradients(data_vector, vgrads);
     gradients = vgrads[0];
   }
 
@@ -309,7 +309,7 @@ namespace Functions
         const unsigned int nq = qpoints[i].size();
         std::vector< std::vector<Tensor<1,dim> > >
         vgrads (nq, std::vector<Tensor<1,dim> >(n_components));
-        fe_v.get_present_fe_values ().get_function_grads(data_vector, vgrads);
+        fe_v.get_present_fe_values ().get_function_gradients(data_vector, vgrads);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vgrads[q];
       }

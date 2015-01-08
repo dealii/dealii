@@ -205,7 +205,7 @@ namespace Evaluation
         if (cell->vertex(vertex) == evaluation_point)
           {
             fe_values.reinit (cell);
-            fe_values.get_present_fe_values().get_function_grads (solution,
+            fe_values.get_present_fe_values().get_function_gradients (solution,
                                                                   solution_gradients);
 
             unsigned int q_point = 0;
@@ -1837,7 +1837,7 @@ namespace LaplaceSolver
     n_q_points = face_data.fe_face_values_cell.get_present_fe_values().n_quadrature_points;
 
     face_data.fe_face_values_cell.reinit (cell, face_no);
-    face_data.fe_face_values_cell.get_present_fe_values().get_function_grads (primal_solution,
+    face_data.fe_face_values_cell.get_present_fe_values().get_function_gradients (primal_solution,
         face_data.cell_grads);
 
     Assert (cell->neighbor(face_no).state() == IteratorState::valid,
@@ -1846,7 +1846,7 @@ namespace LaplaceSolver
     neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
     const active_cell_iterator neighbor = cell->neighbor(face_no);
     face_data.fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor);
-    face_data.fe_face_values_neighbor.get_present_fe_values().get_function_grads (primal_solution,
+    face_data.fe_face_values_neighbor.get_present_fe_values().get_function_gradients (primal_solution,
         face_data.neighbor_grads);
 
     for (unsigned int p=0; p<n_q_points; ++p)
@@ -1907,11 +1907,11 @@ namespace LaplaceSolver
                 ExcInternalError());
 
         face_data.fe_subface_values_cell.reinit (cell, face_no, subface_no);
-        face_data.fe_subface_values_cell.get_present_fe_values().get_function_grads (primal_solution,
+        face_data.fe_subface_values_cell.get_present_fe_values().get_function_gradients (primal_solution,
             face_data.cell_grads);
         face_data.fe_face_values_neighbor.reinit (neighbor_child,
                                                   neighbor_neighbor);
-        face_data.fe_face_values_neighbor.get_present_fe_values().get_function_grads (primal_solution,
+        face_data.fe_face_values_neighbor.get_present_fe_values().get_function_gradients (primal_solution,
             face_data.neighbor_grads);
 
         for (unsigned int p=0; p<n_q_points; ++p)
