@@ -94,8 +94,19 @@ inconvenience this causes.
   - The compress() functions without argument in the various vector
     classes. You should use the versions with a VectorOperation
     argument instead.
+  - In FEValues and related classes, the functions that contain the
+    term <code>2nd_derivatives</code> were removed in favor of those
+    with names containing <code>hessian</code>. Similarly, functions
+    with names including <code>function_grads</code> were removed in
+    favor of those called <code>function_gradients</code>. Finally,
+    the <code>cell_normal_vector</code> functions were replaced by
+    <code>normal_vector</code> ones. In all cases, the new functions
+    have been around for a while.
+  - Vector::scale.
+  - TrilinosWrappers::*Vector*::compress with an Epetra_CombineMode
+    argument
   <br>
-  (Wolfgang Bangerth, 2014/12/29-2015/01/08)
+  (Wolfgang Bangerth, 2014/12/29-2015/01/09)
   </li>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
@@ -108,17 +119,6 @@ inconvenience this causes.
   </li>
 </ol>
 
-- In FEValues and related classes, the functions that contain the
-  term <code>2nd_derivatives</code> were removed in favor of those
-  with names containing <code>hessian</code>. Similarly, functions
-  with names including <code>function_grads</code> were removed in
-  favor of those called <code>function_gradients</code>. Finally,
-  the <code>cell_normal_vector</code> functions were replaced by
-  <code>normal_vector</code> ones. In all cases, the new functions
-  have been around for a while.
-- Vector::scale.
-- TrilinosWrappers::*Vector*::compress with an Epetra_CombineMode
-  argument
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
