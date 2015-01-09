@@ -134,6 +134,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: GridTools::copy_boundary_to_manifold_id() copies 
+  boundary_ids to manifold_ids for faces on the boundary.
+  <br>
+  (Luca Heltai, 2015/01/09)
+  </li>
+
+
   <li> Fixed: Utilities::int_to_string() produced wrong results if
   the number of digits specified was ten or greater.
   <br>

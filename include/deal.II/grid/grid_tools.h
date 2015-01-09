@@ -1145,6 +1145,40 @@ namespace GridTools
    const FullMatrix<double>                                          &matrix = FullMatrix<double>(),
    const std::vector<unsigned int>                                   &first_vector_components = std::vector<unsigned int>());
 
+  /*@}*/
+  /**
+   * @name Dealing with boundary and manifold ids
+   */
+  /*@{*/
+
+  /**
+   * Copy boundary ids to manifold ids. The default manifold_id for
+   * new Triangulation objects is numbers::invalid_manifold_id. When
+   * refinements occurs, the Triangulation asks where to locate new
+   * points to the underlying manifold, and if the manifold_id of a
+   * boundary face is set to numbers::invalid_manifold_id, then
+   * Triangulation reverts back boundary_id (this was the behavior of
+   * deal.II < 8.2). This function copies the boundary_ids of the
+   * boundary faces to the manifold_ids of the same faces, allowing
+   * the user to change the boundary_ids and use them for boundary
+   * conditions regardless of the geometry, which will use
+   * manifold_ids to create new points. Only active cells will be
+   * iterated over. This is a function you'd typically call when there
+   * is only one active level on your Triangulation.
+   *
+   * The optional parameter @p reset_boundary_ids, indicates wether
+   * this function should reset the boundary_ids of the Triangulation
+   * to its default value 0 after copying its value to the
+   * manifold_id. By default, boundary_ids are left untouched.
+   *
+   * @ingroup manifold
+   * @ingroup boundary
+   *
+   * @author Luca Heltai, 2015
+   */
+  template <int dim, int spacedim>
+  void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                                    bool reset_boundary_ids=false);
 
   /*@}*/
   /**
