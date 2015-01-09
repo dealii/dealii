@@ -2239,8 +2239,11 @@ start_time_iteration:
 
 // @sect3{The <code>main()</code> function}
 //
-// The main function looks almost the same as in all other programs:
-int main ()
+// The main function looks almost the same as in all other programs. The need
+// to initialize the MPI subsystem for a program that uses Trilinos -- even
+// for programs that do not actually run in parallel -- is explained in
+// step-31.
+int main (int argc, char *argv[])
 {
   try
     {
@@ -2248,6 +2251,8 @@ int main ()
       using namespace Step43;
 
       deallog.depth_console (0);
+
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
       TwoPhaseFlowProblem<2> two_phase_flow_problem(1);
       two_phase_flow_problem.run ();
