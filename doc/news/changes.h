@@ -117,6 +117,8 @@ inconvenience this causes.
   <code>normal_vector</code> ones. In all cases, the new functions
   have been around for a while.
 - Vector::scale.
+- TrilinosWrappers::*Vector*::compress with an Epetra_CombineMode
+  argument
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 

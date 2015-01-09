@@ -283,11 +283,6 @@ namespace TrilinosWrappers
     void compress (::dealii::VectorOperation::values operation);
 
     /**
-     * @deprecated Use compress(dealii::VectorOperation::values) instead.
-     */
-    void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
-
-    /**
      * Returns the state of the vector, i.e., whether compress() has already
      * been called after an operation requiring data exchange.
      */
@@ -1202,24 +1197,6 @@ namespace TrilinosWrappers
 
     if (v.nonlocal_vector.get() != 0)
       nonlocal_vector.reset(new Epetra_MultiVector(v.nonlocal_vector->Map(), 1));
-  }
-
-
-
-  inline
-  void
-  VectorBase::compress (const Epetra_CombineMode last_action)
-  {
-    ::dealii::VectorOperation::values last_action_ =
-      ::dealii::VectorOperation::unknown;
-    if (last_action == Add)
-      last_action_ = ::dealii::VectorOperation::add;
-    else if (last_action == Insert)
-      last_action_ = ::dealii::VectorOperation::insert;
-    else
-      AssertThrow(false, ExcNotImplemented());
-
-    compress(last_action_);
   }
 
 

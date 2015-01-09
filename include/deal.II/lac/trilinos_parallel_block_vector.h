@@ -262,24 +262,6 @@ namespace TrilinosWrappers
       void import_nonlocal_data_for_fe (const TrilinosWrappers::BlockSparseMatrix &m,
                                         const BlockVector                         &v);
 
-
-      /**
-       * use compress(VectorOperation) instead
-       *
-       * @deprecated
-       *
-       * See
-       * @ref GlossCompress "Compressing distributed objects"
-       * for more information.
-       */
-      void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
-
-      /**
-       * so it is not hidden
-       */
-      using BlockVectorBase<Vector>::compress;
-
-
       /**
        * Returns the state of the vector, i.e., whether compress() needs to be
        * called after an operation requiring data exchange. Does only return
@@ -410,24 +392,6 @@ namespace TrilinosWrappers
           }
 
       return compressed;
-    }
-
-
-
-    inline
-    void
-    BlockVector::compress (const Epetra_CombineMode last_action)
-    {
-      ::dealii::VectorOperation::values last_action_ =
-        ::dealii::VectorOperation::unknown;
-      if (last_action == Add)
-        last_action_ = ::dealii::VectorOperation::add;
-      else if (last_action == Insert)
-        last_action_ = ::dealii::VectorOperation::insert;
-      else
-        AssertThrow(false, ExcNotImplemented());
-
-      this->compress(last_action_);
     }
 
 
