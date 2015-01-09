@@ -267,19 +267,6 @@ namespace Utilities
     class MPI_InitFinalize
     {
     public:
-
-      /**
-       * Constructor. Takes the arguments from the command line (in case of
-       * MPI, the number of processes is specified there), and sets up a
-       * respective communicator by calling <tt>MPI_Init()</tt>. This
-       * constructor can only be called once in a program, since MPI cannot be
-       * initialized twice.
-       *
-       * This constructor sets max_num_threads to 1 (see other constructor).
-       */
-      MPI_InitFinalize (int    &argc,
-                        char ** &argv) /*DEAL_II_DEPRECATED*/;
-
       /**
        * Initialize MPI (and, if deal.II was configured to use it, PETSc) and
        * set the number of threads used by deal.II (via the underlying
@@ -292,7 +279,7 @@ namespace Utilities
        * main.
        * @param[in] max_num_threads The maximal number of threads this MPI
        * process should utilize. If this argument is set to
-       * numbers::invalid_unsigned_int, the number of threads is determined by
+       * numbers::invalid_unsigned_int, the number of threads is determined
        * automatically in the following way: the number of threads to run on
        * this MPI process is set in such a way that all of the cores in your
        * node are spoken for. In other words, if you have started one MPI
@@ -327,22 +314,6 @@ namespace Utilities
        * MPI process.
        */
       ~MPI_InitFinalize();
-
-    private:
-      /**
-       * This flag tells the class whether it owns the MPI process (i.e., it
-       * has been constructed using the argc/argv input, or it has been
-       * copied). In the former case, the command <tt>MPI_Finalize()</tt> will
-       * be called at destruction.
-       */
-      const bool owns_mpi;
-
-
-      /**
-       * A common function called by all of the constructors.
-       */
-      void do_init(int    &argc,
-                   char ** &argv);
     };
 
     namespace internal

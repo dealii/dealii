@@ -22,7 +22,7 @@
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv, numbers::invalid_unsigned_int);
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);

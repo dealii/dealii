@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2013 by the deal.II authors
+ * Copyright (C) 2003 - 2013, 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -1035,7 +1035,7 @@ namespace Step50
 // in step-6:
 int main (int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   try
     {

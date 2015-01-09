@@ -74,14 +74,6 @@ public:
   SparseILU ();
 
   /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions. Instead, pass the
-   * sparsity pattern that you want used for the decomposition in the
-   * AdditionalData structure.
-   */
-  SparseILU (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
-
-  /**
    * Make SparseLUDecomposition::AdditionalData accessible to this class as
    * well.
    */
@@ -117,14 +109,6 @@ public:
   template <typename somenumber>
   void decompose (const SparseMatrix<somenumber> &matrix,
                   const double                    strengthen_diagonal=0.) DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions.
-   */
-  template <typename somenumber>
-  void apply_decomposition (Vector<somenumber>       &dst,
-                            const Vector<somenumber> &src) const DEAL_II_DEPRECATED;
 
   /**
    * Apply the incomplete decomposition, i.e. do one forward-backward step
@@ -171,18 +155,6 @@ public:
 
 /*@}*/
 //---------------------------------------------------------------------------
-
-template <typename number>
-template <typename somenumber>
-inline
-void
-SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
-                                        const Vector<somenumber> &src) const
-{
-  vmult (dst, src);
-}
-
-
 
 
 DEAL_II_NAMESPACE_CLOSE

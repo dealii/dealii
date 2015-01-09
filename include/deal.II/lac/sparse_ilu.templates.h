@@ -35,15 +35,6 @@ SparseILU<number>::SparseILU ()
 
 
 template <typename number>
-SparseILU<number>::SparseILU (const SparsityPattern &sparsity)
-{
-  SparseMatrix<number>::reinit(sparsity);
-}
-
-
-
-
-template <typename number>
 template <typename somenumber>
 void SparseILU<number>::initialize (const SparseMatrix<somenumber> &matrix,
                                     const AdditionalData &data)

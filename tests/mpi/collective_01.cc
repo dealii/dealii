@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,7 @@ void test()
   if (myid==0)
     deallog << "Running on " << numprocs << " CPU(s)." << std::endl;
 
-  Utilities::System::MinMaxAvg result;
+  Utilities::MPI::MinMaxAvg result;
 
   double value = 0.0;
   result = Utilities::MPI::min_max_avg(value, MPI_COMM_WORLD);
@@ -81,7 +81,7 @@ void test()
 int main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
 #else
   (void)argc;
   (void)argv;

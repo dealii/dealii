@@ -222,7 +222,7 @@ private:
    * average time defined as the sum of all individual times divided by the
    * number of MPI processes in the MPI_Comm.
    */
-  Utilities::System::MinMaxAvg mpi_data;
+  Utilities::MPI::MinMaxAvg mpi_data;
 #endif
 };
 
@@ -677,7 +677,7 @@ void Timer::restart ()
 #ifdef DEAL_II_WITH_MPI
 
 inline
-const Utilities::System::MinMaxAvg &
+const Utilities::MPI::MinMaxAvg &
 Timer::get_data() const
 {
   return mpi_data;

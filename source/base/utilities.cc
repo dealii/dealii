@@ -628,36 +628,6 @@ namespace Utilities
       return false;
 #endif
     }
-
-
-    bool
-    program_uses_mpi ()
-    {
-      return job_supports_mpi();
-    }
-
-
-    unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator)
-    {
-      return MPI::n_mpi_processes (mpi_communicator);
-    }
-
-    unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator)
-    {
-      return MPI::this_mpi_process (mpi_communicator);
-    }
-
-
-
-    void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
-                                              double my_value,
-                                              MinMaxAvg &result)
-    {
-      result = Utilities::MPI::min_max_avg (my_value,
-                                            mpi_communicator);
-    }
-
-
   }
 
 
@@ -708,7 +678,7 @@ namespace Utilities
       const Epetra_MpiComm
       *mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&communicator);
       if (mpi_comm != 0)
-        return new Epetra_MpiComm(Utilities::System::
+        return new Epetra_MpiComm(Utilities::MPI::
                                   duplicate_communicator(mpi_comm->GetMpiComm()));
 #endif
 

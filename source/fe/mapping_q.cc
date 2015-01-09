@@ -380,7 +380,7 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
     p_data=&data;
 
   const unsigned int n_q_points=q.size();
-  this->compute_fill_face (cell, face_no, deal_II_numbers::invalid_unsigned_int,
+  this->compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
                            n_q_points,
                            QProjector<dim>::DataSetDescriptor::
                            face (face_no,

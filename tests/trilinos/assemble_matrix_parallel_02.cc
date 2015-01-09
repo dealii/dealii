@@ -162,7 +162,7 @@ BoundaryValues<dim>::value (const Point<dim>   &p,
 {
   double sum = 0;
   for (unsigned int d=0; d<dim; ++d)
-    sum += std::sin(deal_II_numbers::PI*p[d]);
+    sum += std::sin(numbers::PI*p[d]);
   return sum;
 }
 

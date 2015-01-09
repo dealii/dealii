@@ -34,17 +34,6 @@ SparseMIC<number>::SparseMIC ()
 
 
 template <typename number>
-SparseMIC<number>::SparseMIC (const SparsityPattern &sparsity)
-  :
-  diag(0),
-  inv_diag(0),
-  inner_sums(0)
-{
-  SparseMatrix<number>::reinit (sparsity);
-}
-
-
-template <typename number>
 SparseMIC<number>::~SparseMIC()
 {
   clear();

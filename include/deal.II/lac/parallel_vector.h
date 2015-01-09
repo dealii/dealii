@@ -371,11 +371,6 @@ namespace parallel
       void compress (::dealii::VectorOperation::values operation);
 
       /**
-       * @deprecated: use compress(VectorOperation::values) instead.
-       */
-      void compress () DEAL_II_DEPRECATED;
-
-      /**
        * Fills the data field for ghost indices with the values stored in the
        * respective positions of the owning processor. This function is needed
        * before reading from ghosts. The function is @p const even though
@@ -1329,16 +1324,6 @@ namespace parallel
     {
       compress_start (0, operation);
       compress_finish(operation);
-    }
-
-
-
-    template <typename Number>
-    inline
-    void
-    Vector<Number>::compress ()
-    {
-      compress(VectorOperation::unknown);
     }
 
 

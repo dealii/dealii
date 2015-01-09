@@ -108,7 +108,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
   
   std::ofstream logfile("output");
   deallog.attach(logfile);

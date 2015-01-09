@@ -95,7 +95,7 @@ void test_mpi()
 int main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
 #else
   (void)argc;
   (void)argv;

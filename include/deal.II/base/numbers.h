@@ -225,17 +225,6 @@ namespace numbers
 }
 
 
-//TODO[WB]: eventually remove this namespace alias
-/*
- * Namespace alias with the old name for the numbers namespace. The namespace
- * was originally called numbers, but has since been renamed to
- * dealii::numbers when everything was moved into namespace dealii.
- *
- * @deprecated
- */
-namespace deal_II_numbers = numbers;
-
-
 // --------------- inline and template functions ---------------- //
 
 namespace numbers

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,8 +73,10 @@ int main()
   rhs(1) = rhs(3) = 0.0975;
 
 
-  SparseILU<double> ilu (sparsity_pattern);
-  ilu.decompose (M);
+  SparseILU<double>::AdditionalData data;
+  data.use_this_sparsity = &sparsity_pattern;
+  SparseILU<double> ilu;
+  ilu.initialize (M, data);
 
   Vector<double> solution (4);
   // this would fail with elements of

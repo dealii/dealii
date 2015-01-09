@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,7 @@ void test ()
   VEC x(3);
   x(0)=10;
   deallog << x.l2_norm() << std::endl;
-  x.compress();
+  x.compress(VectorOperation::insert);
 
   deallog << "OK" << std::endl;
 }
@@ -43,7 +43,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   try
     {

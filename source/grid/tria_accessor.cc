@@ -96,7 +96,7 @@ namespace
 
     const bool first_child_has_children=face->child(0)->has_children();
 
-    static const unsigned int e = deal_II_numbers::invalid_unsigned_int;
+    static const unsigned int e = numbers::invalid_unsigned_int;
 
     // array containing the translation of the
     // numbers,
@@ -1754,8 +1754,8 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
       // since then we did not find
       // our way back...
       Assert (false, ExcInternalError());
-      return std::make_pair (deal_II_numbers::invalid_unsigned_int,
-                             deal_II_numbers::invalid_unsigned_int);
+      return std::make_pair (numbers::invalid_unsigned_int,
+                             numbers::invalid_unsigned_int);
     }
 
     case 3:

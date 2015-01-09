@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,22 @@
 
 
 
-// check TrilinosWrappers::Vector::operator() in set/add-mode alternatingly
+// check TrilinosWrappers::Vector::operator() in set/add-mode
+// alternatingly. this test doesn't really make sense any more -- at
+// least one a single processor. on multiple processors, one has to
+// call compress() and it used to be that we had code that called
+// compress() either with VectorOperation::insert or
+// VectorOperation::add automatically whenever we switched from one
+// kind of operation to the other. this is no longer the case -- the
+// user has to select which operation herself. on the other hand, as
+// long as we're working on a single processor, it doesn't matter
+// anyway.
+//
+// so the test doesn't make much sense any more for the original
+// purpose, but it's still worth keeping it around just to test that
+// set and write operations on a single processor go right through to
+// the stored data, rather than ending up in separate caches that only
+// get flushed when the right kind of compress() function is called.
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
@@ -43,8 +58,6 @@ void test (TrilinosWrappers::Vector &v)
       pattern[i] = true;
     }
 
-  v.compress ();
-
   // check that they are ok, and this time
   // all of them
   for (unsigned int i=0; i<v.size(); ++i)
@@ -65,7 +78,7 @@ int main (int argc,char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
 
 
   try

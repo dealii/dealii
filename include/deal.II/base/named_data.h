@@ -372,7 +372,7 @@ NamedData<DATA>::find (const std::string &name) const
   const std::vector<std::string>::const_iterator
   i = std::find(names.begin(), names.end(), name);
   if (i == names.end())
-    return deal_II_numbers::invalid_unsigned_int;
+    return numbers::invalid_unsigned_int;
   return i - names.begin();
 }
 

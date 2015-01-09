@@ -104,7 +104,7 @@ namespace internal
           FPArrayComparator<double> >::iterator,
           bool> it = constraints.insert(next_constraint);
 
-      types::global_dof_index insert_position = deal_II_numbers::invalid_dof_index;
+      types::global_dof_index insert_position = numbers::invalid_dof_index;
       if (it.second == false)
         insert_position = it.first->second;
       else
