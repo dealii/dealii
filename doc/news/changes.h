@@ -134,8 +134,10 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> New: GridTools::copy_boundary_to_manifold_id() copies 
-  boundary_ids to manifold_ids for faces on the boundary.
+  <li> New: GridTools::copy_boundary_to_manifold_id() and 
+  GridTools::copy_material_to_manifold_id() copy
+  boundary_ids and material_ids to manifold_ids for 
+  faces on the boundary and for cells respectively.
   <br>
   (Luca Heltai, 2015/01/09)
   </li>
