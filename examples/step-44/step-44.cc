@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2013 by the deal.II authors and
+ * Copyright (C) 2010 - 2013, 2015 by the deal.II authors and
  *                              & Jean-Paul Pelteret and Andrew McBride
  *
  * This file is part of the deal.II library.
@@ -3166,13 +3166,10 @@ namespace Step44
 // @sect3{Main function}
 // Lastly we provide the main driver function which appears
 // no different to the other tutorials.
-int main (int argc, char *argv[])
+int main ()
 {
   using namespace dealii;
   using namespace Step44;
-
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
-                                                       dealii::numbers::invalid_unsigned_int);
 
   try
     {
