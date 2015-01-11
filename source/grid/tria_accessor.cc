@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1475,7 +1475,8 @@ void
 CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id new_subdomain_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert (this->active(), ExcMessage("subdomains only work on active cells!"));
+  Assert (this->active(),
+          ExcMessage("set_subdomain_id() can only be called on active cells!"));
   this->tria->levels[this->present_level]->subdomain_ids[this->present_index]
     = new_subdomain_id;
 }
