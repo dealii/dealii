@@ -1145,6 +1145,74 @@ namespace GridTools
    const FullMatrix<double>                                          &matrix = FullMatrix<double>(),
    const std::vector<unsigned int>                                   &first_vector_components = std::vector<unsigned int>());
 
+  /*@}*/
+  /**
+   * @name Dealing with boundary and manifold ids
+   */
+  /*@{*/
+
+  /**
+   * Copy boundary ids to manifold ids. The default manifold_id for
+   * new Triangulation objects is numbers::invalid_manifold_id. This
+   * function copies the boundary_ids of the boundary faces to the
+   * manifold_ids of the same faces, allowing the user to change the
+   * boundary_ids and use them for boundary conditions regardless of
+   * the geometry, which will use manifold_ids to create new
+   * points. Only active cells will be iterated over. This is a
+   * function you'd typically call when there is only one active level
+   * on your Triangulation.
+   *
+   * The optional parameter @p reset_boundary_ids, indicates wether
+   * this function should reset the boundary_ids of the Triangulation
+   * to its default value 0 after copying its value to the
+   * manifold_id. By default, boundary_ids are left untouched.
+   *
+   * @ingroup manifold
+   * @ingroup boundary
+   *
+   * @author Luca Heltai, 2015
+   */
+  template <int dim, int spacedim>
+  void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                                    const bool reset_boundary_ids=false);
+
+  /**
+   * Copy material ids to manifold ids. The default manifold_id for
+   * new Triangulation objects is numbers::invalid_manifold_id. When
+   * refinements occurs, the Triangulation asks where to locate new
+   * points to the underlying manifold.
+   *
+   * When reading a Triangulation from a supported input format,
+   * typical informations that can be stored in a file are boundary
+   * conditions for boundary faces (which we store in the boundary_id
+   * of the faces), material types for cells (which we store in the
+   * material_id of the cells) and in some cases subdomain ids for
+   * cells (which we store in the subdomain_id of the cell).
+   *
+   * If you read one of these grids into a Triangulation, you might
+   * still want to use the material_id specified in the input file as
+   * a manifold_id description. In this case you can associate a
+   * Manifold object to internal cells, and this object will be used
+   * by the Triangulation to query Manifold objects for new
+   * points. This function iterates over active cells and copies the
+   * material_ids to the manifold_ids.
+   *
+   * The optional parameter @p compute_face_ids, indicates wether this
+   * function should also set the manifold_ids of the faces (both for
+   * internal faces and for faces on the boundary). If set to true,
+   * then each face will get a manifold_id equal to the minimum of the
+   * surrounding manifold_ids, ensuring that a unique manifold id is
+   * selected for each face of the Triangulation. By default, face
+   * manifold_ids are not computed.
+   *
+   * @ingroup manifold
+   *
+   * @author Luca Heltai, 2015
+   */
+  template <int dim, int spacedim>
+  void copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                                    const bool compute_face_ids=false);
+
 
   /*@}*/
   /**

@@ -2894,6 +2894,50 @@ next_cell:
 #endif
   }
 
+  template <int dim, int spacedim>
+  void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                                    const bool reset_boundary_ids)
+  {
+
+    typename Triangulation<dim,spacedim>::active_cell_iterator
+    cell=tria.begin_active(), endc=tria.end();
+
+    for (; cell != endc; ++cell)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+        if (cell->face(f)->at_boundary())
+          {
+            cell->face(f)->set_manifold_id
+            (static_cast<types::manifold_id>(cell->face(f)->boundary_indicator()));
+            if (reset_boundary_ids == true)
+              cell->face(f)->set_boundary_indicator(0);
+          }
+  }
+
+  template <int dim, int spacedim>
+  void copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                                    const bool compute_face_ids)
+  {
+    typename Triangulation<dim,spacedim>::active_cell_iterator
+    cell=tria.begin_active(), endc=tria.end();
+
+    for (; cell != endc; ++cell)
+      {
+        cell->set_manifold_id(cell->material_id());
+        if (compute_face_ids == true)
+          {
+            for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+              {
+                if (cell->neighbor(f) != endc)
+                  cell->face(f)->set_manifold_id
+                  (std::min(cell->material_id(),
+                            cell->neighbor(f)->material_id()));
+                else
+                  cell->face(f)->set_manifold_id(cell->material_id());
+              }
+          }
+      }
+  }
+
 } /* namespace GridTools */
 
 
