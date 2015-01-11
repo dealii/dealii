@@ -1153,18 +1153,14 @@ namespace GridTools
 
   /**
    * Copy boundary ids to manifold ids. The default manifold_id for
-   * new Triangulation objects is numbers::invalid_manifold_id. When
-   * refinements occurs, the Triangulation asks where to locate new
-   * points to the underlying manifold, and if the manifold_id of a
-   * boundary face is set to numbers::invalid_manifold_id, then
-   * Triangulation reverts back boundary_id (this was the behavior of
-   * deal.II < 8.2). This function copies the boundary_ids of the
-   * boundary faces to the manifold_ids of the same faces, allowing
-   * the user to change the boundary_ids and use them for boundary
-   * conditions regardless of the geometry, which will use
-   * manifold_ids to create new points. Only active cells will be
-   * iterated over. This is a function you'd typically call when there
-   * is only one active level on your Triangulation.
+   * new Triangulation objects is numbers::invalid_manifold_id. This
+   * function copies the boundary_ids of the boundary faces to the
+   * manifold_ids of the same faces, allowing the user to change the
+   * boundary_ids and use them for boundary conditions regardless of
+   * the geometry, which will use manifold_ids to create new
+   * points. Only active cells will be iterated over. This is a
+   * function you'd typically call when there is only one active level
+   * on your Triangulation.
    *
    * The optional parameter @p reset_boundary_ids, indicates wether
    * this function should reset the boundary_ids of the Triangulation
@@ -1178,7 +1174,7 @@ namespace GridTools
    */
   template <int dim, int spacedim>
   void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
-                                    bool reset_boundary_ids=false);
+                                    const bool reset_boundary_ids=false);
 
   /**
    * Copy material ids to manifold ids. The default manifold_id for
@@ -1187,10 +1183,11 @@ namespace GridTools
    * points to the underlying manifold.
    *
    * When reading a Triangulation from a supported input format,
-   * tipical informations that can be stored in a file are boundary
-   * conditions (which we store in boundary_ids), material types
-   * (which we store in material_ids) and in some cases subdomain ids
-   * (which we store in subdomain_ids).
+   * typical informations that can be stored in a file are boundary
+   * conditions for boundary faces (which we store in the boundary_id
+   * of the faces), material types for cells (which we store in the
+   * material_id of the cells) and in some cases subdomain ids for
+   * cells (which we store in the subdomain_id of the cell).
    *
    * If you read one of these grids into a Triangulation, you might
    * still want to use the material_id specified in the input file as
@@ -1214,7 +1211,7 @@ namespace GridTools
    */
   template <int dim, int spacedim>
   void copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
-                                    bool compute_face_ids=false);
+                                    const bool compute_face_ids=false);
 
 
   /*@}*/

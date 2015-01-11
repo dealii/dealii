@@ -2896,7 +2896,7 @@ next_cell:
 
   template <int dim, int spacedim>
   void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
-                                    bool reset_boundary_ids)
+                                    const bool reset_boundary_ids)
   {
 
     typename Triangulation<dim,spacedim>::active_cell_iterator
@@ -2915,7 +2915,7 @@ next_cell:
 
   template <int dim, int spacedim>
   void copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
-                                    bool compute_face_ids)
+                                    const bool compute_face_ids)
   {
     typename Triangulation<dim,spacedim>::active_cell_iterator
     cell=tria.begin_active(), endc=tria.end();
@@ -2927,11 +2927,12 @@ next_cell:
           {
             for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
               {
-                cell->face(f)->set_manifold_id(cell->material_id());
                 if (cell->neighbor(f) != endc)
                   cell->face(f)->set_manifold_id
                   (std::min(cell->material_id(),
                             cell->neighbor(f)->material_id()));
+                else
+                  cell->face(f)->set_manifold_id(cell->material_id());
               }
           }
       }
