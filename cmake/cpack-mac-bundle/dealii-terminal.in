@@ -53,7 +53,7 @@ fi
 
 # Everything seems to be okay. Launch a terminal with PATH's
 # set up to work with deal.II.
-CONF=$DEAL_II_RESOURCES/@DEAL_II_COMMON_RELDIR@/dealii.conf
+CONF=$DEAL_II_RESOURCES/@DEAL_II_SHARE_RELDIR@/dealii.conf
 
 if ! [[ -f $CONF ]]; then
     return=`/usr/bin/osascript <<EOF

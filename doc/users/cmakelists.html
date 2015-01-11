@@ -47,7 +47,6 @@
     </li>
     <li><a href="#cmakeauto">Autopilot style <code>CMakeLists.txt</code></li>
     <li><a href="#dealiiconfig"><code>deal.IIConfig.cmake</code></a></li>
-    <li><a href="#legacy">Legacy <code>Make.global_options</code></a></li>
   </ol>
 </div>
 
@@ -728,7 +727,7 @@ DEAL_II_BUILD_TYPES         - an all caps list of available configurations,
 
 DEAL_II_PATH
 DEAL_II_CMAKE_MACROS_RELDIR
-DEAL_II_COMMON_RELDIR
+DEAL_II_SHARE_RELDIR
 DEAL_II_DOCREADME_RELDIR
 DEAL_II_DOCHTML_RELDIR
 DEAL_II_EXAMPLES_RELDIR
@@ -807,35 +806,6 @@ DEAL_II_WITH_TRILINOS
 DEAL_II_WITH_UMFPACK
 DEAL_II_WITH_ZLIB
 </pre>
-
-    <a name="legacy"></a>
-    <h2> Legacy Make.global_options </h2>
-
-    <p>
-      Before version 8.0, <acronym>deal.II</acronym> used the
-      traditional <code>autoconf/make</code> configuration and build
-      system. The interaction between these two programs, as well as
-      propagation of information from <acronym>deal.II</acronym> to user
-      programs happened through a number of files that were generated within
-      the <acronym>deal.II</acronym> directory tree.
-      The CMake build system sets up the following compatibility files (if
-      <code>DEAL_II_COMPONENT_COMPAT_FILES</code> is set, which is default):
-<pre>
-${CMAKE_INSTALL_PREFIX}/
-    common/Make.global_options
-    common/scripts/expand_instantiations
-    common/scripts/make_dependencies
-</pre>
-
-      Therefore, it should be sufficient to set <code>D</code> in the old
-      user Makefiles to:
-<pre>
-D=/path/install/dir
-</pre>
-      where <code>/path/install/dir</code> is the directory set up via
-      <code>CMAKE_INSTALL_PREFIX</code> (the path
-      <acronym>deal.II</acronym> was installed to).
-    </p>
 
     <hr />
     <div class="right">

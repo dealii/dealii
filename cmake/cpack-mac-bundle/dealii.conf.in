@@ -71,7 +71,7 @@ If you want to set up your daily Terminal to work with deal.II, add
 these lines to your ~/.profile file (the first line turns off this message):
 
    export DEAL_II_CONF_SILENT=ON
-   . $DEAL_II_RESOURCES/@DEAL_II_COMMON_RELDIR@/dealii.conf
+   . $DEAL_II_RESOURCES/@DEAL_II_SHARE_RELDIR@/dealii.conf
 
 EOF
 fi

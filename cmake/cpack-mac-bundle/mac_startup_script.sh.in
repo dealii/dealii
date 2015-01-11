@@ -22,5 +22,5 @@ then
 else
   export DEAL_II_BUNDLE=`echo "$BASH_SOURCE" | sed -e 's|/Contents/MacOS/.*||'`
   export DEAL_II_RESOURCES=$DEAL_II_BUNDLE/Contents/Resources
-  source $DEAL_II_RESOURCES/@DEAL_II_COMMON_RELDIR@/dealii.conf
+  source $DEAL_II_RESOURCES/@DEAL_II_SHARE_RELDIR@/dealii.conf
 fi
