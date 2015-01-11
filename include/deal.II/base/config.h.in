@@ -308,17 +308,6 @@
 #endif
 
 
-/*****************************************
- * Configured in configure_mumps.cmake:  *
- *****************************************/
-
-#cmakedefine DEAL_II_WITH_MUMPS
-#ifdef DEAL_II_WITH_MUMPS
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_USE_MUMPS
-#endif
-
-
 /*************************************************
  * Configured in configure_functionparser.cmake: *
  *************************************************/
