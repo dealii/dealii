@@ -5466,7 +5466,7 @@ namespace VectorTools
             if (update_flags & update_values)
               fe_values.get_function_values (fe_function, data.function_values);
             if (update_flags & update_gradients)
-              fe_values.get_function_grads (fe_function, data.function_grads);
+              fe_values.get_function_gradients (fe_function, data.function_grads);
 
             difference(index) =
               integrate_difference_inner (exact_solution, norm, weight,

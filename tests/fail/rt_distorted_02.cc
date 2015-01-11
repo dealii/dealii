@@ -311,7 +311,7 @@ double EvaluateDiver (Mapping<2> &mapping,
       std::vector<std::vector<Tensor<1,2> > >
       grads_here (n_q_points,
                   std::vector<Tensor<1,2> > (n_components));
-      fe_values.get_function_grads (solution, grads_here);
+      fe_values.get_function_gradients (solution, grads_here);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         {

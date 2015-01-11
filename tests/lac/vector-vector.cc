@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -137,7 +137,7 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
   d1.sadd (2, 2, d2, 2, d3);
   print (d1);
 
-  d1.scale (4.);
+  d1 *= 4.;
   print (d1);
 
   deallog << "equ" << std::endl;
