@@ -349,32 +349,6 @@
 
 
 #
-# Mumps:
-#
-# SET(DEAL_II_WITH_MUMPS ON CACHE BOOL
-#   "Build deal.II with support for mumps"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(MUMPS_DIR "/.../..." CACHE PATH "")
-# also, if necessary, SCALAPACK_DIR and BLACS_DIR
-#
-# Manual setup:
-#
-# SET(MUMPS_FOUND TRUE CACHE BOOL "")
-# SET(MUMPS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(MUMPS_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(MUMPS_LINKER_FLAGS "..." CACHE STRING "")
-# SET(MUMPS_VERSION "x.y.z" CACHE STRING "")
-# SET(MUMPS_VERSION_MAJOR "x" CACHE STRING "")
-# SET(MUMPS_VERSION_MINOR "y" CACHE STRING "")
-# SET(MUMPS_VERSION_SUBMINOR "z" CACHE STRING "")
-#
-
-
-#
 # muPaser:
 #
 # SET(DEAL_II_WITH_MUPARSER ON CACHE BOOL

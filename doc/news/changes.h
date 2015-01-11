@@ -38,6 +38,14 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: The direct Mumps interface through
+  <code>SparseDirectMUMPS</code> has been removed. The MUMPS solver is
+  still available through the Trilinos or PETSc interfaces. Alternatively,
+  there is <code>SparseDirectUMFPACK</code>, which has a similar interface.
+  <br>
+  (Matthias Maier, 2015/01/11)
+  </li>
+
   <li> Removed: This release removes a number of functions that have long
   been deprecated and that were previously already marked as
   deprecated (i.e., they would have yielded warnings by the compiler whenever
