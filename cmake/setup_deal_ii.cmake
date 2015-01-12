@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -32,6 +32,7 @@
 #     DEAL_II_PACKAGE_DESCRIPTION     *)
 #     DEAL_II_VERSION_MAJOR
 #     DEAL_II_VERSION_MINOR
+#     DEAL_II_VERSION_SUBMINOR
 #     DEAL_II_VERSION
 #
 # Information about paths, install locations and names:
@@ -65,24 +66,40 @@
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
-FILE(STRINGS "${CMAKE_SOURCE_DIR}/VERSION" _version LIMIT_COUNT 1)
-SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "${_version}")
-
 SET_IF_EMPTY(DEAL_II_PACKAGE_VENDOR
   "The deal.II Authors <http://www.dealii.org/>"
   )
-
 SET_IF_EMPTY(DEAL_II_PACKAGE_DESCRIPTION
   "Library for solving partial differential equations with the finite element method"
   )
 
-STRING(REGEX REPLACE
-  "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
+FILE(STRINGS "${CMAKE_SOURCE_DIR}/VERSION" _version LIMIT_COUNT 1)
+SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "${_version}")
+
+#
+# We expect a version number of the form "X.Y.Z", where X and Y are always
+# numbers and Z is either a third number (for a release version) or a short
+# string.
+#
+STRING(REGEX REPLACE "^([0-9]+)\\..*" "\\1"
+  DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
   )
-STRING(REGEX REPLACE
-  "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_VERSION_MINOR "${DEAL_II_PACKAGE_VERSION}"
+STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
+  DEAL_II_VERSION_MINOR "${DEAL_II_PACKAGE_VERSION}"
   )
-SET(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR})
+
+#
+# If Z is not a number, replace it with "0", otherwise extract version
+# number:
+#
+IF(DEAL_II_PACKAGE_VERSION MATCHES "^[0-9]+\\.[0-9]+.*\\.[0-9]+.*")
+  STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+.*\\.([0-9]+).*" "\\1"
+    DEAL_II_VERSION_SUBMINOR "${DEAL_II_PACKAGE_VERSION}"
+    )
+ELSE()
+  SET(DEAL_II_VERSION_SUBMINOR "0")
+ENDIF()
+SET(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR}.${DEAL_II_VERSION_SUBMINOR})
 
 
 ########################################################################

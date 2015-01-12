@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -94,10 +94,17 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   ENDIF()
 
   #
-  # Get library name directly from the target:
+  # Build up library name depending on link type:
   #
-  GET_TARGET_PROPERTY(_lib ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX} LOCATION)
-  GET_FILENAME_COMPONENT(CONFIG_LIBRARY_${_build} "${_lib}" NAME)
+  IF(BUILD_SHARED_LIBS)
+    SET(CONFIG_LIBRARY_${_build}
+      "${CMAKE_SHARED_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      )
+  ELSE()
+    SET(CONFIG_LIBRARY_${_build}
+      "${CMAKE_STATIC_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      )
+  ENDIF()
 
   IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "Windows")
     SET(CONFIG_LIBRARIES_${_build}
