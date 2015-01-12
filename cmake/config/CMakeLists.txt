@@ -21,7 +21,7 @@
 #
 # We support two configurations out of which deal.II can be used - directly
 # from the build directory or after installation. So we have to prepare
-# two distinct set ups.
+# two distinct setups.
 #
 
 MESSAGE(STATUS "Setting up project configuration")
@@ -93,44 +93,30 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   ENDIF()
 
   #
-  # Build up library name depending on link type:
+  # Build up library name depending on link type and platform:
   #
+
   IF(BUILD_SHARED_LIBS)
-    SET(CONFIG_LIBRARY_${_build}
-      "${CMAKE_SHARED_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      )
+    SET(_type "SHARED")
   ELSE()
-    SET(CONFIG_LIBRARY_${_build}
-      "${CMAKE_STATIC_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-      )
+    SET(_type "STATIC")
   ENDIF()
 
   IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "Windows")
-    SET(CONFIG_LIBRARIES_${_build}
-      \${DEAL_II_PATH}/\${DEAL_II_EXECUTABLE_RELDIR}/${CONFIG_LIBRARY_${_build}}
-      )
+    SET(_reldir "\${DEAL_II_EXECUTABLE_RELDIR}")
   ELSE()
-    SET(CONFIG_LIBRARIES_${_build}
-      \${DEAL_II_PATH}/\${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${_build}}
-      )
+    SET(_reldir "\${DEAL_II_LIBRARY_RELDIR}")
   ENDIF()
 
-  LIST(APPEND CONFIG_LIBRARIES_${_build}
+  SET(CONFIG_LIBRARIES_${_build}
+    "\${DEAL_II_PATH}/${_reldir}/${CMAKE_${_type}_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_${_type}_LIBRARY_SUFFIX}"
     ${DEAL_II_LIBRARIES_${_build}}
     ${DEAL_II_LIBRARIES}
     )
-  LIST(APPEND CONFIG_LIBRARIES
-    ${_keyword}
-    \${DEAL_II_LIBRARIES_${_build}}
-    )
+  LIST(APPEND CONFIG_LIBRARIES ${_keyword} \${DEAL_II_LIBRARIES_${_build}})
 
-  SET(CONFIG_TARGET_${_build}
-    ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
-    )
-  LIST(APPEND CONFIG_TARGET
-    ${_keyword}
-    \${DEAL_II_TARGET_${_build}}
-    )
+  SET(CONFIG_TARGET_${_build} ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
+  LIST(APPEND CONFIG_TARGET ${_keyword} \${DEAL_II_TARGET_${_build}})
 ENDFOREACH()
 
 #
@@ -140,9 +126,7 @@ ENDFOREACH()
 SET(CONFIG_BUILD_DIR TRUE)
 SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/include
-  \${DEAL_II_PATH}/include/deal.II
   ${CMAKE_SOURCE_DIR}/include/
-  ${CMAKE_SOURCE_DIR}/include/deal.II
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
@@ -164,7 +148,6 @@ CONFIGURE_FILE(
 SET(CONFIG_BUILD_DIR FALSE)
 SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}
-  \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
