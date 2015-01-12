@@ -8772,7 +8772,7 @@ Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number)
 
 template <int dim, int spacedim>
 void
-Triangulation<dim, spacedim>::set_all_manifold_ids (const types::manifold_id &m_number)
+Triangulation<dim, spacedim>::set_all_manifold_ids (const types::manifold_id m_number)
 {
   typename Triangulation<dim,spacedim>::active_cell_iterator
   cell=this->begin_active(), endc=this->end();
@@ -8784,7 +8784,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids (const types::manifold_id &m_
 
 template <int dim, int spacedim>
 void
-Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::manifold_id &m_number)
+Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::manifold_id m_number)
 {
   typename Triangulation<dim,spacedim>::active_cell_iterator
   cell=this->begin_active(), endc=this->end();

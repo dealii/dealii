@@ -1628,26 +1628,24 @@ public:
   void set_manifold (const types::manifold_id number);
 
   /**
-   * Set the manifold_id of all of cells and faces to the given
-   * argument.
+   * Set the manifold_id of all cells and faces to the given argument.
    *
    * @ingroup manifold
    *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  void set_all_manifold_ids (const types::manifold_id &number);
+  void set_all_manifold_ids (const types::manifold_id number);
 
   /**
-   * Set the manifold_id of all of boundary faces to the given
-   * argument.
+   * Set the manifold_id of all boundary faces to the given argument.
    *
    * @ingroup manifold
    *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  void set_all_manifold_ids_on_boundary (const types::manifold_id &number);
+  void set_all_manifold_ids_on_boundary (const types::manifold_id number);
 
 
   /**
