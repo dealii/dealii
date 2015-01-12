@@ -1628,6 +1628,29 @@ public:
   void set_manifold (const types::manifold_id number);
 
   /**
+   * Set the manifold_id of all of cells and faces to the given
+   * argument.
+   *
+   * @ingroup manifold
+   *
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  void set_all_manifold_ids (const types::manifold_id &number);
+
+  /**
+   * Set the manifold_id of all of boundary faces to the given
+   * argument.
+   *
+   * @ingroup manifold
+   *
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  void set_all_manifold_ids_on_boundary (const types::manifold_id &number);
+
+
+  /**
    * Return a constant reference to a boundary object used for this
    * triangulation.  Number is the same as in @p set_boundary
    *

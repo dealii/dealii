@@ -145,6 +145,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: Triangulation::set_all_manifold_ids() and 
+  Triangulation::set_all_manifold_ids_on_boundaries()
+  set all manifold ids on every object or on every 
+  boundary object respectively.
+  <br>
+  (Luca Heltai, 2015/01/12)
+  </li>
+
+
   <li> New: GridTools::copy_boundary_to_manifold_id() and 
   GridTools::copy_material_to_manifold_id() copy
   boundary_ids and material_ids to manifold_ids for 

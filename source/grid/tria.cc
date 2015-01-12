@@ -8770,6 +8770,30 @@ Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number)
   manifold.erase(m_number);
 }
 
+template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::set_all_manifold_ids (const types::manifold_id &m_number)
+{
+  typename Triangulation<dim,spacedim>::active_cell_iterator
+  cell=this->begin_active(), endc=this->end();
+
+  for (; cell != endc; ++cell)
+    cell->set_all_manifold_ids(m_number);
+}
+
+
+template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::manifold_id &m_number)
+{
+  typename Triangulation<dim,spacedim>::active_cell_iterator
+  cell=this->begin_active(), endc=this->end();
+
+  for (; cell != endc; ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->face(f)->at_boundary())
+        cell->face(f)->set_all_manifold_ids(m_number);
+}
 
 
 template <int dim, int spacedim>

@@ -1,0 +1,62 @@
+
+DEAL::Testing dim=1, spacedim=1
+DEAL::Original mesh ==============================
+DEAL::cell: 0.0, material_id: 0, manifold_id: -1
+DEAL::face: 0, boundary_id: 0, manifold_id: -1
+DEAL::face: 1, boundary_id: 1, manifold_id: -1
+DEAL::Modified mesh ==============================
+DEAL::cell: 0.0, material_id: 0, manifold_id: -1
+DEAL::face: 0, boundary_id: 0, manifold_id: 1
+DEAL::face: 1, boundary_id: 1, manifold_id: 1
+DEAL::Testing dim=1, spacedim=2
+DEAL::Original mesh ==============================
+DEAL::cell: 0.0, material_id: 0, manifold_id: -1
+DEAL::face: 0, boundary_id: 0, manifold_id: -1
+DEAL::face: 1, boundary_id: 1, manifold_id: -1
+DEAL::Modified mesh ==============================
+DEAL::cell: 0.0, material_id: 0, manifold_id: -1
+DEAL::face: 0, boundary_id: 0, manifold_id: 1
+DEAL::face: 1, boundary_id: 1, manifold_id: 1
+DEAL::Testing dim=2, spacedim=2
+DEAL::Original mesh ==============================
+DEAL::cell: 0.0, material_id: 0, manifold_id: -1
+DEAL::face: 1, boundary_id: 0, manifold_id: -1
+DEAL::face: 2, boundary_id: 0, manifold_id: -1
+DEAL::face: 0, boundary_id: 0, manifold_id: -1
+DEAL::face: 3, boundary_id: 0, manifold_id: -1
+DEAL::Modified mesh ==============================
+DEAL::cell: 0.0, material_id: 0, manifold_id: -1
+DEAL::face: 1, boundary_id: 0, manifold_id: 1
+DEAL::face: 2, boundary_id: 0, manifold_id: 1
+DEAL::face: 0, boundary_id: 0, manifold_id: 1
+DEAL::face: 3, boundary_id: 0, manifold_id: 1
+DEAL::Testing dim=2, spacedim=3
+DEAL::Original mesh ==============================
+DEAL::cell: 0.0, material_id: 0, manifold_id: -1
+DEAL::face: 1, boundary_id: 0, manifold_id: -1
+DEAL::face: 2, boundary_id: 0, manifold_id: -1
+DEAL::face: 0, boundary_id: 0, manifold_id: -1
+DEAL::face: 3, boundary_id: 0, manifold_id: -1
+DEAL::Modified mesh ==============================
+DEAL::cell: 0.0, material_id: 0, manifold_id: -1
+DEAL::face: 1, boundary_id: 0, manifold_id: 1
+DEAL::face: 2, boundary_id: 0, manifold_id: 1
+DEAL::face: 0, boundary_id: 0, manifold_id: 1
+DEAL::face: 3, boundary_id: 0, manifold_id: 1
+DEAL::Testing dim=3, spacedim=3
+DEAL::Original mesh ==============================
+DEAL::cell: 0.0, material_id: 0, manifold_id: -1
+DEAL::face: 2, boundary_id: 0, manifold_id: -1
+DEAL::face: 3, boundary_id: 0, manifold_id: -1
+DEAL::face: 0, boundary_id: 0, manifold_id: -1
+DEAL::face: 4, boundary_id: 0, manifold_id: -1
+DEAL::face: 1, boundary_id: 0, manifold_id: -1
+DEAL::face: 5, boundary_id: 0, manifold_id: -1
+DEAL::Modified mesh ==============================
+DEAL::cell: 0.0, material_id: 0, manifold_id: -1
+DEAL::face: 2, boundary_id: 0, manifold_id: 1
+DEAL::face: 3, boundary_id: 0, manifold_id: 1
+DEAL::face: 0, boundary_id: 0, manifold_id: 1
+DEAL::face: 4, boundary_id: 0, manifold_id: 1
+DEAL::face: 1, boundary_id: 0, manifold_id: 1
+DEAL::face: 5, boundary_id: 0, manifold_id: 1
