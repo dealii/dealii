@@ -106,6 +106,27 @@ namespace PETScWrappers
     }
 
 
+    void
+    SparseMatrix::
+    reinit (const SparseMatrix &other)
+    {
+      if (&other == this)
+        return;
+
+      this->communicator = other.communicator;
+
+      int ierr;
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      ierr = MatDestroy (matrix);
+#else
+      ierr = MatDestroy (&matrix);
+#endif
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      ierr = MatDuplicate(other.matrix, MAT_DO_NOT_COPY_VALUES, &matrix);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+    }
+
 
     SparseMatrix &
     SparseMatrix::operator = (const value_type d)
