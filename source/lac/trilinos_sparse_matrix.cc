@@ -370,17 +370,6 @@ namespace TrilinosWrappers
 
 
 
-  SparseMatrix::SparseMatrix (const SparseMatrix &input_matrix)
-    :
-    Subscriptor(),
-    column_space_map (new Epetra_Map (input_matrix.domain_partitioner())),
-    matrix (new Epetra_FECrsMatrix(*input_matrix.matrix)),
-    last_action (Zero),
-    compressed (true)
-  {}
-
-
-
   SparseMatrix::~SparseMatrix ()
   {}
 

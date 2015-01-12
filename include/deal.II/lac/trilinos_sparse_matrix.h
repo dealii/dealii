@@ -562,12 +562,6 @@ namespace TrilinosWrappers
     SparseMatrix (const SparsityPattern &InputSparsityPattern);
 
     /**
-     * Copy constructor. Sets the calling matrix to be the same as the input
-     * matrix, i.e., using the same sparsity pattern and entries.
-     */
-    SparseMatrix (const SparseMatrix &InputMatrix);
-
-    /**
      * Destructor. Made virtual so that one can use pointers to this class.
      */
     virtual ~SparseMatrix ();
@@ -1843,6 +1837,14 @@ namespace TrilinosWrappers
 
 
   private:
+    /**
+     * Copy constructor is disabled.
+     */
+    SparseMatrix (const SparseMatrix &);
+    /**
+     * operator= is disabled.
+     */
+    SparseMatrix &operator = (const SparseMatrix &);
 
     /**
      * Pointer to the user-supplied Epetra Trilinos mapping of the matrix
