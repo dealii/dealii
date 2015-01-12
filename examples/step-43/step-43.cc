@@ -2252,7 +2252,8 @@ int main (int argc, char *argv[])
 
       deallog.depth_console (0);
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
+                                                           numbers::invalid_unsigned_int);
 
       TwoPhaseFlowProblem<2> two_phase_flow_problem(1);
       two_phase_flow_problem.run ();
