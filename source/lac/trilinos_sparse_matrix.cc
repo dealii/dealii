@@ -378,6 +378,9 @@ namespace TrilinosWrappers
   void
   SparseMatrix::copy_from (const SparseMatrix &rhs)
   {
+    if (this == &rhs)
+      return;
+
     nonlocal_matrix.reset();
     nonlocal_matrix_exporter.reset();
 
@@ -794,6 +797,9 @@ namespace TrilinosWrappers
   void
   SparseMatrix::reinit (const SparseMatrix &sparse_matrix)
   {
+    if (this == &sparse_matrix)
+      return;
+
     column_space_map.reset (new Epetra_Map (sparse_matrix.domain_partitioner()));
     matrix.reset ();
     nonlocal_matrix_exporter.reset();
