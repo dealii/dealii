@@ -25,9 +25,10 @@
 #include <deal.II/grid/tria_iterator.h>
 // Here are some functions to generate standard grids:
 #include <deal.II/grid/grid_generator.h>
-// We would like to use boundaries which are not straight lines, so we import
-// some classes which predefine some boundary descriptions:
-#include <deal.II/grid/tria_boundary_lib.h>
+// We would like to use faces and cells which are not straight lines,
+// or bi-linear quads, so we import some classes which predefine some
+// manifold descriptions:
+#include <deal.II/grid/manifold_lib.h>
 // Output of grids in various graphics formats:
 #include <deal.II/grid/grid_out.h>
 
@@ -99,31 +100,40 @@ void second_grid ()
   GridGenerator::hyper_shell (triangulation,
                               center, inner_radius, outer_radius,
                               10);
-  // By default, the triangulation assumes that all boundaries are straight
-  // and given by the cells of the coarse grid (which we just created). It
-  // uses this information when cells at the boundary are refined and new
-  // points need to be introduced on the boundary; if the boundary is assumed
-  // to be straight, then new points will simply be in the middle of the
+  // By default, the triangulation assumes that all boundaries are
+  // straigth lines, and all cells are bi-linear quads, and that they
+  // are defined by the cells of the coarse grid (which we just
+  // created). It uses this information when cells are refined and new
+  // points need to be introduced; if the domain is assumed to be
+  // flat, then new points will simply be in the middle of the
   // surrounding ones.
   //
-  // Here, however, we would like to have a curved boundary. Fortunately, some
-  // good soul implemented an object which describes the boundary of a ring
-  // domain; it only needs the center of the ring and automatically figures
-  // out the inner and outer radius when needed. Note that we associate this
-  // boundary object with that part of the boundary that has the "boundary
-  // indicator" zero. By default (at least in 2d and 3d, the 1d case is
-  // slightly different), all boundary parts have this number, but you can
-  // change this number for some parts of the boundary. In that case, the
-  // curved boundary thus associated with number zero will not apply on those
-  // parts with a non-zero boundary indicator, but other boundary description
-  // objects can be associated with those non-zero indicators. If no boundary
-  // description is associated with a particular boundary indicator, a
-  // straight boundary is implied. (Boundary indicators are a slightly
-  // complicated topic; if you're confused about what exactly is happening
-  // here, you may want to look at the
-  // @ref GlossBoundaryIndicator "glossary entry on this topic".)
-  const HyperShellBoundary<2> boundary_description(center);
-  triangulation.set_boundary (0, boundary_description);
+  // Here, however, we know that the domain is curved, and we would
+  // like to have the Triangulation place new points according to the
+  // underlying geometry. Fortunately, some good soul implemented an
+  // object which describes a spherical domain, of which the ring is a
+  // section; it only needs the center of the ring and automatically
+  // figures out how to instruct the Triangulation where to place the
+  // new points. We first set the "manifold indicator" of all cells
+  // and faces of the Triangulation to the value zero, and then
+  // associate the curved Manifold object with those parts of the
+  // Triangulation that have the "manifold indicator" zero. By
+  // default, all cells and faces of the Triangulation have their
+  // manifold_id set to numbers::invalid_manifold_id, which is the
+  // default if you want a flat manifold, but you can change this
+  // number for individual cells and faces. In that case, the curved
+  // manifold thus associated with number zero will not apply on those
+  // parts with a non-zero manifold indicator, but other manifold
+  // description objects can be associated with those non-zero
+  // indicators. If no manifold description is associated with a
+  // particular manifold indicator, a flat manifold is
+  // implied. (Manifold indicators are a slightly complicated topic;
+  // if you're confused about what exactly is happening here, you may
+  // want to look at the @ref GlossManifoldIndicator "glossary entry
+  // on this topic".)
+  triangulation.set_all_manifold_ids(0);
+  const SphericalManifold<2> manifold_description(center);
+  triangulation.set_manifold (0, manifold_description);
 
   // In order to demonstrate how to write a loop over all cells, we will
   // refine the grid in five steps towards the inner circle of the domain:
