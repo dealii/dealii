@@ -38,6 +38,25 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: The following compatibility definitions were removed from
+  <code>include/deal.II/base/config.h.in</code> (replacement in brackets):
+  - DEAL_II_CAN_USE_CXX11 (new: DEAL_II_WITH_CXX11)
+  - DEAL_II_CAN_USE_CXX1X (new: DEAL_II_WITH_CXX11)
+  - DEAL_II_COMPILER_SUPPORTS_MPI (new: DEAL_II_WITH_MPI)
+  - DEAL_II_MAJOR (new: DEAL_II_VERSION_MAJOR)
+  - DEAL_II_MINOR (new: DEAL_II_VERSION_MINOR)
+  - DEAL_II_USE_ARPACK (new: DEAL_II_WITH_ARPACK)
+  - DEAL_II_USE_CXX11 (new: DEAL_II_WITH_CXX11)
+  - DEAL_II_USE_METIS (new: DEAL_II_WITH_METIS)
+  - DEAL_II_USE_MT (new: DEAL_II_WITH_THREADS)
+  - DEAL_II_USE_P4EST (new: DEAL_II_WITH_P4EST)
+  - DEAL_II_USE_PETSC (new: DEAL_II_WITH_PETSC)
+  - DEAL_II_USE_SLEPC (new: DEAL_II_WITH_SLEPC)
+  - DEAL_II_USE_TRILINOS (new: DEAL_II_WITH_TRILINOS)
+  <br>
+  (Matthias Maier, 2015/01/12)
+  </li>
+
   <li> Removed: The direct Mumps interface through
   <code>SparseDirectMUMPS</code> has been removed. The MUMPS solver is
   still available through the Trilinos or PETSc interfaces. Alternatively,
