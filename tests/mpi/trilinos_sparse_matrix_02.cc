@@ -67,7 +67,7 @@ void test ()
   TrilinosWrappers::SparseMatrix A;
   A.reinit (sp);
   TrilinosWrappers::SparseMatrix B;
-  B.reinit(A);
+  B.reinit (A);
  
   A.add(0, 0, 0.1);
   A.add(0, 2, 0.2);
@@ -83,7 +83,8 @@ void test ()
 
   deallog << "set B=A..." << std::endl;
   
-  B = A;
+  B.copy_from(A);  
+  
   deallog << "2: " << A.l1_norm() << " " << B.l1_norm()
 	  << " (should be " << l1a << " " << l1a << ")" << std::endl;
 
