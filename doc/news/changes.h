@@ -38,6 +38,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Removed: TrilinosWrappers::SparseMatrix copy constructor got removed
+  to be in line with PETSc and dealii::SparseMatrix. You can use reinit()
+  and copy_from().
+  <br>
+  (Timo Heister, 2015/01/12)
+  </li>
+  
   <li> Removed: The following compatibility definitions were removed from
   <code>include/deal.II/base/config.h.in</code> (replacement in brackets):
   - DEAL_II_CAN_USE_CXX11 (new: DEAL_II_WITH_CXX11)
@@ -172,9 +179,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> New: Triangulation::set_all_manifold_ids() and 
+  <li> New: PETScWrappers::MPI::SparseMatrix::reinit(other) copies
+  the layout of another matrix. TrilinosWrappers::SparseMatrix
+  operator= and copy constructor are now disabled. This brings 
+  functionality between PETSc and Trilinos in line.
+  <br>
+  (Timo Heister, 2015/01/12)
+  </li>
+  
+  <li> New: Triangulation::set_all_manifold_ids() and
   Triangulation::set_all_manifold_ids_on_boundaries()
-  set all manifold ids on every object or on every 
+  set all manifold ids on every object or on every
   boundary object respectively.
   <br>
   (Luca Heltai, 2015/01/12)
