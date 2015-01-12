@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1252,7 +1252,7 @@ namespace parallel
       // we update ghost values whenever one of the input or output vector
       // already held ghost values or when we import data from a vector with
       // the same local range but different ghost layout
-      bool must_update_ghost_values = true;
+      bool must_update_ghost_values = c.vector_is_ghosted;
 
       // check whether the two vectors use the same parallel partitioner. if
       // not, check if all local ranges are the same (that way, we can
@@ -1269,9 +1269,11 @@ namespace parallel
               ||
               local_ranges_different_loc)
             reinit (c, true);
+          else
+            must_update_ghost_values |= vector_is_ghosted;
         }
       else
-        must_update_ghost_values = vector_is_ghosted || c.vector_is_ghosted;
+        must_update_ghost_values |= vector_is_ghosted;
 
       vector_view = c.vector_view;
       if (must_update_ghost_values)
