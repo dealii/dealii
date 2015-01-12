@@ -23,7 +23,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/intergrid_map.h>
 
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 DEAL_II_NAMESPACE_OPEN
 

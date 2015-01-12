@@ -21,7 +21,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <fstream>
 
@@ -49,11 +48,11 @@ void test()
 
   tria[2].refine_global (3);
 
-  MGDoFHandler<dim> dh0 (tria[0]);
-  MGDoFHandler<dim> dh1 (tria[1]);
-  MGDoFHandler<dim> dh2 (tria[2]);
+  DoFHandler<dim> dh0 (tria[0]);
+  DoFHandler<dim> dh1 (tria[1]);
+  DoFHandler<dim> dh2 (tria[2]);
 
-  MGDoFHandler<dim> *dof_handler[3] = { &dh0, &dh1, &dh2 };
+  DoFHandler<dim> *dof_handler[3] = { &dh0, &dh1, &dh2 };
 
   for (unsigned int i=0; i<3; ++i)
     for (unsigned int j=0; j<3; ++j)

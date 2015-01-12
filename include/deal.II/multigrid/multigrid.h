@@ -25,7 +25,6 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <vector>
 

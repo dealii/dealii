@@ -21,7 +21,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 
 #include <fstream>
@@ -50,12 +49,12 @@ void test()
   tria[1].last_active()->set_refine_flag();
   tria[1].execute_coarsening_and_refinement ();
 
-  MGDoFHandler<dim> dh0 (tria[0]);
-  MGDoFHandler<dim> dh1 (tria[1]);
+  DoFHandler<dim> dh0 (tria[0]);
+  DoFHandler<dim> dh1 (tria[1]);
 
   typedef
-  std::list<std::pair<typename MGDoFHandler<dim>::cell_iterator,
-      typename MGDoFHandler<dim>::cell_iterator> >
+  std::list<std::pair<typename DoFHandler<dim>::cell_iterator,
+      typename DoFHandler<dim>::cell_iterator> >
       CellList;
 
   const CellList cell_list

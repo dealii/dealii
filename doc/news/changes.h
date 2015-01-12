@@ -140,7 +140,30 @@ inconvenience this causes.
   - TrilinosWrappers::*Vector*::compress with an Epetra_CombineMode
     argument
   <br>
-  (Wolfgang Bangerth, 2014/12/29-2015/01/09)
+  This release also removes the deprecated class MGDoFHandler. The
+  functionality of this class had previously been incorporated into
+  the DoFHandler class. Unlike the changes above, if you were still
+  using this class, you will need to do the following changes to
+  your code:
+  - Where you called <code>mg_dof_handler.distribute_dofs()</code>
+    you now also need to explicitly call
+    <code>mg_dof_handler.distribute_mg_dofs()</code>.
+  - If you called <code>mg_dof_handler.begin(level)</code>, you
+    will now have to write this as
+    <code>mg_dof_handler.begin_mg(level)</code> to make clear that
+    you are not just interested in an iterator to a cell on a given
+    level, but in fact to a cell that can access the degrees of
+    freedom on a particular level of a multigrid hierarchy.
+  - The type previously referred to as
+    <code>MGDoFHandler::cell_iterator</code> now corresponds to
+    <code>MGDoFHandler::level_cell_iterator</code>.
+  - Where you previously called DoFRenumbering::component_wise
+    for the entire MGDoFHandler object, you now need to call
+    this function for the DoFHandler object, and then call the
+    same function with the <code>level</code> argument for each
+    of the levels of the triangulation individually.
+  <br>
+  (Wolfgang Bangerth, 2014/12/29-2015/01/11)
   </li>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.

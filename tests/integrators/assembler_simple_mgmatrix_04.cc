@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2013 by the deal.II authors
+// Copyright (C) 2012 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -158,8 +158,9 @@ void test(FiniteElement<dim> &fe)
   
   LaplaceMatrix<dim> matrix_integrator;
   
-  MGDoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
+  dof.distribute_mg_dofs(fe);
   mg::SparseMatrixCollection<double> mg;
   mg.resize(0,tr.n_levels()-1);
   mg.reinit(dof);

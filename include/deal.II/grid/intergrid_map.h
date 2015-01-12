@@ -68,12 +68,12 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The implementation of this class is such that not only cell iterators into
  * triangulations can be mapped, but also iterators into objects of type
- * DoFHandler, hp::DoFHandler and MGDoFHandler. The extension to other classes
+ * DoFHandler or hp::DoFHandler. The extension to other classes
  * offering iterator functions and some minor additional requirements is
  * simple.
  *
  * Note that this class could in principle be based on the C++
- * <tt>map<Key,Value></tt> data type. Instead, it uses another data format
+ * <tt>std::map<Key,Value></tt> data type. Instead, it uses another data format
  * which is more effective both in terms of computing time for access as well
  * as with regard to memory consumpion.
  *
@@ -107,8 +107,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Note that the template parameters to this class have to be given as
  * <tt>InterGridMap<DoFHandler<2> ></tt>, which here is DoFHandler (and could
- * equally well be Triangulation, PersistentTriangulation, hp::DoFHandler or
- * MGDoFHandler).
+ * equally well be Triangulation, PersistentTriangulation, or hp::DoFHandler).
  *
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999

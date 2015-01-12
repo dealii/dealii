@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,6 @@ std::ofstream logfile("output");
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -74,7 +73,7 @@ private:
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
-  MGDoFHandler<dim>      mg_dof_handler;
+  DoFHandler<dim>      mg_dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
@@ -99,6 +98,7 @@ template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
   mg_dof_handler.distribute_dofs (fe);
+  mg_dof_handler.distribute_mg_dofs (fe);
 
   deallog << "   Number of degrees of freedom: "
           << mg_dof_handler.n_dofs()
@@ -204,7 +204,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
-  typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
+  typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
                                             endc = mg_dof_handler.end();
   for (; cell!=endc; ++cell)
     {

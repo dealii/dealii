@@ -14,28 +14,6 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS)
-{
-    namespace VectorTools \{
-      template
-        void interpolate_boundary_values (
-          const MGDoFHandler<deal_II_dimension> &,
-          const types::boundary_id,
-          const Function<deal_II_dimension>   &,
-	  ConstraintMatrix&,
-          const ComponentMask    &);
-
-      template
-        void interpolate_boundary_values (
-          const MGDoFHandler<deal_II_dimension> &,
-          const types::boundary_id,
-          const Function<deal_II_dimension>   &,
-          std::map<types::global_dof_index,double>       &,
-          const ComponentMask    &);
-    \}
-}
-
-
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; DH : DOFHANDLER_TEMPLATES)
   {
 #if deal_II_dimension <= deal_II_space_dimension

@@ -42,7 +42,6 @@
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/numerics/matrix_tools.h>
 
 #include <boost/random/uniform_real_distribution.hpp>

@@ -161,17 +161,6 @@ namespace DoFRenumbering
        const std::vector<unsigned int>&);
 
     template
-      void component_wise
-      (MGDoFHandler<deal_II_dimension>&,
-       const std::vector<unsigned int>&);
-
-    template
-      void component_wise
-      (MGDoFHandler<deal_II_dimension>&,
-       unsigned int,
-       const std::vector<unsigned int>&);
-
-    template
       void block_wise<deal_II_dimension>
       (hp::DoFHandler<deal_II_dimension>&);
 
@@ -237,13 +226,6 @@ namespace DoFRenumbering
        const std::vector<hp::DoFHandler<deal_II_dimension>::active_cell_iterator>&);
 
     template void
-      downstream<MGDoFHandler<deal_II_dimension> >
-      (MGDoFHandler<deal_II_dimension>&,
-       unsigned int,
-       const Point<deal_II_dimension>&,
-       const bool);
-
-    template void
       compute_downstream<hp::DoFHandler<deal_II_dimension> >
       (std::vector<types::global_dof_index>&,std::vector<types::global_dof_index>&,
        const hp::DoFHandler<deal_II_dimension>&,
@@ -297,25 +279,11 @@ namespace DoFRenumbering
        const std::vector<bool> &);
 
     template
-      void sort_selected_dofs_back<MGDoFHandler<deal_II_dimension> >
-      (MGDoFHandler<deal_II_dimension> &,
-       const std::vector<bool> &,
-       const unsigned int);
-
-    template
       void
       compute_sort_selected_dofs_back<DoFHandler<deal_II_dimension> >
       (std::vector<types::global_dof_index>&,
        const DoFHandler<deal_II_dimension> &,
        const std::vector<bool> &);
-
-    template
-      void
-      compute_sort_selected_dofs_back<MGDoFHandler<deal_II_dimension> >
-      (std::vector<types::global_dof_index>&,
-       const MGDoFHandler<deal_II_dimension> &,
-       const std::vector<bool> &,
-       const unsigned int);
 
     template
       void random<hp::DoFHandler<deal_II_dimension> >
@@ -350,14 +318,6 @@ namespace DoFRenumbering
        const unsigned int,
        const bool,
        const std::vector<types::global_dof_index>&);
-
-    template
-      void Cuthill_McKee<MGDoFHandler<deal_II_dimension> >
-      (MGDoFHandler<deal_II_dimension>&,
-       const unsigned int,
-       const bool,
-       const std::vector<types::global_dof_index>&);
-
     \}  // namespace DoFRenumbering
 #endif
   }

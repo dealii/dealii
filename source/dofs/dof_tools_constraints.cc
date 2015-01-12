@@ -34,7 +34,6 @@
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <algorithm>
 #include <numeric>
@@ -625,24 +624,6 @@ namespace DoFTools
 
     void
     make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1> &,
-                                            ConstraintMatrix &,
-                                            dealii::internal::int2type<1>)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-    void
-    make_hp_hanging_node_constraints (const dealii::MGDoFHandler<1> &,
-                                      ConstraintMatrix &)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-
-    void
-    make_oldstyle_hanging_node_constraints (const dealii::MGDoFHandler<1> &,
                                             ConstraintMatrix &,
                                             dealii::internal::int2type<1>)
     {

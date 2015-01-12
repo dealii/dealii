@@ -142,8 +142,8 @@ namespace internal
                      const unsigned int version);
 
       /**
-       * Make the DoFHandler and MGDoFHandler classes a friend, so that they
-       * can resize arrays as necessary.
+       * Declare the classes that store levels and faces of DoFs
+       * friends so that they can resize arrays.
        */
       template <int> friend class DoFLevel;
       template <int> friend class DoFFaces;

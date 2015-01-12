@@ -42,7 +42,6 @@ template <typename Number> class BlockVector;
 
 template <int dim, int spacedim> class Mapping;
 template <int dim, int spacedim> class DoFHandler;
-template <int dim, int spacedim> class MGDoFHandler;
 template <int dim, int spacedim> class FEValues;
 
 namespace hp

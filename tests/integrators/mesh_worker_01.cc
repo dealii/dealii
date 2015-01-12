@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -112,7 +112,7 @@ Local<dim>::face(MeshWorker::DoFInfo<dim> & , MeshWorker::DoFInfo<dim> &,
 
 template <int dim>
 void
-test_simple(MGDoFHandler<dim> &mgdofs)
+test_simple(DoFHandler<dim> &mgdofs)
 {
   SparsityPattern pattern;
   SparseMatrix<double> matrix;
@@ -187,8 +187,9 @@ test(const FiniteElement<dim> &fe)
        cell != tr.end(); ++cell, ++cn)
     cell->set_user_index(cn);
 
-  MGDoFHandler<dim> dofs(tr);
+  DoFHandler<dim> dofs(tr);
   dofs.distribute_dofs(fe);
+  dofs.distribute_mg_dofs(fe);
   deallog << "DoFHandler " << dofs.n_dofs() << " levels";
   for (unsigned int l=0; l<tr.n_levels(); ++l)
     deallog << ' ' << l << ':' << dofs.n_dofs(l);

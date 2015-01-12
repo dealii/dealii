@@ -344,8 +344,6 @@ public:
    * multigrid. The active DoFs need to be distributed using distribute_dofs()
    * before calling this function and the @p fe needs to be identical to the
    * finite element passed to distribute_dofs().
-   *
-   * This replaces the functionality of the old MGDoFHandler.
    */
   virtual void distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe);
 
@@ -727,7 +725,8 @@ public:
    *
    * At the end of distribute_dofs(), the number of degrees of freedom in each
    * block is counted, and stored in a BlockInfo object, which can be accessed
-   * here. In an MGDoFHandler, the same is done on each level. Additionally,
+   * here. If you have previously called distribute_mg_dofs(),
+   * the same is done on each level of the multigrid hierarchy. Additionally,
    * the block structure on each cell can be generated in this object by
    * calling initialize_local_block_info().
    */

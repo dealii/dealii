@@ -30,7 +30,6 @@
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/matrix_free/helper_functions.h>
@@ -1583,38 +1582,6 @@ reinit(const Mapping<dim>                         &mapping,
 
 
 
-namespace internal
-{
-  namespace MatrixFree
-  {
-    // resolve DoFHandler types
-
-    // MGDoFHandler is deprecated in deal.II but might still be present in
-    // user code, so we need to resolve its type (fortunately, it is derived
-    // from DoFHandler, so we can static_cast it to a DoFHandler<dim>)
-    template <typename DH>
-    inline
-    std::vector<const dealii::DoFHandler<DH::dimension> *>
-    resolve_dof_handler (const std::vector<const DH *> &dof_handler)
-    {
-      std::vector<const dealii::DoFHandler<DH::dimension> *> conversion(dof_handler.size());
-      for (unsigned int i=0; i<dof_handler.size(); ++i)
-        conversion[i] = static_cast<const dealii::DoFHandler<DH::dimension> *>(dof_handler[i]);
-      return conversion;
-    }
-
-    template <int dim>
-    inline
-    std::vector<const dealii::hp::DoFHandler<dim> *>
-    resolve_dof_handler (const std::vector<const dealii::hp::DoFHandler<dim> *> &dof_handler)
-    {
-      return dof_handler;
-    }
-  }
-}
-
-
-
 template <int dim, typename Number>
 template <typename DH, typename Quad>
 void MatrixFree<dim,Number>::
@@ -1630,7 +1597,7 @@ reinit(const Mapping<dim>                         &mapping,
   for (unsigned int q=0; q<quad.size(); ++q)
     quad_hp.push_back (hp::QCollection<1>(quad[q]));
   internal_reinit (mapping,
-                   internal::MatrixFree::resolve_dof_handler(dof_handler),
+                   dof_handler,
                    constraint, locally_owned_set, quad_hp, additional_data);
 }
 

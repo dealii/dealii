@@ -22,7 +22,6 @@
 #include <deal.II/base/point.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <vector>
 
@@ -594,10 +593,6 @@ namespace DoFRenumbering
    *
    * For finite elements with only one component, or a single non-primitive
    * base element, this function is the identity operation.
-   *
-   * @note A similar function, which renumbered all levels existed for
-   * MGDoFHandler. This function was deleted. Thus, you have to call the level
-   * function for each level now.
    */
   template <int dim, int spacedim>
   void
@@ -618,24 +613,13 @@ namespace DoFRenumbering
   /**
    * Sort the degrees of freedom by component. It does the same thing as the
    * above function, only that it does this for one single level of a multi-
-   * level discretization. The non-multigrid part of the MGDoFHandler is not
+   * level discretization. The non-multigrid part of the the DoFHandler is not
    * touched.
    */
   template <class DH>
   void
   component_wise (DH &dof_handler,
                   const unsigned int level,
-                  const std::vector<unsigned int> &target_component = std::vector<unsigned int>());
-
-
-  /**
-   * Sort the degrees of freedom by component. It does the same thing as the
-   * previous functions, but more: it renumbers not only every level of the
-   * multigrid part, but also the global, i.e. non-multigrid components.
-   */
-  template <int dim>
-  void
-  component_wise (MGDoFHandler<dim>               &dof_handler,
                   const std::vector<unsigned int> &target_component = std::vector<unsigned int>());
 
   /**
@@ -691,27 +675,6 @@ namespace DoFRenumbering
   template <int dim>
   void
   block_wise (hp::DoFHandler<dim> &dof_handler);
-
-  /**
-   * Sort the degrees of freedom by block. It does the same thing as the above
-   * function, only that it does this for one single level of a multi-level
-   * discretization. The non-multigrid part of the MGDoFHandler is not
-   * touched.
-   */
-  template <int dim>
-  void
-  block_wise (MGDoFHandler<dim>  &dof_handler,
-              const unsigned int  level);
-
-
-  /**
-   * Sort the degrees of freedom by block. It does the same thing as the
-   * previous functions, but more: it renumbers not only every level of the
-   * multigrid part, but also the global, i.e. non-multigrid components.
-   */
-  template <int dim>
-  void
-  block_wise (MGDoFHandler<dim> &dof_handler);
 
   /**
    * Computes the renumbering vector needed by the block_wise() functions.
@@ -960,9 +923,10 @@ namespace DoFRenumbering
                                    const std::vector<bool>   &selected_dofs);
 
   /**
-   * Computes the renumbering vector on each level needed by the
+   * This function computes the renumbering vector on each level needed by the
    * sort_selected_dofs_back() function. Does not perform the renumbering on
-   * the MGDoFHandler dofs but returns the renumbering vector.
+   * the DoFHandler dofs but only computes the renumbering and returns
+   * the renumbering vector.
    *
    * @pre The @p selected_dofs array must have as many elements as the @p
    * dof_handler has degrees of freedom on the given level.

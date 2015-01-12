@@ -85,7 +85,7 @@ void check (bool local)
   check_dofs(dof, (local ? 100 : 10));
   deallog.pop();
   deallog.push("MGDoF");
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
   check_dofs(mgdof, (local ? 100 : 10));
   deallog.pop();
 }

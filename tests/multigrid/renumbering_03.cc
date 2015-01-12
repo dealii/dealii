@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,9 +15,9 @@
 
 
 // Until version 1.50 of mg_dof_handler.cc, the
-// MGDoFHandler::distribute_dofs function in 1d and 3d could not
+// DoFHandler::distribute_dofs function in 1d and 3d could not
 // handle coarsened grids (unused vertices). Also, the
-// MGDoFHandler::renumbering function could not handle coarsened grids
+// DoFHandler::renumbering function could not handle coarsened grids
 // (unused vertices, unused faces). Check that all this works now.
 
 #include "../tests.h"
@@ -31,7 +31,6 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 
 #include <fstream>
@@ -55,8 +54,9 @@ void check()
     cell->set_coarsen_flag();
   tria.execute_coarsening_and_refinement ();
 
-  MGDoFHandler<dim> mg_dof_handler(tria);
+  DoFHandler<dim> mg_dof_handler(tria);
   mg_dof_handler.distribute_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs(fe);
   for (unsigned int level=0; level<tria.n_levels(); ++level)
     {
       const types::global_dof_index n_dofs=mg_dof_handler.n_dofs(level);
