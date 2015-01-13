@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1091,7 +1091,7 @@ namespace Functions
    * A scalar function that computes its values by (bi-, tri-)linear
    * interpolation from a set of point data that are arranged on a possibly
    * non-uniform tensor product mesh. In other words, considering the three-
-   * dimensional case, let there be points $x_0,\ldotx, x_{K-1}$,
+   * dimensional case, let there be points $x_0,\ldots, x_{K-1}$,
    * $y_0,\ldots,y_{L-1}$, $z_1,\ldots,z_{M-1}$, and data $d_{klm}$ defined at
    * point $(x_k,y_l,z_m)^T$, then evaluating the function at a point $\mathbf
    * x=(x,y,z)$ will find the box so that $x_k\le x\le x_{k+1}, y_l\le x\le
@@ -1126,7 +1126,7 @@ namespace Functions
     /**
      * Constructor.
      * @param coordinate_values An array of dim arrays. Each of the inner
-     * arrays contains the coordinate values $x_0,\ldotx, x_{K-1}$ and
+     * arrays contains the coordinate values $x_0,\ldots, x_{K-1}$ and
      * similarly for the other coordinate directions. These arrays need not
      * have the same size. Obviously, we need dim such arrays for a dim-
      * dimensional function object. The coordinate values within this array
@@ -1171,7 +1171,7 @@ namespace Functions
    * A scalar function that computes its values by (bi-, tri-)linear
    * interpolation from a set of point data that are arranged on a uniformly
    * spaced tensor product mesh. In other words, considering the three-
-   * dimensional case, let there be points $x_0,\ldotx, x_{K-1}$ that result
+   * dimensional case, let there be points $x_0,\ldots, x_{K-1}$ that result
    * from a uniform subdivision of the interval $[x_0,x_{K-1}]$ into $K-1$
    * sub-intervals of size $\Delta x = (x_{K-1}-x_0)/(K-1)$, and similarly
    * $y_0,\ldots,y_{L-1}$, $z_1,\ldots,z_{M-1}$. Also consider data $d_{klm}$
