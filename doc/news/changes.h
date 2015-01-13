@@ -179,6 +179,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The update of ghost values in parallel::distributed::Vector when
+  calling the assignment operator is now active when one of the two vector had
+  its ghost values updated before or when the layout of the right hand side
+  vector is one-to-one, more consistent with parallel PETSc and Trilinos
+  vectors.
+  <br>
+  (Martin Kronbichler, 2015/01/13)
+  </li>
+
   <li> New: PETScWrappers::MPI::SparseMatrix::reinit(other) copies
   the layout of another matrix. TrilinosWrappers::SparseMatrix
   operator= and copy constructor are now disabled. This brings 
