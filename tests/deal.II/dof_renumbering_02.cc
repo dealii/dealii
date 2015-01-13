@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,6 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
@@ -73,7 +72,7 @@ print_dofs (const DoFHandler<dim> &dof)
 
 template <int dim>
 void
-print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
+print_dofs (const DoFHandler<dim> &dof, unsigned int level)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   std::vector<types::global_dof_index> v (fe.dofs_per_cell);
@@ -85,7 +84,7 @@ print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
       fevalues = std_cxx11::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_q_points));
     }
 
-  for (typename MGDoFHandler<dim>::cell_iterator cell=dof.begin(level);
+  for (typename DoFHandler<dim>::cell_iterator cell=dof.begin(level);
        cell != dof.end(level); ++cell)
     {
       Point<dim> p = cell->center();
@@ -105,7 +104,7 @@ print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
 
 template <int dim>
 void
-check_renumbering(MGDoFHandler<dim> &mgdof)
+check_renumbering(DoFHandler<dim> &mgdof)
 {
   const FiniteElement<dim> &element = mgdof.get_fe();
   DoFHandler<dim> &dof = mgdof;
@@ -156,21 +155,24 @@ check ()
   tr.execute_coarsening_and_refinement ();
   tr.refine_global(3-dim);
 
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
 
   FE_Q<dim> q2(2);
   FE_DGQ<dim> dgq1(1);
   FESystem<dim> system (q2, 2, dgq1, 1);
 
   mgdof.distribute_dofs(q2);
+  mgdof.distribute_mg_dofs(q2);
   check_renumbering(mgdof);
   mgdof.clear();
 
   mgdof.distribute_dofs(dgq1);
+  mgdof.distribute_mg_dofs(dgq1);
   check_renumbering(mgdof);
   mgdof.clear();
 
   mgdof.distribute_dofs(system);
+  mgdof.distribute_mg_dofs(system);
   check_renumbering(mgdof);
   mgdof.clear();
 }

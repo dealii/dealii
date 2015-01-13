@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -136,7 +135,7 @@ private:
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
-  MGDoFHandler<dim>    mg_dof_handler;
+  DoFHandler<dim>    mg_dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
@@ -219,7 +218,8 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
-  mg_dof_handler.distribute_dofs (fe);
+  mg_dof_handler.distribute_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs (fe);
   deallog << "Number of degrees of freedom: "
           << mg_dof_handler.n_dofs();
 
@@ -304,7 +304,7 @@ void LaplaceProblem<dim>::assemble_system ()
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values (n_q_points);
 
-  typename MGDoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim>::active_cell_iterator
   cell = mg_dof_handler.begin_active(),
   endc = mg_dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -360,7 +360,7 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool& use_mw)
     assembler.initialize_interfaces(mg_interface_in, mg_interface_out);
 
     MeshWorker::integration_loop<dim, dim> (
-        mg_dof_handler.begin(), mg_dof_handler.end(),
+        mg_dof_handler.begin_mg(), mg_dof_handler.end_mg(),
         dof_info, info_box, matrix_integrator, assembler);
 
     const unsigned int nlevels = triangulation.n_levels();
@@ -407,8 +407,8 @@ void LaplaceProblem<dim>::assemble_multigrid (const bool& use_mw)
       boundary_interface_constraints[level].close ();
     }
 
-    typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
-             endc = mg_dof_handler.end();
+    typename DoFHandler<dim>::level_cell_iterator cell = mg_dof_handler.begin_mg(),
+             endc = mg_dof_handler.end_mg();
 
     for (; cell!=endc; ++cell)
     {

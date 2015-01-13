@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 class BlockIndices;
 template<int,int> class DoFHandler;
-template<int,int> class MGDoFHandler;
+
 
 /**
  * A collection of functions and classes for the mesh loops that are an

@@ -17,7 +17,7 @@ public:
 
   template<int dim, class MATRIX>
   void build_mgmatrix(MGLevelObject<MATRIX> &A,
-                      const MGDoFHandler<dim> &dof,
+                      const DoFHandler<dim> &dof,
                       const Quadrature<dim> &quadrature);
 };
 

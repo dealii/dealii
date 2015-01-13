@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,8 +22,8 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <fstream>
 #include <iomanip>
@@ -57,6 +57,7 @@ void check()
             << std::endl;
 
 
+    dof.distribute_dofs(fe);
     dof.distribute_mg_dofs(fe);
     deallog << "check " << dim << " level  distribute "
             << dof.has_active_dofs() << ' '

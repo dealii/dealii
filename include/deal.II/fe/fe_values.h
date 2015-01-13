@@ -35,7 +35,6 @@
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/mapping.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <algorithm>
 #include <memory>

@@ -47,7 +47,6 @@ namespace hp
   template <int dim, int spacedim> class DoFHandler;
   template <int dim, int spacedim> class MappingCollection;
 }
-template <int dim, int spacedim> class MGDoFHandler;
 class ConstraintMatrix;
 template <class GridClass> class InterGridMap;
 template <int dim, int spacedim> class Mapping;

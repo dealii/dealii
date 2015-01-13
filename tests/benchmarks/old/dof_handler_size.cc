@@ -99,7 +99,7 @@ void check (bool local)
   check_dofs(dof);
   deallog.pop();
   deallog.push("MGDoF");
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
   check_dofs(mgdof);
   deallog.pop();
 }

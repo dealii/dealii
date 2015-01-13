@@ -76,7 +76,6 @@ namespace hp
 {
   template <int dim, int spacedim> class DoFHandler;
 }
-template <int dim, int spacedim> class MGDoFHandler;
 
 
 /*------------------------------------------------------------------------*/

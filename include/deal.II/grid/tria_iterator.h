@@ -161,11 +161,12 @@ template <typename> class TriaActiveIterator;
  * but you may write your own version (non-virtual, since we use templates) to
  * add functionality.
  *
- * The accessors provided by the library are distributed in three groups,
- * determined by whether they access the data of Triangulation, DoFHandler or
- * MGDoFHandler. They are derived from TriaAccessor, DoFAccessor and
- * MGDoFAccessor, respectively. In each group, there is an accessor to cells,
- * which have more functionality.
+ * The accessors provided by the library consists of two groups,
+ * determined by whether they access the data of Triangulation objects or
+ * DoFHandler/hp::DoFHandler objects. They are derived from TriaAccessor and
+ * DoFAccessor, respectively. Each group also has specialized accessors for
+ * cells (as opposed to faces and lines) that offer more functionality such as
+ * accessing neighbors.
  *
  * @attention It seems impossible to preserve constness of a triangulation
  * through iterator usage. Thus, if you declare pointers to a <tt>const</tt>

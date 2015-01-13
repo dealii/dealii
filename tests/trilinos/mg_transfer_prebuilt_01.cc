@@ -27,7 +27,6 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
 
@@ -40,7 +39,7 @@ using namespace std;
 
 template <int dim, int spacedim>
 void
-reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
                MGLevelObject<TrilinosWrappers::MPI::Vector> &v)
 {
   const dealii::parallel::distributed::Triangulation<dim,spacedim> *tria =
@@ -69,8 +68,9 @@ void check_simple(const FiniteElement<dim> &fe)
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
+  mgdof.distribute_mg_dofs(fe);
 
   MGTransferPrebuilt<TrilinosWrappers::MPI::Vector> transfer;
   transfer.build_matrices(mgdof);

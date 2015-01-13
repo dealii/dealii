@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_tools.h>
 
 #include <fstream>
@@ -61,8 +60,9 @@ void check_fe(FiniteElement<dim> &fe)
   tr.execute_coarsening_and_refinement ();
   tr.refine_global(1);
 
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
+  mgdof.distribute_mg_dofs(fe);
 
   std::vector<std::vector<types::global_dof_index> > count(tr.n_levels());
   MGTools::count_dofs_per_component(mgdof, count, false);

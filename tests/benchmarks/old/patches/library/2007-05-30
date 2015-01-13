@@ -27,14 +27,14 @@ Index: deal.II/source/multigrid/mg_dof_handler.cc
 +//TODO: This seems horrible memory fragmentation!
  
  template <int dim>
- MGDoFHandler<dim>::MGVertexDoFs::MGVertexDoFs ()
+ DoFHandler<dim>::MGVertexDoFs::MGVertexDoFs ()
 @@ -124,6 +125,25 @@
  }
  
  
 +template <int dim>
 +unsigned int
-+MGDoFHandler<dim>::memory_consumption() const
++DoFHandler<dim>::memory_consumption() const
 +{
 +  unsigned int mem = DoFHandler<dim>::memory_consumption();
 +  for (unsigned int l=0;l<mg_levels.size();++l)

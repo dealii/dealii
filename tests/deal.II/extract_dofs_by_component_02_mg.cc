@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,6 @@
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <fstream>
 
@@ -54,8 +53,9 @@ check ()
 
   FESystem<dim> element (FE_Q<dim>(2), 1,
                          FE_Nedelec<dim>(0), 1);
-  MGDoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
+  dof.distribute_mg_dofs(element);
 
   // try all possible block
   // masks, which we encode as bit

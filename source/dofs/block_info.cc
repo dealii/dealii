@@ -16,7 +16,6 @@
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_tools.h>

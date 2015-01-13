@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,7 @@
 
 // a un-hp-ified version of hp/step-16
 // this version uses the new unified DoFHAndler instead
-// of the MGDoFHandler in the test step-16.cc
+// of the DoFHandler in the test step-16.cc
 
 
 #include "../tests.h"
@@ -47,7 +47,6 @@ std::ofstream logfile("output");
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -207,7 +206,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
-  typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
+  typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
                                             endc = mg_dof_handler.end();
   for (; cell!=endc; ++cell)
     {

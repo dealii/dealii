@@ -573,7 +573,7 @@ void MatrixFree<dim,Number>::initialize_indices
                                              constraint_values,
                                              cell_at_boundary);
             }
-          // ok, now we are requested to use a level in a MGDoFHandler
+          // ok, now we are requested to use a level in a MG DoFHandler
           else if (dof_handlers.active_dof_handler == DoFHandlers::usual &&
                    dof_handlers.level != numbers::invalid_unsigned_int)
             {

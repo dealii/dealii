@@ -21,7 +21,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <fstream>
 

@@ -15,16 +15,6 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS)
-  {
-  namespace GridTools \{
-  template
-    std::list<std::pair<MGDoFHandler<deal_II_dimension>::cell_iterator, MGDoFHandler<deal_II_dimension>::cell_iterator> >
-    get_finest_common_cells (const MGDoFHandler<deal_II_dimension> &mesh_1,
-  			     const MGDoFHandler<deal_II_dimension> &mesh_2);
-  \}
-  }
-
 for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
 {
 
@@ -124,22 +114,6 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
     find_active_cell_around_point (const Mapping<deal_II_space_dimension> &,
 				   const parallel::distributed::Triangulation<deal_II_space_dimension> &,
 				   const Point<deal_II_space_dimension> &);
-}
-
-
-for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
-{
-
-#if deal_II_dimension <= deal_II_space_dimension
-  namespace GridTools \{
-  template
-    bool
-    have_same_coarse_mesh (const MGDoFHandler<deal_II_dimension,deal_II_space_dimension> &mesh_1,
-			   const MGDoFHandler<deal_II_dimension,deal_II_space_dimension> &mesh_2);
-
-  \}
-
-  #endif
 }
 
 

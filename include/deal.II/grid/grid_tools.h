@@ -707,7 +707,7 @@ namespace GridTools
 
   /**
    * Given two mesh containers (i.e. objects of type Triangulation,
-   * DoFHandler, hp::DoFHandler, or MGDoFHandler) that are based on the same
+   * DoFHandler, or hp::DoFHandler) that are based on the same
    * coarse mesh, this function figures out a set of cells that are matched
    * between the two meshes and where at most one of the meshes is more
    * refined on this cell. In other words, it finds the smallest cells that
@@ -756,7 +756,7 @@ namespace GridTools
 
   /**
    * The same function as above, but working on arguments of type DoFHandler,
-   * hp::DoFHandler, or MGDoFHandler. This function is provided to allow
+   * or hp::DoFHandler. This function is provided to allow
    * calling have_same_coarse_mesh for all types of containers representing
    * triangulations or the classes built on triangulations.
    *

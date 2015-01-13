@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,6 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer_component.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -49,8 +48,9 @@ void check (const FiniteElement<dim> &fe, const unsigned int selected_block)
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
-  MGDoFHandler<dim> mg_dof_handler(tr);
+  DoFHandler<dim> mg_dof_handler(tr);
   mg_dof_handler.distribute_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs(fe);
 
   std::vector<unsigned int> block_component(5,0);
   block_component[2]=1;

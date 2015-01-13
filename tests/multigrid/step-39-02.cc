@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,6 @@
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
@@ -359,7 +358,7 @@ namespace Step39
     Triangulation<dim>        triangulation;
     const MappingQ1<dim>      mapping;
     const FiniteElement<dim> &fe;
-    MGDoFHandler<dim>         mg_dof_handler;
+    DoFHandler<dim>         mg_dof_handler;
     DoFHandler<dim>          &dof_handler;
 
     SparsityPattern      sparsity;
@@ -396,6 +395,7 @@ namespace Step39
   InteriorPenaltyProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
+    dof_handler.distribute_mg_dofs(fe);
     types::global_dof_index n_dofs = dof_handler.n_dofs();
     solution.reinit(n_dofs);
     right_hand_side.reinit(n_dofs);
@@ -479,7 +479,7 @@ namespace Step39
 
     MatrixIntegrator<dim> integrator;
     MeshWorker::integration_loop<dim, dim> (
-      mg_dof_handler.begin(), mg_dof_handler.end(),
+      mg_dof_handler.begin_mg(), mg_dof_handler.end_mg(),
       dof_info, info_box,
       integrator, assembler);
 

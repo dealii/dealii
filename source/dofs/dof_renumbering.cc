@@ -550,17 +550,6 @@ namespace DoFRenumbering
     //  component_wise(dof_handler, level, component_order_arg);
   }
 
-  // This function is only for compatibility reasons and will vanish in 8.0
-  template <int dim>
-  void
-  component_wise (MGDoFHandler<dim>        &dof_handler,
-                  const std::vector<unsigned int> &component_order_arg)
-  {
-    DoFHandler<dim> &active_dof = dof_handler;
-    component_wise(active_dof, component_order_arg);
-    for (unsigned int level=0; level<dof_handler.get_tria().n_levels(); ++level)
-      component_wise(dof_handler, level, component_order_arg);
-  }
 
 
   template <int dim>
@@ -957,31 +946,6 @@ namespace DoFRenumbering
 
     if (renumbering.size()!=0)
       dof_handler.renumber_dofs (level, renumbering);
-  }
-
-
-
-  template <int dim>
-  void
-  block_wise (MGDoFHandler<dim> &dof_handler)
-  {
-    // renumber the non-MG part of
-    // the DoFHandler in parallel to
-    // the MG part. Because
-    // MGDoFHandler::renumber_dofs
-    // uses the user flags we can't
-    // run renumbering on individual
-    // levels in parallel to the
-    // other levels
-    void (*non_mg_part) (DoFHandler<dim> &)
-      = &block_wise<dim>;
-    Threads::Task<>
-    task = Threads::new_task (non_mg_part, dof_handler);
-
-    for (unsigned int level=0; level<dof_handler.get_tria().n_levels(); ++level)
-      block_wise (dof_handler, level);
-
-    task.join();
   }
 
 

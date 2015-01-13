@@ -23,7 +23,6 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -87,9 +86,9 @@ void check ()
   // holds
   tria.refine_global (1);
 
-  MGDoFHandler<dim> dof_handler (tria);
+  DoFHandler<dim> dof_handler (tria);
 
-  for (typename MGDoFHandler<dim>::cell_iterator cell = dof_handler.begin();
+  for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin();
        cell != dof_handler.end (); ++cell)
     for (unsigned int child = 0; child < cell->n_children (); ++child)
       Assert (cell->child (child)->parent () == cell,
@@ -104,7 +103,7 @@ void check ()
 
   tria.execute_coarsening_and_refinement ();
 
-  for (typename MGDoFHandler<dim>::cell_iterator cell = dof_handler.begin ();
+  for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin ();
        cell != dof_handler.end(); ++cell)
     for (unsigned int child = 0; child < cell->n_children (); ++child)
       Assert (cell->child (child)->parent () == cell,
