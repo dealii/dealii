@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -316,6 +316,19 @@ namespace Utilities
       ~MPI_InitFinalize();
     };
 
+    /**
+     * Return whether (i) deal.II has been compiled to support MPI (for
+     * example by compiling with <code>CXX=mpiCC</code>) and if so whether
+     * (ii) <code>MPI_Init()</code> has been called (for example using the
+     * Utilities::MPI::MPI_InitFinalize class). In other words, the result
+     * indicates whether the current job is running under MPI.
+     *
+     * @note The function does not take into account whether an MPI job
+     * actually runs on more than one processor or is, in fact, a single-node
+     * job that happens to run under MPI.
+     */
+    bool job_supports_mpi ();
+
     namespace internal
     {
 #ifdef DEAL_II_WITH_MPI
@@ -378,15 +391,20 @@ namespace Utilities
            const MPI_Comm &mpi_communicator)
     {
 #ifdef DEAL_II_WITH_MPI
-      T sum;
-      MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
-                     &sum, 1, internal::mpi_type_id(&t), MPI_SUM,
-                     mpi_communicator);
-      return sum;
-#else
-      (void)mpi_communicator;
-      return t;
+      if (job_supports_mpi())
+        {
+          T sum;
+          MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
+                         &sum, 1, internal::mpi_type_id(&t), MPI_SUM,
+                         mpi_communicator);
+          return sum;
+        }
+      else
 #endif
+        {
+          (void)mpi_communicator;
+          return t;
+        }
     }
 
 
@@ -397,18 +415,23 @@ namespace Utilities
               T (&sums)[N])
     {
 #ifdef DEAL_II_WITH_MPI
-      MPI_Allreduce ((&values[0] != &sums[0]
-                      ?
-                      const_cast<void *>(static_cast<const void *>(&values[0]))
-                      :
-                      MPI_IN_PLACE),
-                     &sums[0], N, internal::mpi_type_id(values), MPI_SUM,
-                     mpi_communicator);
-#else
-      (void)mpi_communicator;
-      for (unsigned int i=0; i<N; ++i)
-        sums[i] = values[i];
+      if (job_supports_mpi())
+        {
+          MPI_Allreduce ((&values[0] != &sums[0]
+                          ?
+                          const_cast<void *>(static_cast<const void *>(&values[0]))
+                          :
+                          MPI_IN_PLACE),
+                         &sums[0], N, internal::mpi_type_id(values), MPI_SUM,
+                         mpi_communicator);
+        }
+      else
 #endif
+        {
+          (void)mpi_communicator;
+          for (unsigned int i=0; i<N; ++i)
+            sums[i] = values[i];
+        }
     }
 
 
@@ -419,18 +442,23 @@ namespace Utilities
               std::vector<T>       &sums)
     {
 #ifdef DEAL_II_WITH_MPI
-      sums.resize (values.size());
-      MPI_Allreduce ((&values[0] != &sums[0]
-                      ?
-                      const_cast<void *>(static_cast<const void *>(&values[0]))
-                      :
-                      MPI_IN_PLACE),
-                     &sums[0], values.size(), internal::mpi_type_id((T *)0), MPI_SUM,
-                     mpi_communicator);
-#else
-      (void)mpi_communicator;
-      sums = values;
+      if (job_supports_mpi())
+        {
+          sums.resize (values.size());
+          MPI_Allreduce ((&values[0] != &sums[0]
+                          ?
+                          const_cast<void *>(static_cast<const void *>(&values[0]))
+                          :
+                          MPI_IN_PLACE),
+                         &sums[0], values.size(), internal::mpi_type_id((T *)0), MPI_SUM,
+                         mpi_communicator);
+        }
+      else
 #endif
+        {
+          (void)mpi_communicator;
+          sums = values;
+        }
     }
 
 
@@ -440,15 +468,20 @@ namespace Utilities
            const MPI_Comm &mpi_communicator)
     {
 #ifdef DEAL_II_WITH_MPI
-      T sum;
-      MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
-                     &sum, 1, internal::mpi_type_id(&t), MPI_MAX,
-                     mpi_communicator);
-      return sum;
-#else
-      (void)mpi_communicator;
-      return t;
+      if (job_supports_mpi())
+        {
+          T sum;
+          MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
+                         &sum, 1, internal::mpi_type_id(&t), MPI_MAX,
+                         mpi_communicator);
+          return sum;
+        }
+      else
 #endif
+        {
+          (void)mpi_communicator;
+          return t;
+        }
     }
 
 
@@ -459,18 +492,23 @@ namespace Utilities
               T (&maxima)[N])
     {
 #ifdef DEAL_II_WITH_MPI
-      MPI_Allreduce ((&values[0] != &maxima[0]
-                      ?
-                      const_cast<void *>(static_cast<const void *>(&values[0]))
-                      :
-                      MPI_IN_PLACE),
-                     &maxima[0], N, internal::mpi_type_id(values), MPI_MAX,
-                     mpi_communicator);
-#else
-      (void)mpi_communicator;
-      for (unsigned int i=0; i<N; ++i)
-        maxima[i] = values[i];
+      if (job_supports_mpi())
+        {
+          MPI_Allreduce ((&values[0] != &maxima[0]
+                          ?
+                          const_cast<void *>(static_cast<const void *>(&values[0]))
+                          :
+                          MPI_IN_PLACE),
+                         &maxima[0], N, internal::mpi_type_id(values), MPI_MAX,
+                         mpi_communicator);
+        }
+      else
 #endif
+        {
+          (void)mpi_communicator;
+          for (unsigned int i=0; i<N; ++i)
+            maxima[i] = values[i];
+        }
     }
 
 
@@ -481,17 +519,36 @@ namespace Utilities
               std::vector<T>       &maxima)
     {
 #ifdef DEAL_II_WITH_MPI
-      maxima.resize (values.size());
-      MPI_Allreduce ((&values[0] != &maxima[0]
-                      ?
-                      const_cast<void *>(static_cast<const void *>(&values[0]))
-                      :
-                      MPI_IN_PLACE),
-                     &maxima[0], values.size(), internal::mpi_type_id((T *)0), MPI_MAX,
-                     mpi_communicator);
+      if (job_supports_mpi())
+        {
+          maxima.resize (values.size());
+          MPI_Allreduce ((&values[0] != &maxima[0]
+                          ?
+                          const_cast<void *>(static_cast<const void *>(&values[0]))
+                          :
+                          MPI_IN_PLACE),
+                         &maxima[0], values.size(), internal::mpi_type_id((T *)0), MPI_MAX,
+                         mpi_communicator);
+        }
+      else
+#endif
+        {
+          (void)mpi_communicator;
+          maxima = values;
+        }
+    }
+
+
+    inline
+    bool job_supports_mpi ()
+    {
+#ifdef DEAL_II_WITH_MPI
+      int MPI_has_been_started = 0;
+      MPI_Initialized(&MPI_has_been_started);
+
+      return (MPI_has_been_started > 0);
 #else
-      (void)mpi_communicator;
-      maxima = values;
+      return false;
 #endif
     }
   } // end of namespace MPI

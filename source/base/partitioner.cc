@@ -141,7 +141,6 @@ namespace Utilities
       n_ghost_indices_data = ghost_indices_data.n_elements();
 
       have_ghost_indices =
-        Utilities::System::job_supports_mpi() &&
         Utilities::MPI::sum(n_ghost_indices_data, communicator) > 0;
 
       // In the rest of this function, we determine the point-to-point

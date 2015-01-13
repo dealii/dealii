@@ -31,7 +31,7 @@
 
 void test_mpi()
 {
-  Assert( Utilities::System::job_supports_mpi(), ExcInternalError());
+  Assert( Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);

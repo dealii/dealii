@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -342,17 +342,9 @@ namespace Utilities
     std::string get_time ();
 
     /**
-     * Return whether (i) deal.II has been compiled to support MPI (for
-     * example by compiling with <code>CXX=mpiCC</code>) and if so whether
-     * (ii) <code>MPI_Init()</code> has been called (for example using the
-     * Utilities::System::MPI_InitFinalize class). In other words, the result
-     * indicates whether the current job is running under MPI.
-     *
-     * @note The function does not take into account whether an MPI job
-     * actually runs on more than one processor or is, in fact, a single-node
-     * job that happens to run under MPI.
+     * @deprecated Use Utilities::MPI::job_supports_mpi() instead.
      */
-    bool job_supports_mpi ();
+    bool job_supports_mpi () DEAL_II_DEPRECATED;
   }
 
 
