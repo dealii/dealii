@@ -1094,7 +1094,7 @@ namespace Functions
    * dimensional case, let there be points $x_0,\ldots, x_{K-1}$,
    * $y_0,\ldots,y_{L-1}$, $z_1,\ldots,z_{M-1}$, and data $d_{klm}$ defined at
    * point $(x_k,y_l,z_m)^T$, then evaluating the function at a point $\mathbf
-   * x=(x,y,z)$ will find the box so that $x_k\le x\le x_{k+1}, y_l\le x\le
+   * x=(x,y,z)$ will find the box so that $x_k\le x\le x_{k+1}, y_l\le y\le
    * y_{l+1}, z_m\le z\le z_{m+1}$, and do a trilinear interpolation of the
    * data on this cell. Similar operations are done in lower dimensions.
    *
@@ -1177,7 +1177,7 @@ namespace Functions
    * $y_0,\ldots,y_{L-1}$, $z_1,\ldots,z_{M-1}$. Also consider data $d_{klm}$
    * defined at point $(x_k,y_l,z_m)^T$, then evaluating the function at a
    * point $\mathbf x=(x,y,z)$ will find the box so that $x_k\le x\le x_{k+1},
-   * y_l\le x\le y_{l+1}, z_m\le z\le z_{m+1}$, and do a trilinear
+   * y_l\le y\le y_{l+1}, z_m\le z\le z_{m+1}$, and do a trilinear
    * interpolation of the data on this cell. Similar operations are done in
    * lower dimensions.
    *
