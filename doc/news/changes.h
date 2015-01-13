@@ -14,11 +14,11 @@
 // ---------------------------------------------------------------------
 
 /**
-@page changes_after_8_2 Changes after Version 8.2
+@page changes_after_8_2_1 Changes after Version 8.2.1
 
 <p>
 This is the list of changes made after the release of deal.II version
-8.2.0. All entries are signed with the names of the authors.
+8.2.1. All entries are signed with the names of the authors.
 </p>
 
 
@@ -44,7 +44,7 @@ inconvenience this causes.
   <br>
   (Timo Heister, 2015/01/12)
   </li>
-  
+
   <li> Removed: The following compatibility definitions were removed from
   <code>include/deal.II/base/config.h.in</code> (replacement in brackets):
   - DEAL_II_CAN_USE_CXX11 (new: DEAL_II_WITH_CXX11)
@@ -181,12 +181,12 @@ inconvenience this causes.
 <ol>
   <li> New: PETScWrappers::MPI::SparseMatrix::reinit(other) copies
   the layout of another matrix. TrilinosWrappers::SparseMatrix
-  operator= and copy constructor are now disabled. This brings 
+  operator= and copy constructor are now disabled. This brings
   functionality between PETSc and Trilinos in line.
   <br>
   (Timo Heister, 2015/01/12)
   </li>
-  
+
   <li> New: Triangulation::set_all_manifold_ids() and
   Triangulation::set_all_manifold_ids_on_boundaries()
   set all manifold ids on every object or on every
@@ -195,31 +195,18 @@ inconvenience this causes.
   (Luca Heltai, 2015/01/12)
   </li>
 
-
-  <li> New: GridTools::copy_boundary_to_manifold_id() and 
+  <li> New: GridTools::copy_boundary_to_manifold_id() and
   GridTools::copy_material_to_manifold_id() copy
-  boundary_ids and material_ids to manifold_ids for 
+  boundary_ids and material_ids to manifold_ids for
   faces on the boundary and for cells respectively.
   <br>
   (Luca Heltai, 2015/01/09)
   </li>
 
-
   <li> Fixed: Utilities::int_to_string() produced wrong results if
   the number of digits specified was ten or greater.
   <br>
   (David Wells, 2015/01/08)
-  </li>
-
-  <li> Ported: The build system now supports CMake up to version 3.1.
-  <br>
-  (Matthias Maier, 2015/01/06)
-  </li>
-
-  <li> Fixed: CMake now also handles and exports the subminor version
-  number correctly ("pre" and "rc?" are replaced by "0").
-  <br>
-  (Matthias Maier, 2015/01/02)
   </li>
 
   <li> Fixed: VectorTools::interpolate_to_different_mesh() was accidentally
