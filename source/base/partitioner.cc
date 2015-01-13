@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,8 @@ namespace Utilities
       n_import_indices_data (0),
       my_pid (0),
       n_procs (1),
-      communicator (MPI_COMM_SELF)
+      communicator (MPI_COMM_SELF),
+      have_ghost_indices (false)
     {}
 
 
@@ -44,7 +45,8 @@ namespace Utilities
       n_import_indices_data (0),
       my_pid (0),
       n_procs (1),
-      communicator (MPI_COMM_SELF)
+      communicator (MPI_COMM_SELF),
+      have_ghost_indices (false)
     {
       locally_owned_range_data.add_range (0, size);
       locally_owned_range_data.compress ();
@@ -62,7 +64,8 @@ namespace Utilities
       n_import_indices_data (0),
       my_pid (0),
       n_procs (1),
-      communicator (communicator_in)
+      communicator (communicator_in),
+      have_ghost_indices (false)
     {
       set_owned_indices (locally_owned_indices);
       set_ghost_indices (ghost_indices_in);
@@ -78,7 +81,8 @@ namespace Utilities
       n_import_indices_data (0),
       my_pid (0),
       n_procs (1),
-      communicator (communicator_in)
+      communicator (communicator_in),
+      have_ghost_indices (false)
     {
       set_owned_indices (locally_owned_indices);
     }
@@ -128,12 +132,16 @@ namespace Utilities
               ghost_indices_in.size() == locally_owned_range_data.size(),
               ExcDimensionMismatch (ghost_indices_in.size(),
                                     locally_owned_range_data.size()));
+
       ghost_indices_data = ghost_indices_in;
       if (ghost_indices_data.size() != locally_owned_range_data.size())
         ghost_indices_data.set_size(locally_owned_range_data.size());
       ghost_indices_data.subtract_set (locally_owned_range_data);
       ghost_indices_data.compress();
       n_ghost_indices_data = ghost_indices_data.n_elements();
+
+      have_ghost_indices =
+        Utilities::MPI::sum(n_ghost_indices_data, communicator) > 0;
 
       // In the rest of this function, we determine the point-to-point
       // communication pattern of the partitioner. We make up a list with both
