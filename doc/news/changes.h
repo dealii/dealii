@@ -202,6 +202,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: dealii::multithread_info.n_cpus returns the correct number of CPU 
+  on FreeBSD.
+  <br>
+  (Bruno Turcksin, 2015/01/14)
+  </li>
+
   <li> Improved: MPI collective operations such as MPI::sum, MPI::max now
   check for job_supports_mpi() internally, which allows running them also
   without a call to MPI_Init.
