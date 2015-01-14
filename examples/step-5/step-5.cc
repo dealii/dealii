@@ -49,7 +49,7 @@
 
 // We will use a circular domain, and the object describing the boundary of it
 // comes from this file:
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 // This is C++ ...
 #include <fstream>
@@ -592,14 +592,14 @@ void Step5<dim>::run ()
   // <code>GridIn</code> class to find out what input formats are presently
   // supported.)
 
-  // The grid in the file describes a circle. Therefore we have to use a
-  // boundary object which tells the triangulation where to put new points on
-  // the boundary when the grid is refined. This works in the same way as in
-  // the first example. Note that the HyperBallBoundary constructor takes two
-  // parameters, the center of the ball and the radius, but that their default
-  // (the origin and 1.0) are the ones which we would like to use here.
-  static const HyperBallBoundary<dim> boundary;
-  triangulation.set_boundary (0, boundary);
+  // The grid in the file describes a circle. Therefore we have to use
+  // a manifold object which tells the triangulation where to put new
+  // points on the boundary when the grid is refined. This works in
+  // the same way as in the first example, but in this case we only
+  // set the manifold ids of the boundary.
+  static const SphericalManifold<dim> boundary;
+  triangulation.set_all_manifold_ids_on_boundary(0);
+  triangulation.set_manifold (0, boundary);
 
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
