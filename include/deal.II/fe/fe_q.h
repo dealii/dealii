@@ -109,25 +109,23 @@ DEAL_II_NAMESPACE_OPEN
  * </ul>
  *
  * In 2d, these shape functions look as follows: <table> <tr> <td
- * align="center"> 
+ * align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q1/Q1_shape0000.png
  * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q1/Q1_shape0001.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_1$ element, shape function 0 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_1$ element, shape function 0 </td>
  *
  * <td align="center"> $Q_1$ element, shape function 1 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q1/Q1_shape0002.png
  * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q1/Q1_shape0003.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_1$ element, shape function 2 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_1$ element, shape function 2 </td>
  *
  * <td align="center"> $Q_1$ element, shape function 3 </td> </tr> </table>
  *
@@ -210,51 +208,47 @@ DEAL_II_NAMESPACE_OPEN
  *
  * In 2d, these shape functions look as follows (the black plane corresponds
  * to zero; negative shape function values may not be visible): <table> <tr>
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q2/Q2_shape0000.png
  * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q2/Q2_shape0001.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_2$ element, shape function 0 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_2$ element, shape function 0 </td>
  *
  * <td align="center"> $Q_2$ element, shape function 1 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q2/Q2_shape0002.png
  * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q2/Q2_shape0003.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_2$ element, shape function 2 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_2$ element, shape function 2 </td>
  *
  * <td align="center"> $Q_2$ element, shape function 3 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q2/Q2_shape0004.png
  * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q2/Q2_shape0005.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_2$ element, shape function 4 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_2$ element, shape function 4 </td>
  *
  * <td align="center"> $Q_2$ element, shape function 5 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q2/Q2_shape0006.png
  * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q2/Q2_shape0007.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_2$ element, shape function 6 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_2$ element, shape function 6 </td>
  *
  * <td align="center"> $Q_2$ element, shape function 7 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q2/Q2_shape0008.png
  * </td>
  *
@@ -309,65 +303,59 @@ DEAL_II_NAMESPACE_OPEN
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0004.png
  * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0005.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_3$ element, shape function 4 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3$ element, shape function 4 </td>
  *
  * <td align="center"> $Q_3$ element, shape function 5 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0006.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0007.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_3$ element, shape function 6 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3$ element, shape function 6 </td>
  *
  * <td align="center"> $Q_3$ element, shape function 7 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0008.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0009.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_3$ element, shape function 8 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3$ element, shape function 8 </td>
  *
  * <td align="center"> $Q_3$ element, shape function 9 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0010.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0011.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_3$ element, shape function 10 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3$ element, shape function 10 </td>
  *
  * <td align="center"> $Q_3$ element, shape function 11 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0012.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0013.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_3$ element, shape function 12 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3$ element, shape function 12 </td>
  *
  * <td align="center"> $Q_3$ element, shape function 13 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0014.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q3/Q3_shape0015.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_3$ element, shape function 14 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3$ element, shape function 14 </td>
  *
  * <td align="center"> $Q_3$ element, shape function 15 </td> </tr> </table>
  *
@@ -395,141 +383,129 @@ DEAL_II_NAMESPACE_OPEN
  *
  * In 2d, these shape functions look as follows (the black plane corresponds
  * to zero; negative shape function values may not be visible): <table> <tr>
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0000.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0001.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 0 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 0 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 1 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0002.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0003.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 2 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 2 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 3 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0004.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0005.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 4 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 4 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 5 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0006.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0007.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 6 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 6 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 7 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0008.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0009.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 8 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 8 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 9 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0010.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0011.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 10 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 10 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 11 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0012.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0013.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 12 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 12 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 13 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0014.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0015.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 14 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 14 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 15 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0016.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0017.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 16 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 16 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 17 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0018.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0019.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 18 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 18 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 19 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0020.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0021.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 20 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 20 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 21 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0022.png
- *</td>
+ * </td>
  *
- * <td align="center"> 
+ * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0023.png
- *</td> </tr> <tr> <td
- * align="center"> $Q_4$ element, shape function 22 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4$ element, shape function 22 </td>
  *
  * <td align="center"> $Q_4$ element, shape function 23 </td> </tr>
  *
- * <tr> <td align="center"> 
+ * <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/lagrange/Q4/Q4_shape0024.png
- *</td>
+ * </td>
  *
  * <td align="center"> </td> </tr> <tr> <td align="center"> $Q_4$ element,
  * shape function 24 </td>
