@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,7 +81,7 @@ namespace internal
       dynamic_cast<const parallel::distributed::Triangulation<dim>*>(&tria);
     if (dist_tria != 0)
       {
-        if (Utilities::System::job_supports_mpi())
+        if (Utilities::MPI::job_supports_mpi())
           {
             int communicators_same = 0;
             MPI_Comm_compare (dist_tria->get_communicator(), comm_mf,
@@ -136,7 +136,7 @@ internal_reinit(const Mapping<dim>                          &mapping,
       internal::assert_communicator_equality (dof_handler[0]->get_tria(),
                                               additional_data.mpi_communicator);
       size_info.communicator = additional_data.mpi_communicator;
-      if (Utilities::System::job_supports_mpi() == true)
+      if (Utilities::MPI::job_supports_mpi() == true)
         {
           size_info.my_pid  =
             Utilities::MPI::this_mpi_process(size_info.communicator);
@@ -266,7 +266,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
       internal::assert_communicator_equality (dof_handler[0]->get_tria(),
                                               additional_data.mpi_communicator);
       size_info.communicator = additional_data.mpi_communicator;
-      if (Utilities::System::job_supports_mpi() == true)
+      if (Utilities::MPI::job_supports_mpi() == true)
         {
           size_info.my_pid  =
             Utilities::MPI::this_mpi_process(size_info.communicator);
@@ -890,21 +890,8 @@ namespace internal
     void SizeInfo::print_memory_statistics (STREAM     &out,
                                             std::size_t data_length) const
     {
-      Utilities::MPI::MinMaxAvg memory_c;
-      if (Utilities::System::job_supports_mpi() == true)
-        {
-          memory_c = Utilities::MPI::min_max_avg (1e-6*data_length,
-                                                  communicator);
-        }
-      else
-        {
-          memory_c.sum = 1e-6*data_length;
-          memory_c.min = memory_c.sum;
-          memory_c.max = memory_c.sum;
-          memory_c.avg = memory_c.sum;
-          memory_c.min_index = 0;
-          memory_c.max_index = 0;
-        }
+      Utilities::MPI::MinMaxAvg memory_c
+        = Utilities::MPI::min_max_avg (1e-6*data_length, communicator);
       if (n_procs < 2)
         out << memory_c.min;
       else

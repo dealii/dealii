@@ -202,6 +202,21 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: MPI collective operations such as MPI::sum, MPI::max now
+  check for job_supports_mpi() internally, which allows running them also
+  without a call to MPI_Init.
+  <br>
+  (Martin Kronbichler, 2015/01/13)
+  </li>
+
+  <li> Changed: The method job_supports_mpi() now resides in the namespace
+  Utilities::MPI instead of Utilities::System for consistency with other MPI
+  methods. The old method has been marked deprecated and will be removed in
+  a future version.
+  <br>
+  (Martin Kronbichler, 2015/01/13)
+  </li>
+
   <li> Fixed: The update of ghost values in parallel::distributed::Vector when
   calling the assignment operator is now active when one of the two vector had
   its ghost values updated before or when the layout of the right hand side

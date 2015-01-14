@@ -600,7 +600,7 @@ namespace parallel
 #ifdef DEAL_II_WITH_MPI
 
 #ifdef DEBUG
-      if (Utilities::System::job_supports_mpi())
+      if (Utilities::MPI::job_supports_mpi())
         {
           // make sure that there are not outstanding requests from updating
           // ghost values or compress

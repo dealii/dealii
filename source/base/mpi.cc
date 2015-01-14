@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -230,6 +230,21 @@ namespace Utilities
     min_max_avg(const double my_value,
                 const MPI_Comm &mpi_communicator)
     {
+      // If MPI was not started, we have a serial computation and cannot run
+      // the other MPI commands
+      if (job_supports_mpi() == false)
+        {
+          MinMaxAvg result;
+          result.sum = my_value;
+          result.avg = my_value;
+          result.min = my_value;
+          result.max = my_value;
+          result.min_index = 0;
+          result.max_index = 0;
+
+          return result;
+        }
+
       // To avoid uninitialized values on some MPI implementations, provide
       // result with a default value already...
       MinMaxAvg result = { 0., std::numeric_limits<double>::max(),
@@ -501,10 +516,7 @@ namespace Utilities
       // when running PETSc, because we initialize MPI ourselves before calling
       // PetscInitialize
 #ifdef DEAL_II_WITH_MPI
-      int MPI_has_been_started = 0;
-      MPI_Initialized(&MPI_has_been_started);
-      if (Utilities::System::job_supports_mpi() == true &&
-          MPI_has_been_started != 0)
+      if (job_supports_mpi() == true)
         {
           if (std::uncaught_exception())
             {
