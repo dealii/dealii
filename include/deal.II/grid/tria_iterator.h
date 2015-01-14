@@ -161,8 +161,8 @@ template <typename> class TriaActiveIterator;
  * but you may write your own version (non-virtual, since we use templates) to
  * add functionality.
  *
- * The accessors provided by the library consists of two groups,
- * determined by whether they access the data of Triangulation objects or
+ * The accessors provided by the library consists of two groups, determined by
+ * whether they access the data of Triangulation objects or
  * DoFHandler/hp::DoFHandler objects. They are derived from TriaAccessor and
  * DoFAccessor, respectively. Each group also has specialized accessors for
  * cells (as opposed to faces and lines) that offer more functionality such as

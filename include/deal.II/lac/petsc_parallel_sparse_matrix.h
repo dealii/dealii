@@ -326,8 +326,9 @@ namespace PETScWrappers
                    const MPI_Comm                  &communicator);
 
       /**
-       * Initialize this matrix to have the same structure as @p other. This will not copy
-       * the values of the other matrix, but you can use copy_from() for this.
+       * Initialize this matrix to have the same structure as @p other. This
+       * will not copy the values of the other matrix, but you can use
+       * copy_from() for this.
        */
       void reinit (const SparseMatrix &other);
 

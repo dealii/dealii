@@ -68,14 +68,13 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The implementation of this class is such that not only cell iterators into
  * triangulations can be mapped, but also iterators into objects of type
- * DoFHandler or hp::DoFHandler. The extension to other classes
- * offering iterator functions and some minor additional requirements is
- * simple.
+ * DoFHandler or hp::DoFHandler. The extension to other classes offering
+ * iterator functions and some minor additional requirements is simple.
  *
  * Note that this class could in principle be based on the C++
- * <tt>std::map<Key,Value></tt> data type. Instead, it uses another data format
- * which is more effective both in terms of computing time for access as well
- * as with regard to memory consumpion.
+ * <tt>std::map<Key,Value></tt> data type. Instead, it uses another data
+ * format which is more effective both in terms of computing time for access
+ * as well as with regard to memory consumpion.
  *
  *
  * <h3>Usage</h3>

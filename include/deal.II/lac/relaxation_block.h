@@ -220,10 +220,10 @@ protected:
  *
  * This class implements the step() and Tstep() functions expected by
  * SolverRelaxation and MGSmootherRelaxation. They perform an additive Schwarz
- * method on the blocks provided in the block list of AdditionalData. Differing
- * from PreconditionBlockJacobi, these blocks may be of varying size, non-
- * contiguous, and overlapping. On the other hand, this class does not
- * implement the preconditioner interface expected by Solver objects.
+ * method on the blocks provided in the block list of AdditionalData.
+ * Differing from PreconditionBlockJacobi, these blocks may be of varying
+ * size, non- contiguous, and overlapping. On the other hand, this class does
+ * not implement the preconditioner interface expected by Solver objects.
  *
  * @ingroup Preconditioners
  * @author Guido Kanschat
@@ -383,9 +383,9 @@ public:
  *
  * This class implements the step() and Tstep() functions expected by
  * SolverRelaxation and MGSmootherRelaxation. They perform a multiplicative
- * Schwarz method on the blocks provided in the block list of AdditionalData in
- * symmetric fashion. Differing from PreconditionBlockSSOR, these blocks may
- * be of varying size, non-contiguous, and overlapping. On the other hand,
+ * Schwarz method on the blocks provided in the block list of AdditionalData
+ * in symmetric fashion. Differing from PreconditionBlockSSOR, these blocks
+ * may be of varying size, non-contiguous, and overlapping. On the other hand,
  * this class does not implement the preconditioner interface expected by
  * Solver objects.
  *

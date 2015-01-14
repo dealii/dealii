@@ -85,9 +85,8 @@ protected:
   /**
    * A memory object to be used for temporary vectors.
    *
-   * The object is marked as mutable since we will need to use it
-   * to allocate temporary vectors also in functions that are
-   * const.
+   * The object is marked as mutable since we will need to use it to allocate
+   * temporary vectors also in functions that are const.
    */
   mutable GrowingVectorMemory<VECTOR> vector_memory;
 

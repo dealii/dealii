@@ -77,16 +77,16 @@ namespace MeshWorker
     /**
      * The number of the current face on the current cell.
      *
-     * This number is numbers::invalid_unsigned_int if the info object
-     * was initialized with a cell.
+     * This number is numbers::invalid_unsigned_int if the info object was
+     * initialized with a cell.
      */
     unsigned int face_number;
 
     /**
      * The number of the current subface on the current face
      *
-     * This number is numbers::invalid_unsigned_int if the info object
-     * was not initialized with a subface.
+     * This number is numbers::invalid_unsigned_int if the info object was not
+     * initialized with a subface.
      */
     unsigned int sub_number;
 

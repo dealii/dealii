@@ -925,8 +925,8 @@ namespace DoFRenumbering
   /**
    * This function computes the renumbering vector on each level needed by the
    * sort_selected_dofs_back() function. Does not perform the renumbering on
-   * the DoFHandler dofs but only computes the renumbering and returns
-   * the renumbering vector.
+   * the DoFHandler dofs but only computes the renumbering and returns the
+   * renumbering vector.
    *
    * @pre The @p selected_dofs array must have as many elements as the @p
    * dof_handler has degrees of freedom on the given level.
