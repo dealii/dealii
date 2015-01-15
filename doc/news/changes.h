@@ -38,6 +38,22 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: The MPI_InitFinalize class had a constructor that took
+  two arguments (<code>argc,argv</code>). This constructor has been removed
+  in favor of the one that takes three arguments where the last one is
+  the number of threads to be used for the current MPI process. This last
+  argument has received a default value so that the old, two-argument
+  calling syntax continues to work. However, whereas the old syntax with
+  two arguments indicated that the user wanted only one thread per process,
+  the default value is set so that every processor core on the system is
+  used. If you run as many MPI processes as there are processor cores, then
+  this means one thread per MPI process, as before. On the other hand, if you
+  start fewer MPI processes than there are cores, then your program will now
+  be allowed to use more than one thread, speeding up a number of operations.
+  <br>
+  (Wolfgang Bangerth, 2015/01/14)
+  </li>
+
   <li> Removed: TrilinosWrappers::SparseMatrix copy constructor got removed
   to be in line with PETSc and dealii::SparseMatrix. You can use reinit()
   and copy_from().
@@ -116,7 +132,6 @@ inconvenience this causes.
     approach to getting notified about what happens to triangulations
     has been superseded by the signals defined by the triangulation
     class.
-  - The deprecated constructor of MPI_InitFinalize
   - The MPI support functions in namespace Utilities and Utilities::System.
   - Deprecated members of namespace types.
   - Namespace deal_II_numbers.
