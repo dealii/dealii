@@ -117,8 +117,8 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
         {
           values[start][0] = monovali[0][0];
           values[start][1] = -unit_point(1) * monovali[0][1];
-          values[start+1][0] = -unit_point(0) * monovali[1][1];
-          values[start+1][1] = monovali[1][0];
+          values[start+1][0] = unit_point(0) * monovali[1][1];
+          values[start+1][1] = -monovali[1][0];
         }
       if (grads.size() != 0)
         {

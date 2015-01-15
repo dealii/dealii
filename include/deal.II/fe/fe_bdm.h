@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  * @todo Restriction matrices are missing.
  *
  * The matching pressure space for FE_BDM of order <i>k</i> is the element
- * FE_DGP of order <i>k</i>.
+ * FE_DGP of order <i>k-1</i>.
  *
  * The BDM element of order @p p has <i>p+1</i> degrees of freedom on each
  * face. These are implemented as the function values in the <i>p+1</i> Gauss
