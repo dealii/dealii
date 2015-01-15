@@ -25,7 +25,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -77,12 +77,12 @@ namespace Step10
 
     // So first generate a coarse triangulation of the circle and associate a
     // suitable boundary description to it. Note that the default values of
-    // the HyperBallBoundary constructor are a center at the origin and a
-    // radius equals one.
+    // the SphericalManifold constructor is a center at the origin.
     Triangulation<dim> triangulation;
     GridGenerator::hyper_ball (triangulation);
-    static const HyperBallBoundary<dim> boundary;
-    triangulation.set_boundary (0, boundary);
+    static const SphericalManifold<dim> boundary;
+    triangulation.set_all_manifold_ids_on_boundary(0);
+    triangulation.set_manifold (0, boundary);
 
     // Next generate output for this grid and for a once refined grid. Note
     // that we have hidden the mesh refinement in the loop header, which might
@@ -215,8 +215,9 @@ namespace Step10
         Triangulation<dim> triangulation;
         GridGenerator::hyper_ball (triangulation);
 
-        static const HyperBallBoundary<dim> boundary;
-        triangulation.set_boundary (0, boundary);
+        static const SphericalManifold<dim> boundary;
+        triangulation.set_all_manifold_ids_on_boundary (0);
+        triangulation.set_manifold(0, boundary);
 
         const MappingQ<dim> mapping (degree);
 
@@ -351,8 +352,9 @@ namespace Step10
         Triangulation<dim> triangulation;
         GridGenerator::hyper_ball (triangulation);
 
-        static const HyperBallBoundary<dim> boundary;
-        triangulation.set_boundary (0, boundary);
+        static const SphericalManifold<dim> boundary;
+        triangulation.set_all_manifold_ids_on_boundary (0);
+        triangulation.set_manifold (0, boundary);
 
         const MappingQ<dim> mapping (degree);
         const FE_Q<dim>     fe (1);
