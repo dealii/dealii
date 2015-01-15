@@ -38,18 +38,14 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li> Changed: The MPI_InitFinalize class had a constructor that took
-  two arguments (<code>argc,argv</code>). This constructor has been removed
-  in favor of the one that takes three arguments where the last one is
-  the number of threads to be used for the current MPI process. This last
-  argument has received a default value so that the old, two-argument
-  calling syntax continues to work. However, whereas the old syntax with
-  two arguments indicated that the user wanted only one thread per process,
-  the default value is set so that every processor core on the system is
+  <li> Changed: The two-argument call to the MPI_InitFinalize constructor
+  used to imply that the user wanted only one thread per MPI process. This
+  has been changed and now means that every processor core on the system is
   used. If you run as many MPI processes as there are processor cores, then
   this means one thread per MPI process, as before. On the other hand, if you
   start fewer MPI processes than there are cores, then your program will now
-  be allowed to use more than one thread, speeding up a number of operations.
+  be allowed to use more than one thread. You can get the old behavior by
+  setting the third (optional) argument to one.
   <br>
   (Wolfgang Bangerth, 2015/01/14)
   </li>
