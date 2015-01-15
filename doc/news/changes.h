@@ -195,6 +195,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: Examples from 1 to 16 now use the Manifold interface
+  instead of the old Boundary interface to describe curved boundaries
+  and domains.
+  <br>
+  (Luca Heltai, 2015/01/15)
+  </li>
+
   <li> New: The build system now queries for git branch name and
   revision sha1 (and automatically reconfigures if necessary). This
   information is used to annotate summary.log and detailed.log with the
