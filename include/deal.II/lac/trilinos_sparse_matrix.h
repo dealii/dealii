@@ -599,9 +599,9 @@ namespace TrilinosWrappers
     void reinit (const SparsityPattern &sparsity_pattern);
 
     /**
-     * This function copies the layout of @p sparse_matrix to the
-     * calling matrix. The values are not copied, but you can use
-     * copy_from() for this.
+     * This function copies the layout of @p sparse_matrix to the calling
+     * matrix. The values are not copied, but you can use copy_from() for
+     * this.
      *
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.

@@ -725,10 +725,10 @@ public:
    *
    * At the end of distribute_dofs(), the number of degrees of freedom in each
    * block is counted, and stored in a BlockInfo object, which can be accessed
-   * here. If you have previously called distribute_mg_dofs(),
-   * the same is done on each level of the multigrid hierarchy. Additionally,
-   * the block structure on each cell can be generated in this object by
-   * calling initialize_local_block_info().
+   * here. If you have previously called distribute_mg_dofs(), the same is
+   * done on each level of the multigrid hierarchy. Additionally, the block
+   * structure on each cell can be generated in this object by calling
+   * initialize_local_block_info().
    */
   const BlockInfo &block_info() const;
 

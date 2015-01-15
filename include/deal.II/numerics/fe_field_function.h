@@ -54,8 +54,8 @@ namespace Functions
    *
    * Once the FEFieldFunction knows where the points lie, it creates a
    * quadrature formula for those points, and calls
-   * FEValues::get_function_values or FEValues::get_function_gradients with the
-   * given quadrature points.
+   * FEValues::get_function_values or FEValues::get_function_gradients with
+   * the given quadrature points.
    *
    * If you only need the quadrature points but not the values of the finite
    * element function (you might want this for the adjoint interpolation), you

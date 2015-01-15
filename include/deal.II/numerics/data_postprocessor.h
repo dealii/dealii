@@ -114,9 +114,9 @@ class DataPostprocessor: public Subscriptor
 {
 public:
   /**
-   * Destructor. This function doesn't actually do anything but
-   * is marked as virtual to ensure that data postprocessors can
-   * be destroyed through pointers to the base class.
+   * Destructor. This function doesn't actually do anything but is marked as
+   * virtual to ensure that data postprocessors can be destroyed through
+   * pointers to the base class.
    */
   virtual ~DataPostprocessor ();
 
