@@ -428,9 +428,10 @@ namespace GridGenerator
    * of cells of the resulting triangulation, i.e., how many cells form the
    * ring (in 2d) or the shell (in 3d).
    *
-   * If the flag @p colorize is @p true, then the outer boundary will have the
-   * indicator 1, while the inner boundary has id zero. If the flag is @p
-   * false, both have indicator zero.
+   * If the flag @p colorize is @p true, then the outer boundary will
+   * have the indicator 1, while the inner boundary has id zero. In
+   * 3d, this applies to both the faces and the edges of these
+   * boundaries. If the flag is @p false, both have indicator zero.
    *
    * In 2d, the number <tt>n_cells</tt> of elements for this initial
    * triangulation can be chosen arbitrarily. If the number of initial cells
