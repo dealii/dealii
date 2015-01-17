@@ -101,28 +101,31 @@ void second_grid ()
                               center, inner_radius, outer_radius,
                               10);
   // By default, the triangulation assumes that all boundaries are
-  // straigth lines, and all cells are bi-linear quads, and that they
-  // are defined by the cells of the coarse grid (which we just
-  // created). It uses this information when cells are refined and new
-  // points need to be introduced; if the domain is assumed to be
-  // flat, then new points will simply be in the middle of the
-  // surrounding ones.
-  //
+  // straight lines, and all cells are bi-linear quads or tri-linear
+  // hexes, and that they are defined by the cells of the coarse grid
+  // (which we just created). Unless we do something special, when new
+  // points need to be introduced; the domain is assumed to be
+  // delineated by the straight lines of the coarse mesh, and new
+  // points will simply be in the middle of the surrounding ones.
   // Here, however, we know that the domain is curved, and we would
   // like to have the Triangulation place new points according to the
   // underlying geometry. Fortunately, some good soul implemented an
   // object which describes a spherical domain, of which the ring is a
   // section; it only needs the center of the ring and automatically
   // figures out how to instruct the Triangulation where to place the
-  // new points. We first set the "manifold indicator" of all cells
-  // and faces of the Triangulation to the value zero, and then
-  // associate the curved Manifold object with those parts of the
-  // Triangulation that have the "manifold indicator" zero. By
-  // default, all cells and faces of the Triangulation have their
-  // manifold_id set to numbers::invalid_manifold_id, which is the
-  // default if you want a flat manifold, but you can change this
+  // new points. The way this works in deal.II is that you tag parts
+  // of the triangulation you want to be curved with a number that is
+  // usually referred to as "boundary indicator" and then tell the
+  // triangulation to use a particular "manifold object" for all
+  // places with this manifold indicator. How exactly this works is
+  // not important at this point (you can read up on it in step-53 and
+  // @ref manifold). Here, for simplicity, we will choose the manifold
+  // id to be zero.  By default, all cells and faces of the
+  // Triangulation have their manifold_id set to
+  // numbers::invalid_manifold_id, which is the default if you want a
+  // manifold that produces straight edges, but you can change this
   // number for individual cells and faces. In that case, the curved
-  // manifold thus associated with number zero will not apply on those
+  // manifold thus associated with number zero will not apply to those
   // parts with a non-zero manifold indicator, but other manifold
   // description objects can be associated with those non-zero
   // indicators. If no manifold description is associated with a

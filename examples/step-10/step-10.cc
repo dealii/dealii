@@ -75,9 +75,10 @@ namespace Step10
     std::cout << "Output of grids into gnuplot files:" << std::endl
               << "===================================" << std::endl;
 
-    // So first generate a coarse triangulation of the circle and associate a
-    // suitable boundary description to it. Note that the default values of
-    // the SphericalManifold constructor is a center at the origin.
+    // So first generate a coarse triangulation of the circle and
+    // associate a suitable boundary description to it. Note that the
+    // default value of the argument to the SphericalManifold
+    // constructor is a center at the origin.
     Triangulation<dim> triangulation;
     GridGenerator::hyper_ball (triangulation);
     static const SphericalManifold<dim> boundary;
