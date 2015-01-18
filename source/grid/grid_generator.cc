@@ -173,7 +173,7 @@ namespace GridGenerator
            cell != tria.end (); ++cell)
         {
           Assert(cell->face(2)->at_boundary(), ExcInternalError());
-          cell->face (2)->set_boundary_indicator (1);
+          cell->face (2)->set_all_boundary_indicators (1);
         }
     }
 
@@ -196,23 +196,28 @@ namespace GridGenerator
         {
           Triangulation<3>::cell_iterator cell = tria.begin();
 
-          cell->face(4)->set_boundary_indicator(1);
           Assert (cell->face(4)->at_boundary(), ExcInternalError());
+          cell->face(4)->set_all_boundary_indicators(1);
 
-          (++cell)->face(2)->set_boundary_indicator(1);
+          ++cell;
           Assert (cell->face(2)->at_boundary(), ExcInternalError());
+          cell->face(2)->set_all_boundary_indicators(1);
 
-          (++cell)->face(2)->set_boundary_indicator(1);
+          ++cell;
           Assert (cell->face(2)->at_boundary(), ExcInternalError());
+          cell->face(2)->set_all_boundary_indicators(1);
 
-          (++cell)->face(0)->set_boundary_indicator(1);
+          ++cell;
           Assert (cell->face(0)->at_boundary(), ExcInternalError());
+          cell->face(0)->set_all_boundary_indicators(1);
 
-          (++cell)->face(2)->set_boundary_indicator(1);
+          ++cell;
           Assert (cell->face(2)->at_boundary(), ExcInternalError());
+          cell->face(2)->set_all_boundary_indicators(1);
 
-          (++cell)->face(0)->set_boundary_indicator(1);
+          ++cell;
           Assert (cell->face(0)->at_boundary(), ExcInternalError());
+          cell->face(0)->set_all_boundary_indicators(1);
         }
       else if (tria.n_cells() == 12)
         {
@@ -222,7 +227,7 @@ namespace GridGenerator
                cell != tria.end(); ++cell)
             {
               Assert (cell->face(5)->at_boundary(), ExcInternalError());
-              cell->face(5)->set_boundary_indicator(1);
+              cell->face(5)->set_all_boundary_indicators(1);
             }
         }
       else if (tria.n_cells() == 96)
@@ -243,7 +248,7 @@ namespace GridGenerator
                cell != tria.end(); ++cell)
             if (cell->face(5)->at_boundary())
               {
-                cell->face(5)->set_boundary_indicator(1);
+                cell->face(5)->set_all_boundary_indicators(1);
                 ++count;
               }
           Assert (count == 48, ExcInternalError());

@@ -239,6 +239,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: In 3d, when you set the <code>colorize</code> flag of
+  GridGenerator::hyper_shell(), the faces of the domain were colored but
+  the edges were not. This was an oversight because to refine correctly,
+  the edges also have to have the appropriate boundary indicator set.
+  <br>
+  (Wolfgang Bangerth, 2015/01/16)
+  </li>
+
   <li> New: dealii::multithread_info.n_cpus returns the correct number of CPU 
   on FreeBSD.
   <br>
