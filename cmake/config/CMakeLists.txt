@@ -16,13 +16,13 @@
 #
 # This file sets up the project configuration consisting of
 #
-#   Make.global_options (legacy)
 #   deal.IIConfig.cmake
 #   deal.IIVersionConfig.cmake
+#   Make.global_options
 #
 # We support two configurations out of which deal.II can be used - directly
 # from the build directory or after installation. So we have to prepare
-# two distinct set ups.
+# two distinct setups.
 #
 
 MESSAGE(STATUS "Setting up project configuration")
@@ -32,7 +32,7 @@ MESSAGE(STATUS "Setting up project configuration")
 #
 CONFIGURE_FILE( # for binary dir:
   ${CMAKE_CURRENT_SOURCE_DIR}/template-arguments.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/template-arguments
+  ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
   )
 
 
@@ -94,56 +94,52 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   ENDIF()
 
   #
-  # Build up library name depending on link type:
+  # Build up library name depending on link type and platform:
   #
+
   IF(BUILD_SHARED_LIBS)
-    SET(CONFIG_LIBRARY_${_build}
-      "${CMAKE_SHARED_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      )
+    SET(_type "SHARED")
   ELSE()
-    SET(CONFIG_LIBRARY_${_build}
-      "${CMAKE_STATIC_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-      )
+    SET(_type "STATIC")
   ENDIF()
 
   IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "Windows")
-    SET(CONFIG_LIBRARIES_${_build}
-      \${DEAL_II_PATH}/\${DEAL_II_EXECUTABLE_RELDIR}/${CONFIG_LIBRARY_${_build}}
-      )
+    SET(_reldir "\${DEAL_II_EXECUTABLE_RELDIR}")
   ELSE()
-    SET(CONFIG_LIBRARIES_${_build}
-      \${DEAL_II_PATH}/\${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${_build}}
-      )
+    SET(_reldir "\${DEAL_II_LIBRARY_RELDIR}")
   ENDIF()
 
-  LIST(APPEND CONFIG_LIBRARIES_${_build}
+  SET(CONFIG_LIBRARIES_${_build}
+    "\${DEAL_II_PATH}/${_reldir}/${CMAKE_${_type}_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_${_type}_LIBRARY_SUFFIX}"
     ${DEAL_II_LIBRARIES_${_build}}
     ${DEAL_II_LIBRARIES}
     )
-  LIST(APPEND CONFIG_LIBRARIES
-    ${_keyword}
-    \${DEAL_II_LIBRARIES_${_build}}
-    )
+  TO_STRING(MAKEFILE_LIBRARIES_${_build} ${CONFIG_LIBRARIES_${_build}})
+  TO_STRING(MAKEFILE_USER_DEFINITIONS_${_build} ${DEAL_II_USER_DEFINITIONS_${_build}})
+  LIST(APPEND CONFIG_LIBRARIES ${_keyword} \${DEAL_II_LIBRARIES_${_build}})
 
-  SET(CONFIG_TARGET_${_build}
-    ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
-    )
-  LIST(APPEND CONFIG_TARGET
-    ${_keyword}
-    \${DEAL_II_TARGET_${_build}}
-    )
+  SET(CONFIG_TARGET_${_build} ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX})
+  LIST(APPEND CONFIG_TARGET ${_keyword} \${DEAL_II_TARGET_${_build}})
 ENDFOREACH()
+
+TO_STRING(MAKEFILE_BUILD_TYPES ${DEAL_II_BUILD_TYPES})
+TO_STRING(MAKEFILE_USER_DEFINITIONS ${DEAL_II_USER_DEFINITIONS})
+
+IF(DEAL_II_STATIC_EXECUTABLE)
+  SET(MAKEFILE_STATIC_EXECUTABLE "true")
+ELSE()
+  SET(MAKEFILE_STATIC_EXECUTABLE "false")
+ENDIF()
 
 #
 # For binary dir:
 #
 
 SET(CONFIG_BUILD_DIR TRUE)
+SET(MAKEFILE_BUILD_DIR "true")
 SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/include
-  \${DEAL_II_PATH}/include/deal.II
   ${CMAKE_SOURCE_DIR}/include/
-  ${CMAKE_SOURCE_DIR}/include/deal.II
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
@@ -157,15 +153,21 @@ CONFIGURE_FILE(
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   @ONLY
   )
+TO_STRING(MAKEFILE_INCLUDE_DIRS ${CONFIG_INCLUDE_DIRS})
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in
+  ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/Make.global_options
+  @ONLY
+  )
 
 #
 # For installation:
 #
 
 SET(CONFIG_BUILD_DIR FALSE)
+SET(MAKEFILE_BUILD_DIR "false")
 SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}
-  \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
@@ -179,209 +181,54 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   @ONLY
   )
+TO_STRING(MAKEFILE_INCLUDE_DIRS ${CONFIG_INCLUDE_DIRS})
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in
+  ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
+  @ONLY
+  )
 INSTALL(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
   COMPONENT library
   )
+INSTALL(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
+  DESTINATION ${DEAL_II_SHARE_RELDIR}
+  COMPONENT library
+  )
 
 #
-# Append feature configuration to both configuration files:
+# Append feature configuration to all configuration files:
 #
 
 SET(_files
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   )
-FOREACH(_file ${_files})
-  FILE(APPEND ${_file}
-    "\n\n#\n# Feature configuration:\n#\n\n"
-    )
+SET(_makefiles
+  ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/Make.global_options
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/Make.global_options
+  )
+FOREACH(_file ${_files} ${_makefiles})
+  FILE(APPEND ${_file} "\n\n#\n# Feature configuration:\n#\n\n")
 ENDFOREACH()
+
 GET_CMAKE_PROPERTY(res VARIABLES)
 FOREACH(var ${res})
   IF(var MATCHES "DEAL_II_WITH")
     FOREACH(_file ${_files})
-      FILE(APPEND ${_file}
-        "SET(${var} ${${var}})\n"
-        )
+      FILE(APPEND ${_file} "SET(${var} ${${var}})\n")
+    ENDFOREACH()
+    FOREACH(_file ${_makefiles})
+      IF(${var})
+        FILE(APPEND ${_file} "${var} = true\n")
+      ELSE()
+        FILE(APPEND ${_file} "${var} = false\n")
+      ENDIF()
     ENDFOREACH()
   ENDIF()
 ENDFOREACH()
-
-
-########################################################################
-#                                                                      #
-#         Configure and install the old Makefile configuration:        #
-#                                                                      #
-########################################################################
-
-IF(DEAL_II_COMPONENT_COMPAT_FILES)
-  #
-  # Transform some cmake lists into a string that the old Makefile
-  # mechanism actually understands:
-  #
-
-  FOREACH(build ${DEAL_II_BUILD_TYPES})
-
-    TO_STRING_AND_ADD_PREFIX(MAKEFILE_DEFINITIONS_${build}
-      "-D"
-      ${DEAL_II_USER_DEFINITIONS}
-      ${DEAL_II_USER_DEFINITIONS_${build}}
-      )
-
-    #
-    # Ideally, DEAL_II_EXTERNAL_LIBRARIES should just contain a list of
-    # full library paths. Nevertheless, filter out all elements that are
-    # not a full path starting with "/" or that happen to be a "framework"
-    # - we won't deal with that in Make.global_options.
-    #
-
-    SET(_libs)
-    FOREACH(_lib
-        ${DEAL_II_LIBRARIES_${build}}
-        ${DEAL_II_LIBRARIES}
-        )
-      IF(_lib MATCHES "^\\s*\\/" AND NOT _lib MATCHES "\\.framework$")
-        LIST(APPEND _libs "${_lib}")
-      ENDIF()
-    ENDFOREACH()
-
-    TO_STRING(MAKEFILE_TARGETS_${build}
-        $(D)/${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${build}}
-        ${_libs}
-        )
-
-    SET(_paths)
-    FOREACH(_lib
-        $(D)/${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${build}}
-        ${DEAL_II_LIBRARIES_${build}}
-        ${DEAL_II_LIBRARIES}
-        )
-
-      #
-      # Strip leading and trailing whitespace
-      #
-      STRING(STRIP "${_lib}" _lib)
-
-      IF(_lib MATCHES "^\\/.*\\.framework$")
-        #
-        # We have a MacOSX framework
-        #
-        # TODO: What do?
-        #
-
-      ELSEIF(_lib MATCHES "^(\\/|\\$\\(D\\))")
-        #
-        # Full path: /path/to/libfoo.(so|dylib|etc):
-        #
-
-        # Extract library paths:
-        GET_FILENAME_COMPONENT(_path ${_lib} PATH)
-        LIST(APPEND _paths ${_path})
-
-        LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
-
-      ELSEIF(_lib MATCHES "^-l")
-        #
-        # Library is of the form "-lfoo":
-        #
-        LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
-
-      ELSEIF(NOT _lib MATCHES "^\\s*$" AND NOT _lib MATCHES "\\.so(\\.[0-9]+)*$")
-        #
-        # Well in this case we just assume that we have to append a "-l"
-        #
-
-        LIST(APPEND MAKEFILE_LIBS_${build} "-l${_lib}")
-
-      ELSE()
-        #
-        # For now, ignore the rest.
-        #
-        # TODO: What do?
-        #
-      ENDIF()
-
-    ENDFOREACH()
-
-    #
-    # And build up an rpath:
-    #
-    SET(_rpath "")
-    LIST(REMOVE_DUPLICATES _paths)
-    FOREACH(_path ${_paths})
-      SET(_rpath "${_rpath} -Wl,-rpath,${_path}")
-    ENDFOREACH()
-
-    TO_STRING(MAKEFILE_LIBS_${build} ${MAKEFILE_LIBS_${build}} ${_rpath})
-
-    #
-    # Set up our linker flags:
-    #
-    SET(MAKEFILE_LDFLAGS_${build}
-      "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}} ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
-      )
-  ENDFOREACH()
-
-  #
-  # Boilerplate: The Make.global_options expects variables to be set to
-  # yes, as is common for Makefiles.
-  #
-  COND_SET_TO_YES(DEAL_II_WITH_THREADS MAKEFILE_enablethreads)
-  COND_SET_TO_YES(DEAL_II_WITH_MUPARSER MAKEFILE_enableparser)
-  COND_SET_TO_YES(BUILD_SHARED_LIBS MAKEFILE_enableshared)
-
-  COND_SET_TO_YES(DEAL_II_WITH_ARPACK MAKEFILE_ARPACK)
-  COND_SET_TO_YES(DEAL_II_WITH_BLAS MAKEFILE_BLAS)
-  COND_SET_TO_YES(DEAL_II_WITH_HDF5 MAKEFILE_HDF5)
-  COND_SET_TO_YES(DEAL_II_WITH_LAPACK MAKEFILE_LAPACK)
-  COND_SET_TO_YES(DEAL_II_WITH_METIS MAKEFILE_METIS)
-  COND_SET_TO_YES(DEAL_II_WITH_MPI MAKEFILE_MPI)
-  COND_SET_TO_YES(DEAL_II_WITH_OPENCASCADE MAKEFILE_OPENCASCADE)
-  COND_SET_TO_YES(DEAL_II_WITH_P4EST MAKEFILE_P4EST)
-  COND_SET_TO_YES(DEAL_II_WITH_PETSC MAKEFILE_PETSC)
-  COND_SET_TO_YES(DEAL_II_WITH_SLEPC MAKEFILE_SLEPC)
-  COND_SET_TO_YES(DEAL_II_WITH_TRILINOS MAKEFILE_TRILINOS)
-  COND_SET_TO_YES(DEAL_II_WITH_UMFPACK MAKEFILE_UMFPACK)
-
-  #
-  # For binary dir:
-  #
-  SET(MAKEFILE_D ${CMAKE_BINARY_DIR})
-  TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_CXX}"
-    $(D)/install
-    $(D)/install/deal.II
-    ${CMAKE_SOURCE_DIR}/include/
-    ${CMAKE_SOURCE_DIR}/include/deal.II
-    ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-    ${DEAL_II_USER_INCLUDE_DIRS}
-    )
-  CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in
-    ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/Make.global_options
-    )
-  #
-  # For installation:
-  #
-  SET(MAKEFILE_D ${CMAKE_INSTALL_PREFIX})
-  TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_CXX}"
-    $(D)/${DEAL_II_INCLUDE_RELDIR}
-    $(D)/${DEAL_II_INCLUDE_RELDIR}/deal.II
-    $(D)/${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
-    ${DEAL_II_USER_INCLUDE_DIRS}
-    )
-  CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in
-    ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
-    )
-  INSTALL(FILES
-    ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/template-arguments
-    ${CMAKE_CURRENT_BINARY_DIR}/Make.global_options
-    DESTINATION ${DEAL_II_COMMON_RELDIR}
-    COMPONENT compat_files
-    )
-ENDIF()
 
 MESSAGE(STATUS "Setting up project configuration - Done")

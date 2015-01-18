@@ -38,6 +38,25 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: Make.global_options was completely redesigned. It still
+  contains Makefile sourcable information, but they now closely mimic the
+  declarative style of deal.IIConfig.cmake. Thus, projects that still use
+  Makefiles that source Make.global_options have to be ported to the new
+  layout.
+  <br>
+  (Matthias Maier, 2015/01/13)
+  </li>
+
+  <li> Removed: The Component compat_files was removed entirely. deal.II
+  now always configures and installs with a somewhat FSHS compliant
+  directory structure. Further, the ancient make_dependencies binary was
+  removed. Either migrate your project to CMake, or port your build system
+  to the new (incompatible) Make.global_options found at
+  ${DEAL_II_SHARE_RELDIR}.
+  <br>
+  (Matthias Maier, 2015/01/13)
+  </li>
+
   <li> Changed: The two-argument call to the MPI_InitFinalize constructor
   used to imply that the user wanted only one thread per MPI process. This
   has been changed and now means that every processor core on the system is

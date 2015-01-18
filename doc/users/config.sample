@@ -16,10 +16,6 @@
 # Component configuration:
 #
 #
-# SET(DEAL_II_COMPONENT_COMPAT_FILES ON CACHE BOOL
-#   "Enable installation of the example steps. This adds a COMPONENT \"compat_files\" to the build system."
-#   )
-#
 # SET(DEAL_II_COMPONENT_DOCUMENTATION OFF CACHE BOOL
 #   "Enable configuration, build and installation of the html documentation. This adds a COMPONENT \"documentation\" to the build system."
 #   )
