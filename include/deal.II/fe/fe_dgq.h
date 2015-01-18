@@ -70,7 +70,10 @@ template <int dim> class Quadrature;
  * Note, however, that these are just the Lagrange interpolation points of the
  * shape functions. Even though they may physically be on the boundary of the
  * cell, they are logically in the interior since there are no continuity
- * requirements for these shape functions across cell boundaries.
+ * requirements for these shape functions across cell boundaries. While
+ * discontinuous, when restricted to a single cell the shape functions of this
+ * element are exactly the same as those of the FE_Q element where they are
+ * shown visually.
  *
  * @author Ralf Hartmann, Guido Kanschat 2001, 2004
  */
