@@ -25,9 +25,10 @@
 #include <deal.II/grid/tria_iterator.h>
 // Here are some functions to generate standard grids:
 #include <deal.II/grid/grid_generator.h>
-// We would like to use boundaries which are not straight lines, so we import
-// some classes which predefine some boundary descriptions:
-#include <deal.II/grid/tria_boundary_lib.h>
+// We would like to use faces and cells which are not straight lines,
+// or bi-linear quads, so we import some classes which predefine some
+// manifold descriptions:
+#include <deal.II/grid/manifold_lib.h>
 // Output of grids in various graphics formats:
 #include <deal.II/grid/grid_out.h>
 
@@ -99,31 +100,43 @@ void second_grid ()
   GridGenerator::hyper_shell (triangulation,
                               center, inner_radius, outer_radius,
                               10);
-  // By default, the triangulation assumes that all boundaries are straight
-  // and given by the cells of the coarse grid (which we just created). It
-  // uses this information when cells at the boundary are refined and new
-  // points need to be introduced on the boundary; if the boundary is assumed
-  // to be straight, then new points will simply be in the middle of the
-  // surrounding ones.
-  //
-  // Here, however, we would like to have a curved boundary. Fortunately, some
-  // good soul implemented an object which describes the boundary of a ring
-  // domain; it only needs the center of the ring and automatically figures
-  // out the inner and outer radius when needed. Note that we associate this
-  // boundary object with that part of the boundary that has the "boundary
-  // indicator" zero. By default (at least in 2d and 3d, the 1d case is
-  // slightly different), all boundary parts have this number, but you can
-  // change this number for some parts of the boundary. In that case, the
-  // curved boundary thus associated with number zero will not apply on those
-  // parts with a non-zero boundary indicator, but other boundary description
-  // objects can be associated with those non-zero indicators. If no boundary
-  // description is associated with a particular boundary indicator, a
-  // straight boundary is implied. (Boundary indicators are a slightly
-  // complicated topic; if you're confused about what exactly is happening
-  // here, you may want to look at the
-  // @ref GlossBoundaryIndicator "glossary entry on this topic".)
-  const HyperShellBoundary<2> boundary_description(center);
-  triangulation.set_boundary (0, boundary_description);
+  // By default, the triangulation assumes that all boundaries are
+  // straight lines, and all cells are bi-linear quads or tri-linear
+  // hexes, and that they are defined by the cells of the coarse grid
+  // (which we just created). Unless we do something special, when new
+  // points need to be introduced; the domain is assumed to be
+  // delineated by the straight lines of the coarse mesh, and new
+  // points will simply be in the middle of the surrounding ones.
+  // Here, however, we know that the domain is curved, and we would
+  // like to have the Triangulation place new points according to the
+  // underlying geometry. Fortunately, some good soul implemented an
+  // object which describes a spherical domain, of which the ring is a
+  // section; it only needs the center of the ring and automatically
+  // figures out how to instruct the Triangulation where to place the
+  // new points. The way this works in deal.II is that you tag parts
+  // of the triangulation you want to be curved with a number that is
+  // usually referred to as "manifold indicator" and then tell the
+  // triangulation to use a particular "manifold object" for all
+  // places with this manifold indicator. How exactly this works is
+  // not important at this point (you can read up on it in step-53 and
+  // @ref manifold). Here, for simplicity, we will choose the manifold
+  // id to be zero.  By default, all cells and faces of the
+  // Triangulation have their manifold_id set to
+  // numbers::invalid_manifold_id, which is the default if you want a
+  // manifold that produces straight edges, but you can change this
+  // number for individual cells and faces. In that case, the curved
+  // manifold thus associated with number zero will not apply to those
+  // parts with a non-zero manifold indicator, but other manifold
+  // description objects can be associated with those non-zero
+  // indicators. If no manifold description is associated with a
+  // particular manifold indicator, a manifold that produces straight
+  // edges is implied. (Manifold indicators are a slightly complicated
+  // topic; if you're confused about what exactly is happening here,
+  // you may want to look at the @ref GlossManifoldIndicator "glossary
+  // entry on this topic".)
+  triangulation.set_all_manifold_ids(0);
+  const SphericalManifold<2> manifold_description(center);
+  triangulation.set_manifold (0, manifold_description);
 
   // In order to demonstrate how to write a loop over all cells, we will
   // refine the grid in five steps towards the inner circle of the domain:
@@ -222,18 +235,18 @@ void second_grid ()
   std::cout << "Grid written to grid-2.eps" << std::endl;
 
   // At this point, all objects created in this function will be destroyed in
-  // reverse order. Unfortunately, we defined the boundary object after the
+  // reverse order. Unfortunately, we defined the manifold object after the
   // triangulation, which still has a pointer to it and the library will
-  // produce an error if the boundary object is destroyed before the
+  // produce an error if the manifold object is destroyed before the
   // triangulation. We therefore have to release it, which can be done as
-  // follows. Note that this sets the boundary object used for part "0" of the
-  // boundary back to a default object, over which the triangulation has full
+  // follows. Note that this sets the manifold object used for part "0" of the
+  // domain back to a default object, over which the triangulation has full
   // control.
-  triangulation.set_boundary (0);
+  triangulation.set_manifold (0);
   // An alternative to doing so, and one that is frequently more convenient,
-  // would have been to declare the boundary object before the triangulation
+  // would have been to declare the manifold object before the triangulation
   // object. In that case, the triangulation would have let lose of the
-  // boundary object upon its destruction, and everything would have been
+  // manifold object upon its destruction, and everything would have been
   // fine.
 }
 
