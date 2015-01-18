@@ -115,7 +115,7 @@ void second_grid ()
   // figures out how to instruct the Triangulation where to place the
   // new points. The way this works in deal.II is that you tag parts
   // of the triangulation you want to be curved with a number that is
-  // usually referred to as "boundary indicator" and then tell the
+  // usually referred to as "manifold indicator" and then tell the
   // triangulation to use a particular "manifold object" for all
   // places with this manifold indicator. How exactly this works is
   // not important at this point (you can read up on it in step-53 and
@@ -129,11 +129,11 @@ void second_grid ()
   // parts with a non-zero manifold indicator, but other manifold
   // description objects can be associated with those non-zero
   // indicators. If no manifold description is associated with a
-  // particular manifold indicator, a flat manifold is
-  // implied. (Manifold indicators are a slightly complicated topic;
-  // if you're confused about what exactly is happening here, you may
-  // want to look at the @ref GlossManifoldIndicator "glossary entry
-  // on this topic".)
+  // particular manifold indicator, a manifold that produces straight
+  // edges is implied. (Manifold indicators are a slightly complicated
+  // topic; if you're confused about what exactly is happening here,
+  // you may want to look at the @ref GlossManifoldIndicator "glossary
+  // entry on this topic".)
   triangulation.set_all_manifold_ids(0);
   const SphericalManifold<2> manifold_description(center);
   triangulation.set_manifold (0, manifold_description);
@@ -235,18 +235,18 @@ void second_grid ()
   std::cout << "Grid written to grid-2.eps" << std::endl;
 
   // At this point, all objects created in this function will be destroyed in
-  // reverse order. Unfortunately, we defined the boundary object after the
+  // reverse order. Unfortunately, we defined the manifold object after the
   // triangulation, which still has a pointer to it and the library will
-  // produce an error if the boundary object is destroyed before the
+  // produce an error if the manifold object is destroyed before the
   // triangulation. We therefore have to release it, which can be done as
-  // follows. Note that this sets the boundary object used for part "0" of the
-  // boundary back to a default object, over which the triangulation has full
+  // follows. Note that this sets the manifold object used for part "0" of the
+  // domain back to a default object, over which the triangulation has full
   // control.
-  triangulation.set_boundary (0);
+  triangulation.set_manifold (0);
   // An alternative to doing so, and one that is frequently more convenient,
-  // would have been to declare the boundary object before the triangulation
+  // would have been to declare the manifold object before the triangulation
   // object. In that case, the triangulation would have let lose of the
-  // boundary object upon its destruction, and everything would have been
+  // manifold object upon its destruction, and everything would have been
   // fine.
 }
 
