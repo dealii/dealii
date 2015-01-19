@@ -38,6 +38,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: ParameterHandler::leave_subsection() no longer returns a bool
+  indicating if there was a subsection to leave. This never worked in the
+  first place, because an exception was thrown.
+  <br>
+  (Timo Heister, 2015/01/19)
+  </li>
+  
   <li> Changed: Make.global_options was completely redesigned. It still
   contains Makefile sourcable information, but they now closely mimic the
   declarative style of deal.IIConfig.cmake. Thus, projects that still use
@@ -239,6 +246,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: ParameterHandler::read_input() now checks that
+  'subsection'/'end' are balanced in the input.
+  <br>
+  (Timo Heister, 2015/01/19)
+  </li>
+
   <li> Fixed: In 3d, when you set the <code>colorize</code> flag of
   GridGenerator::hyper_shell(), the faces of the domain were colored but
   the edges were not. This was an oversight because to refine correctly,
