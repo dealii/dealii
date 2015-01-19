@@ -1317,6 +1317,9 @@ bool ParameterHandler::read_input (std::istream &input,
 {
   AssertThrow (input, ExcIO());
 
+  // store subsections we are currently in
+  std::vector<std::string> saved_path = subsection_path;
+
   std::string line;
   int lineno=0;
   bool status = true;
@@ -1325,6 +1328,27 @@ bool ParameterHandler::read_input (std::istream &input,
     {
       ++lineno;
       status &= scan_line (line, filename, lineno);
+    }
+
+  if (status && (saved_path != subsection_path))
+    {
+      std::cerr << "Unbalanced 'subsection'/'end' in file <" << filename
+                << ">." << std::endl;
+      if (saved_path.size()>0)
+        {
+          std::cerr << "Path before loading input:" << std::endl;
+          for (unsigned int i=0; i<saved_path.size(); ++i)
+            std::cerr << std::setw(i*2+4) << " "
+                      << "subsection " << saved_path[i] << std::endl;
+        }
+      std::cerr << "Current path:" << std::endl;
+      for (unsigned int i=0; i<subsection_path.size(); ++i)
+        std::cerr << std::setw(i*2+4) << " "
+                  << "subsection " << subsection_path[i] << std::endl;
+
+      // restore subsection we started with and return failure:
+      subsection_path = saved_path;
+      return false;
     }
 
   return status;
@@ -1601,21 +1625,14 @@ void ParameterHandler::enter_subsection (const std::string &subsection)
 
 
 
-bool ParameterHandler::leave_subsection ()
+void ParameterHandler::leave_subsection ()
 {
   // assert there is a subsection that
   // we may leave
-  // (use assert since this is a logical
-  // error in a program. When reading input
-  // the scan_line function has to check
-  // whether there is a subsection to be left!)
   Assert (subsection_path.size() != 0, ExcAlreadyAtTopLevel());
 
-  if (subsection_path.size() == 0)
-    return false;
-
-  subsection_path.pop_back ();
-  return true;
+  if (subsection_path.size() > 0)
+    subsection_path.pop_back ();
 }
 
 
@@ -2434,7 +2451,11 @@ ParameterHandler::scan_line (std::string         line,
           return false;
         }
       else
-        return leave_subsection ();
+        {
+          leave_subsection ();
+          return true;
+        }
+
     }
 
   // regular entry

@@ -1653,10 +1653,9 @@ public:
   void enter_subsection (const std::string &subsection);
 
   /**
-   * Leave present subsection. Return <tt>false</tt> if there is no subsection
-   * to leave; <tt>true</tt> otherwise.
+   * Leave present subsection.
    */
-  bool leave_subsection ();
+  void leave_subsection ();
 
   /**
    * Return value of entry <tt>entry_string</tt>.  If the entry was changed,
