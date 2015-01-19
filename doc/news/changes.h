@@ -38,13 +38,21 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: The project configuration no longer exports
+  <code>[...]/include/deal.II</code>. Thus it is now mandatory to prefix
+  all includes of deal.II headers with <code>deal.II/</code>, i.e.
+  <code>#include &lt;deal.II/[...]&gt;</code>.
+  <br>
+  (Matthias Maier, 2015/01/19)
+  </li>
+
   <li> Changed: ParameterHandler::leave_subsection() no longer returns a bool
   indicating if there was a subsection to leave. This never worked in the
   first place, because an exception was thrown.
   <br>
   (Timo Heister, 2015/01/19)
   </li>
-  
+
   <li> Changed: Make.global_options was completely redesigned. It still
   contains Makefile sourcable information, but they now closely mimic the
   declarative style of deal.IIConfig.cmake. Thus, projects that still use
