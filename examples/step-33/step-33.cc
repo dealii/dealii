@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2013 by the deal.II authors
+ * Copyright (C) 2007 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -491,7 +491,7 @@ namespace Step33
       for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
         {
           fe_v.reinit(cell);
-          fe_v.get_function_grads (solution, dU);
+          fe_v.get_function_gradients (solution, dU);
 
           refinement_indicators(cell_no)
             = std::log(1+
@@ -1720,7 +1720,7 @@ namespace Step33
     // computed in a similar way.
     //
     // Ideally, we could compute this information using a call into something
-    // like FEValues::get_function_values and FEValues::get_function_grads,
+    // like FEValues::get_function_values and FEValues::get_function_gradients,
     // but since (i) we would have to extend the FEValues class for this, and
     // (ii) we don't want to make the entire <code>old_solution</code> vector
     // fad types, only the local cell variables, we explicitly code the loop

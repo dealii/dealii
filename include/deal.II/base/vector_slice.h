@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,13 +26,12 @@ DEAL_II_NAMESPACE_OPEN
  * Filter a range out of any object having a random access <tt>operator[]
  * (unsigned int)</tt> and a function <tt>size() const</tt>.
  *
- * The use of this object is straightforward. It duplicates the
- * random access operator of the <tt>VECTOR</tt> and adds an offset to
- * every index.
+ * The use of this object is straightforward. It duplicates the random access
+ * operator of the <tt>VECTOR</tt> and adds an offset to every index.
  *
- * Some precautions have to be taken if it is used for a constant
- * vector: the VectorSlice object has to be constant, too. The
- * appropriate initalization sequence is like this:
+ * Some precautions have to be taken if it is used for a constant vector: the
+ * VectorSlice object has to be constant, too. The appropriate initalization
+ * sequence is like this:
  *
  * @code
  *   void f(const std::vector<int>& v)
@@ -50,45 +49,34 @@ class VectorSlice
 {
 public:
   /**
-   * Construct a vector slice
-   * containing the whole
-   * vector. Comes handy, if you
-   * did not want to have a slice
-   * at all, but the function you
-   * call wants it: just put in the
-   * vector itself as argument and
-   * let this constructor make a
+   * Construct a vector slice containing the whole vector. Comes handy, if you
+   * did not want to have a slice at all, but the function you call wants it:
+   * just put in the vector itself as argument and let this constructor make a
    * slice for you.
    */
   VectorSlice(VECTOR &v);
   /**
-   * The real constructor for a
-   * vector slice, allowing you to
-   * specify the start index and
-   * the length of the slice.
+   * The real constructor for a vector slice, allowing you to specify the
+   * start index and the length of the slice.
    */
   VectorSlice(VECTOR &v,
               unsigned int start,
               unsigned int length);
 
   /**
-   * Return the length of the slice
-   * using the same interface as
+   * Return the length of the slice using the same interface as
    * <tt>std::vector</tt>.
    */
   unsigned int size() const;
 
   /**
-   * Access an element of the slice
-   * using the same interface as
+   * Access an element of the slice using the same interface as
    * <tt>std::vector</tt>.
    */
   typename VECTOR::reference operator[] (unsigned int i);
 
   /**
-   * Access an element of a
-   * constant slice using the same
-   * interface as
+   * Access an element of a constant slice using the same interface as
    * <tt>std::vector</tt>.
    */
   typename VECTOR::const_reference operator[] (unsigned int i) const;
@@ -130,8 +118,8 @@ private:
 
 
 /**
- * Helper function for creating temporary objects without typing
- * template arguments.
+ * Helper function for creating temporary objects without typing template
+ * arguments.
  *
  * @relates VectorSlice
  * @author Guido Kanschat, 2004
@@ -148,8 +136,8 @@ make_slice (VECTOR &v)
 
 
 /**
- * Helper function for creating temporary objects without typing
- * template arguments.
+ * Helper function for creating temporary objects without typing template
+ * arguments.
  *
  * @relates VectorSlice
  * @author Guido Kanschat, 2004

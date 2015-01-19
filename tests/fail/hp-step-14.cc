@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -205,7 +205,7 @@ namespace Evaluation
         if (cell->vertex(vertex) == evaluation_point)
           {
             fe_values.reinit (cell);
-            fe_values.get_present_fe_values().get_function_grads (solution,
+            fe_values.get_present_fe_values().get_function_gradients (solution,
                                                                   solution_gradients);
 
             unsigned int q_point = 0;
@@ -377,7 +377,7 @@ namespace LaplaceSolver
     assemble_matrix (LinearSystem                                         &linear_system,
                      const typename hp::DoFHandler<dim>::active_cell_iterator &begin_cell,
                      const typename hp::DoFHandler<dim>::active_cell_iterator &end_cell,
-                     Threads::ThreadMutex                                 &mutex) const;
+                     Threads::Mutex                                 &mutex) const;
   };
 
 
@@ -450,11 +450,11 @@ namespace LaplaceSolver
                                                     dof_handler.end (),
                                                     n_threads);
 
-    Threads::ThreadMutex mutex;
+    Threads::Mutex mutex;
     Threads::ThreadGroup<> threads;
     for (unsigned int thread=0; thread<n_threads; ++thread)
-      threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
-                 (linear_system,
+      threads += Threads::new_thread (&Solver<dim>::assemble_matrix, *this, 
+                  linear_system,
                   thread_ranges[thread].first,
                   thread_ranges[thread].second,
                   mutex);
@@ -483,7 +483,7 @@ namespace LaplaceSolver
   Solver<dim>::assemble_matrix (LinearSystem                                         &linear_system,
                                 const typename hp::DoFHandler<dim>::active_cell_iterator &begin_cell,
                                 const typename hp::DoFHandler<dim>::active_cell_iterator &end_cell,
-                                Threads::ThreadMutex                                 &mutex) const
+                                Threads::Mutex                                 &mutex) const
   {
     hp::FEValues<dim> fe_values (*fe, *quadrature,
                                  update_gradients | update_JxW_values);
@@ -511,7 +511,7 @@ namespace LaplaceSolver
 
 
         cell->get_dof_indices (local_dof_indices);
-        Threads::ThreadMutex::ScopedLock lock (mutex);
+        Threads::Mutex::ScopedLock lock (mutex);
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=0; j<dofs_per_cell; ++j)
             linear_system.matrix.add (local_dof_indices[i],
@@ -532,7 +532,7 @@ namespace LaplaceSolver
       = &DoFTools::make_hanging_node_constraints;
 
     Threads::Thread<>
-    mhnc_thread = Threads::spawn (mhnc_p)(dof_handler, hanging_node_constraints);
+      mhnc_thread = Threads::new_thread (mhnc_p, dof_handler, hanging_node_constraints);
 
     sparsity_pattern.reinit (dof_handler.n_dofs(),
                              dof_handler.n_dofs(),
@@ -1544,8 +1544,8 @@ namespace LaplaceSolver
   WeightedResidual<dim>::solve_problem ()
   {
     Threads::ThreadGroup<> threads;
-    threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_primal_problem)();
-    threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_dual_problem)();
+    threads += Threads::new_thread (&WeightedResidual<dim>::solve_primal_problem, *this);
+    threads += Threads::new_thread (&WeightedResidual<dim>::solve_dual_problem, *this);
     threads.join_all ();
   }
 
@@ -1687,8 +1687,8 @@ namespace LaplaceSolver
     const unsigned int n_threads = multithread_info.n_default_threads;
     Threads::ThreadGroup<> threads;
     for (unsigned int i=0; i<n_threads; ++i)
-      threads += Threads::spawn (*this, &WeightedResidual<dim>::estimate_some)
-                 (primal_solution,
+      threads += Threads::new_thread (&WeightedResidual<dim>::estimate_some, *this,
+                  primal_solution,
                   dual_weights,
                   n_threads, i,
                   error_indicators,
@@ -1808,7 +1808,7 @@ namespace LaplaceSolver
     cell_data.right_hand_side
     ->value_list (cell_data.fe_values.get_present_fe_values().get_quadrature_points(),
                   cell_data.rhs_values);
-    cell_data.fe_values.get_present_fe_values().get_function_2nd_derivatives (primal_solution,
+    cell_data.fe_values.get_present_fe_values().get_function_hessians (primal_solution,
         cell_data.cell_grad_grads);
 
     cell_data.fe_values.get_present_fe_values().get_function_values (dual_weights,
@@ -1837,7 +1837,7 @@ namespace LaplaceSolver
     n_q_points = face_data.fe_face_values_cell.get_present_fe_values().n_quadrature_points;
 
     face_data.fe_face_values_cell.reinit (cell, face_no);
-    face_data.fe_face_values_cell.get_present_fe_values().get_function_grads (primal_solution,
+    face_data.fe_face_values_cell.get_present_fe_values().get_function_gradients (primal_solution,
         face_data.cell_grads);
 
     Assert (cell->neighbor(face_no).state() == IteratorState::valid,
@@ -1846,7 +1846,7 @@ namespace LaplaceSolver
     neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
     const active_cell_iterator neighbor = cell->neighbor(face_no);
     face_data.fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor);
-    face_data.fe_face_values_neighbor.get_present_fe_values().get_function_grads (primal_solution,
+    face_data.fe_face_values_neighbor.get_present_fe_values().get_function_gradients (primal_solution,
         face_data.neighbor_grads);
 
     for (unsigned int p=0; p<n_q_points; ++p)
@@ -1907,11 +1907,11 @@ namespace LaplaceSolver
                 ExcInternalError());
 
         face_data.fe_subface_values_cell.reinit (cell, face_no, subface_no);
-        face_data.fe_subface_values_cell.get_present_fe_values().get_function_grads (primal_solution,
+        face_data.fe_subface_values_cell.get_present_fe_values().get_function_gradients (primal_solution,
             face_data.cell_grads);
         face_data.fe_face_values_neighbor.reinit (neighbor_child,
                                                   neighbor_neighbor);
-        face_data.fe_face_values_neighbor.get_present_fe_values().get_function_grads (primal_solution,
+        face_data.fe_face_values_neighbor.get_present_fe_values().get_function_gradients (primal_solution,
             face_data.neighbor_grads);
 
         for (unsigned int p=0; p<n_q_points; ++p)

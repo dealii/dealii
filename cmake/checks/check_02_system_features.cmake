@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,16 +16,16 @@
 #
 # This file sets up:
 #
-#   HAVE_GETHOSTNAME
-#   HAVE_GETPID
-#   HAVE_JN
-#   HAVE_RAND_R
-#   HAVE_SYS_RESOURCE_H
-#   HAVE_SYS_TIME_H
-#   HAVE_SYS_TIMES_H
-#   HAVE_SYS_TYPES_H
-#   HAVE_TIMES
-#   HAVE_UNISTD_H
+#   DEAL_II_HAVE_GETHOSTNAME
+#   DEAL_II_HAVE_GETPID
+#   DEAL_II_HAVE_JN
+#   DEAL_II_HAVE_RAND_R
+#   DEAL_II_HAVE_SYS_RESOURCE_H
+#   DEAL_II_HAVE_SYS_TIME_H
+#   DEAL_II_HAVE_SYS_TIMES_H
+#   DEAL_II_HAVE_SYS_TYPES_H
+#   DEAL_II_HAVE_TIMES
+#   DEAL_II_HAVE_UNISTD_H
 #   DEAL_II_MSVC
 #
 
@@ -39,20 +39,20 @@
 #
 # Check for various posix (and linux) specific header files and symbols
 #
-CHECK_INCLUDE_FILE_CXX("sys/resource.h" HAVE_SYS_RESOURCE_H)
+CHECK_INCLUDE_FILE_CXX("sys/resource.h" DEAL_II_HAVE_SYS_RESOURCE_H)
 
-CHECK_INCLUDE_FILE_CXX("sys/time.h" HAVE_SYS_TIME_H)
+CHECK_INCLUDE_FILE_CXX("sys/time.h" DEAL_II_HAVE_SYS_TIME_H)
 
-CHECK_INCLUDE_FILE_CXX("sys/times.h" HAVE_SYS_TIMES_H)
-CHECK_CXX_SYMBOL_EXISTS("times" "sys/times.h" HAVE_TIMES)
+CHECK_INCLUDE_FILE_CXX("sys/times.h" DEAL_II_HAVE_SYS_TIMES_H)
+CHECK_CXX_SYMBOL_EXISTS("times" "sys/times.h" DEAL_II_HAVE_TIMES)
 
-CHECK_INCLUDE_FILE_CXX("sys/types.h" HAVE_SYS_TYPES_H)
+CHECK_INCLUDE_FILE_CXX("sys/types.h" DEAL_II_HAVE_SYS_TYPES_H)
 
-CHECK_INCLUDE_FILE_CXX("unistd.h" HAVE_UNISTD_H)
-CHECK_CXX_SYMBOL_EXISTS("gethostname" "unistd.h" HAVE_GETHOSTNAME)
-CHECK_CXX_SYMBOL_EXISTS("getpid" "unistd.h" HAVE_GETPID)
+CHECK_INCLUDE_FILE_CXX("unistd.h" DEAL_II_HAVE_UNISTD_H)
+CHECK_CXX_SYMBOL_EXISTS("gethostname" "unistd.h" DEAL_II_HAVE_GETHOSTNAME)
+CHECK_CXX_SYMBOL_EXISTS("getpid" "unistd.h" DEAL_II_HAVE_GETPID)
 
-CHECK_CXX_SYMBOL_EXISTS("rand_r" "stdlib.h" HAVE_RAND_R)
+CHECK_CXX_SYMBOL_EXISTS("rand_r" "stdlib.h" DEAL_II_HAVE_RAND_R)
 
 #
 # Do we have the Bessel function jn?
@@ -62,9 +62,9 @@ MARK_AS_ADVANCED(m_LIBRARY)
 
 IF(NOT m_LIBRARY MATCHES "-NOTFOUND")
   LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${m_LIBRARY})
-  CHECK_CXX_SYMBOL_EXISTS("jn" "math.h" HAVE_JN)
+  CHECK_CXX_SYMBOL_EXISTS("jn" "math.h" DEAL_II_HAVE_JN)
   RESET_CMAKE_REQUIRED()
-  IF(HAVE_JN)
+  IF(DEAL_II_HAVE_JN)
     LIST(APPEND DEAL_II_LIBRARIES ${m_LIBRARY})
   ENDIF()
 ENDIF()

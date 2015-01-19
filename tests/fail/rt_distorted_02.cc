@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,6 +62,7 @@ char buf[1000];
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/mapping_q1_eulerian.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <fstream>
 
@@ -310,7 +311,7 @@ double EvaluateDiver (Mapping<2> &mapping,
       std::vector<std::vector<Tensor<1,2> > >
       grads_here (n_q_points,
                   std::vector<Tensor<1,2> > (n_components));
-      fe_values.get_function_grads (solution, grads_here);
+      fe_values.get_function_gradients (solution, grads_here);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         {
@@ -339,7 +340,7 @@ int main ()
 
   GridGenerator::hyper_rectangle (tria_test, p1, p2);
   tria_test.refine_global (1);
-  tria_test.distort_random (0.4);
+  GridTools::distort_random (0.4, tria_test);
 
   // Create a DoFHandler for the RT space
   FE_RaviartThomas<2> fe (2);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -96,7 +96,7 @@ namespace
 
     const bool first_child_has_children=face->child(0)->has_children();
 
-    static const unsigned int e = deal_II_numbers::invalid_unsigned_int;
+    static const unsigned int e = numbers::invalid_unsigned_int;
 
     // array containing the translation of the
     // numbers,
@@ -1475,7 +1475,8 @@ void
 CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id new_subdomain_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert (this->active(), ExcMessage("subdomains only work on active cells!"));
+  Assert (this->active(),
+          ExcMessage("set_subdomain_id() can only be called on active cells!"));
   this->tria->levels[this->present_level]->subdomain_ids[this->present_index]
     = new_subdomain_id;
 }
@@ -1754,8 +1755,8 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
       // since then we did not find
       // our way back...
       Assert (false, ExcInternalError());
-      return std::make_pair (deal_II_numbers::invalid_unsigned_int,
-                             deal_II_numbers::invalid_unsigned_int);
+      return std::make_pair (numbers::invalid_unsigned_int,
+                             numbers::invalid_unsigned_int);
     }
 
     case 3:

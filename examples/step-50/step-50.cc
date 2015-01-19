@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2013 by the deal.II authors
+ * Copyright (C) 2003 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -93,7 +93,6 @@
 // The rest of the include files deals with
 // the mechanics of multigrid as a linear
 // operator (solver or preconditioner).
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_transfer.h>
@@ -1035,7 +1034,7 @@ namespace Step50
 // in step-6:
 int main (int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   try
     {

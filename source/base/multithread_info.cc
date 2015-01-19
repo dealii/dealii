@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,18 +16,15 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 
-#ifdef HAVE_UNISTD_H
+#ifdef DEAL_II_HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
 
-#if defined(__MACH__) && defined(__APPLE__)
+#if (defined(__MACH__) && defined(__APPLE__)) || defined(__FreeBSD__)
 #  include <sys/types.h>
 #  include <sys/sysctl.h>
 #endif
 
-#if defined(__FreeBSD__)
-#  include <stdlib.h>
-#endif
 
 #ifdef DEAL_II_WITH_THREADS
 #  include <deal.II/base/thread_management.h>
@@ -53,7 +50,7 @@ unsigned int MultithreadInfo::get_n_cpus()
   return sysconf(_SC_NPROCESSORS_ONLN);
 }
 
-#  elif defined(__MACH__) && defined(__APPLE__)
+#  elif (defined(__MACH__) && defined(__APPLE__)) || defined(__FreeBSD__)
 // This is only tested on a dual G5 2.5GHz running MacOSX 10.3.6
 // and on an Intel Mac Book Pro.
 // If it doesn't work please contact the mailinglist.

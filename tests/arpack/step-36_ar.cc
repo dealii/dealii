@@ -51,6 +51,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 namespace Step36
 {
@@ -113,8 +114,7 @@ namespace Step36
     stiffness_matrix.reinit (sparsity_pattern);
     mass_matrix.reinit (sparsity_pattern);
 
-    eigenfunctions
-    .resize (5);
+    eigenfunctions.resize (8);
     for (unsigned int i=0; i<eigenfunctions.size (); ++i)
       eigenfunctions[i].reinit (dof_handler.n_dofs ());
 
@@ -264,6 +264,10 @@ namespace Step36
   }
 
 
+  bool my_compare(std::complex<double> a, std::complex<double> b)
+  {
+    return a.real() < b.real();
+  }
 
   template <int dim>
   void EigenvalueProblem<dim>::run ()
@@ -274,7 +278,9 @@ namespace Step36
 
     const std::pair<unsigned int, double> res = solve ();
 
-    for (unsigned int i=0; i<eigenvalues.size(); ++i)
+    std::sort(eigenvalues.begin(), eigenvalues.end(), my_compare);
+
+    for (unsigned int i = 0; i < 5 && i < eigenvalues.size(); ++i)
       deallog << "      Eigenvalue " << i
               << " : " << eigenvalues[i]
               << std::endl;
@@ -294,14 +300,10 @@ int main (int argc, char **argv)
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
+      deallog.depth_console (0);
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-      {
-        deallog.depth_console (0);
-
-        EigenvalueProblem<2> problem ("");
-        problem.run ();
-      }
+      EigenvalueProblem<2> problem ("");
+      problem.run ();
     }
 
   catch (std::exception &exc)

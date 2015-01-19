@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,18 @@
 
 #include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/filtered_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -22,9 +34,6 @@
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -33,7 +42,7 @@
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -627,15 +636,136 @@ namespace GridTools
   }
 
 
+  namespace
+  {
+    /**
+     * Solve the Laplace equation for the @p laplace_transform function for one
+     * of the @p dim space dimensions. Factorized into a function of its own
+     * in order to allow parallel execution.
+     */
+    void laplace_solve (const SparseMatrix<double> &S,
+                        const std::map<unsigned int,double> &m,
+                        Vector<double> &u)
+    {
+      const unsigned int n_dofs=S.n();
+      FilteredMatrix<Vector<double> > SF (S);
+      PreconditionJacobi<SparseMatrix<double> > prec;
+      prec.initialize(S, 1.2);
+      FilteredMatrix<Vector<double> > PF (prec);
+
+      SolverControl control (n_dofs, 1.e-10, false, false);
+      GrowingVectorMemory<Vector<double> > mem;
+      SolverCG<Vector<double> > solver (control, mem);
+
+      Vector<double> f(n_dofs);
+
+      SF.add_constraints(m);
+      SF.apply_constraints (f, true);
+      solver.solve(SF, u, f, PF);
+    }
+  }
+
+
+
+  // Implementation for 1D only
+  template <>
+  void laplace_transform (const std::map<unsigned int,Point<1> > &,
+                          Triangulation<1> &,
+                          const Function<1> *)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+  // Implementation for dimensions except 1
   template <int dim>
   void
   laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
                      Triangulation<dim> &triangulation,
                      const Function<dim> *coefficient)
   {
-    //TODO: Move implementation of this function into the current
-    // namespace
-    GridGenerator::laplace_transformation(triangulation, new_points, coefficient);
+    // first provide everything that is
+    // needed for solving a Laplace
+    // equation.
+    MappingQ1<dim> mapping_q1;
+    FE_Q<dim> q1(1);
+
+    DoFHandler<dim> dof_handler(triangulation);
+    dof_handler.distribute_dofs(q1);
+
+    CompressedSparsityPattern c_sparsity_pattern (dof_handler.n_dofs (),
+                                                  dof_handler.n_dofs ());
+    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity_pattern);
+    c_sparsity_pattern.compress ();
+
+    SparsityPattern sparsity_pattern;
+    sparsity_pattern.copy_from (c_sparsity_pattern);
+    sparsity_pattern.compress ();
+
+    SparseMatrix<double> S(sparsity_pattern);
+
+    QGauss<dim> quadrature(4);
+
+    MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S,coefficient);
+
+    // set up the boundary values for
+    // the laplace problem
+    std::vector<std::map<unsigned int,double> > m(dim);
+    typename std::map<unsigned int,Point<dim> >::const_iterator map_end=new_points.end();
+
+    // fill these maps using the data
+    // given by new_points
+    typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin_active(),
+                                            endc=dof_handler.end();
+    for (; cell!=endc; ++cell)
+      {
+        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+          {
+            const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
+
+            // loop over all vertices of the cell and see if it is listed in the map
+            // given as first argument of the function
+            for (unsigned int vertex_no=0;
+                 vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
+              {
+                const unsigned int vertex_index=face->vertex_index(vertex_no);
+
+                const typename std::map<unsigned int,Point<dim> >::const_iterator map_iter
+                  = new_points.find(vertex_index);
+
+                if (map_iter!=map_end)
+                  for (unsigned int i=0; i<dim; ++i)
+                    m[i].insert(std::pair<unsigned int,double> (
+                                  face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
+              }
+          }
+      }
+
+    // solve the dim problems with
+    // different right hand sides.
+    Vector<double> us[dim];
+    for (unsigned int i=0; i<dim; ++i)
+      us[i].reinit (dof_handler.n_dofs());
+
+    // solve linear systems in parallel
+    Threads::TaskGroup<> tasks;
+    for (unsigned int i=0; i<dim; ++i)
+      tasks += Threads::new_task (&laplace_solve,
+                                  S, m[i], us[i]);
+    tasks.join_all ();
+
+    // change the coordinates of the
+    // points of the triangulation
+    // according to the computed values
+    for (cell=dof_handler.begin_active(); cell!=endc; ++cell)
+      for (unsigned int vertex_no=0;
+           vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
+        {
+          Point<dim> &v=cell->vertex(vertex_no);
+          const unsigned int dof_index=cell->vertex_dof_index(vertex_no, 0);
+          for (unsigned int i=0; i<dim; ++i)
+            v(i)=us[i](dof_index);
+        }
   }
 
 
@@ -764,7 +894,7 @@ namespace GridTools
                 }
             }
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
         distributed_triangulation
         ->communicate_locally_moved_vertices(locally_owned_vertices);
 #else
@@ -910,7 +1040,11 @@ namespace GridTools
 
 
   template<int dim, template<int, int> class Container, int spacedim>
-  std::vector<typename Container<dim,spacedim>::active_cell_iterator>
+#ifndef _MSC_VER
+  std::vector<typename Container<dim, spacedim>::active_cell_iterator>
+#else
+  std::vector<typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type>
+#endif
   find_cells_adjacent_to_vertex(const Container<dim,spacedim> &container,
                                 const unsigned int    vertex)
   {
@@ -925,9 +1059,9 @@ namespace GridTools
     // use a set instead of a vector
     // to ensure that cells are inserted only
     // once
-    std::set<typename Container<dim,spacedim>::active_cell_iterator> adjacent_cells;
+    std::set<typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type> adjacent_cells;
 
-    typename Container<dim,spacedim>::active_cell_iterator
+    typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type
     cell = container.begin_active(),
     endc = container.end();
 
@@ -1039,7 +1173,7 @@ next_cell:
 
     // return the result as a vector, rather than the set we built above
     return
-      std::vector<typename Container<dim,spacedim>::active_cell_iterator>
+      std::vector<typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type>
       (adjacent_cells.begin(), adjacent_cells.end());
   }
 
@@ -1049,10 +1183,19 @@ next_cell:
   {
     template <int dim, template<int, int> class Container, int spacedim>
     void find_active_cell_around_point_internal(const Container<dim,spacedim> &container,
-                                                std::set<typename Container<dim,spacedim>::active_cell_iterator> &searched_cells,
-                                                std::set<typename Container<dim,spacedim>::active_cell_iterator> &adjacent_cells)
+#ifndef _MSC_VER
+                                                std::set<typename Container<dim, spacedim>::active_cell_iterator> &searched_cells,
+                                                std::set<typename Container<dim, spacedim>::active_cell_iterator> &adjacent_cells)
+#else
+                                                std::set<typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type> &searched_cells,
+                                                std::set<typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type> &adjacent_cells)
+#endif
     {
-      typedef typename Container<dim,spacedim>::active_cell_iterator cell_iterator;
+#ifndef _MSC_VER
+      typedef typename Container<dim, spacedim>::active_cell_iterator cell_iterator;
+#else
+      typedef typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type cell_iterator;
+#endif
 
       // update the searched cells
       searched_cells.insert(adjacent_cells.begin(), adjacent_cells.end());
@@ -1094,7 +1237,11 @@ next_cell:
   }
 
   template <int dim, template<int, int> class Container, int spacedim>
-  typename Container<dim,spacedim>::active_cell_iterator
+#ifndef _MSC_VER
+  typename Container<dim, spacedim>::active_cell_iterator
+#else
+  typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type
+#endif
   find_active_cell_around_point (const Container<dim,spacedim>  &container,
                                  const Point<spacedim> &p)
   {
@@ -1106,12 +1253,16 @@ next_cell:
 
 
   template <int dim, template <int, int> class Container, int spacedim>
-  std::pair<typename Container<dim,spacedim>::active_cell_iterator, Point<dim> >
+#ifndef _MSC_VER
+  std::pair<typename Container<dim, spacedim>::active_cell_iterator, Point<dim> >
+#else
+  std::pair<typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type, Point<dim> >
+#endif
   find_active_cell_around_point (const Mapping<dim,spacedim>   &mapping,
                                  const Container<dim,spacedim> &container,
                                  const Point<spacedim>     &p)
   {
-    typedef typename Container<dim,spacedim>::active_cell_iterator active_cell_iterator;
+    typedef typename dealii::internal::ActiveCellIterator<dim, spacedim, Container<dim, spacedim> >::type active_cell_iterator;
 
     // The best distance is set to the
     // maximum allowable distance from
@@ -1367,7 +1518,7 @@ next_cell:
     std::map< std::pair<unsigned int,unsigned int>, unsigned int >
     indexmap;
     unsigned int index = 0;
-    for (typename Triangulation<dim,spacedim>::active_cell_iterator
+    for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell, ++index)
       indexmap[std::pair<unsigned int,unsigned int>(cell->level(),cell->index())] = index;
@@ -1389,7 +1540,7 @@ next_cell:
     // add entries in both directions
     // for both cells
     index = 0;
-    for (typename Triangulation<dim,spacedim>::active_cell_iterator
+    for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell, ++index)
       {
@@ -1428,7 +1579,7 @@ next_cell:
     // check for an easy return
     if (n_partitions == 1)
       {
-        for (typename Triangulation<dim,spacedim>::active_cell_iterator
+        for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
              cell = triangulation.begin_active();
              cell != triangulation.end(); ++cell)
           cell->set_subdomain_id (0);
@@ -1472,7 +1623,7 @@ next_cell:
     // check for an easy return
     if (n_partitions == 1)
       {
-        for (typename Triangulation<dim,spacedim>::active_cell_iterator
+        for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
              cell = triangulation.begin_active();
              cell != triangulation.end(); ++cell)
           cell->set_subdomain_id (0);
@@ -1489,7 +1640,7 @@ next_cell:
     // finally loop over all cells and set the
     // subdomain ids
     unsigned int index = 0;
-    for (typename Triangulation<dim,spacedim>::active_cell_iterator
+    for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
          cell = triangulation.begin_active();
          cell != triangulation.end(); ++cell, ++index)
       cell->set_subdomain_id (partition_indices[index]);
@@ -1547,7 +1698,7 @@ next_cell:
     if (const parallel::distributed::Triangulation<dim,spacedim> *tr
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>
         (&triangulation))
-      for (typename Triangulation<dim,spacedim>::active_cell_iterator
+      for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
            cell = triangulation.begin_active();
            cell != triangulation.end(); ++cell)
         if (cell->is_artificial()
@@ -2372,26 +2523,35 @@ next_cell:
    * is parallel to the unit vector in <direction>
    */
   template<int spacedim>
-  inline bool orthogonal_equality (const dealii::Point<spacedim> &point1,
-                                   const dealii::Point<spacedim> &point2,
-                                   const int                     direction,
-                                   const dealii::Tensor<1,spacedim> &offset,
-                                   const FullMatrix<double>      &matrix)
+  inline bool orthogonal_equality (const Point<spacedim>    &point1,
+                                   const Point<spacedim>    &point2,
+                                   const int                 direction,
+                                   const Tensor<1,spacedim> &offset,
+                                   const FullMatrix<double> &matrix)
   {
     Assert (0<=direction && direction<spacedim,
             ExcIndexRange (direction, 0, spacedim));
+
+    Assert(matrix.m() == matrix.n(), ExcInternalError());
+
+    Point<spacedim> distance;
+
+    if (matrix.m() == spacedim)
+      for (int i = 0; i < spacedim; ++i)
+        for (int j = 0; j < spacedim; ++j)
+          distance(i) = matrix(i,j) * point1(j);
+    else
+      distance = point1;
+
+    distance += offset - point2;
+
     for (int i = 0; i < spacedim; ++i)
       {
         // Only compare coordinate-components != direction:
         if (i == direction)
           continue;
 
-        double transformed_p1_comp=0.;
-
-        for (int j = 0; j < spacedim; ++j)
-          transformed_p1_comp += matrix(i,j)*point1(j) + offset[j];
-
-        if (fabs(transformed_p1_comp - point2(i)) > 1.e-10)
+        if (fabs(distance(i)) > 1.e-10)
           return false;
       }
 
@@ -2483,9 +2643,12 @@ next_cell:
                        const FaceIterator &face1,
                        const FaceIterator &face2,
                        const int          direction,
-                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
+                       const Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
                        const FullMatrix<double> &matrix)
   {
+    Assert(matrix.m() == matrix.n(),
+           ExcMessage("The supplied matrix must be a square matrix"));
+
     static const int dim = FaceIterator::AccessorType::dimension;
 
     // Do a full matching of the face vertices:
@@ -2527,7 +2690,7 @@ next_cell:
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,
                        const int          direction,
-                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
+                       const Tensor<1,FaceIterator::AccessorType::space_dimension> &offset,
                        const FullMatrix<double> &matrix)
   {
     // Call the function above with a dummy orientation array
@@ -2581,8 +2744,14 @@ next_cell:
                 // We have a match, so insert the matching pairs and
                 // remove the matched cell in pairs2 to speed up the
                 // matching:
-                const PeriodicFacePair<CellIterator> matched_face
-                = {{cell1, cell2},{face_idx1, face_idx2}, orientation, matrix, first_vector_components};
+                const PeriodicFacePair<CellIterator> matched_face =
+                {
+                  {cell1, cell2},
+                  {face_idx1, face_idx2},
+                  orientation,
+                  matrix,
+                  first_vector_components
+                };
                 matched_pairs.push_back(matched_face);
                 pairs2.erase(it2);
                 ++n_matches;
@@ -2722,6 +2891,50 @@ next_cell:
                           "in default orientation"));
       }
 #endif
+  }
+
+  template <int dim, int spacedim>
+  void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                                    const bool reset_boundary_ids)
+  {
+
+    typename Triangulation<dim,spacedim>::active_cell_iterator
+    cell=tria.begin_active(), endc=tria.end();
+
+    for (; cell != endc; ++cell)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+        if (cell->face(f)->at_boundary())
+          {
+            cell->face(f)->set_manifold_id
+            (static_cast<types::manifold_id>(cell->face(f)->boundary_indicator()));
+            if (reset_boundary_ids == true)
+              cell->face(f)->set_boundary_indicator(0);
+          }
+  }
+
+  template <int dim, int spacedim>
+  void copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                                    const bool compute_face_ids)
+  {
+    typename Triangulation<dim,spacedim>::active_cell_iterator
+    cell=tria.begin_active(), endc=tria.end();
+
+    for (; cell != endc; ++cell)
+      {
+        cell->set_manifold_id(cell->material_id());
+        if (compute_face_ids == true)
+          {
+            for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+              {
+                if (cell->neighbor(f) != endc)
+                  cell->face(f)->set_manifold_id
+                  (std::min(cell->material_id(),
+                            cell->neighbor(f)->material_id()));
+                else
+                  cell->face(f)->set_manifold_id(cell->material_id());
+              }
+          }
+      }
   }
 
 } /* namespace GridTools */

@@ -34,20 +34,20 @@ template <int dim, int space_dim> class Triangulation;
 
 
 /**
- *   This class is used to represent a boundary to a triangulation.
- *   When a triangulation creates a new vertex on the boundary of the
- *   domain, it determines the new vertex' coordinates through the
- *   following code (here in two dimensions):
+ * This class is used to represent a boundary to a triangulation. When a
+ * triangulation creates a new vertex on the boundary of the domain, it
+ * determines the new vertex' coordinates through the following code (here in
+ * two dimensions):
  *   @code
  *     ...
  *     Point<2> new_vertex = boundary.get_new_point_on_line (line);
  *     ...
  *   @endcode
- *   @p line denotes the line at the boundary that shall be refined
- *   and for which we seek the common point of the two child lines.
+ * @p line denotes the line at the boundary that shall be refined and for
+ * which we seek the common point of the two child lines.
  *
- *   In 3D, a new vertex may be placed on the middle of a line or on
- *   the middle of a side. Respectively, the library calls
+ * In 3D, a new vertex may be placed on the middle of a line or on the middle
+ * of a side. Respectively, the library calls
  *   @code
  *     ...
  *     Point<3> new_line_vertices[4]
@@ -57,29 +57,29 @@ template <int dim, int space_dim> class Triangulation;
  *           boundary.get_new_point_on_line (face->line(3))  };
  *     ...
  *   @endcode
- *   to get the four midpoints of the lines bounding the quad at the
- *   boundary, and after that
+ * to get the four midpoints of the lines bounding the quad at the boundary,
+ * and after that
  *   @code
  *     ...
  *     Point<3> new_quad_vertex = boundary.get_new_point_on_quad (face);
  *     ...
  *   @endcode
- *   to get the midpoint of the face. It is guaranteed that this order
- *   (first lines, then faces) holds, so you can use information from
- *   the children of the four lines of a face, since these already exist
- *   at the time the midpoint of the face is to be computed.
+ * to get the midpoint of the face. It is guaranteed that this order (first
+ * lines, then faces) holds, so you can use information from the children of
+ * the four lines of a face, since these already exist at the time the
+ * midpoint of the face is to be computed.
  *
- *   Since iterators are passed to the functions, you may use information
- *   about boundary indicators and the like, as well as all other information
- *   provided by these objects.
+ * Since iterators are passed to the functions, you may use information about
+ * boundary indicators and the like, as well as all other information provided
+ * by these objects.
  *
- *   There are specializations, StraightBoundary, which places
- *   the new point right into the middle of the given points, and
- *   HyperBallBoundary creating a hyperball with given radius
- *   around a given center point.
+ * There are specializations, StraightBoundary, which places the new point
+ * right into the middle of the given points, and HyperBallBoundary creating a
+ * hyperball with given radius around a given center point.
  *
  * @ingroup boundary
- * @author Wolfgang Bangerth, 1999, 2001, 2009, Ralf Hartmann, 2001, 2008, Luca Heltai, 2014
+ * @author Wolfgang Bangerth, 1999, 2001, 2009, Ralf Hartmann, 2001, 2008,
+ * Luca Heltai, 2014
  */
 template <int dim, int spacedim=dim>
 class Boundary : public FlatManifold<dim, spacedim>
@@ -178,9 +178,9 @@ public:
    * have a kink at the vertices itself).
    *
    * @note Implementations of this function should be able to assume that the
-   * point p lies within or close to the face described by the first
-   * argument. In turn, callers of this function should ensure that this is in
-   * fact the case.
+   * point p lies within or close to the face described by the first argument.
+   * In turn, callers of this function should ensure that this is in fact the
+   * case.
    */
   virtual
   Tensor<1,spacedim>
@@ -189,8 +189,8 @@ public:
 
   /**
    * Compute the normal vectors to the boundary at each vertex of the given
-   * face. It is not required that the normal vectors be normed
-   * somehow. Neither is it required that the normals actually point outward.
+   * face. It is not required that the normal vectors be normed somehow.
+   * Neither is it required that the normals actually point outward.
    *
    * This function is needed to compute data for C1 mappings. The default
    * implementation is to throw an error, so you need not overload this
@@ -279,19 +279,18 @@ private:
 
 
 /**
- *   Specialization of Boundary<dim,spacedim>, which places the new point
- *   right into the middle of the given points. The middle is defined
- *   as the arithmetic mean of the points.
+ * Specialization of Boundary<dim,spacedim>, which places the new point right
+ * into the middle of the given points. The middle is defined as the
+ * arithmetic mean of the points.
  *
- *   This class does not really describe a boundary in the usual
- *   sense. By placing new points in the middle of old ones, it rather
- *   assumes that the boundary of the domain is given by the
- *   polygon/polyhedron defined by the boundary of the initial coarse
- *   triangulation.
+ * This class does not really describe a boundary in the usual sense. By
+ * placing new points in the middle of old ones, it rather assumes that the
+ * boundary of the domain is given by the polygon/polyhedron defined by the
+ * boundary of the initial coarse triangulation.
  *
- *   @ingroup boundary
+ * @ingroup boundary
  *
- *   @author Wolfgang Bangerth, 1998, 2001, Ralf Hartmann, 2001
+ * @author Wolfgang Bangerth, 1998, 2001, Ralf Hartmann, 2001
  */
 template <int dim, int spacedim=dim>
 class StraightBoundary : public Boundary<dim,spacedim>

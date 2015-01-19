@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,12 +25,6 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
       template void
 	make_sparsity_pattern<DoFHandler<deal_II_dimension, deal_II_space_dimension>, PATTERN> (
 	  const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-	  PATTERN &,
-	  const unsigned int);
-
-      template void
-	make_sparsity_pattern<MGDoFHandler<deal_II_dimension, deal_II_space_dimension>, PATTERN> (
-	  const MGDoFHandler<deal_II_dimension, deal_II_space_dimension> &,
 	  PATTERN &,
 	  const unsigned int);
 #endif
@@ -95,9 +89,6 @@ for (deal_II_dimension : DIMENSIONS)
 	std::vector<unsigned int>);
       template void count_dofs_per_block (
 	const DoFHandler<deal_II_dimension>&, std::vector<std::vector<types::global_dof_index> >&,
-	std::vector<unsigned int>);
-      template void count_dofs_per_block (
-	const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<types::global_dof_index> >&,
 	std::vector<unsigned int>);
 
 #if deal_II_dimension > 1

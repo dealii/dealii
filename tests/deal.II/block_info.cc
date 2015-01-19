@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,7 @@
 
 #include "../tests.h"
 #include <deal.II/dofs/block_info.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>
@@ -28,8 +28,9 @@ template <int dim>
 void test_grid(const Triangulation<dim> &tr,
                const FiniteElement<dim> &fe)
 {
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
+  mgdof.distribute_mg_dofs(fe);
   BlockInfo bi;
   bi.initialize(mgdof);
   bi.initialize_local(mgdof);

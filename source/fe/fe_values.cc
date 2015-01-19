@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3145,14 +3145,6 @@ FEValuesBase<dim,spacedim>::get_normal_vectors () const
   return this->normal_vectors;
 }
 
-
-
-template <int dim, int spacedim>
-const std::vector<Point<spacedim> > &
-FEValuesBase<dim,spacedim>::get_cell_normal_vectors () const
-{
-  return this->get_normal_vectors ();
-}
 
 
 template <int dim, int spacedim>

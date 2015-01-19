@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,13 +28,12 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Coarse grid solver using LAC iterative methods.
- * This is a little wrapper, transforming a triplet of iterative
- * solver, matrix and preconditioner into a coarse grid solver.
+ * Coarse grid solver using LAC iterative methods. This is a little wrapper,
+ * transforming a triplet of iterative solver, matrix and preconditioner into
+ * a coarse grid solver.
  *
- * The type of the matrix (i.e. the template parameter @p MATRIX)
- * should be derived from @p Subscriptor to allow for the use of a
- * smart pointer to it.
+ * The type of the matrix (i.e. the template parameter @p MATRIX) should be
+ * derived from @p Subscriptor to allow for the use of a smart pointer to it.
  *
  * @author Guido Kanschat, 1999, Ralf Hartmann, 2002.
  */
@@ -48,9 +47,7 @@ public:
   MGCoarseGridLACIteration ();
 
   /**
-   * Constructor.
-   * Store solver, matrix and
-   * preconditioning method for later
+   * Constructor. Store solver, matrix and preconditioning method for later
    * use.
    */
   template<class MATRIX, class PRECOND>
@@ -77,21 +74,16 @@ public:
   void clear ();
 
   /**
-   * Implementation of the abstract
-   * function.
-   * Calls the solver method with
-   * matrix, vectors and
-   * preconditioner.
+   * Implementation of the abstract function. Calls the solver method with
+   * matrix, vectors and preconditioner.
    */
   void operator() (const unsigned int   level,
                    VECTOR       &dst,
                    const VECTOR &src) const;
 
   /**
-   * Sets the matrix. This gives
-   * the possibility to replace the
-   * matrix that was given to the
-   * constructor by a new matrix.
+   * Sets the matrix. This gives the possibility to replace the matrix that
+   * was given to the constructor by a new matrix.
    */
   template <class MATRIX>
   void set_matrix (const MATRIX &);
@@ -116,11 +108,12 @@ private:
 
 
 /**
- * Coarse grid solver by QR factorization implemented in the class Householder.
+ * Coarse grid solver by QR factorization implemented in the class
+ * Householder.
  *
- * Upon initialization, the QR decomposition of the matrix is
- * computed. then, the operator() uses Householder::least_squares() to
- * compute the action of the inverse.
+ * Upon initialization, the QR decomposition of the matrix is computed. then,
+ * the operator() uses Householder::least_squares() to compute the action of
+ * the inverse.
  *
  * @author Guido Kanschat, 2003, 2012
  */
@@ -129,8 +122,7 @@ class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
 {
 public:
   /**
-   * Constructor, taking the coarse
-   * grid matrix.
+   * Constructor, taking the coarse grid matrix.
    */
   MGCoarseGridHouseholder (const FullMatrix<number> *A = 0);
 
@@ -163,15 +155,12 @@ class MGCoarseGridSVD : public MGCoarseGridBase<VECTOR>
 {
 public:
   /**
-   * Constructor leaving an
-   * uninitialized object.
+   * Constructor leaving an uninitialized object.
    */
   MGCoarseGridSVD ();
 
   /**
-   * Initialize for a new
-   * matrix. This resets the
-   * dimensions to the
+   * Initialize for a new matrix. This resets the dimensions to the
    */
   void initialize (const FullMatrix<number> &A, const double threshold = 0);
 

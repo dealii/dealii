@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -414,14 +414,6 @@ namespace PETScWrappers
     // indicate that we're back to a
     // pristine state
     last_action = ::dealii::VectorOperation::unknown;
-  }
-
-
-
-  void
-  VectorBase::compress ()
-  {
-    compress(VectorOperation::unknown);
   }
 
 

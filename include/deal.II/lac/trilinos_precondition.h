@@ -66,8 +66,7 @@ namespace TrilinosWrappers
   class SolverBase;
 
   /**
-   * The base class for all preconditioners based on Trilinos sparse
-   * matrices.
+   * The base class for all preconditioners based on Trilinos sparse matrices.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
@@ -190,17 +189,16 @@ namespace TrilinosWrappers
 
 
   /**
-   * A wrapper class for a (pointwise) Jacobi preconditioner for
-   * Trilinos matrices. This preconditioner works both in serial and in
-   * parallel, depending on the matrix it is based on.
+   * A wrapper class for a (pointwise) Jacobi preconditioner for Trilinos
+   * matrices. This preconditioner works both in serial and in parallel,
+   * depending on the matrix it is based on.
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options. For the Jacobi preconditioner, these options are the
-   * damping parameter <tt>omega</tt> and a <tt>min_diagonal</tt>
-   * argument that can be used to make the preconditioner work even if
-   * the matrix contains some zero elements on the diagonal. The default
-   * settings are 1 for the damping parameter and zero for the diagonal
-   * augmentation.
+   * The AdditionalData data structure allows to set preconditioner options.
+   * For the Jacobi preconditioner, these options are the damping parameter
+   * <tt>omega</tt> and a <tt>min_diagonal</tt> argument that can be used to
+   * make the preconditioner work even if the matrix contains some zero
+   * elements on the diagonal. The default settings are 1 for the damping
+   * parameter and zero for the diagonal augmentation.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
@@ -237,11 +235,11 @@ namespace TrilinosWrappers
       double omega;
 
       /**
-       * This specifies the minimum value the diagonal elements should
-       * have. This might be necessary when the Jacobi preconditioner is used
-       * on matrices with zero diagonal elements. In that case, a
-       * straight-forward application would not be possible since we would
-       * divide by zero.
+       * This specifies the minimum value the diagonal elements should have.
+       * This might be necessary when the Jacobi preconditioner is used on
+       * matrices with zero diagonal elements. In that case, a straight-
+       * forward application would not be possible since we would divide by
+       * zero.
        */
       double min_diagonal;
 
@@ -268,21 +266,19 @@ namespace TrilinosWrappers
    * matrices. This preconditioner works both in serial and in parallel,
    * depending on the matrix it is based on.
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options. For the SSOR preconditioner, these options are the
-   * damping/relaxation parameter <tt>omega</tt>, a
-   * <tt>min_diagonal</tt> argument that can be used to make the
-   * preconditioner work even if the matrix contains some zero elements
-   * on the diagonal, and a parameter <tt>overlap</tt> that determines
-   * if and how much overlap there should be between the matrix
-   * partitions on the various MPI processes. The default settings are 1
-   * for the relaxation parameter, 0 for the diagonal augmentation and 0
-   * for the overlap.
+   * The AdditionalData data structure allows to set preconditioner options.
+   * For the SSOR preconditioner, these options are the damping/relaxation
+   * parameter <tt>omega</tt>, a <tt>min_diagonal</tt> argument that can be
+   * used to make the preconditioner work even if the matrix contains some
+   * zero elements on the diagonal, and a parameter <tt>overlap</tt> that
+   * determines if and how much overlap there should be between the matrix
+   * partitions on the various MPI processes. The default settings are 1 for
+   * the relaxation parameter, 0 for the diagonal augmentation and 0 for the
+   * overlap.
    *
-   * Note that a parallel application of the SSOR preconditioner is
-   * actually a block-Jacobi preconditioner with block size equal to the
-   * local matrix size. Spoken more technically, this parallel operation
-   * is an <a
+   * Note that a parallel application of the SSOR preconditioner is actually a
+   * block-Jacobi preconditioner with block size equal to the local matrix
+   * size. Spoken more technically, this parallel operation is an <a
    * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
    * Schwarz method</a> with an SSOR <em>approximate solve</em> as inner
    * solver, based on the outer parallel partitioning.
@@ -305,8 +301,8 @@ namespace TrilinosWrappers
      * setting the parameter <tt>min_diagonal</tt> to a small nonzero value
      * the SOR will work on a matrix that is not too far away from the one we
      * want to treat. Finally, <tt>overlap</tt> governs the overlap of the
-     * partitions when the preconditioner runs in parallel, forming a
-     * so-called additive Schwarz preconditioner.
+     * partitions when the preconditioner runs in parallel, forming a so-
+     * called additive Schwarz preconditioner.
      */
     struct AdditionalData
     {
@@ -328,11 +324,11 @@ namespace TrilinosWrappers
       double omega;
 
       /**
-       * This specifies the minimum value the diagonal elements should
-       * have. This might be necessary when the SSOR preconditioner is used on
-       * matrices with zero diagonal elements. In that case, a
-       * straight-forward application would not be possible since we divide by
-       * the diagonal element.
+       * This specifies the minimum value the diagonal elements should have.
+       * This might be necessary when the SSOR preconditioner is used on
+       * matrices with zero diagonal elements. In that case, a straight-
+       * forward application would not be possible since we divide by the
+       * diagonal element.
        */
       double min_diagonal;
 
@@ -366,21 +362,19 @@ namespace TrilinosWrappers
    * matrices. This preconditioner works both in serial and in parallel,
    * depending on the matrix it is based on.
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options. For the SOR preconditioner, these options are the
-   * damping/relaxation parameter <tt>omega</tt>, a
-   * <tt>min_diagonal</tt> argument that can be used to make the
-   * preconditioner work even if the matrix contains some zero elements
-   * on the diagonal, and a parameter <tt>overlap</tt> that determines
-   * if and how much overlap there should be between the matrix
-   * partitions on the various MPI processes. The default settings are 1
-   * for the relaxation parameter, 0 for the diagonal augmentation and 0
-   * for the overlap.
+   * The AdditionalData data structure allows to set preconditioner options.
+   * For the SOR preconditioner, these options are the damping/relaxation
+   * parameter <tt>omega</tt>, a <tt>min_diagonal</tt> argument that can be
+   * used to make the preconditioner work even if the matrix contains some
+   * zero elements on the diagonal, and a parameter <tt>overlap</tt> that
+   * determines if and how much overlap there should be between the matrix
+   * partitions on the various MPI processes. The default settings are 1 for
+   * the relaxation parameter, 0 for the diagonal augmentation and 0 for the
+   * overlap.
    *
-   * Note that a parallel application of the SOR preconditioner is
-   * actually a block-Jacobi preconditioner with block size equal to the
-   * local matrix size. Spoken more technically, this parallel operation
-   * is an <a
+   * Note that a parallel application of the SOR preconditioner is actually a
+   * block-Jacobi preconditioner with block size equal to the local matrix
+   * size. Spoken more technically, this parallel operation is an <a
    * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
    * Schwarz method</a> with an SOR <em>approximate solve</em> as inner
    * solver, based on the outer parallel partitioning.
@@ -403,8 +397,8 @@ namespace TrilinosWrappers
      * setting the parameter <tt>min_diagonal</tt> to a small nonzero value
      * the SOR will work on a matrix that is not too far away from the one we
      * want to treat. Finally, <tt>overlap</tt> governs the overlap of the
-     * partitions when the preconditioner runs in parallel, forming a
-     * so-called additive Schwarz preconditioner.
+     * partitions when the preconditioner runs in parallel, forming a so-
+     * called additive Schwarz preconditioner.
      */
     struct AdditionalData
     {
@@ -426,11 +420,11 @@ namespace TrilinosWrappers
       double omega;
 
       /**
-       * This specifies the minimum value the diagonal elements should
-       * have. This might be necessary when the SOR preconditioner is used on
-       * matrices with zero diagonal elements. In that case, a
-       * straight-forward application would not be possible since we divide by
-       * the diagonal element.
+       * This specifies the minimum value the diagonal elements should have.
+       * This might be necessary when the SOR preconditioner is used on
+       * matrices with zero diagonal elements. In that case, a straight-
+       * forward application would not be possible since we divide by the
+       * diagonal element.
        */
       double min_diagonal;
 
@@ -459,19 +453,17 @@ namespace TrilinosWrappers
 
 
   /**
-   * A wrapper class for a block Jacobi preconditioner for Trilinos
-   * matrices. As opposed to PreconditionSOR where each row is treated
-   * separately, this scheme collects block of a given size and inverts a full
-   * matrix for all these rows simultaneously. Trilinos allows to select
-   * several strategies for selecting which rows form a block, including
-   * "linear" (i.e., divide the local range of the matrix in slices of the
-   * block size), "greedy" or "metis". Note that the term <em>block
-   * Jacobi</em> does not relate to possible blocks in the MPI setting, but
-   * small blocks of dense matrices extracted from the sparse matrix local to
-   * each processor.
+   * A wrapper class for a block Jacobi preconditioner for Trilinos matrices.
+   * As opposed to PreconditionSOR where each row is treated separately, this
+   * scheme collects block of a given size and inverts a full matrix for all
+   * these rows simultaneously. Trilinos allows to select several strategies
+   * for selecting which rows form a block, including "linear" (i.e., divide
+   * the local range of the matrix in slices of the block size), "greedy" or
+   * "metis". Note that the term <em>block Jacobi</em> does not relate to
+   * possible blocks in the MPI setting, but small blocks of dense matrices
+   * extracted from the sparse matrix local to each processor.
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options.
+   * The AdditionalData data structure allows to set preconditioner options.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
@@ -518,10 +510,10 @@ namespace TrilinosWrappers
 
       /**
        * Strategy for creation of blocks passed on to Ifpack block relaxation
-       * (variable 'partitioner: type') with this string as the given
-       * value. Available types in Ifpack include "linear" (i.e., divide the
-       * local range of the matrix in slices of the block size), "greedy"
-       * "metis". For a full list, see the documentation of Ifpack.
+       * (variable 'partitioner: type') with this string as the given value.
+       * Available types in Ifpack include "linear" (i.e., divide the local
+       * range of the matrix in slices of the block size), "greedy" "metis".
+       * For a full list, see the documentation of Ifpack.
        */
       std::string block_creation_type;
 
@@ -532,11 +524,11 @@ namespace TrilinosWrappers
       double omega;
 
       /**
-       * This specifies the minimum value the diagonal elements should
-       * have. This might be necessary when the block Jacobi preconditioner is
-       * used on matrices with zero diagonal elements. In that case, a
-       * straight-forward application would not be possible since we divide by
-       * the diagonal element.
+       * This specifies the minimum value the diagonal elements should have.
+       * This might be necessary when the block Jacobi preconditioner is used
+       * on matrices with zero diagonal elements. In that case, a straight-
+       * forward application would not be possible since we divide by the
+       * diagonal element.
        */
       double min_diagonal;
 
@@ -560,15 +552,14 @@ namespace TrilinosWrappers
 
   /**
    * A wrapper class for a block SSOR preconditioner for Trilinos matrices. As
-   * opposed to PreconditionSSOR where each row is treated separately
-   * (point-wise), this scheme collects block of a given size and inverts a
-   * full matrix for all these rows simultaneously. Trilinos allows to select
+   * opposed to PreconditionSSOR where each row is treated separately (point-
+   * wise), this scheme collects block of a given size and inverts a full
+   * matrix for all these rows simultaneously. Trilinos allows to select
    * several strategies for selecting which rows form a block, including
    * "linear" (i.e., divide the local range of the matrix in slices of the
    * block size), "greedy" or "metis".
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options.
+   * The AdditionalData data structure allows to set preconditioner options.
    *
    * Note that a parallel application of this preconditioner is actually a
    * block-Jacobi preconditioner with (outer) block size equal to the local
@@ -625,10 +616,10 @@ namespace TrilinosWrappers
 
       /**
        * Strategy for creation of blocks passed on to Ifpack block relaxation
-       * (variable 'partitioner: type') with this string as the given
-       * value. Available types in Ifpack include "linear" (i.e., divide the
-       * local range of the matrix in slices of the block size), "greedy"
-       * "metis". For a full list, see the documentation of Ifpack.
+       * (variable 'partitioner: type') with this string as the given value.
+       * Available types in Ifpack include "linear" (i.e., divide the local
+       * range of the matrix in slices of the block size), "greedy" "metis".
+       * For a full list, see the documentation of Ifpack.
        */
       std::string block_creation_type;
 
@@ -639,11 +630,11 @@ namespace TrilinosWrappers
       double omega;
 
       /**
-       * This specifies the minimum value the diagonal elements should
-       * have. This might be necessary when the SSOR preconditioner is used on
-       * matrices with zero diagonal elements. In that case, a
-       * straight-forward application would not be possible since we divide by
-       * the diagonal element.
+       * This specifies the minimum value the diagonal elements should have.
+       * This might be necessary when the SSOR preconditioner is used on
+       * matrices with zero diagonal elements. In that case, a straight-
+       * forward application would not be possible since we divide by the
+       * diagonal element.
        */
       double min_diagonal;
 
@@ -681,8 +672,7 @@ namespace TrilinosWrappers
    * the local range of the matrix in slices of the block size), "greedy" or
    * "metis".
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options.
+   * The AdditionalData data structure allows to set preconditioner options.
    *
    * Note that a parallel application of this preconditioner is actually a
    * block-Jacobi preconditioner with (outer) block size equal to the local
@@ -739,10 +729,10 @@ namespace TrilinosWrappers
 
       /**
        * Strategy for creation of blocks passed on to Ifpack block relaxation
-       * (variable 'partitioner: type') with this string as the given
-       * value. Available types in Ifpack include "linear" (i.e., divide the
-       * local range of the matrix in slices of the block size), "greedy"
-       * "metis". For a full list, see the documentation of Ifpack.
+       * (variable 'partitioner: type') with this string as the given value.
+       * Available types in Ifpack include "linear" (i.e., divide the local
+       * range of the matrix in slices of the block size), "greedy" "metis".
+       * For a full list, see the documentation of Ifpack.
        */
       std::string block_creation_type;
 
@@ -753,11 +743,11 @@ namespace TrilinosWrappers
       double omega;
 
       /**
-       * This specifies the minimum value the diagonal elements should
-       * have. This might be necessary when the SOR preconditioner is used on
-       * matrices with zero diagonal elements. In that case, a
-       * straight-forward application would not be possible since we divide by
-       * the diagonal element.
+       * This specifies the minimum value the diagonal elements should have.
+       * This might be necessary when the SOR preconditioner is used on
+       * matrices with zero diagonal elements. In that case, a straight-
+       * forward application would not be possible since we divide by the
+       * diagonal element.
        */
       double min_diagonal;
 
@@ -787,37 +777,34 @@ namespace TrilinosWrappers
 
   /**
    * A wrapper class for an incomplete Cholesky factorization (IC)
-   * preconditioner for @em symmetric Trilinos matrices. This
-   * preconditioner works both in serial and in parallel, depending on
-   * the matrix it is based on. In general, an incomplete factorization
-   * does not take all fill-in elements that would appear in a full
-   * factorization (that is the basis for a direct solve). Trilinos
-   * allows to set the amount of fill-in elements, governed by the
-   * additional data argument <tt>ic_fill</tt>, so one can gradually
-   * choose between a factorization on the sparse matrix structure only
-   * (<tt>ic_fill=0</tt>) to a full factorization (<tt>ic_fill</tt> in
-   * the range of 10 to 50, depending on the spatial dimension of the
-   * PDE problem and the degree of the finite element basis functions;
-   * generally, more required fill-in elements require this parameter to
-   * be set to a higher integer value).
+   * preconditioner for @em symmetric Trilinos matrices. This preconditioner
+   * works both in serial and in parallel, depending on the matrix it is based
+   * on. In general, an incomplete factorization does not take all fill-in
+   * elements that would appear in a full factorization (that is the basis for
+   * a direct solve). Trilinos allows to set the amount of fill-in elements,
+   * governed by the additional data argument <tt>ic_fill</tt>, so one can
+   * gradually choose between a factorization on the sparse matrix structure
+   * only (<tt>ic_fill=0</tt>) to a full factorization (<tt>ic_fill</tt> in
+   * the range of 10 to 50, depending on the spatial dimension of the PDE
+   * problem and the degree of the finite element basis functions; generally,
+   * more required fill-in elements require this parameter to be set to a
+   * higher integer value).
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options. Besides the fill-in argument, these options are some
-   * options for perturbations (see the documentation of the
-   * AdditionalData structure for details), and a parameter
-   * <tt>overlap</tt> that determines if and how much overlap there
-   * should be between the matrix partitions on the various MPI
-   * processes.  The default settings are 0 for the additional fill-in, 0
-   * for the absolute augmentation tolerance, 1 for the relative
-   * augmentation tolerance, 0 for the overlap.
+   * The AdditionalData data structure allows to set preconditioner options.
+   * Besides the fill-in argument, these options are some options for
+   * perturbations (see the documentation of the AdditionalData structure for
+   * details), and a parameter <tt>overlap</tt> that determines if and how
+   * much overlap there should be between the matrix partitions on the various
+   * MPI processes.  The default settings are 0 for the additional fill-in, 0
+   * for the absolute augmentation tolerance, 1 for the relative augmentation
+   * tolerance, 0 for the overlap.
    *
-   * Note that a parallel application of the IC preconditioner is
-   * actually a block-Jacobi preconditioner with block size equal to the
-   * local matrix size. Spoken more technically, this parallel operation
-   * is an <a
+   * Note that a parallel application of the IC preconditioner is actually a
+   * block-Jacobi preconditioner with block size equal to the local matrix
+   * size. Spoken more technically, this parallel operation is an <a
    * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
-   * Schwarz method</a> with an IC <em>approximate solve</em> as inner
-   * solver, based on the (outer) parallel partitioning.
+   * Schwarz method</a> with an IC <em>approximate solve</em> as inner solver,
+   * based on the (outer) parallel partitioning.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
@@ -899,35 +886,32 @@ namespace TrilinosWrappers
 
 
   /**
-   * A wrapper class for an incomplete LU factorization (ILU)
-   * preconditioner for Trilinos matrices. This preconditioner works
-   * both in serial and in parallel, depending on the matrix it is based
-   * on. In general, an incomplete factorization does not take all
-   * fill-in elements that would appear in a full factorization (that is
-   * the basis for a direct solve). Trilinos allows to set the amount of
-   * fill-in elements, governed by the additional data argument
-   * <tt>ilu_fill</tt>, so one can gradually choose between a
-   * factorization on the sparse matrix structure only
-   * (<tt>ilu_fill=0</tt>) to a full factorization (<tt>ilu_fill</tt> in
-   * the range of 10 to 50, depending on the spatial dimension of the
-   * PDE problem and the degree of the finite element basis functions;
-   * generally, more required fill-in elements require this parameter to
-   * be set to a higher integer value).
+   * A wrapper class for an incomplete LU factorization (ILU) preconditioner
+   * for Trilinos matrices. This preconditioner works both in serial and in
+   * parallel, depending on the matrix it is based on. In general, an
+   * incomplete factorization does not take all fill-in elements that would
+   * appear in a full factorization (that is the basis for a direct solve).
+   * Trilinos allows to set the amount of fill-in elements, governed by the
+   * additional data argument <tt>ilu_fill</tt>, so one can gradually choose
+   * between a factorization on the sparse matrix structure only
+   * (<tt>ilu_fill=0</tt>) to a full factorization (<tt>ilu_fill</tt> in the
+   * range of 10 to 50, depending on the spatial dimension of the PDE problem
+   * and the degree of the finite element basis functions; generally, more
+   * required fill-in elements require this parameter to be set to a higher
+   * integer value).
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options. Besides the fill-in argument, these options are some
-   * options for perturbations (see the documentation of the
-   * AdditionalData structure for details), and a parameter
-   * <tt>overlap</tt> that determines if and how much overlap there
-   * should be between the matrix partitions on the various MPI
-   * processes. The default settings are 0 for the additional fill-in, 0
-   * for the absolute augmentation tolerance, 1 for the relative
-   * augmentation tolerance, 0 for the overlap.
+   * The AdditionalData data structure allows to set preconditioner options.
+   * Besides the fill-in argument, these options are some options for
+   * perturbations (see the documentation of the AdditionalData structure for
+   * details), and a parameter <tt>overlap</tt> that determines if and how
+   * much overlap there should be between the matrix partitions on the various
+   * MPI processes. The default settings are 0 for the additional fill-in, 0
+   * for the absolute augmentation tolerance, 1 for the relative augmentation
+   * tolerance, 0 for the overlap.
    *
-   * Note that a parallel application of the ILU preconditioner is
-   * actually a block-Jacobi preconditioner with block size equal to the
-   * local matrix size. Spoken more technically, this parallel operation
-   * is an <a
+   * Note that a parallel application of the ILU preconditioner is actually a
+   * block-Jacobi preconditioner with block size equal to the local matrix
+   * size. Spoken more technically, this parallel operation is an <a
    * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
    * Schwarz method</a> with an ILU <em>approximate solve</em> as inner
    * solver, based on the (outer) parallel partitioning.
@@ -1023,25 +1007,23 @@ namespace TrilinosWrappers
    * lets the user specify which elements should be dropped (i.e., should not
    * be part of the incomplete decomposition). Trilinos calculates first the
    * complete factorization for one row, and then skips those elements that
-   * are lower than the threshold. This is the main difference to the
-   * non-thresholded ILU preconditioner, where the parameter
-   * <tt>ilut_fill</tt> governs the incomplete factorization structure. This
-   * parameter is available here as well, but provides only some extra
-   * information here.
+   * are lower than the threshold. This is the main difference to the non-
+   * thresholded ILU preconditioner, where the parameter <tt>ilut_fill</tt>
+   * governs the incomplete factorization structure. This parameter is
+   * available here as well, but provides only some extra information here.
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options. Besides the fill-in arguments, these options are some options
-   * for perturbations (see the documentation of the AdditionalData structure
-   * for details), and a parameter <tt>overlap</tt> that determines if and how
+   * The AdditionalData data structure allows to set preconditioner options.
+   * Besides the fill-in arguments, these options are some options for
+   * perturbations (see the documentation of the AdditionalData structure for
+   * details), and a parameter <tt>overlap</tt> that determines if and how
    * much overlap there should be between the matrix partitions on the various
    * MPI processes. The default settings are 0 for the additional fill-in, 0
    * for the absolute augmentation tolerance, 1 for the relative augmentation
    * tolerance, 0 for the overlap.
    *
-   * Note that a parallel application of the ILU-T preconditioner is
-   * actually a block-Jacobi preconditioner with block size equal to the
-   * local matrix size. Spoken more technically, this parallel operation
-   * is an <a
+   * Note that a parallel application of the ILU-T preconditioner is actually
+   * a block-Jacobi preconditioner with block size equal to the local matrix
+   * size. Spoken more technically, this parallel operation is an <a
    * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
    * Schwarz method</a> with an ILU <em>approximate solve</em> as inner
    * solver, based on the (outer) parallel partitioning.
@@ -1055,8 +1037,8 @@ namespace TrilinosWrappers
   public:
     /**
      * Standardized data struct to pipe additional parameters to the
-     * preconditioner. The Trilinos ILU-T decomposition allows for some
-     * fill-in, so it actually is a threshold incomplete LU factorization. The
+     * preconditioner. The Trilinos ILU-T decomposition allows for some fill-
+     * in, so it actually is a threshold incomplete LU factorization. The
      * amount of fill-in, and hence, the amount of memory used by this
      * preconditioner, is controlled by the parameters <tt>ilut_drop</tt> and
      * <tt>ilut_fill</tt>, which specifies a threshold about which values
@@ -1135,20 +1117,18 @@ namespace TrilinosWrappers
 
 
   /**
-   * A wrapper class for a sparse direct LU decomposition on parallel
-   * blocks for Trilinos matrices. When run in serial, this corresponds
-   * to a direct solve on the matrix.
+   * A wrapper class for a sparse direct LU decomposition on parallel blocks
+   * for Trilinos matrices. When run in serial, this corresponds to a direct
+   * solve on the matrix.
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options.
+   * The AdditionalData data structure allows to set preconditioner options.
    *
-   * Note that a parallel application of the block direct solve
-   * preconditioner is actually a block-Jacobi preconditioner with block
-   * size equal to the local matrix size. Spoken more technically, this
-   * parallel operation is an <a
-   * href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
-   * Schwarz method</a> with an <em>exact solve</em> as inner solver,
-   * based on the (outer) parallel partitioning.
+   * Note that a parallel application of the block direct solve preconditioner
+   * is actually a block-Jacobi preconditioner with block size equal to the
+   * local matrix size. Spoken more technically, this parallel operation is an
+   * <a href="http://en.wikipedia.org/wiki/Additive_Schwarz_method">additive
+   * Schwarz method</a> with an <em>exact solve</em> as inner solver, based on
+   * the (outer) parallel partitioning.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
@@ -1192,8 +1172,7 @@ namespace TrilinosWrappers
   /**
    * A wrapper class for a Chebyshev preconditioner for Trilinos matrices.
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options.
+   * The AdditionalData data structure allows to set preconditioner options.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
@@ -1304,9 +1283,9 @@ namespace TrilinosWrappers
    * processors.
    *
    * For proper functionality of this class we recommend using Trilinos v9.0
-   * and higher. Older versions may have problems with generating the
-   * coarse-matrix structure when using matrices with many nonzero entries per
-   * row (i.e., matrices stemming from higher order finite element
+   * and higher. Older versions may have problems with generating the coarse-
+   * matrix structure when using matrices with many nonzero entries per row
+   * (i.e., matrices stemming from higher order finite element
    * discretizations).
    *
    * @ingroup TrilinosWrappers
@@ -1319,9 +1298,9 @@ namespace TrilinosWrappers
 
     /**
      * A data structure that is used to control details of how the algebraic
-     * multigrid is set up. The flags detailed in here are then passed to
-     * the Trilinos ML implementation. A structure of the current type are
-     * passed to the constructor of PreconditionAMG.
+     * multigrid is set up. The flags detailed in here are then passed to the
+     * Trilinos ML implementation. A structure of the current type are passed
+     * to the constructor of PreconditionAMG.
      */
     struct AdditionalData
     {
@@ -1344,8 +1323,8 @@ namespace TrilinosWrappers
       /**
        * Determines whether the AMG preconditioner should be optimized for
        * elliptic problems (ML option smoothed aggregation SA, using a
-       * Chebyshev smoother) or for non-elliptic problems (ML option
-       * non-symmetric smoothed aggregation NSSA, smoother is SSOR with
+       * Chebyshev smoother) or for non-elliptic problems (ML option non-
+       * symmetric smoothed aggregation NSSA, smoother is SSOR with
        * underrelaxation).
        */
       bool elliptic;
@@ -1413,37 +1392,37 @@ namespace TrilinosWrappers
       bool output_details;
 
       /**
-       * Determines which smoother to use for the AMG cycle. Possibilities
-       * for smoother_type are the following:
+       * Determines which smoother to use for the AMG cycle. Possibilities for
+       * smoother_type are the following:
        * <ul>
-       *   <li>  "Aztec" </li>
-       *   <li>  "IFPACK" </li>
-       *   <li>  "Jacobi" </li>
-       *   <li>  "ML symmetric Gauss-Seidel" </li>
-       *   <li>  "symmetric Gauss-Seidel" </li>
-       *   <li>  "ML Gauss-Seidel" </li>
-       *   <li>  "Gauss-Seidel" </li>
-       *   <li>  "block Gauss-Seidel" </li>
-       *   <li>  "symmetric block Gauss-Seidel" </li>
-       *   <li>  "Chebyshev" </li>
-       *   <li>  "MLS" </li>
-       *   <li>  "Hiptmair" </li>
-       *   <li>  "Amesos-KLU" </li>
-       *   <li>  "Amesos-Superlu" </li>
-       *   <li>  "Amesos-UMFPACK" </li>
-       *   <li>  "Amesos-Superludist" </li>
-       *   <li>  "Amesos-MUMPS" </li>
-       *   <li>  "user-defined" </li>
-       *   <li>  "SuperLU" </li>
-       *   <li>  "IFPACK-Chebyshev" </li>
-       *   <li>  "self" </li>
-       *   <li>  "do-nothing" </li>
-       *   <li>  "IC" </li>
-       *   <li>  "ICT" </li>
-       *   <li>  "ILU" </li>
-       *   <li>  "ILUT" </li>
-       *   <li>  "Block Chebyshev" </li>
-       *   <li>  "IFPACK-Block Chebyshev" </li>
+       * <li>  "Aztec" </li>
+       * <li>  "IFPACK" </li>
+       * <li>  "Jacobi" </li>
+       * <li>  "ML symmetric Gauss-Seidel" </li>
+       * <li>  "symmetric Gauss-Seidel" </li>
+       * <li>  "ML Gauss-Seidel" </li>
+       * <li>  "Gauss-Seidel" </li>
+       * <li>  "block Gauss-Seidel" </li>
+       * <li>  "symmetric block Gauss-Seidel" </li>
+       * <li>  "Chebyshev" </li>
+       * <li>  "MLS" </li>
+       * <li>  "Hiptmair" </li>
+       * <li>  "Amesos-KLU" </li>
+       * <li>  "Amesos-Superlu" </li>
+       * <li>  "Amesos-UMFPACK" </li>
+       * <li>  "Amesos-Superludist" </li>
+       * <li>  "Amesos-MUMPS" </li>
+       * <li>  "user-defined" </li>
+       * <li>  "SuperLU" </li>
+       * <li>  "IFPACK-Chebyshev" </li>
+       * <li>  "self" </li>
+       * <li>  "do-nothing" </li>
+       * <li>  "IC" </li>
+       * <li>  "ICT" </li>
+       * <li>  "ILU" </li>
+       * <li>  "ILUT" </li>
+       * <li>  "Block Chebyshev" </li>
+       * <li>  "IFPACK-Block Chebyshev" </li>
        * </ul>
        */
       const char *smoother_type;
@@ -1585,33 +1564,30 @@ namespace TrilinosWrappers
                  const VectorBase &src) const;
 
     /**
-     * Apply the preconditioner on deal.II data structures
-     * instead of the ones provided in the Trilinos wrapper class,
-     * i.e., dst = src.
+     * Apply the preconditioner on deal.II data structures instead of the ones
+     * provided in the Trilinos wrapper class, i.e., dst = src.
      */
     void vmult (dealii::Vector<double>       &dst,
                 const dealii::Vector<double> &src) const;
 
     /**
-     * Apply the transpose preconditioner on deal.II data structures
-     * instead of the ones provided in the Trilinos wrapper class,
-     * i.e. dst = src.
+     * Apply the transpose preconditioner on deal.II data structures instead
+     * of the ones provided in the Trilinos wrapper class, i.e. dst = src.
      */
     void Tvmult (dealii::Vector<double>       &dst,
                  const dealii::Vector<double> &src) const;
 
     /**
-     * Apply the preconditioner on deal.II parallel data structures
-     * instead of the ones provided in the Trilinos wrapper class,
-     * i.e., dst = src.
+     * Apply the preconditioner on deal.II parallel data structures instead of
+     * the ones provided in the Trilinos wrapper class, i.e., dst = src.
      */
     void vmult (parallel::distributed::Vector<double>       &dst,
                 const dealii::parallel::distributed::Vector<double> &src) const;
 
     /**
      * Apply the transpose preconditioner on deal.II parallel data structures
-     * instead of the ones provided in the Trilinos wrapper class,
-     * i.e., dst = src.
+     * instead of the ones provided in the Trilinos wrapper class, i.e., dst =
+     * src.
      */
     void Tvmult (parallel::distributed::Vector<double>       &dst,
                  const dealii::parallel::distributed::Vector<double> &src) const;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -178,7 +178,7 @@ void test ()
       std::transform (v1.begin(), v1.end(), v2.begin(),
                       std::bind2nd (std::multiplies<std::complex<double> >(),
                                     2.0));
-      v2.scale (std::complex<double>(1./2.));
+      v2 *= std::complex<double>(1./2.);
       deallog << "Check 7: " << (v1 == v2 ? "true" : "false") << std::endl;
 
 

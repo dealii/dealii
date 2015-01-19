@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -77,7 +76,7 @@ private:
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
-  MGDoFHandler<dim>    mg_dof_handler;
+  DoFHandler<dim>    mg_dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
@@ -157,7 +156,8 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
-  mg_dof_handler.distribute_dofs (fe);
+  mg_dof_handler.distribute_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs (fe);
   deallog << "Number of degrees of freedom: "
           << mg_dof_handler.n_dofs();
 
@@ -239,7 +239,7 @@ void LaplaceProblem<dim>::assemble_system ()
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values (n_q_points);
 
-  typename MGDoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim>::active_cell_iterator
   cell = mg_dof_handler.begin_active(),
   endc = mg_dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -311,7 +311,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
       boundary_interface_constraints[level].close ();
     }
 
-  typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
+  typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
                                             endc = mg_dof_handler.end();
 
   for (; cell!=endc; ++cell)
@@ -416,7 +416,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 // problem under consideration. In that case,
 // we can use the MGTransferPrebuilt class
 // that, given the constraints on the global
-// level and an MGDoFHandler object computes
+// level and an DoFHandler object computes
 // the matrices corresponding to these
 // transfer operators.
 //
@@ -492,7 +492,7 @@ void LaplaceProblem<dim>::solve ()
 // exception of two minor differences: The
 // KellyErrorEstimator::estimate function
 // wants an argument of type DoFHandler, not
-// MGDoFHandler, and so we have to cast from
+// DoFHandler, and so we have to cast from
 // derived to base class; and we generate
 // output in VTK format, to use the more
 // modern visualization programs available

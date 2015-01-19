@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,17 +26,16 @@ template <int rank_, int dim, typename Number> class Tensor;
 template <int dim, typename Number> class Tensor<1,dim,Number>;
 
 /**
- * Provide a general tensor class with an arbitrary rank, i.e. with
- * an arbitrary number of indices. The Tensor class provides an
- * indexing operator and a bit of infrastructure, but most
- * functionality is recursively handed down to tensors of rank 1 or
- * put into external templated functions, e.g. the <tt>contract</tt> family.
+ * Provide a general tensor class with an arbitrary rank, i.e. with an
+ * arbitrary number of indices. The Tensor class provides an indexing operator
+ * and a bit of infrastructure, but most functionality is recursively handed
+ * down to tensors of rank 1 or put into external templated functions, e.g.
+ * the <tt>contract</tt> family.
  *
- * Using this tensor class for objects of rank 2 has advantages over
- * matrices in many cases since the dimension is known to the compiler
- * as well as the location of the data. It is therefore possible to
- * produce far more efficient code than for matrices with
- * runtime-dependent dimension.
+ * Using this tensor class for objects of rank 2 has advantages over matrices
+ * in many cases since the dimension is known to the compiler as well as the
+ * location of the data. It is therefore possible to produce far more
+ * efficient code than for matrices with runtime-dependent dimension.
  *
  * This class provides an optional template argument for the type of the
  * underlying data. It defaults to @p double values. It can be used to base
@@ -51,89 +50,65 @@ class Tensor
 {
 public:
   /**
-   * Provide a way to get the
-   * dimension of an object without
-   * explicit knowledge of it's
-   * data type. Implementation is
-   * this way instead of providing
-   * a function <tt>dimension()</tt>
-   * because now it is possible to
-   * get the dimension at compile
-   * time without the expansion and
-   * preevaluation of an inlined
-   * function; the compiler may
-   * therefore produce more
-   * efficient code and you may use
-   * this value to declare other
-   * data types.
+   * Provide a way to get the dimension of an object without explicit
+   * knowledge of it's data type. Implementation is this way instead of
+   * providing a function <tt>dimension()</tt> because now it is possible to
+   * get the dimension at compile time without the expansion and preevaluation
+   * of an inlined function; the compiler may therefore produce more efficient
+   * code and you may use this value to declare other data types.
    */
   static const unsigned int dimension = dim;
 
   /**
-   * Publish the rank of this tensor to
-   * the outside world.
+   * Publish the rank of this tensor to the outside world.
    */
   static const unsigned int rank      = rank_;
 
   /**
-   * Number of independent components of a
-   * tensor of current rank. This is dim times the
-   * number of independent components of each sub-tensor.
+   * Number of independent components of a tensor of current rank. This is dim
+   * times the number of independent components of each sub-tensor.
    */
   static const unsigned int
   n_independent_components = Tensor<rank_-1,dim>::n_independent_components *dim;
 
   /**
-   * Type of stored objects. This
-   * is a tensor of lower rank.
+   * Type of stored objects. This is a tensor of lower rank.
    */
   typedef Tensor<rank_-1,dim,Number> value_type;
 
   /**
-   * Declare a type that has holds
-   * real-valued numbers with the same
-   * precision as the template argument to
-   * this class. For std::complex<number>,
-   * this corresponds to type number, and
-   * it is equal to Number for all other
-   * cases. See also the respective field
-   * in Vector<Number>.
+   * Declare a type that has holds real-valued numbers with the same precision
+   * as the template argument to this class. For std::complex<number>, this
+   * corresponds to type number, and it is equal to Number for all other
+   * cases. See also the respective field in Vector<Number>.
    *
-   * This typedef is used to
-   * represent the return type of
-   * norms.
+   * This typedef is used to represent the return type of norms.
    */
   typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
   /**
-   * Declare an array type which
-   * can be used to initialize an
-   * object of this type
-   * statically.
+   * Declare an array type which can be used to initialize an object of this
+   * type statically.
    */
   typedef typename Tensor<rank_-1,dim,Number>::array_type array_type[dim];
 
   /**
-   * Constructor. Initialize all entries
-   * to zero.
+   * Constructor. Initialize all entries to zero.
    */
   Tensor ();
 
   /**
-   * Copy constructor, where the data is
-   * copied from a C-style array.
+   * Copy constructor, where the data is copied from a C-style array.
    */
   Tensor (const array_type &initializer);
 
   /**
-   * Conversion operator from tensor of
-   * tensors.
+   * Conversion operator from tensor of tensors.
    */
   Tensor (const Tensor<1,dim,Tensor<rank_-1,dim,Number> > &tensor_in);
 
   /**
-   * Conversion operator to tensor of
-   * tensors.
+   * Conversion operator to tensor of tensors.
    */
   operator Tensor<1,dim,Tensor<rank_-1,dim,Number> > () const;
 
@@ -158,125 +133,102 @@ public:
   Number &operator [](const TableIndices<rank_> &indices);
 
   /**
-   *  Assignment operator.
+   * Assignment operator.
    */
   Tensor &operator = (const Tensor<rank_,dim,Number> &);
 
   /**
-   * This operator assigns a scalar
-   * to a tensor. To avoid
-   * confusion with what exactly it
-   * means to assign a scalar value
-   * to a tensor, zero is the only
-   * value allowed for <tt>d</tt>,
-   * allowing the intuitive
-   * notation <tt>t=0</tt> to reset
-   * all elements of the tensor to
-   * zero.
+   * This operator assigns a scalar to a tensor. To avoid confusion with what
+   * exactly it means to assign a scalar value to a tensor, zero is the only
+   * value allowed for <tt>d</tt>, allowing the intuitive notation
+   * <tt>t=0</tt> to reset all elements of the tensor to zero.
    */
   Tensor<rank_,dim,Number> &operator = (const Number d);
 
   /**
-   *  Test for equality of two tensors.
+   * Test for equality of two tensors.
    */
   bool operator == (const Tensor<rank_,dim,Number> &) const;
 
   /**
-   *  Test for inequality of two tensors.
+   * Test for inequality of two tensors.
    */
   bool operator != (const Tensor<rank_,dim,Number> &) const;
 
   /**
-   *  Add another tensor.
+   * Add another tensor.
    */
   Tensor<rank_,dim,Number> &operator += (const Tensor<rank_,dim,Number> &);
 
   /**
-   *  Subtract another tensor.
+   * Subtract another tensor.
    */
   Tensor<rank_,dim,Number> &operator -= (const Tensor<rank_,dim,Number> &);
 
   /**
-   *  Scale the tensor by <tt>factor</tt>,
-   *  i.e. multiply all components by
-   *  <tt>factor</tt>.
+   * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
+   * <tt>factor</tt>.
    */
   Tensor<rank_,dim,Number> &operator *= (const Number factor);
 
   /**
-   *  Scale the vector by
-   *  <tt>1/factor</tt>.
+   * Scale the vector by <tt>1/factor</tt>.
    */
   Tensor<rank_,dim,Number> &operator /= (const Number factor);
 
   /**
-   *  Add two tensors. If possible, you
-   *  should use <tt>operator +=</tt>
-   *  instead since this does not need the
-   *  creation of a temporary.
+   * Add two tensors. If possible, you should use <tt>operator +=</tt> instead
+   * since this does not need the creation of a temporary.
    */
   Tensor<rank_,dim,Number>   operator + (const Tensor<rank_,dim,Number> &) const;
 
   /**
-   *  Subtract two tensors. If possible,
-   *  you should use <tt>operator -=</tt>
-   *  instead since this does not need the
-   *  creation of a temporary.
+   * Subtract two tensors. If possible, you should use <tt>operator -=</tt>
+   * instead since this does not need the creation of a temporary.
    */
   Tensor<rank_,dim,Number>   operator - (const Tensor<rank_,dim,Number> &) const;
 
   /**
-   * Unary minus operator. Negate all
-   * entries of a tensor.
+   * Unary minus operator. Negate all entries of a tensor.
    */
   Tensor<rank_,dim,Number>   operator - () const;
 
   /**
-   * Return the Frobenius-norm of a tensor,
-   * i.e. the square root of the sum of
+   * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
    * squares of all entries.
    */
   real_type norm () const;
 
   /**
-   * Return the square of the
-   * Frobenius-norm of a tensor,
-   * i.e. the
-   * sum of squares of all entries.
+   * Return the square of the Frobenius-norm of a tensor, i.e. the sum of
+   * squares of all entries.
    *
-   * This function mainly exists
-   * because it makes computing the
-   * norm simpler recursively, but
-   * may also be useful in other
-   * contexts.
+   * This function mainly exists because it makes computing the norm simpler
+   * recursively, but may also be useful in other contexts.
    */
   real_type norm_square () const;
 
   /**
    * Fill a vector with all tensor elements.
    *
-   * This function unrolls all
-   * tensor entries into a single,
-   * linearly numbered vector. As
-   * usual in C++, the rightmost
-   * index of the tensor marches fastest.
+   * This function unrolls all tensor entries into a single, linearly numbered
+   * vector. As usual in C++, the rightmost index of the tensor marches
+   * fastest.
    */
   template <typename Number2>
   void unroll (Vector<Number2> &result) const;
 
   /**
-   * Returns an unrolled index in
-   * the range [0,dim^rank-1] for the element of the tensor indexed by
-   * the argument to the function.
+   * Returns an unrolled index in the range [0,dim^rank-1] for the element of
+   * the tensor indexed by the argument to the function.
    */
   static
   unsigned int
   component_to_unrolled_index(const TableIndices<rank_> &indices);
 
   /**
-   * Opposite of  component_to_unrolled_index: For an index in the
-   * range [0,dim^rank-1], return which set of indices it would
-   * correspond to.
+   * Opposite of  component_to_unrolled_index: For an index in the range
+   * [0,dim^rank-1], return which set of indices it would correspond to.
    */
   static
   TableIndices<rank_> unrolled_to_component_indices(const unsigned int i);
@@ -286,27 +238,20 @@ public:
   /**
    * Reset all values to zero.
    *
-   * Note that this is partly inconsistent
-   * with the semantics of the @p clear()
-   * member functions of the STL and of
-   * several other classes within deal.II
-   * which not only reset the values of
-   * stored elements to zero, but release
-   * all memory and return the object into
-   * a virginial state. However, since the
-   * size of objects of the present type is
-   * determined by its template parameters,
-   * resizing is not an option, and indeed
-   * the state where all elements have a
-   * zero value is the state right after
+   * Note that this is partly inconsistent with the semantics of the @p
+   * clear() member functions of the STL and of several other classes within
+   * deal.II which not only reset the values of stored elements to zero, but
+   * release all memory and return the object into a virginial state. However,
+   * since the size of objects of the present type is determined by its
+   * template parameters, resizing is not an option, and indeed the state
+   * where all elements have a zero value is the state right after
    * construction of such an object.
    */
   void clear ();
 
   /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object.
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
    */
   static std::size_t memory_consumption ();
 
@@ -318,16 +263,15 @@ public:
                   << "Invalid tensor index " << arg1);
 
   /**
-   * Read or write the data of this object to or
-   * from a stream for the purpose of serialization
+   * Read or write the data of this object to or from a stream for the purpose
+   * of serialization
    */
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version);
 
 private:
   /**
-   * Array of tensors holding the
-   * subelements.
+   * Array of tensors holding the subelements.
    */
   Tensor<rank_-1,dim,Number> subtensor[dim];
 
@@ -712,9 +656,9 @@ Tensor<rank_,dim,Number>::serialize(Archive &ar, const unsigned int)
 
 
 /**
- * Output operator for tensors. Print the elements consecutively, with
- * a space in between, two spaces between rank 1 subtensors, three
- * between rank 2 and so on.
+ * Output operator for tensors. Print the elements consecutively, with a space
+ * in between, two spaces between rank 1 subtensors, three between rank 2 and
+ * so on.
  *
  * @relates Tensor
  */
@@ -767,17 +711,16 @@ Number contract (const Tensor<1,dim,Number> &src1,
 
 
 /**
- * Multiplication operator performing a contraction of the last index
- * of the first argument and the first index of the second
- * argument. This function therefore does the same as the
- * corresponding <tt>contract</tt> function, but returns the result as
- * a return value, rather than writing it into the reference given as
- * the first argument to the <tt>contract</tt> function.
+ * Multiplication operator performing a contraction of the last index of the
+ * first argument and the first index of the second argument. This function
+ * therefore does the same as the corresponding <tt>contract</tt> function,
+ * but returns the result as a return value, rather than writing it into the
+ * reference given as the first argument to the <tt>contract</tt> function.
  *
- * Note that for the <tt>Tensor</tt> class, the multiplication
- * operator only performs a contraction over a single pair of
- * indices. This is in contrast to the multiplication operator for
- * symmetric tensors, which does the double contraction.
+ * Note that for the <tt>Tensor</tt> class, the multiplication operator only
+ * performs a contraction over a single pair of indices. This is in contrast
+ * to the multiplication operator for symmetric tensors, which does the double
+ * contraction.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2005
@@ -793,8 +736,8 @@ operator * (const Tensor<1,dim,Number> &src1,
 
 
 /**
- * Double contract two tensors of rank 2, thus computing the Frobenius
- * inner product <tt> sum<sub>i,j</sub> src1[i][j]*src2[i][j]</tt>.
+ * Double contract two tensors of rank 2, thus computing the Frobenius inner
+ * product <tt> sum<sub>i,j</sub> src1[i][j]*src2[i][j]</tt>.
  *
  * @relates Tensor
  * @author Guido Kanschat, 2000
@@ -835,17 +778,16 @@ void contract (Tensor<1,dim,Number>       &dest,
 
 
 /**
- * Multiplication operator performing a contraction of the last index
- * of the first argument and the first index of the second
- * argument. This function therefore does the same as the
- * corresponding <tt>contract</tt> function, but returns the result as
- * a return value, rather than writing it into the reference given as
- * the first argument to the <tt>contract</tt> function.
+ * Multiplication operator performing a contraction of the last index of the
+ * first argument and the first index of the second argument. This function
+ * therefore does the same as the corresponding <tt>contract</tt> function,
+ * but returns the result as a return value, rather than writing it into the
+ * reference given as the first argument to the <tt>contract</tt> function.
  *
- * Note that for the <tt>Tensor</tt> class, the multiplication
- * operator only performs a contraction over a single pair of
- * indices. This is in contrast to the multiplication operator for
- * symmetric tensors, which does the double contraction.
+ * Note that for the <tt>Tensor</tt> class, the multiplication operator only
+ * performs a contraction over a single pair of indices. This is in contrast
+ * to the multiplication operator for symmetric tensors, which does the double
+ * contraction.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2005
@@ -889,17 +831,16 @@ void contract (Tensor<1,dim,Number>       &dest,
 
 
 /**
- * Multiplication operator performing a contraction of the last index
- * of the first argument and the first index of the second
- * argument. This function therefore does the same as the
- * corresponding <tt>contract</tt> function, but returns the result as
- * a return value, rather than writing it into the reference given as
- * the first argument to the <tt>contract</tt> function.
+ * Multiplication operator performing a contraction of the last index of the
+ * first argument and the first index of the second argument. This function
+ * therefore does the same as the corresponding <tt>contract</tt> function,
+ * but returns the result as a return value, rather than writing it into the
+ * reference given as the first argument to the <tt>contract</tt> function.
  *
- * Note that for the <tt>Tensor</tt> class, the multiplication
- * operator only performs a contraction over a single pair of
- * indices. This is in contrast to the multiplication operator for
- * symmetric tensors, which does the double contraction.
+ * Note that for the <tt>Tensor</tt> class, the multiplication operator only
+ * performs a contraction over a single pair of indices. This is in contrast
+ * to the multiplication operator for symmetric tensors, which does the double
+ * contraction.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2005
@@ -946,17 +887,16 @@ void contract (Tensor<2,dim,Number>       &dest,
 
 
 /**
- * Multiplication operator performing a contraction of the last index
- * of the first argument and the first index of the second
- * argument. This function therefore does the same as the
- * corresponding <tt>contract</tt> function, but returns the result as
- * a return value, rather than writing it into the reference given as
- * the first argument to the <tt>contract</tt> function.
+ * Multiplication operator performing a contraction of the last index of the
+ * first argument and the first index of the second argument. This function
+ * therefore does the same as the corresponding <tt>contract</tt> function,
+ * but returns the result as a return value, rather than writing it into the
+ * reference given as the first argument to the <tt>contract</tt> function.
  *
- * Note that for the <tt>Tensor</tt> class, the multiplication
- * operator only performs a contraction over a single pair of
- * indices. This is in contrast to the multiplication operator for
- * symmetric tensors, which does the double contraction.
+ * Note that for the <tt>Tensor</tt> class, the multiplication operator only
+ * performs a contraction over a single pair of indices. This is in contrast
+ * to the multiplication operator for symmetric tensors, which does the double
+ * contraction.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2005
@@ -977,15 +917,15 @@ operator * (const Tensor<2,dim,Number> &src1,
 
 
 /**
- * Contract a tensor of rank 2 with a tensor of rank 2. The
- * contraction is performed over index <tt>index1</tt> of the first tensor,
- * and <tt>index2</tt> of the second tensor. Thus, if <tt>index1==2</tt>,
- * <tt>index2==1</tt>, the result is the usual contraction, but if for
- * example <tt>index1==1</tt>, <tt>index2==2</tt>, then the result is
- * <tt>dest[i][k] = sum_j src1[j][i] src2[k][j]</tt>.
+ * Contract a tensor of rank 2 with a tensor of rank 2. The contraction is
+ * performed over index <tt>index1</tt> of the first tensor, and
+ * <tt>index2</tt> of the second tensor. Thus, if <tt>index1==2</tt>,
+ * <tt>index2==1</tt>, the result is the usual contraction, but if for example
+ * <tt>index1==1</tt>, <tt>index2==2</tt>, then the result is <tt>dest[i][k] =
+ * sum_j src1[j][i] src2[k][j]</tt>.
  *
- * Note that the number of the index is counted from 1 on, not from
- * zero as usual.
+ * Note that the number of the index is counted from 1 on, not from zero as
+ * usual.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 1998
@@ -1050,12 +990,11 @@ void contract (Tensor<2,dim,Number>       &dest,
 
 
 /**
- * Contract a tensor of rank 3 with a tensor of rank 1. The
- * contraction is performed over index <tt>index1</tt> of the first
- * tensor.
+ * Contract a tensor of rank 3 with a tensor of rank 1. The contraction is
+ * performed over index <tt>index1</tt> of the first tensor.
  *
- * Note that the number of the index is counted from 1 on, not from
- * zero as usual.
+ * Note that the number of the index is counted from 1 on, not from zero as
+ * usual.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 1998
@@ -1121,15 +1060,15 @@ void contract (Tensor<3,dim,Number>       &dest,
 
 
 /**
- * Contract a tensor of rank 3 with a tensor of rank 2. The
- * contraction is performed over index <tt>index1</tt> of the first tensor,
- * and <tt>index2</tt> of the second tensor. Thus, if <tt>index1==3</tt>,
- * <tt>index2==1</tt>, the result is the usual contraction, but if for
- * example <tt>index1==1</tt>, <tt>index2==2</tt>, then the result is
+ * Contract a tensor of rank 3 with a tensor of rank 2. The contraction is
+ * performed over index <tt>index1</tt> of the first tensor, and
+ * <tt>index2</tt> of the second tensor. Thus, if <tt>index1==3</tt>,
+ * <tt>index2==1</tt>, the result is the usual contraction, but if for example
+ * <tt>index1==1</tt>, <tt>index2==2</tt>, then the result is
  * <tt>dest[i][j][k] = sum_l src1[l][i][j] src2[k][l]</tt>.
  *
- * Note that the number of the index is counted from 1 on, not from
- * zero as usual.
+ * Note that the number of the index is counted from 1 on, not from zero as
+ * usual.
  *
  * @relates Tensor
  */
@@ -1220,17 +1159,16 @@ void contract (Tensor<3,dim,Number>       &dest,
 
 
 /**
- * Multiplication operator performing a contraction of the last index
- * of the first argument and the first index of the second
- * argument. This function therefore does the same as the
- * corresponding <tt>contract</tt> function, but returns the result as
- * a return value, rather than writing it into the reference given as
- * the first argument to the <tt>contract</tt> function.
+ * Multiplication operator performing a contraction of the last index of the
+ * first argument and the first index of the second argument. This function
+ * therefore does the same as the corresponding <tt>contract</tt> function,
+ * but returns the result as a return value, rather than writing it into the
+ * reference given as the first argument to the <tt>contract</tt> function.
  *
- * Note that for the <tt>Tensor</tt> class, the multiplication
- * operator only performs a contraction over a single pair of
- * indices. This is in contrast to the multiplication operator for
- * symmetric tensors, which does the double contraction.
+ * Note that for the <tt>Tensor</tt> class, the multiplication operator only
+ * performs a contraction over a single pair of indices. This is in contrast
+ * to the multiplication operator for symmetric tensors, which does the double
+ * contraction.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2005
@@ -1274,17 +1212,16 @@ void contract (Tensor<3,dim,Number>       &dest,
 
 
 /**
- * Multiplication operator performing a contraction of the last index
- * of the first argument and the first index of the second
- * argument. This function therefore does the same as the
- * corresponding <tt>contract</tt> function, but returns the result as
- * a return value, rather than writing it into the reference given as
- * the first argument to the <tt>contract</tt> function.
+ * Multiplication operator performing a contraction of the last index of the
+ * first argument and the first index of the second argument. This function
+ * therefore does the same as the corresponding <tt>contract</tt> function,
+ * but returns the result as a return value, rather than writing it into the
+ * reference given as the first argument to the <tt>contract</tt> function.
  *
- * Note that for the <tt>Tensor</tt> class, the multiplication
- * operator only performs a contraction over a single pair of
- * indices. This is in contrast to the multiplication operator for
- * symmetric tensors, which does the double contraction.
+ * Note that for the <tt>Tensor</tt> class, the multiplication operator only
+ * performs a contraction over a single pair of indices. This is in contrast
+ * to the multiplication operator for symmetric tensors, which does the double
+ * contraction.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2005
@@ -1331,8 +1268,8 @@ operator * (const Tensor<3,dim,Number> &src1,
 
 /**
  * Contract the last two indices of <tt>src1</tt> with the two indices
- * <tt>src2</tt>, creating a rank-2 tensor. This is the matrix-vector
- * product analog operation between tensors of rank 4 and rank 2.
+ * <tt>src2</tt>, creating a rank-2 tensor. This is the matrix-vector product
+ * analog operation between tensors of rank 4 and rank 2.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2005
@@ -1445,8 +1382,8 @@ contract3 (const Tensor<2,dim,Number> &t1,
 
 
 /**
- * Form the outer product of two tensors of rank 1 and 1, i.e.
- * <tt>dst[i][j] = src1[i] * src2[j]</tt>.
+ * Form the outer product of two tensors of rank 1 and 1, i.e. <tt>dst[i][j] =
+ * src1[i] * src2[j]</tt>.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2000
@@ -1501,12 +1438,11 @@ void outer_product (Tensor<3,dim,Number>       &dst,
 
 
 /**
- * Form the outer product of two tensors of rank 0 and 1, i.e.
- * <tt>dst[i] = src1 * src2[i]</tt>. Of course, this is only a scaling of
- * <tt>src2</tt>, but we consider this an outer product for completeness of
- * these functions and since this is sometimes needed when writing
- * templates that depend on the rank of a tensor, which may sometimes
- * be zero (i.e. a scalar).
+ * Form the outer product of two tensors of rank 0 and 1, i.e. <tt>dst[i] =
+ * src1 * src2[i]</tt>. Of course, this is only a scaling of <tt>src2</tt>,
+ * but we consider this an outer product for completeness of these functions
+ * and since this is sometimes needed when writing templates that depend on
+ * the rank of a tensor, which may sometimes be zero (i.e. a scalar).
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2000
@@ -1523,12 +1459,11 @@ void outer_product (Tensor<1,dim,Number>       &dst,
 
 
 /**
- * Form the outer product of two tensors of rank 1 and 0, i.e.
- * <tt>dst[i] = src1[i] * src2</tt>. Of course, this is only a scaling of
- * <tt>src1</tt>, but we consider this an outer product for completeness of
- * these functions and since this is sometimes needed when writing
- * templates that depend on the rank of a tensor, which may sometimes
- * be zero (i.e. a scalar).
+ * Form the outer product of two tensors of rank 1 and 0, i.e. <tt>dst[i] =
+ * src1[i] * src2</tt>. Of course, this is only a scaling of <tt>src1</tt>,
+ * but we consider this an outer product for completeness of these functions
+ * and since this is sometimes needed when writing templates that depend on
+ * the rank of a tensor, which may sometimes be zero (i.e. a scalar).
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2000
@@ -1544,13 +1479,12 @@ void outer_product (Tensor<1,dim,Number>       &dst,
 
 
 /**
- * Cross-product in 2d. This is just a rotation by 90 degrees
- * clockwise to compute the outer normal from a tangential
- * vector. This function is defined for all space dimensions to allow
- * for dimension independent programming (e.g. within switches over
- * the space dimenion), but may only be called if the actual dimension
- * of the arguments is two (e.g. from the <tt>dim==2</tt> case in the
- * switch).
+ * Cross-product in 2d. This is just a rotation by 90 degrees clockwise to
+ * compute the outer normal from a tangential vector. This function is defined
+ * for all space dimensions to allow for dimension independent programming
+ * (e.g. within switches over the space dimenion), but may only be called if
+ * the actual dimension of the arguments is two (e.g. from the <tt>dim==2</tt>
+ * case in the switch).
  *
  * @relates Tensor
  * @author Guido Kanschat, 2001
@@ -1569,11 +1503,11 @@ cross_product (Tensor<1,dim,Number>       &dst,
 
 
 /**
- * Cross-product of 2 vectors in 3d. This function is defined for all
- * space dimensions to allow for dimension independent programming
- * (e.g. within switches over the space dimenion), but may only be
- * called if the actual dimension of the arguments is three (e.g. from
- * the <tt>dim==3</tt> case in the switch).
+ * Cross-product of 2 vectors in 3d. This function is defined for all space
+ * dimensions to allow for dimension independent programming (e.g. within
+ * switches over the space dimenion), but may only be called if the actual
+ * dimension of the arguments is three (e.g. from the <tt>dim==3</tt> case in
+ * the switch).
  *
  * @relates Tensor
  * @author Guido Kanschat, 2001
@@ -1618,9 +1552,8 @@ scalar_product (const Tensor<2,dim,Number> &t1,
 
 
 /**
- * Compute the determinant of a tensor of arbitrary rank and dimension
- * one. Since this is a number, the return value is, of course, the
- * number itself.
+ * Compute the determinant of a tensor of arbitrary rank and dimension one.
+ * Since this is a number, the return value is, of course, the number itself.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 1998
@@ -1635,9 +1568,8 @@ Number determinant (const Tensor<rank,1,Number> &t)
 
 
 /**
- * Compute the determinant of a tensor of rank one and dimension
- * one. Since this is a number, the return value is, of course, the
- * number itself.
+ * Compute the determinant of a tensor of rank one and dimension one. Since
+ * this is a number, the return value is, of course, the number itself.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 1998
@@ -1651,9 +1583,8 @@ Number determinant (const Tensor<1,1,Number> &t)
 
 
 /**
- * Compute the determinant of a tensor of rank two and dimension
- * one. Since this is a number, the return value is, of course, the
- * number itself.
+ * Compute the determinant of a tensor of rank two and dimension one. Since
+ * this is a number, the return value is, of course, the number itself.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 1998
@@ -1748,8 +1679,8 @@ Number determinant (const Tensor<2,dim,Number> &t)
 
 
 /**
- * Compute and return the trace of a tensor of rank 2, i.e. the sum of
- * its diagonal entries.
+ * Compute and return the trace of a tensor of rank 2, i.e. the sum of its
+ * diagonal entries.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2001
@@ -1766,10 +1697,10 @@ Number trace (const Tensor<2,dim,Number> &d)
 
 
 /**
- * Compute and return the inverse of the given tensor. Since the
- * compiler can perform the return value optimization, and since the
- * size of the return object is known, it is acceptable to return the
- * result by value, rather than by reference as a parameter.
+ * Compute and return the inverse of the given tensor. Since the compiler can
+ * perform the return value optimization, and since the size of the return
+ * object is known, it is acceptable to return the result by value, rather
+ * than by reference as a parameter.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2000
@@ -1835,11 +1766,11 @@ invert (const Tensor<2,dim,Number> &t)
 
 
 /**
- * Return the transpose of the given tensor. Since the compiler can
- * perform the return value optimization, and since the size of the
- * return object is known, it is acceptable to return the result by
- * value, rather than by reference as a parameter. Note that there are
- * specializations of this function for <tt>dim==1,2,3</tt>.
+ * Return the transpose of the given tensor. Since the compiler can perform
+ * the return value optimization, and since the size of the return object is
+ * known, it is acceptable to return the result by value, rather than by
+ * reference as a parameter. Note that there are specializations of this
+ * function for <tt>dim==1,2,3</tt>.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2002
@@ -1865,8 +1796,8 @@ transpose (const Tensor<2,dim,Number> &t)
 #ifndef DOXYGEN
 
 /**
- * Return the transpose of the given tensor. This is the
- * specialization of the general template for <tt>dim==1</tt>.
+ * Return the transpose of the given tensor. This is the specialization of the
+ * general template for <tt>dim==1</tt>.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2002
@@ -1883,8 +1814,8 @@ transpose (const Tensor<2,1,Number> &t)
 
 
 /**
- * Return the transpose of the given tensor. This is the
- * specialization of the general template for <tt>dim==2</tt>.
+ * Return the transpose of the given tensor. This is the specialization of the
+ * general template for <tt>dim==2</tt>.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2002
@@ -1902,8 +1833,8 @@ transpose (const Tensor<2,2,Number> &t)
 
 
 /**
- * Return the transpose of the given tensor. This is the
- * specialization of the general template for <tt>dim==3</tt>.
+ * Return the transpose of the given tensor. This is the specialization of the
+ * general template for <tt>dim==3</tt>.
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2002
@@ -1924,9 +1855,8 @@ transpose (const Tensor<2,3,Number> &t)
 
 
 /**
- * Return the $l_1$ norm of the given rank-2 tensor, where
- * $||t||_1 = \max_j \sum_i |t_{ij}|$ (maximum of
- * the sums over columns).
+ * Return the $l_1$ norm of the given rank-2 tensor, where $||t||_1 = \max_j
+ * \sum_i |t_{ij}|$ (maximum of the sums over columns).
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2012
@@ -1953,9 +1883,8 @@ l1_norm (const Tensor<2,dim,Number> &t)
 
 
 /**
- * Return the $l_\infty$ norm of the given rank-2 tensor, where
- * $||t||_\infty = \max_i \sum_j |t_{ij}|$ (maximum of
- * the sums over rows).
+ * Return the $l_\infty$ norm of the given rank-2 tensor, where $||t||_\infty
+ * = \max_i \sum_j |t_{ij}|$ (maximum of the sums over rows).
  *
  * @relates Tensor
  * @author Wolfgang Bangerth, 2012
@@ -1982,8 +1911,8 @@ linfty_norm (const Tensor<2,dim,Number> &t)
 
 
 /**
- * Multiplication of a tensor of general rank with a scalar Number
- * from the right.
+ * Multiplication of a tensor of general rank with a scalar Number from the
+ * right.
  *
  * @relates Tensor
  */
@@ -2001,8 +1930,8 @@ operator * (const Tensor<rank,dim,Number> &t,
 
 
 /**
- * Multiplication of a tensor of general rank with a scalar Number
- * from the left.
+ * Multiplication of a tensor of general rank with a scalar Number from the
+ * left.
  *
  * @relates Tensor
  */
@@ -2039,8 +1968,8 @@ operator / (const Tensor<rank,dim,Number> &t,
 
 
 /**
- * Multiplication of a tensor of general rank with a scalar double
- * from the right.
+ * Multiplication of a tensor of general rank with a scalar double from the
+ * right.
  *
  * @relates Tensor
  */
@@ -2058,8 +1987,8 @@ operator * (const Tensor<rank,dim> &t,
 
 
 /**
- * Multiplication of a tensor of general rank with a scalar double
- * from the left.
+ * Multiplication of a tensor of general rank with a scalar double from the
+ * left.
  *
  * @relates Tensor
  */
@@ -2095,8 +2024,8 @@ operator / (const Tensor<rank,dim> &t,
 
 
 /**
- * Multiplication of a tensor of general rank by a scalar
- * complex<double> from the left.
+ * Multiplication of a tensor of general rank by a scalar complex<double> from
+ * the left.
  *
  * @relates Tensor
  */
@@ -2115,8 +2044,8 @@ operator * (const std::complex<double>  factor,
 
 
 /**
- * Multiplication of a tensor of general rank by a scalar
- * complex<double> from the right.
+ * Multiplication of a tensor of general rank by a scalar complex<double> from
+ * the right.
  *
  * @relates Tensor
  */

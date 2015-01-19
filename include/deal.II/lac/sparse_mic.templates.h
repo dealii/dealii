@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,17 +31,6 @@ SparseMIC<number>::SparseMIC ()
   inner_sums(0)
 {}
 
-
-
-template <typename number>
-SparseMIC<number>::SparseMIC (const SparsityPattern &sparsity)
-  :
-  diag(0),
-  inv_diag(0),
-  inner_sums(0)
-{
-  SparseMatrix<number>::reinit (sparsity);
-}
 
 
 template <typename number>

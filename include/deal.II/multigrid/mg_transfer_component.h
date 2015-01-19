@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,9 +47,9 @@ template <int dim, int spacedim> class DoFHandler;
 /**
  * Implementation of matrix generation for component wise multigrid transfer.
  *
- * @note MGTransferBlockBase is probably the more logical
- * class. Still eventually, a class should be developed allowing to
- * select multiple components.
+ * @note MGTransferBlockBase is probably the more logical class. Still
+ * eventually, a class should be developed allowing to select multiple
+ * components.
  *
  * @author Guido Kanschat, 2001-2003
  */
@@ -64,20 +64,14 @@ public:
 
 protected:
   /**
-   * Actually build the prolongation
-   * matrices for each level.
+   * Actually build the prolongation matrices for each level.
    *
-   * This function is only called
-   * by derived classes. These can
-   * also set the member variables
-   * <code>selected_component</code> and <code>mg_selected_component</code> member variables to
-   * restrict the transfer matrices
-   * to certain components.
-   * Furthermore, they use
-   * <code>target_component</code> and
-   * <code>mg_target_component</code> for
-   * re-ordering and grouping of
-   * components.
+   * This function is only called by derived classes. These can also set the
+   * member variables <code>selected_component</code> and
+   * <code>mg_selected_component</code> member variables to restrict the
+   * transfer matrices to certain components. Furthermore, they use
+   * <code>target_component</code> and <code>mg_target_component</code> for
+   * re-ordering and grouping of components.
    */
   template <int dim, int spacedim>
   void build_matrices (const DoFHandler<dim,spacedim> &dof,
@@ -86,40 +80,28 @@ protected:
   /**
    * Flag of selected components.
    *
-   * The transfer operators only act
-   * on the components having a
-   * <tt>true</tt> entry here. If
-   * renumbering by
-   * #target_component is used,
-   * this refers to the
-   * <b>renumbered</b> components.
+   * The transfer operators only act on the components having a <tt>true</tt>
+   * entry here. If renumbering by #target_component is used, this refers to
+   * the <b>renumbered</b> components.
    */
   ComponentMask component_mask;
 
   /**
    * Flag of selected components.
    *
-   * The transfer operators only act
-   * on the components having a
-   * <tt>true</tt> entry here. If
-   * renumbering by
-   * #mg_target_component is used,
-   * this refers to the
-   * <b>renumbered</b> components.
+   * The transfer operators only act on the components having a <tt>true</tt>
+   * entry here. If renumbering by #mg_target_component is used, this refers
+   * to the <b>renumbered</b> components.
    */
   ComponentMask mg_component_mask;
 
   /**
-   * Target component of the
-   * fine-level vector if
-   * renumbering is required.
+   * Target component of the fine-level vector if renumbering is required.
    */
   std::vector<unsigned int> target_component;
 
   /**
-   * Target component if
-   * renumbering of level vectors
-   * is required.
+   * Target component if renumbering of level vectors is required.
    */
   std::vector<unsigned int> mg_target_component;
 
@@ -134,14 +116,12 @@ protected:
   std::vector<types::global_dof_index> component_start;
 
   /**
-   * Start index of each component on
-   * all levels.
+   * Start index of each component on all levels.
    */
   std::vector<std::vector<types::global_dof_index> > mg_component_start;
 
   /**
-   * Call build_matrices()
-   * function first.
+   * Call build_matrices() function first.
    */
   DeclException0(ExcMatricesNotBuilt);
 
@@ -151,29 +131,22 @@ private:
 protected:
 
   /**
-   * The actual prolongation matrix.
-   * column indices belong to the
-   * dof indices of the mother cell,
-   * i.e. the coarse level.
-   * while row indices belong to the
-   * child cell, i.e. the fine level.
+   * The actual prolongation matrix. column indices belong to the dof indices
+   * of the mother cell, i.e. the coarse level. while row indices belong to
+   * the child cell, i.e. the fine level.
    */
   std::vector<std_cxx11::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
 
   /**
-   * Holds the mapping for the
-   * <tt>copy_to/from_mg</tt>-functions.
-   * The data is first the global
-   * index, then the level index.
+   * Holds the mapping for the <tt>copy_to/from_mg</tt>-functions. The data is
+   * first the global index, then the level index.
    */
   std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
   copy_to_and_from_indices;
 
   /**
-   * Store the boundary_indices.
-   * These are needed for the
-   * boundary values in the
-   * restriction matrix.
+   * Store the boundary_indices. These are needed for the boundary values in
+   * the restriction matrix.
    */
   std::vector<std::set<types::global_dof_index> > boundary_indices;
 };
@@ -183,14 +156,13 @@ protected:
 //TODO: Use same kind of template argument as MGTransferSelect
 
 /**
- * Implementation of the MGTransferBase interface for block
- * matrices and simple vectors. This class uses MGTransferComponentBase
- * selecting a single component or grouping several components into a
- * single block. The transfer operators themselves are implemented for
- * Vector and BlockVector objects.
+ * Implementation of the MGTransferBase interface for block matrices and
+ * simple vectors. This class uses MGTransferComponentBase selecting a single
+ * component or grouping several components into a single block. The transfer
+ * operators themselves are implemented for Vector and BlockVector objects.
  *
- * See MGTransferBase to find out which of the transfer classes
- * is best for your needs.
+ * See MGTransferBase to find out which of the transfer classes is best for
+ * your needs.
  *
  * @author Guido Kanschat, 2001, 2002, 2003
  */
@@ -200,11 +172,8 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 {
 public:
   /**
-   * Constructor without constraint
-   * matrices. Use this constructor
-   * only with discontinuous finite
-   * elements or with no local
-   * refinement.
+   * Constructor without constraint matrices. Use this constructor only with
+   * discontinuous finite elements or with no local refinement.
    */
   MGTransferSelect ();
 
@@ -220,45 +189,29 @@ public:
 
 //TODO: rewrite docs; make sure defaulted args are actually allowed
   /**
-   * Actually build the prolongation
-   * matrices for grouped components.
+   * Actually build the prolongation matrices for grouped components.
    *
-   * This function is a front-end
-   * for the same function in
+   * This function is a front-end for the same function in
    * MGTransferComponentBase.
    *
-   * @arg selected: Number of the
-   * block of the global vector
-   * to be copied from and to the
-   * multilevel vector. This number
-   * refers to the renumbering by
+   * @arg selected: Number of the block of the global vector to be copied from
+   * and to the multilevel vector. This number refers to the renumbering by
    * <tt>target_component</tt>.
    *
-   * @arg mg_selected: Number
-   * of the block for which the
-   * transfer matrices should be
-   * built.
+   * @arg mg_selected: Number of the block for which the transfer matrices
+   * should be built.
    *
-   * If <tt>mg_target_component</tt> is
-   * present, this refers to the
-   * renumbered components.
+   * If <tt>mg_target_component</tt> is present, this refers to the renumbered
+   * components.
    *
-   * @arg target_component: this
-   * argument allows grouping and
-   * renumbering of components in
-   * the fine-level vector (see
-   * DoFRenumbering::component_wise).
+   * @arg target_component: this argument allows grouping and renumbering of
+   * components in the fine-level vector (see DoFRenumbering::component_wise).
    *
-   * @arg mg_target_component: this
-   * argument allows grouping and
-   * renumbering of components in
-   * the level vectors (see
-   * DoFRenumbering::component_wise). It
-   * also affects the behavior of
-   * the <tt>selected</tt> argument
+   * @arg mg_target_component: this argument allows grouping and renumbering
+   * of components in the level vectors (see DoFRenumbering::component_wise).
+   * It also affects the behavior of the <tt>selected</tt> argument
    *
-   * @arg boundary_indices: holds the
-   * boundary indices on each level.
+   * @arg boundary_indices: holds the boundary indices on each level.
    */
   template <int dim, int spacedim>
   void build_matrices (const DoFHandler<dim,spacedim> &dof,
@@ -274,8 +227,7 @@ public:
                       );
 
   /**
-   * Change selected
-   * component. Handle with care!
+   * Change selected component. Handle with care!
    */
   void select (const unsigned int component,
                const unsigned int mg_component = numbers::invalid_unsigned_int);
@@ -289,8 +241,7 @@ public:
                                  const Vector<number> &src) const;
 
   /**
-   * Transfer from a vector on the
-   * global grid to a multilevel vector.
+   * Transfer from a vector on the global grid to a multilevel vector.
    */
   template <int dim, typename number2, int spacedim>
   void
@@ -299,13 +250,10 @@ public:
               const Vector<number2>          &src) const;
 
   /**
-   * Transfer from multilevel vector to
-   * normal vector.
+   * Transfer from multilevel vector to normal vector.
    *
-   * Copies data from active
-   * portions of an multilevel
-   * vector into the respective
-   * positions of a Vector.
+   * Copies data from active portions of an multilevel vector into the
+   * respective positions of a Vector.
    */
   template <int dim, typename number2, int spacedim>
   void
@@ -314,12 +262,9 @@ public:
                 const MGLevelObject<Vector<number> > &src) const;
 
   /**
-   * Add a multi-level vector to a
-   * normal vector.
+   * Add a multi-level vector to a normal vector.
    *
-   * Works as the previous
-   * function, but probably not for
-   * continuous elements.
+   * Works as the previous function, but probably not for continuous elements.
    */
   template <int dim, typename number2, int spacedim>
   void
@@ -328,8 +273,7 @@ public:
                     const MGLevelObject<Vector<number> > &src) const;
 
   /**
-   * Transfer from a vector on the
-   * global grid to multilevel vectors.
+   * Transfer from a vector on the global grid to multilevel vectors.
    */
   template <int dim, typename number2, int spacedim>
   void
@@ -338,14 +282,10 @@ public:
               const BlockVector<number2>     &src) const;
 
   /**
-   * Transfer from multilevel vector to
-   * normal vector.
+   * Transfer from multilevel vector to normal vector.
    *
-   * Copies data from active
-   * portions of a multilevel
-   * vector into the respective
-   * positions of a global
-   * BlockVector.
+   * Copies data from active portions of a multilevel vector into the
+   * respective positions of a global BlockVector.
    */
   template <int dim, typename number2, int spacedim>
   void
@@ -354,12 +294,9 @@ public:
                 const MGLevelObject<Vector<number> > &src) const;
 
   /**
-   * Add a multi-level vector to a
-   * normal vector.
+   * Add a multi-level vector to a normal vector.
    *
-   * Works as the previous
-   * function, but probably not for
-   * continuous elements.
+   * Works as the previous function, but probably not for continuous elements.
    */
   template <int dim, typename number2, int spacedim>
   void
@@ -374,8 +311,7 @@ public:
 
 private:
   /**
-   * Implementation of the public
-   * function.
+   * Implementation of the public function.
    */
   template <int dim, class OutVector, int spacedim>
   void
@@ -384,8 +320,7 @@ private:
                    const MGLevelObject<Vector<number> > &src) const;
 
   /**
-   * Implementation of the public
-   * function.
+   * Implementation of the public function.
    */
   template <int dim, class OutVector, int spacedim>
   void
@@ -394,8 +329,7 @@ private:
                        const MGLevelObject<Vector<number> > &src) const;
 
   /**
-   * Actual implementation of
-   * copy_to_mg().
+   * Actual implementation of copy_to_mg().
    */
   template <int dim, class InVector, int spacedim>
   void
@@ -412,20 +346,15 @@ private:
   unsigned int mg_selected_component;
 
   /**
-   * The degrees of freedom on the
-   * the refinement edges. For each
-   * level (outer vector) and each
-   * dof index (inner vector), this
-   * bool is true if the level
-   * degree of freedom is on the
-   * refinement edge towards the
-   * lower level excluding boundary dofs.
+   * The degrees of freedom on the the refinement edges. For each level (outer
+   * vector) and each dof index (inner vector), this bool is true if the level
+   * degree of freedom is on the refinement edge towards the lower level
+   * excluding boundary dofs.
    */
   std::vector<std::vector<bool> > interface_dofs;
 
   /**
-   * The constraints of the global
-   * system.
+   * The constraints of the global system.
    */
 public:
   SmartPointer<const ConstraintMatrix> constraints;

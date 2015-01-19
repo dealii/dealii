@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,9 +29,8 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Matrix with shifted diagonal values.
  *
- * Given a matrix <tt>A</tt>, this class implements a matrix-vector
- * product with <i>A+s I</i>, where <i>s</i> is a provided shift
- * parameter.
+ * Given a matrix <tt>A</tt>, this class implements a matrix-vector product
+ * with <i>A+s I</i>, where <i>s</i> is a provided shift parameter.
  *
  * @author Guido Kanschat, 2000, 2001
  */
@@ -40,8 +39,7 @@ class ShiftedMatrix
 {
 public:
   /**
-   * Constructor.  Provide the base
-   * matrix and a shift parameter.
+   * Constructor.  Provide the base matrix and a shift parameter.
    */
   ShiftedMatrix (const MATRIX &A, const double sigma);
 
@@ -86,7 +84,8 @@ private:
 
 
 /**
- * Matrix with shifted diagonal values with respect to a certain scalar product.
+ * Matrix with shifted diagonal values with respect to a certain scalar
+ * product.
  *
  * Given a matrix <tt>A</tt>, this class implements a matrix-vector product
  * with <i>A+s M</i>, where <i>s</i> is a provided shift parameter and
@@ -99,8 +98,7 @@ class ShiftedMatrixGeneralized
 {
 public:
   /**
-   * Constructor.
-   * Provide the base matrix and a shift parameter.
+   * Constructor. Provide the base matrix and a shift parameter.
    */
   ShiftedMatrixGeneralized (const MATRIX &A,
                             const MASSMATRIX &M,

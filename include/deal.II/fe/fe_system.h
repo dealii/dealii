@@ -35,21 +35,22 @@ DEAL_II_NAMESPACE_OPEN
  * that are possibly of different type. The result is then a vector-valued
  * finite element. %Vector valued elements are discussed in a number of
  * tutorial programs, for example step-8, step-20, step-21, and in particular
- * in the @ref vector_valued module.
+ * in the
+ * @ref vector_valued
+ * module.
  *
  * <h3>FESystem, components and blocks</h3>
  *
  * An FESystem, except in the most trivial case, produces a vector-valued
- * finite element with several components. The number of components n_components()
- * corresponds to the dimension of the solution function in the PDE system,
- * and correspondingly also to the number of equations your PDE system
- * has. For example, the mixed Laplace system covered in step-20 has $d+1$
- * components in $d$ space dimensions: the scalar pressure and the $d$
+ * finite element with several components. The number of components
+ * n_components() corresponds to the dimension of the solution function in the
+ * PDE system, and correspondingly also to the number of equations your PDE
+ * system has. For example, the mixed Laplace system covered in step-20 has
+ * $d+1$ components in $d$ space dimensions: the scalar pressure and the $d$
  * components of the velocity vector. Similarly, the elasticity equation
  * covered in step-8 has $d$ components in $d$ space dimensions. In general,
- * the number of components of a FESystem element is the
- * accumulated number of components of all base elements times their
- * multiplicities. A bit more on
+ * the number of components of a FESystem element is the accumulated number of
+ * components of all base elements times their multiplicities. A bit more on
  * components is also given in the
  * @ref GlossComponent "glossary entry on components".
  *
@@ -57,15 +58,16 @@ DEAL_II_NAMESPACE_OPEN
  * partial differential equation, the finite element side looks a bit
  * different Since not only FESystem, but also vector-valued elements like
  * FE_RaviartThomas, have several components. The concept needed here is a
- * @ref GlossBlock "block". Each block encompasses the set of degrees of
- * freedom associated with a single base element of an FESystem, where base
- * elements with multiplicities count multiple times. These blocks are usually
- * addressed using the information in DoFHandler::block_info(). The number of
- * blocks of a FESystem object is simply the sum of all multiplicities of
- * base elements and is given by n_blocks().
+ * @ref GlossBlock "block".
+ * Each block encompasses the set of degrees of freedom associated with a
+ * single base element of an FESystem, where base elements with multiplicities
+ * count multiple times. These blocks are usually addressed using the
+ * information in DoFHandler::block_info(). The number of blocks of a FESystem
+ * object is simply the sum of all multiplicities of base elements and is
+ * given by n_blocks().
  *
- * For example, the FESystem for the Taylor-Hood element for the
- * three-dimensional Stokes problem can be built using the code
+ * For example, the FESystem for the Taylor-Hood element for the three-
+ * dimensional Stokes problem can be built using the code
  *
  * @code
  * FE_Q<3> u(2);
@@ -103,12 +105,12 @@ DEAL_II_NAMESPACE_OPEN
  * FESystem<3> sys3(u,1, p,1);
  * @endcode
  *
- * This example also produces a system with four components, but only
- * two blocks.
+ * This example also produces a system with four components, but only two
+ * blocks.
  *
- * In most cases, the composed element behaves as if it were a usual
- * element. It just has more degrees of freedom than most of the "common"
- * elements. However the underlying structure is visible in the restriction,
+ * In most cases, the composed element behaves as if it were a usual element.
+ * It just has more degrees of freedom than most of the "common" elements.
+ * However the underlying structure is visible in the restriction,
  * prolongation and interface constraint matrices, which do not couple the
  * degrees of freedom of the base elements. E.g. the continuity requirement is
  * imposed for the shape functions of the subobjects separately; no
@@ -122,34 +124,31 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Internal information on numbering of degrees of freedom</h3>
  *
  * The overall numbering of degrees of freedom is as follows: for each
- * subobject (vertex, line, quad, or hex), the degrees of freedom are
- * numbered such that we run over all subelements first, before
- * turning for the next dof on this subobject or for the next
- * subobject. For example, for an element of three components in one
- * space dimension, the first two components being cubic lagrange
- * elements and the third being a quadratic lagrange element, the
- * ordering for the system <tt>s=(u,v,p)</tt> is:
+ * subobject (vertex, line, quad, or hex), the degrees of freedom are numbered
+ * such that we run over all subelements first, before turning for the next
+ * dof on this subobject or for the next subobject. For example, for an
+ * element of three components in one space dimension, the first two
+ * components being cubic lagrange elements and the third being a quadratic
+ * lagrange element, the ordering for the system <tt>s=(u,v,p)</tt> is:
  *
  * <ul>
  * <li> First vertex: <tt>u0, v0, p0 = s0, s1, s2</tt>
  * <li> Second vertex: <tt>u1, v1, p1 = s3, s4, s5</tt>
- * <li> First component on the line:
- *   <tt>u2, u3 = s4, s5</tt>
- * <li> Second component on the line:
- *   <tt>v2, v3 = s6, s7</tt>.
- * <li> Third component on the line:
- *   <tt>p2 = s8</tt>.
+ * <li> First component on the line: <tt>u2, u3 = s4, s5</tt>
+ * <li> Second component on the line: <tt>v2, v3 = s6, s7</tt>.
+ * <li> Third component on the line: <tt>p2 = s8</tt>.
  * </ul>
  * That said, you should not rely on this numbering in your application as
  * these %internals might change in future. Rather use the functions
  * system_to_component_index() and component_to_system_index().
  *
- * For more information on the template parameter <tt>spacedim</tt>
- * see the documentation of Triangulation.
+ * For more information on the template parameter <tt>spacedim</tt> see the
+ * documentation of Triangulation.
  *
  * @ingroup febase fe vector_valued
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, 2006, Ralf Hartmann 2001.
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, 2006, Ralf
+ * Hartmann 2001.
  */
 template <int dim, int spacedim=dim>
 class FESystem : public FiniteElement<dim,spacedim>
@@ -296,8 +295,8 @@ public:
    * cell with respect to unit cell coordinates. Since this finite element is
    * always vector-valued, we return the value of the only non-zero component
    * of the vector value of this shape function. If the shape function has
-   * more than one non-zero component (which we refer to with the term
-   * non-primitive), then throw an exception of type @p
+   * more than one non-zero component (which we refer to with the term non-
+   * primitive), then throw an exception of type @p
    * ExcShapeFunctionNotPrimitive.
    *
    * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
@@ -414,10 +413,10 @@ public:
    *
    * To explain the concept, consider the case where we would like to know
    * whether a degree of freedom on a face, for example as part of an FESystem
-   * element, is primitive. Unfortunately, the
-   * is_primitive() function in the FiniteElement class takes a cell index, so
-   * we would need to find the cell index of the shape function that
-   * corresponds to the present face index. This function does that.
+   * element, is primitive. Unfortunately, the is_primitive() function in the
+   * FiniteElement class takes a cell index, so we would need to find the cell
+   * index of the shape function that corresponds to the present face index.
+   * This function does that.
    *
    * Code implementing this would then look like this:
    * @code
@@ -429,19 +428,22 @@ public:
    * actual faces can be in their standard ordering with respect to the cell
    * under consideration, or can be flipped, oriented, etc.
    *
-   * @param face_dof_index The index of the degree of freedom on a face.
-   *   This index must be between zero and dofs_per_face.
-   * @param face The number of the face this degree of freedom lives on.
-   *   This number must be between zero and GeometryInfo::faces_per_cell.
-   * @param face_orientation One part of the description of the orientation
-   *   of the face. See @ref GlossFaceOrientation .
-   * @param face_flip One part of the description of the orientation
-   *   of the face. See @ref GlossFaceOrientation .
-   * @param face_rotation One part of the description of the orientation
-   *   of the face. See @ref GlossFaceOrientation .
-   * @return The index of this degree of freedom within the set
-   *   of degrees of freedom on the entire cell. The returned value
-   *   will be between zero and dofs_per_cell.
+   * @param face_dof_index The index of the degree of freedom on a face. This
+   * index must be between zero and dofs_per_face.
+   * @param face The number of the face this degree of freedom lives on. This
+   * number must be between zero and GeometryInfo::faces_per_cell.
+   * @param face_orientation One part of the description of the orientation of
+   * the face. See
+   * @ref GlossFaceOrientation.
+   * @param face_flip One part of the description of the orientation of the
+   * face. See
+   * @ref GlossFaceOrientation.
+   * @param face_rotation One part of the description of the orientation of
+   * the face. See
+   * @ref GlossFaceOrientation.
+   * @return The index of this degree of freedom within the set of degrees of
+   * freedom on the entire cell. The returned value will be between zero and
+   * dofs_per_cell.
    */
   virtual
   unsigned int face_to_cell_index (const unsigned int face_dof_index,
@@ -523,37 +525,35 @@ public:
                                     FullMatrix<double>       &matrix) const;
 
   /**
-   * If, on a vertex, several finite elements are active, the hp code
-   * first assigns the degrees of freedom of each of these FEs
-   * different global indices. It then calls this function to find out
-   * which of them should get identical values, and consequently can
-   * receive the same global DoF index. This function therefore
-   * returns a list of identities between DoFs of the present finite
-   * element object with the DoFs of @p fe_other, which is a reference
-   * to a finite element object representing one of the other finite
-   * elements active on this particular vertex. The function computes
-   * which of the degrees of freedom of the two finite element objects
-   * are equivalent, both numbered between zero and the corresponding
-   * value of dofs_per_vertex of the two finite elements. The first
-   * index of each pair denotes one of the vertex dofs of the present
-   * element, whereas the second is the corresponding index of the
-   * other finite element.
+   * If, on a vertex, several finite elements are active, the hp code first
+   * assigns the degrees of freedom of each of these FEs different global
+   * indices. It then calls this function to find out which of them should get
+   * identical values, and consequently can receive the same global DoF index.
+   * This function therefore returns a list of identities between DoFs of the
+   * present finite element object with the DoFs of @p fe_other, which is a
+   * reference to a finite element object representing one of the other finite
+   * elements active on this particular vertex. The function computes which of
+   * the degrees of freedom of the two finite element objects are equivalent,
+   * both numbered between zero and the corresponding value of dofs_per_vertex
+   * of the two finite elements. The first index of each pair denotes one of
+   * the vertex dofs of the present element, whereas the second is the
+   * corresponding index of the other finite element.
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
-   * Same as hp_vertex_dof_indices(), except that the function treats
-   * degrees of freedom on lines.
+   * Same as hp_vertex_dof_indices(), except that the function treats degrees
+   * of freedom on lines.
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
 
   /**
-   * Same as hp_vertex_dof_indices(), except that the function treats
-   * degrees of freedom on quads.
+   * Same as hp_vertex_dof_indices(), except that the function treats degrees
+   * of freedom on quads.
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
@@ -565,7 +565,8 @@ public:
    * neither dominates, or if either could dominate.
    *
    * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the @ref hp_paper "hp paper".
+   * particular the
+   * @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination
@@ -710,8 +711,8 @@ private:
 
 
   /**
-   * Initialize the @p unit_support_points field of the FiniteElement
-   * class. Called from the constructor.
+   * Initialize the @p unit_support_points field of the FiniteElement class.
+   * Called from the constructor.
    */
   void initialize_unit_support_points ();
 
@@ -803,7 +804,7 @@ private:
    * Compute the nonzero components of a list of finite elements with
    * multiplicities given in the second argument. This function is called from
    * all the above functions.
-  */
+   */
   static std::vector<ComponentMask>
   compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
                               const std::vector<unsigned int>              &multiplicities);
@@ -851,8 +852,8 @@ private:
   public:
     /**
      * Constructor. Is called by the @p get_data function. Sets the size of
-     * the @p base_fe_datas vector to @p n_base_elements and initializes
-     * the compute_hessians field.
+     * the @p base_fe_datas vector to @p n_base_elements and initializes the
+     * compute_hessians field.
      */
     InternalData (const unsigned int n_base_elements,
                   const bool         compute_hessians);
@@ -901,8 +902,8 @@ private:
      * pointing to. Sets <tt>fe_datas[base_no]</tt> to zero.
      *
      * This function is used to delete @p FEValuesData that are needed only on
-     * the first cell but not any more afterwards.  This is the case for
-     * e.g. Lagrangian elements (see e.g. @p FE_Q classes).
+     * the first cell but not any more afterwards.  This is the case for e.g.
+     * Lagrangian elements (see e.g. @p FE_Q classes).
      */
     void delete_fe_values_data (const unsigned int base_no);
 
@@ -922,8 +923,8 @@ private:
      * are accessed to by the @p set_ and @p get_fe_data functions.
      *
      * The size of this vector is set to @p n_base_elements by the
-     * InternalData constructor.  It is filled by the @p get_data
-     * function. Note that since the data for each instance of a base class is
+     * InternalData constructor.  It is filled by the @p get_data function.
+     * Note that since the data for each instance of a base class is
      * necessarily the same, we only need as many of these objects as there
      * are base elements, irrespective of their multiplicity.
      */

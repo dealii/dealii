@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -295,8 +295,11 @@ test ()
   // for the stokes equation the
   // pressure does not couple to
   // itself
-  std::vector<std::vector<bool> > mask (dim+1, std::vector<bool> (dim+1, true));
-  mask[dim][dim] = false;
+  Table<2,DoFTools::Coupling> mask (dim+1, dim+1);
+  for (unsigned int i=0; i<dim+1; ++i)
+    for (unsigned int j=0; j<dim+1; ++j)
+      mask(i,j) = DoFTools::always;
+  mask[dim][dim] = DoFTools::none;
 
   DoFTools::make_sparsity_pattern (dof_handler, mask, sparsity);
   sparsity.compress ();

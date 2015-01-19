@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,7 +49,6 @@ namespace SLEPcWrappers
     :
     solver_control (cn),
     mpi_communicator (mpi_communicator),
-    target_eigenvalue (0.),
     set_which (EPS_LARGEST_MAGNITUDE),
     set_problem (EPS_GNHEP),
     opA (NULL),
@@ -93,7 +92,7 @@ namespace SLEPcWrappers
   void
   SolverBase::set_target_eigenvalue (const PetscScalar &this_target)
   {
-    target_eigenvalue = this_target;
+    target_eigenvalue.reset (new PetscScalar(this_target));
   }
 
   void
@@ -159,10 +158,16 @@ namespace SLEPcWrappers
     if (transformation)
       {
         // set transformation type if any
+        // STSetShift is called inside
         transformation->set_context (solver_data->eps);
+      }
 
-        // set target eigenvalues to solve for
-        ierr = EPSSetTarget (solver_data->eps, target_eigenvalue);
+    // set target eigenvalues to solve for
+    // in all transformation except STSHIFT there is a direct connection between
+    // the target and the shift, read more on p41 of SLEPc manual.
+    if (target_eigenvalue.get() != 0)
+      {
+        int ierr = EPSSetTarget (solver_data->eps, *(target_eigenvalue.get()) );
         AssertThrow (ierr == 0, ExcSLEPcError(ierr));
       }
 
@@ -178,6 +183,11 @@ namespace SLEPcWrappers
     // set the solve options to the eigenvalue problem solver context
     ierr = EPSSetFromOptions (solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+    // TODO breaks step-36
+    // force solvers to use true residual
+    //EPSSetTrueResidual(solver_data->eps, PETSC_TRUE);
+    //AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     // Set convergence test to be absolute
     ierr = EPSSetConvergenceTest (solver_data->eps, EPS_CONV_ABS);
@@ -198,7 +208,7 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     PetscInt n_iterations   = 0;
-    PetscReal residual_norm = 1.e300;
+    PetscReal residual_norm = 0;
 
     // @todo Investigate elaborating on some of this to act on the
     // complete eigenspectrum
@@ -207,12 +217,29 @@ namespace SLEPcWrappers
       ierr = EPSGetIterationNumber (solver_data->eps, &n_iterations);
       AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-      // get the residual norm of the most extreme eigenvalue if and
-      // only if at least one eigenvector has converged.
-      if ((*n_converged)>0)
+      // get the maximum of residual norm among converged eigenvectors.
+      for (unsigned int i = 0; i < *n_converged; i++)
         {
-          ierr = EPSComputeResidualNorm (solver_data->eps, 0, &residual_norm);
+          double residual_norm_i = 0.0;
+          // EPSComputeResidualNorm is L2-norm and is not consistent with the stopping criteria
+          // used during the solution process.
+          // Yet, this is the norm which gives error bounds (Saad, 1992, ch3):
+          //   | \lambda - \widehat\lambda | <= ||r||_2
+          ierr = EPSComputeResidualNorm (solver_data->eps, i, &residual_norm_i);
+
+          // EPSComputeRelativeError may not be consistent with the stopping criteria
+          // used during the solution process. Given EPS_CONV_ABS set above,
+          // this can be either the l2 norm or the mass-matrix induced norm
+          // when EPS_GHEP is set.
+          // ierr = EPSComputeRelativeError (solver_data->eps, i, &residual_norm_i);
+
+          // EPSGetErrorEstimate is consistent with the residual norm
+          // used during the solution process. However, it is not guaranteed to
+          // be derived from the residual even when EPSSetTrueResidual is set.
+          // ierr = EPSGetErrorEstimate (solver_data->eps, i, &residual_norm_i);
+
           AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+          residual_norm = std::max (residual_norm, residual_norm_i);
         }
 
       // check the solver state
@@ -222,10 +249,12 @@ namespace SLEPcWrappers
       // get the solver state according to SLEPc
       get_solver_state (state);
 
+      // as SLEPc uses different stopping criteria, we have to omit this step.
+      // This can be checked only in conjunction with EPSGetErrorEstimate.
       // and in case of failure: throw exception
-      if (solver_control.last_check () != SolverControl::success)
-        AssertThrow(false, SolverControl::NoConvergence (solver_control.last_step(),
-                                                         solver_control.last_value()));
+      // if (solver_control.last_check () != SolverControl::success)
+      //   AssertThrow(false, SolverControl::NoConvergence (solver_control.last_step(),
+      //                                                    solver_control.last_value()));
     }
   }
 

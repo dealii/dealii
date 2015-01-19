@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -48,10 +48,10 @@ MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
       DEPENDS ${_dependency}
-              ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/template-arguments
+              ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
               ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
       COMMAND ${_command}
-      ARGS ${CMAKE_BINARY_DIR}/${DEAL_II_COMMON_RELDIR}/template-arguments
+      ARGS ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
            < ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
            > ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
       )

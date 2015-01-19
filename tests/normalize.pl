@@ -56,7 +56,7 @@ s/^DEAL.*::_.*\n//g;
 
 # Normalize version string by replacing (for example) 'written by
 # deal.II 8.1.pre' by written by 'written by deal.II x.y.z'
-s/written by deal\.II \d+\.\d+\.(pre|\d+)/written by deal.II x.y.z/;
+s/written by deal\.II \d+\.\d+\.(pre|rc\d*|\d+)/written by deal.II x.y.z/;
 
 
 # different p4est versions output different text in VTU output. For
@@ -87,3 +87,14 @@ s/written by deal\.II \d+\.\d+\.(pre|\d+)/written by deal.II x.y.z/;
 # To deal with these issues, we simply delete these lines
 s/.*<PCellData Scalars.*\n//g;
 s/.*<PDataArray type.*(mpirank|level).*\n//g;
+
+#
+# Different boost versions output output the opening bracket for json
+# output on a new line. Thus always transform
+#     "label": {
+#
+# into
+#     "label":
+#     {
+#
+s/^(\s*)(".*":) \{$/\1\2\n\1\{/;

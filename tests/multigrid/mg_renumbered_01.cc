@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,7 +49,6 @@
 #include <deal.II/numerics/data_out.h>
 
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer_component.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -65,7 +64,7 @@ using namespace dealii;
 
 template <int dim, typename number, int spacedim>
 void
-reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
                MGLevelObject<dealii::Vector<number> > &v)
 {
   for (unsigned int level=v.min_level();
@@ -77,13 +76,13 @@ reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
 }
 
 template <int dim>
-void initialize (const MGDoFHandler<dim> &dof,
+void initialize (const DoFHandler<dim> &dof,
                  Vector<double> &u)
 {
   unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
-  for (typename MGDoFHandler<dim>::active_cell_iterator
+  for (typename DoFHandler<dim>::active_cell_iterator
        cell = dof.begin_active();
        cell != dof.end(); ++cell)
     {
@@ -96,13 +95,13 @@ void initialize (const MGDoFHandler<dim> &dof,
 
 
 template <int dim>
-void initialize (const MGDoFHandler<dim> &dof,
+void initialize (const DoFHandler<dim> &dof,
                  MGLevelObject<Vector<double> > &u)
 {
   unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dof_indices(dofs_per_cell);
-  typename MGDoFHandler<dim>::cell_iterator
+  typename DoFHandler<dim>::cell_iterator
   cell = dof.begin(0);
   cell->get_mg_dof_indices(dof_indices);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -111,7 +110,7 @@ void initialize (const MGDoFHandler<dim> &dof,
 
 
 template <int dim>
-void print_diff (const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
+void print_diff (const DoFHandler<dim> &dof_1, const DoFHandler<dim> &dof_2,
                  const Vector<double> &u, const Vector<double> &v)
 {
   Vector<double> diff;
@@ -119,7 +118,7 @@ void print_diff (const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
   const unsigned int dofs_per_cell = dof_1.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dof_indices_1(dofs_per_cell);
   std::vector<types::global_dof_index> dof_indices_2(dofs_per_cell);
-  for (typename MGDoFHandler<dim>::active_cell_iterator
+  for (typename DoFHandler<dim>::active_cell_iterator
        cell_1 = dof_1.begin_active(), cell_2 = dof_2.begin_active();
        cell_1 != dof_1.end(); ++cell_1, ++cell_2)
     {
@@ -133,7 +132,7 @@ void print_diff (const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
 }
 
 template <int dim>
-void print(const MGDoFHandler<dim> &dof, std::vector<std::vector<bool> > &interface_dofs)
+void print(const DoFHandler<dim> &dof, std::vector<std::vector<bool> > &interface_dofs)
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dof_indices(dofs_per_cell);
@@ -141,7 +140,7 @@ void print(const MGDoFHandler<dim> &dof, std::vector<std::vector<bool> > &interf
     {
       deallog << std::endl;
       deallog << "Level " << l << std::endl;
-      for (typename MGDoFHandler<dim>::cell_iterator
+      for (typename DoFHandler<dim>::cell_iterator
            cell = dof.begin(l);
            cell != dof.end(l); ++cell)
         {
@@ -169,8 +168,8 @@ private:
 
   Triangulation<dim>   triangulation;
   FESystem<dim>            fe;
-  MGDoFHandler<dim>    mg_dof_handler;
-  MGDoFHandler<dim>    mg_dof_handler_renumbered;
+  DoFHandler<dim>    mg_dof_handler;
+  DoFHandler<dim>    mg_dof_handler_renumbered;
 
   MGLevelObject<SparsityPattern> mg_sparsity_renumbered;
   MGLevelObject<SparseMatrix<double> > mg_matrices_renumbered;
@@ -200,8 +199,10 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg) :
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
-  mg_dof_handler.distribute_dofs (fe);
+  mg_dof_handler.distribute_dofs(fe);
+  mg_dof_handler.distribute_mg_dofs (fe);
   mg_dof_handler_renumbered.distribute_dofs (fe);
+  mg_dof_handler_renumbered.distribute_mg_dofs (fe);
 
   std::vector<unsigned int> block_component (2*dim,0);
   for (unsigned int c=dim; c<2*dim; ++c)
@@ -300,7 +301,7 @@ void LaplaceProblem<dim>::test_renumber ()
   const unsigned int dofs_per_cell =
     mg_dof_handler_renumbered.get_fe().dofs_per_cell;
   std::vector<unsigned int> dof_indices(dofs_per_cell);
-  for (typename MGDoFHandler<dim>::cell_iterator
+  for (typename DoFHandler<dim>::cell_iterator
        cell = mg_dof_handler_renumbered.begin();
        cell != mg_dof_handler_renumbered.end(); ++cell)
     {

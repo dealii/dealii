@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,54 +29,51 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Base class for quadrature formulæ in arbitrary dimensions. This class
- * stores quadrature points and weights on the unit line [0,1], unit
- * square [0,1]x[0,1], etc.
+ * stores quadrature points and weights on the unit line [0,1], unit square
+ * [0,1]x[0,1], etc.
  *
- * There are a number of derived classes, denoting concrete
- * integration formulæ. Their names names prefixed by
- * <tt>Q</tt>. Refer to the list of derived classes for more details.
+ * There are a number of derived classes, denoting concrete integration
+ * formulæ. Their names names prefixed by <tt>Q</tt>. Refer to the list of
+ * derived classes for more details.
  *
- * The schemes for higher dimensions are typically tensor products of the
- * one-dimensional formulæ, but refer to the section on implementation
- * detail below.
+ * The schemes for higher dimensions are typically tensor products of the one-
+ * dimensional formulæ, but refer to the section on implementation detail
+ * below.
  *
- * In order to allow for dimension independent programming, a
- * quadrature formula of dimension zero exists. Since an integral over
- * zero dimensions is the evaluation at a single point, any
- * constructor of such a formula initializes to a single quadrature
- * point with weight one. Access to the weight is possible, while
- * access to the quadrature point is not permitted, since a Point of
- * dimension zero contains no information. The main purpose of these
- * formulæ is their use in QProjector, which will create a useful
+ * In order to allow for dimension independent programming, a quadrature
+ * formula of dimension zero exists. Since an integral over zero dimensions is
+ * the evaluation at a single point, any constructor of such a formula
+ * initializes to a single quadrature point with weight one. Access to the
+ * weight is possible, while access to the quadrature point is not permitted,
+ * since a Point of dimension zero contains no information. The main purpose
+ * of these formulæ is their use in QProjector, which will create a useful
  * formula of dimension one out of them.
  *
  * <h3>Mathematical background</h3>
  *
- * For each quadrature formula we denote by <tt>m</tt>, the maximal
- * degree of polynomials integrated exactly. This number is given in
- * the documentation of each formula. The order of the integration
- * error is <tt>m+1</tt>, that is, the error is the size of the cell
- * to the <tt>m+1</tt> by the Bramble-Hilbert Lemma. The number
- * <tt>m</tt> is to be found in the documentation of each concrete
- * formula. For the optimal formulæ QGauss we have $m = 2N-1$, where
- * N is the constructor parameter to QGauss. The tensor product
- * formulæ are exact on tensor product polynomials of degree
- * <tt>m</tt> in each space direction, but they are still only of
- * <tt>m+1</tt>st order.
+ * For each quadrature formula we denote by <tt>m</tt>, the maximal degree of
+ * polynomials integrated exactly. This number is given in the documentation
+ * of each formula. The order of the integration error is <tt>m+1</tt>, that
+ * is, the error is the size of the cell to the <tt>m+1</tt> by the Bramble-
+ * Hilbert Lemma. The number <tt>m</tt> is to be found in the documentation of
+ * each concrete formula. For the optimal formulæ QGauss we have $m = 2N-1$,
+ * where N is the constructor parameter to QGauss. The tensor product formulæ
+ * are exact on tensor product polynomials of degree <tt>m</tt> in each space
+ * direction, but they are still only of <tt>m+1</tt>st order.
  *
  * <h3>Implementation details</h3>
  *
- * Most integration formulæ in more than one space dimension are
- * tensor products of quadrature formulæ in one space dimension, or
- * more generally the tensor product of a formula in <tt>(dim-1)</tt>
- * dimensions and one in one dimension. There is a special constructor
- * to generate a quadrature formula from two others.  For example, the
- * QGauss@<dim@> formulæ include <i>N<sup>dim</sup></i> quadrature
- * points in <tt>dim</tt> dimensions, where N is the constructor
- * parameter of QGauss.
+ * Most integration formulæ in more than one space dimension are tensor
+ * products of quadrature formulæ in one space dimension, or more generally
+ * the tensor product of a formula in <tt>(dim-1)</tt> dimensions and one in
+ * one dimension. There is a special constructor to generate a quadrature
+ * formula from two others.  For example, the QGauss@<dim@> formulæ include
+ * <i>N<sup>dim</sup></i> quadrature points in <tt>dim</tt> dimensions, where
+ * N is the constructor parameter of QGauss.
  *
- * @note Instantiations for this template are provided for dimensions
- * 0, 1, 2, and 3 (see the section on @ref Instantiations).
+ * @note Instantiations for this template are provided for dimensions 0, 1, 2,
+ * and 3 (see the section on
+ * @ref Instantiations).
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005, 2009
  */
@@ -85,62 +82,41 @@ class Quadrature : public Subscriptor
 {
 public:
   /**
-   * Define a typedef for a
-   * quadrature that acts on an
-   * object of one dimension
-   * less. For cells, this would
-   * then be a face quadrature.
+   * Define a typedef for a quadrature that acts on an object of one dimension
+   * less. For cells, this would then be a face quadrature.
    */
   typedef Quadrature<dim-1> SubQuadrature;
 
   /**
    * Constructor.
    *
-   * This constructor is marked as
-   * explicit to avoid involuntary
-   * accidents like in
-   * <code>hp::QCollection@<dim@>
-   * q_collection(3)</code> where
-   * <code>hp::QCollection@<dim@>
-   * q_collection(QGauss@<dim@>(3))</code>
-   * was meant.
+   * This constructor is marked as explicit to avoid involuntary accidents
+   * like in <code>hp::QCollection@<dim@> q_collection(3)</code> where
+   * <code>hp::QCollection@<dim@> q_collection(QGauss@<dim@>(3))</code> was
+   * meant.
    */
   explicit Quadrature (const unsigned int n_quadrature_points = 0);
 
   /**
-   * Build this quadrature formula
-   * as the tensor product of a
-   * formula in a dimension one
-   * less than the present and a
-   * formula in one dimension.
+   * Build this quadrature formula as the tensor product of a formula in a
+   * dimension one less than the present and a formula in one dimension.
    *
-   * <tt>SubQuadrature<dim>::type</tt>
-   * expands to
-   * <tt>Quadrature<dim-1></tt>.
+   * <tt>SubQuadrature<dim>::type</tt> expands to <tt>Quadrature<dim-1></tt>.
    */
   Quadrature (const SubQuadrature &,
               const Quadrature<1> &);
 
   /**
-   * Build this quadrature formula
-   * as the <tt>dim</tt>-fold
-   * tensor product of a formula in
-   * one dimension.
+   * Build this quadrature formula as the <tt>dim</tt>-fold tensor product of
+   * a formula in one dimension.
    *
-   * Assuming that the points in
-   * the one-dimensional rule are in
-   * ascending order, the points of
-   * the resulting rule are ordered
-   * lexicographically with
-   * <i>x</i> running fastest.
+   * Assuming that the points in the one-dimensional rule are in ascending
+   * order, the points of the resulting rule are ordered lexicographically
+   * with <i>x</i> running fastest.
    *
-   * In order to avoid a conflict
-   * with the copy constructor in
-   * 1d, we let the argument be a
-   * 0d quadrature formula for
-   * dim==1, and a 1d quadrature
-   * formula for all other space
-   * dimensions.
+   * In order to avoid a conflict with the copy constructor in 1d, we let the
+   * argument be a 0d quadrature formula for dim==1, and a 1d quadrature
+   * formula for all other space dimensions.
    */
   explicit Quadrature (const Quadrature<dim != 1 ? 1 : 0> &quadrature_1d);
 
@@ -150,39 +126,25 @@ public:
   Quadrature (const Quadrature<dim> &q);
 
   /**
-   * Construct a quadrature formula
-   * from given vectors of
-   * quadrature points (which
-   * should really be in the unit
-   * cell) and the corresponding
-   * weights. You will want to have
-   * the weights sum up to one, but
-   * this is not checked.
+   * Construct a quadrature formula from given vectors of quadrature points
+   * (which should really be in the unit cell) and the corresponding weights.
+   * You will want to have the weights sum up to one, but this is not checked.
    */
   Quadrature (const std::vector<Point<dim> > &points,
               const std::vector<double>      &weights);
 
   /**
-   * Construct a dummy quadrature
-   * formula from a list of points,
-   * with weights set to
-   * infinity. The resulting object
-   * is therefore not meant to
-   * actually perform integrations,
-   * but rather to be used with
-   * FEValues objects in
-   * order to find the position of
-   * some points (the quadrature
-   * points in this object) on the
-   * transformed cell in real
-   * space.
+   * Construct a dummy quadrature formula from a list of points, with weights
+   * set to infinity. The resulting object is therefore not meant to actually
+   * perform integrations, but rather to be used with FEValues objects in
+   * order to find the position of some points (the quadrature points in this
+   * object) on the transformed cell in real space.
    */
   Quadrature (const std::vector<Point<dim> > &points);
 
   /**
-   * Constructor for a one-point
-   * quadrature. Sets the weight of
-   * this point to one.
+   * Constructor for a one-point quadrature. Sets the weight of this point to
+   * one.
    */
   Quadrature (const Point<dim> &point);
 
@@ -192,22 +154,19 @@ public:
   virtual ~Quadrature ();
 
   /**
-   * Assignment operator. Copies
-   * contents of #weights and
-   * #quadrature_points as well as
-   * size.
+   * Assignment operator. Copies contents of #weights and #quadrature_points
+   * as well as size.
    */
   Quadrature &operator = (const Quadrature<dim> &);
 
   /**
-                   *  Test for equality of two quadratures.
-                   */
+   * Test for equality of two quadratures.
+   */
   bool operator == (const Quadrature<dim> &p) const;
 
   /**
-   * Set the quadrature points and
-   * weights to the values provided
-   * in the arguments.
+   * Set the quadrature points and weights to the values provided in the
+   * arguments.
    */
   void initialize(const std::vector<Point<dim> > &points,
                   const std::vector<double>      &weights);
@@ -218,71 +177,60 @@ public:
   unsigned int size () const;
 
   /**
-   * Return the <tt>i</tt>th quadrature
-   * point.
+   * Return the <tt>i</tt>th quadrature point.
    */
   const Point<dim> &point (const unsigned int i) const;
 
   /**
-   * Return a reference to the
-   * whole array of quadrature
-   * points.
+   * Return a reference to the whole array of quadrature points.
    */
   const std::vector<Point<dim> > &get_points () const;
 
   /**
-   * Return the weight of the <tt>i</tt>th
-   * quadrature point.
+   * Return the weight of the <tt>i</tt>th quadrature point.
    */
   double weight (const unsigned int i) const;
 
   /**
-   * Return a reference to the whole array
-   * of weights.
+   * Return a reference to the whole array of weights.
    */
   const std::vector<double> &get_weights () const;
 
   /**
-   * Determine an estimate for
-   * the memory consumption (in
-   * bytes) of this
+   * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
   std::size_t memory_consumption () const;
 
   /**
-  * Write or read the data of this object to or
-  * from a stream for the purpose of serialization.
-  */
+   * Write or read the data of this object to or from a stream for the purpose
+   * of serialization.
+   */
   template <class Archive>
   void serialize (Archive &ar, const unsigned int version);
 
 protected:
   /**
-   * List of quadrature points. To
-   * be filled by the constructors
-   * of derived classes.
+   * List of quadrature points. To be filled by the constructors of derived
+   * classes.
    */
   std::vector<Point<dim> > quadrature_points;
 
   /**
-   * List of weights of the
-   * quadrature points.  To be
-   * filled by the constructors of
-   * derived classes.
+   * List of weights of the quadrature points.  To be filled by the
+   * constructors of derived classes.
    */
   std::vector<double>      weights;
 };
 
 
 /**
- * Quadrature formula implementing anisotropic distributions of
- * quadrature points on the reference cell. To this end, the tensor
- * product of <tt>dim</tt> one-dimensional quadrature formulas is
- * generated.
+ * Quadrature formula implementing anisotropic distributions of quadrature
+ * points on the reference cell. To this end, the tensor product of
+ * <tt>dim</tt> one-dimensional quadrature formulas is generated.
  *
- * @note Each constructor can only be used in the dimension matching
- * the number of arguments.
+ * @note Each constructor can only be used in the dimension matching the
+ * number of arguments.
  *
  * @author Guido Kanschat, 2005
  */
@@ -291,23 +239,19 @@ class QAnisotropic : public Quadrature<dim>
 {
 public:
   /**
-   * Constructor for a
-   * one-dimensional formula. This
-   * one just copies the given
+   * Constructor for a one-dimensional formula. This one just copies the given
    * quadrature rule.
    */
   QAnisotropic(const Quadrature<1> &qx);
 
   /**
-   * Constructor for a
-   * two-dimensional formula.
+   * Constructor for a two-dimensional formula.
    */
   QAnisotropic(const Quadrature<1> &qx,
                const Quadrature<1> &qy);
 
   /**
-   * Constructor for a
-   * three-dimensional formula.
+   * Constructor for a three-dimensional formula.
    */
   QAnisotropic(const Quadrature<1> &qx,
                const Quadrature<1> &qy,
@@ -316,27 +260,27 @@ public:
 
 
 /**
- * Quadrature formula constructed by iteration of another quadrature formula in
- * each direction. In more than one space dimension, the resulting quadrature
- * formula is constructed in the usual way by building the tensor product of
- * the respective iterated quadrature formula in one space dimension.
+ * Quadrature formula constructed by iteration of another quadrature formula
+ * in each direction. In more than one space dimension, the resulting
+ * quadrature formula is constructed in the usual way by building the tensor
+ * product of the respective iterated quadrature formula in one space
+ * dimension.
  *
- * In one space dimension, the given base formula is copied and scaled onto
- * a given number of subintervals of length <tt>1/n_copies</tt>. If the quadrature
- * formula uses both end points of the unit interval, then in the interior
- * of the iterated quadrature formula there would be quadrature points which
- * are used twice; we merge them into one with a weight which is the sum
- * of the weights of the left- and the rightmost quadrature point.
+ * In one space dimension, the given base formula is copied and scaled onto a
+ * given number of subintervals of length <tt>1/n_copies</tt>. If the
+ * quadrature formula uses both end points of the unit interval, then in the
+ * interior of the iterated quadrature formula there would be quadrature
+ * points which are used twice; we merge them into one with a weight which is
+ * the sum of the weights of the left- and the rightmost quadrature point.
  *
- * Since all dimensions higher than one are built up by tensor products of
- * one dimensional and <tt>dim-1</tt> dimensional quadrature formulæ, the
- * argument given to the constructor needs to be a quadrature formula in
- * one space dimension, rather than in <tt>dim</tt> dimensions.
+ * Since all dimensions higher than one are built up by tensor products of one
+ * dimensional and <tt>dim-1</tt> dimensional quadrature formulæ, the
+ * argument given to the constructor needs to be a quadrature formula in one
+ * space dimension, rather than in <tt>dim</tt> dimensions.
  *
- * The aim of this class is to provide a
- * low order formula, where the error constant can be tuned by
- * increasing the number of quadrature points. This is useful in
- * integrating non-differentiable functions on cells.
+ * The aim of this class is to provide a low order formula, where the error
+ * constant can be tuned by increasing the number of quadrature points. This
+ * is useful in integrating non-differentiable functions on cells.
  *
  * @author Wolfgang Bangerth 1999
  */
@@ -345,9 +289,8 @@ class QIterated : public Quadrature<dim>
 {
 public:
   /**
-   * Constructor. Iterate the given
-   * quadrature formula <tt>n_copies</tt> times in
-   * each direction.
+   * Constructor. Iterate the given quadrature formula <tt>n_copies</tt> times
+   * in each direction.
    */
   QIterated (const Quadrature<1> &base_quadrature,
              const unsigned int   n_copies);
@@ -358,10 +301,8 @@ public:
   DeclException0 (ExcInvalidQuadratureFormula);
 private:
   /**
-   * Check whether the given
-   * quadrature formula has quadrature
-   * points at the left and right end points
-   * of the interval.
+   * Check whether the given quadrature formula has quadrature points at the
+   * left and right end points of the interval.
    */
   static bool
   uses_both_endpoints (const Quadrature<1> &base_quadrature);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,12 +39,10 @@ namespace LocalIntegrators
   namespace Elasticity
   {
     /**
-     * The linear elasticity operator in weak form, namely double
-     * contraction of symmetric gradients.
+     * The linear elasticity operator in weak form, namely double contraction
+     * of symmetric gradients.
      *
-     * \f[
-     * \int_Z \varepsilon(u): \varepsilon(v)\,dx
-     * \f]
+     * \f[ \int_Z \varepsilon(u): \varepsilon(v)\,dx \f]
      */
     template <int dim>
     inline void cell_matrix (
@@ -75,9 +73,7 @@ namespace LocalIntegrators
     /**
      * Vector-valued residual operator for linear elasticity in weak form
      *
-     * \f[
-     * - \int_Z \varepsilon(u): \varepsilon(v) \,dx
-     * \f]
+     * \f[ - \int_Z \varepsilon(u): \varepsilon(v) \,dx \f]
      */
     template <int dim, typename number>
     inline void
@@ -110,8 +106,7 @@ namespace LocalIntegrators
 
 
     /**
-     * The weak boundary condition of Nitsche type for linear
-     * elasticity:
+     * The weak boundary condition of Nitsche type for linear elasticity:
      * @f[
      * \int_F \Bigl(\gamma (u-g) \cdot v - n^T \epsilon(u) v - (u-g) \epsilon(v) n^T\Bigr)\;ds.
      * @f]
@@ -156,17 +151,17 @@ namespace LocalIntegrators
     }
 
     /**
-     * Weak boundary condition for the elasticity operator by Nitsche,
-     * namely on the face <i>F</i> the vector
+     * Weak boundary condition for the elasticity operator by Nitsche, namely
+     * on the face <i>F</i> the vector
      * @f[
      * \int_F \Bigl(\gamma (u-g) \cdot v - n^T \epsilon(u) v - (u-g) \epsilon(v) n^T\Bigr)\;ds.
      * @f]
      *
-     * Here, <i>u</i> is the finite element function whose values and
-     * gradient are given in the arguments <tt>input</tt> and
-     * <tt>Dinput</tt>, respectively. <i>g</i> is the inhomogeneous
-     * boundary value in the argument <tt>data</tt>. $n$ is the outer
-     * normal vector and $\gamma$ is the usual penalty parameter.
+     * Here, <i>u</i> is the finite element function whose values and gradient
+     * are given in the arguments <tt>input</tt> and <tt>Dinput</tt>,
+     * respectively. <i>g</i> is the inhomogeneous boundary value in the
+     * argument <tt>data</tt>. $n$ is the outer normal vector and $\gamma$ is
+     * the usual penalty parameter.
      *
      * @author Guido Kanschat
      * @date 2013
@@ -214,16 +209,16 @@ namespace LocalIntegrators
     }
 
     /**
-     * Homogeneous weak boundary condition for the elasticity operator by Nitsche,
-     * namely on the face <i>F</i> the vector
+     * Homogeneous weak boundary condition for the elasticity operator by
+     * Nitsche, namely on the face <i>F</i> the vector
      * @f[
      * \int_F \Bigl(\gamma u \cdot v - n^T \epsilon(u) v - u \epsilon(v) n^T\Bigr)\;ds.
      * @f]
      *
-     * Here, <i>u</i> is the finite element function whose values and
-     * gradient are given in the arguments <tt>input</tt> and
-     * <tt>Dinput</tt>, respectively. $n$ is the outer
-     * normal vector and $\gamma$ is the usual penalty parameter.
+     * Here, <i>u</i> is the finite element function whose values and gradient
+     * are given in the arguments <tt>input</tt> and <tt>Dinput</tt>,
+     * respectively. $n$ is the outer normal vector and $\gamma$ is the usual
+     * penalty parameter.
      *
      * @author Guido Kanschat
      * @date 2013
@@ -268,8 +263,7 @@ namespace LocalIntegrators
     }
 
     /**
-     * The interior penalty flux
-     * for symmetric gradients.
+     * The interior penalty flux for symmetric gradients.
      */
     template <int dim>
     inline void ip_matrix (

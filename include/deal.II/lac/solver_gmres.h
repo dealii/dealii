@@ -102,62 +102,56 @@ namespace internal
 }
 
 /**
- * Implementation of the Restarted Preconditioned Direct Generalized
- * Minimal Residual Method. The stopping criterion is the norm of the
- * residual.
+ * Implementation of the Restarted Preconditioned Direct Generalized Minimal
+ * Residual Method. The stopping criterion is the norm of the residual.
  *
- * The AdditionalData structure contains the number of temporary
- * vectors used. The size of the Arnoldi basis is this number minus
- * three. Additionally, it allows you to choose between right or left
- * preconditioning. The default is left preconditioning. Finally it
- * includes a flag indicating whether or not the default residual is
- * used as stopping criterion.
+ * The AdditionalData structure contains the number of temporary vectors used.
+ * The size of the Arnoldi basis is this number minus three. Additionally, it
+ * allows you to choose between right or left preconditioning. The default is
+ * left preconditioning. Finally it includes a flag indicating whether or not
+ * the default residual is used as stopping criterion.
  *
  *
  * <h3>Left versus right preconditioning</h3>
  *
  * @p AdditionalData allows you to choose between left and right
- * preconditioning. As expected, this switches between solving for the
- * systems <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i>,
- * respectively.
+ * preconditioning. As expected, this switches between solving for the systems
+ * <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i>, respectively.
  *
- * A second consequence is the type of residual which is used to
- * measure convergence. With left preconditioning, this is the
- * <b>preconditioned</b> residual, while with right preconditioning,
- * it is the residual of the unpreconditioned system.
+ * A second consequence is the type of residual which is used to measure
+ * convergence. With left preconditioning, this is the <b>preconditioned</b>
+ * residual, while with right preconditioning, it is the residual of the
+ * unpreconditioned system.
  *
  * Optionally, this behavior can be overridden by using the flag
- * AdditionalData::use_default_residual. A <tt>true</tt> value refers
- * to the behavior described in the previous paragraph, while
- * <tt>false</tt> reverts it. Be aware though that additional
- * residuals have to be computed in this case, impeding the overall
- * performance of the solver.
+ * AdditionalData::use_default_residual. A <tt>true</tt> value refers to the
+ * behavior described in the previous paragraph, while <tt>false</tt> reverts
+ * it. Be aware though that additional residuals have to be computed in this
+ * case, impeding the overall performance of the solver.
  *
  *
  * <h3>The size of the Arnoldi basis</h3>
  *
- * The maximal basis size is controlled by
- * AdditionalData::max_n_tmp_vectors, and it is this number minus 2.
- * If the number of iteration steps exceeds this number, all basis
- * vectors are discarded and the iteration starts anew from the
- * approximation obtained so far.
+ * The maximal basis size is controlled by AdditionalData::max_n_tmp_vectors,
+ * and it is this number minus 2. If the number of iteration steps exceeds
+ * this number, all basis vectors are discarded and the iteration starts anew
+ * from the approximation obtained so far.
  *
- * Note that the minimizing property of GMRes only pertains to the
- * Krylov space spanned by the Arnoldi basis. Therefore, restarted
- * GMRes is <b>not</b> minimizing anymore. The choice of the basis
- * length is a trade-off between memory consumption and convergence
- * speed, since a longer basis means minimization over a larger
- * space.
+ * Note that the minimizing property of GMRes only pertains to the Krylov
+ * space spanned by the Arnoldi basis. Therefore, restarted GMRes is
+ * <b>not</b> minimizing anymore. The choice of the basis length is a trade-
+ * off between memory consumption and convergence speed, since a longer basis
+ * means minimization over a larger space.
  *
- * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the Solver base class.
+ * For the requirements on matrices and vectors in order to work with this
+ * class, see the documentation of the Solver base class.
  *
  *
  * <h3>Observing the progress of linear solver iterations</h3>
  *
- * The solve() function of this class uses the mechanism described
- * in the Solver base class to determine convergence. This mechanism
- * can also be used to observe the progress of the iteration.
+ * The solve() function of this class uses the mechanism described in the
+ * Solver base class to determine convergence. This mechanism can also be used
+ * to observe the progress of the iteration.
  *
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
@@ -174,8 +168,8 @@ public:
     /**
      * Constructor. By default, set the number of temporary vectors to 30,
      * i.e. do a restart every 28 iterations. Also set preconditioning from
-     * left, the residual of the stopping criterion to the default
-     * residual, and re-orthogonalization only if necessary.
+     * left, the residual of the stopping criterion to the default residual,
+     * and re-orthogonalization only if necessary.
      */
     AdditionalData (const unsigned int max_n_tmp_vectors = 30,
                     const bool right_preconditioning = false,
@@ -205,8 +199,8 @@ public:
     bool use_default_residual;
 
     /**
-     * Flag to force re-orthogonalization of orthonormal basis in every
-     * step. If set to false, the solver automatically checks for loss of
+     * Flag to force re-orthogonalization of orthonormal basis in every step.
+     * If set to false, the solver automatically checks for loss of
      * orthogonality every 5 iterations and enables re-orthogonalization only
      * if necessary.
      */
@@ -275,12 +269,12 @@ protected:
 
   /**
    * Orthogonalize the vector @p vv against the @p dim (orthogonal) vectors
-   * given by the first argument using the modified Gram-Schmidt
-   * algorithm. The factors used for orthogonalization are stored in @p h. The
-   * boolean @p re_orthogonalize specifies whether the modified Gram-Schmidt
-   * algorithm should be applied twice. The algorithm checks loss of
-   * orthogonality in the procedure every fifth step and sets the flag to true
-   * in that case. All subsequent iterations use re-orthogonalization.
+   * given by the first argument using the modified Gram-Schmidt algorithm.
+   * The factors used for orthogonalization are stored in @p h. The boolean @p
+   * re_orthogonalize specifies whether the modified Gram-Schmidt algorithm
+   * should be applied twice. The algorithm checks loss of orthogonality in
+   * the procedure every fifth step and sets the flag to true in that case.
+   * All subsequent iterations use re-orthogonalization.
    */
   static double
   modified_gram_schmidt (const internal::SolverGMRES::TmpVectors<VECTOR> &orthogonal_vectors,
@@ -313,17 +307,16 @@ private:
  * preconditioning method.
  *
  * This version of the GMRES method allows for the use of a different
- * preconditioner in each iteration step. Therefore, it is also more
- * robust with respect to inaccurate evaluation of the
- * preconditioner. An important application is also the use of a
- * Krylov space method inside the preconditioner.
+ * preconditioner in each iteration step. Therefore, it is also more robust
+ * with respect to inaccurate evaluation of the preconditioner. An important
+ * application is also the use of a Krylov space method inside the
+ * preconditioner.
  *
- * FGMRES needs two vectors in each iteration steps yielding a total
- * of <tt>2 * SolverFGMRESAdditionalData::max_basis_size+1</tt>
- * auxiliary vectors.
+ * FGMRES needs two vectors in each iteration steps yielding a total of
+ * <tt>2*SolverFGMRESAdditionalData::max_basis_size+1</tt> auxiliary vectors.
  *
- * Caveat: documentation of this class is not up to date. There are
- * also a few parameters of GMRES we would like to introduce here.
+ * Caveat: documentation of this class is not up to date. There are also a few
+ * parameters of GMRES we would like to introduce here.
  *
  * @author Guido Kanschat, 2003
  */

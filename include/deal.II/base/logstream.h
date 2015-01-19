@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@
 #include <cmath>
 #include <sstream>
 
-#ifdef HAVE_SYS_TIMES_H
+#ifdef DEAL_II_HAVE_SYS_TIMES_H
 #  include <sys/times.h>
 #else
 struct tms
@@ -45,70 +45,67 @@ DEAL_II_NAMESPACE_OPEN
  * providing
  * <ul>
  * <li> a push and pop mechanism for prefixes, and
- * <li> the possibility of distributing information to files and the
- *   console.
+ * <li> the possibility of distributing information to files and the console.
  * </ul>
  *
  * The usual usage of this class is through the pregenerated object
  * <tt>deallog</tt>. Typical setup steps are:
  * <ul>
- * <li> <tt>deallog.depth_console(n)</tt>: restrict output on screen to outer loops.
- * <li> <tt>deallog.attach(std::ostream)</tt>: write logging information into a file.
- * <li> <tt>deallog.depth_file(n)</tt>: restrict output to file to outer loops.
+ * <li> <tt>deallog.depth_console(n)</tt>: restrict output on screen to outer
+ * loops.
+ * <li> <tt>deallog.attach(std::ostream)</tt>: write logging information into
+ * a file.
+ * <li> <tt>deallog.depth_file(n)</tt>: restrict output to file to outer
+ * loops.
  * </ul>
  *
- * Before entering a new phase of your program, e.g. a new loop,
- * a new prefix can be set via <tt>LogStream::Prefix p("loopname");</tt>.
- * The destructor of the prefix will pop the prefix text from the stack.
+ * Before entering a new phase of your program, e.g. a new loop, a new prefix
+ * can be set via <tt>LogStream::Prefix p("loopname");</tt>. The destructor of
+ * the prefix will pop the prefix text from the stack.
  *
- * Writes via the <tt>&lt;&lt;</tt> operator,
- * <tt> deallog << "This is a log notice";</tt> will be buffered thread
- * locally until a <tt>std::flush</tt> or <tt>std::endl</tt> is
- * encountered, which will trigger a writeout to the console and, if set
- * up, the log file.
+ * Writes via the <tt>&lt;&lt;</tt> operator, <tt> deallog << "This is a log
+ * notice";</tt> will be buffered thread locally until a <tt>std::flush</tt>
+ * or <tt>std::endl</tt> is encountered, which will trigger a writeout to the
+ * console and, if set up, the log file.
  *
  * <h3>LogStream and thread safety</h3>
  *
- * In the vicinity of concurrent threads, LogStream behaves in the
- * following manner:
+ * In the vicinity of concurrent threads, LogStream behaves in the following
+ * manner:
  * <ul>
  * <li> Every write to a Logstream with operator <tt>&lt;&lt;</tt> (or with
- * one of the special member functions) is buffered in a thread-local
- * storage.
- * <li> An <tt>std::flush</tt> or <tt>std::endl</tt> will trigger a
- * writeout to the console and (if attached) to the file stream. This
- * writeout is sequentialized so that output from concurrent threads don't
- * interleave.
+ * one of the special member functions) is buffered in a thread-local storage.
+ * <li> An <tt>std::flush</tt> or <tt>std::endl</tt> will trigger a writeout
+ * to the console and (if attached) to the file stream. This writeout is
+ * sequentialized so that output from concurrent threads don't interleave.
  * <li> On a new thread, invoking a writeout, as well as a call to #push or
- * #pop will copy the current prefix of the "blessed" thread that created
- * the LogStream instance to a thread-local storage. After that prefixes
- * are thread-local.
+ * #pop will copy the current prefix of the "blessed" thread that created the
+ * LogStream instance to a thread-local storage. After that prefixes are
+ * thread-local.
  * </ul>
  *
  * <h3>LogStream and reproducible regression test output</h3>
  *
- * Generating reproducible floating point output for regression tests
- * is mildly put a nightmare. In order to make life a little easier,
- * LogStream implements a few features that try to achieve such a
- * goal. These features are turned on by calling test_mode(), and it
- * is not recommended to use them in any other environment. Right now,
- * LogStream implements the following:
+ * Generating reproducible floating point output for regression tests is
+ * mildly put a nightmare. In order to make life a little easier, LogStream
+ * implements a few features that try to achieve such a goal. These features
+ * are turned on by calling test_mode(), and it is not recommended to use them
+ * in any other environment. Right now, LogStream implements the following:
  *
  * <ol>
  * <li> A double number very close to zero will end up being output in
- * exponential format, although it has no significant digits. The
- * parameter #double_threshold determines which numbers are too close
- * to zero to be considered nonzero.
+ * exponential format, although it has no significant digits. The parameter
+ * #double_threshold determines which numbers are too close to zero to be
+ * considered nonzero.
  * <li> For float numbers holds the same, but with a typically larger
  * #float_threshold.
- * <li> Rounded numbers become unreliable with inexact
- * arithmetics. Therefore, adding a small number before rounding makes
- * results more reproducible, assuming that numbers like 0.5 are more
- * likely than 0.49997.
+ * <li> Rounded numbers become unreliable with inexact arithmetics. Therefore,
+ * adding a small number before rounding makes results more reproducible,
+ * assuming that numbers like 0.5 are more likely than 0.49997.
  * </ol>
- * It should be pointed out that all of these measures distort the
- * output and make it less accurate. Therefore, they are only
- * recommended if the output needs to be reproducible.
+ * It should be pointed out that all of these measures distort the output and
+ * make it less accurate. Therefore, they are only recommended if the output
+ * needs to be reproducible.
  *
  * @ingroup textoutput
  * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003, 2011
@@ -119,19 +116,19 @@ public:
   /**
    * A subclass allowing for the safe generation and removal of prefices.
    *
-   * Somewhere at the beginning of a block, create one of these objects,
-   * and it will appear as a prefix in LogStream output like @p deallog. At
-   * the end of the block, the prefix will automatically be removed, when
-   * this object is destroyed.
+   * Somewhere at the beginning of a block, create one of these objects, and
+   * it will appear as a prefix in LogStream output like @p deallog. At the
+   * end of the block, the prefix will automatically be removed, when this
+   * object is destroyed.
    *
    * In other words, the scope of the object so created determines the
-   * lifetime of the prefix. The advantage of using such an object is that
-   * the prefix is removed whichever way you exit the scope -- by
+   * lifetime of the prefix. The advantage of using such an object is that the
+   * prefix is removed whichever way you exit the scope -- by
    * <code>continue</code>, <code>break</code>, <code>return</code>,
    * <code>throw</code>, or by simply reaching the closing brace. In all of
-   * these cases, it is not necessary to remember to pop the prefix
-   * manually using LogStream::pop. In this, it works just like the better
-   * known Threads::Mutex::ScopedLock class.
+   * these cases, it is not necessary to remember to pop the prefix manually
+   * using LogStream::pop. In this, it works just like the better known
+   * Threads::Mutex::ScopedLock class.
    */
   class Prefix
   {
@@ -143,8 +140,8 @@ public:
     Prefix(const std::string &text);
 
     /**
-     * Set a new prefix for the given stream, which will be removed when
-     * the variable is destroyed.
+     * Set a new prefix for the given stream, which will be removed when the
+     * variable is destroyed.
      */
     Prefix(const std::string &text,
            LogStream &stream);
@@ -183,9 +180,8 @@ public:
 
 
   /**
-   * Disable output to the second stream. You may want to call
-   * <tt>close</tt> on the stream that was previously attached to this
-   * object.
+   * Disable output to the second stream. You may want to call <tt>close</tt>
+   * on the stream that was previously attached to this object.
    */
   void detach ();
 
@@ -193,12 +189,12 @@ public:
   /**
    * Setup the logstream for regression test mode.
    *
-   * This sets the parameters #double_threshold, #float_threshold, and
-   * #offset to nonzero values. The exact values being used have been
-   * determined experimentally and can be found in the source code.
+   * This sets the parameters #double_threshold, #float_threshold, and #offset
+   * to nonzero values. The exact values being used have been determined
+   * experimentally and can be found in the source code.
    *
-   * Called with an argument <tt>false</tt>, switches off test mode and
-   * sets all involved parameters to zero.
+   * Called with an argument <tt>false</tt>, switches off test mode and sets
+   * all involved parameters to zero.
    */
   void test_mode (bool on=true);
 
@@ -235,8 +231,8 @@ public:
 
 
   /**
-   * Push another prefix on the stack. Prefixes are automatically separated
-   * by a colon and there is a double colon after the last prefix.
+   * Push another prefix on the stack. Prefixes are automatically separated by
+   * a colon and there is a double colon after the last prefix.
    *
    * A simpler way to add a prefix (without the manual need to add the
    * corresponding pop()) is to use the Prefix class.
@@ -262,10 +258,9 @@ public:
 
 
   /**
-   * Maximum number of levels to be written to the log file. The
-   * functionality is the same as <tt>depth_console</tt>, nevertheless,
-   * this function should be used with care, since it may spoile the value
-   * of a log file.
+   * Maximum number of levels to be written to the log file. The functionality
+   * is the same as <tt>depth_console</tt>, nevertheless, this function should
+   * be used with care, since it may spoile the value of a log file.
    *
    * The previous value of this parameter is returned.
    */
@@ -283,10 +278,10 @@ public:
 
   /**
    * Output time differences between consecutive logs. If this function is
-   * invoked with <tt>true</tt>, the time difference between the previous
-   * log line and the recent one is printed. If it is invoked with
-   * <tt>false</tt>, the accumulated time since start of the program is
-   * printed (default behavior).
+   * invoked with <tt>true</tt>, the time difference between the previous log
+   * line and the recent one is printed. If it is invoked with <tt>false</tt>,
+   * the accumulated time since start of the program is printed (default
+   * behavior).
    *
    * The measurement of times is not changed by this function, just the
    * output.
@@ -315,17 +310,16 @@ public:
    * The default value for this threshold is zero, i.e. numbers are printed
    * according to their real value.
    *
-   * This feature is mostly useful for automated tests: there, one would
-   * like to reproduce the exact same solution in each run of a testsuite.
-   * However, subtle difference in processor, operating system, or compiler
-   * version can lead to differences in the last few digits of numbers, due
-   * to different rounding. While one can avoid trouble for most numbers
-   * when comparing with stored results by simply limiting the accuracy of
-   * output, this does not hold for numbers very close to zero, i.e. zero
-   * plus accumulated round-off. For these numbers, already the first digit
-   * is tainted by round-off. Using the present function, it is possible to
-   * eliminate this source of problems, by simply writing zero to the
-   * output in this case.
+   * This feature is mostly useful for automated tests: there, one would like
+   * to reproduce the exact same solution in each run of a testsuite. However,
+   * subtle difference in processor, operating system, or compiler version can
+   * lead to differences in the last few digits of numbers, due to different
+   * rounding. While one can avoid trouble for most numbers when comparing
+   * with stored results by simply limiting the accuracy of output, this does
+   * not hold for numbers very close to zero, i.e. zero plus accumulated
+   * round-off. For these numbers, already the first digit is tainted by
+   * round-off. Using the present function, it is possible to eliminate this
+   * source of problems, by simply writing zero to the output in this case.
    */
   void threshold_double(const double t);
 
@@ -337,24 +331,24 @@ public:
 
 
   /**
-   * set the precision for the underlying stream and returns the
-   * previous stream precision. This fuction mimics
+   * set the precision for the underlying stream and returns the previous
+   * stream precision. This fuction mimics
    * http://www.cplusplus.com/reference/ios/ios_base/precision/
    */
   std::streamsize precision (const std::streamsize prec);
 
 
   /**
-   * set the width for the underlying stream and returns the
-   * previous stream width. This fuction mimics
+   * set the width for the underlying stream and returns the previous stream
+   * width. This fuction mimics
    * http://www.cplusplus.com/reference/ios/ios_base/width/
    */
   std::streamsize width (const std::streamsize wide);
 
 
   /**
-   * set the flags for the underlying stream and returns the
-   * previous stream flags. This fuction mimics
+   * set the flags for the underlying stream and returns the previous stream
+   * flags. This fuction mimics
    * http://www.cplusplus.com/reference/ios/ios_base/flags/
    */
   std::ios::fmtflags flags(const std::ios::fmtflags f);
@@ -381,27 +375,26 @@ public:
   /**
    * Treat ostream manipulators. This passes on the whole thing to the
    * template function with the exception of the <tt>std::endl</tt>
-   * manipulator, for which special action is performed: write the
-   * temporary stream buffer including a header to the file and
-   * <tt>std::cout</tt> and empty the buffer.
+   * manipulator, for which special action is performed: write the temporary
+   * stream buffer including a header to the file and <tt>std::cout</tt> and
+   * empty the buffer.
    *
-   * An overload of this function is needed anyway, since the compiler
-   * can't bind manipulators like @p std::endl directly to template
-   * arguments @p T like in the previous general template. This is due to
-   * the fact that @p std::endl is actually an overloaded set of functions
-   * for @p std::ostream, @p std::wostream, and potentially more of this
-   * kind. This function is therefore necessary to pick one element from
-   * this overload set.
+   * An overload of this function is needed anyway, since the compiler can't
+   * bind manipulators like @p std::endl directly to template arguments @p T
+   * like in the previous general template. This is due to the fact that @p
+   * std::endl is actually an overloaded set of functions for @p std::ostream,
+   * @p std::wostream, and potentially more of this kind. This function is
+   * therefore necessary to pick one element from this overload set.
    */
   LogStream &operator<< (std::ostream& (*p) (std::ostream &));
 
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
-   * object. Since sometimes the size of objects can not be determined
-   * exactly (for example: what is the memory consumption of an STL
-   * <tt>std::map</tt> type with a certain number of elements?), this is
-   * only an estimate. however often quite close to the true value.
+   * object. Since sometimes the size of objects can not be determined exactly
+   * (for example: what is the memory consumption of an STL <tt>std::map</tt>
+   * type with a certain number of elements?), this is only an estimate.
+   * however often quite close to the true value.
    */
   std::size_t memory_consumption () const;
 
@@ -415,17 +408,17 @@ private:
 
 
   /**
-   * Internal wrapper around thread-local prefixes. This private
-   * function will return the correct internal prefix stack. More
-   * important, a new thread-local stack will be copied from the current
-   * stack of the "blessed" thread that created this LogStream instance
-   * (usually, in the case of deallog, the "main" thread).
+   * Internal wrapper around thread-local prefixes. This private function will
+   * return the correct internal prefix stack. More important, a new thread-
+   * local stack will be copied from the current stack of the "blessed" thread
+   * that created this LogStream instance (usually, in the case of deallog,
+   * the "main" thread).
    */
   std::stack<std::string> &get_prefixes() const;
 
   /**
-   * Stack of strings which are printed at the beginning of each line to
-   * allow identification where the output was generated.
+   * Stack of strings which are printed at the beginning of each line to allow
+   * identification where the output was generated.
    */
   mutable Threads::ThreadLocalStorage<std::stack<std::string> > prefixes;
 
@@ -446,9 +439,9 @@ private:
 
   /**
    * Value denoting the number of prefixes to be printed to the standard
-   * output. If more than this number of prefixes is pushed to the stack,
-   * then no output will be generated until the number of prefixes shrinks
-   * back below this number.
+   * output. If more than this number of prefixes is pushed to the stack, then
+   * no output will be generated until the number of prefixes shrinks back
+   * below this number.
    */
   unsigned int std_depth;
 
@@ -485,19 +478,19 @@ private:
   float float_threshold;
 
   /**
-   * An offset added to every float or double number upon output. This is
-   * done after the number is compared to #double_threshold or
-   * #float_threshold, but before rounding.
+   * An offset added to every float or double number upon output. This is done
+   * after the number is compared to #double_threshold or #float_threshold,
+   * but before rounding.
    *
-   * This functionality was introduced to produce more reproducible
-   * floating point output for regression tests. The rationale is, that an
-   * exact output value is much more likely to be 1/8 than 0.124997. If we
-   * round to two digits though, 1/8 becomes unreliably either .12 or .13
-   * due to machine accuracy. On the other hand, if we add a something
-   * above machine accuracy first, we will always get .13.
+   * This functionality was introduced to produce more reproducible floating
+   * point output for regression tests. The rationale is, that an exact output
+   * value is much more likely to be 1/8 than 0.124997. If we round to two
+   * digits though, 1/8 becomes unreliably either .12 or .13 due to machine
+   * accuracy. On the other hand, if we add a something above machine accuracy
+   * first, we will always get .13.
    *
-   * It is safe to leave this value equal to zero. For regression tests,
-   * the function test_mode() sets it to a reasonable value.
+   * It is safe to leave this value equal to zero. For regression tests, the
+   * function test_mode() sets it to a reasonable value.
    *
    * The offset is relative to the magnitude of the number.
    */
@@ -520,9 +513,8 @@ private:
 
   /**
    * Original buffer of <tt>std::cerr</tt>. We store the address of that
-   * buffer when #log_cerr is called, and reset it to this value if
-   * #log_cerr is called a second time, or when the destructor of this
-   * class is run.
+   * buffer when #log_cerr is called, and reset it to this value if #log_cerr
+   * is called a second time, or when the destructor of this class is run.
    */
   std::streambuf *old_cerr;
 
@@ -538,15 +530,14 @@ private:
   void print_line_head ();
 
   /**
-   * Internal wrapper around "thread local" outstreams. This private
-   * function will return the correct internal ostringstream buffer for
-   * operater<<.
+   * Internal wrapper around "thread local" outstreams. This private function
+   * will return the correct internal ostringstream buffer for operater<<.
    */
   std::ostringstream &get_stream();
 
   /**
-   * We use tbb's thread local storage facility to generate a stringstream
-   * for every thread that sends log messages.
+   * We use tbb's thread local storage facility to generate a stringstream for
+   * every thread that sends log messages.
    */
   Threads::ThreadLocalStorage<std_cxx11::shared_ptr<std::ostringstream> > outstreams;
 

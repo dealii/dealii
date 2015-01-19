@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2013 by the deal.II authors
+ * Copyright (C) 2000 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -216,7 +216,7 @@ namespace Step18
   // The second function does something very similar (and therefore is given
   // the same name): compute the symmetric strain tensor from the gradient of
   // a vector-valued field. If you already have a solution field, the
-  // <code>fe_values.get_function_grads</code> function allows you to extract
+  // <code>fe_values.get_function_gradients</code> function allows you to extract
   // the gradients of each component of your solution field at a quadrature
   // point. It returns this as a vector of rank-1 tensors: one rank-1 tensor
   // (gradient) per vector component of the solution. From this we have to
@@ -1962,8 +1962,8 @@ namespace Step18
           // cell, and extract the gradients of the displacement at the
           // quadrature points for later computation of the strains
           fe_values.reinit (cell);
-          fe_values.get_function_grads (incremental_displacement,
-                                        displacement_increment_grads);
+          fe_values.get_function_gradients (incremental_displacement,
+                                            displacement_increment_grads);
 
           // Then loop over the quadrature points of this cell:
           for (unsigned int q=0; q<quadrature_formula.size(); ++q)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -949,19 +949,13 @@ namespace Step51
         output_results (cycle);
       }
 
-    convergence_table.set_precision("val L2", 3);
+    convergence_table.set_precision("val L2", 8);
     convergence_table.set_scientific("val L2", true);
-    convergence_table.set_precision("grad L2", 3);
+    convergence_table.set_precision("grad L2", 8);
     convergence_table.set_scientific("grad L2", true);
-    convergence_table.set_precision("val L2-post", 3);
+    convergence_table.set_precision("val L2-post", 8);
     convergence_table.set_scientific("val L2-post", true);
 
-    convergence_table
-      .evaluate_convergence_rates("val L2", "cells", ConvergenceTable::reduction_rate_log2, dim);
-    convergence_table
-      .evaluate_convergence_rates("grad L2", "cells", ConvergenceTable::reduction_rate_log2, dim);
-    convergence_table
-      .evaluate_convergence_rates("val L2-post", "cells", ConvergenceTable::reduction_rate_log2, dim);
     convergence_table.write_text(deallog.get_file_stream());
   }
 

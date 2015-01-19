@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,9 +48,9 @@ namespace internal
      * do this for a number of different vector types. Fortunately, they all
      * have the same interface. So the way we go is to have a base class that
      * provides the functions to access the vector's information, and to have
-     * a derived template class that can be instantiated for each vector
-     * type. Since the vectors all have the same interface, this is no big
-     * problem, as they can all use the same general templatized code.
+     * a derived template class that can be instantiated for each vector type.
+     * Since the vectors all have the same interface, this is no big problem,
+     * as they can all use the same general templatized code.
      *
      * @author Wolfgang Bangerth, 2004
      */
@@ -295,105 +295,100 @@ namespace internal
  *   data_out.clear();
  * @endcode
  *
- * attach_dof_handler() tells this class that all future operations
- * are to take place with the DoFHandler object and the triangulation
- * it lives on. We then add the solution vector and the error
- * estimator; note that they have different dimensions, because the
- * solution is a nodal vector, here consisting of two components
- * ("x-displacement" and "y-displacement") while the error estimator
- * probably is a vector holding cell data. When attaching a data
- * vector, you have to give a name to each component of the vector,
- * which is done through an object of type <tt>vector<string></tt> as
- * second argument; if only one component is in the vector, for
- * example if we are adding cell data as in the second case, or if the
- * finite element used by the DoFHandler has only one component, then
- * you can use the second add_data_vector() function which takes a @p
- * string instead of the <tt>vector<string></tt>.
+ * attach_dof_handler() tells this class that all future operations are to
+ * take place with the DoFHandler object and the triangulation it lives on. We
+ * then add the solution vector and the error estimator; note that they have
+ * different dimensions, because the solution is a nodal vector, here
+ * consisting of two components ("x-displacement" and "y-displacement") while
+ * the error estimator probably is a vector holding cell data. When attaching
+ * a data vector, you have to give a name to each component of the vector,
+ * which is done through an object of type <tt>vector<string></tt> as second
+ * argument; if only one component is in the vector, for example if we are
+ * adding cell data as in the second case, or if the finite element used by
+ * the DoFHandler has only one component, then you can use the second
+ * add_data_vector() function which takes a @p string instead of the
+ * <tt>vector<string></tt>.
  *
  * The add_data_vector() functions have additional arguments (with default
  * values) that can be used to specify certain transformations. In particular,
  * it allows to attach DataPostprocessor arguments to compute derived
- * information from a data vector at each point at which the field will
- * be evaluated so that it can be written to a file (for example, the
- * Mach number in hypersonic flow can be computed from density and velocities;
- * step-29 also shows an example); another piece of information
- * specified through arguments with default values is how certain output
- * components should be interpreted, i.e. whether each component of the data
- * is logically an independent scalar field, or whether some of them together
- * form logically a vector-field (see the
- * DataComponentInterpretation::DataComponentInterpretation enum, and the @ref
- * step_22 "step-22" tutorial program).
+ * information from a data vector at each point at which the field will be
+ * evaluated so that it can be written to a file (for example, the Mach number
+ * in hypersonic flow can be computed from density and velocities; step-29
+ * also shows an example); another piece of information specified through
+ * arguments with default values is how certain output components should be
+ * interpreted, i.e. whether each component of the data is logically an
+ * independent scalar field, or whether some of them together form logically a
+ * vector-field (see the
+ * DataComponentInterpretation::DataComponentInterpretation enum, and the
+ * @ref step_22 "step-22"
+ * tutorial program).
  *
- * It should be noted that this class does not copy the vector given to it through
- * the add_data_vector() functions, for memory consumption reasons. It only
- * stores a reference to it, so it is in your responsibility to make sure that
- * the data vectors exist long enough.
+ * It should be noted that this class does not copy the vector given to it
+ * through the add_data_vector() functions, for memory consumption reasons. It
+ * only stores a reference to it, so it is in your responsibility to make sure
+ * that the data vectors exist long enough.
  *
  * After adding all data vectors, you need to call a function which generates
  * the patches for output from the stored data. Derived classes name this
- * function build_patches(). Finally, you write() the data in one format or other,
- * to a file.
+ * function build_patches(). Finally, you write() the data in one format or
+ * other, to a file.
  *
- * Please note that in the example above, an object of type DataOut was
- * used, i.e. an object of a derived class. This is necessary since this
- * class does not provide means to actually generate the patches, only aids to
- * store and access data.
+ * Please note that in the example above, an object of type DataOut was used,
+ * i.e. an object of a derived class. This is necessary since this class does
+ * not provide means to actually generate the patches, only aids to store and
+ * access data.
  *
- * Note that the base class of this class, DataOutInterface offers
- * several functions to ease programming with run-time determinable
- * output formats (i.e. you need not use a fixed format by calling
- * DataOutInterface::write_xxx in the above example, but you can
- * select it by a run-time parameter without having to write the
- * <tt>if () ... else ...</tt> clauses yourself), and also functions
- * and classes offering ways to control the appearance of the output
- * by setting flags for each output format.
+ * Note that the base class of this class, DataOutInterface offers several
+ * functions to ease programming with run-time determinable output formats
+ * (i.e. you need not use a fixed format by calling
+ * DataOutInterface::write_xxx in the above example, but you can select it by
+ * a run-time parameter without having to write the <tt>if () ... else
+ * ...</tt> clauses yourself), and also functions and classes offering ways to
+ * control the appearance of the output by setting flags for each output
+ * format.
  *
  *
  * <h3>Information for derived classes</h3>
  *
- * What is actually missing this class is a way to produce the patches
- * for output itself, from the stored data and degree of freedom
- * information.  Since this task is often application dependent it is
- * left to derived classes. For example, in many applications, it
- * might be wanted to limit the depth of output to a certain number of
- * refinement levels and write data from finer cells only in a way
- * interpolated to coarser cells, to reduce the amount of
- * output. Also, it might be wanted to use different numbers of
- * subdivisions on different cells when forming a patch, for example
- * to accomplish for different polynomial degrees of the trial space
- * on different cells. Also, the output need not necessarily consist
- * of a patch for each cell, but might be made up of patches for
- * faces, of other things. Take a look at derived classes to what is
- * possible in this respect.
+ * What is actually missing this class is a way to produce the patches for
+ * output itself, from the stored data and degree of freedom information.
+ * Since this task is often application dependent it is left to derived
+ * classes. For example, in many applications, it might be wanted to limit the
+ * depth of output to a certain number of refinement levels and write data
+ * from finer cells only in a way interpolated to coarser cells, to reduce the
+ * amount of output. Also, it might be wanted to use different numbers of
+ * subdivisions on different cells when forming a patch, for example to
+ * accomplish for different polynomial degrees of the trial space on different
+ * cells. Also, the output need not necessarily consist of a patch for each
+ * cell, but might be made up of patches for faces, of other things. Take a
+ * look at derived classes to what is possible in this respect.
  *
- * For this reason, it is left to a derived class to provide a
- * function, named usually build_patches() or the like, which fills
- * the #patches array of this class.
+ * For this reason, it is left to a derived class to provide a function, named
+ * usually build_patches() or the like, which fills the #patches array of this
+ * class.
  *
- * Regarding the templates of this class, it needs three values: first
- * the space dimension in which the triangulation and the DoF handler
- * operate, second the dimension of the objects which the patches
- * represent.  Although in most cases they are equal, there are also
- * classes for which this does not hold, for example if one outputs
- * the result of a computation exploiting rotational symmetry in the
- * original domain (in which the space dimension of the output would
- * be one higher than that of the DoF handler, see the
- * DataOut_Rotation() class), or one might conceive that one could
- * write a class that only outputs the solution on a cut through the
- * domain, in which case the space dimension of the output is less
- * than that of the DoF handler. The last template argument denotes
- * the dimension of the space into which the patches are embedded;
- * usually, this dimension is the same as the dimensio of the patches
- * themselves (which is also the default value of the template
- * parameter), but there might be cases where this is not so. For
- * example, in the DataOut_Faces() class, patches are generated
- * from faces of the triangulation. Thus, the dimension of the patch
- * is one less than the dimension of the embedding space, which is, in
- * this case, equal to the dimension of the triangulation and DoF
- * handler. However, for the cut through the domain mentioned above,
- * if the cut is a straight one, then the cut can be embedded into a
- * space of one dimension lower than the dimension of the
- * triangulation, so that the last template parameter has the same
+ * Regarding the templates of this class, it needs three values: first the
+ * space dimension in which the triangulation and the DoF handler operate,
+ * second the dimension of the objects which the patches represent.  Although
+ * in most cases they are equal, there are also classes for which this does
+ * not hold, for example if one outputs the result of a computation exploiting
+ * rotational symmetry in the original domain (in which the space dimension of
+ * the output would be one higher than that of the DoF handler, see the
+ * DataOut_Rotation() class), or one might conceive that one could write a
+ * class that only outputs the solution on a cut through the domain, in which
+ * case the space dimension of the output is less than that of the DoF
+ * handler. The last template argument denotes the dimension of the space into
+ * which the patches are embedded; usually, this dimension is the same as the
+ * dimensio of the patches themselves (which is also the default value of the
+ * template parameter), but there might be cases where this is not so. For
+ * example, in the DataOut_Faces() class, patches are generated from faces of
+ * the triangulation. Thus, the dimension of the patch is one less than the
+ * dimension of the embedding space, which is, in this case, equal to the
+ * dimension of the triangulation and DoF handler. However, for the cut
+ * through the domain mentioned above, if the cut is a straight one, then the
+ * cut can be embedded into a space of one dimension lower than the dimension
+ * of the triangulation, so that the last template parameter has the same
  * value as the second one.
  *
  * @ingroup output
@@ -464,9 +459,9 @@ public:
    * mapping between nodes and node values.
    *
    * This call is optional: If you add data vectors with specified DoFHandler
-   * object, then that contains all information needed to generate the
-   * output. This call is useful when you only output cell vectors and no
-   * DoFHandler at all, in which case it provides the geometry.
+   * object, then that contains all information needed to generate the output.
+   * This call is useful when you only output cell vectors and no DoFHandler
+   * at all, in which case it provides the geometry.
    */
   void attach_triangulation (const Triangulation<DH::dimension,
                              DH::space_dimension> &);
@@ -487,16 +482,16 @@ public:
    * given. However, there are corner cases where this automatic determination
    * does not work.  One example is if you compute with piecewise constant
    * elements and have a scalar solution, then there are as many cells as
-   * there are degrees of freedom (though they may be numbered
-   * differently). Another possibility is if you have a 1d mesh embedded in 2d
-   * space and the mesh consists of a closed curve of cells; in this case,
-   * there are as many nodes as there are cells, and when using a Q1 element
-   * you will have as many degrees of freedom as there are cells.  In these
-   * cases, you can change the last argument of the function from its default
-   * value #type_automatic to either #type_dof_data or #type_cell_data,
-   * depending on what the vector represents. Apart from such corner cases,
-   * you can leave the argument at its default value and let the function
-   * determine the type of the vector itself.
+   * there are degrees of freedom (though they may be numbered differently).
+   * Another possibility is if you have a 1d mesh embedded in 2d space and the
+   * mesh consists of a closed curve of cells; in this case, there are as many
+   * nodes as there are cells, and when using a Q1 element you will have as
+   * many degrees of freedom as there are cells.  In these cases, you can
+   * change the last argument of the function from its default value
+   * #type_automatic to either #type_dof_data or #type_cell_data, depending on
+   * what the vector represents. Apart from such corner cases, you can leave
+   * the argument at its default value and let the function determine the type
+   * of the vector itself.
    *
    * If it is a vector holding DoF data, the names given shall be one for each
    * component of the underlying finite element.  If it is a finite element
@@ -519,9 +514,8 @@ public:
    * DataComponentInterpretation::component_is_scalar, indicating that all
    * output components are independent scalar fields. However, if the given
    * data vector represents logical vectors, you may pass a vector that
-   * contains values
-   * DataComponentInterpretation::component_is_part_of_vector. In the example
-   * above, one would pass in a vector with components
+   * contains values DataComponentInterpretation::component_is_part_of_vector.
+   * In the example above, one would pass in a vector with components
    * (DataComponentInterpretation::component_is_part_of_vector,
    * DataComponentInterpretation::component_is_part_of_vector,
    * DataComponentInterpretation::component_is_scalar) for (u,v,p).
@@ -602,8 +596,9 @@ public:
 
   /**
    * This function is an alternative to the above ones, allowing the output of
-   * derived quantities instead of the given data. This converison has to be
-   * done in a class derived from DataPostprocessor.
+   * derived quantities instead of the given data. This conversion has to be
+   * done in a class derived from DataPostprocessor. This function is used in
+   * step-29. Other uses are shown in step-32 and step-33.
    *
    * The names for these derived quantities are provided by the @p
    * data_postprocessor argument. Likewise, the data_component_interpretation
@@ -617,6 +612,15 @@ public:
    * FEValuesBase::get_function_values() function. In particular, this
    * includes all of the usual vector types, but also IndexSet (see step-41
    * for a use of this).
+   *
+   * @note The DataPostprocessor object (i.e., in reality the object of your
+   * derived class) has to live until the DataOut object is destroyed as the
+   * latter keeps a pointer to the former and will complain if the object
+   * pointed to is destroyed while the latter still has a pointer to it. If
+   * both the data postprocessor and DataOut objects are local variables of a
+   * function (as they are, for example, in step-29), then you can avoid this
+   * error by declaring the data postprocessor variable before the DataOut
+   * variable as objects are destroyed in reverse order of declaration.
    */
   template <class VECTOR>
   void add_data_vector (const VECTOR                           &data,
@@ -683,8 +687,8 @@ public:
   /**
    * Release the pointers to the data vectors and the DoF handler. You have to
    * set all data entries again using the add_data_vector() function. The
-   * pointer to the dof handler is cleared as well, along with all other
-   * data. In effect, this function resets everything to a virgin state.
+   * pointer to the dof handler is cleared as well, along with all other data.
+   * In effect, this function resets everything to a virgin state.
    */
   virtual void clear ();
 

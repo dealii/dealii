@@ -20,8 +20,8 @@
 #
 #   DEAL_II_WITH_CXX11
 #
-#   HAVE_ISNAN
-#   HAVE_UNDERSCORE_ISNAN
+#   DEAL_II_HAVE_ISNAN
+#   DEAL_II_HAVE_UNDERSCORE_ISNAN
 #   DEAL_II_HAVE_ISFINITE
 #
 
@@ -290,7 +290,7 @@ CHECK_CXX_SOURCE_COMPILES(
   #include <cmath>
   int main(){ double d=0; isnan (d); return 0; }
   "
-  HAVE_ISNAN)
+  DEAL_II_HAVE_ISNAN)
 
 
 CHECK_CXX_SOURCE_COMPILES(
@@ -298,7 +298,7 @@ CHECK_CXX_SOURCE_COMPILES(
   #include <cmath>
   int main(){ double d=0; _isnan (d); return 0; }
   "
-  HAVE_UNDERSCORE_ISNAN)
+  DEAL_II_HAVE_UNDERSCORE_ISNAN)
 
 
 CHECK_CXX_SOURCE_COMPILES(

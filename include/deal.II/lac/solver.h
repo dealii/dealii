@@ -28,29 +28,28 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number> class Vector;
 
 /**
- * A base class for iterative linear solvers. This class
- * provides interfaces to a memory pool and the objects that
- * determine whether a solver has converged.
+ * A base class for iterative linear solvers. This class provides interfaces
+ * to a memory pool and the objects that determine whether a solver has
+ * converged.
  *
  *
  * <h3>Requirements common to derived solver classes</h3>
  *
- * Since iterative solvers do not rely on any special structure of
- * matrices or the format of storage but only require that matrices
- * and vectors define certain operations such as matrix-vector
- * products, or scalar products between vectors, this class as well as
- * the derived classes and their member functions implementing concrete
- * linear solvers are templated on the types of matrices and vectors.
- * However, there are some common requirements a matrix or vector type
- * must fulfill to qualify as an acceptable type for the solvers in this
- * hierarchy. These requirements are listed below.
+ * Since iterative solvers do not rely on any special structure of matrices or
+ * the format of storage but only require that matrices and vectors define
+ * certain operations such as matrix-vector products, or scalar products
+ * between vectors, this class as well as the derived classes and their member
+ * functions implementing concrete linear solvers are templated on the types
+ * of matrices and vectors. However, there are some common requirements a
+ * matrix or vector type must fulfill to qualify as an acceptable type for the
+ * solvers in this hierarchy. These requirements are listed below.
  *
- * The classes we show below are not any concrete class. Rather, they are intended to
- * form a `signature' which a concrete class has to conform to. Note
- * that the matrix and vector classes within this library of course
- * conform to this interface; therefore, SparseMatrix and Vector are
- * good examples for these classes as they provide the necessary
- * signatures of member functions.
+ * The classes we show below are not any concrete class. Rather, they are
+ * intended to form a `signature' which a concrete class has to conform to.
+ * Note that the matrix and vector classes within this library of course
+ * conform to this interface; therefore, SparseMatrix and Vector are good
+ * examples for these classes as they provide the necessary signatures of
+ * member functions.
  *
  * @code
  * class Matrix
@@ -118,23 +117,25 @@ template <typename number> class Vector;
  * @endcode
  *
  * In addition, for some solvers there has to be a global function
- * <tt>swap(VECTOR &a, VECTOR &b)</tt> that exchanges the values of the two vectors.
+ * <tt>swap(VECTOR &a, VECTOR &b)</tt> that exchanges the values of the two
+ * vectors.
  *
- * The preconditioners used must have the same interface as matrices,
- * i.e. in particular they have to provide a member function @p vmult
- * which denotes the application of the preconditioner.
+ * The preconditioners used must have the same interface as matrices, i.e. in
+ * particular they have to provide a member function @p vmult which denotes
+ * the application of the preconditioner.
  *
  *
  * <h3>AdditionalData</h3>
  *
  * Several solvers need additional data, like the damping parameter @p omega
- * of the @p SolverRichardson class or the maximum number of temporary
- * vectors of @p SolverGMRES.  To have a standardized way of constructing solvers,
- * each solver class has a <tt>struct AdditionalData</tt> as a member, and constructors
- * of all solver classes take such an argument. Some solvers need no additional data,
- * or may not at the current time. For these solvers the struct @p AdditionalData is
- * empty and calling the constructor may be done without giving the additional
- * structure as an argument as a default @p AdditionalData is set by default.
+ * of the @p SolverRichardson class or the maximum number of temporary vectors
+ * of @p SolverGMRES.  To have a standardized way of constructing solvers,
+ * each solver class has a <tt>struct AdditionalData</tt> as a member, and
+ * constructors of all solver classes take such an argument. Some solvers need
+ * no additional data, or may not at the current time. For these solvers the
+ * struct @p AdditionalData is empty and calling the constructor may be done
+ * without giving the additional structure as an argument as a default @p
+ * AdditionalData is set by default.
  *
  * With this, creating a solver looks like
  * @code
@@ -150,83 +151,76 @@ template <typename number> class Vector;
  * SolverCG solver_cg (solver_control, vector_memory);
  * @endcode
  *
- * Using a unified constructor parameter list for all solvers supports
- * the @p SolverSelector class; the unified interface
- * enables us to use this class unchanged even if the number of types of
- * parameters to a certain solver changes and it is still possible in a simple
- * way to give these additional data to the @p SolverSelector object for each
- * solver which it may use.
+ * Using a unified constructor parameter list for all solvers supports the @p
+ * SolverSelector class; the unified interface enables us to use this class
+ * unchanged even if the number of types of parameters to a certain solver
+ * changes and it is still possible in a simple way to give these additional
+ * data to the @p SolverSelector object for each solver which it may use.
  *
  *
  * <h3>Observing the progress of linear solver iterations</h3>
  *
- * The Solver class, being the base class for all of the iterative solvers such
- * as SolverCG, SolverGMRES, etc, provides the facilities by which actual solver
- * implementations determine whether the iteration is converged, not yet
- * converged, or has failed. Typically, this is done using an object of type
- * SolverControl that is passed to the solver classes's constructors and from
- * them down to the constructor of this base class. Every one of the tutorial
- * programs that solves a linear problem (starting with step-3) uses this
- * method and it is described in detail there. However, the underlying mechanism
- * is more general and allows for many other uses to observe how the linear
- * solver iterations progress.
+ * The Solver class, being the base class for all of the iterative solvers
+ * such as SolverCG, SolverGMRES, etc, provides the facilities by which actual
+ * solver implementations determine whether the iteration is converged, not
+ * yet converged, or has failed. Typically, this is done using an object of
+ * type SolverControl that is passed to the solver classes's constructors and
+ * from them down to the constructor of this base class. Every one of the
+ * tutorial programs that solves a linear problem (starting with step-3) uses
+ * this method and it is described in detail there. However, the underlying
+ * mechanism is more general and allows for many other uses to observe how the
+ * linear solver iterations progress.
  *
  * The basic approach is that the iterative solvers invoke a <i>signal</i> at
- * the end of each iteration to determine whether the solution is converged.
- * A signal is a class that has, conceptually, a list of pointers to functions
+ * the end of each iteration to determine whether the solution is converged. A
+ * signal is a class that has, conceptually, a list of pointers to functions
  * and every time the signal is invoked, each of these functions are called.
  * In the language of signals, the functions called are called <i>slots</i>
- * and one can attach any number of slots to a signal.
- * (The implementation of signals and slots we use here is the one from the
- * BOOST.signals2 library.) A number of details may clarify what is happening
- * underneath:
- * - In reality, the signal object does not store pointers to functions, but
- *   function objects as slots. Each slot must conform to a particular
- *   signature: here, it is an object that can be called with three arguments
- *   (the number of the current linear iteration, the current residual, and
- *   the current iterate; more specifics are discussed in the documentation of
- *   the connect() function). A pointer to a function with this argument list
- *   satisfies the requirements, but you can also pass a member function
- *   whose <code>this</code> argument has been bound using the
- *   <code>std_cxx11::bind</code> mechanism (see the example below).
- * - Each of the slots will return a value that indicates whether
- *   the iteration should continue, should stop because it has succeeded,
- *   or stop because it has failed. The return type of slots is therefore
- *   of type SolverControl::State. The returned values from all of the
- *   slots will then have to be combined before they are returned to the
- *   iterative solver that invoked the signal. The way this works is that
- *   if at least one slot returned SolverControl::failure, then the
- *   combined value is SolverControl::failure; otherwise, if at least
- *   one slot returned SolverControl::iterate, then this is going to be
- *   the return value of the signal; finally, only if all slots return
- *   SolverControl::success will the signal's return value be
- *   SolverControl::success.
- * - It may of course be that a particular
- *   slot has been connected to the signal only to observe how the
- *   solution or a specific part of it converges, but has no particular
- *   opinion on whether the iteration should continue or not. In such
- *   cases, the slot should just return SolverControl::success, which
- *   is the weakest of all return values according to the rules laid
- *   out above.
+ * and one can attach any number of slots to a signal. (The implementation of
+ * signals and slots we use here is the one from the BOOST.signals2 library.)
+ * A number of details may clarify what is happening underneath: - In reality,
+ * the signal object does not store pointers to functions, but function
+ * objects as slots. Each slot must conform to a particular signature: here,
+ * it is an object that can be called with three arguments (the number of the
+ * current linear iteration, the current residual, and the current iterate;
+ * more specifics are discussed in the documentation of the connect()
+ * function). A pointer to a function with this argument list satisfies the
+ * requirements, but you can also pass a member function whose
+ * <code>this</code> argument has been bound using the
+ * <code>std_cxx11::bind</code> mechanism (see the example below). - Each of
+ * the slots will return a value that indicates whether the iteration should
+ * continue, should stop because it has succeeded, or stop because it has
+ * failed. The return type of slots is therefore of type SolverControl::State.
+ * The returned values from all of the slots will then have to be combined
+ * before they are returned to the iterative solver that invoked the signal.
+ * The way this works is that if at least one slot returned
+ * SolverControl::failure, then the combined value is SolverControl::failure;
+ * otherwise, if at least one slot returned SolverControl::iterate, then this
+ * is going to be the return value of the signal; finally, only if all slots
+ * return SolverControl::success will the signal's return value be
+ * SolverControl::success. - It may of course be that a particular slot has
+ * been connected to the signal only to observe how the solution or a specific
+ * part of it converges, but has no particular opinion on whether the
+ * iteration should continue or not. In such cases, the slot should just
+ * return SolverControl::success, which is the weakest of all return values
+ * according to the rules laid out above.
  *
- * Given all this, it should now be obvious how the SolverControl
- * object fits into this scheme: when a SolverControl object is passed
- * to the constructor of the current class, we simply connect the
- * SolverControl::check() function of that object as a slot to the
- * signal we maintain here. In other words, since a Solver object
- * is always constructed using a SolverControl object, there is
- * always at least one slot associated with the signal, namely the
+ * Given all this, it should now be obvious how the SolverControl object fits
+ * into this scheme: when a SolverControl object is passed to the constructor
+ * of the current class, we simply connect the SolverControl::check() function
+ * of that object as a slot to the signal we maintain here. In other words,
+ * since a Solver object is always constructed using a SolverControl object,
+ * there is always at least one slot associated with the signal, namely the
  * one that determines convergence.
  *
- * On the other hand, using the connect() member function, it is
- * possible to connect any number of other slots to the signal to
- * observe whatever it is you want to observe. The connect() function
- * also returns an object that describes the connection from the
- * signal to the slot, and the corresponding BOOST functions then allow
- * you to disconnect the slot if you want.
+ * On the other hand, using the connect() member function, it is possible to
+ * connect any number of other slots to the signal to observe whatever it is
+ * you want to observe. The connect() function also returns an object that
+ * describes the connection from the signal to the slot, and the corresponding
+ * BOOST functions then allow you to disconnect the slot if you want.
  *
- * An example may illuminate these issues. In the step-3 tutorial
- * program, let us add a member function as follows to the main class:
+ * An example may illuminate these issues. In the step-3 tutorial program, let
+ * us add a member function as follows to the main class:
  * @code
  *  SolverControl::State
  *  Step3::write_intermediate_solution (const unsigned int    iteration,
@@ -245,15 +239,14 @@ template <typename number> class Vector;
  *      return SolverControl::success;
  *    }
  * @endcode
- * The function satisfies the signature necessary to be a slot for the
- * signal discussed above, with the exception that it is a member
- * function and consequently requires a <code>this</code> pointer.
- * What the function does is to take the vector given as last
- * argument and write it into a file in VTU format with a file
- * name derived from the number of the iteration.
+ * The function satisfies the signature necessary to be a slot for the signal
+ * discussed above, with the exception that it is a member function and
+ * consequently requires a <code>this</code> pointer. What the function does
+ * is to take the vector given as last argument and write it into a file in
+ * VTU format with a file name derived from the number of the iteration.
  *
- * This function can then be hooked into the CG solver by modifying
- * the <code>Step3::solve()</code> function as follows:
+ * This function can then be hooked into the CG solver by modifying the
+ * <code>Step3::solve()</code> function as follows:
  * @code
  * void Step3::solve ()
  * {
@@ -269,122 +262,96 @@ template <typename number> class Vector;
  *                 PreconditionIdentity());
  * }
  * @endcode
- * The use of <code>std_cxx11::bind</code> here ensures that we convert
- * the member function with its three arguments plus the <code>this</code>
- * pointer, to a function that only takes three arguments, by fixing
- * the implicit <code>this</code> argument of the function to the
+ * The use of <code>std_cxx11::bind</code> here ensures that we convert the
+ * member function with its three arguments plus the <code>this</code>
+ * pointer, to a function that only takes three arguments, by fixing the
+ * implicit <code>this</code> argument of the function to the
  * <code>this</code> pointer in the current function.
  *
- * It is well understood that the CG method is a smoothing iteration (in
- * the same way as the more commonly used Jacobi or SSOR iterations are
+ * It is well understood that the CG method is a smoothing iteration (in the
+ * same way as the more commonly used Jacobi or SSOR iterations are
  * smoothers). The code above therefore allows to observe how the solution
- * becomes smoother and smoother in every iteration. This is best
- * observed by initializing the solution vector with randomly distributed
- * numbers in $[-1,1]$, using code such as
+ * becomes smoother and smoother in every iteration. This is best observed by
+ * initializing the solution vector with randomly distributed numbers in
+ * $[-1,1]$, using code such as
  * @code
  *   for (unsigned int i=0; i<solution.size(); ++i)
  *     solution(i) = 2.*rand()/RAND_MAX-1;
  * @endcode
- * Using this, the slot will then generate files that when visualized
- * look like this over the course of iterations zero to five:
- * <table>
- * <tr>
- *   <td>
- *     @image html "cg-monitor-smoothing-0.png"
- *   </td>
- *   <td>
- *     @image html "cg-monitor-smoothing-1.png"
- *   </td>
- *   <td>
- *     @image html "cg-monitor-smoothing-2.png"
- *   </td>
- * </tr>
- * <tr>
- *   <td>
- *     @image html "cg-monitor-smoothing-3.png"
- *   </td>
- *   <td>
- *     @image html "cg-monitor-smoothing-4.png"
- *   </td>
- *   <td>
- *     @image html "cg-monitor-smoothing-5.png"
- *   </td>
- * </tr>
- * </table>
+ * Using this, the slot will then generate files that when visualized look
+ * like this over the course of iterations zero to five: <table> <tr> <td>
+ * @image html "cg-monitor-smoothing-0.png"
+ * </td> <td>
+ * @image html "cg-monitor-smoothing-1.png"
+ * </td> <td>
+ * @image html "cg-monitor-smoothing-2.png"
+ * </td> </tr> <tr> <td>
+ * @image html "cg-monitor-smoothing-3.png"
+ * </td> <td>
+ * @image html "cg-monitor-smoothing-4.png"
+ * </td> <td>
+ * @image html "cg-monitor-smoothing-5.png"
+ * </td> </tr> </table>
  *
  * @ingroup Solvers
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005, 2014
+ * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005,
+ * 2014
  */
 template <class VECTOR = Vector<double> >
 class Solver : public Subscriptor
 {
 public:
   /**
-   * Constructor. Takes a control
-   * object which evaluates the
-   * conditions for convergence,
-   * and an object that allows solvers to allocate
-   * memory for temporary objects.
+   * Constructor. Takes a control object which evaluates the conditions for
+   * convergence, and an object that allows solvers to allocate memory for
+   * temporary objects.
    *
-   * Of both objects, a reference is
-   * stored, so it is the user's
-   * responsibility to guarantee that the
-   * lifetime of the two arguments is at
-   * least as long as that of the solver
-   * object.
+   * Of both objects, a reference is stored, so it is the user's
+   * responsibility to guarantee that the lifetime of the two arguments is at
+   * least as long as that of the solver object.
    */
   Solver (SolverControl        &solver_control,
           VectorMemory<VECTOR> &vector_memory);
 
   /**
-   * Constructor. Takes a control
-   * object which evaluates the
-   * conditions for convergence. In
-   * contrast to the other
-   * constructor, this constructor
-   * designates an internal object of
-   * type GrowingVectorMemory to
-   * allocate memory.
+   * Constructor. Takes a control object which evaluates the conditions for
+   * convergence. In contrast to the other constructor, this constructor
+   * designates an internal object of type GrowingVectorMemory to allocate
+   * memory.
    *
-   * A reference to the control
-   * object is stored, so it is the
-   * user's responsibility to
-   * guarantee that the lifetime of
-   * the argument is at least
-   * as long as that of the solver
-   * object.
+   * A reference to the control object is stored, so it is the user's
+   * responsibility to guarantee that the lifetime of the argument is at least
+   * as long as that of the solver object.
    */
   Solver (SolverControl &solver_control);
 
   /**
    * Connect a function object that will be called periodically within
-   * iterative solvers. This function is used to attach monitors to
-   * iterative solvers, either to determine when convergence has happened,
-   * or simply to observe the progress of an iteration. See the documentation
-   * of this class for more information.
+   * iterative solvers. This function is used to attach monitors to iterative
+   * solvers, either to determine when convergence has happened, or simply to
+   * observe the progress of an iteration. See the documentation of this class
+   * for more information.
    *
-   * @param slot A function object specified here will, with
-   *   each call, receive the number of the current iteration,
-   *   the value that is used to check for convergence (typically the residual
-   *   of the current iterate with respect to the linear system to be solved)
-   *   and the currently best available guess for the current iterate.
-   *   Note that some solvers do not update the approximate solution in every
-   *   iteration but only after convergence or failure has been determined
-   *   (GMRES is an example); in such cases, the vector passed as the last
-   *   argument to the signal is simply the best approximate at the time
-   *   the signal is called, but not the vector that will be returned if
-   *   the signal's return value indicates that the iteration should be
-   *   terminated. The function object must return a SolverControl::State
-   *   value that indicates whether the iteration should continue, has
-   *   failed, or has succeeded. The results of all connected functions
-   *   will then be combined to determine what should happen with the
-   *   iteration.
+   * @param slot A function object specified here will, with each call,
+   * receive the number of the current iteration, the value that is used to
+   * check for convergence (typically the residual of the current iterate with
+   * respect to the linear system to be solved) and the currently best
+   * available guess for the current iterate. Note that some solvers do not
+   * update the approximate solution in every iteration but only after
+   * convergence or failure has been determined (GMRES is an example); in such
+   * cases, the vector passed as the last argument to the signal is simply the
+   * best approximate at the time the signal is called, but not the vector
+   * that will be returned if the signal's return value indicates that the
+   * iteration should be terminated. The function object must return a
+   * SolverControl::State value that indicates whether the iteration should
+   * continue, has failed, or has succeeded. The results of all connected
+   * functions will then be combined to determine what should happen with the
+   * iteration.
    *
    * @return A connection object that represents the connection from the
-   *   signal to the function object. It can be used to disconnect the
-   *   function object again from the signal. See the documentation of
-   *   the BOOST Signals2 library for more information on connection
-   *   management.
+   * signal to the function object. It can be used to disconnect the function
+   * object again from the signal. See the documentation of the BOOST Signals2
+   * library for more information on connection management.
    */
   boost::signals2::connection
   connect (const std_cxx11::function<SolverControl::State (const unsigned int iteration,
@@ -395,10 +362,8 @@ public:
 
 protected:
   /**
-   * A static vector memory object
-   * to be used whenever no such
-   * object has been given to the
-   * constructor.
+   * A static vector memory object to be used whenever no such object has been
+   * given to the constructor.
    */
   mutable GrowingVectorMemory<VECTOR> static_vector_memory;
 
@@ -409,13 +374,11 @@ protected:
 
 private:
   /**
-   * A class whose operator() combines two states indicating whether
-   * we should continue iterating or stop, and returns a state that
-   * dominates. The rules are:
-   * - If one of the two states indicates failure, return failure.
-   * - Otherwise, if one of the two states indicates to continue
-   *   iterating, then continue iterating.
-   * - Otherwise, return success.
+   * A class whose operator() combines two states indicating whether we should
+   * continue iterating or stop, and returns a state that dominates. The rules
+   * are: - If one of the two states indicates failure, return failure. -
+   * Otherwise, if one of the two states indicates to continue iterating, then
+   * continue iterating. - Otherwise, return success.
    */
   struct StateCombiner
   {
@@ -431,26 +394,24 @@ private:
 
 protected:
   /**
-   * A signal that iterative solvers can execute at the end of every
-   * iteration (or in an otherwise periodic fashion) to find out whether
-   * we should continue iterating or not. The signal may call one or
-   * more slots that each will make this determination by themselves,
-   * and the result over all slots (function calls) will be determined
-   * by the StateCombiner object.
+   * A signal that iterative solvers can execute at the end of every iteration
+   * (or in an otherwise periodic fashion) to find out whether we should
+   * continue iterating or not. The signal may call one or more slots that
+   * each will make this determination by themselves, and the result over all
+   * slots (function calls) will be determined by the StateCombiner object.
    *
    * The arguments passed to the signal are (i) the number of the current
-   * iteration; (ii) the value that is used to determine convergence (oftentimes
-   * the residual, but in other cases other quantities may be used as long
-   * as they converge to zero as the iterate approaches the solution of
-   * the linear system); and (iii) a vector that corresponds to the current
-   * best guess for the solution at the point where the signal is called.
-   * Note that some solvers do not update the approximate solution in every
+   * iteration; (ii) the value that is used to determine convergence
+   * (oftentimes the residual, but in other cases other quantities may be used
+   * as long as they converge to zero as the iterate approaches the solution
+   * of the linear system); and (iii) a vector that corresponds to the current
+   * best guess for the solution at the point where the signal is called. Note
+   * that some solvers do not update the approximate solution in every
    * iteration but only after convergence or failure has been determined
    * (GMRES is an example); in such cases, the vector passed as the last
-   * argument to the signal is simply the best approximate at the time
-   * the signal is called, but not the vector that will be returned if
-   * the signal's return value indicates that the iteration should be
-   * terminated.
+   * argument to the signal is simply the best approximate at the time the
+   * signal is called, but not the vector that will be returned if the
+   * signal's return value indicates that the iteration should be terminated.
    */
   boost::signals2::signal<SolverControl::State (const unsigned int iteration,
                                                 const double        check_value,

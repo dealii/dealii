@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/fe/mapping_q.h>
 
@@ -97,7 +98,7 @@ int main ()
           }
     }
 
-  GridGenerator::laplace_transformation (tria, new_points);
+  GridTools::laplace_transform (new_points, tria);
   HyperBallBoundary<dim> inner_ball(n_center, n_radius);
   tria.set_boundary(1, inner_ball);
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,6 @@
 #include <deal.II/meshworker/output.h>
 
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer_component.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -68,7 +67,7 @@ using namespace dealii;
 
 template <int dim, typename number, int spacedim>
 void
-reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
                MGLevelObject<dealii::Vector<number> > &v)
 {
   for (unsigned int level=v.min_level();
@@ -80,12 +79,12 @@ reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
 }
 
 template <int dim>
-void initialize (const MGDoFHandler<dim> &dof,
+void initialize (const DoFHandler<dim> &dof,
                  Vector<double> &u)
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
-  for (typename MGDoFHandler<dim>::active_cell_iterator
+  for (typename DoFHandler<dim>::active_cell_iterator
        cell = dof.begin_active();
        cell != dof.end(); ++cell)
     {
@@ -100,13 +99,13 @@ void initialize (const MGDoFHandler<dim> &dof,
 
 
 template <int dim>
-void initialize (const MGDoFHandler<dim> &dof,
+void initialize (const DoFHandler<dim> &dof,
                  MGLevelObject<Vector<double> > &u)
 {
   unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
-  typename MGDoFHandler<dim>::cell_iterator
+  typename DoFHandler<dim>::cell_iterator
   cell = dof.begin(0);
   cell->get_mg_dof_indices(dof_indices);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -115,14 +114,14 @@ void initialize (const MGDoFHandler<dim> &dof,
 
 
 template <int dim>
-void diff (Vector<double> &diff, const MGDoFHandler<dim> &dof,
+void diff (Vector<double> &diff, const DoFHandler<dim> &dof,
            const Vector<double> &v, const unsigned int level)
 {
   diff.reinit (v);
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> mg_dof_indices(dofs_per_cell);
   const unsigned int n_comp = dof.get_fe().n_components();
-  for (typename MGDoFHandler<dim>::cell_iterator
+  for (typename DoFHandler<dim>::cell_iterator
        cell= dof.begin(level);
        cell != dof.end(level); ++cell)
     {
@@ -184,14 +183,14 @@ public:
 private:
   void setup_system ();
   void test_boundary ();
-  void output_gpl(const MGDoFHandler<dim> &dof,
+  void output_gpl(const DoFHandler<dim> &dof,
                   MGLevelObject<Vector<double> > &v);
   void refine_local ();
 
   Triangulation<dim>   triangulation;
   const MappingQ1<dim> mapping;
   FESystem<dim>        fe;
-  MGDoFHandler<dim>    mg_dof_handler_renumbered;
+  DoFHandler<dim>    mg_dof_handler_renumbered;
 
   const unsigned int degree;
   std::vector<std::set<types::global_dof_index> >
@@ -213,6 +212,7 @@ template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
   mg_dof_handler_renumbered.distribute_dofs (fe);
+  mg_dof_handler_renumbered.distribute_mg_dofs (fe);
 
   const unsigned int nlevels = triangulation.n_levels();
 
@@ -236,7 +236,7 @@ void LaplaceProblem<dim>::setup_system ()
 
 template <int dim>
 void
-LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
+LaplaceProblem<dim>::output_gpl(const DoFHandler<dim> &dof,
                                 MGLevelObject<Vector<double> > &v)
 {
   MeshWorker::IntegrationInfoBox<dim> info_box;
@@ -262,7 +262,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
     {
       OutputCreator<dim> matrix_integrator;
       MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> > (
-        dof.begin(l), dof.end(l),
+        dof.begin_mg(l), dof.end_mg(l),
         dof_info, info_box,
         std_cxx11::bind(&OutputCreator<dim>::cell, &matrix_integrator, std_cxx11::_1, std_cxx11::_2),
         0,

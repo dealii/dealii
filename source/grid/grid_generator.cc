@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,16 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/thread_management.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/filtered_matrix.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/grid_tools.h>
@@ -31,12 +21,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/intergrid_map.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/numerics/matrix_tools.h>
 
 #include <deal.II/distributed/tria.h>
 
@@ -189,7 +173,7 @@ namespace GridGenerator
            cell != tria.end (); ++cell)
         {
           Assert(cell->face(2)->at_boundary(), ExcInternalError());
-          cell->face (2)->set_boundary_indicator (1);
+          cell->face (2)->set_all_boundary_indicators (1);
         }
     }
 
@@ -212,23 +196,28 @@ namespace GridGenerator
         {
           Triangulation<3>::cell_iterator cell = tria.begin();
 
-          cell->face(4)->set_boundary_indicator(1);
           Assert (cell->face(4)->at_boundary(), ExcInternalError());
+          cell->face(4)->set_all_boundary_indicators(1);
 
-          (++cell)->face(2)->set_boundary_indicator(1);
+          ++cell;
           Assert (cell->face(2)->at_boundary(), ExcInternalError());
+          cell->face(2)->set_all_boundary_indicators(1);
 
-          (++cell)->face(2)->set_boundary_indicator(1);
+          ++cell;
           Assert (cell->face(2)->at_boundary(), ExcInternalError());
+          cell->face(2)->set_all_boundary_indicators(1);
 
-          (++cell)->face(0)->set_boundary_indicator(1);
+          ++cell;
           Assert (cell->face(0)->at_boundary(), ExcInternalError());
+          cell->face(0)->set_all_boundary_indicators(1);
 
-          (++cell)->face(2)->set_boundary_indicator(1);
+          ++cell;
           Assert (cell->face(2)->at_boundary(), ExcInternalError());
+          cell->face(2)->set_all_boundary_indicators(1);
 
-          (++cell)->face(0)->set_boundary_indicator(1);
+          ++cell;
           Assert (cell->face(0)->at_boundary(), ExcInternalError());
+          cell->face(0)->set_all_boundary_indicators(1);
         }
       else if (tria.n_cells() == 12)
         {
@@ -238,7 +227,7 @@ namespace GridGenerator
                cell != tria.end(); ++cell)
             {
               Assert (cell->face(5)->at_boundary(), ExcInternalError());
-              cell->face(5)->set_boundary_indicator(1);
+              cell->face(5)->set_all_boundary_indicators(1);
             }
         }
       else if (tria.n_cells() == 96)
@@ -259,7 +248,7 @@ namespace GridGenerator
                cell != tria.end(); ++cell)
             if (cell->face(5)->at_boundary())
               {
-                cell->face(5)->set_boundary_indicator(1);
+                cell->face(5)->set_all_boundary_indicators(1);
                 ++count;
               }
           Assert (count == 48, ExcInternalError());
@@ -663,37 +652,6 @@ namespace GridGenerator
   }
 
 
-  template<>
-  void
-  parallelogram (Triangulation<1>  &tria,
-                 const Tensor<2,1> &corners,
-                 const bool         colorize)
-  {
-    Assert (false, ExcNotImplemented());
-  }
-
-  template<>
-  void
-  parallelogram (Triangulation<3>  &tria,
-                 const Tensor<2,3> &corners,
-                 const bool         colorize)
-  {
-    Assert (false, ExcNotImplemented());
-  }
-
-
-  template<>
-  void
-  parallelogram (Triangulation<2>  &tria,
-                 const Tensor<2,2> &corners,
-                 const bool         colorize)
-  {
-    // simply pass everything to the other function of same name
-    const Point<2> x[2] = { corners[0], corners[1] };
-    parallelogram (tria, x, colorize);
-  }
-
-
 
 // Parallelepiped implementation in 1d, 2d, and 3d. @note The
 // implementation in 1d is similar to hyper_rectangle(), and in 2d is
@@ -775,9 +733,9 @@ namespace GridGenerator
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize)
   {
-    // Equalise number of subdivisions in each dim-direction, heir
+    // Equalise number of subdivisions in each dim-direction, their
     // validity will be checked later
-    unsigned int (n_subdivisions_) [dim];
+    unsigned int n_subdivisions_ [dim];
     for (unsigned int i=0; i<dim; ++i)
       n_subdivisions_[i] = n_subdivisions;
 
@@ -790,7 +748,11 @@ namespace GridGenerator
   template<int dim>
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
-                             const unsigned int    ( n_subdivisions) [dim],
+#ifndef _MSC_VER
+                             const unsigned int(&n_subdivisions)[dim],
+#else
+                             const unsigned int *n_subdivisions,
+#endif
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize)
   {
@@ -3567,135 +3529,6 @@ namespace GridGenerator
                                  cells,
                                  s);
   }
-
-
-  /**
-   * Solve the Laplace equation for @p laplace_transformation function for one
-   * of the @p dim space dimensions. Factorized into a function of its own
-   * in order to allow parallel execution.
-   */
-  void laplace_solve (const SparseMatrix<double> &S,
-                      const std::map<unsigned int,double> &m,
-                      Vector<double> &u)
-  {
-    const unsigned int n_dofs=S.n();
-    FilteredMatrix<Vector<double> > SF (S);
-    PreconditionJacobi<SparseMatrix<double> > prec;
-    prec.initialize(S, 1.2);
-    FilteredMatrix<Vector<double> > PF (prec);
-
-    SolverControl control (n_dofs, 1.e-10, false, false);
-    GrowingVectorMemory<Vector<double> > mem;
-    SolverCG<Vector<double> > solver (control, mem);
-
-    Vector<double> f(n_dofs);
-
-    SF.add_constraints(m);
-    SF.apply_constraints (f, true);
-    solver.solve(SF, u, f, PF);
-  }
-
-
-// Implementation for 1D only
-  template <>
-  void laplace_transformation (Triangulation<1> &,
-                               const std::map<unsigned int,Point<1> > &,
-                               const Function<1> *)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-
-
-// Implementation for dimensions except 1
-  template <int dim>
-  void laplace_transformation (Triangulation<dim> &tria,
-                               const std::map<unsigned int,Point<dim> > &new_points,
-                               const Function<dim> *coefficient)
-  {
-    // first provide everything that is
-    // needed for solving a Laplace
-    // equation.
-    MappingQ1<dim> mapping_q1;
-    FE_Q<dim> q1(1);
-
-    DoFHandler<dim> dof_handler(tria);
-    dof_handler.distribute_dofs(q1);
-
-    CompressedSparsityPattern c_sparsity_pattern (dof_handler.n_dofs (),
-                                                  dof_handler.n_dofs ());
-    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity_pattern);
-    c_sparsity_pattern.compress ();
-
-    SparsityPattern sparsity_pattern;
-    sparsity_pattern.copy_from (c_sparsity_pattern);
-    sparsity_pattern.compress ();
-
-    SparseMatrix<double> S(sparsity_pattern);
-
-    QGauss<dim> quadrature(4);
-
-    MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S,coefficient);
-
-    // set up the boundary values for
-    // the laplace problem
-    std::vector<std::map<unsigned int,double> > m(dim);
-    typename std::map<unsigned int,Point<dim> >::const_iterator map_end=new_points.end();
-
-    // fill these maps using the data
-    // given by new_points
-    typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin_active(),
-                                            endc=dof_handler.end();
-    for (; cell!=endc; ++cell)
-      {
-        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-          {
-            const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
-
-            // loop over all vertices of the cell and see if it is listed in the map
-            // given as first argument of the function
-            for (unsigned int vertex_no=0;
-                 vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
-              {
-                const unsigned int vertex_index=face->vertex_index(vertex_no);
-
-                const typename std::map<unsigned int,Point<dim> >::const_iterator map_iter
-                  = new_points.find(vertex_index);
-
-                if (map_iter!=map_end)
-                  for (unsigned int i=0; i<dim; ++i)
-                    m[i].insert(std::pair<unsigned int,double> (
-                                  face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
-              }
-          }
-      }
-
-    // solve the dim problems with
-    // different right hand sides.
-    Vector<double> us[dim];
-    for (unsigned int i=0; i<dim; ++i)
-      us[i].reinit (dof_handler.n_dofs());
-
-    // solve linear systems in parallel
-    Threads::TaskGroup<> tasks;
-    for (unsigned int i=0; i<dim; ++i)
-      tasks += Threads::new_task (&laplace_solve,
-                                  S, m[i], us[i]);
-    tasks.join_all ();
-
-    // change the coordinates of the
-    // points of the triangulation
-    // according to the computed values
-    for (cell=dof_handler.begin_active(); cell!=endc; ++cell)
-      for (unsigned int vertex_no=0;
-           vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
-        {
-          Point<dim> &v=cell->vertex(vertex_no);
-          const unsigned int dof_index=cell->vertex_dof_index(vertex_no, 0);
-          for (unsigned int i=0; i<dim; ++i)
-            v(i)=us[i](dof_index);
-        }
-  }
-
 
 
   template <>

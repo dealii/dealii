@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,12 +40,11 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Selects a solver by changing a parameter.
  *
- * By calling the @p solve function of this @p SolverSelector, it selects
- * the @p solve function of that @p Solver that was specified in the constructor
+ * By calling the @p solve function of this @p SolverSelector, it selects the
+ * @p solve function of that @p Solver that was specified in the constructor
  * of this class.
  *
- * <h3>Usage</h3>
- * The simplest use of this class is the following:
+ * <h3>Usage</h3> The simplest use of this class is the following:
  * @code
  *                                  // generate a @p SolverControl and
  *                                  // a @p VectorMemory
@@ -65,10 +64,9 @@ DEAL_II_NAMESPACE_OPEN
  *                                  // preconditioning as last argument
  * solver_selector.solve(A,x,b,preconditioning);
  * @endcode
- * But the full usefulness of the @p SolverSelector class is not
- * clear until the presentation of the following example that assumes
- * the user using the @p ParameterHandler class and having declared a
- * "solver" entry, e.g. with
+ * But the full usefulness of the @p SolverSelector class is not clear until
+ * the presentation of the following example that assumes the user using the
+ * @p ParameterHandler class and having declared a "solver" entry, e.g. with
  * @code
  * Parameter_Handler prm;
  * prm.declare_entry ("solver", "none",
@@ -76,9 +74,9 @@ DEAL_II_NAMESPACE_OPEN
  * ...
  * @endcode
  * Assuming that in the users parameter file there exists the line
- @verbatim
- set solver = cg
- @endverbatim
+ * @verbatim
+ * set solver = cg
+ * @endverbatim
  * then `Line 3' of the above example reads
  * @code
  * SolverSelector<SparseMatrix<double>, Vector<double> >
@@ -102,19 +100,15 @@ class SolverSelector : public Subscriptor
 public:
 
   /**
-   * Constructor, filling in
-   * default values
+   * Constructor, filling in default values
    */
   SolverSelector ();
 
   /**
-   * @deprecated Use the default
-   * constructor, set_control() and select().
+   * @deprecated Use the default constructor, set_control() and select().
    *
-   * Constructor. Use the arguments
-   * to initialize actual solver
-   * objects. The VectorMemory
-   * argument is ignored.
+   * Constructor. Use the arguments to initialize actual solver objects. The
+   * VectorMemory argument is ignored.
    */
   SolverSelector (const std::string    &solvername,
                   SolverControl        &control,
@@ -126,10 +120,8 @@ public:
   ~SolverSelector();
 
   /**
-   * Solver procedure. Calls the @p solve
-   * function
-   * of the @p solver whose @p SolverName
-   * was specified in the constructor.
+   * Solver procedure. Calls the @p solve function of the @p solver whose @p
+   * SolverName was specified in the constructor.
    *
    */
   template<class Matrix, class Preconditioner>
@@ -139,63 +131,54 @@ public:
              const Preconditioner &precond) const;
 
   /**
-   * Select a new solver. Note that
-   * all solver names used in this
-   * class are all lower case.
+   * Select a new solver. Note that all solver names used in this class are
+   * all lower case.
    */
   void select(const std::string &name);
 
   /**
-   * Set a new SolverControl. This needs to
-   * be set before solving.
+   * Set a new SolverControl. This needs to be set before solving.
    */
   void set_control(SolverControl &ctrl);
 
   /**
-   * Set the additional data. For more
-   * info see the @p Solver class.
+   * Set the additional data. For more info see the @p Solver class.
    */
   void set_data(const typename SolverRichardson<VECTOR>
                 ::AdditionalData &data);
 
   /**
-   * Set the additional data. For more
-   * info see the @p Solver class.
+   * Set the additional data. For more info see the @p Solver class.
    */
   void set_data(const typename SolverCG<VECTOR>
                 ::AdditionalData &data);
 
   /**
-   * Set the additional data. For more
-   * info see the @p Solver class.
+   * Set the additional data. For more info see the @p Solver class.
    */
   void set_data(const typename SolverMinRes<VECTOR>
                 ::AdditionalData &data);
 
   /**
-   * Set the additional data. For more
-   * info see the @p Solver class.
+   * Set the additional data. For more info see the @p Solver class.
    */
   void set_data(const typename SolverBicgstab<VECTOR>
                 ::AdditionalData &data);
 
   /**
-   * Set the additional data. For more
-   * info see the @p Solver class.
+   * Set the additional data. For more info see the @p Solver class.
    */
   void set_data(const typename SolverGMRES<VECTOR>
                 ::AdditionalData &data);
 
   /**
-   * Set the additional data. For more
-   * info see the @p Solver class.
+   * Set the additional data. For more info see the @p Solver class.
    */
   void set_data(const typename SolverFGMRES<VECTOR>
                 ::AdditionalData &data);
 
   /**
-   * Get the names of all implemented
-   * solvers.
+   * Get the names of all implemented solvers.
    */
   static std::string get_solver_names ();
 
@@ -210,10 +193,8 @@ public:
 
 protected:
   /**
-   * Stores the @p SolverControl that is
-   * needed in the constructor of each @p
-   * Solver class. This can be changed with
-   * @p set_control().
+   * Stores the @p SolverControl that is needed in the constructor of each @p
+   * Solver class. This can be changed with @p set_control().
    */
   SmartPointer< SolverControl, SolverSelector< VECTOR > >     control;
 

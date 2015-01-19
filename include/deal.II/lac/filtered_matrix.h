@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,35 +40,30 @@ template <class VECTOR> class FilteredMatrixBlock;
 
 /**
  * This class is a wrapper for linear systems of equations with simple
- * equality constraints fixing individual degrees of freedom to a
- * certain value such as when using Dirichlet boundary
- * values.
+ * equality constraints fixing individual degrees of freedom to a certain
+ * value such as when using Dirichlet boundary values.
  *
  * In order to accomplish this, the vmult(), Tvmult(), vmult_add() and
- * Tvmult_add functions modify the same function of the original
- * matrix such as if all constrained entries of the source vector were
- * zero. Additionally, all constrained entries of the destination
- * vector are set to zero.
+ * Tvmult_add functions modify the same function of the original matrix such
+ * as if all constrained entries of the source vector were zero. Additionally,
+ * all constrained entries of the destination vector are set to zero.
  *
  * <h3>Usage</h3>
  *
- * Usage is simple: create an object of this type, point it to a
- * matrix that shall be used for $A$ above (either through the
- * constructor, the copy constructor, or the
- * set_referenced_matrix() function), specify the list of boundary
- * values or other constraints (through the add_constraints()
- * function), and then for each required solution modify the right
- * hand side vector (through apply_constraints()) and use this
- * object as matrix object in a linear solver. As linear solvers
- * should only use vmult() and residual() functions of a
- * matrix class, this class should be as good a matrix as any other
- * for that purpose.
+ * Usage is simple: create an object of this type, point it to a matrix that
+ * shall be used for $A$ above (either through the constructor, the copy
+ * constructor, or the set_referenced_matrix() function), specify the list of
+ * boundary values or other constraints (through the add_constraints()
+ * function), and then for each required solution modify the right hand side
+ * vector (through apply_constraints()) and use this object as matrix object
+ * in a linear solver. As linear solvers should only use vmult() and
+ * residual() functions of a matrix class, this class should be as good a
+ * matrix as any other for that purpose.
  *
- * Furthermore, also the precondition_Jacobi() function is
- * provided (since the computation of diagonal elements of the
- * filtered matrix $A_X$ is simple), so you can use this as a
- * preconditioner. Some other functions useful for matrices are also
- * available.
+ * Furthermore, also the precondition_Jacobi() function is provided (since the
+ * computation of diagonal elements of the filtered matrix $A_X$ is simple),
+ * so you can use this as a preconditioner. Some other functions useful for
+ * matrices are also available.
  *
  * A typical code snippet showing the above steps is as follows:
  * @code
@@ -100,100 +95,91 @@ template <class VECTOR> class FilteredMatrixBlock;
  *
  * <h3>Connection to other classes</h3>
  *
- * The function MatrixTools::apply_boundary_values() does exactly
- * the same that this class does, except for the fact that that
- * function actually modifies the matrix. Consequently, it is only
- * possible to solve with a matrix to which
- * MatrixTools::apply_boundary_values() was applied for one right
- * hand side and one set of boundary values since the modification of
+ * The function MatrixTools::apply_boundary_values() does exactly the same
+ * that this class does, except for the fact that that function actually
+ * modifies the matrix. Consequently, it is only possible to solve with a
+ * matrix to which MatrixTools::apply_boundary_values() was applied for one
+ * right hand side and one set of boundary values since the modification of
  * the right hand side depends on the original matrix.
  *
- * While this is a feasible method in cases where only
- * one solution of the linear system is required, for example in
- * solving linear stationary systems, one would often like to have the
- * ability to solve multiple times with the same matrix in nonlinear
- * problems (where one often does not want to update the Hessian
- * between Newton steps, despite having different right hand sides in
- * subsequent steps) or time dependent problems, without having to
- * re-assemble the matrix or copy it to temporary matrices with which
- * one then can work. For these cases, this class is meant.
+ * While this is a feasible method in cases where only one solution of the
+ * linear system is required, for example in solving linear stationary
+ * systems, one would often like to have the ability to solve multiple times
+ * with the same matrix in nonlinear problems (where one often does not want
+ * to update the Hessian between Newton steps, despite having different right
+ * hand sides in subsequent steps) or time dependent problems, without having
+ * to re-assemble the matrix or copy it to temporary matrices with which one
+ * then can work. For these cases, this class is meant.
  *
  *
- * <h3>Some background</h3>
- * Mathematically speaking, it is used to represent a system
- * of linear equations $Ax=b$ with the constraint that $B_D x = g_D$,
- * where $B_D$ is a rectangular matrix with exactly one $1$ in each
- * row, and these $1$s in those columns representing constrained
- * degrees of freedom (e.g. for Dirichlet boundary nodes, thus the
- * index $D$) and zeroes for all other diagonal entries, and $g_D$
- * having the requested nodal values for these constrained
- * nodes. Thus, the underdetermined equation $B_D x = g_D$ fixes only
- * the constrained nodes and does not impose any condition on the
- * others. We note that $B_D B_D^T = 1_D$, where $1_D$ is the identity
- * matrix with dimension as large as the number of constrained degrees
- * of freedom. Likewise, $B_D^T B_D$ is the diagonal matrix with
- * diagonal entries $0$ or $1$ that, when applied to a vector, leaves
- * all constrained nodes untouched and deletes all unconstrained ones.
+ * <h3>Some background</h3> Mathematically speaking, it is used to represent a
+ * system of linear equations $Ax=b$ with the constraint that $B_D x = g_D$,
+ * where $B_D$ is a rectangular matrix with exactly one $1$ in each row, and
+ * these $1$s in those columns representing constrained degrees of freedom
+ * (e.g. for Dirichlet boundary nodes, thus the index $D$) and zeroes for all
+ * other diagonal entries, and $g_D$ having the requested nodal values for
+ * these constrained nodes. Thus, the underdetermined equation $B_D x = g_D$
+ * fixes only the constrained nodes and does not impose any condition on the
+ * others. We note that $B_D B_D^T = 1_D$, where $1_D$ is the identity matrix
+ * with dimension as large as the number of constrained degrees of freedom.
+ * Likewise, $B_D^T B_D$ is the diagonal matrix with diagonal entries $0$ or
+ * $1$ that, when applied to a vector, leaves all constrained nodes untouched
+ * and deletes all unconstrained ones.
  *
- * For solving such a system of equations, we first write down the
- * Lagrangian $L=1/2 x^T A x - x^T b + l^T B_D x$, where $l$
- * is a Lagrange multiplier for the constraints. The stationarity
- * condition then reads
+ * For solving such a system of equations, we first write down the Lagrangian
+ * $L=1/2 x^T A x - x^T b + l^T B_D x$, where $l$ is a Lagrange multiplier for
+ * the constraints. The stationarity condition then reads
  * @code
  * [ A   B_D^T ] [x] = [b  ]
  * [ B_D 0     ] [l] = [g_D]
  * @endcode
  *
- * The first equation then reads $B_D^T l = b-Ax$. On the other hand,
- * if we left-multiply the first equation by $B_D^T B_D$, we obtain
- * $B_D^T B_D A x + B_D^T l = B_D^T B_D b$ after equating $B_D B_D^T$
- * to the identity matrix. Inserting the previous equality, this
- * yields $(A - B_D^T B_D A) x = (1 - B_D^T B_D)b$. Since
- * $x=(1 - B_D^T B_D) x + B_D^T B_D x = (1 - B_D^T B_D) x + B_D^T g_D$,
- * we can restate the linear system:
- * $A_D x = (1 - B_D^T B_D)b - (1 - B_D^T B_D) A B^T g_D$, where
- * $A_D = (1 - B_D^T B_D) A (1 - B_D^T B_D)$ is the matrix where all
- * rows and columns corresponding to constrained nodes have been deleted.
+ * The first equation then reads $B_D^T l = b-Ax$. On the other hand, if we
+ * left-multiply the first equation by $B_D^T B_D$, we obtain $B_D^T B_D A x +
+ * B_D^T l = B_D^T B_D b$ after equating $B_D B_D^T$ to the identity matrix.
+ * Inserting the previous equality, this yields $(A - B_D^T B_D A) x = (1 -
+ * B_D^T B_D)b$. Since $x=(1 - B_D^T B_D) x + B_D^T B_D x = (1 - B_D^T B_D) x
+ * + B_D^T g_D$, we can restate the linear system: $A_D x = (1 - B_D^T B_D)b -
+ * (1 - B_D^T B_D) A B^T g_D$, where $A_D = (1 - B_D^T B_D) A (1 - B_D^T B_D)$
+ * is the matrix where all rows and columns corresponding to constrained nodes
+ * have been deleted.
  *
- * The last system of equation only defines the value of the
- * unconstrained nodes, while the constrained ones are determined by
- * the equation $B_D x = g_D$. We can combine these two linear systems
- * by using the zeroed out rows of $A_D$: if we set the diagonal to
- * $1$ and the corresponding zeroed out element of the right hand side
- * to that of $g_D$, then this fixes the constrained elements as
- * well. We can write this as follows:
- * $A_X x = (1 - B_D^T B_D)b - (1 - B_D^T B_D) A B^T g_D + B_D^T g_D$,
- * where $A_X = A_D + B_D^T B_D$. Note that the two parts of the
- * latter matrix operate on disjoint subspaces (the first on the
- * unconstrained nodes, the latter on the constrained ones).
+ * The last system of equation only defines the value of the unconstrained
+ * nodes, while the constrained ones are determined by the equation $B_D x =
+ * g_D$. We can combine these two linear systems by using the zeroed out rows
+ * of $A_D$: if we set the diagonal to $1$ and the corresponding zeroed out
+ * element of the right hand side to that of $g_D$, then this fixes the
+ * constrained elements as well. We can write this as follows: $A_X x = (1 -
+ * B_D^T B_D)b - (1 - B_D^T B_D) A B^T g_D + B_D^T g_D$, where $A_X = A_D +
+ * B_D^T B_D$. Note that the two parts of the latter matrix operate on
+ * disjoint subspaces (the first on the unconstrained nodes, the latter on the
+ * constrained ones).
  *
  * In iterative solvers, it is not actually necessary to compute $A_X$
- * explicitly, since only matrix-vector operations need to be
- * performed. This can be done in a three-step procedure that first
- * clears all elements in the incoming vector that belong to
- * constrained nodes, then performs the product with the matrix $A$,
- * then clears again. This class is a wrapper to this procedure, it
- * takes a pointer to a matrix with which to perform matrix-vector
- * products, and does the cleaning of constrained elements itself.
- * This class therefore implements an overloaded @p vmult function
- * that does the matrix-vector product, as well as @p Tvmult for
- * transpose matrix-vector multiplication and @p residual for
- * residual computation, and can thus be used as a matrix replacement
- * in linear solvers.
+ * explicitly, since only matrix-vector operations need to be performed. This
+ * can be done in a three-step procedure that first clears all elements in the
+ * incoming vector that belong to constrained nodes, then performs the product
+ * with the matrix $A$, then clears again. This class is a wrapper to this
+ * procedure, it takes a pointer to a matrix with which to perform matrix-
+ * vector products, and does the cleaning of constrained elements itself. This
+ * class therefore implements an overloaded @p vmult function that does the
+ * matrix-vector product, as well as @p Tvmult for transpose matrix-vector
+ * multiplication and @p residual for residual computation, and can thus be
+ * used as a matrix replacement in linear solvers.
  *
- * It also has the ability to generate the modification of the right
- * hand side, through the apply_constraints() function.
+ * It also has the ability to generate the modification of the right hand
+ * side, through the apply_constraints() function.
  *
  *
  *
  * <h3>Template arguments</h3>
  *
- * This class takes as template arguments a matrix and a vector
- * class. The former must provide @p vmult, @p vmult_add,  @p Tvmult, and
- * @p residual member function that operate on the vector type (the
- * second template argument). The latter template parameter must
- * provide access to indivual elements through <tt>operator()</tt>,
- * assignment through <tt>operator=</tt>.
+ * This class takes as template arguments a matrix and a vector class. The
+ * former must provide @p vmult, @p vmult_add,  @p Tvmult, and @p residual
+ * member function that operate on the vector type (the second template
+ * argument). The latter template parameter must provide access to indivual
+ * elements through <tt>operator()</tt>, assignment through
+ * <tt>operator=</tt>.
  *
  *
  * <h3>Thread-safety</h3>
@@ -221,32 +207,25 @@ public:
   class Accessor
   {
     /**
-     * Constructor. Since we use
-     * accessors only for read
-     * access, a const matrix
-     * pointer is sufficient.
+     * Constructor. Since we use accessors only for read access, a const
+     * matrix pointer is sufficient.
      */
     Accessor (const FilteredMatrix<VECTOR> *matrix,
               const size_type               index);
 
   public:
     /**
-     * Row number of the element
-     * represented by this
-     * object.
+     * Row number of the element represented by this object.
      */
     size_type row() const;
 
     /**
-     * Column number of the
-     * element represented by
-     * this object.
+     * Column number of the element represented by this object.
      */
     size_type column() const;
 
     /**
-     * Value of the right hand
-     * side for this row.
+     * Value of the right hand side for this row.
      */
     double value() const;
 
@@ -305,10 +284,7 @@ public:
     const Accessor *operator-> () const;
 
     /**
-     * Comparison. True, if
-     * both iterators point to
-     * the same matrix
-     * position.
+     * Comparison. True, if both iterators point to the same matrix position.
      */
     bool operator == (const const_iterator &) const;
     /**
@@ -317,34 +293,27 @@ public:
     bool operator != (const const_iterator &) const;
 
     /**
-     * Comparison operator. Result is
-     * true if either the first row
-     * number is smaller or if the row
-     * numbers are equal and the first
-     * index is smaller.
+     * Comparison operator. Result is true if either the first row number is
+     * smaller or if the row numbers are equal and the first index is smaller.
      */
     bool operator < (const const_iterator &) const;
 
     /**
-     * Comparison operator. Compares just
-     * the other way around than the
+     * Comparison operator. Compares just the other way around than the
      * operator above.
      */
     bool operator > (const const_iterator &) const;
 
   private:
     /**
-     * Store an object of the
-     * accessor class.
+     * Store an object of the accessor class.
      */
     Accessor accessor;
   };
 
   /**
-   * Typedef defining a type that
-   * represents a pair of degree of
-   * freedom index and the value it
-   * shall have.
+   * Typedef defining a type that represents a pair of degree of freedom index
+   * and the value it shall have.
    */
   typedef std::pair<size_type, double> IndexValuePair;
 
@@ -353,30 +322,23 @@ public:
    */
 //@{
   /**
-   * Default constructor. You will
-   * have to set the matrix to be
-   * used later using
-   * initialize().
+   * Default constructor. You will have to set the matrix to be used later
+   * using initialize().
    */
   FilteredMatrix ();
 
   /**
-   * Copy constructor. Use the
-   * matrix and the constraints set
-   * in the given object for the
-   * present one as well.
+   * Copy constructor. Use the matrix and the constraints set in the given
+   * object for the present one as well.
    */
   FilteredMatrix (const FilteredMatrix &fm);
 
   /**
-   * Constructor. Use the given
-   * matrix for future operations.
+   * Constructor. Use the given matrix for future operations.
    *
    * @arg @p m: The matrix being used in multiplications.
    *
-   * @arg @p
-   * expect_constrained_source: See
-   * documentation of
+   * @arg @p expect_constrained_source: See documentation of
    * #expect_constrained_source.
    */
   template <class MATRIX>
@@ -384,25 +346,17 @@ public:
                   bool expect_constrained_source = false);
 
   /**
-   * Copy operator. Take over
-   * matrix and constraints from
-   * the other object.
+   * Copy operator. Take over matrix and constraints from the other object.
    */
   FilteredMatrix &operator = (const FilteredMatrix &fm);
 
   /**
-   * Set the matrix to be used
-   * further on. You will probably
-   * also want to call the
-   * clear_constraints()
-   * function if constraits were
-   * previously added.
+   * Set the matrix to be used further on. You will probably also want to call
+   * the clear_constraints() function if constraits were previously added.
    *
    * @arg @p m: The matrix being used in multiplications.
    *
-   * @arg @p
-   * expect_constrained_source: See
-   * documentation of
+   * @arg @p expect_constrained_source: See documentation of
    * #expect_constrained_source.
    */
   template <class MATRIX>
@@ -410,8 +364,7 @@ public:
                    bool expect_constrained_source = false);
 
   /**
-   * Delete all constraints and the
-   * matrix pointer.
+   * Delete all constraints and the matrix pointer.
    */
   void clear ();
 //@}
@@ -420,49 +373,31 @@ public:
    */
 //@{
   /**
-   * Add the constraint that the
-   * value with index <tt>i</tt>
-   * should have the value
-   * <tt>v</tt>.
+   * Add the constraint that the value with index <tt>i</tt> should have the
+   * value <tt>v</tt>.
    */
   void add_constraint (const size_type i, const double v);
 
   /**
-   * Add a list of constraints to
-   * the ones already managed by
-   * this object. The actual data
-   * type of this list must be so
-   * that dereferenced iterators
-   * are pairs of indices and the
-   * corresponding values to be
-   * enforced on the respective
-   * solution vector's entry. Thus,
-   * the data type might be, for
-   * example, a @p std::list or
-   * @p std::vector of
-   * IndexValuePair objects,
-   * but also a
-   * <tt>std::map<unsigned, double></tt>.
+   * Add a list of constraints to the ones already managed by this object. The
+   * actual data type of this list must be so that dereferenced iterators are
+   * pairs of indices and the corresponding values to be enforced on the
+   * respective solution vector's entry. Thus, the data type might be, for
+   * example, a @p std::list or @p std::vector of IndexValuePair objects, but
+   * also a <tt>std::map<unsigned, double></tt>.
    *
-   * The second component of these
-   * pairs will only be used in
-   * apply_constraints(). The first
-   * is used to set values to zero
-   * in matrix vector
-   * multiplications.
+   * The second component of these pairs will only be used in
+   * apply_constraints(). The first is used to set values to zero in matrix
+   * vector multiplications.
    *
-   * It is an error if the argument
-   * contains an entry for a degree
-   * of freedom that has already
-   * been constrained
-   * previously.
+   * It is an error if the argument contains an entry for a degree of freedom
+   * that has already been constrained previously.
    */
   template <class ConstraintList>
   void add_constraints (const ConstraintList &new_constraints);
 
   /**
-   * Delete the list of constraints
-   * presently in use.
+   * Delete the list of constraints presently in use.
    */
   void clear_constraints ();
 //@}
@@ -471,36 +406,24 @@ public:
    */
 //@{
   /**
-   * Apply the constraints to a
-   * right hand side vector. This
-   * needs to be done before
-   * starting to solve with the
-   * filtered matrix. If the matrix
-   * is symmetric (i.e. the matrix
-   * itself, not only its sparsity
-   * pattern), set the second
-   * parameter to @p true to use a
-   * faster algorithm.
+   * Apply the constraints to a right hand side vector. This needs to be done
+   * before starting to solve with the filtered matrix. If the matrix is
+   * symmetric (i.e. the matrix itself, not only its sparsity pattern), set
+   * the second parameter to @p true to use a faster algorithm.
    */
   void apply_constraints (VECTOR     &v,
                           const bool  matrix_is_symmetric) const;
 
   /**
-   * Matrix-vector multiplication:
-   * this operation performs
-   * pre_filter(), multiplication
-   * with the stored matrix and
-   * post_filter() in that order.
+   * Matrix-vector multiplication: this operation performs pre_filter(),
+   * multiplication with the stored matrix and post_filter() in that order.
    */
   void vmult (VECTOR       &dst,
               const VECTOR &src) const;
 
   /**
-   * Matrix-vector multiplication:
-   * this operation performs
-   * pre_filter(), transposed
-   * multiplication with the stored
-   * matrix and post_filter() in
+   * Matrix-vector multiplication: this operation performs pre_filter(),
+   * transposed multiplication with the stored matrix and post_filter() in
    * that order.
    */
   void Tvmult (VECTOR       &dst,
@@ -509,14 +432,9 @@ public:
   /**
    * Adding matrix-vector multiplication.
    *
-   * @note The result vector of
-   * this multiplication will have
-   * the constraint entries set to
-   * zero, independent of the
-   * previous value of
-   * <tt>dst</tt>. We excpect that
-   * in most cases this is the
-   * required behavior.
+   * @note The result vector of this multiplication will have the constraint
+   * entries set to zero, independent of the previous value of <tt>dst</tt>.
+   * We excpect that in most cases this is the required behavior.
    */
   void vmult_add (VECTOR       &dst,
                   const VECTOR &src) const;
@@ -524,14 +442,9 @@ public:
   /**
    * Adding transpose matrix-vector multiplication:
    *
-   * @note The result vector of
-   * this multiplication will have
-   * the constraint entries set to
-   * zero, independent of the
-   * previous value of
-   * <tt>dst</tt>. We excpect that
-   * in most cases this is the
-   * required behavior.
+   * @note The result vector of this multiplication will have the constraint
+   * entries set to zero, independent of the previous value of <tt>dst</tt>.
+   * We excpect that in most cases this is the required behavior.
    */
   void Tvmult_add (VECTOR       &dst,
                    const VECTOR &src) const;
@@ -542,8 +455,7 @@ public:
    */
 //@{
   /**
-   * Iterator to the first
-   * constraint.
+   * Iterator to the first constraint.
    */
   const_iterator begin () const;
   /**
@@ -553,103 +465,74 @@ public:
 //@}
 
   /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object. Since we are
-   * not the owner of the matrix
-   * referenced, its memory
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object. Since we are not the owner of the matrix referenced, its memory
    * consumption is not included.
    */
   std::size_t memory_consumption () const;
 
 private:
   /**
-   * Determine, whether
-   * multiplications can expect
-   * that the source vector has all
-   * constrained entries set to
-   * zero.
+   * Determine, whether multiplications can expect that the source vector has
+   * all constrained entries set to zero.
    *
-   * If so, the auxiliary vector
-   * can be avoided and memory as
-   * well as time can be saved.
+   * If so, the auxiliary vector can be avoided and memory as well as time can
+   * be saved.
    *
-   * We expect this for instance in
-   * Newton's method, where the
-   * residual already should be
-   * zero on constrained
-   * nodes. This is, because there
-   * is no testfunction in these
-   * nodes.
+   * We expect this for instance in Newton's method, where the residual
+   * already should be zero on constrained nodes. This is, because there is no
+   * testfunction in these nodes.
    */
   bool expect_constrained_source;
 
   /**
-   * Declare an abbreviation for an
-   * iterator into the array
-   * constraint pairs, since that
-   * data type is so often used and
-   * is rather awkward to write out
+   * Declare an abbreviation for an iterator into the array constraint pairs,
+   * since that data type is so often used and is rather awkward to write out
    * each time.
    */
   typedef typename std::vector<IndexValuePair>::const_iterator const_index_value_iterator;
 
   /**
-   * Helper class used to sort
-   * pairs of indices and
-   * values. Only the index is
+   * Helper class used to sort pairs of indices and values. Only the index is
    * considered as sort key.
    */
   struct PairComparison
   {
     /**
-     * Function comparing the
-     * pairs @p i1 and @p i2
-     * for their keys.
+     * Function comparing the pairs @p i1 and @p i2 for their keys.
      */
     bool operator () (const IndexValuePair &i1,
                       const IndexValuePair &i2) const;
   };
 
   /**
-   * Pointer to the sparsity
-   * pattern used for this
-   * matrix.
+   * Pointer to the sparsity pattern used for this matrix.
    */
   std_cxx11::shared_ptr<PointerMatrixBase<VECTOR> > matrix;
 
   /**
-   * Sorted list of pairs denoting
-   * the index of the variable and
-   * the value to which it shall be
-   * fixed.
+   * Sorted list of pairs denoting the index of the variable and the value to
+   * which it shall be fixed.
    */
   std::vector<IndexValuePair> constraints;
 
   /**
-   * Do the pre-filtering step,
-   * i.e. zero out those components
-   * that belong to constrained
-   * degrees of freedom.
+   * Do the pre-filtering step, i.e. zero out those components that belong to
+   * constrained degrees of freedom.
    */
   void pre_filter (VECTOR &v) const;
 
   /**
-   * Do the postfiltering step,
-   * i.e. set constrained degrees
-   * of freedom to the value of the
-   * input vector, as the matrix
-   * contains only ones on the
-   * diagonal for these degrees of
-   * freedom.
+   * Do the postfiltering step, i.e. set constrained degrees of freedom to the
+   * value of the input vector, as the matrix contains only ones on the
+   * diagonal for these degrees of freedom.
    */
   void post_filter (const VECTOR &in,
                     VECTOR       &out) const;
 
   friend class Accessor;
   /**
-   * FilteredMatrixBlock accesses
-   * pre_filter() and post_filter().
+   * FilteredMatrixBlock accesses pre_filter() and post_filter().
    */
   friend class FilteredMatrixBlock<VECTOR>;
 };

@@ -32,42 +32,40 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Bicgstab algorithm by van der Vorst.
  *
- * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the Solver base class.
+ * For the requirements on matrices and vectors in order to work with this
+ * class, see the documentation of the Solver base class.
  *
- * Like all other solver classes, this class has a local structure called
- * @p AdditionalData which is used to pass additional parameters to the
- * solver, like damping parameters or the number of temporary vectors. We
- * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the @p SolverSelector and
- * other classes much easier and guarantees that these will continue to
- * work even if number or type of the additional parameters for a certain
- * solver changes.
+ * Like all other solver classes, this class has a local structure called @p
+ * AdditionalData which is used to pass additional parameters to the solver,
+ * like damping parameters or the number of temporary vectors. We use this
+ * additional structure instead of passing these values directly to the
+ * constructor because this makes the use of the @p SolverSelector and other
+ * classes much easier and guarantees that these will continue to work even if
+ * number or type of the additional parameters for a certain solver changes.
  *
- * The Bicgstab-method has two additional parameters: the first is a
- * boolean, deciding whether to compute the actual residual in each step (@p
- * true) or to use the length of the computed orthogonal residual (@p
- * false). Note that computing the residual causes a third
- * matrix-vector-multiplication, though no additional preconditioning, in
- * each step. The reason for doing this is, that the size of the
- * orthogonalized residual computed during the iteration may be larger by
- * orders of magnitude than the true residual. This is due to numerical
- * instabilities related to badly conditioned matrices. Since this
+ * The Bicgstab-method has two additional parameters: the first is a boolean,
+ * deciding whether to compute the actual residual in each step (@p true) or
+ * to use the length of the computed orthogonal residual (@p false). Note that
+ * computing the residual causes a third matrix-vector-multiplication, though
+ * no additional preconditioning, in each step. The reason for doing this is,
+ * that the size of the orthogonalized residual computed during the iteration
+ * may be larger by orders of magnitude than the true residual. This is due to
+ * numerical instabilities related to badly conditioned matrices. Since this
  * instability results in a bad stopping criterion, the default for this
  * parameter is @p true. Whenever the user knows that the estimated residual
- * works reasonably as well, the flag should be set to @p false in order
- * to increase the performance of the solver.
+ * works reasonably as well, the flag should be set to @p false in order to
+ * increase the performance of the solver.
  *
- * The second parameter is the size of a breakdown criterion. It is
- * difficult to find a general good criterion, so if things do not
- * work for you, try to change this value.
+ * The second parameter is the size of a breakdown criterion. It is difficult
+ * to find a general good criterion, so if things do not work for you, try to
+ * change this value.
  *
  *
  * <h3>Observing the progress of linear solver iterations</h3>
  *
- * The solve() function of this class uses the mechanism described
- * in the Solver base class to determine convergence. This mechanism
- * can also be used to observe the progress of the iteration.
+ * The solve() function of this class uses the mechanism described in the
+ * Solver base class to determine convergence. This mechanism can also be used
+ * to observe the progress of the iteration.
  *
  */
 template <class VECTOR = Vector<double> >
@@ -234,8 +232,8 @@ private:
   SolverControl::State start(const MATRIX &A);
 
   /**
-   * A structure returned by the iterate() function representing
-   * what it found is happening during the iteration.
+   * A structure returned by the iterate() function representing what it found
+   * is happening during the iteration.
    */
   struct IterationResult
   {
@@ -251,8 +249,8 @@ private:
   };
 
   /**
-   * The iteration loop itself. The function returns a structure
-   * indicating what happened in this function.
+   * The iteration loop itself. The function returns a structure indicating
+   * what happened in this function.
    */
   template<class MATRIX, class PRECONDITIONER>
   IterationResult

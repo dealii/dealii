@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -6879,17 +6879,6 @@ write_deal_II_intermediate (std::ostream &out) const
 
 template <int dim, int spacedim>
 XDMFEntry DataOutInterface<dim,spacedim>::
-create_xdmf_entry (const std::string &h5_filename, const double cur_time, MPI_Comm comm) const
-{
-  DataOutBase::DataOutFilter  data_filter(DataOutBase::DataOutFilterFlags(false, true));
-  write_filtered_data(data_filter);
-  return create_xdmf_entry(data_filter, h5_filename, cur_time, comm);
-}
-
-
-
-template <int dim, int spacedim>
-XDMFEntry DataOutInterface<dim,spacedim>::
 create_xdmf_entry (const DataOutBase::DataOutFilter &data_filter,
                    const std::string &h5_filename, const double cur_time, MPI_Comm comm) const
 {
@@ -7154,14 +7143,7 @@ void DataOutBase::write_filtered_data (const std::vector<Patch<dim,spacedim> > &
     }
 }
 
-template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::
-write_hdf5_parallel (const std::string &filename, MPI_Comm comm) const
-{
-  DataOutBase::DataOutFilter  data_filter(DataOutBase::DataOutFilterFlags(false, true));
-  write_filtered_data(data_filter);
-  write_hdf5_parallel(data_filter, filename, comm);
-}
+
 
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
@@ -7171,6 +7153,8 @@ write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
   DataOutBase::write_hdf5_parallel(get_patches(), data_filter, filename, comm);
 }
 
+
+
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
 write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
@@ -7178,6 +7162,8 @@ write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
 {
   DataOutBase::write_hdf5_parallel(get_patches(), data_filter, write_mesh_file, mesh_filename, solution_filename, comm);
 }
+
+
 
 template <int dim, int spacedim>
 void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
@@ -7187,6 +7173,8 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 {
   write_hdf5_parallel(patches, data_filter, true, filename, filename, comm);
 }
+
+
 
 template <int dim, int spacedim>
 void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,

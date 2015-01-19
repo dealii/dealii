@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2002 - 2014 by the deal.II authors
+ * Copyright (C) 2002 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -259,8 +259,8 @@ namespace Step14
               fe_values.reinit (cell);
               // and extract the gradients of the solution vector at the
               // vertices:
-              fe_values.get_function_grads (solution,
-                                            solution_gradients);
+              fe_values.get_function_gradients (solution,
+                                                solution_gradients);
 
               // Now we have the gradients at all vertices, so pick out that
               // one which belongs to the evaluation point (note that the
@@ -2707,8 +2707,8 @@ namespace Step14
       // corresponding to this side of the face, and extract the gradients
       // using that object.
       face_data.fe_face_values_cell.reinit (cell, face_no);
-      face_data.fe_face_values_cell.get_function_grads (primal_solution,
-                                                        face_data.cell_grads);
+      face_data.fe_face_values_cell.get_function_gradients (primal_solution,
+                                                            face_data.cell_grads);
 
       // The second step is then to extract the gradients of the finite
       // element solution at the quadrature points on the other side of the
@@ -2732,8 +2732,8 @@ namespace Step14
       // gradients on that cell:
       const active_cell_iterator neighbor = cell->neighbor(face_no);
       face_data.fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor);
-      face_data.fe_face_values_neighbor.get_function_grads (primal_solution,
-                                                            face_data.neighbor_grads);
+      face_data.fe_face_values_neighbor.get_function_gradients (primal_solution,
+                                                                face_data.neighbor_grads);
 
       // Now that we have the gradients on this and the neighboring cell,
       // compute the jump residual by multiplying the jump in the gradient
@@ -2833,13 +2833,13 @@ namespace Step14
           // Now start the work by again getting the gradient of the solution
           // first at this side of the interface,
           face_data.fe_subface_values_cell.reinit (cell, face_no, subface_no);
-          face_data.fe_subface_values_cell.get_function_grads (primal_solution,
-                                                               face_data.cell_grads);
+          face_data.fe_subface_values_cell.get_function_gradients (primal_solution,
+                                                                   face_data.cell_grads);
           // then at the other side,
           face_data.fe_face_values_neighbor.reinit (neighbor_child,
                                                     neighbor_neighbor);
-          face_data.fe_face_values_neighbor.get_function_grads (primal_solution,
-                                                                face_data.neighbor_grads);
+          face_data.fe_face_values_neighbor.get_function_gradients (primal_solution,
+                                                                    face_data.neighbor_grads);
 
           // and finally building the jump residuals. Since we take the normal
           // vector from the other cell this time, revert the sign of the

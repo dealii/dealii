@@ -1,7 +1,7 @@
 //----------------------------  periodicity_05.cc  ---------------------------
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2010, 2013 by the deal.II authors
+//    Copyright (C) 2002 - 2014 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer

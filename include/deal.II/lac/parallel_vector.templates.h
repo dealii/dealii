@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,9 @@
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-#include <mm_malloc.h>
+#ifndef _MSC_VER
+#  include <mm_malloc.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -168,10 +170,9 @@ namespace parallel
                             const MPI_Comm  communicator)
     {
       // set up parallel partitioner with index sets and communicator
-      IndexSet ghost_indices(locally_owned_indices.size());
       std_cxx11::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner
       (new Utilities::MPI::Partitioner (locally_owned_indices,
-                                        ghost_indices, communicator));
+                                        communicator));
       reinit (new_partitioner);
     }
 
@@ -599,7 +600,7 @@ namespace parallel
 #ifdef DEAL_II_WITH_MPI
 
 #ifdef DEBUG
-      if (Utilities::System::job_supports_mpi())
+      if (Utilities::MPI::job_supports_mpi())
         {
           // make sure that there are not outstanding requests from updating
           // ghost values or compress

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,15 +39,12 @@ namespace LocalIntegrators
   namespace L2
   {
     /**
-     * The mass matrix for scalar or vector values finite elements.
-     * \f[
-     * \int_Z uv\,dx \quad \text{or} \quad \int_Z \mathbf u\cdot \mathbf v\,dx
-     * \f]
+     * The mass matrix for scalar or vector values finite elements. \f[ \int_Z
+     * uv\,dx \quad \text{or} \quad \int_Z \mathbf u\cdot \mathbf v\,dx \f]
      *
-     * Likewise, this term can be used on faces, where it computes  the integrals
-     * \f[
-     * \int_F uv\,ds \quad \text{or} \quad \int_F \mathbf u\cdot \mathbf v\,ds
-     * \f]
+     * Likewise, this term can be used on faces, where it computes  the
+     * integrals \f[ \int_F uv\,ds \quad \text{or} \quad \int_F \mathbf u\cdot
+     * \mathbf v\,ds \f]
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
@@ -76,17 +73,15 @@ namespace LocalIntegrators
 
     /**
      * The weighted mass matrix for scalar or vector values finite elements.
-     * \f[
-     * \int_Z \omega(x) uv\,dx \quad \text{or} \quad \int_Z \omega(x) \mathbf u\cdot \mathbf v\,dx
-     * \f]
+     * \f[ \int_Z \omega(x) uv\,dx \quad \text{or} \quad \int_Z \omega(x)
+     * \mathbf u\cdot \mathbf v\,dx \f]
      *
-     * Likewise, this term can be used on faces, where it computes  the integrals
-     * \f[
-     * \int_F \omega(x) uv\,ds \quad \text{or} \quad \int_F \omega(x) \mathbf u\cdot \mathbf v\,ds
-     * \f]
+     * Likewise, this term can be used on faces, where it computes  the
+     * integrals \f[ \int_F \omega(x) uv\,ds \quad \text{or} \quad \int_F
+     * \omega(x) \mathbf u\cdot \mathbf v\,ds \f]
      *
-     * The size of the vector <tt>weights</tt> must be equal to the
-     * number of quadrature points in the finite element.
+     * The size of the vector <tt>weights</tt> must be equal to the number of
+     * quadrature points in the finite element.
      *
      * @author Guido Kanschat
      * @date 2014
@@ -119,9 +114,7 @@ namespace LocalIntegrators
     /**
      * <i>L<sup>2</sup></i>-inner product for scalar functions.
      *
-     * \f[
-     * \int_Z fv\,dx \quad \text{or} \quad \int_F fv\,ds
-     * \f]
+     * \f[ \int_Z fv\,dx \quad \text{or} \quad \int_F fv\,ds \f]
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
@@ -144,13 +137,9 @@ namespace LocalIntegrators
     }
 
     /**
-     * <i>L<sup>2</sup></i>-inner product for a slice of a vector valued
-     * right hand side.
-     * \f[
-     * \int_Z \mathbf f\cdot \mathbf v\,dx
-     * \quad \text{or} \quad
-     * \int_F \mathbf f\cdot \mathbf v\,ds
-     * \f]
+     * <i>L<sup>2</sup></i>-inner product for a slice of a vector valued right
+     * hand side. \f[ \int_Z \mathbf f\cdot \mathbf v\,dx \quad \text{or}
+     * \quad \int_F \mathbf f\cdot \mathbf v\,ds \f]
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
@@ -176,17 +165,13 @@ namespace LocalIntegrators
     }
 
     /**
-     * The jump matrix between two cells for scalar or vector values
-     * finite elements. Note that the factor $\gamma$ can be used to
-     * implement weighted jumps.
-     * \f[
-     * \int_F [\gamma u][\gamma v]\,ds
-     * \quad \text{or}
-     * \int_F [\gamma \mathbf u]\cdot [\gamma \mathbf v]\,ds
-     * \f]
+     * The jump matrix between two cells for scalar or vector values finite
+     * elements. Note that the factor $\gamma$ can be used to implement
+     * weighted jumps. \f[ \int_F [\gamma u][\gamma v]\,ds \quad \text{or}
+     * \int_F [\gamma \mathbf u]\cdot [\gamma \mathbf v]\,ds \f]
      *
-     * Using appropriate weights, this term can be used to penalize
-     * violation of conformity in <i>H<sup>1</sup></i>.
+     * Using appropriate weights, this term can be used to penalize violation
+     * of conformity in <i>H<sup>1</sup></i>.
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010

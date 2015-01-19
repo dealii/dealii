@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by Martin Steigemann and Wolfgang Bangerth
+## Copyright (C) 2012 - 2014 by Martin Steigemann and Wolfgang Bangerth
 ##
 ## This file is part of the deal.II library.
 ##

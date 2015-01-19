@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,6 +30,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q1_eulerian.h>
 
@@ -167,7 +168,7 @@ int main ()
 
 
   // Then test same on distorted mesh
-  tria_test.distort_random (0.05);
+  GridTools::distort_random (0.05, tria_test);
   deallog << "Distorted mesh test" << std::endl;
   evaluate_normal (dof_handler, solution);
 }

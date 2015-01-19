@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1911,7 +1911,13 @@ namespace internal
       };
 
 
-
+      /**
+      * Create a triangulation from
+      * given data. This function does
+      * this work for 3-dimensional
+      * triangulations independently
+      * of the actual space dimension.
+      */
       template <int spacedim>
       static
       void
@@ -1935,10 +1941,13 @@ namespace internal
         // and reorder_cells function of
         // GridReordering before creating
         // the triangulation
-        for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
-          AssertThrow (dealii::GridTools::cell_measure(triangulation.vertices,
-                                                       cells[cell_no].vertices) >= 0,
-                       ExcGridHasInvalidCell(cell_no));
+#ifndef _MSC_VER
+        //TODO: The following code does not compile with MSVC. Find a way around it
+        for (unsigned int cell_no = 0; cell_no<cells.size(); ++cell_no)
+          AssertThrow(dealii::GridTools::cell_measure(triangulation.vertices,
+                                                      cells[cell_no].vertices) >= 0,
+                      ExcGridHasInvalidCell(cell_no));
+#endif
 
         ///////////////////////////////////////
         // first set up some collections of data
@@ -2776,21 +2785,6 @@ namespace internal
             else
               cell->set_neighbor (face,
                                   adjacent_cells[cell->quad(face)->index()][0]);
-      }
-
-
-      /**
-       * Distort a triangulation in
-       * some random way.
-       */
-      template <int dim, int spacedim>
-      static
-      void
-      distort_random (const double                 factor,
-                      const bool                   keep_boundary,
-                      Triangulation<dim,spacedim> &triangulation)
-      {
-        GridTools::distort_random (factor, triangulation, keep_boundary);
       }
 
 
@@ -8776,6 +8770,30 @@ Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number)
   manifold.erase(m_number);
 }
 
+template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::set_all_manifold_ids (const types::manifold_id m_number)
+{
+  typename Triangulation<dim,spacedim>::active_cell_iterator
+  cell=this->begin_active(), endc=this->end();
+
+  for (; cell != endc; ++cell)
+    cell->set_all_manifold_ids(m_number);
+}
+
+
+template <int dim, int spacedim>
+void
+Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::manifold_id m_number)
+{
+  typename Triangulation<dim,spacedim>::active_cell_iterator
+  cell=this->begin_active(), endc=this->end();
+
+  for (; cell != endc; ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->face(f)->at_boundary())
+        cell->face(f)->set_all_manifold_ids(m_number);
+}
 
 
 template <int dim, int spacedim>
@@ -9138,15 +9156,6 @@ flip_all_direction_flags()
 
 
 template <int dim, int spacedim>
-void Triangulation<dim, spacedim>::distort_random (const double factor,
-                                                   const bool   keep_boundary)
-{
-  internal::Triangulation::Implementation::distort_random (factor, keep_boundary, *this);
-}
-
-
-
-template <int dim, int spacedim>
 void Triangulation<dim, spacedim>::set_all_refine_flags ()
 {
   Assert(n_cells()>0, ExcMessage("Error: An empty Triangulation can not be refined."));
@@ -9450,15 +9459,6 @@ void Triangulation<dim,spacedim>::clear_user_flags ()
   clear_user_flags_quad ();
   clear_user_flags_hex ();
 }
-
-
-
-template <int dim, int spacedim>
-void Triangulation<dim,spacedim>::clear_user_pointers ()
-{
-  clear_user_data();
-}
-
 
 
 
@@ -12989,12 +12989,6 @@ Triangulation<dim, spacedim>::memory_consumption () const
 
 
 template<int dim, int spacedim>
-Triangulation<dim, spacedim>::RefinementListener::~RefinementListener ()
-{}
-
-
-
-template<int dim, int spacedim>
 Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList () throw ()
 {
   // don't do anything here. the compiler will automatically convert
@@ -13002,93 +12996,6 @@ Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList () throw ()
   // into abort() in order to satisfy the throw() specification
 }
 
-
-
-
-template<int dim, int spacedim>
-void Triangulation<dim, spacedim>::
-RefinementListener::pre_refinement_notification (const Triangulation<dim, spacedim> &)
-{}
-
-
-
-template<int dim, int spacedim>
-void Triangulation<dim, spacedim>::
-RefinementListener::post_refinement_notification (const Triangulation<dim, spacedim> &)
-{}
-
-
-
-template<int dim, int spacedim>
-void Triangulation<dim, spacedim>::
-RefinementListener::copy_notification (const Triangulation<dim, spacedim> &,
-                                       const Triangulation<dim, spacedim> &)
-{}
-
-
-
-template<int dim, int spacedim>
-void Triangulation<dim, spacedim>::
-RefinementListener::create_notification (const Triangulation<dim, spacedim> &)
-{}
-
-
-
-template<int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::add_refinement_listener (RefinementListener &listener) const
-{
-  // in this compatibility mode with the old-style refinement
-  // listeners, an external class presents itself as one that may or
-  // may not have overloaded all of the functions that the
-  // RefinementListener class has. consequently, we need to connect
-  // each of its functions to the relevant signals. for those
-  // functions that haven't been overloaded, that means that
-  // triggering the signal yields a call to the function in the
-  // RefinementListener base class which simply does nothing
-  std::vector<boost::signals2::connection> connections;
-
-  connections.push_back
-  (signals.create.connect (std_cxx11::bind (&RefinementListener::create_notification,
-                                            std_cxx11::ref(listener),
-                                            std_cxx11::cref(*this))));
-  connections.push_back
-  (signals.copy.connect (std_cxx11::bind (&RefinementListener::copy_notification,
-                                          std_cxx11::ref(listener),
-                                          std_cxx11::cref(*this),
-                                          std_cxx11::_1)));
-  connections.push_back
-  (signals.pre_refinement.connect (std_cxx11::bind (&RefinementListener::pre_refinement_notification,
-                                                    std_cxx11::ref(listener),
-                                                    std_cxx11::cref(*this))));
-  connections.push_back
-  (signals.post_refinement.connect (std_cxx11::bind (&RefinementListener::post_refinement_notification,
-                                                     std_cxx11::ref(listener),
-                                                     std_cxx11::cref(*this))));
-
-  // now push the set of connections into the map
-  refinement_listener_map.insert (std::make_pair(&listener, connections));
-}
-
-
-
-template<int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::remove_refinement_listener (RefinementListener &listener) const
-{
-  Assert (refinement_listener_map.find (&listener) != refinement_listener_map.end(),
-          ExcMessage("You try to remove a refinement listener that does "
-                     "not appear to have been added previously."));
-
-  // get the element of the map, and terminate these connections. then
-  // erase the element from the list
-  std::vector<boost::signals2::connection> connections
-    = refinement_listener_map.find(&listener)->second;
-  for (unsigned int i=0; i<connections.size(); ++i)
-    connections[i].disconnect ();
-
-  refinement_listener_map.erase (refinement_listener_map.find (&listener));
-}
 
 template <>
 const Manifold<2,1> &Triangulation<2, 1>::get_manifold(const types::manifold_id) const

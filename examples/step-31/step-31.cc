@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2013 by the deal.II authors
+ * Copyright (C) 2007 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -2200,7 +2200,8 @@ int main (int argc, char *argv[])
 
       deallog.depth_console (0);
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
+                                                           numbers::invalid_unsigned_int);
 
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();

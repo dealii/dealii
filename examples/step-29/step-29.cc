@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2013 by the deal.II authors
+ * Copyright (C) 2007 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -299,12 +299,12 @@ namespace Step29
 
     virtual
     void
-    compute_derived_quantities_vector (const std::vector< Vector< double > > &uh,
-                                       const std::vector< std::vector< Tensor< 1, dim > > > &duh,
-                                       const std::vector< std::vector< Tensor< 2, dim > > > &dduh,
-                                       const std::vector< Point< dim > > &normals,
-                                       const std::vector<Point<dim> > &evaluation_points,
-                                       std::vector< Vector< double > > &computed_quantities) const;
+    compute_derived_quantities_vector (const std::vector<Vector<double> >               &uh,
+                                       const std::vector<std::vector<Tensor<1, dim> > > &duh,
+                                       const std::vector<std::vector<Tensor<2, dim> > > &dduh,
+                                       const std::vector<Point<dim> >                   &normals,
+                                       const std::vector<Point<dim> >                   &evaluation_points,
+                                       std::vector<Vector<double> >                     &computed_quantities) const;
   };
 
   // In the constructor, we need to call the constructor of the base class
@@ -346,12 +346,12 @@ namespace Step29
   template <int dim>
   void
   ComputeIntensity<dim>::compute_derived_quantities_vector (
-    const std::vector< Vector< double > >                  &uh,
-    const std::vector< std::vector< Tensor< 1, dim > > >  & /*duh*/,
-    const std::vector< std::vector< Tensor< 2, dim > > >  & /*dduh*/,
-    const std::vector< Point< dim > >                     & /*normals*/,
-    const std::vector<Point<dim> >                        & /*evaluation_points*/,
-    std::vector< Vector< double > >                        &computed_quantities
+    const std::vector<Vector<double> >                 &uh,
+    const std::vector<std::vector<Tensor<1, dim> > >   & /*duh*/,
+    const std::vector<std::vector<Tensor<2, dim> > >   & /*dduh*/,
+    const std::vector<Point<dim> >                     & /*normals*/,
+    const std::vector<Point<dim> >                     & /*evaluation_points*/,
+    std::vector<Vector<double> >                       &computed_quantities
   ) const
   {
     Assert(computed_quantities.size() == uh.size(),

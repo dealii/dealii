@@ -43,21 +43,19 @@ namespace TrilinosWrappers
 
 
   /**
-   * Base class for solver classes using the Trilinos solvers. Since
-   * solvers in Trilinos are selected based on flags passed to a generic
-   * solver object, basically all the actual solver calls happen in this
-   * class, and derived classes simply set the right flags to select one
-   * solver or another, or to set certain parameters for individual
-   * solvers. For a general discussion on the Trilinos solver package
-   * AztecOO, we refer to the <a href =
-   * "http://trilinos.sandia.gov/packages/aztecoo/AztecOOUserGuide.pdf">AztecOO
-   * user guide</a>.
+   * Base class for solver classes using the Trilinos solvers. Since solvers
+   * in Trilinos are selected based on flags passed to a generic solver
+   * object, basically all the actual solver calls happen in this class, and
+   * derived classes simply set the right flags to select one solver or
+   * another, or to set certain parameters for individual solvers. For a
+   * general discussion on the Trilinos solver package AztecOO, we refer to
+   * the <a href = "http://trilinos.sandia.gov/packages/aztecoo/AztecOOUserGui
+   * de.pdf">AztecOO user guide</a>.
    *
    * This solver class can also be used as a standalone class, where the
-   * respective Krylov method is set via the flag
-   * <tt>solver_name</tt>. This can be done at runtime (e.g., when
-   * parsing the solver from a ParameterList) and is similar to the
-   * deal.II class SolverSelector.
+   * respective Krylov method is set via the flag <tt>solver_name</tt>. This
+   * can be done at runtime (e.g., when parsing the solver from a
+   * ParameterList) and is similar to the deal.II class SolverSelector.
    *
    * @ingroup TrilinosWrappers
    * @author Martin Kronbichler, 2008, 2009
@@ -76,9 +74,7 @@ namespace TrilinosWrappers
     enum SolverName {cg, cgs, gmres, bicgstab, tfqmr} solver_name;
 
     /**
-     * Standardized data struct to
-     * pipe additional data to the
-     * solver.
+     * Standardized data struct to pipe additional data to the solver.
      */
 
     struct AdditionalData
@@ -135,11 +131,11 @@ namespace TrilinosWrappers
            const PreconditionBase &preconditioner);
 
     /**
-     * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an
-     * operator. This function can be used for matrix free
-     * computation. Depending on the information provided by derived classes
-     * and the object passed as a preconditioner, one of the linear solvers
-     * and preconditioners of Trilinos is chosen.
+     * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an operator.
+     * This function can be used for matrix free computation. Depending on the
+     * information provided by derived classes and the object passed as a
+     * preconditioner, one of the linear solvers and preconditioners of
+     * Trilinos is chosen.
      */
     void
     solve (Epetra_Operator        &A,
@@ -150,12 +146,12 @@ namespace TrilinosWrappers
     /**
      * Solve the linear system <tt>Ax=b</tt>. Depending on the information
      * provided by derived classes and the object passed as a preconditioner,
-     * one of the linear solvers and preconditioners of Trilinos is
-     * chosen. This class works with matrices according to the
-     * TrilinosWrappers format, but can take deal.II vectors as
-     * argument. Since deal.II are serial vectors (not distributed), this
-     * function does only what you expect in case the matrix is locally
-     * owned. Otherwise, an exception will be thrown.
+     * one of the linear solvers and preconditioners of Trilinos is chosen.
+     * This class works with matrices according to the TrilinosWrappers
+     * format, but can take deal.II vectors as argument. Since deal.II are
+     * serial vectors (not distributed), this function does only what you
+     * expect in case the matrix is locally owned. Otherwise, an exception
+     * will be thrown.
      */
     void
     solve (const SparseMatrix           &A,
@@ -164,15 +160,15 @@ namespace TrilinosWrappers
            const PreconditionBase       &preconditioner);
 
     /**
-     * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an
-     * operator. This function can be used for matrix free
-     * computations. Depending on the information provided by derived classes
-     * and the object passed as a preconditioner, one of the linear solvers
-     * and preconditioners of Trilinos is chosen. This class works with
-     * matrices according to the TrilinosWrappers format, but can take deal.II
-     * vectors as argument. Since deal.II are serial vectors (not
-     * distributed), this function does only what you expect in case the
-     * matrix is locally owned. Otherwise, an exception will be thrown.
+     * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an operator.
+     * This function can be used for matrix free computations. Depending on
+     * the information provided by derived classes and the object passed as a
+     * preconditioner, one of the linear solvers and preconditioners of
+     * Trilinos is chosen. This class works with matrices according to the
+     * TrilinosWrappers format, but can take deal.II vectors as argument.
+     * Since deal.II are serial vectors (not distributed), this function does
+     * only what you expect in case the matrix is locally owned. Otherwise, an
+     * exception will be thrown.
      */
     void
     solve (Epetra_Operator              &A,
@@ -193,11 +189,11 @@ namespace TrilinosWrappers
            const PreconditionBase                              &preconditioner);
 
     /**
-     * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an
-     * operator. This function can be used for matrix free
-     * computation. Depending on the information provided by derived classes
-     * and the object passed as a preconditioner, one of the linear solvers
-     * and preconditioners of Trilinos is chosen.
+     * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an operator.
+     * This function can be used for matrix free computation. Depending on the
+     * information provided by derived classes and the object passed as a
+     * preconditioner, one of the linear solvers and preconditioners of
+     * Trilinos is chosen.
      */
     void
     solve (Epetra_Operator                                     &A,
@@ -260,8 +256,7 @@ namespace TrilinosWrappers
 
 
   /**
-   * An implementation of the solver interface using the Trilinos CG
-   * solver.
+   * An implementation of the solver interface using the Trilinos CG solver.
    *
    * @ingroup TrilinosWrappers
    * @author Martin Kronbichler, 2008
@@ -307,8 +302,7 @@ namespace TrilinosWrappers
 
 
   /**
-   * An implementation of the solver interface using the Trilinos CGS
-   * solver.
+   * An implementation of the solver interface using the Trilinos CGS solver.
    *
    * @ingroup TrilinosWrappers
    * @author Martin Kronbichler, 2008
@@ -497,15 +491,14 @@ namespace TrilinosWrappers
 
 
   /**
-   * An implementation of Trilinos direct solvers (using the Amesos
-   * package). The data field AdditionalData::solver_type can be used to
-   * specify the type of solver. It allows the use of built-in solvers
-   * Amesos_Klu as well as third-party solvers Amesos_Superludist or
-   * Amesos_Mumps.
+   * An implementation of Trilinos direct solvers (using the Amesos package).
+   * The data field AdditionalData::solver_type can be used to specify the
+   * type of solver. It allows the use of built-in solvers Amesos_Klu as well
+   * as third-party solvers Amesos_Superludist or Amesos_Mumps.
    *
-   * For instructions on how to install Trilinos for use with
-   * direct solvers other than KLU, see the link to the Trilinos
-   * installation instructions linked to from the deal.II ReadMe file.
+   * For instructions on how to install Trilinos for use with direct solvers
+   * other than KLU, see the link to the Trilinos installation instructions
+   * linked to from the deal.II ReadMe file.
    *
    * @ingroup TrilinosWrappers
    * @author Martin Kronbichler, 2009, Uwe K&ouml;cher, 2014
@@ -536,16 +529,16 @@ namespace TrilinosWrappers
        * Set the solver type (for third party solver support of Trilinos
        * Amesos package). Possibilities are:
        * <ul>
-       *   <li>  "Amesos_Lapack" </li>
-       *   <li>  "Amesos_Scalapack" </li>
-       *   <li>  "Amesos_Klu" </li>
-       *   <li>  "Amesos_Umfpack" </li>
-       *   <li>  "Amesos_Pardiso" </li>
-       *   <li>  "Amesos_Taucs" </li>
-       *   <li>  "Amesos_Superlu" </li>
-       *   <li>  "Amesos_Superludist" </li>
-       *   <li>  "Amesos_Dscpack" </li>
-       *   <li>  "Amesos_Mumps" </li>
+       * <li>  "Amesos_Lapack" </li>
+       * <li>  "Amesos_Scalapack" </li>
+       * <li>  "Amesos_Klu" </li>
+       * <li>  "Amesos_Umfpack" </li>
+       * <li>  "Amesos_Pardiso" </li>
+       * <li>  "Amesos_Taucs" </li>
+       * <li>  "Amesos_Superlu" </li>
+       * <li>  "Amesos_Superludist" </li>
+       * <li>  "Amesos_Dscpack" </li>
+       * <li>  "Amesos_Mumps" </li>
        * </ul>
        * Note that the availability of these solvers in deal.II depends on
        * which solvers were set when configuring Trilinos.
@@ -599,8 +592,7 @@ namespace TrilinosWrappers
            const dealii::parallel::distributed::Vector<double> &b);
 
     /**
-     * Access to object that controls
-     * convergence.
+     * Access to object that controls convergence.
      */
     SolverControl &control() const;
 

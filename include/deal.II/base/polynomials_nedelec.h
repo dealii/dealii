@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,16 +33,16 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class implements the first family <i>H<sup>curl</sup></i>-conforming,
- * vector-valued polynomials, proposed by J.-C. Nédélec in 1980
- * (Numer. Math. 35).
+ * vector-valued polynomials, proposed by J.-C. Nédélec in 1980 (Numer.
+ * Math. 35).
  *
- * The Nédélec polynomials are constructed such that the curl
- * is in the tensor product polynomial space <i>Q<sub>k</sub></i>.
- * Therefore, the polynomial order of each component must be one
- * order higher in the corresponding two directions,
- * yielding the polynomial spaces <i>(Q<sub>k,k+1</sub>,
- * Q<sub>k+1,k</sub>)</i> and <i>(Q<sub>k,k+1,k+1</sub>,
- * Q<sub>k+1,k,k+1</sub>, Q<sub>k+1,k+1,k</sub>)</i> in 2D and 3D, resp.
+ * The Nédélec polynomials are constructed such that the curl is in the
+ * tensor product polynomial space <i>Q<sub>k</sub></i>. Therefore, the
+ * polynomial order of each component must be one order higher in the
+ * corresponding two directions, yielding the polynomial spaces
+ * <i>(Q<sub>k,k+1</sub>, Q<sub>k+1,k</sub>)</i> and
+ * <i>(Q<sub>k,k+1,k+1</sub>, Q<sub>k+1,k,k+1</sub>,
+ * Q<sub>k+1,k+1,k</sub>)</i> in 2D and 3D, resp.
  *
  * @ingroup Polynomials
  * @author Markus Bürg
@@ -53,87 +53,60 @@ class PolynomialsNedelec
 {
 public:
   /**
-   * Constructor. Creates all basis
-   * functions for Nédélec polynomials
-   * of given degree.
+   * Constructor. Creates all basis functions for Nédélec polynomials of
+   * given degree.
    *
-   * @arg k: the degree of the
-   * Nédélec space, which is the degree
-   * of the largest tensor product
-   * polynomial space
-   * <i>Q<sub>k</sub></i> contained.
+   * @arg k: the degree of the Nédélec space, which is the degree of the
+   * largest tensor product polynomial space <i>Q<sub>k</sub></i> contained.
    */
   PolynomialsNedelec (const unsigned int k);
 
   /**
-   * Computes the value and the
-   * first and second derivatives
-   * of each Nédélec
+   * Computes the value and the first and second derivatives of each Nédélec
    * polynomial at @p unit_point.
    *
-   * The size of the vectors must
-   * either be zero or equal
-   * <tt>n()</tt>.  In the
-   * first case, the function will
-   * not compute these values.
+   * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
+   * the first case, the function will not compute these values.
    *
-   * If you need values or
-   * derivatives of all tensor
-   * product polynomials then use
-   * this function, rather than
-   * using any of the
-   * <tt>compute_value</tt>,
-   * <tt>compute_grad</tt> or
-   * <tt>compute_grad_grad</tt>
-   * functions, see below, in a
-   * loop over all tensor product
-   * polynomials.
+   * If you need values or derivatives of all tensor product polynomials then
+   * use this function, rather than using any of the <tt>compute_value</tt>,
+   * <tt>compute_grad</tt> or <tt>compute_grad_grad</tt> functions, see below,
+   * in a loop over all tensor product polynomials.
    */
   void compute (const Point<dim> &unit_point, std::vector<Tensor<1, dim> > &values, std::vector<Tensor<2, dim> > &grads, std::vector<Tensor<3, dim> > &grad_grads) const;
 
   /**
-   * Returns the number of Nédélec
-     * polynomials.
+   * Returns the number of Nédélec polynomials.
    */
   unsigned int n () const;
 
   /**
-   * Returns the degree of the Nédélec
-   * space, which is one less than
-   * the highest polynomial degree.
+   * Returns the degree of the Nédélec space, which is one less than the
+   * highest polynomial degree.
    */
   unsigned int degree () const;
 
   /**
-   * Return the name of the space,
-   * which is <tt>Nedelec</tt>.
+   * Return the name of the space, which is <tt>Nedelec</tt>.
    */
   std::string name () const;
 
   /**
-   * Return the number of
-   * polynomials in the space
-   * <TT>N(degree)</tt> without
-   * requiring to build an object
-   * of PolynomialsNedelec. This is
-   * required by the FiniteElement
-   * classes.
+   * Return the number of polynomials in the space <TT>N(degree)</tt> without
+   * requiring to build an object of PolynomialsNedelec. This is required by
+   * the FiniteElement classes.
    */
   static unsigned int compute_n_pols (unsigned int degree);
 
 private:
   /**
-   * The degree of this object as
-   * given to the constructor.
+   * The degree of this object as given to the constructor.
    */
   const unsigned int my_degree;
 
   /**
-   * An object representing the
-   * polynomial space for a single
-   * component. We can re-use it by
-   * rotating the coordinates of
-   * the evaluation point.
+   * An object representing the polynomial space for a single component. We
+   * can re-use it by rotating the coordinates of the evaluation point.
    */
   const AnisotropicPolynomials<dim> polynomial_space;
 
@@ -143,11 +116,8 @@ private:
   const unsigned int n_pols;
 
   /**
-   * A static member function that
-   * creates the polynomial space
-   * we use to initialize the
-   * #polynomial_space member
-   * variable.
+   * A static member function that creates the polynomial space we use to
+   * initialize the #polynomial_space member variable.
    */
   static std::vector<std::vector< Polynomials::Polynomial< double > > > create_polynomials (const unsigned int k);
 };

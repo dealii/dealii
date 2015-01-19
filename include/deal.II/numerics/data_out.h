@@ -60,11 +60,11 @@ namespace internal
  * This class is the main class to provide output of data described by finite
  * element fields defined on a collection of cells.
  *
- * This class is an actual implementation of the functionality proposed by
- * the DataOut_DoFData class. It offers a function build_patches() that
- * generates the patches to be written in some graphics format from the data
- * stored in the base class. Most of the interface and an example of its
- * use is described in the documentation of the base class.
+ * This class is an actual implementation of the functionality proposed by the
+ * DataOut_DoFData class. It offers a function build_patches() that generates
+ * the patches to be written in some graphics format from the data stored in
+ * the base class. Most of the interface and an example of its use is
+ * described in the documentation of the base class.
  *
  * The only thing this class offers is the function build_patches() which
  * loops over all cells of the triangulation stored by the
@@ -90,22 +90,21 @@ namespace internal
  * mesh.
  *
  * Note that after having called build_patches() once, you can call one or
- * more of the write() functions of DataOutInterface. You can therefore
- * output the same data in more than one format without having to rebuild
- * the patches.
+ * more of the write() functions of DataOutInterface. You can therefore output
+ * the same data in more than one format without having to rebuild the
+ * patches.
  *
  *
  * <h3>User interface information</h3>
  *
  * The base classes of this class, DataOutBase, DataOutInterface and
  * DataOut_DoFData() offer several interfaces of their own. Refer to the
- * DataOutBase class's documentation for a discussion of the different
- * output formats presently supported, DataOutInterface for ways of
- * selecting which format to use upon output at run-time and without
- * the need to adapt your program when new formats become available, as
- * well as for flags to determine aspects of output. The DataOut_DoFData()
- * class's documentation has an example of using nodal data to generate
- * output.
+ * DataOutBase class's documentation for a discussion of the different output
+ * formats presently supported, DataOutInterface for ways of selecting which
+ * format to use upon output at run-time and without the need to adapt your
+ * program when new formats become available, as well as for flags to
+ * determine aspects of output. The DataOut_DoFData() class's documentation
+ * has an example of using nodal data to generate output.
  *
  *
  * <h3>Extensions</h3>
@@ -116,24 +115,23 @@ namespace internal
  * region of the domain (for example in parallel programs such as the step-18
  * example program), or for some other reason.
  *
- * For this, internally build_patches() does not generate
- * the sequence of cells to be converted into patches itself, but relies
- * on the two functions first_cell() and next_cell(). By default, they
- * return the first active cell, and the next active cell, respectively.
- * Since they are @p virtual functions, you can write your own class
- * derived from DataOut in which you overload these two functions to select other
- * cells for output. This may, for example, include only cells that are
- * in parts of a domain (e.g., if you don't care about the solution elsewhere,
- * think for example a buffer region in which you attenuate outgoing waves
- * in the Perfectly Matched Layer method) or if you don't want output to
- * be generated at all levels of an adaptively refined mesh because this
- * creates too much data (in this case, the set of cells returned by
- * your implementations of first_cell() and next_cell() will include
- * non-active cells, and DataOut::build_patches() will simply take
- * interpolated values of the solution instead of the exact values on these
- * cells children for output). Once you derive your own class, you would
- * just create an object of this type instead of an object of type DataOut,
- * and everything else will remain the same.
+ * For this, internally build_patches() does not generate the sequence of
+ * cells to be converted into patches itself, but relies on the two functions
+ * first_cell() and next_cell(). By default, they return the first active
+ * cell, and the next active cell, respectively. Since they are @p virtual
+ * functions, you can write your own class derived from DataOut in which you
+ * overload these two functions to select other cells for output. This may,
+ * for example, include only cells that are in parts of a domain (e.g., if you
+ * don't care about the solution elsewhere, think for example a buffer region
+ * in which you attenuate outgoing waves in the Perfectly Matched Layer
+ * method) or if you don't want output to be generated at all levels of an
+ * adaptively refined mesh because this creates too much data (in this case,
+ * the set of cells returned by your implementations of first_cell() and
+ * next_cell() will include non-active cells, and DataOut::build_patches()
+ * will simply take interpolated values of the solution instead of the exact
+ * values on these cells children for output). Once you derive your own class,
+ * you would just create an object of this type instead of an object of type
+ * DataOut, and everything else will remain the same.
  *
  * The two functions are not constant, so you may store information within
  * your derived class about the last accessed cell. This is useful if the
@@ -147,12 +145,12 @@ namespace internal
  * this pair of functions and they return a non-active cell, then an exception
  * will be thrown.
  *
- * @pre This class only makes sense if the first template
- * argument, <code>dim</code> equals the dimension of the
- * DoFHandler type given as the second template argument, i.e., if
- * <code>dim == DH::dimension</code>. This redundancy is a historical
- * relic from the time where the library had only a single DoFHandler
- * class and this class consequently only a single template argument.
+ * @pre This class only makes sense if the first template argument,
+ * <code>dim</code> equals the dimension of the DoFHandler type given as the
+ * second template argument, i.e., if <code>dim == DH::dimension</code>. This
+ * redundancy is a historical relic from the time where the library had only a
+ * single DoFHandler class and this class consequently only a single template
+ * argument.
  *
  * @ingroup output
  * @author Wolfgang Bangerth, 1999
@@ -196,9 +194,9 @@ public:
    * which originate from cells at the boundary of the domain can be computed
    * using the mapping, i.e. a higher order mapping leads to a representation
    * of a curved boundary by using more subdivisions. Some mappings like
-   * MappingQEulerian result in curved cells in the interior of the
-   * domain. However, there is nor easy way to get this information from the
-   * Mapping. Thus the last argument @p curved_region take one of three values
+   * MappingQEulerian result in curved cells in the interior of the domain.
+   * However, there is nor easy way to get this information from the Mapping.
+   * Thus the last argument @p curved_region take one of three values
    * resulting in no curved cells at all, curved cells at the boundary
    * (default) or curved cells in the whole domain.
    *

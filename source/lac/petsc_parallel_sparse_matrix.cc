@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,6 +105,27 @@ namespace PETScWrappers
                  preset_nonzero_locations);
     }
 
+
+    void
+    SparseMatrix::
+    reinit (const SparseMatrix &other)
+    {
+      if (&other == this)
+        return;
+
+      this->communicator = other.communicator;
+
+      int ierr;
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      ierr = MatDestroy (matrix);
+#else
+      ierr = MatDestroy (&matrix);
+#endif
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      ierr = MatDuplicate(other.matrix, MAT_DO_NOT_COPY_VALUES, &matrix);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+    }
 
 
     SparseMatrix &

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,15 +30,16 @@ DEAL_II_NAMESPACE_OPEN
 namespace LocalIntegrators
 {
   /**
-   * @brief Local integrators related to advection along a vector field and its DG formulations
+   * @brief Local integrators related to advection along a vector field and
+   * its DG formulations
    *
    * All advection operators depend on an advection velocity denoted by
-   * <b>w</b> in the formulas below. It is denoted as <tt>velocity</tt>
-   * in the parameter lists.
+   * <b>w</b> in the formulas below. It is denoted as <tt>velocity</tt> in the
+   * parameter lists.
    *
-   * The functions cell_matrix() and both upwind_value_matrix() are
-   * taking the equation in weak form, that is, the directional
-   * derivative is on the test function.
+   * The functions cell_matrix() and both upwind_value_matrix() are taking the
+   * equation in weak form, that is, the directional derivative is on the test
+   * function.
    *
    * @ingroup Integrators
    * @author Guido Kanschat
@@ -47,26 +48,24 @@ namespace LocalIntegrators
   namespace Advection
   {
     /**
-     * Advection along the direction <b>w</b> in weak form
-     * with derivative on the test function
-     * \f[
-     * m_{ij} = \int_Z u_j\,(\mathbf w \cdot \nabla) v_i \, dx.
-     * \f]
+     * Advection along the direction <b>w</b> in weak form with derivative on
+     * the test function \f[ m_{ij} = \int_Z u_j\,(\mathbf w \cdot \nabla) v_i
+     * \, dx. \f]
      *
-     * The FiniteElement in <tt>fe</tt> may be scalar or vector valued. In
-     * the latter case, the advection operator is applied to each component
+     * The FiniteElement in <tt>fe</tt> may be scalar or vector valued. In the
+     * latter case, the advection operator is applied to each component
      * separately.
      *
      * @param M: The advection matrix obtained as result
      * @param fe: The FEValues object describing the local trial function
      * space. #update_values and #update_gradients, and #update_JxW_values
      * must be set.
-     * @param fetest: The FEValues object describing the local test
-     * function space. #update_values and #update_gradients must be set.
+     * @param fetest: The FEValues object describing the local test function
+     * space. #update_values and #update_gradients must be set.
      * @param velocity: The advection velocity, a vector of dimension
-     * <tt>dim</tt>. Each component may either contain a vector of length
-     * one, in which case a constant velocity is assumed, or a vector with
-     * as many entries as quadrature points if the velocity is not constant.
+     * <tt>dim</tt>. Each component may either contain a vector of length one,
+     * in which case a constant velocity is assumed, or a vector with as many
+     * entries as quadrature points if the velocity is not constant.
      * @param factor is an optional multiplication factor for the result.
      *
      * @author Guido Kanschat
@@ -121,9 +120,7 @@ namespace LocalIntegrators
     /**
      * Advection residual operator in strong form
      *
-     * \f[
-     * r_i = \int_Z  (\mathbf w \cdot \nabla)u\, v_i \, dx.
-     * \f]
+     * \f[ r_i = \int_Z  (\mathbf w \cdot \nabla)u\, v_i \, dx. \f]
      */
     template <int dim>
     inline void
@@ -161,9 +158,8 @@ namespace LocalIntegrators
      * Vector-valued advection residual operator in strong form
      *
      *
-     * \f[
-     * r_i = \int_Z \bigl((\mathbf w \cdot \nabla) \mathbf u\bigr) \cdot\mathbf v_i \, dx.
-     * \f]
+     * \f[ r_i = \int_Z \bigl((\mathbf w \cdot \nabla) \mathbf u\bigr)
+     * \cdot\mathbf v_i \, dx. \f]
      */
     template <int dim>
     inline void
@@ -200,33 +196,21 @@ namespace LocalIntegrators
     }
 
     /**
-     * Upwind flux at the boundary
-     * for weak advection
-     * operator. This is the value of
-     * the trial function at the
-     * outflow boundary and zero
-     * else:
+     * Upwind flux at the boundary for weak advection operator. This is the
+     * value of the trial function at the outflow boundary and zero else:
      * @f[
      * a_{ij} = \int_{\partial\Omega}
      * [\mathbf w\cdot\mathbf n]_+
      * u_i v_j \, ds
      * @f]
      *
-     * The <tt>velocity</tt> is
-     * provided as a VectorSlice,
-     * having <tt>dim</tt> vectors,
-     * one for each velocity
-     * component. Each of the
-     * vectors must either have only
-     * a single entry, if t he
-     * advection velocity is
-     * constant, or have an entry
-     * for each quadrature point.
+     * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
+     * vectors, one for each velocity component. Each of the vectors must
+     * either have only a single entry, if t he advection velocity is
+     * constant, or have an entry for each quadrature point.
      *
-     * The finite element can have
-     * several components, in which
-     * case each component is
-     * advected by the same velocity.
+     * The finite element can have several components, in which case each
+     * component is advected by the same velocity.
      */
     template <int dim>
     void upwind_value_matrix(
@@ -274,37 +258,25 @@ namespace LocalIntegrators
     }
 
     /**
-    * Upwind flux in the interior
-    * for weak advection
-    * operator. Matrix entries
-    * correspond to the upwind value
-    * of the trial function, multiplied
-    * by the jump of the test
-    * functions
-    * @f[
-    * a_{ij} = \int_F \left|\mathbf w
-    * \cdot \mathbf n\right|
-    * u^\uparrow
-    * (v^\uparrow-v^\downarrow)
-    * \,ds
-    * @f]
-    *
-    * The <tt>velocity</tt> is
-    * provided as a VectorSlice,
-    * having <tt>dim</tt> vectors,
-    * one for each velocity
-    * component. Each of the
-    * vectors must either have only
-    * a single entry, if t he
-    * advection velocity is
-    * constant, or have an entry
-    * for each quadrature point.
-    *
-    * The finite element can have
-    * several components, in which
-    * case each component is
-    * advected the same way.
-    */
+     * Upwind flux in the interior for weak advection operator. Matrix entries
+     * correspond to the upwind value of the trial function, multiplied by the
+     * jump of the test functions
+     * @f[
+     * a_{ij} = \int_F \left|\mathbf w
+     * \cdot \mathbf n\right|
+     * u^\uparrow
+     * (v^\uparrow-v^\downarrow)
+     * \,ds
+     * @f]
+     *
+     * The <tt>velocity</tt> is provided as a VectorSlice, having <tt>dim</tt>
+     * vectors, one for each velocity component. Each of the vectors must
+     * either have only a single entry, if t he advection velocity is
+     * constant, or have an entry for each quadrature point.
+     *
+     * The finite element can have several components, in which case each
+     * component is advected the same way.
+     */
     template <int dim>
     void upwind_value_matrix (
       FullMatrix<double> &M11,

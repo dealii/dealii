@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -206,8 +206,8 @@ namespace internal
       /**
        * This helper function determines a block size if the user decided not
        * to force a block size through MatrixFree::AdditionalData. This is
-       * computed based on the number of hardware threads on the system
-       *  and the number of macro cells that we should work on.
+       * computed based on the number of hardware threads on the system and
+       * the number of macro cells that we should work on.
        */
       void guess_block_size (const SizeInfo &size_info,
                              TaskInfo       &task_info);
@@ -240,11 +240,11 @@ namespace internal
        *
        * The strategy is based on a two-level approach. The outer level is
        * subdivided into partitions similar to the type of neighbors in
-       * Cuthill-McKee, and the inner level is again subdivided into
-       * Cuthill-McKee-like partitions (partitions whose level differs by more
-       * than 2 can be worked on independently). One task is represented by a
-       * chunk of cells. The cell chunks are formed after subdivision into the
-       * two levels of partitions.
+       * Cuthill-McKee, and the inner level is again subdivided into Cuthill-
+       * McKee-like partitions (partitions whose level differs by more than 2
+       * can be worked on independently). One task is represented by a chunk
+       * of cells. The cell chunks are formed after subdivision into the two
+       * levels of partitions.
        */
       void
       make_thread_graph_partition_partition (SizeInfo                  &size_info,
@@ -314,13 +314,12 @@ namespace internal
        * <tt>n_locally_owned_dofs</tt> to
        * <tt>n_locally_owned_dofs+n_ghost_dofs</tt>. The translation between
        * this MPI-local index space and the global numbering of degrees of
-       * freedom is stored in the @p vector_partitioner data structure.
-
-       * This array also includes the indirect contributions from constraints,
+       * freedom is stored in the @p vector_partitioner data structure.  This
+       * array also includes the indirect contributions from constraints,
        * which are described by the @p constraint_indicator field. Because of
-       * variable lengths of rows, this would be a vector of a
-       * vector. However, we use one contiguous memory region and store the
-       * rowstart in the variable @p row_starts.
+       * variable lengths of rows, this would be a vector of a vector.
+       * However, we use one contiguous memory region and store the rowstart
+       * in the variable @p row_starts.
        */
       std::vector<unsigned int> dof_indices;
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,30 +49,28 @@ extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
  * eigenvectors of a general n by n matrix A. It is most appropriate for large
  * sparse matrices A.
  *
- * In this class we make use of the method applied to the
- * generalized eigenspectrum problem $(A-\lambda B)x=0$, for
- * $x\neq0$; where $A$ is a system matrix, $B$ is a mass matrix,
- * and $\lambda, x$ are a set of eigenvalues and eigenvectors
- * respectively.
+ * In this class we make use of the method applied to the generalized
+ * eigenspectrum problem $(A-\lambda B)x=0$, for $x\neq0$; where $A$ is a
+ * system matrix, $B$ is a mass matrix, and $\lambda, x$ are a set of
+ * eigenvalues and eigenvectors respectively.
  *
- * The ArpackSolver can be used in application codes
- * with serial objects in the following way:
- @code
-  SolverControl solver_control (1000, 1e-9);
-  ArpackSolver (solver_control);
-  system.solve (A, B, OP, lambda, x, size_of_spectrum);
- @endcode
- * for the generalized eigenvalue problem $Ax=B\lambda x$, where
- * the variable <code>size_of_spectrum</code>
- * tells ARPACK the number of eigenvector/eigenvalue pairs to
- * solve for. Here, <code>lambda</code> is a vector that will contain
- * the eigenvalues computed, <code>x</code> a vector that will
- * contain the eigenvectors computed, and <code>OP</code> is
- * an inverse operation for the matrix <code>A</code>.
- * Shift and invert transformation around zero is applied.
+ * The ArpackSolver can be used in application codes with serial objects in
+ * the following way:
+ * @code
+ * SolverControl solver_control (1000, 1e-9);
+ * ArpackSolver (solver_control);
+ * system.solve (A, B, OP, lambda, x, size_of_spectrum);
+ * @endcode
+ * for the generalized eigenvalue problem $Ax=B\lambda x$, where the variable
+ * <code>size_of_spectrum</code> tells ARPACK the number of
+ * eigenvector/eigenvalue pairs to solve for. Here, <code>lambda</code> is a
+ * vector that will contain the eigenvalues computed, <code>x</code> a vector
+ * that will contain the eigenvectors computed, and <code>OP</code> is an
+ * inverse operation for the matrix <code>A</code>. Shift and invert
+ * transformation around zero is applied.
  *
- * Through the AdditionalData the user can specify some of the
- * parameters to be set.
+ * Through the AdditionalData the user can specify some of the parameters to
+ * be set.
  *
  * For further information on how the ARPACK routines <code>dneupd</code> and
  * <code>dnaupd</code> work and also how to set the parameters appropriately
@@ -90,9 +88,8 @@ public:
 
 
   /**
-   * An enum that lists the possible
-   * choices for which eigenvalues to
-   * compute in the solve() function.
+   * An enum that lists the possible choices for which eigenvalues to compute
+   * in the solve() function.
    */
   enum WhichEigenvalues
   {
@@ -108,9 +105,8 @@ public:
   };
 
   /**
-   * Standardized data struct to pipe
-   * additional data to the solver,
-   * should it be needed.
+   * Standardized data struct to pipe additional data to the solver, should it
+   * be needed.
    */
   struct AdditionalData
   {
@@ -122,8 +118,7 @@ public:
   };
 
   /**
-   * Access to the object that
-   * controls convergence.
+   * Access to the object that controls convergence.
    */
   SolverControl &control () const;
 
@@ -134,10 +129,8 @@ public:
                const AdditionalData &data = AdditionalData());
 
   /**
-   * Solve the generalized eigensprectrum
-   * problem $A x=\lambda B x$ by calling
-   * the <code>dneupd</code> and <code>dnaupd</code>
-   * functions of ARPACK.
+   * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
+   * the <code>dneupd</code> and <code>dnaupd</code> functions of ARPACK.
    */
   template <typename VECTOR, typename MATRIX1,
             typename MATRIX2, typename INVERSE>
@@ -152,15 +145,13 @@ public:
 protected:
 
   /**
-   * Reference to the object that
-   * controls convergence of the
-   * iterative solver.
+   * Reference to the object that controls convergence of the iterative
+   * solver.
    */
   SolverControl &solver_control;
 
   /**
-   * Store a copy of the flags for
-   * this particular solver.
+   * Store a copy of the flags for this particular solver.
    */
   const AdditionalData additional_data;
 
@@ -266,22 +257,16 @@ void ArpackSolver::solve (
   int ido = 0;
 
   /**
-   * 'G' generalized eigenvalue problem
-   * 'I' standard eigenvalue problem
+   * 'G' generalized eigenvalue problem 'I' standard eigenvalue problem
    */
   char bmat[2] = "G";
 
-  /** Specify the eigenvalues of interest,
-   *  possible parameters
-   *  "LA" algebraically largest
-   *  "SA" algebraically smallest
-   *  "LM" largest magnitude
-   *  "SM" smallest magnitude
-   *  "LR" largest real part
-   *  "SR" smallest real part
-   *  "LI" largest imaginary part
-   *  "SI" smallest imaginary part
-   *  "BE" both ends of spectrum simultaneous
+  /**
+   * Specify the eigenvalues of interest, possible parameters "LA"
+   * algebraically largest "SA" algebraically smallest "LM" largest magnitude
+   * "SM" smallest magnitude "LR" largest real part "SR" smallest real part
+   * "LI" largest imaginary part "SI" smallest imaginary part "BE" both ends
+   * of spectrum simultaneous
    */
   char which[3];
   switch (additional_data.eigenvalue_of_interest)
@@ -336,12 +321,9 @@ void ArpackSolver::solve (
   // maximum number of iterations
   iparam[2] = control().max_steps();
 
-  /** Sets the mode of dsaupd.
-   *  1 is exact shifting,
-   *  2 is user-supplied shifts,
-   *  3 is shift-invert mode,
-   *  4 is buckling mode,
-   *  5 is Cayley mode.
+  /**
+   * Sets the mode of dsaupd. 1 is exact shifting, 2 is user-supplied shifts,
+   * 3 is shift-invert mode, 4 is buckling mode, 5 is Cayley mode.
    */
 
   iparam[6] = mode;
@@ -457,8 +439,8 @@ void ArpackSolver::solve (
     }
   else
     {
-      /** 1 - compute eigenvectors,
-       *  0 - only eigenvalues
+      /**
+       * 1 - compute eigenvectors, 0 - only eigenvalues
        */
       int rvec = 1;
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1070,14 +1070,6 @@ Vector<double> PointValueHistory<dim>
         }
     }
   return dof_vector;
-}
-
-
-template <int dim>
-Vector<double> PointValueHistory<dim>
-::mark_locations ()
-{
-  return mark_support_locations ();
 }
 
 

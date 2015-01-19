@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,7 +48,7 @@ private:
 void test ()
 {
   X x(42);
-  Threads::Thread<void> t = Threads::spawn (x, &X::execute)();
+  Threads::Thread<void> t = Threads::new_thread (&X::execute, x);
   t.join ();
 }
 

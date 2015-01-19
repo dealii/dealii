@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -380,7 +380,7 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
     p_data=&data;
 
   const unsigned int n_q_points=q.size();
-  this->compute_fill_face (cell, face_no, deal_II_numbers::invalid_unsigned_int,
+  this->compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
                            n_q_points,
                            QProjector<dim>::DataSetDescriptor::
                            face (face_no,

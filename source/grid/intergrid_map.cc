@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +23,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/intergrid_map.h>
 
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 DEAL_II_NAMESPACE_OPEN
 

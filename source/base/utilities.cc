@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 #include <deal.II/base/exceptions.h>
 
 #include <boost/math/special_functions/erf.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <algorithm>
 #include <cerrno>
@@ -70,55 +71,18 @@ namespace Utilities
                   << " to the desired type");
 
   std::string
-  int_to_string (const unsigned int i,
-                 const unsigned int digits)
+  int_to_string (const unsigned int value, const unsigned int digits)
   {
-    // if second argument is invalid, then do
-    // not pad the resulting string at all
+    std::string lc_string = boost::lexical_cast<std::string>(value);
+
     if (digits == numbers::invalid_unsigned_int)
-      return int_to_string (i, needed_digits(i));
-
-
-    AssertThrow ( ! ((digits==1 && i>=10)   ||
-                     (digits==2 && i>=100)  ||
-                     (digits==3 && i>=1000) ||
-                     (digits==4 && i>=10000)||
-                     (digits==5 && i>=100000)||
-                     (digits==6 && i>=1000000)||
-                     (digits==7 && i>=10000000)||
-                     (digits==8 && i>=100000000)||
-                     (digits==9 && i>=1000000000)||
-                     (i>=1000000000)),
-                  ExcInvalidNumber2StringConversersion(i, digits));
-
-    std::string s;
-    switch (digits)
+      return lc_string;
+    else if (lc_string.size() < digits)
       {
-      case 10:
-        s += '0' + i/1000000000;
-      case 9:
-        s += '0' + i/100000000;
-      case 8:
-        s += '0' + i/10000000;
-      case 7:
-        s += '0' + i/1000000;
-      case 6:
-        s += '0' + i/100000;
-      case 5:
-        s += '0' + (i%100000)/10000;
-      case 4:
-        s += '0' + (i%10000)/1000;
-      case 3:
-        s += '0' + (i%1000)/100;
-      case 2:
-        s += '0' + (i%100)/10;
-      case 1:
-        s += '0' + i%10;
-        break;
-      default:
-        s += "invalid digits information";
-      };
-    return s;
+        std::string padding(digits - lc_string.size(), '0');
+        lc_string.insert(0, padding);
+      }
+    return lc_string;
   }
 
 
@@ -416,7 +380,7 @@ namespace Utilities
     // between threads either, but at least it is reentrant. if you need
     // an exactly reproducible sequence even in multithreaded contexts,
     // then this is probably not the function to use.
-#ifdef HAVE_RAND_R
+#ifdef DEAL_II_HAVE_RAND_R
     static unsigned int seed = 0xabcd1234;
     const double y = 1.0*rand_r(&seed)/RAND_MAX;
 #else
@@ -627,7 +591,7 @@ namespace Utilities
 
     std::string get_hostname ()
     {
-#if defined(HAVE_UNISTD_H) && defined(HAVE_GETHOSTNAME)
+#if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
       const unsigned int N=1024;
       char hostname[N];
       gethostname (&(hostname[0]), N-1);
@@ -655,45 +619,8 @@ namespace Utilities
 
     bool job_supports_mpi ()
     {
-#ifdef DEAL_II_WITH_MPI
-      int MPI_has_been_started = 0;
-      MPI_Initialized(&MPI_has_been_started);
-
-      return true && (MPI_has_been_started > 0);
-#else
-      return false;
-#endif
+      return Utilities::MPI::job_supports_mpi();
     }
-
-
-    bool
-    program_uses_mpi ()
-    {
-      return job_supports_mpi();
-    }
-
-
-    unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator)
-    {
-      return MPI::n_mpi_processes (mpi_communicator);
-    }
-
-    unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator)
-    {
-      return MPI::this_mpi_process (mpi_communicator);
-    }
-
-
-
-    void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
-                                              double my_value,
-                                              MinMaxAvg &result)
-    {
-      result = Utilities::MPI::min_max_avg (my_value,
-                                            mpi_communicator);
-    }
-
-
   }
 
 
@@ -744,7 +671,7 @@ namespace Utilities
       const Epetra_MpiComm
       *mpi_comm = dynamic_cast<const Epetra_MpiComm *>(&communicator);
       if (mpi_comm != 0)
-        return new Epetra_MpiComm(Utilities::System::
+        return new Epetra_MpiComm(Utilities::MPI::
                                   duplicate_communicator(mpi_comm->GetMpiComm()));
 #endif
 

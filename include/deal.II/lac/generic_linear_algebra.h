@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,8 +75,8 @@ namespace LinearAlgebraPETSc
     typedef PETScWrappers::MPI::Vector Vector;
 
     /**
-     * Typedef for the type used to describe vectors that
-     * consist of multiple blocks.
+     * Typedef for the type used to describe vectors that consist of multiple
+     * blocks.
      */
     typedef PETScWrappers::MPI::BlockVector BlockVector;
 
@@ -86,8 +86,8 @@ namespace LinearAlgebraPETSc
     typedef PETScWrappers::MPI::SparseMatrix SparseMatrix;
 
     /**
-     * Typedef for the type used to describe sparse matrices that
-     * consist of multiple blocks.
+     * Typedef for the type used to describe sparse matrices that consist of
+     * multiple blocks.
      */
     typedef PETScWrappers::MPI::BlockSparseMatrix BlockSparseMatrix;
 
@@ -156,8 +156,8 @@ namespace LinearAlgebraTrilinos
     typedef TrilinosWrappers::MPI::Vector Vector;
 
     /**
-     * Typedef for the type used to describe vectors that
-     * consist of multiple blocks.
+     * Typedef for the type used to describe vectors that consist of multiple
+     * blocks.
      */
     typedef TrilinosWrappers::MPI::BlockVector BlockVector;
 
@@ -167,8 +167,8 @@ namespace LinearAlgebraTrilinos
     typedef TrilinosWrappers::SparseMatrix SparseMatrix;
 
     /**
-     * Typedef for the type used to describe sparse matrices that
-     * consist of multiple blocks.
+     * Typedef for the type used to describe sparse matrices that consist of
+     * multiple blocks.
      */
     typedef TrilinosWrappers::BlockSparseMatrix BlockSparseMatrix;
 

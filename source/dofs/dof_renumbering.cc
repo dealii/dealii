@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -378,6 +378,13 @@ namespace DoFRenumbering
                          const bool                 use_constraints,
                          const std::vector<types::global_dof_index> &starting_indices)
   {
+    // see if there is anything to do at all or whether we can skip the work on this processor
+    if (dof_handler.locally_owned_dofs().n_elements() == 0)
+      {
+        Assert (new_indices.size() == 0, ExcInternalError());
+        return;
+      }
+
     // make the connection graph. in 2d/3d use an intermediate compressed
     // sparsity pattern since the we don't have very good estimates for
     // max_couplings_between_dofs() in 3d and this then leads to excessive
@@ -392,7 +399,9 @@ namespace DoFRenumbering
 
     IndexSet locally_owned = dof_handler.locally_owned_dofs();
     SparsityPattern sparsity;
-    if (DH::dimension < 2)
+
+    // otherwise compute the Cuthill-McKee permutation
+    if (DH::dimension == 1)
       {
         sparsity.reinit (dof_handler.n_dofs(),
                          dof_handler.n_dofs(),
@@ -541,17 +550,6 @@ namespace DoFRenumbering
     //  component_wise(dof_handler, level, component_order_arg);
   }
 
-  // This function is only for compatibility reasons and will vanish in 8.0
-  template <int dim>
-  void
-  component_wise (MGDoFHandler<dim>        &dof_handler,
-                  const std::vector<unsigned int> &component_order_arg)
-  {
-    DoFHandler<dim> &active_dof = dof_handler;
-    component_wise(active_dof, component_order_arg);
-    for (unsigned int level=0; level<dof_handler.get_tria().n_levels(); ++level)
-      component_wise(dof_handler, level, component_order_arg);
-  }
 
 
   template <int dim>
@@ -948,31 +946,6 @@ namespace DoFRenumbering
 
     if (renumbering.size()!=0)
       dof_handler.renumber_dofs (level, renumbering);
-  }
-
-
-
-  template <int dim>
-  void
-  block_wise (MGDoFHandler<dim> &dof_handler)
-  {
-    // renumber the non-MG part of
-    // the DoFHandler in parallel to
-    // the MG part. Because
-    // MGDoFHandler::renumber_dofs
-    // uses the user flags we can't
-    // run renumbering on individual
-    // levels in parallel to the
-    // other levels
-    void (*non_mg_part) (DoFHandler<dim> &)
-      = &block_wise<dim>;
-    Threads::Task<>
-    task = Threads::new_task (non_mg_part, dof_handler);
-
-    for (unsigned int level=0; level<dof_handler.get_tria().n_levels(); ++level)
-      block_wise (dof_handler, level);
-
-    task.join();
   }
 
 
