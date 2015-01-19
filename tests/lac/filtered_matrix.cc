@@ -22,7 +22,6 @@
 #include <deal.II/lac/matrix_lib.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/vector.h>
-
 #include <fstream>
 
 
@@ -79,8 +78,6 @@ void test (const FilteredMatrix<VECTOR> &M)
 
   deallog << std::endl;
 }
-
-
 
 int main()
 {
