@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 #include "../tests.h"
-#include <base/thread_management.h>
-#include <base/logstream.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/logstream.h>
 #include <fstream>
 #include <iostream>
 template <int> struct X {};

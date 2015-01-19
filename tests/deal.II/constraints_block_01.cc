@@ -23,43 +23,43 @@
 // testcase by Jason Sheldon
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/utilities.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/quadrature_lib.h>
 
-#include <numerics/vector_tools.h>
-#include <numerics/matrix_tools.h>
-#include <numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/data_out.h>
 
-#include <lac/vector.h>
-#include <lac/sparse_direct.h>
-#include <lac/full_matrix.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/sparse_matrix.h>
-#include <lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/sparse_direct.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/constraint_matrix.h>
 
-#include <dofs/dof_accessor.h>
-#include <lac/constraint_matrix.h>
-#include <dofs/dof_renumbering.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <hp/dof_handler.h>
-#include <hp/q_collection.h>
-#include <hp/fe_collection.h>
-#include <hp/fe_values.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/q_collection.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/fe_values.h>
 
-#include <fe/fe.h>
-#include <fe/fe_tools.h>
-#include <fe/fe_q.h>
-#include <fe/fe_nothing.h>
-#include <fe/fe_system.h>
-#include <fe/fe_values.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
 
-#include <grid/grid_generator.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria.h>
 
 #include <fstream>
 #include <cmath>
