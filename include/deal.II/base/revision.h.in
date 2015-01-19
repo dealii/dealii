@@ -19,16 +19,16 @@
 /**
  * Name of the local git branch of the source directory.
  */
-#define DEAL_II_GIT_BRANCH @DEAL_II_GIT_BRANCH@
+#define DEAL_II_GIT_BRANCH "@DEAL_II_GIT_BRANCH@"
 
 /**
  * Full sha1 revision of the current git HEAD.
  */
-#define DEAL_II_GIT_REVISION @DEAL_II_GIT_REVISION@
+#define DEAL_II_GIT_REVISION "@DEAL_II_GIT_REVISION@"
 
 /**
  * Short sha1 revision of the current git HEAD.
  */
-#define DEAL_II_GIT_SHORTREV @DEAL_II_GIT_SHORTREV@
+#define DEAL_II_GIT_SHORTREV "@DEAL_II_GIT_SHORTREV@"
 
 #endif
