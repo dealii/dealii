@@ -14,7 +14,7 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
 #include <deal.II/opencascade/utilities.h>
 #include <TopTools.hxx>
