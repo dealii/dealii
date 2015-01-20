@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,13 +68,12 @@ template <int dim> class Quadrature;
  * with node 13 being placed in the interior of the hex.
  *
  * Note, however, that these are just the Lagrange interpolation points of the
- * shape functions. Even though they may physically be on the surface of the
+ * shape functions. Even though they may physically be on the boundary of the
  * cell, they are logically in the interior since there are no continuity
- * requirements for these shape functions across cell boundaries. This class
- * if partially implemented for the codimension one case (<tt>spacedim != dim
- * </tt>), since no passage of information between meshes of different
- * refinement level is possible because the embedding and projection matrices
- * are not computed in the class constructor.
+ * requirements for these shape functions across cell boundaries. While
+ * discontinuous, when restricted to a single cell the shape functions of this
+ * element are exactly the same as those of the FE_Q element where they are
+ * shown visually.
  *
  * @author Ralf Hartmann, Guido Kanschat 2001, 2004
  */
