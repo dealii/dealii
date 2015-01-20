@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -77,12 +77,6 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-local-typedefs")
 # with disabled C++11 support:
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
-
-#
-# Disable deprecation warnings
-#
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #

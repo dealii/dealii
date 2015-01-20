@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -93,7 +93,6 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
 #   -w981   operands are evaluated in unspecified order
 #   -w1418  external function definition with no prior declaration
 #           (happens in boost)
-#   -w1478  deprecation warning
 #   -w1572  floating-point equality and inequality comparisons are unreliable
 #   -w2259  non-pointer conversion from "double" to "float" may
 #           lose significant bits
@@ -112,7 +111,6 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd327")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd383")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd981")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1418")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1478")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd1572")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd2259")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd21")
