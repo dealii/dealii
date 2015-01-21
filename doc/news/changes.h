@@ -254,6 +254,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: A new macro <code>DEAL_II_QUERY_GIT_INFORMATION</code> is
+  provided to query user projects for git repository information simmilarly
+  to those exported by deal.II.
+  <br>
+  (Matthias Maier, 2015/01/21)
+  </li>
+
   <li> Fixed: FEFaceValues and FESubfaceValues did not fill the
   jacobians and inverse jacobians if requested via the update flags.
   This is now fixed.

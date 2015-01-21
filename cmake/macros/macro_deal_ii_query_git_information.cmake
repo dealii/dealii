@@ -24,6 +24,13 @@
 # short and long revision. If ${CMAKE_SOURCE_DIR} is the root of a git
 # repository the following variables will be populated:
 #
+#       GIT_BRANCH
+#       GIT_REVISION
+#       GIT_SHORTREV
+#
+# If this macro is called within the deal.II build system the variables are
+# prefixed with DEAL_II_:
+#
 #       DEAL_II_GIT_BRANCH
 #       DEAL_II_GIT_REVISION
 #       DEAL_II_GIT_SHORTREV
@@ -32,6 +39,18 @@
 MACRO(DEAL_II_QUERY_GIT_INFORMATION)
 
   MESSAGE(STATUS "Query git repository information.")
+
+  #
+  # If DEAL_II_BASE_NAME is defined and DEAL_II_PROJECT_CONFIG_INCLUDED was
+  # not set, we assume that we are called from within the deal.II build
+  # system. In this case we prepend all variables by "DEAL_II_"
+  #
+  IF( DEFINED DEAL_II_BASE_NAME AND
+      NOT DEFINED DEAL_II_PROJECT_CONFIG_INCLUDED )
+    SET(_prefix "DEAL_II_")
+  ELSE()
+    SET(_prefix "")
+  ENDIF()
 
   FIND_PACKAGE(Git)
 
@@ -70,9 +89,9 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
        )
     IF(${_result} EQUAL 0)
       STRING(REGEX REPLACE "^\"([^ ]+) ([^ ]+)\"$"
-        "\\1" DEAL_II_GIT_REVISION "${_info}")
+        "\\1" ${_prefix}GIT_REVISION "${_info}")
       STRING(REGEX REPLACE "^\"([^ ]+) ([^ ]+)\"$"
-        "\\2" DEAL_II_GIT_SHORTREV "${_info}")
+        "\\2" ${_prefix}GIT_SHORTREV "${_info}")
     ENDIF()
 
     #
@@ -87,7 +106,7 @@ MACRO(DEAL_II_QUERY_GIT_INFORMATION)
        OUTPUT_STRIP_TRAILING_WHITESPACE
        )
     IF(${_result} EQUAL 0)
-      STRING(REGEX REPLACE "refs/heads/" "" DEAL_II_GIT_BRANCH "${_branch}")
+      STRING(REGEX REPLACE "refs/heads/" "" ${_prefix}GIT_BRANCH "${_branch}")
     ENDIF()
   ENDIF()
 
