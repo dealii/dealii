@@ -75,23 +75,6 @@ SparsityPattern::SparsityPattern (const SparsityPattern &s)
 
 SparsityPattern::SparsityPattern (const size_type m,
                                   const size_type n,
-                                  const unsigned int max_per_row,
-                                  const bool)
-  :
-  max_dim(0),
-  max_vec_len(0),
-  rowstart(0),
-  colnums(0),
-  compressed(false),
-  store_diagonal_first_in_row(m == n)
-{
-  reinit (m,n,max_per_row);
-}
-
-
-
-SparsityPattern::SparsityPattern (const size_type m,
-                                  const size_type n,
                                   const unsigned int max_per_row)
   :
   max_dim(0),
@@ -104,21 +87,6 @@ SparsityPattern::SparsityPattern (const size_type m,
   reinit (m,n,max_per_row);
 }
 
-
-
-SparsityPattern::SparsityPattern (const size_type m,
-                                  const size_type n,
-                                  const std::vector<unsigned int> &row_lengths,
-                                  const bool)
-  :
-  max_dim(0),
-  max_vec_len(0),
-  rowstart(0),
-  colnums(0),
-  store_diagonal_first_in_row(m == n)
-{
-  reinit (m, n, row_lengths);
-}
 
 
 SparsityPattern::SparsityPattern (const size_type m,
@@ -147,19 +115,6 @@ SparsityPattern::SparsityPattern (const size_type n,
   reinit (n, n, max_per_row);
 }
 
-
-
-SparsityPattern::SparsityPattern (const size_type               m,
-                                  const std::vector<unsigned int> &row_lengths,
-                                  const bool)
-  :
-  max_dim(0),
-  max_vec_len(0),
-  rowstart(0),
-  colnums(0)
-{
-  reinit (m, m, row_lengths);
-}
 
 
 SparsityPattern::SparsityPattern (const size_type               m,
@@ -289,34 +244,10 @@ SparsityPattern::operator = (const SparsityPattern &s)
 void
 SparsityPattern::reinit (const size_type m,
                          const size_type n,
-                         const unsigned int max_per_row,
-                         const bool)
-{
-  // simply map this function to the other @p{reinit} function
-  const std::vector<unsigned int> row_lengths (m, max_per_row);
-  reinit (m, n, row_lengths);
-}
-
-
-
-void
-SparsityPattern::reinit (const size_type m,
-                         const size_type n,
                          const unsigned int max_per_row)
 {
   // simply map this function to the other @p{reinit} function
   const std::vector<unsigned int> row_lengths (m, max_per_row);
-  reinit (m, n, row_lengths);
-}
-
-
-
-void
-SparsityPattern::reinit (const size_type m,
-                         const size_type n,
-                         const VectorSlice<const std::vector<unsigned int> > &row_lengths,
-                         const bool)
-{
   reinit (m, n, row_lengths);
 }
 
@@ -551,16 +482,6 @@ SparsityPattern::compress ()
 
 template <typename CSP>
 void
-SparsityPattern::copy_from (const CSP &csp,
-                            const bool)
-{
-  copy_from (csp);
-}
-
-
-
-template <typename CSP>
-void
 SparsityPattern::copy_from (const CSP &csp)
 {
   // first determine row lengths for each row. if the matrix is quadratic,
@@ -603,15 +524,6 @@ SparsityPattern::copy_from (const CSP &csp)
 
 
 template <typename number>
-void SparsityPattern::copy_from (const FullMatrix<number> &matrix,
-                                 const bool)
-{
-  copy_from (matrix);
-}
-
-
-
-template <typename number>
 void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
 {
   // first init with the number of entries per row. if this matrix is square
@@ -642,17 +554,6 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
   // finally compress
   compress ();
 }
-
-
-void
-SparsityPattern::reinit (const size_type               m,
-                         const size_type               n,
-                         const std::vector<unsigned int> &row_lengths,
-                         const bool)
-{
-  reinit(m, n, make_slice(row_lengths));
-}
-
 
 
 void
@@ -1073,13 +974,6 @@ partition (const unsigned int         n_partitions,
 
 
 // explicit instantiations
-template void SparsityPattern::copy_from<SparsityPattern> (const SparsityPattern &, bool);
-template void SparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &, bool);
-template void SparsityPattern::copy_from<CompressedSetSparsityPattern> (const CompressedSetSparsityPattern &, bool);
-template void SparsityPattern::copy_from<CompressedSimpleSparsityPattern> (const CompressedSimpleSparsityPattern &, bool);
-template void SparsityPattern::copy_from<float> (const FullMatrix<float> &, bool);
-template void SparsityPattern::copy_from<double> (const FullMatrix<double> &, bool);
-
 template void SparsityPattern::copy_from<SparsityPattern> (const SparsityPattern &);
 template void SparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &);
 template void SparsityPattern::copy_from<CompressedSetSparsityPattern> (const CompressedSetSparsityPattern &);

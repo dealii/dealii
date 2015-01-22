@@ -150,7 +150,7 @@ inconvenience this causes.
   - Vector::scale.
   - TrilinosWrappers::*Vector*::compress with an Epetra_CombineMode
     argument
-  - ChunkSparsityPattern functions that take an
+  - SparsityPattern and ChunkSparsityPattern functions that take an
     <code>optimize_diagonal</code> argument.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
@@ -176,7 +176,7 @@ inconvenience this causes.
     same function with the <code>level</code> argument for each
     of the levels of the triangulation individually.
   <br>
-  (Wolfgang Bangerth, 2014/12/29-2015/01/11)
+  (Wolfgang Bangerth, 2014/12/29-2015/01/22)
   </li>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.
