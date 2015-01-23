@@ -153,6 +153,7 @@ inconvenience this causes.
   - SparsityPattern and ChunkSparsityPattern functions that take an
     <code>optimize_diagonal</code> argument.
   - Mapping::transform_covariant and Mapping::transform_contravariant.
+  - The typedef CompressedBlockSparsityPattern.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
