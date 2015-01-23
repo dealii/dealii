@@ -348,13 +348,15 @@ template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::fill_fe_face_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int       face_no,
-  const Quadrature<dim-1> &q,
+  const unsigned int                face_no,
+  const Quadrature<dim-1>          &q,
   typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  std::vector<Point<spacedim> >     &quadrature_points,
-  std::vector<double>          &JxW_values,
-  std::vector<Tensor<1,spacedim> >  &exterior_forms,
-  std::vector<Point<spacedim> >     &normal_vectors) const
+  std::vector<Point<spacedim> >    &quadrature_points,
+  std::vector<double>              &JxW_values,
+  std::vector<Tensor<1,spacedim> > &exterior_forms,
+  std::vector<Point<spacedim> >    &normal_vectors,
+  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -391,7 +393,8 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
                            q.get_weights(),
                            *p_data,
                            quadrature_points, JxW_values,
-                           exterior_forms, normal_vectors);
+                           exterior_forms, normal_vectors, jacobians,
+                           inverse_jacobians);
 }
 
 
@@ -405,7 +408,9 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
                                                 std::vector<Point<spacedim> >     &quadrature_points,
                                                 std::vector<double>          &JxW_values,
                                                 std::vector<Tensor<1,spacedim> >  &exterior_forms,
-                                                std::vector<Point<spacedim> >     &normal_vectors) const
+                                                std::vector<Point<spacedim> >     &normal_vectors,
+                                                std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                                                std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -443,7 +448,8 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
                            q.get_weights(),
                            *p_data,
                            quadrature_points, JxW_values,
-                           exterior_forms, normal_vectors);
+                           exterior_forms, normal_vectors, jacobians,
+                           inverse_jacobians);
 }
 
 

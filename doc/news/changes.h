@@ -254,6 +254,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: FEFaceValues and FESubfaceValues did not fill the
+  jacobians and inverse jacobians if requested via the update flags.
+  This is now fixed.
+  <br>
+  (Martin Kronbichler, 2015/01/23)
+  </li>
+
   <li> Fixed: ParameterHandler::read_input() now checks that
   'subsection'/'end' are balanced in the input.
   <br>

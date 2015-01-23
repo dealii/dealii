@@ -306,42 +306,46 @@ public:
    */
   virtual void
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim>                                     &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-                  typename std::vector<Point<spacedim> >                    &quadrature_points,
-                  std::vector<double>                                       &JxW_values,
-                  std::vector<DerivativeForm<1,dim,spacedim> >        &jacobians,
-                  std::vector<DerivativeForm<2,dim,spacedim> >       &jacobian_grads,
-                  std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
-                  std::vector<Point<spacedim> >                             &cell_normal_vectors,
-                  CellSimilarity::Similarity                           &cell_similarity) const;
+                  const Quadrature<dim>                        &quadrature,
+                  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                  typename std::vector<Point<spacedim> >       &quadrature_points,
+                  std::vector<double>                          &JxW_values,
+                  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                  std::vector<DerivativeForm<2,dim,spacedim> > &jacobian_grads,
+                  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians,
+                  std::vector<Point<spacedim> >                &cell_normal_vectors,
+                  CellSimilarity::Similarity                   &cell_similarity) const;
 
   /**
    * Implementation of the interface in Mapping.
    */
   virtual void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int                               face_no,
-                       const Quadrature<dim-1>                          &quadrature,
+                       const unsigned int                            face_no,
+                       const Quadrature<dim-1>                      &quadrature,
                        typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                       typename std::vector<Point<spacedim> >                &quadrature_points,
-                       std::vector<double>                              &JxW_values,
-                       typename std::vector<Tensor<1,spacedim> >             &boundary_form,
-                       typename std::vector<Point<spacedim> >           &normal_vectors) const ;
+                       typename std::vector<Point<spacedim> >       &quadrature_points,
+                       std::vector<double>                          &JxW_values,
+                       typename std::vector<Tensor<1,spacedim> >    &boundary_form,
+                       typename std::vector<Point<spacedim> >       &normal_vectors,
+                       std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
 
   /**
    * Implementation of the interface in Mapping.
    */
   virtual void
   fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int face_no,
-                          const unsigned int sub_no,
-                          const Quadrature<dim-1>& quadrature,
+                          const unsigned int                           face_no,
+                          const unsigned int                           sub_no,
+                          const Quadrature<dim-1>&                     quadrature,
                           typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                          typename std::vector<Point<spacedim> >        &quadrature_points,
-                          std::vector<double>             &JxW_values,
-                          typename std::vector<Tensor<1,spacedim> >        &boundary_form,
-                          typename std::vector<Point<spacedim> >        &normal_vectors) const ;
+                          typename std::vector<Point<spacedim> >       &quadrature_points,
+                          std::vector<double>                          &JxW_values,
+                          typename std::vector<Tensor<1,spacedim> >    &boundary_form,
+                          typename std::vector<Point<spacedim> >       &normal_vectors,
+                          std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
 
   /**
    * Compute shape values and/or derivatives.
@@ -388,16 +392,18 @@ public:
    * Do the computation for the <tt>fill_*</tt> functions.
    */
   void compute_fill_face (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int      face_no,
-                          const unsigned int      subface_no,
-                          const unsigned int      npts,
-                          const DataSetDescriptor data_set,
-                          const std::vector<double>   &weights,
-                          InternalData           &mapping_data,
+                          const unsigned int                face_no,
+                          const unsigned int                subface_no,
+                          const unsigned int                npts,
+                          const DataSetDescriptor           data_set,
+                          const std::vector<double>        &weights,
+                          InternalData                     &mapping_data,
                           std::vector<Point<spacedim> >    &quadrature_points,
-                          std::vector<double>         &JxW_values,
+                          std::vector<double>              &JxW_values,
                           std::vector<Tensor<1,spacedim> > &boundary_form,
-                          std::vector<Point<spacedim> > &normal_vectors) const;
+                          std::vector<Point<spacedim> >    &normal_vectors,
+                          std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const;
 
   /**
    * Compute shape values and/or derivatives.
