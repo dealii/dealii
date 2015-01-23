@@ -563,7 +563,7 @@ namespace Step39
     SolverControl coarse_solver_control (1000, 1e-10, false, false);
     SolverCG<TrilinosWrappers::MPI::Vector> coarse_solver(coarse_solver_control);
     PreconditionIdentity identity;
-    TrilinosWrappers::SparseMatrix coarse_matrix = mg_matrix[0];
+    TrilinosWrappers::SparseMatrix & coarse_matrix = mg_matrix[0];
     MGCoarseGridLACIteration<SolverCG<TrilinosWrappers::MPI::Vector>,TrilinosWrappers::MPI::Vector>
     coarse_grid_solver(coarse_solver, coarse_matrix, identity);
 
