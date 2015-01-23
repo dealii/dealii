@@ -121,16 +121,6 @@ namespace SparsityPatternIterators
   public:
     /**
      * Constructor.
-     *
-     * @deprecated This constructor is deprecated. Use the other constructor
-     * with a global index instead.
-     */
-    Accessor (const SparsityPattern *matrix,
-              const size_type        row,
-              const size_type        index) DEAL_II_DEPRECATED;
-
-    /**
-     * Constructor.
      */
     Accessor (const SparsityPattern *matrix,
               const std::size_t      index_within_sparsity);
@@ -244,17 +234,6 @@ namespace SparsityPatternIterators
   class Iterator
   {
   public:
-    /**
-     * Constructor. Create an iterator into the sparsity pattern @p sp for the
-     * given row and the index within it.
-     *
-     * @deprecated This constructor is deprecated. Use the other constructor
-     * with a global index instead.
-     */
-    Iterator (const SparsityPattern *sp,
-              const size_type        row,
-              const size_type        index) DEAL_II_DEPRECATED;
-
     /**
      * Constructor. Create an iterator into the sparsity pattern @p sp for the
      * given global index (i.e., the index of the given element counting from
@@ -1251,17 +1230,6 @@ namespace SparsityPatternIterators
   inline
   Accessor::
   Accessor (const SparsityPattern *sparsity_pattern,
-            const size_type        r,
-            const size_type        i)
-    :
-    sparsity_pattern(sparsity_pattern),
-    index_within_sparsity(sparsity_pattern->rowstart[r]+i)
-  {}
-
-
-  inline
-  Accessor::
-  Accessor (const SparsityPattern *sparsity_pattern,
             const std::size_t      i)
     :
     sparsity_pattern(sparsity_pattern),
@@ -1354,16 +1322,6 @@ namespace SparsityPatternIterators
             ExcIteratorPastEnd());
     ++index_within_sparsity;
   }
-
-
-
-  inline
-  Iterator::Iterator (const SparsityPattern *sparsity_pattern,
-                      const size_type        r,
-                      const size_type        i)
-    :
-    accessor(sparsity_pattern, sparsity_pattern->rowstart[r]+i)
-  {}
 
 
 
