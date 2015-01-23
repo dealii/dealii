@@ -63,28 +63,6 @@ BlockMatrixArray<number>::BlockMatrixArray (
 
 
 template <typename number>
-BlockMatrixArray<number>::BlockMatrixArray (
-  const unsigned int n_block_rows,
-  const unsigned int n_block_cols,
-  VectorMemory<Vector<number> > &)
-  : block_rows (n_block_rows),
-    block_cols (n_block_cols)
-{}
-
-
-template <typename number>
-void
-BlockMatrixArray<number>::initialize (
-  const unsigned int n_block_rows,
-  const unsigned int n_block_cols,
-  VectorMemory<Vector<number> > &)
-{
-  block_rows = n_block_rows;
-  block_cols = n_block_cols;
-}
-
-
-template <typename number>
 void
 BlockMatrixArray<number>::initialize (
   const unsigned int n_block_rows,
@@ -281,34 +259,11 @@ BlockTrianglePrecondition<number>::BlockTrianglePrecondition()
 
 template <typename number>
 BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
-  const unsigned int block_rows,
-  VectorMemory<Vector<number> > &,
-  const bool backward)
-  :
-  BlockMatrixArray<number> (block_rows, block_rows),
-  backward(backward)
-{}
-
-
-template <typename number>
-BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
   const unsigned int block_rows)
   :
   BlockMatrixArray<number> (block_rows, block_rows),
   backward(false)
 {}
-
-
-template <typename number>
-void
-BlockTrianglePrecondition<number>::initialize(
-  const unsigned int n_block_rows,
-  VectorMemory<Vector<number> > &,
-  const bool backward)
-{
-  BlockMatrixArray<number>::initialize(n_block_rows, n_block_rows);
-  this->backward = backward;
-}
 
 
 template <typename number>

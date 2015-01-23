@@ -156,6 +156,8 @@ inconvenience this causes.
   - The typedef CompressedBlockSparsityPattern.
   - The deprecated constructors of SparsityPattern iterator classes.
   - The deprecated variants of DoFTools::make_periodicity_constraints.
+  - BlockMatrixArray and BlockTrianglePreconditioner functions that
+    take an explicit VectorMemory object.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
