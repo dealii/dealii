@@ -71,36 +71,40 @@ public:
 
   virtual void
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim>                                     &quadrature,
-                  typename Mapping<dim, spacedim>::InternalDataBase         &mapping_data,
-                  std::vector<Point<spacedim> >                             &quadrature_points,
-                  std::vector<double>                                       &JxW_values,
+                  const Quadrature<dim>                             &quadrature,
+                  typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
+                  std::vector<Point<spacedim> >                     &quadrature_points,
+                  std::vector<double>                               &JxW_values,
                   std::vector<DerivativeForm<1,dim,spacedim> >      &jacobians,
-                  std::vector<DerivativeForm<2,dim,spacedim> >     &jacobian_grads,
-                  std::vector<DerivativeForm<1,spacedim,dim> >   &inverse_jacobians,
+                  std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
+                  std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
                   std::vector<Point<spacedim> > &,
-                  CellSimilarity::Similarity                           &cell_similarity) const ;
+                  CellSimilarity::Similarity                        &cell_similarity) const ;
 
 
   virtual void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int face_no,
-                       const Quadrature<dim-1>& quadrature,
+                       const unsigned int               face_no,
+                       const Quadrature<dim-1>&         quadrature,
                        typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
                        std::vector<Point<dim> >        &quadrature_points,
                        std::vector<double>             &JxW_values,
-                       std::vector<Tensor<1,dim> >        &boundary_form,
-                       std::vector<Point<spacedim> >        &normal_vectors) const ;
+                       std::vector<Tensor<1,dim> >     &boundary_form,
+                       std::vector<Point<spacedim> >   &normal_vectors,
+                       std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
   virtual void
   fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int face_no,
-                          const unsigned int sub_no,
-                          const Quadrature<dim-1>& quadrature,
+                          const unsigned int              face_no,
+                          const unsigned int              sub_no,
+                          const Quadrature<dim-1>&        quadrature,
                           typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
                           std::vector<Point<dim> >        &quadrature_points,
                           std::vector<double>             &JxW_values,
-                          std::vector<Tensor<1,dim> >        &boundary_form,
-                          std::vector<Point<spacedim> >        &normal_vectors) const ;
+                          std::vector<Tensor<1,dim> >     &boundary_form,
+                          std::vector<Point<spacedim> >   &normal_vectors,
+                          std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
 
   virtual void
   transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
