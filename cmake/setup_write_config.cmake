@@ -16,6 +16,25 @@
 
 ########################################################################
 #                                                                      #
+#                Query for git repository information:                 #
+#                                                                      #
+########################################################################
+
+DEAL_II_QUERY_GIT_INFORMATION()
+
+FILE(WRITE ${CMAKE_BINARY_DIR}/revision.log
+"###
+#
+#  Git information:
+#        Branch:   ${DEAL_II_GIT_BRANCH}
+#        Revision: ${DEAL_II_GIT_REVISION}
+#
+###"
+  )
+
+
+########################################################################
+#                                                                      #
 #              Write a nice configuration summary to file:             #
 #                                                                      #
 ########################################################################

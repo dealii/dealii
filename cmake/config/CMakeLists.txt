@@ -42,16 +42,16 @@ CONFIGURE_FILE( # for binary dir:
 #                                                                      #
 ########################################################################
 
-FILE(COPY # for binary dir:
+SET(_macros
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_query_git_information.cmake
+  )
+FILE(COPY ${_macros}
   DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_CMAKE_MACROS_RELDIR}
   )
-INSTALL(FILES # for installation:
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
+INSTALL(FILES ${_macros}
   DESTINATION ${DEAL_II_CMAKE_MACROS_RELDIR}
   COMPONENT library
   )
