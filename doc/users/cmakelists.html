@@ -47,6 +47,7 @@
     </li>
     <li><a href="#cmakeauto">Autopilot style <code>CMakeLists.txt</code></li>
     <li><a href="#dealiiconfig"><code>deal.IIConfig.cmake</code></a></li>
+    <li><a href="#makeconfig"><code>Make.global_options</code></a></li>
   </ol>
 </div>
 
@@ -717,6 +718,10 @@ DEAL_II_VERSION_MAJOR       - the major number, e.g. "8"
 DEAL_II_VERSION_MINOR       - the minor version number, e.g. "2"
 DEAL_II_VERSION_SUBMINOR    - the minor version number, e.g. "0"
 
+DEAL_II_GIT_BRANCH          - name of the local git branch of the source directory
+DEAL_II_GIT_REVISION        - full sha1 revision of the current git HEAD
+DEAL_II_GIT_SHORTREV        - short sha1 revision of the current git HEAD
+
 DEAL_II_BUILD_TYPE          - the configured build type, e.g. "DebugRelease"
 DEAL_II_BUILD_TYPES         - an all caps list of available configurations,
                               e.g. "DEBUG;RELEASE"
@@ -806,6 +811,18 @@ DEAL_II_WITH_TRILINOS
 DEAL_II_WITH_UMFPACK
 DEAL_II_WITH_ZLIB
 </pre>
+
+<a name="makeconfig"></a>
+<h2>  <code>Make.global_options</code> </h2>
+
+<p>
+  Above CMake configuration file <code>deal.IIConfig.cmake</code> is also
+  available as a Makefile includable file called
+  <code>Make.global_options</code>. It resides under
+  <code>share/deal.II/Make.global_options</code> in the build and install
+  directory (or alternatively whichever relative path
+  <code>DEAL_II_SHARE_RELDIR</code> is set to).
+</p>
 
     <hr />
     <div class="right">
