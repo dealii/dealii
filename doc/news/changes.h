@@ -149,9 +149,10 @@ inconvenience this causes.
     have been around for a while.
   - Vector::scale.
   - TrilinosWrappers::*Vector*::compress with an Epetra_CombineMode
-    argument
+    argument.
   - SparsityPattern and ChunkSparsityPattern functions that take an
     <code>optimize_diagonal</code> argument.
+  - Mapping::transform_covariant and Mapping::transform_contravariant.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
