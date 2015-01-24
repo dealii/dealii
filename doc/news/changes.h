@@ -165,6 +165,7 @@ inconvenience this causes.
   - The version of parallel::distributed::Vector::scale
     function that takes a scalar as argument.
   - GridTools::create_union_triangulation.
+  - GridTools::extract_boundary_mesh.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
