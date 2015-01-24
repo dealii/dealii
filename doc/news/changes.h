@@ -160,6 +160,8 @@ inconvenience this causes.
   - BlockMatrixArray and BlockTrianglePreconditioner functions that
     take an explicit VectorMemory object.
   - The SolverSelector constructor that takes a VectorMemory argument.
+  - The version of parallel::distributed::Vector::compress_finish
+    function that takes a boolean.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
