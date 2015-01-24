@@ -964,15 +964,6 @@ SparsityPattern::memory_consumption () const
 
 
 
-void
-SparsityPattern::
-partition (const unsigned int         n_partitions,
-           std::vector<unsigned int> &partition_indices) const
-{
-  SparsityTools::partition (*this, n_partitions, partition_indices);
-}
-
-
 // explicit instantiations
 template void SparsityPattern::copy_from<SparsityPattern> (const SparsityPattern &);
 template void SparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &);

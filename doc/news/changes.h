@@ -152,6 +152,7 @@ inconvenience this causes.
     argument.
   - SparsityPattern and ChunkSparsityPattern functions that take an
     <code>optimize_diagonal</code> argument.
+  - SparsityPattern::partition.
   - Mapping::transform_covariant and Mapping::transform_contravariant.
   - The typedef CompressedBlockSparsityPattern.
   - The deprecated constructors of SparsityPattern iterator classes.
