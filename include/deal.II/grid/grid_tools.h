@@ -769,15 +769,6 @@ namespace GridTools
   have_same_coarse_mesh (const Container &mesh_1,
                          const Container &mesh_2);
 
-  /**
-   * @deprecated Use GridGenerator::create_union_triangulation().
-   */
-  template <int dim, int spacedim>
-  void
-  create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
-                              const Triangulation<dim, spacedim> &triangulation_2,
-                              Triangulation<dim, spacedim>       &result)  DEAL_II_DEPRECATED;
-
   /*@}*/
   /**
    * @name Dealing with distorted cells
@@ -879,21 +870,6 @@ namespace GridTools
         return_type;
   };
 #endif
-
-  /**
-   * @deprecated Use GridGenerator::extract_boundary_mesh() instead.
-   */
-  template <template <int,int> class Container, int dim, int spacedim>
-#ifndef _MSC_VER
-  std::map<typename Container<dim-1,spacedim>::cell_iterator,
-      typename Container<dim,spacedim>::face_iterator>
-#else
-  typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
-#endif
-      extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
-                             Container<dim-1,spacedim>     &surface_mesh,
-                             const std::set<types::boundary_id> &boundary_ids
-                             = std::set<types::boundary_id>()) DEAL_II_DEPRECATED;
 
   /*@}*/
   /**

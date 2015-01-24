@@ -1877,17 +1877,6 @@ next_cell:
 
 
 
-  template <int dim, int spacedim>
-  void
-  create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
-                              const Triangulation<dim, spacedim> &triangulation_2,
-                              Triangulation<dim, spacedim>       &result)
-  {
-    // this function is deprecated. call the function that replaced it
-    GridGenerator::create_union_triangulation (triangulation_1, triangulation_2, result);
-  }
-
-
   namespace internal
   {
     namespace FixUpDistortedChildCells
@@ -2493,23 +2482,6 @@ next_cell:
     return patch;
   }
 
-
-
-
-  template <template <int,int> class Container, int dim, int spacedim>
-#ifndef _MSC_VER
-  std::map<typename Container<dim-1,spacedim>::cell_iterator,
-      typename Container<dim,spacedim>::face_iterator>
-#else
-  typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
-#endif
-      extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
-                             Container<dim-1,spacedim>     &surface_mesh,
-                             const std::set<types::boundary_id> &boundary_ids)
-  {
-    // this function is deprecated. call the one that replaced it
-    return GridGenerator::extract_boundary_mesh (volume_mesh, surface_mesh, boundary_ids);
-  }
 
 
 

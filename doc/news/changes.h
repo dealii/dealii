@@ -183,7 +183,26 @@ inconvenience this causes.
     have been around for a while.
   - Vector::scale.
   - TrilinosWrappers::*Vector*::compress with an Epetra_CombineMode
-    argument
+    argument.
+  - SparsityPattern and ChunkSparsityPattern functions that take an
+    <code>optimize_diagonal</code> argument.
+  - SparsityPattern::partition.
+  - Mapping::transform_covariant and Mapping::transform_contravariant.
+  - The typedef CompressedBlockSparsityPattern.
+  - The deprecated constructors of SparsityPattern iterator classes.
+  - The deprecated variants of DoFTools::make_periodicity_constraints.
+  - BlockMatrixArray and BlockTrianglePreconditioner functions that
+    take an explicit VectorMemory object.
+  - The SolverSelector constructor that takes a VectorMemory argument.
+  - The version of parallel::distributed::Vector::compress_finish
+    function that takes a boolean as argument.
+  - The version of BlockVector::scale and
+    parallel::distributed::Vector::scale,
+    parallel::distributed::BlockVector::scale
+    function that takes a scalar as argument.
+  - GridTools::create_union_triangulation.
+  - GridTools::extract_boundary_mesh.
+  - PreconditionBlock::size.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
@@ -208,7 +227,7 @@ inconvenience this causes.
     same function with the <code>level</code> argument for each
     of the levels of the triangulation individually.
   <br>
-  (Wolfgang Bangerth, 2014/12/29-2015/01/11)
+  (Wolfgang Bangerth, 2014/12/29-2015/01/22)
   </li>
 
   <li> Removed: The config.h file no longer exports HAVE_* definitions.

@@ -140,27 +140,6 @@ public:
                    const unsigned int n_block_cols);
 
   /**
-   * Constructor fixing the dimensions.
-   *
-   * @deprecated The last argument is ignored. Use the constructor with only
-   * the first two arguments.
-   */
-  BlockMatrixArray (const unsigned int n_block_rows,
-                    const unsigned int n_block_cols,
-                    VectorMemory<Vector<number> > &mem) DEAL_II_DEPRECATED;
-
-  /**
-   * Initialize object completely. This is the function to call for an object
-   * created by the default constructor.
-   *
-   * @deprecated The last argument is ignored. Use the function with same name
-   * but only the first two arguments.
-   */
-  void initialize (const unsigned int n_block_rows,
-                   const unsigned int n_block_cols,
-                   VectorMemory<Vector<number> > &mem) DEAL_II_DEPRECATED;
-
-  /**
    * Adjust the matrix to a new size and delete all blocks.
    */
   void reinit (const unsigned int n_block_rows,
@@ -182,22 +161,6 @@ public:
               const unsigned int  col,
               const double        prefix = 1.,
               const bool          transpose = false);
-
-  /**
-   * Add an entry like with enter, but use PointerMatrixAux for matrices not
-   * having functions vmult_add() and TVmult_add().
-   *
-   * @deprecated The first argument is ignored. Use the function with same
-   * name but without the first argument.
-   */
-  template <class MATRIX>
-  void enter_aux (VectorMemory<Vector<number> > &mem,
-                  const MATRIX       &matrix,
-                  const unsigned int  row,
-                  const unsigned int  col,
-                  const double        prefix = 1.,
-                  const bool          transpose = false) DEAL_II_DEPRECATED;
-
 
   /**
    * Delete all entries, i.e. reset the matrix to an empty state.
@@ -446,28 +409,6 @@ public:
   BlockTrianglePrecondition (const unsigned int n_blocks);
 
   /**
-   * Constructor. This matrix must be block-quadratic. The additional
-   * parameter allows for backward insertion instead of forward.
-   *
-   * @deprecated The second argument is ignored. Use the constructor with only
-   * the first and third argument.
-   */
-  BlockTrianglePrecondition (const unsigned int n_block_rows,
-                             VectorMemory<Vector<number> > &mem,
-                             const bool backward = false) DEAL_II_DEPRECATED;
-
-  /**
-   * Initialize object completely. This is the function to call for an object
-   * created by the default constructor.
-   *
-   * @deprecated The second argument is ignored. Use the function without that
-   * argument.
-   */
-  void initialize (const unsigned int n_block_rows,
-                   VectorMemory<Vector<number> > &mem,
-                   const bool backward = false) DEAL_II_DEPRECATED;
-
-  /**
    * Resize preconditioner to a new size and clear all blocks.
    */
   void reinit (const unsigned int n_block_rows);
@@ -483,21 +424,6 @@ public:
               const size_type col,
               const double    prefix = 1.,
               const bool      transpose = false);
-
-  /**
-   * Enter a block. This calls BlockMatrixArray::enter_aux(). Remember that
-   * the diagonal blocks should actually be inverse matrices or
-   * preconditioners.
-   *
-   * @deprecated The first argument is ignored. Use enter() instead.
-   */
-  template <class MATRIX>
-  void enter_aux (VectorMemory<Vector<double> > &mem,
-                  const MATRIX   &matrix,
-                  const size_type row,
-                  const size_type col,
-                  const double    prefix = 1.,
-                  const bool      transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Preconditioning.
@@ -618,24 +544,6 @@ BlockMatrixArray<number>::enter (
 
 
 template <typename number>
-template <class MATRIX>
-inline
-void
-BlockMatrixArray<number>::enter_aux (
-  VectorMemory<Vector<number> > &mem,
-  const MATRIX &matrix,
-  unsigned int row,
-  unsigned int col,
-  double prefix,
-  bool transpose)
-{
-  Assert(row<n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(col<n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
-  entries.push_back(Entry(matrix, row, col, prefix, transpose, mem));
-}
-
-
-template <typename number>
 template <class STREAM>
 inline
 void
@@ -707,23 +615,6 @@ BlockTrianglePrecondition<number>::enter (const MATRIX &matrix,
                                           double prefix, bool transpose)
 {
   BlockMatrixArray<number>::enter(matrix, row, col, prefix, transpose);
-}
-
-
-
-template <typename number>
-template <class MATRIX>
-inline
-void
-BlockTrianglePrecondition<number>::enter_aux (
-  VectorMemory<Vector<double> > &mem,
-  const MATRIX &matrix,
-  size_type row,
-  size_type col,
-  double prefix,
-  bool transpose)
-{
-  BlockMatrixArray<number>::enter_aux(mem, matrix, row, col, prefix, transpose);
 }
 
 

@@ -1055,57 +1055,6 @@ namespace DoFTools
    dealii::ConstraintMatrix &constraint_matrix,
    const ComponentMask      &component_mask = ComponentMask());
 
-
-
-  /**
-   * The @p offset is a vector tangential to the faces that is added to the
-   * location of vertices of the 'first' boundary when attempting to match
-   * them to the corresponding vertices of the 'second' boundary via
-   * orthogonal_equality (). This can be used to implement conditions such as
-   * $u(0,y)=u(1,y+1)$.
-   *
-   * @deprecated This function is deprecated. Use
-   * GridTools::collect_periodic_faces in conjunction with
-   * make_periodicity_constraints instead.
-   */
-  template<typename DH>
-  void
-  make_periodicity_constraints
-  (const DH                              &dof_handler,
-   const types::boundary_id              b_id1,
-   const types::boundary_id              b_id2,
-   const int                             direction,
-   dealii::Tensor<1,DH::space_dimension> &offset,
-   dealii::ConstraintMatrix              &constraint_matrix,
-   const ComponentMask                   &component_mask = ComponentMask()) DEAL_II_DEPRECATED;
-
-
-  /**
-   * The @p offset is a vector tangential to the faces that is added to the
-   * location of vertices of the 'first' boundary when attempting to match
-   * them to the corresponding vertices of the 'second' boundary via
-   * orthogonal_equality(). This can be used to implement conditions such as
-   * $u(0,y)=u(1,y+1)$.
-   *
-   * @note This version of make_periodicity_constraints  will not work on
-   * meshes with cells not in
-   * @ref GlossFaceOrientation "standard orientation".
-   *
-   * @deprecated This function is deprecated. Use
-   * GridTools::collect_periodic_faces in conjunction with
-   * make_periodicity_constraints instead.
-   */
-  template<typename DH>
-  void
-  make_periodicity_constraints
-  (const DH                              &dof_handler,
-   const types::boundary_id              b_id,
-   const int                             direction,
-   dealii::Tensor<1,DH::space_dimension> &offset,
-   dealii::ConstraintMatrix              &constraint_matrix,
-   const ComponentMask                   &component_mask = ComponentMask()) DEAL_II_DEPRECATED;
-
-
   /**
    * Take a vector of values which live on cells (e.g. an error per cell) and
    * distribute it to the dofs in such a way that a finite element field

@@ -2225,28 +2225,6 @@ namespace DoFTools
                                 dealii::ConstraintMatrix       &constraint_matrix,
                                 const ComponentMask            &component_mask)
   {
-    Tensor<1,DH::space_dimension> dummy;
-    make_periodicity_constraints (dof_handler,
-                                  b_id1,
-                                  b_id2,
-                                  direction,
-                                  dummy,
-                                  constraint_matrix,
-                                  component_mask);
-  }
-
-
-
-  template<typename DH>
-  void
-  make_periodicity_constraints (const DH                  &dof_handler,
-                                const types::boundary_id  b_id1,
-                                const types::boundary_id  b_id2,
-                                const int                 direction,
-                                dealii::Tensor<1,DH::space_dimension> &offset,
-                                dealii::ConstraintMatrix  &constraint_matrix,
-                                const ComponentMask       &component_mask)
-  {
     static const int space_dim = DH::space_dimension;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
@@ -2260,7 +2238,7 @@ namespace DoFTools
 
     // Collect matching periodic cells on the coarsest level:
     GridTools::collect_periodic_faces(dof_handler, b_id1, b_id2, direction,
-                                      matched_faces, offset);
+                                      matched_faces);
 
     make_periodicity_constraints<DH>
     (matched_faces, constraint_matrix, component_mask);
@@ -2276,26 +2254,6 @@ namespace DoFTools
                                 dealii::ConstraintMatrix       &constraint_matrix,
                                 const ComponentMask            &component_mask)
   {
-    Tensor<1,DH::space_dimension> dummy;
-    make_periodicity_constraints (dof_handler,
-                                  b_id,
-                                  direction,
-                                  dummy,
-                                  constraint_matrix,
-                                  component_mask);
-  }
-
-
-
-  template<typename DH>
-  void
-  make_periodicity_constraints (const DH                  &dof_handler,
-                                const types::boundary_id  b_id,
-                                const int                 direction,
-                                dealii::Tensor<1,DH::space_dimension> &offset,
-                                dealii::ConstraintMatrix  &constraint_matrix,
-                                const ComponentMask       &component_mask)
-  {
     static const int dim = DH::dimension;
     static const int space_dim = DH::space_dimension;
 
@@ -2310,7 +2268,7 @@ namespace DoFTools
 
     // Collect matching periodic cells on the coarsest level:
     GridTools::collect_periodic_faces(dof_handler, b_id, direction,
-                                      matched_faces, offset);
+                                      matched_faces);
 
     make_periodicity_constraints<DH>
     (matched_faces, constraint_matrix, component_mask);

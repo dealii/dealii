@@ -298,13 +298,6 @@ public:
   size_type block_size () const;
 
   /**
-   * @deprecated Use size() instead.
-   *
-   * The number of blocks of the matrix.
-   */
-  unsigned int n_blocks() const DEAL_II_DEPRECATED;
-
-  /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
@@ -522,10 +515,6 @@ public:
   using PreconditionBlockBase<inverse_type>::inverse_householder;
   using PreconditionBlockBase<inverse_type>::inverse_svd;
   using PreconditionBlockBase<inverse_type>::log_statistics;
-  /**
-   * @deprecated Use size() instead
-   */
-  using PreconditionBlock<MATRIX, inverse_type>::n_blocks;
   using PreconditionBlock<MATRIX, inverse_type>::set_permutation;
 
   /**
@@ -885,14 +874,6 @@ PreconditionBlock<MATRIX, inverse_type>::empty () const
   if (A == 0)
     return true;
   return A->empty();
-}
-
-
-template<class MATRIX, typename inverse_type>
-inline unsigned int
-PreconditionBlock<MATRIX, inverse_type>::n_blocks () const
-{
-  return this->size();
 }
 
 

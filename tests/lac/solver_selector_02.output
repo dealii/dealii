@@ -12,6 +12,3 @@ DEAL:GMRES::Convergence step 0 value 0
 DEAL:FGMRES::MySolverControl 0
 DEAL:FGMRES::Starting value 0
 DEAL:FGMRES::Convergence step 0 value 0
-DEAL:GMRES::MySolverControl 0
-DEAL:GMRES::Starting value 0
-DEAL:GMRES::Convergence step 0 value 0

@@ -276,16 +276,6 @@ public:
                const bool                 fast=false);
 
   /**
-   * Scale each element of the vector by the given factor.
-   *
-   * This function is deprecated and will be removed in a future version. Use
-   * <tt>operator *=</tt> and <tt>operator /=</tt> instead.
-   *
-   * @deprecated Use <tt>operator*=</tt> instead.
-   */
-  void scale (const value_type factor) DEAL_II_DEPRECATED;
-
-  /**
    * Multiply each element of this vector by the corresponding element of
    * <tt>v</tt>.
    */
@@ -438,18 +428,6 @@ void BlockVector<Number>::compress (::dealii::VectorOperation::values operation)
 {
   for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i].compress(operation);
-}
-
-
-
-template <typename Number>
-void BlockVector<Number>::scale (const value_type factor)
-{
-
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
-
-  for (size_type i=0; i<this->n_blocks(); ++i)
-    this->components[i] *= factor;
 }
 
 

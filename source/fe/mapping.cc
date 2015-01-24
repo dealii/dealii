@@ -25,69 +25,6 @@ Mapping<dim, spacedim>::~Mapping ()
 {}
 
 
-// This function is deprecated and has been replaced by transform above
-template<int dim, int spacedim>
-void
-Mapping<dim,spacedim>::transform_covariant (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-  const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
-{
-  Assert (offset == 0, ExcInternalError());
-
-  transform(input, output, mapping_data, mapping_covariant);
-}
-
-
-
-// This function is deprecated and has been replaced by transform above
-template <int dim, int spacedim>
-void
-Mapping<dim, spacedim>::transform_covariant (
-  const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
-  const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
-{
-  Assert (offset == 0, ExcInternalError());
-
-  transform(input, output, mapping_data, mapping_covariant);
-}
-
-
-
-// This function is deprecated and has been replaced by transform above
-template<int dim, int spacedim>
-void
-Mapping<dim,spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-  const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<1,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
-{
-  Assert (offset == 0, ExcInternalError());
-
-  transform(input, output, mapping_data, mapping_contravariant);
-}
-
-
-
-// This function is deprecated and has been replaced by transform above
-template<int dim, int spacedim>
-void
-Mapping<dim,spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
-  const unsigned int                 offset,
-  VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
-{
-  Assert (offset == 0, ExcInternalError());
-
-  transform(input, output, mapping_data, mapping_contravariant);
-}
-
-
 /*------------------------------ InternalDataBase ------------------------------*/
 
 

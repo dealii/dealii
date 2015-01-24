@@ -453,11 +453,6 @@ namespace parallel
       void compress_finish (::dealii::VectorOperation::values operation);
 
       /**
-       * @deprecated: use compress_finish(VectorOperation::values) instead.
-       */
-      void compress_finish (const bool add_ghost_data = true) DEAL_II_DEPRECATED;
-
-      /**
        * Initiates communication for the @p update_ghost_values() function
        * with non-blocking communication. This function does not wait for the
        * transfer to finish, in order to allow for other computations during
@@ -871,15 +866,6 @@ namespace parallel
                  const Vector<Number> &W,
                  const Number          c,
                  const Vector<Number> &X);
-
-      /**
-       * Scale each element of the vector by the given factor.
-       *
-       * @deprecated This function is deprecated and will be removed in a
-       * future version. Use <tt>operator *=</tt> and <tt>operator /=</tt>
-       * instead.
-       */
-      void scale (const Number factor) DEAL_II_DEPRECATED;
 
       /**
        * Scale each element of the vector by a constant value.
@@ -1338,19 +1324,6 @@ namespace parallel
     {
       compress_start (0, operation);
       compress_finish(operation);
-    }
-
-
-
-    template <typename Number>
-    inline
-    void
-    Vector<Number>::compress_finish (const bool add_value)
-    {
-      if (add_value)
-        compress_finish(VectorOperation::add);
-      else
-        compress_finish(VectorOperation::insert);
     }
 
 
@@ -2181,16 +2154,6 @@ namespace parallel
 
       if (vector_is_ghosted)
         update_ghost_values();
-    }
-
-
-
-    template <typename Number>
-    inline
-    void
-    Vector<Number>::scale (const Number factor)
-    {
-      operator *=(factor);
     }
 
 

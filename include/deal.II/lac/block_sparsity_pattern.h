@@ -488,9 +488,6 @@ public:
  * @ref Sparsity,
  * section 'Dynamic block sparsity patterns' for more information.
  *
- * <b>Note:</b> This class used to be called CompressedBlockSparsityPattern.
- * However, since it's a block wrapper around the CompressedSparsityPattern
- * class, this is a misnomer and the class has been renamed.
  *
  * <h3>Example</h3>
  *
@@ -578,17 +575,6 @@ public:
    */
   using BlockSparsityPatternBase<CompressedSparsityPattern>::reinit;
 };
-
-
-/**
- * A typdef to preserve the old name CompressedBlockSparsityPattern even after
- * we changed the naming of the class to BlockCompressedSparsityPattern. The
- * old name is now deprecated and user codes should use the name
- * BlockCompressedSparsityPattern instead.
- *
- * @deprecated
- */
-typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern DEAL_II_DEPRECATED;
 
 
 
