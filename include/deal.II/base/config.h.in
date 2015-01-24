@@ -62,6 +62,8 @@
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_WITH_ZLIB
 
+#cmakedefine DEAL_II_ARPACK_WITH_PARPACK
+
 
 /***********************************************************************
  * Compiler bugs:
