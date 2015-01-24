@@ -161,7 +161,9 @@ inconvenience this causes.
     take an explicit VectorMemory object.
   - The SolverSelector constructor that takes a VectorMemory argument.
   - The version of parallel::distributed::Vector::compress_finish
-    function that takes a boolean.
+    function that takes a boolean as argument.
+  - The version of parallel::distributed::Vector::scale
+    function that takes a scalar as argument.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into

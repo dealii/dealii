@@ -868,15 +868,6 @@ namespace parallel
                  const Vector<Number> &X);
 
       /**
-       * Scale each element of the vector by the given factor.
-       *
-       * @deprecated This function is deprecated and will be removed in a
-       * future version. Use <tt>operator *=</tt> and <tt>operator /=</tt>
-       * instead.
-       */
-      void scale (const Number factor) DEAL_II_DEPRECATED;
-
-      /**
        * Scale each element of the vector by a constant value.
        */
       Vector<Number> &operator *= (const Number factor);
@@ -2163,16 +2154,6 @@ namespace parallel
 
       if (vector_is_ghosted)
         update_ghost_values();
-    }
-
-
-
-    template <typename Number>
-    inline
-    void
-    Vector<Number>::scale (const Number factor)
-    {
-      operator *=(factor);
     }
 
 
