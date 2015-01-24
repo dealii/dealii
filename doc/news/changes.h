@@ -166,6 +166,7 @@ inconvenience this causes.
     function that takes a scalar as argument.
   - GridTools::create_union_triangulation.
   - GridTools::extract_boundary_mesh.
+  - PreconditionBlock::size.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
