@@ -162,7 +162,8 @@ inconvenience this causes.
   - The SolverSelector constructor that takes a VectorMemory argument.
   - The version of parallel::distributed::Vector::compress_finish
     function that takes a boolean as argument.
-  - The version of parallel::distributed::Vector::scale and
+  - The version of BlockVector::scale and
+    parallel::distributed::Vector::scale,
     parallel::distributed::BlockVector::scale
     function that takes a scalar as argument.
   - GridTools::create_union_triangulation.

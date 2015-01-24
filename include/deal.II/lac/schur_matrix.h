@@ -271,7 +271,7 @@ double SchurMatrix<MA_inverse, MB, MDt, MC>
            const BlockVector<double> &rhs) const
 {
   vmult(dst, src);
-  dst.scale(-1.);
+  dst *= -1.;
   dst += rhs;
   return dst.l2_norm();
 }
