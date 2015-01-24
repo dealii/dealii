@@ -159,6 +159,7 @@ inconvenience this causes.
   - The deprecated variants of DoFTools::make_periodicity_constraints.
   - BlockMatrixArray and BlockTrianglePreconditioner functions that
     take an explicit VectorMemory object.
+  - The SolverSelector constructor that takes a VectorMemory argument.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into

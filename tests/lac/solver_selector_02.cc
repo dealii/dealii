@@ -68,12 +68,6 @@ check(const MATRIX &A, const VECTOR &f)
       u = 0.;
       solver.solve(A, u, f, pre);
     }
-
-  //test deprecated constructor too:
-  GrowingVectorMemory<VECTOR> mem;
-  SolverSelector<VECTOR> solver2("gmres", mycont, mem);
-  u = 0.;
-  solver2.solve(A, u, f, pre);
 }
 
 
