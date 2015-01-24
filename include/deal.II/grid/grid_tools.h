@@ -769,15 +769,6 @@ namespace GridTools
   have_same_coarse_mesh (const Container &mesh_1,
                          const Container &mesh_2);
 
-  /**
-   * @deprecated Use GridGenerator::create_union_triangulation().
-   */
-  template <int dim, int spacedim>
-  void
-  create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
-                              const Triangulation<dim, spacedim> &triangulation_2,
-                              Triangulation<dim, spacedim>       &result)  DEAL_II_DEPRECATED;
-
   /*@}*/
   /**
    * @name Dealing with distorted cells

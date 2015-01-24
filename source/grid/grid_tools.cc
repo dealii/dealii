@@ -1877,17 +1877,6 @@ next_cell:
 
 
 
-  template <int dim, int spacedim>
-  void
-  create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
-                              const Triangulation<dim, spacedim> &triangulation_2,
-                              Triangulation<dim, spacedim>       &result)
-  {
-    // this function is deprecated. call the function that replaced it
-    GridGenerator::create_union_triangulation (triangulation_1, triangulation_2, result);
-  }
-
-
   namespace internal
   {
     namespace FixUpDistortedChildCells
