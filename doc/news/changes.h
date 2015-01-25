@@ -207,6 +207,7 @@ inconvenience this causes.
   - MGTools::apply_boundary_values.
   - MGTools::extract_inner_interface_dofs.
   - Class MGMatrix.
+  - Multigrid::vmult and friends.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
