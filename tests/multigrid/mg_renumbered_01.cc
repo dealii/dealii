@@ -372,11 +372,11 @@ void LaplaceProblem<dim>::test ()
   mg_smoother.set_steps(1);
   mg_smoother_renumbered.set_steps(1);
 
-  MGMatrix<SparseMatrix<double>, Vector<double> >
-  mg_matrix(&mg_matrices);
+  mg::Matrix<Vector<double> >
+  mg_matrix(mg_matrices);
 
-  MGMatrix<SparseMatrix<double>, Vector<double> >
-  mg_matrix_renumbered(&mg_matrices_renumbered);
+  mg::Matrix<Vector<double> >
+  mg_matrix_renumbered(mg_matrices_renumbered);
 
   Multigrid<Vector<double> > mg(mg_dof_handler,
                                 mg_matrix,

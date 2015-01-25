@@ -449,9 +449,9 @@ void LaplaceProblem<dim>::solve ()
   mg_smoother.set_steps(2);
   mg_smoother.set_symmetric(true);
 
-  MGMatrix<> mg_matrix(&mg_matrices);
-  MGMatrix<> mg_interface_up(&mg_interface_matrices);
-  MGMatrix<> mg_interface_down(&mg_interface_matrices);
+  mg::Matrix<> mg_matrix(mg_matrices);
+  mg::Matrix<> mg_interface_up(mg_interface_matrices);
+  mg::Matrix<> mg_interface_down(mg_interface_matrices);
 
   Multigrid<Vector<double> > mg(mg_dof_handler,
                                 mg_matrix,

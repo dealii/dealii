@@ -83,34 +83,6 @@ namespace mg
 
 }
 
-/**
- * @deprecated Use the much simpler class mg::Matrix instead.
- * @author Guido Kanschat, 2002
- */
-template <class MATRIX = SparseMatrix<double>, class VECTOR = Vector<double> >
-class MGMatrix : public MGMatrixBase<VECTOR>
-{
-public:
-  MGMatrix (MGLevelObject<MATRIX> *matrix= 0);
-
-  void set_matrix (MGLevelObject<MATRIX> *M);
-  virtual void vmult (const unsigned int level,
-                      VECTOR &dst,
-                      const VECTOR &src) const;
-  virtual void vmult_add (const unsigned int level,
-                          VECTOR &dst,
-                          const VECTOR &src) const;
-  virtual void Tvmult (const unsigned int level,
-                       VECTOR &dst,
-                       const VECTOR &src) const;
-  virtual void Tvmult_add (const unsigned int level,
-                           VECTOR &dst,
-                           const VECTOR &src) const;
-  std::size_t memory_consumption () const;
-private:
-  SmartPointer<MGLevelObject<MATRIX>,MGMatrix<MATRIX,VECTOR> > matrix;
-} DEAL_II_DEPRECATED;
-
 
 /**
  * Multilevel matrix selecting from block matrices. This class implements the
@@ -283,81 +255,6 @@ namespace mg
   }
 }
 
-/*----------------------------------------------------------------------*/
-
-template <class MATRIX, class VECTOR>
-MGMatrix<MATRIX, VECTOR>::MGMatrix (MGLevelObject<MATRIX> *p)
-  :
-  matrix (p, typeid(*this).name())
-{}
-
-
-template <class MATRIX, class VECTOR>
-void
-MGMatrix<MATRIX, VECTOR>::set_matrix (MGLevelObject<MATRIX> *p)
-{
-  matrix = p;
-}
-
-
-template <class MATRIX, class VECTOR>
-void
-MGMatrix<MATRIX, VECTOR>::vmult  (const unsigned int level,
-                                  VECTOR &dst,
-                                  const VECTOR &src) const
-{
-  Assert(matrix != 0, ExcNotInitialized());
-
-  const MGLevelObject<MATRIX> &m = *matrix;
-  m[level].vmult(dst, src);
-}
-
-
-template <class MATRIX, class VECTOR>
-void
-MGMatrix<MATRIX, VECTOR>::vmult_add  (const unsigned int level,
-                                      VECTOR &dst,
-                                      const VECTOR &src) const
-{
-  Assert(matrix != 0, ExcNotInitialized());
-
-  const MGLevelObject<MATRIX> &m = *matrix;
-  m[level].vmult_add(dst, src);
-}
-
-
-template <class MATRIX, class VECTOR>
-void
-MGMatrix<MATRIX, VECTOR>::Tvmult  (const unsigned int level,
-                                   VECTOR &dst,
-                                   const VECTOR &src) const
-{
-  Assert(matrix != 0, ExcNotInitialized());
-
-  const MGLevelObject<MATRIX> &m = *matrix;
-  m[level].Tvmult(dst, src);
-}
-
-
-template <class MATRIX, class VECTOR>
-void
-MGMatrix<MATRIX, VECTOR>::Tvmult_add  (const unsigned int level,
-                                       VECTOR &dst,
-                                       const VECTOR &src) const
-{
-  Assert(matrix != 0, ExcNotInitialized());
-
-  const MGLevelObject<MATRIX> &m = *matrix;
-  m[level].Tvmult_add(dst, src);
-}
-
-
-template <class MATRIX, class VECTOR>
-std::size_t
-MGMatrix<MATRIX, VECTOR>::memory_consumption () const
-{
-  return sizeof(*this) + matrix->memory_consumption();
-}
 
 /*----------------------------------------------------------------------*/
 

@@ -206,6 +206,7 @@ inconvenience this causes.
   - MGTools::count_dofs_per_component.
   - MGTools::apply_boundary_values.
   - MGTools::extract_inner_interface_dofs.
+  - Class MGMatrix.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
