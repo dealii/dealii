@@ -170,16 +170,6 @@ namespace MGTools
                             std::vector<unsigned int> target_component = std::vector<unsigned int>());
 
   /**
-   * @deprecated Wrapper for the other function with same name, introduced for
-   * compatibility.
-   */
-  template <int dim, int spacedim>
-  void
-  count_dofs_per_component (const DoFHandler<dim,spacedim> &mg_dof,
-                            std::vector<std::vector<types::global_dof_index> > &result,
-                            std::vector<unsigned int> target_component) DEAL_II_DEPRECATED;
-
-  /**
    * Generate a list of those degrees of freedom at the boundary of the domain
    * that should be eliminated from the matrix because they will be
    * constrained by Dirichlet boundary conditions.

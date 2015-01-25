@@ -1059,18 +1059,6 @@ namespace MGTools
 
 
 
-  template <int dim, int spacedim>
-  void
-  count_dofs_per_component (const DoFHandler<dim,spacedim>        &dof_handler,
-                            std::vector<std::vector<types::global_dof_index> > &result,
-                            std::vector<unsigned int>            target_component)
-  {
-    count_dofs_per_component (dof_handler, result,
-                              false, target_component);
-  }
-
-
-
   template <class DH>
   void
   count_dofs_per_block (

@@ -84,9 +84,6 @@ for (deal_II_dimension : DIMENSIONS)
       template void count_dofs_per_component (
 	const DoFHandler<deal_II_dimension>&, std::vector<std::vector<types::global_dof_index> >&,
 	bool, std::vector<unsigned int>);
-      template void count_dofs_per_component (
-	const DoFHandler<deal_II_dimension>&, std::vector<std::vector<types::global_dof_index> >&,
-	std::vector<unsigned int>);
       template void count_dofs_per_block (
 	const DoFHandler<deal_II_dimension>&, std::vector<std::vector<types::global_dof_index> >&,
 	std::vector<unsigned int>);
