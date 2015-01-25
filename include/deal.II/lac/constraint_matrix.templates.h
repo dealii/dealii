@@ -786,14 +786,15 @@ ConstraintMatrix::set_zero (VectorType &vec) const
 
 
 
-template <typename VectorType, typename LocalType>
+template <typename VectorType>
 void
 ConstraintMatrix::
-distribute_local_to_global (const Vector<LocalType>      &local_vector,
-                            const std::vector<size_type> &local_dof_indices,
-                            VectorType                   &global_vector,
-                            const FullMatrix<LocalType>  &local_matrix) const
+distribute_local_to_global (const Vector<typename VectorType::value_type>      &local_vector,
+                            const std::vector<size_type>                       &local_dof_indices,
+                            VectorType                                         &global_vector,
+                            const FullMatrix<typename VectorType::value_type>  &local_matrix) const
 {
+  typedef typename VectorType::value_type LocalType;
   Assert (sorted == true, ExcMatrixNotClosed());
   AssertDimension (local_vector.size(), local_dof_indices.size());
   AssertDimension (local_matrix.m(), local_dof_indices.size());
@@ -2167,19 +2168,20 @@ add_this_index:
   // degrees of freedom to which this dof is constrained are also constrained
   // (the usual case with hanging nodes in 3d). however, in the line below, we
   // do actually do something with this dof
-  template <typename MatrixType, typename VectorType, typename LocalType>
+  template <typename MatrixType, typename VectorType>
   inline void
-  set_matrix_diagonals (const internals::GlobalRowsFromLocal &global_rows,
-                        const std::vector<size_type>         &local_dof_indices,
-                        const FullMatrix<LocalType>          &local_matrix,
-                        const ConstraintMatrix               &constraints,
-                        MatrixType                           &global_matrix,
-                        VectorType                           &global_vector,
-                        bool                                 use_inhomogeneities_for_rhs)
+  set_matrix_diagonals (const internals::GlobalRowsFromLocal               &global_rows,
+                        const std::vector<size_type>                       &local_dof_indices,
+                        const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+                        const ConstraintMatrix                             &constraints,
+                        MatrixType                                         &global_matrix,
+                        VectorType                                         &global_vector,
+                        bool                                               use_inhomogeneities_for_rhs)
   {
+    typedef typename MatrixType::value_type LocalType;
     if (global_rows.n_constraints() > 0)
       {
-        LocalType average_diagonal = 0;
+        LocalType average_diagonal = LocalType();
         for (size_type i=0; i<local_matrix.m(); ++i)
           average_diagonal += std::abs (local_matrix(i,i));
         average_diagonal /= static_cast<double>(local_matrix.m());
@@ -2386,7 +2388,7 @@ resolve_vector_entry (const size_type                       i,
 {
   const size_type loc_row = global_rows.local_row(i);
   const size_type n_inhomogeneous_rows = global_rows.n_inhomogeneities();
-  LocalType val = 0;
+  LocalType val = LocalType();
   // has a direct contribution from some local entry. If we have inhomogeneous
   // constraints, compute the contribution of the inhomogeneity in the current
   // row.
@@ -2419,17 +2421,18 @@ resolve_vector_entry (const size_type                       i,
 
 // internal implementation for distribute_local_to_global for standard
 // (non-block) matrices
-template <typename MatrixType, typename VectorType, typename LocalType>
+template <typename MatrixType, typename VectorType>
 void
 ConstraintMatrix::distribute_local_to_global (
-  const FullMatrix<LocalType>     &local_matrix,
-  const Vector<LocalType>         &local_vector,
-  const std::vector<size_type>    &local_dof_indices,
-  MatrixType                      &global_matrix,
-  VectorType                      &global_vector,
-  bool                            use_inhomogeneities_for_rhs,
+  const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+  const Vector<typename VectorType::value_type>      &local_vector,
+  const std::vector<size_type>                       &local_dof_indices,
+  MatrixType                                         &global_matrix,
+  VectorType                                         &global_vector,
+  bool                                               use_inhomogeneities_for_rhs,
   internal::bool2type<false>) const
 {
+  typedef typename VectorType::value_type LocalTypeVector;
   // check whether we work on real vectors or we just used a dummy when
   // calling the other function above.
   const bool use_vectors = (local_vector.size() == 0 &&
@@ -2509,10 +2512,10 @@ ConstraintMatrix::distribute_local_to_global (
       // hand side.
       if (use_vectors == true)
         {
-          const LocalType val = resolve_vector_entry (i, global_rows,
-                                                      local_vector,
-                                                      local_dof_indices,
-                                                      local_matrix);
+          const LocalTypeVector val = resolve_vector_entry (i, global_rows,
+                                                            local_vector,
+                                                            local_dof_indices,
+                                                            local_matrix);
 
           if (val != LocalType ())
             global_vector(row) += static_cast<typename VectorType::value_type>(val);
@@ -2526,15 +2529,15 @@ ConstraintMatrix::distribute_local_to_global (
 
 
 
-template <typename MatrixType, typename LocalType>
+template <typename MatrixType>
 void
 ConstraintMatrix::distribute_local_to_global (
-  const FullMatrix<LocalType>  &local_matrix,
-  const std::vector<size_type> &row_indices,
-  const std::vector<size_type> &col_indices,
-  MatrixType                   &global_matrix) const
+  const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+  const std::vector<size_type>                       &row_indices,
+  const std::vector<size_type>                       &col_indices,
+  MatrixType                                         &global_matrix) const
 {
-  typedef LocalType number;
+  typedef typename MatrixType::value_type number;
 
   AssertDimension (local_matrix.m(), row_indices.size());
   AssertDimension (local_matrix.n(), col_indices.size());
@@ -2582,15 +2585,15 @@ ConstraintMatrix::distribute_local_to_global (
 
 // similar function as above, but now specialized for block matrices. See the
 // other function for additional comments.
-template <typename MatrixType, typename VectorType, typename LocalType>
+template <typename MatrixType, typename VectorType>
 void
 ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<LocalType>  &local_matrix,
-                            const Vector<LocalType>      &local_vector,
-                            const std::vector<size_type> &local_dof_indices,
-                            MatrixType                   &global_matrix,
-                            VectorType                   &global_vector,
-                            bool                          use_inhomogeneities_for_rhs,
+distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+                            const Vector<typename VectorType::value_type>      &local_vector,
+                            const std::vector<size_type>                       &local_dof_indices,
+                            MatrixType                                         &global_matrix,
+                            VectorType                                         &global_vector,
+                            bool                                                use_inhomogeneities_for_rhs,
                             internal::bool2type<true>) const
 {
   const bool use_vectors = (local_vector.size() == 0 &&
@@ -2683,12 +2686,12 @@ distribute_local_to_global (const FullMatrix<LocalType>  &local_matrix,
 
           if (use_vectors == true)
             {
-              const LocalType val = resolve_vector_entry (i, global_rows,
-                                                          local_vector,
-                                                          local_dof_indices,
-                                                          local_matrix);
+              const number val = resolve_vector_entry (i, global_rows,
+                                                       local_vector,
+                                                       local_dof_indices,
+                                                       local_matrix);
 
-              if (val != LocalType ())
+              if (val != number ())
                 global_vector(global_indices[i]) +=
                   static_cast<typename VectorType::value_type>(val);
             }

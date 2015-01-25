@@ -803,12 +803,12 @@ public:
    * site. There is no locking mechanism inside this method to prevent data
    * races.
    */
-  template <typename VectorType, typename LocalType>
+  template <typename VectorType>
   void
-  distribute_local_to_global (const Vector<LocalType>      &local_vector,
-                              const std::vector<size_type> &local_dof_indices,
-                              VectorType                   &global_vector,
-                              const FullMatrix<LocalType>  &local_matrix) const;
+  distribute_local_to_global (const Vector<typename VectorType::value_type>      &local_vector,
+                              const std::vector<size_type>                       &local_dof_indices,
+                              VectorType                                         &global_vector,
+                              const FullMatrix<typename VectorType::value_type>  &local_matrix) const;
 
   /**
    * Enter a single value into a result vector, obeying constraints.
@@ -904,17 +904,9 @@ public:
    */
   template <typename MatrixType>
   void
-  distribute_local_to_global (const FullMatrix<double>     &local_matrix,
-                              const std::vector<size_type> &local_dof_indices,
-                              MatrixType                   &global_matrix) const;
-  /**
-   * Same as above for complex.
-   */
-  template <typename MatrixType>
-  void
-  distribute_local_to_global (const FullMatrix<std::complex<double> > &local_matrix,
-                              const std::vector<size_type>            &local_dof_indices,
-                              MatrixType                              &global_matrix) const;
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type> &local_matrix,
+                              const std::vector<size_type>                      &local_dof_indices,
+                              MatrixType                                        &global_matrix) const;
 
   /**
    * Does almost the same as the function above but can treat general
@@ -943,12 +935,12 @@ public:
    * eigenvalue (with a multiplicity that is possibly greater than one).
    * Taking this into account, nothing else has to be changed.
    */
-  template <typename MatrixType, typename LocalType>
+  template <typename MatrixType>
   void
-  distribute_local_to_global (const FullMatrix<LocalType>  &local_matrix,
-                              const std::vector<size_type> &row_indices,
-                              const std::vector<size_type> &col_indices,
-                              MatrixType                   &global_matrix) const;
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+                              const std::vector<size_type>                       &row_indices,
+                              const std::vector<size_type>                       &col_indices,
+                              MatrixType                                         &global_matrix) const;
 
   /**
    * This function simultaneously writes elements into matrix and vector,
@@ -968,24 +960,12 @@ public:
    */
   template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global (const FullMatrix<double>      &local_matrix,
-                              const Vector<double>          &local_vector,
-                              const std::vector<size_type>  &local_dof_indices,
-                              MatrixType                    &global_matrix,
-                              VectorType                    &global_vector,
-                              bool                          use_inhomogeneities_for_rhs = false) const;
-
-  /**
-   * Same as above for complex.
-   */
-  template <typename MatrixType, typename VectorType>
-  void
-  distribute_local_to_global (const FullMatrix<std::complex<double> > &local_matrix,
-                              const Vector<std::complex<double> >     &local_vector,
-                              const std::vector<size_type>            &local_dof_indices,
-                              MatrixType                              &global_matrix,
-                              VectorType                              &global_vector,
-                              bool                                    use_inhomogeneities_for_rhs = false) const;
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+                              const Vector<typename VectorType::value_type>      &local_vector,
+                              const std::vector<size_type>                       &local_dof_indices,
+                              MatrixType                                         &global_matrix,
+                              VectorType                                         &global_vector,
+                              bool                                                use_inhomogeneities_for_rhs = false) const;
 
   /**
    * Do a similar operation as the distribute_local_to_global() function that
@@ -1355,28 +1335,28 @@ private:
    * This function actually implements the local_to_global function for
    * standard (non-block) matrices.
    */
-  template <typename MatrixType, typename VectorType, typename LocalType>
+  template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global (const FullMatrix<LocalType>  &local_matrix,
-                              const Vector<LocalType>      &local_vector,
-                              const std::vector<size_type> &local_dof_indices,
-                              MatrixType                   &global_matrix,
-                              VectorType                   &global_vector,
-                              bool                          use_inhomogeneities_for_rhs,
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+                              const Vector<typename VectorType::value_type>      &local_vector,
+                              const std::vector<size_type>                       &local_dof_indices,
+                              MatrixType                                         &global_matrix,
+                              VectorType                                         &global_vector,
+                              bool                                                use_inhomogeneities_for_rhs,
                               internal::bool2type<false>) const;
 
   /**
    * This function actually implements the local_to_global function for block
    * matrices.
    */
-  template <typename MatrixType, typename VectorType, typename LocalType>
+  template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global (const FullMatrix<LocalType>  &local_matrix,
-                              const Vector<LocalType>      &local_vector,
-                              const std::vector<size_type> &local_dof_indices,
-                              MatrixType                   &global_matrix,
-                              VectorType                   &global_vector,
-                              bool                          use_inhomogeneities_for_rhs,
+  distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &local_matrix,
+                              const Vector<typename VectorType::value_type>      &local_vector,
+                              const std::vector<size_type>                       &local_dof_indices,
+                              MatrixType                                         &global_matrix,
+                              VectorType                                         &global_vector,
+                              bool                                                use_inhomogeneities_for_rhs,
                               internal::bool2type<true>) const;
 
   /**
