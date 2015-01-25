@@ -208,6 +208,7 @@ inconvenience this causes.
   - MGTools::extract_inner_interface_dofs.
   - Class MGMatrix.
   - Multigrid::vmult and friends.
+  - Classes FEEvaluationGeneral and FEEvaluationGL.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
