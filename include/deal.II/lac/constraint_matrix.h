@@ -1732,29 +1732,13 @@ template <typename MatrixType>
 inline
 void
 ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<double>     &local_matrix,
-                            const std::vector<size_type> &local_dof_indices,
-                            MatrixType                   &global_matrix) const
+distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>     &local_matrix,
+                            const std::vector<size_type>                          &local_dof_indices,
+                            MatrixType                                            &global_matrix) const
 {
   // create a dummy and hand on to the function actually implementing this
   // feature in the cm.templates.h file.
-  Vector<double> dummy(0);
-  distribute_local_to_global (local_matrix, dummy, local_dof_indices,
-                              global_matrix, dummy, false,
-                              dealii::internal::bool2type<IsBlockMatrix<MatrixType>::value>());
-}
-
-template <typename MatrixType>
-inline
-void
-ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<std::complex<double> > &local_matrix,
-                            const std::vector<size_type>            &local_dof_indices,
-                            MatrixType                              &global_matrix) const
-{
-  // create a dummy and hand on to the function actually implementing this
-  // feature in the cm.templates.h file.
-  Vector<std::complex<double> > dummy(0);
+  Vector<typename MatrixType::value_type> dummy(0);
   distribute_local_to_global (local_matrix, dummy, local_dof_indices,
                               global_matrix, dummy, false,
                               dealii::internal::bool2type<IsBlockMatrix<MatrixType>::value>());
@@ -1766,32 +1750,12 @@ template <typename MatrixType, typename VectorType>
 inline
 void
 ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<double>     &local_matrix,
-                            const Vector<double>         &local_vector,
-                            const std::vector<size_type> &local_dof_indices,
-                            MatrixType                   &global_matrix,
-                            VectorType                   &global_vector,
-                            bool                          use_inhomogeneities_for_rhs) const
-{
-  // enter the internal function with the respective block information set,
-  // the actual implementation follows in the cm.templates.h file.
-  distribute_local_to_global (local_matrix, local_vector, local_dof_indices,
-                              global_matrix, global_vector, use_inhomogeneities_for_rhs,
-                              dealii::internal::bool2type<IsBlockMatrix<MatrixType>::value>());
-}
-
-
-// Complex case (maybe can be merged with the function above)
-template <typename MatrixType, typename VectorType>
-inline
-void
-ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<std::complex<double> > &local_matrix,
-                            const Vector<std::complex<double> >     &local_vector,
-                            const std::vector<size_type>            &local_dof_indices,
-                            MatrixType                              &global_matrix,
-                            VectorType                              &global_vector,
-                            bool                                     use_inhomogeneities_for_rhs) const
+distribute_local_to_global (const FullMatrix<typename MatrixType::value_type> &local_matrix,
+                            const Vector<typename VectorType::value_type>     &local_vector,
+                            const std::vector<size_type>                      &local_dof_indices,
+                            MatrixType                                        &global_matrix,
+                            VectorType                                        &global_vector,
+                            bool                                               use_inhomogeneities_for_rhs) const
 {
   // enter the internal function with the respective block information set,
   // the actual implementation follows in the cm.templates.h file.
