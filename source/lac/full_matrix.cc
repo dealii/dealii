@@ -20,6 +20,8 @@ DEAL_II_NAMESPACE_OPEN
 
 #include "full_matrix.inst"
 
+template void dealii::FullMatrix<double>::vmult<std::complex<double> >(dealii::Vector<std::complex<double> >&, dealii::Vector<std::complex<double> > const&, bool) const;
+
 // do a few functions that currently don't fit the scheme because they have
 // two template arguments that need to be different (the case of same
 // arguments is covered by the default copy constructor and copy operator that

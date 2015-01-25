@@ -513,7 +513,7 @@ namespace internal
     namespace
     {
       template <class VectorType>
-      double
+      typename VectorType::value_type
       get_vector_element (const VectorType &vector,
                           const unsigned int cell_number)
       {

@@ -279,17 +279,16 @@ namespace VectorTools
 
 
 
-
-  template <int dim, class InVector, class OutVector, int spacedim>
+  template <int dim, class InVector, class OutVector, int spacedim, typename number>
   void
-  interpolate (const DoFHandler<dim,spacedim>           &dof_1,
-               const DoFHandler<dim,spacedim>           &dof_2,
-               const FullMatrix<double>        &transfer,
+  interpolate (const DoFHandler<dim,spacedim>  &dof_1,
+               const DoFHandler<dim,spacedim>  &dof_2,
+               const FullMatrix<number>        &transfer,
                const InVector                  &data_1,
                OutVector                       &data_2)
   {
-    Vector<double> cell_data_1(dof_1.get_fe().dofs_per_cell);
-    Vector<double> cell_data_2(dof_2.get_fe().dofs_per_cell);
+    Vector<number> cell_data_1(dof_1.get_fe().dofs_per_cell);
+    Vector<number> cell_data_2(dof_2.get_fe().dofs_per_cell);
 
     std::vector<short unsigned int> touch_count (dof_2.n_dofs(), 0); //TODO: check on datatype... kinda strange (UK)
     std::vector<types::global_dof_index>       local_dof_indices (dof_2.get_fe().dofs_per_cell);
