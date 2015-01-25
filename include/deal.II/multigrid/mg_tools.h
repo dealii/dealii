@@ -204,25 +204,6 @@ namespace MGTools
                       const ComponentMask               &component_mask = ComponentMask());
 
   /**
-   * @deprecated
-   */
-  template <typename number>
-  void
-  apply_boundary_values (const std::set<types::global_dof_index> &boundary_dofs,
-                         SparseMatrix<number> &matrix,
-                         const bool preserve_symmetry,
-                         const bool ignore_zeros = false) DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated
-   */
-  template <typename number>
-  void
-  apply_boundary_values (const std::set<types::global_dof_index> &boundary_dofs,
-                         BlockSparseMatrix<number> &matrix,
-                         const bool preserve_symmetry) DEAL_II_DEPRECATED;
-
-  /**
    * For each level in a multigrid hierarchy, produce an IndexSet that
    * indicates which of the degrees of freedom are along interfaces of this
    * level to cells that only exist on coarser levels.

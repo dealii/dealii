@@ -204,6 +204,7 @@ inconvenience this causes.
   - GridTools::extract_boundary_mesh.
   - PreconditionBlock::size.
   - MGTools::count_dofs_per_component.
+  - MGTools::apply_boundary_values.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into

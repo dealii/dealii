@@ -1576,89 +1576,10 @@ namespace MGTools
       }
 
   }
-
-
-  template <typename number>
-  void
-  apply_boundary_values (
-    const std::set<types::global_dof_index> &boundary_dofs,
-    SparseMatrix<number> &matrix,
-    const bool preserve_symmetry,
-    const bool /*ignore_zeros*/)
-  {
-    // this function is not documented and not tested in the testsuite
-    // so it isn't quite clear what it's supposed to do. it also isn't
-    // used anywhere else in the library. in avoiding the use of
-    // a deprecated function, I therefore threw away the original function
-    // and replaced it by the following, which I believe should work
-
-    std::map<types::global_dof_index, double> boundary_values;
-    for (std::set<types::global_dof_index>::const_iterator p=boundary_dofs.begin();
-         p != boundary_dofs.end(); ++p)
-      boundary_values[*p] = 0;
-
-    Vector<number> dummy(matrix.m());
-    MatrixTools::apply_boundary_values (boundary_values,
-                                        matrix, dummy, dummy,
-                                        preserve_symmetry);
-  }
-
-
-
-  template <typename number>
-  void
-  apply_boundary_values (
-    const std::set<types::global_dof_index> &boundary_dofs,
-    BlockSparseMatrix<number> &matrix,
-    const bool preserve_symmetry)
-  {
-    Assert (matrix.n_block_rows() == matrix.n_block_cols(),
-            ExcNotQuadratic());
-    Assert (matrix.get_sparsity_pattern().get_row_indices() ==
-            matrix.get_sparsity_pattern().get_column_indices(),
-            ExcNotQuadratic());
-
-    // this function is not documented and not tested in the testsuite
-    // so it isn't quite clear what it's supposed to do. it also isn't
-    // used anywhere else in the library. in avoiding the use of
-    // a deprecated function, I therefore threw away the original function
-    // and replaced it by the following, which I believe should work
-
-    std::map<types::global_dof_index, double> boundary_values;
-    for (std::set<types::global_dof_index>::const_iterator p=boundary_dofs.begin();
-         p != boundary_dofs.end(); ++p)
-      boundary_values[*p] = 0;
-
-    BlockVector<number> dummy(matrix.n_block_rows());
-    for (unsigned int i=0; i<matrix.n_block_rows(); ++i)
-      dummy.block(i).reinit (matrix.block(i,i).m());
-    dummy.collect_sizes();
-
-    MatrixTools::apply_boundary_values (boundary_values,
-                                        matrix, dummy, dummy,
-                                        preserve_symmetry);
-  }
 }
 
 
 // explicit instantiations
 #include "mg_tools.inst"
-
-namespace MGTools
-{
-  template void apply_boundary_values (
-    const std::set<types::global_dof_index> &,
-    SparseMatrix<float> &, const bool, const bool);
-  template void apply_boundary_values (
-    const std::set<types::global_dof_index> &,
-    SparseMatrix<double> &, const bool, const bool);
-  template void apply_boundary_values (
-    const std::set<types::global_dof_index> &,
-    BlockSparseMatrix<float> &, const bool);
-  template void apply_boundary_values (
-    const std::set<types::global_dof_index> &,
-    BlockSparseMatrix<double> &, const bool);
-}
-
 
 DEAL_II_NAMESPACE_CLOSE
