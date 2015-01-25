@@ -2517,7 +2517,7 @@ ConstraintMatrix::distribute_local_to_global (
                                                             local_dof_indices,
                                                             local_matrix);
 
-          if (val != LocalType ())
+          if (val != LocalTypeVector ())
             global_vector(row) += static_cast<typename VectorType::value_type>(val);
         }
     }
