@@ -1714,39 +1714,6 @@ namespace internal
 }
 
 
-
-/**
- * Functionality has been merged into FEEvaluation. Use class FEEvaluation
- * instead.
- */
-template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1,
-          int n_components_ = 1, typename Number = double >
-class FEEvaluationDGP :
-  public FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-{
-public:
-  typedef FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number> BaseClass;
-  typedef Number                            number_type;
-  typedef typename BaseClass::value_type    value_type;
-  typedef typename BaseClass::gradient_type gradient_type;
-  static const unsigned int dimension     = dim;
-  static const unsigned int n_components  = n_components_;
-  static const unsigned int dofs_per_cell = internal::MatrixFreeFunctions::DGP_dofs_per_cell<dim,fe_degree>::value;
-  static const unsigned int n_q_points    = BaseClass::n_q_points;
-
-  /**
-   * Constructor.
-   */
-  FEEvaluationDGP (const MatrixFree<dim,Number> &matrix_free,
-                   const unsigned int            fe_no   = 0,
-                   const unsigned int            quad_no = 0) DEAL_II_DEPRECATED
-:
-  BaseClass (matrix_free, fe_no, quad_no)
-  {}
-};
-
-
-
 /*----------------------- Inline functions ----------------------------------*/
 
 #ifndef DOXYGEN
