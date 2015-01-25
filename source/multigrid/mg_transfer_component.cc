@@ -614,7 +614,10 @@ void MGTransferSelect<number>::build_matrices (
 
   interface_dofs.resize(mg_dof.get_tria().n_levels());
   for (unsigned int l=0; l<mg_dof.get_tria().n_levels(); ++l)
-    interface_dofs[l].resize(mg_dof.n_dofs(l));
+    {
+      interface_dofs[l].clear();
+      interface_dofs[l].set_size(mg_dof.n_dofs(l));
+    }
   MGTools::extract_inner_interface_dofs(mg_dof, interface_dofs);
 
   // use a temporary vector to create the
@@ -649,7 +652,7 @@ void MGTransferSelect<number>::build_matrices (
               const unsigned int component
                 = fe.system_to_component_index(i).first;
               if (component_mask[component] &&
-                  !interface_dofs[level][level_dof_indices[i]])
+                  !interface_dofs[level].is_element(level_dof_indices[i]))
                 {
                   const types::global_dof_index level_start
                     = mg_component_start[level][mg_target_component[component]];

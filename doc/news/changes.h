@@ -205,6 +205,7 @@ inconvenience this causes.
   - PreconditionBlock::size.
   - MGTools::count_dofs_per_component.
   - MGTools::apply_boundary_values.
+  - MGTools::extract_inner_interface_dofs.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into

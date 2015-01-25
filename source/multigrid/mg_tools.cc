@@ -1407,29 +1407,6 @@ namespace MGTools
 
   template <int dim, int spacedim>
   void
-  extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> >  &interface_dofs)
-  {
-    std::vector<IndexSet> temp;
-    temp.resize(interface_dofs.size());
-    for (unsigned int l=0; l<interface_dofs.size(); ++l)
-      temp[l] = IndexSet(interface_dofs[l].size());
-
-    extract_inner_interface_dofs(mg_dof_handler, temp);
-
-    for (unsigned int l=0; l<interface_dofs.size(); ++l)
-      {
-        Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
-                ExcDimensionMismatch (interface_dofs[l].size(),
-                                      mg_dof_handler.n_dofs(l)));
-
-        temp[l].fill_binary_vector(interface_dofs[l]);
-      }
-  }
-
-
-  template <int dim, int spacedim>
-  void
   extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                               std::vector<std::set<types::global_dof_index> >  &non_interface_dofs)
   {
