@@ -209,6 +209,7 @@ inconvenience this causes.
   - Class MGMatrix.
   - Multigrid::vmult and friends.
   - Classes FEEvaluationDGP, FEEvaluationGeneral and FEEvaluationGL.
+  - Classes PreconditionedMatrix and PreconditionLACSolver.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
