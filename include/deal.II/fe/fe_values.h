@@ -1663,9 +1663,9 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_values (const InputVector &fe_function,
-                            std::vector<number> &values) const;
+                            std::vector<typename InputVector::value_type> &values) const;
 
   /**
    * This function does the same as the other get_function_values(), but
@@ -1680,9 +1680,9 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_values (const InputVector       &fe_function,
-                            std::vector<Vector<number> > &values) const;
+                            std::vector<Vector<typename InputVector::value_type> > &values) const;
 
   /**
    * Generate function values from an arbitrary vector.
@@ -1702,10 +1702,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_values (const InputVector &fe_function,
                             const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                            std::vector<number> &values) const;
+                            std::vector<typename InputVector::value_type> &values) const;
 
   /**
    * Generate vector function values from an arbitrary vector.
@@ -1728,10 +1728,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_values (const InputVector &fe_function,
                             const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                            std::vector<Vector<number> > &values) const;
+                            std::vector<Vector<typename InputVector::value_type> > &values) const;
 
 
   /**
@@ -1764,10 +1764,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_values (const InputVector &fe_function,
                             const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                            VectorSlice<std::vector<std::vector<number> > > values,
+                            VectorSlice<std::vector<std::vector<typename InputVector::value_type> > > values,
                             const bool quadrature_points_fastest) const;
 
   //@}
@@ -1808,9 +1808,9 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_gradients (const InputVector      &fe_function,
-                               std::vector<Tensor<1,spacedim,number> > &gradients) const;
+                               std::vector<Tensor<1,spacedim,typename InputVector::value_type> > &gradients) const;
 
   /**
    * This function does the same as the other get_function_gradients(), but
@@ -1828,9 +1828,9 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_gradients (const InputVector               &fe_function,
-                               std::vector<std::vector<Tensor<1,spacedim,number> > > &gradients) const;
+                               std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > &gradients) const;
 
   /**
    * Function gradient access with more flexibility. See get_function_values()
@@ -1838,10 +1838,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_gradients (const InputVector &fe_function,
                                const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                               std::vector<Tensor<1,spacedim,number> > &gradients) const;
+                               std::vector<Tensor<1,spacedim,typename InputVector::value_type> > &gradients) const;
 
   /**
    * Function gradient access with more flexibility. See get_function_values()
@@ -1849,10 +1849,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_gradients (const InputVector &fe_function,
                                const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                               VectorSlice<std::vector<std::vector<Tensor<1,spacedim,number> > > > gradients,
+                               VectorSlice<std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > > gradients,
                                bool quadrature_points_fastest = false) const;
 
   //@}
@@ -1894,10 +1894,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void
   get_function_hessians (const InputVector &fe_function,
-                         std::vector<Tensor<2,spacedim,number> > &hessians) const;
+                         std::vector<Tensor<2,spacedim,typename InputVector::value_type> > &hessians) const;
 
   /**
    * This function does the same as the other get_function_hessians(), but
@@ -1916,21 +1916,21 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void
   get_function_hessians (const InputVector      &fe_function,
-                         std::vector<std::vector<Tensor<2,spacedim,number> > > &hessians,
+                         std::vector<std::vector<Tensor<2,spacedim,typename InputVector::value_type> > > &hessians,
                          bool quadrature_points_fastest = false) const;
 
   /**
    * Access to the second derivatives of a function with more flexibility. See
    * get_function_values() with corresponding arguments.
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_hessians (
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-    std::vector<Tensor<2,spacedim,number> > &hessians) const;
+    std::vector<Tensor<2,spacedim,typename InputVector::value_type> > &hessians) const;
 
   /**
    * Access to the second derivatives of a function with more flexibility. See
@@ -1938,11 +1938,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_hessians (
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-    VectorSlice<std::vector<std::vector<Tensor<2,spacedim,number> > > > hessians,
+    VectorSlice<std::vector<std::vector<Tensor<2,spacedim,typename InputVector::value_type> > > > hessians,
     bool quadrature_points_fastest = false) const;
 
   /**
@@ -1984,10 +1984,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void
   get_function_laplacians (const InputVector &fe_function,
-                           std::vector<number> &laplacians) const;
+                           std::vector<typename InputVector::value_type> &laplacians) const;
 
   /**
    * This function does the same as the other get_function_laplacians(), but
@@ -2008,10 +2008,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void
   get_function_laplacians (const InputVector      &fe_function,
-                           std::vector<Vector<number> > &laplacians) const;
+                           std::vector<Vector<typename InputVector::value_type> > &laplacians) const;
 
   /**
    * Access to the second derivatives of a function with more flexibility. See
@@ -2019,11 +2019,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_laplacians (
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-    std::vector<number> &laplacians) const;
+    std::vector<typename InputVector::value_type> &laplacians) const;
 
   /**
    * Access to the second derivatives of a function with more flexibility. See
@@ -2031,11 +2031,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_laplacians (
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-    std::vector<Vector<number> > &laplacians) const;
+    std::vector<Vector<typename InputVector::value_type> > &laplacians) const;
 
   /**
    * Access to the second derivatives of a function with more flexibility. See
@@ -2043,11 +2043,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_laplacians (
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-    std::vector<std::vector<number> > &laplacians,
+    std::vector<std::vector<typename InputVector::value_type> > &laplacians,
     bool quadrature_points_fastest = false) const;
   //@}
 
