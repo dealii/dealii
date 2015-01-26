@@ -170,16 +170,6 @@ namespace MGTools
                             std::vector<unsigned int> target_component = std::vector<unsigned int>());
 
   /**
-   * @deprecated Wrapper for the other function with same name, introduced for
-   * compatibility.
-   */
-  template <int dim, int spacedim>
-  void
-  count_dofs_per_component (const DoFHandler<dim,spacedim> &mg_dof,
-                            std::vector<std::vector<types::global_dof_index> > &result,
-                            std::vector<unsigned int> target_component) DEAL_II_DEPRECATED;
-
-  /**
    * Generate a list of those degrees of freedom at the boundary of the domain
    * that should be eliminated from the matrix because they will be
    * constrained by Dirichlet boundary conditions.
@@ -214,25 +204,6 @@ namespace MGTools
                       const ComponentMask               &component_mask = ComponentMask());
 
   /**
-   * @deprecated
-   */
-  template <typename number>
-  void
-  apply_boundary_values (const std::set<types::global_dof_index> &boundary_dofs,
-                         SparseMatrix<number> &matrix,
-                         const bool preserve_symmetry,
-                         const bool ignore_zeros = false) DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated
-   */
-  template <typename number>
-  void
-  apply_boundary_values (const std::set<types::global_dof_index> &boundary_dofs,
-                         BlockSparseMatrix<number> &matrix,
-                         const bool preserve_symmetry) DEAL_II_DEPRECATED;
-
-  /**
    * For each level in a multigrid hierarchy, produce an IndexSet that
    * indicates which of the degrees of freedom are along interfaces of this
    * level to cells that only exist on coarser levels.
@@ -241,15 +212,6 @@ namespace MGTools
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                                 std::vector<IndexSet>  &interface_dofs);
-
-  /**
-   * As above but with a deprecated data structure. This makes one additional
-   * copy.
-   */
-  template <int dim, int spacedim>
-  void
-  extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> >  &interface_dofs) DEAL_II_DEPRECATED;
 
 
   template <int dim, int spacedim>

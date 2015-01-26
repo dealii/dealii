@@ -137,40 +137,6 @@ public:
   void vcycle ();
 
   /**
-   * @deprecated This function is purely experimental and will probably never
-   * be implemented in a way that it can be released.
-   *
-   * Perform a multigrid cycle with a vector which is already a level vector.
-   * Use of this function assumes that there is NO local refinement and that
-   * both vectors are on the finest level of this Multigrid object.
-   */
-  void vmult(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated This function is purely experimental and will probably never
-   * be implemented in a way that it can be released.
-   *
-   * Perform a multigrid cycle with a vector which is already a level vector.
-   * Use of this function assumes that there is NO local refinement and that
-   * both vectors are on the finest level of this Multigrid object.
-   */
-  void vmult_add(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Even worse than vmult(), this function is not even
-   * implemented, but just declared such that certain objects relying on it
-   * can be constructed.
-   */
-  void Tvmult(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Even worse than vmult(), this function is not even
-   * implemented, but just declared such that certain objects relying on it
-   * can be constructed.
-   */
-  void Tvmult_add(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
-
-  /**
    * Set additional matrices to correct residual computation at refinement
    * edges. Since we only smoothen in the interior of the refined part of the
    * mesh, the coupling across the refinement edge is missing. This coupling

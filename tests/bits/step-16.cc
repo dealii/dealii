@@ -260,8 +260,8 @@ void LaplaceProblem<dim>::solve ()
   mg_smoother.set_steps(2);
   mg_smoother.set_symmetric(true);
 
-  MGMatrix<SparseMatrix<float>, Vector<double> >
-  mg_matrix(&mg_matrices);
+  mg::Matrix<Vector<double> >
+  mg_matrix(mg_matrices);
   Multigrid<Vector<double> > mg(mg_dof_handler,
                                 mg_matrix,
                                 mg_coarse,

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2014 by the deal.II authors
+ * Copyright (C) 2010 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -712,9 +712,9 @@ namespace Step39
 
     // Finally, we must wrap our matrices in an object having the required
     // multiplication functions.
-    MGMatrix<SparseMatrix<double>, Vector<double> > mgmatrix(&mg_matrix);
-    MGMatrix<SparseMatrix<double>, Vector<double> > mgdown(&mg_matrix_dg_down);
-    MGMatrix<SparseMatrix<double>, Vector<double> > mgup(&mg_matrix_dg_up);
+    mg::Matrix<Vector<double> > mgmatrix(mg_matrix);
+    mg::Matrix<Vector<double> > mgdown(mg_matrix_dg_down);
+    mg::Matrix<Vector<double> > mgup(mg_matrix_dg_up);
 
     // Now, we are ready to set up the V-cycle operator and the multilevel
     // preconditioner.

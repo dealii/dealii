@@ -572,9 +572,9 @@ namespace Step39
     mg_smoother.initialize(mg_matrix, .7);
     mg_smoother.set_steps(2);
 
-    MGMatrix<TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector> mgmatrix(&mg_matrix);
-    MGMatrix<TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector> mgdown(&mg_matrix_dg_down);
-    MGMatrix<TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector> mgup(&mg_matrix_dg_up);
+    mg::Matrix<TrilinosWrappers::MPI::Vector> mgmatrix(mg_matrix);
+    mg::Matrix<TrilinosWrappers::MPI::Vector> mgdown(mg_matrix_dg_down);
+    mg::Matrix<TrilinosWrappers::MPI::Vector> mgup(mg_matrix_dg_up);
 
     Multigrid<TrilinosWrappers::MPI::Vector > mg(dof_handler, mgmatrix,
                                                  coarse_grid_solver, mg_transfer,

@@ -203,6 +203,13 @@ inconvenience this causes.
   - GridTools::create_union_triangulation.
   - GridTools::extract_boundary_mesh.
   - PreconditionBlock::size.
+  - MGTools::count_dofs_per_component.
+  - MGTools::apply_boundary_values.
+  - MGTools::extract_inner_interface_dofs.
+  - Class MGMatrix.
+  - Multigrid::vmult and friends.
+  - Classes FEEvaluationDGP, FEEvaluationGeneral and FEEvaluationGL.
+  - Classes PreconditionedMatrix and PreconditionLACSolver.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
