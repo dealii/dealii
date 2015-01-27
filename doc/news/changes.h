@@ -280,6 +280,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Bugfix: deal.II now correctly links against librt in case of bundled
+  boost being used.
+  <br>
+  (Matthias Maier, 2015/01/27)
+  </li>
+
   <li> New: A new macro <code>DEAL_II_QUERY_GIT_INFORMATION</code> is
   provided to query user projects for git repository information simmilarly
   to those exported by deal.II.
