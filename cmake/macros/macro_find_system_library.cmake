@@ -42,7 +42,7 @@ MACRO(FIND_SYSTEM_LIBRARY)
       ENDIF()
     ENDFOREACH()
 
-    IF(NOT _variable)
+    IF(NOT ${_variable})
       SET(${_variable} "${_variable}-NOTFOUND")
     ENDIF()
   ENDIF()
