@@ -61,7 +61,7 @@ namespace internal
    * A class whose specialization is used to define what type the curl of a
    * vector valued function corresponds to.
    */
-  template <int dim>
+  template <int dim,typename number>
   struct CurlType;
 
   /**
@@ -70,10 +70,10 @@ namespace internal
    *
    * In 1d, the curl is a scalar.
    */
-  template <>
-  struct CurlType<1>
+  template <typename number>
+  struct CurlType<1,number>
   {
-    typedef Tensor<1,1>     type;
+    typedef Tensor<1,1,number>     type;
   };
 
   /**
@@ -82,10 +82,10 @@ namespace internal
    *
    * In 2d, the curl is a scalar.
    */
-  template <>
-  struct CurlType<2>
+  template <typename number>
+  struct CurlType<2,number>
   {
-    typedef Tensor<1,1>     type;
+    typedef Tensor<1,1,number>     type;
   };
 
   /**
@@ -94,10 +94,10 @@ namespace internal
    *
    * In 3d, the curl is a vector.
    */
-  template <>
-  struct CurlType<3>
+  template <typename number>
+  struct CurlType<3,number>
   {
-    typedef Tensor<1,3>     type;
+    typedef Tensor<1,3,number>     type;
   };
 }
 
@@ -268,7 +268,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<typename InputVector::value_type> &values) const;
 
     /**
      * Return the gradients of the selected scalar component of the finite
@@ -284,7 +284,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
-                                 std::vector<gradient_type> &gradients) const;
+                                 std::vector<dealii::Tensor<1,spacedim,typename InputVector::value_type>> &gradients) const;
 
     /**
      * Return the Hessians of the selected scalar component of the finite
@@ -300,7 +300,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
-                                std::vector<hessian_type> &hessians) const;
+                                std::vector<dealii::Tensor<2,spacedim,typename InputVector::value_type>> &hessians) const;
 
     /**
      * Return the Laplacians of the selected scalar component of the finite
@@ -317,7 +317,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
-                                  std::vector<value_type> &laplacians) const;
+                                  std::vector<typename InputVector::value_type> &laplacians) const;
 
   private:
     /**
@@ -414,7 +414,7 @@ namespace FEValuesViews
      * element, the curl is a <code>Tensor@<1, 1@></code>. For
      * <code>spacedim=3</code> it is a <code>Tensor@<1, dim@></code>.
      */
-    typedef typename dealii::internal::CurlType<spacedim>::type   curl_type;
+    typedef typename dealii::internal::CurlType<spacedim,double>::type   curl_type;
 
     /**
      * A typedef for the type of second derivatives of the view this class
@@ -602,7 +602,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<dealii::Tensor<1,spacedim,typename InputVector::value_type>> &values) const;
 
     /**
      * Return the gradients of the selected vector components of the finite
@@ -618,7 +618,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
-                                 std::vector<gradient_type> &gradients) const;
+                                 std::vector<dealii::Tensor<2,spacedim,typename InputVector::value_type>> &gradients) const;
 
     /**
      * Return the symmetrized gradients of the selected vector components of
@@ -640,7 +640,7 @@ namespace FEValuesViews
     template <class InputVector>
     void
     get_function_symmetric_gradients (const InputVector &fe_function,
-                                      std::vector<symmetric_gradient_type> &symmetric_gradients) const;
+                                      std::vector<dealii::SymmetricTensor<2,spacedim,typename InputVector::value_type>> &symmetric_gradients) const;
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -657,7 +657,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<divergence_type> &divergences) const;
+                                   std::vector<typename InputVector::value_type> &divergences) const;
 
     /**
      * Return the curl of the selected vector components of the finite element
@@ -674,7 +674,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_curls (const InputVector &fe_function,
-                             std::vector<curl_type> &curls) const;
+                             std::vector<typename dealii::internal::CurlType<spacedim,typename InputVector::value_type>::type> &curls) const;
 
     /**
      * Return the Hessians of the selected vector components of the finite
@@ -690,7 +690,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
-                                std::vector<hessian_type> &hessians) const;
+                                std::vector<dealii::Tensor<3,spacedim,typename InputVector::value_type>> &hessians) const;
 
     /**
      * Return the Laplacians of the selected vector components of the finite
@@ -707,7 +707,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
-                                  std::vector<value_type> &laplacians) const;
+                                  std::vector<dealii::Tensor<1,spacedim,typename InputVector::value_type>> &laplacians) const;
 
   private:
     /**
@@ -893,7 +893,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<dealii::SymmetricTensor<2,spacedim,typename InputVector::value_type>> &values) const;
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -913,7 +913,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<divergence_type> &divergences) const;
+                                   std::vector<dealii::Tensor<1,spacedim,typename InputVector::value_type>> &divergences) const;
 
   private:
     /**
@@ -1087,7 +1087,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<dealii::Tensor<2,spacedim,typename InputVector::value_type>> &values) const;
 
 
     /**
@@ -1108,7 +1108,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<divergence_type> &divergences) const;
+                                   std::vector<dealii::Tensor<1,spacedim,typename InputVector::value_type>> &divergences) const;
 
   private:
     /**
