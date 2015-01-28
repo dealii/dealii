@@ -261,7 +261,7 @@ namespace Step51
 // solution. It is very similar to step-7, with the exception that we now have
 // a convection term instead of the reaction term. Since the velocity field is
 // incompressible, i.e. $\nabla \cdot \mathbf{c} = 0$, this term simply reads
-// $\mathbf{c} \nabla \ve u$.
+// $\mathbf{c} \nabla u$.
   template <int dim>
   class RightHandSide : public Function<dim>,
     protected SolutionBase<dim>
