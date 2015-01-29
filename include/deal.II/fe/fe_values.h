@@ -147,21 +147,33 @@ namespace FEValuesViews
      * represents. Since we deal with a single components, the value type is a
      * scalar double.
      */
-    typedef double        value_type;
+    template<typename number>
+    struct Value
+    {
+      typedef number type;
+    };
 
     /**
      * A typedef for the type of gradients of the view this class represents.
      * Here, for a scalar component of the finite element, the gradient is a
      * <code>Tensor@<1,dim@></code>.
      */
-    typedef dealii::Tensor<1,spacedim> gradient_type;
+    template<typename number>
+    struct Gradient
+    {
+      typedef dealii::Tensor<1,spacedim,number> type;
+    };
 
     /**
      * A typedef for the type of second derivatives of the view this class
      * represents. Here, for a scalar component of the finite element, the
      * Hessian is a <code>Tensor@<2,dim@></code>.
      */
-    typedef dealii::Tensor<2,spacedim> hessian_type;
+    template<typename number>
+    struct Hessian
+    {
+      typedef dealii::Tensor<2,spacedim,number> type;
+    };
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
@@ -222,7 +234,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    value_type
+    Value<double>::type
     value (const unsigned int shape_function,
            const unsigned int q_point) const;
 
@@ -236,7 +248,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    gradient_type
+    Gradient<double>::type
     gradient (const unsigned int shape_function,
               const unsigned int q_point) const;
 
@@ -250,7 +262,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
-    hessian_type
+    Hessian<double>::type
     hessian (const unsigned int shape_function,
              const unsigned int q_point) const;
 
@@ -268,7 +280,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<typename InputVector::value_type> &values) const;
+                              std::vector<Value<typename InputVector::value_type>::type> &values) const;
 
     /**
      * Return the gradients of the selected scalar component of the finite
@@ -284,7 +296,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
-                                 std::vector<dealii::Tensor<1,spacedim,typename InputVector::value_type>> &gradients) const;
+                                 std::vector<Gradient<typename InputVector::value_type>::type> &gradients) const;
 
     /**
      * Return the Hessians of the selected scalar component of the finite
@@ -300,7 +312,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
-                                std::vector<dealii::Tensor<2,spacedim,typename InputVector::value_type>> &hessians) const;
+                                std::vector<Hessian<typename InputVector::value_type>::type> &hessians) const;
 
     /**
      * Return the Laplacians of the selected scalar component of the finite
@@ -317,7 +329,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
-                                  std::vector<typename InputVector::value_type> &laplacians) const;
+                                  std::vector<Value<typename InputVector::value_type>::type> &laplacians) const;
 
   private:
     /**
@@ -377,7 +389,11 @@ namespace FEValuesViews
      * represents. Since we deal with a set of <code>dim</code> components,
      * the value type is a Tensor<1,spacedim>.
      */
-    typedef dealii::Tensor<1,spacedim>          value_type;
+    template <typename number>
+    struct Value
+    {
+      typedef dealii::Tensor<1,spacedim,number> type;
+    };
 
     /**
      * A typedef for the type of gradients of the view this class represents.
@@ -387,7 +403,11 @@ namespace FEValuesViews
      * See the general documentation of this class for how exactly the
      * gradient of a vector is defined.
      */
-    typedef dealii::Tensor<2,spacedim>          gradient_type;
+    template <typename number>
+    struct Gradient
+    {
+      typedef dealii::Tensor<2,spacedim,number> type;
+    };
 
     /**
      * A typedef for the type of symmetrized gradients of the view this class
@@ -399,14 +419,22 @@ namespace FEValuesViews
      * $\varepsilon(\mathbf v)=\frac 12 (\nabla \mathbf v + \nabla \mathbf
      * v^T)$.
      */
-    typedef dealii::SymmetricTensor<2,spacedim> symmetric_gradient_type;
+    template <typename number>
+    struct SymmetricGradient
+    {
+      typedef dealii::SymmetricTensor<2,spacedim,number> type;
+    };
 
     /**
      * A typedef for the type of the divergence of the view this class
      * represents. Here, for a set of <code>dim</code> components of the
      * finite element, the divergence of course is a scalar.
      */
-    typedef double                 divergence_type;
+    template <typename number>
+    struct Divergence
+    {
+      typedef number type;
+    };
 
     /**
      * A typedef for the type of the curl of the view this class represents.
@@ -414,14 +442,22 @@ namespace FEValuesViews
      * element, the curl is a <code>Tensor@<1, 1@></code>. For
      * <code>spacedim=3</code> it is a <code>Tensor@<1, dim@></code>.
      */
-    typedef typename dealii::internal::CurlType<spacedim,double>::type   curl_type;
+    template <typename number>
+    struct Curl
+    {
+      typedef typename dealii::internal::CurlType<spacedim,number>::type   type;
+    };
 
     /**
      * A typedef for the type of second derivatives of the view this class
      * represents. Here, for a set of <code>dim</code> components of the
      * finite element, the Hessian is a <code>Tensor@<3,dim@></code>.
      */
-    typedef dealii::Tensor<3,spacedim>          hessian_type;
+    template <typename number>
+    struct Hessian
+    {
+      typedef dealii::Tensor<3,spacedim,number> type;
+    };
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
@@ -500,7 +536,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    value_type
+    Value<double>::type
     value (const unsigned int shape_function,
            const unsigned int q_point) const;
 
@@ -517,7 +553,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    gradient_type
+    Gradient<double>::type
     gradient (const unsigned int shape_function,
               const unsigned int q_point) const;
 
@@ -536,7 +572,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    symmetric_gradient_type
+    SymmetricGradient<double>::type
     symmetric_gradient (const unsigned int shape_function,
                         const unsigned int q_point) const;
 
@@ -550,7 +586,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    divergence_type
+    Divergence<double>::type
     divergence (const unsigned int shape_function,
                 const unsigned int q_point) const;
 
@@ -570,7 +606,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    curl_type
+    Curl<double>::type
     curl (const unsigned int shape_function,
           const unsigned int q_point) const;
 
@@ -584,7 +620,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
-    hessian_type
+    Hessian<double>::type
     hessian (const unsigned int shape_function,
              const unsigned int q_point) const;
 
@@ -602,7 +638,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<dealii::Tensor<1,spacedim,typename InputVector::value_type>> &values) const;
+                              std::vector<Value<typename InputVector::value_type>::type> &values) const;
 
     /**
      * Return the gradients of the selected vector components of the finite
@@ -618,7 +654,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
-                                 std::vector<dealii::Tensor<2,spacedim,typename InputVector::value_type>> &gradients) const;
+                                 std::vector<Gradient<typename InputVector::value_type>::type> &gradients) const;
 
     /**
      * Return the symmetrized gradients of the selected vector components of
@@ -640,7 +676,7 @@ namespace FEValuesViews
     template <class InputVector>
     void
     get_function_symmetric_gradients (const InputVector &fe_function,
-                                      std::vector<dealii::SymmetricTensor<2,spacedim,typename InputVector::value_type>> &symmetric_gradients) const;
+                                      std::vector<SymmetricGradient<typename InputVector::value_type>::type> &symmetric_gradients) const;
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -657,7 +693,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<typename InputVector::value_type> &divergences) const;
+                                   std::vector<Divergence<typename InputVector::value_type>::type> &divergences) const;
 
     /**
      * Return the curl of the selected vector components of the finite element
@@ -674,7 +710,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_curls (const InputVector &fe_function,
-                             std::vector<typename dealii::internal::CurlType<spacedim,typename InputVector::value_type>::type> &curls) const;
+                             std::vector<Curl<typename InputVector::value_type>::type>::type> &curls) const;
 
     /**
      * Return the Hessians of the selected vector components of the finite
@@ -690,7 +726,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
-                                std::vector<dealii::Tensor<3,spacedim,typename InputVector::value_type>> &hessians) const;
+                                std::vector<Hessian<typename InputVector::value_type>::type> &hessians) const;
 
     /**
      * Return the Laplacians of the selected vector components of the finite
@@ -707,7 +743,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
-                                  std::vector<dealii::Tensor<1,spacedim,typename InputVector::value_type>> &laplacians) const;
+                                  std::vector<Value<typename InputVector::value_type>::type> &laplacians) const;
 
   private:
     /**
@@ -765,7 +801,11 @@ namespace FEValuesViews
      * components (i.e. the unique components of a symmetric second-order
      * tensor), the value type is a SymmetricTensor<2,spacedim>.
      */
-    typedef dealii::SymmetricTensor<2, spacedim> value_type;
+    template <typename number>
+    struct Value
+    {
+      typedef dealii::SymmetricTensor<2, spacedim,number> type;
+    };
 
     /**
      * A typedef for the type of the divergence of the view this class
@@ -776,7 +816,11 @@ namespace FEValuesViews
      * See the general discussion of this class for a definition of the
      * divergence.
      */
-    typedef dealii::Tensor<1, spacedim> divergence_type;
+    template <typename number>
+    struct Divergence
+    {
+      typedef dealii::Tensor<1, spacedim,number> type;
+    };
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
@@ -857,7 +901,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    value_type
+    Value<double>::type
     value (const unsigned int shape_function,
            const unsigned int q_point) const;
 
@@ -875,7 +919,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    divergence_type
+    Divergence<double>::type
     divergence (const unsigned int shape_function,
                 const unsigned int q_point) const;
 
@@ -893,7 +937,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<dealii::SymmetricTensor<2,spacedim,typename InputVector::value_type>> &values) const;
+                              std::vector<Value<typename InputVector::value_type>::type> &values) const;
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -913,7 +957,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<dealii::Tensor<1,spacedim,typename InputVector::value_type>> &divergences) const;
+                                   std::vector<Divergence<typename InputVector::value_type>::type> &divergences) const;
 
   private:
     /**
@@ -965,12 +1009,20 @@ namespace FEValuesViews
      * Data type for what you get when you apply an extractor of this kind to
      * a vector-valued finite element.
      */
-    typedef dealii::Tensor<2, spacedim> value_type;
+    template <typename number>
+    struct Value
+    {
+      typedef dealii::Tensor<2, spacedim,number> type;
+    };
 
     /**
      * Data type for taking the divergence of a tensor: a vector.
      */
-    typedef dealii::Tensor<1, spacedim> divergence_type;
+    template <typename number>
+    struct Divergence
+    {
+      typedef dealii::Tensor<1, spacedim,number> type;
+    };
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
@@ -1052,7 +1104,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    value_type
+    Value<double>::type
     value (const unsigned int shape_function,
            const unsigned int q_point) const;
 
@@ -1069,7 +1121,7 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    divergence_type
+    Divergence<double>::type
     divergence (const unsigned int shape_function,
                 const unsigned int q_point) const;
 
@@ -1087,7 +1139,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<dealii::Tensor<2,spacedim,typename InputVector::value_type>> &values) const;
+                              std::vector<Value<typename InputVector::value_type>::type> &values) const;
 
 
     /**
@@ -1108,7 +1160,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<dealii::Tensor<1,spacedim,typename InputVector::value_type>> &divergences) const;
+                                   std::vector<Divergence<typename InputVector::value_type>::type> &divergences) const;
 
   private:
     /**
