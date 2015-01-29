@@ -2949,7 +2949,7 @@ namespace FEValuesViews
 {
   template <int dim, int spacedim>
   inline
-  typename Scalar<dim,spacedim>::value_type
+  typename Scalar<dim,spacedim>::Value<double>::type
   Scalar<dim,spacedim>::value (const unsigned int shape_function,
                                const unsigned int q_point) const
   {
@@ -2975,7 +2975,7 @@ namespace FEValuesViews
 
   template <int dim, int spacedim>
   inline
-  typename Scalar<dim,spacedim>::gradient_type
+  typename Scalar<dim,spacedim>::Gradient<double>::type
   Scalar<dim,spacedim>::gradient (const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
@@ -2995,14 +2995,14 @@ namespace FEValuesViews
       return fe_values.shape_gradients[shape_function_data[shape_function]
                                        .row_index][q_point];
     else
-      return gradient_type();
+      return Gradient<double>::type();
   }
 
 
 
   template <int dim, int spacedim>
   inline
-  typename Scalar<dim,spacedim>::hessian_type
+  typename Scalar<dim,spacedim>::Hessian<double>::type
   Scalar<dim,spacedim>::hessian (const unsigned int shape_function,
                                  const unsigned int q_point) const
   {
@@ -3021,14 +3021,14 @@ namespace FEValuesViews
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
       return fe_values.shape_hessians[shape_function_data[shape_function].row_index][q_point];
     else
-      return hessian_type();
+      return Hessian<double>::type;
   }
 
 
 
   template <int dim, int spacedim>
   inline
-  typename Vector<dim,spacedim>::value_type
+  typename Vector<dim,spacedim>::Value<double>::type
   Vector<dim,spacedim>::value (const unsigned int shape_function,
                                const unsigned int q_point) const
   {
@@ -3042,17 +3042,17 @@ namespace FEValuesViews
     // that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
-      return value_type();
+      return Value<double>::type();
     else if (snc != -1)
       {
-        value_type return_value;
+        Value<double>::type return_value;
         return_value[shape_function_data[shape_function].single_nonzero_component_index]
           = fe_values.shape_values(snc,q_point);
         return return_value;
       }
     else
       {
-        value_type return_value;
+        Value<double>::type return_value;
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
@@ -3066,7 +3066,7 @@ namespace FEValuesViews
 
   template <int dim, int spacedim>
   inline
-  typename Vector<dim,spacedim>::gradient_type
+  typename Vector<dim,spacedim>::Gradient<double>::type
   Vector<dim,spacedim>::gradient (const unsigned int shape_function,
                                   const unsigned int q_point) const
   {
@@ -3080,17 +3080,17 @@ namespace FEValuesViews
     // that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
-      return gradient_type();
+      return Gradient<double>::type();
     else if (snc != -1)
       {
-        gradient_type return_value;
+        Gradient<double>::type return_value;
         return_value[shape_function_data[shape_function].single_nonzero_component_index]
           = fe_values.shape_gradients[snc][q_point];
         return return_value;
       }
     else
       {
-        gradient_type return_value;
+        Gradient<double>::type return_value;
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
@@ -3104,7 +3104,7 @@ namespace FEValuesViews
 
   template <int dim, int spacedim>
   inline
-  typename Vector<dim,spacedim>::divergence_type
+  typename Vector<dim,spacedim>::Divergence<double>::type
   Vector<dim,spacedim>::divergence (const unsigned int shape_function,
                                     const unsigned int q_point) const
   {
@@ -3120,13 +3120,13 @@ namespace FEValuesViews
     // that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
-      return divergence_type();
+      return Divergence<double>::type();
     else if (snc != -1)
       return
         fe_values.shape_gradients[snc][q_point][shape_function_data[shape_function].single_nonzero_component_index];
     else
       {
-        divergence_type return_value = 0;
+        Divergence<double>::type return_value = 0;
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value
@@ -3140,7 +3140,7 @@ namespace FEValuesViews
 
   template <int dim, int spacedim>
   inline
-  typename Vector<dim,spacedim>::curl_type
+  typename Vector<dim,spacedim>::Curl<double>::type
   Vector<dim,spacedim>::curl (const unsigned int shape_function, const unsigned int q_point) const
   {
     // this function works like in the case above
@@ -3154,7 +3154,7 @@ namespace FEValuesViews
     const int snc = shape_function_data[shape_function].single_nonzero_component;
 
     if (snc == -2)
-      return curl_type ();
+      return Curl<double>::type ();
 
     else
       switch (dim)
@@ -3162,14 +3162,14 @@ namespace FEValuesViews
         case 1:
         {
           Assert (false, ExcMessage("Computing the curl in 1d is not a useful operation"));
-          return curl_type ();
+          return Curl<double>::type ();
         }
 
         case 2:
         {
           if (snc != -1)
             {
-              curl_type return_value;
+              Curl<double>::type return_value;
 
               // the single
               // nonzero component
@@ -3185,7 +3185,7 @@ namespace FEValuesViews
 
           else
             {
-              curl_type return_value;
+              Curl<double>::type return_value;
 
               return_value[0] = 0.0;
 
@@ -3205,7 +3205,7 @@ namespace FEValuesViews
         {
           if (snc != -1)
             {
-              curl_type return_value;
+              Curl<double>::type return_value;
 
               switch (shape_function_data[shape_function].single_nonzero_component_index)
                 {
@@ -3237,7 +3237,7 @@ namespace FEValuesViews
 
           else
             {
-              curl_type return_value;
+              Curl<double>::type return_value;
 
               for (unsigned int i = 0; i < dim; ++i)
                 return_value[i] = 0.0;
@@ -3272,12 +3272,12 @@ namespace FEValuesViews
         }
     // should not end up here
     Assert (false, ExcInternalError());
-    return curl_type();
+    return Curl<double>::type();
   }
 
   template <int dim, int spacedim>
   inline
-  typename Vector<dim,spacedim>::hessian_type
+  typename Vector<dim,spacedim>::Hessian<double>::type
   Vector<dim,spacedim>::hessian (const unsigned int shape_function,
                                  const unsigned int q_point) const
   {
@@ -3293,17 +3293,17 @@ namespace FEValuesViews
     // that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
-      return hessian_type();
+      return Hessian<double>::type();
     else if (snc != -1)
       {
-        hessian_type return_value;
+        Hessian<double>::type return_value;
         return_value[shape_function_data[shape_function].single_nonzero_component_index]
           = fe_values.shape_hessians[snc][q_point];
         return return_value;
       }
     else
       {
-        hessian_type return_value;
+        Hessian<double>::type return_value;
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
@@ -3393,7 +3393,7 @@ namespace FEValuesViews
 
   template <int dim, int spacedim>
   inline
-  typename Vector<dim,spacedim>::symmetric_gradient_type
+  typename Vector<dim,spacedim>::SymmetricGradient<double>::type
   Vector<dim,spacedim>::symmetric_gradient (const unsigned int shape_function,
                                             const unsigned int q_point) const
   {
@@ -3407,13 +3407,13 @@ namespace FEValuesViews
     // that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
-      return symmetric_gradient_type();
+      return SymmetricGradient<double>::type();
     else if (snc != -1)
       return symmetrize_single_row (shape_function_data[shape_function].single_nonzero_component_index,
                                     fe_values.shape_gradients[snc][q_point]);
     else
       {
-        gradient_type return_value;
+        SymmetricGradient<double>::type return_value;
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
@@ -3427,7 +3427,7 @@ namespace FEValuesViews
 
   template <int dim, int spacedim>
   inline
-  typename SymmetricTensor<2, dim, spacedim>::value_type
+  typename SymmetricTensor<2, dim, spacedim>::Value<double>::type
   SymmetricTensor<2, dim, spacedim>::value (const unsigned int shape_function,
                                             const unsigned int q_point) const
   {
@@ -3448,12 +3448,12 @@ namespace FEValuesViews
       {
         // shape function is zero for the
         // selected components
-        return value_type();
+        return Value<double>::type();
 
       }
     else if (snc != -1)
       {
-        value_type return_value;
+        Value<double>::type return_value;
         const unsigned int comp =
           shape_function_data[shape_function].single_nonzero_component_index;
         return_value[value_type::unrolled_to_component_indices(comp)]
@@ -3462,7 +3462,7 @@ namespace FEValuesViews
       }
     else
       {
-        value_type return_value;
+        Value<double>::type return_value;
         for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[value_type::unrolled_to_component_indices(d)]
@@ -3474,7 +3474,7 @@ namespace FEValuesViews
 
   template <int dim, int spacedim>
   inline
-  typename SymmetricTensor<2, dim, spacedim>::divergence_type
+  typename SymmetricTensor<2, dim, spacedim>::Divergence<double>::type
   SymmetricTensor<2, dim, spacedim>::divergence(const unsigned int shape_function,
                                                 const unsigned int q_point) const
   {
@@ -3490,7 +3490,7 @@ namespace FEValuesViews
       {
         // shape function is zero for the
         // selected components
-        return divergence_type();
+        return Divergence<double>::type();
       }
     else if (snc != -1)
       {
@@ -3545,7 +3545,7 @@ namespace FEValuesViews
         // zero
         const dealii::Tensor<1, spacedim> phi_grad = fe_values.shape_gradients[snc][q_point];
 
-        divergence_type return_value;
+        Divergence<double>::type return_value;
         return_value[ii] = phi_grad[jj];
 
         if (ii != jj)
@@ -3557,14 +3557,14 @@ namespace FEValuesViews
     else
       {
         Assert (false, ExcNotImplemented());
-        divergence_type return_value;
+        Divergence<double>::type return_value;
         return return_value;
       }
   }
 
   template <int dim, int spacedim>
   inline
-  typename Tensor<2, dim, spacedim>::value_type
+  typename Tensor<2, dim, spacedim>::Value<double>::type
   Tensor<2, dim, spacedim>::value (const unsigned int shape_function,
                                    const unsigned int q_point) const
   {
@@ -3585,12 +3585,12 @@ namespace FEValuesViews
       {
         // shape function is zero for the
         // selected components
-        return value_type();
+        return Value<double>::type();
 
       }
     else if (snc != -1)
       {
-        value_type return_value;
+        Value<double>::type return_value;
         const unsigned int comp =
           shape_function_data[shape_function].single_nonzero_component_index;
         const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
@@ -3599,7 +3599,7 @@ namespace FEValuesViews
       }
     else
       {
-        value_type return_value;
+        Value<double>::type return_value;
         for (unsigned int d = 0; d < dim*dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             {
@@ -3614,7 +3614,7 @@ namespace FEValuesViews
 
   template <int dim, int spacedim>
   inline
-  typename Tensor<2, dim, spacedim>::divergence_type
+  typename Tensor<2, dim, spacedim>::Divergence<double>::type
   Tensor<2, dim, spacedim>::divergence(const unsigned int shape_function,
                                        const unsigned int q_point) const
   {
@@ -3630,7 +3630,7 @@ namespace FEValuesViews
       {
         // shape function is zero for the
         // selected components
-        return divergence_type();
+        return Divergence<double>::type();
       }
     else if (snc != -1)
       {
@@ -3658,7 +3658,7 @@ namespace FEValuesViews
 
         const dealii::Tensor<1, spacedim> phi_grad = fe_values.shape_gradients[snc][q_point];
 
-        divergence_type return_value;
+        Divergence<double>::type return_value;
         return_value[jj] = phi_grad[ii];
 
         return return_value;
@@ -3667,7 +3667,7 @@ namespace FEValuesViews
     else
       {
         Assert (false, ExcNotImplemented());
-        divergence_type return_value;
+        Divergence<double>::type return_value;
         return return_value;
       }
   }
