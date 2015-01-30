@@ -110,6 +110,8 @@ public:
    */
   typedef types::global_dof_index size_type;
 
+  typedef typename MATRIX::value_type value_type;
+
   /**
    * Constructor rendering an uninitialized object.
    */
