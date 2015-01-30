@@ -2995,7 +2995,7 @@ namespace FEValuesViews
       return fe_values.shape_gradients[shape_function_data[shape_function]
                                        .row_index][q_point];
     else
-      return Gradient<double>::type();
+      return typename Gradient<double>::type();
   }
 
 
@@ -3021,7 +3021,7 @@ namespace FEValuesViews
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
       return fe_values.shape_hessians[shape_function_data[shape_function].row_index][q_point];
     else
-      return Hessian<double>::type;
+      return typename Hessian<double>::type();
   }
 
 
@@ -3042,7 +3042,7 @@ namespace FEValuesViews
     // that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
-      return Value<double>::type();
+      return typename Value<double>::type();
     else if (snc != -1)
       {
         typename Value<double>::type return_value;
@@ -3080,7 +3080,7 @@ namespace FEValuesViews
     // that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
-      return Gradient<double>::type();
+      return typename Gradient<double>::type();
     else if (snc != -1)
       {
         typename Gradient<double>::type return_value;
@@ -3120,7 +3120,7 @@ namespace FEValuesViews
     // that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
-      return Divergence<double>::type();
+      return typename Divergence<double>::type();
     else if (snc != -1)
       return
         fe_values.shape_gradients[snc][q_point][shape_function_data[shape_function].single_nonzero_component_index];
@@ -3154,7 +3154,7 @@ namespace FEValuesViews
     const int snc = shape_function_data[shape_function].single_nonzero_component;
 
     if (snc == -2)
-      return Curl<double>::type ();
+      return typename Curl<double>::type ();
 
     else
       switch (dim)
@@ -3272,7 +3272,7 @@ namespace FEValuesViews
         }
     // should not end up here
     Assert (false, ExcInternalError());
-    return Curl<double>::type();
+    return typename Curl<double>::type();
   }
 
   template <int dim, int spacedim>
@@ -3293,7 +3293,7 @@ namespace FEValuesViews
     // that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
-      return Hessian<double>::type();
+      return typename Hessian<double>::type();
     else if (snc != -1)
       {
         typename Hessian<double>::type return_value;
@@ -3407,7 +3407,7 @@ namespace FEValuesViews
     // that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
-      return SymmetricGradient<double>::type();
+      return typename SymmetricGradient<double>::type();
     else if (snc != -1)
       return symmetrize_single_row (shape_function_data[shape_function].single_nonzero_component_index,
                                     fe_values.shape_gradients[snc][q_point]);
@@ -3448,7 +3448,7 @@ namespace FEValuesViews
       {
         // shape function is zero for the
         // selected components
-        return Value<double>::type();
+        return typename Value<double>::type();
 
       }
     else if (snc != -1)
@@ -3490,7 +3490,7 @@ namespace FEValuesViews
       {
         // shape function is zero for the
         // selected components
-        return Divergence<double>::type();
+        return typename Divergence<double>::type();
       }
     else if (snc != -1)
       {
@@ -3585,7 +3585,7 @@ namespace FEValuesViews
       {
         // shape function is zero for the
         // selected components
-        return Value<double>::type();
+        return typename Value<double>::type();
 
       }
     else if (snc != -1)
@@ -3630,7 +3630,7 @@ namespace FEValuesViews
       {
         // shape function is zero for the
         // selected components
-        return Divergence<double>::type();
+        return typename Divergence<double>::type();
       }
     else if (snc != -1)
       {
