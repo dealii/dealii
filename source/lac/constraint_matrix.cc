@@ -1759,15 +1759,15 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
                                                       VectorType                      &, \
                                                       bool                             , \
                                                       internal::bool2type<false>) const
-//#define MATRIX_FUNCTIONS(MatrixType) \
-//  template void ConstraintMatrix:: \
-//  distribute_local_to_global<MatrixType,Vector<double> > (const FullMatrix<double>        &, \
-//                                                          const Vector<double>            &, \
-//                                                          const std::vector<ConstraintMatrix::size_type> &, \
-//                                                          MatrixType                      &, \
-//                                                          Vector<double>                  &, \
-//                                                          bool                             , \
-//                                                          internal::bool2type<false>) const
+#define MATRIX_FUNCTIONS(MatrixType) \
+  template void ConstraintMatrix:: \
+  distribute_local_to_global<MatrixType,Vector<typename MatrixType::value_type> > (const FullMatrix<typename MatrixType::value_type>        &, \
+                                                          const Vector<typename MatrixType::value_type>            &, \
+                                                          const std::vector<ConstraintMatrix::size_type> &, \
+                                                          MatrixType                      &, \
+                                                          Vector<typename MatrixType::value_type>                  &, \
+                                                          bool                             , \
+                                                          internal::bool2type<false>) const
 #define BLOCK_MATRIX_VECTOR_FUNCTIONS(MatrixType, VectorType)   \
   template void ConstraintMatrix:: \
   distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<typename MatrixType::value_type>        &, \
@@ -1777,35 +1777,31 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
                                                       VectorType                      &, \
                                                       bool                             , \
                                                       internal::bool2type<true>) const
-//#define BLOCK_MATRIX_FUNCTIONS(MatrixType)      \
-//  template void ConstraintMatrix:: \
-//  distribute_local_to_global<MatrixType,Vector<double> > (const FullMatrix<double>        &, \
-//                                                          const Vector<double>            &, \
-//                                                          const std::vector<ConstraintMatrix::size_type> &, \
-//                                                          MatrixType                      &, \
-//                                                          Vector<double>                  &, \
-//                                                          bool                             , \
-//                                                          internal::bool2type<true>) const
+#define BLOCK_MATRIX_FUNCTIONS(MatrixType)      \
+  template void ConstraintMatrix:: \
+  distribute_local_to_global<MatrixType,Vector<typename MatrixType::value_type> > (const FullMatrix<typename MatrixType::value_type>        &, \
+                                                          const Vector<typename MatrixType::value_type>            &, \
+                                                          const std::vector<ConstraintMatrix::size_type> &, \
+                                                          MatrixType                      &, \
+                                                          Vector<typename MatrixType::value_type>                  &, \
+                                                          bool                             , \
+                                                          internal::bool2type<true>) const
 
 
 MATRIX_FUNCTIONS(SparseMatrix<double>);
 MATRIX_FUNCTIONS(SparseMatrix<float>);
 MATRIX_FUNCTIONS(FullMatrix<double>);
 MATRIX_FUNCTIONS(FullMatrix<float>);
-MATRIX_VECTOR_FUNCTIONS(SparseMatrix<float>, Vector<float>);
 
 BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
 BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<float>);
-BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<double>);
 
 MATRIX_FUNCTIONS(SparseMatrixEZ<double>);
 MATRIX_FUNCTIONS(SparseMatrixEZ<float>);
 MATRIX_FUNCTIONS(ChunkSparseMatrix<double>);
 MATRIX_FUNCTIONS(ChunkSparseMatrix<float>);
-MATRIX_VECTOR_FUNCTIONS(SparseMatrixEZ<float>,  Vector<float>);
-MATRIX_VECTOR_FUNCTIONS(ChunkSparseMatrix<float>, Vector<float>);
 
 // BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrixEZ<double>);
 // BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrixEZ<float>,  Vector<float>);
@@ -1875,14 +1871,7 @@ BLOCK_SPARSITY_FUNCTIONS(TrilinosWrappers::BlockSparsityPattern);
 
 #define ONLY_MATRIX_FUNCTIONS(MatrixType) \
   template void ConstraintMatrix::distribute_local_to_global<MatrixType > (\
-      const FullMatrix<double>        &, \
-      const std::vector<ConstraintMatrix::size_type> &, \
-      const std::vector<ConstraintMatrix::size_type> &, \
-      MatrixType                      &) const
-
-#define COMPLEX_ONLY_MATRIX_FUNCTIONS(MatrixType) \
-  template void ConstraintMatrix::distribute_local_to_global<MatrixType > (\
-      const FullMatrix<std::complex<double> >        &, \
+      const FullMatrix<typename MatrixType::value_type>        &, \
       const std::vector<ConstraintMatrix::size_type> &, \
       const std::vector<ConstraintMatrix::size_type> &, \
       MatrixType                      &) const
@@ -1891,8 +1880,9 @@ ONLY_MATRIX_FUNCTIONS(FullMatrix<float>);
 ONLY_MATRIX_FUNCTIONS(FullMatrix<double>);
 ONLY_MATRIX_FUNCTIONS(SparseMatrix<float>);
 ONLY_MATRIX_FUNCTIONS(SparseMatrix<double>);
-ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<float> >);
-ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<double> >);
+//TODO: fix this
+//ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<float> >);
+//ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<double> >);
 ONLY_MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
 ONLY_MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
 
@@ -1902,17 +1892,10 @@ ONLY_MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix);
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
-#ifndef PETSC_USE_COMPLEX
 ONLY_MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
 ONLY_MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
 ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
 ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
-#else
-COMPLEX_ONLY_MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
-COMPLEX_ONLY_MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
-COMPLEX_ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
-COMPLEX_ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
-#endif
 #endif
 
 #include "constraint_matrix.inst"
