@@ -1880,9 +1880,8 @@ ONLY_MATRIX_FUNCTIONS(FullMatrix<float>);
 ONLY_MATRIX_FUNCTIONS(FullMatrix<double>);
 ONLY_MATRIX_FUNCTIONS(SparseMatrix<float>);
 ONLY_MATRIX_FUNCTIONS(SparseMatrix<double>);
-//TODO: fix this
-//ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<float> >);
-//ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<double> >);
+ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<float> >);
+ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<double> >);
 ONLY_MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
 ONLY_MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
 
