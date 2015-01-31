@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -23,10 +23,6 @@
 #   ARPACK_WITH_PARPACK
 #
 
-#
-# TODO: ARPACK and mpi...
-#
-
 SET(ARPACK_DIR "" CACHE PATH "An optional hint to an ARPACK installation")
 SET_IF_EMPTY(ARPACK_DIR "$ENV{ARPACK_DIR}")
 
@@ -36,21 +32,25 @@ DEAL_II_FIND_LIBRARY(ARPACK_LIBRARY
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-#
-# Sanity check: Only search the parpack library in the same directory as
-# the arpack library...
-#
-GET_FILENAME_COMPONENT(_path "${ARPACK_LIBRARY}" PATH)
-DEAL_II_FIND_LIBRARY(PARPACK_LIBRARY
-  NAMES parpack
-  HINTS ${_path}
-  NO_DEFAULT_PATH
-  NO_CMAKE_ENVIRONMENT_PATH
-  NO_CMAKE_PATH
-  NO_SYSTEM_ENVIRONMENT_PATH
-  NO_CMAKE_SYSTEM_PATH
-  NO_CMAKE_FIND_ROOT_PATH
-  )
+IF(DEAL_II_WITH_MPI)
+  #
+  # Sanity check: Only search the parpack library in the same directory as
+  # the arpack library...
+  #
+  GET_FILENAME_COMPONENT(_path "${ARPACK_LIBRARY}" PATH)
+  DEAL_II_FIND_LIBRARY(PARPACK_LIBRARY
+    NAMES parpack
+    HINTS ${_path}
+    NO_DEFAULT_PATH
+    NO_CMAKE_ENVIRONMENT_PATH
+    NO_CMAKE_PATH
+    NO_SYSTEM_ENVIRONMENT_PATH
+    NO_CMAKE_SYSTEM_PATH
+    NO_CMAKE_FIND_ROOT_PATH
+    )
+ELSE()
+  SET(PARPACK_LIBRARY "PARPACK_LIBRARY-NOTFOUND")
+ENDIF()
 
 IF(NOT PARPACK_LIBRARY MATCHES "-NOTFOUND")
   SET(ARPACK_WITH_PARPACK TRUE)
@@ -58,9 +58,8 @@ ELSE()
   SET(ARPACK_WITH_PARPACK FALSE)
 ENDIF()
 
-
 DEAL_II_PACKAGE_HANDLE(ARPACK
-  LIBRARIES 
+  LIBRARIES
     OPTIONAL PARPACK_LIBRARY
     REQUIRED ARPACK_LIBRARY LAPACK_LIBRARIES
     OPTIONAL MPI_C_LIBRARIES
