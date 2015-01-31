@@ -57,7 +57,7 @@ namespace GridGenerator
    * tensor product interval $[left,right]^{\text{dim}}$ in the present number
    * of dimensions, where the limits are given as arguments. They default to
    * zero and unity, then producing the unit hypercube. If the argument
-   * `colorize` is false, all boundary indicators are set to zero ("not
+   * @p colorize is false, all boundary indicators are set to zero ("not
    * colorized") for 2d and 3d. If it is true, the boundary is colorized as in
    * hyper_rectangle(). In 1d the indicators are always colorized, see
    * hyper_rectangle().
@@ -217,7 +217,7 @@ namespace GridGenerator
    * vectors. Colorizing is done according to hyper_rectangle().
    *
    * @note This function silently reorders the vertices on the cells to
-   * lexiographic ordering (see <code>GridReordering::reorder_grid</code>). In
+   * lexicographic ordering (see <code>GridReordering::reorder_grid</code>). In
    * other words, if reodering of the vertices does occur, the ordering of
    * vertices in the array of <code>corners</code> will no longer refer to the
    * same triangulation.
@@ -248,7 +248,7 @@ namespace GridGenerator
                              const bool           colorize = false);
 
   /**
-   * A subdivided parallelepiped, ie. the same as above, but where the number
+   * A subdivided parallelepiped, i.e., the same as above, but where the number
    * of subdivisions in each of the @p dim directions may vary. Colorizing is
    * done according to hyper_rectangle().
    *
@@ -271,7 +271,7 @@ namespace GridGenerator
    * give the lower and upper bound of the inner hypercube in all coordinate
    * directions.  @p thickness marks the size of the layer cells.
    *
-   * If the flag colorize is set, the outer cells get material id's according
+   * If the flag @p colorize is set, the outer cells get material id's according
    * to the following scheme: extending over the inner cube in (+/-)
    * x-direction: 1/2. In y-direction 4/8, in z-direction 16/32. The cells at
    * corners and edges (3d) get these values bitwise or'd.
@@ -350,7 +350,7 @@ namespace GridGenerator
                  const double        half_length = 1.);
 
   /**
-   * Create a cutted cone around the x-axis.  The cone extends from
+   * Create a cut cone around the x-axis.  The cone extends from
    * <tt>x=-half_length</tt> to <tt>x=half_length</tt> and its projection into
    * the @p yz-plane is a circle of radius @p radius_0 at
    * <tt>x=-half_length</tt> and a circle of radius @p radius_1 at
@@ -384,12 +384,11 @@ namespace GridGenerator
    * Initialize the given triangulation with a hyper-L (in 2d or 3d)
    * consisting of exactly <tt>2^dim-1</tt> cells. It produces the hypercube
    * with the interval [<i>left,right</i>] without the hypercube made out of
-   * the interval [<i>(a+b)/2,b</i>]. This will result in the classical
-   * L-shape in 2d. The shape will look like the following in 3d:
+   * the interval [<i>(left+right)/2,right</i>] for each coordinate. This will
+   * result in the classical L-shape in 2d and it will look like the following
+   * in 3d:
    *
    * @image html hyper_l.png
-   *
-   * The triangulation needs to be void upon calling this function.
    *
    * This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
@@ -528,7 +527,7 @@ namespace GridGenerator
    * computed adaptively such that the resulting elements have the least
    * aspect ratio in 2d.
    *
-   * If colorize is set to true, the inner, outer, left, and right boundary
+   * If @p colorize is set to true, the inner, outer, left, and right boundary
    * get indicator 0, 1, 2, and 3 in 2d, respectively. Otherwise all
    * indicators are set to 0. In 3d indicator 2 is at the face x=0, 3 at y=0,
    * 4 at z=0.
@@ -591,14 +590,15 @@ namespace GridGenerator
    *
    * It is implemented in 2d and 3d, and takes the following arguments:
    *
-   * @arg @p inner_radius: radius of the internal hole @arg @p  outer_radius:
-   * half of the edge length of the square @arg @p L: extension in @p
-   * z-direction (only used in 3d) @arg @p repetitions: number of subdivisions
-   * along the @p z-direction @arg @p colorize: whether to assign different
-   * boundary indicators to different faces. The colors are given in
-   * lexicographic ordering for the flat faces (0 to 3 in 2d, 0 to 5 in 3d)
-   * plus the curved hole (4 in 2d, and 6 in 3d). If @p colorize is set to
-   * false, then flat faces get the number 0 and the hole gets number 1.
+   * @param inner_radius  Radius of the internal hole.
+   * @param outer_radius Half of the edge length of the square.
+   * @param L  Extension in @p z-direction (only used in 3d).
+   * @param repetitions Number of subdivisions along the @p z-direction.
+   * @param colorize Whether to assign different boundary indicators to
+   * different faces. The colors are given in lexicographic ordering for the
+   * flat faces (0 to 3 in 2d, 0 to 5 in 3d) plus the curved hole (4 in 2d,
+   * and 6 in 3d). If @p colorize is set to false, then flat faces get the
+   * number 0 and the hole gets number 1.
    */
   template<int dim>
   void hyper_cube_with_cylindrical_hole (
@@ -617,7 +617,7 @@ namespace GridGenerator
    * @param n_cells     The number of cells in the loop. Must be greater than
    * 4.
    * @param n_rotations The number of rotations (Pi/2 each) to be performed
-   * before glueing the loop together.
+   * before gluing the loop together.
    * @param R           The radius of the circle, which forms the middle line
    * of the torus containing the loop of cells. Must be greater than @p r.
    * @param r           The radius of the cylinder bend together as loop.
