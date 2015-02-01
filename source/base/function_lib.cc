@@ -2180,7 +2180,7 @@ namespace Functions
 #ifdef DEAL_II_HAVE_JN
     return jn(order, r*wave_number);
 #else
-    Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
     return r;
 #endif
   }
@@ -2201,7 +2201,7 @@ namespace Functions
         const double r = points[k].distance(center);
         values[k] = jn(order, r*wave_number);
 #else
-        Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+        Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
 #endif
       }
   }
@@ -2226,7 +2226,7 @@ namespace Functions
     result[1] = wave_number * si * dJn;
     return result;
 #else
-    Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
     return Tensor<1,dim>();
 #endif
   }
@@ -2255,7 +2255,7 @@ namespace Functions
                            : (.5*(jn(order-1, wave_number*r) -jn(order+1, wave_number*r)));
 #else
         const double dJn = 0.;
-        Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+        Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
 #endif
         Tensor<1,dim> &result = gradients[k];
         result[0] = wave_number * co * dJn;

@@ -59,8 +59,7 @@
 // provided by UMFPACK (see the SparseDirectUMFPACK class), for which the
 // following header file is needed.  Note that in order to compile this
 // tutorial program, the deal.II-library needs to be built with UMFPACK
-// support, which can be most easily achieved by giving the <code>
-// --with-umfpack</code> switch when configuring the library:
+// support, which is enabled by default:
 #include <deal.II/lac/sparse_direct.h>
 
 // The FESystem class allows us to stack several FE-objects to one compound,
@@ -810,9 +809,7 @@ namespace Step29
   // solve our linear system with just 3 lines of code.
 
   // Note again that for compiling this example program, you need to have the
-  // deal.II library built with UMFPACK support, which can be achieved by
-  // providing the <code> --with-umfpack</code> switch to the configure script
-  // prior to compilation of the library.
+  // deal.II library built with UMFPACK support.
   template <int dim>
   void UltrasoundProblem<dim>::solve ()
   {
