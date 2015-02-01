@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -178,7 +178,8 @@ public:
    * The iteration is also aborted if the residual becomes a denormalized
    * value (@p NaN). Note, however, that this check is only performed if the
    * @p isnan function is provided by the operating system, which is not
-   * always true. The @p configure scripts checks for this and sets the flag
+   * always true. CMake checks this with the 'check_01_cxx_features.cmake'
+   * test and sets the flag
    * @p DEAL_II_HAVE_ISNAN in the include file <tt>deal.II/base/config.h</tt>
    * if this function was found.
    *

@@ -554,7 +554,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.n() > 300)
       {
-        // In case we have the BLAS function gemm detected at configure, we
+        // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
         // provides better performance than the deal.II native function (it
         // uses cache and register blocking in order to access local data).
@@ -624,7 +624,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.n() > 300)
       {
-        // In case we have the BLAS function gemm detected at configure, we
+        // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
         // provides better performance than the deal.II native function (it
         // uses cache and register blocking in order to access local data).
@@ -714,7 +714,7 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.m() > 300)
       {
-        // In case we have the BLAS function gemm detected at configure, we
+        // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
         // provides better performance than the deal.II native function (it
         // uses cache and register blocking in order to access local data).
@@ -802,7 +802,7 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.m() > 300)
       {
-        // In case we have the BLAS function gemm detected at configure, we
+        // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
         // provides better performance than the deal.II native function (it
         // uses cache and register blocking in order to access local data).
@@ -1720,7 +1720,7 @@ FullMatrix<number>::gauss_jordan ()
     if (this->n_cols() > 15)
       {
         // In case we have the LAPACK functions
-        // getrf and getri detected at configure,
+        // getrf and getri detected by CMake,
         // we use these algorithms for inversion
         // since they provide better performance
         // than the deal.II native functions.
