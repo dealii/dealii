@@ -110,16 +110,6 @@ namespace SparseMatrixIterators
 
     /**
      * Constructor.
-     *
-     * @deprecated This constructor is deprecated. Use the other constructor
-     * with a global index instead.
-     */
-    Accessor (MatrixType     *matrix,
-              const size_type row,
-              const size_type index) DEAL_II_DEPRECATED;
-
-    /**
-     * Constructor.
      */
     Accessor (MatrixType         *matrix,
               const std::size_t   index_within_matrix);
@@ -256,13 +246,6 @@ namespace SparseMatrixIterators
     /**
      * Constructor.
      */
-    Accessor (MatrixType     *matrix,
-              const size_type row,
-              const size_type index);
-
-    /**
-     * Constructor.
-     */
     Accessor (MatrixType         *matrix,
               const std::size_t   index);
 
@@ -354,17 +337,6 @@ namespace SparseMatrixIterators
      */
     typedef
     const Accessor<number,Constness> &value_type;
-
-    /**
-     * Constructor. Create an iterator into the matrix @p matrix for the given
-     * row and the index within it.
-     *
-     * @deprecated This constructor is deprecated. Use the other constructor
-     * with a global index instead.
-     */
-    Iterator (MatrixType     *matrix,
-              const size_type row,
-              const size_type index) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
@@ -2044,20 +2016,6 @@ namespace SparseMatrixIterators
   template <typename number>
   inline
   Accessor<number,true>::
-  Accessor (const MatrixType *matrix,
-            const size_type   row,
-            const size_type   index)
-    :
-    SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
-                                        row, index),
-    matrix (matrix)
-  {}
-
-
-
-  template <typename number>
-  inline
-  Accessor<number,true>::
   Accessor (const MatrixType   *matrix,
             const std::size_t   index_within_matrix)
     :
@@ -2194,20 +2152,6 @@ namespace SparseMatrixIterators
   template <typename number>
   inline
   Accessor<number,false>::
-  Accessor (MatrixType      *matrix,
-            const size_type  row,
-            const size_type  index)
-    :
-    SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
-                                        row, index),
-    matrix (matrix)
-  {}
-
-
-
-  template <typename number>
-  inline
-  Accessor<number,false>::
   Accessor (MatrixType         *matrix,
             const std::size_t   index)
     :
@@ -2247,18 +2191,6 @@ namespace SparseMatrixIterators
   {
     return *matrix;
   }
-
-
-
-  template <typename number, bool Constness>
-  inline
-  Iterator<number, Constness>::
-  Iterator (MatrixType      *matrix,
-            const size_type  r,
-            const size_type  i)
-    :
-    accessor(matrix, r, i)
-  {}
 
 
 
