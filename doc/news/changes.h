@@ -280,12 +280,6 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> New: deal.II now also provides an interface to the parallel ARPACK
-  (PARPACK) solver with the <code>PArpackSolver</code> class.
-  <br>
-  (Denis Davydov, 2015/01/30)
-  </li>
-
   <li> Bugfix: deal.II now correctly links against librt in case of bundled
   boost being used.
   <br>
