@@ -608,6 +608,22 @@ namespace hp
     virtual std::size_t memory_consumption () const;
 
     /**
+    * Write the data of this object to a stream for the purpose of
+    * serialization.
+    */
+    template <class Archive>
+    void save(Archive &ar, const unsigned int version) const;
+
+    /**
+    * Read the data of this object from a stream for the purpose of
+    * serialization.
+    */
+    template <class Archive>
+    void load(Archive &ar, const unsigned int version);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+    /**
      * Exception
      */
     DeclException0 (ExcInvalidTriangulation);
@@ -876,6 +892,60 @@ namespace hp
 
 
   /* ----------------------- Inline functions ---------------------------------- */
+
+  template <int dim, int spacedim>
+  template <class Archive>
+  void DoFHandler<dim, spacedim>::save(Archive &ar, unsigned int) const
+  {
+    ar &vertex_dofs;
+    ar &vertex_dofs_offsets;
+    ar &number_cache;
+    ar &levels;
+    ar &faces;
+    ar &has_children;
+
+    // write out the number of triangulation cells and later check during
+    // loading that this number is indeed correct;
+    unsigned int n_cells = tria->n_cells();
+
+    ar &n_cells;
+  }
+
+  template <int dim, int spacedim>
+  template <class Archive>
+  void DoFHandler<dim, spacedim>::load(Archive &ar, unsigned int)
+  {
+    ar &vertex_dofs;
+    ar &vertex_dofs_offsets;
+    ar &number_cache;
+
+    // boost::serialization can restore pointers just fine, but if the
+    // pointer object still points to something useful, that object is not
+    // destroyed and we end up with a memory leak. consequently, first delete
+    // previous content before re-loading stuff
+    for (unsigned int i = 0; i<levels.size(); ++i)
+      delete levels[i];
+    for (unsigned int i = 0; i<has_children.size(); ++i)
+      delete has_children[i];
+    levels.resize(0);
+    has_children.resize(0);
+    delete faces;
+    faces = 0;
+
+    ar &levels;
+    ar &faces;
+    ar &has_children;
+
+    // these are the checks that correspond to the last block in the save()
+    // function
+    unsigned int n_cells;
+
+    ar &n_cells;
+
+    AssertThrow(n_cells == tria->n_cells(),
+                ExcMessage("The object being loaded into does not match the triangulation "
+                           "that has been stored previously."));
+  }
 
   template <int dim, int spacedim>
   inline
