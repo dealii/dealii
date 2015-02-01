@@ -280,6 +280,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: Class hp::DoFHandler can now also be serialized.
+  <br>
+  (Lukas Korous, 2015/01/31)
+  </li>
+
   <li> Bugfix: deal.II now correctly links against librt in case of bundled
   boost being used.
   <br>
