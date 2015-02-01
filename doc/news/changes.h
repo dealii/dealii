@@ -210,6 +210,7 @@ inconvenience this causes.
   - Multigrid::vmult and friends.
   - Classes FEEvaluationDGP, FEEvaluationGeneral and FEEvaluationGL.
   - Classes PreconditionedMatrix and PreconditionLACSolver.
+  - PETScVectors::MPI::Vector constructors and reinit() variants.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into
