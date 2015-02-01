@@ -242,6 +242,14 @@ namespace internal
        */
       std::size_t memory_consumption () const;
 
+      /**
+      * Read or write the data of this object to or from a stream for the
+      * purpose of serialization
+      */
+      template <class Archive>
+      void serialize(Archive &ar,
+                     const unsigned int version);
+
     private:
       /**
        * Compress the arrays that store dof indices by using a variant of run-
@@ -388,6 +396,19 @@ namespace internal
               ExcInternalError());
 
       return &cell_dof_indices_cache[cell_cache_offsets[obj_index]];
+    }
+
+    template <class Archive>
+    inline
+    void
+    DoFLevel::serialize(Archive &ar,
+                        const unsigned int)
+    {
+      ar &this->active_fe_indices;
+      ar &this->cell_cache_offsets;
+      ar &this->cell_dof_indices_cache;
+      ar &this->dof_indices;
+      ar &this->dof_offsets;
     }
   } // namespace hp
 
