@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace
 {
   template <class VectorType>
-  double
+  typename VectorType::value_type
   get_vector_element (const VectorType &vector,
                       const types::global_dof_index cell_number)
   {
@@ -455,26 +455,26 @@ namespace FEValuesViews
     // consistently throughout the code since revision 17903 at least.
 
     // ------------------------- scalar functions --------------------------
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
-    do_function_values (const ::dealii::Vector<double> &dof_values,
+    do_function_values (const ::dealii::Vector<number> &dof_values,
                         const Table<2,double>          &shape_values,
                         const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                        std::vector<double>            &values)
+                        std::vector<number>            &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                                shape_values.n_cols() : values.size();
       AssertDimension (values.size(), n_quadrature_points);
 
-      std::fill (values.begin(), values.end(), 0.);
+      std::fill (values.begin(), values.end(), number());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const double value = dof_values(shape_function);
-            if (value == 0.)
+            const number value = dof_values(shape_function);
+            if (value == number())
               continue;
 
             const double *shape_value_ptr =
@@ -488,12 +488,12 @@ namespace FEValuesViews
 
     // same code for gradient and Hessian, template argument 'order' to give
     // the order of the derivative (= rank of gradient/Hessian tensor)
-    template <int order, int dim, int spacedim>
+    template <int order, int dim, int spacedim, typename number>
     void
-    do_function_derivatives (const ::dealii::Vector<double> &dof_values,
+    do_function_derivatives (const ::dealii::Vector<number> &dof_values,
                              const std::vector<std::vector<dealii::Tensor<order,spacedim> > > &shape_derivatives,
                              const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<dealii::Tensor<order,spacedim> > &derivatives)
+                             std::vector<dealii::Tensor<order,spacedim,number> > &derivatives)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -501,14 +501,14 @@ namespace FEValuesViews
       AssertDimension (derivatives.size(), n_quadrature_points);
 
       std::fill (derivatives.begin(), derivatives.end(),
-                 dealii::Tensor<order,spacedim>());
+                 dealii::Tensor<order,spacedim,number>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const double value = dof_values(shape_function);
-            if (value == 0.)
+            const number value = dof_values(shape_function);
+            if (value == number())
               continue;
 
             const dealii::Tensor<order,spacedim> *shape_derivative_ptr =
@@ -520,26 +520,26 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
-    do_function_laplacians (const ::dealii::Vector<double> &dof_values,
+    do_function_laplacians (const ::dealii::Vector<number> &dof_values,
                             const std::vector<std::vector<dealii::Tensor<2,spacedim> > > &shape_hessians,
                             const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                            std::vector<double>           &laplacians)
+                            std::vector<number>           &laplacians)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                                shape_hessians[0].size() : laplacians.size();
       AssertDimension (laplacians.size(), n_quadrature_points);
 
-      std::fill (laplacians.begin(), laplacians.end(), 0.);
+      std::fill (laplacians.begin(), laplacians.end(), number());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const double value = dof_values(shape_function);
-            if (value == 0.)
+            const number value = dof_values(shape_function);
+            if (value == number())
               continue;
 
             const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
@@ -553,18 +553,18 @@ namespace FEValuesViews
 
     // ----------------------------- vector part ---------------------------
 
-    template <int dim, int spacedim>
-    void do_function_values (const ::dealii::Vector<double> &dof_values,
+    template <int dim, int spacedim, typename number>
+    void do_function_values (const ::dealii::Vector<number> &dof_values,
                              const Table<2,double>          &shape_values,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<dealii::Tensor<1,spacedim> > &values)
+                             std::vector<dealii::Tensor<1,spacedim,number> > &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                                shape_values.n_cols() : values.size();
       AssertDimension (values.size(), n_quadrature_points);
 
-      std::fill (values.begin(), values.end(), dealii::Tensor<1,spacedim>());
+      std::fill (values.begin(), values.end(), dealii::Tensor<1,spacedim,number>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -575,8 +575,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const number value = dof_values(shape_function);
+          if (value == number())
             continue;
 
           if (snc != -1)
@@ -601,12 +601,12 @@ namespace FEValuesViews
 
 
 
-    template <int order, int dim, int spacedim>
+    template <int order, int dim, int spacedim, typename number>
     void
-    do_function_derivatives (const ::dealii::Vector<double> &dof_values,
+    do_function_derivatives (const ::dealii::Vector<number> &dof_values,
                              const std::vector<std::vector<dealii::Tensor<order,spacedim> > > &shape_derivatives,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<dealii::Tensor<order+1,spacedim> > &derivatives)
+                             std::vector<dealii::Tensor<order+1,spacedim,number> > &derivatives)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -614,7 +614,7 @@ namespace FEValuesViews
       AssertDimension (derivatives.size(), n_quadrature_points);
 
       std::fill (derivatives.begin(), derivatives.end(),
-                 dealii::Tensor<order+1,spacedim>());
+                 dealii::Tensor<order+1,spacedim,number>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -625,8 +625,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const number value = dof_values(shape_function);
+          if (value == number())
             continue;
 
           if (snc != -1)
@@ -653,12 +653,12 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
-    do_function_symmetric_gradients (const ::dealii::Vector<double> &dof_values,
+    do_function_symmetric_gradients (const ::dealii::Vector<number> &dof_values,
                                      const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
                                      const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                                     std::vector<dealii::SymmetricTensor<2,spacedim> > &symmetric_gradients)
+                                     std::vector<dealii::SymmetricTensor<2,spacedim,number> > &symmetric_gradients)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -666,7 +666,7 @@ namespace FEValuesViews
       AssertDimension (symmetric_gradients.size(), n_quadrature_points);
 
       std::fill (symmetric_gradients.begin(), symmetric_gradients.end(),
-                 dealii::SymmetricTensor<2,spacedim>());
+                 dealii::SymmetricTensor<2,spacedim,number>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -677,8 +677,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const number value = dof_values(shape_function);
+          if (value == number())
             continue;
 
           if (snc != -1)
@@ -694,7 +694,7 @@ namespace FEValuesViews
           else
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
               {
-                dealii::Tensor<2,spacedim> grad;
+                dealii::Tensor<2,spacedim,number> grad;
                 for (unsigned int d=0; d<spacedim; ++d)
                   if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
                     grad[d] = value *
@@ -706,19 +706,19 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
-    do_function_divergences (const ::dealii::Vector<double> &dof_values,
+    do_function_divergences (const ::dealii::Vector<number> &dof_values,
                              const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<double> &divergences)
+                             std::vector<number> &divergences)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                                shape_gradients[0].size() : divergences.size();
       AssertDimension (divergences.size(), n_quadrature_points);
 
-      std::fill (divergences.begin(), divergences.end(), 0.);
+      std::fill (divergences.begin(), divergences.end(), number());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -729,8 +729,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const number value = dof_values(shape_function);
+          if (value == number())
             continue;
 
           if (snc != -1)
@@ -756,19 +756,19 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
-    do_function_curls (const ::dealii::Vector<double> &dof_values,
+    do_function_curls (const ::dealii::Vector<number> &dof_values,
                        const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
                        const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                       std::vector<typename dealii::internal::CurlType<spacedim>::type> &curls)
+                       std::vector<typename dealii::internal::CurlType<spacedim,number>::type> &curls)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                                shape_gradients[0].size() : curls.size();
       AssertDimension (curls.size(), n_quadrature_points);
 
-      std::fill (curls.begin(), curls.end(), typename dealii::internal::CurlType<spacedim>::type());
+      std::fill (curls.begin(), curls.end(), typename dealii::internal::CurlType<spacedim,number>::type());
 
       switch (spacedim)
         {
@@ -789,9 +789,9 @@ namespace FEValuesViews
                 // shape function is zero for the selected components
                 continue;
 
-              const double value = dof_values (shape_function);
+              const number value = dof_values (shape_function);
 
-              if (value == 0.)
+              if (value == number())
                 continue;
 
               if (snc != -1)
@@ -849,7 +849,7 @@ namespace FEValuesViews
                 // shape function is zero for the selected components
                 continue;
 
-              const double value = dof_values (shape_function);
+              const number value = dof_values (shape_function);
 
               if (value == 0.)
                 continue;
@@ -948,12 +948,12 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim,typename number>
     void
-    do_function_laplacians (const ::dealii::Vector<double> &dof_values,
+    do_function_laplacians (const ::dealii::Vector<number> &dof_values,
                             const std::vector<std::vector<dealii::Tensor<2,spacedim> > > &shape_hessians,
                             const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                            std::vector<dealii::Tensor<1,spacedim> > &laplacians)
+                            std::vector<dealii::Tensor<1,spacedim,number> > &laplacians)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -961,7 +961,7 @@ namespace FEValuesViews
       AssertDimension (laplacians.size(), n_quadrature_points);
 
       std::fill (laplacians.begin(), laplacians.end(),
-                 dealii::Tensor<1,spacedim>());
+                 dealii::Tensor<1,spacedim,number>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -972,8 +972,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const number value = dof_values(shape_function);
+          if (value == number())
             continue;
 
           if (snc != -1)
@@ -1002,12 +1002,12 @@ namespace FEValuesViews
 
     // ---------------------- symmetric tensor part ------------------------
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
-    do_function_values (const ::dealii::Vector<double> &dof_values,
+    do_function_values (const ::dealii::Vector<number> &dof_values,
                         const dealii::Table<2,double>          &shape_values,
                         const std::vector<typename SymmetricTensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                        std::vector<dealii::SymmetricTensor<2,spacedim> > &values)
+                        std::vector<dealii::SymmetricTensor<2,spacedim,number> > &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1015,7 +1015,7 @@ namespace FEValuesViews
       AssertDimension (values.size(), n_quadrature_points);
 
       std::fill (values.begin(), values.end(),
-                 dealii::SymmetricTensor<2,spacedim>());
+                 dealii::SymmetricTensor<2,spacedim,number>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1026,8 +1026,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const number value = dof_values(shape_function);
+          if (value == number())
             continue;
 
           if (snc != -1)
@@ -1056,12 +1056,12 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
-    do_function_divergences (const ::dealii::Vector<double> &dof_values,
+    do_function_divergences (const ::dealii::Vector<number> &dof_values,
                              const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
                              const std::vector<typename SymmetricTensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<dealii::Tensor<1,spacedim> > &divergences)
+                             std::vector<dealii::Tensor<1,spacedim,number> > &divergences)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1069,7 +1069,7 @@ namespace FEValuesViews
       AssertDimension (divergences.size(), n_quadrature_points);
 
       std::fill (divergences.begin(), divergences.end(),
-                 dealii::Tensor<1,spacedim>());
+                 dealii::Tensor<1,spacedim,number>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1080,8 +1080,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const number value = dof_values(shape_function);
+          if (value == number())
             continue;
 
           if (snc != -1)
@@ -1144,12 +1144,12 @@ namespace FEValuesViews
 
     // ---------------------- non-symmetric tensor part ------------------------
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
-    do_function_values (const ::dealii::Vector<double> &dof_values,
+    do_function_values (const ::dealii::Vector<number> &dof_values,
                         const dealii::Table<2,double>          &shape_values,
                         const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                        std::vector<dealii::Tensor<2,spacedim> > &values)
+                        std::vector<dealii::Tensor<2,spacedim,number> > &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1157,7 +1157,7 @@ namespace FEValuesViews
       AssertDimension (values.size(), n_quadrature_points);
 
       std::fill (values.begin(), values.end(),
-                 dealii::Tensor<2,spacedim>());
+                 dealii::Tensor<2,spacedim,number>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1168,8 +1168,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const number value = dof_values(shape_function);
+          if (value == number())
             continue;
 
           if (snc != -1)
@@ -1200,12 +1200,12 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
-    do_function_divergences (const ::dealii::Vector<double> &dof_values,
+    do_function_divergences (const ::dealii::Vector<number> &dof_values,
                              const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
                              const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<dealii::Tensor<1,spacedim> > &divergences)
+                             std::vector<dealii::Tensor<1,spacedim,number> > &divergences)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1213,7 +1213,7 @@ namespace FEValuesViews
       AssertDimension (divergences.size(), n_quadrature_points);
 
       std::fill (divergences.begin(), divergences.end(),
-                 dealii::Tensor<1,spacedim>());
+                 dealii::Tensor<1,spacedim,number>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1224,8 +1224,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const number value = dof_values(shape_function);
+          if (value == number())
             continue;
 
           if (snc != -1)
@@ -1267,7 +1267,7 @@ namespace FEValuesViews
   void
   Scalar<dim,spacedim>::
   get_function_values (const InputVector &fe_function,
-                       std::vector<value_type> &values) const
+                       std::vector<typename Value<typename InputVector::value_type>::type> &values) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_values,
@@ -1278,9 +1278,9 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell and call internal worker function
-    dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_values<dim,spacedim>
+    internal::do_function_values<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_values, shape_function_data, values);
   }
 
@@ -1291,7 +1291,7 @@ namespace FEValuesViews
   void
   Scalar<dim,spacedim>::
   get_function_gradients (const InputVector &fe_function,
-                          std::vector<gradient_type> &gradients) const
+                          std::vector<typename Gradient<typename InputVector::value_type>::type> &gradients) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_gradients,
@@ -1302,9 +1302,9 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_derivatives<1,dim,spacedim>
+    internal::do_function_derivatives<1,dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
   }
 
@@ -1315,7 +1315,7 @@ namespace FEValuesViews
   void
   Scalar<dim,spacedim>::
   get_function_hessians (const InputVector &fe_function,
-                         std::vector<hessian_type> &hessians) const
+                         std::vector<typename Hessian<typename InputVector::value_type>::type> &hessians) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_hessians,
@@ -1326,9 +1326,9 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_derivatives<2,dim,spacedim>
+    internal::do_function_derivatives<2,dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
   }
 
@@ -1339,7 +1339,7 @@ namespace FEValuesViews
   void
   Scalar<dim,spacedim>::
   get_function_laplacians (const InputVector &fe_function,
-                           std::vector<value_type> &laplacians) const
+                           std::vector<typename Value<typename InputVector::value_type>::type> &laplacians) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_hessians,
@@ -1350,9 +1350,9 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_laplacians<dim,spacedim>
+    internal::do_function_laplacians<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
   }
 
@@ -1363,7 +1363,7 @@ namespace FEValuesViews
   void
   Vector<dim,spacedim>::
   get_function_values (const InputVector &fe_function,
-                       std::vector<value_type> &values) const
+                       std::vector<typename Value<typename InputVector::value_type>::type> &values) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_values,
@@ -1374,9 +1374,9 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_values<dim,spacedim>
+    internal::do_function_values<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_values, shape_function_data, values);
   }
 
@@ -1388,7 +1388,7 @@ namespace FEValuesViews
   void
   Vector<dim,spacedim>::
   get_function_gradients (const InputVector &fe_function,
-                          std::vector<gradient_type> &gradients) const
+                          std::vector<typename Gradient<typename InputVector::value_type>::type> &gradients) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_gradients,
@@ -1399,9 +1399,9 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_derivatives<1,dim,spacedim>
+    internal::do_function_derivatives<1,dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
   }
 
@@ -1412,7 +1412,7 @@ namespace FEValuesViews
   void
   Vector<dim,spacedim>::
   get_function_symmetric_gradients (const InputVector &fe_function,
-                                    std::vector<symmetric_gradient_type> &symmetric_gradients) const
+                                    std::vector<typename SymmetricGradient<typename InputVector::value_type>::type> &symmetric_gradients) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_gradients,
@@ -1423,9 +1423,9 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_symmetric_gradients<dim,spacedim>
+    internal::do_function_symmetric_gradients<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_gradients, shape_function_data,
      symmetric_gradients);
   }
@@ -1437,7 +1437,7 @@ namespace FEValuesViews
   void
   Vector<dim,spacedim>::
   get_function_divergences (const InputVector &fe_function,
-                            std::vector<divergence_type> &divergences) const
+                            std::vector<typename Divergence<typename InputVector::value_type>::type> &divergences) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_gradients,
@@ -1449,9 +1449,9 @@ namespace FEValuesViews
 
     // get function values of dofs
     // on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_divergences<dim,spacedim>
+    internal::do_function_divergences<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
   }
 
@@ -1460,7 +1460,7 @@ namespace FEValuesViews
   void
   Vector<dim,spacedim>::
   get_function_curls (const InputVector &fe_function,
-                      std::vector<curl_type> &curls) const
+                      std::vector<typename Curl<typename InputVector::value_type>::type> &curls) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
 
@@ -1472,9 +1472,9 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler ());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values (fe_function, dof_values);
-    internal::do_function_curls<dim,spacedim>
+    internal::do_function_curls<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_gradients, shape_function_data, curls);
   }
 
@@ -1484,7 +1484,7 @@ namespace FEValuesViews
   void
   Vector<dim,spacedim>::
   get_function_hessians (const InputVector &fe_function,
-                         std::vector<hessian_type> &hessians) const
+                         std::vector<typename Hessian<typename InputVector::value_type>::type> &hessians) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_hessians,
@@ -1495,9 +1495,9 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_derivatives<2,dim,spacedim>
+    internal::do_function_derivatives<2,dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
   }
 
@@ -1508,7 +1508,7 @@ namespace FEValuesViews
   void
   Vector<dim,spacedim>::
   get_function_laplacians (const InputVector &fe_function,
-                           std::vector<value_type> &laplacians) const
+                           std::vector<typename Value<typename InputVector::value_type>::type> &laplacians) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_hessians,
@@ -1522,9 +1522,9 @@ namespace FEValuesViews
                                  fe_values.present_cell->n_dofs_for_dof_handler()));
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_laplacians<dim,spacedim>
+    internal::do_function_laplacians<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
   }
 
@@ -1535,7 +1535,7 @@ namespace FEValuesViews
   void
   SymmetricTensor<2, dim, spacedim>::
   get_function_values(const InputVector &fe_function,
-                      std::vector<value_type> &values) const
+                      std::vector<typename Value<typename InputVector::value_type>::type> &values) const
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_values,
@@ -1546,9 +1546,9 @@ namespace FEValuesViews
                     fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_values<dim,spacedim>
+    internal::do_function_values<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_values, shape_function_data, values);
   }
 
@@ -1559,7 +1559,7 @@ namespace FEValuesViews
   void
   SymmetricTensor<2, dim, spacedim>::
   get_function_divergences(const InputVector &fe_function,
-                           std::vector<divergence_type> &divergences) const
+                           std::vector<typename Divergence<typename InputVector::value_type>::type> &divergences) const
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_gradients,
@@ -1571,9 +1571,9 @@ namespace FEValuesViews
 
     // get function values of dofs
     // on this cell
-    dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_divergences<dim,spacedim>
+    internal::do_function_divergences<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
   }
 
@@ -1582,7 +1582,7 @@ namespace FEValuesViews
   void
   Tensor<2, dim, spacedim>::
   get_function_values(const InputVector &fe_function,
-                      std::vector<value_type> &values) const
+                      std::vector<typename Value<typename InputVector::value_type>::type> &values) const
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_values,
@@ -1593,9 +1593,9 @@ namespace FEValuesViews
                     fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_values<dim,spacedim>
+    internal::do_function_values<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_values, shape_function_data, values);
   }
 
@@ -1606,7 +1606,7 @@ namespace FEValuesViews
   void
   Tensor<2, dim, spacedim>::
   get_function_divergences(const InputVector &fe_function,
-                           std::vector<divergence_type> &divergences) const
+                           std::vector<typename Divergence<typename InputVector::value_type>::type> &divergences) const
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_gradients,
@@ -1618,9 +1618,9 @@ namespace FEValuesViews
 
     // get function values of dofs
     // on this cell
-    dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_divergences<dim,spacedim>
+    internal::do_function_divergences<dim,spacedim,typename InputVector::value_type>
     (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
   }
 }
@@ -1999,7 +1999,6 @@ FEValuesBase<dim,spacedim>::CellIterator<CI>::n_dofs_for_dof_handler () const
 
 #include "fe_values.impl.1.inst"
 
-
 template <int dim, int spacedim>
 template <typename CI>
 void
@@ -2060,7 +2059,6 @@ FEValuesBase<dim,spacedim>::TriaCellIterator::n_dofs_for_dof_handler () const
 
 #include "fe_values.impl.2.inst"
 
-
 template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
@@ -2069,7 +2067,6 @@ get_interpolated_dof_values (const IndexSet &,
 {
   Assert (false, ExcMessage (message_string));
 }
-
 
 
 /* --------------------- FEValuesData ----------------- */
@@ -2203,9 +2200,9 @@ namespace internal
   // compilation and reduces the size of the final file since all the
   // different global vectors get channeled through the same code.
 
-  template <typename Number>
+  template <typename Number, typename Number2>
   void
-  do_function_values (const double          *dof_values_ptr,
+  do_function_values (const Number2         *dof_values_ptr,
                       const dealii::Table<2,double> &shape_values,
                       std::vector<Number>   &values)
   {
@@ -2227,8 +2224,8 @@ namespace internal
     // the shape_values data stored contiguously
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-        const double value = dof_values_ptr[shape_func];
-        if (value == 0.)
+        const Number2 value = dof_values_ptr[shape_func];
+        if (value == Number2())
           continue;
 
         const double *shape_value_ptr = &shape_values(shape_func, 0);
@@ -2237,9 +2234,9 @@ namespace internal
       }
   }
 
-  template <int dim, int spacedim, typename VectorType>
+  template <int dim, int spacedim, typename VectorType, typename Number>
   void
-  do_function_values (const double                      *dof_values_ptr,
+  do_function_values (const Number                      *dof_values_ptr,
                       const dealii::Table<2,double>             &shape_values,
                       const FiniteElement<dim,spacedim> &fe,
                       const std::vector<unsigned int> &shape_function_to_row_table,
@@ -2282,8 +2279,8 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const double value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == 0.)
+          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          if (value == Number())
             continue;
 
           if (fe.is_primitive(shape_func))
@@ -2334,11 +2331,11 @@ namespace internal
 
   // use the same implementation for gradients and Hessians, distinguish them
   // by the rank of the tensors
-  template <int order, int spacedim>
+  template <int order, int spacedim, typename Number>
   void
-  do_function_derivatives (const double                     *dof_values_ptr,
+  do_function_derivatives (const Number                     *dof_values_ptr,
                            const std::vector<std::vector<Tensor<order,spacedim> > > &shape_derivatives,
-                           std::vector<Tensor<order,spacedim> > &derivatives)
+                           std::vector<Tensor<order,spacedim,Number> > &derivatives)
   {
     const unsigned int dofs_per_cell = shape_derivatives.size();
     const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -2346,7 +2343,7 @@ namespace internal
     AssertDimension(derivatives.size(), n_quadrature_points);
 
     // initialize with zero
-    std::fill_n (derivatives.begin(), n_quadrature_points, Tensor<order,spacedim>());
+    std::fill_n (derivatives.begin(), n_quadrature_points, Tensor<order,spacedim,Number>());
 
     // add up contributions of trial functions. note that here we deal with
     // scalar finite elements, so no need to check for non-primitivity of
@@ -2357,8 +2354,8 @@ namespace internal
     // access the shape_gradients/hessians data stored contiguously
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-        const double value = dof_values_ptr[shape_func];
-        if (value == 0.)
+        const Number value = dof_values_ptr[shape_func];
+        if (value == Number())
           continue;
 
         const Tensor<order,spacedim> *shape_derivative_ptr
@@ -2368,20 +2365,20 @@ namespace internal
       }
   }
 
-  template <int order, int dim, int spacedim>
+  template <int order, int dim, int spacedim, typename Number>
   void
-  do_function_derivatives (const double                      *dof_values_ptr,
+  do_function_derivatives (const Number                      *dof_values_ptr,
                            const std::vector<std::vector<Tensor<order,spacedim> > > &shape_derivatives,
                            const FiniteElement<dim,spacedim> &fe,
                            const std::vector<unsigned int> &shape_function_to_row_table,
-                           VectorSlice<std::vector<std::vector<Tensor<order,spacedim> > > > &derivatives,
+                           VectorSlice<std::vector<std::vector<Tensor<order,spacedim,Number> > > > &derivatives,
                            const bool quadrature_points_fastest  = false,
                            const unsigned int component_multiple = 1)
   {
     // initialize with zero
     for (unsigned int i=0; i<derivatives.size(); ++i)
       std::fill_n (derivatives[i].begin(), derivatives[i].size(),
-                   Tensor<order,spacedim>());
+                   Tensor<order,spacedim,Number>());
 
     // see if there the current cell has DoFs at all, and if not
     // then there is nothing else to do.
@@ -2414,8 +2411,8 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const double value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == 0.)
+          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          if (value == Number())
             continue;
 
           if (fe.is_primitive(shape_func))
@@ -2459,9 +2456,9 @@ namespace internal
         }
   }
 
-  template <int spacedim, typename Number>
+  template <int spacedim, typename Number, typename Number2>
   void
-  do_function_laplacians (const double        *dof_values_ptr,
+  do_function_laplacians (const Number2        *dof_values_ptr,
                           const std::vector<std::vector<Tensor<2,spacedim> > > &shape_hessians,
                           std::vector<Number> &laplacians)
   {
@@ -2478,8 +2475,8 @@ namespace internal
     // the trace of the Hessian.
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-        const double value = dof_values_ptr[shape_func];
-        if (value == 0.)
+        const Number2 value = dof_values_ptr[shape_func];
+        if (value == Number2())
           continue;
 
         const Tensor<2,spacedim> *shape_hessian_ptr
@@ -2489,9 +2486,9 @@ namespace internal
       }
   }
 
-  template <int dim, int spacedim, typename VectorType>
+  template <int dim, int spacedim, typename VectorType, typename Number>
   void
-  do_function_laplacians (const double                    *dof_values_ptr,
+  do_function_laplacians (const Number                    *dof_values_ptr,
                           const std::vector<std::vector<Tensor<2,spacedim> > > &shape_hessians,
                           const FiniteElement<dim,spacedim> &fe,
                           const std::vector<unsigned int> &shape_function_to_row_table,
@@ -2535,8 +2532,8 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const double value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == 0.)
+          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          if (value == Number())
             continue;
 
           if (fe.is_primitive(shape_func))
@@ -2590,11 +2587,12 @@ namespace internal
 
 
 template <int dim, int spacedim>
-template <class InputVector, typename number>
+template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector   &fe_function,
-  std::vector<number> &values) const
+  std::vector<typename InputVector::value_type> &values) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_values,
           ExcAccessToUninitializedField("update_values"));
   AssertDimension (fe->n_components(), 1);
@@ -2604,7 +2602,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
                    present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
   internal::do_function_values (dof_values.begin(), this->shape_values,
                                 values);
@@ -2613,12 +2611,13 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 
 template <int dim, int spacedim>
-template <class InputVector, typename number>
+template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<number> &values) const
+  std::vector<typename InputVector::value_type> &values) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_values,
           ExcAccessToUninitializedField("update_values"));
   AssertDimension (fe->n_components(), 1);
@@ -2627,14 +2626,14 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   // avoid allocation when the local size is small enough
   if (dofs_per_cell <= 100)
     {
-      double dof_values[100];
+      number dof_values[100];
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_values(&dof_values[0], this->shape_values, values);
     }
   else
     {
-      Vector<double> dof_values(dofs_per_cell);
+      Vector<number> dof_values(dofs_per_cell);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_values(dof_values.begin(), this->shape_values,
@@ -2645,11 +2644,12 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 
 template <int dim, int spacedim>
-template <class InputVector, typename number>
+template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector            &fe_function,
-  std::vector<Vector<number> > &values) const
+  std::vector<Vector<typename InputVector::value_type> > &values) const
 {
+  typedef typename InputVector::value_type number;
   Assert (present_cell.get() != 0,
           ExcMessage ("FEValues object is not reinit'ed to any cell"));
 
@@ -2658,7 +2658,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
   VectorSlice<std::vector<Vector<number> > > val(values);
   internal::do_function_values(dof_values.begin(), this->shape_values, *fe,
@@ -2668,12 +2668,13 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 
 template <int dim, int spacedim>
-template <class InputVector, typename number>
+template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<Vector<number> > &values) const
+  std::vector<Vector<typename InputVector::value_type> > &values) const
 {
+  typedef typename InputVector::value_type number;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
   Assert (indices.size() % dofs_per_cell == 0,
@@ -2684,7 +2685,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   VectorSlice<std::vector<Vector<number> > > val(values);
   if (indices.size() <= 100)
     {
-      double dof_values[100];
+      number dof_values[100];
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_values(&dof_values[0], this->shape_values, *fe,
@@ -2693,7 +2694,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
     }
   else
     {
-      Vector<double> dof_values(100);
+      Vector<number> dof_values(100);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_values(dof_values.begin(), this->shape_values, *fe,
@@ -2709,9 +2710,10 @@ template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  VectorSlice<std::vector<std::vector<double> > > values,
+  VectorSlice<std::vector<std::vector<typename InputVector::value_type> > > values,
   bool quadrature_points_fastest) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_values,
           ExcAccessToUninitializedField("update_values"));
 
@@ -2722,7 +2724,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
   if (indices.size() <= 100)
     {
-      double dof_values[100];
+      number dof_values[100];
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_values(&dof_values[0], this->shape_values, *fe,
@@ -2732,7 +2734,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
     }
   else
     {
-      Vector<double> dof_values(indices.size());
+      Vector<number> dof_values(indices.size());
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_values(dof_values.begin(), this->shape_values, *fe,
@@ -2749,8 +2751,9 @@ template <class InputVector>
 void
 FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector           &fe_function,
-  std::vector<Tensor<1,spacedim> > &gradients) const
+  std::vector<Tensor<1,spacedim,typename InputVector::value_type> > &gradients) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_gradients,
           ExcAccessToUninitializedField("update_gradients"));
   AssertDimension (fe->n_components(), 1);
@@ -2759,7 +2762,7 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
   internal::do_function_derivatives(dof_values.begin(), this->shape_gradients,
                                     gradients);
@@ -2772,15 +2775,16 @@ template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<Tensor<1,spacedim> > &gradients) const
+  std::vector<Tensor<1,spacedim,typename InputVector::value_type> > &gradients) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_gradients,
           ExcAccessToUninitializedField("update_gradients"));
   AssertDimension (fe->n_components(), 1);
   AssertDimension (indices.size(), dofs_per_cell);
   if (dofs_per_cell <= 100)
     {
-      double dof_values[100];
+      number dof_values[100];
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_derivatives(&dof_values[0], this->shape_gradients,
@@ -2788,7 +2792,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
     }
   else
     {
-      Vector<double> dof_values(dofs_per_cell);
+      Vector<number> dof_values(dofs_per_cell);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_derivatives(dof_values.begin(), this->shape_gradients,
@@ -2804,8 +2808,9 @@ template <class InputVector>
 void
 FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector                              &fe_function,
-  std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const
+  std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > &gradients) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_gradients,
           ExcAccessToUninitializedField("update_gradients"));
   Assert (present_cell.get() != 0,
@@ -2813,9 +2818,9 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > > grads(gradients);
+  VectorSlice<std::vector<std::vector<Tensor<1,spacedim,number> > > > grads(gradients);
   internal::do_function_derivatives(dof_values.begin(), this->shape_gradients,
                                     *fe, this->shape_function_to_row_table,
                                     grads);
@@ -2828,9 +2833,10 @@ template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > > gradients,
+  VectorSlice<std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > > gradients,
   bool quadrature_points_fastest) const
 {
+  typedef typename InputVector::value_type number;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
   Assert (indices.size() % dofs_per_cell == 0,
@@ -2840,7 +2846,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
 
   if (indices.size() <= 100)
     {
-      double dof_values[100];
+      number dof_values[100];
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_derivatives(&dof_values[0], this->shape_gradients,
@@ -2850,7 +2856,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
     }
   else
     {
-      Vector<double> dof_values(indices.size());
+      Vector<number> dof_values(indices.size());
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_derivatives(dof_values.begin(),this->shape_gradients,
@@ -2867,8 +2873,9 @@ template <class InputVector>
 void
 FEValuesBase<dim,spacedim>::
 get_function_hessians (const InputVector                &fe_function,
-                       std::vector<Tensor<2,spacedim> > &hessians) const
+                       std::vector<Tensor<2,spacedim,typename InputVector::value_type> > &hessians) const
 {
+  typedef typename InputVector::value_type number;
   AssertDimension (fe->n_components(), 1);
   Assert (this->update_flags & update_hessians,
           ExcAccessToUninitializedField("update_hessians"));
@@ -2877,7 +2884,7 @@ get_function_hessians (const InputVector                &fe_function,
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
   internal::do_function_derivatives(dof_values.begin(), this->shape_hessians,
                                     hessians);
@@ -2890,15 +2897,16 @@ template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_hessians (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<Tensor<2,spacedim> > &hessians) const
+  std::vector<Tensor<2,spacedim,typename InputVector::value_type> > &hessians) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_hessians,
           ExcAccessToUninitializedField("update_hessians"));
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
   AssertDimension (indices.size(), dofs_per_cell);
   if (dofs_per_cell <= 100)
     {
-      double dof_values[100];
+      number dof_values[100];
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_derivatives(&dof_values[0], this->shape_hessians,
@@ -2906,7 +2914,7 @@ void FEValuesBase<dim,spacedim>::get_function_hessians (
     }
   else
     {
-      Vector<double> dof_values(dofs_per_cell);
+      Vector<number> dof_values(dofs_per_cell);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_derivatives(dof_values.begin(), this->shape_hessians,
@@ -2922,9 +2930,10 @@ template <class InputVector>
 void
 FEValuesBase<dim,spacedim>::
 get_function_hessians (const InputVector                         &fe_function,
-                       std::vector<std::vector<Tensor<2,spacedim> > > &hessians,
+                       std::vector<std::vector<Tensor<2,spacedim,typename InputVector::value_type> > > &hessians,
                        bool quadrature_points_fastest) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_hessians,
           ExcAccessToUninitializedField("update_hessians"));
   Assert (present_cell.get() != 0,
@@ -2932,9 +2941,9 @@ get_function_hessians (const InputVector                         &fe_function,
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > > hes(hessians);
+  VectorSlice<std::vector<std::vector<Tensor<2,spacedim,number> > > > hes(hessians);
   internal::do_function_derivatives(dof_values.begin(), this->shape_hessians,
                                     *fe, this->shape_function_to_row_table,
                                     hes, quadrature_points_fastest);
@@ -2947,16 +2956,17 @@ template <class InputVector>
 void FEValuesBase<dim, spacedim>::get_function_hessians (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > > hessians,
+  VectorSlice<std::vector<std::vector<Tensor<2,spacedim,typename InputVector::value_type> > > > hessians,
   bool quadrature_points_fastest) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_hessians,
           ExcAccessToUninitializedField("update_hessians"));
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
   if (indices.size() <= 100)
     {
-      double dof_values[100];
+      number dof_values[100];
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_derivatives(&dof_values[0], this->shape_hessians,
@@ -2966,7 +2976,7 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
     }
   else
     {
-      Vector<double> dof_values(indices.size());
+      Vector<number> dof_values(indices.size());
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_derivatives(dof_values.begin(),this->shape_hessians,
@@ -2979,11 +2989,12 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
 
 
 template <int dim, int spacedim>
-template <class InputVector, typename number>
+template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector   &fe_function,
-  std::vector<number> &laplacians) const
+  std::vector<typename InputVector::value_type> &laplacians) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_hessians,
           ExcAccessToUninitializedField("update_hessians"));
   AssertDimension (fe->n_components(), 1);
@@ -2992,7 +3003,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
   internal::do_function_laplacians(dof_values.begin(), this->shape_hessians,
                                    laplacians);
@@ -3001,19 +3012,20 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 
 template <int dim, int spacedim>
-template <class InputVector, typename number>
+template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<number> &laplacians) const
+  std::vector<typename InputVector::value_type> &laplacians) const
 {
+  typedef typename InputVector::value_type number;
   Assert (this->update_flags & update_hessians,
           ExcAccessToUninitializedField("update_hessians"));
   AssertDimension (fe->n_components(), 1);
   AssertDimension (indices.size(), dofs_per_cell);
   if (dofs_per_cell <= 100)
     {
-      double dof_values[100];
+      number dof_values[100];
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_laplacians(&dof_values[0], this->shape_hessians,
@@ -3021,7 +3033,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
     }
   else
     {
-      Vector<double> dof_values(dofs_per_cell);
+      Vector<number> dof_values(dofs_per_cell);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_laplacians(dof_values.begin(), this->shape_hessians,
@@ -3032,11 +3044,12 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 
 template <int dim, int spacedim>
-template <class InputVector, typename number>
+template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector            &fe_function,
-  std::vector<Vector<number> > &laplacians) const
+  std::vector<Vector<typename InputVector::value_type> > &laplacians) const
 {
+  typedef typename InputVector::value_type number;
   Assert (present_cell.get() != 0,
           ExcMessage ("FEValues object is not reinit'ed to any cell"));
   Assert (this->update_flags & update_hessians,
@@ -3044,7 +3057,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<double> dof_values (dofs_per_cell);
+  Vector<number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
   internal::do_function_laplacians(dof_values.begin(), this->shape_hessians,
                                    *fe, this->shape_function_to_row_table,
@@ -3054,12 +3067,13 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 
 template <int dim, int spacedim>
-template <class InputVector, typename number>
+template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<Vector<number> > &laplacians) const
+  std::vector<Vector<typename InputVector::value_type> > &laplacians) const
 {
+  typedef typename InputVector::value_type number;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
   Assert (indices.size() % dofs_per_cell == 0,
@@ -3068,7 +3082,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
           ExcAccessToUninitializedField("update_hessians"));
   if (indices.size() <= 100)
     {
-      double dof_values[100];
+      number dof_values[100];
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_laplacians(&dof_values[0], this->shape_hessians,
@@ -3078,7 +3092,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
     }
   else
     {
-      Vector<double> dof_values(indices.size());
+      Vector<number> dof_values(indices.size());
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_laplacians(dof_values.begin(),this->shape_hessians,
@@ -3091,20 +3105,21 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 
 template <int dim, int spacedim>
-template <class InputVector, typename number>
+template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<std::vector<number> > &laplacians,
+  std::vector<std::vector<typename InputVector::value_type> > &laplacians,
   bool quadrature_points_fastest) const
 {
+  typedef typename InputVector::value_type number;
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
   Assert (this->update_flags & update_hessians,
           ExcAccessToUninitializedField("update_hessians"));
   if (indices.size() <= 100)
     {
-      double dof_values[100];
+      number dof_values[100];
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_laplacians(&dof_values[0], this->shape_hessians,
@@ -3114,7 +3129,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
     }
   else
     {
-      Vector<double> dof_values(indices.size());
+      Vector<number> dof_values(indices.size());
       for (unsigned int i=0; i<indices.size(); ++i)
         dof_values[i] = get_vector_element (fe_function, indices[i]);
       internal::do_function_laplacians(dof_values.begin(),this->shape_hessians,
