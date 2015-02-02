@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2063,10 +2063,25 @@ public:
 
   /**
    * Return a pointer to the @p ith neighbor.  If the neighbor does not exist,
+   * i.e., if the @p ith face of the current object is at the boundary, then
    * an invalid iterator is returned.
    *
-   * <b>Note</b> (cf. TriaLevel<0>): The neighbor of a cell has at most the
-   * same level as this cell, i.e. it may or may not be refined.
+   * The neighbor of a cell has at most the same level as this cell. For
+   * example, consider the following situation:
+   * @image html limit_level_difference_at_vertices.png ""
+   * Here, if you are on the top right cell and you ask for its left
+   * neighbor (which is, according to the conventions spelled out in the
+   * GeometryInfo class, its <i>zeroth</i> neighbor), then you will get
+   * the mother cell of the four small cells at the top left. In other
+   * words, the cell you get as neighbor has the same refinement level
+   * as the one you're on right now (the top right one) and it may have
+   * children.
+   *
+   * On the other hand, if you were at the top right cell of the four
+   * small cells at the top left, and you asked for the right neighbor
+   * (which is associated with index <code>i=1</code>), then you would
+   * get the large cell at the top right which in this case has
+   * a lower refinement level and no children of its own.
    */
   TriaIterator<CellAccessor<dim, spacedim>  >
   neighbor (const unsigned int i) const;
