@@ -223,114 +223,114 @@ for (deal_II_dimension : DIMENSIONS)
 #if (deal_II_dimension == DIM_A) || (deal_II_dimension == DIM_B)
     template
 	void FEValuesViews::Scalar<deal_II_dimension>::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<double>&) const;
+	(const dealii::IndexSet&, std::vector<bool>&) const;
     template
 	void FEValuesViews::Scalar<deal_II_dimension>::get_function_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension,bool> >&) const;
     template
 	void FEValuesViews::Scalar<deal_II_dimension>::get_function_hessians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension,bool> >&) const;
     template
 	void FEValuesViews::Scalar<deal_II_dimension>::get_function_laplacians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<double>&) const;
+	(const dealii::IndexSet&, std::vector<bool>&) const;
 
     template
 	void FEValuesViews::Vector<deal_II_dimension>::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension,bool> >&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension>::get_function_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension,bool> >&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension>::get_function_symmetric_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::SymmetricTensor<2,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::SymmetricTensor<2,deal_II_dimension,bool> >&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension>::get_function_curls<dealii::IndexSet>
 	(const dealii::IndexSet&, std::vector<curl_type>&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension>::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<double>&) const;
+	(const dealii::IndexSet&, std::vector<bool>&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension>::get_function_hessians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<3,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<3,deal_II_dimension,bool> >&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension>::get_function_laplacians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension,bool> >&) const;
 
     template
 	void FEValuesViews::SymmetricTensor<2,deal_II_dimension,deal_II_dimension>::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::SymmetricTensor<2,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::SymmetricTensor<2,deal_II_dimension,bool> >&) const;
     template
 	void FEValuesViews::SymmetricTensor<2,deal_II_dimension,deal_II_dimension>::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension,bool> >&) const;
 
 	template
 	void FEValuesViews::Tensor<2,deal_II_dimension,deal_II_dimension>::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension,bool> >&) const;
     template
 	void FEValuesViews::Tensor<2,deal_II_dimension,deal_II_dimension>::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension,bool> >&) const;
 
 
 #if deal_II_dimension != 3
     template
 	void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
 	::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<value_type>&) const;
+	(const dealii::IndexSet&, std::vector<bool>&) const;
     template
 	void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
 	::get_function_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1,bool> >&) const;
     template
 	void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
 	::get_function_hessians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension+1,bool> >&) const;
     template
 	void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
 	::get_function_laplacians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<double>&) const;
+	(const dealii::IndexSet&, std::vector<bool>&) const;
 
     template
 	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
 	::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1,bool> >&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
 	::get_function_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension+1,bool> >&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
 	::get_function_symmetric_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::SymmetricTensor<2,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::SymmetricTensor<2,deal_II_dimension+1,bool> >&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
 	::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<double>&) const;
+	(const dealii::IndexSet&, std::vector<bool>&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
 	::get_function_hessians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<3,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<3,deal_II_dimension+1,bool> >&) const;
     template
 	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
 	::get_function_laplacians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1,bool> >&) const;
 
     template
 	void FEValuesViews::SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>
         ::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::SymmetricTensor<2,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::SymmetricTensor<2,deal_II_dimension+1,bool> >&) const;
     template
 	void FEValuesViews::SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>
         ::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1,bool> >&) const;
 
     template
 	void FEValuesViews::Tensor<2, deal_II_dimension, deal_II_dimension+1>
         ::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension+1,bool> >&) const;
     template
 	void FEValuesViews::Tensor<2, deal_II_dimension, deal_II_dimension+1>
         ::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1> >&) const;
+	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1,bool> >&) const;
 
 #endif
 #endif
@@ -345,37 +345,24 @@ for (deal_II_dimension : DIMENSIONS)
 #if (deal_II_dimension == DIM_A) || (deal_II_dimension == DIM_B)
     template
 	void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
-      (const IndexSet&, std::vector<double>&) const;
+      (const IndexSet&, std::vector<bool>&) const;
     template
       void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
-      (const IndexSet&, std::vector<float>&) const;
-    template
-      void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
-      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<double>&) const;
-    template
-      void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
-      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<float>&) const;
+      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<bool>&) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
-      (const IndexSet&, std::vector<Vector<double> > &) const;
-    template
-      void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
-      (const IndexSet&, std::vector<Vector<float> > &) const;
+      (const IndexSet&, std::vector<Vector<bool> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<Vector<double> > &) const;
-    template
-      void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
-      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<Vector<float> > &) const;
+       std::vector<Vector<bool> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       VectorSlice<std::vector<std::vector<double> > >, bool) const;
+       VectorSlice<std::vector<std::vector<bool> > >, bool) const;
 //     template
 //       void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
 //       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
@@ -383,110 +370,84 @@ for (deal_II_dimension : DIMENSIONS)
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_gradients<IndexSet>
-      (const IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension> > &) const;
+      (const IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension,bool> > &) const;
     template
       void FEValuesBase<deal_II_dimension>::get_function_gradients<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<dealii::Tensor<1,deal_II_dimension> > &) const;
+       std::vector<dealii::Tensor<1,deal_II_dimension,bool> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_gradients<IndexSet>
-      (const IndexSet&, std::vector<std::vector<dealii::Tensor<1,deal_II_dimension> > > &) const;
+      (const IndexSet&, std::vector<std::vector<dealii::Tensor<1,deal_II_dimension,bool> > > &) const;
     template
       void FEValuesBase<deal_II_dimension>::get_function_gradients<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       VectorSlice<std::vector<std::vector<dealii::Tensor<1,deal_II_dimension> > > >, bool) const;
+       VectorSlice<std::vector<std::vector<dealii::Tensor<1,deal_II_dimension,bool> > > >, bool) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_hessians<IndexSet>
-      (const IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension> > &) const;
+      (const IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension,bool> > &) const;
     template
       void FEValuesBase<deal_II_dimension>::get_function_hessians<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<dealii::Tensor<2,deal_II_dimension> > &) const;
+       std::vector<dealii::Tensor<2,deal_II_dimension,bool> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_hessians<IndexSet>
-      (const IndexSet&, std::vector<std::vector<dealii::Tensor<2,deal_II_dimension> > > &, bool) const;
+      (const IndexSet&, std::vector<std::vector<dealii::Tensor<2,deal_II_dimension,bool> > > &, bool) const;
     template
       void FEValuesBase<deal_II_dimension>::get_function_hessians<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       VectorSlice<std::vector<std::vector<dealii::Tensor<2,deal_II_dimension> > > >, bool) const;
+       VectorSlice<std::vector<std::vector<dealii::Tensor<2,deal_II_dimension,bool> > > >, bool) const;
 
     template
 	void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
-      (const IndexSet&, std::vector<double>&) const;
+      (const IndexSet&, std::vector<bool>&) const;
     template
       void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
-      (const IndexSet&, std::vector<float>&) const;
-    template
-      void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
-      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<double>&) const;
-    template
-      void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
-      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<float>&) const;
+      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<bool>&) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
-      (const IndexSet&, std::vector<Vector<double> > &) const;
-    template
-      void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
-      (const IndexSet&, std::vector<Vector<float> > &) const;
+      (const IndexSet&, std::vector<Vector<bool> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<Vector<double> > &) const;
+       std::vector<Vector<bool> > &) const;
     template
       void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<Vector<float> > &) const;
+       std::vector<Vector<bool> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<std::vector<double> > &, bool) const;
-    template
-      void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
-      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<std::vector<float> > &, bool) const;
+       std::vector<std::vector<bool> > &, bool) const;
 
 
 #if deal_II_dimension != 3
 
     template
 	void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
-      (const IndexSet&, std::vector<double>&) const;
+      (const IndexSet&, std::vector<bool>&) const;
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
-      (const IndexSet&, std::vector<float>&) const;
-    template
-      void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
-      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<double>&) const;
-    template
-      void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
-      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<float>&) const;
+      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<bool>&) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
-      (const IndexSet&, std::vector<Vector<double> > &) const;
-    template
-      void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
-      (const IndexSet&, std::vector<Vector<float> > &) const;
+      (const IndexSet&, std::vector<Vector<bool> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<Vector<double> > &) const;
-    template
-      void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
-      (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<Vector<float> > &) const;
+       std::vector<Vector<bool> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       VectorSlice<std::vector<std::vector<double> > >, bool) const;
+       VectorSlice<std::vector<std::vector<bool> > >, bool) const;
 //     template
 //       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
 //       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
@@ -494,23 +455,23 @@ for (deal_II_dimension : DIMENSIONS)
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_gradients<IndexSet>
-      (const IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1> > &) const;
+      (const IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension+1,bool> > &) const;
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_gradients<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<dealii::Tensor<1,deal_II_dimension+1> > &) const;
+       std::vector<dealii::Tensor<1,deal_II_dimension+1,bool> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_gradients<IndexSet>
-      (const IndexSet&, std::vector<std::vector<dealii::Tensor<1,deal_II_dimension+1> > > &) const;
+      (const IndexSet&, std::vector<std::vector<dealii::Tensor<1,deal_II_dimension+1,bool> > > &) const;
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_gradients<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       VectorSlice<std::vector<std::vector<dealii::Tensor<1,deal_II_dimension+1> > > >, bool) const;
+       VectorSlice<std::vector<std::vector<dealii::Tensor<1,deal_II_dimension+1,bool> > > >, bool) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_hessians<IndexSet>
-      (const IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension+1> > &) const;
+      (const IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension+1,bool> > &) const;
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_hessians<IndexSet>
       (const IndexSet&, const VectorSlice<const std::vector<types::global_dof_index> >&,
