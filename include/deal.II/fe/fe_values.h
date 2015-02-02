@@ -3503,7 +3503,7 @@ namespace FEValuesViews
                                     fe_values.shape_gradients[snc][q_point]);
     else
       {
-        typename SymmetricGradient<double>::type return_value;
+        typename Gradient<double>::type return_value;
         for (unsigned int d=0; d<dim; ++d)
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
             return_value[d]
