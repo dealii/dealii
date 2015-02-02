@@ -119,9 +119,9 @@ namespace MeshWorker
   template <class VECTOR, int dim, int spacedim>
   void
   VectorData<VECTOR, dim, spacedim>::fill(
-    std::vector<std::vector<std::vector<double> > > &values,
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
-    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+    std::vector<std::vector<std::vector<typename VECTOR::value_type> > > &values,
+    std::vector<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > &gradients,
+    std::vector<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > &hessians,
     const FEValuesBase<dim,spacedim> &fe,
     const std::vector<types::global_dof_index> &index,
     const unsigned int component,
@@ -137,21 +137,21 @@ namespace MeshWorker
     for (unsigned int i=0; i<this->n_values(); ++i)
       {
         const VECTOR *src = data.read_ptr<VECTOR>(this->value_index(i));
-        VectorSlice<std::vector<std::vector<double> > > dst(values[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<typename VECTOR::value_type> > > dst(values[i], component, n_comp);
         fe.get_function_values(*src, make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_gradients(); ++i)
       {
         const VECTOR *src = data.read_ptr<VECTOR>(this->gradient_index(i));
-        VectorSlice<std::vector<std::vector<Tensor<1,dim> > > > dst(gradients[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > dst(gradients[i], component, n_comp);
         fe.get_function_gradients(*src, make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_hessians(); ++i)
       {
         const VECTOR *src = data.read_ptr<VECTOR>(this->hessian_index(i));
-        VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > dst(hessians[i], component, n_comp);
         fe.get_function_hessians(*src, make_slice(index, start, size), dst, true);
       }
   }
@@ -203,9 +203,9 @@ namespace MeshWorker
   template <class VECTOR, int dim, int spacedim>
   void
   VectorData<VECTOR, dim, spacedim>::mg_fill(
-    std::vector<std::vector<std::vector<double> > > &values,
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
-    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+    std::vector<std::vector<std::vector<typename VECTOR::value_type> > > &values,
+    std::vector<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > &gradients,
+    std::vector<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > &hessians,
     const FEValuesBase<dim,spacedim> &fe,
     const unsigned int level,
     const std::vector<types::global_dof_index> &index,
@@ -222,21 +222,21 @@ namespace MeshWorker
     for (unsigned int i=0; i<this->n_values(); ++i)
       {
         const MGLevelObject<VECTOR> *src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
-        VectorSlice<std::vector<std::vector<double> > > dst(values[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<typename VECTOR::value_type> > > dst(values[i], component, n_comp);
         fe.get_function_values((*src)[level], make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_gradients(); ++i)
       {
         const MGLevelObject<VECTOR> *src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
-        VectorSlice<std::vector<std::vector<Tensor<1,dim> > > > dst(gradients[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<Tensor<1,dim,typename VECTOR::value_type> > > > dst(gradients[i], component, n_comp);
         fe.get_function_gradients((*src)[level], make_slice(index, start, size), dst, true);
       }
 
     for (unsigned int i=0; i<this->n_hessians(); ++i)
       {
         const MGLevelObject<VECTOR> *src = data.read_ptr<MGLevelObject<VECTOR> >(this->value_index(i));
-        VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
+        VectorSlice<std::vector<std::vector<Tensor<2,dim,typename VECTOR::value_type> > > > dst(hessians[i], component, n_comp);
         fe.get_function_hessians((*src)[level], make_slice(index, start, size), dst, true);
       }
   }
