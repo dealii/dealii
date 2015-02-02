@@ -143,9 +143,24 @@ namespace FEValuesViews
   {
   public:
     /**
-     * A typedef for the data type of values of the view this class
-     * represents. Since we deal with a single components, the value type is a
-     * scalar double.
+     * This structure has a local typedef @p type that represents the
+     * values of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
+     *
+     * In places where this type is used to evaluate the values of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate shape functions. When evaluating the values
+     * of finite element fields, the correct data type for the value
+     * of a field at a quadrature point is what you get when you
+     * multiply the type used to represent the shape function
+     * $\varphi_j(x_q)$ times the type used to store the values $U_j$
+     * of degrees of freedom, in order to form the value of
+     * $u_h(x_q)=\sum_j U_j \varphi_j(x_q)$. The local typedef in the
+     * current structure corresponds to the type you get when forming
+     * this Product.
      */
     template<typename number>
     struct Value
@@ -154,9 +169,24 @@ namespace FEValuesViews
     };
 
     /**
-     * A typedef for the type of gradients of the view this class represents.
-     * Here, for a scalar component of the finite element, the gradient is a
-     * <code>Tensor@<1,dim@></code>.
+     * This structure has a local typedef @p type that represents the
+     * gradient of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
+     *
+     * In places where this type is used to evaluate the gradients of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate shape functions. When evaluating the gradients
+     * of finite element fields, the correct data type for the value
+     * of a field at a quadrature point is what you get when you
+     * multiply the type used to represent the shape function
+     * $\varphi_j(x_q)$ times the type used to store the values $U_j$
+     * of degrees of freedom, in order to form the value of
+     * $u_h(x_q)=\sum_j U_j \varphi_j(x_q)$. The local typedef in the
+     * current structure corresponds to the type you get when forming
+     * this Product.
      */
     template<typename number>
     struct Gradient
@@ -165,9 +195,24 @@ namespace FEValuesViews
     };
 
     /**
-     * A typedef for the type of second derivatives of the view this class
-     * represents. Here, for a scalar component of the finite element, the
-     * Hessian is a <code>Tensor@<2,dim@></code>.
+     * This structure has a local typedef @p type that represents the
+     * hessian of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
+     *
+     * In places where this type is used to evaluate the hessians of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate shape functions. When evaluating the hessians
+     * of finite element fields, the correct data type for the value
+     * of a field at a quadrature point is what you get when you
+     * multiply the type used to represent the shape function
+     * $\varphi_j(x_q)$ times the type used to store the values $U_j$
+     * of degrees of freedom, in order to form the value of
+     * $u_h(x_q)=\sum_j U_j \varphi_j(x_q)$. The local typedef in the
+     * current structure corresponds to the type you get when forming
+     * this Product.
      */
     template<typename number>
     struct Hessian
@@ -385,9 +430,24 @@ namespace FEValuesViews
   {
   public:
     /**
-     * A typedef for the data type of values of the view this class
-     * represents. Since we deal with a set of <code>dim</code> components,
-     * the value type is a Tensor<1,spacedim>.
+     * This structure has a local typedef @p type that represents the
+     * values of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
+     *
+     * In places where this type is used to evaluate the values of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate shape functions. When evaluating the values
+     * of finite element fields, the correct data type for the value
+     * of a field at a quadrature point is what you get when you
+     * multiply the type used to represent the shape function
+     * $\varphi_j(x_q)$ times the type used to store the values $U_j$
+     * of degrees of freedom, in order to form the value of
+     * $u_h(x_q)=\sum_j U_j \varphi_j(x_q)$. The local typedef in the
+     * current structure corresponds to the type you get when forming
+     * this Product.
      */
     template <typename number>
     struct Value
@@ -796,10 +856,24 @@ namespace FEValuesViews
   {
   public:
     /**
-     * A typedef for the data type of values of the view this class
-     * represents. Since we deal with a set of <code>(dim*dim + dim)/2</code>
-     * components (i.e. the unique components of a symmetric second-order
-     * tensor), the value type is a SymmetricTensor<2,spacedim>.
+     * This structure has a local typedef @p type that represents the
+     * values of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
+     *
+     * In places where this type is used to evaluate the values of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate shape functions. When evaluating the values
+     * of finite element fields, the correct data type for the value
+     * of a field at a quadrature point is what you get when you
+     * multiply the type used to represent the shape function
+     * $\varphi_j(x_q)$ times the type used to store the values $U_j$
+     * of degrees of freedom, in order to form the value of
+     * $u_h(x_q)=\sum_j U_j \varphi_j(x_q)$. The local typedef in the
+     * current structure corresponds to the type you get when forming
+     * this Product.
      */
     template <typename number>
     struct Value
@@ -1006,8 +1080,24 @@ namespace FEValuesViews
   public:
 
     /**
-     * Data type for what you get when you apply an extractor of this kind to
-     * a vector-valued finite element.
+     * This structure has a local typedef @p type that represents the
+     * values of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
+     *
+     * In places where this type is used to evaluate the values of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate shape functions. When evaluating the values
+     * of finite element fields, the correct data type for the value
+     * of a field at a quadrature point is what you get when you
+     * multiply the type used to represent the shape function
+     * $\varphi_j(x_q)$ times the type used to store the values $U_j$
+     * of degrees of freedom, in order to form the value of
+     * $u_h(x_q)=\sum_j U_j \varphi_j(x_q)$. The local typedef in the
+     * current structure corresponds to the type you get when forming
+     * this Product.
      */
     template <typename number>
     struct Value
