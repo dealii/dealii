@@ -95,7 +95,7 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
       ::get_function_curls<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename Curl<typename dealii::VEC::value_type>::type> &&) const;
+      (const dealii::VEC&, std::vector<typename Curl<typename dealii::VEC::value_type>::type> &) const;
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
       ::get_function_divergences<dealii::VEC>
