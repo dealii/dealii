@@ -140,6 +140,7 @@ inconvenience this causes.
   - The MPI support functions in namespace Utilities and Utilities::System.
   - Deprecated members of namespace types.
   - Namespace deal_II_numbers.
+  - MultithreadInfo::n_default_threads.
 
   <br>
   <em>With headers in <code>deal.II/lac/</code>:</em>

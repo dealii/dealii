@@ -67,28 +67,6 @@ public:
   const unsigned int n_cpus;
 
   /**
-   * The number of threads to use as a default value for all functions that
-   * support multithreading.  At start time this is <tt>n_cpus</tt> or one, if
-   * detection of the number of CPUs is not possible.
-   *
-   * This variable used to be the mechanism by which many parts of the library
-   * determined how many threads to use, for example when assembling matrices
-   * in MatrixCreator or generating output in DataOut. To this end,
-   * n_default_threads is set to n_cpus at the start of the program, but used
-   * programs could set it to a different value in their main() function.
-   * However, since almost all of deal.II has now been converted to a task-
-   * based parallelism model, this variable is no longer used in the library.
-   * Instead, the task scheduling methods use the n_threads() function as a
-   * guide to how many threads to use, and the current variable is now
-   * deprecated.
-   *
-   * @deprecated: Use n_threads() to query the number of threads to use (if
-   * you wanted to read this variable), and set_thread_limit() to limit it (if
-   * you wanted to write to it).
-   */
-  unsigned int n_default_threads DEAL_II_DEPRECATED;
-
-  /**
    * Returns the number of threads to use. This is initially set to the number
    * of cores the system has (n_cpus) but can be further restricted by
    * set_thread_limit().

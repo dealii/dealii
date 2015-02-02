@@ -1232,8 +1232,11 @@
  * that there are no other libraries starting threads.
  *
  * Note that a small number of places inside deal.II also uses thread-based
- * parallelism controlled by MultithreadInfo::n_default_threads
- * generally. Under some circumstances, deal.II also calls the BLAS library
+ * parallelism explicitly, for example for running background tasks that have
+ * to wait for input or output to happen and consequently do not consume
+ * much CPU time. Such threads do not run under the control of the TBB
+ * task scheduler and, therefore, are not affected by the procedure above.
+ * Under some circumstances, deal.II also calls the BLAS library
  * which may sometimes also start threads of its own. You will have to consult
  * the documentation of your BLAS installation to determine how to set the
  * number of threads for these operations.
