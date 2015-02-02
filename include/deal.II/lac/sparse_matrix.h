@@ -998,17 +998,6 @@ public:
   number &diag_element (const size_type i);
 
   /**
-   * Access to values in internal mode.  Returns the value of the
-   * <tt>index</tt>th entry in <tt>row</tt>. Here, <tt>index</tt> refers to
-   * the internal representation of the matrix, not the column. Be sure to
-   * understand what you are doing here.
-   *
-   * @deprecated Use iterator or const_iterator instead!
-   */
-  number raw_entry (const size_type row,
-                    const size_type index) const DEAL_II_DEPRECATED;
-
-  /**
    * This is for hackers. Get access to the <i>i</i>th element of this matrix.
    * The elements are stored in a consecutive way, refer to the
    * SparsityPattern class for more details.
@@ -1939,22 +1928,6 @@ number &SparseMatrix<number>::diag_element (const size_type i)
   // Use that the first element in each row of a quadratic matrix is the main
   // diagonal
   return val[cols->rowstart[i]];
-}
-
-
-
-template <typename number>
-inline
-number
-SparseMatrix<number>::raw_entry (const size_type row,
-                                 const size_type index) const
-{
-  Assert(row<cols->rows, ExcIndexRange(row,0,cols->rows));
-  Assert(index<cols->row_length(row),
-         ExcIndexRange(index,0,cols->row_length(row)));
-
-  // this function will soon go away.
-  return val[cols->rowstart[row]+index];
 }
 
 

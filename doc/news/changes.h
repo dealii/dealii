@@ -173,6 +173,7 @@ inconvenience this causes.
   - PETScVectors::MPI::Vector constructors and reinit() variants.
   - SparseMatrixIterators::Accessor and SparseMatrixIterators::Iterator
     constructors.
+  - SparseMatrix::raw_entry.
 
   <br>
   <em>With headers in <code>deal.II/deal.II/</code>:</em>
