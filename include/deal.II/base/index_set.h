@@ -65,6 +65,11 @@ public:
   IndexSet ();
 
   /**
+   * A value type used in the IndexSet.
+   */
+  typedef bool value_type;
+
+  /**
    * Constructor that also sets the overall size of the index range.
    */
   explicit IndexSet (const types::global_dof_index size);
