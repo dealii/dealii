@@ -3162,7 +3162,7 @@ namespace FEValuesViews
         case 1:
         {
           Assert (false, ExcMessage("Computing the curl in 1d is not a useful operation"));
-          return Curl<double>::type ();
+          return typename Curl<double>::type ();
         }
 
         case 2:
