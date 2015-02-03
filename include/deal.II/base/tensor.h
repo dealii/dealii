@@ -103,6 +103,13 @@ public:
   Tensor (const array_type &initializer);
 
   /**
+   * Copy constructor taking a tesnor of another base data type
+   */
+  template <typename OtherNumber>
+  explicit
+  Tensor (const Tensor<rank_,dim,OtherNumber> &);
+
+  /**
    * Conversion operator from tensor of tensors.
    */
   Tensor (const Tensor<1,dim,Tensor<rank_-1,dim,Number> > &tensor_in);
@@ -136,6 +143,9 @@ public:
    * Assignment operator.
    */
   Tensor &operator = (const Tensor<rank_,dim,Number> &);
+
+  template <typename OtherNumber>
+  Tensor &operator = (const Tensor<rank_,dim,OtherNumber> &);
 
   /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
@@ -399,6 +409,26 @@ Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,Number> &t)
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] = t.subtensor[i];
   return *this;
+}
+
+
+
+template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<rank_,dim,Number> &
+Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,OtherNumber> &t)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    subtensor[i] = t.subtensor[i];
+  return *this;
+}
+
+template <int rank_, int dim, typename Number>
+template <typename OtherNumber>
+Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,OtherNumber> &t)
+{
+  *this = t;
 }
 
 
