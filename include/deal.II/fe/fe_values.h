@@ -179,15 +179,17 @@ namespace FEValuesViews
      * In places where this type is used to evaluate the gradients of
      * shape functions at quadrature points, the template argument is
      * simply <code>double</code> since this is the accuracy with
-     * which we evaluate shape functions. When evaluating the gradients
-     * of finite element fields, the correct data type for the value
-     * of a field at a quadrature point is what you get when you
-     * multiply the type used to represent the shape function
-     * $\varphi_j(x_q)$ times the type used to store the values $U_j$
-     * of degrees of freedom, in order to form the value of
-     * $u_h(x_q)=\sum_j U_j \varphi_j(x_q)$. The local typedef in the
-     * current structure corresponds to the type you get when forming
-     * this Product.
+     * which we evaluate the gradient of the shape functions.  When
+     * evaluating the gradients of finite element fields, the correct
+     * data type for the gradient of a field at a quadrature point is
+     * what you get when you multiply the type used to represent the
+     * gradient of the shape function $\nabla \varphi_j(x_q)$ times
+     * the type used to store the values $U_j$ of degrees of freedom,
+     * in order to form the value of $\nabla u_h(x_q)=\sum_j U_j
+     * \nabla \varphi_j(x_q)$. The local typedef in the current
+     * structure corresponds to the type you get when forming this
+     * project where the template argument of this structure
+     * represents the type of $U_j$.
      */
     template<typename number>
     struct Gradient
