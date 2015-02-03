@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -113,7 +113,16 @@ public:
   /**
    * Copy constructor.
    */
-  Tensor (const Tensor<0,dim,Number> &);
+  Tensor (const Tensor<0,dim,Number> &initializer);
+
+  /**
+   * Copy constructor from tensors with different underlying scalar
+   * type. This obviously requires that the @p OtherNumber type is
+   * convertible to @p Number.
+   */
+  template <typename OtherNumber>
+  explicit
+  Tensor (const Tensor<0,dim,OtherNumber> &initializer);
 
   /**
    * Conversion to Number. Since rank-0 tensors are scalars, this is a natural
@@ -133,7 +142,15 @@ public:
   /**
    * Assignment operator.
    */
-  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &);
+  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &rhs);
+
+  /**
+   * Assignment operator from tensors with different underlying scalar
+   * type. This obviously requires that the @p OtherNumber type is
+   * convertible to @p Number.
+   */
+  template <typename OtherNumber>
+  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
    * Assignment operator.
@@ -143,22 +160,22 @@ public:
   /**
    * Test for equality of two tensors.
    */
-  bool operator == (const Tensor<0,dim,Number> &) const;
+  bool operator == (const Tensor<0,dim,Number> &rhs) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  bool operator != (const Tensor<0,dim,Number> &) const;
+  bool operator != (const Tensor<0,dim,Number> &rhs) const;
 
   /**
    * Add another vector, i.e. move this point by the given offset.
    */
-  Tensor<0,dim,Number> &operator += (const Tensor<0,dim,Number> &);
+  Tensor<0,dim,Number> &operator += (const Tensor<0,dim,Number> &rhs);
 
   /**
    * Subtract another vector.
    */
-  Tensor<0,dim,Number> &operator -= (const Tensor<0,dim,Number> &);
+  Tensor<0,dim,Number> &operator -= (const Tensor<0,dim,Number> &rhs);
 
   /**
    * Scale the vector by <tt>factor</tt>, i.e. multiply all coordinates by
@@ -326,7 +343,8 @@ public:
    * Constructor. Initialize all entries to zero if <tt>initialize==true</tt>;
    * this is the default behaviour.
    */
-  explicit Tensor (const bool initialize = true);
+  explicit
+  Tensor (const bool initialize = true);
 
   /**
    * Copy constructor, where the data is copied from a C-style array.
@@ -336,7 +354,16 @@ public:
   /**
    * Copy constructor.
    */
-  Tensor (const Tensor<1,dim,Number> &);
+  Tensor (const Tensor<1,dim,Number> &initializer);
+
+  /**
+   * Copy constructor from tensors with different underlying scalar
+   * type. This obviously requires that the @p OtherNumber type is
+   * convertible to @p Number.
+   */
+  template <typename OtherNumber>
+  explicit
+  Tensor (const Tensor<1,dim,OtherNumber> &initializer);
 
   /**
    * Read access to the <tt>index</tt>th coordinate.
@@ -367,7 +394,15 @@ public:
   /**
    * Assignment operator.
    */
-  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,Number> &);
+  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,Number> &rhs);
+
+  /**
+   * Assignment operator from tensors with different underlying scalar
+   * type. This obviously requires that the @p OtherNumber type is
+   * convertible to @p Number.
+   */
+  template <typename OtherNumber>
+  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,OtherNumber> &rhs);
 
   /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
@@ -380,22 +415,22 @@ public:
   /**
    * Test for equality of two tensors.
    */
-  bool operator == (const Tensor<1,dim,Number> &) const;
+  bool operator == (const Tensor<1,dim,Number> &rhs) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  bool operator != (const Tensor<1,dim,Number> &) const;
+  bool operator != (const Tensor<1,dim,Number> &rhs) const;
 
   /**
    * Add another vector, i.e. move this point by the given offset.
    */
-  Tensor<1,dim,Number> &operator += (const Tensor<1,dim,Number> &);
+  Tensor<1,dim,Number> &operator += (const Tensor<1,dim,Number> &rhs);
 
   /**
    * Subtract another vector.
    */
-  Tensor<1,dim,Number> &operator -= (const Tensor<1,dim,Number> &);
+  Tensor<1,dim,Number> &operator -= (const Tensor<1,dim,Number> &rhs);
 
   /**
    * Scale the vector by <tt>factor</tt>, i.e. multiply all coordinates by
@@ -602,6 +637,17 @@ Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,Number> &p)
 
 
 
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,OtherNumber> &p)
+{
+  Assert (dim>0, ExcDimTooSmall(dim));
+
+  value = Number(p.value);
+}
+
+
 
 template <int dim, typename Number>
 inline
@@ -629,6 +675,14 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Numbe
   return *this;
 }
 
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,OtherNumber> &p)
+{
+  value = Number(p.value);
+  return *this;
+}
 
 
 template <int dim, typename Number>
@@ -815,6 +869,19 @@ Tensor<1,dim,Number>::Tensor (const Tensor<1,dim,Number> &p)
 
 
 
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<1,dim,Number>::Tensor (const Tensor<1,dim,OtherNumber> &p)
+{
+  Assert (dim>0, ExcDimTooSmall(dim));
+
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] = Number(p.values[i]);
+}
+
+
+
 template <>
 inline
 Tensor<1,0,double>::Tensor (const Tensor<1,0,double> &)
@@ -895,6 +962,20 @@ Tensor<1,dim,Number>::operator = (const Tensor<1,dim,Number> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
+
+  return *this;
+}
+
+
+
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<1,dim,Number> &
+Tensor<1,dim,Number>::operator = (const Tensor<1,dim,OtherNumber> &p)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] = Number(p.values[i]);
 
   return *this;
 }
