@@ -160,7 +160,8 @@ namespace FEValuesViews
      * of degrees of freedom, in order to form the value of
      * $u_h(x_q)=\sum_j U_j \varphi_j(x_q)$. The local typedef in the
      * current structure corresponds to the type you get when forming
-     * this Product.
+     * this project where the template argument of this structure
+     * represents the type of $U_j$.
      */
     template<typename number>
     struct Value
