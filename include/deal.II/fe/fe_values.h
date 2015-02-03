@@ -485,14 +485,25 @@ namespace FEValuesViews
     };
 
     /**
-     * A typedef for the type of symmetrized gradients of the view this class
-     * represents. Here, for a set of <code>dim</code> components of the
-     * finite element, the symmetrized gradient is a
-     * <code>SymmetricTensor@<2,spacedim@></code>.
+     * This structure has a local typedef @p type that represents the
+     * symmetric gradient of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
      *
-     * The symmetric gradient of a vector field $\mathbf v$ is defined as
-     * $\varepsilon(\mathbf v)=\frac 12 (\nabla \mathbf v + \nabla \mathbf
-     * v^T)$.
+     * In places where this type is used to evaluate the symmetric gradient of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate it. When evaluating the symmetric gradient of finite
+     * element fields at a quadrature point, the correct type is that
+     * which you get when you multiply the type used to represent the
+     * symmetric gradient of the shape function $\nabla_s \varphi_j(x_q)$ by the
+     * type used to store the values $U_j$ of degrees of freedom, in
+     * order to form the value of $\nabla_s u_h(x_q)=\sum_j U_j \nabla_s
+     * \varphi_j(x_q)$. The local typedef in the current structure
+     * corresponds to the type you get when forming this product where
+     * the template argument of this structure represents the type of
+     * $U_j$.
      */
     template <typename number>
     struct SymmetricGradient
@@ -501,9 +512,25 @@ namespace FEValuesViews
     };
 
     /**
-     * A typedef for the type of the divergence of the view this class
-     * represents. Here, for a set of <code>dim</code> components of the
-     * finite element, the divergence of course is a scalar.
+     * This structure has a local typedef @p type that represents the
+     * divergence of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
+     *
+     * In places where this type is used to evaluate the divergence of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate it. When evaluating the divergence of finite
+     * element fields at a quadrature point, the correct type is that
+     * which you get when you multiply the type used to represent the
+     * divergence of the shape function $\varphi_j(x_q) \cdot \nabla$ by the
+     * type used to store the values $U_j$ of degrees of freedom, in
+     * order to form the value of $u_h(x_q) \cdot \nabla=\sum_j U_j
+     * \varphi_j(x_q) \cdot \nabla$. The local typedef in the current structure
+     * corresponds to the type you get when forming this product where
+     * the template argument of this structure represents the type of
+     * $U_j$.
      */
     template <typename number>
     struct Divergence
@@ -512,10 +539,25 @@ namespace FEValuesViews
     };
 
     /**
-     * A typedef for the type of the curl of the view this class represents.
-     * Here, for a set of <code>spacedim=2</code> components of the finite
-     * element, the curl is a <code>Tensor@<1, 1@></code>. For
-     * <code>spacedim=3</code> it is a <code>Tensor@<1, dim@></code>.
+     * This structure has a local typedef @p type that represents the
+     * curl of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
+     *
+     * In places where this type is used to evaluate the curl of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate it. When evaluating the curl of finite
+     * element fields at a quadrature point, the correct type is that
+     * which you get when you multiply the type used to represent the
+     * curl of the shape function $\nabla \otimes \varphi_j(x_q)$ by the
+     * type used to store the values $U_j$ of degrees of freedom, in
+     * order to form the value of $\nabla \otimes u_h(x_q)=\sum_j U_j \nabla
+     * \otimes \varphi_j(x_q)$. The local typedef in the current structure
+     * corresponds to the type you get when forming this product where
+     * the template argument of this structure represents the type of
+     * $U_j$.
      */
     template <typename number>
     struct Curl
