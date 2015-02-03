@@ -68,47 +68,15 @@ void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
 {
   SparseLUDecomposition<number>::initialize(matrix, data);
 
-  decompose(matrix, data.strengthen_diagonal);
-}
-
-
-
-template <typename number>
-void SparseMIC<number>::reinit (const SparsityPattern &sparsity)
-{
-  {
-    std::vector<number> tmp;
-    tmp.swap (diag);
-  }
-  {
-    std::vector<number> tmp;
-    tmp.swap (inv_diag);
-  }
-  {
-    std::vector<number> tmp;
-    tmp.swap (inner_sums);
-  }
-
-  SparseMatrix<number>::reinit(sparsity);
-  this->decomposed = false;
-}
-
-
-
-template <typename number>
-template <typename somenumber>
-void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
-                                   const double                    strengthen_diagonal)
-{
-  SparseLUDecomposition<number>::decompose(matrix, strengthen_diagonal);
+  SparseLUDecomposition<number>::decompose(matrix, data.strengthen_diagonal);
 
   Assert (matrix.m()==matrix.n(), ExcNotQuadratic ());
   Assert (this->m()==this->n(),   ExcNotQuadratic ());
   Assert (matrix.m()==this->m(),  ExcDimensionMismatch(matrix.m(), this->m()));
 
-  Assert (strengthen_diagonal>=0, ExcInvalidStrengthening (strengthen_diagonal));
+  Assert (data.strengthen_diagonal>=0, ExcInvalidStrengthening (data.strengthen_diagonal));
 
-  if (strengthen_diagonal > 0)
+  if (data.strengthen_diagonal > 0)
     this->strengthen_diagonal_impl ();
 
   // MIC implementation: (S. Margenov lectures)
@@ -146,6 +114,28 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
 
       inv_diag[row] = 1.0/diag[row];
     }
+}
+
+
+
+template <typename number>
+void SparseMIC<number>::reinit (const SparsityPattern &sparsity)
+{
+  {
+    std::vector<number> tmp;
+    tmp.swap (diag);
+  }
+  {
+    std::vector<number> tmp;
+    tmp.swap (inv_diag);
+  }
+  {
+    std::vector<number> tmp;
+    tmp.swap (inner_sums);
+  }
+
+  SparseMatrix<number>::reinit(sparsity);
+  this->decomposed = false;
 }
 
 
