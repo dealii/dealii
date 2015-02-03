@@ -27,6 +27,8 @@
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/number_cache.h>
 #include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/dof_faces.h>
+#include <deal.II/hp/dof_level.h>
 
 #include <vector>
 #include <map>
@@ -39,8 +41,6 @@ namespace internal
   namespace hp
   {
     class DoFLevel;
-    template <int> class DoFIndicesOnFaces;
-    template <int> class DoFIndicesOnFacesOrEdges;
 
     namespace DoFHandler
     {
