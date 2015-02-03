@@ -955,13 +955,25 @@ namespace FEValuesViews
     };
 
     /**
-     * A typedef for the type of the divergence of the view this class
-     * represents. Here, for a set of of <code>(dim*dim + dim)/2</code> unique
-     * components of the finite element representing a symmetric second-order
-     * tensor, the divergence of course is a * <code>Tensor@<1,dim@></code>.
+     * This structure has a local typedef @p type that represents the
+     * divergence of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
      *
-     * See the general discussion of this class for a definition of the
-     * divergence.
+     * In places where this type is used to evaluate the divergence of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate it. When evaluating the divergence of finite
+     * element fields at a quadrature point, the correct type is that
+     * which you get when you multiply the type used to represent the
+     * divergence of the shape function $\varphi_j(x_q) \cdot \nabla$ by the
+     * type used to store the values $U_j$ of degrees of freedom, in
+     * order to form the value of $u_h(x_q) \cdot \nabla=\sum_j U_j
+     * \varphi_j(x_q) \cdot \nabla$. The local typedef in the current structure
+     * corresponds to the type you get when forming this product where
+     * the template argument of this structure represents the type of
+     * $U_j$.
      */
     template <typename number>
     struct Divergence
@@ -1179,7 +1191,25 @@ namespace FEValuesViews
     };
 
     /**
-     * Data type for taking the divergence of a tensor: a vector.
+     * This structure has a local typedef @p type that represents the
+     * divergence of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
+     *
+     * In places where this type is used to evaluate the divergence of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate it. When evaluating the divergence of finite
+     * element fields at a quadrature point, the correct type is that
+     * which you get when you multiply the type used to represent the
+     * divergence of the shape function $\varphi_j(x_q) \cdot \nabla$ by the
+     * type used to store the values $U_j$ of degrees of freedom, in
+     * order to form the value of $u_h(x_q) \cdot \nabla=\sum_j U_j
+     * \varphi_j(x_q) \cdot \nabla$. The local typedef in the current structure
+     * corresponds to the type you get when forming this product where
+     * the template argument of this structure represents the type of
+     * $U_j$.
      */
     template <typename number>
     struct Divergence
