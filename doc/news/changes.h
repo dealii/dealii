@@ -202,7 +202,6 @@ inconvenience this causes.
     <code>normal_vector</code> ones. In all cases, the new functions
     have been around for a while.
   - Mapping::transform_covariant and Mapping::transform_contravariant.
-  - Classes FEEvaluationDGP, FEEvaluationGeneral and FEEvaluationGL.
 
   <br>
   <em>With headers in <code>deal.II/dofs/</code>:</em>
@@ -222,6 +221,10 @@ inconvenience this causes.
   - MGTools::extract_inner_interface_dofs.
   - Class MGMatrix.
   - Multigrid::vmult and friends.
+
+  <br>
+  <em>With headers in <code>deal.II/matrix_free/</code>:</em>
+  - Classes FEEvaluationDGP, FEEvaluationGeneral and FEEvaluationGL.
 
   <br>
   <em>With headers in <code>deal.II/mesh_worker/</code>:</em>
