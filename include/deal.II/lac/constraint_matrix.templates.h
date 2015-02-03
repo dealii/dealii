@@ -979,7 +979,7 @@ namespace internal
                                        PETScWrappers::MPI::Vector       &output,
                                        const internal::bool2type<false>  /*is_block_vector*/)
     {
-      output.reinit (vec.get_mpi_communicator(), locally_owned_elements, needed_elements);
+      output.reinit (locally_owned_elements, needed_elements, vec.get_mpi_communicator());
       output = vec;
     }
 #endif

@@ -443,7 +443,7 @@ namespace LaplaceSolver
     typename hp::DoFHandler<dim>::active_cell_iterator
     active_cell_iterator;
 
-    const unsigned int n_threads = multithread_info.n_default_threads;
+    const unsigned int n_threads = multithread_info.n_threads();
     std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
     thread_ranges
       = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
@@ -1684,7 +1684,7 @@ namespace LaplaceSolver
     error_indicators.reinit (dual_solver.dof_handler
                              .get_tria().n_active_cells());
 
-    const unsigned int n_threads = multithread_info.n_default_threads;
+    const unsigned int n_threads = multithread_info.n_threads();
     Threads::ThreadGroup<> threads;
     for (unsigned int i=0; i<n_threads; ++i)
       threads += Threads::new_thread (&WeightedResidual<dim>::estimate_some, *this,

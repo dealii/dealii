@@ -110,16 +110,6 @@ namespace SparseMatrixIterators
 
     /**
      * Constructor.
-     *
-     * @deprecated This constructor is deprecated. Use the other constructor
-     * with a global index instead.
-     */
-    Accessor (MatrixType     *matrix,
-              const size_type row,
-              const size_type index) DEAL_II_DEPRECATED;
-
-    /**
-     * Constructor.
      */
     Accessor (MatrixType         *matrix,
               const std::size_t   index_within_matrix);
@@ -256,13 +246,6 @@ namespace SparseMatrixIterators
     /**
      * Constructor.
      */
-    Accessor (MatrixType     *matrix,
-              const size_type row,
-              const size_type index);
-
-    /**
-     * Constructor.
-     */
     Accessor (MatrixType         *matrix,
               const std::size_t   index);
 
@@ -354,17 +337,6 @@ namespace SparseMatrixIterators
      */
     typedef
     const Accessor<number,Constness> &value_type;
-
-    /**
-     * Constructor. Create an iterator into the matrix @p matrix for the given
-     * row and the index within it.
-     *
-     * @deprecated This constructor is deprecated. Use the other constructor
-     * with a global index instead.
-     */
-    Iterator (MatrixType     *matrix,
-              const size_type row,
-              const size_type index) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
@@ -1024,17 +996,6 @@ public:
    * what you do?
    */
   number &diag_element (const size_type i);
-
-  /**
-   * Access to values in internal mode.  Returns the value of the
-   * <tt>index</tt>th entry in <tt>row</tt>. Here, <tt>index</tt> refers to
-   * the internal representation of the matrix, not the column. Be sure to
-   * understand what you are doing here.
-   *
-   * @deprecated Use iterator or const_iterator instead!
-   */
-  number raw_entry (const size_type row,
-                    const size_type index) const DEAL_II_DEPRECATED;
 
   /**
    * This is for hackers. Get access to the <i>i</i>th element of this matrix.
@@ -1973,22 +1934,6 @@ number &SparseMatrix<number>::diag_element (const size_type i)
 
 template <typename number>
 inline
-number
-SparseMatrix<number>::raw_entry (const size_type row,
-                                 const size_type index) const
-{
-  Assert(row<cols->rows, ExcIndexRange(row,0,cols->rows));
-  Assert(index<cols->row_length(row),
-         ExcIndexRange(index,0,cols->row_length(row)));
-
-  // this function will soon go away.
-  return val[cols->rowstart[row]+index];
-}
-
-
-
-template <typename number>
-inline
 number SparseMatrix<number>::global_entry (const size_type j) const
 {
   Assert (cols != 0, ExcNotInitialized());
@@ -2041,20 +1986,6 @@ SparseMatrix<number>::copy_from (const ForwardIterator begin,
 
 namespace SparseMatrixIterators
 {
-  template <typename number>
-  inline
-  Accessor<number,true>::
-  Accessor (const MatrixType *matrix,
-            const size_type   row,
-            const size_type   index)
-    :
-    SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
-                                        row, index),
-    matrix (matrix)
-  {}
-
-
-
   template <typename number>
   inline
   Accessor<number,true>::
@@ -2194,20 +2125,6 @@ namespace SparseMatrixIterators
   template <typename number>
   inline
   Accessor<number,false>::
-  Accessor (MatrixType      *matrix,
-            const size_type  row,
-            const size_type  index)
-    :
-    SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
-                                        row, index),
-    matrix (matrix)
-  {}
-
-
-
-  template <typename number>
-  inline
-  Accessor<number,false>::
   Accessor (MatrixType         *matrix,
             const std::size_t   index)
     :
@@ -2247,18 +2164,6 @@ namespace SparseMatrixIterators
   {
     return *matrix;
   }
-
-
-
-  template <typename number, bool Constness>
-  inline
-  Iterator<number, Constness>::
-  Iterator (MatrixType      *matrix,
-            const size_type  r,
-            const size_type  i)
-    :
-    accessor(matrix, r, i)
-  {}
 
 
 

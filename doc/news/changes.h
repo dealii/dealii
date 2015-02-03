@@ -124,70 +124,39 @@ inconvenience this causes.
   you tried to use them). In almost all cases, there is a function with same
   name but different argument list that should be used instead.
   Specifically, the removed functions and classes are:
-  - TimeDependent::end_sweep (with an argument).
-  - PointValueHistory::mark_locations.
-  - The DataPostprocessor::compute_derived_quantities_scalar and
-    DataPostprocessor::compute_derived_quantities_vector functions without
-    evaluation points. If you have
-    data postprocessor classes implemented in your program that overload these
-    functions, you will have to change it in a way that they overload the
-    functions of same name but with the evaluation point argument instead.
-  - The constructors of classes MGSmoother, MGSmootherRelaxation and
-    MGSmootherPrecondition that take a VectorMemory object.
-  - Deprecated variants of MeshWorker::loop and MeshWorker::integration_loop.
+  <br>
+  <em>With headers in <code>deal.II/base/</code>:</em>
   - ThreadManagement::spawn.
   - Threads::ThreadCondition and Threads::ThreadMutex.
-  - GridGenerator::laplace_transformation.
-  - The version of GridGenerator::parallelogram where the corners are given
-    as a rank-2 tensor rather than as an array of points.
   - DataOutBase::create_xdmf_entry with 3 arguments.
   - DataOutBase::write_hdf5_parallel with 2 arguments.
-  - Algorithms::ThetaTimestepping::operator().
-  - Algorithms::ThetaTimestepping::initialize.
-  - Algorithms::Newton::initialize.
-  - MGLevelObject::get_minlevel and MGLevelObject::get_maxlevel.
   - The versions of FunctionParser::initialize that took a
     <code>use_degrees</code> or <code>constants</code> argument.
     The implementation as it is now no longer supports either of
     these two concepts (since we switched from the FunctionParser
     library to the muparser library after the deal.II 8.1 release).
-  - DoFRenumbering::downstream_dg.
-  - DoFTools::count_dofs_per_component.
-  - DoFTools::make_sparsity_pattern with a vector-of-vector mask.
   - GridOutFlags::XFig::level_color.
   - class BlockList.
-  - MGConstrainedDoFs::non_refinement_edge_index
-  - MGConstrainedDoFs::at_refinement_edge_boundary
-  - The refinement listener concept of the Triangulation class. This
-    approach to getting notified about what happens to triangulations
-    has been superseded by the signals defined by the triangulation
-    class.
   - The MPI support functions in namespace Utilities and Utilities::System.
   - Deprecated members of namespace types.
   - Namespace deal_II_numbers.
-  - Triangulation::distort_random.
-  - Triangulation::clear_user_pointers.
+  - MultithreadInfo::n_default_threads.
+  - Table::data.
+
+  <br>
+  <em>With headers in <code>deal.II/lac/</code>:</em>
   - The deprecated constructor of SparseILU.
   - SparseILU::apply_decomposition.
   - The deprecated constructor of SparseMIC.
   - The compress() functions without argument in the various vector
     classes. You should use the versions with a VectorOperation
     argument instead.
-  - In FEValues and related classes, the functions that contain the
-    term <code>2nd_derivatives</code> were removed in favor of those
-    with names containing <code>hessian</code>. Similarly, functions
-    with names including <code>function_grads</code> were removed in
-    favor of those called <code>function_gradients</code>. Finally,
-    the <code>cell_normal_vector</code> functions were replaced by
-    <code>normal_vector</code> ones. In all cases, the new functions
-    have been around for a while.
   - Vector::scale.
   - TrilinosWrappers::*Vector*::compress with an Epetra_CombineMode
     argument.
   - SparsityPattern and ChunkSparsityPattern functions that take an
     <code>optimize_diagonal</code> argument.
   - SparsityPattern::partition.
-  - Mapping::transform_covariant and Mapping::transform_contravariant.
   - The typedef CompressedBlockSparsityPattern.
   - The deprecated constructors of SparsityPattern iterator classes.
   - The deprecated variants of DoFTools::make_periodicity_constraints.
@@ -200,16 +169,83 @@ inconvenience this causes.
     parallel::distributed::Vector::scale,
     parallel::distributed::BlockVector::scale
     function that takes a scalar as argument.
+  - PreconditionBlock::size.
+  - Classes PreconditionedMatrix and PreconditionLACSolver.
+  - PETScWrappers::VectorBase::update_ghost_values.
+  - PETScWrappers::MPI::Vector constructors and reinit variants.
+  - SparseMatrixIterators::Accessor and SparseMatrixIterators::Iterator
+    constructors.
+  - SparseMatrix::raw_entry.
+
+  <br>
+  <em>With headers in <code>deal.II/deal.II/</code>:</em>
+  - GridGenerator::laplace_transformation.
+  - The version of GridGenerator::parallelogram where the corners are given
+    as a rank-2 tensor rather than as an array of points.
   - GridTools::create_union_triangulation.
   - GridTools::extract_boundary_mesh.
-  - PreconditionBlock::size.
+  - Triangulation::distort_random.
+  - Triangulation::clear_user_pointers.
+  - The refinement listener concept of the Triangulation class. This
+    approach to getting notified about what happens to triangulations
+    has been superseded by the signals defined by the triangulation
+    class.
+
+  <br>
+  <em>With headers in <code>deal.II/fe/</code>:</em>
+  - In FEValues and related classes, the functions that contain the
+    term <code>2nd_derivatives</code> were removed in favor of those
+    with names containing <code>hessian</code>. Similarly, functions
+    with names including <code>function_grads</code> were removed in
+    favor of those called <code>function_gradients</code>. Finally,
+    the <code>cell_normal_vector</code> functions were replaced by
+    <code>normal_vector</code> ones. In all cases, the new functions
+    have been around for a while.
+  - Mapping::transform_covariant and Mapping::transform_contravariant.
+
+  <br>
+  <em>With headers in <code>deal.II/dofs/</code>:</em>
+  - DoFRenumbering::downstream_dg.
+  - DoFTools::count_dofs_per_component.
+  - DoFTools::make_sparsity_pattern with a vector-of-vector mask.
+
+  <br>
+  <em>With headers in <code>deal.II/multigrid/</code>:</em>
+  - The constructors of classes MGSmoother, MGSmootherRelaxation and
+    MGSmootherPrecondition that take a VectorMemory object.
+  - MGLevelObject::get_minlevel and MGLevelObject::get_maxlevel.
+  - MGConstrainedDoFs::non_refinement_edge_index
+  - MGConstrainedDoFs::at_refinement_edge_boundary
   - MGTools::count_dofs_per_component.
   - MGTools::apply_boundary_values.
   - MGTools::extract_inner_interface_dofs.
   - Class MGMatrix.
   - Multigrid::vmult and friends.
+
+  <br>
+  <em>With headers in <code>deal.II/matrix_free/</code>:</em>
   - Classes FEEvaluationDGP, FEEvaluationGeneral and FEEvaluationGL.
-  - Classes PreconditionedMatrix and PreconditionLACSolver.
+
+  <br>
+  <em>With headers in <code>deal.II/mesh_worker/</code>:</em>
+  - Deprecated variants of MeshWorker::loop and MeshWorker::integration_loop.
+
+  <br>
+  <em>With headers in <code>deal.II/algorithm/</code>:</em>
+  - Algorithms::ThetaTimestepping::operator().
+  - Algorithms::ThetaTimestepping::initialize.
+  - Algorithms::Newton::initialize.
+
+  <br>
+  <em>With headers in <code>deal.II/numerics/</code>:</em>
+  - TimeDependent::end_sweep (with an argument).
+  - PointValueHistory::mark_locations.
+  - The DataPostprocessor::compute_derived_quantities_scalar and
+    DataPostprocessor::compute_derived_quantities_vector functions without
+    evaluation points. If you have
+    data postprocessor classes implemented in your program that overload these
+    functions, you will have to change it in a way that they overload the
+    functions of same name but with the evaluation point argument instead.
   <br>
   This release also removes the deprecated class MGDoFHandler. The
   functionality of this class had previously been incorporated into

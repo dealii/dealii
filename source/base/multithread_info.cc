@@ -157,7 +157,6 @@ bool MultithreadInfo::is_running_single_threaded()
 MultithreadInfo::MultithreadInfo ()
   :
   n_cpus (get_n_cpus()),
-  n_default_threads (n_cpus),
   n_max_threads (numbers::invalid_unsigned_int)
 {}
 

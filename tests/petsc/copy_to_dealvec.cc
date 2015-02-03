@@ -55,7 +55,6 @@ void test ()
   vb.compress(VectorOperation::insert);
   vb*=2.0;
   v=vb;
-  //v.update_ghost_values();
 
   Assert(!vb.has_ghost_elements(), ExcInternalError());
   Assert(v.has_ghost_elements(), ExcInternalError());
