@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -103,16 +103,18 @@ public:
   Tensor (const array_type &initializer);
 
   /**
-   * Copy constructor taking a tesnor of another base data type
+   * Copy constructor from tensors with different underlying scalar
+   * type. This obviously requires that the @p OtherNumber type is
+   * convertible to @p Number.
    */
   template <typename OtherNumber>
   explicit
-  Tensor (const Tensor<rank_,dim,OtherNumber> &);
+  Tensor (const Tensor<rank_,dim,OtherNumber> &initializer);
 
   /**
    * Conversion operator from tensor of tensors.
    */
-  Tensor (const Tensor<1,dim,Tensor<rank_-1,dim,Number> > &tensor_in);
+  Tensor (const Tensor<1,dim,Tensor<rank_-1,dim,Number> > &initializer);
 
   /**
    * Conversion operator to tensor of tensors.
@@ -142,10 +144,15 @@ public:
   /**
    * Assignment operator.
    */
-  Tensor &operator = (const Tensor<rank_,dim,Number> &);
+  Tensor &operator = (const Tensor<rank_,dim,Number> &rhs);
 
+  /**
+   * Assignment operator from tensors with different underlying scalar
+   * type. This obviously requires that the @p OtherNumber type is
+   * convertible to @p Number.
+   */
   template <typename OtherNumber>
-  Tensor &operator = (const Tensor<rank_,dim,OtherNumber> &);
+  Tensor &operator = (const Tensor<rank_,dim,OtherNumber> &rhs);
 
   /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
@@ -373,6 +380,8 @@ Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
   return subtensor[i];
 }
 
+
+
 template <int rank_, int dim, typename Number>
 inline
 Number
@@ -387,6 +396,8 @@ Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices) const
   return (subtensor[inner_ind])[indices1];
 }
 
+
+
 template <int rank_, int dim, typename Number>
 inline
 Number &
@@ -400,6 +411,8 @@ Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices)
     indices1[i] = indices[i+1];
   return (subtensor[inner_ind])[indices1];
 }
+
+
 
 template <int rank_, int dim, typename Number>
 inline
@@ -423,6 +436,8 @@ Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,OtherNumber> &t)
     subtensor[i] = t.subtensor[i];
   return *this;
 }
+
+
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>

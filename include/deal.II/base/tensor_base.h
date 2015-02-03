@@ -113,7 +113,7 @@ public:
   /**
    * Copy constructor.
    */
-  Tensor (const Tensor<0,dim,Number> &);
+  Tensor (const Tensor<0,dim,Number> &initializer);
 
   /**
    * Copy constructor from tensors with different underlying scalar
@@ -121,7 +121,8 @@ public:
    * convertible to @p Number.
    */
   template <typename OtherNumber>
-  Tensor (const Tensor<0,dim,OtherNumber> &);
+  explicit
+  Tensor (const Tensor<0,dim,OtherNumber> &initializer);
 
   /**
    * Conversion to Number. Since rank-0 tensors are scalars, this is a natural
@@ -141,7 +142,7 @@ public:
   /**
    * Assignment operator.
    */
-  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &);
+  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &rhs);
 
   /**
    * Assignment operator from tensors with different underlying scalar
@@ -149,7 +150,7 @@ public:
    * convertible to @p Number.
    */
   template <typename OtherNumber>
-  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,OtherNumber> &);
+  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
    * Assignment operator.
@@ -159,22 +160,22 @@ public:
   /**
    * Test for equality of two tensors.
    */
-  bool operator == (const Tensor<0,dim,Number> &) const;
+  bool operator == (const Tensor<0,dim,Number> &rhs) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  bool operator != (const Tensor<0,dim,Number> &) const;
+  bool operator != (const Tensor<0,dim,Number> &rhs) const;
 
   /**
    * Add another vector, i.e. move this point by the given offset.
    */
-  Tensor<0,dim,Number> &operator += (const Tensor<0,dim,Number> &);
+  Tensor<0,dim,Number> &operator += (const Tensor<0,dim,Number> &rhs);
 
   /**
    * Subtract another vector.
    */
-  Tensor<0,dim,Number> &operator -= (const Tensor<0,dim,Number> &);
+  Tensor<0,dim,Number> &operator -= (const Tensor<0,dim,Number> &rhs);
 
   /**
    * Scale the vector by <tt>factor</tt>, i.e. multiply all coordinates by
@@ -342,7 +343,8 @@ public:
    * Constructor. Initialize all entries to zero if <tt>initialize==true</tt>;
    * this is the default behaviour.
    */
-  explicit Tensor (const bool initialize = true);
+  explicit
+  Tensor (const bool initialize = true);
 
   /**
    * Copy constructor, where the data is copied from a C-style array.
@@ -352,7 +354,7 @@ public:
   /**
    * Copy constructor.
    */
-  Tensor (const Tensor<1,dim,Number> &);
+  Tensor (const Tensor<1,dim,Number> &initializer);
 
   /**
    * Copy constructor from tensors with different underlying scalar
@@ -360,7 +362,8 @@ public:
    * convertible to @p Number.
    */
   template <typename OtherNumber>
-  Tensor (const Tensor<1,dim,OtherNumber> &);
+  explicit
+  Tensor (const Tensor<1,dim,OtherNumber> &initializer);
 
   /**
    * Read access to the <tt>index</tt>th coordinate.
@@ -391,7 +394,7 @@ public:
   /**
    * Assignment operator.
    */
-  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,Number> &);
+  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,Number> &rhs);
 
   /**
    * Assignment operator from tensors with different underlying scalar
@@ -399,7 +402,7 @@ public:
    * convertible to @p Number.
    */
   template <typename OtherNumber>
-  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,OtherNumber> &);
+  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,OtherNumber> &rhs);
 
   /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
@@ -412,22 +415,22 @@ public:
   /**
    * Test for equality of two tensors.
    */
-  bool operator == (const Tensor<1,dim,Number> &) const;
+  bool operator == (const Tensor<1,dim,Number> &rhs) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  bool operator != (const Tensor<1,dim,Number> &) const;
+  bool operator != (const Tensor<1,dim,Number> &rhs) const;
 
   /**
    * Add another vector, i.e. move this point by the given offset.
    */
-  Tensor<1,dim,Number> &operator += (const Tensor<1,dim,Number> &);
+  Tensor<1,dim,Number> &operator += (const Tensor<1,dim,Number> &rhs);
 
   /**
    * Subtract another vector.
    */
-  Tensor<1,dim,Number> &operator -= (const Tensor<1,dim,Number> &);
+  Tensor<1,dim,Number> &operator -= (const Tensor<1,dim,Number> &rhs);
 
   /**
    * Scale the vector by <tt>factor</tt>, i.e. multiply all coordinates by
