@@ -145,9 +145,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * value of shape functions or finite element fields at quadrature
-     * points. The template argument denotes the type used to store
-     * the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * points.
      *
      * In places where this type is used to evaluate the value of
      * shape functions at quadrature points, the template argument is
@@ -171,9 +169,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * gradient of shape functions or finite element fields at
-     * quadrature points. The template argument denotes the type used
-     * to store the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * quadrature points.
      *
      * In places where this type is used to evaluate the gradient of
      * shape functions at quadrature points, the template argument is
@@ -198,9 +194,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * hessian of shape functions or finite element fields at
-     * quadrature points. The template argument denotes the type used
-     * to store the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * quadrature points.
      *
      * In places where this type is used to evaluate the hessian of
      * shape functions at quadrature points, the template argument is
@@ -434,9 +428,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * value of shape functions or finite element fields at quadrature
-     * points. The template argument denotes the type used to store
-     * the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * points.
      *
      * In places where this type is used to evaluate the value of
      * shape functions at quadrature points, the template argument is
@@ -460,9 +452,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * gradient of shape functions or finite element fields at
-     * quadrature points. The template argument denotes the type used
-     * to store the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * quadrature points.
      *
      * In places where this type is used to evaluate the gradient of
      * shape functions at quadrature points, the template argument is
@@ -487,9 +477,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * symmetric gradient of shape functions or finite element fields at
-     * quadrature points. The template argument denotes the type used
-     * to store the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * quadrature points.
      *
      * In places where this type is used to evaluate the symmetric gradient of
      * shape functions at quadrature points, the template argument is
@@ -514,9 +502,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * divergence of shape functions or finite element fields at
-     * quadrature points. The template argument denotes the type used
-     * to store the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * quadrature points.
      *
      * In places where this type is used to evaluate the divergence of
      * shape functions at quadrature points, the template argument is
@@ -541,9 +527,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * curl of shape functions or finite element fields at
-     * quadrature points. The template argument denotes the type used
-     * to store the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * quadrature points.
      *
      * In places where this type is used to evaluate the curl of
      * shape functions at quadrature points, the template argument is
@@ -568,9 +552,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * hessian of shape functions or finite element fields at
-     * quadrature points. The template argument denotes the type used
-     * to store the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * quadrature points.
      *
      * In places where this type is used to evaluate the hessian of
      * shape functions at quadrature points, the template argument is
@@ -931,9 +913,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * value of shape functions or finite element fields at quadrature
-     * points. The template argument denotes the type used to store
-     * the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * points.
      *
      * In places where this type is used to evaluate the value of
      * shape functions at quadrature points, the template argument is
@@ -957,9 +937,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * divergence of shape functions or finite element fields at
-     * quadrature points. The template argument denotes the type used
-     * to store the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * quadrature points.
      *
      * In places where this type is used to evaluate the divergence of
      * shape functions at quadrature points, the template argument is
@@ -1167,9 +1145,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * value of shape functions or finite element fields at quadrature
-     * points. The template argument denotes the type used to store
-     * the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * points.
      *
      * In places where this type is used to evaluate the value of
      * shape functions at quadrature points, the template argument is
@@ -1193,9 +1169,7 @@ namespace FEValuesViews
     /**
      * This structure has a local typedef @p type that represents the
      * divergence of shape functions or finite element fields at
-     * quadrature points. The template argument denotes the type used
-     * to store the values of degrees of freedom in vectors of size
-     * <code>DoFHandler::n_dofs()</code>.
+     * quadrature points.
      *
      * In places where this type is used to evaluate the divergence of
      * shape functions at quadrature points, the template argument is
