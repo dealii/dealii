@@ -141,6 +141,7 @@ inconvenience this causes.
   - Deprecated members of namespace types.
   - Namespace deal_II_numbers.
   - MultithreadInfo::n_default_threads.
+  - Table::data.
 
   <br>
   <em>With headers in <code>deal.II/lac/</code>:</em>

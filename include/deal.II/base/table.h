@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -614,14 +614,6 @@ protected:
    * don't know here whether copying is expensive or not.
    */
   typename AlignedVector<T>::const_reference el (const TableIndices<N> &indices) const;
-
-  /**
-   * @deprecated This function accesses data directly and should not be used!
-   *
-   * Direct read-only access to data field. Used by <tt>FullMatrix</tt> of the
-   * LAC sublibrary (there even with a cast from const), otherwise, keep away!
-   */
-  typename AlignedVector<T>::const_pointer data () const DEAL_II_DEPRECATED;
 
 protected:
   /**
@@ -2069,20 +2061,6 @@ TableBase<N,T>::el (const TableIndices<N> &indices)
           ExcIndexRange (position(indices), 0, values.size()));
   return values[position(indices)];
 }
-
-
-
-template <int N, typename T>
-inline
-typename AlignedVector<T>::const_pointer
-TableBase<N,T>::data () const
-{
-  if (values.size() == 0)
-    return typename AlignedVector<T>::const_pointer();
-  else
-    return &values[0];
-}
-
 
 
 
