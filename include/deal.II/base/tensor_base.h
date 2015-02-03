@@ -122,7 +122,7 @@ public:
    */
   template <typename OtherNumber>
   Tensor (const Tensor<0,dim,OtherNumber> &);
-  
+
   /**
    * Conversion to Number. Since rank-0 tensors are scalars, this is a natural
    * operation.
@@ -361,7 +361,7 @@ public:
    */
   template <typename OtherNumber>
   Tensor (const Tensor<1,dim,OtherNumber> &);
-  
+
   /**
    * Read access to the <tt>index</tt>th coordinate.
    *

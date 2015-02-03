@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,34 +38,40 @@ int main ()
   
   // rank 2
   {
-  	Tensor<2,dim,float> t(a);
-  	Tensor<2,dim,double> dt(t), dt2;
-  	dt2 = t;
-  	Assert (dt2 == dt, ExcInternalError());
+    Tensor<2,dim,float> t(a);
+    Tensor<2,dim,double> dt(t), dt2;
+    dt2 = t;
+    Assert (dt2 == dt, ExcInternalError());
+    Assert (dt == dt2, ExcInternalError());
   
- 	Tensor<2,dim,float> ft(dt), ft2;
-  	ft2 = dt;
-  	Assert (ft2 == ft, ExcInternalError());
+    Tensor<2,dim,float> ft(dt), ft2;
+    ft2 = dt;
+    Assert (ft2 == ft, ExcInternalError());
+    Assert (ft == ft2, ExcInternalError());
   
-  	Tensor<2,dim,std::complex<double> > ct(dt), ct2;
-  	ct2 = dt;
-  	Assert (ct2 == ct, ExcInternalError());
+    Tensor<2,dim,std::complex<double> > ct(dt), ct2;
+    ct2 = dt;
+    Assert (ct2 == ct, ExcInternalError());
+    Assert (ct == ct2, ExcInternalError());
   }
   
   // rank 1
   {
-  	Tensor<1,dim,float> t(b);
-  	Tensor<1,dim,double> dt(t), dt2;
-  	dt2 = t;
-  	Assert (dt2 == dt, ExcInternalError());
+    Tensor<1,dim,float> t(b);
+    Tensor<1,dim,double> dt(t), dt2;
+    dt2 = t;
+    Assert (dt2 == dt, ExcInternalError());
+    Assert (dt == dt2, ExcInternalError());
   
-  	Tensor<1,dim,float> ft(dt),ft2;
+    Tensor<1,dim,float> ft(dt),ft2;
     ft2 = dt;
     Assert (ft2 == ft, ExcInternalError());
+    Assert (ft == ft2, ExcInternalError());
   
     Tensor<1,dim,std::complex<double>> ct(dt), ct2;
     ct2 = dt;
-  	Assert (ct2 == ct, ExcInternalError());
+    Assert (ct2 == ct, ExcInternalError());
+    Assert (ct == ct2, ExcInternalError());
   }
   
   deallog << "OK." << std::endl;
