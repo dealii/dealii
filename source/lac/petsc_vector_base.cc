@@ -1152,25 +1152,6 @@ namespace PETScWrappers
     last_action = action;
   }
 
-
-  void
-  VectorBase::update_ghost_values() const
-  {
-    // generate an error for not ghosted
-    // vectors
-    if (!ghosted)
-      AssertThrow (false, ExcInternalError());
-
-    int ierr;
-
-    ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-    ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-  }
-
-
-
 }
 
 DEAL_II_NAMESPACE_CLOSE

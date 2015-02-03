@@ -170,7 +170,8 @@ inconvenience this causes.
     function that takes a scalar as argument.
   - PreconditionBlock::size.
   - Classes PreconditionedMatrix and PreconditionLACSolver.
-  - PETScVectors::MPI::Vector constructors and reinit() variants.
+  - PETScWrappers::VectorBase::update_ghost_values.
+  - PETScWrappers::MPI::Vector constructors and reinit variants.
   - SparseMatrixIterators::Accessor and SparseMatrixIterators::Iterator
     constructors.
   - SparseMatrix::raw_entry.

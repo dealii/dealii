@@ -661,16 +661,6 @@ namespace PETScWrappers
                 const VectorBase &b);
 
     /**
-     * Updates the ghost values of this vector. As ghosted vectors are now
-     * read-only and assignments from a non-ghosted vector update the ghost
-     * values automatically, this method does not need to be called in user
-     * code.
-     * @deprecated: calling this method is no longer necessary.
-     */
-    void update_ghost_values() const DEAL_II_DEPRECATED;
-
-
-    /**
      * Prints the PETSc vector object values using PETSc internal vector
      * viewer function <tt>VecView</tt>. The default format prints the
      * vector's contents, including indices of vector elements. For other
