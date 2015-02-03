@@ -135,6 +135,9 @@ public:
    */
   Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &);
 
+  template <typename OtherNumber>
+  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,OtherNumber> &);
+
   /**
    * Assignment operator.
    */
@@ -368,6 +371,9 @@ public:
    * Assignment operator.
    */
   Tensor<1,dim,Number> &operator = (const Tensor<1,dim,Number> &);
+
+  template <typename OtherNumber>
+  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,OtherNumber> &);
 
   /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
@@ -629,6 +635,14 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Numbe
   return *this;
 }
 
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,OtherNumber> &p)
+{
+  value = p.value;
+  return *this;
+}
 
 
 template <int dim, typename Number>
@@ -892,6 +906,20 @@ template <int dim, typename Number>
 inline
 Tensor<1,dim,Number> &
 Tensor<1,dim,Number>::operator = (const Tensor<1,dim,Number> &p)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] = p.values[i];
+
+  return *this;
+}
+
+
+
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<1,dim,Number> &
+Tensor<1,dim,Number>::operator = (const Tensor<1,dim,OtherNumber> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
