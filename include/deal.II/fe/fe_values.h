@@ -524,9 +524,25 @@ namespace FEValuesViews
     };
 
     /**
-     * A typedef for the type of second derivatives of the view this class
-     * represents. Here, for a set of <code>dim</code> components of the
-     * finite element, the Hessian is a <code>Tensor@<3,dim@></code>.
+     * This structure has a local typedef @p type that represents the
+     * hessian of shape functions or finite element fields at
+     * quadrature points. The template argument denotes the type used
+     * to store the values of degrees of freedom in vectors of size
+     * <code>DoFHandler::n_dofs()</code>.
+     *
+     * In places where this type is used to evaluate the hessian of
+     * shape functions at quadrature points, the template argument is
+     * simply <code>double</code> since this is the accuracy with
+     * which we evaluate it. When evaluating the hessian of finite
+     * element fields at a quadrature point, the correct type is that
+     * which you get when you multiply the type used to represent the
+     * hessian of the shape function $\nabla^2 \varphi_j(x_q)$ by the
+     * type used to store the values $U_j$ of degrees of freedom, in
+     * order to form the value of $\nabla^2 u_h(x_q)=\sum_j U_j
+     * \nabla^2 \varphi_j(x_q)$. The local typedef in the current
+     * structure corresponds to the type you get when forming this
+     * product where the template argument of this structure
+     * represents the type of $U_j$.
      */
     template <typename number>
     struct Hessian
