@@ -316,6 +316,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The Tensor classes now have copy constructors and copy
+  operators that allow assignment from other tensors with different
+  underlying scalar types.
+  <br>
+  (Denis Davydov, 2015/02/03)
+  </li>
+
   <li> New: Class hp::DoFHandler can now also be serialized.
   <br>
   (Lukas Korous, 2015/01/31)
