@@ -1769,7 +1769,7 @@ public:
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
-                               Vector<double> &out) const = 0;
+                               Vector<IndexSet::value_type> &out) const = 0;
 };
 
 
@@ -1838,7 +1838,7 @@ public:
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
-                               Vector<double> &out) const;
+                               Vector<IndexSet::value_type> &out) const;
 
 private:
   /**
@@ -1941,7 +1941,7 @@ public:
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
-                               Vector<double> &out) const;
+                               Vector<IndexSet::value_type> &out) const;
 
 private:
   /**
@@ -2004,7 +2004,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const IndexSet &in,
-                             Vector<double> &out) const
+                             Vector<IndexSet::value_type> &out) const
 {
   Assert (cell->has_children() == false, ExcNotImplemented());
 
@@ -2063,7 +2063,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const IndexSet &,
-                             Vector<double> &) const
+                             Vector<IndexSet::value_type> &) const
 {
   Assert (false, ExcMessage (message_string));
 }
