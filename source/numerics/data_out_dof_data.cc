@@ -381,6 +381,8 @@ namespace internal
     class DataEntry : public DataEntryBase<DH>
     {
     public:
+      typedef typename VectorType::value_type number;
+
       /**
        * Constructor. Give a list of names for the individual components of
        * the vector and their interpretation as scalar or vector data. This
@@ -405,7 +407,7 @@ namespace internal
        * element from it.
        */
       virtual
-      double
+      number
       get_cell_data_value (const unsigned int cell_number) const;
 
       /**
@@ -415,7 +417,7 @@ namespace internal
       virtual
       void
       get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                           std::vector<double>             &patch_values) const;
+                           std::vector<number>             &patch_values) const;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -425,7 +427,7 @@ namespace internal
       virtual
       void
       get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                           std::vector<dealii::Vector<double> >    &patch_values_system) const;
+                           std::vector<dealii::Vector<number> >    &patch_values_system) const;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -434,7 +436,7 @@ namespace internal
       virtual
       void
       get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                              std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const;
+                              std::vector<Tensor<1,DH::space_dimension,number> >    &patch_gradients) const;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -444,7 +446,7 @@ namespace internal
       virtual
       void
       get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                              std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const;
+                              std::vector<std::vector<Tensor<1,DH::space_dimension,number> > > &patch_gradients_system) const;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -453,7 +455,7 @@ namespace internal
       virtual
       void
       get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                             std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const;
+                             std::vector<Tensor<2,DH::space_dimension,number> >    &patch_hessians) const;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -463,7 +465,7 @@ namespace internal
       virtual
       void
       get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                             std::vector<std::vector< Tensor<2,DH::space_dimension> > > &patch_hessians_system) const;
+                             std::vector<std::vector< Tensor<2,DH::space_dimension,number> > > &patch_hessians_system) const;
 
       /**
        * Clear all references to the vectors.
@@ -513,7 +515,7 @@ namespace internal
     namespace
     {
       template <class VectorType>
-      double
+      typename VectorType::value_type
       get_vector_element (const VectorType &vector,
                           const unsigned int cell_number)
       {
@@ -532,7 +534,7 @@ namespace internal
 
 
     template <class DH, class VectorType>
-    double
+    DataEntry<DH,VectorType>::number
     DataEntry<DH,VectorType>::
     get_cell_data_value (const unsigned int cell_number) const
     {
@@ -545,7 +547,7 @@ namespace internal
     void
     DataEntry<DH,VectorType>::
     get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                         std::vector<dealii::Vector<double> >    &patch_values_system) const
+                         std::vector<dealii::Vector<DataEntry<DH,VectorType>::number> >    &patch_values_system) const
     {
       fe_patch_values.get_function_values (*vector, patch_values_system);
     }
@@ -556,7 +558,7 @@ namespace internal
     void
     DataEntry<DH,VectorType>::
     get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                         std::vector<double>             &patch_values) const
+                         std::vector<DataEntry<DH,VectorType>::number>         &patch_values) const
     {
       fe_patch_values.get_function_values (*vector, patch_values);
     }
@@ -567,7 +569,7 @@ namespace internal
     void
     DataEntry<DH,VectorType>::
     get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                            std::vector<std::vector<Tensor<1,DH::space_dimension> > >   &patch_gradients_system) const
+                            std::vector<std::vector<Tensor<1,DH::space_dimension,DataEntry<DH,VectorType>::number> > >   &patch_gradients_system) const
     {
       fe_patch_values.get_function_gradients (*vector, patch_gradients_system);
     }
@@ -578,7 +580,7 @@ namespace internal
     void
     DataEntry<DH,VectorType>::
     get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                            std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const
+                            std::vector<Tensor<1,DH::space_dimension,DataEntry<DH,VectorType>::number> >       &patch_gradients) const
     {
       fe_patch_values.get_function_gradients (*vector, patch_gradients);
     }
@@ -589,7 +591,7 @@ namespace internal
     void
     DataEntry<DH,VectorType>::
     get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                           std::vector<std::vector<Tensor<2,DH::space_dimension> > >   &patch_hessians_system) const
+                           std::vector<std::vector<Tensor<2,DH::space_dimension,DataEntry<DH,VectorType>::number> > >   &patch_hessians_system) const
     {
       fe_patch_values.get_function_hessians (*vector, patch_hessians_system);
     }
@@ -600,7 +602,7 @@ namespace internal
     void
     DataEntry<DH,VectorType>::
     get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                           std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const
+                           std::vector<Tensor<2,DH::space_dimension,DataEntry<DH,VectorType>::number> >       &patch_hessians) const
     {
       fe_patch_values.get_function_hessians (*vector, patch_hessians);
     }

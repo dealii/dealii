@@ -39,12 +39,9 @@ for (V: EXTERNAL_SEQUENTIAL_VECTORS)
   {
     template void ConstraintMatrix::condense<V >(const V&, V&) const;
     template void ConstraintMatrix::condense<V >(V&vec) const;
-    template void ConstraintMatrix::distribute_local_to_global<V > (
-      const Vector<double>&, const std::vector<types::global_dof_index> &, V&, const FullMatrix<double>&) const;
     template void ConstraintMatrix::distribute<V >(const V&, V&) const;
     template void ConstraintMatrix::set_zero<V >(V&) const;
   }
-
 
 for (V: EXTERNAL_PARALLEL_VECTORS)
   {
