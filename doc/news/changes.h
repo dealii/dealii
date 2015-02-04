@@ -148,6 +148,7 @@ inconvenience this causes.
   - The deprecated constructor of SparseILU.
   - SparseILU::apply_decomposition.
   - The deprecated constructor of SparseMIC.
+  - SparseMIC::decompose.
   - The compress() functions without argument in the various vector
     classes. You should use the versions with a VectorOperation
     argument instead.
