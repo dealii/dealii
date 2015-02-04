@@ -86,7 +86,8 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_values);
     fe_v.reinit(cell);
-    std::vector< Vector<double> > vvalues (1, values);
+    std::vector< Vector<typename VECTOR::value_type> > vvalues (1);
+    vvalues[0].reinit(values.size());
     fe_v.get_function_values(data_vector, vvalues);
     values = vvalues[0];
   }
@@ -137,10 +138,13 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_gradients);
     fe_v.reinit(cell);
-    std::vector< std::vector<Tensor<1,dim> > > vgrads
-    (1,  std::vector<Tensor<1,dim> >(n_components) );
+    std::vector< std::vector<Tensor<1,dim,typename VECTOR::value_type> > > vgrads
+    (1,  std::vector<Tensor<1,dim,typename VECTOR::value_type> >(n_components) );
     fe_v.get_function_gradients(data_vector, vgrads);
-    gradients = vgrads[0];
+    const unsigned int s = vgrads[0].size();
+    gradients.resize(s);
+    for (unsigned int i = 0; i < s; i++)
+      gradients[i] = vgrads[0][i];
   }
 
 
@@ -190,7 +194,8 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_hessians);
     fe_v.reinit(cell);
-    std::vector< Vector<double> > vvalues (1, values);
+    std::vector< Vector<typename VECTOR::value_type> > vvalues (1);
+    vvalues[0].reinit(values.size());
     fe_v.get_function_laplacians(data_vector, vvalues);
     values = vvalues[0];
   }
@@ -245,7 +250,7 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< Vector<double> > vvalues (nq, Vector<double>(n_components));
+        std::vector< Vector<typename VECTOR::value_type> > vvalues (nq, Vector<typename VECTOR::value_type>(n_components));
         fe_v.get_present_fe_values ().get_function_values(data_vector, vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
@@ -307,11 +312,17 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< std::vector<Tensor<1,dim> > >
-        vgrads (nq, std::vector<Tensor<1,dim> >(n_components));
+        std::vector< std::vector<Tensor<1,dim,typename VECTOR::value_type> > >
+        vgrads (nq, std::vector<Tensor<1,dim,typename VECTOR::value_type> >(n_components));
         fe_v.get_present_fe_values ().get_function_gradients(data_vector, vgrads);
         for (unsigned int q=0; q<nq; ++q)
-          values[maps[i][q]] = vgrads[q];
+          {
+            std::vector< Tensor<1,dim> > &viq = values[maps[i][q]];
+            const unsigned int s = vgrads[q].size();
+            viq.resize(s);
+            for (unsigned int l=0;l<s;l++)
+              viq[l] = vgrads[q][l];
+          }
       }
   }
 
@@ -367,7 +378,7 @@ namespace Functions
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
-        std::vector< Vector<double> > vvalues (nq, Vector<double>(n_components));
+        std::vector< Vector<typename VECTOR::value_type> > vvalues (nq, Vector<typename VECTOR::value_type>(n_components));
         fe_v.get_present_fe_values ().get_function_laplacians(data_vector, vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
