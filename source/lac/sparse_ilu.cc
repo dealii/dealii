@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,16 +22,12 @@ DEAL_II_NAMESPACE_OPEN
 template class SparseILU<double>;
 template void SparseILU<double>::initialize<double> (const SparseMatrix<double> &,
                                                      const AdditionalData &data);
-template void SparseILU<double>::decompose<double> (const SparseMatrix<double> &,
-                                                    const double);
 template void SparseILU<double>::vmult <double> (Vector<double> &,
                                                  const Vector<double> &) const;
 template void SparseILU<double>::Tvmult <double> (Vector<double> &,
                                                   const Vector<double> &) const;
 template void SparseILU<double>::initialize<float> (const SparseMatrix<float> &,
                                                     const AdditionalData &data);
-template void SparseILU<double>::decompose<float> (const SparseMatrix<float> &,
-                                                   const double);
 template void SparseILU<double>::vmult<float> (Vector<float> &,
                                                const Vector<float> &) const;
 template void SparseILU<double>::Tvmult<float> (Vector<float> &,
@@ -41,16 +37,12 @@ template void SparseILU<double>::Tvmult<float> (Vector<float> &,
 template class SparseILU<float>;
 template void SparseILU<float>::initialize<double> (const SparseMatrix<double> &,
                                                     const AdditionalData &data);
-template void SparseILU<float>::decompose<double> (const SparseMatrix<double> &,
-                                                   const double);
 template void SparseILU<float>::vmult<double> (Vector<double> &,
                                                const Vector<double> &) const;
 template void SparseILU<float>::Tvmult<double> (Vector<double> &,
                                                 const Vector<double> &) const;
 template void SparseILU<float>::initialize<float> (const SparseMatrix<float> &,
                                                    const AdditionalData &data);
-template void SparseILU<float>::decompose<float> (const SparseMatrix<float> &,
-                                                  const double);
 template void SparseILU<float>::vmult<float> (Vector<float> &,
                                               const Vector<float> &) const;
 template void SparseILU<float>::Tvmult<float> (Vector<float> &,

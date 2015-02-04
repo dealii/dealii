@@ -103,14 +103,6 @@ public:
                    const AdditionalData &parameters = AdditionalData());
 
   /**
-   * @deprecated This method is deprecated, and left for backward compability.
-   * It will be removed in later versions.
-   */
-  template <typename somenumber>
-  void decompose (const SparseMatrix<somenumber> &matrix,
-                  const double                    strengthen_diagonal=0.) DEAL_II_DEPRECATED;
-
-  /**
    * Apply the incomplete decomposition, i.e. do one forward-backward step
    * $dst=(LU)^{-1}src$.
    *
