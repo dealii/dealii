@@ -1010,8 +1010,10 @@ namespace Step34
     DataOut<dim-1, DoFHandler<dim-1, dim> > dataout;
 
     dataout.attach_dof_handler(dh);
-    dataout.add_data_vector(phi, "phi");
-    dataout.add_data_vector(alpha, "alpha");
+    dataout.add_data_vector(phi, "phi",
+                            DataOut<dim-1, DoFHandler<dim-1, dim> >::type_dof_data);
+    dataout.add_data_vector(alpha, "alpha",
+                            DataOut<dim-1, DoFHandler<dim-1, dim> >::type_dof_data);
     dataout.build_patches(mapping,
                           mapping.get_degree(),
                           DataOut<dim-1, DoFHandler<dim-1, dim> >::curved_inner_cells);
