@@ -330,6 +330,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: There is now a new class ProductType that can be used
+  to infer the type of the product of two objects.
+  <br>
+  (Wolfgang Bangerth, 2015/02/04)
+  </li>
+
   <li> New: The Tensor classes now have copy constructors and copy
   operators that allow assignment from other tensors with different
   underlying scalar types.
