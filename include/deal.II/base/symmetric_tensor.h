@@ -619,6 +619,13 @@ public:
   SymmetricTensor   operator - () const;
 
   /**
+   * Simple addition of a multiple of a tensor, i.e. *this += a*T,
+   * where the scalar is of the same base type and
+   * T is a symmetric tensor of double.
+   */
+  void add(const Number &a, const SymmetricTensor<rank,dim,double> &p);
+
+  /**
    * Product between the present symmetric tensor and a tensor of rank 2. For
    * example, if the present object is also a rank-2 tensor, then this is the
    * scalar-product double contraction <tt>a<sub>ij</sub>b<sub>ij</sub></tt>
@@ -1070,6 +1077,14 @@ SymmetricTensor<rank,dim,Number>::operator +=
 {
   data += t.data;
   return *this;
+}
+
+template <int rank, int dim, typename Number>
+inline
+void
+SymmetricTensor<rank,dim,Number>::add(const Number &a, const SymmetricTensor<rank,dim,double> &t)
+{
+  data.add (a, t.data);
 }
 
 

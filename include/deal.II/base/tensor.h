@@ -211,6 +211,13 @@ public:
   Tensor<rank_,dim,Number>   operator - () const;
 
   /**
+   * Simple addition of a multiple of a tensor, i.e. *this += a*T,
+   * where the scalar is of the same base type and
+   * T is a tensor of double.
+   */
+  void add(const Number &, const Tensor<rank_,dim,double> &);
+
+  /**
    * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
    * squares of all entries.
    */
@@ -495,6 +502,14 @@ Tensor<rank_,dim,Number>::operator += (const Tensor<rank_,dim,Number> &p)
   return *this;
 }
 
+template <int rank_, int dim, typename Number>
+inline
+void
+Tensor<rank_,dim,Number>::add(const Number &a, const Tensor<rank_,dim,double> &p)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    subtensor[i].add(a, p.subtensor[i]);
+}
 
 
 template <int rank_, int dim, typename Number>
