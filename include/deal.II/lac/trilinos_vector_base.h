@@ -1699,8 +1699,12 @@ namespace TrilinosWrappers
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
-    if (local_size() == v.local_size())
+    // We assume that the vectors have the same Map
+    // if the local size is the same and if the vectors are not ghosted
+    if (local_size() == v.local_size() && !v.has_ghost_elements())
       {
+        Assert (this->vector->Map().SameAs(v.vector->Map())==true,
+                ExcDifferentParallelPartitioning());
         const int ierr = vector->Update(1., *(v.vector), s);
         AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
@@ -1727,8 +1731,12 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
-    if (local_size() == v.local_size())
+    // We assume that the vectors have the same Map
+    // if the local size is the same and if the vectors are not ghosted
+    if (local_size() == v.local_size() && !v.has_ghost_elements())
       {
+        Assert (this->vector->Map().SameAs(v.vector->Map())==true,
+                ExcDifferentParallelPartitioning());
         const int ierr = vector->Update(a, *(v.vector), s);
         AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
@@ -1762,24 +1770,22 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
-    if (local_size() == v.local_size() && local_size() == w.local_size())
+    // We assume that the vectors have the same Map
+    // if the local size is the same and if the vectors are not ghosted
+    if (local_size() == v.local_size() && !v.has_ghost_elements() &&
+        local_size() == w.local_size() && !w.has_ghost_elements())
       {
+        Assert (this->vector->Map().SameAs(v.vector->Map())==true,
+                ExcDifferentParallelPartitioning());
+        Assert (this->vector->Map().SameAs(w.vector->Map())==true,
+                ExcDifferentParallelPartitioning());
         const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
         AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
     else
       {
-        (*this)*=s;
-        {
-          VectorBase tmp = v;
-          tmp *= a;
-          this->add(tmp, true);
-        }
-        {
-          VectorBase tmp = w;
-          tmp *= b;
-          this->add(tmp, true);
-        }
+        this->sadd( s, a, v);
+        this->sadd(1., b, w);
       }
   }
 
@@ -1809,10 +1815,19 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
     Assert (numbers::is_finite(c), ExcNumberNotFinite());
 
-    if (local_size() == v.local_size()
-        && local_size() == w.local_size()
-        && local_size() == x.local_size())
+    // We assume that the vectors have the same Map
+    // if the local size is the same and if the vectors are not ghosted
+    if (local_size() == v.local_size() && !v.has_ghost_elements() &&
+        local_size() == w.local_size() && !w.has_ghost_elements() &&
+        local_size() == x.local_size() && !x.has_ghost_elements())
       {
+        Assert (this->vector->Map().SameAs(v.vector->Map())==true,
+                ExcDifferentParallelPartitioning());
+        Assert (this->vector->Map().SameAs(w.vector->Map())==true,
+                ExcDifferentParallelPartitioning());
+        Assert (this->vector->Map().SameAs(x.vector->Map())==true,
+                ExcDifferentParallelPartitioning());
+
         // Update member can only
         // input two other vectors so
         // do it in two steps
@@ -1825,22 +1840,9 @@ namespace TrilinosWrappers
       }
     else
       {
-        (*this)*=s;
-        {
-          VectorBase tmp = v;
-          tmp *= a;
-          this->add(tmp, true);
-        }
-        {
-          VectorBase tmp = w;
-          tmp *= b;
-          this->add(tmp, true);
-        }
-        {
-          VectorBase tmp = x;
-          tmp *= c;
-          this->add(tmp, true);
-        }
+        this->sadd( s, a, v);
+        this->sadd(1., b, w);
+        this->sadd(1., c, x);
       }
   }
 
