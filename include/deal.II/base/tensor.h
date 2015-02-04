@@ -757,10 +757,10 @@ std::ostream &operator << (std::ostream &out, const Tensor<rank_,1> &p)
  * @relates Tensor
  * @author Guido Kanschat, 2000
  */
-template <int dim, typename Number>
+template <int dim, typename Number, typename OtherNumber>
 inline
 Number contract (const Tensor<1,dim,Number> &src1,
-                 const Tensor<1,dim,Number> &src2)
+                 const Tensor<1,dim,OtherNumber> &src2)
 {
   Number res = 0.;
   for (unsigned int i=0; i<dim; ++i)
@@ -785,11 +785,11 @@ Number contract (const Tensor<1,dim,Number> &src1,
  * @relates Tensor
  * @author Wolfgang Bangerth, 2005
  */
-template <int dim, typename Number>
+template <int dim, typename Number, typename OtherNumber>
 inline
 Number
 operator * (const Tensor<1,dim,Number> &src1,
-            const Tensor<1,dim,Number> &src2)
+            const Tensor<1,dim,OtherNumber> &src2)
 {
   return contract(src1, src2);
 }
