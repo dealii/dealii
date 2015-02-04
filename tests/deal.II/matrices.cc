@@ -104,8 +104,7 @@ check_boundary (const DoFHandler<dim> &dof,
   // range of 1 or below,
   // multiply matrix by 100 to
   // make test more sensitive
-  for (unsigned int i=0; i<matrix.n_nonzero_elements(); ++i)
-    matrix.global_entry(i) *= 100;
+  matrix *= 100;
 
   // finally write out matrix
   matrix.print (deallog.get_file_stream());
@@ -197,9 +196,10 @@ check ()
       // range of 1 or below,
       // multiply matrix by 100 to
       // make test more sensitive
-      for (unsigned int i=0; i<matrix.n_nonzero_elements(); ++i)
-        deallog.get_file_stream() << matrix.global_entry(i) * 100
-                                  << std::endl;
+      for (SparseMatrix<double>::const_iterator p=matrix.begin();
+	   p!=matrix.end(); ++p)
+	deallog.get_file_stream() << p->value() * 100
+				  << std::endl;
     };
 
   if (dim > 1)

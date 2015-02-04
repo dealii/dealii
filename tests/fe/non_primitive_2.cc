@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -243,11 +243,13 @@ test (const unsigned int p)
   // reduce the amount of data
   // written out a little bit, only
   // write every so-many-th element
-  for (unsigned int i=0; i<A2.n_nonzero_elements(); ++i)
+  SparseMatrix<double>::const_iterator p2 = A2.begin(),
+				       p3 = A3.begin();
+  for (unsigned int i=0; i<A2.n_nonzero_elements(); ++i, ++p2, ++p3)
     {
       if (i % (dim*dim*dim) == 0)
-        deallog << i << ' ' << A2.global_entry(i) << std::endl;
-      Assert (A3.global_entry(i) == A2.global_entry(i),
+        deallog << i << ' ' << p2->value() << std::endl;
+      Assert (p3->value() == p2->value(),
               ExcInternalError());
     };
 }
