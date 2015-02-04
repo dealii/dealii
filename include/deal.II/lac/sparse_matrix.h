@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -997,28 +997,6 @@ public:
    */
   number &diag_element (const size_type i);
 
-  /**
-   * This is for hackers. Get access to the <i>i</i>th element of this matrix.
-   * The elements are stored in a consecutive way, refer to the
-   * SparsityPattern class for more details.
-   *
-   * You should use this interface very carefully and only if you are
-   * absolutely sure to know what you do. You should also note that the
-   * structure of these arrays may change over time.  If you change the layout
-   * yourself, you should also rename this function to avoid programs relying
-   * on outdated information!
-   *
-   * @deprecated Use iterator or const_iterator instead!
-   */
-  number global_entry (const size_type i) const DEAL_II_DEPRECATED;
-
-  /**
-   * Same as above, but with write access.  You certainly know what you do?
-   *
-   * @deprecated Use iterator or const_iterator instead!
-   */
-  number &global_entry (const size_type i) DEAL_II_DEPRECATED;
-
 //@}
   /**
    * @name Multiplications
@@ -1928,32 +1906,6 @@ number &SparseMatrix<number>::diag_element (const size_type i)
   // Use that the first element in each row of a quadratic matrix is the main
   // diagonal
   return val[cols->rowstart[i]];
-}
-
-
-
-template <typename number>
-inline
-number SparseMatrix<number>::global_entry (const size_type j) const
-{
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (j < cols->n_nonzero_elements(),
-          ExcIndexRange (j, 0, cols->n_nonzero_elements()));
-
-  return val[j];
-}
-
-
-
-template <typename number>
-inline
-number &SparseMatrix<number>::global_entry (const size_type j)
-{
-  Assert (cols != 0, ExcNotInitialized());
-  Assert (j < cols->n_nonzero_elements(),
-          ExcIndexRange (j, 0, cols->n_nonzero_elements()));
-
-  return val[j];
 }
 
 

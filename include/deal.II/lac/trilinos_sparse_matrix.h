@@ -1060,7 +1060,7 @@ namespace TrilinosWrappers
      * <li> If the matrix was initialized without a sparsity pattern, elements
      * have been added manually using the set() command. When this process is
      * completed, a call to compress() reorganizes the internal data
-     * structures (aparsity pattern) so that a fast access to data is possible
+     * structures (sparsity pattern) so that a fast access to data is possible
      * in matrix-vector products.
      * <li> If the matrix structure has already been fixed (either by
      * initialization with a sparsity pattern or by calling compress() during
