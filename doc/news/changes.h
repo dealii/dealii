@@ -330,6 +330,19 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: If you take the product of a Tensor and a scalar number,
+  you previously got a Tensor back that stored its elements in the same
+  data type as the original tensor. This leads to problems if you
+  multiply a <code>Tensor@<1,dim,double@></code> by a
+  <code>std::complex@<double@></code> because the result clearly needs
+  to store its elements as complex numbers, rather than as double
+  variables. This is now changed: The result of the product of a Tensor
+  and a scalar number is now a Tensor that stores its elements in a data
+  type appropriate for this product.
+  <br>
+  (Wolfgang Bangerth, 2015/02/11)
+  </li>
+
   <li> New: There is now a new class ProductType that can be used
   to infer the type of the product of two objects. There is now also
   a class EnableIfScalar that helps restrict some templates to only
