@@ -767,7 +767,7 @@ namespace GridGenerator
                 ExcMessage ("Invalid distance between corner points of parallelepiped."));
 
     // Create a list of points
-    Point<dim> (delta) [dim];
+    Point<dim> delta[dim];
 
     for (unsigned int i=0; i<dim; ++i)
       delta[i] = corners[i]/n_subdivisions[i];
