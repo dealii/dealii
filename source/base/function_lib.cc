@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -131,7 +131,7 @@ namespace Functions
             ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i=0; i<points.size(); ++i)
-      gradients[i] = points[i]*2;
+      gradients[i] = static_cast<Tensor<1,dim> >(points[i])*2;
   }
 
 
@@ -1839,7 +1839,7 @@ namespace Functions
 
   template <int dim>
   FourierCosineFunction<dim>::
-  FourierCosineFunction (const Point<dim> &fourier_coefficients)
+  FourierCosineFunction (const Tensor<1,dim> &fourier_coefficients)
     :
     Function<dim> (1),
     fourier_coefficients (fourier_coefficients)
@@ -1875,7 +1875,7 @@ namespace Functions
                                          const unsigned int  component) const
   {
     Assert (component==0, ExcIndexRange(component,0,1));
-    return fourier_coefficients.square() * (-std::cos(fourier_coefficients * p));
+    return (fourier_coefficients * fourier_coefficients) * (-std::cos(fourier_coefficients * p));
   }
 
 
@@ -1887,7 +1887,7 @@ namespace Functions
 
   template <int dim>
   FourierSineFunction<dim>::
-  FourierSineFunction (const Point<dim> &fourier_coefficients)
+  FourierSineFunction (const Tensor<1,dim> &fourier_coefficients)
     :
     Function<dim> (1),
     fourier_coefficients (fourier_coefficients)
@@ -1923,7 +1923,7 @@ namespace Functions
                                        const unsigned int  component) const
   {
     Assert (component==0, ExcIndexRange(component,0,1));
-    return fourier_coefficients.square() * (-std::sin(fourier_coefficients * p));
+    return (fourier_coefficients * fourier_coefficients) * (-std::sin(fourier_coefficients * p));
   }
 
 
@@ -1994,7 +1994,7 @@ namespace Functions
     const unsigned int n = weights.size();
     double sum = 0;
     for (unsigned int s=0; s<n; ++s)
-      sum -= fourier_coefficients[s].square() * std::sin(fourier_coefficients[s] * p);
+      sum -= (fourier_coefficients[s] * fourier_coefficients[s]) * std::sin(fourier_coefficients[s] * p);
 
     return sum;
   }
@@ -2066,7 +2066,7 @@ namespace Functions
     const unsigned int n = weights.size();
     double sum = 0;
     for (unsigned int s=0; s<n; ++s)
-      sum -= fourier_coefficients[s].square() * std::cos(fourier_coefficients[s] * p);
+      sum -= (fourier_coefficients[s] * fourier_coefficients[s]) * std::cos(fourier_coefficients[s] * p);
 
     return sum;
   }

@@ -635,7 +635,7 @@ namespace Functions
      * Constructor. Take the Fourier coefficients in each space direction as
      * argument.
      */
-    FourierCosineFunction (const Point<dim> &fourier_coefficients);
+    FourierCosineFunction (const Tensor<1,dim> &fourier_coefficients);
 
     /**
      * Return the value of the function at the given point. Unless there is
@@ -662,7 +662,7 @@ namespace Functions
     /**
      * Stored Fourier coefficients.
      */
-    const Point<dim> fourier_coefficients;
+    const Tensor<1,dim> fourier_coefficients;
   };
 
 
@@ -687,7 +687,7 @@ namespace Functions
      * Constructor. Take the Fourier coefficients in each space direction as
      * argument.
      */
-    FourierSineFunction (const Point<dim> &fourier_coefficients);
+    FourierSineFunction (const Tensor<1,dim> &fourier_coefficients);
 
     /**
      * Return the value of the function at the given point. Unless there is
@@ -714,7 +714,7 @@ namespace Functions
     /**
      * Stored Fourier coefficients.
      */
-    const Point<dim> fourier_coefficients;
+    const Tensor<1,dim> fourier_coefficients;
   };
 
 
