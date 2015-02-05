@@ -2555,7 +2555,7 @@ protected:
   inline std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
   get_vector_data_ranges() const
   {
-	  return std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >();
+    return std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >();
   }
 
   /**

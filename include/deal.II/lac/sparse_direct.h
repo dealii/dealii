@@ -31,8 +31,8 @@
 #  include <umfpack.h>
 #endif
 
-// The following block is a fix for 
-// either not having UMFPACK 
+// The following block is a fix for
+// either not having UMFPACK
 // or using CLang with UMFPACK where apparently the symbol is not defined (maybe due to the symbol being in extern "C" block)?
 #ifndef SuiteSparse_long
 #define SuiteSparse_long long int
