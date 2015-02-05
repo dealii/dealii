@@ -2170,7 +2170,7 @@ next_cell:
                   gradient[d]
                     = ((objective_function (object, object_mid_point + h)
                         -
-                        objective_function (object, object_mid_point - h))
+                        objective_function (object, object_mid_point + (-h)))
                        /
                        eps);
                 else
@@ -2181,7 +2181,7 @@ next_cell:
                         -
                         objective_function (object,
                                             manifold->project_to_surface(object,
-                                                                         object_mid_point - h)))
+                                                                         object_mid_point + (-h))))
                        /
                        eps);
               }
