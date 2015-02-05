@@ -103,7 +103,7 @@ namespace DerivativeApproximation
 
       /**
        * Return the norm of the derivative object. Here, for the gradient, we
-       * choose the Euclidian norm of the gradient vector.
+       * choose the Euclidean norm of the gradient vector.
        */
       static double derivative_norm (const Derivative &d);
 
