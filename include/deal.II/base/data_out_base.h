@@ -2552,8 +2552,11 @@ protected:
    * fields.
    */
   virtual
-  std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
-  get_vector_data_ranges () const;
+  inline std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
+  get_vector_data_ranges() const
+  {
+	  return std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >();
+  }
 
   /**
    * The default number of subdivisions for patches. This is filled by
