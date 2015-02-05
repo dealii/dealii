@@ -786,7 +786,7 @@ unsigned int QGaussOneOverR<2>::quad_size(const Point<2> singularity,
     if ( ( std::abs(singularity[i]  ) < eps ) ||
          ( std::abs(singularity[i]-1) < eps ) )
       on_edge = true;
-  if (on_edge && (std::abs( (singularity-Point<2>(.5, .5)).square()-.5)
+  if (on_edge && (std::abs( (singularity-Point<2>(.5, .5)).norm_square()-.5)
                   < eps) )
     on_vertex = true;
   if (on_vertex) return (2*n*n);
