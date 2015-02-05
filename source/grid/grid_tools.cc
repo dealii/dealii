@@ -170,8 +170,8 @@ namespace GridTools
         std::vector<bool>::const_iterator pj = pi+1;
         for (unsigned int j=i+1; j<N; ++j, ++pj)
           if ((*pi==true) && (*pj==true) &&
-              ((vertices[i]-vertices[j]).square() > max_distance_sqr))
-            max_distance_sqr = (vertices[i]-vertices[j]).square();
+              ((vertices[i]-vertices[j]).norm_square() > max_distance_sqr))
+            max_distance_sqr = (vertices[i]-vertices[j]).norm_square();
       };
 
     return std::sqrt(max_distance_sqr);
@@ -1020,14 +1020,14 @@ namespace GridTools
     Assert(first != used.end(), ExcInternalError());
 
     unsigned int best_vertex = std::distance(used.begin(), first);
-    double       best_dist   = (p - vertices[best_vertex]).square();
+    double       best_dist   = (p - vertices[best_vertex]).norm_square();
 
     // For all remaining vertices, test
     // whether they are any closer
     for (unsigned int j = best_vertex+1; j < vertices.size(); j++)
       if (used[j])
         {
-          double dist = (p - vertices[j]).square();
+          double dist = (p - vertices[j]).norm_square();
           if (dist < best_dist)
             {
               best_vertex = j;
