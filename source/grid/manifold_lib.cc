@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -172,7 +172,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
   Point<spacedim> middle = flat_manifold.get_new_point(quad);
 
   double radius = 0;
-  Point<spacedim> on_plane;
+  Tensor<1,spacedim> on_plane;
 
   for (unsigned int i=0; i<surrounding_points.size(); ++i)
     {
@@ -184,8 +184,8 @@ get_new_point (const Quadrature<spacedim> &quad) const
   // we then have to project this point out to the given radius from
   // the axis. to this end, we have to take into account the offset
   // point_on_axis and the direction of the axis
-  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
-                                           ((middle-point_on_axis) * direction) * direction;
+  const Tensor<1,spacedim> vector_from_axis = (middle-point_on_axis) -
+					      ((middle-point_on_axis) * direction) * direction;
 
   // scale it to the desired length and put everything back together,
   // unless we have a point on the axis
