@@ -278,7 +278,7 @@ private:
  * points that make up geometric objects. As such, they have a small number of
  * additional operations over general tensors of rank 1 for which we use the
  * <tt>Tensor<1,dim,Number></tt> class. In particular, there is a distance()
- * function to compute the Euclidian distance between two points in space.
+ * function to compute the Euclidean distance between two points in space.
  *
  * However, the <tt>Point</tt> class is really only used where the coordinates
  * of an object can be thought to possess the dimension of a length. For all

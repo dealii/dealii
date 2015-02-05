@@ -166,7 +166,7 @@ namespace DerivativeApproximation
   /**
    * This function is used to obtain an approximation of the gradient. Pass it
    * the DoF handler object that describes the finite element field, a nodal
-   * value vector, and receive the cell-wise Euclidian norm of the
+   * value vector, and receive the cell-wise Euclidean norm of the
    * approximated gradient.
    *
    * The last parameter denotes the solution component, for which the gradient

@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
  * that make up geometric objects. As such, they have a small number of
  * additional operations over general tensors of rank 1 for which we use the
  * <tt>Tensor<1,dim></tt> class. In particular, there is a distance() function
- * to compute the Euclidian distance between two points in space.
+ * to compute the Euclidean distance between two points in space.
  *
  * The <tt>Point</tt> class is really only used where the coordinates of an
  * object can be thought to possess the dimension of a length. For all other
@@ -165,7 +165,7 @@ public:
   Number              square () const;
 
   /**
-   * Returns the Euclidian distance of <tt>this</tt> point to the point
+   * Returns the Euclidean distance of <tt>this</tt> point to the point
    * <tt>p</tt>, i.e. the <tt>l_2</tt> norm of the difference between the
    * vectors representing the two points.
    */
