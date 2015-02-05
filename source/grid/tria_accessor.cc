@@ -978,13 +978,13 @@ namespace
     // v_03, should be in the plane P_012 of vertices 0, 1 and 2.  Get
     // the normal vector of P_012 and test if v_03 is orthogonal to
     // that. If so, the face is planar and computing its area is simple.
-    const Point<3> v01 = accessor.vertex(1) - accessor.vertex(0);
-    const Point<3> v02 = accessor.vertex(2) - accessor.vertex(0);
+    const Tensor<1,3> v01 = accessor.vertex(1) - accessor.vertex(0);
+    const Tensor<1,3> v02 = accessor.vertex(2) - accessor.vertex(0);
 
-    Point<3> normal;
+    Tensor<1,3> normal;
     cross_product(normal, v01, v02);
 
-    const Point<3> v03 = accessor.vertex(3) - accessor.vertex(0);
+    const Tensor<1,3> v03 = accessor.vertex(3) - accessor.vertex(0);
 
     // check whether v03 does not lie in the plane of v01 and v02
     // (i.e., whether the face is not planar). we do so by checking
@@ -992,7 +992,7 @@ namespace
     // volume relative to |v01|*|v02|*|v03|. the test checks the
     // squares of these to avoid taking norms/square roots:
     if (std::abs((v03 * normal) * (v03 * normal) /
-                 (v03.square() * v01.square() * v02.square()))
+                 ((v03 * v03) * (v01 * v01) * (v02 * v02)))
         >=
         1e-24)
       {
@@ -1283,12 +1283,12 @@ bool CellAccessor<2>::point_inside (const Point<2> &p) const
     {
       // vector from the first vertex
       // of the line to the point
-      const Point<2> to_p = p-this->vertex(
-                              GeometryInfo<2>::face_to_cell_vertices(f,0));
+      const Tensor<1,2> to_p = p-this->vertex(
+	                         GeometryInfo<2>::face_to_cell_vertices(f,0));
       // vector describing the line
-      const Point<2> face = direction[f]*(
-                              this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,1)) -
-                              this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,0)));
+      const Tensor<1,2> face = direction[f]*(
+                                 this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,1)) -
+                                 this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,0)));
 
       // if we rotate the face vector
       // by 90 degrees to the left
@@ -1302,7 +1302,7 @@ bool CellAccessor<2>::point_inside (const Point<2> &p) const
       // is not the case, we can be
       // sure that the point is
       // outside
-      if ((-face(1)*to_p(0)+face(0)*to_p(1))<0)
+      if ((-face[1]*to_p[0]+face[0]*to_p[1])<0)
         return false;
     };
 
