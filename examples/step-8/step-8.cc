@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2014 by the deal.II authors
+ * Copyright (C) 2000 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -210,15 +210,15 @@ namespace Step8
     // If now the point <code>p</code> is in a circle (sphere) of radius 0.2
     // around one of these points, then set the force in x-direction to one,
     // otherwise to zero:
-    if (((p-point_1).square() < 0.2*0.2) ||
-        ((p-point_2).square() < 0.2*0.2))
+    if (((p-point_1).norm_square() < 0.2*0.2) ||
+        ((p-point_2).norm_square() < 0.2*0.2))
       values(0) = 1;
     else
       values(0) = 0;
 
     // Likewise, if <code>p</code> is in the vicinity of the origin, then set
     // the y-force to 1, otherwise to zero:
-    if (p.square() < 0.2*0.2)
+    if (p.norm_square() < 0.2*0.2)
       values(1) = 1;
     else
       values(1) = 0;
