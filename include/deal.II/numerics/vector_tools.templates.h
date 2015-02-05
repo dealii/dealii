@@ -2977,15 +2977,15 @@ namespace VectorTools
                 || ((dynamic_cast<const FE_Nedelec<dim>*> (&fe) != 0) && (line * fe.degree <= i)
                     && (i < (line + 1) * fe.degree)))
               {
-		const double tangential_solution_component
-		  = (values[q_point] (first_vector_component) * tangentials[q_point][0]
-		     + values[q_point] (first_vector_component + 1) * tangentials[q_point][1]
-		     + values[q_point] (first_vector_component + 2) * tangentials[q_point][2]);
+                const double tangential_solution_component
+                  = (values[q_point] (first_vector_component) * tangentials[q_point][0]
+                     + values[q_point] (first_vector_component + 1) * tangentials[q_point][1]
+                     + values[q_point] (first_vector_component + 2) * tangentials[q_point][2]);
                 dof_values[i]
                 += (fe_values.JxW (q_point)
                     * tangential_solution_component
                     * (fe_values[vec].value (fe.face_to_cell_index (i, face), q_point) *
-		       tangentials[q_point])
+                       tangentials[q_point])
                     / std::sqrt (jacobians[q_point][0][edge_coordinate_direction[face][line]]
                                  * jacobians[q_point][0][edge_coordinate_direction[face][line]]
                                  + jacobians[q_point][1][edge_coordinate_direction[face][line]]
@@ -3122,7 +3122,7 @@ namespace VectorTools
                                                  shifted_reference_point_2))
                   / tol;
               tangentials[q_point] /= tangentials[q_point].norm();
-	      
+
               // Compute the degrees
               // of freedom.
               for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
@@ -4473,7 +4473,7 @@ namespace VectorTools
                     Tensor<1,dim> normal_vector
                       = (cell->face(face_no)->get_boundary().normal_vector
                          (cell->face(face_no),
-			  fe_values.quadrature_point(i)));
+                          fe_values.quadrature_point(i)));
                     if (normal_vector * static_cast<Tensor<1,dim> >(fe_values.normal_vector(i)) < 0)
                       normal_vector *= -1;
                     Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,

@@ -406,7 +406,7 @@ namespace DoFRenumbering
   };
 
 
-  
+
   /**
    * A namespace for the implementation of some renumbering algorithms based
    * on algorithms implemented in the Boost Graph Library (BGL) by Jeremy Siek

@@ -185,7 +185,7 @@ get_new_point (const Quadrature<spacedim> &quad) const
   // the axis. to this end, we have to take into account the offset
   // point_on_axis and the direction of the axis
   const Tensor<1,spacedim> vector_from_axis = (middle-point_on_axis) -
-					      ((middle-point_on_axis) * direction) * direction;
+                                              ((middle-point_on_axis) * direction) * direction;
 
   // scale it to the desired length and put everything back together,
   // unless we have a point on the axis

@@ -594,7 +594,7 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
   Assert(n>0, ExcInternalError());
 
   const Tensor<1,spacedim> v0=p0-center,
-			   v1=p1-center;
+                           v1=p1-center;
   const double length=(v1-v0).norm();
 
   double eps=1e-12;
