@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,8 +74,8 @@ get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator
   // have to take into account the
   // offset point_on_axis and the
   // direction of the axis
-  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
-                                           ((middle-point_on_axis) * direction) * direction;
+  const Tensor<1,spacedim> vector_from_axis = (middle-point_on_axis) -
+                                              ((middle-point_on_axis) * direction) * direction;
   // scale it to the desired length
   // and put everything back
   // together, unless we have a point
@@ -100,8 +100,8 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
   // same algorithm as above
   const unsigned int spacedim = 3;
 
-  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
-                                           ((middle-point_on_axis) * direction) * direction;
+  const Tensor<1,spacedim> vector_from_axis = (middle-point_on_axis) -
+                                              ((middle-point_on_axis) * direction) * direction;
   if (vector_from_axis.norm() <= 1e-10 * middle.norm())
     return middle;
   else
@@ -119,8 +119,8 @@ get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const
 
   // same algorithm as above
   const unsigned int spacedim = 3;
-  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
-                                           ((middle-point_on_axis) * direction) * direction;
+  const Tensor<1,spacedim> vector_from_axis = (middle-point_on_axis) -
+                                              ((middle-point_on_axis) * direction) * direction;
   if (vector_from_axis.norm() <= 1e-10 * middle.norm())
     return middle;
   else
