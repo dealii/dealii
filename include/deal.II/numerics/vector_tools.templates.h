@@ -2889,7 +2889,7 @@ namespace VectorTools
       const std::vector<Point<dim> > &
       quadrature_points = fe_values.get_quadrature_points ();
 
-      std::vector<Point<dim> > tangentials (fe_values.n_quadrature_points);
+      std::vector<Tensor<1,dim> > tangentials (fe_values.n_quadrature_points);
       std::vector<Vector<double> > values (fe_values.n_quadrature_points,
                                            Vector<double> (fe.n_components ()));
 
@@ -2962,8 +2962,7 @@ namespace VectorTools
                 .transform_unit_to_real_cell (cell,
                                               shifted_reference_point_2))
                / tol);
-          tangentials[q_point]
-          /= std::sqrt (tangentials[q_point].square ());
+          tangentials[q_point] /= tangentials[q_point].norm();
 
           // Compute the degrees of
           // freedom.
@@ -2978,12 +2977,15 @@ namespace VectorTools
                 || ((dynamic_cast<const FE_Nedelec<dim>*> (&fe) != 0) && (line * fe.degree <= i)
                     && (i < (line + 1) * fe.degree)))
               {
+		const double tangential_solution_component
+		  = (values[q_point] (first_vector_component) * tangentials[q_point][0]
+		     + values[q_point] (first_vector_component + 1) * tangentials[q_point][1]
+		     + values[q_point] (first_vector_component + 2) * tangentials[q_point][2]);
                 dof_values[i]
                 += (fe_values.JxW (q_point)
-                    * (values[q_point] (first_vector_component) * tangentials[q_point] (0)
-                       + values[q_point] (first_vector_component + 1) * tangentials[q_point] (1)
-                       + values[q_point] (first_vector_component + 2) * tangentials[q_point] (2))
-                    * (fe_values[vec].value (fe.face_to_cell_index (i, face), q_point) * tangentials[q_point])
+                    * tangential_solution_component
+                    * (fe_values[vec].value (fe.face_to_cell_index (i, face), q_point) *
+		       tangentials[q_point])
                     / std::sqrt (jacobians[q_point][0][edge_coordinate_direction[face][line]]
                                  * jacobians[q_point][0][edge_coordinate_direction[face][line]]
                                  + jacobians[q_point][1][edge_coordinate_direction[face][line]]
@@ -3075,8 +3077,7 @@ namespace VectorTools
         case 2:
         {
           const double tol = 0.5 * cell->face (face)->diameter () / cell->get_fe ().degree;
-          std::vector<Point<dim> >
-          tangentials (fe_values.n_quadrature_points);
+          std::vector<Tensor<1,dim> > tangentials (fe_values.n_quadrature_points);
 
           const std::vector<Point<dim> > &
           reference_quadrature_points = fe_values.get_quadrature ().get_points ();
@@ -3120,8 +3121,8 @@ namespace VectorTools
                    .transform_unit_to_real_cell (cell,
                                                  shifted_reference_point_2))
                   / tol;
-              tangentials[q_point]
-              /= std::sqrt (tangentials[q_point].square ());
+              tangentials[q_point] /= tangentials[q_point].norm();
+	      
               // Compute the degrees
               // of freedom.
               for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
@@ -3132,9 +3133,9 @@ namespace VectorTools
                     dof_values[i]
                     += fe_values.JxW (q_point)
                        * (values[q_point] (first_vector_component)
-                          * tangentials[q_point] (0)
+                          * tangentials[q_point][0]
                           + values[q_point] (first_vector_component + 1)
-                          * tangentials[q_point] (1))
+                          * tangentials[q_point][1])
                        * (fe_values[vec].value (fe.face_to_cell_index (i, face), q_point)
                           * tangentials[q_point]);
 
@@ -4469,10 +4470,11 @@ namespace VectorTools
                     // sign of the normal vector provided by the boundary
                     // if they should point in different directions. this is the
                     // case in tests/deal.II/no_flux_11.
-                    Point<dim> normal_vector
+                    Tensor<1,dim> normal_vector
                       = (cell->face(face_no)->get_boundary().normal_vector
-                         (cell->face(face_no), fe_values.quadrature_point(i)));
-                    if (normal_vector * fe_values.normal_vector(i) < 0)
+                         (cell->face(face_no),
+			  fe_values.quadrature_point(i)));
+                    if (normal_vector * static_cast<Tensor<1,dim> >(fe_values.normal_vector(i)) < 0)
                       normal_vector *= -1;
                     Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,
                             ExcInternalError());
@@ -5249,8 +5251,8 @@ namespace VectorTools
             for (unsigned int k=0; k<n_components; ++k)
               for (unsigned int q=0; q<n_q_points; ++q)
                 data.psi_grads[q][k] -= (data.function_grads[q][k] +
-                                         (data.psi_grads[q][k]* // (f.n) n
-                                          fe_values.normal_vector(q))*
+                                         (data.psi_grads[q][k] * // (f.n) n
+                                          Tensor<1,spacedim>(fe_values.normal_vector(q)))*
                                          fe_values.normal_vector(q));
           else
             for (unsigned int k=0; k<n_components; ++k)
