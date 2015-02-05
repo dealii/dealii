@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ void check_this (Triangulation<3> &tria)
             for (unsigned int q=0; q<quadrature.size(); ++q)
               {
                 Assert ((fe_face_values1.quadrature_point(q)-
-                         fe_face_values2.quadrature_point(q)).square()
+                         fe_face_values2.quadrature_point(q)).norm_square()
                         < 1e-20,
                         ExcInternalError());
 
@@ -86,7 +86,7 @@ void check_this (Triangulation<3> &tria)
                                   fe_face_values2.JxW(q)) < 1e-15,
                         ExcInternalError());
                 Assert ((fe_face_values1.normal_vector(q) +
-                         fe_face_values2.normal_vector(q)).square()
+                         fe_face_values2.normal_vector(q)).norm_square()
                         < 1e-20,
                         ExcInternalError());
               }
