@@ -903,7 +903,7 @@ namespace
   {
     // remember that we use (dim-)linear
     // mappings
-    return std::sqrt((accessor.vertex(1)-accessor.vertex(0)).square());
+    return (accessor.vertex(1)-accessor.vertex(0)).norm();
   }
 
 
