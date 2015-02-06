@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2013 - 2014 by the deal.II authors
+ * Copyright (C) 2013 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -154,8 +154,8 @@ namespace Step51
     double return_value = 0;
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
-        const Point<dim> x_minus_xi = p - this->source_centers[i];
-        return_value += std::exp(-x_minus_xi.square() /
+        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
+        return_value += std::exp(-x_minus_xi.norm_square() /
                                  (this->width * this->width));
       }
 
@@ -173,10 +173,10 @@ namespace Step51
 
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
-        const Point<dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
 
         return_value += (-2 / (this->width * this->width) *
-                         std::exp(-x_minus_xi.square() /
+                         std::exp(-x_minus_xi.norm_square() /
                                   (this->width * this->width)) *
                          x_minus_xi);
       }
@@ -285,13 +285,13 @@ namespace Step51
     double return_value = 0;
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
-        const Point<dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
 
         return_value +=
-          ((2*dim - 2*convection*x_minus_xi - 4*x_minus_xi.square()/
+          ((2*dim - 2*convection*x_minus_xi - 4*x_minus_xi.norm_square()/
             (this->width * this->width)) /
            (this->width * this->width) *
-           std::exp(-x_minus_xi.square() /
+           std::exp(-x_minus_xi.norm_square() /
                     (this->width * this->width)));
       }
 
