@@ -2315,7 +2315,7 @@ GeometryInfo<1>::cell_to_child_coordinates (const Point<1>         &p,
           ExcInternalError());
   (void)refine_case; // removes -Wunused-parameter warning in optimized mode
 
-  return p*2.0-unit_cell_vertex(child_index);
+  return Point<1>(p*2.0-unit_cell_vertex(child_index));
 }
 
 
