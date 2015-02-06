@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -863,8 +863,8 @@ namespace DerivativeApproximation
           // direction between
           // the centers of two
           // cells
-          Point<dim>   y        = neighbor_center - this_center;
-          const double distance = std::sqrt(y.square());
+          Tensor<1,dim> y        = neighbor_center - this_center;
+          const double  distance = y.norm();
           // normalize y
           y /= distance;
           // *** note that unlike in
