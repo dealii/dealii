@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -825,7 +825,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   double eps = 1e-8;
   unsigned int q_id = 0; // Current quad point index.
   double area = 0;
-  Point<2> dist;
+  Tensor<1,2> dist;
 
   for (unsigned int box=0; box<4; ++box)
     {
