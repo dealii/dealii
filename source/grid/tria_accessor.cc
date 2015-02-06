@@ -1003,8 +1003,8 @@ namespace
 
     // the face is planar. then its area is 1/2 of the norm of the
     // cross product of the two diagonals
-    const Point<3> v12 = accessor.vertex(2) - accessor.vertex(1);
-    Point<3> twice_area;
+    const Tensor<1,3> v12 = accessor.vertex(2) - accessor.vertex(1);
+    Tensor<1,3> twice_area;
     cross_product(twice_area, v03, v12);
     return 0.5 * twice_area.norm();
   }
