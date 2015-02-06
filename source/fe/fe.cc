@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,8 +64,8 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim,spacedim> *element,
   differences.resize(2*dim);
   for (unsigned int d=0; d<dim; ++d)
     {
-      Point<dim> shift;
-      shift (d) = fd_step_length;
+      Tensor<1,dim> shift;
+      shift[d] = fd_step_length;
 
       // generate points and FEValues
       // objects shifted in
