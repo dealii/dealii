@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -132,7 +132,7 @@ private:
   /**
    * Helper object. Contains the increment vector for the formula.
    */
-  std::vector<Point<dim> > incr;
+  std::vector<Tensor<1,dim> > incr;
 };
 
 DEAL_II_NAMESPACE_CLOSE

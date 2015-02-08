@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -74,8 +74,8 @@ get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator
   // have to take into account the
   // offset point_on_axis and the
   // direction of the axis
-  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
-                                           ((middle-point_on_axis) * direction) * direction;
+  const Tensor<1,spacedim> vector_from_axis = (middle-point_on_axis) -
+                                              ((middle-point_on_axis) * direction) * direction;
   // scale it to the desired length
   // and put everything back
   // together, unless we have a point
@@ -100,8 +100,8 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
   // same algorithm as above
   const unsigned int spacedim = 3;
 
-  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
-                                           ((middle-point_on_axis) * direction) * direction;
+  const Tensor<1,spacedim> vector_from_axis = (middle-point_on_axis) -
+                                              ((middle-point_on_axis) * direction) * direction;
   if (vector_from_axis.norm() <= 1e-10 * middle.norm())
     return middle;
   else
@@ -119,8 +119,8 @@ get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const
 
   // same algorithm as above
   const unsigned int spacedim = 3;
-  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
-                                           ((middle-point_on_axis) * direction) * direction;
+  const Tensor<1,spacedim> vector_from_axis = (middle-point_on_axis) -
+                                              ((middle-point_on_axis) * direction) * direction;
   if (vector_from_axis.norm() <= 1e-10 * middle.norm())
     return middle;
   else
@@ -173,8 +173,8 @@ CylinderBoundary<dim,spacedim>::get_intermediate_points_between_points (
       const double x = line_points[i+1][0];
       const Point<spacedim> middle = (1-x)*v0 + x*v1;
 
-      const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
-                                               ((middle-point_on_axis) * direction) * direction;
+      const Tensor<1,spacedim> vector_from_axis = (middle-point_on_axis) -
+                                                  ((middle-point_on_axis) * direction) * direction;
       if (vector_from_axis.norm() <= 1e-10 * middle.norm())
         points[i] = middle;
       else
@@ -252,8 +252,8 @@ get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterat
     {
       const Point<spacedim> vertex = face->vertex(v);
 
-      const Point<spacedim> vector_from_axis = (vertex-point_on_axis) -
-                                               ((vertex-point_on_axis) * direction) * direction;
+      const Tensor<1,spacedim> vector_from_axis = (vertex-point_on_axis) -
+                                                  ((vertex-point_on_axis) * direction) * direction;
 
       face_vertex_normals[v] = (vector_from_axis / vector_from_axis.norm());
     }
@@ -305,7 +305,7 @@ get_intermediate_points_between_points (const Point<dim> &p0,
                                         std::vector<Point<dim> > &points) const
 {
   const unsigned int n = points.size ();
-  const Point<dim> axis = x_1 - x_0;
+  const Tensor<1,dim> axis = x_1 - x_0;
 
   Assert (n > 0, ExcInternalError ());
 
@@ -319,7 +319,7 @@ get_intermediate_points_between_points (const Point<dim> &p0,
       const Point<dim> x_i = (1-x)*p0 + x*p1;
       // To project this point on the boundary of the cone we first compute
       // the orthogonal projection of this point onto the axis of the cone.
-      const double c = (x_i - x_0) * axis / axis.square ();
+      const double c = (x_i - x_0) * axis / (axis*axis);
       const Point<dim> x_ip = x_0 + c * axis;
       // Compute the projection of the middle point on the boundary of the
       // cone.
@@ -332,12 +332,12 @@ Point<dim>
 ConeBoundary<dim>::
 get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
 {
-  const Point<dim> axis = x_1 - x_0;
+  const Tensor<1,dim> axis = x_1 - x_0;
   // Compute the middle point of the line.
   const Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
   // To project it on the boundary of the cone we first compute the orthogonal
   // projection of the middle point onto the axis of the cone.
-  const double c = (middle - x_0) * axis / axis.square ();
+  const double c = (middle - x_0) * axis / (axis*axis);
   const Point<dim> middle_p = x_0 + c * axis;
   // Compute the projection of the middle point on the boundary of the cone.
   return middle_p + get_radius (middle_p) * (middle - middle_p) / (middle - middle_p).norm ();
@@ -352,13 +352,13 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 {
   const int dim = 3;
 
-  const Point<dim> axis = x_1 - x_0;
+  const Tensor<1,dim> axis = x_1 - x_0;
   // Compute the middle point of the quad.
   const Point<dim> middle = StraightBoundary<3,3>::get_new_point_on_quad (quad);
   // Same algorithm as above: To project it on the boundary of the cone we
   // first compute the orthogonal projection of the middle point onto the axis
   // of the cone.
-  const double c = (middle - x_0) * axis / axis.square ();
+  const double c = (middle - x_0) * axis / (axis*axis);
   const Point<dim> middle_p = x_0 + c * axis;
   // Compute the projection of the middle point on the boundary of the cone.
   return middle_p + get_radius (middle_p) * (middle - middle_p) / (middle - middle_p).norm ();
@@ -458,13 +458,13 @@ ConeBoundary<dim>::
 get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
                          typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
 {
-  const Point<dim> axis = x_1 - x_0;
+  const Tensor<1,dim> axis = x_1 - x_0;
 
   for (unsigned int vertex = 0; vertex < GeometryInfo<dim>::vertices_per_cell; ++vertex)
     {
       // Compute the orthogonal projection of the vertex onto the axis of the
       // cone.
-      const double c = (face->vertex (vertex) - x_0) * axis / axis.square ();
+      const double c = (face->vertex (vertex) - x_0) * axis / (axis*axis);
       const Point<dim> vertex_p = x_0 + c * axis;
       // Then compute the vector pointing from the point <tt>vertex_p</tt> on
       // the axis to the vertex.
@@ -593,9 +593,9 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
 
-  const Point<spacedim> v0=p0-center,
-                        v1=p1-center;
-  const double length=std::sqrt((v1-v0).square());
+  const Tensor<1,spacedim> v0=p0-center,
+                           v1=p1-center;
+  const double length=(v1-v0).norm();
 
   double eps=1e-12;
   double r=0;
@@ -609,10 +609,10 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
 
 
   const double r2=r*r;
-  Assert(std::fabs(v0.square()-r2)<eps*r2, ExcInternalError());
-  Assert(std::fabs(v1.square()-r2)<eps*r2, ExcInternalError());
+  Assert(std::fabs(v0*v0-r2)<eps*r2, ExcInternalError());
+  Assert(std::fabs(v1*v1-r2)<eps*r2, ExcInternalError());
 
-  const double alpha=std::acos((v0*v1)/std::sqrt(v0.square()*v1.square()));
+  const double alpha=std::acos((v0*v1)/std::sqrt((v0*v0)*(v1*v1)));
   const Point<spacedim> pm=0.5*(v0+v1);
 
   const double h=std::sqrt(pm.square());

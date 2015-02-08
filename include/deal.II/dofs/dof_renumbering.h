@@ -350,7 +350,7 @@ namespace DoFRenumbering
     /**
      * Constructor.
      */
-    CompareDownstream (const Point<dim> &dir)
+    CompareDownstream (const Tensor<1,dim> &dir)
       :
       dir(dir)
     {}
@@ -359,7 +359,7 @@ namespace DoFRenumbering
      */
     bool operator () (const Iterator &c1, const Iterator &c2) const
     {
-      const Point<dim> diff = c2->center() - c1->center();
+      const Tensor<1,dim> diff = c2->center() - c1->center();
       return (diff*dir > 0);
     }
 
@@ -367,7 +367,7 @@ namespace DoFRenumbering
     /**
      * Flow direction.
      */
-    const Point<dim> dir;
+    const Tensor<1,dim> dir;
   };
 
 
@@ -384,7 +384,7 @@ namespace DoFRenumbering
     /**
      * Constructor.
      */
-    ComparePointwiseDownstream (const Point<dim> &dir)
+    ComparePointwiseDownstream (const Tensor<1,dim> &dir)
       :
       dir(dir)
     {}
@@ -394,7 +394,7 @@ namespace DoFRenumbering
     bool operator () (const std::pair<Point<dim>,types::global_dof_index> &c1,
                       const std::pair<Point<dim>,types::global_dof_index> &c2) const
     {
-      const Point<dim> diff = c2.first-c1.first;
+      const Tensor<1,dim> diff = c2.first-c1.first;
       return (diff*dir > 0 || (diff*dir==0 && c1.second<c2.second));
     }
 
@@ -402,8 +402,10 @@ namespace DoFRenumbering
     /**
      * Flow direction.
      */
-    const Point<dim> dir;
+    const Tensor<1,dim> dir;
   };
+
+
 
   /**
    * A namespace for the implementation of some renumbering algorithms based

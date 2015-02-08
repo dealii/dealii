@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2014 by the deal.II authors
+ * Copyright (C) 2000 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -329,7 +329,7 @@ namespace Step9
   {
     Assert (component == 0, ExcIndexRange (component, 0, 1));
     const double diameter = 0.1;
-    return ( (p-center_point).square() < diameter*diameter ?
+    return ( (p-center_point).norm_square() < diameter*diameter ?
              .1/std::pow(diameter,dim) :
              0);
   }
@@ -376,8 +376,8 @@ namespace Step9
   {
     Assert (component == 0, ExcIndexRange (component, 0, 1));
 
-    const double sine_term = std::sin(16*numbers::PI*std::sqrt(p.square()));
-    const double weight    = std::exp(-5*p.square()) / std::exp(-5.);
+    const double sine_term = std::sin(16*numbers::PI*std::sqrt(p.norm_square()));
+    const double weight    = std::exp(-5*p.norm_square()) / std::exp(-5.);
     return sine_term * weight;
   }
 
@@ -1254,8 +1254,8 @@ namespace Step9
         // two cells. Note that as opposed to the introduction, we denote
         // by <code>y</code> the normalized difference vector, as this is
         // the quantity used everywhere in the computations.
-        Point<dim>   y        = neighbor_center - this_center;
-        const double distance = std::sqrt(y.square());
+        Tensor<1,dim> y        = neighbor_center - this_center;
+        const double  distance = y.norm();
         y /= distance;
 
         // Then add up the contribution of this cell to the Y matrix...
@@ -1300,7 +1300,7 @@ namespace Step9
     // using this quantity and the right powers of the mesh width:
     const Tensor<2,dim> Y_inverse = invert(Y);
 
-    Point<dim> gradient;
+    Tensor<1,dim> gradient;
     contract (gradient, Y_inverse, projected_gradient);
 
     // The last part of this function is the one where we
@@ -1311,7 +1311,7 @@ namespace Step9
     // difficult:
     *(std_cxx11::get<1>(cell.iterators)) = (std::pow(std_cxx11::get<0>(cell.iterators)->diameter(),
                                                      1+1.0*dim/2) *
-                                            std::sqrt(gradient.square()));
+                                            std::sqrt(gradient.norm_square()));
 
   }
 }

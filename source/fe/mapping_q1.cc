@@ -1938,8 +1938,8 @@ transform_real_to_unit_cell_internal_codim1
 
   Point<spacedim1> p_minus_F;
 
-  Point<spacedim1>  DF[dim1];
-  Point<spacedim1>  D2F[dim1][dim1];
+  Tensor<1,spacedim1>  DF[dim1];
+  Tensor<1,spacedim1>  D2F[dim1][dim1];
 
   Point<dim1> p_unit = initial_p_unit;
   Point<dim1> f;
