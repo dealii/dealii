@@ -419,7 +419,7 @@ public:
      * Apply the constraints to a right hand side vector. This needs to be done
      * before starting to solve with the filtered matrix.
      */
-  void apply_constraints (VECTOR     &v) const;
+  void apply_constraints (VECTOR     &v) const DEAL_II_DEPRECATED;
 
   /**
    * Matrix-vector multiplication: this operation performs pre_filter(),
