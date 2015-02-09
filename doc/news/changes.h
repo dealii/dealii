@@ -292,6 +292,19 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Changed: We have traditionally used Point@<dim@> to represent points
+  in physical space, i.e., vectors that are anchored at the origin, whereas
+  for vectors anchored elsewhere (e.g., differences between points, normal
+  vectors, gradients, etc) we have used Tensor@<1,dim@>. This has now be
+  made more formal in the documentation but also in the return types of
+  <code>operator-()</code> for Point objects: The difference between two
+  points, <code>p1-p2</code> now returns a Tensor@<1,dim@>. On the other
+  hand, subtracting a Tensor@<1,dim@> object from a Point, <code>p-t</code>,
+  results in a Point@<dim@>.
+  <br>
+  (Wolfgang Bangerth, 2015/02/05)
+  </li>
+
   <li> New: Examples from 1 to 16 now use the Manifold interface
   instead of the old Boundary interface to describe curved boundaries
   and domains.
