@@ -410,9 +410,15 @@ public:
    * before starting to solve with the filtered matrix. If the matrix is
    * symmetric (i.e. the matrix itself, not only its sparsity pattern), set
    * the second parameter to @p true to use a faster algorithm.
+   * Note: This method is deprecated as matrix_is_symmetric parameter is no longer used.
    */
   void apply_constraints (VECTOR     &v,
-                          const bool  matrix_is_symmetric) const;
+                          const bool  matrix_is_symmetric) const DEAL_II_DEPRECATED;
+  /**
+   * Apply the constraints to a right hand side vector. This needs to be done
+   * before starting to solve with the filtered matrix.
+   */
+  void apply_constraints (VECTOR     &v) const;
 
   /**
    * Matrix-vector multiplication: this operation performs pre_filter(),
@@ -812,6 +818,16 @@ FilteredMatrix<VECTOR>::apply_constraints (
   VECTOR     &v,
   const bool  /* matrix_is_symmetric */) const
 {
+  apply_constraints(v);
+}
+
+
+template <class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::apply_constraints (
+  VECTOR     &v) const
+{
   GrowingVectorMemory<VECTOR> mem;
   typename VectorMemory<VECTOR>::Pointer tmp_vector(mem);
   tmp_vector->reinit(v);
@@ -835,7 +851,6 @@ FilteredMatrix<VECTOR>::apply_constraints (
       v(i->first) = i->second;
     }
 }
-
 
 
 template <class VECTOR>
