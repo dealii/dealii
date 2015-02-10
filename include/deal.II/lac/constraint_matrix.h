@@ -530,9 +530,13 @@ public:
    * referring to <tt>condensed</tt>. Therefore, the dimension of
    * <tt>condensed</tt> is the dimension of <tt>uncondensed</tt> minus the
    * number of constrained degrees of freedom.
+   *
+   * @deprecated The functions converting an uncondensed matrix into its
+   * condensed form are deprecated. Use the functions doing the in-place
+   * condensation leaving the size of the linear system unchanged.
    */
   void condense (const SparsityPattern &uncondensed,
-                 SparsityPattern       &condensed) const;
+                 SparsityPattern       &condensed) const DEAL_II_DEPRECATED;
 
 
   /**
