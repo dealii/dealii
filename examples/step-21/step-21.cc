@@ -411,7 +411,7 @@ namespace Step21
 
           double permeability = 0;
           for (unsigned int i=0; i<centers.size(); ++i)
-            permeability += std::exp(-(points[p]-centers[i]).square()
+            permeability += std::exp(-(points[p]-centers[i]).norm_square()
                                      / (0.05 * 0.05));
 
           const double normalized_permeability
