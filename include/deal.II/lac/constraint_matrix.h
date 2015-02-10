@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -536,14 +536,22 @@ public:
 
 
   /**
-   * This function does much the same as the above one, except that it
-   * condenses the matrix struct 'in-place'. It does not remove nonzero
-   * entries from the matrix but adds those needed for the process of
-   * distribution of the constrained degrees of freedom.
+   * Condense a sparsity pattern. The name of the function mimics the
+   * name of the function we use to condense linear systems, but it is
+   * a bit of a misnomer for the current context. This is because in
+   * the context of linear systems, we eliminate certain rows and
+   * columns of the linear system, i.e., we "reduce" or "condense" the
+   * linear system. On the other hand, in the current context, the
+   * functions does not remove nonzero entries from the sparsity
+   * pattern. Rather, it adds those nonzero entry locations to the
+   * sparsity pattern that will later be needed for the process of
+   * condensation of constrained degrees of freedom from a linear
+   * system.
    *
-   * Since this function adds new nonzero entries to the sparsity pattern, the
-   * argument must not be compressed. However the constraint matrix must be
-   * closed. The matrix struct is compressed at the end of the function.
+   * Since this function adds new nonzero entries to the sparsity
+   * pattern, the given sparsity pattern must not be compressed. The
+   * constraint matrix (i.e., the current object) must be closed. The
+   * sparsity pattern is compressed at the end of the function.
    */
   void condense (SparsityPattern &sparsity) const;
 
@@ -627,8 +635,10 @@ public:
                  SparseMatrix<number>       &condensed) const DEAL_II_DEPRECATED;
 
   /**
-   * This function does much the same as the above one, except that it
-   * condenses the matrix 'in-place'. See the general documentation of this
+   * Condense a given matrix, i.e., eliminate the rows and columns of
+   * the matrix that correspond to constrained degrees of freedom.
+   *
+   * See the general documentation of this
    * class for more detailed information.
    */
   template<typename number>
@@ -665,13 +675,16 @@ public:
                  VectorType       &output) const;
 
   /**
-   * Condense a given matrix and a given vector. The associated matrix struct
-   * should be condensed and compressed. It is the user's responsibility to
-   * guarantee that all entries in the @p condensed matrix and vector be zero!
-   * This function is the appropriate choice for applying inhomogeneous
-   * constraints.
+   * Condense a given matrix and a given vector by eliminating rows
+   * and columns of the linear system that correspond to constrained
+   * degrees of freedom. The sparsity pattern associated with the
+   * matrix needs to be condensed and compressed.  This function is
+   * the appropriate choice for applying inhomogeneous constraints.
    *
    * The constraint matrix object must be closed to call this function.
+   *
+   * See the general documentation of this
+   * class for more detailed information.
    *
    * @deprecated The functions converting an uncondensed matrix into its
    * condensed form are deprecated. Use the functions doing the in-place
@@ -684,9 +697,16 @@ public:
                  VectorType                 &condensed_vector) const DEAL_II_DEPRECATED;
 
   /**
-   * This function does much the same as the above one, except that it
-   * condenses matrix and vector 'in-place'. See the general documentation of
-   * this class for more detailed information.
+   * Condense a given matrix and a given vector by eliminating rows
+   * and columns of the linear system that correspond to constrained
+   * degrees of freedom. The sparsity pattern associated with the
+   * matrix needs to be condensed and compressed.  This function is
+   * the appropriate choice for applying inhomogeneous constraints.
+   *
+   * The constraint matrix object must be closed to call this function.
+   *
+   * See the general documentation of this
+   * class for more detailed information.
    */
   template<typename number, class VectorType>
   void condense (SparseMatrix<number> &matrix,
