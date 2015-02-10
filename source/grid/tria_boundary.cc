@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -628,7 +628,7 @@ normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
           for (unsigned int k=0; k<spacedim; ++k)
             H[i][j] += grad_F[i][k] * grad_F[j][k];
 
-      const Point<facedim> delta_xi = -invert(H) * J;
+      const Tensor<1,facedim> delta_xi = -invert(H) * J;
       xi += delta_xi;
 
       if (delta_xi.norm() < eps)
@@ -847,7 +847,7 @@ namespace internal
               H_k += (object->vertex(i) * object->vertex(j)) * tmp;
             }
 
-        const Point<dim> delta_xi = - invert(H_k) * F_k;
+        const Tensor<1,dim> delta_xi = - invert(H_k) * F_k;
         xi += delta_xi;
 
         x_k = Point<spacedim>();

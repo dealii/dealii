@@ -2060,11 +2060,11 @@ is_translation_of (const TriaIterator<TriaAccessor<structdim,dim,spacedim> > &o)
   // times the distance between the zeroth
   // vertices here.
   bool is_translation = true;
-  const Point<spacedim> dist = o->vertex(0) - this->vertex(0);
+  const Tensor<1,spacedim> dist = o->vertex(0) - this->vertex(0);
   const double tol_square = 1e-24 * dist.norm_square();
   for (unsigned int i=1; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
     {
-      const Point<spacedim> dist_new = (o->vertex(i) - this->vertex(i)) - dist;
+      const Tensor<1,spacedim> dist_new = (o->vertex(i) - this->vertex(i)) - dist;
       if (dist_new.norm_square() > tol_square)
         {
           is_translation = false;

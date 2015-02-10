@@ -1039,7 +1039,7 @@ namespace internal
                   }
 
                 if (update_flags & update_normal_vectors)
-                  normal_vectors[i] = boundary_forms[i] / boundary_forms[i].norm();
+                  normal_vectors[i] = Point<spacedim>(boundary_forms[i] / boundary_forms[i].norm());
               }
 
           if (update_flags & update_jacobians)
@@ -1720,10 +1720,10 @@ transform_real_to_unit_cell_internal
 
   compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
   Point<spacedim> p_real = transform_unit_to_real_cell_internal(mdata);
-  Point<spacedim> f = p_real-p;
+  Tensor<1,spacedim> f = p_real-p;
 
   // early out if we already have our point
-  if (f.square() < 1e-24 * cell->diameter() * cell->diameter())
+  if (f.norm_square() < 1e-24 * cell->diameter() * cell->diameter())
     return p_unit;
 
   // we need to compare the position of the computed p(x) against the given
@@ -1809,7 +1809,7 @@ transform_real_to_unit_cell_internal
 
           // f(x)
           Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal(mdata);
-          const Point<spacedim> f_trial = p_real_trial-p;
+          const Tensor<1,spacedim> f_trial = p_real_trial-p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
           std::cout << "     step_length=" << step_length << std::endl

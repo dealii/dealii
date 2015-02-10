@@ -83,9 +83,9 @@ get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator
   if (vector_from_axis.norm() <= 1e-10 * middle.norm())
     return middle;
   else
-    return (vector_from_axis / vector_from_axis.norm() * radius +
-            ((middle-point_on_axis) * direction) * direction +
-            point_on_axis);
+    return Point<spacedim>(vector_from_axis / vector_from_axis.norm() * radius +
+                           ((middle-point_on_axis) * direction) * direction +
+                           point_on_axis);
 }
 
 
@@ -105,9 +105,9 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
   if (vector_from_axis.norm() <= 1e-10 * middle.norm())
     return middle;
   else
-    return (vector_from_axis / vector_from_axis.norm() * radius +
-            ((middle-point_on_axis) * direction) * direction +
-            point_on_axis);
+    return Point<3>(vector_from_axis / vector_from_axis.norm() * radius +
+                    ((middle-point_on_axis) * direction) * direction +
+                    point_on_axis);
 }
 
 template<>
@@ -124,9 +124,9 @@ get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const
   if (vector_from_axis.norm() <= 1e-10 * middle.norm())
     return middle;
   else
-    return (vector_from_axis / vector_from_axis.norm() * radius +
-            ((middle-point_on_axis) * direction) * direction +
-            point_on_axis);
+    return Point<3>(vector_from_axis / vector_from_axis.norm() * radius +
+                    ((middle-point_on_axis) * direction) * direction +
+                    point_on_axis);
 }
 
 
@@ -178,9 +178,9 @@ CylinderBoundary<dim,spacedim>::get_intermediate_points_between_points (
       if (vector_from_axis.norm() <= 1e-10 * middle.norm())
         points[i] = middle;
       else
-        points[i] = (vector_from_axis / vector_from_axis.norm() * radius +
-                     ((middle-point_on_axis) * direction) * direction +
-                     point_on_axis);
+        points[i] = Point<spacedim>(vector_from_axis / vector_from_axis.norm() * radius +
+                                    ((middle-point_on_axis) * direction) * direction +
+                                    point_on_axis);
     }
 }
 
@@ -468,7 +468,7 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
       const Point<dim> vertex_p = x_0 + c * axis;
       // Then compute the vector pointing from the point <tt>vertex_p</tt> on
       // the axis to the vertex.
-      const Point<dim> axis_to_vertex = face->vertex (vertex) - vertex_p;
+      const Tensor<1,dim> axis_to_vertex = face->vertex (vertex) - vertex_p;
 
       face_vertex_normals[vertex] = axis_to_vertex / axis_to_vertex.norm ();
     }
@@ -498,12 +498,10 @@ HyperBallBoundary<dim,spacedim>::get_new_point_on_line (const typename Triangula
 
   double r=0;
   if (compute_radius_automatically)
-    {
-      const Point<spacedim> vertex_relative = line->vertex(0) - center;
-      r = std::sqrt(vertex_relative.square());
-    }
+    r = (line->vertex(0) - center).norm();
   else
-    r=radius;
+    r = radius;
+
   // project to boundary
   middle *= r / std::sqrt(middle.square());
   middle += center;
@@ -544,12 +542,10 @@ get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator
 
   double r=0;
   if (compute_radius_automatically)
-    {
-      const Point<spacedim> vertex_relative = quad->vertex(0) - center;
-      r = std::sqrt(vertex_relative.square());
-    }
+    r = (quad->vertex(0) - center).norm();
   else
-    r=radius;
+    r = radius;
+
   // project to boundary
   middle *= r / std::sqrt(middle.square());
 
@@ -600,12 +596,9 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
   double eps=1e-12;
   double r=0;
   if (compute_radius_automatically)
-    {
-      const Point<spacedim> vertex_relative = p0 - center;
-      r = std::sqrt(vertex_relative.square());
-    }
+    r = (p0 - center).norm();
   else
-    r=radius;
+    r = radius;
 
 
   const double r2=r*r;
@@ -613,9 +606,9 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
   Assert(std::fabs(v1*v1-r2)<eps*r2, ExcInternalError());
 
   const double alpha=std::acos((v0*v1)/std::sqrt((v0*v0)*(v1*v1)));
-  const Point<spacedim> pm=0.5*(v0+v1);
+  const Tensor<1,spacedim> pm=0.5*(v0+v1);
 
-  const double h=std::sqrt(pm.square());
+  const double h=pm.norm();
 
   // n even:  m=n/2,
   // n odd:   m=(n-1)/2
@@ -624,14 +617,14 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
   for (unsigned int i=0; i<m ; ++i)
     {
       const double beta = alpha * (line_points[i+1][0]-0.5);
-      const double d=h*std::tan(beta);
-      points[i]=pm+d/length*(v1-v0);
-      points[n-1-i]=pm-d/length*(v1-v0);
+      const double d = h*std::tan(beta);
+      points[i]      = Point<spacedim>(pm+d/length*(v1-v0));
+      points[n-1-i]  = Point<spacedim>(pm-d/length*(v1-v0));
     }
 
   if ((n+1)%2==0)
     // if the number of parts is even insert the midpoint
-    points[(n-1)/2]=pm;
+    points[(n-1)/2] = Point<spacedim>(pm);
 
 
   // project the points from the straight line to the HyperBallBoundary
@@ -1038,7 +1031,7 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
     {
       const Point<dim> quad_center = (quad->vertex(0) + quad->vertex(1) +
                                       quad->vertex(2) + quad->vertex(3)   )/4;
-      const Point<dim> quad_center_offset = quad_center - this->center;
+      const Tensor<1,dim> quad_center_offset = quad_center - this->center;
 
 
       if (std::fabs (quad->line(0)->center().distance(this->center) -

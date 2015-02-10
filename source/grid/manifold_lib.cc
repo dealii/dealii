@@ -57,7 +57,7 @@ SphericalManifold<dim,spacedim>::get_new_point(const Quadrature<spacedim> &quad)
           mid_point += quad.weight(i)*quad.point(i);
         }
       // Project the mid_pont back to the right location
-      Point<spacedim> R = mid_point-center;
+      Tensor<1,spacedim> R = mid_point-center;
       // Scale it to have radius rho_average
       R *= rho_average/R.norm();
       // And return it.
@@ -102,7 +102,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 SphericalManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const
 {
-  const Point<spacedim> R = space_point-center;
+  const Tensor<1,spacedim> R = space_point-center;
   const double rho = R.norm();
 
   Point<spacedim> p;
@@ -193,9 +193,9 @@ get_new_point (const Quadrature<spacedim> &quad) const
     return middle;
 
   else
-    return (vector_from_axis / vector_from_axis.norm() * radius +
-            ((middle-point_on_axis) * direction) * direction +
-            point_on_axis);
+    return Point<spacedim>((vector_from_axis / vector_from_axis.norm() * radius +
+                            ((middle-point_on_axis) * direction) * direction +
+                            point_on_axis));
 }
 
 

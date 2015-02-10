@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2014 by the deal.II authors
+ * Copyright (C) 2000 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -210,8 +210,8 @@ namespace Step7
     double return_value = 0;
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
-        const Point<dim> x_minus_xi = p - this->source_centers[i];
-        return_value += std::exp(-x_minus_xi.square() /
+        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
+        return_value += std::exp(-x_minus_xi.norm_square() /
                                  (this->width * this->width));
       }
 
@@ -251,13 +251,13 @@ namespace Step7
 
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
-        const Point<dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
 
         // For the gradient, note that its direction is along (x-x_i), so we
         // add up multiples of this distance vector, where the factor is given
         // by the exponentials.
         return_value += (-2 / (this->width * this->width) *
-                         std::exp(-x_minus_xi.square() /
+                         std::exp(-x_minus_xi.norm_square() /
                                   (this->width * this->width)) *
                          x_minus_xi);
       }
@@ -295,16 +295,16 @@ namespace Step7
     double return_value = 0;
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
-        const Point<dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
 
         // The first contribution is the Laplacian:
-        return_value += ((2*dim - 4*x_minus_xi.square()/
+        return_value += ((2*dim - 4*x_minus_xi.norm_square()/
                           (this->width * this->width)) /
                          (this->width * this->width) *
-                         std::exp(-x_minus_xi.square() /
+                         std::exp(-x_minus_xi.norm_square() /
                                   (this->width * this->width)));
         // And the second is the solution itself:
-        return_value += std::exp(-x_minus_xi.square() /
+        return_value += std::exp(-x_minus_xi.norm_square() /
                                  (this->width * this->width));
       }
 

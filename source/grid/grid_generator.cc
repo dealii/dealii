@@ -3071,7 +3071,7 @@ namespace GridGenerator
                 // one. move it to halfway
                 // between inner and outer
                 // sphere
-                const Point<3> old_distance = cell->vertex(v) - p;
+                const Tensor<1,3> old_distance = cell->vertex(v) - p;
                 const double old_radius = cell->vertex(v).distance(p);
                 cell->vertex(v) = p + old_distance * (middle_radius / old_radius);
 
