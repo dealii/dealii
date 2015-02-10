@@ -410,9 +410,16 @@ public:
    * before starting to solve with the filtered matrix. If the matrix is
    * symmetric (i.e. the matrix itself, not only its sparsity pattern), set
    * the second parameter to @p true to use a faster algorithm.
+   * Note: This method is deprecated as matrix_is_symmetric parameter is no longer used.
    */
   void apply_constraints (VECTOR     &v,
-                          const bool  matrix_is_symmetric) const;
+                          const bool  matrix_is_symmetric) const DEAL_II_DEPRECATED;
+
+  /**
+     * Apply the constraints to a right hand side vector. This needs to be done
+     * before starting to solve with the filtered matrix.
+     */
+  void apply_constraints (VECTOR     &v) const;
 
   /**
    * Matrix-vector multiplication: this operation performs pre_filter(),
@@ -811,6 +818,38 @@ void
 FilteredMatrix<VECTOR>::apply_constraints (
   VECTOR     &v,
   const bool  /* matrix_is_symmetric */) const
+{
+  GrowingVectorMemory<VECTOR> mem;
+  typename VectorMemory<VECTOR>::Pointer tmp_vector(mem);
+  tmp_vector->reinit(v);
+  const_index_value_iterator       i = constraints.begin();
+  const const_index_value_iterator e = constraints.end();
+  for (; i!=e; ++i)
+    {
+      Assert(numbers::is_finite(i->second), ExcNumberNotFinite());
+      (*tmp_vector)(i->first) = -i->second;
+    }
+
+  // This vmult is without bc, to get
+  // the rhs correction in a correct
+  // way.
+  matrix->vmult_add(v, *tmp_vector);
+  // finally set constrained
+  // entries themselves
+  for (i=constraints.begin(); i!=e; ++i)
+    {
+      Assert(numbers::is_finite(i->second), ExcNumberNotFinite());
+      v(i->first) = i->second;
+    }
+}
+
+
+
+template <class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::apply_constraints (
+  VECTOR     &v) const
 {
   GrowingVectorMemory<VECTOR> mem;
   typename VectorMemory<VECTOR>::Pointer tmp_vector(mem);
