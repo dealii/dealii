@@ -488,7 +488,7 @@ namespace Step29
     for (; cell!=endc; ++cell)
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         if ( cell->face(face)->at_boundary() &&
-             ((cell->face(face)->center() - transducer).square() < 0.01) )
+             ((cell->face(face)->center() - transducer).norm_square() < 0.01) )
 
           cell->face(face)->set_boundary_indicator (1);
 
