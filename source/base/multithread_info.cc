@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -103,14 +103,42 @@ void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
   Assert(n_max_threads==numbers::invalid_unsigned_int,
          ExcMessage("Calling set_thread_limit() more than once is not supported!"));
 
-  unsigned int max_threads_env = numbers::invalid_unsigned_int;
-  char *penv;
-  penv = getenv ("DEAL_II_NUM_THREADS");
+  // set the maximal number of threads to the given value as specified
+  n_max_threads = max_threads;
 
-  if (penv!=NULL)
-    max_threads_env = Utilities::string_to_int(std::string(penv));
+  // then also see if something was given in the environment
+  {
+    const char *penv = getenv ("DEAL_II_NUM_THREADS");
+    if (penv!=NULL)
+      {
+        unsigned int max_threads_env = numbers::invalid_unsigned_int;
+        try
+          {
+            max_threads_env = Utilities::string_to_int(std::string(penv));
+          }
+        catch (...)
+          {
+            AssertThrow (false,
+                         ExcMessage (std::string("When specifying the <DEAL_II_NUM_THREADS> environment "
+                                                 "variable, it needs to be something that can be interpreted "
+                                                 "as an integer. The text you have in the environment "
+                                                 "variable is <") + penv + ">"));
+          }
 
-  n_max_threads = std::min(max_threads, max_threads_env);
+        AssertThrow (max_threads_env>0,
+                     ExcMessage ("When specifying the <DEAL_II_NUM_THREADS> environment "
+                                 "variable, it needs to be a positive number."));
+
+        if (n_max_threads != numbers::invalid_unsigned_int)
+          n_max_threads = std::min(n_max_threads, max_threads_env);
+        else
+          n_max_threads = max_threads_env;
+      }
+  }
+  // finally see if we need to tell the TBB about this. if no value has been set
+  // (the if-branch), then simply set n_max_threads to what we get from the TBB
+  // but don't do anything further. otherwise (some value has been set), let the
+  // TBB use this value
   if (n_max_threads == numbers::invalid_unsigned_int)
     n_max_threads = tbb::task_scheduler_init::default_num_threads();
   else
