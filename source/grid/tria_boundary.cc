@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -604,6 +604,7 @@ normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
 
   const double eps = 1e-12;
   Tensor<1,spacedim> grad_F[facedim];
+  unsigned int iteration = 0;
   while (true)
     {
       Point<spacedim> F;
@@ -630,6 +631,14 @@ normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
 
       const Point<facedim> delta_xi = -invert(H) * J;
       xi += delta_xi;
+      ++iteration;
+
+      Assert (iteration<10,
+              ExcMessage("The Newton iteration to find the reference point "
+                         "did not converge in 10 iterations. Do you have a "
+                         "deformed cell? (See the glossary for a definition "
+                         "of what a deformed cell is. You may want to output "
+                         "the vertices of your cell."));
 
       if (delta_xi.norm() < eps)
         break;
