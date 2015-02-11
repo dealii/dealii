@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2014 by the deal.II authors
+ * Copyright (C) 2010 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -47,6 +47,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
+#include <iostream>
 #include <fstream>
 
 

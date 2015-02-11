@@ -164,19 +164,19 @@ $\frac{h}{2\delta T}$ with $h$ the diameter of the face to which the flux is
 applied, and $\delta T$ the current time step.
 
 With these choices, equating the residual to zero results in a
-nonlinear system of equations which we solve the nonlinear system by a
-Newton iteration, i.e. by iterating
+nonlinear system of equations $R(\mathbf{W}_{n+1})=0$. We solve this nonlinear system by a
+Newton iteration (in the same way as explained in step-15), i.e. by iterating
 @f{eqnarray*}
-R'(\mathbf{W}^k,\delta \mathbf{W})(\mathbf z) & = & -
-R(\mathbf{W}^{k})(\mathbf z) \qquad \qquad \forall \mathbf z\in V_h \\
-\mathbf{W}^{k+1} &=& \mathbf{W}^k + \delta \mathbf{W},
+R'(\mathbf{W}^k_{n+1},\delta \mathbf{W}_{n+1}^k)(\mathbf z) & = & -
+R(\mathbf{W}^{k}_{n+1})(\mathbf z) \qquad \qquad \forall \mathbf z\in V_h \\
+\mathbf{W}^{k+1}_{n+1} &=& \mathbf{W}^k_{n+1} + \delta \mathbf{W}^k_{n+1},
 @f}
-until $|R(\mathbf{W}^k)|$ (the residual) is sufficiently small. By
+until $|R(\mathbf{W}^k_{n+1})|$ (the residual) is sufficiently small. By
 testing with the nodal basis of a finite element space instead of all
 $\mathbf z$, we arrive at a linear system for $\delta \mathbf W$:
 @f{eqnarray*}
-\mathbf R'(\mathbf{W}^k)\delta \mathbf{W} & = & -
-\mathbf R(\mathbf{W}^{k}).
+\mathbf R'(\mathbf{W}^k_{n+1})\delta \mathbf{W}^k_{n+1} & = & -
+\mathbf R(\mathbf{W}^{k}_{n+1}).
 @f}
 This linear system is, in general, neither symmetric nor has any
 particular definiteness properties. We will either use a direct solver

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2014 by the deal.II authors
+ * Copyright (C) 1999 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -33,6 +33,7 @@
 #include <deal.II/grid/grid_out.h>
 
 // This is needed for C++ output:
+#include <iostream>
 #include <fstream>
 // And this for the declarations of the `sqrt' and `fabs' functions:
 #include <cmath>

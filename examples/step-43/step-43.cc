@@ -65,6 +65,7 @@
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 

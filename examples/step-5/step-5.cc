@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2014 by the deal.II authors
+ * Copyright (C) 1999 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -53,6 +53,7 @@
 
 // This is C++ ...
 #include <fstream>
+#include <iostream>
 // ... and this is too: We will convert integers to strings using the C++
 // stringstream class <code>ostringstream</code>:
 #include <sstream>
@@ -582,12 +583,10 @@ void Step5<dim>::run ()
   // not to do, after all.
 
   // So if we got past the assertion, we know that dim==2, and we can now
-  // actually read the grid. It is in UCD (unstructured cell data) format (but
-  // the ending of the <code>UCD</code>-file is <code>inp</code>), as
-  // supported as input format by the AVS Explorer (a visualization program),
-  // for example:
+  // actually read the grid. It is in UCD (unstructured cell data) format (though
+  // the convention is to use the suffix <code>inp</code> for UCD files):
   grid_in.read_ucd (input_file);
-  // If you like to use another input format, you have to use an other
+  // If you like to use another input format, you have to use one of the other
   // <code>grid_in.read_xxx</code> function. (See the documentation of the
   // <code>GridIn</code> class to find out what input formats are presently
   // supported.)

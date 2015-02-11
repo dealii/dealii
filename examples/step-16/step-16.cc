@@ -86,6 +86,7 @@
 #include <deal.II/integrators/l2.h>
 
 // This is C++:
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
