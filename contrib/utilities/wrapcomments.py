@@ -110,6 +110,16 @@ def format_block(lines, infostr=""):
                 if it in thisline and thisline!=it:
                     print ("%s warning %s not in separate line"%(infostr, it), file=sys.stderr)
             out.append(start + thisline)
+        elif "@page" in lines[idx]:
+            # do not break @page
+            if curlines!=[]:
+                out.extend(wrap_block(remove_junk(curlines), start))
+                curlines=[]
+            thisline = remove_junk([lines[idx]])[0]
+            if not thisline.startswith("@page") and not thisline.startswith("(@page"):
+                print ("%s warning %s not at start of line"%(infostr, "@page"), file=sys.stderr)
+            out.append(start + thisline.strip())
+
         elif "@ref" in lines[idx]:
             # @ref link "some long description"
             # is special, and we mustn't break it
@@ -387,6 +397,14 @@ lineO = [" /**", \
          "  * c2", \
          "  */"]
 assert(format_block(lineI)==lineO)
+
+# do not break @page:
+longtext = "bla bla"*20
+lineI = [" /**", \
+         "  * @page " + longtext, \
+         "  * hello", \
+         "  */"]
+assert(format_block(lineI)==lineI)
 
 
 
