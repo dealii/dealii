@@ -354,7 +354,7 @@ template <typename T, typename U>
 struct ProductType
 {
 #ifdef DEAL_II_WITH_CXX11
-    typedef decltype(T() * U()) type;
+  typedef decltype(T() * U()) type;
 #endif
 };
 
@@ -363,37 +363,37 @@ struct ProductType
 template <typename T>
 struct ProductType<T,double>
 {
-    typedef T type;
+  typedef T type;
 };
 
 template <typename T>
 struct ProductType<T,bool>
 {
-    typedef T type;
+  typedef T type;
 };
 
 template <typename T>
 struct ProductType<double,T>
 {
-    typedef T type;
+  typedef T type;
 };
 
 template <typename T>
 struct ProductType<bool, T>
 {
-    typedef T type;
+  typedef T type;
 };
 
 template <>
 struct ProductType<bool,double>
 {
-    typedef double type;
+  typedef double type;
 };
 
 template <>
 struct ProductType<double,bool>
 {
-    typedef double type;
+  typedef double type;
 };
 
 #endif
@@ -490,38 +490,38 @@ template <typename T>
 struct EnableIfScalar;
 
 
-template <> struct EnableIfScalar<double> 
+template <> struct EnableIfScalar<double>
 {
   typedef double type;
 };
 
 
-template <> struct EnableIfScalar<float> 
+template <> struct EnableIfScalar<float>
 {
   typedef float type;
 };
 
 
-template <> struct EnableIfScalar<long double> 
+template <> struct EnableIfScalar<long double>
 {
   typedef long double type;
 };
 
 
-template <> struct EnableIfScalar<int> 
+template <> struct EnableIfScalar<int>
 {
   typedef int type;
 };
 
 
-template <> struct EnableIfScalar<unsigned int> 
+template <> struct EnableIfScalar<unsigned int>
 {
   typedef unsigned int type;
 };
 
 
 
-template <typename T> struct EnableIfScalar<std::complex<T> > 
+template <typename T> struct EnableIfScalar<std::complex<T> >
 {
   typedef std::complex<T> type;
 };
