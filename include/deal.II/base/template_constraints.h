@@ -435,6 +435,100 @@ struct ProductType<std::complex<T>,float>
 
 
 
+/**
+ * This class provides a local typedef @p type that is equal to the
+ * template argument but only if the template argument corresponds to
+ * a scalar type (i.e., one of the floating point types, signed or unsigned
+ * integer, or a complex number). If the template type @p T is not a scalar,
+ * then no class <code>EnableIfScalar@<T@></code> is declared and,
+ * consequently, no local typedef is available.
+ *
+ * The purpose of the class is to disable certain template functions if
+ * one of the arguments is not a scalar number. By way of (nonsensical)
+ * example, consider the following function:
+ * @code
+ *   template <typename T>
+ *   T multiply (const T t1, const T t2) { return t1*t2; }
+ * @endcode
+ * This function can be called with any two arguments of the same type @p T.
+ * This includes arguments for which this clearly makes no sense. Consequently,
+ * one may want to restrict the function to only scalars, and this can be
+ * written as
+ * @code
+ *   template <typename T>
+ *   typename EnableIfScalar<T>::type
+ *   multiply (const T t1, const T t2) { return t1*t2; }
+ * @endcode
+ * At a place where you call the function, the compiler will deduce the
+ * type @p T from the arguments. For example, in
+ * @code
+ *   multiply(1.234, 2.345);
+ * @endcode
+ * it will deduce @p T to be @p double, and because
+ * <code>EnableIfScalar@<double@>::type</code> equals @p double, the compiler
+ * will instantiate a function
+ * <code>double multiply(const double, const double)</code> from the template
+ * above. On the other hand, in a context like
+ * @code
+ *   std::vector<char> v1, v2;
+ *   multiply(v1, v2);
+ * @endcode
+ * the compiler will deduce @p T to be <code>std::vector@<char@></code> but
+ * because <code>EnableIfScalar@<std::vector@<char@>@>::type</code> does not exist
+ * the compiler does not consider the template for instantiation. This technique
+ * is called "Substitution Failure is not an Error (SFINAE)". It makes sure that
+ * the template function can not even be called, rather than leading to a
+ * later error about the fact that the operation <code>t1*t2</code> is not
+ * defined (or may lead to some nonsensical result). It also allows the
+ * declaration of overloads of a function such as @p multiply for different
+ * types of arguments, without resulting in ambiguous call errors by the
+ * compiler.
+ *
+ * @author Wolfgang Bangerth, 2015
+ */
+template <typename T>
+struct EnableIfScalar;
+
+
+template <> struct EnableIfScalar<double> 
+{
+  typedef double type;
+};
+
+
+template <> struct EnableIfScalar<float> 
+{
+  typedef float type;
+};
+
+
+template <> struct EnableIfScalar<long double> 
+{
+  typedef long double type;
+};
+
+
+template <> struct EnableIfScalar<int> 
+{
+  typedef int type;
+};
+
+
+template <> struct EnableIfScalar<unsigned int> 
+{
+  typedef unsigned int type;
+};
+
+
+
+template <typename T> struct EnableIfScalar<std::complex<T> > 
+{
+  typedef std::complex<T> type;
+};
+
+
+
+
 
 // --------------- inline functions -----------------
 
@@ -456,7 +550,6 @@ PointerComparison::equal (const T *p1, const T *p2)
 {
   return (p1==p2);
 }
-
 
 
 DEAL_II_NAMESPACE_CLOSE

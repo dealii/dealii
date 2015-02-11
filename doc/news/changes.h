@@ -331,7 +331,9 @@ inconvenience this causes.
 
 <ol>
   <li> New: There is now a new class ProductType that can be used
-  to infer the type of the product of two objects.
+  to infer the type of the product of two objects. There is now also
+  a class EnableIfScalar that helps restrict some templates to only
+  cases where a type is a scalar.
   <br>
   (Wolfgang Bangerth, 2015/02/04)
   </li>
