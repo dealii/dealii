@@ -820,9 +820,9 @@ namespace Step50
     // both up and down versions of the
     // operator with the matrices we already
     // built:
-    MGMatrix<matrix_t,vector_t> mg_matrix(&mg_matrices);
-    MGMatrix<matrix_t,vector_t> mg_interface_up(&mg_interface_matrices);
-    MGMatrix<matrix_t,vector_t> mg_interface_down(&mg_interface_matrices);
+    mg::Matrix<vector_t> mg_matrix(&mg_matrices);
+    mg::Matrix<vector_t> mg_interface_up(&mg_interface_matrices);
+    mg::Matrix<vector_t> mg_interface_down(&mg_interface_matrices);
 
     // Now, we are ready to set up the
     // V-cycle operator and the
