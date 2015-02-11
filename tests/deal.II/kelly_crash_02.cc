@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,66 +105,66 @@ void test ()
     // points 15-18
     Point<dim>(0,  0, 7) + Point<dim> (std::cos(2*numbers::PI/6),
     std::sin(2*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
     Point<dim>(std::cos(0*numbers::PI/6),
     std::sin(0*numbers::PI/6),
     7) + Point<dim> (std::cos(2*numbers::PI/6),
     std::sin(2*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
     Point<dim>(std::cos(2*numbers::PI/6),
     std::sin(2*numbers::PI/6),
     7) + Point<dim> (std::cos(2*numbers::PI/6),
     std::sin(2*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
     Point<dim>(std::cos(4*numbers::PI/6),
     std::sin(4*numbers::PI/6),
     7) + Point<dim> (std::cos(2*numbers::PI/6),
     std::sin(2*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
 
     // points at the top of the
     // second extension
     // points 19-22
     Point<dim>(0,  0, 7) + Point<dim> (std::cos(6*numbers::PI/6),
     std::sin(6*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
     Point<dim>(std::cos(4*numbers::PI/6),
     std::sin(4*numbers::PI/6),
     7) + Point<dim> (std::cos(6*numbers::PI/6),
     std::sin(6*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
     Point<dim>(std::cos(6*numbers::PI/6),
     std::sin(6*numbers::PI/6),
     7) + Point<dim> (std::cos(6*numbers::PI/6),
     std::sin(6*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
     Point<dim>(std::cos(8*numbers::PI/6),
     std::sin(8*numbers::PI/6),
     7) + Point<dim> (std::cos(6*numbers::PI/6),
     std::sin(6*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
 
     // points at the top of the
     // third extension
     // points 23-26
     Point<dim>(0,  0, 7) + Point<dim> (std::cos(10*numbers::PI/6),
     std::sin(10*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
     Point<dim>(std::cos(8*numbers::PI/6),
     std::sin(8*numbers::PI/6),
     7) + Point<dim> (std::cos(10*numbers::PI/6),
     std::sin(10*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
     Point<dim>(std::cos(10*numbers::PI/6),
     std::sin(10*numbers::PI/6),
     7) + Point<dim> (std::cos(10*numbers::PI/6),
     std::sin(10*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
     Point<dim>(std::cos(0*numbers::PI/6),
     std::sin(0*numbers::PI/6),
     7) + Point<dim> (std::cos(10*numbers::PI/6),
     std::sin(10*numbers::PI/6),
-    0) * 4,
+    0) * 4.0,
 
   };
 
