@@ -53,6 +53,7 @@
 
 // This is C++ ...
 #include <fstream>
+#include <iostream>
 // ... and this is too: We will convert integers to strings using the C++
 // stringstream class <code>ostringstream</code>:
 #include <sstream>

@@ -64,8 +64,9 @@
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 
-// Finally, here are two C++ headers that haven't been included yet by one of
+// Finally, here are a few C++ headers that haven't been included yet by one of
 // the aforelisted header files:
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <limits>

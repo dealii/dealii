@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2013 - 2014 by the deal.II authors
+ * Copyright (C) 2013 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -37,6 +37,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
 
+#include <iostream>
 #include <fstream>
 
 #include <map>

@@ -79,6 +79,9 @@
 // the simulation.
 #include <deal.II/numerics/data_out_faces.h>
 
+#include <iostream>
+
+
 
 // We start by putting the class into its own namespace.
 namespace Step51

@@ -48,6 +48,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
+#include <iostream>
 #include <fstream>
 
 // This header file contains the necessary declarations for the
