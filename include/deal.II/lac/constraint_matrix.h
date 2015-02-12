@@ -1042,22 +1042,6 @@ public:
    */
 
   /**
-   * Re-distribute the elements of the vector @p condensed to @p uncondensed.
-   * It is the user's responsibility to guarantee that all entries of @p
-   * uncondensed be zero!
-   *
-   * This function undoes the action of @p condense somehow, but it should be
-   * noted that it is not the inverse of @p condense.
-   *
-   * The @p VectorType may be a Vector<float>, Vector<double>,
-   * BlockVector<tt><...></tt>, a PETSc or Trilinos vector wrapper class, or
-   * any other type having the same interface.
-   */
-  template <class VectorType>
-  void distribute (const VectorType &condensed,
-                   VectorType       &uncondensed) const;
-
-  /**
    * Re-distribute the elements of the vector in-place. The @p VectorType may
    * be a Vector<float>, Vector<double>, BlockVector<tt><...></tt>, a PETSc or
    * Trilinos vector wrapper class, or any other type having the same
