@@ -777,20 +777,20 @@ namespace GridGenerator
       {
       case 1:
         for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
-          points.push_back (Point<dim> (x*delta[0]));
+          points.push_back (double(x)*delta[0]);
         break;
 
       case 2:
         for (unsigned int y=0; y<=n_subdivisions[1]; ++y)
           for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
-            points.push_back (Point<dim> (x*delta[0] + y*delta[1]));
+            points.push_back (double(x)*delta[0] + double(y)*delta[1]);
         break;
 
       case 3:
         for (unsigned int z=0; z<=n_subdivisions[2]; ++z)
           for (unsigned int y=0; y<=n_subdivisions[1]; ++y)
             for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
-              points.push_back (Point<dim> (x*delta[0] + y*delta[1] + z*delta[2]));
+              points.push_back (double(x)*delta[0] + double(y)*delta[1] + double(z)*delta[2]);
         break;
 
       default:

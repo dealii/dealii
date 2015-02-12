@@ -26,6 +26,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table_indices.h>
+#include <deal.II/base/template_constraints.h>
 #include <vector>
 
 #include <cmath>
@@ -1319,6 +1320,69 @@ operator * (const Number                factor,
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] * factor;
   return tt;
+}
+
+
+/**
+ * Multiplication of a tensor of rank 1 with a scalar number from the right.
+ *
+ * The purpose of this operator is to enable only multiplication of a tensor
+ * by a scalar number (i.e., a floating point number, a complex floating point
+ * number, etc.). The function is written in a way that only allows the
+ * compiler to consider the function if the second argument is indeed a scalar
+ * number -- in other words, @p OtherNumber will not match, for example
+ * <code>std::vector@<double@></code> as the product of a tensor and a vector
+ * clearly would make no sense. The mechanism by which the compiler is
+ * prohibited of considering this operator for multiplication with non-scalar
+ * types are explained in the documentation of the EnableIfScalar class.
+ *
+ * The return type of the function is chosen so that it matches the types
+ * of both the tensor and the scalar argument. For example, if you multiply
+ * a <code>Tensor@<1,dim,double@></code> by <code>std::complex@<double@></code>,
+ * then the result will be a <code>Tensor@<1,dim,std::complex@<double@>@></code>.
+ * In other words, the type with which the returned tensor stores its
+ * components equals the type you would get if you multiplied an individual
+ * component of the input tensor by the scalar factor.
+ *
+ * @relates Tensor<1,dim,Number>
+ * @relates EnableIfScalar
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+Tensor<1,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const Tensor<1,dim,Number> &t,
+            const OtherNumber           factor)
+{
+  // form the product. we have to convert the two factors into the final
+  // type via explicit casts because, for awkward reasons, the C++
+  // standard committee saw it fit to not define an
+  //   operator*(float,std::complex<double>)
+  // (as well as with switched arguments and double<->float).
+  typedef typename ProductType<Number,OtherNumber>::type product_type;
+  Tensor<1,dim,product_type> tt (false);
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = product_type(t[d]) * product_type(factor);
+  return tt;
+}
+
+
+
+/**
+ * Multiplication of a tensor of rank 1 with a scalar number from the left.
+ * See the discussion with the operator with switched arguments for more
+ * information about template arguments and the return type.
+ *
+ * @relates Tensor<1,dim,Number>
+ * @relates EnableIfScalar
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+Tensor<1,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const Number                     factor,
+            const Tensor<1,dim,OtherNumber> &t)
+{
+  // simply forward to the other operator with switched arguments
+  return (t*factor);
 }
 
 

@@ -1992,6 +1992,65 @@ operator * (const Number                   factor,
 }
 
 
+/**
+ * Multiplication of a tensor of general rank with a scalar number from the
+ * right.
+ *
+ * The purpose of this operator is to enable only multiplication of a tensor
+ * by a scalar number (i.e., a floating point number, a complex floating point
+ * number, etc.). The function is written in a way that only allows the
+ * compiler to consider the function if the second argument is indeed a scalar
+ * number -- in other words, @p OtherNumber will not match, for example
+ * <code>std::vector@<double@></code> as the product of a tensor and a vector
+ * clearly would make no sense. The mechanism by which the compiler is
+ * prohibited of considering this operator for multiplication with non-scalar
+ * types are explained in the documentation of the EnableIfScalar class.
+ *
+ * The return type of the function is chosen so that it matches the types
+ * of both the tensor and the scalar argument. For example, if you multiply
+ * a <code>Tensor@<1,dim,double@></code> by <code>std::complex@<double@></code>,
+ * then the result will be a <code>Tensor@<1,dim,std::complex@<double@>@></code>.
+ * In other words, the type with which the returned tensor stores its
+ * components equals the type you would get if you multiplied an individual
+ * component of the input tensor by the scalar factor.
+ *
+ * @relates Tensor
+ * @relates EnableIfScalar
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+Tensor<rank,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const Tensor<rank,dim,Number> &t,
+            const OtherNumber              factor)
+{
+  // recurse over the base objects
+  Tensor<rank,dim,typename ProductType<Number,OtherNumber>::type> tt;
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = t[d] * factor;
+  return tt;
+}
+
+
+
+/**
+ * Multiplication of a tensor of general rank with a scalar number from the
+ * left. See the discussion with the operator with switched arguments for more
+ * information about template arguments and the return type.
+ *
+ * @relates Tensor
+ * @relates EnableIfScalar
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+Tensor<rank,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const Number                        factor,
+            const Tensor<rank,dim,OtherNumber> &t)
+{
+  // simply forward to the operator above
+  return t * factor;
+}
+
+
 
 /**
  * Division of a tensor of general rank by a scalar Number.
