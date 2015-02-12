@@ -519,25 +519,6 @@ public:
    * @{
    */
 
-  /**
-   * Condense a given sparsity pattern. This function assumes the uncondensed
-   * matrix struct to be compressed and the one to be filled to be empty. The
-   * condensed structure is compressed afterwards.
-   *
-   * The constraint matrix object must be closed to call this function.
-   *
-   * @note The hanging nodes are completely eliminated from the linear system
-   * referring to <tt>condensed</tt>. Therefore, the dimension of
-   * <tt>condensed</tt> is the dimension of <tt>uncondensed</tt> minus the
-   * number of constrained degrees of freedom.
-   *
-   * @deprecated The functions converting an uncondensed matrix into its
-   * condensed form are deprecated. Use the functions doing the in-place
-   * condensation leaving the size of the linear system unchanged.
-   */
-  void condense (const SparsityPattern &uncondensed,
-                 SparsityPattern       &condensed) const DEAL_II_DEPRECATED;
-
 
   /**
    * Condense a sparsity pattern. The name of the function mimics the
@@ -622,22 +603,6 @@ public:
    */
   void condense (BlockCompressedSimpleSparsityPattern &sparsity) const;
 
-
-  /**
-   * Condense a given matrix. The associated matrix struct should be condensed
-   * and compressed. It is the user's responsibility to guarantee that all
-   * entries in the @p condensed matrix be zero!
-   *
-   * The constraint matrix object must be closed to call this function.
-   *
-   * @deprecated The functions converting an uncondensed matrix into its
-   * condensed form are deprecated. Use the functions doing the in-place
-   * condensation leaving the size of the linear system unchanged.
-   */
-  template<typename number>
-  void condense (const SparseMatrix<number> &uncondensed,
-                 SparseMatrix<number>       &condensed) const DEAL_II_DEPRECATED;
-
   /**
    * Condense a given matrix, i.e., eliminate the rows and columns of
    * the matrix that correspond to constrained degrees of freedom.
@@ -677,28 +642,6 @@ public:
   template <class VectorType>
   void condense (const VectorType &vec_ghosted,
                  VectorType       &output) const;
-
-  /**
-   * Condense a given matrix and a given vector by eliminating rows
-   * and columns of the linear system that correspond to constrained
-   * degrees of freedom. The sparsity pattern associated with the
-   * matrix needs to be condensed and compressed.  This function is
-   * the appropriate choice for applying inhomogeneous constraints.
-   *
-   * The constraint matrix object must be closed to call this function.
-   *
-   * See the general documentation of this
-   * class for more detailed information.
-   *
-   * @deprecated The functions converting an uncondensed matrix into its
-   * condensed form are deprecated. Use the functions doing the in-place
-   * condensation leaving the size of the linear system unchanged.
-   */
-  template<typename number, class VectorType>
-  void condense (const SparseMatrix<number> &uncondensed_matrix,
-                 const VectorType           &uncondensed_vector,
-                 SparseMatrix<number>       &condensed_matrix,
-                 VectorType                 &condensed_vector) const DEAL_II_DEPRECATED;
 
   /**
    * Condense a given matrix and a given vector by eliminating rows

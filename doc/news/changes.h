@@ -177,6 +177,10 @@ inconvenience this causes.
   - SparseMatrixIterators::Accessor and SparseMatrixIterators::Iterator
     constructors.
   - SparseMatrix::raw_entry and SparseMatrix::global_entry.
+  - The ConstraintMatrix functions that transform a matrix, vector, or
+    linear system into a smaller by not just setting the corresponding
+    rows and columns to zero, but actually shrinking the size of the
+    linear system.
 
   <br>
   <em>With headers in <code>deal.II/deal.II/</code>:</em>

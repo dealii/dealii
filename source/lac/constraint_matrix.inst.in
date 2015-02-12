@@ -54,7 +54,6 @@ for (V: EXTERNAL_PARALLEL_VECTORS)
 
 for (S : REAL_SCALARS)
   {
-    template void ConstraintMatrix::condense<S>(const SparseMatrix<S>&, SparseMatrix<S> &) const;
     template void ConstraintMatrix::condense<S>(SparseMatrix<S>&) const;
     template void ConstraintMatrix::condense<S>(BlockSparseMatrix<S>&) const;
   }
@@ -64,10 +63,6 @@ for (S1 : REAL_SCALARS; S2 : REAL_SCALARS)
   {
     template void ConstraintMatrix::condense<S1,Vector<S2> >(SparseMatrix<S1>&, Vector<S2>&) const;
     template void ConstraintMatrix::condense<S1,BlockVector<S2> >(BlockSparseMatrix<S1>&, BlockVector<S2>&) const;
-    template void ConstraintMatrix::condense<S1,Vector<S2> >(
-        const SparseMatrix<S1>&, const Vector<S2>&, SparseMatrix<S1> &, Vector<S2>&) const;
-    template void ConstraintMatrix::condense<S1,BlockVector<S2> >(
-        const SparseMatrix<S1>&, const BlockVector<S2>&, SparseMatrix<S1> &, BlockVector<S2>&) const;
   }
 
 
