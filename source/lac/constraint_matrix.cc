@@ -641,109 +641,6 @@ void ConstraintMatrix::reinit (const IndexSet &local_constraints)
 
 
 
-void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
-                                 SparsityPattern       &condensed) const
-{
-  Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (uncondensed.is_compressed() == true, ExcMatrixNotClosed());
-  Assert (uncondensed.n_rows() == uncondensed.n_cols(), ExcNotQuadratic());
-
-  // store for each line of the matrix its new line number after
-  // compression. If the shift is -1, this line will be condensed away
-#ifndef DEAL_II_WITH_64BIT_INDICES
-  std::vector<int> new_line;
-#else
-  std::vector<long long int> new_line;
-#endif
-
-  new_line.reserve (uncondensed.n_rows());
-
-  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  size_type                                   shift           = 0;
-  size_type n_rows = uncondensed.n_rows();
-
-  if (next_constraint == lines.end())
-    // if no constraint is to be handled
-    for (size_type row=0; row!=n_rows; ++row)
-      new_line.push_back (row);
-  else
-    for (size_type row=0; row!=n_rows; ++row)
-      if (row == next_constraint->line)
-        {
-          // this line is constrained
-          new_line.push_back (-1);
-          // note that @p{lines} is ordered
-          ++shift;
-          ++next_constraint;
-          if (next_constraint == lines.end())
-            // nothing more to do; finish rest of loop
-            {
-              for (size_type i=row+1; i<n_rows; ++i)
-                new_line.push_back (i-shift);
-              break;
-            };
-        }
-      else
-        new_line.push_back (row-shift);
-
-
-  next_constraint = lines.begin();
-  // note: in this loop we need not check whether @p{next_constraint} is a
-  // valid iterator, since @p{next_constraint} is only evaluated so often as
-  // there are entries in new_line[*] which tells us which constraints exist
-  for (size_type row=0; row<uncondensed.n_rows(); ++row)
-    if (new_line[row] != -1)
-      // line not constrained copy entries if column will not be condensed
-      // away, distribute otherwise
-      for (SparsityPattern::iterator j=uncondensed.begin(row);
-           j<uncondensed.end(row); ++j)
-        if (new_line[j->column()])
-          condensed.add (new_line[row], new_line[j->column()]);
-        else
-          {
-            // let c point to the constraint of this column
-            std::vector<ConstraintLine>::const_iterator c = lines.begin();
-            while (c->line != j->column())
-              ++c;
-
-            for (size_type q=0; q!=c->entries.size(); ++q)
-              condensed.add (new_line[row], new_line[c->entries[q].first]);
-          }
-    else
-      // line must be distributed
-      {
-        for (SparsityPattern::iterator j=uncondensed.begin(row);
-             j<uncondensed.end(row); ++j)
-          // for each entry: distribute
-          if (new_line[j->column()] != -1)
-            // column is not constrained
-            for (size_type q=0; q!=next_constraint->entries.size(); ++q)
-              condensed.add (new_line[next_constraint->entries[q].first],
-                             new_line[j->column()]);
-
-          else
-            // not only this line but
-            // also this col is constrained
-            {
-              // let c point to the constraint
-              // of this column
-              std::vector<ConstraintLine>::const_iterator c = lines.begin();
-              while (c->line != j->column()) ++c;
-
-              for (size_type p=0; p!=c->entries.size(); ++p)
-                for (size_type q=0; q!=next_constraint->entries.size(); ++q)
-                  condensed.add (new_line[next_constraint->entries[q].first],
-                                 new_line[c->entries[p].first]);
-            };
-
-        ++next_constraint;
-      };
-
-  condensed.compress();
-}
-
-
-
 void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
@@ -1715,14 +1612,6 @@ ConstraintMatrix::resolve_indices (std::vector<types::global_dof_index> &indices
   template void ConstraintMatrix::condense<VectorType >(const VectorType &uncondensed,\
                                                         VectorType       &condensed) const;\
   template void ConstraintMatrix::condense<VectorType >(VectorType &vec) const;\
-  template void ConstraintMatrix::condense<float,VectorType >(const SparseMatrix<float> &uncondensed, \
-                                                              const VectorType &uncondensed_vector, \
-                                                              SparseMatrix<float> &condensed, \
-                                                              VectorType       &condensed_vector) const; \
-  template void ConstraintMatrix::condense<double,VectorType >(const SparseMatrix<double> &uncondensed, \
-      const VectorType &uncondensed_vector, \
-      SparseMatrix<double> &condensed, \
-      VectorType       &condensed_vector) const; \
   template void ConstraintMatrix:: \
   distribute_local_to_global<VectorType > (const Vector<double>            &, \
                                            const std::vector<ConstraintMatrix::size_type>  &, \
