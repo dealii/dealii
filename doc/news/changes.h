@@ -171,6 +171,8 @@ inconvenience this causes.
   - SparsityPattern and ChunkSparsityPattern functions that take an
     <code>optimize_diagonal</code> argument.
   - SparsityPattern::partition.
+  - SparsityPattern::get_rowstart_indices and
+    SparsityPattern::get_column_numbers.
   - The typedef CompressedBlockSparsityPattern.
   - The deprecated constructors of SparsityPattern iterator classes.
   - The deprecated variants of DoFTools::make_periodicity_constraints.

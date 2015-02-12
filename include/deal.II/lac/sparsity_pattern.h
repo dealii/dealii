@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -986,45 +986,6 @@ public:
    */
   row_iterator row_end (const size_type r) const DEAL_II_DEPRECATED;
 
-  /**
-   * @deprecated This is kind of an expert mode. Get access to the rowstart
-   * array, but read-only.
-   *
-   * Use of this function is highly deprecated. Use @p row_length and @p
-   * column_number instead. Also, using iterators may get you most of the
-   * information you may want.
-   *
-   * Though the return value is declared <tt>const</tt>, you should be aware
-   * that it may change if you call any nonconstant function of objects which
-   * operate on it.
-   *
-   * You should use this interface very carefully and only if you are
-   * absolutely sure to know what you do. You should also note that the
-   * structure of these arrays may change over time.  If you change the layout
-   * yourself, you should also rename this function to avoid programs relying
-   * on outdated information!
-   */
-  const std::size_t *get_rowstart_indices () const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated. Use @p row_length and @p column_number instead. Also, using
-   * iterators may get you most of the information you may want.
-   *
-   * This is kind of an expert mode: get access to the colnums array, but
-   * readonly.
-   *
-   * Though the return value is declared <tt>const</tt>, you should be aware
-   * that it may change if you call any nonconstant function of objects which
-   * operate on it.
-   *
-   * You should use this interface very carefully and only if you are
-   * absolutely sure to know what you do. You should also note that the
-   * structure of these arrays may change over time. If you change the layout
-   * yourself, you should also rename this function to avoid programs relying
-   * on outdated information!
-   */
-  const size_type *get_column_numbers () const DEAL_II_DEPRECATED;
-
 // @}
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -1459,22 +1420,6 @@ bool
 SparsityPattern::stores_only_added_elements () const
 {
   return (store_diagonal_first_in_row == false);
-}
-
-
-inline
-const std::size_t *
-SparsityPattern::get_rowstart_indices () const
-{
-  return rowstart;
-}
-
-
-inline
-const SparsityPattern::size_type *
-SparsityPattern::get_column_numbers () const
-{
-  return colnums;
 }
 
 
