@@ -49,29 +49,27 @@ class MultithreadInfo
 {
 public:
   /**
-   * The constructor determines the number of CPUs in the system. At the
-   * moment detection of CPUs is only implemented on Linux computers with the
-   * /proc filesystem and on Sun machines.  The number of CPUs present is set
-   * to one if detection failed or if detection is not supported.
-   */
-  MultithreadInfo ();
-
-  /**
-   * The number of CPUs in the system.  It is one if detection is not
-   * implemented or failed.
+   * The number of CPUs in the system. At the moment detection of CPUs is only
+   * implemented on Linux, FreeBSD, and Mac computers.  It is one if detection
+   * failed or is not implemented on your system.
    *
    * If it is one, although you are on a multi-processor machine, please refer
    * to the documentation in <tt>multithread_info.cc</tt> near to the
    * <tt>error</tt> directive.
    */
-  const unsigned int n_cpus;
+  static unsigned int n_cores ();
+
+  /**
+   * @deprecated Use n_cores() instead.
+   */
+  static const unsigned int n_cpus DEAL_II_DEPRECATED;
 
   /**
    * Returns the number of threads to use. This is initially set to the number
    * of cores the system has (n_cpus) but can be further restricted by
    * set_thread_limit().
    */
-  unsigned int n_threads() const;
+  static unsigned int n_threads ();
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -94,7 +92,7 @@ public:
    * method will have any effect. Use the parameter of the MPI_InitFinalize if
    * you have an MPI based code.
    */
-  void set_thread_limit(const unsigned int max_threads = numbers::invalid_unsigned_int);
+  static void set_thread_limit (const unsigned int max_threads = numbers::invalid_unsigned_int);
 
 
   /**
@@ -103,11 +101,18 @@ public:
    * is used in the PETScWrappers to avoid using the interface that is not
    * thread-safe.
    */
-  bool is_running_single_threaded();
+  static bool is_running_single_threaded ();
+
   /**
    * Exception
    */
   DeclException0(ExcProcNotPresent);
+
+  /**
+   * @deprecated All members are static, so there is no need to construct an
+   * instance.
+   */
+  MultithreadInfo () DEAL_II_DEPRECATED;
 
 private:
 
@@ -116,24 +121,24 @@ private:
    * Linux, OSF, SGI, and Sun machines; if no detection of the number of CPUs
    * is supported, or if detection fails, this function returns one.
    */
-  static unsigned int get_n_cpus();
+  static unsigned int get_n_cpus ();
 
   /**
-   * variable representing the maximum number of threads
+   * Variable representing the maximum number of threads.
    */
-  unsigned int n_max_threads;
+  static unsigned int n_max_threads;
 };
 
 
 
 /**
- * Global variable of type <tt>MultithreadInfo</tt> which you may ask for the
- * number of CPUs in your system, as well as for the default number of threads
- * that multithreaded functions shall use.
+ * Global variable of type <tt>MultithreadInfo</tt>.
+ *
+ * @deprecated Use the static member functions instead.
  *
  * @ingroup threads
  */
-extern MultithreadInfo multithread_info;
+extern MultithreadInfo multithread_info DEAL_II_DEPRECATED;
 
 
 

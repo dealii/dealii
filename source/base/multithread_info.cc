@@ -98,6 +98,15 @@ unsigned int MultithreadInfo::get_n_cpus()
 
 #  endif
 
+const unsigned int MultithreadInfo::n_cpus = MultithreadInfo::get_n_cpus();
+unsigned int MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
+
+unsigned int MultithreadInfo::n_cores()
+{
+  return MultithreadInfo::n_cpus;
+}
+
+
 void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 {
   Assert(n_max_threads==numbers::invalid_unsigned_int,
@@ -148,7 +157,7 @@ void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 }
 
 
-unsigned int MultithreadInfo::n_threads() const
+unsigned int MultithreadInfo::n_threads()
 {
   if (n_max_threads == numbers::invalid_unsigned_int)
     return tbb::task_scheduler_init::default_num_threads();
@@ -164,7 +173,7 @@ unsigned int MultithreadInfo::get_n_cpus()
   return 1;
 }
 
-unsigned int MultithreadInfo::n_threads() const
+unsigned int MultithreadInfo::n_threads()
 {
   return 1;
 }
@@ -183,9 +192,6 @@ bool MultithreadInfo::is_running_single_threaded()
 
 
 MultithreadInfo::MultithreadInfo ()
-  :
-  n_cpus (get_n_cpus()),
-  n_max_threads (numbers::invalid_unsigned_int)
 {}
 
 
@@ -199,8 +205,8 @@ MultithreadInfo::memory_consumption ()
 }
 
 
-
 // definition of the variable which is declared `extern' in the .h file
 MultithreadInfo multithread_info;
+
 
 DEAL_II_NAMESPACE_CLOSE
