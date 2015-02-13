@@ -217,10 +217,10 @@ namespace internal
         std::vector<unsigned int> rowstart_q_points;
 
         /**
-         * Stores the quadrature points in real coordinates for Cartesian
-         * cells (does not need to store the full data on all points)
+         * Stores the quadrature points in real coordinates (does not need to
+         * store the full data on all points for Cartesian cells)
          */
-        AlignedVector<Point<dim,VectorizedArray<Number> > > quadrature_points;
+        AlignedVector<Tensor<1,dim,VectorizedArray<Number> > > quadrature_points;
 
         /**
          * The dim-dimensional quadrature formula underlying the problem

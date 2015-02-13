@@ -70,7 +70,7 @@ namespace Step37
                           const unsigned int  component = 0) const;
 
     template <typename number>
-    number value (const Point<dim,number> &p,
+    number value (const Tensor<1,dim,number> &p,
                   const unsigned int component = 0) const;
 
     virtual void value_list (const std::vector<Point<dim> > &points,
@@ -82,10 +82,10 @@ namespace Step37
 
   template <int dim>
   template <typename number>
-  number Coefficient<dim>::value (const Point<dim,number> &p,
+  number Coefficient<dim>::value (const Tensor<1,dim,number> &p,
                                   const unsigned int /*component*/) const
   {
-    return 1. / (0.05 + 2.*p.square());
+    return 1. / (0.05 + 2.*p.norm_square());
   }
 
 
@@ -94,7 +94,7 @@ namespace Step37
   double Coefficient<dim>::value (const Point<dim> &p,
                                   const unsigned int component) const
   {
-    return value<double>(p,component);
+    return value<double>(static_cast<const Tensor<1,dim>&>(p),component);
   }
 
 
