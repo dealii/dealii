@@ -38,6 +38,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: The second template argument of the Point@<dim@> class,
+  its number type, as been removed. Choosing anything else than a double
+  for space coordinates anchored in the origin does not make sense.
+  <br>
+  (Wolfgang Bangerth, Martin Kronbichler, 2015/02/13)
+  </li>
+
   <li> Changed: Implicit conversion from Tensor@<1,dim@> to Point@<dim@> was
   previously possible. This has now been prohibited (but you can still
   do the conversion with an explicit cast) as such conversions are
@@ -48,7 +55,7 @@ inconvenience this causes.
   usage between Point and Tensor have now been clarified in the documentation
   of class Point.
   <br>
-  (Wolfgang Bangerth, 2015/01/12)
+  (Wolfgang Bangerth, 2015/02/12)
   </li>
 
   <li> Changed: The project configuration no longer exports
@@ -347,6 +354,23 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: The data type for quadrature points involving vectorized data
+  in the FEEvaluation class has been changed from Point@<dim,VectorizedArray@>
+  to Tensor@<1,dim,VectorizedArray@> because the former does not allow for
+  other number types than double any more.
+  <br>
+  (Martin Kronbichler, 2015/02/13)
+  </li>
+
+  <li> Changed: The use of the template argument <code>Number</code> of the
+  Function class has been made consistent: Previously, the template argument
+  also applied to the Point for the various evaluation functions, which
+  does not make sense e.g. for types <code>std::complex@<double@></code>.
+  Now, only the template only controls the result type of the function.
+  <br>
+  (Wolfgang Bangerth, 2015/02/13)
+  </li>
+
   <li> Changed: If you take the product of a Tensor and a scalar number,
   you previously got a Tensor back that stored its elements in the same
   data type as the original tensor. This leads to problems if you
