@@ -41,7 +41,7 @@ template <typename number> class Vector;
 // this file must be included when using something like Tensor<1,dim>, and
 // Point and Tensor must not be forward declared without the number type
 // specified)
-template <int dim, typename Number=double> class Point;
+template <int dim> class Point;
 
 // general template; specialized for rank==1; the general template is in
 // tensor.h
@@ -584,7 +584,7 @@ private:
    * Point is allowed access to the coordinates. This is supposed to improve
    * speed.
    */
-  friend class Point<dim,Number>;
+  friend class Point<dim>;
 };
 
 
