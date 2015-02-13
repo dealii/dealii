@@ -26,6 +26,12 @@
 #include <deal.II/lac/sparse_matrix_ez.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 
+#ifdef DEAL_II_WITH_UMFPACK
+#  include <umfpack.h>
+#endif
+#ifndef SuiteSparse_long
+#define SuiteSparse_long long int
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -291,9 +297,11 @@ private:
 
   /**
    * The arrays in which we store the data for the solver.
+   * SuiteSparse_long has to be used here for Windows 64 build,
+   * if we used only long int, compilation would fail.
    */
-  std::vector<long int> Ap;
-  std::vector<long int> Ai;
+  std::vector<SuiteSparse_long> Ap;
+  std::vector<SuiteSparse_long> Ai;
   std::vector<double> Ax;
 
   /**
