@@ -1257,7 +1257,7 @@ namespace parallel
     Vector<Number> &
     Vector<Number>::operator = (const Vector<Number> &c)
     {
-      return this->template operator=<Number>(c);
+      return this->operator=<Number>(c);
     }
 
 

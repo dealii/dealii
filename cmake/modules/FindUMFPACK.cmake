@@ -27,10 +27,6 @@
 #   UMFPACK_VERSION_SUBMINOR
 #
 
-SET(UMFPACK_DIR "" CACHE PATH "An optional hint to an UMFPACK directory")
-SET(SUITESPARSE_DIR "" CACHE PATH
-  "An optional hint to a SUITESPARSE directory"
-  )
 FOREACH(_comp SUITESPARSE SUITESPARSE_CONFIG UMFPACK AMD CHOLMOD COLAMD)
   SET_IF_EMPTY(${_comp}_DIR "$ENV{${_comp}_DIR}")
 ENDFOREACH()
@@ -109,14 +105,22 @@ ENDIF()
 
 #
 # Link against everything we can find to avoid underlinkage:
+# (also use lib- prefixes for Windows)
 #
 FIND_UMFPACK_LIBRARY(UMFPACK umfpack)
+FIND_UMFPACK_LIBRARY(UMFPACK libumfpack)
 FIND_UMFPACK_LIBRARY(AMD amd)
+FIND_UMFPACK_LIBRARY(AMD libamd)
 FIND_UMFPACK_LIBRARY(CHOLMOD cholmod)
+FIND_UMFPACK_LIBRARY(CHOLMOD libcholmod)
 FIND_UMFPACK_LIBRARY(COLAMD colamd)
+FIND_UMFPACK_LIBRARY(COLAMD libcolamd)
 FIND_UMFPACK_LIBRARY(CCOLAMD ccolamd)
+FIND_UMFPACK_LIBRARY(CCOLAMD libccolamd)
 FIND_UMFPACK_LIBRARY(CAMD camd)
+FIND_UMFPACK_LIBRARY(CAMD libcamd)
 FIND_UMFPACK_LIBRARY(SuiteSparse_config suitesparseconfig)
+FIND_UMFPACK_LIBRARY(SuiteSparse_config libsuitesparseconfig)
 
 #
 # Test whether libsuitesparseconfig.xxx can be used for shared library

@@ -35,8 +35,9 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     # Push -pthread as well:
     ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-pthread")
 
-    IF(CMAKE_C_COMPILER_WORKS)
-
+    # Do not do this check for build with Visual Studio because there is a bug in CMake for Windows
+    # and the symbols sought in the .lib are not found, therefore the libraries are deemed wrong, although they are fine.
+    IF(CMAKE_C_COMPILER_WORKS AND NOT(MSVC))
       INCLUDE(CheckCSourceCompiles)
       CHECK_C_SOURCE_COMPILES("
         char daxpy_(); char dgeev_(); char dgeevx_(); char dgelsd_(); char
