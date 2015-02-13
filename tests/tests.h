@@ -191,7 +191,7 @@ struct LimitConcurrency
 {
   LimitConcurrency ()
   {
-    multithread_info.set_thread_limit (5);
+    MultithreadInfo::set_thread_limit (5);
   }
 } limit_concurrency;
 #endif

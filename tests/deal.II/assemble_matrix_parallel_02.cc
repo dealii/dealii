@@ -400,7 +400,7 @@ void LaplaceProblem<dim>::assemble_test_1 ()
                           std_cxx11::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
          Assembly::Copy::Data (),
-         multithread_info.n_threads(),
+         MultithreadInfo::n_threads(),
          1);
 }
 
@@ -425,7 +425,7 @@ void LaplaceProblem<dim>::assemble_test_2 ()
                           std_cxx11::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
          Assembly::Copy::Data (true),
-         2*multithread_info.n_threads(),
+         2*MultithreadInfo::n_threads(),
          1);
 }
 

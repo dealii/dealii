@@ -170,7 +170,7 @@ check ()
       KellyErrorEstimator<dim>::estimate (mapping, dof, q_face, neumann_bc,
                                           v, this_error,
                                           std::vector<bool>(), 0,
-                                          multithread_info.n_threads(),
+                                          MultithreadInfo::n_threads(),
                                           numbers::invalid_unsigned_int,
                                           material);
       this_error *= scaling_factor;

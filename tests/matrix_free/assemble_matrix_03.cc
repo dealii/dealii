@@ -152,7 +152,7 @@ void do_test (const DoFHandler<dim> &dof)
          &copy_data_local_to_global,
          Assembly::Scratch::Data<dim,fe_degree>(dof.get_fe()),
          dummy,
-         2*multithread_info.n_threads(),
+         2*MultithreadInfo::n_threads(),
          1);
   deallog << "OK" << std::endl;
 }

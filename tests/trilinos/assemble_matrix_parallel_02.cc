@@ -377,7 +377,7 @@ void LaplaceProblem<dim>::assemble_test ()
                           std_cxx11::_1),
          Assembly::Scratch::Data<dim>(fe, quadrature),
          Assembly::Copy::Data (false),
-         2*multithread_info.n_threads(),
+         2*MultithreadInfo::n_threads(),
          1);
   test_matrix.compress(VectorOperation::add);
   test_rhs.compress(VectorOperation::add);

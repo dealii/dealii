@@ -168,7 +168,7 @@ check ()
       KellyErrorEstimator<dim,spacedim>::estimate (mapping, dof, q_face, neumann_bc,
                                                    v, this_error,
                                                    std::vector<bool>(), 0,
-                                                   multithread_info.n_threads(),
+                                                   MultithreadInfo::n_threads(),
                                                    subdomain);
       this_error *= scaling_factor;
 
