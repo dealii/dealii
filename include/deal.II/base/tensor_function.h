@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,27 +80,27 @@ public:
   /**
    * Return the value of the function at the given point.
    */
-  virtual value_type value (const Point<dim, Number> &p) const;
+  virtual value_type value (const Point<dim> &p) const;
 
   /**
    * Set <tt>values</tt> to the point values of the function at the
    * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
    * right size, i.e.  the same size as the <tt>points</tt> array.
    */
-  virtual void value_list (const std::vector<Point<dim, Number> > &points,
+  virtual void value_list (const std::vector<Point<dim> > &points,
                            std::vector<value_type> &values) const;
 
   /**
    * Return the gradient of the function at the given point.
    */
-  virtual gradient_type gradient (const Point<dim, Number> &p) const;
+  virtual gradient_type gradient (const Point<dim> &p) const;
 
   /**
    * Set <tt>gradients</tt> to the gradients of the function at the
    * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
    * right size, i.e.  the same size as the <tt>points</tt> array.
    */
-  virtual void gradient_list (const std::vector<Point<dim, Number> >   &points,
+  virtual void gradient_list (const std::vector<Point<dim> >   &points,
                               std::vector<gradient_type> &gradients) const;
 
   /**
@@ -142,14 +142,14 @@ public:
 
   virtual ~ConstantTensorFunction ();
 
-  virtual typename dealii::TensorFunction<rank, dim, Number>::value_type value (const Point<dim, Number> &p) const;
+  virtual typename dealii::TensorFunction<rank, dim, Number>::value_type value (const Point<dim> &p) const;
 
-  virtual void value_list (const std::vector<Point<dim, Number> > &points,
+  virtual void value_list (const std::vector<Point<dim> > &points,
                            std::vector<typename dealii::TensorFunction<rank, dim, Number>::value_type> &values) const;
 
-  virtual typename dealii::TensorFunction<rank, dim, Number>::gradient_type gradient (const Point<dim, Number> &p) const;
+  virtual typename dealii::TensorFunction<rank, dim, Number>::gradient_type gradient (const Point<dim> &p) const;
 
-  virtual void gradient_list (const std::vector<Point<dim, Number> > &points,
+  virtual void gradient_list (const std::vector<Point<dim> > &points,
                               std::vector<typename dealii::TensorFunction<rank, dim, Number>::gradient_type> &gradients) const;
 
 private:
