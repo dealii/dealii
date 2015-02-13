@@ -152,7 +152,7 @@ namespace PETScWrappers
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(true)
   {
-    Assert( multithread_info.is_running_single_threaded(),
+    Assert( MultithreadInfo::is_running_single_threaded(),
             ExcMessage("PETSc does not support multi-threaded access, set "
                        "the thread limit to 1 in MPI_InitFinalize()."));
   }
@@ -167,7 +167,7 @@ namespace PETScWrappers
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(true)
   {
-    Assert( multithread_info.is_running_single_threaded(),
+    Assert( MultithreadInfo::is_running_single_threaded(),
             ExcMessage("PETSc does not support multi-threaded access, set "
                        "the thread limit to 1 in MPI_InitFinalize()."));
 
@@ -188,7 +188,7 @@ namespace PETScWrappers
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(false)
   {
-    Assert( multithread_info.is_running_single_threaded(),
+    Assert( MultithreadInfo::is_running_single_threaded(),
             ExcMessage("PETSc does not support multi-threaded access, set "
                        "the thread limit to 1 in MPI_InitFinalize()."));
   }

@@ -389,7 +389,7 @@ namespace Utilities
           // set maximum number of threads (also respecting the environment
           // variable that the called function evaluates) based on what
           // the user asked
-          multithread_info.set_thread_limit(max_num_threads);
+          MultithreadInfo::set_thread_limit(max_num_threads);
         }
       else
         // user wants automatic choice
@@ -437,20 +437,20 @@ namespace Utilities
           // if the number would be zero, round up to one since every
           // process needs to have at least one thread
           const unsigned int n_threads
-            = std::max(multithread_info.n_cpus / n_local_processes
+            = std::max(MultithreadInfo::n_cpus / n_local_processes
                        +
-                       (nth_process_on_host <= multithread_info.n_cpus % n_local_processes
+                       (nth_process_on_host <= MultithreadInfo::n_cpus % n_local_processes
                         ?
                         1
                         :
                         0),
                        1U);
 #else
-          const unsigned int n_threads = multithread_info.n_cpus;
+          const unsigned int n_threads = MultithreadInfo::n_cpus;
 #endif
 
           // finally set this number of threads
-          multithread_info.set_thread_limit(n_threads);
+          MultithreadInfo::set_thread_limit(n_threads);
         }
     }
 
