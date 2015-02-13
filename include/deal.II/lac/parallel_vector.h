@@ -1257,7 +1257,11 @@ namespace parallel
     Vector<Number> &
     Vector<Number>::operator = (const Vector<Number> &c)
     {
+#ifdef _MSC_VER
+      return this->operator=<Number>(c);
+#else
       return this->template operator=<Number>(c);
+#endif
     }
 
 
