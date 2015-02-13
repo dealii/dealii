@@ -38,6 +38,19 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: Implicit conversion from Tensor@<1,dim@> to Point@<dim@> was
+  previously possible. This has now been prohibited (but you can still
+  do the conversion with an explicit cast) as such conversions are
+  likely incorrect uses of class Point (which should represent only
+  points in space, i.e., vectors anchored at the origin) whereas Tensor
+  should be used for vectors anchored elsewhere (such as normal vectors,
+  directions, differences between points, etc). The difference in
+  usage between Point and Tensor have now been clarified in the documentation
+  of class Point.
+  <br>
+  (Wolfgang Bangerth, 2015/01/12)
+  </li>
+
   <li> Changed: The project configuration no longer exports
   <code>[...]/include/deal.II</code>. Thus it is now mandatory to prefix
   all includes of deal.II headers with <code>deal.II/</code>, i.e.

@@ -90,7 +90,7 @@ public:
   /**
    * Convert a tensor to a point.
    */
-  Point (const Tensor<1,dim,Number> &);
+  explicit Point (const Tensor<1,dim,Number> &);
 
   /**
    * Constructor for one dimensional points. This function is only implemented
@@ -324,7 +324,9 @@ inline
 Point<dim,Number>
 Point<dim,Number>::operator + (const Tensor<1,dim,Number> &p) const
 {
-  return (Point<dim,Number>(*this) += p);
+  Point<dim,Number> tmp = *this;
+  tmp += p;
+  return tmp;
 }
 
 
@@ -344,7 +346,9 @@ inline
 Point<dim,Number>
 Point<dim,Number>::operator - (const Tensor<1,dim,Number> &p) const
 {
-  return (Point<dim,Number>(*this) -= p);
+  Point<dim,Number> tmp = *this;
+  tmp -= p;
+  return tmp;
 }
 
 
@@ -367,7 +371,9 @@ inline
 Point<dim,Number>
 Point<dim,Number>::operator * (const Number factor) const
 {
-  return (Point<dim,Number>(*this) *= factor);
+  Point<dim,Number> tmp = *this;
+  tmp *= factor;
+  return tmp;
 }
 
 
@@ -416,7 +422,9 @@ template <int dim, typename Number>
 inline
 Point<dim,Number> Point<dim,Number>::operator / (const Number factor) const
 {
-  return (Point<dim,Number>(*this) /= factor);
+  Point<dim,Number> tmp = *this;
+  tmp /= factor;
+  return tmp;
 }
 
 
