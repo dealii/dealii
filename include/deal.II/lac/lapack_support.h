@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -142,13 +142,18 @@ namespace LAPACKSupport
                  << state_name(arg1));
 
   /**
-   * This exception is thrown if a certain function is not implemented in your
-   * LAPACK version.
+   * This exception is thrown if a certain LAPACK function is not available
+   * because no LAPACK installation was detected during configuration.
    */
   DeclException1(ExcMissing, char *,
-                 << "The function "
+                 << "When you ran 'cmake' during installation of deal.II, "
+                 << "no suitable installation of the BLAS or LAPACK library could "
+                 << "be found. Consequently, the function <"
                  << arg1
-                 << " required here is missing in your LAPACK installation");
+                 << "> can not be called. Refer to the doc/readme.html "
+                 << "file for information on how to ensure that deal.II "
+                 << "picks up an existing BLAS and LAPACK installation at "
+                 << "configuration time.");
 }
 
 
