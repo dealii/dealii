@@ -49,11 +49,11 @@ template <int rank, int dim, typename Number> class TensorFunction;
  * object represents. Access to function objects therefore is through the
  * following methods:
  * @code
- *                 // access to one component at one point
+ *   // access to one component at one point
  *   double value        (const Point<dim>   &p,
  *                        const unsigned int  component = 0) const;
  *
- *                 // return all components at one point
+ *   // return all components at one point
  *   void   vector_value (const Point<dim>   &p,
  *                        Vector<double>     &value) const;
  * @endcode
@@ -61,12 +61,12 @@ template <int rank, int dim, typename Number> class TensorFunction;
  * For more efficiency, there are other functions returning one or all
  * components at a list of points at once:
  * @code
- *                 // access to one component at several points
+ *   // access to one component at several points
  *   void   value_list (const std::vector<Point<dim> >  &point_list,
  *                      std::vector<double>             &value_list,
  *                      const unsigned int  component = 0) const;
  *
- *                 // return all components at several points
+ *   // return all components at several points
  *   void   vector_value_list (const std::vector<Point<dim> >    &point_list,
  *                             std::vector<Vector<double> >      &value_list) const;
  * @endcode
@@ -80,9 +80,9 @@ template <int rank, int dim, typename Number> class TensorFunction;
  * vector_value(), and gradient analogs), while those ones will throw an
  * exception when called but not overloaded.
  *
- * Note however, that conversely the functions returning all components of the
- * function at one or several points (i.e. vector_value(),
- * vector_value_list()), will not call the function returning one component at
+ * Conversely, the functions returning all components of the function at
+ * one or several points (i.e. vector_value(), vector_value_list()),
+ * will <em>not</em> call the function returning one component at
  * one point repeatedly, once for each point and component. The reason is
  * efficiency: this would amount to too many virtual function calls. If you
  * have vector-valued functions, you should therefore also provide overloads
@@ -93,16 +93,38 @@ template <int rank, int dim, typename Number> class TensorFunction;
  * returning a whole array), since the cost of evaluation of a point value is
  * often less than the virtual function call itself.
  *
- *
  * Support for time dependent functions can be found in the base class
  * FunctionTime.
  *
- * @note If the functions you are dealing with have sizes which are a priori
- * known (for example, <tt>dim</tt> elements), you might consider using the
- * TensorFunction class instead. On the other hand, functions like
- * VectorTools::interpolate or VectorTools::interpolate_boundary_values
- * definitely only want objects of the current type. You can use the
- * VectorFunctionFromTensorFunction class to convert the former to the latter.
+ *
+ * <h3>Functions that return tensors</h3>
+ *
+ * If the functions you are dealing with have a number of
+ * components that are a priori known (for example, <tt>dim</tt>
+ * elements), you might consider using the TensorFunction class
+ * instead. This is, in particular, true if the objects you return
+ * have the properties of a tensor, i.e., they are for example
+ * dim-dimensional vectors or dim-by-dim matrices. On the other hand,
+ * functions like VectorTools::interpolate or
+ * VectorTools::interpolate_boundary_values definitely only want
+ * objects of the current type. You can use the
+ * VectorFunctionFromTensorFunction class to convert the former to the
+ * latter.
+ *
+ *
+ * <h3>Functions that return different fields</h3>
+ *
+ * Most of the time, your functions will have the form
+ * $f : \Omega \rightarrow {\mathbb R}^{n_\text{components}}$. However,
+ * there are occasions where you want the function to return vectors (or
+ * scalars) over a different number field, for example functions that
+ * return complex numbers or vectors of complex numbers:
+ * $f : \Omega \rightarrow {\mathbb C}^{n_\text{components}}$. In such
+ * cases, you can use the second template argument of this class: it
+ * describes the scalar type to be used for each component of your return
+ * values. It defaults to @p double, but in the example above, it could
+ * be set to <code>std::complex@<double@></code>.
+ *
  *
  * @ingroup functions
  * @author Wolfgang Bangerth, 1998, 1999, Luca Heltai 2014
