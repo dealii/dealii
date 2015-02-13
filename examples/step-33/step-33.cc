@@ -314,9 +314,7 @@ namespace Step33
             forcing[c] = gravity * W[density_component];
             break;
           case energy_component:
-            forcing[c] = gravity *
-                         W[density_component] *
-                         W[first_momentum_component+dim-1];
+            forcing[c] = gravity * W[first_momentum_component+dim-1];
             break;
           default:
             forcing[c] = 0;
