@@ -355,7 +355,8 @@ inconvenience this causes.
   to store its elements as complex numbers, rather than as double
   variables. This is now changed: The result of the product of a Tensor
   and a scalar number is now a Tensor that stores its elements in a data
-  type appropriate for this product.
+  type appropriate for this product. The same approach is taken for the
+  SymmetricTensor class.
   <br>
   (Wolfgang Bangerth, 2015/02/11)
   </li>
