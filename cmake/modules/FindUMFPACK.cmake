@@ -57,7 +57,7 @@ ENDMACRO()
 MACRO(FIND_UMFPACK_LIBRARY _comp _name)
   STRING(TOUPPER ${_comp} _comp_uppercase)
   DEAL_II_FIND_LIBRARY(${_comp}_LIBRARY
-    NAMES ${_name}
+    NAMES ${_name} lib${_name}
     HINTS
       ${${_comp_uppercase}_DIR}
       ${SUITESPARSE_DIR}/${_comp}
