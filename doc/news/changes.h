@@ -349,13 +349,18 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-
   <li> Changed: All members of MultithreadInfo are now static so it is no
   longer necessary to use the global instance multithread_info (now
   deprecated) or create your own instance (which does not work correctly
   anyway).
   <br>
   (Timo Heister, 2015/02/13)
+  </li>
+
+  <li> Fixed: There was a bug in the energy source term of step-33 whereby
+  the term was erroneously multiplied by the density. This is now fixed.
+  <br>
+  (Praveen C, Lei Qiao, 2015/02/13)
   </li>
 
   <li> Changed: If you take the product of a Tensor and a scalar number,
