@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -786,7 +786,7 @@ protected:
   /**
    * A pointer to the quadrature points on the present cell.
    */
-  const Point<dim,VectorizedArray<Number> > *quadrature_points;
+  const Tensor<1,dim,VectorizedArray<Number> > *quadrature_points;
 
   /**
    * A pointer to the diagonal part of the Jacobian gradient on the present
@@ -1636,9 +1636,10 @@ public:
                   const bool integrate_grad);
 
   /**
-   * Returns the q-th quadrature point stored in MappingInfo.
+   * Returns the q-th quadrature point stored in MappingInfo in vectorized
+   * format.
    */
-  Point<dim,VectorizedArray<Number> >
+  Tensor<1,dim,VectorizedArray<Number> >
   quadrature_point (const unsigned int q_point) const;
 
   /**
@@ -6648,7 +6649,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
           typename Number>
 inline
-Point<dim,VectorizedArray<Number> >
+Tensor<1,dim,VectorizedArray<Number> >
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::quadrature_point (const unsigned int q) const
 {
@@ -6661,7 +6662,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   // value from that
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
-      Point<dim,VectorizedArray<Number> > point (false);
+      Tensor<1,dim,VectorizedArray<Number> > point (false);
       switch (dim)
         {
         case 1:

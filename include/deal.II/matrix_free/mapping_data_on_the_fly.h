@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -119,7 +119,7 @@ namespace internal
        * For compatibility with FEEvaluation, it returns tensors of vectorized
        * arrays, even though all components are equal.
        */
-      const AlignedVector<Point<dim,VectorizedArray<Number> > > &
+      const AlignedVector<Tensor<1,dim,VectorizedArray<Number> > > &
       get_quadrature_points() const;
 
       /**
@@ -172,7 +172,7 @@ namespace internal
       /**
        * Stored quadrature points
        */
-      AlignedVector<Point<dim,VectorizedArray<Number> > > quadrature_points;
+      AlignedVector<Tensor<1,dim,VectorizedArray<Number> > > quadrature_points;
 
       /**
        * Stored normal vectors (for face integration)
@@ -302,7 +302,7 @@ namespace internal
 
     template <int dim, typename Number>
     inline
-    const AlignedVector<Point<dim,VectorizedArray<Number> > > &
+    const AlignedVector<Tensor<1,dim,VectorizedArray<Number> > > &
     MappingDataOnTheFly<dim,Number>::get_quadrature_points() const
     {
       return quadrature_points;

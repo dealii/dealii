@@ -85,7 +85,8 @@ namespace Step37
   // merely to demonstrate the possibilities of this implementation, rather
   // than making much sense physically. We define the coefficient in the same
   // way as functions in earlier tutorial programs. There is one new function,
-  // namely a @p value method with template argument @p number.
+  // namely a @p value method with template argument @p number to evaluate the
+  // function on a collection of several quadrature points at once.
   template <int dim>
   class Coefficient : public Function<dim>
   {
@@ -96,7 +97,7 @@ namespace Step37
                           const unsigned int  component = 0) const;
 
     template <typename number>
-    number value (const Point<dim,number> &p,
+    number value (const Tensor<1,dim,number> &p,
                   const unsigned int component = 0) const;
 
     virtual void value_list (const std::vector<Point<dim> > &points,
@@ -112,15 +113,18 @@ namespace Step37
   // data type is essentially a short array of doubles as discussed in the
   // introduction that holds data from several cells. For example, we evaluate
   // the coefficient shown here not on a simple point as usually done, but we
-  // hand it a Point<dim,VectorizedArray<double> > point, which is actually a
-  // collection of two points in the case of SSE2. Do not confuse the entries
-  // in VectorizedArray<double> with the different coordinates of the
+  // hand it a Tensor<1,dim,VectorizedArray<double> > point, which is actually
+  // a collection of two points in the case of SSE2. Do not confuse the
+  // entries in VectorizedArray<double> with the different coordinates of the
   // point. Indeed, the data is laid out such that <code>p[0]</code> returns a
   // VectorizedArray<double>, which in turn contains the x-coordinate for the
   // first point and the second point. You may access the coordinates
   // individually using e.g. <code>p[0][j]</code>, j=0,1, but it is
   // recommended to define operations on a VectorizedArray as much as possible
-  // in order to make use of vectorized operations.
+  // in order to make use of vectorized operations. Note that due to the
+  // definition of the Point and Tensor classes in deal.II where only the
+  // latter allows for arbitrary data types, we need to pass vectorized data
+  // in the form of a tensor.
   //
   // In the function implementation, we assume that the number type overloads
   // basic arithmetic operations, so we just write the code as usual. The
@@ -129,10 +133,10 @@ namespace Step37
   // with double type, in order to avoid duplicating code.
   template <int dim>
   template <typename number>
-  number Coefficient<dim>::value (const Point<dim,number> &p,
+  number Coefficient<dim>::value (const Tensor<1,dim,number> &p,
                                   const unsigned int /*component*/) const
   {
-    return 1. / (0.05 + 2.*p.square());
+    return 1. / (0.05 + 2.*p.norm_square());
   }
 
 
@@ -141,7 +145,7 @@ namespace Step37
   double Coefficient<dim>::value (const Point<dim>  &p,
                                   const unsigned int component) const
   {
-    return value<double>(p,component);
+    return value<double>(static_cast<const Tensor<1,dim>&>(p),component);
   }
 
 
