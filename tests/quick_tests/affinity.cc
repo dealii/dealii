@@ -60,8 +60,8 @@ int main ()
   if (!getaffinity(bits_set, mask))
     return 1;
 
-  unsigned int nprocs = dealii::multithread_info.n_cpus;
-  unsigned int tbbprocs = dealii::multithread_info.n_threads();
+  unsigned int nprocs = dealii::MultithreadInfo::n_cpus;
+  unsigned int tbbprocs = dealii::MultithreadInfo::n_threads();
   printf("aff_ncpus=%d, mask=%08X, nprocs=%d, tbb_threads=%d\n",
 	 bits_set, mask, nprocs, tbbprocs );
 

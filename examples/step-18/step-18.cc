@@ -1647,7 +1647,7 @@ namespace Step18
                                         error_per_cell,
                                         ComponentMask(),
                                         0,
-                                        multithread_info.n_threads(),
+                                        MultithreadInfo::n_threads(),
                                         this_mpi_process);
 
     // Then set up a global vector into which we merge the local indicators

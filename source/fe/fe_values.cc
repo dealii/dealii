@@ -3283,7 +3283,7 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
   //
   // TODO: Is it reasonable to introduce a flag "unsafe" in the constructor of
   // FEValues to re-enable this feature?
-  if (multithread_info.n_threads() > 1)
+  if (MultithreadInfo::n_threads() > 1)
     {
       cell_similarity = CellSimilarity::none;
       return;

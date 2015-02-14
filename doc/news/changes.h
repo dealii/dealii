@@ -347,6 +347,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+
+  <li> Changed: All members of MultithreadInfo are now static so it is no
+  longer necessary to use the global instance multithread_info (now
+  deprecated) or create your own instance (which does not work correctly
+  anyway).
+  <br>
+  (Timo Heister, 2015/02/13)
+  </li>
+
   <li> Changed: If you take the product of a Tensor and a scalar number,
   you previously got a Tensor back that stored its elements in the same
   data type as the original tensor. This leads to problems if you

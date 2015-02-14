@@ -48,8 +48,7 @@
 // programs. In the first one, the classes and functions are declared which we
 // need to do assembly in parallel (i.e. the
 // <code>WorkStream</code> namespace). The
-// second file has a class <code>MultithreadInfo</code> (and a global object
-// <code>multithread_info</code> of that type) which can be used to query the
+// second file has a class <code>MultithreadInfo</code> which can be used to query the
 // number of processors in your system, which is often useful when deciding
 // how many threads to start in parallel.
 #include <deal.II/base/work_stream.h>
