@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,16 +81,22 @@ public:
   static std::size_t memory_consumption ();
 
   /**
-   * Sets the maximum number of threads to be used to the minimum of the
-   * environment variable DEAL_II_NUM_THREADS and the given parameter (if not
-   * the default value). This affects the initialization of the TBB. If
-   * neither is given, the default from TBB is used (based on the number of
-   * cores in the system).
+   * Set the maximum number of threads to be used to the minimum of the
+   * environment variable DEAL_II_NUM_THREADS and the given argument (or its
+   * default value). This affects the initialization of the TBB. If neither is
+   * given, the default from TBB is used (based on the number of cores in the
+   * system).
    *
-   * This routine is called automatically by MPI_InitFinalize. Due to
-   * limitations in the way TBB can be controlled, only the first call to this
-   * method will have any effect. Use the parameter of the MPI_InitFinalize if
-   * you have an MPI based code.
+   * Due to limitations in the way TBB can be controlled, only the first call
+   * to this method will have any effect. In practice, this means that you
+   * need to call this function before you get to any point in your program
+   * where multiple threads may be created. In other words, the correct place
+   * for a call to this function is at the top of your <code>main()</code>
+   * function.
+   *
+   * This routine is called automatically by MPI_InitFinalize. Use the
+   * appropriate argument of the constructor of MPI_InitFinalize if you have
+   * an MPI based code.
    */
   static void set_thread_limit (const unsigned int max_threads = numbers::invalid_unsigned_int);
 
