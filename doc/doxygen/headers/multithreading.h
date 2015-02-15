@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1211,27 +1211,22 @@
  * number of threads explicitly. However, on large symmetric multiprocessing
  * (SMP) machines, especially ones with a resource/job manager or on systems
  * on which access to some parts of the memory is possible but very expensive
- * for processors far away (e.g. large NUMA SMP machines), it may be necessary
+ * for processors far away (e.g. very large NUMA SMP machines), it may be necessary
  * to explicitly set the number of threads to prevent the TBB from using too
- * many CPUs. In this case the following commands can be used:
- * @code
-   #include <tbb/task_scheduler_init.h>
-
-   // In the program, before any task-based parallelism is reached.
-   // Early in the main method is a good place to call this:
-   tbb::task_scheduler_init init(n_desired_threads + 1);
- * @endcode
- * The method of setting the number of threads relies on this call to
- * <code>task_scheduler_init</code> occurring before any other calls to the
- * TBB functions.  If this call is first, it will set the number of threads
- * used by TBB for the remainder of the program.  Notice that the call starts
- * one less thread than the argument, since the main thread is counted. If
- * this method does not seem successful (gdb can be used to see when and how
- * many threads are started), ensure that the call is early enough in the
- * program (for example right at the start of <code>main()</code>), and check
- * that there are no other libraries starting threads.
+ * many CPUs. Another use case is if you run multiple MPI jobs on a single
+ * machine and each job should only use a subset of the available processor
+ * cores.
  *
- * Note that a small number of places inside deal.II also uses thread-based
+ * Setting the number of threads explicitly is done by calling
+ * MultithreadInfo::set_thread_limit() before any other calls to functions
+ * that may create threads. In practice, it should be one of the first
+ * functions you call in <code>main()</code>.
+ *
+ * If you run your program with MPI, then you can use the optional third
+ * argument to the constructor of the MPI_InitFinalize class to achieve the
+ * same goal.
+ *
+ * @note A small number of places inside deal.II also uses thread-based
  * parallelism explicitly, for example for running background tasks that have
  * to wait for input or output to happen and consequently do not consume
  * much CPU time. Such threads do not run under the control of the TBB

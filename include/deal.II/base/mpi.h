@@ -305,6 +305,13 @@ namespace Utilities
        * that will really be created will be the minimum of the argument
        * passed here, the environment variable (if set), and the number of
        * cores accessible to the thread.
+       *
+       * @note MultithreadInfo::set_thread_limit() can only work if it is
+       * called before any threads are created. The safest place for a call to
+       * it is therefore at the beginning of
+       * <code>main()</code>. Consequently, this extends to the current class:
+       * the best place to create an object of this type is also at or close
+       * to the top of <code>main()</code>.
        */
       MPI_InitFinalize (int    &argc,
                         char ** &argv,
