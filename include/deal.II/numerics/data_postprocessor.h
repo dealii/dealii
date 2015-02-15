@@ -20,6 +20,7 @@
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/point.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/numerics/data_component_interpretation.h>

@@ -41,7 +41,7 @@ template <typename number> class Vector;
 // this file must be included when using something like Tensor<1,dim>, and
 // Point and Tensor must not be forward declared without the number type
 // specified)
-template <int dim, typename Number=double> class Point;
+template <int dim, typename Number> class Point;
 
 // general template; specialized for rank==1; the general template is in
 // tensor.h
@@ -62,6 +62,21 @@ template <int dim, typename Number> class Tensor<1,dim,Number>;
  * @p dim and @p spacedim. We therefore need a class that acts as a scalar
  * (i.e. @p Number) for all purposes but is part of the Tensor template
  * family.
+ *
+ * @tparam dim An integer that denotes the dimension of the space in which
+ *   this tensor operates. This of course equals the number of coordinates that
+ *   identify a point and rank-1 tensor. Since the current object is a rank-0
+ *   tensor (a scalar), this template argument has no meaning for this class.
+ * @tparam Number The data type in which the tensor elements are
+ *   to be stored. This will, in almost all cases, simply be the default
+ *   @p double, but there are cases where one may want to store elements
+ *   in a different (and always scalar) type. It can be used to base
+ *   tensors on @p float or @p complex numbers or any other data type that
+ *   implements basic arithmetic operations.
+ *   Another example would be a type that allows for Automatic Differentiation
+ *   (see, for example, the Sacado type used in step-33) and thereby can
+ *   generate analytic (spatial) derivatives of a function that takes a
+ *   tensor as argument.
  *
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 2009
@@ -179,7 +194,7 @@ public:
   Tensor<0,dim,Number> &operator -= (const Tensor<0,dim,Number> &rhs);
 
   /**
-   * Scale the vector by <tt>factor</tt>, i.e. multiply all coordinates by
+   * Scale the vector by <tt>factor</tt>, i.e. multiply all elements by
    * <tt>factor</tt>.
    */
   Tensor<0,dim,Number> &operator *= (const Number factor);
@@ -286,6 +301,20 @@ private:
  * other uses, such as the gradient of a scalar function (which is a tensor of
  * rank 1, or vector, with as many elements as a point object, but with
  * different physical units), we use the <tt>Tensor<1,dim,Number></tt> class.
+ *
+ * @tparam dim An integer that denotes the dimension of the space in which
+ *   this tensor operates. This of course equals the number of coordinates that
+ *   identify a point and rank-1 tensor.
+ * @tparam Number The data type in which the tensor elements are
+ *   to be stored. This will, in almost all cases, simply be the default
+ *   @p double, but there are cases where one may want to store elements
+ *   in a different (and always scalar) type. It can be used to base
+ *   tensors on @p float or @p complex numbers or any other data type that
+ *   implements basic arithmetic operations.
+ *   Another example would be a type that allows for Automatic Differentiation
+ *   (see, for example, the Sacado type used in step-33) and thereby can
+ *   generate analytic (spatial) derivatives of a function that takes
+ *   a tensor as argument.
  *
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 1998-2005
