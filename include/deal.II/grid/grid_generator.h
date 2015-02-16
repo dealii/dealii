@@ -582,7 +582,7 @@ namespace GridGenerator
 
 
   /**
-   * This class produces a square on the <i>xy</i>-plane with a circular hole
+   * This class produces a square in the <i>xy</i>-plane with a circular hole
    * in the middle. Square and circle are centered at the origin. In 3d, this
    * geometry is extruded in $z$ direction to the interval $[0,L]$.
    *
@@ -606,7 +606,7 @@ namespace GridGenerator
     const double        inner_radius = .25,
     const double        outer_radius = .5,
     const double        L = .5,
-    const unsigned int  repetition = 1,
+    const unsigned int  repetitions = 1,
     const bool          colorize = false);
 
   /**

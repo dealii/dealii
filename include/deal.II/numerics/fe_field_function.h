@@ -150,8 +150,8 @@ namespace Functions
    *
    * @note To C++,
    * <code>Functions::FEFieldFunction<dim>::ExcPointNotAvailableHere</code>
-   * and <code>Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers
-   * ::MPI::Vector>::ExcPointNotAvailableHere</code> are distinct types. You
+   * and <code>Functions::FEFieldFunction<dim,DoFHandler<dim>, TrilinosWrappers::MPI::Vector>::ExcPointNotAvailableHere</code>
+   * are distinct types. You
    * need to make sure that the type of the exception you catch matches the
    * type of the object that throws it, as shown in the example above.
    *

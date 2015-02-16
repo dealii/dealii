@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -313,9 +313,9 @@ private:
  * preconditioner.
  *
  * FGMRES needs two vectors in each iteration steps yielding a total of
- * <tt>2*SolverFGMRESAdditionalData::max_basis_size+1</tt> auxiliary vectors.
+ * <tt>2*SolverFGMRES::AdditionalData::max_basis_size+1</tt> auxiliary vectors.
  *
- * Caveat: documentation of this class is not up to date. There are also a few
+ * Caveat: Documentation of this class is not up to date. There are also a few
  * parameters of GMRES we would like to introduce here.
  *
  * @author Guido Kanschat, 2003

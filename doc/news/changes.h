@@ -80,7 +80,7 @@ inconvenience this causes.
   directory structure. Further, the ancient make_dependencies binary was
   removed. Either migrate your project to CMake, or port your build system
   to the new (incompatible) Make.global_options found at
-  ${DEAL_II_SHARE_RELDIR}.
+  <code>\${DEAL_II_SHARE_RELDIR}</code>.
   <br>
   (Matthias Maier, 2015/01/13)
   </li>
