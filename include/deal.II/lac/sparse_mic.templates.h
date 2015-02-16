@@ -119,28 +119,6 @@ void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
 
 
 template <typename number>
-void SparseMIC<number>::reinit (const SparsityPattern &sparsity)
-{
-  {
-    std::vector<number> tmp;
-    tmp.swap (diag);
-  }
-  {
-    std::vector<number> tmp;
-    tmp.swap (inv_diag);
-  }
-  {
-    std::vector<number> tmp;
-    tmp.swap (inner_sums);
-  }
-
-  SparseMatrix<number>::reinit(sparsity);
-  this->decomposed = false;
-}
-
-
-
-template <typename number>
 inline number
 SparseMIC<number>::get_rowsum (const size_type row) const
 {

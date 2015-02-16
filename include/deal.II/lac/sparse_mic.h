@@ -77,12 +77,6 @@ public:
   AdditionalData;
 
   /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions.
-   */
-  void reinit (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
-
-  /**
    * Perform the incomplete LU factorization of the given matrix.
    *
    * This function needs to be called before an object of this class is used

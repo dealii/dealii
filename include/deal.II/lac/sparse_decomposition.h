@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -143,14 +143,6 @@ protected:
    */
   SparseLUDecomposition ();
 
-  /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions. Instead, pass the
-   * sparsity pattern that you want used for the decomposition in the
-   * AdditionalData structure.
-   */
-  SparseLUDecomposition (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
-
 public:
   /**
    * Declare type for container size.
@@ -243,14 +235,6 @@ public:
   template <typename somenumber>
   void initialize (const SparseMatrix<somenumber> &matrix,
                    const AdditionalData parameters);
-
-  /**
-   * This method is deprecated, and left for backward compatibility. It will
-   * be removed in later versions.
-   *
-   * @deprecated
-   */
-  void reinit (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
   /**
    * This method is deprecated, and left for backward compability. It will be

@@ -158,10 +158,11 @@ inconvenience this causes.
 
   <br>
   <em>With headers in <code>deal.II/lac/</code>:</em>
-  - The deprecated constructor of SparseILU.
-  - SparseILU::apply_decomposition.
-  - The deprecated constructor of SparseMIC.
+  - The deprecated constructors of SparseMIC,
+    SparseILU, and SparseLUDecomposition.
   - SparseMIC::decompose and SparseILU::decompose.
+  - SparseMIC::reinit and SparseLUDecomposition::reinit.
+  - SparseILU::apply_decomposition.
   - The compress() functions without argument in the various vector
     classes. You should use the versions with a VectorOperation
     argument instead.

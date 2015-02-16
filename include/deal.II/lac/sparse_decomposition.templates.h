@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,16 +31,6 @@ template<typename number>
 SparseLUDecomposition<number>::SparseLUDecomposition()
   :
   SparseMatrix<number>(),
-  decomposed(false),
-  own_sparsity(0)
-{}
-
-
-
-template<typename number>
-SparseLUDecomposition<number>::
-SparseLUDecomposition (const SparsityPattern &sparsity) :
-  SparseMatrix<number>(sparsity),
   decomposed(false),
   own_sparsity(0)
 {}
@@ -154,21 +144,6 @@ decompose (const SparseMatrix<somenumber> &matrix,
   prebuild_lower_bound ();
   copy_from (matrix);
   decomposed = true;
-}
-
-
-
-template <typename number>
-void SparseLUDecomposition<number>::reinit (const SparsityPattern &sparsity)
-{
-  Assert (sparsity.n_rows() == sparsity.n_cols(),
-          typename SparsityPattern::ExcDiagonalNotOptimized());
-  decomposed = false;
-  {
-    std::vector<const size_type *> tmp;
-    tmp.swap (prebuilt_lower_bound);
-  }
-  SparseMatrix<number>::reinit (sparsity);
 }
 
 
