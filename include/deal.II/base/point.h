@@ -25,14 +25,16 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * The <tt>Point</tt> class represents a point in a space with
- * arbitrary dimension <tt>dim</tt>.
+ * A class that represents a point in a space with arbitrary dimension
+ * <tt>dim</tt>.
  *
- * It is the preferred object to be passed to functions which operate on
- * points in spaces of a priori fixed dimension: rather than using functions
- * like <tt>double f(double x)</tt> and <tt>double f(double x, double y)</tt>,
- * you should use <tt>double f(Point<dim> &p)</tt> instead as it allows writing
- * dimension independent code.
+ * Objects of this class are used to represent points, i.e., vectors
+ * anchored at the origin of a Cartesian vector space. They are, among
+ * other uses, passed to functions that operate on points in spaces of
+ * a priori fixed dimension: rather than using functions like
+ * <tt>double f(double x)</tt> and <tt>double f(double x, double
+ * y)</tt>, you should use <tt>double f(Point<dim> &p)</tt> instead as
+ * it allows writing dimension independent code.
  *
  *
  * <h3>What's a <code>Point@<dim@></code> and what is a <code>Tensor@<1,dim@></code>?</h3>
@@ -67,10 +69,25 @@ DEAL_II_NAMESPACE_OPEN
  * class. Alternatively, as in the case of vector-valued functions,
  * you can use objects of type Vector or <code>std::vector<code>.
  *
+ *
+ * @tparam dim An integer that denotes the dimension of the space in which
+ *   a point lies. This of course equals the number of coordinates that
+ *   identify a point.
+ * @tparam Number The data type in which the coordinates values are
+ *   to be stored. This will, in almost all cases, simply be the default
+ *   @p double, but there are cases where one may want to store coordinates
+ *   in a different (and always scalar) type. An example would be an interval
+ *   type that can store the value of a coordinate as well as its uncertainty.
+ *   Another example would be a type that allows for Automatic Differentiation
+ *   (see, for example, the Sacado type used in step-33) and thereby can
+ *   generate analytic (spatial) derivatives of a function when passed a
+ *   Point object whose coordinates are stored in such a type.
+ *
+ *
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 1997
  */
-template <int dim, typename Number>
+template <int dim, typename Number = double>
 class Point : public Tensor<1,dim,Number>
 {
 public:
@@ -122,7 +139,9 @@ public:
          const Number z);
 
   /**
-   * Return a unit vector in coordinate direction <tt>i</tt>.
+   * Return a unit vector in coordinate direction <tt>i</tt>, i.e., a
+   * vector that is zero in all coordinates except for a single 1 in
+   * the <tt>i</tt>th coordinate.
    */
   static Point<dim,Number> unit_vector(const unsigned int i);
 
@@ -137,13 +156,12 @@ public:
   Number &operator () (const unsigned int index);
 
   /*
-   * Plus and minus operators are re-implemented from Tensor<1,dim>
-   * to avoid additional casting.
+   * @name Addition and subtraction of points.
+   * @{
    */
 
   /**
-   * Add two point vectors. If possible, use <tt>operator +=</tt> instead
-   * since this does not need to copy a point at least once.
+   * Add two point vectors.
    */
   Point<dim,Number>   operator + (const Tensor<1,dim,Number> &) const;
 
@@ -171,36 +189,45 @@ public:
   Point<dim,Number>   operator - () const;
 
   /**
-   * Multiply by a factor. If possible, use <tt>operator *=</tt> instead since
-   * this does not need to copy a point at least once.
-   *
-   * There is a commutative complement to this function also
+   * @}
+   */
+
+  /*
+   * @name Multiplication and scaling of points. Dot products. Norms.
+   * @{
+   */
+
+  /**
+   * Multiply the current point by a factor.
    */
   Point<dim,Number>   operator * (const Number) const;
 
   /**
-   * Returns the scalar product of two vectors.
-   */
-  Number       operator * (const Tensor<1,dim,Number> &) const;
-
-  /**
-   * Divide by a factor. If possible, use <tt>operator /=</tt> instead since
-   * this does not need to copy a point at least once.
+   * Divide the current point by a factor.
    */
   Point<dim,Number>   operator / (const Number) const;
 
   /**
-   * Returns the scalar product of this point vector with itself, i.e. the
+   * Return the scalar product of the vectors representing two points.
+   */
+  Number              operator * (const Tensor<1,dim,Number> &p) const;
+
+  /**
+   * Return the scalar product of this point vector with itself, i.e. the
    * square, or the square of the norm.
    */
   Number              square () const;
 
   /**
-   * Returns the Euclidean distance of <tt>this</tt> point to the point
+   * Return the Euclidean distance of <tt>this</tt> point to the point
    * <tt>p</tt>, i.e. the <tt>l_2</tt> norm of the difference between the
    * vectors representing the two points.
    */
   Number distance (const Point<dim,Number> &p) const;
+
+  /**
+   * @}
+   */
 
   /**
    * Read or write the data of this object to or from a stream for the purpose

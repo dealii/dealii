@@ -26,21 +26,42 @@ template <int rank_, int dim, typename Number> class Tensor;
 template <int dim, typename Number> class Tensor<1,dim,Number>;
 
 /**
- * Provide a general tensor class with an arbitrary rank, i.e. with an
+ * A general tensor class with an arbitrary rank, i.e. with an
  * arbitrary number of indices. The Tensor class provides an indexing operator
  * and a bit of infrastructure, but most functionality is recursively handed
  * down to tensors of rank 1 or put into external templated functions, e.g.
  * the <tt>contract</tt> family.
  *
- * Using this tensor class for objects of rank 2 has advantages over matrices
- * in many cases since the dimension is known to the compiler as well as the
- * location of the data. It is therefore possible to produce far more
- * efficient code than for matrices with runtime-dependent dimension.
+ * Using this tensor class for objects of rank 2 has advantages over
+ * matrices in many cases since the dimension is known to the compiler
+ * as well as the location of the data. It is therefore possible to
+ * produce far more efficient code than for matrices with
+ * runtime-dependent dimension. It also makes the code easier to read
+ * because of the semantic difference between a tensor (an object that
+ * relates to a coordinate system and has transformation properties
+ * with regard to coordinate rotations and transforms) and matrices
+ * (which we consider as operators on arbitrary vector spaces related
+ * to linear algebra things).
  *
- * This class provides an optional template argument for the type of the
- * underlying data. It defaults to @p double values. It can be used to base
- * tensors on @p float or @p complex numbers or any other data type that
- * implements basic arithmetic operations.
+ * @tparam rank_ An integer that denotes the rank of this tensor. A
+ *   rank-0 tensor is a scalar, a rank-1 tensor is a vector with @p dim
+ *   components, a rank-2 tensor is a matrix with dim-by-dim components,
+ *   etc. There are specializations of this class for rank-0 and rank-1
+ *   tensors. There is also a related class SymmetricTensor for
+ *   tensors of even rank whose elements are symmetric.
+ * @tparam dim An integer that denotes the dimension of the space in which
+ *   this tensor operates. This of course equals the number of coordinates that
+ *   identify a point and rank-1 tensor.
+ * @tparam Number The data type in which the tensor elements are
+ *   to be stored. This will, in almost all cases, simply be the default
+ *   @p double, but there are cases where one may want to store elements
+ *   in a different (and always scalar) type. It can be used to base
+ *   tensors on @p float or @p complex numbers or any other data type that
+ *   implements basic arithmetic operations.
+ *   Another example would be a type that allows for Automatic Differentiation
+ *   (see, for example, the Sacado type used in step-33) and thereby can
+ *   generate analytic (spatial) derivatives of a function that takes a
+ *   tensor as argument.
  *
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 1998-2005
