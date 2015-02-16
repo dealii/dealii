@@ -1143,7 +1143,7 @@ namespace GridTools
    * boundary_ids are left untouched.
    *
    * @ingroup manifold
-   * @ingroup boundary
+   * @relatesalso boundary
    *
    * @author Luca Heltai, 2015
    */
