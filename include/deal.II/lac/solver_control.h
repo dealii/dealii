@@ -498,13 +498,14 @@ public:
 
   /**
    * Initialize with a SolverControl object. The result will emulate
-   * SolverControl by setting #reduce to zero.
+   * SolverControl by setting the reduction target to zero.
    */
   IterationNumberControl (const SolverControl &c);
 
   /**
    * Assign a SolverControl object to ReductionControl. The result of the
-   * assignment will emulate SolverControl by setting #reduce to zero.
+   * assignment will emulate SolverControl by setting the reduction target to
+   * zero.
    */
   IterationNumberControl &operator= (const SolverControl &c);
 
