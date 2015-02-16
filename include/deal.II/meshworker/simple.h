@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,7 @@
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
 /**
- * @file @brief MeshWorker::Assember objects for systems without block
+ * @file MeshWorker::Assember objects for systems without block
  * structure
  *
  * The header containing the classes MeshWorker::Assember::MatrixSimple,
