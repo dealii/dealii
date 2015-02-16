@@ -26,10 +26,7 @@
 #include <deal.II/meshworker/functional.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
-/**
- * @file MeshWorker::Assember objects for systems without block
- * structure
- *
+/*
  * The header containing the classes MeshWorker::Assember::MatrixSimple,
  * MeshWorker::Assember::MGMatrixSimple, MeshWorker::Assember::ResidualSimple,
  * and MeshWorker::Assember::SystemSimple.
