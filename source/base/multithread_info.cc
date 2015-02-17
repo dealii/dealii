@@ -173,6 +173,11 @@ unsigned int MultithreadInfo::get_n_cpus()
   return 1;
 }
 
+unsigned int MultithreadInfo::n_cores()
+{
+  return 1;
+}
+
 unsigned int MultithreadInfo::n_threads()
 {
   return 1;

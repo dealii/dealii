@@ -960,7 +960,7 @@ namespace WorkStream
        Copier                                     copier,
        const ScratchData                         &sample_scratch_data,
        const CopyData                            &sample_copy_data,
-       const unsigned int queue_length = 2*multithread_info.n_threads(),
+       const unsigned int queue_length = 2*MultithreadInfo::n_threads(),
        const unsigned int                         chunk_size = 8);
 
 
@@ -1010,7 +1010,7 @@ namespace WorkStream
        Copier                                   copier,
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
-       const unsigned int queue_length = 2*multithread_info.n_threads(),
+       const unsigned int queue_length = 2*MultithreadInfo::n_threads(),
        const unsigned int                       chunk_size = 8)
   {
     Assert (queue_length > 0,
@@ -1029,7 +1029,7 @@ namespace WorkStream
     // we want to use TBB if we have support and if it is not disabled at
     // runtime:
 #ifdef DEAL_II_WITH_THREADS
-    if (multithread_info.n_threads()==1)
+    if (MultithreadInfo::n_threads()==1)
 #endif
       {
         // need to copy the sample since it is marked const
@@ -1135,7 +1135,7 @@ namespace WorkStream
     // we want to use TBB if we have support and if it is not disabled at
     // runtime:
 #ifdef DEAL_II_WITH_THREADS
-    if (multithread_info.n_threads()==1)
+    if (MultithreadInfo::n_threads()==1)
 #endif
       {
         // need to copy the sample since it is marked const
@@ -1236,7 +1236,7 @@ namespace WorkStream
        void (MainClass::*copier) (const CopyData &),
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
-       const unsigned int queue_length =        2*multithread_info.n_threads(),
+       const unsigned int queue_length =        2*MultithreadInfo::n_threads(),
        const unsigned int chunk_size =          8)
   {
     // forward to the other function
