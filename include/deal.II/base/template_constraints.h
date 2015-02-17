@@ -361,6 +361,12 @@ struct ProductType
 #ifndef DEAL_II_WITH_CXX11
 
 template <typename T>
+struct ProductType<T,T>
+{
+  typedef T type;
+};
+
+template <typename T>
 struct ProductType<T,double>
 {
   typedef T type;
