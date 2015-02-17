@@ -203,7 +203,7 @@ public:
     /**
      * Sets the number of so-called macro cells that should form one
      * partition. If zero size is given, the class tries to find a good size
-     * for the blocks based on multithread_info.n_threads() and the number of
+     * for the blocks based on MultithreadInfo::n_threads() and the number of
      * cells present. Otherwise, the given number is used. If the given number
      * is larger than one third of the number of total cells, this means no
      * parallelism. Note that in the case vectorization is used, a macro cell

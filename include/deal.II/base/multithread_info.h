@@ -37,10 +37,9 @@ DEAL_II_NAMESPACE_OPEN
  * @ref threads
  * for more information on this.  Thread-based parallel methods need to
  * explicitly created threads and may want to use a number of threads that is
- * related to the number of CPUs in your system. This can be queried using the
- * variable <code> multithread_info.n_cpus; </code> of a global variable
- * <code>multithread_info</code> of this class that, or using <code>
- * multithread_info.n_threads(); </code>
+ * related to the number of CPUs in your system. The recommended number of threads
+ * can be queried using MultithreadInfo::n_threads(), while the number of cores
+ * in the system is returned by MultithreadInfo::n_cores().
  *
  * @ingroup threads
  * @author Thomas Richter, Wolfgang Bangerth, 2000
@@ -66,7 +65,7 @@ public:
 
   /**
    * Returns the number of threads to use. This is initially set to the number
-   * of cores the system has (n_cpus) but can be further restricted by
+   * of cores the system has (see n_cores()) but can be further restricted by
    * set_thread_limit().
    */
   static unsigned int n_threads ();

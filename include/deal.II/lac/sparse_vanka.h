@@ -165,7 +165,7 @@ public:
   SparseVanka(const SparseMatrix<number> &M,
               const std::vector<bool>    &selected,
               const bool                  conserve_memory = false,
-              const unsigned int          n_threads       = multithread_info.n_threads());
+              const unsigned int          n_threads       = MultithreadInfo::n_threads());
 
   /**
    * Destructor. Delete all allocated matrices.
@@ -441,7 +441,7 @@ public:
                     const unsigned int          n_blocks,
                     const BlockingStrategy      blocking_strategy,
                     const bool                  conserve_memory = false,
-                    const unsigned int          n_threads       = multithread_info.n_threads());
+                    const unsigned int          n_threads       = MultithreadInfo::n_threads());
 
   /**
    * Apply the preconditioner.

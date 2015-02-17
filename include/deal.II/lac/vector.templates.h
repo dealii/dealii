@@ -1150,7 +1150,7 @@ namespace internal
           result = outer_results[0];
         }
 #ifdef DEAL_II_WITH_THREADS
-      else if (multithread_info.n_threads() > 1 &&
+      else if (MultithreadInfo::n_threads() > 1 &&
                vec_size > 4 * internal::Vector::minimum_parallel_grain_size &&
                depth != 0)
         {
@@ -1161,10 +1161,10 @@ namespace internal
 
           // find out how many recursions we should make (avoid too deep
           // hierarchies of tasks on large vectors), max use 8 *
-          // multithread_info.n_threads()
+          // MultithreadInfo::n_threads()
           int next_depth = depth;
           if (depth == -1)
-            next_depth = 8 * multithread_info.n_threads();
+            next_depth = 8 * MultithreadInfo::n_threads();
           next_depth /= 4;
 
           Threads::TaskGroup<> task_group;
