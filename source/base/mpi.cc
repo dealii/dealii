@@ -437,16 +437,16 @@ namespace Utilities
           // if the number would be zero, round up to one since every
           // process needs to have at least one thread
           const unsigned int n_threads
-            = std::max(MultithreadInfo::n_cpus / n_local_processes
+            = std::max(MultithreadInfo::n_cores() / n_local_processes
                        +
-                       (nth_process_on_host <= MultithreadInfo::n_cpus % n_local_processes
+                       (nth_process_on_host <= MultithreadInfo::n_cores() % n_local_processes
                         ?
                         1
                         :
                         0),
                        1U);
 #else
-          const unsigned int n_threads = MultithreadInfo::n_cpus;
+          const unsigned int n_threads = MultithreadInfo::n_cores();
 #endif
 
           // finally set this number of threads
