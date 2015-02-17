@@ -98,9 +98,6 @@ unsigned int MultithreadInfo::get_n_cpus()
 
 #  endif
 
-const unsigned int MultithreadInfo::n_cpus = MultithreadInfo::get_n_cpus();
-unsigned int MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
-
 unsigned int MultithreadInfo::n_cores()
 {
   return MultithreadInfo::n_cpus;
@@ -209,6 +206,9 @@ MultithreadInfo::memory_consumption ()
   return sizeof (MultithreadInfo);
 }
 
+
+const unsigned int MultithreadInfo::n_cpus = MultithreadInfo::get_n_cpus();
+unsigned int MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
 
 // definition of the variable which is declared `extern' in the .h file
 MultithreadInfo multithread_info;
