@@ -256,7 +256,7 @@ namespace internal
 /**
  * This is an abstract class which provides the functionality to generate
  * patches for output by base classes from data vectors on a grid. It allows
- * to store one or more pointers to a DoFHandler and attached node and cell
+ * to attach one or more pointers to a DoFHandler and attached node and cell
  * data denoting functions on the grid which shall later be written in any of
  * the implemented data formats.
  *
@@ -324,20 +324,22 @@ namespace internal
  * @ref step_22 "step-22"
  * tutorial program).
  *
- * It should be noted that this class does not copy the vector given to it
+ * This class does not copy the vector given to it
  * through the add_data_vector() functions, for memory consumption reasons. It
  * only stores a reference to it, so it is in your responsibility to make sure
  * that the data vectors exist long enough.
  *
  * After adding all data vectors, you need to call a function which generates
- * the patches for output from the stored data. Derived classes name this
+ * the patches (i.e., some intermediate data representation) for output from
+ * the stored data. Derived classes name this
  * function build_patches(). Finally, you write() the data in one format or
  * other, to a file.
  *
- * Please note that in the example above, an object of type DataOut was used,
- * i.e. an object of a derived class. This is necessary since this class does
+ * In the example above, an object of type DataOut was used,
+ * i.e. an object of a derived class. This is necessary since the current class does
  * not provide means to actually generate the patches, only aids to store and
- * access data.
+ * access data. Any real functionality is implemented in derived classes such
+ * as DataOut.
  *
  * Note that the base class of this class, DataOutInterface offers several
  * functions to ease programming with run-time determinable output formats
@@ -351,7 +353,7 @@ namespace internal
  *
  * <h3>Information for derived classes</h3>
  *
- * What is actually missing this class is a way to produce the patches for
+ * What this class lacks is a way to produce the patches for
  * output itself, from the stored data and degree of freedom information.
  * Since this task is often application dependent it is left to derived
  * classes. For example, in many applications, it might be wanted to limit the

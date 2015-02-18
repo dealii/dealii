@@ -139,15 +139,21 @@ public:
 
   /**
    * This is the central function of this class since it builds the list of
-   * patches to be written by the low-level functions of the base class. See
-   * the general documentation of this class for further information.
+   * patches to be written by the low-level functions of the base class. A
+   * patch is, in essence, some intermediate representation of the data on
+   * each cell of a triangulation and DoFHandler object that can then be
+   * used to write files in some format that is readable by visualization
+   * programs.
    *
-   * In addition to the same parameters as found in the respective function of
-   * the DataOut class, the first parameter denotes into how many intervals
-   * the angular (rotation) variable is to be subdivided.
+   * You can find an overview of the use of this function in
+   * the general documentation of this class. An example is also provided in
+   * the documentation of this class's base class DataOut_DoFData.
    *
-   * The function supports multithreading, if deal.II is compiled in
-   * multithreading mode.
+   * @param n_patches_per_circle Denotes into how many intervals
+   *   the angular (rotation) variable is to be subdivided.
+   *
+   * @param n_subdivisions See DataOut::build_patches() for an extensive
+   *   description of this parameter.
    */
   virtual void build_patches (const unsigned int n_patches_per_circle,
                               const unsigned int n_subdivisions = 0);

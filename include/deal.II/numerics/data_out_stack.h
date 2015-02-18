@@ -209,15 +209,23 @@ public:
                         const std::vector<std::string> &names);
 
   /**
-   * Actually build the patches for output by the base classes from the data
-   * stored in the data vectors and using the previously attached DoFHandler
-   * object.
+   * This is the central function of this class since it builds the list of
+   * patches to be written by the low-level functions of the base class. A
+   * patch is, in essence, some intermediate representation of the data on
+   * each cell of a triangulation and DoFHandler object that can then be
+   * used to write files in some format that is readable by visualization
+   * programs.
    *
-   * By @p n_subdivisions you can decide into how many subdivisions (in each
-   * space and parameter direction) each patch is divided. This is useful if
-   * higher order elements are used. Note however, that the number of
-   * subdivisions in parameter direction is always the same as the one is
-   * space direction for technical reasons.
+   * You can find an overview of the use of this function in
+   * the general documentation of this class. An example is also provided in
+   * the documentation of this class's base class DataOut_DoFData.
+   *
+   * @param n_patches_per_circle Denotes into how many intervals
+   *   the angular (rotation) variable is to be subdivided.
+   *
+   * @param n_subdivisions See DataOut::build_patches() for an extensive
+   *   description of this parameter. The number of subdivisions is always
+   *   one in the direction of the time-like parameter used by this class.
    */
   void build_patches (const unsigned int n_subdivisions = 0);
 
