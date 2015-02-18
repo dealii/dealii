@@ -367,19 +367,7 @@ struct ProductType<T,T>
 };
 
 template <typename T>
-struct ProductType<T,double>
-{
-  typedef T type;
-};
-
-template <typename T>
 struct ProductType<T,bool>
-{
-  typedef T type;
-};
-
-template <typename T>
-struct ProductType<double,T>
 {
   typedef T type;
 };

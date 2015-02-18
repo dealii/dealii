@@ -131,7 +131,7 @@ namespace OpenCASCADE
                        const Point<spacedim> &candidate) const
   {
     TopoDS_Shape out_shape;
-    Point<3> average_normal(0.0,0.0,0.0);
+    Tensor<1,3> average_normal;
 #ifdef DEBUG
     for (unsigned int i=0; i<surrounding_points.size(); ++i)
       {
@@ -161,7 +161,7 @@ namespace OpenCASCADE
         Assert(average_normal.norm() > 1e-4,
                ExcMessage("Failed to refine cell: the average of the surface normals at the surrounding edge turns out to be a null vector, making the projection direction undetermined."));
 
-        Point<3> T = surrounding_points[0]-surrounding_points[1];
+        Tensor<1,3> T = surrounding_points[0]-surrounding_points[1];
         T /= T.norm();
         average_normal = average_normal-(average_normal*T)*T;
         average_normal /= average_normal.norm();
@@ -169,21 +169,25 @@ namespace OpenCASCADE
       }
       case 8:
       {
-        Point<3> u = surrounding_points[1]-surrounding_points[0];
-        Point<3> v = surrounding_points[2]-surrounding_points[0];
-        Point<3> n1(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0));
+        Tensor<1,3> u = surrounding_points[1]-surrounding_points[0];
+        Tensor<1,3> v = surrounding_points[2]-surrounding_points[0];
+	const double n1_coords[3] = {u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0)};
+        Tensor<1,3> n1(n1_coords);
         n1 = n1/n1.norm();
         u = surrounding_points[2]-surrounding_points[3];
         v = surrounding_points[1]-surrounding_points[3];
-        Point<3> n2(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0));
+	const double n2_coords[3] = {u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0)};
+        Tensor<1,3> n2(n2_coords);
         n2 = n2/n2.norm();
         u = surrounding_points[4]-surrounding_points[7];
         v = surrounding_points[6]-surrounding_points[7];
-        Point<3> n3(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0));
+	const double n3_coords[3] = {u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0)};
+        Tensor<1,3> n3(n3_coords);
         n3 = n3/n3.norm();
         u = surrounding_points[6]-surrounding_points[7];
         v = surrounding_points[5]-surrounding_points[7];
-        Point<3> n4(u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0));
+	const double n4_coords[3] = {u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0)};
+        Tensor<1,3> n4(n4_coords);
         n4 = n4/n4.norm();
         //for (unsigned int i=0; i<surrounding_points.size(); ++i)
         //    cout<<surrounding_points[i]<<endl;
