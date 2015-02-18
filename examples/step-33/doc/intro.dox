@@ -128,27 +128,33 @@ Hartmann's PhD thesis ("Adaptive Finite Element Methods for the
 Compressible Euler Equations", PhD thesis, University of Heidelberg, 2002).
 
 We use a time stepping scheme to substitute the time derivative in the
-above equations. At each time step, our full discretization is thus
+above equations. For simplicity, we define $ \mathbf{B}({\mathbf{w}_{n})(\mathbf z) $ as the spacial residual at time step $n$ :
+
+@f{eqnarray*}
+ \mathbf{B}({\mathbf{w}_{n})(\mathbf z)  &=&
+- \int_{\Omega} \left(\mathbf{F}(\mathbf{w_n}),
+\nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w_n} , \nabla \mathbf{z})
+\\
+&& 
++ 
+\int_{\partial \Omega} \left(\mathbf{H}(\mathbf{w_n}^+,
+\mathbf{w}^-(\mathbf{w_n}^+), \mathbf{n}), \mathbf{z}\right)
+-
+\int_{\partial \Omega} \left(\mathbf{G}(\mathbf{w_n}),
+\mathbf{z}\right) .
+@f}
+
+At each time step, our full discretization is thus
 that the residual applied to any test
 function $\mathbf z$ equals zero:
 @f{eqnarray*}
 R(\mathbf{W}_{n+1})(\mathbf z) &=&
 \int_{\Omega} \left(\frac{\mathbf{w}_{n+1} - \mathbf{w}_n}{\delta t},
-\mathbf{z}\right)
-- \int_{\Omega} \left(\mathbf{F}(\tilde{\mathbf{w}}),
-\nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z})
-\\
-&& \qquad
-+
-\int_{\partial \Omega} \left(\mathbf{H}(\tilde{\mathbf{w}}^+),
-\mathbf{w}^-(\tilde{\mathbf{w}}^+), \mathbf{n}), \mathbf{z}\right)
--
-\int_{\partial \Omega} \left(\mathbf{G}(\mathbf{w}),
-\mathbf{z}\right)
-\\
+\mathbf{z}\right)+
+\theta \mathbf{B}({\mathbf{w}_{n+1}) +  (1-\theta) \mathbf{B}({\mathbf{w}_{n}) \\
 & = & 0
 @f}
-where $\tilde{\mathbf{w}} = \theta \mathbf{w}_{n+1} + (1-\theta) \mathbf{w}_n$ for $0 \leq \theta \leq 1$ and
+where $ \theta \in [0,1] $ and
 $\mathbf{w}_i = \sum_k \mathbf{W}_i^k \mathbf{\phi}_k$. Choosing
 $\theta=0$ results in the explicit (forward) Euler scheme, $\theta=1$
 in the stable implicit (backward) Euler scheme, and $\theta=\frac 12$
