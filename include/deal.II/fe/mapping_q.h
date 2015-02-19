@@ -487,13 +487,6 @@ private:
 
 #ifndef DOXYGEN
 
-template<> MappingQ<1>::MappingQ (const unsigned int,
-                                  const bool);
-template<> MappingQ<1>::~MappingQ ();
-
-template<>
-void MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
-                                          MappingQ1<1>::InternalData   &data) const;
 template <>
 void MappingQ<1>::set_laplace_on_quad_vector(Table<2,double> &) const;
 

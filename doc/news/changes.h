@@ -350,6 +350,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: MappingQEulerian would previously not move interior points
+  in 1D for higher order mappings. This has been fixed by removing a few
+  specializations of MappingQ for 1D that are no longer necessary.
+  <br>
+  (Martin Kronbichler, 2015/02/19)
+  </li>
+
   <li> Fixed: The implementation of the class GrowingVectorMemory has been
   moved from source/lac/vector_memory.cc to the new file
   include/deal.II/lac/vector_memory.templates.h. This allows users to
