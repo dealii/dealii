@@ -121,21 +121,24 @@ template <typename number> class Vector;
  * vectors.
  *
  * Finally, the solvers also expect an instantiation of
- * GrowingVectorMemory<VECTOR>. These instantiations are provided by the
+ * GrowingVectorMemory@<VECTOR@>. These instantiations are provided by the
  * deal.II library for the built-in vector types, but must be explicitly added
  * for user-provided vector classes. Otherwise, the linker will complain that
- * it cannout find the constructors and destructors of GrowingVectorMemory
- * that happen in the @p Solver class below.
+ * it cannot find the constructors and destructors of GrowingVectorMemory that
+ * happen in the @p Solver class.
  *
  * @code
- * #include <deal.II/lac/vector_memory.templates.h>
- *
  * // Definition and implementation of vector class
  * class UserVector { ... };
  *
- * // Create explicit instantiation for the vector class
- * template class VectorMemory<UserVector >;
- * template class GrowingVectorMemory<UserVector >;
+ * // Create explicit instantiation for the vector class. If your project
+ * // consists of multiple files, including header files, this instantiation
+ * // must be put in a <code>.cc</code> file in order to instantiate only
+ * // once.
+ * #include <deal.II/lac/vector_memory.templates.h>
+ *
+ * template class VectorMemory<UserVector>;
+ * template class GrowingVectorMemory<UserVector>;
  * @endcode
  *
  * The preconditioners used must have the same interface as matrices, i.e. in
