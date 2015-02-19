@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -152,6 +152,9 @@ DEAL_II_PACKAGE_HANDLE(UMFPACK
     REQUIRED AMD_LIBRARY
     OPTIONAL METIS_LIBRARIES LAPACK_LIBRARIES rt_LIBRARY
   INCLUDE_DIRS
+    REQUIRED UMFPACK_INCLUDE_DIR AMD_INCLUDE_DIR
+    OPTIONAL SuiteSparse_config_INCLUDE_DIR
+  USER_INCLUDE_DIRS
     REQUIRED UMFPACK_INCLUDE_DIR AMD_INCLUDE_DIR
     OPTIONAL SuiteSparse_config_INCLUDE_DIR
   LINKER_FLAGS

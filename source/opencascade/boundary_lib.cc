@@ -171,22 +171,22 @@ namespace OpenCASCADE
       {
         Tensor<1,3> u = surrounding_points[1]-surrounding_points[0];
         Tensor<1,3> v = surrounding_points[2]-surrounding_points[0];
-	const double n1_coords[3] = {u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0)};
+        const double n1_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
         Tensor<1,3> n1(n1_coords);
         n1 = n1/n1.norm();
         u = surrounding_points[2]-surrounding_points[3];
         v = surrounding_points[1]-surrounding_points[3];
-	const double n2_coords[3] = {u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0)};
+        const double n2_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
         Tensor<1,3> n2(n2_coords);
         n2 = n2/n2.norm();
         u = surrounding_points[4]-surrounding_points[7];
         v = surrounding_points[6]-surrounding_points[7];
-	const double n3_coords[3] = {u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0)};
+        const double n3_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
         Tensor<1,3> n3(n3_coords);
         n3 = n3/n3.norm();
         u = surrounding_points[6]-surrounding_points[7];
         v = surrounding_points[5]-surrounding_points[7];
-	const double n4_coords[3] = {u(1)*v(2)-u(2)*v(1),u(2)*v(0)-u(0)*v(2),u(0)*v(1)-u(1)*v(0)};
+        const double n4_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
         Tensor<1,3> n4(n4_coords);
         n4 = n4/n4.norm();
         //for (unsigned int i=0; i<surrounding_points.size(); ++i)

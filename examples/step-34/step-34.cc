@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2014 by the deal.II authors
+ * Copyright (C) 2009 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -79,7 +79,7 @@ namespace Step34
   namespace LaplaceKernel
   {
     template <int dim>
-    double single_layer(const Point<dim> &R)
+    double single_layer(const Tensor<1,dim> &R)
     {
       switch (dim)
         {
@@ -98,7 +98,7 @@ namespace Step34
 
 
     template <int dim>
-    Point<dim> double_layer(const Point<dim> &R)
+    Tensor<1,dim> double_layer(const Tensor<1,dim> &R)
     {
       switch (dim)
         {
@@ -638,7 +638,7 @@ namespace Step34
                     for (unsigned int d=0; d<dim; ++d)
                       normal_wind += normals[q][d]*cell_wind[q](d);
 
-                    const Point<dim> R = q_points[q] - support_points[i];
+                    const Tensor<1,dim> R = q_points[q] - support_points[i];
 
                     system_rhs(i) += ( LaplaceKernel::single_layer(R)   *
                                        normal_wind                      *
@@ -692,7 +692,7 @@ namespace Step34
 
                 for (unsigned int q=0; q<singular_quadrature.size(); ++q)
                   {
-                    const Point<dim> R = singular_q_points[q] - support_points[i];
+                    const Tensor<1,dim> R = singular_q_points[q] - support_points[i];
                     double normal_wind = 0;
                     for (unsigned int d=0; d<dim; ++d)
                       normal_wind += (singular_cell_wind[q](d)*
@@ -974,7 +974,7 @@ namespace Step34
           for (unsigned int q=0; q<n_q_points; ++q)
             {
 
-              const Point<dim> R =  q_points[q] - external_support_points[i];
+              const Tensor<1,dim> R = q_points[q] - external_support_points[i];
 
               external_phi(i) += ( ( LaplaceKernel::single_layer(R) *
                                      normal_wind[q]
