@@ -103,13 +103,13 @@ namespace Step34
       switch (dim)
         {
         case 2:
-          return R / ( -2*numbers::PI * R.square());
+          return R / ( -2*numbers::PI * R.norm_square());
         case 3:
-          return R / ( -4*numbers::PI * R.square() * R.norm() );
+          return R / ( -4*numbers::PI * R.norm_square() * R.norm() );
 
         default:
           Assert(false, ExcInternalError());
-          return Point<dim>();
+          return Tensor<1,dim>();
         }
     }
   }
