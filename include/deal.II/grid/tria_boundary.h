@@ -467,12 +467,6 @@ get_new_point_on_quad (const Triangulation<3,3>::quad_iterator &quad) const;
 
 template <>
 void
-StraightBoundary<1,1>::
-get_intermediate_points_on_line (const Triangulation<1,1>::line_iterator &,
-                                 std::vector<Point<1> > &) const;
-
-template <>
-void
 StraightBoundary<3,3>::
 get_intermediate_points_on_quad (const Triangulation<3,3>::quad_iterator &quad,
                                  std::vector<Point<3> > &points) const;

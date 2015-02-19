@@ -335,42 +335,6 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 
 
 
-template <>
-void
-StraightBoundary<1>::
-get_intermediate_points_on_line (const Triangulation<1>::line_iterator &,
-                                 std::vector<Point<1> > &) const
-{
-  Assert(false, ExcImpossibleInDim(1));
-}
-
-template <>
-void
-StraightBoundary<1, 2>::
-get_intermediate_points_on_line (const Triangulation<1, 2>::line_iterator &line,
-                                 std::vector<Point<2> > &points) const
-{
-  const unsigned int spacedim = 2;
-  const unsigned int n=points.size();
-  Assert(n>0, ExcInternalError());
-
-  // Use interior points of QGaussLobatto quadrature formula support points
-  // for consistency with MappingQ
-  const std::vector<Point<1> > &line_points = this->get_line_support_points(n);
-  const Point<spacedim> vertices[2] = { line->vertex(0),
-                                        line->vertex(1)
-                                      };
-
-  for (unsigned int i=0; i<n; ++i)
-    {
-      const double x = line_points[i+1][0];
-      points[i] = (1-x)*vertices[0] + x*vertices[1];
-    }
-}
-
-
-
-
 template <int dim, int spacedim>
 void
 StraightBoundary<dim, spacedim>::

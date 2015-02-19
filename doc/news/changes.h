@@ -350,6 +350,22 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: MappingQEulerian would previously not move interior points
+  in 1D for higher order mappings. This has been fixed by removing a few
+  specializations of MappingQ for 1D that are no longer necessary.
+  <br>
+  (Martin Kronbichler, 2015/02/19)
+  </li>
+
+  <li> Fixed: The implementation of the class GrowingVectorMemory has been
+  moved from source/lac/vector_memory.cc to the new file
+  include/deal.II/lac/vector_memory.templates.h. This allows users to
+  create instantiations of GrowingVectorMemory for their own vector classes
+  in case they intend to use them for the deal.II solvers.
+  <br>
+  (Martin Kronbichler, 2015/02/18)
+  </li>
+
   <li> Changed: All members of MultithreadInfo are now static so it is no
   longer necessary to use the global instance multithread_info (now
   deprecated) or create your own instance (which does not work correctly
