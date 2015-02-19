@@ -57,44 +57,6 @@ MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 
 
 
-// in 1d, it is irrelevant which polynomial degree to use, since all
-// cells are scaled linearly. Unless codimension is equal to two
-template<>
-MappingQ<1>::MappingQ (const unsigned int,
-                       const bool /*use_mapping_q_on_all_cells*/)
-  :
-  degree(1),
-  n_inner(0),
-  n_outer(0),
-  tensor_pols(0),
-  n_shape_functions(2),
-  renumber(0),
-  use_mapping_q_on_all_cells (false),
-  feq(degree),
-  line_support_points(degree+1)
-{}
-
-
-template<>
-MappingQ<1>::MappingQ (const MappingQ<1> &m):
-  MappingQ1<1> (),
-  degree(1),
-  n_inner(0),
-  n_outer(0),
-  tensor_pols(0),
-  n_shape_functions(2),
-  renumber(0),
-  use_mapping_q_on_all_cells (m.use_mapping_q_on_all_cells),
-  feq(degree),
-  line_support_points(degree+1)
-{}
-
-template<>
-MappingQ<1>::~MappingQ ()
-{}
-
-
-
 namespace
 {
   template <int dim>
@@ -175,16 +137,6 @@ template<int dim, int spacedim>
 MappingQ<dim,spacedim>::~MappingQ ()
 {
   delete tensor_pols;
-}
-
-
-
-template<>
-void
-MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
-                                     MappingQ1<1>::InternalData   &data) const
-{
-  MappingQ1<1>::compute_shapes_virtual(unit_points, data);
 }
 
 
