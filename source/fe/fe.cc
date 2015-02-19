@@ -821,9 +821,16 @@ template <int dim, int spacedim>
 const FullMatrix<double> &
 FiniteElement<dim,spacedim>::constraints (const internal::SubfaceCase<dim> &subface_case) const
 {
-  Assert (subface_case==internal::SubfaceCase<dim>::case_isotropic, ExcConstraintsVoid());
+  Assert (subface_case==internal::SubfaceCase<dim>::case_isotropic,
+          ExcMessage("Constraints for this element are only implemented "
+                     "for the case that faces are refined isotropically "
+                     "(which is always the case in 2d, and in 3d requires "
+                     "that the neighboring cell of a coarse cell presents "
+                     "exactly four children on the common face)."));
   Assert ((this->dofs_per_face  == 0) || (interface_constraints.m() != 0),
-          ExcConstraintsVoid());
+          ExcMessage ("The finite element for which you try to obtain "
+                      "hanging node constraints does not appear to "
+                      "implement them."));
 
   if (dim==1)
     Assert ((interface_constraints.m()==0) && (interface_constraints.n()==0),

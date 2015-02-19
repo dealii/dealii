@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -694,13 +694,10 @@ public:
   bool restriction_is_additive (const unsigned int index) const;
 
   /**
-   * Return a read only reference to the matrix which describes the
+   * Return a read only reference to the matrix that describes the
    * constraints at the interface between a refined and an unrefined cell.
    *
-   * The matrix is obviously empty in only one dimension, since there are no
-   * constraints then.
-   *
-   * Note that some finite elements do not (yet) implement hanging node
+   * Some finite elements do not (yet) implement hanging node
    * constraints. If this is the case, then this function will generate an
    * exception, since no useful return value can be generated. If you should
    * have a way to live with this, then you might want to use the
@@ -1628,7 +1625,7 @@ public:
   DeclException0 (ExcUnitShapeValuesDoNotExist);
 
   /**
-   * Attempt to access support points of a finite element which is not
+   * Attempt to access support points of a finite element that is not
    * Lagrangian.
    *
    * @ingroup Exceptions
@@ -1636,7 +1633,7 @@ public:
   DeclException0 (ExcFEHasNoSupportPoints);
 
   /**
-   * Attempt to access embedding matrices of a finite element which did not
+   * Attempt to access embedding matrices of a finite element that did not
    * implement these matrices.
    *
    * @ingroup Exceptions
@@ -1644,22 +1641,13 @@ public:
   DeclException0 (ExcEmbeddingVoid);
 
   /**
-   * Attempt to access restriction matrices of a finite element which did not
+   * Attempt to access restriction matrices of a finite element that did not
    * implement these matrices.
    *
    * Exception
    * @ingroup Exceptions
    */
   DeclException0 (ExcProjectionVoid);
-
-  /**
-   * Attempt to access constraint matrices of a finite element which did not
-   * implement these matrices.
-   *
-   * Exception
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcConstraintsVoid);
 
   /**
    * Exception
