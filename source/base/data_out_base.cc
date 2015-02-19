@@ -6657,7 +6657,7 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
       std::stringstream ss;
       DataOutBase::write_vtu_header(ss, vtk_flags);
       header_size = ss.str().size();
-      MPI_File_write(fh, const_cast<char *>(ss.str().c_str()), header_size, MPI_CHAR, NULL);
+      MPI_File_write(fh, const_cast<char *>(ss.str().c_str()), header_size, MPI_CHAR, MPI_STATUS_IGNORE);
     }
 
   MPI_Bcast(&header_size, 1, MPI_INT, 0, comm);
@@ -6668,7 +6668,7 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
     DataOutBase::write_vtu_main (get_patches(), get_dataset_names(),
                                  get_vector_data_ranges(),
                                  vtk_flags, ss);
-    MPI_File_write_ordered(fh, const_cast<char *>(ss.str().c_str()), ss.str().size(), MPI_CHAR, NULL);
+    MPI_File_write_ordered(fh, const_cast<char *>(ss.str().c_str()), ss.str().size(), MPI_CHAR, MPI_STATUS_IGNORE);
   }
 
   //write footer
@@ -6677,7 +6677,7 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
       std::stringstream ss;
       DataOutBase::write_vtu_footer(ss);
       unsigned int footer_size = ss.str().size();
-      MPI_File_write_shared(fh, const_cast<char *>(ss.str().c_str()), footer_size, MPI_CHAR, NULL);
+      MPI_File_write_shared(fh, const_cast<char *>(ss.str().c_str()), footer_size, MPI_CHAR, MPI_STATUS_IGNORE);
     }
   MPI_File_close( &fh );
 #endif
