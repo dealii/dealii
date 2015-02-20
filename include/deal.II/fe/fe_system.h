@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -156,17 +156,32 @@ class FESystem : public FiniteElement<dim,spacedim>
 public:
 
   /**
-   * Constructor. Take a finite element type and the number of elements you
+   * Constructor. Take a finite element and the number of elements you
    * want to group together using this class.
    *
-   * In fact, the object @p fe is not used, apart from getting the number of
-   * dofs per vertex, line, etc for that finite element class. The objects
-   * creates its own copy of the finite element object at construction time
-   * (but after the initialization of the base class @p FiniteElement, which
-   * is why we need a valid finite element object passed to the constructor).
+   * The object @p fe is not actually used for anything other than creating
+   * a copy that will then be owned by the current object. In other words,
+   * it is completely fine to call this constructor with a temporary object
+   * for the finite element, as in this code snippet:
+   * @code
+   *   FESystem<dim> fe (FE_Q<dim>(2), 2);
+   * @endcode
+   * Here, <code>FE_Q@<dim@>(2)</code> constructs an unnamed, temporary
+   * object that is passed to the FESystem constructor to create a
+   * finite element that consists of two components, both of which are
+   * quadratic FE_Q elements. The temporary is destroyed again at the
+   * end of the code that corresponds to this line, but this does not
+   * matter because FESystem creates its own copy of the FE_Q object.
    *
-   * Obviously, the template finite element class needs to be of the same
-   * dimension as is this object.
+   * This constructor (or its variants below) is used in essentially all
+   * tutorial programs that deal with vector valued problems. See step-8,
+   * step-20, step-22 and others for use cases. Also see the module on
+   * @ref vector_valued "Handling vector valued problems".
+   *
+   * @param[in] fe The finite element that will be used to represent
+   *   the components of this composed element.
+   * @param[in] n_elements An integer denoting how many copies of
+   *   @fe this element should consist of.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe,
             const unsigned int n_elements);
@@ -174,7 +189,8 @@ public:
   /**
    * Constructor for mixed discretizations with two base elements.
    *
-   * See the other constructor.
+   * See the other constructor above for an explanation of the
+   * general idea of composing elements.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
             const FiniteElement<dim,spacedim> &fe2, const unsigned int n2);
@@ -182,7 +198,8 @@ public:
   /**
    * Constructor for mixed discretizations with three base elements.
    *
-   * See the other constructor.
+   * See the other constructor above for an explanation of the
+   * general idea of composing elements.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
             const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
@@ -191,7 +208,8 @@ public:
   /**
    * Constructor for mixed discretizations with four base elements.
    *
-   * See the other constructor.
+   * See the first of the other constructors above for an explanation of the
+   * general idea of composing elements.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
             const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
@@ -201,7 +219,8 @@ public:
   /**
    * Constructor for mixed discretizations with five base elements.
    *
-   * See the other constructor.
+   * See the first of the other constructors above for an explanation of the
+   * general idea of composing elements.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
             const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
