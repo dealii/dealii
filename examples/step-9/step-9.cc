@@ -48,7 +48,7 @@
 // programs. In the first one, the classes and functions are declared which we
 // need to do assembly in parallel (i.e. the
 // <code>WorkStream</code> namespace). The
-// second file has a class <code>MultithreadInfo</code> which can be used to query the
+// second file has a class MultithreadInfo which can be used to query the
 // number of processors in your system, which is often useful when deciding
 // how many threads to start in parallel.
 #include <deal.II/base/work_stream.h>
@@ -1318,14 +1318,24 @@ namespace Step9
 
 // @sect3{Main function}
 
-// The <code>main</code> function is exactly like in previous examples, with
-// the only difference in the name of the main class that actually does the
-// computation.
+// The <code>main</code> function is similar to the previous examples. The main
+// difference is that we use MultithreadInfo to set the maximum
+// number of threads (see @ref threads "Parallel computing with multiple
+// processors accessing shared memory" documentation module for more
+// explanation). The number of threads used is the minimum of the environment
+// variable DEAL_II_NUM_THREADS and the parameter of
+// <code>set_thread_limit</code>. If no value is given to
+// <code>set_thread_limit</code>, the default value from the Intel Threading
+// Building Blocks (TBB) library is used. If the call to
+// <code>set_thread_limit</code> is omitted, the number of threads will be
+// chosen by TBB indepently of DEAL_II_NUM_THREADS.
 int main ()
 {
   try
     {
       dealii::deallog.depth_console (0);
+
+      dealii::MultithreadInfo::set_thread_limit();
 
       Step9::AdvectionProblem<2> advection_problem_2d;
       advection_problem_2d.run ();
