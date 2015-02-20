@@ -236,8 +236,181 @@ public:
    * Same as above but for any number of base elements. Pointers to the base
    * elements and their multiplicities are passed as vectors to this
    * constructor. The lengths of these vectors are assumed to be equal.
+   *
+   * As above, the finite element objects pointed to by the first argument are
+   * not actually used other than to create copies internally. Consequently,
+   * you can delete these pointers immediately again after calling this
+   * constructor.
+   *
+   * <h4>How to use this constructor</h4>
+   *
+   * Using this constructor is a bit awkward at times because you need to pass
+   * two vectors in a place where it may not be straightforward to construct
+   * such a vector -- for example, in the member initializer list of a class
+   * with an FESystem member variable. For example, if your main class looks
+   * like this:
+   * @code
+   *   template <int dim>
+   *   class MySimulator {
+   *   public:
+   *     MySimulator (const unsigned int polynomial_degree);
+   *   private:
+   *     FESystem<dim> fe;
+   *   };
+   *
+   *   template <int dim>
+   *   MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
+   *     :
+   *     fe (...)  // what to pass here???
+   *   {}
+   * @endcode
+   *
+   * If your compiler supports the C++11 language standard (or later) and
+   * deal.II has been configured to use it, then you could do something
+   * like this to create an element with four base elements and
+   * multiplicities 1, 2, 3 and 4:
+   * @code
+   *   template <int dim>
+   *   MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
+   *     :
+   *     fe (std::vector<const FiniteElement<dim>*> { new FE_Q<dim>(1),
+   *                                                  new FE_Q<dim>(2),
+   *                                                  new FE_Q<dim>(3),
+   *                                                  new FE_Q<dim>(4) },
+   *         std::vector<unsigned int> { 1, 2, 3, 4 })
+   *   {}
+   * @endcode
+   * This creates two vectors in place and initializes them using the
+   * initializer list enclosed in braces <code>{ ... }</code>.
+   *
+   * This code has a problem: it creates four memory leaks because the first
+   * vector above is created with pointers to elements that are allocated
+   * with <code>new</code> but never destroyed. Without C++11, you have another
+   * problem: brace-initializer don't exist in earlier C++ standards.
+   *
+   * The solution to the second of these problems is to create two static
+   * member functions that can create vectors. Here is an example:
+   * @code
+   *   template <int dim>
+   *   class MySimulator {
+   *   public:
+   *     MySimulator (const unsigned int polynomial_degree);
+   *
+   *   private:
+   *     FESystem<dim> fe;
+   *
+   *     static std::vector<const FiniteElement<dim>*>
+   *     create_fe_list (const unsigned int polynomial_degree);
+   *
+   *     static std::vector<unsigned int>
+   *     create_fe_multiplicities ();
+   *   };
+   *
+   *   template <int dim>
+   *   std::vector<const FiniteElement<dim>*>
+   *   MySimulator<dim>::create_fe_list (const unsigned int polynomial_degree)
+   *   {
+   *     std::vector<const FiniteElement<dim>*> fe_list;
+   *     fe_list.push_back (new FE_Q<dim>(1));
+   *     fe_list.push_back (new FE_Q<dim>(2));
+   *     fe_list.push_back (new FE_Q<dim>(3));
+   *     fe_list.push_back (new FE_Q<dim>(4));
+   *     return fe_list;
+   *   }
+   *
+   *   template <int dim>
+   *   std::vector<unsigned int>
+   *   MySimulator<dim>::create_fe_multiplicities ()
+   *   {
+   *     std::vector<unsigned int> multiplicities;
+   *     multiplicities.push_back (1);
+   *     multiplicities.push_back (2);
+   *     multiplicities.push_back (3);
+   *     multiplicities.push_back (4);
+   *     return multiplicities;
+   *   }
+   *
+   *   template <int dim>
+   *   MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
+   *     :
+   *     fe (create_fe_list (polynomial_degree),
+   *         create_fe_multiplicities ())
+   *   {}
+   * @endcode
+   *
+   * The way this works is that we have two static member functions that
+   * create the necessary vectors to pass to the constructor of the member
+   * variable <code>fe</code>. They need to be static because they are called
+   * during the constructor of <code>MySimulator</code> at a time when the
+   * <code>*this</code> object isn't fully constructed and, consequently,
+   * regular member functions cannot be called yet.
+   *
+   * The code above does not solve the problem with the memory leak yet,
+   * though: the <code>create_fe_list()</code> function creates a vector of
+   * pointers, but nothing destroys these. This is the solution:
+   * @code
+   *   template <int dim>
+   *   class MySimulator {
+   *   public:
+   *     MySimulator (const unsigned int polynomial_degree);
+   *
+   *   private:
+   *     FESystem<dim> fe;
+   *
+   *     struct VectorElementDestroyer {
+   *       const std::vector<const FiniteElement<dim>*> data;
+   *       VectorElementDestroyer (const std::vector<const FiniteElement<dim>*> &pointers);
+   *       ~VectorElementDestroyer (); // destructor to delete the pointers
+   *       const std::vector<const FiniteElement<dim>*> & get_data () const;
+   *     };
+   *
+   *     static std::vector<const FiniteElement<dim>*>
+   *     create_fe_list (const unsigned int polynomial_degree);
+   *
+   *     static std::vector<unsigned int>
+   *     create_fe_multiplicities ();
+   *   };
+   *
+   *   template <int dim>
+   *   MySimulator<dim>::VectorElementDestroyer::
+   *   VectorElementDestroyer (const std::vector<const FiniteElement<dim>*> &pointers)
+   *     : data(pointers)
+   *   {}
+   *
+   *   template <int dim>
+   *   MySimulator<dim>::VectorElementDestroyer::
+   *   ~VectorElementDestroyer ()
+   *   {
+   *     for (unsigned int i=0; i<data.size(); ++i)
+   *       delete data[i];
+   *   }
+   *
+   *   template <int dim>
+   *   const std::vector<const FiniteElement<dim>*> &
+   *   MySimulator<dim>::VectorElementDestroyer::
+   *   get_data () const
+   *   {
+   *     return data;
+   *   }
+   *
+   *
+   *   template <int dim>
+   *   MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
+   *     :
+   *     fe (VectorElementDestroyer(create_fe_list (polynomial_degree)).get_data(),
+   *         create_fe_multiplicities ())
+   *   {}
+   * @endcode
+   *
+   * In other words, the vector we receive from the
+   * <code>create_fe_list()</code> is packed into a temporary object of type
+   * <code>VectorElementDestroyer</code>; we then get the vector from this
+   * temporary object immediately to pass it to the constructor of
+   * <code>fe</code>; and finally, the <code>VectorElementDestroyer</code>
+   * destructor is called at the end of the entire expression (after the
+   * constructor of <code>fe</code> has finished) and destroys the elements of
+   * the temporary vector. Voila: not short nor elegant, but it works!
    */
-
   FESystem (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
             const std::vector<unsigned int>                   &multiplicities);
 
