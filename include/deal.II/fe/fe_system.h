@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ref vector_valued
  * module.
  *
- * @videolecture{19,20}
+ * @dealiiVideoLecture{19,20}
  *
  * <h3>FESystem, components and blocks</h3>
  *
@@ -180,7 +180,7 @@ public:
    * step-20, step-22 and others for use cases. Also see the module on
    * @ref vector_valued "Handling vector valued problems".
    *
-   * @videolecture{19,20}
+   * @dealiiVideoLecture{19,20}
    *
    * @param[in] fe The finite element that will be used to represent
    *   the components of this composed element.
