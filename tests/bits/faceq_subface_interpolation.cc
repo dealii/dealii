@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,9 +16,10 @@
 
 #include "../tests.h"
 #include <deal.II/fe/fe_face.h>
+#include <deal.II/fe/fe_trace.h>
 
 // check
-//   FE_FaceQ/P::subface_interpolation
+//   FE_FaceQ/FaceP/TraceQ::subface_interpolation
 
 
 std::string output_file_name = "output";
@@ -143,6 +144,15 @@ check (const unsigned int degree1,
 
     check_this (fe1, fe2);
   }
+  if (degree1 > 0 && degree2 > 0)
+    {
+      deallog << "Checking FE_TraceQ in " << dim << "d:"
+              << std::endl;
+
+      FE_FaceP<dim> fe1 (degree1), fe2 (degree2);
+
+      check_this (fe1, fe2);
+    }
 }
 
 
@@ -172,6 +182,7 @@ main()
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
+      check<1>();
       check<2>();
       check<3>();
 

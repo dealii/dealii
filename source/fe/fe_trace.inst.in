@@ -15,7 +15,5 @@
 
 for (deal_II_dimension : DIMENSIONS)
   {
-#if deal_II_dimension > 1
     template class FE_TraceQ<deal_II_dimension>;
-#endif
   }

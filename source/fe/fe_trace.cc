@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,8 +16,10 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/qprojector.h>
 #include <deal.II/fe/fe_poly_face.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_trace.h>
 
@@ -35,7 +37,8 @@ FE_TraceQ<dim,spacedim>::FE_TraceQ (const unsigned int degree)
   FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim> (
     TensorProductPolynomials<dim-1>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
     FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-    std::vector<bool>(1,true))
+    std::vector<bool>(1,true)),
+  fe_q (degree)
 {
   Assert (degree > 0,
           ExcMessage ("FE_Trace can only be used for polynomial degrees "
@@ -45,9 +48,11 @@ FE_TraceQ<dim,spacedim>::FE_TraceQ (const unsigned int degree)
   this->poly_space.set_numbering(renumber);
 
   // Initialize face support points
-  FE_Q<dim,spacedim> fe_q(degree);
   this->unit_face_support_points = fe_q.get_unit_face_support_points();
+  // Initialize constraint matrices
+  this->interface_constraints = fe_q.constraints();
 }
+
 
 
 template <int dim, int spacedim>
@@ -56,6 +61,7 @@ FE_TraceQ<dim,spacedim>::clone() const
 {
   return new FE_TraceQ<dim,spacedim>(this->degree);
 }
+
 
 
 template <int dim, int spacedim>
@@ -77,6 +83,8 @@ FE_TraceQ<dim,spacedim>::get_name () const
   return namebuf.str();
 }
 
+
+
 template <int dim, int spacedim>
 bool
 FE_TraceQ<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
@@ -87,90 +95,7 @@ FE_TraceQ<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
-  // let's see whether this is a
-  // vertex
-  if (shape_index < this->first_line_index)
-    {
-      // for Q elements, there is
-      // one dof per vertex, so
-      // shape_index==vertex_number. check
-      // whether this vertex is
-      // on the given face. thus,
-      // for each face, give a
-      // list of vertices
-      const unsigned int vertex_no = shape_index;
-      Assert (vertex_no < GeometryInfo<dim>::vertices_per_cell,
-              ExcInternalError());
-
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-        if (GeometryInfo<dim>::face_to_cell_vertices(face_index, v) == vertex_no)
-          return true;
-
-      return false;
-    }
-  else if (shape_index < this->first_quad_index)
-    // ok, dof is on a line
-    {
-      const unsigned int line_index
-        = (shape_index - this->first_line_index) / this->dofs_per_line;
-      Assert (line_index < GeometryInfo<dim>::lines_per_cell,
-              ExcInternalError());
-
-      // in 2d, the line is the
-      // face, so get the line
-      // index
-      if (dim == 2)
-        return (line_index == face_index);
-      else if (dim == 3)
-        {
-          // see whether the
-          // given line is on the
-          // given face.
-          for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
-            if (GeometryInfo<3>::face_to_cell_lines(face_index, l) == line_index)
-              return true;
-
-          return false;
-        }
-      else
-        Assert (false, ExcNotImplemented());
-    }
-  else if (shape_index < this->first_hex_index)
-    // dof is on a quad
-    {
-      const unsigned int quad_index
-        = (shape_index - this->first_quad_index) / this->dofs_per_quad;
-      Assert (static_cast<signed int>(quad_index) <
-              static_cast<signed int>(GeometryInfo<dim>::quads_per_cell),
-              ExcInternalError());
-
-      // in 2d, cell bubble are
-      // zero on all faces. but
-      // we have treated this
-      // case above already
-      Assert (dim != 2, ExcInternalError());
-
-      // in 3d,
-      // quad_index=face_index
-      if (dim == 3)
-        return (quad_index == face_index);
-      else
-        Assert (false, ExcNotImplemented());
-    }
-  else
-    // dof on hex
-    {
-      // can only happen in 3d,
-      // but this case has
-      // already been covered
-      // above
-      Assert (false, ExcNotImplemented());
-      return false;
-    }
-
-  // we should not have gotten here
-  Assert (false, ExcInternalError());
-  return false;
+  return fe_q.has_support_on_face (shape_index, face_index);
 }
 
 
@@ -200,6 +125,113 @@ FE_TraceQ<dim,spacedim>::get_dpo_vector (const unsigned int deg)
     dpo[i] = dpo[i-1]*(deg-1);
   return dpo;
 }
+
+
+
+template <int dim, int spacedim>
+bool
+FE_TraceQ<dim,spacedim>::hp_constraints_are_implemented () const
+{
+  return fe_q.hp_constraints_are_implemented ();
+}
+
+
+template <int dim, int spacedim>
+FiniteElementDomination::Domination
+FE_TraceQ<dim,spacedim>::
+compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
+{
+  if (const FE_TraceQ<dim,spacedim> *fe_q_other
+      = dynamic_cast<const FE_TraceQ<dim,spacedim>*>(&fe_other))
+    {
+      if (this->degree < fe_q_other->degree)
+        return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_q_other->degree)
+        return FiniteElementDomination::either_element_can_dominate;
+      else
+        return FiniteElementDomination::other_element_dominates;
+    }
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+    {
+      // the FE_Nothing has no degrees of freedom and it is typically used in
+      // a context where we don't require any continuity along the interface
+      return FiniteElementDomination::no_requirements;
+    }
+
+  Assert (false, ExcNotImplemented());
+  return FiniteElementDomination::neither_element_dominates;
+}
+
+
+
+template <int dim, int spacedim>
+void
+FE_TraceQ<dim,spacedim>::
+get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source_fe,
+                               FullMatrix<double>       &interpolation_matrix) const
+{
+  get_subface_interpolation_matrix (source_fe, numbers::invalid_unsigned_int,
+                                    interpolation_matrix);
+}
+
+
+
+template <int dim, int spacedim>
+void
+FE_TraceQ<dim,spacedim>::
+get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
+                                  const unsigned int        subface,
+                                  FullMatrix<double>       &interpolation_matrix) const
+{
+  // this is the code from FE_FaceQ
+  Assert (interpolation_matrix.n() == this->dofs_per_face,
+          ExcDimensionMismatch (interpolation_matrix.n(),
+                                this->dofs_per_face));
+  Assert (interpolation_matrix.m() == x_source_fe.dofs_per_face,
+          ExcDimensionMismatch (interpolation_matrix.m(),
+                                x_source_fe.dofs_per_face));
+
+  // see if source is a FaceQ element
+  if (const FE_TraceQ<dim,spacedim> *source_fe
+      = dynamic_cast<const FE_TraceQ<dim,spacedim> *>(&x_source_fe))
+    {
+      fe_q.get_subface_interpolation_matrix (source_fe->fe_q, subface, interpolation_matrix);
+    }
+  else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != 0)
+    {
+      // nothing to do here, the FE_Nothing has no degrees of freedom anyway
+    }
+  else
+    AssertThrow (false,(typename FiniteElement<dim,spacedim>::
+                        ExcInterpolationNotImplemented()));
+}
+
+
+
+template <int spacedim>
+FE_TraceQ<1,spacedim>::FE_TraceQ (const unsigned int degree)
+  :
+  FE_FaceQ<1,spacedim> (degree)
+{}
+
+
+
+template <int spacedim>
+std::string
+FE_TraceQ<1,spacedim>::get_name () const
+{
+  // note that the FETools::get_fe_from_name function depends on the
+  // particular format of the string this function returns, so they have to be
+  // kept in synch
+  std::ostringstream namebuf;
+  namebuf << "FE_TraceQ<"
+          << Utilities::dim_string(1,spacedim)
+          << ">(" << this->degree << ")";
+
+  return namebuf.str();
+}
+
+
 
 // explicit instantiations
 #include "fe_trace.inst"

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,8 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/fe/fe_poly_face.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_face.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -76,12 +78,84 @@ public:
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const;
 
+
+
+
+  /**
+   * Return whether this element implements its hanging node constraints in
+   * the new way, which has to be used to make elements "hp compatible".
+   */
+  virtual bool hp_constraints_are_implemented () const;
+
+  /**
+   * Return the matrix interpolating from a face of of one element to the face
+   * of the neighboring element.  The size of the matrix is then
+   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
+   * element only provides interpolation matrices for elements of the same
+   * type and FE_Nothing. For all other elements, an exception of type
+   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
+   */
+  virtual void
+  get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
+                                 FullMatrix<double>       &matrix) const;
+
+  /**
+   * Return the matrix interpolating from a face of of one element to the face
+   * of the neighboring element.  The size of the matrix is then
+   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
+   * element only provides interpolation matrices for elements of the same
+   * type and FE_Nothing. For all other elements, an exception of type
+   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
+   */
+  virtual void
+  get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
+                                    const unsigned int        subface,
+                                    FullMatrix<double>       &matrix) const;
+
+  /**
+   * Return whether this element dominates the one given as argument when they
+   * meet at a common face, whether it is the other way around, whether
+   * neither dominates, or if either could dominate.
+   *
+   * For a definition of domination, see FiniteElementBase::Domination and in
+   * particular the
+   * @ref hp_paper "hp paper".
+   */
+  virtual
+  FiniteElementDomination::Domination
+  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
+
 private:
+  /**
+   * Store a copy of FE_Q for delegating the hp-constraints functionality.
+   */
+  FE_Q<dim, spacedim> fe_q;
   /**
    * Return vector with dofs per vertex, line, quad, hex.
    */
   static std::vector<unsigned int> get_dpo_vector (const unsigned int deg);
 };
+
+
+
+/**
+ * FE_TraceQ in 1D, i.e., with degrees of freedom on the element vertices.
+ */
+template <int spacedim>
+class FE_TraceQ<1,spacedim> : public FE_FaceQ<1,spacedim>
+{
+public:
+  /**
+   * Constructor.
+   */
+  FE_TraceQ (const unsigned int p);
+
+  /**
+   * Returns the name of the element
+   */
+  std::string get_name() const;
+};
+
 
 DEAL_II_NAMESPACE_CLOSE
 
