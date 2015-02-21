@@ -49,10 +49,13 @@ test ()
   data_out.add_data_vector (dof1, v1, "linear");
   data_out.build_patches (2);
 
-  data_out.write_hdf5_parallel ("out.h5", MPI_COMM_WORLD);
+  DataOutBase::DataOutFilter data_filter
+  (DataOutBase::DataOutFilterFlags (false, false));
+  data_out.write_filtered_data (data_filter);
+  data_out.write_hdf5_parallel (data_filter, "out.h5", MPI_COMM_WORLD);
   std::vector<XDMFEntry> xdmf_entries;
-  xdmf_entries.push_back(
-    data_out.create_xdmf_entry("out.h5", 0, MPI_COMM_WORLD));
+  xdmf_entries.push_back
+  (data_out.create_xdmf_entry (data_filter, "out.h5", 0, MPI_COMM_WORLD));
 
   data_out.write_xdmf_file(xdmf_entries, "out.xdmf",
 			   MPI_COMM_WORLD);
