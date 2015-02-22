@@ -528,9 +528,9 @@ namespace TrilinosWrappers
     int ierr;
 
     Teuchos::ParameterList parameter_list;
-    parameter_list.set ("fact: level-of-fill",(int)additional_data.ilu_fill);
-    parameter_list.set ("fact: absolute threshold",additional_data.ilu_atol);
-    parameter_list.set ("fact: relative threshold",additional_data.ilu_rtol);
+    parameter_list.set ("fact: level-of-fill", static_cast<int>(additional_data.ilu_fill));
+    parameter_list.set ("fact: absolute threshold", additional_data.ilu_atol);
+    parameter_list.set ("fact: relative threshold", additional_data.ilu_rtol);
     parameter_list.set ("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
