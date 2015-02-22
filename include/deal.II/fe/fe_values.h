@@ -264,11 +264,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_values function but it only works on the
      * selected scalar component.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the values of shape function (i.e., @p
+     * value_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
     /**
      * Return the gradients of the selected scalar component of the finite
@@ -280,11 +286,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_gradients function but it only works on the
      * selected scalar component.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the gradients of shape function (i.e., @p
+     * gradient_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
-                                 std::vector<gradient_type> &gradients) const;
+                                 std::vector<typename ProductType<gradient_type,typename InputVector::value_type>::type> &gradients) const;
 
     /**
      * Return the Hessians of the selected scalar component of the finite
@@ -296,11 +308,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_hessians function but it only works on the
      * selected scalar component.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the Hessians of shape function (i.e., @p
+     * hessian_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
-                                std::vector<hessian_type> &hessians) const;
+                                std::vector<typename ProductType<hessian_type,typename InputVector::value_type>::type> &hessians) const;
 
     /**
      * Return the Laplacians of the selected scalar component of the finite
@@ -313,11 +331,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_laplacians function but it only works on the
      * selected scalar component.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the Laplacians of shape function (i.e., @p
+     * value_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
-                                  std::vector<value_type> &laplacians) const;
+                                  std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &laplacians) const;
 
   private:
     /**

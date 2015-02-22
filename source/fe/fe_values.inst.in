@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,19 +70,19 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
     template
       void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
       ::get_function_values<dealii::VEC>
-      (const dealii::VEC&, std::vector<value_type>&) const;
+      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,value_type>::type>&) const;
     template
       void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
       ::get_function_gradients<dealii::VEC>
-      (const dealii::VEC&, std::vector<dealii::Tensor<1,deal_II_space_dimension> >&) const;
+      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension>>::type>&) const;
     template
       void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
       ::get_function_hessians<dealii::VEC>
-      (const dealii::VEC&, std::vector<dealii::Tensor<2,deal_II_space_dimension> >&) const;
+      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<2,deal_II_space_dimension>>::type>&) const;
     template
       void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
       ::get_function_laplacians<dealii::VEC>
-      (const dealii::VEC&, std::vector<double>&) const;
+      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,double>::type> &) const;
 
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
@@ -261,16 +261,16 @@ for (deal_II_dimension : DIMENSIONS)
 #if (deal_II_dimension == DIM_A) || (deal_II_dimension == DIM_B)
     template
 	void FEValuesViews::Scalar<deal_II_dimension>::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<double>&) const;
+	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,double>::type> &) const;
     template
 	void FEValuesViews::Scalar<deal_II_dimension>::get_function_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<1,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
     template
 	void FEValuesViews::Scalar<deal_II_dimension>::get_function_hessians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<dealii::Tensor<2,deal_II_dimension> >&) const;
+	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension> >::type>&) const;
     template
 	void FEValuesViews::Scalar<deal_II_dimension>::get_function_laplacians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<double>&) const;
+	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,double>::type>&) const;
 
     template
 	void FEValuesViews::Vector<deal_II_dimension>::get_function_values<dealii::IndexSet>
