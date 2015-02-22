@@ -886,7 +886,7 @@ namespace TrilinosWrappers
 
 
   /**
-   * A wrapper class for an incomplete LU factorization (ILU) preconditioner
+   * A wrapper class for an incomplete LU factorization (ILU(k)) preconditioner
    * for Trilinos matrices. This preconditioner works both in serial and in
    * parallel, depending on the matrix it is based on. In general, an
    * incomplete factorization does not take all fill-in elements that would
@@ -900,14 +900,9 @@ namespace TrilinosWrappers
    * required fill-in elements require this parameter to be set to a higher
    * integer value).
    *
-   * The AdditionalData data structure allows to set preconditioner options.
-   * Besides the fill-in argument, these options are some options for
-   * perturbations (see the documentation of the AdditionalData structure for
-   * details), and a parameter <tt>overlap</tt> that determines if and how
-   * much overlap there should be between the matrix partitions on the various
-   * MPI processes. The default settings are 0 for the additional fill-in, 0
-   * for the absolute augmentation tolerance, 1 for the relative augmentation
-   * tolerance, 0 for the overlap.
+   * The AdditionalData data structure allows to set preconditioner
+   * options. See the documentation of the AdditionalData structure for
+   * details.
    *
    * Note that a parallel application of the ILU preconditioner is actually a
    * block-Jacobi preconditioner with block size equal to the local matrix
@@ -925,29 +920,43 @@ namespace TrilinosWrappers
   public:
     /**
      * Standardized data struct to pipe additional parameters to the
-     * preconditioner. The Trilinos ILU decomposition allows for some fill-in,
-     * so it actually is a threshold incomplete LU factorization. The amount
-     * of fill-in, and hence, the amount of memory used by this
-     * preconditioner, is controlled by the parameter <tt>ilu_fill</tt>, which
-     * specifies this as a double. When forming the preconditioner, for
-     * certain problems bad conditioning (or just bad luck) can cause the
-     * preconditioner to be very poorly conditioned. Hence it can help to add
-     * diagonal perturbations to the original matrix and form the
-     * preconditioner for this slightly better matrix. <tt>ilu_atol</tt> is an
-     * absolute perturbation that is added to the diagonal before forming the
-     * prec, and <tt>ilu_rtol</tt> is a scaling factor $rtol \geq 1$. The last
-     * parameter specifies the overlap of the partitions when the
-     * preconditioner runs in parallel.
+     * preconditioner:
+     * <ul>
+     *
+     * <li> @p ilu_fill: This specifies the amount of additional fill-in
+     * elements besides the original sparse matrix structure. If $k$ is @p
+     * fill, the sparsity pattern of $A^{k+1}$ is used for the storage of
+     * the result of the Gaussian elemination. This is known as ILU($k$) in
+     * the literature.  When @p fill is large, the preconditioner comes
+     * closer to a (direct) sparse LU decomposition. Note, however, that this
+     * will drastically increase the memory requirement, especially when the
+     * preconditioner is used in 3D.
+     *
+     * <li> @p ilu_atol and @p ilu_rtol: These two parameters allow
+     * perturbation of the diagonal of the matrix, which sometimes can help to
+     * get better preconditioners especially in the case of bad
+     * conditioning. Before factorization, the diagonal entry $a_{ii}$ is
+     * replaced by $\alpha sign(a_{ii}) + \beta a_{ii}$, where $\alpha\geq 0$
+     * is the absolute threshold @p ilu_atol and $\beta\geq 1$ is the relative
+     * threshold @p ilu_rtol. The default values ($\alpha = 0$, $\beta = 1$)
+     * therefore use the original, unmodified diagonal entry. Suggested values
+     * are in the order of $10^{-5}$ to $10^{-2}$ for @p ilu_atol and 1.01 for
+     * @p ilu_rtol.
+     *
+     * <li> @p overlap: This determines how large the overlap of the local
+     * matrix portions on each processor in a parallel application should
+     * be. An overlap of 0 corresponds to a block diagonal decomposition on
+     * each processor, an overlap of 1 will additionally include a row j if
+     * there is a nonzero entry in column j in one of the own rows. Higher
+     * overlap numbers work accordingly in a recursive fashion. Increasing @p
+     * overlap will increase communication and storage cost. According to the
+     * IFPACK documentation, an overlap of 1 is often effective and values of
+     * more than 3 are rarely needed.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, the level of extra fill-ins is set to be
-       * zero (just use the matrix structure, do not generate any additional
-       * fill-in), the tolerance level are 0 and 1, respectively, and the
-       * overlap in case of a parallel execution is zero. This overlap in a
-       * block-application of the ILU in the parallel case makes the
-       * preconditioner a so-called additive Schwarz preconditioner.
+       * Constructor with default values for all parameters.
        */
       AdditionalData (const unsigned int ilu_fill = 0,
                       const double       ilu_atol = 0.,
@@ -955,31 +964,24 @@ namespace TrilinosWrappers
                       const unsigned int overlap  = 0);
 
       /**
-       * This specifies the amount of additional fill-in elements besides the
-       * sparse matrix structure. When <tt>ilu_fill</tt> is large, this means
-       * that many fill-ins will be added, so that the ILU preconditioner
-       * comes closer to a (direct) sparse LU decomposition. Note, however,
-       * that this will drastically increase the memory requirement,
-       * especially when the preconditioner is used in 3D.
+       * Additional fill-in, see class documentation above.
        */
       unsigned int ilu_fill;
 
       /**
-       * This specifies the amount of an absolute perturbation that will be
-       * added to the diagonal of the matrix, which sometimes can help to get
-       * better preconditioners.
+       * The amount of perturbation to add to diagonal entries. See the class
+       * documentation above for details.
        */
       double ilu_atol;
 
       /**
-       * This specifies the factor by which the diagonal of the matrix will be
-       * scaled, which sometimes can help to get better preconditioners.
+       * Scaling actor for diagonal entries. See the class documentation above
+       * for details.
        */
       double ilu_rtol;
 
       /**
-       * This determines how large the overlap of the local matrix portions on
-       * each processor in a parallel application should be.
+       * Overlap between processors. See the class documentation for details.
        */
       unsigned int overlap;
     };
