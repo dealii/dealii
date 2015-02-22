@@ -350,6 +350,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: IndexSet now has a local typedef IndexSet::value_type/
+  <br>
+  (Wolfgang Bangerth, 2015/02/22)
+  </li>
+
   <li> Fixed: MappingQEulerian would previously not move interior points
   in 1D for higher order mappings. This has been fixed by removing a few
   specializations of MappingQ for 1D that are no longer necessary.

@@ -60,6 +60,27 @@ class IndexSet
 {
 public:
   /**
+   * One can see an IndexSet as a container of size size(), where the
+   * elements of the containers are bool values that are either false
+   * or true, depending on whether a particular index is an element of
+   * the IndexSet or not. In other words, an IndexSet is a bit like a
+   * vector in which the elements we store are booleans. In this view,
+   * the correct local typedef indicating the type of the elements of
+   * the vector would then be @p bool.
+   *
+   * On the other hand, @p bool has the disadvantage that it is not a
+   * numerical type that, for example, allows multiplication with a @p
+   * double. In other words, one can not easily use a vector of
+   * booleans in a place where other vectors are
+   * allowed. Consequently, we declare the type of the elements of
+   * such a vector as a signed integer. This uses the fact that in the
+   * C++ language, booleans are implicitly convertible to integers. In
+   * other words, declaring the type of the elements of the vector as
+   * a signed integer is only a small lie, but it is a useful one.
+   */
+  typedef signed int value_type;
+
+  /**
    * Default constructor.
    */
   IndexSet ();
