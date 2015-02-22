@@ -445,22 +445,16 @@ namespace FEValuesViews
 
   namespace internal
   {
-    // put the evaluation part of the get_function_xxx from a local vector
-    // into separate functions. this reduces the size of the compilation unit
-    // by a factor more than 2 without affecting the performance at all.
-
-    // remark: up to revision 27774, dof_values used to be extracted as
-    // VectorType::value_type and not simply double. this did not make a lot
-    // of sense since they were later extracted and converted to double
-    // consistently throughout the code since revision 17903 at least.
+    // Given values of degrees of freedom, evaluate the
+    // values/gradients/... at quadrature points
 
     // ------------------------- scalar functions --------------------------
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    do_function_values (const ::dealii::Vector<double> &dof_values,
+    do_function_values (const ::dealii::Vector<Number> &dof_values,
                         const Table<2,double>          &shape_values,
                         const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                        std::vector<double>            &values)
+                        std::vector<typename ProductType<Number,double>::type>            &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -488,12 +482,12 @@ namespace FEValuesViews
 
     // same code for gradient and Hessian, template argument 'order' to give
     // the order of the derivative (= rank of gradient/Hessian tensor)
-    template <int order, int dim, int spacedim>
+    template <int order, int dim, int spacedim, typename Number>
     void
-    do_function_derivatives (const ::dealii::Vector<double> &dof_values,
+    do_function_derivatives (const ::dealii::Vector<Number> &dof_values,
                              const std::vector<std::vector<dealii::Tensor<order,spacedim> > > &shape_derivatives,
                              const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<dealii::Tensor<order,spacedim> > &derivatives)
+                             std::vector<typename ProductType<Number,dealii::Tensor<order,spacedim> >::type> &derivatives)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -514,18 +508,19 @@ namespace FEValuesViews
             const dealii::Tensor<order,spacedim> *shape_derivative_ptr =
               &shape_derivatives[shape_function_data[shape_function].row_index][0];
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-              derivatives[q_point] += value **shape_derivative_ptr++;
+              derivatives[q_point] += value *
+				      typename ProductType<Number,dealii::Tensor<order,spacedim> >::type(*shape_derivative_ptr++);
           }
     }
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    do_function_laplacians (const ::dealii::Vector<double> &dof_values,
+    do_function_laplacians (const ::dealii::Vector<Number> &dof_values,
                             const std::vector<std::vector<dealii::Tensor<2,spacedim> > > &shape_hessians,
                             const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                            std::vector<double>           &laplacians)
+                            std::vector<typename ProductType<Number,double>::type>           &laplacians)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -553,11 +548,11 @@ namespace FEValuesViews
 
     // ----------------------------- vector part ---------------------------
 
-    template <int dim, int spacedim>
-    void do_function_values (const ::dealii::Vector<double> &dof_values,
+    template <int dim, int spacedim, typename Number>
+    void do_function_values (const ::dealii::Vector<Number> &dof_values,
                              const Table<2,double>          &shape_values,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<dealii::Tensor<1,spacedim> > &values)
+                             std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -601,12 +596,12 @@ namespace FEValuesViews
 
 
 
-    template <int order, int dim, int spacedim>
+    template <int order, int dim, int spacedim, typename Number>
     void
-    do_function_derivatives (const ::dealii::Vector<double> &dof_values,
+    do_function_derivatives (const ::dealii::Vector<Number> &dof_values,
                              const std::vector<std::vector<dealii::Tensor<order,spacedim> > > &shape_derivatives,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<dealii::Tensor<order+1,spacedim> > &derivatives)
+                             std::vector<typename ProductType<Number,dealii::Tensor<order+1,spacedim> >::type> &derivatives)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -653,12 +648,12 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    do_function_symmetric_gradients (const ::dealii::Vector<double> &dof_values,
+    do_function_symmetric_gradients (const ::dealii::Vector<Number> &dof_values,
                                      const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
                                      const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                                     std::vector<dealii::SymmetricTensor<2,spacedim> > &symmetric_gradients)
+                                     std::vector<typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type> &symmetric_gradients)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -706,12 +701,12 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    do_function_divergences (const ::dealii::Vector<double> &dof_values,
+    do_function_divergences (const ::dealii::Vector<Number> &dof_values,
                              const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<double> &divergences)
+                             std::vector<typename ProductType<Number,double>::type> &divergences)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -756,12 +751,12 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    do_function_curls (const ::dealii::Vector<double> &dof_values,
+    do_function_curls (const ::dealii::Vector<Number> &dof_values,
                        const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
                        const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                       std::vector<typename dealii::internal::CurlType<spacedim>::type> &curls)
+                       std::vector<typename ProductType<Number,typename dealii::internal::CurlType<spacedim>::type>::type> &curls)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -948,12 +943,12 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    do_function_laplacians (const ::dealii::Vector<double> &dof_values,
+    do_function_laplacians (const ::dealii::Vector<Number> &dof_values,
                             const std::vector<std::vector<dealii::Tensor<2,spacedim> > > &shape_hessians,
                             const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                            std::vector<dealii::Tensor<1,spacedim> > &laplacians)
+                            std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &laplacians)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1002,12 +997,12 @@ namespace FEValuesViews
 
     // ---------------------- symmetric tensor part ------------------------
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    do_function_values (const ::dealii::Vector<double> &dof_values,
+    do_function_values (const ::dealii::Vector<Number> &dof_values,
                         const dealii::Table<2,double>          &shape_values,
                         const std::vector<typename SymmetricTensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                        std::vector<dealii::SymmetricTensor<2,spacedim> > &values)
+                        std::vector<typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type> &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1056,12 +1051,12 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    do_function_divergences (const ::dealii::Vector<double> &dof_values,
+    do_function_divergences (const ::dealii::Vector<Number> &dof_values,
                              const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
                              const std::vector<typename SymmetricTensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<dealii::Tensor<1,spacedim> > &divergences)
+                             std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &divergences)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1144,12 +1139,12 @@ namespace FEValuesViews
 
     // ---------------------- non-symmetric tensor part ------------------------
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    do_function_values (const ::dealii::Vector<double> &dof_values,
+    do_function_values (const ::dealii::Vector<Number> &dof_values,
                         const dealii::Table<2,double>          &shape_values,
                         const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                        std::vector<dealii::Tensor<2,spacedim> > &values)
+                        std::vector<typename ProductType<Number,dealii::Tensor<2,spacedim> >::type> &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1200,12 +1195,12 @@ namespace FEValuesViews
 
 
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    do_function_divergences (const ::dealii::Vector<double> &dof_values,
+    do_function_divergences (const ::dealii::Vector<Number> &dof_values,
                              const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
                              const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<dealii::Tensor<1,spacedim> > &divergences)
+                             std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &divergences)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1267,7 +1262,7 @@ namespace FEValuesViews
   void
   Scalar<dim,spacedim>::
   get_function_values (const InputVector &fe_function,
-                       std::vector<value_type> &values) const
+                       std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_values,
@@ -1278,7 +1273,7 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell and call internal worker function
-    dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
     (dof_values, fe_values.shape_values, shape_function_data, values);
@@ -1291,7 +1286,7 @@ namespace FEValuesViews
   void
   Scalar<dim,spacedim>::
   get_function_gradients (const InputVector &fe_function,
-                          std::vector<gradient_type> &gradients) const
+                          std::vector<typename ProductType<gradient_type,typename InputVector::value_type>::type> &gradients) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_gradients,
@@ -1302,7 +1297,7 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<1,dim,spacedim>
     (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
@@ -1315,7 +1310,7 @@ namespace FEValuesViews
   void
   Scalar<dim,spacedim>::
   get_function_hessians (const InputVector &fe_function,
-                         std::vector<hessian_type> &hessians) const
+                         std::vector<typename ProductType<hessian_type,typename InputVector::value_type>::type> &hessians) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_hessians,
@@ -1326,7 +1321,7 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<2,dim,spacedim>
     (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
@@ -1339,7 +1334,7 @@ namespace FEValuesViews
   void
   Scalar<dim,spacedim>::
   get_function_laplacians (const InputVector &fe_function,
-                           std::vector<value_type> &laplacians) const
+                           std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &laplacians) const
   {
     typedef FEValuesBase<dim,spacedim> FVB;
     Assert (fe_values.update_flags & update_hessians,
@@ -1350,7 +1345,7 @@ namespace FEValuesViews
                      fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_laplacians<dim,spacedim>
     (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
@@ -1769,7 +1764,7 @@ public:
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
-                               Vector<double> &out) const = 0;
+                               Vector<IndexSet::value_type> &out) const = 0;
 };
 
 
@@ -1838,7 +1833,7 @@ public:
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
-                               Vector<double> &out) const;
+                               Vector<IndexSet::value_type> &out) const;
 
 private:
   /**
@@ -1941,7 +1936,7 @@ public:
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
-                               Vector<double> &out) const;
+                               Vector<IndexSet::value_type> &out) const;
 
 private:
   /**
@@ -2005,7 +2000,7 @@ template <typename CI>
 void
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
 get_interpolated_dof_values (const IndexSet &in,
-                             Vector<double> &out) const
+                             Vector<IndexSet::value_type> &out) const
 {
   Assert (cell->has_children() == false, ExcNotImplemented());
 
@@ -2065,7 +2060,7 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 get_interpolated_dof_values (const IndexSet &,
-                             Vector<double> &) const
+                             Vector<IndexSet::value_type> &) const
 {
   Assert (false, ExcMessage (message_string));
 }
