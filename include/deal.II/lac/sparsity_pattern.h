@@ -755,7 +755,10 @@ public:
    * Compute the bandwidth of the matrix represented by this structure. The
    * bandwidth is the maximum of $|i-j|$ for which the index pair $(i,j)$
    * represents a nonzero entry of the matrix. Consequently, the maximum
-   * bandwidth a $n\times m$ matrix can have is $\max\{n-1,m-1\}$.
+   * bandwidth a $n\times m$ matrix can have is $\max\{n-1,m-1\}$, a diagonal
+   * matrix has bandwidth 0, and there are at most $2*q+1$ entries per row if
+   * the bandwidth is $q$. The returned quantity is sometimes called "half
+   * bandwidth" in the literature.
    */
   size_type bandwidth () const;
 
