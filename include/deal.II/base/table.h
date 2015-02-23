@@ -593,7 +593,7 @@ protected:
    * Return the position of the indicated element within the array of elements
    * stored one after the other. This function does no index checking.
    */
-  unsigned int position (const TableIndices<N> &indices) const;
+  typename AlignedVector<T>::size_type position (const TableIndices<N> &indices) const;
 
   /**
    * Return a read-write reference to the indicated element.
@@ -1987,9 +1987,11 @@ TableBase<N,T>::memory_consumption () const
 
 template <int N, typename T>
 inline
-unsigned int
+typename AlignedVector<T>::size_type
 TableBase<N,T>::position (const TableIndices<N> &indices) const
 {
+  typedef typename AlignedVector<T>::size_type size_type;
+
   // specialize this for the
   // different numbers of dimensions,
   // to make the job somewhat easier
@@ -2000,13 +2002,13 @@ TableBase<N,T>::position (const TableIndices<N> &indices) const
     case 1:
       return indices[0];
     case 2:
-      return indices[0]*table_size[1] + indices[1];
+      return size_type(indices[0])*table_size[1] + indices[1];
     case 3:
-      return ((indices[0]*table_size[1] + indices[1])*table_size[2]
+      return ((size_type(indices[0])*table_size[1] + indices[1])*table_size[2]
               + indices[2]);
     default:
     {
-      unsigned int s = indices[0];
+      size_type s = indices[0];
       for (unsigned int n=1; n<N; ++n)
         s = s*table_size[n] + indices[n];
       return s;
