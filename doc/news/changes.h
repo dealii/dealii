@@ -355,6 +355,18 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/02/22)
   </li>
 
+  <li> New: FE_TraceQ can now also be used in 1D.
+  <br>
+  (Martin Kronbichler, 2015/02/21)
+  </li>
+
+  <li> New: FE_TraceQ now implements get_face_interpolation_matrix and
+  get_subface_interpolation_matrix, enabling
+  DoFTools::make_hanging_node_constraints on this element.
+  <br>
+  (Anton Evgrafov, 2015/02/21)
+  </li>
+
   <li> Fixed: MappingQEulerian would previously not move interior points
   in 1D for higher order mappings. This has been fixed by removing a few
   specializations of MappingQ for 1D that are no longer necessary.
