@@ -384,9 +384,9 @@ namespace GridGenerator
    * Initialize the given triangulation with a hyper-L (in 2d or 3d)
    * consisting of exactly <tt>2^dim-1</tt> cells. It produces the hypercube
    * with the interval [<i>left,right</i>] without the hypercube made out of
-   * the interval [<i>(left+right)/2,right</i>] for each coordinate. This will
-   * result in the classical L-shape in 2d and it will look like the following
-   * in 3d:
+   * the interval [<i>(left+right)/2,right</i>] for each coordinate.  All
+   * faces will have boundary indicator 0. This function will create the
+   * classical L-shape in 2d and it will look like the following in 3d:
    *
    * @image html hyper_l.png
    *
@@ -590,6 +590,7 @@ namespace GridGenerator
    *
    * It is implemented in 2d and 3d, and takes the following arguments:
    *
+   * @param triangulation The triangulation to be filled.
    * @param inner_radius  Radius of the internal hole.
    * @param outer_radius Half of the edge length of the square.
    * @param L  Extension in @p z-direction (only used in 3d).
