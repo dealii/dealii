@@ -40,8 +40,6 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @todo Polynomials::LagrangeEquidistant should be and will be replaced by
  * Polynomials::LagrangeGaussLobatto as soon as such a polynomial set exists.
- * @todo so far, hanging nodes are not implemented
- *
  */
 
 template <int dim, int spacedim=dim>
@@ -55,6 +53,11 @@ public:
    */
   FE_TraceQ(unsigned int p);
 
+  /**
+   * @p clone function instead of a copy constructor.
+   *
+   * This function is needed by the constructors of @p FESystem.
+   */
   virtual FiniteElement<dim,spacedim> *clone() const;
 
   /**
@@ -77,9 +80,6 @@ public:
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const;
-
-
-
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -130,6 +130,7 @@ private:
    * Store a copy of FE_Q for delegating the hp-constraints functionality.
    */
   FE_Q<dim, spacedim> fe_q;
+
   /**
    * Return vector with dofs per vertex, line, quad, hex.
    */

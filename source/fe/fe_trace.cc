@@ -68,12 +68,9 @@ template <int dim, int spacedim>
 std::string
 FE_TraceQ<dim,spacedim>::get_name () const
 {
-  // note that the
-  // FETools::get_fe_from_name
-  // function depends on the
-  // particular format of the string
-  // this function returns, so they
-  // have to be kept in synch
+  // note that the FETools::get_fe_from_name function depends on the
+  // particular format of the string this function returns, so they have to be
+  // kept in synch
 
   std::ostringstream namebuf;
   namebuf << "FE_TraceQ<"
@@ -95,6 +92,11 @@ FE_TraceQ<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
+  // FE_TraceQ shares the numbering of elemental degrees of freedom with FE_Q
+  // except for the missing interior ones (quad dofs in 2D and hex dofs in
+  // 3D). Therefore, it is safe to ask fe_q for the corresponding
+  // information. The assertion 'shape_index < this->dofs_per_cell' will make
+  // sure that we only access the trace dofs.
   return fe_q.has_support_on_face (shape_index, face_index);
 }
 
@@ -117,6 +119,9 @@ template <int dim, int spacedim>
 std::vector<unsigned int>
 FE_TraceQ<dim,spacedim>::get_dpo_vector (const unsigned int deg)
 {
+  // This constructs FE_TraceQ in exactly the same way as FE_Q except for the
+  // interior degrees of freedom that are not present here (lnine in 1D, quad
+  // in 2D, hex in 3D).
   AssertThrow(deg>0,ExcMessage("FE_TraceQ needs to be of degree > 0."));
   std::vector<unsigned int> dpo(dim+1, 1U);
   dpo[dim]=0;
