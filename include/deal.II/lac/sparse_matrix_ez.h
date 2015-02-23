@@ -847,7 +847,7 @@ private:
 
 template <typename number>
 inline
-SparseMatrixEZ<number>::Entry::Entry(size_type column,
+SparseMatrixEZ<number>::Entry::Entry(const size_type column,
                                      const number &value)
   :
   column(column),
