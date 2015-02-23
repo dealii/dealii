@@ -350,7 +350,7 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> New: IndexSet now has a local typedef IndexSet::value_type/
+  <li> New: IndexSet now has a local typedef IndexSet::value_type.
   <br>
   (Wolfgang Bangerth, 2015/02/22)
   </li>
