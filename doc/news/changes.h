@@ -350,6 +350,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: There is now a class std_cxx11::unique_ptr that provides
+  the functionality of std::unique_ptr in C++11 mode, and that
+  provides an emulation for older compilers.
+  <br>
+  (Wolfgang Bangerth, 2015/02/22)
+  </li>
+
   <li> New: IndexSet now has a local typedef IndexSet::value_type.
   <br>
   (Wolfgang Bangerth, 2015/02/22)
