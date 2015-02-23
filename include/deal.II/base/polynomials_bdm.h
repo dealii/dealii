@@ -46,8 +46,8 @@ DEAL_II_NAMESPACE_OPEN
  * <i>(x<sup>k-i</sup>yz<sup>i+1</sup>,0,0)</i> and
  * <i>(0,x<sup>i+1</sup>y<sup>k-i</sup>z,0)</i> </dl>
  *
- * Note the curl of a scalar function is given by
- * $\text{curl}(f(x,y)) = \begin{pmatrix} f_{y}(x,y) \\ -f_{x}(x,y) \end{pmatrix}$.
+ * Note the curl of a scalar function is given by $\text{curl}(f(x,y)) =
+ * \begin{pmatrix} f_{y}(x,y) \\ -f_{x}(x,y) \end{pmatrix}$.
  * @todo Second derivatives in 3D are missing.
  *
  * @ingroup Polynomials

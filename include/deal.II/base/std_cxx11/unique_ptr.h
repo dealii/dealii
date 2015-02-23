@@ -36,26 +36,23 @@ DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
   /**
-   * Implementation of a basic replacement for C++11's std::unique_ptr
-   * class.
+   * Implementation of a basic replacement for C++11's std::unique_ptr class.
    *
-   * BOOST does not have a replacement for std::unique_ptr (because
-   * unique_ptr requires move semantics that aren't available unless
-   * you have a C++11 compiler -- in which case you also have
-   * std::unique_ptr; see for example
+   * BOOST does not have a replacement for std::unique_ptr (because unique_ptr
+   * requires move semantics that aren't available unless you have a C++11
+   * compiler -- in which case you also have std::unique_ptr; see for example
    * http://stackoverflow.com/questions/2953530/unique-ptr-boost-equivalent)
    *
-   * Consequently, we emulate the class by just wrapping a
-   * boost::shared_ptr in the cheapest possible way -- by just
-   * deriving from it and repeating the basic constructors. Everything
-   * else is inherited from the shared_ptr class.
+   * Consequently, we emulate the class by just wrapping a boost::shared_ptr
+   * in the cheapest possible way -- by just deriving from it and repeating
+   * the basic constructors. Everything else is inherited from the shared_ptr
+   * class.
    *
-   * This replacement comes with a certain overhead: doing reference
-   * counting instead of just passing ownership of pointers has a
-   * cost. But we don't use unique_ptrs in expensive places, and it is
-   * also a cost that will disappear once we require C++11 (and the
-   * cost of course does not apply if your compiler already supports
-   * C++11 and deal.II uses it).
+   * This replacement comes with a certain overhead: doing reference counting
+   * instead of just passing ownership of pointers has a cost. But we don't
+   * use unique_ptrs in expensive places, and it is also a cost that will
+   * disappear once we require C++11 (and the cost of course does not apply if
+   * your compiler already supports C++11 and deal.II uses it).
    */
   template <typename T>
   class unique_ptr : public boost::shared_ptr<T>

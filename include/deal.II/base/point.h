@@ -28,60 +28,58 @@ DEAL_II_NAMESPACE_OPEN
  * A class that represents a point in a space with arbitrary dimension
  * <tt>dim</tt>.
  *
- * Objects of this class are used to represent points, i.e., vectors
- * anchored at the origin of a Cartesian vector space. They are, among
- * other uses, passed to functions that operate on points in spaces of
- * a priori fixed dimension: rather than using functions like
- * <tt>double f(double x)</tt> and <tt>double f(double x, double
- * y)</tt>, you should use <tt>double f(Point<dim> &p)</tt> instead as
- * it allows writing dimension independent code.
+ * Objects of this class are used to represent points, i.e., vectors anchored
+ * at the origin of a Cartesian vector space. They are, among other uses,
+ * passed to functions that operate on points in spaces of a priori fixed
+ * dimension: rather than using functions like <tt>double f(double x)</tt> and
+ * <tt>double f(double x, double y)</tt>, you should use <tt>double
+ * f(Point<dim> &p)</tt> instead as it allows writing dimension independent
+ * code.
  *
  *
- * <h3>What's a <code>Point@<dim@></code> and what is a <code>Tensor@<1,dim@></code>?</h3>
+ * <h3>What's a <code>Point@<dim@></code> and what is a
+ * <code>Tensor@<1,dim@></code>?</h3>
  *
- * The Point class is derived from Tensor@<1,dim@> and consequently
- * shares the latter's member functions and other attributes. In fact,
- * it has relatively few additional functions itself (the most notable
- * exception being the distance() function to compute the Euclidean
- * distance between two points in space), and these two classes can
- * therefore often be used interchangeably.
+ * The Point class is derived from Tensor@<1,dim@> and consequently shares the
+ * latter's member functions and other attributes. In fact, it has relatively
+ * few additional functions itself (the most notable exception being the
+ * distance() function to compute the Euclidean distance between two points in
+ * space), and these two classes can therefore often be used interchangeably.
  *
- * Nonetheless, there are semantic differences that make us use these
- * classes in different and well-defined contexts. Within deal.II, we
- * use the <tt>Point</tt> class to denote points in space, i.e., for
- * vectors (rank-1 tensors) that are <em>anchored at the
- * origin</em>. On the other hand, vectors that are anchored elsewhere
- * (and consequently do not represent <em>points</em> in the common
- * usage of the word) are represented by objects of type
- * Tensor@<1,dim@>. In particular, this is the case for direction
- * vectors, normal vectors, gradients, and the differences between two
- * points (i.e., what you get when you subtract one point from
- * another): all of these are represented by Tensor@<1,dim@> objects
- * rather than Point@<dim@>.
+ * Nonetheless, there are semantic differences that make us use these classes
+ * in different and well-defined contexts. Within deal.II, we use the
+ * <tt>Point</tt> class to denote points in space, i.e., for vectors (rank-1
+ * tensors) that are <em>anchored at the origin</em>. On the other hand,
+ * vectors that are anchored elsewhere (and consequently do not represent
+ * <em>points</em> in the common usage of the word) are represented by objects
+ * of type Tensor@<1,dim@>. In particular, this is the case for direction
+ * vectors, normal vectors, gradients, and the differences between two points
+ * (i.e., what you get when you subtract one point from another): all of these
+ * are represented by Tensor@<1,dim@> objects rather than Point@<dim@>.
  *
- * Furthermore, the Point class is only used where the coordinates of
- * an object can be thought to possess the dimension of a length. An
- * object that represents the weight, height, and cost of an object is
- * neither a point nor a tensor (because it lacks the transformation
- * properties under rotation of the coordinate system) and should
- * consequently not be represented by either of these classes. Use an
- * array of size 3 in this case, or the <code>std_cxx11::array</code>
- * class. Alternatively, as in the case of vector-valued functions,
- * you can use objects of type Vector or <code>std::vector</code>.
+ * Furthermore, the Point class is only used where the coordinates of an
+ * object can be thought to possess the dimension of a length. An object that
+ * represents the weight, height, and cost of an object is neither a point nor
+ * a tensor (because it lacks the transformation properties under rotation of
+ * the coordinate system) and should consequently not be represented by either
+ * of these classes. Use an array of size 3 in this case, or the
+ * <code>std_cxx11::array</code> class. Alternatively, as in the case of
+ * vector-valued functions, you can use objects of type Vector or
+ * <code>std::vector</code>.
  *
  *
- * @tparam dim An integer that denotes the dimension of the space in which
- *   a point lies. This of course equals the number of coordinates that
- *   identify a point.
- * @tparam Number The data type in which the coordinates values are
- *   to be stored. This will, in almost all cases, simply be the default
- *   @p double, but there are cases where one may want to store coordinates
- *   in a different (and always scalar) type. An example would be an interval
- *   type that can store the value of a coordinate as well as its uncertainty.
- *   Another example would be a type that allows for Automatic Differentiation
- *   (see, for example, the Sacado type used in step-33) and thereby can
- *   generate analytic (spatial) derivatives of a function when passed a
- *   Point object whose coordinates are stored in such a type.
+ * @tparam dim An integer that denotes the dimension of the space in which a
+ * point lies. This of course equals the number of coordinates that identify a
+ * point.
+ * @tparam Number The data type in which the coordinates values are to be
+ * stored. This will, in almost all cases, simply be the default @p double,
+ * but there are cases where one may want to store coordinates in a different
+ * (and always scalar) type. An example would be an interval type that can
+ * store the value of a coordinate as well as its uncertainty. Another example
+ * would be a type that allows for Automatic Differentiation (see, for
+ * example, the Sacado type used in step-33) and thereby can generate analytic
+ * (spatial) derivatives of a function when passed a Point object whose
+ * coordinates are stored in such a type.
  *
  *
  * @ingroup geomprimitives
@@ -139,9 +137,9 @@ public:
          const Number z);
 
   /**
-   * Return a unit vector in coordinate direction <tt>i</tt>, i.e., a
-   * vector that is zero in all coordinates except for a single 1 in
-   * the <tt>i</tt>th coordinate.
+   * Return a unit vector in coordinate direction <tt>i</tt>, i.e., a vector
+   * that is zero in all coordinates except for a single 1 in the <tt>i</tt>th
+   * coordinate.
    */
   static Point<dim,Number> unit_vector(const unsigned int i);
 
@@ -166,20 +164,19 @@ public:
   Point<dim,Number>   operator + (const Tensor<1,dim,Number> &) const;
 
   /**
-   * Subtract two points, i.e., obtain the vector that connects the
-   * two. As discussed in the documentation of this class, subtracting
-   * two points results in a vector anchored at one of the two points
-   * (rather than at the origin) and, consequently, the result is
-   * returned as a Tensor@<1,dim@> rather than as a Point@<dim@>.
+   * Subtract two points, i.e., obtain the vector that connects the two. As
+   * discussed in the documentation of this class, subtracting two points
+   * results in a vector anchored at one of the two points (rather than at the
+   * origin) and, consequently, the result is returned as a Tensor@<1,dim@>
+   * rather than as a Point@<dim@>.
    */
   Tensor<1,dim,Number>   operator - (const Point<dim,Number> &) const;
 
   /**
-   * Subtract a difference vector (represented by a Tensor@<1,dim@>)
-   * from the current point. This results in another point and, as
-   * discussed in the documentation of this class, the result is then
-   * naturally returned as a Point@<dim@> object rather than as a
-   * Tensor@<1,dim@>.
+   * Subtract a difference vector (represented by a Tensor@<1,dim@>) from the
+   * current point. This results in another point and, as discussed in the
+   * documentation of this class, the result is then naturally returned as a
+   * Point@<dim@> object rather than as a Tensor@<1,dim@>.
    */
   Point<dim,Number>   operator - (const Tensor<1,dim,Number> &) const;
 

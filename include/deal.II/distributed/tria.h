@@ -184,8 +184,7 @@ namespace parallel
      * relies on the p4est library that does not support this. Attempts to
      * refine cells anisotropically will result in errors.
      *
-     * @note There is
-     * currently no support for distributing 1d triangulations.
+     * @note There is currently no support for distributing 1d triangulations.
      *
      *
      * <h3> Interaction with boundary description </h3>

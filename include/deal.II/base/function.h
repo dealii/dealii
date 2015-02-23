@@ -80,13 +80,13 @@ template <int rank, int dim, typename Number> class TensorFunction;
  * vector_value(), and gradient analogs), while those ones will throw an
  * exception when called but not overloaded.
  *
- * Conversely, the functions returning all components of the function at
- * one or several points (i.e. vector_value(), vector_value_list()),
- * will <em>not</em> call the function returning one component at
- * one point repeatedly, once for each point and component. The reason is
- * efficiency: this would amount to too many virtual function calls. If you
- * have vector-valued functions, you should therefore also provide overloads
- * of the virtual functions for all components at a time.
+ * Conversely, the functions returning all components of the function at one
+ * or several points (i.e. vector_value(), vector_value_list()), will
+ * <em>not</em> call the function returning one component at one point
+ * repeatedly, once for each point and component. The reason is efficiency:
+ * this would amount to too many virtual function calls. If you have vector-
+ * valued functions, you should therefore also provide overloads of the
+ * virtual functions for all components at a time.
  *
  * Also note, that unless only called a very small number of times, you should
  * overload all sets of functions (returning only one value, as well as those
@@ -99,31 +99,28 @@ template <int rank, int dim, typename Number> class TensorFunction;
  *
  * <h3>Functions that return tensors</h3>
  *
- * If the functions you are dealing with have a number of
- * components that are a priori known (for example, <tt>dim</tt>
- * elements), you might consider using the TensorFunction class
- * instead. This is, in particular, true if the objects you return
- * have the properties of a tensor, i.e., they are for example
- * dim-dimensional vectors or dim-by-dim matrices. On the other hand,
+ * If the functions you are dealing with have a number of components that are
+ * a priori known (for example, <tt>dim</tt> elements), you might consider
+ * using the TensorFunction class instead. This is, in particular, true if the
+ * objects you return have the properties of a tensor, i.e., they are for
+ * example dim-dimensional vectors or dim-by-dim matrices. On the other hand,
  * functions like VectorTools::interpolate or
- * VectorTools::interpolate_boundary_values definitely only want
- * objects of the current type. You can use the
- * VectorFunctionFromTensorFunction class to convert the former to the
- * latter.
+ * VectorTools::interpolate_boundary_values definitely only want objects of
+ * the current type. You can use the VectorFunctionFromTensorFunction class to
+ * convert the former to the latter.
  *
  *
  * <h3>Functions that return different fields</h3>
  *
- * Most of the time, your functions will have the form
- * $f : \Omega \rightarrow {\mathbb R}^{n_\text{components}}$. However,
- * there are occasions where you want the function to return vectors (or
- * scalars) over a different number field, for example functions that
- * return complex numbers or vectors of complex numbers:
- * $f : \Omega \rightarrow {\mathbb C}^{n_\text{components}}$. In such
- * cases, you can use the second template argument of this class: it
- * describes the scalar type to be used for each component of your return
- * values. It defaults to @p double, but in the example above, it could
- * be set to <code>std::complex@<double@></code>.
+ * Most of the time, your functions will have the form $f : \Omega \rightarrow
+ * {\mathbb R}^{n_\text{components}}$. However, there are occasions where you
+ * want the function to return vectors (or scalars) over a different number
+ * field, for example functions that return complex numbers or vectors of
+ * complex numbers: $f : \Omega \rightarrow {\mathbb
+ * C}^{n_\text{components}}$. In such cases, you can use the second template
+ * argument of this class: it describes the scalar type to be used for each
+ * component of your return values. It defaults to @p double, but in the
+ * example above, it could be set to <code>std::complex@<double@></code>.
  *
  *
  * @ingroup functions

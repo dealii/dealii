@@ -347,9 +347,8 @@ private:
 
   /**
    * The degrees of freedom on the refinement edges. For each level the index
-   * set denotes which level
-   * degrees of freedom are on the refinement edge towards the lower level,
-   * excluding boundary dofs.
+   * set denotes which level degrees of freedom are on the refinement edge
+   * towards the lower level, excluding boundary dofs.
    */
   std::vector<IndexSet> interface_dofs;
 

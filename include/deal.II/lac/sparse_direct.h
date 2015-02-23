@@ -296,9 +296,9 @@ private:
   void sort_arrays (const BlockSparseMatrix<number> &);
 
   /**
-   * The arrays in which we store the data for the solver.
-   * SuiteSparse_long has to be used here for Windows 64 build,
-   * if we used only long int, compilation would fail.
+   * The arrays in which we store the data for the solver. SuiteSparse_long
+   * has to be used here for Windows 64 build, if we used only long int,
+   * compilation would fail.
    */
   std::vector<SuiteSparse_long> Ap;
   std::vector<SuiteSparse_long> Ai;

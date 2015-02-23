@@ -608,16 +608,16 @@ namespace hp
     virtual std::size_t memory_consumption () const;
 
     /**
-    * Write the data of this object to a stream for the purpose of
-    * serialization.
-    */
+     * Write the data of this object to a stream for the purpose of
+     * serialization.
+     */
     template <class Archive>
     void save(Archive &ar, const unsigned int version) const;
 
     /**
-    * Read the data of this object from a stream for the purpose of
-    * serialization.
-    */
+     * Read the data of this object from a stream for the purpose of
+     * serialization.
+     */
     template <class Archive>
     void load(Archive &ar, const unsigned int version);
 

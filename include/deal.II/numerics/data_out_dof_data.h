@@ -324,22 +324,20 @@ namespace internal
  * @ref step_22 "step-22"
  * tutorial program).
  *
- * This class does not copy the vector given to it
- * through the add_data_vector() functions, for memory consumption reasons. It
- * only stores a reference to it, so it is in your responsibility to make sure
- * that the data vectors exist long enough.
+ * This class does not copy the vector given to it through the
+ * add_data_vector() functions, for memory consumption reasons. It only stores
+ * a reference to it, so it is in your responsibility to make sure that the
+ * data vectors exist long enough.
  *
  * After adding all data vectors, you need to call a function which generates
  * the patches (i.e., some intermediate data representation) for output from
- * the stored data. Derived classes name this
- * function build_patches(). Finally, you write() the data in one format or
- * other, to a file.
+ * the stored data. Derived classes name this function build_patches().
+ * Finally, you write() the data in one format or other, to a file.
  *
- * In the example above, an object of type DataOut was used,
- * i.e. an object of a derived class. This is necessary since the current class does
- * not provide means to actually generate the patches, only aids to store and
- * access data. Any real functionality is implemented in derived classes such
- * as DataOut.
+ * In the example above, an object of type DataOut was used, i.e. an object of
+ * a derived class. This is necessary since the current class does not provide
+ * means to actually generate the patches, only aids to store and access data.
+ * Any real functionality is implemented in derived classes such as DataOut.
  *
  * Note that the base class of this class, DataOutInterface offers several
  * functions to ease programming with run-time determinable output formats
@@ -353,18 +351,18 @@ namespace internal
  *
  * <h3>Information for derived classes</h3>
  *
- * What this class lacks is a way to produce the patches for
- * output itself, from the stored data and degree of freedom information.
- * Since this task is often application dependent it is left to derived
- * classes. For example, in many applications, it might be wanted to limit the
- * depth of output to a certain number of refinement levels and write data
- * from finer cells only in a way interpolated to coarser cells, to reduce the
- * amount of output. Also, it might be wanted to use different numbers of
- * subdivisions on different cells when forming a patch, for example to
- * accomplish for different polynomial degrees of the trial space on different
- * cells. Also, the output need not necessarily consist of a patch for each
- * cell, but might be made up of patches for faces, of other things. Take a
- * look at derived classes to what is possible in this respect.
+ * What this class lacks is a way to produce the patches for output itself,
+ * from the stored data and degree of freedom information. Since this task is
+ * often application dependent it is left to derived classes. For example, in
+ * many applications, it might be wanted to limit the depth of output to a
+ * certain number of refinement levels and write data from finer cells only in
+ * a way interpolated to coarser cells, to reduce the amount of output. Also,
+ * it might be wanted to use different numbers of subdivisions on different
+ * cells when forming a patch, for example to accomplish for different
+ * polynomial degrees of the trial space on different cells. Also, the output
+ * need not necessarily consist of a patch for each cell, but might be made up
+ * of patches for faces, of other things. Take a look at derived classes to
+ * what is possible in this respect.
  *
  * For this reason, it is left to a derived class to provide a function, named
  * usually build_patches() or the like, which fills the #patches array of this

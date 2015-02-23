@@ -36,8 +36,8 @@ DEAL_II_NAMESPACE_OPEN
  * Let a symmetric, positive-definite, sparse matrix $A$ be in the form $A = D
  * - L - L^T$, where $D$ is the diagonal part of $A$ and $-L$ is a strictly
  * lower triangular matrix. The MIC(0) decomposition of the matrix $A$ is
- * defined by $B = (X-L)X^{-1}(X-L^T)$, where $X$ is a diagonal matrix
- * defined by the condition $\text{rowsum}(A) = \text{rowsum}(B)$.
+ * defined by $B = (X-L)X^{-1}(X-L^T)$, where $X$ is a diagonal matrix defined
+ * by the condition $\text{rowsum}(A) = \text{rowsum}(B)$.
  *
  * @author Stephen "Cheffo" Kolaroff, 2002, unified interface: Ralf Hartmann
  * 2003.

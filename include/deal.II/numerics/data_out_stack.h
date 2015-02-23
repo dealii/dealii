@@ -212,17 +212,16 @@ public:
    * This is the central function of this class since it builds the list of
    * patches to be written by the low-level functions of the base class. A
    * patch is, in essence, some intermediate representation of the data on
-   * each cell of a triangulation and DoFHandler object that can then be
-   * used to write files in some format that is readable by visualization
-   * programs.
+   * each cell of a triangulation and DoFHandler object that can then be used
+   * to write files in some format that is readable by visualization programs.
    *
-   * You can find an overview of the use of this function in
-   * the general documentation of this class. An example is also provided in
-   * the documentation of this class's base class DataOut_DoFData.
+   * You can find an overview of the use of this function in the general
+   * documentation of this class. An example is also provided in the
+   * documentation of this class's base class DataOut_DoFData.
    *
    * @param n_subdivisions See DataOut::build_patches() for an extensive
-   *   description of this parameter. The number of subdivisions is always
-   *   one in the direction of the time-like parameter used by this class.
+   * description of this parameter. The number of subdivisions is always one
+   * in the direction of the time-like parameter used by this class.
    */
   void build_patches (const unsigned int n_subdivisions = 0);
 

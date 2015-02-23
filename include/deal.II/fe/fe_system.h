@@ -158,22 +158,22 @@ class FESystem : public FiniteElement<dim,spacedim>
 public:
 
   /**
-   * Constructor. Take a finite element and the number of elements you
-   * want to group together using this class.
+   * Constructor. Take a finite element and the number of elements you want to
+   * group together using this class.
    *
-   * The object @p fe is not actually used for anything other than creating
-   * a copy that will then be owned by the current object. In other words,
-   * it is completely fine to call this constructor with a temporary object
-   * for the finite element, as in this code snippet:
+   * The object @p fe is not actually used for anything other than creating a
+   * copy that will then be owned by the current object. In other words, it is
+   * completely fine to call this constructor with a temporary object for the
+   * finite element, as in this code snippet:
    * @code
    *   FESystem<dim> fe (FE_Q<dim>(2), 2);
    * @endcode
-   * Here, <code>FE_Q@<dim@>(2)</code> constructs an unnamed, temporary
-   * object that is passed to the FESystem constructor to create a
-   * finite element that consists of two components, both of which are
-   * quadratic FE_Q elements. The temporary is destroyed again at the
-   * end of the code that corresponds to this line, but this does not
-   * matter because FESystem creates its own copy of the FE_Q object.
+   * Here, <code>FE_Q@<dim@>(2)</code> constructs an unnamed, temporary object
+   * that is passed to the FESystem constructor to create a finite element
+   * that consists of two components, both of which are quadratic FE_Q
+   * elements. The temporary is destroyed again at the end of the code that
+   * corresponds to this line, but this does not matter because FESystem
+   * creates its own copy of the FE_Q object.
    *
    * This constructor (or its variants below) is used in essentially all
    * tutorial programs that deal with vector valued problems. See step-8,
@@ -182,10 +182,10 @@ public:
    *
    * @dealiiVideoLecture{19,20}
    *
-   * @param[in] fe The finite element that will be used to represent
-   *   the components of this composed element.
-   * @param[in] n_elements An integer denoting how many copies of
-   *   @p fe this element should consist of.
+   * @param[in] fe The finite element that will be used to represent the
+   * components of this composed element.
+   * @param[in] n_elements An integer denoting how many copies of @p fe this
+   * element should consist of.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe,
             const unsigned int n_elements);
@@ -193,8 +193,8 @@ public:
   /**
    * Constructor for mixed discretizations with two base elements.
    *
-   * See the other constructor above for an explanation of the
-   * general idea of composing elements.
+   * See the other constructor above for an explanation of the general idea of
+   * composing elements.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
             const FiniteElement<dim,spacedim> &fe2, const unsigned int n2);
@@ -202,8 +202,8 @@ public:
   /**
    * Constructor for mixed discretizations with three base elements.
    *
-   * See the other constructor above for an explanation of the
-   * general idea of composing elements.
+   * See the other constructor above for an explanation of the general idea of
+   * composing elements.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
             const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
@@ -266,9 +266,9 @@ public:
    * @endcode
    *
    * If your compiler supports the C++11 language standard (or later) and
-   * deal.II has been configured to use it, then you could do something
-   * like this to create an element with four base elements and
-   * multiplicities 1, 2, 3 and 4:
+   * deal.II has been configured to use it, then you could do something like
+   * this to create an element with four base elements and multiplicities 1,
+   * 2, 3 and 4:
    * @code
    *   template <int dim>
    *   MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
@@ -284,8 +284,8 @@ public:
    * initializer list enclosed in braces <code>{ ... }</code>.
    *
    * This code has a problem: it creates four memory leaks because the first
-   * vector above is created with pointers to elements that are allocated
-   * with <code>new</code> but never destroyed. Without C++11, you have another
+   * vector above is created with pointers to elements that are allocated with
+   * <code>new</code> but never destroyed. Without C++11, you have another
    * problem: brace-initializer don't exist in earlier C++ standards.
    *
    * The solution to the second of these problems is to create two static

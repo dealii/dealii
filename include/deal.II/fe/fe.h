@@ -694,15 +694,15 @@ public:
   bool restriction_is_additive (const unsigned int index) const;
 
   /**
-   * Return a read only reference to the matrix that describes the
-   * constraints at the interface between a refined and an unrefined cell.
+   * Return a read only reference to the matrix that describes the constraints
+   * at the interface between a refined and an unrefined cell.
    *
-   * Some finite elements do not (yet) implement hanging node
-   * constraints. If this is the case, then this function will generate an
-   * exception, since no useful return value can be generated. If you should
-   * have a way to live with this, then you might want to use the
-   * constraints_are_implemented() function to check up front whether this
-   * function will succeed or generate the exception.
+   * Some finite elements do not (yet) implement hanging node constraints. If
+   * this is the case, then this function will generate an exception, since no
+   * useful return value can be generated. If you should have a way to live
+   * with this, then you might want to use the constraints_are_implemented()
+   * function to check up front whether this function will succeed or generate
+   * the exception.
    */
   const FullMatrix<double> &constraints (const dealii::internal::SubfaceCase<dim> &subface_case=dealii::internal::SubfaceCase<dim>::case_isotropic) const;
 
