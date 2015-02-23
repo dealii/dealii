@@ -26,42 +26,40 @@ template <int rank_, int dim, typename Number> class Tensor;
 template <int dim, typename Number> class Tensor<1,dim,Number>;
 
 /**
- * A general tensor class with an arbitrary rank, i.e. with an
- * arbitrary number of indices. The Tensor class provides an indexing operator
- * and a bit of infrastructure, but most functionality is recursively handed
- * down to tensors of rank 1 or put into external templated functions, e.g.
- * the <tt>contract</tt> family.
+ * A general tensor class with an arbitrary rank, i.e. with an arbitrary
+ * number of indices. The Tensor class provides an indexing operator and a bit
+ * of infrastructure, but most functionality is recursively handed down to
+ * tensors of rank 1 or put into external templated functions, e.g. the
+ * <tt>contract</tt> family.
  *
- * Using this tensor class for objects of rank 2 has advantages over
- * matrices in many cases since the dimension is known to the compiler
- * as well as the location of the data. It is therefore possible to
- * produce far more efficient code than for matrices with
- * runtime-dependent dimension. It also makes the code easier to read
- * because of the semantic difference between a tensor (an object that
- * relates to a coordinate system and has transformation properties
- * with regard to coordinate rotations and transforms) and matrices
- * (which we consider as operators on arbitrary vector spaces related
- * to linear algebra things).
+ * Using this tensor class for objects of rank 2 has advantages over matrices
+ * in many cases since the dimension is known to the compiler as well as the
+ * location of the data. It is therefore possible to produce far more
+ * efficient code than for matrices with runtime-dependent dimension. It also
+ * makes the code easier to read because of the semantic difference between a
+ * tensor (an object that relates to a coordinate system and has
+ * transformation properties with regard to coordinate rotations and
+ * transforms) and matrices (which we consider as operators on arbitrary
+ * vector spaces related to linear algebra things).
  *
- * @tparam rank_ An integer that denotes the rank of this tensor. A
- *   rank-0 tensor is a scalar, a rank-1 tensor is a vector with @p dim
- *   components, a rank-2 tensor is a matrix with dim-by-dim components,
- *   etc. There are specializations of this class for rank-0 and rank-1
- *   tensors. There is also a related class SymmetricTensor for
- *   tensors of even rank whose elements are symmetric.
+ * @tparam rank_ An integer that denotes the rank of this tensor. A rank-0
+ * tensor is a scalar, a rank-1 tensor is a vector with @p dim components, a
+ * rank-2 tensor is a matrix with dim-by-dim components, etc. There are
+ * specializations of this class for rank-0 and rank-1 tensors. There is also
+ * a related class SymmetricTensor for tensors of even rank whose elements are
+ * symmetric.
  * @tparam dim An integer that denotes the dimension of the space in which
- *   this tensor operates. This of course equals the number of coordinates that
- *   identify a point and rank-1 tensor.
- * @tparam Number The data type in which the tensor elements are
- *   to be stored. This will, in almost all cases, simply be the default
- *   @p double, but there are cases where one may want to store elements
- *   in a different (and always scalar) type. It can be used to base
- *   tensors on @p float or @p complex numbers or any other data type that
- *   implements basic arithmetic operations.
- *   Another example would be a type that allows for Automatic Differentiation
- *   (see, for example, the Sacado type used in step-33) and thereby can
- *   generate analytic (spatial) derivatives of a function that takes a
- *   tensor as argument.
+ * this tensor operates. This of course equals the number of coordinates that
+ * identify a point and rank-1 tensor.
+ * @tparam Number The data type in which the tensor elements are to be stored.
+ * This will, in almost all cases, simply be the default @p double, but there
+ * are cases where one may want to store elements in a different (and always
+ * scalar) type. It can be used to base tensors on @p float or @p complex
+ * numbers or any other data type that implements basic arithmetic operations.
+ * Another example would be a type that allows for Automatic Differentiation
+ * (see, for example, the Sacado type used in step-33) and thereby can
+ * generate analytic (spatial) derivatives of a function that takes a tensor
+ * as argument.
  *
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 1998-2005
@@ -124,9 +122,9 @@ public:
   Tensor (const array_type &initializer);
 
   /**
-   * Copy constructor from tensors with different underlying scalar
-   * type. This obviously requires that the @p OtherNumber type is
-   * convertible to @p Number.
+   * Copy constructor from tensors with different underlying scalar type. This
+   * obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
    */
   template <typename OtherNumber>
   explicit
@@ -168,9 +166,9 @@ public:
   Tensor &operator = (const Tensor<rank_,dim,Number> &rhs);
 
   /**
-   * Assignment operator from tensors with different underlying scalar
-   * type. This obviously requires that the @p OtherNumber type is
-   * convertible to @p Number.
+   * Assignment operator from tensors with different underlying scalar type.
+   * This obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
    */
   template <typename OtherNumber>
   Tensor &operator = (const Tensor<rank_,dim,OtherNumber> &rhs);
@@ -2027,13 +2025,14 @@ operator * (const Number                   factor,
  * prohibited of considering this operator for multiplication with non-scalar
  * types are explained in the documentation of the EnableIfScalar class.
  *
- * The return type of the function is chosen so that it matches the types
- * of both the tensor and the scalar argument. For example, if you multiply
- * a <code>Tensor@<1,dim,double@></code> by <code>std::complex@<double@></code>,
- * then the result will be a <code>Tensor@<1,dim,std::complex@<double@>@></code>.
- * In other words, the type with which the returned tensor stores its
- * components equals the type you would get if you multiplied an individual
- * component of the input tensor by the scalar factor.
+ * The return type of the function is chosen so that it matches the types of
+ * both the tensor and the scalar argument. For example, if you multiply a
+ * <code>Tensor@<1,dim,double@></code> by <code>std::complex@<double@></code>,
+ * then the result will be a
+ * <code>Tensor@<1,dim,std::complex@<double@>@></code>. In other words, the
+ * type with which the returned tensor stores its components equals the type
+ * you would get if you multiplied an individual component of the input tensor
+ * by the scalar factor.
  *
  * @relates Tensor
  * @relates EnableIfScalar

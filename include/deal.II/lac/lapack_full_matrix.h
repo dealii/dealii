@@ -95,17 +95,20 @@ public:
   operator = (const LAPACKFullMatrix<number> &);
 
   /**
-   * Assignment operator from a regular FullMatrix. @note Since LAPACK expects
-   * matrices in transposed order, this transposition is included here.
+   * Assignment operator from a regular FullMatrix.
+   *
+   * @note Since LAPACK expects matrices in transposed order, this
+   * transposition is included here.
    */
   template <typename number2>
   LAPACKFullMatrix<number> &
   operator = (const FullMatrix<number2> &);
 
   /**
-   * Assignment operator from a regular SparseMatrix. @note Since LAPACK
-   * expects matrices in transposed order, this transposition is included
-   * here.
+   * Assignment operator from a regular SparseMatrix.
+   *
+   * @note Since LAPACK expects matrices in transposed order, this
+   * transposition is included here.
    */
   template <typename number2>
   LAPACKFullMatrix<number> &
@@ -143,14 +146,16 @@ public:
                const size_type cols);
 
   /**
-   * Return the dimension of the range space. @note The matrix is of dimension
-   * $m \times n$.
+   * Return the dimension of the range space.
+   *
+   * @note The matrix is of dimension $m \times n$.
    */
   unsigned int m () const;
 
   /**
-   * Return the number of the range space. @note The matrix is of dimension $m
-   * \times n$.
+   * Return the number of the range space.
+   *
+   * @note The matrix is of dimension $m \times n$.
    */
   unsigned int n () const;
 
@@ -431,8 +436,8 @@ public:
    * eigenvalues and the corresponding eigenvectors will be stored in the
    * columns of eigenvectors, whose dimension is set accordingly.
    *
-   * @note Calls the LAPACK function Xsyevx. For this to work, deal.II must
-   * be configured to use LAPACK.
+   * @note Calls the LAPACK function Xsyevx. For this to work, deal.II must be
+   * configured to use LAPACK.
    */
   void compute_eigenvalues_symmetric (const number        lower_bound,
                                       const number        upper_bound,
@@ -458,8 +463,8 @@ public:
    * eigenvalues and the corresponding eigenvectors will be stored in
    * eigenvectors, whose dimension is set accordingly.
    *
-   * @note Calls the LAPACK function Xsygvx. For this to work, deal.II must
-   * be configured to use LAPACK.
+   * @note Calls the LAPACK function Xsygvx. For this to work, deal.II must be
+   * configured to use LAPACK.
    */
   void compute_generalized_eigenvalues_symmetric (LAPACKFullMatrix<number>     &B,
                                                   const number                  lower_bound,
@@ -482,8 +487,8 @@ public:
    * be retrieved using the eigenvalue() function.  The number of computed
    * eigenvectors is equal to eigenvectors.size()
    *
-   * @note Calls the LAPACK function Xsygv. For this to work, deal.II must
-   * be configured to use LAPACK.
+   * @note Calls the LAPACK function Xsygv. For this to work, deal.II must be
+   * configured to use LAPACK.
    */
   void compute_generalized_eigenvalues_symmetric (LAPACKFullMatrix<number>     &B,
                                                   std::vector<Vector<number> > &eigenvectors,

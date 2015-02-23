@@ -1702,18 +1702,17 @@ namespace VectorTools
    * @param[in] weight The additional argument @p weight allows to evaluate
    * weighted norms.  The weight function may be scalar, establishing a
    * spatially variable weight in the domain for all components equally. This
-   * may be used, for instance, to only integrate over parts of the
-   * domain. The weight function may also be vector-valued, with as many
-   * components as the finite element: Then, different components get
-   * different weights. A typical application is when the error with respect
-   * to only one or a subset of the solution variables is to be computed, in
-   * which case the other components would have weight values equal to
-   * zero. The ComponentSelectFunction class is particularly useful for this
-   * purpose as it provides such a "mask" weight. The weight function is
-   * expected to be positive, but negative values are not filtered. The
-   * default value of this function, a null pointer, is interpreted as "no
-   * weighting function", i.e., weight=1 in the whole domain for all vector
-   * components uniformly.
+   * may be used, for instance, to only integrate over parts of the domain.
+   * The weight function may also be vector-valued, with as many components as
+   * the finite element: Then, different components get different weights. A
+   * typical application is when the error with respect to only one or a
+   * subset of the solution variables is to be computed, in which case the
+   * other components would have weight values equal to zero. The
+   * ComponentSelectFunction class is particularly useful for this purpose as
+   * it provides such a "mask" weight. The weight function is expected to be
+   * positive, but negative values are not filtered. The default value of this
+   * function, a null pointer, is interpreted as "no weighting function",
+   * i.e., weight=1 in the whole domain for all vector components uniformly.
    * @param[in] exponent This value denotes the $p$ used in computing
    * $L^p$-norms and $W^{1,p}$-norms. The value is ignores if a @p norm other
    * than NormType::Lp_norm or NormType::W1p_norm is chosen.

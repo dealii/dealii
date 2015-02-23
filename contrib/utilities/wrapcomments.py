@@ -92,13 +92,19 @@ def format_block(lines, infostr=""):
     endidx = len(lines)-1
     curlines = []
 
-    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@deprecated", "@image", "@return"]
+    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@relates", "@relatesalso", "@deprecated", "@image", "@return", "@brief", "@attention", "@copydoc", "@addtogroup", "@todo", "@tparam", "@skip", "@skipline", "@until", "@line", "@dontinclude", "@include", "@see", "@note"]
 
     # subset of ops_startline that does not want stuff from the next line appended
     # to this.
     ops_also_end_paragraph = ["@image"]
 
+    # stuff handled in the while loop down: @code, @verbatim, @f @ref
+
     ops_separate_line = ["<ol>", "</ol>", "<ul>", "</ul>", "@{", "@}", "<br>"]
+
+
+    #todo:
+    #  @arg @c @cond  @em @endcond @f{ @internal @name @post @pre  @sa 
 
     while idx<endidx:
         if one_in(ops_separate_line, lines[idx]):

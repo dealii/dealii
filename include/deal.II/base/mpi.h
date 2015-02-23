@@ -279,19 +279,18 @@ namespace Utilities
        * main.
        * @param[in] max_num_threads The maximal number of threads this MPI
        * process should utilize. If this argument is set to
-       * numbers::invalid_unsigned_int (the default value),
-       * then the number of threads is determined
-       * automatically in the following way: the number of threads to run on
-       * this MPI process is set in such a way that all of the cores in your
-       * node are spoken for. In other words, if you have started one MPI
-       * process per node, setting this argument is equivalent to setting it
-       * to the number of cores present in the node this MPI process runs on.
-       * If you have started as many MPI processes per node as there are cores
-       * on each node, then this is equivalent to passing 1 as the argument.
-       * On the other hand, if, for example, you start 4 MPI processes on each
-       * 16-core node, then this option will start 4 worker threads for each
-       * node. If you start 3 processes on an 8 core node, then they will
-       * start 3, 3 and 2 threads, respectively.
+       * numbers::invalid_unsigned_int (the default value), then the number of
+       * threads is determined automatically in the following way: the number
+       * of threads to run on this MPI process is set in such a way that all
+       * of the cores in your node are spoken for. In other words, if you have
+       * started one MPI process per node, setting this argument is equivalent
+       * to setting it to the number of cores present in the node this MPI
+       * process runs on. If you have started as many MPI processes per node
+       * as there are cores on each node, then this is equivalent to passing 1
+       * as the argument. On the other hand, if, for example, you start 4 MPI
+       * processes on each 16-core node, then this option will start 4 worker
+       * threads for each node. If you start 3 processes on an 8 core node,
+       * then they will start 3, 3 and 2 threads, respectively.
        *
        * @note This function calls MultithreadInfo::set_thread_limit() with
        * either @p max_num_threads or, following the discussion above, a
@@ -308,10 +307,10 @@ namespace Utilities
        *
        * @note MultithreadInfo::set_thread_limit() can only work if it is
        * called before any threads are created. The safest place for a call to
-       * it is therefore at the beginning of
-       * <code>main()</code>. Consequently, this extends to the current class:
-       * the best place to create an object of this type is also at or close
-       * to the top of <code>main()</code>.
+       * it is therefore at the beginning of <code>main()</code>.
+       * Consequently, this extends to the current class: the best place to
+       * create an object of this type is also at or close to the top of
+       * <code>main()</code>.
        */
       MPI_InitFinalize (int    &argc,
                         char ** &argv,

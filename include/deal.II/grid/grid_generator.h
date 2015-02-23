@@ -56,8 +56,8 @@ namespace GridGenerator
    * in 2D, etc) consisting of exactly one cell. The hypercube volume is the
    * tensor product interval $[left,right]^{\text{dim}}$ in the present number
    * of dimensions, where the limits are given as arguments. They default to
-   * zero and unity, then producing the unit hypercube. If the argument
-   * @p colorize is false, all boundary indicators are set to zero ("not
+   * zero and unity, then producing the unit hypercube. If the argument @p
+   * colorize is false, all boundary indicators are set to zero ("not
    * colorized") for 2d and 3d. If it is true, the boundary is colorized as in
    * hyper_rectangle(). In 1d the indicators are always colorized, see
    * hyper_rectangle().
@@ -217,8 +217,8 @@ namespace GridGenerator
    * vectors. Colorizing is done according to hyper_rectangle().
    *
    * @note This function silently reorders the vertices on the cells to
-   * lexicographic ordering (see <code>GridReordering::reorder_grid</code>). In
-   * other words, if reodering of the vertices does occur, the ordering of
+   * lexicographic ordering (see <code>GridReordering::reorder_grid</code>).
+   * In other words, if reodering of the vertices does occur, the ordering of
    * vertices in the array of <code>corners</code> will no longer refer to the
    * same triangulation.
    *
@@ -248,9 +248,9 @@ namespace GridGenerator
                              const bool           colorize = false);
 
   /**
-   * A subdivided parallelepiped, i.e., the same as above, but where the number
-   * of subdivisions in each of the @p dim directions may vary. Colorizing is
-   * done according to hyper_rectangle().
+   * A subdivided parallelepiped, i.e., the same as above, but where the
+   * number of subdivisions in each of the @p dim directions may vary.
+   * Colorizing is done according to hyper_rectangle().
    *
    * @note The triangulation needs to be void upon calling this function.
    */
@@ -271,8 +271,8 @@ namespace GridGenerator
    * give the lower and upper bound of the inner hypercube in all coordinate
    * directions.  @p thickness marks the size of the layer cells.
    *
-   * If the flag @p colorize is set, the outer cells get material id's according
-   * to the following scheme: extending over the inner cube in (+/-)
+   * If the flag @p colorize is set, the outer cells get material id's
+   * according to the following scheme: extending over the inner cube in (+/-)
    * x-direction: 1/2. In y-direction 4/8, in z-direction 16/32. The cells at
    * corners and edges (3d) get these values bitwise or'd.
    *
@@ -384,9 +384,9 @@ namespace GridGenerator
    * Initialize the given triangulation with a hyper-L (in 2d or 3d)
    * consisting of exactly <tt>2^dim-1</tt> cells. It produces the hypercube
    * with the interval [<i>left,right</i>] without the hypercube made out of
-   * the interval [<i>(left+right)/2,right</i>] for each coordinate. This will
-   * result in the classical L-shape in 2d and it will look like the following
-   * in 3d:
+   * the interval [<i>(left+right)/2,right</i>] for each coordinate.  All
+   * faces will have boundary indicator 0. This function will create the
+   * classical L-shape in 2d and it will look like the following in 3d:
    *
    * @image html hyper_l.png
    *
@@ -427,10 +427,10 @@ namespace GridGenerator
    * of cells of the resulting triangulation, i.e., how many cells form the
    * ring (in 2d) or the shell (in 3d).
    *
-   * If the flag @p colorize is @p true, then the outer boundary will
-   * have the indicator 1, while the inner boundary has id zero. In
-   * 3d, this applies to both the faces and the edges of these
-   * boundaries. If the flag is @p false, both have indicator zero.
+   * If the flag @p colorize is @p true, then the outer boundary will have the
+   * indicator 1, while the inner boundary has id zero. In 3d, this applies to
+   * both the faces and the edges of these boundaries. If the flag is @p
+   * false, both have indicator zero.
    *
    * In 2d, the number <tt>n_cells</tt> of elements for this initial
    * triangulation can be chosen arbitrarily. If the number of initial cells
@@ -590,6 +590,7 @@ namespace GridGenerator
    *
    * It is implemented in 2d and 3d, and takes the following arguments:
    *
+   * @param triangulation The triangulation to be filled.
    * @param inner_radius  Radius of the internal hole.
    * @param outer_radius Half of the edge length of the square.
    * @param L  Extension in @p z-direction (only used in 3d).

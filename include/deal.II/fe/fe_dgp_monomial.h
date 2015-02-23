@@ -80,28 +80,23 @@ template <int dim, int spacedim> class MappingQ;
  * within the range of the mapped $P_1$ polynomials.
  *
  *
- * <h3>Visualization of shape functions</h3>
- * In 2d, the shape functions of this element look as follows.
+ * <h3>Visualization of shape functions</h3> In 2d, the shape functions of
+ * this element look as follows.
  *
  * <h4>$P_0$ element</h4>
  *
- * <table>
- * <tr>
- * <td align="center">
+ * <table> <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0000.png
  * </td>
  *
- * <td align="center">
- * </td> </tr> <tr> <td align="center"> $P_0$ element, shape function 0 </td>
+ * <td align="center"> </td> </tr> <tr> <td align="center"> $P_0$ element,
+ * shape function 0 </td>
  *
- * <td align="center"></tr>
- * </table>
+ * <td align="center"></tr> </table>
  *
  * <h4>$P_1$ element</h4>
  *
- * <table>
- * <tr>
- * <td align="center">
+ * <table> <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0000.png
  * </td>
  *
@@ -115,16 +110,15 @@ template <int dim, int spacedim> class MappingQ;
  * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P1/P1_DGPMonomial_shape0002.png
  * </td>
  *
- * <td align="center">
- * </td> </tr> <tr> <td align="center"> $P_1$ element, shape function 2 </td>
+ * <td align="center"> </td> </tr> <tr> <td align="center"> $P_1$ element,
+ * shape function 2 </td>
  *
  * <td align="center"></td> </tr> </table>
  *
  *
  * <h4>$P_2$ element</h4>
  *
- * <table> <tr>
- * <td align="center">
+ * <table> <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0000.png
  * </td>
  *
@@ -152,14 +146,12 @@ template <int dim, int spacedim> class MappingQ;
  * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P2/P2_DGPMonomial_shape0005.png
  * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 4 </td>
  *
- * <td align="center"> $P_2$ element, shape function 5 </td> </tr>
- * </table>
+ * <td align="center"> $P_2$ element, shape function 5 </td> </tr> </table>
  *
  *
  * <h4>$P_3$ element</h4>
  *
- * <table> <tr>
- * <td align="center">
+ * <table> <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0000.png
  * </td>
  *
@@ -207,13 +199,10 @@ template <int dim, int spacedim> class MappingQ;
  * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P3/P3_DGPMonomial_shape0009.png
  * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 8 </td>
  *
- * <td align="center"> $P_3$ element, shape function 9 </td> </tr>
- * </table>
+ * <td align="center"> $P_3$ element, shape function 9 </td> </tr> </table>
  *
  *
- * <h4>$P_4$ element</h4>
- * <table> <tr>
- * <td align="center">
+ * <h4>$P_4$ element</h4> <table> <tr> <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0000.png
  * </td>
  *
@@ -287,11 +276,10 @@ template <int dim, int spacedim> class MappingQ;
  * @image html http://www.dealii.org/images/shape-functions/DGPMonomial/P4/P4_DGPMonomial_shape0014.png
  * </td>
  *
- * <td align="center">
- * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 14 </td>
+ * <td align="center"> </td> </tr> <tr> <td align="center"> $P_4$ element,
+ * shape function 14 </td>
  *
- * <td align="center"></td> </tr>
- * </table>
+ * <td align="center"></td> </tr> </table>
  *
  * @author Ralf Hartmann, 2004
  */

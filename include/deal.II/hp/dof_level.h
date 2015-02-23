@@ -243,9 +243,9 @@ namespace internal
       std::size_t memory_consumption () const;
 
       /**
-      * Read or write the data of this object to or from a stream for the
-      * purpose of serialization
-      */
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
+       */
       template <class Archive>
       void serialize(Archive &ar,
                      const unsigned int version);
