@@ -73,7 +73,8 @@ public:
 
   /**
    * Assign a new matrix pointer. Deletes the old pointer and releases its
-   * matrix. @see SmartPointer
+   * matrix.
+   * @see SmartPointer
    */
   const TransposeMatrix &operator= (const MATRIX *M);
 

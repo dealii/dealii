@@ -41,8 +41,8 @@ template<typename number> class SparseMatrix;
  * stack products of three or more matrices by making one of the two matrices
  * an object of the current type handles be a ProductMatrix itself.
  *
- * Here is an example multiplying two different FullMatrix objects: @include
- * product_matrix.cc
+ * Here is an example multiplying two different FullMatrix objects:
+ * @include product_matrix.cc
  *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
  */

@@ -182,7 +182,9 @@ namespace parallel
      *
      * @note This class does not support anisotropic refinement, because it
      * relies on the p4est library that does not support this. Attempts to
-     * refine cells anisotropically will result in errors. @note There is
+     * refine cells anisotropically will result in errors.
+     *
+     * @note There is
      * currently no support for distributing 1d triangulations.
      *
      *

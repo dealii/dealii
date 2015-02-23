@@ -77,9 +77,11 @@ template <typename> class Vector;
  * @dontinclude block_matrix_array.cc
  *
  * Obviously, we have to include the header file containing the definition of
- * BlockMatrixArray: @skipline block_matrix_array.h
+ * BlockMatrixArray:
+ * @skipline block_matrix_array.h
  *
- * First, we set up some matrices to be entered into the blocks. @skip main
+ * First, we set up some matrices to be entered into the blocks.
+ * @skip main
  * @until C.fill
  *
  * The BlockMatrixArray needs a VectorMemory&lt;Vector&lt;number&gt; &gt;
@@ -90,18 +92,25 @@ template <typename> class Vector;
  *
  * @line Growing
  *
- * Now, we are ready to build a <i>2x2</i> BlockMatrixArray. @line Block
+ * Now, we are ready to build a <i>2x2</i> BlockMatrixArray.
+ * @line Block
  * First, we enter the matrix <tt>A</tt> multiplied by 2 in the upper left
- * block @line enter Now -1 times <tt>B1</tt> in the upper right block. @line
- * enter We add the transpose of <tt>B2</tt> to the upper right block and
+ * block
+ * @line enter
+ * Now -1 times <tt>B1</tt> in the upper right block.
+ * @line enter
+ * We add the transpose of <tt>B2</tt> to the upper right block and
  * continue in a similar fashion. In the end, the block matrix structure is
- * printed into an LaTeX table. @until latex
+ * printed into an LaTeX table.
+ * @until latex
  *
  * Now, we set up vectors to be multiplied with this matrix and do a
- * multiplication. @until vmult
+ * multiplication.
+ * @until vmult
  *
  * Finally, we solve a linear system with BlockMatrixArray, using no
- * preconditioning and the conjugate gradient method. @until Error
+ * preconditioning and the conjugate gradient method.
+ * @until Error
  *
  * The remaining code of this sample program concerns preconditioning and is
  * described in the documentation of BlockTrianglePrecondition.
@@ -363,24 +372,30 @@ private:
  *
  * In order to set up the preconditioner, we have to compute the inverses of
  * the diagonal blocks ourselves. Since we used FullMatrix objects, this is
- * fairly easy. @dontinclude block_matrix_array.cc @skip Error @until
- * Cinv.invert
+ * fairly easy.
+ * @dontinclude block_matrix_array.cc
+ * @skip Error
+ * @until Cinv.invert
  *
  * After creating a <i>2x2</i> BlockTrianglePrecondition object, we only fill
  * its diagonals. The scaling factor <i>1/2</i> used for <tt>A</tt> is the
  * reciprocal of the scaling factor used for the <tt>matrix</tt> itself.
  * Remember, this preconditioner actually <b>multiplies</b> with the diagonal
- * blocks. @until Cinv
+ * blocks.
+ * @until Cinv
  *
  * Now, we have a block Jacobi preconditioner, which is still symmetric, since
  * the blocks are symmetric. Therefore, we can still use the preconditioned
- * conjugate gradient method. @until Error
+ * conjugate gradient method.
+ * @until Error
  *
  * Now, we enter the subdiagonal block. This is the same as in
- * <tt>matrix</tt>. @until B2
+ * <tt>matrix</tt>.
+ * @until B2
  *
  * Since the preconditioner is not symmetric anymore, we use the GMRES method
- * for solving. @until Error
+ * for solving.
+ * @until Error
  *
  *
  * @ingroup Preconditioners

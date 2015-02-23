@@ -95,7 +95,9 @@ public:
   operator = (const LAPACKFullMatrix<number> &);
 
   /**
-   * Assignment operator from a regular FullMatrix. @note Since LAPACK expects
+   * Assignment operator from a regular FullMatrix.
+   *
+   * @note Since LAPACK expects
    * matrices in transposed order, this transposition is included here.
    */
   template <typename number2>
@@ -103,7 +105,9 @@ public:
   operator = (const FullMatrix<number2> &);
 
   /**
-   * Assignment operator from a regular SparseMatrix. @note Since LAPACK
+   * Assignment operator from a regular SparseMatrix.
+   *
+   * @note Since LAPACK
    * expects matrices in transposed order, this transposition is included
    * here.
    */
@@ -143,13 +147,17 @@ public:
                const size_type cols);
 
   /**
-   * Return the dimension of the range space. @note The matrix is of dimension
+   * Return the dimension of the range space.
+   *
+   * @note The matrix is of dimension
    * $m \times n$.
    */
   unsigned int m () const;
 
   /**
-   * Return the number of the range space. @note The matrix is of dimension $m
+   * Return the number of the range space.
+   *
+   * @note The matrix is of dimension $m
    * \times n$.
    */
   unsigned int n () const;

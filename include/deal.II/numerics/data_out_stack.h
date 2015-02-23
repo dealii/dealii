@@ -220,9 +220,6 @@ public:
    * the general documentation of this class. An example is also provided in
    * the documentation of this class's base class DataOut_DoFData.
    *
-   * @param n_patches_per_circle Denotes into how many intervals
-   *   the angular (rotation) variable is to be subdivided.
-   *
    * @param n_subdivisions See DataOut::build_patches() for an extensive
    *   description of this parameter. The number of subdivisions is always
    *   one in the direction of the time-like parameter used by this class.

@@ -67,7 +67,7 @@ DEAL_II_NAMESPACE_OPEN
  * consequently not be represented by either of these classes. Use an
  * array of size 3 in this case, or the <code>std_cxx11::array</code>
  * class. Alternatively, as in the case of vector-valued functions,
- * you can use objects of type Vector or <code>std::vector<code>.
+ * you can use objects of type Vector or <code>std::vector</code>.
  *
  *
  * @tparam dim An integer that denotes the dimension of the space in which
@@ -474,7 +474,8 @@ Point<dim,Number>::serialize(Archive &ar, const unsigned int)
 
 
 /**
- * Global operator scaling a point vector by a scalar. @relates Point
+ * Global operator scaling a point vector by a scalar.
+ * @relates Point
  */
 template <int dim, typename Number>
 inline
@@ -487,7 +488,8 @@ Point<dim,Number> operator * (const Number             factor,
 
 
 /**
- * Global operator scaling a point vector by a scalar. @relates Point
+ * Global operator scaling a point vector by a scalar.
+ * @relates Point
  */
 template <int dim>
 inline
@@ -501,7 +503,8 @@ Point<dim,double> operator * (const double             factor,
 
 /**
  * Output operator for points. Print the elements consecutively, with a space
- * in between. @relates Point
+ * in between.
+ * @relates Point
  */
 template <int dim, typename Number>
 inline
@@ -519,7 +522,8 @@ std::ostream &operator << (std::ostream            &out,
 
 /**
  * Output operator for points. Print the elements consecutively, with a space
- * in between. @relates Point
+ * in between.
+ * @relates Point
  */
 template <int dim, typename Number>
 inline

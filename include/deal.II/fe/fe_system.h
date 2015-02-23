@@ -185,7 +185,7 @@ public:
    * @param[in] fe The finite element that will be used to represent
    *   the components of this composed element.
    * @param[in] n_elements An integer denoting how many copies of
-   *   @fe this element should consist of.
+   *   @p fe this element should consist of.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe,
             const unsigned int n_elements);
