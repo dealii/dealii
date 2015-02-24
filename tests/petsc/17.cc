@@ -33,7 +33,7 @@ void test (PETScWrappers::Vector &v)
       v(i) = i;
       norm += std::fabs(1.*i);
     }
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // then check the norm
   Assert (v.l1_norm() == norm, ExcInternalError());

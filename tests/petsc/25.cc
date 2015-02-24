@@ -30,7 +30,7 @@ void test (PETScWrappers::Vector &v)
   for (unsigned int i=0; i<v.size(); ++i)
     if (i%3 == 0)
       v(i) = i+1.;
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // then clear it again and make sure the
   // vector is really empty

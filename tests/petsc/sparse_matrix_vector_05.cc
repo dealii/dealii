@@ -39,9 +39,9 @@ void test (PETScWrappers::Vector &v,
       w(i) = i+1;
     }
 
-  m.compress (VectorOperation::add);
-  v.compress (VectorOperation::add);
-  w.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
+  v.compress (VectorOperation::insert);
+  w.compress (VectorOperation::insert);
 
   // <w,Mv>
   const PetscScalar s = m.matrix_scalar_product (w,v);

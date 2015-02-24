@@ -52,7 +52,7 @@ void test()
     vec.block(0)(i) = i;
   for (unsigned int i=vec.block(1).local_range().first; i<vec.block(1).local_range().second; ++i)
     vec.block(1)(i) = i;
-  vec.compress(VectorOperation::add);
+  vec.compress(VectorOperation::insert);
 
   // verify correctness so far
   {

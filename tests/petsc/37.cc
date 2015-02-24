@@ -29,7 +29,7 @@ void test (PETScWrappers::Vector &v)
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i;
 
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   v.add (1.);
 

@@ -33,7 +33,7 @@ void test (PETScWrappers::Vector &v)
       v(i) = i;
       sum += i*i*i;
     }
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // set them to zero again
   v = 0;

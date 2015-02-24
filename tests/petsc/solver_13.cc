@@ -73,9 +73,7 @@ int main(int argc, char **argv)
     PETScWrappers::Vector  u(dim);
     u = 0.;
     f = 1.;
-    A.compress (VectorOperation::add);
-    f.compress (VectorOperation::add);
-    u.compress (VectorOperation::add);
+    A.compress (VectorOperation::insert);
     PETScWrappers::Vector t=u;
 
     PETScWrappers::SolverPreOnly solver(control);

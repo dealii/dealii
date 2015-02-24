@@ -34,7 +34,7 @@ void test (PETScWrappers::FullMatrix &m)
     for (unsigned int j=0; j<m.n(); ++j)
       m.set (i, j, i+2*j);
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   // things we know
   Assert (m.m() == 3, ExcInternalError());
@@ -57,7 +57,7 @@ void test (PETScWrappers::FullMatrix &m)
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
       m.set (i, j, j+2*i);
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
   
   // things we know
   Assert (m.m() == 5, ExcInternalError());

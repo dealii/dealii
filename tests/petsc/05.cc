@@ -37,7 +37,7 @@ void test (PETScWrappers::SparseMatrix &m)
           ++counter;
         }
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   deallog << m.n_nonzero_elements() << std::endl;
   Assert (m.n_nonzero_elements() == counter,
