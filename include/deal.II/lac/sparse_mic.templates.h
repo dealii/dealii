@@ -66,15 +66,19 @@ inline
 void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
                                     const AdditionalData &data)
 {
-  SparseLUDecomposition<number>::initialize(matrix, data);
-
-  SparseLUDecomposition<number>::decompose(matrix, data.strengthen_diagonal);
-
   Assert (matrix.m()==matrix.n(), ExcNotQuadratic ());
   Assert (this->m()==this->n(),   ExcNotQuadratic ());
   Assert (matrix.m()==this->m(),  ExcDimensionMismatch(matrix.m(), this->m()));
 
   Assert (data.strengthen_diagonal>=0, ExcInvalidStrengthening (data.strengthen_diagonal));
+
+  SparseLUDecomposition<number>::initialize(matrix, data);
+
+  this->decomposed = false;
+  this->strengthen_diagonal = data.strengthen_diagonal;
+  this->prebuild_lower_bound ();
+  this->copy_from (matrix);
+  this->decomposed = true;
 
   if (data.strengthen_diagonal > 0)
     this->strengthen_diagonal_impl ();

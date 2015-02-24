@@ -237,24 +237,6 @@ public:
                    const AdditionalData parameters);
 
   /**
-   * This method is deprecated, and left for backward compability. It will be
-   * removed in later versions.
-   *
-   * @deprecated
-   */
-  template <typename somenumber>
-  void decompose (const SparseMatrix<somenumber> &matrix,
-                  const double                    strengthen_diagonal=0.) DEAL_II_DEPRECATED;
-
-  /**
-   * This method is deprecated, and left for backward compability. It will be
-   * removed in later versions.
-   *
-   * @deprecated
-   */
-  virtual bool is_decomposed () const DEAL_II_DEPRECATED;
-
-  /**
    * Return whether the object is empty. It calls the inherited
    * SparseMatrix::empty() function.
    */
@@ -324,11 +306,12 @@ protected:
    */
   std::vector<const size_type *> prebuilt_lower_bound;
 
-private:
   /**
    * Fills the #prebuilt_lower_bound array.
    */
   void prebuild_lower_bound ();
+  
+private:
 
   /**
    * In general this pointer is zero except for the case that no
@@ -354,15 +337,6 @@ get_strengthen_diagonal(const number /*rowsum*/,
                         const size_type /*row*/) const
 {
   return strengthen_diagonal;
-}
-
-
-
-template <typename number>
-inline bool
-SparseLUDecomposition<number>::is_decomposed () const
-{
-  return decomposed;
 }
 
 

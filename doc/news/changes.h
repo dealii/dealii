@@ -163,6 +163,7 @@ inconvenience this causes.
   - SparseMIC::decompose and SparseILU::decompose.
   - SparseMIC::reinit and SparseLUDecomposition::reinit.
   - SparseILU::apply_decomposition.
+  - SparseLUDecomposition::decompose and SparseLUDecomposition::is_decomposed.
   - The compress() functions without argument in the various vector
     classes. You should use the versions with a VectorOperation
     argument instead.

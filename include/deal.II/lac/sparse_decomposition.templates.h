@@ -131,22 +131,6 @@ void SparseLUDecomposition<number>::initialize (
 }
 
 
-template<typename number>
-template<typename somenumber>
-void
-SparseLUDecomposition<number>::
-decompose (const SparseMatrix<somenumber> &matrix,
-           const double                    strengthen_diagonal)
-{
-  decomposed = false;
-
-  this->strengthen_diagonal = strengthen_diagonal;
-  prebuild_lower_bound ();
-  copy_from (matrix);
-  decomposed = true;
-}
-
-
 
 template<typename number>
 void
