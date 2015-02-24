@@ -262,7 +262,7 @@ namespace PETScWrappers
                           row_lengths[i], &row_entries[0],
                           &row_values[0], INSERT_VALUES);
           }
-        compress ();
+        compress (VectorOperation::insert);
 
 
         // Tell PETSc that we are not

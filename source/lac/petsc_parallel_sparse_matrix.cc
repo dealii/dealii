@@ -567,6 +567,8 @@ namespace PETScWrappers
                                     local_columns_per_process.size()));
       Assert (this_process < local_rows_per_process.size(),
               ExcInternalError());
+      assert_is_compressed ();
+
       // for each row that we own locally, we
       // have to count how many of the
       // entries in the sparsity pattern lie
@@ -753,13 +755,12 @@ namespace PETScWrappers
               }
           }
 
-          compress ();
+          compress (VectorOperation::insert);
 
           // set the dummy entries set above
           // back to zero
           *this = 0;
 #endif // version <=2.3.3
-          compress ();
 
 
           // Tell PETSc that we are not
