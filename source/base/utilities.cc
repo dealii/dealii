@@ -219,7 +219,7 @@ namespace Utilities
                (name[0] == ' '))
           name.erase (0,1);
 
-        while (name[name.length()-1] == ' ')
+        while (name.length() != 0 && name[name.length()-1] == ' ')
           name.erase (name.length()-1, 1);
 
         split_list.push_back (name);
