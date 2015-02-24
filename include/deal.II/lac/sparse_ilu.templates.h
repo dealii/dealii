@@ -48,11 +48,9 @@ void SparseILU<number>::initialize (const SparseMatrix<somenumber> &matrix,
   Assert (data.strengthen_diagonal>=0,
           ExcInvalidStrengthening (data.strengthen_diagonal));
 
-  this->decomposed = false;
   this->strengthen_diagonal = data.strengthen_diagonal;
   this->prebuild_lower_bound ();
   this->copy_from (matrix);
-  this->decomposed = true;
 
   if (data.strengthen_diagonal>0)
     this->strengthen_diagonal_impl();

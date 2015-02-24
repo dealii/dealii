@@ -288,13 +288,6 @@ protected:
   virtual number get_strengthen_diagonal(const number rowsum, const size_type row) const;
 
   /**
-   * State flag. If not in decomposed state, it is illegal to apply the
-   * decomposition.  This flag is cleared when the underlaying SparseMatrix
-   * SparsityPattern is changed, and set by decompose().
-   */
-  bool decomposed;
-
-  /**
    * The default strengthening value, returned by get_strengthen_diagonal().
    */
   double  strengthen_diagonal;

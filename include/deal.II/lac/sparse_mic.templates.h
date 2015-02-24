@@ -74,11 +74,9 @@ void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
 
   SparseLUDecomposition<number>::initialize(matrix, data);
 
-  this->decomposed = false;
   this->strengthen_diagonal = data.strengthen_diagonal;
   this->prebuild_lower_bound ();
   this->copy_from (matrix);
-  this->decomposed = true;
 
   if (data.strengthen_diagonal > 0)
     this->strengthen_diagonal_impl ();
