@@ -153,7 +153,6 @@ namespace internal
 
       typedef typename Types<N,T,C>::iterator iterator;
       typedef typename Types<N,T,C>::const_iterator const_iterator;
-
     private:
       /**
        * Constructor. Take a pointer to the table object to know about the
@@ -2245,7 +2244,9 @@ Table<2,T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[0]));
   Assert (j < this->table_size[1],
           ExcIndexRange (j, 0, this->table_size[1]));
-  return this->values[i*this->table_size[1]+j];
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[size_type(i)*this->table_size[1]+j];
 }
 
 
@@ -2260,7 +2261,9 @@ Table<2,T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[0]));
   Assert (j < this->table_size[1],
           ExcIndexRange (j, 0, this->table_size[1]));
-  return this->values[i*this->table_size[1]+j];
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[size_type(i)*this->table_size[1]+j];
 }
 
 
@@ -2291,7 +2294,8 @@ typename AlignedVector<T>::const_reference
 Table<2,T>::el (const unsigned int i,
                 const unsigned int j) const
 {
-  return this->values[i*this->table_size[1]+j];
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[size_type(i)*this->table_size[1]+j];
 }
 
 
@@ -2302,7 +2306,8 @@ typename AlignedVector<T>::reference
 Table<2,T>::el (const unsigned int i,
                 const unsigned int j)
 {
-  return this->values[i*this->table_size[1]+j];
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[size_type(i)*this->table_size[1]+j];
 }
 
 
@@ -2368,7 +2373,9 @@ TransposeTable<T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[1]));
   Assert (j < this->table_size[0],
           ExcIndexRange (j, 0, this->table_size[0]));
-  return this->values[j*this->table_size[1]+i];
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[size_type(j)*this->table_size[1]+i];
 }
 
 
@@ -2383,7 +2390,9 @@ TransposeTable<T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[1]));
   Assert (j < this->table_size[0],
           ExcIndexRange (j, 0, this->table_size[0]));
-  return this->values[j*this->table_size[1]+i];
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[size_type(j)*this->table_size[1]+i];
 }
 
 
@@ -2394,7 +2403,8 @@ typename AlignedVector<T>::const_reference
 TransposeTable<T>::el (const unsigned int i,
                        const unsigned int j) const
 {
-  return this->values[j*this->table_size[1]+i];
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[size_type(j)*this->table_size[1]+i];
 }
 
 
@@ -2405,7 +2415,8 @@ typename AlignedVector<T>::reference
 TransposeTable<T>::el (const unsigned int i,
                        const unsigned int j)
 {
-  return this->values[j*this->table_size[1]+i];
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[size_type(j)*this->table_size[1]+i];
 }
 
 
@@ -2512,7 +2523,9 @@ Table<3,T>::operator () (const unsigned int i,
           ExcIndexRange (j, 0, this->table_size[1]));
   Assert (k < this->table_size[2],
           ExcIndexRange (k, 0, this->table_size[2]));
-  return this->values[(i*this->table_size[1]+j)
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[(size_type(i)*this->table_size[1]+j)
                       *this->table_size[2] + k];
 }
 
@@ -2531,7 +2544,9 @@ Table<3,T>::operator () (const unsigned int i,
           ExcIndexRange (j, 0, this->table_size[1]));
   Assert (k < this->table_size[2],
           ExcIndexRange (k, 0, this->table_size[2]));
-  return this->values[(i*this->table_size[1]+j)
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[(size_type(i)*this->table_size[1]+j)
                       *this->table_size[2] + k];
 }
 
@@ -2626,7 +2641,9 @@ Table<4,T>::operator () (const unsigned int i,
           ExcIndexRange (k, 0, this->table_size[2]));
   Assert (l < this->table_size[3],
           ExcIndexRange (l, 0, this->table_size[3]));
-  return this->values[((i*this->table_size[1]+j)
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[((size_type(i)*this->table_size[1]+j)
                        *this->table_size[2] + k)
                       *this->table_size[3] + l];
 }
@@ -2649,7 +2666,9 @@ Table<4,T>::operator () (const unsigned int i,
           ExcIndexRange (k, 0, this->table_size[2]));
   Assert (l < this->table_size[3],
           ExcIndexRange (l, 0, this->table_size[3]));
-  return this->values[((i*this->table_size[1]+j)
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[((size_type(i)*this->table_size[1]+j)
                        *this->table_size[2] + k)
                       *this->table_size[3] + l];
 }
@@ -2751,7 +2770,9 @@ Table<5,T>::operator () (const unsigned int i,
           ExcIndexRange (l, 0, this->table_size[3]));
   Assert (m < this->table_size[4],
           ExcIndexRange (m, 0, this->table_size[4]));
-  return this->values[(((i*this->table_size[1]+j)
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[(((size_type(i)*this->table_size[1]+j)
                         *this->table_size[2] + k)
                        *this->table_size[3] + l)
                       *this->table_size[4] + m];
@@ -2778,7 +2799,9 @@ Table<5,T>::operator () (const unsigned int i,
           ExcIndexRange (l, 0, this->table_size[3]));
   Assert (m < this->table_size[4],
           ExcIndexRange (m, 0, this->table_size[4]));
-  return this->values[(((i*this->table_size[1]+j)
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[(((size_type(i)*this->table_size[1]+j)
                         *this->table_size[2] + k)
                        *this->table_size[3] + l)
                       *this->table_size[4] + m];
@@ -2887,7 +2910,9 @@ Table<6,T>::operator () (const unsigned int i,
           ExcIndexRange (m, 0, this->table_size[4]));
   Assert (n < this->table_size[5],
           ExcIndexRange (n, 0, this->table_size[5]));
-  return this->values[((((i*this->table_size[1]+j)
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[((((size_type(i)*this->table_size[1]+j)
                          *this->table_size[2] + k)
                         *this->table_size[3] + l)
                        *this->table_size[4] + m)
@@ -2918,7 +2943,9 @@ Table<6,T>::operator () (const unsigned int i,
           ExcIndexRange (m, 0, this->table_size[4]));
   Assert (n < this->table_size[5],
           ExcIndexRange (n, 0, this->table_size[5]));
-  return this->values[((((i*this->table_size[1]+j)
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[((((size_type(i)*this->table_size[1]+j)
                          *this->table_size[2] + k)
                         *this->table_size[3] + l)
                        *this->table_size[4] + m)
@@ -3034,7 +3061,9 @@ Table<7,T>::operator () (const unsigned int i,
           ExcIndexRange (n, 0, this->table_size[5]));
   Assert (o < this->table_size[6],
           ExcIndexRange (o, 0, this->table_size[6]));
-  return this->values[(((((i*this->table_size[1]+j)
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[(((((size_type(i)*this->table_size[1]+j)
                           *this->table_size[2] + k)
                          *this->table_size[3] + l)
                         *this->table_size[4] + m)
@@ -3069,7 +3098,9 @@ Table<7,T>::operator () (const unsigned int i,
           ExcIndexRange (n, 0, this->table_size[5]));
   Assert (o < this->table_size[5],
           ExcIndexRange (o, 0, this->table_size[6]));
-  return this->values[(((((i*this->table_size[1]+j)
+
+  typedef typename AlignedVector<T>::size_type size_type;
+  return this->values[(((((size_type(i)*this->table_size[1]+j)
                           *this->table_size[2] + k)
                          *this->table_size[3] + l)
                         *this->table_size[4] + m)
