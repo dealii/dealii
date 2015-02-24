@@ -87,9 +87,7 @@ int main(int argc, char **argv)
     PETScWrappers::Vector  f(dim);
     PETScWrappers::Vector  u(dim);
     f = 1.;
-    A.compress (VectorOperation::add);
-    f.compress (VectorOperation::add);
-    u.compress (VectorOperation::add);
+    A.compress (VectorOperation::insert);
 
     GrowingVectorMemory<PETScWrappers::Vector> mem;
     SolverQMRS<PETScWrappers::Vector> solver(control,mem);

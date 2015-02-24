@@ -37,7 +37,7 @@ void test (PETScWrappers::FullMatrix &m)
           ++counter;
         }
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   // check n_nonzero_elements then
   // output a dummy number.

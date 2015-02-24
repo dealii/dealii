@@ -84,13 +84,11 @@ int main(int argc, char **argv)
     FDMatrix testproblem(size, size);
     PETScWrappers::SparseMatrix  A(dim, dim, 5);
     testproblem.five_point(A);
+    A.compress (VectorOperation::insert);
 
     PETScWrappers::Vector  f(dim);
     PETScWrappers::Vector  u(dim);
     f = 1.;
-    A.compress (VectorOperation::add);
-    f.compress (VectorOperation::add);
-    u.compress (VectorOperation::add);
 
     GrowingVectorMemory<PETScWrappers::Vector> mem;
     SolverBicgstab<PETScWrappers::Vector> solver(control,mem);

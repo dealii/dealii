@@ -33,13 +33,13 @@ void test ()
     for (unsigned int j=0; j<=i; ++j)
       m.set (i,j, i+2*j);
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   PETScWrappers::SparseMatrix m2(s,s,s);
   m2.set(0,1,5.0);
   for (unsigned int i=0; i<m2.m(); ++i)
     m2.set(i,i,1.0+ i);
-  m2.compress (VectorOperation::add);
+  m2.compress (VectorOperation::insert);
 
   // we now print the matrix m,
   // print after adding m2, and then subtract m2 again

@@ -35,8 +35,8 @@ void test (PETScWrappers::Vector &v)
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i;
 
-  m.compress (VectorOperation::add);
-  v.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
+  v.compress (VectorOperation::insert);
 
   // <w,Mv>
   const PetscScalar s = m.matrix_norm_square (v);

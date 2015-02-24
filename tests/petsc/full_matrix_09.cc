@@ -31,7 +31,7 @@ void test (PETScWrappers::FullMatrix &m)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   // then multiply everything by 1.25 and
   // make sure we retrieve the values we

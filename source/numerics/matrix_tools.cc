@@ -2410,7 +2410,6 @@ namespace MatrixTools
           }
 
         // clean up
-        matrix.compress ();
         solution.compress (VectorOperation::insert);
         right_hand_side.compress (VectorOperation::insert);
       }
@@ -2445,9 +2444,6 @@ namespace MatrixTools
     // used for both petsc matrix types
     internal::PETScWrappers::apply_boundary_values (boundary_values, matrix, solution,
                                                     right_hand_side, eliminate_columns);
-
-    // compress the matrix once we're done
-    matrix.compress ();
   }
 
 

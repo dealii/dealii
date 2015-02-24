@@ -33,7 +33,7 @@ void test (PETScWrappers::SparseMatrix &m)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   // then make sure we retrieve the same ones
   for (unsigned int i=0; i<m.m(); ++i)

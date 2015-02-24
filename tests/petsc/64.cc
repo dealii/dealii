@@ -34,8 +34,8 @@ template<typename MatrixType>
 void test (MatrixType &m)
 {
   m.add(0,0,1);
+  m.compress(VectorOperation::add);
   m = 0;
-  m.compress();
 
   Assert(fabs(m.frobenius_norm())<1e-15, ExcInternalError());
 

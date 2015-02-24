@@ -38,7 +38,7 @@ void test (PETScWrappers::Vector &v)
   for (unsigned int i=0; i<v.size(); i+=1+i)
     v(i) /= 2;
 
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // check that they are ok, and this time
   // all of them

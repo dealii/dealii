@@ -32,7 +32,7 @@ void test (PETScWrappers::FullMatrix &m)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   // compare against the exact value of the
   // l1-norm (max col-sum)

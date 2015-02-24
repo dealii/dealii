@@ -36,7 +36,7 @@ void test (PETScWrappers::Vector &v)
       pattern[i] = true;
     }
 
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // check that they are ok, and this time
   // all of them

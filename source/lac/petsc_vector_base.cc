@@ -388,8 +388,27 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::compress (::dealii::VectorOperation::values)
+  VectorBase::compress (const VectorOperation::values operation)
   {
+#ifdef DEBUG
+#ifdef DEAL_II_WITH_MPI
+    // Check that all processors agree that last_action is the same (or none!)
+
+    int my_int_last_action = last_action;
+    int all_int_last_action;
+
+    MPI_Allreduce(&my_int_last_action, &all_int_last_action, 1, MPI_INT,
+                  MPI_BOR, get_mpi_communicator());
+
+    AssertThrow(all_int_last_action != (::dealii::VectorOperation::add | ::dealii::VectorOperation::insert),
+                ExcMessage("Error: not all processors agree on the last VectorOperation before this compress() call."));
+#endif
+#endif
+
+    AssertThrow(last_action == ::dealii::VectorOperation::unknown
+                || last_action == operation,
+                ExcMessage("Missing compress() or calling with wrong VectorOperation argument."));
+
     // note that one may think that
     // we only need to do something
     // if in fact the state is

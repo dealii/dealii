@@ -270,7 +270,7 @@ namespace PETScWrappers
      * @ref GlossCompress "Compressing distributed objects"
      * for more information.
      */
-    void compress (::dealii::VectorOperation::values operation);
+    void compress (const VectorOperation::values operation);
 
     /**
      * Set all components of the vector to the given number @p s. Simply pass
@@ -741,7 +741,7 @@ namespace PETScWrappers
      * variable is @p mutable so that the accessor classes can write to it,
      * even though the vector object they refer to is constant.
      */
-    mutable ::dealii::VectorOperation::values last_action;
+    mutable VectorOperation::values last_action;
 
     /**
      * Make the reference class a friend.

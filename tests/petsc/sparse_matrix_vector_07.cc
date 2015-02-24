@@ -40,9 +40,9 @@ void test (PETScWrappers::Vector &v,
       w(i) = i+1;
     }
 
-  m.compress (VectorOperation::add);
-  v.compress (VectorOperation::add);
-  w.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
+  v.compress (VectorOperation::insert);
+  w.compress (VectorOperation::insert);
 
   // x=w-Mv
   const double s = m.residual (x, v, w);
