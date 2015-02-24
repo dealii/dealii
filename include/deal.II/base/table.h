@@ -154,6 +154,8 @@ namespace internal
       typedef typename Types<N,T,C>::iterator iterator;
       typedef typename Types<N,T,C>::const_iterator const_iterator;
 
+      typedef size_t size_type;
+      typedef ptrdiff_t difference_type;
     private:
       /**
        * Constructor. Take a pointer to the table object to know about the
@@ -402,6 +404,12 @@ class TableBase : public Subscriptor
 {
 public:
   /**
+   * Integer type used to count the number of elements in this container.
+   */
+  typedef typename AlignedVector<T>::size_type size_type;
+
+
+  /**
    * Default constructor. Set all dimensions to zero.
    */
   TableBase ();
@@ -493,7 +501,7 @@ public:
    * Return the number of elements stored in this object, which is the product
    * of the extensions in each dimension.
    */
-  unsigned int n_elements () const;
+  size_type n_elements () const;
 
   /**
    * Return whether the object is empty, i.e. one of the directions is zero.
@@ -593,7 +601,7 @@ protected:
    * Return the position of the indicated element within the array of elements
    * stored one after the other. This function does no index checking.
    */
-  typename AlignedVector<T>::size_type position (const TableIndices<N> &indices) const;
+  size_type position (const TableIndices<N> &indices) const;
 
   /**
    * Return a read-write reference to the indicated element.
@@ -668,6 +676,11 @@ template <typename T>
 class Table<1,T> : public TableBase<1,T>
 {
 public:
+  /**
+   * Integer type used to count the number of elements in this container.
+   */
+  typedef typename TableBase<1,T>::size_type size_type;
+
   /**
    * Default constructor. Set all dimensions to zero.
    */
@@ -782,6 +795,11 @@ template <typename T>
 class Table<2,T> : public TableBase<2,T>
 {
 public:
+  /**
+   * Integer type used to count the number of elements in this container.
+   */
+  typedef typename TableBase<2,T>::size_type size_type;
+
   /**
    * Default constructor. Set all dimensions to zero.
    */
@@ -961,6 +979,11 @@ class Table<3,T> : public TableBase<3,T>
 {
 public:
   /**
+   * Integer type used to count the number of elements in this container.
+   */
+  typedef typename TableBase<3,T>::size_type size_type;
+
+  /**
    * Default constructor. Set all dimensions to zero.
    */
   Table ();
@@ -1090,6 +1113,11 @@ class Table<4,T> : public TableBase<4,T>
 {
 public:
   /**
+   * Integer type used to count the number of elements in this container.
+   */
+  typedef typename TableBase<4,T>::size_type size_type;
+
+  /**
    * Default constructor. Set all dimensions to zero.
    */
   Table ();
@@ -1176,6 +1204,12 @@ template <typename T>
 class Table<5,T> : public TableBase<5,T>
 {
 public:
+  /**
+   * Integer type used to count the number of elements in this container.
+   */
+  typedef typename TableBase<5,T>::size_type size_type;
+
+
   /**
    * Default constructor. Set all dimensions to zero.
    */
@@ -1265,6 +1299,11 @@ template <typename T>
 class Table<6,T> : public TableBase<6,T>
 {
 public:
+  /**
+   * Integer type used to count the number of elements in this container.
+   */
+  typedef typename TableBase<6,T>::size_type size_type;
+
   /**
    * Default constructor. Set all dimensions to zero.
    */
@@ -1356,6 +1395,11 @@ template <typename T>
 class Table<7,T> : public TableBase<7,T>
 {
 public:
+  /**
+   * Integer type used to count the number of elements in this container.
+   */
+  typedef typename TableBase<7,T>::size_type size_type;
+
   /**
    * Default constructor. Set all dimensions to zero.
    */
@@ -1454,6 +1498,11 @@ template <typename T>
 class TransposeTable : public TableBase<2,T>
 {
 public:
+  /**
+   * Integer type used to count the number of elements in this container.
+   */
+  typedef typename TableBase<2,T>::size_type size_type;
+
   /**
    * Default constructor. Set all dimensions to zero.
    */
@@ -1664,7 +1713,7 @@ namespace internal
           // note: P>1, otherwise the
           // specialization would have
           // been taken!
-          unsigned int subobject_size = table.size()[N-1];
+          size_type subobject_size = table.size()[N-1];
           for (int p=P-1; p>1; --p)
             subobject_size *= table.size()[N-p];
           const iterator new_data = data + i*subobject_size;
@@ -1832,7 +1881,7 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
 {
   table_size = new_sizes;
 
-  const unsigned int new_size = n_elements();
+  const size_type new_size = n_elements();
 
   // if zero size was given: free all memory
   if (new_size == 0)
@@ -1879,10 +1928,10 @@ TableBase<N,T>::size (const unsigned int i) const
 
 template <int N, typename T>
 inline
-unsigned int
+typename TableBase<N,T>::size_type
 TableBase<N,T>::n_elements () const
 {
-  unsigned int s = 1;
+  size_type s = 1;
   for (unsigned int n=0; n<N; ++n)
     s *= table_size[n];
   return s;
@@ -1987,11 +2036,9 @@ TableBase<N,T>::memory_consumption () const
 
 template <int N, typename T>
 inline
-typename AlignedVector<T>::size_type
+typename TableBase<N,T>::size_type
 TableBase<N,T>::position (const TableIndices<N> &indices) const
 {
-  typedef typename AlignedVector<T>::size_type size_type;
-
   // specialize this for the
   // different numbers of dimensions,
   // to make the job somewhat easier
@@ -2217,7 +2264,7 @@ Table<2,T>::operator [] (const unsigned int i) const
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
   return dealii::internal::TableBaseAccessors::Accessor<2,T,true,1>(*this,
-         this->values.begin()+i*n_cols());
+         this->values.begin()+size_type(i)*n_cols());
 }
 
 
@@ -2230,7 +2277,7 @@ Table<2,T>::operator [] (const unsigned int i)
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
   return dealii::internal::TableBaseAccessors::Accessor<2,T,false,1>(*this,
-         this->values.begin()+i*n_cols());
+         this->values.begin()+size_type(i)*n_cols());
 }
 
 
@@ -2245,7 +2292,7 @@ Table<2,T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[0]));
   Assert (j < this->table_size[1],
           ExcIndexRange (j, 0, this->table_size[1]));
-  return this->values[i*this->table_size[1]+j];
+  return this->values[size_type(i)*this->table_size[1]+j];
 }
 
 
@@ -2260,7 +2307,7 @@ Table<2,T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[0]));
   Assert (j < this->table_size[1],
           ExcIndexRange (j, 0, this->table_size[1]));
-  return this->values[i*this->table_size[1]+j];
+  return this->values[size_type(i)*this->table_size[1]+j];
 }
 
 
@@ -2291,7 +2338,7 @@ typename AlignedVector<T>::const_reference
 Table<2,T>::el (const unsigned int i,
                 const unsigned int j) const
 {
-  return this->values[i*this->table_size[1]+j];
+  return this->values[size_type(i)*this->table_size[1]+j];
 }
 
 
@@ -2302,7 +2349,7 @@ typename AlignedVector<T>::reference
 Table<2,T>::el (const unsigned int i,
                 const unsigned int j)
 {
-  return this->values[i*this->table_size[1]+j];
+  return this->values[size_type(i)*this->table_size[1]+j];
 }
 
 
@@ -2368,7 +2415,7 @@ TransposeTable<T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[1]));
   Assert (j < this->table_size[0],
           ExcIndexRange (j, 0, this->table_size[0]));
-  return this->values[j*this->table_size[1]+i];
+  return this->values[size_type(j)*this->table_size[1]+i];
 }
 
 
@@ -2383,7 +2430,7 @@ TransposeTable<T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[1]));
   Assert (j < this->table_size[0],
           ExcIndexRange (j, 0, this->table_size[0]));
-  return this->values[j*this->table_size[1]+i];
+  return this->values[size_type(j)*this->table_size[1]+i];
 }
 
 
@@ -2394,7 +2441,7 @@ typename AlignedVector<T>::const_reference
 TransposeTable<T>::el (const unsigned int i,
                        const unsigned int j) const
 {
-  return this->values[j*this->table_size[1]+i];
+  return this->values[size_type(j)*this->table_size[1]+i];
 }
 
 
@@ -2405,7 +2452,7 @@ typename AlignedVector<T>::reference
 TransposeTable<T>::el (const unsigned int i,
                        const unsigned int j)
 {
-  return this->values[j*this->table_size[1]+i];
+  return this->values[size_type(j)*this->table_size[1]+i];
 }
 
 
@@ -2474,8 +2521,8 @@ Table<3,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  const unsigned int subobject_size = this->table_size[1] *
-                                      this->table_size[2];
+  const size_type subobject_size = size_type(this->table_size[1]) *
+                                   this->table_size[2];
   return (dealii::internal::TableBaseAccessors::Accessor<3,T,true,2>
           (*this,
            this->values.begin() + i*subobject_size));
@@ -2490,8 +2537,8 @@ Table<3,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  const unsigned int subobject_size = this->table_size[1] *
-                                      this->table_size[2];
+  const size_type subobject_size = size_type(this->table_size[1]) *
+                                   this->table_size[2];
   return (dealii::internal::TableBaseAccessors::Accessor<3,T,false,2>
           (*this,
            this->values.begin() + i*subobject_size));
@@ -2512,7 +2559,7 @@ Table<3,T>::operator () (const unsigned int i,
           ExcIndexRange (j, 0, this->table_size[1]));
   Assert (k < this->table_size[2],
           ExcIndexRange (k, 0, this->table_size[2]));
-  return this->values[(i*this->table_size[1]+j)
+  return this->values[(size_type(i)*this->table_size[1]+j)
                       *this->table_size[2] + k];
 }
 
@@ -2531,7 +2578,7 @@ Table<3,T>::operator () (const unsigned int i,
           ExcIndexRange (j, 0, this->table_size[1]));
   Assert (k < this->table_size[2],
           ExcIndexRange (k, 0, this->table_size[2]));
-  return this->values[(i*this->table_size[1]+j)
+  return this->values[(size_type(i)*this->table_size[1]+j)
                       *this->table_size[2] + k];
 }
 
@@ -2583,9 +2630,9 @@ Table<4,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  const unsigned int subobject_size = this->table_size[1] *
-                                      this->table_size[2] *
-                                      this->table_size[3];
+  const size_type subobject_size = size_type(this->table_size[1]) *
+                                   this->table_size[2] *
+                                   this->table_size[3];
   return (dealii::internal::TableBaseAccessors::Accessor<4,T,true,3>
           (*this,
            this->values.begin() + i*subobject_size));
@@ -2600,9 +2647,9 @@ Table<4,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  const unsigned int subobject_size = this->table_size[1] *
-                                      this->table_size[2] *
-                                      this->table_size[3];
+  const size_type subobject_size = size_type(this->table_size[1]) *
+                                   this->table_size[2] *
+                                   this->table_size[3];
   return (dealii::internal::TableBaseAccessors::Accessor<4,T,false,3>
           (*this,
            this->values.begin() + i*subobject_size));
@@ -2626,7 +2673,7 @@ Table<4,T>::operator () (const unsigned int i,
           ExcIndexRange (k, 0, this->table_size[2]));
   Assert (l < this->table_size[3],
           ExcIndexRange (l, 0, this->table_size[3]));
-  return this->values[((i*this->table_size[1]+j)
+  return this->values[((size_type(i)*this->table_size[1]+j)
                        *this->table_size[2] + k)
                       *this->table_size[3] + l];
 }
@@ -2649,7 +2696,7 @@ Table<4,T>::operator () (const unsigned int i,
           ExcIndexRange (k, 0, this->table_size[2]));
   Assert (l < this->table_size[3],
           ExcIndexRange (l, 0, this->table_size[3]));
-  return this->values[((i*this->table_size[1]+j)
+  return this->values[((size_type(i)*this->table_size[1]+j)
                        *this->table_size[2] + k)
                       *this->table_size[3] + l];
 }
@@ -2703,10 +2750,10 @@ Table<5,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  const unsigned int subobject_size = this->table_size[1] *
-                                      this->table_size[2] *
-                                      this->table_size[3] *
-                                      this->table_size[4];
+  const size_type subobject_size = size_type(this->table_size[1]) *
+                                   this->table_size[2] *
+                                   this->table_size[3] *
+                                   this->table_size[4];
   return (dealii::internal::TableBaseAccessors::Accessor<5,T,true,4>
           (*this,
            this->values.begin() + i*subobject_size));
@@ -2721,10 +2768,10 @@ Table<5,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  const unsigned int subobject_size = this->table_size[1] *
-                                      this->table_size[2] *
-                                      this->table_size[3] *
-                                      this->table_size[4];
+  const size_type subobject_size = size_type(this->table_size[1]) *
+                                   this->table_size[2] *
+                                   this->table_size[3] *
+                                   this->table_size[4];
   return (dealii::internal::TableBaseAccessors::Accessor<5,T,false,4>
           (*this,
            this->values.begin() + i*subobject_size));
@@ -2751,7 +2798,7 @@ Table<5,T>::operator () (const unsigned int i,
           ExcIndexRange (l, 0, this->table_size[3]));
   Assert (m < this->table_size[4],
           ExcIndexRange (m, 0, this->table_size[4]));
-  return this->values[(((i*this->table_size[1]+j)
+  return this->values[(((size_type(i)*this->table_size[1]+j)
                         *this->table_size[2] + k)
                        *this->table_size[3] + l)
                       *this->table_size[4] + m];
@@ -2778,7 +2825,7 @@ Table<5,T>::operator () (const unsigned int i,
           ExcIndexRange (l, 0, this->table_size[3]));
   Assert (m < this->table_size[4],
           ExcIndexRange (m, 0, this->table_size[4]));
-  return this->values[(((i*this->table_size[1]+j)
+  return this->values[(((size_type(i)*this->table_size[1]+j)
                         *this->table_size[2] + k)
                        *this->table_size[3] + l)
                       *this->table_size[4] + m];
@@ -2834,11 +2881,11 @@ Table<6,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  const unsigned int subobject_size = this->table_size[1] *
-                                      this->table_size[2] *
-                                      this->table_size[3] *
-                                      this->table_size[4] *
-                                      this->table_size[5];
+  const size_type subobject_size = size_type(this->table_size[1]) *
+                                   this->table_size[2] *
+                                   this->table_size[3] *
+                                   this->table_size[4] *
+                                   this->table_size[5];
   return (dealii::internal::TableBaseAccessors::Accessor<6,T,true,5>
           (*this,
            this->values.begin() + i*subobject_size));
@@ -2853,11 +2900,11 @@ Table<6,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  const unsigned int subobject_size = this->table_size[1] *
-                                      this->table_size[2] *
-                                      this->table_size[3] *
-                                      this->table_size[4] *
-                                      this->table_size[5];
+  const size_type subobject_size = size_type(this->table_size[1]) *
+                                   this->table_size[2] *
+                                   this->table_size[3] *
+                                   this->table_size[4] *
+                                   this->table_size[5];
   return (dealii::internal::TableBaseAccessors::Accessor<6,T,false,5>
           (*this,
            this->values.begin() + i*subobject_size));
@@ -2887,7 +2934,7 @@ Table<6,T>::operator () (const unsigned int i,
           ExcIndexRange (m, 0, this->table_size[4]));
   Assert (n < this->table_size[5],
           ExcIndexRange (n, 0, this->table_size[5]));
-  return this->values[((((i*this->table_size[1]+j)
+  return this->values[((((size_type(i)*this->table_size[1]+j)
                          *this->table_size[2] + k)
                         *this->table_size[3] + l)
                        *this->table_size[4] + m)
@@ -2918,7 +2965,7 @@ Table<6,T>::operator () (const unsigned int i,
           ExcIndexRange (m, 0, this->table_size[4]));
   Assert (n < this->table_size[5],
           ExcIndexRange (n, 0, this->table_size[5]));
-  return this->values[((((i*this->table_size[1]+j)
+  return this->values[((((size_type(i)*this->table_size[1]+j)
                          *this->table_size[2] + k)
                         *this->table_size[3] + l)
                        *this->table_size[4] + m)
@@ -2976,12 +3023,12 @@ Table<7,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  const unsigned int subobject_size = this->table_size[1] *
-                                      this->table_size[2] *
-                                      this->table_size[3] *
-                                      this->table_size[4] *
-                                      this->table_size[5] *
-                                      this->table_size[6];
+  const size_type subobject_size = size_type(this->table_size[1]) *
+                                   this->table_size[2] *
+                                   this->table_size[3] *
+                                   this->table_size[4] *
+                                   this->table_size[5] *
+                                   this->table_size[6];
   return (dealii::internal::TableBaseAccessors::Accessor<7,T,true,6>
           (*this,
            this->values.begin() + i*subobject_size));
@@ -2996,12 +3043,12 @@ Table<7,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  const unsigned int subobject_size = this->table_size[1] *
-                                      this->table_size[2] *
-                                      this->table_size[3] *
-                                      this->table_size[4] *
-                                      this->table_size[5] *
-                                      this->table_size[6];
+  const size_type subobject_size = size_type(this->table_size[1]) *
+                                   this->table_size[2] *
+                                   this->table_size[3] *
+                                   this->table_size[4] *
+                                   this->table_size[5] *
+                                   this->table_size[6];
   return (dealii::internal::TableBaseAccessors::Accessor<7,T,false,6>
           (*this,
            this->values.begin() + i*subobject_size));
@@ -3034,7 +3081,7 @@ Table<7,T>::operator () (const unsigned int i,
           ExcIndexRange (n, 0, this->table_size[5]));
   Assert (o < this->table_size[6],
           ExcIndexRange (o, 0, this->table_size[6]));
-  return this->values[(((((i*this->table_size[1]+j)
+  return this->values[(((((size_type(i)*this->table_size[1]+j)
                           *this->table_size[2] + k)
                          *this->table_size[3] + l)
                         *this->table_size[4] + m)
@@ -3069,7 +3116,7 @@ Table<7,T>::operator () (const unsigned int i,
           ExcIndexRange (n, 0, this->table_size[5]));
   Assert (o < this->table_size[5],
           ExcIndexRange (o, 0, this->table_size[6]));
-  return this->values[(((((i*this->table_size[1]+j)
+  return this->values[(((((size_type(i)*this->table_size[1]+j)
                           *this->table_size[2] + k)
                          *this->table_size[3] + l)
                         *this->table_size[4] + m)
