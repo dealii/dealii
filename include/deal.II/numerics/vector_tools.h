@@ -1110,6 +1110,110 @@ namespace VectorTools
                                                 ConstraintMatrix &constraints,
                                                 const hp::MappingCollection<dim, dim> &mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
 
+  /**
+   * This function is an updated version of the project_boundary_values_curl_conforming
+   * function. The intention is to fix a problem when using the previous function in
+   * conjunction with non-rectangular geometries (i.e. elements with non-rectangular faces).
+   * The L2-projection method used has been taken from the paper "Electromagnetic scattering
+   * simulation using an H (curl) conforming hp finite element method in three dimensions"
+   * by PD Ledger, K Morgan and O Hassan ( Int. J.  Num. Meth. Fluids, Volume 53, Issue 8, pages 1267–1296).
+   *
+   * This function will compute constraints that correspond to Dirichlet boundary conditions of the form
+   * $\vec{n}\times\vec{E}=\vec{n}\times\vec{F}$
+   * i.e. the tangential components of $\vec{E}$ and $f$ shall coincide.
+   *
+   * <h4>Computing constraints</h4>
+   *
+   * To compute the constraints we use a projection method based upon the paper mentioned
+   * above. In 2D this is done in a single stage for the edge-based shape functions, regardless
+   * of the order of the finite element. In 3D this is done in two stages, edges first and then
+   * faces.
+   *
+   * For each cell, each edge, $e$, is projected by solving the linear system $Ax=b$ where $x$
+   * is the vector of contraints on degrees of freedom on the edge and
+   *
+   * $A_{ij} = \int_{e} (\vec{s}_{i}\cdot\vec{t})(\vec{s}_{j}\cdot\vec{t}) dS$
+   *
+   * $b_{i} = \int_{e} (\vec{s}_{i}\cdot\vec{t})(\vec{F}\cdot\vec{t}) dS$
+   *
+   * with $\vec{s}_{i}$ the $i^{th}$ shape function and $\vec{t}$ the tangent vector.
+   *
+   * Once all edge constraints, $x$, have been computed, we may compute the face constraints
+   * in a similar fashion, taking into account the residuals from the edges.
+   *
+   * For each face on the cell, $f$, we solve the linear system By=c where $y$ is the vector of
+   * constraints on degrees of freedom on the face and
+   *
+   * B_{ij} = \int_{f} (\vec{n} \cross \vec{s}_{i}) \cdot (\vec{n} \cross \vec{s}_{j}) dS
+   *
+   * $c_{i} = \int_{f} (\vec{n} \cross \vec{r}) \cdot (\vec{n} \cross \vec{s}_i} dS
+   *
+   * and $\vec{r} = \vec{F} - \sum_{e \in f} \sum{i \in e} \x_{i}\vec{s}_i}$, the edge residual.
+   *
+   * The resulting constraints are then given in the solutions $x$ and $y$.
+   *
+   * If the ConstraintMatrix @p constraints contained values or other
+   * constraints before, the new ones are added or the old ones overwritten,
+   * if a node of the boundary part to be used was already in the list of
+   * constraints. This is handled by using inhomogeneous constraints. Please
+   * note that when combining adaptive meshes and this kind of constraints, the
+   * Dirichlet conditions should be set first, and then completed by hanging
+   * node constraints, in order to make sure that the discretization remains
+   * consistent. See the discussion on conflicting constraints in the
+   * module on @ref constraints
+   *
+   * <h4>Arguments to this function></h4>
+   *
+   * This function is explicitly for use with FE_Nedelec elements, or with FESystem
+   * elements which contain FE_Nedelec elements. It will throw an exception if called
+   * with any other finite element. The user must ensure that FESystem elements are
+   * correctly setup when using this function as this check not possible in this case.
+   *
+   * The second argument of this function denotes the first vector component of the
+   * finite element which corresponds to the vector function that you wish to constrain.
+   * For example, if we are solving Maxwell's equations in 3D and have components
+   * $(E_x,E_y,E_z,B_x,B_y,B_z)$ and we want the boundary conditions
+   * $\vec{n}\times\vec{B}=\vec{n}\times\vec{f}$, then @p first_vector_component would
+   * be 3. The @p boundary_function must return 6 components in this example, with the first 3
+   * corresponding to $\vec{E}$ and the second 3 corresponding to $\vec{B}$.
+   * Vectors are implicitly assumed to have exactly <code>dim</code> components
+   * that are ordered in the same way as we usually order the coordinate directions,
+   * i.e. $x$-, $y$-, and finally $z$-component.
+   *
+   * The parameter @p boundary_component corresponds to the number @p boundary_indicator
+   * of the face. numbers::internal_face_boundary_id is an illegal value, since it is
+   * reserved for interior faces.
+   *
+   * The last argument is denoted to compute the normal vector $\vec{n}$ at the
+   * boundary points.
+   *
+   *
+   * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   */
+  template <int dim>
+  void project_boundary_values_curl_conforming_l2 (const DoFHandler<dim> &dof_handler,
+                                                   const unsigned int first_vector_component,
+                                                   const Function<dim,double> &boundary_function,
+                                                   const types::boundary_id boundary_component,
+                                                   ConstraintMatrix &constraints,
+                                                   const Mapping<dim> &mapping = StaticMappingQ1<dim>::mapping);
+
+
+  /**
+   * hp-namespace version of project_boundary_values_curl_conforming_l2 (above).
+   *
+   * @ingroup constraints
+   */
+  template <int dim>
+  void project_boundary_values_curl_conforming_l2 (const hp::DoFHandler<dim> &dof_handler,
+                                                   const unsigned int first_vector_component,
+                                                   const Function<dim,double> &boundary_function,
+                                                   const types::boundary_id boundary_component,
+                                                   ConstraintMatrix &constraints,
+                                                   const hp::MappingCollection<dim, dim> &mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
+
 
   /**
    * Compute constraints that correspond to boundary conditions of the form
