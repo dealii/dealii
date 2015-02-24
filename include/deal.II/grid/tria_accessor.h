@@ -2069,19 +2069,18 @@ public:
    * The neighbor of a cell has at most the same level as this cell. For
    * example, consider the following situation:
    * @image html limit_level_difference_at_vertices.png ""
-   * Here, if you are on the top right cell and you ask for its left
-   * neighbor (which is, according to the conventions spelled out in the
-   * GeometryInfo class, its <i>zeroth</i> neighbor), then you will get
-   * the mother cell of the four small cells at the top left. In other
-   * words, the cell you get as neighbor has the same refinement level
-   * as the one you're on right now (the top right one) and it may have
-   * children.
+   * Here, if you are on the top right cell and you ask for its left neighbor
+   * (which is, according to the conventions spelled out in the GeometryInfo
+   * class, its <i>zeroth</i> neighbor), then you will get the mother cell of
+   * the four small cells at the top left. In other words, the cell you get as
+   * neighbor has the same refinement level as the one you're on right now
+   * (the top right one) and it may have children.
    *
-   * On the other hand, if you were at the top right cell of the four
-   * small cells at the top left, and you asked for the right neighbor
-   * (which is associated with index <code>i=1</code>), then you would
-   * get the large cell at the top right which in this case has
-   * a lower refinement level and no children of its own.
+   * On the other hand, if you were at the top right cell of the four small
+   * cells at the top left, and you asked for the right neighbor (which is
+   * associated with index <code>i=1</code>), then you would get the large
+   * cell at the top right which in this case has a lower refinement level and
+   * no children of its own.
    */
   TriaIterator<CellAccessor<dim, spacedim>  >
   neighbor (const unsigned int i) const;

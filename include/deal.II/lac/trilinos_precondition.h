@@ -886,23 +886,22 @@ namespace TrilinosWrappers
 
 
   /**
-   * A wrapper class for an incomplete LU factorization (ILU(k)) preconditioner
-   * for Trilinos matrices. This preconditioner works both in serial and in
-   * parallel, depending on the matrix it is based on. In general, an
-   * incomplete factorization does not take all fill-in elements that would
-   * appear in a full factorization (that is the basis for a direct solve).
-   * Trilinos allows to set the amount of fill-in elements, governed by the
-   * additional data argument <tt>ilu_fill</tt>, so one can gradually choose
-   * between a factorization on the sparse matrix structure only
+   * A wrapper class for an incomplete LU factorization (ILU(k))
+   * preconditioner for Trilinos matrices. This preconditioner works both in
+   * serial and in parallel, depending on the matrix it is based on. In
+   * general, an incomplete factorization does not take all fill-in elements
+   * that would appear in a full factorization (that is the basis for a direct
+   * solve). Trilinos allows to set the amount of fill-in elements, governed
+   * by the additional data argument <tt>ilu_fill</tt>, so one can gradually
+   * choose between a factorization on the sparse matrix structure only
    * (<tt>ilu_fill=0</tt>) to a full factorization (<tt>ilu_fill</tt> in the
    * range of 10 to 50, depending on the spatial dimension of the PDE problem
    * and the degree of the finite element basis functions; generally, more
    * required fill-in elements require this parameter to be set to a higher
    * integer value).
    *
-   * The AdditionalData data structure allows to set preconditioner
-   * options. See the documentation of the AdditionalData structure for
-   * details.
+   * The AdditionalData data structure allows to set preconditioner options.
+   * See the documentation of the AdditionalData structure for details.
    *
    * Note that a parallel application of the ILU preconditioner is actually a
    * block-Jacobi preconditioner with block size equal to the local matrix
@@ -925,33 +924,33 @@ namespace TrilinosWrappers
      *
      * <li> @p ilu_fill: This specifies the amount of additional fill-in
      * elements besides the original sparse matrix structure. If $k$ is @p
-     * fill, the sparsity pattern of $A^{k+1}$ is used for the storage of
-     * the result of the Gaussian elemination. This is known as ILU($k$) in
-     * the literature.  When @p fill is large, the preconditioner comes
-     * closer to a (direct) sparse LU decomposition. Note, however, that this
-     * will drastically increase the memory requirement, especially when the
+     * fill, the sparsity pattern of $A^{k+1}$ is used for the storage of the
+     * result of the Gaussian elemination. This is known as ILU($k$) in the
+     * literature.  When @p fill is large, the preconditioner comes closer to
+     * a (direct) sparse LU decomposition. Note, however, that this will
+     * drastically increase the memory requirement, especially when the
      * preconditioner is used in 3D.
      *
      * <li> @p ilu_atol and @p ilu_rtol: These two parameters allow
      * perturbation of the diagonal of the matrix, which sometimes can help to
-     * get better preconditioners especially in the case of bad
-     * conditioning. Before factorization, the diagonal entry $a_{ii}$ is
-     * replaced by $\alpha sign(a_{ii}) + \beta a_{ii}$, where $\alpha\geq 0$
-     * is the absolute threshold @p ilu_atol and $\beta\geq 1$ is the relative
+     * get better preconditioners especially in the case of bad conditioning.
+     * Before factorization, the diagonal entry $a_{ii}$ is replaced by
+     * $\alpha sign(a_{ii}) + \beta a_{ii}$, where $\alpha\geq 0$ is the
+     * absolute threshold @p ilu_atol and $\beta\geq 1$ is the relative
      * threshold @p ilu_rtol. The default values ($\alpha = 0$, $\beta = 1$)
      * therefore use the original, unmodified diagonal entry. Suggested values
      * are in the order of $10^{-5}$ to $10^{-2}$ for @p ilu_atol and 1.01 for
      * @p ilu_rtol.
      *
      * <li> @p overlap: This determines how large the overlap of the local
-     * matrix portions on each processor in a parallel application should
-     * be. An overlap of 0 corresponds to a block diagonal decomposition on
-     * each processor, an overlap of 1 will additionally include a row j if
-     * there is a nonzero entry in column j in one of the own rows. Higher
-     * overlap numbers work accordingly in a recursive fashion. Increasing @p
-     * overlap will increase communication and storage cost. According to the
-     * IFPACK documentation, an overlap of 1 is often effective and values of
-     * more than 3 are rarely needed.
+     * matrix portions on each processor in a parallel application should be.
+     * An overlap of 0 corresponds to a block diagonal decomposition on each
+     * processor, an overlap of 1 will additionally include a row j if there
+     * is a nonzero entry in column j in one of the own rows. Higher overlap
+     * numbers work accordingly in a recursive fashion. Increasing @p overlap
+     * will increase communication and storage cost. According to the IFPACK
+     * documentation, an overlap of 1 is often effective and values of more
+     * than 3 are rarely needed.
      */
     struct AdditionalData
     {

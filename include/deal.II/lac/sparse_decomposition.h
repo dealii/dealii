@@ -35,8 +35,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The decomposition is stored as a sparse matrix which is why this class is
  * derived from the SparseMatrix. Since it is not a matrix in the usual sense
- * (the stored entries are not those of a matrix, but of two different matrix
- * factors), the derivation is <tt>protected</tt> rather than <tt>public</tt>.
+ * (the stored entries are not those of a matrix, but of the two factors of
+ * the original matrix), the derivation is <tt>protected</tt> rather than
+ * <tt>public</tt>.
  *
  *
  * <h3>Fill-in</h3>
@@ -49,9 +50,9 @@ DEAL_II_NAMESPACE_OPEN
  * sparsity pattern of the decomposition is a superset of the sparsity pattern
  * in the original matrix.
  *
- * Such fill-in can be accomplished by various ways, one of which is a copy-
- * constructor of the SparsityPattern class which allows the addition of side-
- * diagonals to a given sparsity structure.
+ * Such fill-in can be accomplished by various ways, one of which is the
+ * copy-constructor of the SparsityPattern class that allows the addition of
+ * side-diagonals to a given sparsity structure.
  *
  *
  * <h3>Unified use of preconditioners</h3>
@@ -70,48 +71,27 @@ DEAL_II_NAMESPACE_OPEN
  * Through the AdditionalData object it is possible to specify additional
  * parameters of the LU decomposition.
  *
- * 1/ The matrix diagonals can be strengthened by adding
- * <tt>strengthen_diagonal</tt> times the sum of the absolute row entries of
+ * 1/ The matrix diagonal can be strengthened by adding
+ * <code>strengthen_diagonal</code> times the sum of the absolute row entries of
  * each row to the respective diagonal entries. By default no strengthening is
  * performed.
  *
  * 2/ By default, each initialize() function call creates its own sparsity.
- * For that, it copies the sparsity of <tt>matrix</tt> and adds a specific
+ * For that, it copies the sparsity of <code>matrix</code> and adds a specific
  * number of extra off diagonal entries specified by
- * <tt>extra_off_diagonals</tt>.
+ * <code>extra_off_diagonals</code>.
  *
- * 3/ By setting <tt>use_previous_sparsity=true</tt> the sparsity is not
+ * 3/ By setting <code>use_previous_sparsity=true</code> the sparsity is not
  * recreated but the sparsity of the previous initialize() call is reused
  * (recycled). This might be useful when several linear problems on the same
  * sparsity need to solved, as for example several Newton iteration steps on
- * the same triangulation. The default is <tt>false</tt>.
+ * the same triangulation. The default is <code>false</code>.
  *
  * 4/ It is possible to give a user defined sparsity to
- * <tt>use_this_sparsity</tt>. Then, no sparsity is created but
- * <tt>*use_this_sparsity</tt> is used to store the decomposed matrix. For
+ * <code>use_this_sparsity</code>. Then, no sparsity is created but
+ * <code>*use_this_sparsity</code> is used to store the decomposed matrix. For
  * restrictions on the sparsity see section `Fill-in' above).
  *
- *
- * <h3>State management</h3>
- *
- * The state management simply requires the initialize() function to be called
- * before the object is used as preconditioner.
- *
- * <b>Obsolete:</b> In order to prevent users from applying decompositions
- * before the decomposition itself has been built, and to introduce some
- * optimization of common "sparse idioms", this class introduces a simple
- * state management.  A SparseLUdecomposition instance is considered not
- * decomposed if the decompose method has not yet been invoked since the last
- * time the underlying SparseMatrix had changed. The underlying sparse matrix
- * is considered changed when one of this class reinit methods, constructors
- * or destructors are invoked.  The not-decomposed state is indicated by a
- * false value returned by is_decomposed() method.  It is illegal to apply
- * this decomposition (vmult() method) in not decomposed state; in this case,
- * the vmult() method throws an <tt>ExcInvalidState</tt> exception. This
- * object turns into decomposed state immediately after its decompose() method
- * is invoked. The decomposed state is indicated by true value returned by
- * is_decomposed() method. It is legal to apply this decomposition (vmult()
- * method) in decomposed state.
  *
  * <h3>Particular implementations</h3>
  *
@@ -119,13 +99,7 @@ DEAL_II_NAMESPACE_OPEN
  * particular LU decompositions, like the true LU, or the Cholesky
  * decomposition. Additionally, if that decomposition needs fine tuned
  * diagonal strengthening on a per row basis, it may override the
- * get_strengthen_diagonal() method. You should invoke the non-abstract base
- * class method to employ the state management. Implementations may choose
- * more restrictive definition of what is legal or illegal state; but they
- * must conform to the is_decomposed() method specification above.
- *
- * If an exception is thrown by method other than vmult(), this object may be
- * left in an inconsistent state.
+ * get_strengthen_diagonal() method.
  *
  * @author Stephen "Cheffo" Kolaroff, 2002, based on SparseILU implementation
  * by Wolfgang Bangerth; unified interface: Ralf Hartmann, 2003
@@ -176,7 +150,7 @@ public:
                     const SparsityPattern *use_this_sparsity=0);
 
     /**
-     * <tt>strengthen_diag</tt> times the sum of absolute row entries is added
+     * <code>strengthen_diag</code> times the sum of absolute row entries is added
      * to the diagonal entries.
      *
      * Per default, this value is zero, i.e. the diagonal is not strengthened.
@@ -184,13 +158,13 @@ public:
     double strengthen_diagonal;
 
     /**
-     * By default, the <tt>initialize(matrix, data)</tt> function creates its
+     * By default, the <code>initialize(matrix, data)</code> function creates its
      * own sparsity. This sparsity has the same SparsityPattern as
-     * <tt>matrix</tt> with some extra off diagonals the number of which is
-     * specified by <tt>extra_off_diagonals</tt>.
+     * <code>matrix</code> with some extra off diagonals the number of which is
+     * specified by <code>extra_off_diagonals</code>.
      *
-     * The user can give a SparsityPattern to <tt>use_this_sparsity</tt>. Then
-     * this sparsity is used and the <tt>extra_off_diagonals</tt> argument is
+     * The user can give a SparsityPattern to <code>use_this_sparsity</code>. Then
+     * this sparsity is used and the <code>extra_off_diagonals</code> argument is
      * ignored.
      */
     unsigned int extra_off_diagonals;
@@ -207,10 +181,10 @@ public:
 
     /**
      * When a SparsityPattern is given to this argument, the initialize()
-     * function calls <tt>reinit(*use_this_sparsity)</tt> causing this
+     * function calls <code>reinit(*use_this_sparsity)</code> causing this
      * sparsity to be used.
      *
-     * Note that the sparsity structures of <tt>*use_this_sparsity</tt> and
+     * Note that the sparsity structures of <code>*use_this_sparsity</code> and
      * the matrix passed to the initialize function need not be equal. Fill-in
      * is allowed, as well as filtering out some elements in the matrix.
      */
@@ -224,9 +198,9 @@ public:
    * For more detail about possible parameters, see the class documentation
    * and the documentation of the SparseLUDecomposition::AdditionalData class.
    *
-   * According to the <tt>parameters</tt>, this function creates a new
+   * According to the <code>parameters</code>, this function creates a new
    * SparsityPattern or keeps the previous sparsity or takes the sparsity
-   * given by the user to <tt>data</tt>. Then, this function performs the LU
+   * given by the user to <code>data</code>. Then, this function performs the LU
    * decomposition.
    *
    * After this function is called the preconditioner is ready to be used
@@ -235,24 +209,6 @@ public:
   template <typename somenumber>
   void initialize (const SparseMatrix<somenumber> &matrix,
                    const AdditionalData parameters);
-
-  /**
-   * This method is deprecated, and left for backward compability. It will be
-   * removed in later versions.
-   *
-   * @deprecated
-   */
-  template <typename somenumber>
-  void decompose (const SparseMatrix<somenumber> &matrix,
-                  const double                    strengthen_diagonal=0.) DEAL_II_DEPRECATED;
-
-  /**
-   * This method is deprecated, and left for backward compability. It will be
-   * removed in later versions.
-   *
-   * @deprecated
-   */
-  virtual bool is_decomposed () const DEAL_II_DEPRECATED;
 
   /**
    * Return whether the object is empty. It calls the inherited
@@ -291,26 +247,19 @@ protected:
    * Performs the strengthening loop. For each row calculates the sum of
    * absolute values of its elements, determines the strengthening factor
    * (through get_strengthen_diagonal()) sf and multiplies the diagonal entry
-   * with <tt>sf+1</tt>.
+   * with <code>sf+1</code>.
    */
   virtual void strengthen_diagonal_impl ();
 
   /**
    * In the decomposition phase, computes a strengthening factor for the
-   * diagonal entry in row <tt>row</tt> with sum of absolute values of its
-   * elements <tt>rowsum</tt>.
+   * diagonal entry in row <code>row</code> with sum of absolute values of its
+   * elements <code>rowsum</code>.
    *
    * @note The default implementation in SparseLUDecomposition returns
-   * <tt>strengthen_diagonal</tt>'s value.
+   * <code>strengthen_diagonal</code>'s value.
    */
   virtual number get_strengthen_diagonal(const number rowsum, const size_type row) const;
-
-  /**
-   * State flag. If not in decomposed state, it is illegal to apply the
-   * decomposition.  This flag is cleared when the underlaying SparseMatrix
-   * SparsityPattern is changed, and set by decompose().
-   */
-  bool decomposed;
 
   /**
    * The default strengthening value, returned by get_strengthen_diagonal().
@@ -324,11 +273,12 @@ protected:
    */
   std::vector<const size_type *> prebuilt_lower_bound;
 
-private:
   /**
    * Fills the #prebuilt_lower_bound array.
    */
   void prebuild_lower_bound ();
+
+private:
 
   /**
    * In general this pointer is zero except for the case that no
@@ -354,15 +304,6 @@ get_strengthen_diagonal(const number /*rowsum*/,
                         const size_type /*row*/) const
 {
   return strengthen_diagonal;
-}
-
-
-
-template <typename number>
-inline bool
-SparseLUDecomposition<number>::is_decomposed () const
-{
-  return decomposed;
 }
 
 

@@ -552,9 +552,9 @@ public:
   SymmetricTensor (const Number (&array) [n_independent_components]);
 
   /**
-   * Copy constructor from tensors with different underlying scalar
-   * type. This obviously requires that the @p OtherNumber type is
-   * convertible to @p Number.
+   * Copy constructor from tensors with different underlying scalar type. This
+   * obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
    */
   template <typename OtherNumber>
   explicit
@@ -2666,10 +2666,9 @@ symmetrize (const Tensor<2,3,Number> &t)
 
 
 /**
- * Multiplication of a symmetric tensor of general rank with a scalar
- * from the right. This version of the operator is used if the scalar
- * has the same data type as is used to store the elements of the
- * symmetric tensor.
+ * Multiplication of a symmetric tensor of general rank with a scalar from the
+ * right. This version of the operator is used if the scalar has the same data
+ * type as is used to store the elements of the symmetric tensor.
  *
  * @relates SymmetricTensor
  */
@@ -2688,9 +2687,8 @@ operator * (const SymmetricTensor<rank,dim,Number> &t,
 
 /**
  * Multiplication of a symmetric tensor of general rank with a scalar from the
- * left. This version of the operator is used if the scalar
- * has the same data type as is used to store the elements of the
- * symmetric tensor.
+ * left. This version of the operator is used if the scalar has the same data
+ * type as is used to store the elements of the symmetric tensor.
  *
  * @relates SymmetricTensor
  */
@@ -2718,13 +2716,14 @@ operator * (const Number                            factor,
  * prohibited of considering this operator for multiplication with non-scalar
  * types are explained in the documentation of the EnableIfScalar class.
  *
- * The return type of the function is chosen so that it matches the types
- * of both the tensor and the scalar argument. For example, if you multiply
- * a <code>SymmetricTensor@<2,dim,double@></code> by <code>std::complex@<double@></code>,
- * then the result will be a <code>SymmetricTensor@<2,dim,std::complex@<double@>@></code>.
- * In other words, the type with which the returned tensor stores its
- * components equals the type you would get if you multiplied an individual
- * component of the input tensor by the scalar factor.
+ * The return type of the function is chosen so that it matches the types of
+ * both the tensor and the scalar argument. For example, if you multiply a
+ * <code>SymmetricTensor@<2,dim,double@></code> by
+ * <code>std::complex@<double@></code>, then the result will be a
+ * <code>SymmetricTensor@<2,dim,std::complex@<double@>@></code>. In other
+ * words, the type with which the returned tensor stores its components equals
+ * the type you would get if you multiplied an individual component of the
+ * input tensor by the scalar factor.
  *
  * @relates SymmetricTensor
  * @relates EnableIfScalar

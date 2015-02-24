@@ -64,19 +64,18 @@ template <int dim, typename Number> class Tensor<1,dim,Number>;
  * family.
  *
  * @tparam dim An integer that denotes the dimension of the space in which
- *   this tensor operates. This of course equals the number of coordinates that
- *   identify a point and rank-1 tensor. Since the current object is a rank-0
- *   tensor (a scalar), this template argument has no meaning for this class.
- * @tparam Number The data type in which the tensor elements are
- *   to be stored. This will, in almost all cases, simply be the default
- *   @p double, but there are cases where one may want to store elements
- *   in a different (and always scalar) type. It can be used to base
- *   tensors on @p float or @p complex numbers or any other data type that
- *   implements basic arithmetic operations.
- *   Another example would be a type that allows for Automatic Differentiation
- *   (see, for example, the Sacado type used in step-33) and thereby can
- *   generate analytic (spatial) derivatives of a function that takes a
- *   tensor as argument.
+ * this tensor operates. This of course equals the number of coordinates that
+ * identify a point and rank-1 tensor. Since the current object is a rank-0
+ * tensor (a scalar), this template argument has no meaning for this class.
+ * @tparam Number The data type in which the tensor elements are to be stored.
+ * This will, in almost all cases, simply be the default @p double, but there
+ * are cases where one may want to store elements in a different (and always
+ * scalar) type. It can be used to base tensors on @p float or @p complex
+ * numbers or any other data type that implements basic arithmetic operations.
+ * Another example would be a type that allows for Automatic Differentiation
+ * (see, for example, the Sacado type used in step-33) and thereby can
+ * generate analytic (spatial) derivatives of a function that takes a tensor
+ * as argument.
  *
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 2009
@@ -132,9 +131,9 @@ public:
   Tensor (const Tensor<0,dim,Number> &initializer);
 
   /**
-   * Copy constructor from tensors with different underlying scalar
-   * type. This obviously requires that the @p OtherNumber type is
-   * convertible to @p Number.
+   * Copy constructor from tensors with different underlying scalar type. This
+   * obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
    */
   template <typename OtherNumber>
   explicit
@@ -161,9 +160,9 @@ public:
   Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &rhs);
 
   /**
-   * Assignment operator from tensors with different underlying scalar
-   * type. This obviously requires that the @p OtherNumber type is
-   * convertible to @p Number.
+   * Assignment operator from tensors with different underlying scalar type.
+   * This obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
    */
   template <typename OtherNumber>
   Tensor<0,dim,Number> &operator = (const Tensor<0,dim,OtherNumber> &rhs);
@@ -303,18 +302,17 @@ private:
  * different physical units), we use the <tt>Tensor<1,dim,Number></tt> class.
  *
  * @tparam dim An integer that denotes the dimension of the space in which
- *   this tensor operates. This of course equals the number of coordinates that
- *   identify a point and rank-1 tensor.
- * @tparam Number The data type in which the tensor elements are
- *   to be stored. This will, in almost all cases, simply be the default
- *   @p double, but there are cases where one may want to store elements
- *   in a different (and always scalar) type. It can be used to base
- *   tensors on @p float or @p complex numbers or any other data type that
- *   implements basic arithmetic operations.
- *   Another example would be a type that allows for Automatic Differentiation
- *   (see, for example, the Sacado type used in step-33) and thereby can
- *   generate analytic (spatial) derivatives of a function that takes
- *   a tensor as argument.
+ * this tensor operates. This of course equals the number of coordinates that
+ * identify a point and rank-1 tensor.
+ * @tparam Number The data type in which the tensor elements are to be stored.
+ * This will, in almost all cases, simply be the default @p double, but there
+ * are cases where one may want to store elements in a different (and always
+ * scalar) type. It can be used to base tensors on @p float or @p complex
+ * numbers or any other data type that implements basic arithmetic operations.
+ * Another example would be a type that allows for Automatic Differentiation
+ * (see, for example, the Sacado type used in step-33) and thereby can
+ * generate analytic (spatial) derivatives of a function that takes a tensor
+ * as argument.
  *
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 1998-2005
@@ -387,9 +385,9 @@ public:
   Tensor (const Tensor<1,dim,Number> &initializer);
 
   /**
-   * Copy constructor from tensors with different underlying scalar
-   * type. This obviously requires that the @p OtherNumber type is
-   * convertible to @p Number.
+   * Copy constructor from tensors with different underlying scalar type. This
+   * obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
    */
   template <typename OtherNumber>
   explicit
@@ -427,9 +425,9 @@ public:
   Tensor<1,dim,Number> &operator = (const Tensor<1,dim,Number> &rhs);
 
   /**
-   * Assignment operator from tensors with different underlying scalar
-   * type. This obviously requires that the @p OtherNumber type is
-   * convertible to @p Number.
+   * Assignment operator from tensors with different underlying scalar type.
+   * This obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
    */
   template <typename OtherNumber>
   Tensor<1,dim,Number> &operator = (const Tensor<1,dim,OtherNumber> &rhs);
@@ -1365,13 +1363,14 @@ operator * (const Number                factor,
  * prohibited of considering this operator for multiplication with non-scalar
  * types are explained in the documentation of the EnableIfScalar class.
  *
- * The return type of the function is chosen so that it matches the types
- * of both the tensor and the scalar argument. For example, if you multiply
- * a <code>Tensor@<1,dim,double@></code> by <code>std::complex@<double@></code>,
- * then the result will be a <code>Tensor@<1,dim,std::complex@<double@>@></code>.
- * In other words, the type with which the returned tensor stores its
- * components equals the type you would get if you multiplied an individual
- * component of the input tensor by the scalar factor.
+ * The return type of the function is chosen so that it matches the types of
+ * both the tensor and the scalar argument. For example, if you multiply a
+ * <code>Tensor@<1,dim,double@></code> by <code>std::complex@<double@></code>,
+ * then the result will be a
+ * <code>Tensor@<1,dim,std::complex@<double@>@></code>. In other words, the
+ * type with which the returned tensor stores its components equals the type
+ * you would get if you multiplied an individual component of the input tensor
+ * by the scalar factor.
  *
  * @relates Tensor<1,dim,Number>
  * @relates EnableIfScalar

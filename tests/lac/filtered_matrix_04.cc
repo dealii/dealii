@@ -55,16 +55,19 @@ main()
   deallog.threshold_double(1.e-10);
 
   const double Adata[] =
-  { 1, 2, 3, 4, 5, 6 };
+  { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-  FullMatrix<double> A(2, 3);
+  FullMatrix<double> A(3, 3);
 
   A.fill(Adata);
 
-  Vector<double> V(2);
-  V(0) = 1;
-  V(1) = 2;
+  Vector<double> V1(3);
+  Vector<double> V2(3);
 
-  checkTvmult_Add<double>(A, V, false);
-  checkTvmult_Add<double>(A, V, true);
+  V1(0) = V2(0) = 1;
+  V1(1) = V2(1) = 2;
+  V1(2) = V2(2) = 3;
+
+  checkTvmult_Add<double>(A, V1, false);
+  checkTvmult_Add<double>(A, V2, true);
 }

@@ -521,22 +521,21 @@ public:
 
 
   /**
-   * Condense a sparsity pattern. The name of the function mimics the
-   * name of the function we use to condense linear systems, but it is
-   * a bit of a misnomer for the current context. This is because in
-   * the context of linear systems, we eliminate certain rows and
-   * columns of the linear system, i.e., we "reduce" or "condense" the
-   * linear system. On the other hand, in the current context, the
-   * functions does not remove nonzero entries from the sparsity
-   * pattern. Rather, it adds those nonzero entry locations to the
-   * sparsity pattern that will later be needed for the process of
-   * condensation of constrained degrees of freedom from a linear
+   * Condense a sparsity pattern. The name of the function mimics the name of
+   * the function we use to condense linear systems, but it is a bit of a
+   * misnomer for the current context. This is because in the context of
+   * linear systems, we eliminate certain rows and columns of the linear
+   * system, i.e., we "reduce" or "condense" the linear system. On the other
+   * hand, in the current context, the functions does not remove nonzero
+   * entries from the sparsity pattern. Rather, it adds those nonzero entry
+   * locations to the sparsity pattern that will later be needed for the
+   * process of condensation of constrained degrees of freedom from a linear
    * system.
    *
-   * Since this function adds new nonzero entries to the sparsity
-   * pattern, the given sparsity pattern must not be compressed. The
-   * constraint matrix (i.e., the current object) must be closed. The
-   * sparsity pattern is compressed at the end of the function.
+   * Since this function adds new nonzero entries to the sparsity pattern, the
+   * given sparsity pattern must not be compressed. The constraint matrix
+   * (i.e., the current object) must be closed. The sparsity pattern is
+   * compressed at the end of the function.
    */
   void condense (SparsityPattern &sparsity) const;
 
@@ -604,11 +603,11 @@ public:
   void condense (BlockCompressedSimpleSparsityPattern &sparsity) const;
 
   /**
-   * Condense a given matrix, i.e., eliminate the rows and columns of
-   * the matrix that correspond to constrained degrees of freedom.
+   * Condense a given matrix, i.e., eliminate the rows and columns of the
+   * matrix that correspond to constrained degrees of freedom.
    *
-   * See the general documentation of this
-   * class for more detailed information.
+   * See the general documentation of this class for more detailed
+   * information.
    */
   template<typename number>
   void condense (SparseMatrix<number> &matrix) const;
@@ -644,16 +643,16 @@ public:
                  VectorType       &output) const;
 
   /**
-   * Condense a given matrix and a given vector by eliminating rows
-   * and columns of the linear system that correspond to constrained
-   * degrees of freedom. The sparsity pattern associated with the
-   * matrix needs to be condensed and compressed.  This function is
-   * the appropriate choice for applying inhomogeneous constraints.
+   * Condense a given matrix and a given vector by eliminating rows and
+   * columns of the linear system that correspond to constrained degrees of
+   * freedom. The sparsity pattern associated with the matrix needs to be
+   * condensed and compressed.  This function is the appropriate choice for
+   * applying inhomogeneous constraints.
    *
    * The constraint matrix object must be closed to call this function.
    *
-   * See the general documentation of this
-   * class for more detailed information.
+   * See the general documentation of this class for more detailed
+   * information.
    */
   template<typename number, class VectorType>
   void condense (SparseMatrix<number> &matrix,

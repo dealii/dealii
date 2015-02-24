@@ -124,8 +124,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0001.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_1^H$ element, shape function 0 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_1^H$ element, shape function 0
+ * </td>
  *
  * <td align="center"> $Q_1^H$ element, shape function 1 </td> </tr>
  *
@@ -135,8 +135,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q1/Q1H_shape0003.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_1^H$ element, shape function 2 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_1^H$ element, shape function 2
+ * </td>
  *
  * <td align="center"> $Q_1^H$ element, shape function 3 </td> </tr> </table>
  *
@@ -225,8 +225,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0001.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_2^H$ element, shape function 0 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 0
+ * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 1 </td> </tr>
  *
@@ -236,8 +236,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0003.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_2^H$ element, shape function 2 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 2
+ * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 3 </td> </tr>
  *
@@ -247,8 +247,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0005.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_2^H$ element, shape function 4 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 4
+ * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 5 </td> </tr>
  *
@@ -258,8 +258,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q2/Q2H_shape0007.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_2^H$ element, shape function 6 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_2^H$ element, shape function 6
+ * </td>
  *
  * <td align="center"> $Q_2^H$ element, shape function 7 </td> </tr>
  *
@@ -300,8 +300,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0001.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_3^H$ element, shape function 0 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 0
+ * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 1 </td> </tr>
  *
@@ -311,8 +311,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0003.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_3^H$ element, shape function 2 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 2
+ * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 3 </td> </tr>
  *
@@ -322,8 +322,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0005.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_3^H$ element, shape function 4 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 4
+ * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 5 </td> </tr>
  *
@@ -333,8 +333,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0007.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_3^H$ element, shape function 6 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 6
+ * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 7 </td> </tr>
  *
@@ -344,8 +344,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0009.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_3^H$ element, shape function 8 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 8
+ * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 9 </td> </tr>
  *
@@ -355,8 +355,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0011.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_3^H$ element, shape function 10 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 10
+ * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 11 </td> </tr>
  *
@@ -366,8 +366,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0013.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_3^H$ element, shape function 12 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 12
+ * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 13 </td> </tr>
  *
@@ -377,8 +377,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q3/Q3H_shape0015.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_3^H$ element, shape function 14 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_3^H$ element, shape function 14
+ * </td>
  *
  * <td align="center"> $Q_3^H$ element, shape function 15 </td> </tr> </table>
  *
@@ -412,8 +412,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0001.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 0 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 0
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 1 </td> </tr>
  *
@@ -423,8 +423,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0003.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 2 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 2
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 3 </td> </tr>
  *
@@ -434,8 +434,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0005.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 4 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 4
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 5 </td> </tr>
  *
@@ -445,8 +445,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0007.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 6 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 6
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 7 </td> </tr>
  *
@@ -456,8 +456,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0009.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 8 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 8
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 9 </td> </tr>
  *
@@ -467,8 +467,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0011.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 10 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 10
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 11 </td> </tr>
  *
@@ -478,8 +478,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0013.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 12 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 12
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 13 </td> </tr>
  *
@@ -489,8 +489,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0015.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 14 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 14
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 15 </td> </tr>
  *
@@ -500,8 +500,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0017.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 16 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 16
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 17 </td> </tr>
  *
@@ -511,8 +511,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0019.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 18 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 18
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 19 </td> </tr>
  *
@@ -522,8 +522,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0021.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 20 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 20
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 21 </td> </tr>
  *
@@ -533,8 +533,8 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center">
  * @image html http://www.dealii.org/images/shape-functions/hierarchical/Q4/Q4H_shape0023.png
- * </td> </tr> <tr> <td
- * align="center"> $Q_4^H$ element, shape function 22 </td>
+ * </td> </tr> <tr> <td align="center"> $Q_4^H$ element, shape function 22
+ * </td>
  *
  * <td align="center"> $Q_4^H$ element, shape function 23 </td> </tr>
  *

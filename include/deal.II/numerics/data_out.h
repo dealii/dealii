@@ -180,43 +180,41 @@ public:
    * This is the central function of this class since it builds the list of
    * patches to be written by the low-level functions of the base class. A
    * patch is, in essence, some intermediate representation of the data on
-   * each cell of a triangulation and DoFHandler object that can then be
-   * used to write files in some format that is readable by visualization
-   * programs.
+   * each cell of a triangulation and DoFHandler object that can then be used
+   * to write files in some format that is readable by visualization programs.
    *
-   * You can find an overview of the use of this function in
-   * the general documentation of this class. An example is also provided in
-   * the documentation of this class's base class DataOut_DoFData.
+   * You can find an overview of the use of this function in the general
+   * documentation of this class. An example is also provided in the
+   * documentation of this class's base class DataOut_DoFData.
    *
    * @param n_subdivisions A parameter that determines how many "patches" this
-   *   function will build out of every cell. If you do not specify this
-   *   value in calling, or provide the default value zero, then this is
-   *   interpreted as DataOutInterface::default_subdivisions which most of
-   *   the time will be equal to one (unless you have set it to something else).
-   *   The purpose of this parameter is to subdivide each cell of the mesh
-   *   into $2\times 2, 3\times 3, \ldots$ "patches" in 2d, and
-   *   $2\times 2\times 2, 3\times 3\times 3, \ldots$ (if passed the value
-   *   2, 3, etc) where each patch represents the data from a regular subdivision
-   *   of the cell into equal parts. Most of the times, this is not necessary
-   *   and outputting one patch per cell is exactly what you want to plot
-   *   the solution. That said, the data we write into files for visualization
-   *   can only represent (bi-, tri)linear data on each cell, and most
-   *   visualization programs can in fact only visualize this kind of data.
-   *   That's good enough if you work with (bi-, tri)linear finite elements,
-   *   in which case what you get to see is exactly what has been computed.
-   *   On the other hand, if you work with (bi-, tri)quadratic elements, then
-   *   what is written into the output file is just a (bi-, tri)linear
-   *   interpolation onto the current mesh, i.e., only the values at the
-   *   vertices. If this is not good enough, you can, for example, specify
-   *   @p n_subdivisions equal to 2 to plot the solution on a once-refined
-   *   mesh, or if set to 3, on a mesh where each cell is represented by
-   *   3-by-3 patches. On each of these smaller patches, given the limitations
-   *   of output formats, the data is still linearly interpolated, but a
-   *   linear interpolation of quadratic data on a finer mesh is still a
-   *   better representation of the actual quadratic surface than on the
-   *   original mesh. In other words, using this parameter can not help
-   *   you plot the solution exactly, but it can get you closer if you
-   *   use finite elements of higher polynomial degree.
+   * function will build out of every cell. If you do not specify this value
+   * in calling, or provide the default value zero, then this is interpreted
+   * as DataOutInterface::default_subdivisions which most of the time will be
+   * equal to one (unless you have set it to something else). The purpose of
+   * this parameter is to subdivide each cell of the mesh into $2\times 2,
+   * 3\times 3, \ldots$ "patches" in 2d, and $2\times 2\times 2, 3\times
+   * 3\times 3, \ldots$ (if passed the value 2, 3, etc) where each patch
+   * represents the data from a regular subdivision of the cell into equal
+   * parts. Most of the times, this is not necessary and outputting one patch
+   * per cell is exactly what you want to plot the solution. That said, the
+   * data we write into files for visualization can only represent (bi-,
+   * tri)linear data on each cell, and most visualization programs can in fact
+   * only visualize this kind of data. That's good enough if you work with
+   * (bi-, tri)linear finite elements, in which case what you get to see is
+   * exactly what has been computed. On the other hand, if you work with (bi-,
+   * tri)quadratic elements, then what is written into the output file is just
+   * a (bi-, tri)linear interpolation onto the current mesh, i.e., only the
+   * values at the vertices. If this is not good enough, you can, for example,
+   * specify @p n_subdivisions equal to 2 to plot the solution on a once-
+   * refined mesh, or if set to 3, on a mesh where each cell is represented by
+   * 3-by-3 patches. On each of these smaller patches, given the limitations
+   * of output formats, the data is still linearly interpolated, but a linear
+   * interpolation of quadratic data on a finer mesh is still a better
+   * representation of the actual quadratic surface than on the original mesh.
+   * In other words, using this parameter can not help you plot the solution
+   * exactly, but it can get you closer if you use finite elements of higher
+   * polynomial degree.
    */
   virtual void build_patches (const unsigned int n_subdivisions = 0);
 
