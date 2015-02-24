@@ -197,11 +197,23 @@ namespace Utilities
   split_string_list (const std::string &s,
                      const char         delimiter)
   {
+    // keep the currently remaining part of the input string in 'tmp' and
+    // keep chopping elements of the list off the front
     std::string tmp = s;
+
+    // as discussed in the documentation, eat whitespace from the end
+    // of the string
+    while (tmp.length() != 0 && tmp[tmp.length()-1] == ' ')
+      tmp.erase (tmp.length()-1, 1);
+
+    // split the input list until it is empty. since in every iteration
+    // 'tmp' is what's left of the string after the next delimiter,
+    // and since we've stripped trailing space already, 'tmp' will
+    // be empty at one point if 's' ended in a delimiter, even if
+    // there was space after the last delimiter. this matches what's
+    // discussed in the documentation
     std::vector<std::string> split_list;
     split_list.reserve (std::count (tmp.begin(), tmp.end(), delimiter)+1);
-
-    // split the input list
     while (tmp.length() != 0)
       {
         std::string name;
@@ -215,10 +227,9 @@ namespace Utilities
         else
           tmp = "";
 
-        while ((name.length() != 0) &&
-               (name[0] == ' '))
+        // strip spaces from this element's front and end
+        while ((name.length() != 0) && (name[0] == ' '))
           name.erase (0,1);
-
         while (name.length() != 0 && name[name.length()-1] == ' ')
           name.erase (name.length()-1, 1);
 
