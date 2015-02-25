@@ -1350,6 +1350,22 @@ operator * (const Number                factor,
 }
 
 
+#ifndef DEAL_II_WITH_CXX11
+
+template <typename T, typename U, int dim>
+struct ProductType<T,Tensor<1,dim,U> >
+{
+  typedef Tensor<1,dim,typename ProductType<T,U>::type> type;
+};
+
+template <typename T, typename U, int dim>
+struct ProductType<Tensor<1,dim,T>,U>
+{
+  typedef Tensor<1,dim,typename ProductType<T,U>::type> type;
+};
+
+#endif
+
 /**
  * Multiplication of a tensor of rank 1 with a scalar number from the right.
  *
