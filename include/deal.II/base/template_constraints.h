@@ -388,12 +388,67 @@ struct ProductType<double,bool>
   typedef double type;
 };
 
+template <>
+struct ProductType<double,float>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<float,double>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<double,long double>
+{
+  typedef long double type;
+};
+
+template <>
+struct ProductType<long double,double>
+{
+  typedef long double type;
+};
+
+template <>
+struct ProductType<double,int>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<int,double>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<float,int>
+{
+  typedef float type;
+};
+
+template <>
+struct ProductType<int,float>
+{
+  typedef float type;
+};
+
+
 #endif
 
 
 // Annoyingly, there is no std::complex<T>::operator*(U) for scalars U
 // other than T. Consequently, even with C++11, we need the following
 // specializations:
+template <typename T>
+struct ProductType<std::complex<T>,std::complex<T> >
+{
+  typedef std::complex<T> type;
+};
+
 template <typename T, typename U>
 struct ProductType<std::complex<T>,std::complex<U> >
 {
