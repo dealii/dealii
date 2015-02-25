@@ -113,10 +113,44 @@ namespace Utilities
   /**
    * Given a string that contains text separated by a @p delimiter, split it
    * into its components; for each component, remove leading and trailing
-   * spaces.
-   *
-   * The default value of the delimiter is a comma, so that the function
+   * spaces. The default value of the delimiter is a comma, so that the function
    * splits comma separated lists of strings.
+   *
+   * To make data input from tables simpler, if the input string ends in
+   * a delimiter (possibly followed by an arbitrary amount of whitespace),
+   * then this last delimiter is ignored. For example,
+   * @code
+   *   Utilities::split_string_list("abc; def; ghi; ", ';');
+   * @endcode
+   * yields the same 3-element list of output <code>{"abc","def","ghi"}</code>
+   * as you would get if the input had been
+   * @code
+   *   Utilities::split_string_list("abc; def; ghi", ';');
+   * @endcode
+   * or
+   * @code
+   *   Utilities::split_string_list("abc; def; ghi;", ';');
+   * @endcode
+   * As a consequence of this rule, a call like
+   * @code
+   *   Utilities::split_string_list(" ; ", ';');
+   * @endcode
+   * yields a one-element list. Because of the trimming of
+   * whitespace, the single element is the empty string.
+   *
+   * This function can digest the case that the delimiter is a space. In this
+   * case, it returns all words in the string. Combined with the rules above,
+   * this implies that
+   * @code
+   *   Utilities::split_string_list("abc def ghi ", ' ');
+   * @endcode
+   * yields again the 3-element list of output <code>{"abc","def","ghi"}</code>
+   * from above despite the presence of space at the end of the string.
+   * Furthermore,
+   * @code
+   *   Utilities::split_string_list("      ", ' ');
+   * @endcode
+   * yields an empty list regardless of the number of spaces in the string.
    */
   std::vector<std::string>
   split_string_list (const std::string &s,
