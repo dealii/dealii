@@ -68,7 +68,7 @@ int main ()
     Assert (ft2 == ft, ExcInternalError());
     Assert (ft == ft2, ExcInternalError());
   
-    Tensor<1,dim,std::complex<double>> ct(dt), ct2;
+    Tensor<1,dim,std::complex<double> > ct(dt), ct2;
     ct2 = dt;
     Assert (ct2 == ct, ExcInternalError());
     Assert (ct == ct2, ExcInternalError());
