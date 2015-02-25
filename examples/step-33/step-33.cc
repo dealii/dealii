@@ -1618,17 +1618,17 @@ namespace Step33
   // residual, adding its negative to the right hand side vector, and adding
   // its derivative with respect to the local variables to the Jacobian
   // (i.e. the Newton matrix). Recall that the cell contributions to the
-  // residual read 
+  // residual read
   // $R_i = \left(\frac{\mathbf{w}^{k}_{n+1} - \mathbf{w}_n}{\delta t} ,
-  // \mathbf{z}_i \right)_K $ $ +    
+  // \mathbf{z}_i \right)_K $ $ +
   // \theta \mathbf{B}({\mathbf{w}^{k}_{n+1})(\mathbf{z}_i)_K $ $ +
   // (1-\theta) \mathbf{B}({\mathbf{w}_{n}) (\mathbf{z}_i)_K $ where
-  // $\mathbf{B}({\mathbf{w})(\mathbf{z}_i)_K = 
+  // $\mathbf{B}({\mathbf{w})(\mathbf{z}_i)_K =
   // - \left(\mathbf{F}(\mathbf{w}),\nabla\mathbf{z}_i\right)_K $ $
   // + h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}_i)_K $ $
-  // - (\mathbf{G}(\mathbf {w}), \mathbf{z}_i)_K $ for both 
+  // - (\mathbf{G}(\mathbf {w}), \mathbf{z}_i)_K $ for both
   // ${\mathbf{w} = \mathbf{w}^k_{n+1}$ and ${\mathbf{w} = \mathbf{w}_{n}}$ ,
-  // $\mathbf{z}_i$ is the $i$th vector valued test function. 
+  // $\mathbf{z}_i$ is the $i$th vector valued test function.
   //   Furthermore, the scalar product
   // $\left(\mathbf{F}(\mathbf{w}), \nabla\mathbf{z}_i\right)_K$ is
   // understood as $\int_K \sum_{c=1}^{\text{n\_components}}
@@ -1763,7 +1763,7 @@ namespace Step33
 
 
     // Next, in order to compute the cell contributions, we need to evaluate
-    // $F({\mathbf w}^k_{n+1})$, $G({\mathbf w}^k_{n+1})$ and 
+    // $F({\mathbf w}^k_{n+1})$, $G({\mathbf w}^k_{n+1})$ and
     // $F({\mathbf w}_n)$, $G({\mathbf w}_n)$ at all quadrature
     // points. To store these, we also need to allocate a bit of memory. Note
     // that we compute the flux matrices and right hand sides in terms of
@@ -1800,9 +1800,9 @@ namespace Step33
     // single nonzero component (more on this topic can be found in the @ref
     // vector_valued module). It will be represented by the variable
     // <code>component_i</code> below. With this, the residual term can be
-    // re-written as 
+    // re-written as
     // @f{eqnarray*}
-    // R_i &=& 
+    // R_i &=&
     // \left(\frac{(\mathbf{w}_{n+1} -
     // \mathbf{w}_n)_{\text{component\_i}}}{\delta
     // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K \\
@@ -1813,7 +1813,7 @@ namespace Step33
     // x_d}\right)_K \\
     // &+& \sum_{d=1}^{\text{dim}} h^{\eta} \left( \theta \frac{\partial
     // \mathbf{w^k_{n+1}}_{\text{component\_i}}}{\partial x_d} + (1-\theta)
-    // \frac{\partial \mathbf{w_n}_{\text{component\_i}}}{\partial x_d} , 
+    // \frac{\partial \mathbf{w_n}_{\text{component\_i}}}{\partial x_d} ,
     // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d} \right)_K\\
     // &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}} +
     // (1-\theta)\mathbf{G}({\mathbf{w}_n} )_{\text{component\_i}} ,
@@ -1936,8 +1936,8 @@ namespace Step33
 
     // Next, we need to define the values of the conservative variables
     // ${\mathbf W}$ on this side of the face ($ {\mathbf W}^+$)
-    // and on the opposite side (${\mathbf W}^-$), for both ${\mathbf W} =  
-    // {\mathbf W}^k_{n+1}$ and  ${\mathbf W} = {\mathbf W}_n$. 
+    // and on the opposite side (${\mathbf W}^-$), for both ${\mathbf W} =
+    // {\mathbf W}^k_{n+1}$ and  ${\mathbf W} = {\mathbf W}_n$.
     // The "this side" values can be
     // computed in exactly the same way as in the previous function, but note
     // that the <code>fe_v</code> variable now is of type FEFaceValues or
@@ -2010,7 +2010,7 @@ namespace Step33
                                                boundary_values[q],
                                                Wminus[q]);
           // Here we assume that boundary type, boundary normal vector and boundary data values
-          // maintain the same during time advancing. 
+          // maintain the same during time advancing.
           EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
                                                fe_v.normal_vector(q),
                                                Wplus_old[q],

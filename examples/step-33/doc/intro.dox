@@ -135,8 +135,8 @@ above equations. For simplicity, we define $ \mathbf{B}({\mathbf{w}_{n})(\mathbf
 - \int_{\Omega} \left(\mathbf{F}(\mathbf{w_n}),
 \nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w_n} , \nabla \mathbf{z})
 \\
-&& 
-+ 
+&&
++
 \int_{\partial \Omega} \left(\mathbf{H}(\mathbf{w_n}^+,
 \mathbf{w}^-(\mathbf{w_n}^+), \mathbf{n}), \mathbf{z}\right)
 -

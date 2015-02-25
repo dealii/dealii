@@ -162,25 +162,25 @@ T=1.9
    8.494e-02        0016        6.05e-12
    1.199e+01        0026        5.72e-10
    1.198e+03        0002        1.20e+03
-   7.030e+03        0001        nan  
-   7.030e+03        0001        nan  
-   7.030e+03        0001        nan  
-   7.030e+03        0001        nan  
-   7.030e+03        0001        nan  
+   7.030e+03        0001        nan
+   7.030e+03        0001        nan
+   7.030e+03        0001        nan
+   7.030e+03        0001        nan
+   7.030e+03        0001        nan
    7.030e+03        0001        nan
 
 
 ----------------------------------------------------
-Exception on processing: 
+Exception on processing:
 
 --------------------------------------------------------
 An error occurred in line <2476> of file <\step-33.cc> in function
     void Step33::ConservationLaw<dim>::run() [with int dim = 2]
-The violated condition was: 
+The violated condition was:
     nonlin_iter <= 10
 The name and call sequence of the exception was:
     ExcMessage ("No convergence in nonlinear solver")
-Additional Information: 
+Additional Information:
 No convergence in nonlinear solver
 --------------------------------------------------------
 
@@ -196,7 +196,7 @@ movie, the results of last several time steps looks like this:
 
 <img src="https://www.dealii.org/images/steps/developer/step-33.oscillation.gif " alt="" height="300">
 
-As we see, when the heavy mass of fluid hits the left bottom corner, 
+As we see, when the heavy mass of fluid hits the left bottom corner,
 some oscillation occurs and lead to the divergence of the iteration. A lazy solution to
 this issue is add more viscosity. If we set the diffusion power $\eta = 1.5$ instead of $2.0$,
 the simulation would be able to survive this crisis. Then, the result looks like this:
@@ -206,7 +206,7 @@ the simulation would be able to survive this crisis. Then, the result looks like
 
 The heavy mass of fluid is drawn down the slope by gravity, where
 it collides with the ski lodge and is flung into the air!  Hopefully everyone
-escapes! And also, we can see the boundary between heavy mass and light mass blur quickly 
+escapes! And also, we can see the boundary between heavy mass and light mass blur quickly
 due to the artificial viscosity.
 
 We can also visualize the evolution of the adaptively refined grid:
@@ -261,15 +261,15 @@ faster.
 <h4>Cache the explicit part of residual</h4>
 
 The residual calulated in ConservationLaw::assemble_cell_term function
-read 
+read
    $R_i = \left(\frac{\mathbf{w}^{k}_{n+1} - \mathbf{w}_n}{\delta t}
-    , \mathbf{z}_i \right)_K  +    
+    , \mathbf{z}_i \right)_K  +
       \theta \mathbf{B}({\mathbf{w}^{k}_{n+1})(\mathbf{z}_i)_K +
-      (1-\theta) \mathbf{B}({\mathbf{w}_{n}) (\mathbf{z}_i)_K $   
-means that we calculate the spacial residual twice at one Newton 
-iteration step: once respect to the current solution ${\mathbf{w}^{k}_{n+1}$ 
-and another respect to the last time step solution $\mathbf{w}_{n}$ which 
-remains the same during all Newton interations through one timestep. 
+      (1-\theta) \mathbf{B}({\mathbf{w}_{n}) (\mathbf{z}_i)_K $
+means that we calculate the spacial residual twice at one Newton
+iteration step: once respect to the current solution ${\mathbf{w}^{k}_{n+1}$
+and another respect to the last time step solution $\mathbf{w}_{n}$ which
+remains the same during all Newton interations through one timestep.
 Cache up the explicit part of residual
  $ \mathbf{B}({\mathbf{w}_{n}) (\mathbf{z}_i)_K}$
 during Newton iteration will save lots of labor.
