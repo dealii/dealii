@@ -143,7 +143,6 @@ void
 SparseMIC<number>::vmult (Vector<somenumber>       &dst,
                           const Vector<somenumber> &src) const
 {
-  SparseLUDecomposition<number>::vmult (dst, src);
   Assert (dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
 
