@@ -3822,7 +3822,6 @@ namespace VectorTools
       // the DoFs corresponding to the group of components making up the vector
       // with first component first_vector_component (length dim).
       const unsigned int dim = 3;
-      const unsigned int spacedim = 3;
       const FiniteElement<dim> &fe = cell->get_fe ();
 
       // reinit for this cell, face and line.
@@ -4245,8 +4244,8 @@ namespace VectorTools
           //
           // This matches with the search done in compute_edge_projection.
           const unsigned int lines_per_face = GeometryInfo<dim>::lines_per_face;
-          std::vector<std::vector<unsigned int>>
-                                              associated_edge_dof_to_face_dof(lines_per_face, std::vector<unsigned int> (degree + 1));
+          std::vector<std::vector<unsigned int> >
+          associated_edge_dof_to_face_dof(lines_per_face, std::vector<unsigned int> (degree + 1));
           std::vector<unsigned int> associated_edge_dofs (lines_per_face);
 
           for (unsigned int line = 0; line < lines_per_face; ++line)
@@ -4333,7 +4332,7 @@ namespace VectorTools
                  cross_product_rhs;
 
           // Store all normal vectors at quad points:
-          std::vector<Point<dim>> normal_vector_list(fe_face_values.get_normal_vectors());
+          std::vector<Point<dim> > normal_vector_list(fe_face_values.get_normal_vectors());
 
           // Loop to construct face linear system.
           for (unsigned int q_point = 0;
