@@ -260,11 +260,11 @@ namespace OpenCASCADE
     STEPControl_Writer SCW;
     IFSelect_ReturnStatus status;
     status = SCW.Transfer(shape, STEPControl_AsIs);
-    AssertThrow(status = IFSelect_RetDone, ExcMessage("Failed to add shape to STEP controller."));
+    AssertThrow(status == IFSelect_RetDone, ExcMessage("Failed to add shape to STEP controller."));
 
     status = SCW.Write(filename.c_str());
 
-    AssertThrow(status = IFSelect_RetDone, ExcMessage("Failed to write translated shape to STEP file."));
+    AssertThrow(status == IFSelect_RetDone, ExcMessage("Failed to write translated shape to STEP file."));
   }
 
   double get_shape_tolerance(const TopoDS_Shape &shape)
