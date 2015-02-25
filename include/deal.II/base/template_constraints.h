@@ -412,6 +412,31 @@ struct ProductType<long double,double>
   typedef long double type;
 };
 
+template <>
+struct ProductType<double,int>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<int,double>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<float,int>
+{
+  typedef float type;
+};
+
+template <>
+struct ProductType<int,float>
+{
+  typedef float type;
+};
+
+
 #endif
 
 
