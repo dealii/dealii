@@ -128,7 +128,7 @@ Hartmann's PhD thesis ("Adaptive Finite Element Methods for the
 Compressible Euler Equations", PhD thesis, University of Heidelberg, 2002).
 
 We use a time stepping scheme to substitute the time derivative in the
-above equations. For simplicity, we define $ \mathbf{B}({\mathbf{w}_{n})(\mathbf z) $ as the spacial residual at time step $n$ :
+above equations. For simplicity, we define $ \mathbf{B}({\mathbf{w}_{n})(\mathbf z) $ as the spatial residual at time step $n$ :
 
 @f{eqnarray*}
  \mathbf{B}({\mathbf{w}_{n})(\mathbf z)  &=&

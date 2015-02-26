@@ -185,12 +185,12 @@ namespace Step33
     // to the <code>i</code>th element, and then dereference it. This works
     // for both kinds of vectors -- not the prettiest solution, but one that
     // works.
-    template <typename number, typename InputVector>
+    template <typename Number, typename InputVector>
     static
-    number
+    Number
     compute_kinetic_energy (const InputVector &W)
     {
-      number kinetic_energy = 0;
+      Number kinetic_energy = 0;
       for (unsigned int d=0; d<dim; ++d)
         kinetic_energy += *(W.begin()+first_momentum_component+d) *
                           *(W.begin()+first_momentum_component+d);
@@ -200,14 +200,14 @@ namespace Step33
     }
 
 
-    template <typename number, typename InputVector>
+    template <typename Number, typename InputVector>
     static
-    number
+    Number
     compute_pressure (const InputVector &W)
     {
       return ((gas_gamma-1.0) *
               (*(W.begin() + energy_component) -
-               compute_kinetic_energy<number>(W)));
+               compute_kinetic_energy<Number>(W)));
     }
 
 
@@ -227,15 +227,15 @@ namespace Step33
     // use the automatic differentiation type here.  Similarly, we will call
     // the function with different input vector data types, so we templatize
     // on it as well:
-    template <typename InputVector, typename number>
+    template <typename InputVector, typename Number>
     static
     void compute_flux_matrix (const InputVector &W,
-                              number (&flux)[n_components][dim])
+                              Number (&flux)[n_components][dim])
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
       // correspond to the momentum terms:
-      const number pressure = compute_pressure<number> (W);
+      const Number pressure = compute_pressure<number> (W);
 
       for (unsigned int d=0; d<dim; ++d)
         {
@@ -266,16 +266,16 @@ namespace Step33
     // numerical flux function to enforce boundary conditions.  This routine
     // is the basic Lax-Friedrich's flux with a stabilization parameter
     // $\alpha$. It's form has also been given already in the introduction:
-    template <typename InputVector, typename number>
+    template <typename InputVector, typename Number>
     static
     void numerical_normal_flux (const Point<dim>          &normal,
                                 const InputVector         &Wplus,
                                 const InputVector         &Wminus,
                                 const double               alpha,
-                                number (&normal_flux)[n_components])
+                                Number (&normal_flux)[n_components])
     {
-      number iflux[n_components][dim];
-      number oflux[n_components][dim];
+      Number iflux[n_components][dim];
+      Number oflux[n_components][dim];
 
       compute_flux_matrix (Wplus, iflux);
       compute_flux_matrix (Wminus, oflux);
@@ -300,10 +300,10 @@ namespace Step33
     // \right)^T$, shown here for the 3d case. More specifically, we will
     // consider only $\mathbf g=(0,0,-1)^T$ in 3d, or $\mathbf g=(0,-1)^T$ in
     // 2d. This naturally leads to the following function:
-    template <typename InputVector, typename number>
+    template <typename InputVector, typename Number>
     static
     void compute_forcing_vector (const InputVector &W,
-                                 number (&forcing)[n_components])
+                                 Number (&forcing)[n_components])
     {
       const double gravity = -1.0;
 
