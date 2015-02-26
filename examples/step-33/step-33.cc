@@ -1736,10 +1736,10 @@ namespace Step33
           W[q][c]       = 0;
           W_old[q][c]   = 0;
           for (unsigned int d=0; d<dim; ++d)
-          {
-            grad_W[q][c][d] = 0;
-            grad_W_old[q][c][d] = 0;
-          }
+            {
+              grad_W[q][c][d] = 0;
+              grad_W_old[q][c][d] = 0;
+            }
         }
 
     for (unsigned int q=0; q<n_q_points; ++q)
@@ -1753,12 +1753,12 @@ namespace Step33
                          fe_v.shape_value_component(i, q, c);
 
           for (unsigned int d = 0; d < dim; d++)
-          {
-            grad_W[q][c][d] += independent_local_dof_values[i] *
-                               fe_v.shape_grad_component(i, q, c)[d];
-            grad_W_old[q][c][d] += old_solution(dof_indices[i]) *
-                                   fe_v.shape_grad_component(i, q, c)[d];
-          }
+            {
+              grad_W[q][c][d] += independent_local_dof_values[i] *
+                                 fe_v.shape_grad_component(i, q, c)[d];
+              grad_W_old[q][c][d] += old_solution(dof_indices[i]) *
+                                     fe_v.shape_grad_component(i, q, c)[d];
+            }
         }
 
 
@@ -1943,11 +1943,11 @@ namespace Step33
     // that the <code>fe_v</code> variable now is of type FEFaceValues or
     // FESubfaceValues:
     Table<2,Sacado::Fad::DFad<double> >
-      Wplus (n_q_points, EulerEquations<dim>::n_components),
-      Wminus (n_q_points, EulerEquations<dim>::n_components);
+    Wplus (n_q_points, EulerEquations<dim>::n_components),
+          Wminus (n_q_points, EulerEquations<dim>::n_components);
     Table<2,double>
-      Wplus_old(n_q_points, EulerEquations<dim>::n_components),
-      Wminus_old(n_q_points, EulerEquations<dim>::n_components);
+    Wplus_old(n_q_points, EulerEquations<dim>::n_components),
+              Wminus_old(n_q_points, EulerEquations<dim>::n_components);
 
     for (unsigned int q=0; q<n_q_points; ++q)
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -2003,20 +2003,20 @@ namespace Step33
                                   boundary_values);
 
         for (unsigned int q = 0; q < n_q_points; q++)
-        {
-          EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
-                                               fe_v.normal_vector(q),
-                                               Wplus[q],
-                                               boundary_values[q],
-                                               Wminus[q]);
-          // Here we assume that boundary type, boundary normal vector and boundary data values
-          // maintain the same during time advancing.
-          EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
-                                               fe_v.normal_vector(q),
-                                               Wplus_old[q],
-                                               boundary_values[q],
-                                               Wminus_old[q]);
-        }
+          {
+            EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
+                                                 fe_v.normal_vector(q),
+                                                 Wplus[q],
+                                                 boundary_values[q],
+                                                 Wminus[q]);
+            // Here we assume that boundary type, boundary normal vector and boundary data values
+            // maintain the same during time advancing.
+            EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
+                                                 fe_v.normal_vector(q),
+                                                 Wplus_old[q],
+                                                 boundary_values[q],
+                                                 Wminus_old[q]);
+          }
       }
 
 
@@ -2047,14 +2047,14 @@ namespace Step33
       }
 
     for (unsigned int q=0; q<n_q_points; ++q)
-    {
-      EulerEquations<dim>::numerical_normal_flux(fe_v.normal_vector(q),
-                                                 Wplus[q], Wminus[q], alpha,
-                                                 normal_fluxes[q]);
-      EulerEquations<dim>::numerical_normal_flux(fe_v.normal_vector(q),
-                                                 Wplus_old[q], Wminus_old[q], alpha,
-                                                 normal_fluxes_old[q]);
-    }
+      {
+        EulerEquations<dim>::numerical_normal_flux(fe_v.normal_vector(q),
+                                                   Wplus[q], Wminus[q], alpha,
+                                                   normal_fluxes[q]);
+        EulerEquations<dim>::numerical_normal_flux(fe_v.normal_vector(q),
+                                                   Wplus_old[q], Wminus_old[q], alpha,
+                                                   normal_fluxes_old[q]);
+      }
 
     // Now assemble the face term in exactly the same way as for the cell
     // contributions in the previous function. The only difference is that if
