@@ -935,11 +935,6 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException0 (ExcGridHasInvalidVertices);
-    /**
-     * Exception
-     * @ingroup Exceptions
-     */
     DeclException1 (ExcInternalErrorOnCell,
                     int,
                     << "Something went wrong upon construction of cell "
@@ -1692,7 +1687,10 @@ namespace internal
           // exit with an exception
           AssertThrow (* (std::min_element(vertex_touch_count.begin(),
                                            vertex_touch_count.end())) >= 2,
-                       ExcGridHasInvalidVertices());
+                       ExcMessage("During creation of a triangulation, a part of the "
+                                  "algorithm encountered a vertex that is part of only "
+                                  "a single adjacent line. However, in 2d, every vertex "
+                                  "needs to be at least part of two lines."));
         }
 
         // reserve enough space
@@ -2009,7 +2007,10 @@ namespace internal
           // exit with an exception
           AssertThrow (* (std::min_element(vertex_touch_count.begin(),
                                            vertex_touch_count.end())) >= 3,
-                       ExcGridHasInvalidVertices());
+                       ExcGridHasInvalidVertices("During creation of a triangulation, a part of the "
+                                                 "algorithm encountered a vertex that is part of only "
+                                                 "one or two adjacent lines. However, in 3d, every vertex "
+                                                 "needs to be at least part of three lines."));
         }
 
 
