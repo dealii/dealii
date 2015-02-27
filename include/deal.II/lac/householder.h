@@ -229,7 +229,7 @@ Householder<number>::least_squares (Vector<number2> &dst,
   number2 sum = 0.;
   for (size_type i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
-  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  AssertIsFinite(sum);
 
   // Compute solution
   this->backward(dst, *aux);
@@ -274,7 +274,7 @@ Householder<number>::least_squares (BlockVector<number2> &dst,
   number2 sum = 0.;
   for (size_type i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
-  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  AssertIsFinite(sum);
 
   //backward works for
   //Vectors only, so copy

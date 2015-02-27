@@ -1646,7 +1646,7 @@ SparseMatrix<number>::set (const size_type i,
                            const size_type j,
                            const number       value)
 {
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   const size_type index = cols->operator()(i, j);
 
@@ -1730,7 +1730,7 @@ SparseMatrix<number>::add (const size_type i,
                            const size_type j,
                            const number    value)
 {
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   if (value == 0)
     return;

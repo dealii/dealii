@@ -2292,7 +2292,7 @@ namespace VectorTools
         if (dof_to_boundary_mapping[i] != DoFHandler<dim,spacedim>::invalid_dof_index
             && ! excluded_dofs[dof_to_boundary_mapping[i]])
           {
-            Assert(numbers::is_finite(boundary_projection(dof_to_boundary_mapping[i])), ExcNumberNotFinite());
+            AssertIsFinite(boundary_projection(dof_to_boundary_mapping[i]));
 
             // this dof is on one of the
             // interesting boundary parts
@@ -6294,7 +6294,7 @@ namespace VectorTools
         }
 
       // append result of this cell to the end of the vector
-      Assert (numbers::is_finite(diff), ExcNumberNotFinite());
+      AssertIsFinite(diff);
       return diff;
     }
 

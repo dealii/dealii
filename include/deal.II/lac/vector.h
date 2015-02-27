@@ -1227,7 +1227,7 @@ inline
 Vector<Number> &
 Vector<Number>::operator /= (const Number factor)
 {
-  Assert (numbers::is_finite(factor),ExcNumberNotFinite());
+  AssertIsFinite(factor);
   Assert (factor != Number(0.), ExcZero() );
 
   this->operator *= (Number(1.)/factor);

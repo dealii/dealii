@@ -213,7 +213,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator = (const PetscScalar s)
   {
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    AssertIsFinite(s);
 
     //TODO[TH]: assert(is_compressed())
 
@@ -774,7 +774,7 @@ namespace PETScWrappers
   VectorBase::operator *= (const PetscScalar a)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     const int ierr = VecScale (vector, a);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -788,10 +788,10 @@ namespace PETScWrappers
   VectorBase::operator /= (const PetscScalar a)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     const PetscScalar factor = 1./a;
-    Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+    AssertIsFinite(factor);
 
     const int ierr = VecScale (vector, factor);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -829,7 +829,7 @@ namespace PETScWrappers
   VectorBase::add (const PetscScalar s)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    AssertIsFinite(s);
 
     const int ierr = VecShift (vector, s);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -850,7 +850,7 @@ namespace PETScWrappers
                    const VectorBase &v)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     const int ierr = VecAXPY (vector, a, v);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -865,8 +865,8 @@ namespace PETScWrappers
                    const VectorBase &w)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
+    AssertIsFinite(a);
+    AssertIsFinite(b);
 
     const PetscScalar weights[2] = {a,b};
     Vec               addends[2] = {v.vector, w.vector};
@@ -882,7 +882,7 @@ namespace PETScWrappers
                     const VectorBase &v)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    AssertIsFinite(s);
 
     const int ierr = VecAYPX (vector, s, v);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -896,8 +896,8 @@ namespace PETScWrappers
                     const VectorBase     &v)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(s);
+    AssertIsFinite(a);
 
     // there is nothing like a AXPAY
     // operation in Petsc, so do it in two
@@ -916,9 +916,9 @@ namespace PETScWrappers
                     const VectorBase     &w)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
+    AssertIsFinite(s);
+    AssertIsFinite(a);
+    AssertIsFinite(b);
 
     // there is no operation like MAXPAY, so
     // do it in two steps
@@ -943,10 +943,10 @@ namespace PETScWrappers
                     const VectorBase     &x)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
-    Assert (numbers::is_finite(c), ExcNumberNotFinite());
+    AssertIsFinite(s);
+    AssertIsFinite(a);
+    AssertIsFinite(b);
+    AssertIsFinite(c);
 
     // there is no operation like MAXPAY, so
     // do it in two steps
@@ -977,7 +977,7 @@ namespace PETScWrappers
                    const VectorBase &v)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     Assert (size() == v.size(),
             ExcDimensionMismatch (size(), v.size()));
@@ -1000,8 +1000,8 @@ namespace PETScWrappers
                    const VectorBase &w)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
+    AssertIsFinite(a);
+    AssertIsFinite(b);
 
     Assert (size() == v.size(),
             ExcDimensionMismatch (size(), v.size()));

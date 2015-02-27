@@ -835,7 +835,7 @@ FilteredMatrix<VECTOR>::apply_constraints (
   const const_index_value_iterator e = constraints.end();
   for (; i!=e; ++i)
     {
-      Assert(numbers::is_finite(i->second), ExcNumberNotFinite());
+      AssertIsFinite(i->second);
       (*tmp_vector)(i->first) = -i->second;
     }
 
@@ -847,7 +847,7 @@ FilteredMatrix<VECTOR>::apply_constraints (
   // entries themselves
   for (i=constraints.begin(); i!=e; ++i)
     {
-      Assert(numbers::is_finite(i->second), ExcNumberNotFinite());
+      AssertIsFinite(i->second);
       v(i->first) = i->second;
     }
 }
@@ -880,7 +880,7 @@ FilteredMatrix<VECTOR>::post_filter (const VECTOR &in,
   const const_index_value_iterator e = constraints.end();
   for (; i!=e; ++i)
     {
-      Assert(numbers::is_finite(in(i->first)), ExcNumberNotFinite());
+      AssertIsFinite(in(i->first));
       out(i->first) = in(i->first);
     }
 }

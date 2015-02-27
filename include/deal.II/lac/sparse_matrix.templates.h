@@ -580,7 +580,7 @@ SparseMatrix<number>::add (const size_type  row,
   for (size_type j=0; j<n_cols; ++j)
     {
       const number value = values[j];
-      Assert (numbers::is_finite(value), ExcNumberNotFinite());
+      AssertIsFinite(value);
 
 #ifdef DEBUG
       if (elide_zero_values==true && value == 0)
@@ -641,7 +641,7 @@ SparseMatrix<number>::set (const size_type  row,
       for (size_type j=0; j<n_cols; ++j)
         {
           const number value = values[j];
-          Assert (numbers::is_finite(value), ExcNumberNotFinite());
+          AssertIsFinite(value);
 
           if (value == 0)
             continue;
@@ -677,7 +677,7 @@ set_value:
       for (size_type j=0; j<n_cols; ++j)
         {
           const number value = values[j];
-          Assert (numbers::is_finite(value), ExcNumberNotFinite());
+          AssertIsFinite(value);
 
           if (index != next_row_index && my_cols[index] == col_indices[j])
             goto set_value_checked;

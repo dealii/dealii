@@ -2348,7 +2348,7 @@ namespace TrilinosWrappers
                      const TrilinosScalar value)
   {
 
-    Assert (numbers::is_finite(value), ExcNumberNotFinite());
+    AssertIsFinite(value);
 
     set (i, 1, &j, &value, false);
   }
@@ -2468,7 +2468,7 @@ namespace TrilinosWrappers
         for (size_type j=0; j<n_cols; ++j)
           {
             const double value = values[j];
-            Assert (numbers::is_finite(value), ExcNumberNotFinite());
+            AssertIsFinite(value);
             if (value != 0)
               {
                 col_index_ptr[n_columns] = col_indices[j];
@@ -2554,7 +2554,7 @@ namespace TrilinosWrappers
                      const size_type      j,
                      const TrilinosScalar value)
   {
-    Assert (numbers::is_finite(value), ExcNumberNotFinite());
+    AssertIsFinite(value);
 
     if (value == 0)
       {
@@ -2679,7 +2679,7 @@ namespace TrilinosWrappers
         n_columns = n_cols;
 #ifdef DEBUG
         for (size_type j=0; j<n_cols; ++j)
-          Assert (numbers::is_finite(values[j]), ExcNumberNotFinite());
+          AssertIsFinite(values[j]);
 #endif
       }
     else
@@ -2704,7 +2704,7 @@ namespace TrilinosWrappers
           {
             const double value = values[j];
 
-            Assert (numbers::is_finite(value), ExcNumberNotFinite());
+            AssertIsFinite(value);
             if (value != 0)
               {
                 col_index_ptr[n_columns] = col_indices[j];

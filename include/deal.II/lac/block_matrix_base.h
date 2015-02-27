@@ -1637,7 +1637,7 @@ BlockMatrixBase<MatrixType>::set (const size_type i,
 {
   prepare_set_operation();
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   const std::pair<unsigned int,size_type>
   row_index = row_block_indices.global_to_local (i),
@@ -1823,7 +1823,7 @@ BlockMatrixBase<MatrixType>::add (const size_type  i,
                                   const value_type value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   prepare_add_operation();
 
@@ -2069,7 +2069,7 @@ void
 BlockMatrixBase<MatrixType>::add (const value_type                   factor,
                                   const BlockMatrixBase<MatrixType> &matrix)
 {
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
 
   prepare_add_operation();
 
