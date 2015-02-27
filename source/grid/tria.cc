@@ -950,7 +950,10 @@ namespace internal
      */
     DeclException1 (ExcCellHasNegativeMeasure,
                     int,
-                    << "Cell " << arg1 << " has negative measure.");
+                    << "Cell " << arg1 << " has negative measure. This typically "
+                    << "indicates some distortion in the cell, or a mistakenly "
+                    << "swapped pair of vertices in the input to "
+                    << "Triangulation::create_triangulation().");
     /**
      * A cell is created with a
      * vertex number exceeding the
@@ -986,7 +989,7 @@ namespace internal
      * @ingroup Exceptions
      */
     DeclException3 (ExcInteriorLineCantBeBoundary,
-                    int, int, int, int,
+                    int, int,
                     types::boundary_id,
                     << "The input data for creating a triangulation contained "
                     << "information about a line with indices "
@@ -1017,11 +1020,11 @@ namespace internal
      * @ingroup Exceptions
      */
     DeclException5 (ExcInteriorQuadCantBeBoundary,
-                    int, int, int, int
+                    int, int, int, int,
                     types::boundary_id,
                     << "The input data for creating a triangulation contained "
                     << "information about a quad with indices "
-                    << arg1 << ", " << arg2 << ", " << arg 3 << ", and " << arg4
+                    << arg1 << ", " << arg2 << ", " << arg3 << ", and " << arg4
                     << "that is supposed to have boundary indicator "
                     << arg5
                     << ". However, this is an internal quad not located on the "
@@ -1050,7 +1053,8 @@ namespace internal
     DeclException2 (ExcMultiplySetLineInfoOfLine,
                     int, int,
                     << "In SubCellData the line info of the line with vertex indices "
-                    << arg1 << " and " << arg2 << " is multiply set.");
+                    << arg1 << " and " << arg2 << " appears more than once. "
+                    << "This is not allowed.");
 
 
     /**
@@ -2781,10 +2785,10 @@ namespace internal
             // check whether this face is
             // really an exterior one
             AssertThrow (quad->at_boundary(),
-                         ExcInteriorQuadCantBeBoundary(quad->vertex(0),
-                                                       quad->vertex(1),
-                                                       quad->vertex(2),
-                                                       quad->vertex(3),
+                         ExcInteriorQuadCantBeBoundary(quad->vertex_index(0),
+                                                       quad->vertex_index(1),
+                                                       quad->vertex_index(2),
+                                                       quad->vertex_index(3),
                                                        boundary_quad->boundary_id));
 
             // and make sure that we don't
