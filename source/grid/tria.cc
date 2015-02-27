@@ -926,11 +926,6 @@ namespace internal
      *  Exception
      * @ingroup Exceptions
      */
-    DeclException0 (ExcTooFewVerticesAllocated);
-    /**
-     *  Exception
-     * @ingroup Exceptions
-     */
     DeclException0 (ExcUncaughtState);
     /**
      * Exception
@@ -3721,7 +3716,7 @@ namespace internal
             while (triangulation.vertices_used[next_unused_vertex] == true)
               ++next_unused_vertex;
             Assert (next_unused_vertex < triangulation.vertices.size(),
-                    ExcTooFewVerticesAllocated());
+                    ExcMessage("Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
             triangulation.vertices_used[next_unused_vertex] = true;
 
             new_vertices[8] = next_unused_vertex;
@@ -4177,7 +4172,7 @@ namespace internal
                   while (triangulation.vertices_used[next_unused_vertex] == true)
                     ++next_unused_vertex;
                   Assert (next_unused_vertex < triangulation.vertices.size(),
-                          ExcTooFewVerticesAllocated());
+                          ExcMessage("Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
 
                   // Now we always ask the cell itself where to put
                   // the new point. The cell in turn will query the
@@ -4507,7 +4502,7 @@ namespace internal
                   while (triangulation.vertices_used[next_unused_vertex] == true)
                     ++next_unused_vertex;
                   Assert (next_unused_vertex < triangulation.vertices.size(),
-                          ExcTooFewVerticesAllocated());
+                          ExcMessage("Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
                   triangulation.vertices_used[next_unused_vertex] = true;
 
                   if (spacedim == dim)
@@ -4972,7 +4967,7 @@ namespace internal
                   while (triangulation.vertices_used[next_unused_vertex] == true)
                     ++next_unused_vertex;
                   Assert (next_unused_vertex < triangulation.vertices.size(),
-                          ExcTooFewVerticesAllocated());
+                          ExcMessage("Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
                   triangulation.vertices_used[next_unused_vertex] = true;
 
                   triangulation.vertices[next_unused_vertex]
@@ -5474,7 +5469,7 @@ namespace internal
                     while (triangulation.vertices_used[next_unused_vertex] == true)
                       ++next_unused_vertex;
                     Assert (next_unused_vertex < triangulation.vertices.size(),
-                            ExcTooFewVerticesAllocated());
+                            ExcMessage("Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
 
                     // now: if the quad is refined anisotropically
                     // already, set the anisotropic refinement flag
@@ -7692,7 +7687,7 @@ namespace internal
                       while (triangulation.vertices_used[next_unused_vertex] == true)
                         ++next_unused_vertex;
                       Assert (next_unused_vertex < triangulation.vertices.size(),
-                              ExcTooFewVerticesAllocated());
+                              ExcMessage("Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
                       triangulation.vertices_used[next_unused_vertex] = true;
 
                       // the new vertex is definitely in the interior,
