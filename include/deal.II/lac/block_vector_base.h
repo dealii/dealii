@@ -1935,7 +1935,7 @@ BlockVectorBase<VectorType>::add (const size_type  n_indices,
 template <class VectorType>
 void BlockVectorBase<VectorType>::add (const value_type a)
 {
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   for (size_type i=0; i<n_blocks(); ++i)
     {
@@ -1964,7 +1964,7 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType> &v)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -1984,8 +1984,8 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType> &w)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2006,7 +2006,7 @@ void BlockVectorBase<VectorType>::sadd (const value_type x,
                                         const BlockVectorBase<VectorType> &v)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
+  AssertIsFinite(x);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2024,8 +2024,8 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType> &v)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2045,9 +2045,9 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType> &w)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2071,10 +2071,10 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType> &y)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
-  Assert (numbers::is_finite(c), ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
+  AssertIsFinite(b);
+  AssertIsFinite(c);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2111,8 +2111,8 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
                                        const BlockVectorBase<VectorType> &w)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2146,7 +2146,7 @@ void BlockVectorBase<VectorType>::equ (const value_type    a,
                                        const BlockVector2 &v)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2171,7 +2171,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator = (const value_type s)
 {
 
-  Assert (numbers::is_finite(s), ExcNumberNotFinite());
+  AssertIsFinite(s);
 
   for (size_type i=0; i<n_blocks(); ++i)
     components[i] = s;
@@ -2249,7 +2249,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator *= (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
 
   for (size_type i=0; i<n_blocks(); ++i)
     components[i] *= factor;
@@ -2265,7 +2265,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator /= (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
   Assert (factor > 0., ExcDivideByZero() );
 
   for (size_type i=0; i<n_blocks(); ++i)

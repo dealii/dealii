@@ -1159,7 +1159,7 @@ namespace PETScWrappers
                    const size_type   j,
                    const PetscScalar value)
   {
-    Assert (numbers::is_finite(value), ExcNumberNotFinite());
+    AssertIsFinite(value);
 
     set (i, 1, &j, &value, false);
   }
@@ -1258,7 +1258,7 @@ namespace PETScWrappers
         for (size_type j=0; j<n_cols; ++j)
           {
             const PetscScalar value = values[j];
-            Assert (numbers::is_finite(value), ExcNumberNotFinite());
+            AssertIsFinite(value);
             if (value != PetscScalar())
               {
                 column_indices[n_columns] = col_indices[j];
@@ -1287,7 +1287,7 @@ namespace PETScWrappers
                    const PetscScalar value)
   {
 
-    Assert (numbers::is_finite(value), ExcNumberNotFinite());
+    AssertIsFinite(value);
 
     if (value == PetscScalar())
       {
@@ -1404,7 +1404,7 @@ namespace PETScWrappers
         for (size_type j=0; j<n_cols; ++j)
           {
             const PetscScalar value = values[j];
-            Assert (numbers::is_finite(value), ExcNumberNotFinite());
+            AssertIsFinite(value);
             if (value != PetscScalar())
               {
                 column_indices[n_columns] = col_indices[j];

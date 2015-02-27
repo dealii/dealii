@@ -1419,7 +1419,7 @@ void ChunkSparseMatrix<number>::set (const size_type i,
                                      const number value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   Assert (cols != 0, ExcNotInitialized());
   // it is allowed to set elements of the matrix that are not part of the
@@ -1442,7 +1442,7 @@ void ChunkSparseMatrix<number>::add (const size_type i,
                                      const number value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   Assert (cols != 0, ExcNotInitialized());
 

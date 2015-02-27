@@ -204,7 +204,7 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
 #ifdef DEBUG
           for (unsigned int i=0; i<x_cell.size(); ++i)
             {
-              Assert(numbers::is_finite(x_cell(i)), ExcNumberNotFinite());
+              AssertIsFinite(x_cell(i));
             }
 #endif
           // Store in result vector

@@ -586,8 +586,40 @@ namespace StandardExceptions
    * This exception should be used to catch infinite or not a number results
    * of arithmetic operations that do not result from a division by zero (use
    * ExcDivideByZero for those).
+   *
+   * The exception uses std::complex as its argument to ensure that we can
+   * use it for all scalar arguments (real or complex-valued).
    */
-  DeclException0 (ExcNumberNotFinite);
+  DeclException1 (ExcNumberNotFinite,
+                  std::complex<double>,
+                  << "In a significant number of places, deal.II checks that some intermediate "
+                  << "value is a finite number (as opposed to plus or minus infinity, or "
+                  << "NaN/Not a Number). In the current function, we encountered a number "
+                  << "that is not finite (its value is " << arg1 << " and therefore "
+                  << "violates the current assertion.\n\n"
+                  << "This may be due to the fact that some operation in this function "
+                  << "created such a value, or because one of the arguments you passed "
+                  << "to the function already had this value from some previous "
+                  << "operation. In the latter case, this function only triggered the "
+                  << "error but may not actually be responsible for the computation of "
+                  << "the number that is not finite.\n\n"
+                  << "There are two common cases where this situation happens. First, your "
+                  << "code (or something in deal.II) divides by zero in a place where this "
+                  << "should not happen. Or, you are trying to solve a linear system "
+                  << "with an unsuitable solver (such as an indefinite or non-symmetric "
+                  << "linear system using a Conjugate Gradient solver); such attempts "
+                  << "oftentimes yield an operation somewhere that tries to divide "
+                  << "by zero or take the square root of a negative value.\n\n"
+                  << "In any case, when trying to find the source of the error, "
+                  << "recall that the location where you are getting this error is "
+                  << "simply the first place in the program where there is a check "
+                  << "that a number (e.g., an element of a solution vector) is in fact "
+                  << "finite, but that the actual error that computed the number "
+                  << "may have happened far earlier. To find this location, you "
+                  << "may want to add checks for finiteness in places of your "
+                  << "program visited before the place where this error is produced."
+                  << "One way to check for finiteness is to use the 'AssertIsFinite' "
+                  << "macro.");
 
   /**
    * Trying to allocate a new object failed due to lack of free memory.
@@ -879,6 +911,19 @@ namespace StandardExceptions
 
 #define AssertGlobalIndexRange(index,range) Assert((index) < (range), \
                                                    ExcIndexRange<types::global_dof_index>((index),0,(range)))
+
+/**
+ * An assertion that checks whether a number is finite or not.
+ * We explicitly cast the number to std::complex to match
+ * the signature of the exception (see there for an explanation
+ * of why we use std::complex at all) and to satisfy the
+ * fact that std::complex has no implicit conversions.
+ *
+ * @ingroup Exceptions
+ * @author Wolfgang Bangerth, 2015
+ */
+#define AssertIsFinite(number) Assert(dealii::numbers::is_finite(number), \
+                                      ExcNumberNotFinite(std::complex<double>(number)))
 
 using namespace StandardExceptions;
 

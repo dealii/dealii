@@ -1118,13 +1118,12 @@ namespace MatrixCreator
                         if (copy_data.dof_is_on_face[pos][j] &&
                             dof_to_boundary_mapping[copy_data.dofs[j]] != numbers::invalid_dof_index)
                           {
-                            Assert(numbers::is_finite(copy_data.cell_matrix[pos](i,j)),
-                                   ExcNumberNotFinite());
+                            AssertIsFinite(copy_data.cell_matrix[pos](i,j));
                             matrix.add(dof_to_boundary_mapping[copy_data.dofs[i]],
                                        dof_to_boundary_mapping[copy_data.dofs[j]],
                                        copy_data.cell_matrix[pos](i,j));
                           }
-                      Assert(numbers::is_finite(copy_data.cell_vector[pos](i)), ExcNumberNotFinite());
+                      AssertIsFinite(copy_data.cell_vector[pos](i));
                       rhs_vector(dof_to_boundary_mapping[copy_data.dofs[i]]) += copy_data.cell_vector[pos](i);
                     }
                 }

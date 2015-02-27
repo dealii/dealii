@@ -1205,7 +1205,7 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator = (const TrilinosScalar s)
   {
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    AssertIsFinite(s);
 
     const int ierr = vector->PutScalar(s);
 
@@ -1564,7 +1564,7 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator *= (const TrilinosScalar a)
   {
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     const int ierr = vector->Scale(a);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1578,11 +1578,11 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator /= (const TrilinosScalar a)
   {
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     const TrilinosScalar factor = 1./a;
 
-    Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+    AssertIsFinite(factor);
 
     const int ierr = vector->Scale(factor);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1633,7 +1633,7 @@ namespace TrilinosWrappers
     // if we have ghost values, do not allow
     // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    AssertIsFinite(s);
 
     size_type n_local = local_size();
     for (size_type i=0; i<n_local; i++)
@@ -1653,7 +1653,7 @@ namespace TrilinosWrappers
     Assert (local_size() == v.local_size(),
             ExcDimensionMismatch(local_size(), v.local_size()));
 
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     const int ierr = vector->Update(a, *(v.vector), 1.);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1676,8 +1676,8 @@ namespace TrilinosWrappers
     Assert (local_size() == w.local_size(),
             ExcDimensionMismatch(local_size(), w.local_size()));
 
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
+    AssertIsFinite(a);
+    AssertIsFinite(b);
 
     const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), 1.);
 
@@ -1697,7 +1697,7 @@ namespace TrilinosWrappers
     Assert (size() == v.size(),
             ExcDimensionMismatch (size(), v.size()));
 
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    AssertIsFinite(s);
 
     // We assume that the vectors have the same Map
     // if the local size is the same and if the vectors are not ghosted
@@ -1728,8 +1728,8 @@ namespace TrilinosWrappers
     Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (size() == v.size(),
             ExcDimensionMismatch (size(), v.size()));
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(s);
+    AssertIsFinite(a);
 
     // We assume that the vectors have the same Map
     // if the local size is the same and if the vectors are not ghosted
@@ -1766,9 +1766,9 @@ namespace TrilinosWrappers
             ExcDimensionMismatch (size(), v.size()));
     Assert (size() == w.size(),
             ExcDimensionMismatch (size(), w.size()));
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
+    AssertIsFinite(s);
+    AssertIsFinite(a);
+    AssertIsFinite(b);
 
     // We assume that the vectors have the same Map
     // if the local size is the same and if the vectors are not ghosted
@@ -1810,10 +1810,10 @@ namespace TrilinosWrappers
             ExcDimensionMismatch (size(), w.size()));
     Assert (size() == x.size(),
             ExcDimensionMismatch (size(), x.size()));
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
-    Assert (numbers::is_finite(c), ExcNumberNotFinite());
+    AssertIsFinite(s);
+    AssertIsFinite(a);
+    AssertIsFinite(b);
+    AssertIsFinite(c);
 
     // We assume that the vectors have the same Map
     // if the local size is the same and if the vectors are not ghosted
@@ -1872,7 +1872,7 @@ namespace TrilinosWrappers
     // if we have ghost values, do not allow
     // writing to this vector at all.
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     // If we don't have the same map, copy.
     if (vector->Map().SameAs(v.vector->Map())==false)
@@ -1905,8 +1905,8 @@ namespace TrilinosWrappers
     Assert (v.local_size() == w.local_size(),
             ExcDimensionMismatch (v.local_size(), w.local_size()));
 
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
+    AssertIsFinite(a);
+    AssertIsFinite(b);
 
     // If we don't have the same map, copy.
     if (vector->Map().SameAs(v.vector->Map())==false)

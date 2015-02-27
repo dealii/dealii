@@ -150,7 +150,7 @@ FullMatrix<number> &
 FullMatrix<number>::operator *= (const number factor)
 {
 
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
 
   number       *p = &(*this)(0,0);
   const number *e = &(*this)(0,0) + n()*m();
@@ -167,14 +167,14 @@ FullMatrix<number> &
 FullMatrix<number>::operator /= (const number factor)
 {
 
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
 
   number       *p = &(*this)(0,0);
   const number *e = &(*this)(0,0) + n()*m();
 
   const number factor_inv = number(1.)/factor;
 
-  Assert (numbers::is_finite(factor_inv), ExcNumberNotFinite());
+  AssertIsFinite(factor_inv);
 
   while (p != e)
     *p++ *= factor_inv;
@@ -296,7 +296,7 @@ void FullMatrix<number>::forward (Vector<number2>       &dst,
       for (j=0; j<i; ++j)
         s -= number(dst(j)) * (*this)(i,j);
       dst(i) = s/(*this)(i,i);
-      Assert(numbers::is_finite(dst(i)), ExcNumberNotFinite());
+      AssertIsFinite(dst(i));
     }
 }
 
@@ -317,7 +317,7 @@ void FullMatrix<number>::backward (Vector<number2>       &dst,
       for (j=i+1; j<nu; ++j)
         s -= dst(j) * number2((*this)(i,j));
       dst(i) = s/number2((*this)(i,i));
-      Assert(numbers::is_finite(dst(i)), ExcNumberNotFinite());
+      AssertIsFinite(dst(i));
     }
 }
 

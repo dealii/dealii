@@ -380,7 +380,7 @@ BlockVector<Number> &
 BlockVector<Number>::operator = (const value_type s)
 {
 
-  Assert (numbers::is_finite(s), ExcNumberNotFinite());
+  AssertIsFinite(s);
 
   BaseClass::operator = (s);
   return *this;

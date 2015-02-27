@@ -729,7 +729,7 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator = (const Number s)
 {
-  Assert (numbers::is_finite(s), ExcNumberNotFinite());
+  AssertIsFinite(s);
   if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
   if (vec_size>internal::Vector::minimum_parallel_grain_size)
@@ -751,7 +751,7 @@ template <>
 Vector<std::complex<float> > &
 Vector<std::complex<float> >::operator = (const std::complex<float> s)
 {
-  Assert (numbers::is_finite(s), ExcNumberNotFinite());
+  AssertIsFinite(s);
   if (s != std::complex<float>())
     Assert (vec_size!=0, ExcEmptyObject());
   if (vec_size!=0)
@@ -766,7 +766,7 @@ Vector<std::complex<float> >::operator = (const std::complex<float> s)
 template <typename Number>
 Vector<Number> &Vector<Number>::operator *= (const Number factor)
 {
-  Assert (numbers::is_finite(factor),ExcNumberNotFinite());
+  AssertIsFinite(factor);
 
   Assert (vec_size!=0, ExcEmptyObject());
 
@@ -786,7 +786,7 @@ void
 Vector<Number>::add (const Number a,
                      const Vector<Number> &v)
 {
-  Assert (numbers::is_finite(a),ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -806,8 +806,8 @@ Vector<Number>::sadd (const Number x,
                       const Number a,
                       const Vector<Number> &v)
 {
-  Assert (numbers::is_finite(x),ExcNumberNotFinite());
-  Assert (numbers::is_finite(a),ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -1226,7 +1226,7 @@ Number Vector<Number>::operator * (const Vector<Number2> &v) const
   Number sum;
   internal::Vector::accumulate (internal::Vector::Dot<Number,Number2>(),
                                 val, v.val, Number(), vec_size, val, sum);
-  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  AssertIsFinite(sum);
 
   return sum;
 }
@@ -1243,7 +1243,7 @@ Vector<Number>::norm_sqr () const
   internal::Vector::accumulate (internal::Vector::Norm2<Number,real_type>(),
                                 val, val, real_type(), vec_size, val, sum);
 
-  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  AssertIsFinite(sum);
 
   return sum;
 }
@@ -1315,7 +1315,7 @@ Vector<Number>::l2_norm () const
                 sum += (abs_x/scale) * (abs_x/scale);
             }
         }
-      Assert(numbers::is_finite(scale*std::sqrt(sum)), ExcNumberNotFinite());
+      AssertIsFinite(scale*std::sqrt(sum));
       return scale * std::sqrt(sum);
     }
 }
@@ -1393,7 +1393,7 @@ Vector<Number>::add_and_dot (const Number          a,
   Number sum;
   internal::Vector::accumulate (internal::Vector::AddAndDot<Number>(),
                                 V.val, W.val, a, vec_size, val, sum);
-  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  AssertIsFinite(sum);
 
   return sum;
 }
@@ -1458,8 +1458,8 @@ template <typename Number>
 void Vector<Number>::add (const Number a, const Vector<Number> &v,
                           const Number b, const Vector<Number> &w)
 {
-  Assert (numbers::is_finite(a),ExcNumberNotFinite());
-  Assert (numbers::is_finite(b),ExcNumberNotFinite());
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -1480,7 +1480,7 @@ template <typename Number>
 void Vector<Number>::sadd (const Number x,
                            const Vector<Number> &v)
 {
-  Assert (numbers::is_finite(x),ExcNumberNotFinite());
+  AssertIsFinite(x);
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -1499,9 +1499,9 @@ void Vector<Number>::sadd (const Number x, const Number a,
                            const Vector<Number> &v, const Number b,
                            const Vector<Number> &w)
 {
-  Assert (numbers::is_finite(x),ExcNumberNotFinite());
-  Assert (numbers::is_finite(a),ExcNumberNotFinite());
-  Assert (numbers::is_finite(b),ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -1561,7 +1561,7 @@ template <typename Number>
 void Vector<Number>::equ (const Number a,
                           const Vector<Number> &u)
 {
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
@@ -1580,7 +1580,7 @@ template <typename Number2>
 void Vector<Number>::equ (const Number a,
                           const Vector<Number2> &u)
 {
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
@@ -1601,8 +1601,8 @@ template <typename Number>
 void Vector<Number>::equ (const Number a, const Vector<Number> &u,
                           const Number b, const Vector<Number> &v)
 {
-  Assert (numbers::is_finite(a),ExcNumberNotFinite());
-  Assert (numbers::is_finite(b),ExcNumberNotFinite());
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));

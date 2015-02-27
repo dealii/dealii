@@ -1360,7 +1360,7 @@ inline
 number
 FullMatrix<number>::Accessor::value() const
 {
-  Assert (numbers::is_finite( matrix->el(a_row, a_col) ), ExcNumberNotFinite());
+  AssertIsFinite(matrix->el(a_row, a_col));
   return matrix->el(a_row, a_col);
 }
 
