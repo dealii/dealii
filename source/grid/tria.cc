@@ -969,7 +969,7 @@ namespace internal
      */
     DeclException2 (ExcLineInexistant,
                     int, int,
-                    << "When trying to give a boundary indicator to a line: "
+                    << "While trying to assign a boundary indicator to a line: "
                     << "the line with end vertices " << arg1 << " and "
                     << arg2 << " does not exist.");
     /**
@@ -978,7 +978,7 @@ namespace internal
      */
     DeclException4 (ExcQuadInexistant,
                     int, int, int, int,
-                    << "When trying to give a boundary indicator to a quad: "
+                    << "While trying to assign a boundary indicator to a quad: "
                     << "the quad with bounding lines " << arg1 << ", " << arg2
                     << ", " << arg3 << ", " << arg4 << " does not exist.");
     /**
