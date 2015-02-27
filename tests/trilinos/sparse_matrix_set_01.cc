@@ -33,7 +33,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
-  m.compress ();
+  m.compress (VectorOperation::insert);
 
   TrilinosWrappers::SparseMatrix m2(m.m(), m.n(), m.n()/3+1);
 
@@ -67,7 +67,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
       }
   }
 
-  m2.compress();
+  m2.compress(VectorOperation::insert);
 
   // subtract the matrix m from this one,
   // we should get a zero matrix.

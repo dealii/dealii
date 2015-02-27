@@ -94,7 +94,7 @@ int main(int argc, char **argv)
     TrilinosWrappers::Vector  f(dim);
     TrilinosWrappers::Vector  u(dim);
     f = 1.;
-    A.compress ();
+    A.compress (VectorOperation::insert);
     f.compress (VectorOperation::insert);
     u.compress (VectorOperation::insert);
 

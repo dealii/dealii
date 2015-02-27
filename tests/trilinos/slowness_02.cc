@@ -63,7 +63,7 @@ void test ()
             matrix.set(global, global+N, -1);
           }
       }
-  matrix.compress ();
+  matrix.compress (VectorOperation::insert);
 
 
   // then do a single matrix-vector

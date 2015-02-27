@@ -38,7 +38,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
           ++counter;
         }
 
-  m.compress ();
+  m.compress (VectorOperation::insert);
 
   deallog << m.n_nonzero_elements() << std::endl;
   Assert (m.n_nonzero_elements() == counter,

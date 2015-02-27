@@ -38,7 +38,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
         }
   norm = std::sqrt(norm);
 
-  m.compress ();
+  m.compress (VectorOperation::insert);
 
   // compare against the exact value of the
   // l2-norm (max row-sum)
