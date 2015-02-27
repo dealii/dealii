@@ -78,7 +78,7 @@ namespace Step36
     SparsityPattern                     sparsity_pattern;
     SparseMatrix<double>                stiffness_matrix, mass_matrix;
     std::vector<Vector<double> >        eigenfunctions;
-    std::vector<std::complex<double>>        eigenvalues;
+    std::vector<std::complex<double> >  eigenvalues;
 
     ConstraintMatrix constraints;
   };
