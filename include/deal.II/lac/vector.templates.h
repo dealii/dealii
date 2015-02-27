@@ -1315,7 +1315,7 @@ Vector<Number>::l2_norm () const
                 sum += (abs_x/scale) * (abs_x/scale);
             }
         }
-      Assert(numbers::is_finite(scale)*std::sqrt(sum), ExcNumberNotFinite());
+      Assert(numbers::is_finite(scale*std::sqrt(sum)), ExcNumberNotFinite());
       return scale * std::sqrt(sum);
     }
 }
