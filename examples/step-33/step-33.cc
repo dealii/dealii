@@ -230,12 +230,13 @@ namespace Step33
     template <typename InputVector, typename Number>
     static
     void compute_flux_matrix (const InputVector &W,
-                              Number (&flux)[n_components][dim])
+                              std::array <std::array <Number, dim>, EulerEquations<dim>::n_components > &flux)
+//                              Number (&flux)[n_components][dim])
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
       // correspond to the momentum terms:
-      const Number pressure = compute_pressure<number> (W);
+      const Number pressure = compute_pressure<Number> (W);
 
       for (unsigned int d=0; d<dim; ++d)
         {
@@ -272,10 +273,12 @@ namespace Step33
                                 const InputVector         &Wplus,
                                 const InputVector         &Wminus,
                                 const double               alpha,
-                                Number (&normal_flux)[n_components])
+                                std::array < Number, n_components> &normal_flux)
+//                                Number (&normal_flux)[n_components])
     {
-      Number iflux[n_components][dim];
-      Number oflux[n_components][dim];
+//      Number iflux[n_components][dim];
+//      Number oflux[n_components][dim];
+      std::array <std::array <Number, dim>, EulerEquations<dim>::n_components > iflux, oflux;
 
       compute_flux_matrix (Wplus, iflux);
       compute_flux_matrix (Wminus, oflux);
@@ -303,7 +306,8 @@ namespace Step33
     template <typename InputVector, typename Number>
     static
     void compute_forcing_vector (const InputVector &W,
-                                 Number (&forcing)[n_components])
+                                   std::array < Number, n_components> &forcing)
+//                                 Number (&forcing)[n_components])
     {
       const double gravity = -1.0;
 
@@ -1769,17 +1773,30 @@ namespace Step33
     // that we compute the flux matrices and right hand sides in terms of
     // autodifferentiation variables, so that the Jacobian contributions can
     // later easily be computed from it:
-    typedef Sacado::Fad::DFad<double> FluxMatrix[EulerEquations<dim>::n_components][dim];
-    FluxMatrix *flux = new FluxMatrix[n_q_points];
+//    typedef Sacado::Fad::DFad<double> FluxMatrix[EulerEquations<dim>::n_components][dim];
+//    FluxMatrix *flux = new FluxMatrix[n_q_points];
 
-    typedef double FluxMatrixOld[EulerEquations<dim>::n_components][dim];
-    FluxMatrixOld  *flux_old = new FluxMatrixOld[n_q_points];
+    std::vector <
+                std::array <std::array <Sacado::Fad::DFad<double>, dim>, EulerEquations<dim>::n_components >
+//                std::array <std::array <Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components>, dim >
+                > flux(n_q_points);
 
-    typedef Sacado::Fad::DFad<double> ForcingVector[EulerEquations<dim>::n_components];
-    ForcingVector *forcing = new ForcingVector[n_q_points];
 
-    typedef double ForcingVectorOld[EulerEquations<dim>::n_components];
-    ForcingVectorOld *forcing_old = new ForcingVectorOld[n_q_points];
+//    typedef double FluxMatrixOld[EulerEquations<dim>::n_components][dim];
+//    FluxMatrixOld  *flux_old = new FluxMatrixOld[n_q_points];
+
+    std::vector <
+                std::array <std::array <double, dim>, EulerEquations<dim>::n_components >
+                > flux_old(n_q_points);
+
+//    typedef Sacado::Fad::DFad<double> ForcingVector[EulerEquations<dim>::n_components];
+//    ForcingVector *forcing = new ForcingVector[n_q_points];
+
+    std::vector < std::array< Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> > forcing(n_q_points);
+
+//    typedef double ForcingVectorOld[EulerEquations<dim>::n_components];
+//    ForcingVectorOld *forcing_old = new ForcingVectorOld[n_q_points];
+    std::vector < std::array< double, EulerEquations<dim>::n_components> > forcing_old(n_q_points);
 
     for (unsigned int q=0; q<n_q_points; ++q)
       {
@@ -1879,10 +1896,10 @@ namespace Step33
         right_hand_side(dof_indices[i]) -= R_i.val();
       }
 
-    delete[] forcing;
-    delete[] flux;
-    delete[] forcing_old;
-    delete[] flux_old;
+//    delete[] forcing;
+//    delete[] flux;
+//    delete[] forcing_old;
+//    delete[] flux_old;
 
   }
 
@@ -2025,11 +2042,15 @@ namespace Step33
     // w^-, \mathbf n)$ for each quadrature point. Before calling the function
     // that does so, we also need to determine the Lax-Friedrich's stability
     // parameter:
-    typedef Sacado::Fad::DFad<double> NormalFlux[EulerEquations<dim>::n_components];
-    NormalFlux *normal_fluxes = new NormalFlux[n_q_points];
+//    typedef Sacado::Fad::DFad<double> NormalFlux[EulerEquations<dim>::n_components];
+//    NormalFlux *normal_fluxes; = new NormalFlux[n_q_points];
 
-    typedef double NormalFluxOld[EulerEquations<dim>::n_components];
-    NormalFluxOld *normal_fluxes_old = new NormalFluxOld[n_q_points];
+    std::vector< std::array < Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> >  normal_fluxes(n_q_points);
+
+//    typedef double NormalFluxOld[EulerEquations<dim>::n_components];
+//    NormalFluxOld *normal_fluxes_old = new NormalFluxOld[n_q_points];
+
+    std::vector< std::array < double, EulerEquations<dim>::n_components> >  normal_fluxes_old(n_q_points);
 
     double alpha;
 
@@ -2093,8 +2114,8 @@ namespace Step33
           right_hand_side(dof_indices[i]) -= R_i.val();
         }
 
-    delete[] normal_fluxes;
-    delete[] normal_fluxes_old;
+//    delete[] normal_fluxes;
+//    delete[] normal_fluxes_old;
   }
 
 
