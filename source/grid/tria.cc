@@ -923,11 +923,6 @@ namespace internal
     using dealii::Triangulation;
 
     /**
-     *  Exception
-     * @ingroup Exceptions
-     */
-    DeclException0 (ExcUncaughtState);
-    /**
      * Exception
      * @ingroup Exceptions
      */
