@@ -985,7 +985,33 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException0 (ExcInteriorLineCantBeBoundary);
+    DeclException3 (ExcInteriorLineCantBeBoundary,
+                    int, int,
+                    types::boundary_id,
+                    << "The input data for creating a triangulation contained "
+                    << "information about a line with indices "
+                    << arg1 << " and " << arg2
+                    << "that is supposed to have boundary indicator "
+                    << arg3
+                    << ". However, this is an internal line not located on the "
+                    << "boundary. You cannot assign a boundary indicator to it."
+                    << std::endl
+                    << std::endl
+                    << "If this happened at a place where you call "
+                    << "Triangulation::create_triangulation() yourself, you need "
+                    << "to check the SubCellData object you pass to this function."
+                    << std::endl
+                    << std::endl
+                    << "If this happened in a place where you are reading a mesh "
+                    << "from a file, then you need to investigate why such a line "
+                    << "ended up in the input file. A typical case is a geometry "
+                    << "that consisted of multiple parts and for which the mesh "
+                    << "generator program assumes that the interface between "
+                    << "two parts is a boundary when that isn't supposed to be "
+                    << "the case, or where the mesh generator simply assigns "
+                    << "'geometry indicators' to lines at the perimeter of "
+                    << "a part that are not supposed to be interpreted as "
+                    << "'boundary indicators'.");
     /**
      * Exception
      * @ingroup Exceptions
@@ -1818,7 +1844,9 @@ namespace internal
             // Assert that only exterior lines
             // are given a boundary indicator
             AssertThrow (! (line->boundary_indicator() == numbers::internal_face_boundary_id),
-                         ExcInteriorLineCantBeBoundary());
+                         ExcInteriorLineCantBeBoundary(line->vertex_index(0),
+                                                       line->vertex_index(1),
+                                                       boundary_line->boundary_id));
 
             line->set_boundary_indicator (boundary_line->boundary_id);
             line->set_manifold_id (boundary_line->manifold_id);
@@ -2007,10 +2035,10 @@ namespace internal
           // exit with an exception
           AssertThrow (* (std::min_element(vertex_touch_count.begin(),
                                            vertex_touch_count.end())) >= 3,
-                       ExcGridHasInvalidVertices("During creation of a triangulation, a part of the "
-                                                 "algorithm encountered a vertex that is part of only "
-                                                 "one or two adjacent lines. However, in 3d, every vertex "
-                                                 "needs to be at least part of three lines."));
+                       ExcMessage("During creation of a triangulation, a part of the "
+                                  "algorithm encountered a vertex that is part of only "
+                                  "one or two adjacent lines. However, in 3d, every vertex "
+                                  "needs to be at least part of three lines."));
         }
 
 
@@ -2591,7 +2619,9 @@ namespace internal
             // lines are given a boundary
             // indicator
             AssertThrow (line->at_boundary(),
-                         ExcInteriorLineCantBeBoundary());
+                         ExcInteriorLineCantBeBoundary(line->vertex_index(0),
+                                                       line->vertex_index(1),
+                                                       boundary_line->boundary_id));
 
             // and make sure that we don't
             // attempt to reset the
