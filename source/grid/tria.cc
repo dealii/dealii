@@ -926,14 +926,6 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException2 (ExcGridsDoNotMatch,
-                    int, int,
-                    << "The present grid has " << arg1 << " active cells, "
-                    << "but the one in the file had " << arg2);
-    /**
-     * Exception
-     * @ingroup Exceptions
-     */
     DeclException1 (ExcGridHasInvalidCell,
                     int,
                     << "Something went wrong when making cell " << arg1
