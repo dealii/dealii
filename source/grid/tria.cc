@@ -926,11 +926,6 @@ namespace internal
      *  Exception
      * @ingroup Exceptions
      */
-    DeclException0 (ExcCellShouldBeUnused);
-    /**
-     *  Exception
-     * @ingroup Exceptions
-     */
     DeclException0 (ExcTooFewVerticesAllocated);
     /**
      *  Exception
@@ -3844,7 +3839,7 @@ namespace internal
             ++next_unused_line;
 
             Assert (new_lines[l]->used() == false,
-                    ExcCellShouldBeUnused());
+                    ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
           }
 
         if (ref_case==RefinementCase<dim>::cut_xy)
@@ -3929,7 +3924,7 @@ namespace internal
         for (unsigned int i=0; i<n_children; ++i)
           {
             Assert (next_unused_cell->used() == false,
-                    ExcCellShouldBeUnused());
+                    ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
             subcells[i] = next_unused_cell;
             ++next_unused_cell;
             if (i%2==1 && i<n_children-1)
@@ -4204,7 +4199,7 @@ namespace internal
                   first_child->clear_user_data ();
                   ++next_unused_cell;
                   Assert (next_unused_cell->used() == false,
-                          ExcCellShouldBeUnused());
+                          ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                   second_child = next_unused_cell;
                   second_child->set_used_flag ();
                   second_child->clear_user_data ();
@@ -4566,8 +4561,8 @@ namespace internal
                                 };
                   // some tests; if any of the iterators should be
                   // invalid, then already dereferencing will fail
-                  Assert (children[0]->used() == false, ExcCellShouldBeUnused());
-                  Assert (children[1]->used() == false, ExcCellShouldBeUnused());
+                  Assert (children[0]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                  Assert (children[1]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                   children[0]->set (internal::Triangulation
                                     ::TriaObject<1>(line->vertex_index(0),
@@ -5003,8 +4998,8 @@ namespace internal
 
                   // some tests; if any of the iterators should be
                   // invalid, then already dereferencing will fail
-                  Assert (children[0]->used() == false, ExcCellShouldBeUnused());
-                  Assert (children[1]->used() == false, ExcCellShouldBeUnused());
+                  Assert (children[0]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                  Assert (children[1]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                   children[0]->set (internal::Triangulation
                                     ::TriaObject<1>(line->vertex_index(0),
@@ -5104,7 +5099,7 @@ namespace internal
 
                     new_line=triangulation.faces->lines.next_free_single_object(triangulation);
                     Assert (new_line->used() == false,
-                            ExcCellShouldBeUnused());
+                            ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     // first collect the
                     // indices of the vertices:
@@ -5158,11 +5153,11 @@ namespace internal
 
                     next_unused_quad=triangulation.faces->quads.next_free_pair_object(triangulation);
                     new_quads[0] = next_unused_quad;
-                    Assert (new_quads[0]->used() == false, ExcCellShouldBeUnused());
+                    Assert (new_quads[0]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     ++next_unused_quad;
                     new_quads[1] = next_unused_quad;
-                    Assert (new_quads[1]->used() == false, ExcCellShouldBeUnused());
+                    Assert (new_quads[1]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
 
                     if (aniso_quad_ref_case==RefinementCase<dim-1>::cut_x)
@@ -5534,8 +5529,8 @@ namespace internal
                             // some tests; if any of the iterators
                             // should be invalid, then already
                             // dereferencing will fail
-                            Assert (children[0]->used() == false, ExcCellShouldBeUnused());
-                            Assert (children[1]->used() == false, ExcCellShouldBeUnused());
+                            Assert (children[0]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
+                            Assert (children[1]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                             children[0]->set (internal::Triangulation::
                                               TriaObject<1>(middle_line->vertex_index(0),
@@ -5625,7 +5620,7 @@ namespace internal
                         ++next_unused_line;
 
                         Assert (new_lines[i]->used() == false,
-                                ExcCellShouldBeUnused());
+                                ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                       }
 
                     // set the data of the four lines.  first collect
@@ -5717,19 +5712,19 @@ namespace internal
                     next_unused_quad=triangulation.faces->quads.next_free_pair_object(triangulation);
 
                     new_quads[0] = next_unused_quad;
-                    Assert (new_quads[0]->used() == false, ExcCellShouldBeUnused());
+                    Assert (new_quads[0]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     ++next_unused_quad;
                     new_quads[1] = next_unused_quad;
-                    Assert (new_quads[1]->used() == false, ExcCellShouldBeUnused());
+                    Assert (new_quads[1]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     next_unused_quad=triangulation.faces->quads.next_free_pair_object(triangulation);
                     new_quads[2] = next_unused_quad;
-                    Assert (new_quads[2]->used() == false, ExcCellShouldBeUnused());
+                    Assert (new_quads[2]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     ++next_unused_quad;
                     new_quads[3] = next_unused_quad;
-                    Assert (new_quads[3]->used() == false, ExcCellShouldBeUnused());
+                    Assert (new_quads[3]->used() == false, ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     // note these quads as children to the present one
                     quad->set_children (0, new_quads[0]->index());
@@ -5874,7 +5869,7 @@ namespace internal
                       new_lines[i] = triangulation.faces->lines.next_free_single_object(triangulation);
 
                       Assert (new_lines[i]->used() == false,
-                              ExcCellShouldBeUnused());
+                              ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                       new_lines[i]->set_used_flag();
                       new_lines[i]->clear_user_flag();
                       new_lines[i]->clear_user_data();
@@ -5894,7 +5889,7 @@ namespace internal
                       new_quads[i] = triangulation.faces->quads.next_free_single_object(triangulation);
 
                       Assert (new_quads[i]->used() == false,
-                              ExcCellShouldBeUnused());
+                              ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                       new_quads[i]->set_used_flag();
                       new_quads[i]->clear_user_flag();
                       new_quads[i]->clear_user_data();
@@ -5925,7 +5920,7 @@ namespace internal
                       new_hexes[i]=next_unused_hex;
 
                       Assert (new_hexes[i]->used() == false,
-                              ExcCellShouldBeUnused());
+                              ExcMessage("Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
                       new_hexes[i]->set_used_flag();
                       new_hexes[i]->clear_user_flag();
                       new_hexes[i]->clear_user_data();
