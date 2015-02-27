@@ -986,7 +986,7 @@ namespace internal
      * @ingroup Exceptions
      */
     DeclException3 (ExcInteriorLineCantBeBoundary,
-                    int, int,
+                    int, int, int, int,
                     types::boundary_id,
                     << "The input data for creating a triangulation contained "
                     << "information about a line with indices "
@@ -1016,7 +1016,33 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException0 (ExcInteriorQuadCantBeBoundary);
+    DeclException5 (ExcInteriorQuadCantBeBoundary,
+                    int, int, int, int
+                    types::boundary_id,
+                    << "The input data for creating a triangulation contained "
+                    << "information about a quad with indices "
+                    << arg1 << ", " << arg2 << ", " << arg 3 << ", and " << arg4
+                    << "that is supposed to have boundary indicator "
+                    << arg5
+                    << ". However, this is an internal quad not located on the "
+                    << "boundary. You cannot assign a boundary indicator to it."
+                    << std::endl
+                    << std::endl
+                    << "If this happened at a place where you call "
+                    << "Triangulation::create_triangulation() yourself, you need "
+                    << "to check the SubCellData object you pass to this function."
+                    << std::endl
+                    << std::endl
+                    << "If this happened in a place where you are reading a mesh "
+                    << "from a file, then you need to investigate why such a quad "
+                    << "ended up in the input file. A typical case is a geometry "
+                    << "that consisted of multiple parts and for which the mesh "
+                    << "generator program assumes that the interface between "
+                    << "two parts is a boundary when that isn't supposed to be "
+                    << "the case, or where the mesh generator simply assigns "
+                    << "'geometry indicators' to quads at the surface of "
+                    << "a part that are not supposed to be interpreted as "
+                    << "'boundary indicators'.");
     /**
      * Exception
      * @ingroup Exceptions
@@ -2755,7 +2781,11 @@ namespace internal
             // check whether this face is
             // really an exterior one
             AssertThrow (quad->at_boundary(),
-                         ExcInteriorQuadCantBeBoundary());
+                         ExcInteriorQuadCantBeBoundary(quad->vertex(0),
+                                                       quad->vertex(1),
+                                                       quad->vertex(2),
+                                                       quad->vertex(3),
+                                                       boundary_quad->boundary_id));
 
             // and make sure that we don't
             // attempt to reset the
