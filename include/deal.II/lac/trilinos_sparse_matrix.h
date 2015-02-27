@@ -1084,11 +1084,6 @@ namespace TrilinosWrappers
     void compress (::dealii::VectorOperation::values operation);
 
     /**
-     * @deprecated: use compress() with VectorOperation instead.
-     */
-    void compress () DEAL_II_DEPRECATED;
-
-    /**
      * Set the element (<i>i,j</i>) to @p value.
      *
      * This function is able to insert new elements into the matrix as long as
@@ -2308,15 +2303,6 @@ namespace TrilinosWrappers
   SparseMatrix::is_compressed () const
   {
     return compressed;
-  }
-
-
-
-  inline
-  void
-  SparseMatrix::compress ()
-  {
-    compress(::dealii::VectorOperation::unknown);
   }
 
 

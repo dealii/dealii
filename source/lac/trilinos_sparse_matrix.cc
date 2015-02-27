@@ -126,9 +126,6 @@ namespace TrilinosWrappers
           return;
         }
 
-      // otherwise first flush Trilinos caches
-      matrix->compress ();
-
       // get a representation of the present
       // row
       int ncols;
@@ -365,7 +362,7 @@ namespace TrilinosWrappers
   {
     Assert(sparsity_pattern.trilinos_sparsity_pattern().Filled() == true,
            ExcMessage("The Trilinos sparsity pattern has not been compressed."));
-    compress();
+    compress(VectorOperation::insert);
   }
 
 
@@ -605,7 +602,7 @@ namespace TrilinosWrappers
 
     // In the end, the matrix needs to be compressed in order to be really
     // ready.
-    compress();
+    compress(VectorOperation::insert);
   }
 
 
@@ -765,7 +762,7 @@ namespace TrilinosWrappers
 
     // In the end, the matrix needs to be compressed in order to be really
     // ready.
-    compress();
+    compress(VectorOperation::insert);
   }
 
 
@@ -788,7 +785,7 @@ namespace TrilinosWrappers
     else
       nonlocal_matrix.reset ();
 
-    compress();
+    compress(VectorOperation::insert);
     last_action = Zero;
   }
 
@@ -811,7 +808,7 @@ namespace TrilinosWrappers
     else
       nonlocal_matrix.reset();
 
-    compress();
+    compress(VectorOperation::unknown);
   }
 
 
@@ -951,7 +948,7 @@ namespace TrilinosWrappers
                &values[0], false);
         }
 
-    compress();
+    compress(VectorOperation::insert);
   }
 
 
@@ -985,7 +982,7 @@ namespace TrilinosWrappers
                      my_nonzeros*sizeof (TrilinosScalar));
       }
 
-    compress();
+    compress(VectorOperation::insert);
   }
 
 
@@ -1009,7 +1006,7 @@ namespace TrilinosWrappers
           ((last_action == Add) && (operation!=::dealii::VectorOperation::insert))
           ||
           ((last_action == Insert) && (operation!=::dealii::VectorOperation::add)),
-          ExcMessage("operation and argument to compress() do not match"));
+          ExcMessage("Operation and argument to compress() do not match"));
       }
 
     // flush buffers
@@ -1102,7 +1099,6 @@ namespace TrilinosWrappers
   SparseMatrix::clear_rows (const std::vector<size_type> &rows,
                             const TrilinosScalar          new_diag_value)
   {
-    compress();
     for (size_type row=0; row<rows.size(); ++row)
       clear_row(rows[row], new_diag_value);
 
@@ -1111,7 +1107,7 @@ namespace TrilinosWrappers
     // data, so we need to flush the
     // buffers to make sure that the
     // right data is used.
-    compress();
+    compress(VectorOperation::insert);
   }
 
 
@@ -1441,7 +1437,7 @@ namespace TrilinosWrappers
                                     GID, values[j]);
 #endif
             }
-          transposed_mat.compress();
+          transposed_mat.compress(VectorOperation::insert);
           ML_Operator_WrapEpetraCrsMatrix
           (const_cast<Epetra_CrsMatrix *>(&transposed_mat.trilinos_matrix()),
            A_,false);
