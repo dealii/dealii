@@ -80,6 +80,8 @@ namespace VectorTools
                     const Function<spacedim>       &function,
                     VECTOR                         &vec)
   {
+    Assert (vec.size() == dof.n_dofs(),
+            ExcDimensionMismatch (vec.size(), dof.n_dofs()));
     Assert (dof.get_fe().n_components() == function.n_components,
             ExcDimensionMismatch(dof.get_fe().n_components(),
                                  function.n_components));
