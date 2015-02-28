@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace
 {
   template <class VectorType>
-  double
+  typename VectorType::value_type
   get_vector_element (const VectorType &vector,
                       const types::global_dof_index cell_number)
   {
@@ -48,7 +48,7 @@ namespace
   }
 
 
-  double
+  IndexSet::value_type
   get_vector_element (const IndexSet &is,
                       const types::global_dof_index cell_number)
   {
@@ -461,14 +461,14 @@ namespace FEValuesViews
                                                shape_values.n_cols() : values.size();
       AssertDimension (values.size(), n_quadrature_points);
 
-      std::fill (values.begin(), values.end(), 0.);
+      std::fill (values.begin(), values.end(), Number());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const double value = dof_values(shape_function);
-            if (value == 0.)
+            const Number value = dof_values(shape_function);
+            if (value == Number() )
               continue;
 
             const double *shape_value_ptr =
@@ -495,14 +495,14 @@ namespace FEValuesViews
       AssertDimension (derivatives.size(), n_quadrature_points);
 
       std::fill (derivatives.begin(), derivatives.end(),
-                 dealii::Tensor<order,spacedim>());
+                 typename ProductType<Number,dealii::Tensor<order,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const double value = dof_values(shape_function);
-            if (value == 0.)
+            const Number value = dof_values(shape_function);
+            if (value == Number() )
               continue;
 
             const dealii::Tensor<order,spacedim> *shape_derivative_ptr =
@@ -527,14 +527,14 @@ namespace FEValuesViews
                                                shape_hessians[0].size() : laplacians.size();
       AssertDimension (laplacians.size(), n_quadrature_points);
 
-      std::fill (laplacians.begin(), laplacians.end(), 0.);
+      std::fill (laplacians.begin(), laplacians.end(), typename ProductType<Number,double>::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const double value = dof_values(shape_function);
-            if (value == 0.)
+            const Number value = dof_values(shape_function);
+            if (value == Number())
               continue;
 
             const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
@@ -559,7 +559,7 @@ namespace FEValuesViews
                                                shape_values.n_cols() : values.size();
       AssertDimension (values.size(), n_quadrature_points);
 
-      std::fill (values.begin(), values.end(), dealii::Tensor<1,spacedim>());
+      std::fill (values.begin(), values.end(), typename ProductType<Number,dealii::Tensor<1,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -570,8 +570,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const Number value = dof_values(shape_function);
+          if (value == Number())
             continue;
 
           if (snc != -1)
@@ -609,7 +609,7 @@ namespace FEValuesViews
       AssertDimension (derivatives.size(), n_quadrature_points);
 
       std::fill (derivatives.begin(), derivatives.end(),
-                 dealii::Tensor<order+1,spacedim>());
+                 typename ProductType<Number,dealii::Tensor<order+1,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -620,8 +620,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const Number value = dof_values(shape_function);
+          if (value == Number())
             continue;
 
           if (snc != -1)
@@ -661,7 +661,7 @@ namespace FEValuesViews
       AssertDimension (symmetric_gradients.size(), n_quadrature_points);
 
       std::fill (symmetric_gradients.begin(), symmetric_gradients.end(),
-                 dealii::SymmetricTensor<2,spacedim>());
+                 typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -672,8 +672,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const Number value = dof_values(shape_function);
+          if (value == Number)
             continue;
 
           if (snc != -1)
@@ -689,7 +689,7 @@ namespace FEValuesViews
           else
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
               {
-                dealii::Tensor<2,spacedim> grad;
+                dealii::Tensor<2,spacedim,Number> grad;
                 for (unsigned int d=0; d<spacedim; ++d)
                   if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
                     grad[d] = value *
@@ -713,7 +713,7 @@ namespace FEValuesViews
                                                shape_gradients[0].size() : divergences.size();
       AssertDimension (divergences.size(), n_quadrature_points);
 
-      std::fill (divergences.begin(), divergences.end(), 0.);
+      std::fill (divergences.begin(), divergences.end(), typename ProductType<Number,double>::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -724,8 +724,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const Number value = dof_values(shape_function);
+          if (value == Number())
             continue;
 
           if (snc != -1)
@@ -763,7 +763,7 @@ namespace FEValuesViews
                                                shape_gradients[0].size() : curls.size();
       AssertDimension (curls.size(), n_quadrature_points);
 
-      std::fill (curls.begin(), curls.end(), typename dealii::internal::CurlType<spacedim>::type());
+      std::fill (curls.begin(), curls.end(), typename ProductType<Number,typename dealii::internal::CurlType<spacedim>::type>::type());
 
       switch (spacedim)
         {
@@ -784,9 +784,9 @@ namespace FEValuesViews
                 // shape function is zero for the selected components
                 continue;
 
-              const double value = dof_values (shape_function);
+              const Number value = dof_values (shape_function);
 
-              if (value == 0.)
+              if (value == Number())
                 continue;
 
               if (snc != -1)
@@ -844,9 +844,9 @@ namespace FEValuesViews
                 // shape function is zero for the selected components
                 continue;
 
-              const double value = dof_values (shape_function);
+              const Number value = dof_values (shape_function);
 
-              if (value == 0.)
+              if (value == Number())
                 continue;
 
               if (snc != -1)
@@ -956,7 +956,7 @@ namespace FEValuesViews
       AssertDimension (laplacians.size(), n_quadrature_points);
 
       std::fill (laplacians.begin(), laplacians.end(),
-                 dealii::Tensor<1,spacedim>());
+                 typename ProductType<Number,dealii::Tensor<1,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -967,8 +967,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const Number value = dof_values(shape_function);
+          if (value == Number())
             continue;
 
           if (snc != -1)
@@ -1010,7 +1010,7 @@ namespace FEValuesViews
       AssertDimension (values.size(), n_quadrature_points);
 
       std::fill (values.begin(), values.end(),
-                 dealii::SymmetricTensor<2,spacedim>());
+                 typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1021,8 +1021,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const Number value = dof_values(shape_function);
+          if (value == Number())
             continue;
 
           if (snc != -1)
@@ -1064,7 +1064,7 @@ namespace FEValuesViews
       AssertDimension (divergences.size(), n_quadrature_points);
 
       std::fill (divergences.begin(), divergences.end(),
-                 dealii::Tensor<1,spacedim>());
+                 typename ProductType<Number,dealii::Tensor<1,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1075,8 +1075,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const Number value = dof_values(shape_function);
+          if (value == Number())
             continue;
 
           if (snc != -1)
@@ -1152,7 +1152,7 @@ namespace FEValuesViews
       AssertDimension (values.size(), n_quadrature_points);
 
       std::fill (values.begin(), values.end(),
-                 dealii::Tensor<2,spacedim>());
+                 typename ProductType<Number,dealii::Tensor<2,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1163,8 +1163,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const Number value = dof_values(shape_function);
+          if (value == Number())
             continue;
 
           if (snc != -1)
