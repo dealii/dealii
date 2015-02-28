@@ -48,27 +48,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/**
- * Helper struct to tell us if we can use SIMD instructions for the given @p
- * Number type.
- */
-template <typename Number>
-struct EnableOpenMPSimdFor
-{
-  static const bool value = true;
-};
-
-#ifdef __INTEL_COMPILER
-// Disable long double SIMD instructions on ICC. This is to work around a bug
-// that generates wrong code at least up to intel 15 (see
-// tests/lac/vector-vector, tests/lac/intel-15-bug, and the discussion at
-// https://github.com/dealii/dealii/issues/598).
-template <>
-struct EnableOpenMPSimdFor<long double>
-{
-  static const bool value = false;
-};
-#endif
 
 
 namespace internal
@@ -181,7 +160,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -210,7 +189,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -240,7 +219,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -268,7 +247,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -296,7 +275,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -324,7 +303,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -355,7 +334,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -384,7 +363,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -416,7 +395,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -444,7 +423,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -473,7 +452,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -504,7 +483,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -537,7 +516,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)
@@ -566,7 +545,7 @@ namespace internal
 
     void operator() (const size_type begin, const size_type end) const
     {
-      if (EnableOpenMPSimdFor<Number>::value)
+      if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
         {
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (size_type i=begin; i<end; ++i)

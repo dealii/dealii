@@ -15,7 +15,8 @@
 
 // intel 15.0 compiler bug. This is a simplification of tests/lac/vector-vector
 // It only triggers when using TBB (it will use two threads) and only with
-// SIMD for long double.
+// SIMD for long double. We now use dealii::parallel::internal::EnableOpenMPSimdFor
+// so the test passes.
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -35,9 +36,18 @@ template <typename Number>
 
   void operator() (const tbb::blocked_range<size_type> &range) const
   {
+    if (dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
+      {	
       DEAL_II_OPENMP_SIMD_PRAGMA
         for (size_type i=range.begin(); i<range.end(); ++i)
           val[i] += v_val[i];
+      }
+    else
+      {
+        for (size_type i=range.begin(); i<range.end(); ++i)
+          val[i] += v_val[i];
+      }
+    
   }
 };
 
