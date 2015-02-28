@@ -8937,9 +8937,14 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
           (levels.size () == 0) &&
           (faces == NULL),
           ExcTriangulationNotEmpty(vertices.size(), levels.size()));
-  Assert (old_tria.levels.size() != 0, ExcInternalError());
-  Assert (old_tria.vertices.size() != 0, ExcInternalError());
-  Assert (dim == 1 || old_tria.faces != NULL, ExcInternalError());
+  Assert ((old_tria.levels.size() != 0) &&
+          (old_tria.vertices.size() != 0) &&
+          (dim == 1 || old_tria.faces != NULL),
+          ExcMessage("When calling Triangulation::copy_triangulation(), "
+                     "the target triangulation must be empty but the source "
+                     "triangulation (the argument to this function) must contain "
+                     "something. Here, it seems like the source does not "
+                     "contain anything at all."));
 
 
   // copy normal elements
