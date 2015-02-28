@@ -1530,7 +1530,7 @@ namespace FEValuesViews
   void
   SymmetricTensor<2, dim, spacedim>::
   get_function_values(const InputVector &fe_function,
-                      std::vector<value_type> &values) const
+                      std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_values,
@@ -1541,7 +1541,7 @@ namespace FEValuesViews
                     fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
     (dof_values, fe_values.shape_values, shape_function_data, values);
@@ -1554,7 +1554,7 @@ namespace FEValuesViews
   void
   SymmetricTensor<2, dim, spacedim>::
   get_function_divergences(const InputVector &fe_function,
-                           std::vector<divergence_type> &divergences) const
+                           std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_gradients,
@@ -1566,7 +1566,7 @@ namespace FEValuesViews
 
     // get function values of dofs
     // on this cell
-    dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
     (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
@@ -1577,7 +1577,7 @@ namespace FEValuesViews
   void
   Tensor<2, dim, spacedim>::
   get_function_values(const InputVector &fe_function,
-                      std::vector<value_type> &values) const
+                      std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_values,
@@ -1588,7 +1588,7 @@ namespace FEValuesViews
                     fe_values.present_cell->n_dofs_for_dof_handler());
 
     // get function values of dofs on this cell
-    dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
     (dof_values, fe_values.shape_values, shape_function_data, values);
@@ -1601,7 +1601,7 @@ namespace FEValuesViews
   void
   Tensor<2, dim, spacedim>::
   get_function_divergences(const InputVector &fe_function,
-                           std::vector<divergence_type> &divergences) const
+                           std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const
   {
     typedef FEValuesBase<dim, spacedim> FVB;
     Assert(fe_values.update_flags & update_gradients,
@@ -1613,7 +1613,7 @@ namespace FEValuesViews
 
     // get function values of dofs
     // on this cell
-    dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
     (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
