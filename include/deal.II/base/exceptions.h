@@ -377,6 +377,27 @@ namespace deal_II_exceptions
 
 
 /**
+ * Declare an exception class derived from ExceptionBase that can take
+ * one runtime argument, but if none is given in the place where you
+ * want to throw the exception, it simply reverts to the default text
+ * provided when declaring the exception class through this macro.
+ *
+ * @ingroup Exceptions
+ */
+#define DeclExceptionMsg(Exception, defaulttext)                          \
+  class Exception :  public dealii::ExceptionBase                         \
+  {                                                                       \
+  public:                                                                 \
+    Exception (const std::string &msg = defaulttext) : arg (msg) {}       \
+    virtual ~Exception () throw () {}                                     \
+    virtual void print_info (std::ostream &out) const {                   \
+      out << arg << std::endl;                                            \
+    }                                                                     \
+  private:                                                                \
+    const std::string arg;                                                \
+  }
+
+/**
  * Declare an exception class derived from ExceptionBase with one additional
  * parameter.
  *
@@ -499,6 +520,16 @@ namespace deal_II_exceptions
 #define DeclException0(Exception0)                                        \
   static dealii::ExceptionBase& Exception0 ()
 
+/**
+ * Declare an exception class derived from ExceptionBase that can take
+ * one runtime argument, but if none is given in the place where you
+ * want to throw the exception, it simply reverts to the default text
+ * provided when declaring the exception class through this macro.
+ *
+ * @ingroup Exceptions
+ */
+#define DeclExceptionMsg(Exception, defaulttext)                          \
+  static dealii::ExceptionBase& Exception ()
 
 /**
  * Declare an exception class derived from ExceptionBase with one additional

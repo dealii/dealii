@@ -351,6 +351,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: There is now a new macro DeclExceptionMsg that allows to
+  declare an exception that does not take any run-time arguments
+  yet still allows to specify an error message.
+  <br>
+  (Wolfgang Bangerth, 2015/02/27)
+  </li>
+
   <li> New: There is now a class std_cxx11::unique_ptr that provides
   the functionality of std::unique_ptr in C++11 mode, and that
   provides an emulation for older compilers.
