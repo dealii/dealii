@@ -917,7 +917,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -937,7 +937,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<divergence_type> &divergences) const;
+                                   std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const;
 
   private:
     /**
@@ -1111,7 +1111,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
 
     /**
@@ -1132,7 +1132,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<divergence_type> &divergences) const;
+                                   std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const;
 
   private:
     /**
