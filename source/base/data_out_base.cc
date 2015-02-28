@@ -7196,7 +7196,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   (void)comm;
   AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
 #else
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
