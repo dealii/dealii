@@ -8767,7 +8767,8 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::set_mesh_smoothing(const MeshSmoothing mesh_smoothing)
 {
-  Assert (n_levels() == 0, ExcTriangulationNotEmpty ());
+  Assert (n_levels() == 0,
+          ExcTriangulationNotEmpty (vertices.size(), levels.size()));
   smooth_grid=mesh_smoothing;
 }
 
@@ -8932,10 +8933,10 @@ void
 Triangulation<dim, spacedim>::
 copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
 {
-  Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
-  Assert (levels.size () == 0, ExcTriangulationNotEmpty());
-  Assert (faces == NULL, ExcTriangulationNotEmpty());
-
+  Assert ((vertices.size() == 0) &&
+          (levels.size () == 0) &&
+          (faces == NULL),
+          ExcTriangulationNotEmpty(vertices.size(), levels.size()));
   Assert (old_tria.levels.size() != 0, ExcInternalError());
   Assert (old_tria.vertices.size() != 0, ExcInternalError());
   Assert (dim == 1 || old_tria.faces != NULL, ExcInternalError());
@@ -9015,9 +9016,10 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
                       const std::vector<CellData<dim> > &cells,
                       const SubCellData &subcelldata)
 {
-  Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
-  Assert (levels.size() == 0, ExcTriangulationNotEmpty());
-  Assert (faces == NULL, ExcTriangulationNotEmpty());
+  Assert ((vertices.size() == 0) &&
+          (levels.size () == 0) &&
+          (faces == NULL),
+          ExcTriangulationNotEmpty(vertices.size(), levels.size()));
   // check that no forbidden arrays
   // are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());

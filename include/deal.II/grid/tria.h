@@ -2785,7 +2785,12 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcTriangulationNotEmpty);
+  DeclException2 (ExcTriangulationNotEmpty,
+                  int, int,
+                  << "You are trying to perform an operation on a triangulation "
+                  << "that is only allowed if the triangulation is currently empty. "
+                  << "However, it currently stores " << arg1 << " vertices and has "
+                  << "cells on " << arg2 << " levels.");
   /**
    * Trying to re-read a grid, an error occurred.
    *
