@@ -1208,7 +1208,7 @@ namespace FEValuesViews
       AssertDimension (divergences.size(), n_quadrature_points);
 
       std::fill (divergences.begin(), divergences.end(),
-                 dealii::Tensor<1,spacedim>());
+                 typename ProductType<Number,dealii::Tensor<1,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1219,8 +1219,8 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const double value = dof_values(shape_function);
-          if (value == 0.)
+          const Number value = dof_values(shape_function);
+          if (value == Number())
             continue;
 
           if (snc != -1)
@@ -2198,9 +2198,9 @@ namespace internal
   // compilation and reduces the size of the final file since all the
   // different global vectors get channeled through the same code.
 
-  template <typename Number>
+  template <typename Number, typename Number2>
   void
-  do_function_values (const double          *dof_values_ptr,
+  do_function_values (const Number2         *dof_values_ptr,
                       const dealii::Table<2,double> &shape_values,
                       std::vector<Number>   &values)
   {
@@ -2222,8 +2222,8 @@ namespace internal
     // the shape_values data stored contiguously
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-        const double value = dof_values_ptr[shape_func];
-        if (value == 0.)
+        const Number2 value = dof_values_ptr[shape_func];
+        if (value == Number2())
           continue;
 
         const double *shape_value_ptr = &shape_values(shape_func, 0);
@@ -2232,9 +2232,9 @@ namespace internal
       }
   }
 
-  template <int dim, int spacedim, typename VectorType>
+  template <int dim, int spacedim, typename VectorType, typename Number>
   void
-  do_function_values (const double                      *dof_values_ptr,
+  do_function_values (const Number                      *dof_values_ptr,
                       const dealii::Table<2,double>             &shape_values,
                       const FiniteElement<dim,spacedim> &fe,
                       const std::vector<unsigned int> &shape_function_to_row_table,
@@ -2277,8 +2277,8 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const double value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == 0.)
+          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          if (value == Number())
             continue;
 
           if (fe.is_primitive(shape_func))
@@ -2329,11 +2329,11 @@ namespace internal
 
   // use the same implementation for gradients and Hessians, distinguish them
   // by the rank of the tensors
-  template <int order, int spacedim>
+  template <int order, int spacedim, typename Number>
   void
-  do_function_derivatives (const double                     *dof_values_ptr,
+  do_function_derivatives (const Number                     *dof_values_ptr,
                            const std::vector<std::vector<Tensor<order,spacedim> > > &shape_derivatives,
-                           std::vector<Tensor<order,spacedim> > &derivatives)
+                           std::vector<Tensor<order,spacedim,Number> > &derivatives)
   {
     const unsigned int dofs_per_cell = shape_derivatives.size();
     const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -2341,7 +2341,7 @@ namespace internal
     AssertDimension(derivatives.size(), n_quadrature_points);
 
     // initialize with zero
-    std::fill_n (derivatives.begin(), n_quadrature_points, Tensor<order,spacedim>());
+    std::fill_n (derivatives.begin(), n_quadrature_points, Tensor<order,spacedim,Number>());
 
     // add up contributions of trial functions. note that here we deal with
     // scalar finite elements, so no need to check for non-primitivity of
@@ -2352,8 +2352,8 @@ namespace internal
     // access the shape_gradients/hessians data stored contiguously
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-        const double value = dof_values_ptr[shape_func];
-        if (value == 0.)
+        const Number value = dof_values_ptr[shape_func];
+        if (value == Number())
           continue;
 
         const Tensor<order,spacedim> *shape_derivative_ptr
@@ -2363,20 +2363,20 @@ namespace internal
       }
   }
 
-  template <int order, int dim, int spacedim>
+  template <int order, int dim, int spacedim, typename Number>
   void
-  do_function_derivatives (const double                      *dof_values_ptr,
+  do_function_derivatives (const Number                      *dof_values_ptr,
                            const std::vector<std::vector<Tensor<order,spacedim> > > &shape_derivatives,
                            const FiniteElement<dim,spacedim> &fe,
                            const std::vector<unsigned int> &shape_function_to_row_table,
-                           VectorSlice<std::vector<std::vector<Tensor<order,spacedim> > > > &derivatives,
+                           VectorSlice<std::vector<std::vector<Tensor<order,spacedim,Number> > > > &derivatives,
                            const bool quadrature_points_fastest  = false,
                            const unsigned int component_multiple = 1)
   {
     // initialize with zero
     for (unsigned int i=0; i<derivatives.size(); ++i)
       std::fill_n (derivatives[i].begin(), derivatives[i].size(),
-                   Tensor<order,spacedim>());
+                   Tensor<order,spacedim,Number>());
 
     // see if there the current cell has DoFs at all, and if not
     // then there is nothing else to do.
@@ -2409,8 +2409,8 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const double value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == 0.)
+          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          if (value == Number())
             continue;
 
           if (fe.is_primitive(shape_func))
@@ -2454,9 +2454,9 @@ namespace internal
         }
   }
 
-  template <int spacedim, typename Number>
+  template <int spacedim, typename Number, typename Number2>
   void
-  do_function_laplacians (const double        *dof_values_ptr,
+  do_function_laplacians (const Number2        *dof_values_ptr,
                           const std::vector<std::vector<Tensor<2,spacedim> > > &shape_hessians,
                           std::vector<Number> &laplacians)
   {
@@ -2473,8 +2473,8 @@ namespace internal
     // the trace of the Hessian.
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-        const double value = dof_values_ptr[shape_func];
-        if (value == 0.)
+        const Number2 value = dof_values_ptr[shape_func];
+        if (value == Number2())
           continue;
 
         const Tensor<2,spacedim> *shape_hessian_ptr
@@ -2484,9 +2484,9 @@ namespace internal
       }
   }
 
-  template <int dim, int spacedim, typename VectorType>
+  template <int dim, int spacedim, typename VectorType, typename Number>
   void
-  do_function_laplacians (const double                    *dof_values_ptr,
+  do_function_laplacians (const Number                    *dof_values_ptr,
                           const std::vector<std::vector<Tensor<2,spacedim> > > &shape_hessians,
                           const FiniteElement<dim,spacedim> &fe,
                           const std::vector<unsigned int> &shape_function_to_row_table,
@@ -2530,8 +2530,8 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const double value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == 0.)
+          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          if (value == Number())
             continue;
 
           if (fe.is_primitive(shape_func))
