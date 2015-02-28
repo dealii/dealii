@@ -626,7 +626,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
     /**
      * Return the gradients of the selected vector components of the finite
@@ -642,7 +642,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
-                                 std::vector<gradient_type> &gradients) const;
+                                 std::vector<typename ProductType<gradient_type,typename InputVector::value_type>::type> &gradients) const;
 
     /**
      * Return the symmetrized gradients of the selected vector components of
@@ -664,7 +664,7 @@ namespace FEValuesViews
     template <class InputVector>
     void
     get_function_symmetric_gradients (const InputVector &fe_function,
-                                      std::vector<symmetric_gradient_type> &symmetric_gradients) const;
+                                      std::vector<typename ProductType<symmetric_gradient_type,typename InputVector::value_type>::type> &symmetric_gradients) const;
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -681,7 +681,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<divergence_type> &divergences) const;
+                                   std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const;
 
     /**
      * Return the curl of the selected vector components of the finite element
@@ -698,7 +698,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_curls (const InputVector &fe_function,
-                             std::vector<curl_type> &curls) const;
+                             std::vector<typename ProductType<curl_type,typename InputVector::value_type>::type> &curls) const;
 
     /**
      * Return the Hessians of the selected vector components of the finite
@@ -714,7 +714,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
-                                std::vector<hessian_type> &hessians) const;
+                                std::vector<typename ProductType<hessian_type,typename InputVector::value_type>::type> &hessians) const;
 
     /**
      * Return the Laplacians of the selected vector components of the finite
@@ -731,7 +731,7 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
-                                  std::vector<value_type> &laplacians) const;
+                                  std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &laplacians) const;
 
   private:
     /**
