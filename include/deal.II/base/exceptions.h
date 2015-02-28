@@ -710,7 +710,22 @@ namespace StandardExceptions
    * cases. These cases will then be trapped sooner or later by the exception,
    * so that the algorithm can then be fixed for these cases as well.
    */
-  DeclException0 (ExcInternalError);
+  DeclExceptionMsg (ExcInternalError,
+                    "This exception -- which is used in many places in the "
+                    "library -- usually indicates that some condition which "
+                    "the author of the code thought must be satisfied at a "
+                    "certain point in an algorithm, is not fulfilled. An "
+                    "example would be that the first part of an algorithm "
+                    "sorts elements of an array in ascending order, and "
+                    "a second part of the algorithm later encounters an "
+                    "an element that is not larger than the previous one."
+                    "\n\n"
+                    "There is usually not very much you can do if you "
+                    "encounter such an exception since it indicates an error "
+                    "in deal.II, not in your own program. Try to come up with "
+                    "the smallest possible program that still demonstrates "
+                    "the error and contact the deal.II mailing lists with it "
+                    "to obtain help.");
 
   /**
    * This exception is used in functions that may not be called (i.e. in pure
