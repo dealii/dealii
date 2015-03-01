@@ -689,7 +689,7 @@ namespace FEValuesViews
           else
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
               {
-                dealii::Tensor<2,spacedim,Number> grad;
+                typename ProductType<Number,dealii::Tensor<2,spacedim> >::type grad;
                 for (unsigned int d=0; d<spacedim; ++d)
                   if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
                     grad[d] = value *
