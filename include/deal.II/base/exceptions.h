@@ -377,6 +377,27 @@ namespace deal_II_exceptions
 
 
 /**
+ * Declare an exception class derived from ExceptionBase that can take
+ * one runtime argument, but if none is given in the place where you
+ * want to throw the exception, it simply reverts to the default text
+ * provided when declaring the exception class through this macro.
+ *
+ * @ingroup Exceptions
+ */
+#define DeclExceptionMsg(Exception, defaulttext)                          \
+  class Exception :  public dealii::ExceptionBase                         \
+  {                                                                       \
+  public:                                                                 \
+    Exception (const std::string &msg = defaulttext) : arg (msg) {}       \
+    virtual ~Exception () throw () {}                                     \
+    virtual void print_info (std::ostream &out) const {                   \
+      out << arg << std::endl;                                            \
+    }                                                                     \
+  private:                                                                \
+    const std::string arg;                                                \
+  }
+
+/**
  * Declare an exception class derived from ExceptionBase with one additional
  * parameter.
  *
@@ -499,6 +520,16 @@ namespace deal_II_exceptions
 #define DeclException0(Exception0)                                        \
   static dealii::ExceptionBase& Exception0 ()
 
+/**
+ * Declare an exception class derived from ExceptionBase that can take
+ * one runtime argument, but if none is given in the place where you
+ * want to throw the exception, it simply reverts to the default text
+ * provided when declaring the exception class through this macro.
+ *
+ * @ingroup Exceptions
+ */
+#define DeclExceptionMsg(Exception, defaulttext)                          \
+  static dealii::ExceptionBase& Exception ()
 
 /**
  * Declare an exception class derived from ExceptionBase with one additional
@@ -679,7 +710,22 @@ namespace StandardExceptions
    * cases. These cases will then be trapped sooner or later by the exception,
    * so that the algorithm can then be fixed for these cases as well.
    */
-  DeclException0 (ExcInternalError);
+  DeclExceptionMsg (ExcInternalError,
+                    "This exception -- which is used in many places in the "
+                    "library -- usually indicates that some condition which "
+                    "the author of the code thought must be satisfied at a "
+                    "certain point in an algorithm, is not fulfilled. An "
+                    "example would be that the first part of an algorithm "
+                    "sorts elements of an array in ascending order, and "
+                    "a second part of the algorithm later encounters an "
+                    "an element that is not larger than the previous one."
+                    "\n\n"
+                    "There is usually not very much you can do if you "
+                    "encounter such an exception since it indicates an error "
+                    "in deal.II, not in your own program. Try to come up with "
+                    "the smallest possible program that still demonstrates "
+                    "the error and contact the deal.II mailing lists with it "
+                    "to obtain help.");
 
   /**
    * This exception is used in functions that may not be called (i.e. in pure
