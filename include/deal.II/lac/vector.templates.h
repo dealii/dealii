@@ -575,7 +575,6 @@ Vector<Number>::Vector (const Vector<Number> &v)
   if (vec_size != 0)
     {
       allocate(max_vec_size);
-      Assert (val != 0, ExcOutOfMemory());
       *this = v;
     }
 }
@@ -595,7 +594,6 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
   if (vec_size != 0)
     {
       allocate(max_vec_size);
-      Assert (val != 0, ExcOutOfMemory());
       std::copy (v.begin(), v.end(), begin());
     }
 }
@@ -616,7 +614,6 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
   if (vec_size != 0)
     {
       allocate(max_vec_size);
-      Assert (val != 0, ExcOutOfMemory());
 
       // get a representation of the vector
       // and copy it
@@ -668,7 +665,6 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
   if (vec_size != 0)
     {
       allocate(max_vec_size);
-      Assert (val != 0, ExcOutOfMemory());
 
       // Copy the distributed vector to
       // a local one at all
@@ -702,7 +698,6 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
   if (vec_size != 0)
     {
       allocate(max_vec_size);
-      Assert (val != 0, ExcOutOfMemory());
 
       // get a representation of the vector
       // and copy it
@@ -2051,6 +2046,7 @@ void
 Vector<Number>::allocate(const size_type size)
 {
   val = static_cast<Number *>(_mm_malloc (sizeof(Number)*size, 64));
+  Assert (val != 0, ExcOutOfMemory());
 }
 
 

@@ -1050,9 +1050,8 @@ void Vector<Number>::reinit (const size_type n, const bool fast)
   if (n>max_vec_size)
     {
       if (val) deallocate();
-      allocate(n);
-      Assert (val != 0, ExcOutOfMemory());
       max_vec_size = n;
+      allocate(max_vec_size);
     };
   vec_size = n;
   if (fast == false)
