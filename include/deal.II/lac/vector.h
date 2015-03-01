@@ -1347,12 +1347,14 @@ inline
 void
 Vector<Number>::load (Archive &ar, const unsigned int)
 {
-  // forward to serialization function in the base class.
-  ar   &static_cast<Subscriptor &>(*this);
+  // get rid of previous content
+  deallocate();
 
+  // the load stuff again from the archive
+  ar &static_cast<Subscriptor &>(*this);
   ar &vec_size &max_vec_size ;
 
-  allocate(max_vec_size);
+  allocate();
   ar &boost::serialization::make_array(val, max_vec_size);
 }
 
