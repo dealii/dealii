@@ -603,13 +603,10 @@ namespace StandardExceptions
 
   /**
    * Exception denoting a division by zero.
-   *
-   * @note Unfortunately, automatic detection of division by zero is very
-   * hardware dependent and requires severe hacking on some architectures.
-   * Therefore, this exception is only raised if the test is performed
-   * explicitly.
    */
-  DeclException0 (ExcDivideByZero);
+  DeclExceptionMsg (ExcDivideByZero,
+                    "A piece of code is attempting a division by zero. This is "
+                    "likely going to lead to results that make no sense.");
 
   /**
    * Exception raised if a number is not finite.
