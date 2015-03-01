@@ -673,7 +673,7 @@ namespace FEValuesViews
             continue;
 
           const Number value = dof_values(shape_function);
-          if (value == Number)
+          if (value == Number())
             continue;
 
           if (snc != -1)
@@ -2658,7 +2658,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  VectorSlice<std::vector<Vector<number> > > val(values);
+  VectorSlice<std::vector<Vector<Number> > > val(values);
   internal::do_function_values(dof_values.begin(), this->shape_values, *fe,
                                this->shape_function_to_row_table, val);
 }
@@ -2680,7 +2680,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   Assert (this->update_flags & update_values,
           ExcAccessToUninitializedField("update_values"));
 
-  VectorSlice<std::vector<Vector<number> > > val(values);
+  VectorSlice<std::vector<Vector<Number> > > val(values);
   if (indices.size() <= 100)
     {
       Number dof_values[100];
@@ -3110,7 +3110,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   std::vector<std::vector<typename InputVector::value_type> > &laplacians,
   bool quadrature_points_fastest) const
 {
-  typedef typename InputVector::value_type number;
+  typedef typename InputVector::value_type Number;
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
   Assert (this->update_flags & update_hessians,
