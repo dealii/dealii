@@ -6313,6 +6313,7 @@ namespace VectorTools
                              const Function<spacedim>   *weight,
                              const double           exponent_1)
     {
+      typedef typename InVector::value_type Number;
       // we mark the "exponent" parameter to this function "const" since it is
       // strictly incoming, but we need to set it to something different later
       // on, if necessary, so have a read-write version of it:
@@ -6373,6 +6374,11 @@ namespace VectorTools
       dealii::hp::FECollection<dim,spacedim> fe_collection (dof.get_fe());
       IDScratchData<dim,spacedim> data(mapping, fe_collection, q, update_flags);
 
+      //FIXME
+      // temporary vectors of consistent with InVector type
+      std::vector<dealii::Vector<Number>> function_values;
+      std::vector<std::vector<Tensor<1,spacedim,Number> >> function_grads;
+
       // loop over all cells
       typename DH::active_cell_iterator cell = dof.begin_active(),
                                         endc = dof.end();
@@ -6386,10 +6392,24 @@ namespace VectorTools
             const unsigned int   n_q_points = fe_values.n_quadrature_points;
             data.resize_vectors (n_q_points, n_components);
 
+            //FIXME:
+            function_values.resize (n_q_points,
+                                    dealii::Vector<Number>(n_components));
+            function_grads.resize (n_q_points,
+                                   std::vector<Tensor<1,spacedim,Number> >(n_components));
+
             if (update_flags & update_values)
-              fe_values.get_function_values (fe_function, data.function_values);
+              fe_values.get_function_values (fe_function, function_values);
             if (update_flags & update_gradients)
-              fe_values.get_function_gradients (fe_function, data.function_grads);
+              fe_values.get_function_gradients (fe_function, function_grads);
+
+            // FIXME
+            for (unsigned int q = 0; q < n_q_points; q++)
+              for (unsigned int c = 0; c < n_components; c++)
+                {
+                  data.function_values[q][c] = function_values[q][c];
+                  data.function_grads[q][c] = function_grads[q][c];
+                }
 
             difference(index) =
               integrate_difference_inner (exact_solution, norm, weight,
@@ -6513,6 +6533,7 @@ namespace VectorTools
                     Vector<double>        &difference,
                     const Point<spacedim>      &point)
   {
+    typedef typename InVector::value_type Number;
     const FiniteElement<dim> &fe = dof.get_fe();
 
     Assert(difference.size() == fe.n_components(),
@@ -6536,7 +6557,7 @@ namespace VectorTools
 
     // then use this to get at the values of
     // the given fe_function at this point
-    std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+    std::vector<Vector<Number> > u_value(1, Vector<Number> (fe.n_components()));
     fe_values.get_function_values(fe_function, u_value);
 
     if (fe.n_components() == 1)
@@ -6614,6 +6635,7 @@ namespace VectorTools
                const Point<spacedim>      &point,
                Vector<double>        &value)
   {
+    typedef typename InVector::value_type Number;
     const FiniteElement<dim> &fe = dof.get_fe();
 
     Assert(value.size() == fe.n_components(),
@@ -6639,7 +6661,7 @@ namespace VectorTools
 
     // then use this to get at the values of
     // the given fe_function at this point
-    std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+    std::vector<Vector<Number> > u_value(1, Vector<Number> (fe.n_components()));
     fe_values.get_function_values(fe_function, u_value);
 
     value = u_value[0];
@@ -6654,6 +6676,7 @@ namespace VectorTools
                const Point<spacedim>      &point,
                Vector<double>        &value)
   {
+    typedef typename InVector::value_type Number;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe();
 
     Assert(value.size() == fe.n_components(),
@@ -6678,7 +6701,7 @@ namespace VectorTools
 
     // then use this to get at the values of
     // the given fe_function at this point
-    std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+    std::vector<Vector<Number> > u_value(1, Vector<Number> (fe.n_components()));
     fe_values.get_function_values(fe_function, u_value);
 
     value = u_value[0];
@@ -6692,6 +6715,7 @@ namespace VectorTools
                const InVector        &fe_function,
                const Point<spacedim>      &point)
   {
+    typedef typename InVector::value_type Number;
     const FiniteElement<dim> &fe = dof.get_fe();
 
     Assert(fe.n_components() == 1,
@@ -6715,7 +6739,7 @@ namespace VectorTools
 
     // then use this to get at the values of
     // the given fe_function at this point
-    std::vector<double> u_value(1);
+    std::vector<Number> u_value(1);
     fe_values.get_function_values(fe_function, u_value);
 
     return u_value[0];
@@ -6729,6 +6753,7 @@ namespace VectorTools
                const InVector        &fe_function,
                const Point<spacedim>      &point)
   {
+    typedef typename InVector::value_type Number;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe();
 
     Assert(fe.n_components() == 1,
@@ -6753,7 +6778,7 @@ namespace VectorTools
 
     // then use this to get at the values of
     // the given fe_function at this point
-    std::vector<double> u_value(1);
+    std::vector<Number> u_value(1);
     fe_values.get_function_values(fe_function, u_value);
 
     return u_value[0];
@@ -6818,6 +6843,7 @@ namespace VectorTools
                       const InVector        &v,
                       const unsigned int     component)
   {
+    typedef typename InVector::value_type Number;
     Assert (v.size() == dof.n_dofs(),
             ExcDimensionMismatch (v.size(), dof.n_dofs()));
     Assert (component < dof.get_fe().n_components(),
@@ -6828,10 +6854,10 @@ namespace VectorTools
                                           | update_values));
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell;
-    std::vector<Vector<double> > values(quadrature.size(),
-                                        Vector<double> (dof.get_fe().n_components()));
+    std::vector<Vector<Number> > values(quadrature.size(),
+                                        Vector<Number> (dof.get_fe().n_components()));
 
-    double mean = 0.;
+    Number mean = Number();
     double area = 0.;
     // Compute mean value
     for (cell = dof.begin_active(); cell != dof.end(); ++cell)
@@ -6853,7 +6879,8 @@ namespace VectorTools
         p_d_triangulation
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(&dof.get_tria()))
       {
-        double my_values[2] = { mean, area };
+        double mean_double = mean;
+        double my_values[2] = { mean_double, area };
         double global_values[2];
 
         MPI_Allreduce (&my_values, &global_values, 2, MPI_DOUBLE,
