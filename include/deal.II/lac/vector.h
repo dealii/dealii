@@ -965,9 +965,10 @@ protected:
 private:
 
   /**
-   * Allocate and align @p v along 64-byte boundaries.
+   * Allocate and align @p val along 64-byte boundaries. The size
+   * of the allocated memory is determined by @p max_vec_size .
    */
-  void allocate(const size_type n);
+  void allocate();
 
   /**
    * Deallocate @p val.
@@ -1051,7 +1052,7 @@ void Vector<Number>::reinit (const size_type n, const bool fast)
     {
       if (val) deallocate();
       max_vec_size = n;
-      allocate(max_vec_size);
+      allocate();
     };
   vec_size = n;
   if (fast == false)
