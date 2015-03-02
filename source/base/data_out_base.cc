@@ -7752,17 +7752,6 @@ DataOutInterface<dim,spacedim>::memory_consumption () const
 }
 
 
-
-template <int dim, int spacedim>
-std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >
-DataOutInterface<dim,spacedim>::get_vector_data_ranges () const
-{
-  return std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >();
-}
-
-
-
-
 // ---------------------------------------------- DataOutReader ----------
 
 template <int dim, int spacedim>
