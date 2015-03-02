@@ -2703,6 +2703,24 @@ operator * (const Number                            factor,
 }
 
 
+#ifndef DEAL_II_WITH_CXX11
+
+template <typename T, typename U, int rank, int dim>
+struct ProductType<T,SymmetricTensor<rank,dim,U> >
+{
+  typedef SymmetricTensor<rank,dim,typename ProductType<T,U>::type> type;
+};
+
+template <typename T, typename U, int rank, int dim>
+struct ProductType<SymmetricTensor<rank,dim,T>,U>
+{
+  typedef SymmetricTensor<rank,dim,typename ProductType<T,U>::type> type;
+};
+
+#endif
+
+
+
 /**
  * Multiplication of a symmetric tensor with a scalar number from the right.
  *
