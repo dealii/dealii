@@ -103,8 +103,6 @@ get_interpolated_dof_values (const InputVector &values,
 
       Assert (this->dof_handler != 0,
               typename BaseClass::ExcInvalidObject());
-      Assert (&fe != 0,
-              typename BaseClass::ExcInvalidObject());
       Assert (interpolated_values.size() == dofs_per_cell,
               typename BaseClass::ExcVectorDoesNotMatch());
       Assert (values.size() == this->dof_handler->n_dofs(),
