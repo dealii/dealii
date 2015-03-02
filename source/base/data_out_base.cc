@@ -3964,7 +3964,7 @@ namespace DataOutBase
                   const EpsFlags                          &flags,
                   std::ostream                            &out)
   {
-    Assert (out, ExcIO());
+    AssertThrow (out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed
@@ -6488,7 +6488,7 @@ namespace DataOutBase
   std::pair<unsigned int, unsigned int>
   determine_intermediate_format_dimensions (std::istream &input)
   {
-    Assert (input, ExcIO());
+    AssertThrow (input, ExcIO());
 
     unsigned int dim, spacedim;
     input >> dim >> spacedim;
@@ -7769,7 +7769,7 @@ template <int dim, int spacedim>
 void
 DataOutReader<dim,spacedim>::read (std::istream &in)
 {
-  Assert (in, ExcIO());
+  AssertThrow (in, ExcIO());
 
   // first empty previous content
   {
@@ -7874,7 +7874,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
       std_cxx11::get<2>(vector_data_ranges[i]) = name;
     }
 
-  Assert (in, ExcIO());
+  AssertThrow (in, ExcIO());
 }
 
 
@@ -8016,7 +8016,7 @@ namespace DataOutBase
   operator >> (std::istream                     &in,
                Patch<dim,spacedim> &patch)
   {
-    Assert (in, ExcIO());
+    AssertThrow (in, ExcIO());
 
     // read a header line and compare
     // it to what we usually
@@ -8059,7 +8059,7 @@ namespace DataOutBase
       for (unsigned int j=0; j<patch.data.n_cols(); ++j)
         in >> patch.data[i][j];
 
-    Assert (in, ExcIO());
+    AssertThrow (in, ExcIO());
 
     return in;
   }

@@ -273,7 +273,8 @@ public:
   DeclException1 (ExcInvalidNumberOfSubdivisions,
                   int,
                   << "The number of subdivisions per patch, " << arg1
-                  << ", is not valid.");
+                  << ", is not valid. It needs to be greater or equal "
+                  << "to one.");
 
 private:
 

@@ -603,13 +603,10 @@ namespace StandardExceptions
 
   /**
    * Exception denoting a division by zero.
-   *
-   * @note Unfortunately, automatic detection of division by zero is very
-   * hardware dependent and requires severe hacking on some architectures.
-   * Therefore, this exception is only raised if the test is performed
-   * explicitly.
    */
-  DeclException0 (ExcDivideByZero);
+  DeclExceptionMsg (ExcDivideByZero,
+                    "A piece of code is attempting a division by zero. This is "
+                    "likely going to lead to results that make no sense.");
 
   /**
    * Exception raised if a number is not finite.
@@ -655,7 +652,14 @@ namespace StandardExceptions
   /**
    * Trying to allocate a new object failed due to lack of free memory.
    */
-  DeclException0 (ExcOutOfMemory);
+  DeclExceptionMsg (ExcOutOfMemory,
+                    "Your program tried to allocate some memory but this "
+                    "allocation failed. Typically, this either means that "
+                    "you simply do not have enough memory in your system, "
+                    "or that you are (erroneously) trying to allocate "
+                    "a chunk of memory that is simply beyond all reasonable "
+                    "size, for example because the size of the object has "
+                    "been computed incorrectly.");
 
   /**
    * A memory handler reached a point where all allocated objects should have
@@ -668,7 +672,28 @@ namespace StandardExceptions
   /**
    * An error occurred reading or writing a file.
    */
-  DeclException0 (ExcIO);
+  DeclExceptionMsg (ExcIO,
+                    "An input/output error has occurred. There are a number of "
+                    "reasons why this may be happening, both for reading and "
+                    "writing operations."
+                    "\n\n"
+                    "If this happens during an operation that tries to read "
+                    "data: First, you may be "
+                    "trying to read from a file that doesn't exist or that is "
+                    "not readable given its file permissions. Second, deal.II "
+                    "uses this error at times if it tries to "
+                    "read information from a file but where the information "
+                    "in the file does not correspond to the expected format. "
+                    "An example would be a truncated file, or a mesh file "
+                    "that contains not only sections that describe the "
+                    "vertices and cells, but also sections for additional "
+                    "data that deal.II does not understand."
+                    "\n\n"
+                    "If this happens during an operation that tries to write "
+                    "data: you may be trying to write to a file to which file "
+                    "or directory permissions do not allow you to write. A "
+                    "typical example is where you specify an output file in "
+                    "a directory that does not exist.");
 
   /**
    * An error occurred opening the named file.
@@ -688,7 +713,17 @@ namespace StandardExceptions
    * corresponding place and see whether it can be implemented without too
    * much effort.
    */
-  DeclException0 (ExcNotImplemented);
+  DeclExceptionMsg (ExcNotImplemented,
+                    "You are trying to use functionality in deal.II that is "
+                    "currently not implemented. In many cases, this indicates "
+                    "that there simply didn't appear much of a need for it, or "
+                    "that the author of the original code did not have the "
+                    "time to implement a particular case. If you hit this "
+                    "exception, it is therefore worth the time to look into "
+                    "the code to find out whether you may be able to "
+                    "implement the missing functionality. If you do, please "
+                    "consider providing a patch to the deal.II development "
+                    "sources (see the deal.II website on how to contribute).");
 
   /**
    * This exception usually indicates that some condition which the programmer
@@ -760,18 +795,28 @@ namespace StandardExceptions
    */
   DeclException1 (ExcImpossibleInDim,
                   int,
-                  << "Impossible in " << arg1 << "d.");
+                  << "You are trying to execute functionality that is "
+                  << "impossible in " << arg1
+                  << "d or simply does not make any sense.");
 
   /**
    * A number is zero, but it should not be here.
    */
-  DeclException0(ExcZero);
+  DeclExceptionMsg(ExcZero,
+                   "In a check in the code, deal.II encountered a zero in "
+                   "a place where this does not make sense. See the condition "
+                   "that was being checked and that is printed further up "
+                   "in the error message to get more information on what "
+                   "the erroneous zero corresponds to.");
 
   /**
    * The object should have been filled with something before this member
    * function is called.
    */
-  DeclException0(ExcEmptyObject);
+  DeclExceptionMsg(ExcEmptyObject,
+                   "The object you are trying to access is empty but it makes "
+                   "no sense to attempt the operation you are trying on an "
+                   "empty object.");
 
   /**
    * This exception is raised whenever the sizes of two objects were assumed
@@ -854,13 +899,21 @@ namespace StandardExceptions
    * Typically, this will be an internal error of deal.II, because the
    * increment and decrement operators should never yield an invalid iterator.
    */
-  DeclException0 (ExcInvalidIterator);
+  DeclExceptionMsg (ExcInvalidIterator,
+                    "You are trying to use an iterator, but the iterator is "
+                    "in an invalid state. This may indicate that the iterator "
+                    "object has not been initialized, or that it has been "
+                    "moved beyond the end of the range of valid elements.");
 
   /**
    * This exception is thrown if the iterator you incremented or decremented
    * was already at its final state.
    */
-  DeclException0 (ExcIteratorPastEnd);
+  DeclExceptionMsg (ExcIteratorPastEnd,
+                    "You are trying to use an iterator, but the iterator is "
+                    "pointing past the end of the range of valid elements. "
+                    "It is not valid to dereference the iterator in this "
+                    "case.");
 
   /**
    * This exception works around a design flaw in the <tt>DeclException0</tt>
@@ -882,7 +935,12 @@ namespace StandardExceptions
   /**
    * Parallel vectors with ghost elements are read-only vectors.
    */
-  DeclException0 (ExcGhostsPresent);
+  DeclExceptionMsg (ExcGhostsPresent,
+                    "You are trying an operation on a vector that is only "
+                    "allowed if the vector has no ghost elements, but the "
+                    "vector you are operating on does have ghost elements. "
+                    "See the glossary entry on 'Ghosted vectors' for more "
+                    "information.");
 
   /**
    * Some of our numerical classes allow for setting alll entries to zero
@@ -891,7 +949,10 @@ namespace StandardExceptions
    * In many cases, this assignment operator makes sense <b>only</b> for the
    * argument zero. In other cases, this exception is thrown.
    */
-  DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
+  DeclExceptionMsg (ExcScalarAssignmentOnlyForZeroValue,
+                    "You are trying an operation of the form 'vector=s' with "
+                    "a nonzero scalar value 's'. However, such assignments "
+                    "are only allowed if the right hand side is zero.");
 
   /**
    * This function requires support for the LAPACK library.

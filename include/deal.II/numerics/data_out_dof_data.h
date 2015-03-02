@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -701,17 +701,18 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcNoTriangulationSelected);
+  DeclExceptionMsg (ExcNoTriangulationSelected,
+                    "For the operation you are attempting, you first need to "
+                    "tell the DataOut or related object which DoFHandler or "
+                    "triangulation you would like to work on.");
 
   /**
    * Exception
    */
-  DeclException0 (ExcNoDoFHandlerSelected);
-
-  /**
-   * Exception
-   */
-  DeclException0 (ExcDataPostprocessingIsNotPossibleForCellData);
+  DeclExceptionMsg (ExcNoDoFHandlerSelected,
+                    "For the operation you are attempting, you first need to "
+                    "tell the DataOut or related object which DoFHandler "
+                    "you would like to work on.");
 
   /**
    * Exception
@@ -719,9 +720,11 @@ public:
   DeclException3 (ExcInvalidVectorSize,
                   int, int, int,
                   << "The vector has size " << arg1
-                  << " but the DoFHandler objects says there are " << arg2
+                  << " but the DoFHandler object says that there are " << arg2
                   << " degrees of freedom and there are " << arg3
-                  << " active cells.");
+                  << " active cells. The size of your vector needs to be"
+                  << " either equal to the number of degrees of freedom, or"
+                  << " equal to the number of active cells.");
   /**
    * Exception
    */
@@ -731,12 +734,16 @@ public:
                   << "description strings since some graphics formats will only accept these."
                   << std::endl
                   << "The string you gave was <" << arg1
-                  << ">, the invalid character is <" << arg1[arg2]
+                  << ">, within which the invalid character is <" << arg1[arg2]
                   << ">." << std::endl);
   /**
    * Exception
    */
-  DeclException0 (ExcOldDataStillPresent);
+  DeclExceptionMsg (ExcOldDataStillPresent,
+                    "When attaching a triangulation or DoFHandler object, it is "
+                    "not allowed if old data vectors are still referenced. If "
+                    "you want to reuse an object of the current type, you first "
+                    "need to call the 'clear_data_vector()' function.");
   /**
    * Exception
    */
@@ -748,15 +755,21 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcNoPatches);
+  DeclExceptionMsg (ExcIncompatibleDatasetNames,
+                    "While merging sets of patches, the two sets to be merged "
+                    "need to refer to data that agrees on the names of the "
+                    "various variables represented. In other words, you "
+                    "cannot merge sets of patches that originate from "
+                    "entirely unrelated simulations.");
   /**
    * Exception
    */
-  DeclException0 (ExcIncompatibleDatasetNames);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcIncompatiblePatchLists);
+  DeclExceptionMsg (ExcIncompatiblePatchLists,
+                    "While merging sets of patches, the two sets to be merged "
+                    "need to refer to data that agrees on the number of "
+                    "subdivisions and other properties. In other words, you "
+                    "cannot merge sets of patches that originate from "
+                    "entirely unrelated simulations.");
 
   DeclException2 (ExcInvalidVectorDeclaration,
                   int, std::string,
@@ -852,8 +865,14 @@ merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
                const Point<patch_space_dim> &shift)
 {
   const std::vector<Patch> source_patches = source.get_patches ();
-  Assert (patches.size () != 0,        ExcNoPatches ());
-  Assert (source_patches.size () != 0, ExcNoPatches ());
+  Assert ((patches.size () != 0) &&
+          (source_patches.size () != 0),
+          ExcMessage ("When calling this function, both the current "
+                      "object and the one being merged need to have a "
+                      "nonzero number of patches associated with it. "
+                      "Either you called this function on objects that "
+                      "are empty, or you may have forgotten to call "
+                      "the 'build_patches()' function."));
   // check equality of component
   // names
   Assert (get_dataset_names() == source.get_dataset_names(),
