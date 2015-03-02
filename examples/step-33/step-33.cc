@@ -1806,17 +1806,17 @@ namespace Step33
     // R_i &=&
     // \left(\frac{(\mathbf{w}_{n+1} -
     // \mathbf{w}_n)_{\text{component\_i}}}{\delta
-    // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K \\
-    // &-& \sum_{d=1}^{\text{dim}} \left(  \theta \mathbf{F}
+    // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K
+    // \\ &-& \sum_{d=1}^{\text{dim}} \left(  \theta \mathbf{F}
     // ({\mathbf{w^k_{n+1}}})_{\text{component\_i},d} + (1-\theta)
     // \mathbf{F} ({\mathbf{w_{n}}})_{\text{component\_i},d}  ,
     // \frac{\partial(\mathbf{z}_i)_{\text{component\_i}}} {\partial
-    // x_d}\right)_K \\
-    // &+& \sum_{d=1}^{\text{dim}} h^{\eta} \left( \theta \frac{\partial
+    // x_d}\right)_K
+    // \\ &+& \sum_{d=1}^{\text{dim}} h^{\eta} \left( \theta \frac{\partial
     // \mathbf{w^k_{n+1}}_{\text{component\_i}}}{\partial x_d} + (1-\theta)
     // \frac{\partial \mathbf{w_n}_{\text{component\_i}}}{\partial x_d} ,
-    // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d} \right)_K\\
-    // &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}} +
+    // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d} \right)_K
+    // \\ &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}} +
     // (1-\theta)\mathbf{G}({\mathbf{w}_n} )_{\text{component\_i}} ,
     // (\mathbf{z}_i)_{\text{component\_i}} \right)_K ,
     // @f}
