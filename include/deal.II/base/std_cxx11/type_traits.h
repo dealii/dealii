@@ -25,8 +25,8 @@
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
-                                // TODO: could fill up with more types from
-                                // C++11 type traits
+  // TODO: could fill up with more types from
+  // C++11 type traits
   using std::is_pod;
   using std::is_standard_layout;
   using std::is_trivial;
@@ -41,9 +41,9 @@ namespace std_cxx11
 {
   using boost::is_pod;
 
-                                // boost does not have is_standard_layout and
-                                // is_trivial, but those are both a subset of
-                                // is_pod
+  // boost does not have is_standard_layout and
+  // is_trivial, but those are both a subset of
+  // is_pod
   template <typename T>
   struct is_standard_layout
   {
@@ -54,9 +54,9 @@ namespace std_cxx11
   struct is_trivial
   {
     static const bool value = boost::has_trivial_copy<T>::value &&
-      boost::has_trivial_assign<T>::value &&
-      boost::has_trivial_constructor<T>::value &&
-      boost::has_trivial_destructor<T>::value;
+                              boost::has_trivial_assign<T>::value &&
+                              boost::has_trivial_constructor<T>::value &&
+                              boost::has_trivial_destructor<T>::value;
   };
 }
 DEAL_II_NAMESPACE_CLOSE
