@@ -1549,7 +1549,6 @@ DoFAccessor<structdim, DH,level_dof_access>::mg_vertex_dof_index (const int leve
     const unsigned int fe_index) const
 {
   Assert (this->dof_handler != 0, ExcInvalidObject ());
-  Assert (&this->dof_handler->get_fe () != 0, ExcInvalidObject ());
   Assert (vertex < GeometryInfo<structdim>::vertices_per_cell, ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
   Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex, ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
   return this->dof_handler->mg_vertex_dofs[this->vertex_index (vertex)].get_index (level, i);
@@ -1583,7 +1582,6 @@ DoFAccessor<structdim, DH,level_dof_access>::set_mg_vertex_dof_index (const int 
     const unsigned int fe_index) const
 {
   Assert (this->dof_handler != 0, ExcInvalidObject ());
-  Assert (&this->dof_handler->get_fe () != 0, ExcInvalidObject ());
   Assert (vertex < GeometryInfo<structdim>::vertices_per_cell, ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
   Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex, ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
   this->dof_handler->mg_vertex_dofs[this->vertex_index (vertex)].set_index (level, i, index);
@@ -1851,7 +1849,6 @@ DoFAccessor<structdim,DH,level_dof_access>::get_dof_indices (std::vector<types::
     const unsigned int         fe_index) const
 {
   Assert (this->dof_handler != 0, ExcNotInitialized());
-  Assert (&this->dof_handler->get_fe() != 0, ExcMessage ("DoFHandler not initialized"));
   Assert (static_cast<unsigned int>(this->level()) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
@@ -1914,7 +1911,6 @@ void DoFAccessor<structdim, DH,level_dof_access>::get_mg_dof_indices (const int 
     const unsigned int fe_index) const
 {
   Assert (this->dof_handler != 0, ExcInvalidObject ());
-  Assert (&this->dof_handler->get_fe () != 0, ExcInvalidObject ());
 
   switch (structdim)
     {
@@ -1966,7 +1962,6 @@ void DoFAccessor<structdim, DH,level_dof_access>::set_mg_dof_indices (const int 
     const unsigned int fe_index)
 {
   Assert (this->dof_handler != 0, ExcInvalidObject ());
-  Assert (&this->dof_handler->get_fe () != 0, ExcInvalidObject ());
 
   switch (structdim)
     {

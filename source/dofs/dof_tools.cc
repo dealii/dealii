@@ -1545,8 +1545,6 @@ namespace DoFTools
   map_dof_to_boundary_indices (const DH                  &dof_handler,
                                std::vector<types::global_dof_index> &mapping)
   {
-    Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
-
     mapping.clear ();
     mapping.insert (mapping.end(), dof_handler.n_dofs(),
                     DH::invalid_dof_index);
@@ -1587,7 +1585,6 @@ namespace DoFTools
     const std::set<types::boundary_id> &boundary_indicators,
     std::vector<types::global_dof_index>     &mapping)
   {
-    Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
     Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
 

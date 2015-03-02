@@ -371,11 +371,6 @@ namespace internal
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (fe_index < dof_handler.get_fe().size(),
               ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
       Assert (local_index <
@@ -433,11 +428,6 @@ namespace internal
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (fe_index < dof_handler.get_fe().size(),
               ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
       Assert (local_index <
@@ -490,11 +480,6 @@ namespace internal
     n_active_fe_indices (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                          const unsigned int                obj_index) const
     {
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
@@ -540,11 +525,6 @@ namespace internal
                          const unsigned int                obj_index,
                          const unsigned int                n) const
     {
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
@@ -601,11 +581,6 @@ namespace internal
                         const unsigned int                fe_index,
                         const unsigned int                obj_level) const
     {
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, static_cast<unsigned int>(dof_offsets.size())));
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),

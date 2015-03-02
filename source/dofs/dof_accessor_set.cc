@@ -100,8 +100,6 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
 
       Assert (this->dof_handler != 0,
               typename BaseClass::ExcInvalidObject());
-      Assert (&this->get_dof_handler().get_fe() != 0,
-              typename BaseClass::ExcInvalidObject());
       Assert (local_values.size() == dofs_per_cell,
               typename BaseClass::ExcVectorDoesNotMatch());
       Assert (values.size() == this->dof_handler->n_dofs(),
