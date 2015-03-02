@@ -96,7 +96,7 @@ namespace internal
      * resizing to a smaller size doesn't imply memory allocation, this is
      * fast.
      */
-    template <class DH>
+    template <class DH,typename number>
     struct ParallelData
     {
       static const unsigned int dim      = DH::dimension;
@@ -128,7 +128,7 @@ namespace internal
        * particular in presence of multiple threads where synchronisation
        * makes things even slower.
        */
-      std::vector<std::vector<std::vector<double> > > phi;
+      std::vector<std::vector<std::vector<number> > > phi;
 
       /**
        * A vector for the gradients of the finite element function on one cell
@@ -138,12 +138,12 @@ namespace internal
        * the number of the quadrature point. The first index denotes the index
        * of the solution vector.
        */
-      std::vector<std::vector<std::vector<Tensor<1,spacedim> > > > psi;
+      std::vector<std::vector<std::vector<Tensor<1,spacedim,number> > > > psi;
 
       /**
        * The same vector for a neighbor cell
        */
-      std::vector<std::vector<std::vector<Tensor<1,spacedim> > > > neighbor_psi;
+      std::vector<std::vector<std::vector<Tensor<1,spacedim,number> > > > neighbor_psi;
 
       /**
        * The normal vectors of the finite element function on one face
@@ -204,9 +204,9 @@ namespace internal
     };
 
 
-    template <class DH>
+    template <class DH,typename number>
     template <class FE>
-    ParallelData<DH>::
+    ParallelData<DH,number>::
     ParallelData (const FE                                           &fe,
                   const dealii::hp::QCollection<dim-1>     &face_quadratures,
                   const dealii::hp::MappingCollection<dim, spacedim> &mapping,
@@ -238,17 +238,17 @@ namespace internal
                          face_quadratures,
                          update_gradients),
       phi (n_solution_vectors,
-           std::vector<std::vector<double> >
+           std::vector<std::vector<number> >
            (face_quadratures.max_n_quadrature_points(),
-            std::vector<double> (fe.n_components()))),
+            std::vector<number> (fe.n_components()))),
       psi (n_solution_vectors,
-           std::vector<std::vector<Tensor<1,spacedim> > >
+           std::vector<std::vector<Tensor<1,spacedim,number> > >
            (face_quadratures.max_n_quadrature_points(),
-            std::vector<Tensor<1,spacedim> > (fe.n_components()))),
+            std::vector<Tensor<1,spacedim,number> > (fe.n_components()))),
       neighbor_psi (n_solution_vectors,
-                    std::vector<std::vector<Tensor<1,spacedim> > >
+                    std::vector<std::vector<Tensor<1,spacedim,number> > >
                     (face_quadratures.max_n_quadrature_points(),
-                     std::vector<Tensor<1,spacedim> > (fe.n_components()))),
+                     std::vector<Tensor<1,spacedim,number> > (fe.n_components()))),
       normal_vectors (face_quadratures.max_n_quadrature_points()),
       coefficient_values1 (face_quadratures.max_n_quadrature_points()),
       coefficient_values (face_quadratures.max_n_quadrature_points(),
@@ -263,9 +263,9 @@ namespace internal
 
 
 
-    template <class DH>
+    template <class DH, typename number>
     void
-    ParallelData<DH>::resize (const unsigned int active_fe_index)
+    ParallelData<DH,number>::resize (const unsigned int active_fe_index)
     {
       const unsigned int n_q_points   = face_quadratures[active_fe_index].size();
       const unsigned int n_components = finite_element.n_components();
@@ -332,9 +332,9 @@ namespace internal
      * Actually do the computation based on the evaluated gradients in
      * ParallelData.
      */
-    template <class DH>
+    template <class DH, typename number>
     std::vector<double>
-    integrate_over_face (ParallelData<DH>                        &parallel_data,
+    integrate_over_face (ParallelData<DH,number>                 &parallel_data,
                          const typename DH::face_iterator        &face,
                          dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_cell)
     {
@@ -475,7 +475,7 @@ namespace internal
     template <typename InputVector, class DH>
     void
     integrate_over_regular_face (const std::vector<const InputVector *>   &solutions,
-                                 ParallelData<DH>                        &parallel_data,
+                                 ParallelData<DH, typename InputVector::value_type> &parallel_data,
                                  std::map<typename DH::face_iterator,std::vector<double> > &local_face_integrals,
                                  const typename DH::active_cell_iterator &cell,
                                  const unsigned int                       face_no,
@@ -551,7 +551,7 @@ namespace internal
     template <typename InputVector, class DH>
     void
     integrate_over_irregular_face (const std::vector<const InputVector *>   &solutions,
-                                   ParallelData<DH>                         &parallel_data,
+                                   ParallelData<DH, typename InputVector::value_type> &parallel_data,
                                    std::map<typename DH::face_iterator,std::vector<double> > &local_face_integrals,
                                    const typename DH::active_cell_iterator    &cell,
                                    const unsigned int                          face_no,
@@ -643,7 +643,7 @@ namespace internal
     template <typename InputVector, class DH>
     void
     estimate_one_cell (const typename DH::active_cell_iterator &cell,
-                       ParallelData<DH>                    &parallel_data,
+                       ParallelData<DH, typename InputVector::value_type> &parallel_data,
                        std::map<typename DH::face_iterator,std::vector<double> > &local_face_integrals,
                        const std::vector<const InputVector *> &solutions)
     {
@@ -961,7 +961,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   // all the data needed in the error estimator by each of the threads is
   // gathered in the following structures
   const hp::MappingCollection<dim,spacedim> mapping_collection(mapping);
-  const internal::ParallelData<DH>
+  const internal::ParallelData<DH,typename InputVector::value_type>
   parallel_data (dof_handler.get_fe(),
                  face_quadratures,
                  mapping_collection,
