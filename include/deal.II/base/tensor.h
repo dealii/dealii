@@ -230,6 +230,13 @@ public:
   Tensor<rank_,dim,Number>   operator - () const;
 
   /**
+   * Simple addition of a multiple of a tensor, i.e. *this += a*T,
+   * where the scalar is of the same base type and
+   * T is a tensor of double.
+   */
+  void add(const Number &, const Tensor<rank_,dim,double> &);
+
+  /**
    * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
    * squares of all entries.
    */
@@ -514,6 +521,14 @@ Tensor<rank_,dim,Number>::operator += (const Tensor<rank_,dim,Number> &p)
   return *this;
 }
 
+template <int rank_, int dim, typename Number>
+inline
+void
+Tensor<rank_,dim,Number>::add(const Number &a, const Tensor<rank_,dim,double> &p)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    subtensor[i].add(a, p.subtensor[i]);
+}
 
 
 template <int rank_, int dim, typename Number>
@@ -761,10 +776,10 @@ std::ostream &operator << (std::ostream &out, const Tensor<rank_,1> &p)
  * @relates Tensor
  * @author Guido Kanschat, 2000
  */
-template <int dim, typename Number>
+template <int dim, typename Number, typename OtherNumber>
 inline
 Number contract (const Tensor<1,dim,Number> &src1,
-                 const Tensor<1,dim,Number> &src2)
+                 const Tensor<1,dim,OtherNumber> &src2)
 {
   Number res = 0.;
   for (unsigned int i=0; i<dim; ++i)
@@ -789,11 +804,11 @@ Number contract (const Tensor<1,dim,Number> &src1,
  * @relates Tensor
  * @author Wolfgang Bangerth, 2005
  */
-template <int dim, typename Number>
+template <int dim, typename Number, typename OtherNumber>
 inline
 Number
 operator * (const Tensor<1,dim,Number> &src1,
-            const Tensor<1,dim,Number> &src2)
+            const Tensor<1,dim,OtherNumber> &src2)
 {
   return contract(src1, src2);
 }

@@ -547,7 +547,13 @@ namespace internal
     get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                          std::vector<dealii::Vector<double> >    &patch_values_system) const
     {
-      fe_patch_values.get_function_values (*vector, patch_values_system);
+      //FIXME
+      std::vector<dealii::Vector<typename VectorType::value_type> > tmp(patch_values_system.size());
+      for (unsigned int i = 0; i < patch_values_system.size(); i++)
+        tmp[i].reinit(patch_values_system[i]);
+      fe_patch_values.get_function_values (*vector, tmp);
+      for (unsigned int i = 0; i < patch_values_system.size(); i++)
+        patch_values_system[i] = tmp[i];
     }
 
 
@@ -558,7 +564,11 @@ namespace internal
     get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                          std::vector<double>             &patch_values) const
     {
-      fe_patch_values.get_function_values (*vector, patch_values);
+      //FIXME
+      std::vector<typename VectorType::value_type> tmp (patch_values.size());
+      fe_patch_values.get_function_values (*vector, tmp);
+      for (unsigned int i = 0; i < tmp.size();i++)
+        patch_values[i] = tmp[i];
     }
 
 
@@ -569,7 +579,14 @@ namespace internal
     get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                             std::vector<std::vector<Tensor<1,DH::space_dimension> > >   &patch_gradients_system) const
     {
-      fe_patch_values.get_function_gradients (*vector, patch_gradients_system);
+      //FIXME
+      std::vector<std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_gradients_system.size());
+      for (unsigned int i = 0; i < tmp.size();i++)
+        tmp[i].resize(patch_gradients_system.size());
+      fe_patch_values.get_function_gradients (*vector, tmp);
+      for (unsigned int i = 0; i < tmp.size();i++)
+        for (unsigned int j = 0; j < tmp[i].size();j++)
+          patch_gradients_system[i][j] = tmp[i][j];
     }
 
 
@@ -580,7 +597,12 @@ namespace internal
     get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                             std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const
     {
-      fe_patch_values.get_function_gradients (*vector, patch_gradients);
+      //FIXME
+      std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> >  tmp;
+      tmp.resize(patch_gradients.size());
+      fe_patch_values.get_function_gradients (*vector, tmp);
+      for (unsigned int i = 0; i < tmp.size();i++)
+        patch_gradients[i] = tmp[i];
     }
 
 
@@ -591,7 +613,13 @@ namespace internal
     get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                            std::vector<std::vector<Tensor<2,DH::space_dimension> > >   &patch_hessians_system) const
     {
-      fe_patch_values.get_function_hessians (*vector, patch_hessians_system);
+      std::vector<std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_hessians_system.size());
+      for (unsigned int i = 0; i < tmp.size(); i++)
+        tmp[i].resize(patch_hessians_system[i].size());
+      fe_patch_values.get_function_hessians (*vector, tmp);
+      for (unsigned int i = 0; i < tmp.size(); i++)
+        for (unsigned int j = 0; j < tmp[i].size(); j++)
+          patch_hessians_system[i][j] = tmp[i][j];
     }
 
 
@@ -602,7 +630,10 @@ namespace internal
     get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                            std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const
     {
-      fe_patch_values.get_function_hessians (*vector, patch_hessians);
+      std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > tmp(patch_hessians.size());
+      fe_patch_values.get_function_hessians (*vector, tmp);
+      for (unsigned int i = 0; i < tmp.size(); i++)
+        patch_hessians[i] = tmp[i];
     }
 
 

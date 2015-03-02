@@ -20,7 +20,7 @@ for (VEC : SERIAL_VECTORS)
     void
     FEValuesBase<dim,spacedim>::TriaCellIterator::
     get_interpolated_dof_values (const VEC &,
-    			         Vector<double> &) const
+    			         Vector<typename VEC::value_type> &) const
     \{
       Assert (false, ExcMessage (message_string));
     \}
