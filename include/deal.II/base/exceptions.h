@@ -673,15 +673,27 @@ namespace StandardExceptions
    * An error occurred reading or writing a file.
    */
   DeclExceptionMsg (ExcIO,
-                    "An input/output error has occurred. Ther are a number of "
-                    "reasons why this may be happening. First, you may be "
+                    "An input/output error has occurred. There are a number of "
+                    "reasons why this may be happening, both for reading and "
+                    "writing operations."
+                    "\n\n"
+                    "If this happens during an operation that tries to read "
+                    "data: First, you may be "
                     "trying to read from a file that doesn't exist or that is "
-                    "not readable given its file permissions. Second, you "
-                    "may be trying to write to a file to which file or "
-                    "directory permissions do not allow you to write. "
-                    "Finally, deal.II uses this error at times if it tries to "
+                    "not readable given its file permissions. Second, deal.II "
+                    "uses this error at times if it tries to "
                     "read information from a file but where the information "
-                    "in the file does not correspond to the expected format.");
+                    "in the file does not correspond to the expected format. "
+                    "An example would be a truncated file, or a mesh file "
+                    "that contains not only sections that describe the "
+                    "vertices and cells, but also sections for additional "
+                    "data that deal.II does not understand."
+                    "\n\n"
+                    "If this happens during an operation that tries to write "
+                    "data: you may be trying to write to a file to which file "
+                    "or directory permissions do not allow you to write. A "
+                    "typical example is where you specify an output file in "
+                    "a directory that does not exist.");
 
   /**
    * An error occurred opening the named file.
