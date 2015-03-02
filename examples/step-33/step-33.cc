@@ -28,6 +28,7 @@
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/std_cxx11/array.h>
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/compressed_sparsity_pattern.h>
@@ -230,7 +231,7 @@ namespace Step33
     template <typename InputVector, typename Number>
     static
     void compute_flux_matrix (const InputVector &W,
-                              std::array <std::array <Number, dim>, EulerEquations<dim>::n_components > &flux)
+                              std_cxx11::array <std_cxx11::array <Number, dim>, EulerEquations<dim>::n_components > &flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
@@ -272,9 +273,9 @@ namespace Step33
                                 const InputVector                  &Wplus,
                                 const InputVector                  &Wminus,
                                 const double                        alpha,
-                                std::array < Number, n_components> &normal_flux)
+                                std_cxx11::array < Number, n_components> &normal_flux)
     {
-      std::array <std::array <Number, dim>, EulerEquations<dim>::n_components > iflux, oflux;
+      std_cxx11::array <std_cxx11::array <Number, dim>, EulerEquations<dim>::n_components > iflux, oflux;
 
       compute_flux_matrix (Wplus, iflux);
       compute_flux_matrix (Wminus, oflux);
@@ -302,7 +303,7 @@ namespace Step33
     template <typename InputVector, typename Number>
     static
     void compute_forcing_vector (const InputVector &W,
-                                 std::array < Number, n_components> &forcing)
+                                 std_cxx11::array < Number, n_components> &forcing)
     {
       const double gravity = -1.0;
 
@@ -1770,16 +1771,16 @@ namespace Step33
     // later easily be computed from it:
 
     std::vector <
-    std::array <std::array <Sacado::Fad::DFad<double>, dim>, EulerEquations<dim>::n_components >
+    std_cxx11::array <std_cxx11::array <Sacado::Fad::DFad<double>, dim>, EulerEquations<dim>::n_components >
     > flux(n_q_points);
 
     std::vector <
-    std::array <std::array <double, dim>, EulerEquations<dim>::n_components >
+    std_cxx11::array <std_cxx11::array <double, dim>, EulerEquations<dim>::n_components >
     > flux_old(n_q_points);
 
-    std::vector < std::array< Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> > forcing(n_q_points);
+    std::vector < std_cxx11::array< Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> > forcing(n_q_points);
 
-    std::vector < std::array< double, EulerEquations<dim>::n_components> > forcing_old(n_q_points);
+    std::vector < std_cxx11::array< double, EulerEquations<dim>::n_components> > forcing_old(n_q_points);
 
     for (unsigned int q=0; q<n_q_points; ++q)
       {
@@ -1805,17 +1806,17 @@ namespace Step33
     // R_i &=&
     // \left(\frac{(\mathbf{w}_{n+1} -
     // \mathbf{w}_n)_{\text{component\_i}}}{\delta
-    // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K \\
-    // &-& \sum_{d=1}^{\text{dim}} \left(  \theta \mathbf{F}
+    // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K
+    // \\ &-& \sum_{d=1}^{\text{dim}} \left(  \theta \mathbf{F}
     // ({\mathbf{w^k_{n+1}}})_{\text{component\_i},d} + (1-\theta)
     // \mathbf{F} ({\mathbf{w_{n}}})_{\text{component\_i},d}  ,
     // \frac{\partial(\mathbf{z}_i)_{\text{component\_i}}} {\partial
-    // x_d}\right)_K \\
-    // &+& \sum_{d=1}^{\text{dim}} h^{\eta} \left( \theta \frac{\partial
+    // x_d}\right)_K
+    // \\ &+& \sum_{d=1}^{\text{dim}} h^{\eta} \left( \theta \frac{\partial
     // \mathbf{w^k_{n+1}}_{\text{component\_i}}}{\partial x_d} + (1-\theta)
     // \frac{\partial \mathbf{w_n}_{\text{component\_i}}}{\partial x_d} ,
-    // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d} \right)_K\\
-    // &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}} +
+    // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d} \right)_K
+    // \\ &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}} +
     // (1-\theta)\mathbf{G}({\mathbf{w}_n} )_{\text{component\_i}} ,
     // (\mathbf{z}_i)_{\text{component\_i}} \right)_K ,
     // @f}
@@ -2020,8 +2021,8 @@ namespace Step33
     // that does so, we also need to determine the Lax-Friedrich's stability
     // parameter:
 
-    std::vector< std::array < Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> >  normal_fluxes(n_q_points);
-    std::vector< std::array < double, EulerEquations<dim>::n_components> >  normal_fluxes_old(n_q_points);
+    std::vector< std_cxx11::array < Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> >  normal_fluxes(n_q_points);
+    std::vector< std_cxx11::array < double, EulerEquations<dim>::n_components> >  normal_fluxes_old(n_q_points);
 
     double alpha;
 
