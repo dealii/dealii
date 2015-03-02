@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -110,8 +110,8 @@ void test ()
                 cell->line(line)->get_dof_indices (line_dof_indices_2,
                                                    cell->line(line)->nth_active_fe_index(j));
 
-                Assert (line_dof_indices_1 == line_dof_indices_2,
-                        ExcInternalError());
+                AssertThrow (line_dof_indices_1 == line_dof_indices_2,
+                             ExcInternalError());
               }
         }
 }

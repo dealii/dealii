@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,7 @@ void check_this (Triangulation<3> &tria)
           vertices.insert (cell->face(f)->vertex_index(2));
           vertices.insert (cell->face(f)->vertex_index(3));
         }
-      Assert (vertices.size() == 8, ExcInternalError());
+      AssertThrow (vertices.size() == 8, ExcInternalError());
     }
   deallog << "    ok." << std::endl;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,8 +45,8 @@ void check_this (Triangulation<3> &tria)
       std::set<Triangulation<3>::line_iterator> lines;
       for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
         {
-          Assert (lines.find (cell->line(l)) == lines.end(),
-                  ExcInternalError());
+          AssertThrow (lines.find (cell->line(l)) == lines.end(),
+                       ExcInternalError());
           lines.insert (cell->line(l));
         }
     }

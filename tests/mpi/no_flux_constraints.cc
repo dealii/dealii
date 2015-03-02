@@ -160,7 +160,7 @@ void test()
   const std::pair<unsigned int,unsigned int> range = vector.local_range();
   for (unsigned int i=range.first; i<range.second; ++i)
     if (constraints.is_constrained(i))
-      Assert (vector(i)==0, ExcInternalError());
+      AssertThrow (vector(i)==0, ExcInternalError());
 
   if (myid==0)
     deallog << "OK" << std::endl;

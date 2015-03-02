@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,9 +77,9 @@ void test2 ()
       for (unsigned int e=0; e<GeometryInfo<2>::faces_per_cell; ++e)
         if (f != e)
           if (!cell->at_boundary(e) && !cell->at_boundary(f))
-            Assert (cell->neighbor(e) !=
-                    cell->neighbor(f),
-                    ExcInternalError());
+            AssertThrow (cell->neighbor(e) !=
+                         cell->neighbor(f),
+                         ExcInternalError());
   deallog << "OK" << std::endl;
 }
 

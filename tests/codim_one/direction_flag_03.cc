@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,8 @@ void test ()
   for (typename Triangulation<dim>::active_cell_iterator
        cell = volume_mesh.begin_active();
        cell != volume_mesh.end(); ++cell)
-    Assert (cell->direction_flag() == true,
-            ExcInternalError());
+    AssertThrow (cell->direction_flag() == true,
+                 ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

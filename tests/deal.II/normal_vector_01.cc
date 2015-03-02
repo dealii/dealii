@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,13 +80,13 @@ int main ()
           face=cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
           for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_face; ++v)
-            Assert ((boundary.normal_vector (face,
-                                             face->vertex(v))
-                     -
-                     normals[v] / normals[v].norm()).norm()
-                    <
-                    1e-12,
-                    ExcInternalError());
+            AssertThrow ((boundary.normal_vector (face,
+                                                  face->vertex(v))
+                          -
+                          normals[v] / normals[v].norm()).norm()
+                         <
+                         1e-12,
+                         ExcInternalError());
         }
       tria.clear();
     }

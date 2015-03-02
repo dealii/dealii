@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,8 +49,8 @@ void test ()
         block_mask[c] = (int_mask & (1<<c));
 
       // make sure that the round-trip works
-      Assert (BlockMask(block_mask) == fe.block_mask(fe.component_mask(BlockMask(block_mask))),
-              ExcInternalError());
+      AssertThrow (BlockMask(block_mask) == fe.block_mask(fe.component_mask(BlockMask(block_mask))),
+                   ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,16 +60,16 @@ check_this (const FiniteElement<dim> &fe1,
   // two FEs are actually the same
   deallog << modify_name<dim> (fe1.get_name());
   p1 = FETools::get_fe_from_name<dim> (modify_name<dim> (fe1.get_name()));
-  Assert (fe1.get_name() == p1->get_name(),
-          ExcInternalError());
+  AssertThrow (fe1.get_name() == p1->get_name(),
+               ExcInternalError());
   deallog << " ok" << std::endl;
   delete p1;
 
   // same for fe2
   deallog << modify_name<dim> (fe2.get_name());
   p2 = FETools::get_fe_from_name<dim> (modify_name<dim> (fe2.get_name()));
-  Assert (fe2.get_name() == p2->get_name(),
-          ExcInternalError());
+  AssertThrow (fe2.get_name() == p2->get_name(),
+               ExcInternalError());
   deallog << " ok" << std::endl;
   delete p2;
 }

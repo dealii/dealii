@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,16 +81,16 @@ void test ()
       // set values without specifying an explicit fe_index
       Vector<double> local (cell->get_fe().dofs_per_cell);
       for (unsigned int i=0; i<local.size(); ++i)
-	local(i) = i;
+        local(i) = i;
 
       cell->set_dof_values_by_interpolation (local, solution1);
 
       // then do the same with the "correct", local fe_index
       cell->set_dof_values_by_interpolation (local, solution2,
-					     cell->active_fe_index());
+                                             cell->active_fe_index());
 
       // now verify correctness
-      Assert (solution1 == solution2, ExcInternalError());
+      AssertThrow (solution1 == solution2, ExcInternalError());
     }
   deallog << "OK" << std::endl;
 }

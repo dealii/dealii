@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,7 +64,7 @@ void verify (const T &t1,
 
     ia >> t2;
 
-    Assert (compare (t1, t2), ExcInternalError());
+    AssertThrow (compare (t1, t2), ExcInternalError());
   }
 }
 

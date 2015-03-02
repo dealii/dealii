@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,15 +46,15 @@ void test (Vector<std::complex<double> > &v,
     {
       if (i%3 == 0)
         {
-          Assert (w(i) == std::complex<double> (i+1., i+2.),
-                  ExcInternalError());
-          Assert (v(i) == std::complex<double> (i+1., i+2.)+1.*i,
-                  ExcInternalError());
+          AssertThrow (w(i) == std::complex<double> (i+1., i+2.),
+                       ExcInternalError());
+          AssertThrow (v(i) == std::complex<double> (i+1., i+2.)+1.*i,
+                       ExcInternalError());
         }
       else
         {
-          Assert (w(i) == 0., ExcInternalError());
-          Assert (v(i) == 1.*i, ExcInternalError());
+          AssertThrow (w(i) == 0., ExcInternalError());
+          AssertThrow (v(i) == 1.*i, ExcInternalError());
         }
     }
 

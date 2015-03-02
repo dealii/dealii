@@ -36,8 +36,8 @@ void test (TrilinosWrappers::Vector &v)
   // then resize with setting to zero
   v.reinit (13);
 
-  Assert (v.size() == 13, ExcInternalError());
-  Assert (v.l2_norm() == 0, ExcInternalError());
+  AssertThrow (v.size() == 13, ExcInternalError());
+  AssertThrow (v.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,7 @@ int main ()
   t[0][1][0][1] = 3;
   t[1][0][1][0] = 3;
 
-  Assert (t[0][1][0][1] == t[1][0][1][0], ExcInternalError());
+  AssertThrow (t[0][1][0][1] == t[1][0][1][0], ExcInternalError());
 
   // check norm of tensor
   deallog << t.norm() << std::endl;
@@ -50,8 +50,8 @@ int main ()
         for (unsigned int l=0; l<2; ++l)
           norm_sqr += t[i][j][k][l] * t[i][j][k][l];
 
-  Assert (std::fabs (t.norm()*t.norm() - norm_sqr) < 1e-14,
-          ExcInternalError());
+  AssertThrow (std::fabs (t.norm()*t.norm() - norm_sqr) < 1e-14,
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -29,13 +29,13 @@
 
 void test (TrilinosWrappers::SparseMatrix &m)
 {
-  Assert (m.m() != 0, ExcInternalError());
-  Assert (m.n() != 0, ExcInternalError());
+  AssertThrow (m.m() != 0, ExcInternalError());
+  AssertThrow (m.n() != 0, ExcInternalError());
 
   m.clear ();
 
-  Assert (m.m() == 0, ExcInternalError());
-  Assert (m.n() == 0, ExcInternalError());
+  AssertThrow (m.m() == 0, ExcInternalError());
+  AssertThrow (m.n() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

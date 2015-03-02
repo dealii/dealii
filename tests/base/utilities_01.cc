@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,33 +36,33 @@ void test ()
   v.push_back ("1");
   v.push_back (" -12");
   v.push_back ("+125 ");
-  Assert (Utilities::string_to_int (v).size() == 3, ExcInternalError());
+  AssertThrow (Utilities::string_to_int (v).size() == 3, ExcInternalError());
   deallog << Utilities::string_to_int (v)[0] << std::endl;
   deallog << Utilities::string_to_int (v)[1] << std::endl;
   deallog << Utilities::string_to_int (v)[2] << std::endl;
 
   {
     const char *p = "alpha, beta, gamma ";
-    Assert (Utilities::split_string_list (p).size() == 3,
-            ExcInternalError());
-    Assert (Utilities::split_string_list (p)[0] == "alpha",
-            ExcInternalError());
-    Assert (Utilities::split_string_list (p)[1] == "beta",
-            ExcInternalError());
-    Assert (Utilities::split_string_list (p)[2] == "gamma",
-            ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p).size() == 3,
+                 ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p)[0] == "alpha",
+                 ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p)[1] == "beta",
+                 ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p)[2] == "gamma",
+                 ExcInternalError());
   }
 
   {
     const char *p = "alpha; beta; gamma ";
-    Assert (Utilities::split_string_list (p, ';').size() == 3,
-            ExcInternalError());
-    Assert (Utilities::split_string_list (p, ';')[0] == "alpha",
-            ExcInternalError());
-    Assert (Utilities::split_string_list (p, ';')[1] == "beta",
-            ExcInternalError());
-    Assert (Utilities::split_string_list (p, ';')[2] == "gamma",
-            ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p, ';').size() == 3,
+                 ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p, ';')[0] == "alpha",
+                 ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p, ';')[1] == "beta",
+                 ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p, ';')[2] == "gamma",
+                 ExcInternalError());
   }
 
   deallog << Utilities::generate_normal_random_number (13, 44) << ' ';

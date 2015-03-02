@@ -32,7 +32,7 @@ void test (TrilinosWrappers::Vector &v)
 
   v.compress (VectorOperation::insert);
 
-  Assert (v.size() == 100, ExcInternalError());
+  AssertThrow (v.size() == 100, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

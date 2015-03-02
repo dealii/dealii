@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,18 +45,18 @@ void test ()
       deallog << i << ' ' << (is3.is_element(i) ? "true" : "false")
               << std::endl;
 
-      Assert ((is1.is_element(i) && is2.is_element(i))
-              ==
-              is3.is_element(i),
-              ExcInternalError());
+      AssertThrow ((is1.is_element(i) && is2.is_element(i))
+                   ==
+                   is3.is_element(i),
+                   ExcInternalError());
     }
 
   // some sanity tests
-  Assert ((is1 & is2) == (is2 & is1), ExcInternalError());
-  Assert ((is1 & is3) == (is2 & is3), ExcInternalError());
-  Assert ((is1 & is3) == is3, ExcInternalError());
-  Assert ((is3 & is1) == is3, ExcInternalError());
-  Assert ((is3 & is3) == is3, ExcInternalError());
+  AssertThrow ((is1 & is2) == (is2 & is1), ExcInternalError());
+  AssertThrow ((is1 & is3) == (is2 & is3), ExcInternalError());
+  AssertThrow ((is1 & is3) == is3, ExcInternalError());
+  AssertThrow ((is3 & is1) == is3, ExcInternalError());
+  AssertThrow ((is3 & is3) == is3, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

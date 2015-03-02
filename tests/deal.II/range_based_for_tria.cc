@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,8 +45,8 @@ void check()
 
     // now verify that it is really only the active cells
     for (auto cell : tr.cell_iterators())
-      Assert (cell->user_flag_set() == !cell->has_children(),
-	      ExcInternalError());
+      AssertThrow (cell->user_flag_set() == !cell->has_children(),
+                   ExcInternalError());
   }
 
   // now do the same again for all levels of the triangulation
@@ -54,17 +54,17 @@ void check()
     {
       tr.clear_user_flags ();
       for (auto cell : tr.active_cell_iterators_on_level(l))
-	cell->set_user_flag();
+        cell->set_user_flag();
 
       for (auto cell : tr.cell_iterators_on_level(l))
-	Assert (cell->user_flag_set() == !cell->has_children(),
-		ExcInternalError());
-      
+        AssertThrow (cell->user_flag_set() == !cell->has_children(),
+                     ExcInternalError());
+
       for (auto cell : tr.cell_iterators())
-	Assert ((cell->user_flag_set() == !cell->has_children())
-		||
-		(l != cell->level()),
-		ExcInternalError());
+        AssertThrow ((cell->user_flag_set() == !cell->has_children())
+                     ||
+                     (l != cell->level()),
+                     ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

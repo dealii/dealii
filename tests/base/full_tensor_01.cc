@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,11 +37,11 @@ int main ()
   t[1][0] = 4;
   // make sure transposition doesn't change
   // anything
-  Assert (t == transpose(t), ExcInternalError());
+  AssertThrow (t == transpose(t), ExcInternalError());
 
   // check norm of tensor
-  Assert (std::fabs(t.norm() - std::sqrt(1.*1+2*2+2*4*4)) < 1e-14,
-          ExcInternalError());
+  AssertThrow (std::fabs(t.norm() - std::sqrt(1.*1+2*2+2*4*4)) < 1e-14,
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

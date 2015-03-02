@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,15 +61,15 @@ void test ()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       {
-        Assert (as[i][j] == aa[i][j], ExcInternalError());
-        Assert (bs[i][j] == ba[i][j], ExcInternalError());
+        AssertThrow (as[i][j] == aa[i][j], ExcInternalError());
+        AssertThrow (bs[i][j] == ba[i][j], ExcInternalError());
 
         deallog << as[i][j] << ' ' << bs[i][j] << std::endl;
       }
 
   // test distributivity of
   // multiplication
-  Assert ((as*ts)*as == as*(ts*as), ExcInternalError());
+  AssertThrow ((as*ts)*as == as*(ts*as), ExcInternalError());
 
 
   // also test that the elasticity

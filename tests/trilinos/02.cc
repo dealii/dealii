@@ -46,12 +46,12 @@ void test (TrilinosWrappers::SparseMatrix &m)
     for (unsigned int j=0; j<m.m(); ++j)
       if ((i+2*j+1) % 3 == 0)
         {
-          Assert (m(i,j) == i*j*.5+.5, ExcInternalError());
-          Assert (m.el(i,j) == i*j*.5+.5, ExcInternalError());
+          AssertThrow (m(i,j) == i*j*.5+.5, ExcInternalError());
+          AssertThrow (m.el(i,j) == i*j*.5+.5, ExcInternalError());
         }
       else
         {
-          Assert (m.el(i,j) == 0, ExcInternalError());
+          AssertThrow (m.el(i,j) == 0, ExcInternalError());
         }
 
   deallog << "OK" << std::endl;

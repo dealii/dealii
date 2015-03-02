@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,15 +32,15 @@
 void test ()
 {
   // test for an initialized mask
-  Assert (ComponentMask(12,false).represents_the_all_selected_mask() == false,
-          ExcInternalError());
+  AssertThrow (ComponentMask(12,false).represents_the_all_selected_mask() == false,
+               ExcInternalError());
   // note the semantics of the following as
   // described in the documentation
-  Assert (ComponentMask(12,true).represents_the_all_selected_mask() == false,
-          ExcInternalError());
+  AssertThrow (ComponentMask(12,true).represents_the_all_selected_mask() == false,
+               ExcInternalError());
   // test for an empty mask
-  Assert (ComponentMask().represents_the_all_selected_mask() == true,
-          ExcInternalError());
+  AssertThrow (ComponentMask().represents_the_all_selected_mask() == true,
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,9 +60,9 @@ void test ()
   // t_times_1 should be a multiple of the
   // unit tensor, given the structure we have
   // given to it
-  Assert ((t_times_1 - (dim*10000 + 2*100)*unit_symmetric_tensor<dim>()).norm()
-          < 1e-14*t_times_1.norm(),
-          ExcInternalError());
+  AssertThrow ((t_times_1 - (dim*10000 + 2*100)*unit_symmetric_tensor<dim>()).norm()
+               < 1e-14*t_times_1.norm(),
+               ExcInternalError());
 }
 
 

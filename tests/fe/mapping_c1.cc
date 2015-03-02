@@ -118,14 +118,14 @@ int main ()
           // some numerical checks for correctness
           for (unsigned int i=0; i<2; ++i)
             {
-              Assert (std::fabs(c1_values.normal_vector(i) *
-                                c1_values.normal_vector(i) - 1) < 1e-14,
-                      ExcInternalError());
+              AssertThrow (std::fabs(c1_values.normal_vector(i) *
+                                     c1_values.normal_vector(i) - 1) < 1e-14,
+                           ExcInternalError());
               Point<2> radius = c1_values.quadrature_point(i);
               radius /= std::sqrt(radius.square());
 
-              Assert ((radius-c1_values.normal_vector(i)).norm_square() < 1e-14,
-                      ExcInternalError());
+              AssertThrow ((radius-c1_values.normal_vector(i)).norm_square() < 1e-14,
+                           ExcInternalError());
             };
         };
 }

@@ -45,7 +45,7 @@ void test ()
   x1.ReplaceGlobalValues(1, &GID, &value);
   x1.GlobalAssemble (Insert);
   if (Comm.MyPID()==0)
-    Assert (x1[0][0] == 1, ExcInternalError());
+    AssertThrow (x1[0][0] == 1, ExcInternalError());
 
   // copy vector
   Epetra_FEVector x2 (x1);
@@ -62,7 +62,7 @@ void test ()
   x2.GlobalAssemble (Insert);
 
   if (Comm.MyPID()==0)
-    Assert (x1[0][0] == 1, ExcInternalError());
+    AssertThrow (x1[0][0] == 1, ExcInternalError());
 }
 
 

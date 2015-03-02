@@ -90,8 +90,8 @@ void test ()
   for (SparseMatrix<double>::iterator p=B.begin();
        p!=B.end(); ++p)
     if (p->column() != p->row())
-      Assert (B(p->row(),p->column()) != B(p->column(),p->row()),
-              ExcInternalError());
+      AssertThrow (B(p->row(),p->column()) != B(p->column(),p->row()),
+                   ExcInternalError());
 
 
   SparseMatrixEZ<double> B_ez(dof_handler.n_dofs(),

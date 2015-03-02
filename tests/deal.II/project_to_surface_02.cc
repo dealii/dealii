@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -122,9 +122,9 @@ void test ()
           // trial_point than any of
           // the vertices of the quad
           for (unsigned int v=0; v<4; ++v)
-            Assert (p.distance (trial_point) <=
-                    quad->vertex(v).distance (trial_point),
-                    ExcInternalError());
+            AssertThrow (p.distance (trial_point) <=
+                         quad->vertex(v).distance (trial_point),
+                         ExcInternalError());
         }
       tria.clear();
     }

@@ -36,8 +36,8 @@ void test ()
 
   TrilinosWrappers::MPI::Vector test1, test2;
 
-  Assert (test1.vector_partitioner().SameAs(test2.vector_partitioner()),
-          ExcInternalError());
+  AssertThrow (test1.vector_partitioner().SameAs(test2.vector_partitioner()),
+               ExcInternalError());
 
   // first processor owns 2 indices, second
   // processor owns none
@@ -50,8 +50,8 @@ void test ()
   // reinit Trilinos vector from other vector
   test2.reinit (test1, true);
 
-  Assert (test1.vector_partitioner().SameAs(test2.vector_partitioner()),
-          ExcInternalError());
+  AssertThrow (test1.vector_partitioner().SameAs(test2.vector_partitioner()),
+               ExcInternalError());
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;

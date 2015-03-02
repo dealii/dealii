@@ -37,7 +37,7 @@ void test ()
 
   // verify equality
   for (unsigned int i=0; i<v.size(); ++i)
-    Assert (m[i] == v[i], ExcInternalError());
+    AssertThrow (m[i] == v[i], ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

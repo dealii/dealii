@@ -95,7 +95,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
   // make sure that zeroing out rows does at
   // least not add new nonzero entries (it
   // may remove some, though)
-  Assert (m.n_nonzero_elements() <= nnz, ExcInternalError());
+  AssertThrow (m.n_nonzero_elements() <= nnz, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

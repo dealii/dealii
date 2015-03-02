@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -87,9 +87,9 @@ void test (const Triangulation<dim> &tr,
             for (unsigned int d=0; d<dim; ++d)
               grad[d] = vector_values[q][c+d];
 
-            Assert ((selected_vector_values[q] - symmetrize(grad)).norm()
-                    <= 1e-12 * selected_vector_values[q].norm(),
-                    ExcInternalError());
+            AssertThrow ((selected_vector_values[q] - symmetrize(grad)).norm()
+                         <= 1e-12 * selected_vector_values[q].norm(),
+                         ExcInternalError());
           }
       }
 }

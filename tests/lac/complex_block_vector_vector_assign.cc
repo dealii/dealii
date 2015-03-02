@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,12 +55,12 @@ void test ()
     v1(i) = 1+i*i;
 
   v2 = v1;
-  Assert (v1==v2, ExcInternalError());
+  AssertThrow (v1==v2, ExcInternalError());
 
   BlockVector<std::complex<double> > v3 (ivector);
   v3 = v2;
-  Assert (v3==v2, ExcInternalError());
-  Assert (v3==v1, ExcInternalError());
+  AssertThrow (v3==v2, ExcInternalError());
+  AssertThrow (v3==v1, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

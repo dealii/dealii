@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,8 +57,8 @@ void check (const unsigned int n)
        cell = tria.begin_active();
        cell != tria.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      Assert (cell->face(f)->at_boundary() == cell->at_boundary(f),
-              ExcInternalError());
+      AssertThrow (cell->face(f)->at_boundary() == cell->at_boundary(f),
+                   ExcInternalError());
 
   // also output something slightly
   // more useful

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,10 +47,10 @@ void test (Vector<double> &v,
   // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (w(i) == i+1., ExcInternalError());
-      Assert (x(i) == i+2., ExcInternalError());
-      Assert (y(i) == i+3., ExcInternalError());
-      Assert (v(i) == 1.5*i+2*(i+1.)+3*(i+2.)+4*(i+3), ExcInternalError());
+      AssertThrow (w(i) == i+1., ExcInternalError());
+      AssertThrow (x(i) == i+2., ExcInternalError());
+      AssertThrow (y(i) == i+3., ExcInternalError());
+      AssertThrow (v(i) == 1.5*i+2*(i+1.)+3*(i+2.)+4*(i+3), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,7 @@ void test ()
       Tensor<1,dim> s;
       for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
         s += GeometryInfo<dim>::d_linear_shape_function_gradient(GeometryInfo<dim>::unit_cell_vertex(v),i);
-      Assert (s.norm() == 0, ExcInternalError());
+      AssertThrow (s.norm() == 0, ExcInternalError());
 
       deallog << "Sum of shape functions: " << s << std::endl;
     }
@@ -64,7 +64,7 @@ void test ()
     Tensor<1,dim> s;
     for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       s += GeometryInfo<dim>::d_linear_shape_function_gradient(center,i);
-    Assert (s.norm() == 0, ExcInternalError());
+    AssertThrow (s.norm() == 0, ExcInternalError());
 
     deallog << "Sum of shape functions: " << s << std::endl;
   }

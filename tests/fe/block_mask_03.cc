@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +37,7 @@ void test ()
 
   // verify equality
   for (unsigned int i=0; i<v.size(); ++i)
-    Assert (m[i] == v[i], ExcInternalError());
+    AssertThrow (m[i] == v[i], ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

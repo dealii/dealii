@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,8 +79,8 @@ check_this (const DoFHandler<dim> &dof_handler)
   // set
   for (unsigned int i=0; i<dof_data.size(); ++i)
     if (component_dofs[i] == false)
-      Assert (dof_data(i) == 0,
-              ExcInternalError());
+      AssertThrow (dof_data(i) == 0,
+                   ExcInternalError());
 
 
   // distribute to last component. by
@@ -113,6 +113,6 @@ check_this (const DoFHandler<dim> &dof_handler)
   // set
   for (unsigned int i=0; i<dof_data.size(); ++i)
     if (component_dofs[i] == false)
-      Assert (dof_data(i) == 0,
-              ExcInternalError());
+      AssertThrow (dof_data(i) == 0,
+                   ExcInternalError());
 }

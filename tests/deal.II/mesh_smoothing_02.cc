@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -117,13 +117,13 @@ void test ()
        cell = triangulation.begin();
        cell != triangulation.end(); ++cell)
     {
-      Assert ((cell->refine_flag_set() == false)
-              &&
-              (cell->coarsen_flag_set() == false),
-              ExcInternalError());
+      AssertThrow ((cell->refine_flag_set() == false)
+                   &&
+                   (cell->coarsen_flag_set() == false),
+                   ExcInternalError());
       if (!cell->active())
-        Assert (cell_is_patch_level_1<2>(cell),
-                ExcInternalError());
+        AssertThrow (cell_is_patch_level_1<2>(cell),
+                     ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

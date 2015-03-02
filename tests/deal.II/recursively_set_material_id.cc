@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,11 +76,15 @@ void test()
       deallog << n << std::endl;
 
       if (t==0)
-        Assert (n == GeometryInfo<dim>::max_children_per_cell,
-                ExcInternalError())
-        else
-          Assert (n == 2,
-                  ExcInternalError());
+        {
+          AssertThrow (n == GeometryInfo<dim>::max_children_per_cell,
+                       ExcInternalError());
+        }
+      else
+        {
+          AssertThrow (n == 2,
+                       ExcInternalError());
+        }
     }
 }
 

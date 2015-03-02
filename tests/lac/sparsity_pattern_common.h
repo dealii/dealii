@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -306,18 +306,24 @@ void copy_from_1 ()
   if ((sparsity_pattern.stores_only_added_elements() == true)
       &&
       (sp4.stores_only_added_elements() == true))
-    Assert (sparsity_pattern.n_nonzero_elements() ==
-            sp4.n_nonzero_elements(),
-            ExcInternalError());
+    AssertThrow (sparsity_pattern.n_nonzero_elements() ==
+                 sp4.n_nonzero_elements(),
+                 ExcInternalError());
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
-      if ((sparsity_pattern.stores_only_added_elements() == true)
-          &&
-          (sp4.stores_only_added_elements() == true))
-        Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
-                ExcInternalError())
+      {
+        if ((sparsity_pattern.stores_only_added_elements() == true)
+            &&
+            (sp4.stores_only_added_elements() == true))
+          {
+            AssertThrow (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
+                         ExcInternalError());
+          }
         else if (sparsity_pattern.exists(i,j))
-          Assert (sp4.exists (i,j), ExcInternalError());
+          {
+            AssertThrow (sp4.exists (i,j), ExcInternalError());
+          }
+      }
 
   deallog << "OK" << std::endl;
 }
@@ -341,18 +347,24 @@ void copy_from_2 ()
   if ((sparsity_pattern.stores_only_added_elements() == true)
       &&
       (sp4.stores_only_added_elements() == true))
-    Assert (sparsity_pattern.n_nonzero_elements() ==
-            sp4.n_nonzero_elements(),
-            ExcInternalError());
+    AssertThrow (sparsity_pattern.n_nonzero_elements() ==
+                 sp4.n_nonzero_elements(),
+                 ExcInternalError());
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
-      if ((sparsity_pattern.stores_only_added_elements() == true)
-          &&
-          (sp4.stores_only_added_elements() == true))
-        Assert (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
-                ExcInternalError())
+      {
+        if ((sparsity_pattern.stores_only_added_elements() == true)
+            &&
+            (sp4.stores_only_added_elements() == true))
+          {
+            AssertThrow (sparsity_pattern.exists(i,j) == sp4.exists (i,j),
+                         ExcInternalError());
+          }
         else if (sparsity_pattern.exists(i,j))
-          Assert (sp4.exists (i,j), ExcInternalError());
+          {
+            AssertThrow (sp4.exists (i,j), ExcInternalError());
+          }
+      }
 
   deallog << "OK" << std::endl;
 }
@@ -376,24 +388,28 @@ void copy_from_4 ()
   // now check for equivalence of original
   // and copy
   if (sp4.stores_only_added_elements() == true)
-    Assert (sp4.n_nonzero_elements() ==
-            static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
-                                      sparsity_pattern.frobenius_norm()
-                                      + 0.5),
-            ExcInternalError())
-    else
-      Assert (sp4.n_nonzero_elements() >=
-              static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
-                                        sparsity_pattern.frobenius_norm()
-                                        + 0.5),
-              ExcInternalError());
+    {
+      AssertThrow (sp4.n_nonzero_elements() ==
+                   static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
+                                             sparsity_pattern.frobenius_norm()
+                                             + 0.5),
+                   ExcInternalError());
+    }
+  else
+    {
+      AssertThrow (sp4.n_nonzero_elements() >=
+                   static_cast<unsigned int>(sparsity_pattern.frobenius_norm() *
+                                             sparsity_pattern.frobenius_norm()
+                                             + 0.5),
+                   ExcInternalError());
+    }
 
   for (unsigned int i=0; i<M; ++i)
     for (unsigned int j=0; j<M; ++j)
       if (std::abs((int)(i-j)) == 3)
-        Assert (sp4.exists (i,j)
-                == true,
-                ExcInternalError());
+        AssertThrow (sp4.exists (i,j)
+                     == true,
+                     ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -411,15 +427,15 @@ void matrix_position ()
   // function should be the inverse
   // of operator()
   for (unsigned int i=0; i<sparsity_pattern.n_nonzero_elements(); ++i)
-    Assert (sparsity_pattern(sparsity_pattern.matrix_position(i).first,
-                             sparsity_pattern.matrix_position(i).second) == i,
-            ExcInternalError());
+    AssertThrow (sparsity_pattern(sparsity_pattern.matrix_position(i).first,
+                                  sparsity_pattern.matrix_position(i).second) == i,
+                 ExcInternalError());
   for (types::global_dof_index row=0; row<sparsity_pattern.n_rows(); ++row)
     for (types::global_dof_index col=0; col<sparsity_pattern.n_cols(); ++col)
       if (sparsity_pattern(row,col) != SparsityPattern::invalid_entry)
-        Assert (sparsity_pattern.matrix_position(sparsity_pattern(row,col)) ==
-                std::make_pair(row,col),
-                ExcInternalError());
+        AssertThrow (sparsity_pattern.matrix_position(sparsity_pattern(row,col)) ==
+                     std::make_pair(row,col),
+                     ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -470,8 +486,8 @@ void block_read_write ()
 
   for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
     for (unsigned int j=0; j<sparsity_pattern.n_cols(); ++j)
-      Assert (sparsity_pattern.exists(i,j) == sp5.exists (i,j),
-              ExcInternalError());
+      AssertThrow (sparsity_pattern.exists(i,j) == sp5.exists (i,j),
+                   ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -33,9 +33,9 @@ void test ()
   // iterator
   {
     PETScWrappers::BlockVector::const_iterator i=v.begin();
-    Assert (*i == 1, ExcInternalError());
+    AssertThrow (*i == 1, ExcInternalError());
     ++i;
-    Assert (*i == 2, ExcInternalError());
+    AssertThrow (*i == 2, ExcInternalError());
   }
 
   // same, but create iterator in a different
@@ -43,17 +43,17 @@ void test ()
   {
     PETScWrappers::BlockVector::const_iterator
     i=const_cast<const PETScWrappers::BlockVector &>(v).begin();
-    Assert (*i == 1, ExcInternalError());
+    AssertThrow (*i == 1, ExcInternalError());
     ++i;
-    Assert (*i == 2, ExcInternalError());
+    AssertThrow (*i == 2, ExcInternalError());
   }
 
   // read through a read-write iterator
   {
     PETScWrappers::BlockVector::iterator i = v.begin();
-    Assert (*i == 1, ExcInternalError());
+    AssertThrow (*i == 1, ExcInternalError());
     ++i;
-    Assert (*i == 2, ExcInternalError());
+    AssertThrow (*i == 2, ExcInternalError());
   }
 
   // write through a read-write iterator
@@ -68,9 +68,9 @@ void test ()
   // and read again
   {
     PETScWrappers::BlockVector::iterator i = v.begin();
-    Assert (*i == 2, ExcInternalError());
+    AssertThrow (*i == 2, ExcInternalError());
     ++i;
-    Assert (*i == 3, ExcInternalError());
+    AssertThrow (*i == 3, ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

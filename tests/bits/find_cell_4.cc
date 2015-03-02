@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,7 +57,7 @@ void check (Triangulation<3> &tria)
       )
     );
 
-  Assert (p.distance (pp) < 1e-15,  ExcInternalError());
+  AssertThrow (p.distance (pp) < 1e-15,  ExcInternalError());
 }
 
 

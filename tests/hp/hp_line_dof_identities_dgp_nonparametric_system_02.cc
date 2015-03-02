@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,9 +75,9 @@ void test ()
         // brings us back to the first of the
         // three identical elements in the
         // collection)
-        Assert (identities ==
-                fe_collection[i/3*3].hp_line_dof_identities (fe_collection[j/3*3]),
-                ExcInternalError());
+        AssertThrow (identities ==
+                     fe_collection[i/3*3].hp_line_dof_identities (fe_collection[j/3*3]),
+                     ExcInternalError());
       }
 }
 
