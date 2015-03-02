@@ -109,9 +109,32 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     "
     DEAL_II_HAVE_SSE2)
 
+  #
+  # clang-3.6.0 has a bug in operator+ on two VectorizedArray components as
+  # defined in deal.II. Therefore, the test for AVX needs to also test for
+  # operator+ to be correctly implemented.
+  #
   CHECK_CXX_SOURCE_RUNS(
     "
     #include <immintrin.h>
+    class VectorizedArray
+    {
+    public:
+      VectorizedArray &
+      operator += (const VectorizedArray &vec)
+      {
+        data = _mm256_add_pd (data, vec.data);
+        return *this;
+      }
+      __m256d data;
+    };
+    inline
+    VectorizedArray
+    operator + (const VectorizedArray &u, const VectorizedArray &v)
+    {
+      VectorizedArray tmp = u;
+      return tmp+=v;
+    }
     int main()
     {
       __m256d a, b;
@@ -132,6 +155,14 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
         return_value = 1;
       for (int i=1; i<n_vectors; ++i)
         if (ptr[i] != 5.0625)
+          return_value = 1;
+      VectorizedArray c, d, e;
+      c.data = b;
+      d.data = b;
+      e = c + d;
+      ptr = reinterpret_cast<double*>(&e.data);
+      for (int i=0; i<n_vectors; ++i)
+        if (ptr[i] != 4.5)
           return_value = 1;
       _mm_free (data);
       return return_value;
