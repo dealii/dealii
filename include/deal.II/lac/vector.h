@@ -965,9 +965,10 @@ protected:
 private:
 
   /**
-   * Allocate and align @p v along 64-byte boundaries.
+   * Allocate and align @p val along 64-byte boundaries. The size
+   * of the allocated memory is determined by @p max_vec_size .
    */
-  void allocate(const size_type n);
+  void allocate();
 
   /**
    * Deallocate @p val.
@@ -1050,9 +1051,8 @@ void Vector<Number>::reinit (const size_type n, const bool fast)
   if (n>max_vec_size)
     {
       if (val) deallocate();
-      allocate(n);
-      Assert (val != 0, ExcOutOfMemory());
       max_vec_size = n;
+      allocate();
     };
   vec_size = n;
   if (fast == false)
@@ -1347,12 +1347,14 @@ inline
 void
 Vector<Number>::load (Archive &ar, const unsigned int)
 {
-  // forward to serialization function in the base class.
-  ar   &static_cast<Subscriptor &>(*this);
+  // get rid of previous content
+  deallocate();
 
+  // the load stuff again from the archive
+  ar &static_cast<Subscriptor &>(*this);
   ar &vec_size &max_vec_size ;
 
-  allocate(max_vec_size);
+  allocate();
   ar &boost::serialization::make_array(val, max_vec_size);
 }
 

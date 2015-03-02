@@ -574,8 +574,7 @@ Vector<Number>::Vector (const Vector<Number> &v)
 {
   if (vec_size != 0)
     {
-      allocate(max_vec_size);
-      Assert (val != 0, ExcOutOfMemory());
+      allocate();
       *this = v;
     }
 }
@@ -594,8 +593,7 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
 {
   if (vec_size != 0)
     {
-      allocate(max_vec_size);
-      Assert (val != 0, ExcOutOfMemory());
+      allocate();
       std::copy (v.begin(), v.end(), begin());
     }
 }
@@ -615,8 +613,7 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
 {
   if (vec_size != 0)
     {
-      allocate(max_vec_size);
-      Assert (val != 0, ExcOutOfMemory());
+      allocate();
 
       // get a representation of the vector
       // and copy it
@@ -667,8 +664,7 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
 {
   if (vec_size != 0)
     {
-      allocate(max_vec_size);
-      Assert (val != 0, ExcOutOfMemory());
+      allocate();
 
       // Copy the distributed vector to
       // a local one at all
@@ -701,8 +697,7 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
 {
   if (vec_size != 0)
     {
-      allocate(max_vec_size);
-      Assert (val != 0, ExcOutOfMemory());
+      allocate();
 
       // get a representation of the vector
       // and copy it
@@ -2048,9 +2043,12 @@ Vector<Number>::memory_consumption () const
 
 template <typename Number>
 void
-Vector<Number>::allocate(const size_type size)
+Vector<Number>::allocate()
 {
-  val = static_cast<Number *>(_mm_malloc (sizeof(Number)*size, 64));
+  // make sure that we don't create a memory leak
+  Assert (val == 0, ExcInternalError());
+  val = static_cast<Number *>(_mm_malloc (sizeof(Number)*max_vec_size, 64));
+  Assert (val != 0, ExcOutOfMemory());
 }
 
 
@@ -2060,6 +2058,7 @@ void
 Vector<Number>::deallocate()
 {
   _mm_free(val);
+  val = 0;
 }
 
 DEAL_II_NAMESPACE_CLOSE
