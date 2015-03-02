@@ -67,27 +67,27 @@ void test ()
 
   // check local values for correctness
   for (unsigned int i=0; i<local_size; ++i)
-    Assert (v.local_element(i) == 2.0 * (i + my_start), ExcInternalError());
+    AssertThrow (v.local_element(i) == 2.0 * (i + my_start), ExcInternalError());
 
   // check local values with two different
   // access operators
   for (unsigned int i=0; i<local_size; ++i)
-    Assert (v.local_element(i) == v(local_owned.nth_index_in_set (i)), ExcInternalError());
+    AssertThrow (v.local_element(i) == v(local_owned.nth_index_in_set (i)), ExcInternalError());
   for (unsigned int i=0; i<local_size; ++i)
-    Assert (v.local_element(i) == v(i+my_start), ExcInternalError());
+    AssertThrow (v.local_element(i) == v(i+my_start), ExcInternalError());
 
   // check non-local entries on all processors
   for (unsigned int i=0; i<10; ++i)
-    Assert (v(ghost_indices[i])== 2. * ghost_indices[i], ExcInternalError());
+    AssertThrow (v(ghost_indices[i])== 2. * ghost_indices[i], ExcInternalError());
 
   // compare direct access [] with access ()
   for (unsigned int i=0; i<10; ++i)
     if (ghost_indices[i] < my_start)
-      Assert (v(ghost_indices[i])==v.local_element(local_size+i), ExcInternalError());
+      AssertThrow (v(ghost_indices[i])==v.local_element(local_size+i), ExcInternalError());
 
   if (myid == 0)
     for (unsigned int i=5; i<10; ++i)
-      Assert (v(ghost_indices[i])==v.local_element(local_size+i-5), ExcInternalError());
+      AssertThrow (v(ghost_indices[i])==v.local_element(local_size+i-5), ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;

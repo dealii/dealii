@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -96,9 +96,9 @@ void test_with_wrong_face_orientation ()
   // CellAccessor::neighbor_child_on_subface it
   // should work. let's make sure we get the
   // status we expect.
-  Assert (cell->face(3)->child(1) ==
-          neighbor_child->face(cell->neighbor_of_neighbor(3)),
-          ExcInternalError());
+  AssertThrow (cell->face(3)->child(1) ==
+               neighbor_child->face(cell->neighbor_of_neighbor(3)),
+               ExcInternalError());
 }
 
 

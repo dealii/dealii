@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -112,8 +112,8 @@ mass_assembler(const typename Triangulation<dim>::active_cell_iterator &cell,
                                std_cxx11::bind(&zero_subrange, std_cxx11::_1, std_cxx11::_2,
                                                std_cxx11::ref(copy_data.cell_rhs)), 1);
 
-  Assert(q == data.x_fe_values.quadrature_point(0),
-         ExcInternalError());
+  AssertThrow(q == data.x_fe_values.quadrature_point(0),
+              ExcInternalError());
 
   copy_data.cell_rhs[0] = value(data.x_fe_values.quadrature_point(0));
 }
@@ -157,10 +157,10 @@ do_project()
       CopyData copy_data;
       copy_data.cell_rhs.resize(8);
       WorkStream::run(GraphColoring::make_graph_coloring (triangulation.begin_active(),
-							  triangulation.end(),
-							  std_cxx11::function<std::vector<types::global_dof_index>
-									      (const Triangulation<dim>::active_cell_iterator &)>
-							  (&conflictor<dim>)),
+                                                          triangulation.end(),
+                                                          std_cxx11::function<std::vector<types::global_dof_index>
+                                                          (const Triangulation<dim>::active_cell_iterator &)>
+                                                          (&conflictor<dim>)),
                       &mass_assembler<dim>,
                       std_cxx11::bind(&copy_local_to_global, std_cxx11::_1, &sum),
                       assembler_data, copy_data, 8, 1);

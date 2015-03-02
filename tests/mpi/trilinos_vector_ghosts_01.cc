@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,8 +57,8 @@ void test()
 
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
                                              MPI_COMM_WORLD);
-  Assert (interpolated.has_ghost_elements() == false,
-          ExcInternalError());
+  AssertThrow (interpolated.has_ghost_elements() == false,
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

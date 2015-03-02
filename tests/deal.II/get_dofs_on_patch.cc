@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014-2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,7 @@ void test()
            cell != triangulation.end(); ++cell, ++index)
         if (flags[index])
           cell->set_refine_flag();
-      Assert (index == triangulation.n_active_cells(), ExcInternalError());
+      AssertThrow (index == triangulation.n_active_cells(), ExcInternalError());
 
       // flag all other cells for coarsening
       // (this should ensure that at least
@@ -79,19 +79,19 @@ void test()
   FE_Q<dim> fe(2);
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs(fe);
-  
+
   // now extract patches and print the mapping from global to patch dofs
   for (typename DoFHandler<dim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
+       cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     {
       const std::vector<types::global_dof_index>
-	m = DoFTools::get_dofs_on_patch<DoFHandler<dim> >
-	(GridTools::get_patch_around_cell<DoFHandler<dim> > (cell));
+      m = DoFTools::get_dofs_on_patch<DoFHandler<dim> >
+          (GridTools::get_patch_around_cell<DoFHandler<dim> > (cell));
       deallog << cell << ": ";
       for (unsigned int i=0; i<m.size(); ++i)
-	deallog << i << "->" << m[i]
-		<< ' ';
+        deallog << i << "->" << m[i]
+                << ' ';
       deallog << std::endl;
     }
 }

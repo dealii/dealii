@@ -58,8 +58,8 @@ int main (int argc,char **argv)
   // indeed what we expect. verify
   // that both methods of accessing
   // the entry work
-  Assert (A.el(2, 3) == 2, ExcInternalError());
-  Assert (A(2, 3) == 2, ExcInternalError());
+  AssertThrow (A.el(2, 3) == 2, ExcInternalError());
+  AssertThrow (A(2, 3) == 2, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

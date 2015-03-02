@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,8 @@ int main()
   // started out with
   Patterns::Integer *pattern2 = Patterns::Integer::create (desc);
 
-  Assert (pattern2 != 0, ExcInternalError());
-  Assert (desc == pattern2->description(), ExcInternalError());
+  AssertThrow (pattern2 != 0, ExcInternalError());
+  AssertThrow (desc == pattern2->description(), ExcInternalError());
 
   deallog << desc << std::endl;
 

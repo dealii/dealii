@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -242,10 +242,10 @@ void ImposeBC<dim>::test_interpolate_BC ()
       // nedelec boundary DoF i has
       // wrongly been set to some
       // value
-      Assert ((p_boundary_dofs[i] && boundary_values[i] == 1.)
-              ||
-              (!(p_boundary_dofs[i])  && boundary_values[i] != 1.),
-              ExcInternalError());
+      AssertThrow ((p_boundary_dofs[i] && boundary_values[i] == 1.)
+                   ||
+                   (!(p_boundary_dofs[i])  && boundary_values[i] != 1.),
+                   ExcInternalError());
 
       deallog << boundary_values[i] << ' ';
     }

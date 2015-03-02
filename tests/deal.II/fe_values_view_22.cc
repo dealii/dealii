@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -214,10 +214,10 @@ void MixedElastoPlasticity<dim>::assemble_system()
         for (unsigned int m = 0; m < dim; m++)
           {
             for (unsigned int n = 0; n< dim; n++)
-              Assert ( (local_values[q])[m][n] == stress_value, ExcInternalError());
+              AssertThrow ( (local_values[q])[m][n] == stress_value, ExcInternalError());
 
-            Assert ( (local_divergences[q])[m] == 0.0, ExcInternalError());
-            Assert ( local_scalar_values[q] == gamma_value, ExcInternalError());
+            AssertThrow ( (local_divergences[q])[m] == 0.0, ExcInternalError());
+            AssertThrow ( local_scalar_values[q] == gamma_value, ExcInternalError());
 
           }
       }

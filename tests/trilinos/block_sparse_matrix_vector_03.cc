@@ -60,7 +60,7 @@ void test (const unsigned int size_1, const unsigned int size_2)
         result += (i+2*j)*j;
       for (unsigned int j=0; j<m.n(); ++j)
         result += (i+2*j)*(j+m.n());
-      Assert (w(i) == result, ExcInternalError());
+      AssertThrow (w(i) == result, ExcInternalError());
     }
 
   for (unsigned int i=0; i<w.size(); ++i)
@@ -73,8 +73,8 @@ void test (const unsigned int size_1, const unsigned int size_2)
       double result = 0;
       for (unsigned int j=0; j<m.m(); ++j)
         result += (j+2*i)*j;
-      Assert (v(i) == result, ExcInternalError());
-      Assert (v(i+m.n()) == result, ExcInternalError());
+      AssertThrow (v(i) == result, ExcInternalError());
+      AssertThrow (v(i+m.n()) == result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

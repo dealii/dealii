@@ -36,8 +36,8 @@ void test (PETScWrappers::Vector &v)
   // vector is really empty
   const unsigned int sz = v.size();
   v = 0;
-  Assert (v.size() == sz, ExcInternalError());
-  Assert (v.l2_norm() == 0, ExcInternalError());
+  AssertThrow (v.size() == sz, ExcInternalError());
+  AssertThrow (v.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

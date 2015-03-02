@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,7 +67,7 @@ void check ()
 
       bool res = cell->point_inside(testpoint);
       deallog << testpoint << " inside " << res <<std::endl;
-      Assert (res == expected[i], ExcInternalError());
+      AssertThrow (res == expected[i], ExcInternalError());
     }
 }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,7 @@ void test (Vector<double> &v)
   v.compress ();
 
   // then check the norm
-  Assert (v.linfty_norm() == norm, ExcInternalError());
+  AssertThrow (v.linfty_norm() == norm, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

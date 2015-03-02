@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,8 +43,8 @@ void test ()
     // where the diagonal elements are the
     // traces of t
     SymmetricTensor<2,dim> x = T * t;
-    Assert ((x-trace(t)*unit_symmetric_tensor<dim>()).norm()
-            < 1e-15*t.norm(), ExcInternalError());
+    AssertThrow ((x-trace(t)*unit_symmetric_tensor<dim>()).norm()
+                 < 1e-15*t.norm(), ExcInternalError());
 
     deallog << "x=" << std::endl;
     for (unsigned int i=0; i<dim; ++i)
@@ -59,8 +59,8 @@ void test ()
 
     // T*t should yield norm(t)^2*t
     SymmetricTensor<2,dim> x = T * t;
-    Assert ((x-(t*t)*t).norm()
-            < 1e-15*t.norm(), ExcInternalError());
+    AssertThrow ((x-(t*t)*t).norm()
+                 < 1e-15*t.norm(), ExcInternalError());
 
     deallog << "x=" << std::endl;
     for (unsigned int i=0; i<dim; ++i)

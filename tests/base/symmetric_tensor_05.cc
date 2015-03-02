@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,7 @@ void test ()
         b[i][j] = tmp_ij;
       }
 
-  Assert (a == b/2, ExcInternalError());
+  AssertThrow (a == b/2, ExcInternalError());
 
   // try the same thing with scaled
   // tensors etc
@@ -71,7 +71,7 @@ void test ()
         b[i][j] = tmp_ij;
       }
 
-  Assert (a == b/4, ExcInternalError());
+  AssertThrow (a == b/4, ExcInternalError());
 }
 
 

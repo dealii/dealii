@@ -93,7 +93,7 @@ check ()
   // make sure all dof indices have
   // actually been used
   for (unsigned int i=0; i<touched.size(); ++i)
-    Assert (touched[i] == true, ExcInternalError());
+    AssertThrow (touched[i] == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

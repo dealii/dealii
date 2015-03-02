@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,7 @@ void test ()
   BlockSparseMatrix<double>::const_iterator it2 = m.end();
 
   // make sure that the two of them match
-  Assert (it == it2, ExcInternalError());
+  AssertThrow (it == it2, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

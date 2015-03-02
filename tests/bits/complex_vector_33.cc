@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,9 +37,9 @@ void test (Vector<std::complex<double> > &v)
   v.compress ();
 
   // then check the norm
-  Assert (std::abs(v.lp_norm(3) - std::pow(sum, 1./3.)) <
-          1e-14*std::abs(std::pow(sum, 1./3.)),
-          ExcInternalError());
+  AssertThrow (std::abs(v.lp_norm(3) - std::pow(sum, 1./3.)) <
+               1e-14*std::abs(std::pow(sum, 1./3.)),
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

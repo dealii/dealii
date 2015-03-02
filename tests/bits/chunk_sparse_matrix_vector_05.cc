@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,8 +58,8 @@ void test (const unsigned int chunk_size,
   // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (v(i) == i, ExcInternalError());
-      Assert (w(i) == i+1, ExcInternalError());
+      AssertThrow (v(i) == i, ExcInternalError());
+      AssertThrow (w(i) == i+1, ExcInternalError());
     }
 
   double result = 0;
@@ -67,7 +67,7 @@ void test (const unsigned int chunk_size,
     for (unsigned int j=0; j<m.n(); ++j)
       result += (i+2*j)*j*(i+1);
 
-  Assert (s == result, ExcInternalError());
+  AssertThrow (s == result, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

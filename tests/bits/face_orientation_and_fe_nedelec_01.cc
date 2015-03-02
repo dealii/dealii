@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -151,8 +151,8 @@ void do_project (const Triangulation<dim> &triangulation,
               << std::endl;
 
       if (q<=p-order_difference)
-        Assert (error.l2_norm() <= 1e-10*projection.l2_norm(),
-                ExcFailedProjection(error.l2_norm() / projection.l2_norm()));
+        AssertThrow (error.l2_norm() <= 1e-10*projection.l2_norm(),
+                     ExcFailedProjection(error.l2_norm() / projection.l2_norm()));
     }
 }
 

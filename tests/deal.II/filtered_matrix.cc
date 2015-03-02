@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,8 +67,8 @@ solve_filtered (std::map<types::global_dof_index,double> &bv,
 
   for (std::map<types::global_dof_index,double>::const_iterator i=bv.begin();
        i!=bv.end(); ++i)
-    Assert (std::fabs(u(i->first) - i->second) < 1e-8,
-            ExcInternalError());
+    AssertThrow (std::fabs(u(i->first) - i->second) < 1e-8,
+                 ExcInternalError());
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -107,9 +107,9 @@ void do_check (const FiniteElement<dim> &coarse_fe,
         for (unsigned int i=0; i<fine_fe.dofs_per_cell; ++i)
           for (unsigned int j=0; j<coarse_fe.dofs_per_cell; ++j)
             injection_2(i,j) -= injection_1(i,j);
-        Assert (injection_2.frobenius_norm() <=
-                1e-12 * injection_1.frobenius_norm(),
-                ExcInternalError());
+        AssertThrow (injection_2.frobenius_norm() <=
+                     1e-12 * injection_1.frobenius_norm(),
+                     ExcInternalError());
       }
 }
 

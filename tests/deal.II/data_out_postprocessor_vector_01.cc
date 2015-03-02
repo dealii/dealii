@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -153,8 +153,8 @@ public:
 
         for (unsigned int d=0; d<dim; ++d)
           computed_quantities[q](d) = uh[q](0)*uh[q](0) + uh[q](1)*uh[q](1);
-        Assert (std::fabs(computed_quantities[q](0)-1) < 1e-12,
-                ExcInternalError());
+        AssertThrow (std::fabs(computed_quantities[q](0)-1) < 1e-12,
+                     ExcInternalError());
       }
   }
 };

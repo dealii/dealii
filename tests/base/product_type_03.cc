@@ -32,10 +32,10 @@
 template <typename T, typename U, typename CompareType>
 void check()
 {
-  Assert (typeid(T() * U()) == typeid(CompareType),
-	  ExcInternalError());
-  Assert (typeid(T() * U()) == typeid(CompareType),
-	  ExcInternalError());
+  AssertThrow (typeid(T() * U()) == typeid(CompareType),
+               ExcInternalError());
+  AssertThrow (typeid(T() * U()) == typeid(CompareType),
+               ExcInternalError());
 }
 
 
@@ -64,6 +64,6 @@ int main()
 
   check<Tensor<2,1,float>,std::complex<float>,Tensor<2,1,std::complex<float> > >();
   check<std::complex<float>,Tensor<2,1,float>,Tensor<2,1,std::complex<float> > >();
-  
+
   deallog << "OK" << std::endl;
 }

@@ -36,8 +36,8 @@ void test (TrilinosWrappers::Vector &v)
 
   const unsigned int sz = v.size();
   v = 2;
-  Assert (v.size() == sz, ExcInternalError());
-  Assert (v.l2_norm() == std::sqrt(4.*sz), ExcInternalError());
+  AssertThrow (v.size() == sz, ExcInternalError());
+  AssertThrow (v.l2_norm() == std::sqrt(4.*sz), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

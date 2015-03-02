@@ -41,8 +41,8 @@ void test (PETScWrappers::Vector &v,
   // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (w(i) == i+1., ExcInternalError());
-      Assert (v(i) == 3*i+2*(i+1.), ExcInternalError());
+      AssertThrow (w(i) == i+1., ExcInternalError());
+      AssertThrow (v(i) == 3*i+2*(i+1.), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

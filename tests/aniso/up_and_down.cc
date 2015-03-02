@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,7 +57,7 @@ Point<dim> transform (const Point<dim> p)
                         p(1)*(1+p(0))*(1+p(2)),
                         p(2)*(1+p(0))*(1+p(1)));
     default:
-      Assert (false, ExcNotImplemented());
+      AssertThrow (false, ExcNotImplemented());
       return Point<dim>();
     };
 }
@@ -94,7 +94,7 @@ void check_element (const Triangulation<dim> &tr,
         // to be active, not only
         // some of them
         for (unsigned int c=0; c<cell->n_children(); ++c)
-          Assert (cell->child(c)->active(), ExcInternalError());
+          AssertThrow (cell->child(c)->active(), ExcInternalError());
 
         // then restrict and prolongate
         cell->get_interpolated_dof_values (tmp, v);

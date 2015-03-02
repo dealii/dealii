@@ -42,7 +42,7 @@ void test (TrilinosWrappers::Vector &v,
     w(i) += v(i);
 
   // check that they're equal
-  Assert (v==w, ExcInternalError());
+  AssertThrow (v==w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

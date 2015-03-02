@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -83,8 +83,8 @@ void check (Triangulation<2> &tria)
     deallog << "<" << cell->vertex(v) << "> ";
   deallog << std::endl;
 
-  Assert (p.distance (cell->center()) < cell->diameter()/2,
-          ExcInternalError());
+  AssertThrow (p.distance (cell->center()) < cell->diameter()/2,
+               ExcInternalError());
 }
 
 

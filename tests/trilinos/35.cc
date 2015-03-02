@@ -47,13 +47,13 @@ void test (TrilinosWrappers::Vector &v,
     {
       if (i%3 == 0)
         {
-          Assert (w(i) == i+1., ExcInternalError());
-          Assert (v(i) == i+i+1., ExcInternalError());
+          AssertThrow (w(i) == i+1., ExcInternalError());
+          AssertThrow (v(i) == i+i+1., ExcInternalError());
         }
       else
         {
-          Assert (w(i) == 0, ExcInternalError());
-          Assert (v(i) == i, ExcInternalError());
+          AssertThrow (w(i) == 0, ExcInternalError());
+          AssertThrow (v(i) == i, ExcInternalError());
         }
     }
 

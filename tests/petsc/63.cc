@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,13 +26,13 @@
 
 void test (PETScWrappers::MatrixBase &m)
 {
-  Assert (m.m() == 100, ExcInternalError());
-  Assert (m.n() == 100, ExcInternalError());
+  AssertThrow (m.m() == 100, ExcInternalError());
+  AssertThrow (m.n() == 100, ExcInternalError());
 
   m = 0;
 
-  Assert (m.m() == 100, ExcInternalError());
-  Assert (m.n() == 100, ExcInternalError());
+  AssertThrow (m.m() == 100, ExcInternalError());
+  AssertThrow (m.n() == 100, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

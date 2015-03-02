@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,10 +41,10 @@ void test (Vector<double> &v)
   // check that they are ok, and this time
   // all of them
   for (unsigned int i=0; i<v.size(); ++i)
-    Assert ((((pattern[i] == true) && (v(i) == i))
-             ||
-             ((pattern[i] == false) && (v(i) == 0))),
-            ExcInternalError());
+    AssertThrow ((((pattern[i] == true) && (v(i) == i))
+                  ||
+                  ((pattern[i] == false) && (v(i) == 0))),
+                 ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

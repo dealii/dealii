@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,8 @@ void test (PETScWrappers::Vector &v)
   // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (w(i) == i, ExcInternalError());
-      Assert (v(i) == i, ExcInternalError());
+      AssertThrow (w(i) == i, ExcInternalError());
+      AssertThrow (v(i) == i, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

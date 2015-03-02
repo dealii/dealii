@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ void test ()
   // constrained rows are zero
   for (unsigned int i=0; i<b.size(); ++i)
     if (constraints.is_constrained(i))
-      Assert (b(i) == 0, ExcInternalError());
+      AssertThrow (b(i) == 0, ExcInternalError());
 }
 
 

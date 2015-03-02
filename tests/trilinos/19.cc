@@ -37,7 +37,7 @@ void test (TrilinosWrappers::Vector &v)
   v.compress (VectorOperation::insert);
 
   // then check the norm
-  Assert (v.linfty_norm() == norm, ExcInternalError());
+  AssertThrow (v.linfty_norm() == norm, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

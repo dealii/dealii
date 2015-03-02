@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -171,11 +171,11 @@ void FindBug<dim>::dirichlet_conditions ()
     {
       if (fixed_dofs[i] == true)
         {
-          Assert (dirichlet_dofs[i] == 13, ExcInternalError());
+          AssertThrow (dirichlet_dofs[i] == 13, ExcInternalError());
         }
       else
         {
-          Assert (dirichlet_dofs[i] == 1, ExcInternalError());
+          AssertThrow (dirichlet_dofs[i] == 1, ExcInternalError());
         };
     };
 

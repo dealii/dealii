@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +37,7 @@ void test (Vector<std::complex<double> > &v)
   v = 0;
 
   // then check all_zero
-  Assert (v.all_zero() == true, ExcInternalError());
+  AssertThrow (v.all_zero() == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -90,7 +90,7 @@ void assert_tria_equal(const Triangulation<dim> &a, const Triangulation<dim> &b)
 
   //compare the two files
   std::string cmd = std::string("diff -q ")+file1+std::string(" ")+file2;
-  Assert (system(cmd.c_str()) == 0, ExcInternalError());
+  AssertThrow (system(cmd.c_str()) == 0, ExcInternalError());
 
   //and delete them
   std::remove (file1.c_str());

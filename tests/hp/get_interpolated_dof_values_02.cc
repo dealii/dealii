@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,21 +82,21 @@ void test ()
       // then do the same with the "correct", local fe_index
       Vector<double> local2 (cell->get_fe().dofs_per_cell);
       cell->get_interpolated_dof_values (solution, local2,
-					 cell->active_fe_index());
+                                         cell->active_fe_index());
 
       // and do it a third time with the fe_index for a Q1 element
       Vector<double> local3 (fe[0].dofs_per_cell);
       cell->get_interpolated_dof_values (solution, local3,
-					 0);
+                                         0);
 
       // now verify correctness
-      Assert (local1 == local2, ExcInternalError());
+      AssertThrow (local1 == local2, ExcInternalError());
 
       // also for the second test. note that vertex dofs always come first in
       // local1, so we can easily compare
       for (unsigned int i=0; i<fe[0].dofs_per_cell; ++i)
-	Assert (local1[i] == local3[i],
-		ExcInternalError());
+        AssertThrow (local1[i] == local3[i],
+                     ExcInternalError());
     }
   deallog << "OK" << std::endl;
 }

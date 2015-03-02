@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,7 @@ int main()
   deallog.threshold_double(1.e-10);
 
   Threads::Task<int> t = Threads::new_task (test);
-  Assert (t.return_value() == 42, ExcInternalError());
+  AssertThrow (t.return_value() == 42, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

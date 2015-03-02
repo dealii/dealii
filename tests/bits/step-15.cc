@@ -217,7 +217,7 @@ void MinimizationProblem<dim>::assemble_step ()
       fe_values.get_function_values (present_solution,
                                      local_solution_values);
       fe_values.get_function_gradients (present_solution,
-                                    local_solution_grads);
+                                        local_solution_grads);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         {
@@ -441,8 +441,8 @@ void MinimizationProblem<1>::refine_grid ()
       const double x_left  = fe_values.quadrature_point(0)[0];
       const double x_right = fe_values.quadrature_point(1)[0];
 
-      Assert (x_left  == cell->vertex(0)[0], ExcInternalError());
-      Assert (x_right == cell->vertex(1)[0], ExcInternalError());
+      AssertThrow (x_left  == cell->vertex(0)[0], ExcInternalError());
+      AssertThrow (x_right == cell->vertex(1)[0], ExcInternalError());
 
       const double u_left  = local_values[0];
       const double u_right = local_values[1];
@@ -537,7 +537,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
       fe_values.get_function_values (function,
                                      local_solution_values);
       fe_values.get_function_gradients (function,
-                                    local_solution_grads);
+                                        local_solution_grads);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         energy += (std::pow (fe_values.quadrature_point(q_point)(0)

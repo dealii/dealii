@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,14 +47,14 @@ void test ()
   ComponentMask m = m1 | m2;
 
   // verify equality
-  Assert (m == ComponentMask(v),
-          ExcInternalError());
-  Assert (!(m == m1),
-          ExcInternalError());
-  Assert (!(m == ComponentMask(v1)),
-          ExcInternalError());
-  Assert (!(m == ComponentMask(v2)),
-          ExcInternalError());
+  AssertThrow (m == ComponentMask(v),
+               ExcInternalError());
+  AssertThrow (!(m == m1),
+               ExcInternalError());
+  AssertThrow (!(m == ComponentMask(v1)),
+               ExcInternalError());
+  AssertThrow (!(m == ComponentMask(v2)),
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,14 +36,14 @@ void check1 ()
         p[d] = i+d;
 
       for (unsigned int c=0; c<3; ++c)
-        Assert (object.value(p,c) == (c==1 ? p.norm() : 0),
-                ExcInternalError());
+        AssertThrow (object.value(p,c) == (c==1 ? p.norm() : 0),
+                     ExcInternalError());
 
       Vector<double> v(3);
       object.vector_value (p, v);
       for (unsigned int c=0; c<3; ++c)
-        Assert (v(c) == (c==1 ? p.norm() : 0),
-                ExcInternalError());
+        AssertThrow (v(c) == (c==1 ? p.norm() : 0),
+                     ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -68,8 +68,8 @@ void check2 ()
       for (unsigned int d=0; d<dim; ++d)
         p[d] = i+d;
 
-      Assert (object.value(p) == q.distance (p),
-              ExcInternalError());
+      AssertThrow (object.value(p) == q.distance (p),
+                   ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

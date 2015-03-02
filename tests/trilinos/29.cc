@@ -29,7 +29,7 @@ void test (TrilinosWrappers::Vector &v)
 {
   v.reinit (13);
 
-  Assert (v.size() == 13, ExcInternalError());
+  AssertThrow (v.size() == 13, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -224,10 +224,10 @@ void test ()
        cell != triangulation.end(); ++cell)
     for (unsigned int face_no=0;
          face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-      Assert (cell->at_boundary(face_no)
-              ==
-              cell->face(face_no)->at_boundary(),
-              ExcInternalError());
+      AssertThrow (cell->at_boundary(face_no)
+                   ==
+                   cell->face(face_no)->at_boundary(),
+                   ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

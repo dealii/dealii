@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,15 +105,15 @@ my_check_this (const DoFHandler<dim> &dof_handler,
   // finally make sure that we have
   // read everything back in
   // correctly
-  Assert (data_out.get_dataset_names() == reader.get_dataset_names(),
-          ExcInternalError());
+  AssertThrow (data_out.get_dataset_names() == reader.get_dataset_names(),
+               ExcInternalError());
 
-  Assert (data_out.get_patches().size() == reader.get_patches().size(),
-          ExcInternalError());
+  AssertThrow (data_out.get_patches().size() == reader.get_patches().size(),
+               ExcInternalError());
 
   for (unsigned int i=0; i<reader.get_patches().size(); ++i)
-    Assert (data_out.get_patches()[i] == reader.get_patches()[i],
-            ExcInternalError());
+    AssertThrow (data_out.get_patches()[i] == reader.get_patches()[i],
+                 ExcInternalError());
 
   // for good measure, delete tmp file
   remove ("data_out_rotation_03.tmp");

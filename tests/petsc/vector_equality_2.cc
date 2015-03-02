@@ -39,7 +39,7 @@ void test (PETScWrappers::Vector &v,
   // but then copy elements and make sure the
   // vectors are actually equal
   v = w;
-  Assert (v==w, ExcInternalError());
+  AssertThrow (v==w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

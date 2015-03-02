@@ -40,7 +40,7 @@ void test (TrilinosWrappers::Vector &v)
   v = 0;
 
   // then check all_zero
-  Assert (v.all_zero() == true, ExcInternalError());
+  AssertThrow (v.all_zero() == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
