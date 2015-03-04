@@ -101,7 +101,7 @@ void test()
           Assert (std::fabs(value - (p[0]+2)) < 1e-8* std::fabs(value + (p[0]+2)),
                   ExcInternalError());
         }
-      catch (typename Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>::ExcPointNotAvailableHere &)
+      catch (typename VectorTools::ExcPointNotAvailableHere &)
         {
           point_found = false;
         }
