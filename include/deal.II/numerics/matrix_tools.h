@@ -578,7 +578,15 @@ namespace MatrixCreator
   /**
    * Exception
    */
-  DeclException0 (ExcComponentMismatch);
+  DeclExceptionMsg (ExcComponentMismatch,
+                    "You are providing either a right hand side function or a "
+                    "coefficient with a number of vector components that is "
+                    "inconsistent with the rest of the arguments. If you do "
+                    "provide a coefficient or right hand side function, then "
+                    "it either needs to have as many components as the finite "
+                    "element in use, or only a single vector component. In "
+                    "the latter case, the same value will be taken for "
+                    "each vector component of the finite element.");
 }
 
 
@@ -972,7 +980,11 @@ namespace MatrixTools
   /**
    * Exception
    */
-  DeclException0 (ExcBlocksDontMatch);
+  DeclExceptionMsg (ExcBlocksDontMatch,
+                    "You are providing a matrix whose subdivision into "
+                    "blocks in either row or column direction does not use "
+                    "the same blocks sizes as the solution vector or "
+                    "right hand side vectors, respectively.");
 }
 
 
