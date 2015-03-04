@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2014 by the deal.II authors
+ * Copyright (C) 1999 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -307,6 +307,39 @@ void Step3::assemble_system ()
   // compared to approaches where everything, including second derivatives,
   // normal vectors to cells, etc are computed on each cell, regardless of
   // whether they are needed or not.
+  //
+  // @note The syntax <code>update_values | update_gradients |
+  // update_JxW_values</code> is not immediately obvious to anyone not
+  // used to programming bit operations in C for years already. First,
+  // <code>operator|</code> is the <i>bitwise or operator</i>, i.e.,
+  // it takes two integer arguments that are interpreted as bit
+  // patterns and returns an integer in which every bit is set for
+  // which the corresponding bit is set in at least one of the two
+  // arguments. For example, consider the operation
+  // <code>9|10</code>. In binary, <code>9=0b1001</code> (where the
+  // prefix <code>0b</code> indicates that the number is to be
+  // interpreted as a binary number) and <code>10=0b1010</code>. Going
+  // through each bit and seeing whether it is set in one of the
+  // argument, we arrive at <code>0b1001|0b1010=0b1011</code> or, in
+  // decimal notation, <code>9|10=11</code>. The second piece of
+  // information you need to know is that the various
+  // <code>update_*</code> flags are all integers that have <i>exactly
+  // one bit set</i>. For example, assume that
+  // <code>update_values=0b00001=1</code>,
+  // <code>update_gradients=0b00010=2</code>,
+  // <code>update_JxW_values=0b10000=16</code>. Then
+  // <code>update_values | update_gradients | update_JxW_values =
+  // 0b10011 = 19</code>. In other words, we obtain a number that
+  // <i>encodes a binary mask representing all of the operations you
+  // want to happen</i>, where each operation corresponds to exactly
+  // one bit in the integer that, if equal to one, means that a
+  // particular piece should be updated on each cell and, if it is
+  // zero, means that we need not compute it. In other words, even
+  // though <code>operator|</code> is the <i>bitwise OR operation</i>,
+  // what it really represents is <i>I want this AND that AND the
+  // other</i>. Such binary masks are quite common in C programming,
+  // but maybe not so in higher level languages like C++, but serve
+  // the current purpose quite well.
 
   // For use further down below, we define two shortcuts for values that will
   // be used very frequently. First, an abbreviation for the number of degrees
