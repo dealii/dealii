@@ -32,6 +32,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace VectorTools
+{
+  class ExcPointNotAvailableHere;
+}
+
 namespace Functions
 {
 
@@ -116,7 +121,7 @@ namespace Functions
    * @ref GlossGhostCell).
    * If the cell is artificial, we have no access to the solution there and
    * functions that evaluate the solution at such a point will trigger an
-   * exception of type FEFieldFunction::ExcPointNotAvailableHere. The same
+   * exception of type VectorTools::ExcPointNotAvailableHere. The same
    * kind of exception will also be produced if the cell is a ghost cell: On
    * such cells, one could in principle evaluate the solution, but it becomes
    * easier if we do not allow to do so because then there is exactly one
@@ -139,7 +144,7 @@ namespace Functions
    *     {
    *       solution_at_origin = solution_function.value (origin);
    *     }
-   *   catch (const typename Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>::ExcPointNotAvailableHere &)
+   *   catch (const VectorTools::ExcPointNotAvailableHere &)
    *     {
    *       point_found = false;
    *     }
@@ -147,14 +152,6 @@ namespace Functions
    *   if (point_found == true)
    *     ...do something...;
    * @endcode
-   *
-   * @note To C++,
-   * <code>Functions::FEFieldFunction<dim>::ExcPointNotAvailableHere</code>
-   * and <code>Functions::FEFieldFunction<dim,DoFHandler<dim>,
-   * TrilinosWrappers::MPI::Vector>::ExcPointNotAvailableHere</code> are
-   * distinct types. You need to make sure that the type of the exception you
-   * catch matches the type of the object that throws it, as shown in the
-   * example above.
    *
    * @ingroup functions
    * @author Luca Heltai, 2006, Markus Buerg, 2012, Wolfgang Bangerth, 2013
@@ -414,9 +411,9 @@ namespace Functions
                             std::vector<std::vector<unsigned int> > &maps) const;
 
     /**
-     * Exception
+     * @deprecated Use VectorTools::ExcPointNotAvailableHere instead.
      */
-    DeclException0 (ExcPointNotAvailableHere);
+    typedef VectorTools::ExcPointNotAvailableHere ExcPointNotAvailableHere DEAL_II_DEPRECATED;
 
   private:
     /**

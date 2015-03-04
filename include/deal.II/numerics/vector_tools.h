@@ -2208,7 +2208,10 @@ namespace VectorTools
   /**
    * Exception
    */
-  DeclException0 (ExcPointNotAvailableHere);
+  DeclExceptionMsg (ExcPointNotAvailableHere,
+                    "The given point is inside a cell of a "
+                    "parallel::distributed::Triangulation that is not "
+                    "locally owned by this processor.");
 }
 
 
