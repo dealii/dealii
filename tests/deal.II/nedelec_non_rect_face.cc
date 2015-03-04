@@ -463,7 +463,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   
-  for (unsigned int p=0; p<4; ++p)
+  for (unsigned int p=0; p<3; ++p)
     {
       MaxwellProblem<3> (p).run();
     }
