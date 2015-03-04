@@ -315,7 +315,7 @@ void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions)
 
 template <int dim, class DH>
 void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimension> &mapping,
-                                     const unsigned int nnnn_subdivisions,
+                                     const unsigned int n_subdivisions_,
                                      const CurvedCellRegion curved_region)
 {
   // Check consistency of redundant template parameter
@@ -325,8 +325,8 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
   Assert (this->triangulation != 0,
           typename BaseClass::ExcNoTriangulationSelected());
 
-  const unsigned int n_subdivisions = (nnnn_subdivisions != 0)
-                                      ? nnnn_subdivisions
+  const unsigned int n_subdivisions = (n_subdivisions_ != 0)
+                                      ? n_subdivisions_
                                       : this->default_subdivisions;
   Assert (n_subdivisions >= 1,
           ExcInvalidNumberOfSubdivisions(n_subdivisions));
