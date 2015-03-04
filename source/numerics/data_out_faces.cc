@@ -245,7 +245,10 @@ build_one_patch (const FaceDescriptor *cell_and_face,
           // we need to get at the number of the cell to which this face
           // belongs in order to access the cell data. this is not readily
           // available, so choose the following rather inefficient way:
-          Assert (cell_and_face->first->active(), ExcCellNotActiveForCellData());
+          Assert (cell_and_face->first->active(),
+                  ExcMessage("The current function is trying to generate cell-data output "
+                             "for a face that does not belong to an active cell. This is "
+                             "not supported."));
           const unsigned int cell_number
             = std::distance (this->triangulation->begin_active(),
                              typename Triangulation<dimension,space_dimension>::active_cell_iterator(cell_and_face->first));
