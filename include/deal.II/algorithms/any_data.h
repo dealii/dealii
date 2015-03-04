@@ -176,8 +176,8 @@ public:
   AnyData(const NamedData<type> &);
 
   /// An entry with this name does not exist in the AnyData object.
-  DeclException1(ExcNameNotFound, std::string &,
-                 << "No entry with the name " << arg1 << " exists");
+  DeclException1(ExcNameNotFound, std::string,
+                 << "No entry with the name " << arg1 << " exists.");
 
   /// The requested type and the stored type are different
   DeclException2(ExcTypeMismatch,
