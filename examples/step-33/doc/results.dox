@@ -264,14 +264,14 @@ The residual calulated in ConservationLaw::assemble_cell_term function
 reads 
    $R_i = \left(\frac{\mathbf{w}^{k}_{n+1} - \mathbf{w}_n}{\delta t}
     , \mathbf{z}_i \right)_K  +
-      \theta \mathbf{B}({\mathbf{w}^{k}_{n+1})(\mathbf{z}_i)_K +
-      (1-\theta) \mathbf{B}({\mathbf{w}_{n}) (\mathbf{z}_i)_K $
+      \theta \mathbf{B}({\mathbf{w}^{k}_{n+1}})(\mathbf{z}_i)_K +
+      (1-\theta) \mathbf{B}({\mathbf{w}_{n}}) (\mathbf{z}_i)_K $
 This means that we calculate the spatial residual twice at one Newton
-iteration step: once respect to the current solution ${\mathbf{w}^{k}_{n+1}$
+iteration step: once respect to the current solution $\mathbf{w}^{k}_{n+1}$
 and once more respect to the last time step solution $\mathbf{w}_{n}$ which
 remains the same during all Newton iterations through one timestep.
 Cache up the explicit part of residual
- $ \mathbf{B}({\mathbf{w}_{n}) (\mathbf{z}_i)_K}$
+ $ \mathbf{B}({\mathbf{w}_{n}}) (\mathbf{z}_i)_K$
 during Newton iteration will save lots of labor.
 
 
