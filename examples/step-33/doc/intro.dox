@@ -131,16 +131,14 @@ We use a time stepping scheme to substitute the time derivative in the
 above equations. For simplicity, we define $ \mathbf{B}({\mathbf{w}_{n}})(\mathbf z) $ as the spatial residual at time step $n$ :
 
 @f{eqnarray*}
- \mathbf{B}({\mathbf{w}_{n})(\mathbf z)  &=&
-- \int_{\Omega} \left(\mathbf{F}(\mathbf{w_n}),
-\nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w_n} , \nabla \mathbf{z})
-\\
-&&
-+
-\int_{\partial \Omega} \left(\mathbf{H}(\mathbf{w_n}^+,
-\mathbf{w}^-(\mathbf{w_n}^+), \mathbf{n}), \mathbf{z}\right)
+ \mathbf{B}(\mathbf{w}_{n})(\mathbf z)  &=&
+- \int_{\Omega} \left(\mathbf{F}(\mathbf{w}_n),
+\nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w}_n , \nabla \mathbf{z}) \\
+&& +
+\int_{\partial \Omega} \left(\mathbf{H}(\mathbf{w}_n^+,
+\mathbf{w}^-(\mathbf{w}_n^+), \mathbf{n}), \mathbf{z}\right)
 -
-\int_{\partial \Omega} \left(\mathbf{G}(\mathbf{w_n}),
+\int_{\partial \Omega} \left(\mathbf{G}(\mathbf{w}_n),
 \mathbf{z}\right) .
 @f}
 
@@ -149,10 +147,10 @@ that the residual applied to any test
 function $\mathbf z$ equals zero:
 @f{eqnarray*}
 R(\mathbf{W}_{n+1})(\mathbf z) &=&
-\int_{\Omega} \left(\frac{\mathbf{w}_{n+1} - \mathbf{w}_n}{\delta t},
+\int_{\Omega} \left(\frac{{\mathbf w}_{n+1} - \mathbf{w}_n}{\delta t},
 \mathbf{z}\right)+
-\theta \mathbf{B}({\mathbf{w}_{n+1}) +  (1-\theta) \mathbf{B}({\mathbf{w}_{n}) \\
-& = & 0
+\theta \mathbf{B}({\mathbf{w}}_{n+1}) +  (1-\theta) \mathbf{B}({\mathbf w}_{n}) \\
+&=& 0
 @f}
 where $ \theta \in [0,1] $ and
 $\mathbf{w}_i = \sum_k \mathbf{W}_i^k \mathbf{\phi}_k$. Choosing

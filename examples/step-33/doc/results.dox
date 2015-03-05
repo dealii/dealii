@@ -92,7 +92,7 @@ end
 @endverbatim
 
 When we run the program, we get the following kind of output:
-@code
+@verbatim
 ...
 T=0.14
    Number of active cells:       1807
@@ -127,7 +127,7 @@ T=0.18
    4.091e-09        0008        3.35e-19
    5.617e-16        (converged)
 ...
-@endcode
+@endverbatim
 
 This output reports the progress of the Newton iterations and the time
 stepping. Note that our implementation of the Newton iteration indeed shows
@@ -136,7 +136,7 @@ in each step is roughly the norm of the previous step squared. This leads to
 the very rapid convergence we can see here. This holds until
 times up to $t=1.9$ at which time the nonlinear iteration reports a
 lack of convergence:
-@code
+@verbatim
 ...
 
 T=1.88
@@ -186,7 +186,7 @@ No convergence in nonlinear solver
 
 Aborting!
 ----------------------------------------------------
-@endcode
+@endverbatim
 
 We may find out the cause and possible remedies by looking at the animation of the solution.
 
