@@ -313,6 +313,19 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Improved: We have traditionally had a large number of exceptions
+  that did not output any useful error message other than the name
+  of the exception class. This name was suggestive of the error that
+  had happened, but did not convey a sufficient amount of information
+  to what happened in many of the places where these kinds of exceptions
+  were used, nor what may have caused the exception, or how it could
+  be avoided. We have gone through many of these places and changed
+  the exception to be much more verbose in what they state about the
+  problem, its origin, and how it may be solved.
+  <br>
+  (Wolfgang Bangerth, 2015/02/28-2015/03/31)
+  </li>
+
   <li> Changed: We have traditionally used Point@<dim@> to represent points
   in physical space, i.e., vectors that are anchored at the origin, whereas
   for vectors anchored elsewhere (e.g., differences between points, normal

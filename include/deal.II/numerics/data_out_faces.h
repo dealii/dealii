@@ -224,12 +224,8 @@ public:
   DeclException1 (ExcInvalidNumberOfSubdivisions,
                   int,
                   << "The number of subdivisions per patch, " << arg1
-                  << ", is not valid.");
-
-  /**
-   * Exception
-   */
-  DeclException0 (ExcCellNotActiveForCellData);
+                  << ", is not valid. It needs to be greater or equal "
+                  << "to one.");
 
 private:
   /**
