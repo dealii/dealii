@@ -30,7 +30,7 @@
 #  include <umfpack.h>
 #endif
 #ifndef SuiteSparse_long
-#define SuiteSparse_long long int
+#  define SuiteSparse_long long int
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -262,9 +262,37 @@ public:
    */
   DeclException2 (ExcUMFPACKError, char *, int,
                   << "UMFPACK routine " << arg1
-                  << " returned error status " << arg2
-                  << ". See the file <bundled/umfpack/UMFPACK/Include/umfpack.h>"
-                  << " for a description of 'status codes'.");
+                  << " returned error status " << arg2 << "."
+                  << "\n\n"
+                  << ("A complete list of error codes can be found in the file "
+                      "<bundled/umfpack/UMFPACK/Include/umfpack.h>."
+                      "\n\n"
+                      "That said, the two most common errors that can happen are "
+                      "that your matrix cannot be factorized because it is "
+                      "rank deficient, and that UMFPACK runs out of memory "
+                      "because your problem is too large."
+                      "\n\n"
+                      "The first of these cases most often happens if you "
+                      "forget terms in your bilinear form necessary to ensure "
+                      "that the matrix has full rank, or if your equation has a "
+                      "spatially variable coefficient (or nonlinearity) that is "
+                      "supposed to be strictly positive but, for whatever "
+                      "reasons, is negative or zero. In either case, you probably "
+                      "want to check your assembly procedure. Similarly, a "
+                      "matrix can be rank deficient if you forgot to apply the "
+                      "appropriate boundary conditions. For example, the "
+                      "Laplace equation without boundary conditions has a "
+                      "single zero eigenvalue and its rank is therefore "
+                      "deficient by one."
+                      "\n\n"
+                      "The other common situation is that you run out of memory."
+                      "On a typical laptop or desktop, it should easily be possible "
+                      "to solve problems with 100,000 unknowns in 2d. If you are "
+                      "solving problems with many more unknowns than that, in "
+                      "particular if you are in 3d, then you may be running out "
+                      "of memory and you will need to consider iterative "
+                      "solvers instead of the direct solver employed by "
+                      "UMFPACK."));
 
 private:
   /**
