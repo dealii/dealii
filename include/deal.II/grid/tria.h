@@ -93,6 +93,9 @@ namespace hp
  * Triangulation::create_triangulation() that denotes the faces. It can be
  * used to attach boundary indicators to faces.
  *
+ * An example showing how this class can be used is in the
+ * <code>create_coarse_grid()</code> function of step-14.
+ *
  * @ingroup grid
  */
 template <int structdim>
