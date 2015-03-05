@@ -151,7 +151,7 @@ that
 @f]
 for all test functions $v\in H^1_0=\{v\in H^1: v|_{\Gamma_1}=0\}$. The
 boundary term ${(g_2,v)}_{\Gamma_2}$ has appeared by integration by parts and
-using $\partial_n u=g$ on $\Gamma_2$ and $v=0$ on $\Gamma_1$. The cell
+using $\partial_n u=g_2$ on $\Gamma_2$ and $v=0$ on $\Gamma_1$. The cell
 matrices and vectors which we use to build the global matrices and right hand
 side vectors in the discrete formulation therefore look like this:
 @f{eqnarray*}
