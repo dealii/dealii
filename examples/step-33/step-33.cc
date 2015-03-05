@@ -1621,13 +1621,13 @@ namespace Step33
   // residual read
   // $R_i = \left(\frac{\mathbf{w}^{k}_{n+1} - \mathbf{w}_n}{\delta t} ,
   // \mathbf{z}_i \right)_K $ $ +
-  // \theta \mathbf{B}({\mathbf{w}^{k}_{n+1})(\mathbf{z}_i)_K $ $ +
-  // (1-\theta) \mathbf{B}({\mathbf{w}_{n}) (\mathbf{z}_i)_K $ where
-  // $\mathbf{B}({\mathbf{w})(\mathbf{z}_i)_K =
+  // \theta \mathbf{B}(\mathbf{w}^{k}_{n+1})(\mathbf{z}_i)_K $ $ +
+  // (1-\theta) \mathbf{B}(\mathbf{w}_{n}) (\mathbf{z}_i)_K $ where
+  // $\mathbf{B}(\mathbf{w})(\mathbf{z}_i)_K =
   // - \left(\mathbf{F}(\mathbf{w}),\nabla\mathbf{z}_i\right)_K $ $
   // + h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}_i)_K $ $
   // - (\mathbf{G}(\mathbf {w}), \mathbf{z}_i)_K $ for both
-  // ${\mathbf{w} = \mathbf{w}^k_{n+1}$ and ${\mathbf{w} = \mathbf{w}_{n}}$ ,
+  // $\mathbf{w} = \mathbf{w}^k_{n+1}$ and $\mathbf{w} = \mathbf{w}_{n}$ ,
   // $\mathbf{z}_i$ is the $i$th vector valued test function.
   //   Furthermore, the scalar product
   // $\left(\mathbf{F}(\mathbf{w}), \nabla\mathbf{z}_i\right)_K$ is
@@ -1763,8 +1763,8 @@ namespace Step33
 
 
     // Next, in order to compute the cell contributions, we need to evaluate
-    // $F({\mathbf w}^k_{n+1})$, $G({\mathbf w}^k_{n+1})$ and
-    // $F({\mathbf w}_n)$, $G({\mathbf w}_n)$ at all quadrature
+    // $\mathbf{F}({\mathbf w}^k_{n+1})$, $\mathbf{G}({\mathbf w}^k_{n+1})$ and
+    // $\mathbf{F}({\mathbf w}_n)$, $\mathbf{G}({\mathbf w}_n)$ at all quadrature
     // points. To store these, we also need to allocate a bit of memory. Note
     // that we compute the flux matrices and right hand sides in terms of
     // autodifferentiation variables, so that the Jacobian contributions can
@@ -1808,16 +1808,16 @@ namespace Step33
     // \mathbf{w}_n)_{\text{component\_i}}}{\delta
     // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K
     // \\ &-& \sum_{d=1}^{\text{dim}} \left(  \theta \mathbf{F}
-    // ({\mathbf{w^k_{n+1}}})_{\text{component\_i},d} + (1-\theta)
-    // \mathbf{F} ({\mathbf{w_{n}}})_{\text{component\_i},d}  ,
+    // ({\mathbf{w}^k_{n+1}})_{\text{component\_i},d} + (1-\theta)
+    // \mathbf{F} ({\mathbf{w}_{n}})_{\text{component\_i},d}  ,
     // \frac{\partial(\mathbf{z}_i)_{\text{component\_i}}} {\partial
     // x_d}\right)_K
     // \\ &+& \sum_{d=1}^{\text{dim}} h^{\eta} \left( \theta \frac{\partial
-    // \mathbf{w^k_{n+1}}_{\text{component\_i}}}{\partial x_d} + (1-\theta)
-    // \frac{\partial \mathbf{w_n}_{\text{component\_i}}}{\partial x_d} ,
+    // (\mathbf{w}^k_{n+1})_{\text{component\_i}}}{\partial x_d} + (1-\theta)
+    // \frac{\partial (\mathbf{w}_n)_{\text{component\_i}}}{\partial x_d} ,
     // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d} \right)_K
     // \\ &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}} +
-    // (1-\theta)\mathbf{G}({\mathbf{w}_n} )_{\text{component\_i}} ,
+    // (1-\theta)\mathbf{G}({\mathbf{w}_n})_{\text{component\_i}} ,
     // (\mathbf{z}_i)_{\text{component\_i}} \right)_K ,
     // @f}
     // where integrals are
@@ -1971,7 +1971,7 @@ namespace Step33
             }
       }
     // On the other hand, if this is an external boundary face, then the
-    // values of $W^-$ will be either functions of $W^+$, or they will be
+    // values of $\mathbf{W}^-$ will be either functions of $\mathbf{W}^+$, or they will be
     // prescribed, depending on the kind of boundary condition imposed here.
     //
     // To start the evaluation, let us ensure that the boundary id specified
