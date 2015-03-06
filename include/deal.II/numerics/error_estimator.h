@@ -40,11 +40,12 @@ namespace hp
 
 
 /**
- * Implementation of the error indicator by Kelly, Gago, Zienkiewicz and
+ * Implementation of the error indicator by Kelly, De S. R. Gago, Zienkiewicz and
  * Babuska.  This error indicator tries to approximate the error per cell by
  * integration of the jump of the gradient of the solution along the faces of
  * each cell.  It can be understood as a gradient recovery estimator; see the
- * survey of Ainsworth for a complete discussion.
+ * survey of Ainsworth and Oden, "A Posteriori Error Estimation in Finite Element
+ * Analysis" (Wiley, 2000) for a complete discussion.
  *
  * @note In spite of the name, this is not truly an a posteriori error
  * estimator, even if applied to the Poisson problem only. It gives good hints
@@ -58,10 +59,25 @@ namespace hp
  * the conormal derivative $a\frac{du}{dn} = g$.
  *
  * The error estimator returns a vector of estimated errors per cell which can
- * be used to feed the <tt>Triangulation<dim>::refine_*</tt> functions. This
+ * be used to feed the GridRefinement::refine_fixed_fraction,
+ * GridRefinement::refine_fixed_number, and similar functions. This
  * vector contains elements of data type @p float, rather than @p double,
- * since accuracy is not so important here, and since this can save rather a
- * lot of memory, when using many cells.
+ * since accuracy is not important in the current context.
+ *
+ * The full reference for the paper in which this error estimator is defined
+ * is as follows:
+ * @code
+ * @Article{KGZB83,
+ *   author =       {Kelly, D. W. and {De S. R. Gago}, J. P. and Zienkiewicz, O. C.
+ *                   and Babu\v{s}ka, I.},
+ *   title =        {A posteriori error analysis and adaptive processes
+ *                   in the finite element method: Part {I}--Error Analysis},
+ *   journal =      {Int. J. Num. Meth. Engrg.},
+ *   year =         {1983},
+ *   volume =       {19},
+ *   pages =        {1593--1619}
+ * }
+ * @endcode
  *
  *
  * <h3>Implementation</h3>
