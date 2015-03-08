@@ -31,7 +31,7 @@
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_bicgstab.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
@@ -470,7 +470,7 @@ namespace Step51
     // to the number of dofs on a face, when copying this into the final
     // sparsity pattern.
     {
-      CompressedSimpleSparsityPattern csp (dof_handler.n_dofs());
+      DynamicSparsityPattern csp (dof_handler.n_dofs());
       DoFTools::make_sparsity_pattern (dof_handler, csp,
                                        constraints, false);
       sparsity_pattern.copy_from(csp, fe.dofs_per_face);

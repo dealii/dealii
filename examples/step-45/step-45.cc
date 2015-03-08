@@ -32,7 +32,7 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -180,8 +180,8 @@ namespace Step45
     // Then we create the sparsity pattern and the system matrix and
     // initialize the solution and right-hand side vectors. This is again as
     // in step-3 or step-6, for example:
-    CompressedSparsityPattern c_sparsity_pattern (dof_handler.n_dofs(),
-                                                  dof_handler.n_dofs());
+    DynamicSparsityPattern c_sparsity_pattern (dof_handler.n_dofs(),
+                                               dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler,
                                      c_sparsity_pattern,
                                      constraints,

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// See documentation of BlockCompressedSparsityPattern for documentation of this example
+// See documentation of BlockDynamicSparsityPattern for documentation of this example
 
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -55,7 +55,7 @@ int main()
   std::vector<unsigned int> dofs_per_block(fe.n_blocks());
   DoFTools::count_dofs_per_block(dof, dofs_per_block);
 
-  BlockCompressedSparsityPattern c_sparsity(fe.n_blocks(), fe.n_blocks());
+  BlockDynamicSparsityPattern c_sparsity(fe.n_blocks(), fe.n_blocks());
   for (unsigned int i=0; i<fe.n_blocks(); ++i)
     for (unsigned int j=0; j<fe.n_blocks(); ++j)
       c_sparsity.block(i,j).reinit(dofs_per_block[i],dofs_per_block[j]);

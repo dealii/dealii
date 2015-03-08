@@ -23,7 +23,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -215,14 +215,14 @@ namespace Step12
     dof_handler.distribute_dofs (fe);
 
     // We start by generating the sparsity pattern. To this end, we first fill
-    // an intermediate object of type CompressedSparsityPattern with the
+    // an intermediate object of type DynamicSparsityPattern with the
     // couplings appearing in the system. After building the pattern, this
     // object is copied to <code>sparsity_pattern</code> and can be discarded.
 
     // To build the sparsity pattern for DG discretizations, we can call the
     // function analogue to DoFTools::make_sparsity_pattern, which is called
     // DoFTools::make_flux_sparsity_pattern:
-    CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+    DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
     DoFTools::make_flux_sparsity_pattern (dof_handler, c_sparsity);
     sparsity_pattern.copy_from(c_sparsity);
 

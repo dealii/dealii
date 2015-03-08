@@ -28,6 +28,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -530,12 +531,10 @@ namespace Step7
                                              hanging_node_constraints);
     hanging_node_constraints.close ();
 
-    sparsity_pattern.reinit (dof_handler.n_dofs(),
-                             dof_handler.n_dofs(),
-                             dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-    hanging_node_constraints.condense (sparsity_pattern);
-    sparsity_pattern.compress();
+    DynamicSparsityPattern csp (dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, csp);
+    hanging_node_constraints.condense (csp);
+    sparsity_pattern.copy_from (csp);
 
     system_matrix.reinit (sparsity_pattern);
 

@@ -28,7 +28,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
@@ -284,9 +284,7 @@ Step6<dim>::~Step6 ()
 // sparsity pattern, and initializing the solution and right hand side
 // vectors. Note that the sparsity pattern will have significantly more
 // entries per row now, since there are now 9 degrees of freedom per cell, not
-// only four, that can couple with each other. The
-// <code>dof_Handler.max_couplings_between_dofs()</code> call will take care
-// of this, however:
+// only four, that can couple with each other.
 template <int dim>
 void Step6<dim>::setup_system ()
 {
@@ -346,7 +344,7 @@ void Step6<dim>::setup_system ()
   // constraints after assembling, we would have to pass <code>true</code>
   // instead because then we would first write into these locations only to
   // later set them to zero again during condensation.
-  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+  DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler,
                                   c_sparsity,
                                   constraints,

@@ -919,16 +919,13 @@ namespace Step31
     // The next step is to create the sparsity pattern for the Stokes and
     // temperature system matrices as well as the preconditioner matrix from
     // which we build the Stokes preconditioner. As in step-22, we choose to
-    // create the pattern not as in the first few tutorial programs, but by
-    // using the blocked version of CompressedSimpleSparsityPattern.  The
-    // reason for doing this is mainly memory, that is, the SparsityPattern
-    // class would consume too much memory when used in three spatial
-    // dimensions as we intend to do for this program.
+    // create the pattern by
+    // using the blocked version of DynamicSparsityPattern.
     //
     // So, we first release the memory stored in the matrices, then set up an
-    // object of type BlockCompressedSimpleSparsityPattern consisting of
+    // object of type BlockDynamicSparsityPattern consisting of
     // $2\times 2$ blocks (for the Stokes system matrix and preconditioner) or
-    // CompressedSimpleSparsityPattern (for the temperature part). We then
+    // DynamicSparsityPattern (for the temperature part). We then
     // fill these objects with the nonzero pattern, taking into account that
     // for the Stokes system matrix, there are no entries in the
     // pressure-pressure block (but all velocity vector components couple with
@@ -961,7 +958,7 @@ namespace Step31
     {
       stokes_matrix.clear ();
 
-      BlockCompressedSimpleSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern csp (2,2);
 
       csp.block(0,0).reinit (n_u, n_u);
       csp.block(0,1).reinit (n_u, n_p);
@@ -990,7 +987,7 @@ namespace Step31
       Mp_preconditioner.reset ();
       stokes_preconditioner_matrix.clear ();
 
-      BlockCompressedSimpleSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern csp (2,2);
 
       csp.block(0,0).reinit (n_u, n_u);
       csp.block(0,1).reinit (n_u, n_p);
@@ -1030,7 +1027,7 @@ namespace Step31
       temperature_stiffness_matrix.clear ();
       temperature_matrix.clear ();
 
-      CompressedSimpleSparsityPattern csp (n_T, n_T);
+      DynamicSparsityPattern csp (n_T, n_T);
       DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
                                        temperature_constraints, false);
 

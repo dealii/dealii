@@ -677,13 +677,10 @@ namespace Step43
   // various blocks. This information is then used to create the sparsity
   // pattern for the Darcy and saturation system matrices as well as the
   // preconditioner matrix from which we build the Darcy preconditioner. As in
-  // step-31, we choose to create the pattern not as in the first few tutorial
-  // programs, but by using the blocked version of
-  // CompressedSimpleSparsityPattern. The reason for doing this is mainly
-  // memory, that is, the SparsityPattern class would consume too much memory
-  // when used in three spatial dimensions as we intend to do for this
-  // program. So, for this, we follow the same way as step-31 did and we don't
-  // have to repeat descriptions again for the rest of the member function.
+  // step-31, we choose to create the pattern using the blocked version of
+  // DynamicSparsityPattern. So, for this, we follow the same way as step-31
+  // did and we don't have to repeat descriptions again for the rest of the
+  // member function.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::setup_dofs ()
   {
@@ -739,7 +736,7 @@ namespace Step43
     {
       darcy_matrix.clear ();
 
-      BlockCompressedSimpleSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern csp (2,2);
 
       csp.block(0,0).reinit (n_u, n_u);
       csp.block(0,1).reinit (n_u, n_p);
@@ -769,7 +766,7 @@ namespace Step43
       Mp_preconditioner.reset ();
       darcy_preconditioner_matrix.clear ();
 
-      BlockCompressedSimpleSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern csp (2,2);
 
       csp.block(0,0).reinit (n_u, n_u);
       csp.block(0,1).reinit (n_u, n_p);
@@ -796,7 +793,7 @@ namespace Step43
     {
       saturation_matrix.clear ();
 
-      CompressedSimpleSparsityPattern csp (n_s, n_s);
+      DynamicSparsityPattern csp (n_s, n_s);
 
       DoFTools::make_sparsity_pattern (saturation_dof_handler, csp,
                                        saturation_constraints, false);

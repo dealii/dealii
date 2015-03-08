@@ -151,7 +151,7 @@ namespace Step36
   // sure that we do not need to re-allocate memory and free the one used
   // previously. One way to do that would be to use code like this:
   // @code
-  //   CompressedSimpleSparsityPattern
+  //   DynamicSparsityPattern
   //      csp (dof_handler.n_dofs(),
   //           dof_handler.n_dofs());
   //   DoFTools::make_sparsity_pattern (dof_handler, csp);

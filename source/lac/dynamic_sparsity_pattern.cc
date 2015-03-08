@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/base/memory_consumption.h>
 
 #include <algorithm>
@@ -27,9 +27,9 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename ForwardIterator>
 void
-CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
-                                                    ForwardIterator end,
-                                                    const bool      indices_are_sorted)
+DynamicSparsityPattern::Line::add_entries (ForwardIterator begin,
+                                           ForwardIterator end,
+                                           const bool      indices_are_sorted)
 {
   const int n_elements = end - begin;
   if (n_elements <= 0)
@@ -207,14 +207,14 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 }
 
 
-CompressedSimpleSparsityPattern::size_type
-CompressedSimpleSparsityPattern::Line::memory_consumption () const
+DynamicSparsityPattern::size_type
+DynamicSparsityPattern::Line::memory_consumption () const
 {
   return entries.capacity()*sizeof(size_type)+sizeof(Line);
 }
 
 
-CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern ()
+DynamicSparsityPattern::DynamicSparsityPattern ()
   :
   rows(0),
   cols(0),
@@ -223,8 +223,8 @@ CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern ()
 
 
 
-CompressedSimpleSparsityPattern::
-CompressedSimpleSparsityPattern (const CompressedSimpleSparsityPattern &s)
+DynamicSparsityPattern::
+DynamicSparsityPattern (const DynamicSparsityPattern &s)
   :
   Subscriptor(),
   rows(0),
@@ -237,10 +237,10 @@ CompressedSimpleSparsityPattern (const CompressedSimpleSparsityPattern &s)
 
 
 
-CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const size_type m,
-    const size_type n,
-    const IndexSet &rowset_
-                                                                 )
+DynamicSparsityPattern::DynamicSparsityPattern (const size_type m,
+                                                const size_type n,
+                                                const IndexSet &rowset_
+                                               )
   :
   rows(0),
   cols(0),
@@ -250,7 +250,7 @@ CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const size_typ
 }
 
 
-CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const IndexSet &rowset_)
+DynamicSparsityPattern::DynamicSparsityPattern (const IndexSet &rowset_)
   :
   rows(0),
   cols(0),
@@ -260,7 +260,7 @@ CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const IndexSet
 }
 
 
-CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const size_type n)
+DynamicSparsityPattern::DynamicSparsityPattern (const size_type n)
   :
   rows(0),
   cols(0),
@@ -271,8 +271,8 @@ CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const size_typ
 
 
 
-CompressedSimpleSparsityPattern &
-CompressedSimpleSparsityPattern::operator = (const CompressedSimpleSparsityPattern &s)
+DynamicSparsityPattern &
+DynamicSparsityPattern::operator = (const DynamicSparsityPattern &s)
 {
   Assert (s.rows == 0, ExcInvalidConstructorCall());
   Assert (s.cols == 0, ExcInvalidConstructorCall());
@@ -286,9 +286,9 @@ CompressedSimpleSparsityPattern::operator = (const CompressedSimpleSparsityPatte
 
 
 void
-CompressedSimpleSparsityPattern::reinit (const size_type m,
-                                         const size_type n,
-                                         const IndexSet &rowset_)
+DynamicSparsityPattern::reinit (const size_type m,
+                                const size_type n,
+                                const IndexSet &rowset_)
 {
   rows = m;
   cols = n;
@@ -303,21 +303,21 @@ CompressedSimpleSparsityPattern::reinit (const size_type m,
 
 
 void
-CompressedSimpleSparsityPattern::compress ()
+DynamicSparsityPattern::compress ()
 {}
 
 
 
 bool
-CompressedSimpleSparsityPattern::empty () const
+DynamicSparsityPattern::empty () const
 {
   return ((rows==0) && (cols==0));
 }
 
 
 
-CompressedSimpleSparsityPattern::size_type
-CompressedSimpleSparsityPattern::max_entries_per_row () const
+DynamicSparsityPattern::size_type
+DynamicSparsityPattern::max_entries_per_row () const
 {
   size_type m = 0;
   for (size_type i=0; i<lines.size(); ++i)
@@ -331,8 +331,8 @@ CompressedSimpleSparsityPattern::max_entries_per_row () const
 
 
 bool
-CompressedSimpleSparsityPattern::exists (const size_type i,
-                                         const size_type j) const
+DynamicSparsityPattern::exists (const size_type i,
+                                const size_type j) const
 {
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
@@ -349,7 +349,7 @@ CompressedSimpleSparsityPattern::exists (const size_type i,
 
 
 void
-CompressedSimpleSparsityPattern::symmetrize ()
+DynamicSparsityPattern::symmetrize ()
 {
   Assert (rows==cols, ExcNotQuadratic());
 
@@ -383,7 +383,7 @@ CompressedSimpleSparsityPattern::symmetrize ()
 
 
 void
-CompressedSimpleSparsityPattern::print (std::ostream &out) const
+DynamicSparsityPattern::print (std::ostream &out) const
 {
   for (size_type row=0; row<lines.size(); ++row)
     {
@@ -403,7 +403,7 @@ CompressedSimpleSparsityPattern::print (std::ostream &out) const
 
 
 void
-CompressedSimpleSparsityPattern::print_gnuplot (std::ostream &out) const
+DynamicSparsityPattern::print_gnuplot (std::ostream &out) const
 {
   for (size_type row=0; row<lines.size(); ++row)
     {
@@ -429,8 +429,8 @@ CompressedSimpleSparsityPattern::print_gnuplot (std::ostream &out) const
 
 
 
-CompressedSimpleSparsityPattern::size_type
-CompressedSimpleSparsityPattern::bandwidth () const
+DynamicSparsityPattern::size_type
+DynamicSparsityPattern::bandwidth () const
 {
   size_type b=0;
   for (size_type row=0; row<lines.size(); ++row)
@@ -450,8 +450,8 @@ CompressedSimpleSparsityPattern::bandwidth () const
 
 
 
-CompressedSimpleSparsityPattern::size_type
-CompressedSimpleSparsityPattern::n_nonzero_elements () const
+DynamicSparsityPattern::size_type
+DynamicSparsityPattern::n_nonzero_elements () const
 {
   size_type n=0;
   for (size_type i=0; i<lines.size(); ++i)
@@ -463,11 +463,11 @@ CompressedSimpleSparsityPattern::n_nonzero_elements () const
 }
 
 
-CompressedSimpleSparsityPattern::size_type
-CompressedSimpleSparsityPattern::memory_consumption () const
+DynamicSparsityPattern::size_type
+DynamicSparsityPattern::memory_consumption () const
 {
   //TODO: IndexSet...
-  size_type mem = sizeof(CompressedSimpleSparsityPattern);
+  size_type mem = sizeof(DynamicSparsityPattern);
   for (size_type i=0; i<lines.size(); ++i)
     mem += MemoryConsumption::memory_consumption (lines[i]);
 
@@ -476,14 +476,14 @@ CompressedSimpleSparsityPattern::memory_consumption () const
 
 
 // explicit instantiations
-template void CompressedSimpleSparsityPattern::Line::add_entries(size_type *,
-    size_type *,
-    const bool);
-template void CompressedSimpleSparsityPattern::Line::add_entries(const size_type *,
-    const size_type *,
-    const bool);
+template void DynamicSparsityPattern::Line::add_entries(size_type *,
+                                                        size_type *,
+                                                        const bool);
+template void DynamicSparsityPattern::Line::add_entries(const size_type *,
+                                                        const size_type *,
+                                                        const bool);
 #ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
-template void CompressedSimpleSparsityPattern::Line::
+template void DynamicSparsityPattern::Line::
 add_entries(std::vector<size_type>::iterator,
             std::vector<size_type>::iterator,
             const bool);

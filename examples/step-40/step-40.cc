@@ -45,7 +45,7 @@ namespace LA
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
@@ -295,7 +295,7 @@ namespace Step40
 
     // The last part of this function deals with initializing the matrix with
     // accompanying sparsity pattern. As in previous tutorial programs, we use
-    // the CompressedSimpleSparsityPattern as an intermediate with which we
+    // the DynamicSparsityPattern as an intermediate with which we
     // then initialize the PETSc matrix. To do so we have to tell the sparsity
     // pattern its size but as above there is no way the resulting object will
     // be able to store even a single pointer for each global degree of
@@ -315,7 +315,7 @@ namespace Step40
     // entries that will exist in that part of the finite element matrix that
     // it will own. The final step is to initialize the matrix with the
     // sparsity pattern.
-    CompressedSimpleSparsityPattern csp (locally_relevant_dofs);
+    DynamicSparsityPattern csp (locally_relevant_dofs);
 
     DoFTools::make_sparsity_pattern (dof_handler, csp,
                                      constraints, false);

@@ -36,7 +36,7 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -341,7 +341,7 @@ namespace Step38
               << " degrees of freedom."
               << std::endl;
 
-    CompressedSparsityPattern csp (dof_handler.n_dofs(), dof_handler.n_dofs());
+    DynamicSparsityPattern csp (dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, csp);
     sparsity_pattern.copy_from (csp);
 

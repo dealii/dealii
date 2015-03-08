@@ -201,7 +201,7 @@ ChunkSparsityPattern::copy_from (const SparsityType &csp,
   // sparsity pattern
   const size_type m_chunks = (csp.n_rows()+chunk_size-1) / chunk_size,
                   n_chunks = (csp.n_cols()+chunk_size-1) / chunk_size;
-  CompressedSimpleSparsityPattern temporary_sp(m_chunks, n_chunks);
+  DynamicSparsityPattern temporary_sp(m_chunks, n_chunks);
 
   for (size_type row = 0; row<csp.n_rows(); ++row)
     {
@@ -613,13 +613,7 @@ ChunkSparsityPattern::memory_consumption () const
 
 // explicit instantiations
 template
-void ChunkSparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &,
-    const size_type);
-template
-void ChunkSparsityPattern::copy_from<CompressedSetSparsityPattern> (const CompressedSetSparsityPattern &,
-    const size_type);
-template
-void ChunkSparsityPattern::copy_from<CompressedSimpleSparsityPattern> (const CompressedSimpleSparsityPattern &,
+void ChunkSparsityPattern::copy_from<DynamicSparsityPattern> (const DynamicSparsityPattern &,
     const size_type);
 template
 void ChunkSparsityPattern::create_from<SparsityPattern>
@@ -629,24 +623,10 @@ void ChunkSparsityPattern::create_from<SparsityPattern>
  const unsigned int,
  const bool);
 template
-void ChunkSparsityPattern::create_from<CompressedSparsityPattern>
+void ChunkSparsityPattern::create_from<DynamicSparsityPattern>
 (const unsigned int,
  const unsigned int,
  const CompressedSparsityPattern &,
- const unsigned int,
- const bool);
-template
-void ChunkSparsityPattern::create_from<CompressedSetSparsityPattern>
-(const unsigned int,
- const unsigned int,
- const CompressedSetSparsityPattern &,
- const unsigned int,
- const bool);
-template
-void ChunkSparsityPattern::create_from<CompressedSimpleSparsityPattern>
-(const unsigned int,
- const unsigned int,
- const CompressedSimpleSparsityPattern &,
  const unsigned int,
  const bool);
 template

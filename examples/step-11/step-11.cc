@@ -44,9 +44,9 @@
 #include <deal.II/numerics/matrix_tools.h>
 
 // Just this one is new: it declares a class
-// <code>CompressedSparsityPattern</code>, which we will use and explain
+// <code>DynamicSparsityPattern</code>, which we will use and explain
 // further down below.
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 // We will make use of the std::find algorithm of the C++ standard library, so
 // we have to include the following file for its declaration:
@@ -202,7 +202,7 @@ namespace Step11
     //
     // Since this can be so difficult that no reasonable answer can be given
     // that allows allocation of only a reasonable amount of memory, there is
-    // a class <code>CompressedSparsityPattern</code>, that can help us out
+    // a class <code>DynamicSparsityPattern</code>, that can help us out
     // here. It does not require that we know in advance how many entries rows
     // could have, but allows just about any length. It is thus significantly
     // more flexible in case you do not have good estimates of row lengths,
@@ -215,15 +215,15 @@ namespace Step11
     // pattern due to the differential operator, then condense it with the
     // constraints object which adds those positions in the sparsity pattern
     // that are required for the elimination of the constraint.
-    CompressedSparsityPattern csp (dof_handler.n_dofs(),
-                                   dof_handler.n_dofs());
+    DynamicSparsityPattern csp (dof_handler.n_dofs(),
+                                dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, csp);
     mean_value_constraints.condense (csp);
 
     // Finally, once we have the full pattern, we can initialize an object of
     // type <code>SparsityPattern</code> from it and in turn initialize the
     // matrix with it. Note that this is actually necessary, since the
-    // <code>CompressedSparsityPattern</code> is so inefficient compared to
+    // <code>DynamicSparsityPattern</code> is so inefficient compared to
     // the <code>SparsityPattern</code> class due to the more flexible data
     // structures it has to use, that we can impossibly base the sparse matrix
     // class on it, but rather need an object of type

@@ -460,8 +460,8 @@ namespace Step46
     // extensively in the introduction, and use it to initialize the matrix;
     // then also set vectors to their correct sizes:
     {
-      CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                           dof_handler.n_dofs());
+      DynamicSparsityPattern csp (dof_handler.n_dofs(),
+                                  dof_handler.n_dofs());
 
       Table<2,DoFTools::Coupling> cell_coupling (fe_collection.n_components(),
                                                  fe_collection.n_components());

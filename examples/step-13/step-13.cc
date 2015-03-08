@@ -32,6 +32,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -1035,20 +1036,20 @@ namespace Step13
       Threads::Task<> side_task(std_cxx11::bind(mhnc_p,std_cxx11::cref(dof_handler),
                                                 std_cxx11::ref(hanging_node_constraints)));
 
-      sparsity_pattern.reinit (dof_handler.n_dofs(),
-                               dof_handler.n_dofs(),
-                               dof_handler.max_couplings_between_dofs());
-      DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+      DynamicSparsityPattern csp(dof_handler.n_dofs(), dof_handler.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler, csp);
+
+
 
       // Wait for the side task to be done before going further
       side_task.join();
 
       hanging_node_constraints.close ();
-      hanging_node_constraints.condense (sparsity_pattern);
+      hanging_node_constraints.condense (csp);
+      sparsity_pattern.copy_from(csp);
 
-      // Finally, close the sparsity pattern, initialize the matrix, and set
-      // the right hand side vector to the right size.
-      sparsity_pattern.compress();
+
+      // Finally initialize the matrix and right hand side vector
       matrix.reinit (sparsity_pattern);
       rhs.reinit (dof_handler.n_dofs());
     }

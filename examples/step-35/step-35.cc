@@ -36,6 +36,7 @@
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_gmres.h>
@@ -789,13 +790,11 @@ namespace Step35
   void
   NavierStokesProjection<dim>::initialize_velocity_matrices()
   {
-    sparsity_pattern_velocity.reinit (dof_handler_velocity.n_dofs(),
-                                      dof_handler_velocity.n_dofs(),
-                                      dof_handler_velocity.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler_velocity,
-                                     sparsity_pattern_velocity);
-    sparsity_pattern_velocity.compress();
-
+    {
+      DynamicSparsityPattern csp(dof_handler_velocity.n_dofs(), dof_handler_velocity.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler_velocity, csp);
+      sparsity_pattern_velocity.copy_from (csp);
+    }
     vel_Laplace_plus_Mass.reinit (sparsity_pattern_velocity);
     for (unsigned int d=0; d<dim; ++d)
       vel_it_matrix[d].reinit (sparsity_pattern_velocity);
@@ -817,11 +816,11 @@ namespace Step35
   void
   NavierStokesProjection<dim>::initialize_pressure_matrices()
   {
-    sparsity_pattern_pressure.reinit (dof_handler_pressure.n_dofs(), dof_handler_pressure.n_dofs(),
-                                      dof_handler_pressure.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler_pressure, sparsity_pattern_pressure);
-
-    sparsity_pattern_pressure.compress();
+    {
+      DynamicSparsityPattern csp(dof_handler_pressure.n_dofs(), dof_handler_pressure.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler_pressure, csp);
+      sparsity_pattern_pressure.copy_from (csp);
+    }
 
     pres_Laplace.reinit (sparsity_pattern_pressure);
     pres_iterative.reinit (sparsity_pattern_pressure);
@@ -847,13 +846,11 @@ namespace Step35
   void
   NavierStokesProjection<dim>::initialize_gradient_operator()
   {
-    sparsity_pattern_pres_vel.reinit (dof_handler_velocity.n_dofs(),
-                                      dof_handler_pressure.n_dofs(),
-                                      dof_handler_velocity.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler_velocity,
-                                     dof_handler_pressure,
-                                     sparsity_pattern_pres_vel);
-    sparsity_pattern_pres_vel.compress();
+    {
+      DynamicSparsityPattern csp(dof_handler_velocity.n_dofs(), dof_handler_pressure.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler_velocity, dof_handler_pressure, csp);
+      sparsity_pattern_pres_vel.copy_from (csp);
+    }
 
     InitGradPerTaskData per_task_data (0, fe_velocity.dofs_per_cell,
                                        fe_pressure.dofs_per_cell);

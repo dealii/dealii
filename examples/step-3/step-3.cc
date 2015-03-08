@@ -66,7 +66,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 
@@ -208,7 +208,7 @@ void Step3::setup_system ()
   // first creating a temporary structure, tagging those entries that might be
   // nonzero, and then copying the data over to the SparsityPattern object
   // that can then be used by the system matrix.
-  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+  DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
   sparsity_pattern.copy_from(c_sparsity);
 

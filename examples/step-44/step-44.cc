@@ -50,7 +50,7 @@
 
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition_selector.h>
 #include <deal.II/lac/solver_cg.h>
@@ -1582,7 +1582,7 @@ namespace Step44
       const types::global_dof_index n_dofs_p = dofs_per_block[p_dof];
       const types::global_dof_index n_dofs_J = dofs_per_block[J_dof];
 
-      BlockCompressedSimpleSparsityPattern csp(n_blocks, n_blocks);
+      BlockDynamicSparsityPattern csp(n_blocks, n_blocks);
 
       csp.block(u_dof, u_dof).reinit(n_dofs_u, n_dofs_u);
       csp.block(u_dof, p_dof).reinit(n_dofs_u, n_dofs_p);

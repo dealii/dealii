@@ -48,7 +48,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 // We will also need to use an intermediate sparsity pattern structure, which
 // is found in this file:
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 // We will want to use a special algorithm to renumber degrees of freedom. It
 // is declared here:
@@ -195,15 +195,15 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
   // number, leading to a lot of wasted memory, sometimes too much for the
   // machine used, even if the unused memory can be released immediately after
   // computing the sparsity pattern. In order to avoid this, we use an
-  // intermediate object of type CompressedSparsityPattern that uses a
+  // intermediate object of type DynamicSparsityPattern that uses a
   // different %internal data structure and that we can later copy into the
   // SparsityPattern object without much overhead. (Some more information on
   // these data structures can be found in the @ref Sparsity module.) In order
   // to initialize this intermediate data structure, we have to give it the
   // size of the matrix, which in our case will be square with as many rows
   // and columns as there are degrees of freedom on the grid:
-  CompressedSparsityPattern compressed_sparsity_pattern(dof_handler.n_dofs(),
-                                                        dof_handler.n_dofs());
+  DynamicSparsityPattern compressed_sparsity_pattern(dof_handler.n_dofs(),
+                                                     dof_handler.n_dofs());
 
   // We then fill this object with the places where nonzero elements will be
   // located given the present numbering of degrees of freedom:
@@ -211,7 +211,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 
   // Now we are ready to create the actual sparsity pattern that we could
   // later use for our matrix. It will just contain the data already assembled
-  // in the CompressedSparsityPattern.
+  // in the DynamicSparsityPattern.
   SparsityPattern sparsity_pattern;
   sparsity_pattern.copy_from (compressed_sparsity_pattern);
 
@@ -265,8 +265,8 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee (dof_handler);
 
-  CompressedSparsityPattern compressed_sparsity_pattern(dof_handler.n_dofs(),
-                                                        dof_handler.n_dofs());
+  DynamicSparsityPattern compressed_sparsity_pattern(dof_handler.n_dofs(),
+                                                     dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, compressed_sparsity_pattern);
 
   SparsityPattern sparsity_pattern;

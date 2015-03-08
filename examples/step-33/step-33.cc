@@ -31,7 +31,7 @@
 #include <deal.II/base/std_cxx11/array.h>
 
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -1401,8 +1401,8 @@ namespace Step33
   template <int dim>
   void ConservationLaw<dim>::setup_system ()
   {
-    CompressedSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
-                                                dof_handler.n_dofs());
+    DynamicSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
+                                             dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
     system_matrix.reinit (sparsity_pattern);

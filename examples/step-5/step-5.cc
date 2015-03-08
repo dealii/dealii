@@ -28,7 +28,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
@@ -270,7 +270,7 @@ void Step5<dim>::setup_system ()
             << dof_handler.n_dofs()
             << std::endl;
 
-  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+  DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
   sparsity_pattern.copy_from(c_sparsity);
 

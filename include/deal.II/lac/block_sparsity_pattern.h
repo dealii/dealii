@@ -34,9 +34,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class BlockSparseMatrix;
 class BlockSparsityPattern;
-class BlockCompressedSparsityPattern;
-class BlockCompressedSimpleSparsityPattern;
-class BlockCompressedSetSparsityPattern;
+class BlockDynamicSparsityPattern;
 #ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
@@ -443,31 +441,12 @@ public:
   std::size_t memory_consumption () const;
 
   /**
-   * Copy data from an object of type BlockCompressedSparsityPattern, i.e.
+   * Copy data from an object of type BlockDynamicSparsityPattern, i.e.
    * resize this object to the size of the given argument, and copy over the
    * contents of each of the subobjects. Previous content of this object is
    * lost.
    */
-  void copy_from (const BlockCompressedSparsityPattern &csp);
-
-  /**
-   * Copy data from an object of type BlockCompressedSetSparsityPattern, i.e.
-   * resize this object to the size of the given argument, and copy over the
-   * contents of each of the subobjects. Previous content of this object is
-   * lost.
-   */
-  void copy_from (const BlockCompressedSetSparsityPattern &csp);
-
-  /**
-   * Copy data from an object of type BlockCompressedSimpleSparsityPattern,
-   * i.e. resize this object to the size of the given argument, and copy over
-   * the contents of each of the subobjects. Previous content of this object
-   * is lost.
-   */
-  void copy_from (const BlockCompressedSimpleSparsityPattern &csp);
-
-
-
+  void copy_from (const BlockDynamicSparsityPattern &csp);
 };
 
 
@@ -484,14 +463,9 @@ public:
  * This class is an example of the "dynamic" type of
  * @ref Sparsity.
  *
- * <b>Note:</b> There are several, exchangeable variations of this class, see
- * @ref Sparsity,
- * section 'Dynamic block sparsity patterns' for more information.
- *
- *
  * <h3>Example</h3>
  *
- * Usage of this class is very similar to CompressedSparsityPattern, but since
+ * Usage of this class is very similar to DynamicSparsityPattern, but since
  * the use of block indices causes some additional complications, we give a
  * short example.
  *
@@ -503,7 +477,7 @@ public:
  *
  * @skipline dofs_per_block @until count
  *
- * Now, we are ready to set up the BlockCompressedSparsityPattern.
+ * Now, we are ready to set up the BlockDynamicSparsityPattern.
  *
  * @until collect
  *
@@ -517,7 +491,8 @@ public:
  *
  * @author Wolfgang Bangerth, 2000, 2001, Guido Kanschat, 2006, 2007
  */
-class BlockCompressedSparsityPattern : public BlockSparsityPatternBase<CompressedSparsityPattern>
+
+class BlockDynamicSparsityPattern : public BlockSparsityPatternBase<DynamicSparsityPattern>
 {
 public:
 
@@ -526,15 +501,15 @@ public:
    * useful if you want such objects as member variables in other classes. You
    * can make the structure usable by calling the reinit() function.
    */
-  BlockCompressedSparsityPattern ();
+  BlockDynamicSparsityPattern ();
 
   /**
    * Initialize the matrix with the given number of block rows and columns.
    * The blocks themselves are still empty, and you have to call
    * collect_sizes() after you assign them sizes.
    */
-  BlockCompressedSparsityPattern (const size_type n_rows,
-                                  const size_type n_columns);
+  BlockDynamicSparsityPattern (const size_type n_rows,
+                               const size_type n_columns);
 
   /**
    * Initialize the pattern with two BlockIndices for the block structures of
@@ -542,168 +517,8 @@ public:
    * previous constructor with the length of the two index vector and then
    * entering the index values.
    */
-  BlockCompressedSparsityPattern (const std::vector<size_type> &row_block_sizes,
-                                  const std::vector<size_type> &col_block_sizes);
-
-  /**
-   * Initialize the pattern with two BlockIndices for the block structures of
-   * matrix rows and columns.
-   */
-  BlockCompressedSparsityPattern (const BlockIndices &row_indices,
-                                  const BlockIndices &col_indices);
-
-  /**
-   * Resize the matrix to a tensor product of matrices with dimensions defined
-   * by the arguments.
-   *
-   * The matrix will have as many block rows and columns as there are entries
-   * in the two arguments. The block at position (<i>i,j</i>) will have the
-   * dimensions <tt>row_block_sizes[i]</tt> times <tt>col_block_sizes[j]</tt>.
-   */
-  void reinit (const std::vector<size_type> &row_block_sizes,
-               const std::vector<size_type> &col_block_sizes);
-
-  /**
-   * Resize the matrix to a tensor product of matrices with dimensions defined
-   * by the arguments. The two BlockIndices objects must be initialized and
-   * the sparsity pattern will have the same block structure afterwards.
-   */
-  void reinit (const BlockIndices &row_indices, const BlockIndices &col_indices);
-
-  /**
-   * Allow the use of the reinit functions of the base class as well.
-   */
-  using BlockSparsityPatternBase<CompressedSparsityPattern>::reinit;
-};
-
-
-
-/**
- * This class extends the base class to implement an array of compressed
- * sparsity patterns that can be used to initialize objects of type
- * BlockSparsityPattern. It is used in the same way as the
- * BlockCompressedSparsityPattern except that it builds upon the
- * CompressedSetSparsityPattern instead of the CompressedSparsityPattern. See
- * the documentation of the BlockCompressedSparsityPattern for examples.
- *
- * This class is an example of the "dynamic" type of
- * @ref Sparsity.
- *
- * @note There are several, exchangeable variations of this class, see
- * @ref Sparsity,
- * section 'Dynamic block sparsity patterns' for more information.
- *
- * @author Wolfgang Bangerth, 2007
- */
-class BlockCompressedSetSparsityPattern : public BlockSparsityPatternBase<CompressedSetSparsityPattern>
-{
-public:
-
-  /**
-   * Initialize the matrix empty, that is with no memory allocated. This is
-   * useful if you want such objects as member variables in other classes. You
-   * can make the structure usable by calling the reinit() function.
-   */
-  BlockCompressedSetSparsityPattern ();
-
-  /**
-   * Initialize the matrix with the given number of block rows and columns.
-   * The blocks themselves are still empty, and you have to call
-   * collect_sizes() after you assign them sizes.
-   */
-  BlockCompressedSetSparsityPattern (const size_type n_rows,
-                                     const size_type n_columns);
-
-  /**
-   * Initialize the pattern with two BlockIndices for the block structures of
-   * matrix rows and columns. This function is equivalent to calling the
-   * previous constructor with the length of the two index vector and then
-   * entering the index values.
-   */
-  BlockCompressedSetSparsityPattern (const std::vector<size_type> &row_block_sizes,
-                                     const std::vector<size_type> &col_block_sizes);
-
-  /**
-   * Initialize the pattern with two BlockIndices for the block structures of
-   * matrix rows and columns.
-   */
-  BlockCompressedSetSparsityPattern (const BlockIndices &row_indices,
-                                     const BlockIndices &col_indices);
-
-  /**
-   * Resize the matrix to a tensor product of matrices with dimensions defined
-   * by the arguments.
-   *
-   * The matrix will have as many block rows and columns as there are entries
-   * in the two arguments. The block at position (<i>i,j</i>) will have the
-   * dimensions <tt>row_block_sizes[i]</tt> times <tt>col_block_sizes[j]</tt>.
-   */
-  void reinit (const std::vector<size_type> &row_block_sizes,
-               const std::vector<size_type> &col_block_sizes);
-
-  /**
-   * Resize the matrix to a tensor product of matrices with dimensions defined
-   * by the arguments. The two BlockIndices objects must be initialized and
-   * the sparsity pattern will have the same block structure afterwards.
-   */
-  void reinit (const BlockIndices &row_indices, const BlockIndices &col_indices);
-
-  /**
-   * Allow the use of the reinit functions of the base class as well.
-   */
-  using BlockSparsityPatternBase<CompressedSetSparsityPattern>::reinit;
-};
-
-
-
-
-
-/**
- * This class extends the base class to implement an array of compressed
- * sparsity patterns that can be used to initialize objects of type
- * BlockSparsityPattern. It is used in the same way as the
- * BlockCompressedSparsityPattern except that it builds upon the
- * CompressedSimpleSparsityPattern instead of the CompressedSparsityPattern.
- * See the documentation of the BlockCompressedSparsityPattern for examples.
- *
- * This class is an example of the "dynamic" type of
- * @ref Sparsity.
- *
- * @note There are several, exchangeable variations of this class, see
- * @ref Sparsity,
- * section 'Dynamic block sparsity patterns' for more information.
- *
- * This class is used in step-22 and step-31.
- *
- * @author Timo Heister, 2008
- */
-class BlockCompressedSimpleSparsityPattern : public BlockSparsityPatternBase<CompressedSimpleSparsityPattern>
-{
-public:
-
-  /**
-   * Initialize the matrix empty, that is with no memory allocated. This is
-   * useful if you want such objects as member variables in other classes. You
-   * can make the structure usable by calling the reinit() function.
-   */
-  BlockCompressedSimpleSparsityPattern ();
-
-  /**
-   * Initialize the matrix with the given number of block rows and columns.
-   * The blocks themselves are still empty, and you have to call
-   * collect_sizes() after you assign them sizes.
-   */
-  BlockCompressedSimpleSparsityPattern (const size_type n_rows,
-                                        const size_type n_columns);
-
-  /**
-   * Initialize the pattern with two BlockIndices for the block structures of
-   * matrix rows and columns. This function is equivalent to calling the
-   * previous constructor with the length of the two index vector and then
-   * entering the index values.
-   */
-  BlockCompressedSimpleSparsityPattern (const std::vector<size_type> &row_block_sizes,
-                                        const std::vector<size_type> &col_block_sizes);
+  BlockDynamicSparsityPattern (const std::vector<size_type> &row_block_sizes,
+                               const std::vector<size_type> &col_block_sizes);
 
   /**
    * Initialize the pattern with symmetric blocks. The number of IndexSets in
@@ -713,7 +528,7 @@ public:
    * which is useful for distributed memory parallel computations and usually
    * corresponds to the locally owned DoFs.
    */
-  BlockCompressedSimpleSparsityPattern (const std::vector<IndexSet> &partitioning);
+  BlockDynamicSparsityPattern (const std::vector<IndexSet> &partitioning);
 
   /**
    * Resize the pattern to a tensor product of matrices with dimensions
@@ -742,8 +557,23 @@ public:
   /**
    * Allow the use of the reinit functions of the base class as well.
    */
-  using BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::reinit;
+  using BlockSparsityPatternBase<DynamicSparsityPattern>::reinit;
 };
+
+/**
+ * @deprecated Use  BlockDynamicSparsityPattern instead.
+ */
+typedef BlockDynamicSparsityPattern BlockCompressedSparsityPattern DEAL_II_DEPRECATED;
+
+/**
+ * @deprecated Use  BlockDynamicSparsityPattern instead.
+ */
+typedef BlockDynamicSparsityPattern BlockCompressedSetSparsityPattern DEAL_II_DEPRECATED;
+
+/**
+ * @deprecated Use  BlockDynamicSparsityPattern instead.
+ */
+typedef BlockDynamicSparsityPattern BlockCompressedSimpleSparsityPattern DEAL_II_DEPRECATED;
 
 
 
@@ -1108,9 +938,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_block_rows () const
 
 
 inline
-BlockCompressedSimpleSparsityPattern::size_type
-BlockCompressedSimpleSparsityPattern::column_number (const size_type row,
-                                                     const unsigned int index) const
+BlockDynamicSparsityPattern::size_type
+BlockDynamicSparsityPattern::column_number (const size_type row,
+                                            const unsigned int index) const
 {
   // .first= ith block, .second = jth row in that block
   const std::pair<size_type ,size_type >

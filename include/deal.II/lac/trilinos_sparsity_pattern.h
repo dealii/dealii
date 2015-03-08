@@ -44,9 +44,7 @@ DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
 class SparsityPattern;
-class CompressedSparsityPattern;
-class CompressedSetSparsityPattern;
-class CompressedSimpleSparsityPattern;
+class DynamicSparsityPattern;
 
 namespace TrilinosWrappers
 {
