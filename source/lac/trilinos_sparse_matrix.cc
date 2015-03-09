@@ -811,7 +811,7 @@ namespace TrilinosWrappers
     else
       nonlocal_matrix.reset();
 
-    compress(VectorOperation::unknown);
+    compress(VectorOperation::insert);
   }
 
 
