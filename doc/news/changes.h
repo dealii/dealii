@@ -43,6 +43,10 @@ inconvenience this causes.
   but this is neither efficient nor safe. You will now have to do this
   yourself after assembling a matrix and before clearing rows.
   <br>
+  The changes to the function above also affect the
+  MatrixTools::apply_boundary_values() variants that operate on Trilinos
+  matrices.
+  <br>
   (Wolfgang Bangerth, 2015/03/09)
   </li>
 
