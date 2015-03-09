@@ -1354,61 +1354,61 @@ public:
    */
 //@{
 
-    /**
-     * Return an iterator pointing to the first element of the matrix.
-     *
-     * Note the discussion in the general documentation of this class about the
-     * order in which elements are accessed.
-     */
-    const_iterator begin () const;
+  /**
+   * Return an iterator pointing to the first element of the matrix.
+   *
+   * Note the discussion in the general documentation of this class about the
+   * order in which elements are accessed.
+   */
+  const_iterator begin () const;
 
-    /**
-     * Like the function above, but for non-const matrices.
-     */
-    iterator begin ();
-    
-    /**
-     * Return an iterator pointing the element past the last one of
-     * this matrix.
-     */
-    const_iterator end () const;
+  /**
+   * Like the function above, but for non-const matrices.
+   */
+  iterator begin ();
 
-    /**
-     * Like the function above, but for non-const matrices.
-     */
-    iterator end ();
-    
-    /**
-     * Return an iterator pointing to the first element of row @p r.
-     *
-     * Note that if the given row is empty, i.e. does not contain any
-     * nonzero entries, then the iterator returned by this function
-     * equals <tt>end(r)</tt>. The returned iterator may not be
-     * dereferencable in that case if neither row @p r nor any of the
-     * following rows contain any nonzero entries.
-     */
-    const_iterator begin (const size_type r) const;
+  /**
+   * Return an iterator pointing the element past the last one of
+   * this matrix.
+   */
+  const_iterator end () const;
 
-    /**
-     * Like the function above, but for non-const matrices.
-     */
-    iterator begin (const size_type r);
+  /**
+   * Like the function above, but for non-const matrices.
+   */
+  iterator end ();
 
-    /**
-     * Return an iterator pointing the element past the last one of
-     * row @p r , or past the end of the entire sparsity pattern if
-     * none of the rows after @p r contain any entries at all.
-     *
-     * Note that the end iterator is not necessarily dereferencable. This is
-     * in particular the case if it is the end iterator for the last row of a
-     * matrix.
-     */
-    const_iterator end (const size_type r) const;
+  /**
+   * Return an iterator pointing to the first element of row @p r.
+   *
+   * Note that if the given row is empty, i.e. does not contain any
+   * nonzero entries, then the iterator returned by this function
+   * equals <tt>end(r)</tt>. The returned iterator may not be
+   * dereferencable in that case if neither row @p r nor any of the
+   * following rows contain any nonzero entries.
+   */
+  const_iterator begin (const size_type r) const;
 
-    /**
-     * Like the function above, but for non-const matrices.
-     */
-    iterator end (const size_type r);
+  /**
+   * Like the function above, but for non-const matrices.
+   */
+  iterator begin (const size_type r);
+
+  /**
+   * Return an iterator pointing the element past the last one of
+   * row @p r , or past the end of the entire sparsity pattern if
+   * none of the rows after @p r contain any entries at all.
+   *
+   * Note that the end iterator is not necessarily dereferencable. This is
+   * in particular the case if it is the end iterator for the last row of a
+   * matrix.
+   */
+  const_iterator end (const size_type r) const;
+
+  /**
+   * Like the function above, but for non-const matrices.
+   */
+  iterator end (const size_type r);
 //@}
   /**
    * @name Input/Output

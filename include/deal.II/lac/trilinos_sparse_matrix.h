@@ -1719,7 +1719,7 @@ namespace TrilinosWrappers
      * Like the function above, but for non-const matrices.
      */
     iterator begin ();
-    
+
     /**
      * Return an iterator pointing the element past the last one of
      * this matrix.
@@ -1730,7 +1730,7 @@ namespace TrilinosWrappers
      * Like the function above, but for non-const matrices.
      */
     iterator end ();
-    
+
     /**
      * Return an iterator pointing to the first element of row @p r.
      *
@@ -2147,8 +2147,8 @@ namespace TrilinosWrappers
           while ((accessor.a_row < accessor.matrix->m())
                  &&
                  ((accessor.matrix->in_local_range (accessor.a_row) == false)
-		  ||
-		  (accessor.matrix->row_length(accessor.a_row) == 0)))
+                  ||
+                  (accessor.matrix->row_length(accessor.a_row) == 0)))
             ++accessor.a_row;
 
           accessor.visit_present_row();
@@ -2257,8 +2257,8 @@ namespace TrilinosWrappers
   {
     Assert (r < m(), ExcIndexRange(r, 0, m()));
     if (in_local_range (r)
-	&&
-	(row_length(r) > 0))
+        &&
+        (row_length(r) > 0))
       return const_iterator(this, r, 0);
     else
       return end (r);
@@ -2277,8 +2277,8 @@ namespace TrilinosWrappers
     // matrix
     for (size_type i=r+1; i<m(); ++i)
       if (in_local_range (i)
-	  &&
-	  (row_length(i) > 0))
+          &&
+          (row_length(i) > 0))
         return const_iterator(this, i, 0);
 
     // if there is no such line, then take the
@@ -2312,8 +2312,8 @@ namespace TrilinosWrappers
   {
     Assert (r < m(), ExcIndexRange(r, 0, m()));
     if (in_local_range (r)
-	&&
-	(row_length(r) > 0))
+        &&
+        (row_length(r) > 0))
       return iterator(this, r, 0);
     else
       return end (r);
@@ -2332,8 +2332,8 @@ namespace TrilinosWrappers
     // matrix
     for (size_type i=r+1; i<m(); ++i)
       if (in_local_range (i)
-	  &&
-	  (row_length(i) > 0))
+          &&
+          (row_length(i) > 0))
         return iterator(this, i, 0);
 
     // if there is no such line, then take the

@@ -121,8 +121,8 @@ namespace TrilinosWrappers
       // owned. this is simply going to make non-locally owned rows
       // look like they're empty
       if ((this->a_row == matrix->m())
-	  ||
-	  (matrix->in_local_range (this->a_row) == false))
+          ||
+          (matrix->in_local_range (this->a_row) == false))
         {
           colnum_cache.reset ();
           value_cache.reset ();
