@@ -114,11 +114,15 @@ namespace TrilinosWrappers
     void
     AccessorBase::visit_present_row ()
     {
-      // if we are asked to visit the
-      // past-the-end line, then simply
-      // release all our caches and go on
-      // with life
-      if (this->a_row == matrix->m())
+      // if we are asked to visit the past-the-end line, then simply
+      // release all our caches and go on with life.
+      //
+      // do the same if the row we're supposed to visit is not locally
+      // owned. this is simply going to make non-locally owned rows
+      // look like they're empty
+      if ((this->a_row == matrix->m())
+	  ||
+	  (matrix->in_local_range (this->a_row) == false))
         {
           colnum_cache.reset ();
           value_cache.reset ();
@@ -126,8 +130,7 @@ namespace TrilinosWrappers
           return;
         }
 
-      // get a representation of the present
-      // row
+      // get a representation of the present row
       int ncols;
       TrilinosWrappers::types::int_type colnums = matrix->n();
       if (value_cache.get() == 0)

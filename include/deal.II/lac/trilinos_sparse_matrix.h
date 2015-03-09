@@ -1684,10 +1684,11 @@ namespace TrilinosWrappers
      * elements if you iterate over them.
      *
      * When you iterate over the elements of a parallel matrix, you
-     * will only be able to access the locally owned rows. In that
-     * case, you probably want to call the begin() function that takes
-     * the row as an argument to limit the range of elements to loop
-     * over.
+     * will only be able to access the locally owned rows. (You can
+     * access the other rows as well, but they will look empty.) In
+     * that case, you probably want to call the begin() function that
+     * takes the row as an argument to limit the range of elements to
+     * loop over.
      */
     const_iterator begin () const;
 
@@ -1728,7 +1729,8 @@ namespace TrilinosWrappers
      *
      * @note When you access the elements of a parallel matrix, you
      * can only access the elements of rows that are actually stored
-     * locally. Even then, if another processor has since written
+     * locally. (You can access the other rows as well, but they will
+     * look empty.) Even then, if another processor has since written
      * into, or added to, an element of the matrix that is stored on
      * the current processor, then you will still see the old value of
      * this entry unless you have called compress() between modifying
@@ -2121,7 +2123,9 @@ namespace TrilinosWrappers
 
           while ((accessor.a_row < accessor.matrix->m())
                  &&
-                 (accessor.matrix->row_length(accessor.a_row) == 0))
+                 ((accessor.matrix->in_local_range (accessor.a_row) == false)
+		  ||
+		  (accessor.matrix->row_length(accessor.a_row) == 0)))
             ++accessor.a_row;
 
           accessor.visit_present_row();
@@ -2210,7 +2214,7 @@ namespace TrilinosWrappers
   SparseMatrix::const_iterator
   SparseMatrix::begin() const
   {
-    return const_iterator(this, 0, 0);
+    return begin(0);
   }
 
 
@@ -2229,7 +2233,9 @@ namespace TrilinosWrappers
   SparseMatrix::begin(const size_type r) const
   {
     Assert (r < m(), ExcIndexRange(r, 0, m()));
-    if (row_length(r) > 0)
+    if (in_local_range (r)
+	&&
+	(row_length(r) > 0))
       return const_iterator(this, r, 0);
     else
       return end (r);
@@ -2247,7 +2253,9 @@ namespace TrilinosWrappers
     // past this line, or at the end of the
     // matrix
     for (size_type i=r+1; i<m(); ++i)
-      if (row_length(i) > 0)
+      if (in_local_range (i)
+	  &&
+	  (row_length(i) > 0))
         return const_iterator(this, i, 0);
 
     // if there is no such line, then take the
@@ -2261,7 +2269,7 @@ namespace TrilinosWrappers
   SparseMatrix::iterator
   SparseMatrix::begin()
   {
-    return iterator(this, 0, 0);
+    return begin(0);
   }
 
 
@@ -2280,7 +2288,9 @@ namespace TrilinosWrappers
   SparseMatrix::begin(const size_type r)
   {
     Assert (r < m(), ExcIndexRange(r, 0, m()));
-    if (row_length(r) > 0)
+    if (in_local_range (r)
+	&&
+	(row_length(r) > 0))
       return iterator(this, r, 0);
     else
       return end (r);
@@ -2298,7 +2308,9 @@ namespace TrilinosWrappers
     // past this line, or at the end of the
     // matrix
     for (size_type i=r+1; i<m(); ++i)
-      if (row_length(i) > 0)
+      if (in_local_range (i)
+	  &&
+	  (row_length(i) > 0))
         return iterator(this, i, 0);
 
     // if there is no such line, then take the

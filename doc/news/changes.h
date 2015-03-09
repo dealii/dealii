@@ -364,6 +364,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Iterating over the elements of a TrilinosWrappers::SparseMatrix
+  object previously led to errors if the matrix was in fact stored in
+  parallel across multiple MPI processes. This is now fixed: rows not
+  stored locally on the processor where you run the iteration simply look
+  like they're empty.
+  <br>
+  (Wolfgang Bangerth, 2015/03/08)
+  </li>
+
   <li> New: There is now a new macro DeclExceptionMsg that allows to
   declare an exception that does not take any run-time arguments
   yet still allows to specify an error message.
