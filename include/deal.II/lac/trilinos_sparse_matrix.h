@@ -1288,10 +1288,7 @@ namespace TrilinosWrappers
     /**
      * Remove all elements from this <tt>row</tt> by setting them to zero. The
      * function does not modify the number of allocated nonzero entries, it
-     * only sets some entries to zero. It may drop them from the sparsity
-     * pattern, though (but retains the allocated memory in case new entries
-     * are again added later). Note that this is a global operation, so this
-     * needs to be done on all MPI processes.
+     * only sets the entries to zero.
      *
      * This operation is used in eliminating constraints (e.g. due to hanging
      * nodes) and makes sure that we can write this modification to the matrix
@@ -1301,6 +1298,19 @@ namespace TrilinosWrappers
      *
      * The second parameter can be used to set the diagonal entry of this row
      * to a value different from zero. The default is to set it to zero.
+     *
+     * @note If the matrix is stored in parallel across multiple
+     * processors using MPI, this function only touches rows that are
+     * locally stored and simply ignores all other row
+     * indices. Further, in the context of parallel computations, you
+     * will get into trouble if you clear a row while other processors
+     * still have pending writes or additions into the same row. In
+     * other words, if another processor still wants to add something
+     * to an element of a row and you call this function to zero out
+     * the row, then the next time you call compress() may add the
+     * remote value to the zero you just created. Consequently, you
+     * will want to call compress() after you made the last
+     * modifications to a matrix and before starting to clear rows.
      */
     void clear_row (const size_type      row,
                     const TrilinosScalar new_diag_value = 0);
@@ -1312,6 +1322,19 @@ namespace TrilinosWrappers
      * cleared rows to something different from zero. Note that all of these
      * diagonal entries get the same value -- if you want different values for
      * the diagonal entries, you have to set them by hand.
+     *
+     * @note If the matrix is stored in parallel across multiple
+     * processors using MPI, this function only touches rows that are
+     * locally stored and simply ignores all other row
+     * indices. Further, in the context of parallel computations, you
+     * will get into trouble if you clear a row while other processors
+     * still have pending writes or additions into the same row. In
+     * other words, if another processor still wants to add something
+     * to an element of a row and you call this function to zero out
+     * the row, then the next time you call compress() may add the
+     * remote value to the zero you just created. Consequently, you
+     * will want to call compress() after you made the last
+     * modifications to a matrix and before starting to clear rows.
      */
     void clear_rows (const std::vector<size_type> &rows,
                      const TrilinosScalar          new_diag_value = 0);

@@ -1104,13 +1104,6 @@ namespace TrilinosWrappers
   {
     for (size_type row=0; row<rows.size(); ++row)
       clear_row(rows[row], new_diag_value);
-
-    // This function needs to be called
-    // on all processors. We change some
-    // data, so we need to flush the
-    // buffers to make sure that the
-    // right data is used.
-    compress(VectorOperation::insert);
   }
 
 

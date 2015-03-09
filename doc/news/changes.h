@@ -38,6 +38,14 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: The TrilinosWrappers::SparseMatrix::clear_row() function used
+  to call TrilinosWrappers::SparseMatrix::compress() before doing its work,
+  but this is neither efficient nor safe. You will now have to do this
+  yourself after assembling a matrix and before clearing rows.
+  <br>
+  (Wolfgang Bangerth, 2015/03/09)
+  </li>
+
   <li> Changed: Implicit conversion from Tensor@<1,dim@> to Point@<dim@> was
   previously possible. This has now been prohibited (but you can still
   do the conversion with an explicit cast) as such conversions are
