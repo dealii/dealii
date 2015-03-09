@@ -1671,28 +1671,82 @@ namespace TrilinosWrappers
 //@{
 
     /**
-     * STL-like iterator with the first entry.
+     * Return an iterator pointing to the first element of the matrix.
+     *
+     * The elements accessed by iterators within each row are ordered
+     * in the way in which Trilinos stores them, though the
+     * implementation guarantees that all elements of one row are
+     * accessed before the elements of the next row. If your algorithm
+     * relies on visiting elements within one row, you will need to
+     * consult with the Trilinos documentation on the order in which
+     * it stores data. It is, however, generally not a good and
+     * long-term stable idea to rely on the order in which receive
+     * elements if you iterate over them.
+     *
+     * When you iterate over the elements of a parallel matrix, you
+     * will only be able to access the locally owned rows. In that
+     * case, you probably want to call the begin() function that takes
+     * the row as an argument to limit the range of elements to loop
+     * over.
      */
     const_iterator begin () const;
 
     /**
-     * Final iterator.
+     * Like the function above, but for non-const matrices.
+     */
+    iterator begin ();
+    
+    /**
+     * Return an iterator pointing the element past the last one of
+     * this matrix.
      */
     const_iterator end () const;
 
     /**
-     * STL-like iterator with the first entry of row @p r.
+     * Like the function above, but for non-const matrices.
+     */
+    iterator end ();
+    
+    /**
+     * Return an iterator pointing to the first element of row @p r.
      *
-     * Note that if the given row is empty, i.e. does not contain any nonzero
-     * entries, then the iterator returned by this function equals
-     * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable
-     * in that case.
+     * Note that if the given row is empty, i.e. does not contain any
+     * nonzero entries, then the iterator returned by this function
+     * equals <tt>end(r)</tt>. The returned iterator may not be
+     * dereferencable in that case if neither row @p r nor any of the
+     * following rows contain any nonzero entries.
+     *
+     * The elements accessed by iterators within each row are ordered
+     * in the way in which Trilinos stores them, though the
+     * implementation guarantees that all elements of one row are
+     * accessed before the elements of the next row. If your algorithm
+     * relies on visiting elements within one row, you will need to
+     * consult with the Trilinos documentation on the order in which
+     * it stores data. It is, however, generally not a good and
+     * long-term stable idea to rely on the order in which receive
+     * elements if you iterate over them.
+     *
+     * @note When you access the elements of a parallel matrix, you
+     * can only access the elements of rows that are actually stored
+     * locally. Even then, if another processor has since written
+     * into, or added to, an element of the matrix that is stored on
+     * the current processor, then you will still see the old value of
+     * this entry unless you have called compress() between modifying
+     * the matrix element on the remote processor and accessing it on
+     * the current processor. See the documentation of the compress()
+     * function for more information.
      */
     const_iterator begin (const size_type r) const;
 
     /**
-     * Final iterator of row <tt>r</tt>. It points to the first element past
-     * the end of line @p r, or past the end of the entire sparsity pattern.
+     * Like the function above, but for non-const matrices.
+     */
+    iterator begin (const size_type r);
+
+    /**
+     * Return an iterator pointing the element past the last one of
+     * row @p r , or past the end of the entire sparsity pattern if
+     * none of the rows after @p r contain any entries at all.
      *
      * Note that the end iterator is not necessarily dereferencable. This is
      * in particular the case if it is the end iterator for the last row of a
@@ -1701,32 +1755,7 @@ namespace TrilinosWrappers
     const_iterator end (const size_type r) const;
 
     /**
-     * STL-like iterator with the first entry.
-     */
-    iterator begin ();
-
-    /**
-     * Final iterator.
-     */
-    iterator end ();
-
-    /**
-     * STL-like iterator with the first entry of row @p r.
-     *
-     * Note that if the given row is empty, i.e. does not contain any nonzero
-     * entries, then the iterator returned by this function equals
-     * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable
-     * in that case.
-     */
-    iterator begin (const size_type r);
-
-    /**
-     * Final iterator of row <tt>r</tt>. It points to the first element past
-     * the end of line @p r, or past the end of the entire sparsity pattern.
-     *
-     * Note that the end iterator is not necessarily dereferencable. This is
-     * in particular the case if it is the end iterator for the last row of a
-     * matrix.
+     * Like the function above, but for non-const matrices.
      */
     iterator end (const size_type r);
 
