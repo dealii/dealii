@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,6 +37,11 @@
 #  include <Teuchos_ParameterList.hpp>
 #  include <Epetra_RowMatrix.h>
 #  include <Epetra_Vector.h>
+
+#  if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
+#  include <MueLu.hpp>
+#  include <Teuchos_RCP.hpp>
+#  endif
 
 // forward declarations
 class Ifpack_Preconditioner;
@@ -1538,6 +1543,235 @@ namespace TrilinosWrappers
      */
     std_cxx11::shared_ptr<SparseMatrix> trilinos_matrix;
   };
+
+
+
+#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
+  /**
+   * This class implements an algebraic multigrid (AMG) preconditioner based
+   * on the Trilinos MueLu implementation, which is a black-box preconditioner
+   * that works well for many PDE-based linear problems. The interface of
+   * PreconditionerAMGMueLu is the same as the interface of PreconditionerAMG
+   * except for the higher_order_elements parameter which does not exist in
+   * PreconditionerAMGMueLu.
+   *
+   * This class requires Trilinos 11.14 or higher.
+   *
+   * This interface should not be considered as stable.
+   *
+   * @ingroup TrilinosWrappers
+   * @ingroup Preconditioners
+   * @author Bruno Turcksin, 2014
+   */
+  class PreconditionAMGMueLu : public PreconditionBase
+  {
+  public:
+
+
+    /**
+     * A data structure that is used to control details of how the algebraic
+     * multigrid is set up. The flags detailed in here are then passed to
+     * the Trilinos MueLu implementation. A structure of the current type are
+     * passed to the constructor of PreconditionAMGMueLu.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor. By default, we pretend to work on elliptic problems with
+       * linear finite elements on a scalar equation.
+       */
+      AdditionalData (const bool                             elliptic = true,
+                      const unsigned int                     n_cycles = 1,
+                      const bool                             w_cyle = false,
+                      const double                           aggregation_threshold = 1e-4,
+                      const std::vector<std::vector<bool> > &constant_modes = std::vector<std::vector<bool> > (0),
+                      const unsigned int                     smoother_sweeps = 2,
+                      const unsigned int                     smoother_overlap = 0,
+                      const bool                             output_details = false,
+                      const char                            *smoother_type = "Chebyshev",
+                      const char                            *coarse_type = "Amesos-KLU");
+
+      /**
+       * Determines whether the AMG preconditioner should be optimized for
+       * elliptic problems (MueLu option smoothed aggregation SA, using a
+       * Chebyshev smoother) or for non-elliptic problems (MueLu option
+       * non-symmetric smoothed aggregation NSSA, smoother is SSOR with
+       * underrelaxation).
+       */
+      bool elliptic;
+
+      /**
+       * Defines how many multigrid cycles should be performed by the
+       * preconditioner.
+       */
+      unsigned int n_cycles;
+
+      /**
+       * Defines whether a w-cycle should be used instead of the standard
+       * setting of a v-cycle.
+       */
+      bool w_cycle;
+
+      /**
+       * This threshold tells the AMG setup how the coarsening should be
+       * performed. In the AMG used by MueLu, all points that strongly couple
+       * with the tentative coarse-level point form one aggregate. The term
+       * <em>strong coupling</em> is controlled by the variable
+       * <tt>aggregation_threshold</tt>, meaning that all elements that are
+       * not smaller than <tt>aggregation_threshold</tt> times the diagonal
+       * element do couple strongly.
+       */
+      double aggregation_threshold;
+
+      /**
+       * Specifies the constant modes (near null space) of the matrix. This
+       * parameter tells AMG whether we work on a scalar equation (where the
+       * near null space only consists of ones) or on a vector-valued
+       * equation.
+       */
+      std::vector<std::vector<bool> > constant_modes;
+
+      /**
+       * Determines how many sweeps of the smoother should be performed. When
+       * the flag <tt>elliptic</tt> is set to <tt>true</tt>, i.e., for
+       * elliptic or almost elliptic problems, the polynomial degree of the
+       * Chebyshev smoother is set to <tt>smoother_sweeps</tt>. The term
+       * sweeps refers to the number of matrix-vector products performed in
+       * the Chebyshev case. In the non-elliptic case,
+       * <tt>smoother_sweeps</tt> sets the number of SSOR relaxation sweeps
+       * for post-smoothing to be performed.
+       */
+      unsigned int smoother_sweeps;
+
+      /**
+       * Determines the overlap in the SSOR/Chebyshev error smoother when run
+       * in parallel.
+       */
+      unsigned int smoother_overlap;
+
+      /**
+       * If this flag is set to <tt>true</tt>, then internal information from
+       * the ML preconditioner is printed to screen. This can be useful when
+       * debugging the preconditioner.
+       */
+      bool output_details;
+
+      /**
+       * Determines which smoother to use for the AMG cycle. Possibilities
+       * for smoother_type are the following:
+       * <ul>
+       *   <li>  "Aztec" </li>
+       *   <li>  "IFPACK" </li>
+       *   <li>  "Jacobi" </li>
+       *   <li>  "ML symmetric Gauss-Seidel" </li>
+       *   <li>  "symmetric Gauss-Seidel" </li>
+       *   <li>  "ML Gauss-Seidel" </li>
+       *   <li>  "Gauss-Seidel" </li>
+       *   <li>  "block Gauss-Seidel" </li>
+       *   <li>  "symmetric block Gauss-Seidel" </li>
+       *   <li>  "Chebyshev" </li>
+       *   <li>  "MLS" </li>
+       *   <li>  "Hiptmair" </li>
+       *   <li>  "Amesos-KLU" </li>
+       *   <li>  "Amesos-Superlu" </li>
+       *   <li>  "Amesos-UMFPACK" </li>
+       *   <li>  "Amesos-Superludist" </li>
+       *   <li>  "Amesos-MUMPS" </li>
+       *   <li>  "user-defined" </li>
+       *   <li>  "SuperLU" </li>
+       *   <li>  "IFPACK-Chebyshev" </li>
+       *   <li>  "self" </li>
+       *   <li>  "do-nothing" </li>
+       *   <li>  "IC" </li>
+       *   <li>  "ICT" </li>
+       *   <li>  "ILU" </li>
+       *   <li>  "ILUT" </li>
+       *   <li>  "Block Chebyshev" </li>
+       *   <li>  "IFPACK-Block Chebyshev" </li>
+       * </ul>
+       */
+      const char *smoother_type;
+
+      /**
+       * Determines which solver to use on the coarsest level. The same
+       * settings as for the smoother type are possible.
+       */
+      const char *coarse_type;
+    };
+
+    /**
+     * Destructor.
+     */
+    ~PreconditionAMGMueLu();
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. The function uses the matrix
+     * format specified in TrilinosWrappers::SparseMatrix.
+     */
+    void initialize (const SparseMatrix   &matrix,
+                     const AdditionalData &additional_data = AdditionalData());
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. As opposed to the other initialize
+     * function above, this function uses an object of type Epetra_CrsMatrixCrs.
+     */
+    void initialize (const Epetra_CrsMatrix &matrix,
+                     const AdditionalData   &additional_data = AdditionalData());
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. The function uses the matrix
+     * format specified in TrilinosWrappers::SparseMatrix.
+     *
+     * This function is similar to the one above, but allows the user to set
+     * most of the options of the Trilinos ML preconditioner. In order to find out
+     * about all the options for ML, we refer to the <a
+     * href=http://trilinos.sandia.gov/packages/ml/mlguide5.pdf>ML user's
+     * guide</a>. Not all ML options have a corresponding MueLu option.
+     */
+    void initialize (const SparseMatrix   &matrix,
+                     Teuchos::ParameterList &muelu_parameters);
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. As opposed to the other initialize
+     * function above, this function uses an object of type Epetra_CrsMatrix.
+     */
+    void initialize (const Epetra_CrsMatrix &matrix,
+                     Teuchos::ParameterList &muelu_parameters);
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. This function takes a deal.ii
+     * matrix and copies the content into a Trilinos matrix, so the function
+     * can be considered rather inefficient.
+     */
+    template <typename number>
+    void initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
+                     const AdditionalData                 &additional_data = AdditionalData(),
+                     const double                          drop_tolerance = 1e-13,
+                     const ::dealii::SparsityPattern      *use_this_sparsity = 0);
+
+    /**
+     * Destroys the preconditioner, leaving an object like just after having
+     * called the constructor.
+     */
+    void clear ();
+
+    /**
+     * Prints an estimate of the memory consumption of this class.
+     */
+    size_type memory_consumption () const;
+
+  private:
+    /**
+     * A copy of the deal.II matrix into Trilinos format.
+     */
+    std_cxx11::shared_ptr<SparseMatrix> trilinos_matrix;
+  };
+#endif
 
 
 

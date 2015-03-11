@@ -54,6 +54,20 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDIF()
     ENDFOREACH()
 
+    IF((TRILINOS_VERSION_MAJOR EQUAL 11 AND
+        NOT (TRILINOS_VERSION_MINOR LESS 14)) 
+       OR
+       (NOT (TRILINOS_VERSION_MAJOR LESS 12)))
+        ITEM_MATCHES(_module_found MueLu ${Trilinos_PACKAGE_LIST})
+      IF(_module_found)
+        MESSAGE(STATUS "Found MueLu")
+      ELSE()
+        MESSAGE(STATUS "Module MueLu not found!")
+        SET(_modules_missing "${_modules_missing} MueLu")
+        SET(${var} FALSE)
+      ENDIF()
+    ENDIF()
+
     IF(NOT ${var})
       MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
         "Missing ${_modules_missing}"
