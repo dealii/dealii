@@ -42,9 +42,9 @@ void test (TrilinosWrappers::SparseMatrix &m)
           m3.set (i,j, -0.1);
         }
 
-  m.compress ();
-  m2.compress();
-  m3.compress();
+  m.compress (VectorOperation::insert);
+  m2.compress(VectorOperation::insert);
+  m3.compress(VectorOperation::insert);
 
   deallog << "Matrix nonzeros: " << m.n_nonzero_elements() <<  " "
           << m2.n_nonzero_elements() <<  " "

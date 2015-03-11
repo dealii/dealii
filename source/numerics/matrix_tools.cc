@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2462,8 +2462,6 @@ namespace MatrixTools
 
     const unsigned int n_blocks = matrix.n_block_rows();
 
-    matrix.compress();
-
     // We need to find the subdivision
     // into blocks for the boundary values.
     // To this end, generate a vector of
@@ -2558,12 +2556,6 @@ namespace MatrixTools
             Assert (local_range == solution.local_range(),
                     ExcInternalError());
 
-            // we have to read and write from this
-            // matrix (in this order). this will only
-            // work if we compress the matrix first,
-            // done here
-            matrix.compress ();
-
             // determine the first nonzero diagonal
             // entry from within the part of the
             // matrix that we can see. if we can't
@@ -2626,7 +2618,7 @@ namespace MatrixTools
           }
 
         // clean up
-        matrix.compress ();
+        matrix.compress (VectorOperation::insert);
         solution.compress (VectorOperation::insert);
         right_hand_side.compress (VectorOperation::insert);
       }
@@ -2651,8 +2643,6 @@ namespace MatrixTools
                 ExcNotQuadratic());
 
         const unsigned int n_blocks = matrix.n_block_rows();
-
-        matrix.compress();
 
         // We need to find the subdivision
         // into blocks for the boundary values.

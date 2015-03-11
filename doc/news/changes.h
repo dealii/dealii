@@ -38,6 +38,18 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li> Changed: The TrilinosWrappers::SparseMatrix::clear_row() function used
+  to call TrilinosWrappers::SparseMatrix::compress() before doing its work,
+  but this is neither efficient nor safe. You will now have to do this
+  yourself after assembling a matrix and before clearing rows.
+  <br>
+  The changes to the function above also affect the
+  MatrixTools::apply_boundary_values() variants that operate on Trilinos
+  matrices.
+  <br>
+  (Wolfgang Bangerth, 2015/03/09)
+  </li>
+
   <li> Changed: Implicit conversion from Tensor@<1,dim@> to Point@<dim@> was
   previously possible. This has now been prohibited (but you can still
   do the conversion with an explicit cast) as such conversions are
@@ -364,6 +376,15 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Iterating over the elements of a TrilinosWrappers::SparseMatrix
+  object previously led to errors if the matrix was in fact stored in
+  parallel across multiple MPI processes. This is now fixed: rows not
+  stored locally on the processor where you run the iteration simply look
+  like they're empty.
+  <br>
+  (Wolfgang Bangerth, 2015/03/08)
+  </li>
+
   <li> New: There is now a new macro DeclExceptionMsg that allows to
   declare an exception that does not take any run-time arguments
   yet still allows to specify an error message.

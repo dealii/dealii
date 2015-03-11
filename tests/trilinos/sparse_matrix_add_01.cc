@@ -38,8 +38,8 @@ void test (TrilinosWrappers::SparseMatrix &m)
           m2.set (i,j, 0.);
         }
 
-  m.compress ();
-  m2.compress();
+  m.compress (VectorOperation::insert);
+  m2.compress(VectorOperation::insert);
 
   // now add the same elements row-wise
   {
@@ -71,7 +71,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
       }
   }
 
-  m2.compress();
+  m2.compress(VectorOperation::add);
 
   // subtract the matrix m from this one,
   // we should get a zero matrix

@@ -50,7 +50,7 @@ void test ()
 
           m_small.set (i,j, value);
         }
-  m_small.compress();
+  m_small.compress(VectorOperation::insert);
 
   // Then build two matrices consisting of
   // several copies of the small
@@ -105,7 +105,7 @@ void test ()
       }
   }
 
-  m2.compress();
+  m2.compress(VectorOperation::add);
 
   // subtract the matrix m from this one,
   // we should get a zero matrix

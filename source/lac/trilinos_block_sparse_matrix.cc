@@ -258,7 +258,7 @@ namespace TrilinosWrappers
   void
   BlockSparseMatrix::collect_sizes ()
   {
-    compress();
+    // simply forward to the (non-public) function of the base class
     BaseClass::collect_sizes ();
   }
 

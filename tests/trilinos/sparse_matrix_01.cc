@@ -52,7 +52,7 @@ int main (int argc,char **argv)
 
   TrilinosWrappers::SparseMatrix A (sp);
   A.add (2, 3, 2.0);
-  A.compress();
+  A.compress(VectorOperation::add);
 
   // verify that entry (2,3) is
   // indeed what we expect. verify

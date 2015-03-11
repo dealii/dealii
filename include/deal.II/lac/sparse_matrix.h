@@ -1355,8 +1355,7 @@ public:
 //@{
 
   /**
-   * STL-like iterator with the first entry of the matrix. This is the version
-   * for constant matrices.
+   * Return an iterator pointing to the first element of the matrix.
    *
    * Note the discussion in the general documentation of this class about the
    * order in which elements are accessed.
@@ -1364,71 +1363,50 @@ public:
   const_iterator begin () const;
 
   /**
-   * Final iterator. This is the version for constant matrices.
-   */
-  const_iterator end () const;
-
-  /**
-   * STL-like iterator with the first entry of the matrix. This is the version
-   * for non-constant matrices.
-   *
-   * Note the discussion in the general documentation of this class about the
-   * order in which elements are accessed.
+   * Like the function above, but for non-const matrices.
    */
   iterator begin ();
 
   /**
-   * Final iterator. This is the version for non-constant matrices.
+   * Return an iterator pointing the element past the last one of
+   * this matrix.
+   */
+  const_iterator end () const;
+
+  /**
+   * Like the function above, but for non-const matrices.
    */
   iterator end ();
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>. This is the
-   * version for constant matrices.
+   * Return an iterator pointing to the first element of row @p r.
    *
-   * Note that if the given row is empty, i.e. does not contain any nonzero
-   * entries, then the iterator returned by this function equals
-   * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
-   * that case.
-   *
-   * Note also the discussion in the general documentation of this class about
-   * the order in which elements are accessed.
+   * Note that if the given row is empty, i.e. does not contain any
+   * nonzero entries, then the iterator returned by this function
+   * equals <tt>end(r)</tt>. The returned iterator may not be
+   * dereferencable in that case if neither row @p r nor any of the
+   * following rows contain any nonzero entries.
    */
   const_iterator begin (const size_type r) const;
 
   /**
-   * Final iterator of row <tt>r</tt>. It points to the first element past the
-   * end of line @p r, or past the end of the entire sparsity pattern. This is
-   * the version for constant matrices.
+   * Like the function above, but for non-const matrices.
+   */
+  iterator begin (const size_type r);
+
+  /**
+   * Return an iterator pointing the element past the last one of
+   * row @p r , or past the end of the entire sparsity pattern if
+   * none of the rows after @p r contain any entries at all.
    *
-   * Note that the end iterator is not necessarily dereferencable. This is in
-   * particular the case if it is the end iterator for the last row of a
+   * Note that the end iterator is not necessarily dereferencable. This is
+   * in particular the case if it is the end iterator for the last row of a
    * matrix.
    */
   const_iterator end (const size_type r) const;
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>. This is the
-   * version for non-constant matrices.
-   *
-   * Note that if the given row is empty, i.e. does not contain any nonzero
-   * entries, then the iterator returned by this function equals
-   * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
-   * that case.
-   *
-   * Note the discussion in the general documentation of this class about the
-   * order in which elements are accessed.
-   */
-  iterator begin (const size_type r);
-
-  /**
-   * Final iterator of row <tt>r</tt>. It points to the first element past the
-   * end of line @p r, or past the end of the entire sparsity pattern. This is
-   * the version for non-constant matrices.
-   *
-   * Note that the end iterator is not necessarily dereferencable. This is in
-   * particular the case if it is the end iterator for the last row of a
-   * matrix.
+   * Like the function above, but for non-const matrices.
    */
   iterator end (const size_type r);
 //@}

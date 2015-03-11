@@ -49,7 +49,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
           m.set (i,j, value);
         }
-  m.compress ();
+  m.compress (VectorOperation::insert);
   // now add the same elements from a full
   // matrix (if the same element is set
   // more than once, Trilinos adds them)
@@ -68,7 +68,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
       }
   }
 
-  m2.compress();
+  m2.compress(VectorOperation::insert);
 
   // subtract the matrix m from this one,
   // we should get a zero matrix
