@@ -126,7 +126,7 @@ label_200:
       // now we have to deal with the diagonal element. in the book it is
       // located at position 'j', but here we use the convention of storing
       // the diagonal element first, so instead of j we use uptr[k]=ia[k]
-      Assert (luval[ia[k]] != 0, ExcInternalError());
+      Assert (luval[ia[k]] != 0, ExcZeroPivot(k));
 
       luval[ia[k]] = 1./luval[ia[k]];
 

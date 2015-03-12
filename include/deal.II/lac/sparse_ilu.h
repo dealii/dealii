@@ -142,6 +142,17 @@ public:
                   double,
                   << "The strengthening parameter " << arg1
                   << " is not greater or equal than zero!");
+  /**
+   * Exception
+   */
+  DeclException1 (ExcZeroPivot,
+                  size_type,
+                  << "While computing the ILU decomposition, the algorithm "
+                  "found a zero pivot on the diagonal of row "
+                  << arg1
+                  << ". This must stop the ILU algorithm because it means "
+                  "that the matrix for which you try to compute a "
+                  "decomposition is singular.");
   //@}
 };
 
