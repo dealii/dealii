@@ -2094,7 +2094,8 @@ namespace Step31
   // solution and refinement, but without actually advancing in time. Rather,
   // we use the vilified <code>goto</code> statement to jump out of the time
   // loop right after mesh refinement to start all over again on the new mesh
-  // beginning at the <code>start_time_iteration</code> label.
+  // beginning at the <code>start_time_iteration</code> label. (The use of the
+  // <code>goto</code> is discussed in step-26.)
   //
   // Before we start, we project the initial values to the grid and obtain the
   // first data for the <code>old_temperature_solution</code> vector. Then, we
