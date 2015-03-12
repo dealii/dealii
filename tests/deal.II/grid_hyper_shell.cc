@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,19 @@ void check (double r1, double r2, unsigned int n)
 
   Point<dim> center;
   Triangulation<dim> tria (Triangulation<dim>::none, true);
+
+  // create a hyper shell. before a bug fix in early 2015, the coloring would
+  // only set the boundary indicators of the faces, not of the edges in
+  // 3d. the test was written in a way that it tests with this bug present, so
+  // undo the big fix here
   GridGenerator::hyper_shell (tria, center, r1, r2, n, true);
+  if (dim==3)
+    for (typename Triangulation<dim>::active_cell_iterator c=tria.begin_active(); c!=tria.end(); ++c)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	if (c->face(f)->at_boundary())
+	  for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+	    c->face(f)->line(e)->set_boundary_indicator(0);
+  
   static const HyperShellBoundary<dim> boundary(center);
   tria.set_boundary(0, boundary);
 

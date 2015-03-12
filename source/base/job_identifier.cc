@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,7 +16,7 @@
 #include <deal.II/base/job_identifier.h>
 #include <ctime>
 
-#ifdef HAVE_UNISTD_H
+#ifdef DEAL_II_HAVE_UNISTD_H
 # include <unistd.h>
 #endif
 
@@ -35,7 +35,7 @@ JobIdentifier::JobIdentifier()
   time_t t = std::time(0);
   id = std::string("JobId ");
 
-#if defined(HAVE_UNISTD_H) && defined(HAVE_GETHOSTNAME)
+#if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
   char name[100];
   gethostname(name,99);
   id += std::string(name) + std::string(" ");

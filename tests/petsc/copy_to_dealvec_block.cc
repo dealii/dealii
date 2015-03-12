@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -117,7 +117,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));

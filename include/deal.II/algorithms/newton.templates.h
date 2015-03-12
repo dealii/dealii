@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,13 +62,6 @@ namespace Algorithms
     n_stepsize_iterations = param.get_integer("Stepsize iterations");
     debug_vectors = param.get_bool("Debug vectors");
     param.leave_subsection ();
-  }
-
-  template <class VECTOR>
-  void
-  Newton<VECTOR>::initialize (ParameterHandler &param)
-  {
-    parse_parameters(param);
   }
 
   template <class VECTOR>

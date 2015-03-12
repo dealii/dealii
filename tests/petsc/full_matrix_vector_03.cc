@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,9 +39,9 @@ void test (PETScWrappers::Vector &v,
       w(i) = i;
     }
 
-  m.compress (VectorOperation::add);
-  v.compress (VectorOperation::add);
-  w.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
+  v.compress (VectorOperation::insert);
+  w.compress (VectorOperation::insert);
 
   // w:=Mv
   m.vmult_add (w,v);

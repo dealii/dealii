@@ -192,15 +192,13 @@ namespace internal
   namespace DoFAccessor
   {
     /**
-     * A class like the one with same
-     * name in tria.cc. See there for
-     * more information.
+     * A class like the one with same name in tria.cc. See there for more
+     * information.
      */
     struct Implementation
     {
       /**
-       * Implementations of the
-       * get_dof_index/set_dof_index functions.
+       * Implementations of the get_dof_index/set_dof_index functions.
        */
       template <int spacedim>
       static
@@ -1048,14 +1046,9 @@ namespace internal
       }
 
       /**
-       * Set the @p local_index-th
-       * degree of freedom
-       * corresponding to the finite
-       * element specified by @p
-       * fe_index on the vertex with
-       * global number @p
-       * vertex_index to @p
-       * global_index.
+       * Set the @p local_index-th degree of freedom corresponding to the
+       * finite element specified by @p fe_index on the vertex with global
+       * number @p vertex_index to @p global_index.
        */
       template <int dim, int spacedim>
       static
@@ -1141,14 +1134,9 @@ namespace internal
 
 
       /**
-       * Get the @p local_index-th
-       * degree of freedom
-       * corresponding to the finite
-       * element specified by @p
-       * fe_index on the vertex with
-       * global number @p
-       * vertex_index to @p
-       * global_index.
+       * Get the @p local_index-th degree of freedom corresponding to the
+       * finite element specified by @p fe_index on the vertex with global
+       * number @p vertex_index to @p global_index.
        */
 
       template <int dim, int spacedim>
@@ -1230,10 +1218,8 @@ namespace internal
 
 
       /**
-       * Return the number of
-       * different finite elements
-       * that are active on a given
-       * vertex.
+       * Return the number of different finite elements that are active on a
+       * given vertex.
        */
       template<int dim, int spacedim>
       static
@@ -1279,9 +1265,8 @@ namespace internal
 
 
       /**
-       * Return the fe index of the
-       * n-th finite element active
-       * on a given vertex.
+       * Return the fe index of the n-th finite element active on a given
+       * vertex.
        */
       template<int dim, int spacedim>
       static
@@ -1337,10 +1322,8 @@ namespace internal
 
 
       /**
-       * Return whether a particular
-       * finite element index is
-       * active on the specified
-       * vertex.
+       * Return whether a particular finite element index is active on the
+       * specified vertex.
        */
       template<int dim, int spacedim>
       static
@@ -1566,7 +1549,6 @@ DoFAccessor<structdim, DH,level_dof_access>::mg_vertex_dof_index (const int leve
     const unsigned int fe_index) const
 {
   Assert (this->dof_handler != 0, ExcInvalidObject ());
-  Assert (&this->dof_handler->get_fe () != 0, ExcInvalidObject ());
   Assert (vertex < GeometryInfo<structdim>::vertices_per_cell, ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
   Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex, ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
   return this->dof_handler->mg_vertex_dofs[this->vertex_index (vertex)].get_index (level, i);
@@ -1600,7 +1582,6 @@ DoFAccessor<structdim, DH,level_dof_access>::set_mg_vertex_dof_index (const int 
     const unsigned int fe_index) const
 {
   Assert (this->dof_handler != 0, ExcInvalidObject ());
-  Assert (&this->dof_handler->get_fe () != 0, ExcInvalidObject ());
   Assert (vertex < GeometryInfo<structdim>::vertices_per_cell, ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
   Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex, ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
   this->dof_handler->mg_vertex_dofs[this->vertex_index (vertex)].set_index (level, i, index);
@@ -1868,7 +1849,6 @@ DoFAccessor<structdim,DH,level_dof_access>::get_dof_indices (std::vector<types::
     const unsigned int         fe_index) const
 {
   Assert (this->dof_handler != 0, ExcNotInitialized());
-  Assert (&this->dof_handler->get_fe() != 0, ExcMessage ("DoFHandler not initialized"));
   Assert (static_cast<unsigned int>(this->level()) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
@@ -1931,7 +1911,6 @@ void DoFAccessor<structdim, DH,level_dof_access>::get_mg_dof_indices (const int 
     const unsigned int fe_index) const
 {
   Assert (this->dof_handler != 0, ExcInvalidObject ());
-  Assert (&this->dof_handler->get_fe () != 0, ExcInvalidObject ());
 
   switch (structdim)
     {
@@ -1983,7 +1962,6 @@ void DoFAccessor<structdim, DH,level_dof_access>::set_mg_dof_indices (const int 
     const unsigned int fe_index)
 {
   Assert (this->dof_handler != 0, ExcInvalidObject ());
-  Assert (&this->dof_handler->get_fe () != 0, ExcInvalidObject ());
 
   switch (structdim)
     {
@@ -2347,10 +2325,8 @@ namespace internal
     struct Implementation
     {
       /**
-       * Implement the updating of the
-       * cache. Currently not
-       * implemented for hp::DoFHandler
-       * objects.
+       * Implement the updating of the cache. Currently not implemented for
+       * hp::DoFHandler objects.
        */
       template <int spacedim, bool level_dof_access>
       static
@@ -2573,11 +2549,8 @@ namespace internal
 
 
       /**
-       * Implement setting dof
-       * indices on a
-       * cell. Currently not
-       * implemented for
-       * hp::DoFHandler objects.
+       * Implement setting dof indices on a cell. Currently not implemented
+       * for hp::DoFHandler objects.
        */
       template <int spacedim, bool level_dof_access>
       static
@@ -2733,9 +2706,8 @@ namespace internal
 
 
       /**
-       * Do what the active_fe_index
-       * function in the parent class
-       * is supposed to do.
+       * Do what the active_fe_index function in the parent class is supposed
+       * to do.
        */
       template <int dim, int spacedim, bool level_dof_access>
       static
@@ -2765,9 +2737,7 @@ namespace internal
 
 
       /**
-       * Do what the
-       * set_active_fe_index function
-       * in the parent class is
+       * Do what the set_active_fe_index function in the parent class is
        * supposed to do.
        */
       template <int dim, int spacedim, bool level_dof_access>

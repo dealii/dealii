@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -90,8 +90,10 @@ int main()
               Assert (false, ExcNotImplemented());
             };
           mic_pattern.compress();
-          SparseMIC<double> mic (mic_pattern);
-          mic.decompose (A);
+	  SparseMIC<double>::AdditionalData data;
+	  data.use_this_sparsity = &mic_pattern;
+          SparseMIC<double> mic;
+	  mic.initialize (A, data);
 
           // now for three test vectors v
           // determine norm of

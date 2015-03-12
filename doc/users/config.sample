@@ -16,10 +16,6 @@
 # Component configuration:
 #
 #
-# SET(DEAL_II_COMPONENT_COMPAT_FILES ON CACHE BOOL
-#   "Enable installation of the example steps. This adds a COMPONENT \"compat_files\" to the build system."
-#   )
-#
 # SET(DEAL_II_COMPONENT_DOCUMENTATION OFF CACHE BOOL
 #   "Enable configuration, build and installation of the html documentation. This adds a COMPONENT \"documentation\" to the build system."
 #   )
@@ -193,17 +189,15 @@
 
 
 #
-# Functionparser:
+# Muparser:
 #
-# SET(DEAL_II_WITH_FUNCTIONPARSER TRUE CACHE BOOL
-#   "Build deal.II with support for functionparser"
+# SET(DEAL_II_WITH_MUPARSER TRUE CACHE BOOL
+#   "Build deal.II with support for muparser"
 #   )
 #
-# SET(DEAL_II_FORCE_BUNDLED_FUNCTIONPARSER TRUE CACHE BOOL
-#   "Always use the bundled functionparser library instead of an external one."
+# SET(DEAL_II_FORCE_BUNDLED_MUPARSER TRUE CACHE BOOL
+#   "Always use the bundled muparser library instead of an external one."
 #   )
-#
-# Only support for bundled functionparser is available.
 #
 
 
@@ -347,32 +341,6 @@
 # SET(MPI_C_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 # SET(MPI_Fortran_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 #
-#
-
-
-#
-# Mumps:
-#
-# SET(DEAL_II_WITH_MUMPS ON CACHE BOOL
-#   "Build deal.II with support for mumps"
-#   )
-#
-# Automatic detection:
-#
-# Specify a hint with CMAKE_PREFIX_PATH or by setting
-# SET(MUMPS_DIR "/.../..." CACHE PATH "")
-# also, if necessary, SCALAPACK_DIR and BLACS_DIR
-#
-# Manual setup:
-#
-# SET(MUMPS_FOUND TRUE CACHE BOOL "")
-# SET(MUMPS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(MUMPS_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(MUMPS_LINKER_FLAGS "..." CACHE STRING "")
-# SET(MUMPS_VERSION "x.y.z" CACHE STRING "")
-# SET(MUMPS_VERSION_MAJOR "x" CACHE STRING "")
-# SET(MUMPS_VERSION_MINOR "y" CACHE STRING "")
-# SET(MUMPS_VERSION_SUBMINOR "z" CACHE STRING "")
 #
 
 
@@ -609,14 +577,12 @@
 #
 # C++11 support:
 #
-# C++11 support is autodetected. You can explicitly disable C+11 support by
-# specifying
-#
-#   SET(DEAL_II_HAVE_CXX11_FLAG FALSE CACHE BOOL "")
+# SET(DEAL_II_WITH_CXX11 ON CACHE BOOL
+#   "deal.II using C++11 language standard"
+#   )
 #
 # A custom C++11 flag can be set by setting
 #
-#   SET(DEAL_II_HAVE_CXX11_FLAG TRUE CACHE BOOL "")
 #   SET(DEAL_II_CXX11_FLAG "-std=c++0x" CACHE STRING "")
 #
 

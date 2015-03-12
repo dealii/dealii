@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,15 +24,15 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * The ConvergenceTable class is an application to the TableHandler
- * class and stores some convergence data, such as residuals of the
- * cg-method, or some evaluated <i>L<sup>2</sup></i>-errors of
- * discrete solutions, etc, and evaluates convergence rates or orders.
+ * The ConvergenceTable class is an application to the TableHandler class and
+ * stores some convergence data, such as residuals of the cg-method, or some
+ * evaluated <i>L<sup>2</sup></i>-errors of discrete solutions, etc, and
+ * evaluates convergence rates or orders.
  *
- * The already implemented #RateMode's are #reduction_rate,
- * where the convergence rate is the quotient of two following rows, and
- * #reduction_rate_log2, that evaluates the order of convergence.
- * These standard evaluations are useful for global refinement, for local refinement
+ * The already implemented #RateMode's are #reduction_rate, where the
+ * convergence rate is the quotient of two following rows, and
+ * #reduction_rate_log2, that evaluates the order of convergence. These
+ * standard evaluations are useful for global refinement, for local refinement
  * this may not be an appropriate method, as the convergence rates should be
  * set in relation to the number of cells or the number of DoFs. The
  * implementations of these non-standard methods is left to a user.
@@ -43,14 +43,14 @@ DEAL_II_NAMESPACE_OPEN
  * functions evaluate_convergence_rates() and evaluate_all_convergence_rates()
  * may be called.
  *
- * There are two possibilities of how to evaluate the convergence rates of multiple
- * columns in the same RateMode.
+ * There are two possibilities of how to evaluate the convergence rates of
+ * multiple columns in the same RateMode.
  * <ol>
  * <li> call evaluate_convergence_rates() for all wanted columns
- * <li> call omit_column_from_convergence_rate_evaluation() for all
- *      columns for which this evaluation is not desired and then
- *      evaluate_all_convergence_rates() to evaluate the convergence rates of all columns
- *      that have not been flagged for omission.
+ * <li> call omit_column_from_convergence_rate_evaluation() for all columns
+ * for which this evaluation is not desired and then
+ * evaluate_all_convergence_rates() to evaluate the convergence rates of all
+ * columns that have not been flagged for omission.
  * </ol>
  *
  * A detailed discussion of this class can also be found in the step-7 and
@@ -102,28 +102,26 @@ public:
    * $1/h$, remember to set the dimension to 1 also when working in 3D to get
    * correct rates.
    *
-   * The new rate column and the data column will be merged to a
-   * supercolumn. The tex caption of the supercolumn will be (by default) the
-   * same as the one of the data column. This may be changed by using the
+   * The new rate column and the data column will be merged to a supercolumn.
+   * The tex caption of the supercolumn will be (by default) the same as the
+   * one of the data column. This may be changed by using the
    * <tt>set_tex_supercaption (...)</tt> function of the base class
    * TableHandler.
    *
    * This method behaves in the following way:
    *
-   * If RateMode is reduction_rate, then the computed output is
-   * $ \frac{e_{n-1}/k_{n-1}}{e_n/k_n}, $
-   * where $k$ is the reference column (no dimension dependence!).
+   * If RateMode is reduction_rate, then the computed output is $
+   * \frac{e_{n-1}/k_{n-1}}{e_n/k_n}, $ where $k$ is the reference column (no
+   * dimension dependence!).
    *
-   * If RateMode is reduction_rate_log2, then the computed output is
-   * $
-   * dim \frac{\log |e_{n-1}/e_{n}|}{\log |k_n/k_{n-1}|}
-   * $.
+   * If RateMode is reduction_rate_log2, then the computed output is $ dim
+   * \frac{\log |e_{n-1}/e_{n}|}{\log |k_n/k_{n-1}|} $.
    *
    * This is useful, for example, if we use as reference key the number of
    * degrees of freedom or better, the number of cells.  Assuming that the
    * error is proportional to $ C (1/\sqrt{k})^r $ in 2D, then this method
-   * will produce the rate $r$ as a result. For general dimension, as described
-   * by the last parameter of this function, the formula needs to be
+   * will produce the rate $r$ as a result. For general dimension, as
+   * described by the last parameter of this function, the formula needs to be
    * $ C (1/\sqrt[dim]{k})^r $.
    *
    * @note Since this function adds columns to the table after several rows
@@ -144,9 +142,9 @@ public:
    * types of the table entries of the data column is a number, i.e. double,
    * float, (unsigned) int, and so on.
    *
-   * The new rate column and the data column will be merged to a
-   * supercolumn. The tex caption of the supercolumn will be (by default) the
-   * same as the one of the data column. This may be changed by using the
+   * The new rate column and the data column will be merged to a supercolumn.
+   * The tex caption of the supercolumn will be (by default) the same as the
+   * one of the data column. This may be changed by using the
    * set_tex_supercaption() function of the base class TableHandler.
    *
    * @note Since this function adds columns to the table after several rows
@@ -177,10 +175,10 @@ public:
    * convergence rate for almost all columns of a table without calling
    * evaluate_convergence_rates() for each column separately.
    *
-   * Example:
-   * Columns like <tt>n cells</tt> or <tt>n dofs</tt> columns may be wanted to
-   * be omitted in the evaluation of the convergence rates. Hence they should
-   * omitted by calling the omit_column_from_convergence_rate_evaluation().
+   * Example: Columns like <tt>n cells</tt> or <tt>n dofs</tt> columns may be
+   * wanted to be omitted in the evaluation of the convergence rates. Hence
+   * they should omitted by calling the
+   * omit_column_from_convergence_rate_evaluation().
    */
   void
   evaluate_all_convergence_rates(const std::string &reference_column_key,
@@ -194,16 +192,18 @@ public:
    * convergence rate for almost all columns of a table without calling
    * evaluate_convergence_rates() for each column separately.
    *
-   * Example:
-   * Columns like <tt>n cells</tt> or <tt>n dofs</tt> columns may be wanted to
-   * be omitted in the evaluation of the convergence rates. Hence they should
-   * omitted by calling the omit_column_from_convergence_rate_evaluation().
+   * Example: Columns like <tt>n cells</tt> or <tt>n dofs</tt> columns may be
+   * wanted to be omitted in the evaluation of the convergence rates. Hence
+   * they should omitted by calling the
+   * omit_column_from_convergence_rate_evaluation().
    */
   void
   evaluate_all_convergence_rates(const RateMode rate_mode);
 
-  /** @addtogroup Exceptions
-   * @{ */
+  /**
+   * @addtogroup Exceptions
+   * @{
+   */
 
   /**
    * Exception

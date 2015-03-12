@@ -9,11 +9,13 @@ to the complex data structures and algorithms required.
 For the impatient:
 ------------------
 
-Configure compile and install the deal.II library with:
+Let's say you've unpacked the .tar.gz file, or cloned the git repository into
+a directory /path/to/dealii/sources. Then configure, compile, and install the
+deal.II library with: 
 
     $ mkdir build
     $ cd build
-    $ cmake -DCMAKE_INSTALL_PREFIX=/path/where/deal.II/should/be/intalled/to ..
+    $ cmake -DCMAKE_INSTALL_PREFIX=/path/where/dealii/should/be/intalled/to /path/to/dealii/sources
     $ make install    (alternatively $ make -j<N> install)
     $ make test
 
@@ -23,9 +25,9 @@ A detailed *ReadME* can be found at ./doc/readme.html and
 Getting started:
 ----------------
 
-The tutorial steps are located under ./examples/
+The tutorial steps are located under examples/ of the installation.
 Information about the tutorial steps can be found at
-./doc/doxygen/tutorial/index.html or at http://www.dealii.org/.
+doc/doxygen/tutorial/index.html or at http://www.dealii.org/.
 
 License:
 --------

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -203,12 +203,6 @@ void TimeDependent::start_sweep (const unsigned int s)
     timesteps[step]->start_sweep ();
 }
 
-
-
-void TimeDependent::end_sweep (const unsigned int)
-{
-  end_sweep ();
-}
 
 
 void TimeDependent::end_sweep ()

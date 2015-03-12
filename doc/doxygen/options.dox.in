@@ -111,7 +111,7 @@ HTML_FILE_EXTENSION    = .html
 HTML_HEADER            = header.html
 HTML_FOOTER            = footer.html
 USE_MATHJAX            = @_use_mathjax@
-MATHJAX_RELPATH        = http://cdn.mathjax.org/mathjax/latest
+MATHJAX_RELPATH        = https://cdn.mathjax.org/mathjax/latest
 MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 200
@@ -163,7 +163,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_USE_MT_POSIX=1 \
 			 DEAL_II_WITH_ARPACK=1 \
 			 DEAL_II_WITH_METIS=1 \
-			 DEAL_II_WITH_MUMPS=1 \
+			 DEAL_II_WITH_MUPARSER=1 \
 			 DEAL_II_WITH_P4EST=1 \
 			 DEAL_II_WITH_MPI=1
 

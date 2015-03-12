@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,21 +32,18 @@ template <class number> class SparseMatrix;
  */
 
 /**
- * Selects the preconditioner. The constructor of this class takes
- * the name of the preconditioning and the damping parameter
- * @p omega of the preconditioning and the @p use_matrix function takes
- * the matrix that is used
- * by the matrix-builtin precondition functions. Each time, the <tt>operator()</tt> function
- * is called, this preselected preconditioner, this matrix and
- * this @p omega is used
- * for the preconditioning. This class is designed for being used as
- * argument of the @p solve function of a @p Solver and it covers the
- * selection of all matrix-builtin precondition functions. The selection
- * of other preconditioners, like BlockSOR or ILU should be handled in
- * derived classes by the user.
+ * Selects the preconditioner. The constructor of this class takes the name of
+ * the preconditioning and the damping parameter @p omega of the
+ * preconditioning and the @p use_matrix function takes the matrix that is
+ * used by the matrix-builtin precondition functions. Each time, the
+ * <tt>operator()</tt> function is called, this preselected preconditioner,
+ * this matrix and this @p omega is used for the preconditioning. This class
+ * is designed for being used as argument of the @p solve function of a @p
+ * Solver and it covers the selection of all matrix-builtin precondition
+ * functions. The selection of other preconditioners, like BlockSOR or ILU
+ * should be handled in derived classes by the user.
  *
- * <h3>Usage</h3>
- * The simplest use of this class is the following:
+ * <h3>Usage</h3> The simplest use of this class is the following:
  * @code
  *                                  // generate a @p SolverControl and
  *                                  // a @p VectorMemory
@@ -84,10 +81,10 @@ template <class number> class SparseMatrix;
  *
  * solver_selector.solve(A,x,b,preconditioning);
  * @endcode
- * Now the use of the @p SolverSelector in combination with the @p PreconditionSelector
- * allows the user to select both, the solver and the preconditioner, at the
- * beginning of his program and each time the
- * solver is started (that is several times e.g. in a nonlinear iteration) this
+ * Now the use of the @p SolverSelector in combination with the @p
+ * PreconditionSelector allows the user to select both, the solver and the
+ * preconditioner, at the beginning of his program and each time the solver is
+ * started (that is several times e.g. in a nonlinear iteration) this
  * preselected solver and preconditioner is called.
  *
  * @author Ralf Hartmann, 1999
@@ -99,9 +96,8 @@ class PreconditionSelector : public Subscriptor
 public:
 
   /**
-   * Constructor. @p omega denotes
-   * the damping parameter of
-   * the preconditioning.
+   * Constructor. @p omega denotes the damping parameter of the
+   * preconditioning.
    */
   PreconditionSelector(const std::string                 &preconditioning,
                        const typename VECTOR::value_type &omega=1.);
@@ -112,28 +108,26 @@ public:
   virtual ~PreconditionSelector();
 
   /**
-   * Takes the matrix that is needed
-   * for preconditionings that involves a
-   * matrix. e.g. for @p precondition_jacobi,
-   * <tt>~_sor</tt>, <tt>~_ssor</tt>.
+   * Takes the matrix that is needed for preconditionings that involves a
+   * matrix. e.g. for @p precondition_jacobi, <tt>~_sor</tt>, <tt>~_ssor</tt>.
    */
   void use_matrix(const MATRIX &M);
 
   /**
-   * Precondition procedure. Calls the
-   * preconditioning that was specified in
+   * Precondition procedure. Calls the preconditioning that was specified in
    * the constructor.
    */
   virtual void vmult (VECTOR &dst, const VECTOR &src) const;
 
   /**
-   * Get the names of all implemented
-   * preconditionings.
+   * Get the names of all implemented preconditionings.
    */
   static std::string get_precondition_names();
 
-  /** @addtogroup Exceptions
-   * @{ */
+  /**
+   * @addtogroup Exceptions
+   * @{
+   */
 
 
   /**
@@ -145,22 +139,19 @@ public:
 protected:
 
   /**
-   * Stores the name of the
-   * preconditioning.
+   * Stores the name of the preconditioning.
    */
   std::string preconditioning;
 
 private:
   /**
-   * Matrix that is used for the
-   * matrix-builtin preconditioning function.
-   * cf. also @p PreconditionUseMatrix.
+   * Matrix that is used for the matrix-builtin preconditioning function. cf.
+   * also @p PreconditionUseMatrix.
    */
   SmartPointer<const MATRIX,PreconditionSelector<MATRIX,VECTOR> > A;
 
   /**
-   * Stores the damping parameter
-   * of the preconditioner.
+   * Stores the damping parameter of the preconditioner.
    */
   const typename VECTOR::value_type omega;
 };

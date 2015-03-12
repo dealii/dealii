@@ -7,7 +7,7 @@ DEAL:BDM::p[3] value 0 1  first 0 0 0 0
 DEAL:BDM::p[4] value 0 5  first 0 0 3 0 
 DEAL:BDM::p[5] value 0 9  first 0 0 0 3 
 DEAL:BDM::p[6] value 4 -11  first 4 0 -5 -3 
-DEAL:BDM::p[7] value -11 9  first -5 -3 0 6 
+DEAL:BDM::p[7] value 12 -8  first 6 4 0 -5 
 DEAL:BDM::Point 2. 3.
 DEAL:BDM::p[0] value 1 0  first 0 0 0 0 
 DEAL:BDM::p[1] value 5 0  first 3 0 0 0 
@@ -22,7 +22,7 @@ DEAL:BDM::p[9] value 0 9  first 0 0 0 3
 DEAL:BDM::p[10] value 0 45  first 0 0 30 18 
 DEAL:BDM::p[11] value 0 83  first 0 0 0 67 
 DEAL:BDM::p[12] value 8 -35  first 12 0 -35 -11 
-DEAL:BDM::p[13] value -53 27  first -26 -35 0 27 
+DEAL:BDM::p[13] value 54 -26  first 27 36 0 -26 
 DEAL:BDM::Point 2. 3.
 DEAL:BDM::p[0] value 1 0  first 0 0 0 0 
 DEAL:BDM::p[1] value 5 0  first 3 0 0 0 
@@ -45,7 +45,7 @@ DEAL:BDM::p[17] value 0 83  first 0 0 0 67
 DEAL:BDM::p[18] value 0 430  first 0 0 287 349 
 DEAL:BDM::p[19] value 0 807  first 0 0 0 984 
 DEAL:BDM::p[20] value 16 -95  first 32 0 -143 -31 
-DEAL:BDM::p[21] value -215 81  first -107 -215 0 108 
+DEAL:BDM::p[21] value 216 -80  first 108 216 0 -107 
 DEAL:BDM::Point 2. 3.
 DEAL:BDM::p[0] value 1 0  first 0 0 0 0 
 DEAL:BDM::p[1] value 5 0  first 3 0 0 0 
@@ -78,7 +78,7 @@ DEAL:BDM::p[27] value 0 807  first 0 0 0 984
 DEAL:BDM::p[28] value 0 4193  first 0 0 2795 5114 
 DEAL:BDM::p[29] value 0 7923  first 0 0 0 12900 
 DEAL:BDM::p[30] value 32 -239  first 80 0 -479 -79 
-DEAL:BDM::p[31] value -809 243  first -404 -1079 0 405 
+DEAL:BDM::p[31] value 810 -242  first 405 1080 0 -404 
 DEAL:BDM::Point 2. 3. 4.
 DEAL:BDM::p[0] value 1 0 0  first 0 0 0 0 0 0 0 0 0 
 DEAL:BDM::p[1] value 5 0 0  first 3 0 0 0 0 0 0 0 0 

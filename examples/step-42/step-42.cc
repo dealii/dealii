@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2012 - 2014 by the deal.II authors
+ * Copyright (C) 2012 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -2197,7 +2197,8 @@ int main (int argc, char *argv[])
         }
 
       prm.read_input(argv[1]);
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
+                                                           numbers::invalid_unsigned_int);
       {
         PlasticityContactProblem<3> problem(prm);
         problem.run();

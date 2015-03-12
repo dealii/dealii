@@ -23,6 +23,16 @@ SET(DEAL_II_WITH_BOOST ON # Always true. We need it :-]
 
 
 MACRO(FEATURE_BOOST_CONFIGURE_BUNDLED)
+
+  #
+  # Add rt to the link interface as well, boost/chrono needs it.
+  #
+  FIND_SYSTEM_LIBRARY(rt_LIBRARY NAMES rt)
+  MARK_AS_ADVANCED(rt_LIBRARY)
+  IF(NOT rt_LIBRARY MATCHES "-NOTFOUND")
+    SET(BOOST_LIBRARIES ${rt_LIBRARY})
+  ENDIF()
+
   SET(BOOST_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
 ENDMACRO()
 

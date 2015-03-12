@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2014 by the deal.II authors
+ * Copyright (C) 2003 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -40,7 +40,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -86,6 +86,7 @@
 #include <deal.II/integrators/l2.h>
 
 // This is C++:
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -504,11 +505,6 @@ namespace Step16
     // iteration. To this end, we define an appropriate <code>typedef</code>
     // and then setup a smoother object.
     //
-    // Since this smoother needs temporary vectors to store intermediate
-    // results, we need to provide a VectorMemory object. Since these vectors
-    // will be reused over and over, the GrowingVectorMemory is more time
-    // efficient than the PrimitiveVectorMemory class in the current case.
-    //
     // The last step is to initialize the smoother object with our level
     // matrices and to set some smoothing parameters.  The
     // <code>initialize()</code> function can optionally take additional
@@ -632,8 +628,9 @@ namespace Step16
           {
             GridGenerator::hyper_ball (triangulation);
 
-            static const HyperBallBoundary<dim> boundary;
-            triangulation.set_boundary (0, boundary);
+            static const SphericalManifold<dim> boundary;
+            triangulation.set_all_manifold_ids_on_boundary(0);
+            triangulation.set_manifold (0, boundary);
 
             triangulation.refine_global (1);
           }

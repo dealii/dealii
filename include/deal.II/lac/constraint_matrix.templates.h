@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,19 +35,6 @@
 #include <iomanip>
 
 DEAL_II_NAMESPACE_OPEN
-
-
-template<typename number>
-void
-ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
-                            SparseMatrix<number>       &condensed) const
-{
-  // create two dummy vectors and enter the
-  // other function
-  Vector<number> dummy (0);
-  condense (uncondensed, dummy, condensed, dummy);
-}
-
 
 
 template<typename number>
@@ -124,178 +111,6 @@ void
 ConstraintMatrix::condense (VectorType &vec) const
 {
   condense(vec, vec);
-}
-
-
-
-template<typename number, class VectorType>
-void
-ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
-                            const VectorType           &uncondensed_vector,
-                            SparseMatrix<number>       &condensed,
-                            VectorType                 &condensed_vector) const
-{
-  // check whether we work on real vectors
-  // or we just used a dummy when calling
-  // the other function above.
-  const bool use_vectors = (uncondensed_vector.size() == 0 &&
-                            condensed_vector.size() == 0) ? false : true;
-
-  const SparsityPattern &uncondensed_struct = uncondensed.get_sparsity_pattern ();
-
-  Assert (sorted == true, ExcMatrixNotClosed());
-  Assert (uncondensed_struct.is_compressed() == true, ExcMatrixNotClosed());
-  Assert (condensed.get_sparsity_pattern().is_compressed() == true, ExcMatrixNotClosed());
-  Assert (uncondensed_struct.n_rows() == uncondensed_struct.n_cols(),
-          ExcNotQuadratic());
-  Assert (condensed.n() == condensed.m(),
-          ExcNotQuadratic());
-  AssertDimension (condensed.n()+n_constraints(), uncondensed.n());
-  if (use_vectors == true)
-    {
-      AssertDimension (condensed_vector.size()+n_constraints(),
-                       uncondensed_vector.size());
-      AssertDimension (condensed_vector.size(), condensed.m());
-    }
-
-  // store for each line of the matrix
-  // its new line number
-  // after compression. If the shift is
-  // -1, this line will be condensed away
-  std::vector<int> new_line;
-
-  new_line.reserve (uncondensed_struct.n_rows());
-
-  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  size_type                                   shift           = 0;
-  const size_type n_rows = uncondensed_struct.n_rows();
-
-  if (next_constraint == lines.end())
-    // if no constraint is to be handled
-    for (size_type row=0; row!=n_rows; ++row)
-      new_line.push_back (row);
-  else
-    for (size_type row=0; row!=n_rows; ++row)
-      if (row == next_constraint->line)
-        {
-          // this line is constrained
-          new_line.push_back (-1);
-          // note that @p lines is ordered
-          ++shift;
-          ++next_constraint;
-          if (next_constraint == lines.end())
-            // nothing more to do; finish rest
-            // of loop
-            {
-              for (size_type i=row+1; i<n_rows; ++i)
-                new_line.push_back (i-shift);
-              break;
-            };
-        }
-      else
-        new_line.push_back (row-shift);
-
-
-  next_constraint = lines.begin();
-
-  // note: in this loop we need not check
-  // whether @p next_constraint is a valid
-  // iterator, since @p next_constraint is
-  // only evaluated so often as there are
-  // entries in new_line[*] which tells us
-  // which constraints exist
-  for (size_type row=0; row<uncondensed_struct.n_rows(); ++row)
-    if (new_line[row] != -1)
-      {
-        // line not constrained
-        // copy entries if column will not
-        // be condensed away, distribute
-        // otherwise
-        for (typename SparseMatrix<number>::const_iterator
-             p = uncondensed.begin(row);
-             p != uncondensed.end(row); ++p)
-          if (new_line[p->column()] != -1)
-            condensed.add (new_line[row],
-                           new_line[p->column()],
-                           p->value());
-          else
-            {
-              // let c point to the
-              // constraint of this column
-              std::vector<ConstraintLine>::const_iterator c = lines.begin();
-              while (c->line != p->column())
-                ++c;
-
-              for (size_type q=0; q!=c->entries.size(); ++q)
-                // distribute to rows with
-                // appropriate weight
-                condensed.add (new_line[row], new_line[c->entries[q].first],
-                               p->value() * c->entries[q].second);
-
-              // take care of inhomogeneity:
-              // need to subtract this element from the
-              // vector. this corresponds to an
-              // explicit elimination in the respective
-              // row of the inhomogeneous constraint in
-              // the matrix with Gauss elimination
-              if (use_vectors == true)
-                condensed_vector(new_line[row]) -= p->value() *
-                                                   c->inhomogeneity;
-            }
-
-        if (use_vectors == true)
-          condensed_vector(new_line[row]) += uncondensed_vector(row);
-      }
-    else
-      // line must be distributed
-      {
-        for (typename SparseMatrix<number>::const_iterator
-             p = uncondensed.begin(row);
-             p != uncondensed.end(row); ++p)
-          // for each column: distribute
-          if (new_line[p->column()] != -1)
-            // column is not constrained
-            for (size_type q=0; q!=next_constraint->entries.size(); ++q)
-              condensed.add (new_line[next_constraint->entries[q].first],
-                             new_line[p->column()],
-                             p->value() *
-                             next_constraint->entries[q].second);
-
-          else
-            // not only this line but
-            // also this col is constrained
-            {
-              // let c point to the constraint
-              // of this column
-              std::vector<ConstraintLine>::const_iterator c = lines.begin();
-              while (c->line != p->column())
-                ++c;
-
-              for (size_type r=0; r!=c->entries.size(); ++r)
-                for (size_type q=0; q!=next_constraint->entries.size(); ++q)
-                  condensed.add (new_line[next_constraint->entries[q].first],
-                                 new_line[c->entries[r].first],
-                                 p->value() *
-                                 next_constraint->entries[r].second *
-                                 c->entries[r].second);
-
-              if (use_vectors == true)
-                for (size_type q=0; q!=next_constraint->entries.size(); ++q)
-                  condensed_vector (new_line[next_constraint->entries[q].first])
-                  -= p->value() *
-                     next_constraint->entries[q].second *
-                     c->inhomogeneity;
-            }
-
-        // condense the vector
-        if (use_vectors == true)
-          for (size_type q=0; q!=next_constraint->entries.size(); ++q)
-            condensed_vector(new_line[next_constraint->entries[q].first])
-            +=
-              uncondensed_vector(row) * next_constraint->entries[q].second;
-
-        ++next_constraint;
-      };
 }
 
 
@@ -866,79 +681,6 @@ distribute_local_to_global (const Vector<double>            &local_vector,
 
 
 
-template<class VectorType>
-void
-ConstraintMatrix::distribute (const VectorType &condensed,
-                              VectorType       &uncondensed) const
-{
-  Assert (sorted == true, ExcMatrixNotClosed());
-  AssertDimension (condensed.size()+n_constraints(), uncondensed.size());
-
-  // store for each line of the new vector
-  // its old line number before
-  // distribution. If the shift is
-  // -1, this line was condensed away
-  std::vector<int> old_line;
-
-  old_line.reserve (uncondensed.size());
-
-  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  size_type                                   shift           = 0;
-  size_type n_rows = uncondensed.size();
-
-  if (next_constraint == lines.end())
-    // if no constraint is to be handled
-    for (size_type row=0; row!=n_rows; ++row)
-      old_line.push_back (row);
-  else
-    for (size_type row=0; row!=n_rows; ++row)
-      if (row == next_constraint->line)
-        {
-          // this line is constrained
-          old_line.push_back (-1);
-          // note that @p lines is ordered
-          ++shift;
-          ++next_constraint;
-          if (next_constraint == lines.end())
-            // nothing more to do; finish rest
-            // of loop
-            {
-              for (size_type i=row+1; i<n_rows; ++i)
-                old_line.push_back (i-shift);
-              break;
-            }
-        }
-      else
-        old_line.push_back (row-shift);
-
-
-  next_constraint = lines.begin();
-  // note: in this loop we need not check
-  // whether @p next_constraint is a valid
-  // iterator, since @p next_constraint is
-  // only evaluated so often as there are
-  // entries in new_line[*] which tells us
-  // which constraints exist
-  for (size_type line=0; line<uncondensed.size(); ++line)
-    if (old_line[line] != -1)
-      // line was not condensed away
-      uncondensed(line) = condensed(old_line[line]);
-    else
-      {
-        // line was condensed away,
-        // create it newly. first set
-        // it to zero
-        uncondensed(line) = next_constraint->inhomogeneity;
-        // then add the different
-        // contributions
-        for (size_type i=0; i<next_constraint->entries.size(); ++i)
-          uncondensed(line) += (condensed(old_line[next_constraint->entries[i].first]) *
-                                next_constraint->entries[i].second);
-        ++next_constraint;
-      };
-}
-
-
 namespace internal
 {
   namespace
@@ -979,7 +721,7 @@ namespace internal
                                        PETScWrappers::MPI::Vector       &output,
                                        const internal::bool2type<false>  /*is_block_vector*/)
     {
-      output.reinit (vec.get_mpi_communicator(), locally_owned_elements, needed_elements);
+      output.reinit (locally_owned_elements, needed_elements, vec.get_mpi_communicator());
       output = vec;
     }
 #endif
@@ -1101,7 +843,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
               new_value += (static_cast<typename VectorType::value_type>
                             (ghosted_vector(it->entries[i].first)) *
                             it->entries[i].second);
-            Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
+            AssertIsFinite(new_value);
             vec(it->line) = new_value;
           }
 
@@ -1129,7 +871,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
             new_value += (static_cast<typename VectorType::value_type>
                           (vec(next_constraint->entries[i].first)) *
                           next_constraint->entries[i].second);
-          Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
+          AssertIsFinite(new_value);
           vec(next_constraint->line) = new_value;
         }
     }
@@ -1584,9 +1326,9 @@ namespace internals
    * Since each thread gets its private version of scratch data out of the
    * ThreadLocalStorage, no conflicting access can occur. For this to be
    * valid, we need to make sure that no call within
-   * distribute_local_to_global is made that by itself can spawn
-   * tasks. Otherwise, we might end up in a situation where several threads
-   * fight for the data.
+   * distribute_local_to_global is made that by itself can spawn tasks.
+   * Otherwise, we might end up in a situation where several threads fight for
+   * the data.
    *
    * Access to the scratch data is only through the accessor class which
    * handles the access as well as marking the data as used.

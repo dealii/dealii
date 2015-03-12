@@ -39,16 +39,15 @@ template <int dim, typename POLY> class TensorProductPolynomials;
  * are therefore preferred over equidistant support points.
  *
  * For more details about Qp-mappings, see the `mapping' report at
- * <tt>deal.II/doc/reports/mapping_q/index.html</tt> in the `Reports'
- * section of `Documentation'.
+ * <tt>deal.II/doc/reports/mapping_q/index.html</tt> in the `Reports' section
+ * of `Documentation'.
  *
- * For more information about the <tt>spacedim</tt> template parameter
- * check the documentation of FiniteElement or the one of
- * Triangulation.
+ * For more information about the <tt>spacedim</tt> template parameter check
+ * the documentation of FiniteElement or the one of Triangulation.
  *
  * @note Since the boundary description is closely tied to the unit cell
- * support points, new boundary descriptions need to explicitly use the
- * Gauss-Lobatto points.
+ * support points, new boundary descriptions need to explicitly use the Gauss-
+ * Lobatto points.
  *
  * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001
  */
@@ -196,42 +195,46 @@ protected:
    */
   virtual void
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim>                                     &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-                  typename std::vector<Point<spacedim> >                    &quadrature_points,
-                  std::vector<double>                                       &JxW_values,
-                  std::vector<DerivativeForm<1,dim,spacedim> >       &jacobians,
-                  std::vector<DerivativeForm<2,dim,spacedim> >       &jacobian_grads,
-                  std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
-                  std::vector<Point<spacedim> >                             &cell_normal_vectors,
-                  CellSimilarity::Similarity                           &cell_similarity) const ;
+                  const Quadrature<dim>                            &quadrature,
+                  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                  typename std::vector<Point<spacedim> >           &quadrature_points,
+                  std::vector<double>                              &JxW_values,
+                  std::vector<DerivativeForm<1,dim,spacedim> >     &jacobians,
+                  std::vector<DerivativeForm<2,dim,spacedim> >     &jacobian_grads,
+                  std::vector<DerivativeForm<1,spacedim,dim> >     &inverse_jacobians,
+                  std::vector<Point<spacedim> >                    &cell_normal_vectors,
+                  CellSimilarity::Similarity                       &cell_similarity) const ;
 
   /**
    * Implementation of the interface in Mapping.
    */
   virtual void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int face_no,
-                       const Quadrature<dim-1>& quadrature,
+                       const unsigned int                           face_no,
+                       const Quadrature<dim-1>&                     quadrature,
                        typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                       typename std::vector<Point<spacedim> >        &quadrature_points,
-                       std::vector<double>             &JxW_values,
-                       typename std::vector<Tensor<1,spacedim> >        &exterior_form,
-                       typename std::vector<Point<spacedim> >        &normal_vectors) const ;
+                       typename std::vector<Point<spacedim> >       &quadrature_points,
+                       std::vector<double>                          &JxW_values,
+                       typename std::vector<Tensor<1,spacedim> >    &exterior_form,
+                       typename std::vector<Point<spacedim> >       &normal_vectors,
+                       std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
 
   /**
    * Implementation of the interface in Mapping.
    */
   virtual void
   fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int face_no,
-                          const unsigned int sub_no,
-                          const Quadrature<dim-1>& quadrature,
+                          const unsigned int                           face_no,
+                          const unsigned int                           sub_no,
+                          const Quadrature<dim-1>&                     quadrature,
                           typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                          typename std::vector<Point<spacedim> >        &quadrature_points,
-                          std::vector<double>             &JxW_values,
-                          typename std::vector<Tensor<1,spacedim> >        &exterior_form,
-                          typename std::vector<Point<spacedim> >        &normal_vectors) const ;
+                          typename std::vector<Point<spacedim> >       &quadrature_points,
+                          std::vector<double>                          &JxW_values,
+                          typename std::vector<Tensor<1,spacedim> >    &exterior_form,
+                          typename std::vector<Point<spacedim> >       &normal_vectors,
+                          std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
 
   /**
    * For <tt>dim=2,3</tt>. Append the support points of all shape functions
@@ -268,13 +271,12 @@ protected:
 
 private:
   /**
-   * Ask the manifold descriptor to return intermediate points on
-   * lines or faces. The function needs to return one or multiple
-   * points (depending on the number of elements in the output vector
-   * @p points that lie inside a line, quad or hex). Whether it is a
-   * line, quad or hex doesn't really matter to this function but it
-   * can be inferred from the number of input points in the @p
-   * surrounding_points vector.
+   * Ask the manifold descriptor to return intermediate points on lines or
+   * faces. The function needs to return one or multiple points (depending on
+   * the number of elements in the output vector @p points that lie inside a
+   * line, quad or hex). Whether it is a line, quad or hex doesn't really
+   * matter to this function but it can be inferred from the number of input
+   * points in the @p surrounding_points vector.
    */
   void get_intermediate_points(const Manifold<dim, spacedim> &manifold,
                                const std::vector<Point<spacedim> > &surrounding_points,
@@ -282,12 +284,12 @@ private:
 
 
   /**
-   * Ask the manifold descriptor to return intermediate points on the
-   * object pointed to by the TriaIterator @p iter. This function
-   * tries to be backward compatible with respect to the differences
-   * between Boundary<dim,spacedim> and Manifold<dim,spacedim>,
-   * querying the first whenever the passed @p manifold can be
-   * upgraded to a Boundary<dim,spacedim>.
+   * Ask the manifold descriptor to return intermediate points on the object
+   * pointed to by the TriaIterator @p iter. This function tries to be
+   * backward compatible with respect to the differences between
+   * Boundary<dim,spacedim> and Manifold<dim,spacedim>, querying the first
+   * whenever the passed @p manifold can be upgraded to a
+   * Boundary<dim,spacedim>.
    */
   template <class TriaIterator>
   void get_intermediate_points_on_object(const Manifold<dim, spacedim> &manifold,
@@ -388,10 +390,9 @@ private:
    * Needed by the @p laplace_on_quad function (for <tt>dim==2</tt>). Filled
    * by the constructor.
    *
-   * Sizes:
-   * laplace_on_quad_vector.size()= number of inner unit_support_points
+   * Sizes: laplace_on_quad_vector.size()= number of inner unit_support_points
    * laplace_on_quad_vector[i].size()= number of outer unit_support_points,
-   *   i.e.  unit_support_points on the boundary of the quad
+   * i.e.  unit_support_points on the boundary of the quad
    *
    * For the definition of this vector see equation (8) of the `mapping'
    * report.
@@ -486,13 +487,6 @@ private:
 
 #ifndef DOXYGEN
 
-template<> MappingQ<1>::MappingQ (const unsigned int,
-                                  const bool);
-template<> MappingQ<1>::~MappingQ ();
-
-template<>
-void MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
-                                          MappingQ1<1>::InternalData   &data) const;
 template <>
 void MappingQ<1>::set_laplace_on_quad_vector(Table<2,double> &) const;
 

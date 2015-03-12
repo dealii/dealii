@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/std_cxx1x/array.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/template_constraints.h>
@@ -33,7 +34,6 @@
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <algorithm>
 #include <numeric>
@@ -624,24 +624,6 @@ namespace DoFTools
 
     void
     make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1> &,
-                                            ConstraintMatrix &,
-                                            dealii::internal::int2type<1>)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-    void
-    make_hp_hanging_node_constraints (const dealii::MGDoFHandler<1> &,
-                                      ConstraintMatrix &)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-
-    void
-    make_oldstyle_hanging_node_constraints (const dealii::MGDoFHandler<1> &,
                                             ConstraintMatrix &,
                                             dealii::internal::int2type<1>)
     {
@@ -1642,23 +1624,29 @@ namespace DoFTools
 
   namespace
   {
-    // enter constraints for periodicity into the given ConstraintMatrix object.
-    // this function is called when at least one of the two face iterators corresponds
-    // to an active object without further children
-    //
-    // @param transformation A matrix that maps degrees of freedom from one face
-    // to another. If the DoFs on the two faces are supposed to match exactly, then
-    // the matrix so provided will be the identity matrix. if face 2 is once refined
-    // from face 1, then the matrix needs to be the interpolation matrix from a face
-    // to this particular child
-    //
-    // @precondition: face_1 is supposed to be active
-    //
-    // @note As bug #82 ((http://code.google.com/p/dealii/issues/detail?id=82) and the
-    // corresponding testcase bits/periodicity_05 demonstrate, we can occasionally
-    // get into trouble if we already have the constraint x1=x2 and want to insert
-    // x2=x1. we avoid this by skipping an identity constraint if the opposite
-    // constraint already exists
+    /**
+     * @internal
+     *
+     * Internally used in make_periodicity_constraints.
+     *
+     * enter constraints for periodicity into the given ConstraintMatrix object.
+     * this function is called when at least one of the two face iterators corresponds
+     * to an active object without further children
+     *
+     * @param transformation A matrix that maps degrees of freedom from one face
+     * to another. If the DoFs on the two faces are supposed to match exactly, then
+     * the matrix so provided will be the identity matrix. if face 2 is once refined
+     * from face 1, then the matrix needs to be the interpolation matrix from a face
+     * to this particular child
+     *
+     * @precondition: face_1 is supposed to be active
+     *
+     * @note As bug #82 ((http://code.google.com/p/dealii/issues/detail?id=82) and the
+     * corresponding testcase bits/periodicity_05 demonstrate, we can occasionally
+     * get into trouble if we already have the constraint x1=x2 and want to insert
+     * x2=x1. we avoid this by skipping an identity constraint if the opposite
+     * constraint already exists
+     */
     template <typename FaceIterator>
     void
     set_periodicity_constraints (const FaceIterator                          &face_1,
@@ -1711,7 +1699,7 @@ namespace DoFTools
         {
           const unsigned int face_1_index = face_1->nth_active_fe_index(0);
           const unsigned int face_2_index = face_2->nth_active_fe_index(0);
-          Assert(face_1->get_fe(face_1_index) == face_2->get_fe(face_1_index),
+          Assert(face_1->get_fe(face_1_index) == face_2->get_fe(face_2_index),
                  ExcMessage ("Matching periodic cells need to use the same finite element"));
 
           const FiniteElement<dim, spacedim> &fe = face_1->get_fe(face_1_index);
@@ -1834,8 +1822,8 @@ namespace DoFTools
                       const unsigned int j =
                         cell_to_rotated_face_index[fe.face_to_cell_index(identity_constraint_target,
                                                                          0, /* It doesn't really matter, just assume
-                           * we're on the first face...
-                           */
+                                                                             * we're on the first face...
+                                                                             */
                                                                          face_orientation, face_flip, face_rotation)];
 
                       // if the two aren't already identity constrained (whichever way
@@ -1856,10 +1844,8 @@ namespace DoFTools
                           // Query the correct face_index on face_2 respecting the given
                           // orientation:
                           const unsigned int j =
-                            cell_to_rotated_face_index[fe.face_to_cell_index(jj, 0, /* It doesn't really matter, just assume
-                               * we're on the first face...
-                               */
-                                                                             face_orientation, face_flip, face_rotation)];
+                            cell_to_rotated_face_index[fe.face_to_cell_index
+                                                       (jj, 0, face_orientation, face_flip, face_rotation)];
 
                           // And finally constrain the two DoFs respecting component_mask:
                           if (transformation(i,jj) != 0)
@@ -1870,7 +1856,101 @@ namespace DoFTools
                 }
         }
     }
-  }
+
+
+    // Internally used in make_periodicity_constraints.
+    //
+    // Build up a (possibly rotated) interpolation matrix that is used in
+    // set_periodicity_constraints with the help of user supplied matrix
+    // and first_vector_components.
+    template<int dim, int spacedim>
+    FullMatrix<double> compute_transformation(
+      const FiniteElement<dim, spacedim> &fe,
+      const FullMatrix<double>           &matrix,
+      const std::vector<unsigned int>    &first_vector_components)
+    {
+      Assert(matrix.m() == matrix.n(), ExcInternalError());
+
+      const unsigned int n_dofs_per_face = fe.dofs_per_face;
+
+      if (matrix.m() == n_dofs_per_face)
+        {
+          // In case of m == n == n_dofs_per_face the supplied matrix is already
+          // an interpolation matrix, so we use it directly:
+          return matrix;
+        }
+
+      if (first_vector_components.empty() && matrix.m() == 0)
+        {
+          // Just the identity matrix in case no rotation is specified:
+          return IdentityMatrix(n_dofs_per_face);
+        }
+
+      // The matrix describes a rotation and we have to build a
+      // transformation matrix, we assume that for a 0* rotation
+      // we would have to build the identity matrix
+
+      Assert(matrix.m() == (int)spacedim, ExcInternalError())
+
+      Quadrature<dim-1> quadrature (fe.get_unit_face_support_points());
+      FEFaceValues<dim> fe_face_values (fe, quadrature, update_q_points);
+
+      // have an array that stores the location of each vector-dof tuple
+      // we want to rotate.
+      typedef std_cxx1x::array<unsigned int, spacedim> DoFTuple;
+
+      // start with a pristine interpolation matrix...
+      FullMatrix<double> transformation = IdentityMatrix(n_dofs_per_face);
+
+      for (unsigned int i=0; i < n_dofs_per_face; ++i)
+        {
+          std::vector<unsigned int>::const_iterator comp_it
+            = std::find (first_vector_components.begin(),
+                         first_vector_components.end(),
+                         fe.face_system_to_component_index(i).first);
+          if (comp_it != first_vector_components.end())
+            {
+              const unsigned int first_vector_component = *comp_it;
+
+              // find corresponding other components of vector
+              DoFTuple vector_dofs;
+              vector_dofs[0] = i;
+
+              Assert(*comp_it + spacedim <= fe.n_components(),
+                     ExcMessage("Error: the finite element does not have enough components "
+                                "to define rotated periodic boundaries."));
+
+              for (unsigned int k = 0; k < n_dofs_per_face; ++k)
+                if ((k != i) &&
+                    (quadrature.point(k) == quadrature.point(i)) &&
+                    (fe.face_system_to_component_index(k).first >=
+                     first_vector_component) &&
+                    (fe.face_system_to_component_index(k).first <
+                     first_vector_component + spacedim))
+                  {
+                    vector_dofs[fe.face_system_to_component_index(k).first -
+                                first_vector_component]
+                      = k;
+                    break;
+                  }
+
+              // ... and rotate all dofs belonging to vector valued
+              // components that are selected by first_vector_components:
+              for (int i = 0; i < spacedim; ++i)
+                {
+                  transformation[vector_dofs[i]][vector_dofs[i]] = 0.;
+                  for (int j = 0; j < spacedim; ++j)
+                    transformation[vector_dofs[i]][vector_dofs[j]] = matrix[i][j];
+                }
+            }
+        }
+      return transformation;
+    }
+
+  } /*namespace*/
+
+
+  // Low level interface:
 
 
   template <typename FaceIterator>
@@ -1881,9 +1961,12 @@ namespace DoFTools
                                 const ComponentMask                         &component_mask,
                                 const bool                                   face_orientation,
                                 const bool                                   face_flip,
-                                const bool                                   face_rotation)
+                                const bool                                   face_rotation,
+                                const FullMatrix<double>                    &matrix,
+                                const std::vector<unsigned int>             &first_vector_components)
   {
     static const int dim = FaceIterator::AccessorType::dimension;
+    static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
     Assert( (dim != 1) ||
             (face_orientation == true &&
@@ -1905,8 +1988,42 @@ namespace DoFTools
                        "on the very same face"));
 
     Assert(face_1->at_boundary() && face_2->at_boundary(),
-           ExcMessage ("Faces for periodicity constraints must be on the boundary"));
+           ExcMessage ("Faces for periodicity constraints must be on the "
+                       "boundary"));
 
+    Assert(matrix.m() == matrix.n(),
+           ExcMessage("The supplied (rotation or interpolation) matrix must "
+                      "be a square matrix"));
+
+    Assert(first_vector_components.empty() || matrix.m() == (int)spacedim,
+           ExcMessage ("first_vector_components is nonempty, so matrix must "
+                       "be a rotation matrix exactly of size spacedim"));
+
+#ifdef DEBUG
+    if (!face_1->has_children())
+      {
+        Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
+        const unsigned int n_dofs_per_face =
+          face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
+
+        Assert(matrix.m() == 0 || matrix.m() == n_dofs_per_face ||
+               matrix.m() == (int)spacedim,
+               ExcMessage ("matrix must have either size 0 or spacedim or the "
+                           "size must be equal to the # of DoFs on the face"));
+      }
+
+    if (!face_2->has_children())
+      {
+        Assert(face_2->n_active_fe_indices() == 1, ExcInternalError());
+        const unsigned int n_dofs_per_face =
+          face_2->get_fe(face_2->nth_active_fe_index(0)).dofs_per_face;
+
+        Assert(matrix.m() == 0 || matrix.m() == n_dofs_per_face ||
+               matrix.m() == (int)spacedim,
+               ExcMessage ("matrix must have either size 0 or spacedim or the "
+                           "size must be equal to the # of DoFs on the face"));
+      }
+#endif
 
     // A lookup table on how to go through the child faces depending on the
     // orientation:
@@ -1937,15 +2054,18 @@ namespace DoFTools
       },
     };
 
-    // In the case that both faces have children, we loop over all
-    // children and apply make_periodicty_constrains recursively:
     if (face_1->has_children() && face_2->has_children())
       {
+        // In the case that both faces have children, we loop over all
+        // children and apply make_periodicty_constrains recursively:
+
         Assert(face_1->n_children() == GeometryInfo<dim>::max_children_per_face &&
-               face_2->n_children() == GeometryInfo<dim>::max_children_per_face,
+               face_2->n_children() ==
+               GeometryInfo<dim>::max_children_per_face,
                ExcNotImplemented());
 
-        for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
+        for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face;
+             ++i)
           {
             // Lookup the index for the second face
             unsigned int j;
@@ -1967,128 +2087,86 @@ namespace DoFTools
                                           component_mask,
                                           face_orientation,
                                           face_flip,
-                                          face_rotation);
+                                          face_rotation,
+                                          matrix,
+                                          first_vector_components);
           }
       }
     else
-      // otherwise at least one of the two faces is active and
-      // we need to enter the constraints
       {
-        if (face_2->has_children() == false)
-          set_periodicity_constraints(face_2, face_1,
-                                      FullMatrix<double>(IdentityMatrix(face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face)),
-                                      constraint_matrix,
-                                      component_mask,
-                                      face_orientation, face_flip, face_rotation);
+        // Otherwise at least one of the two faces is active and
+        // we need to do some work and enter the constraints!
+
+        // The finite element that matters is the one on the active face:
+        const FiniteElement<dim,spacedim> &fe =
+          face_1->has_children()
+          ? face_2->get_fe(face_2->nth_active_fe_index(0))
+          : face_1->get_fe(face_1->nth_active_fe_index(0));
+
+        const unsigned int n_dofs_per_face = fe.dofs_per_face;
+
+        // Sometimes we just have nothing to do (for all finite elements,
+        // or systems which accidentally don't have any dofs on the
+        // boundary).
+        if (n_dofs_per_face == 0)
+          return;
+
+        const FullMatrix<double> transformation =
+          compute_transformation(fe, matrix, first_vector_components);
+
+        if (! face_2->has_children())
+          {
+            // Performance hack: We do not need to compute an inverse if
+            // the matrix is the identity matrix.
+            if (first_vector_components.empty() && matrix.m() == 0)
+              {
+                set_periodicity_constraints(face_2,
+                                            face_1,
+                                            transformation,
+                                            constraint_matrix,
+                                            component_mask,
+                                            face_orientation,
+                                            face_flip,
+                                            face_rotation);
+              }
+            else
+              {
+                FullMatrix<double> inverse(transformation.m());
+                inverse.invert(transformation);
+
+                set_periodicity_constraints(face_2,
+                                            face_1,
+                                            inverse,
+                                            constraint_matrix,
+                                            component_mask,
+                                            face_orientation,
+                                            face_flip,
+                                            face_rotation);
+              }
+          }
         else
-          set_periodicity_constraints(face_1, face_2,
-                                      FullMatrix<double>(IdentityMatrix(face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face)),
-                                      constraint_matrix,
-                                      component_mask,
-                                      face_orientation, face_flip, face_rotation);
+          {
+            Assert(!face_1->has_children(), ExcInternalError());
+
+            // Important note:
+            // In 3D we have to take care of the fact that face_rotation
+            // gives the relative rotation of face_1 to face_2, i.e. we
+            // have to invert the rotation when constraining face_2 to
+            // face_1. Therefore face_flip has to be toggled if
+            // face_rotation is true:
+            // In case of inverted orientation, nothing has to be done.
+            set_periodicity_constraints(face_1,
+                                        face_2,
+                                        transformation,
+                                        constraint_matrix,
+                                        component_mask,
+                                        face_orientation,
+                                        face_orientation
+                                        ? face_rotation ^ face_flip
+                                        : face_flip,
+                                        face_rotation);
+          }
       }
-  }
-
-
-
-  template<typename DH>
-  void
-  make_periodicity_constraints (const DH                       &dof_handler,
-                                const types::boundary_id       b_id1,
-                                const types::boundary_id       b_id2,
-                                const int                      direction,
-                                dealii::ConstraintMatrix       &constraint_matrix,
-                                const ComponentMask            &component_mask)
-  {
-    Tensor<1,DH::space_dimension> dummy;
-    make_periodicity_constraints (dof_handler,
-                                  b_id1,
-                                  b_id2,
-                                  direction,
-                                  dummy,
-                                  constraint_matrix,
-                                  component_mask);
-  }
-
-
-
-  template<typename DH>
-  void
-  make_periodicity_constraints (const DH                  &dof_handler,
-                                const types::boundary_id  b_id1,
-                                const types::boundary_id  b_id2,
-                                const int                 direction,
-                                dealii::Tensor<1,DH::space_dimension> &offset,
-                                dealii::ConstraintMatrix  &constraint_matrix,
-                                const ComponentMask       &component_mask)
-  {
-    static const int space_dim = DH::space_dimension;
-    Assert (0<=direction && direction<space_dim,
-            ExcIndexRange (direction, 0, space_dim));
-
-    Assert (b_id1 != b_id2,
-            ExcMessage ("The boundary indicators b_id1 and b_id2 must be"
-                        "different to denote different boundaries."));
-
-    std::vector<GridTools::PeriodicFacePair
-    <typename DH::cell_iterator> > matched_faces;
-
-    // Collect matching periodic cells on the coarsest level:
-    GridTools::collect_periodic_faces(dof_handler, b_id1, b_id2, direction,
-                                      matched_faces, offset);
-
-    make_periodicity_constraints<DH>
-    (matched_faces, constraint_matrix, component_mask);
-  }
-
-
-
-  template<typename DH>
-  void
-  make_periodicity_constraints (const DH                       &dof_handler,
-                                const types::boundary_id       b_id,
-                                const int                      direction,
-                                dealii::ConstraintMatrix       &constraint_matrix,
-                                const ComponentMask            &component_mask)
-  {
-    Tensor<1,DH::space_dimension> dummy;
-    make_periodicity_constraints (dof_handler,
-                                  b_id,
-                                  direction,
-                                  dummy,
-                                  constraint_matrix,
-                                  component_mask);
-  }
-
-
-
-  template<typename DH>
-  void
-  make_periodicity_constraints (const DH                  &dof_handler,
-                                const types::boundary_id  b_id,
-                                const int                 direction,
-                                dealii::Tensor<1,DH::space_dimension> &offset,
-                                dealii::ConstraintMatrix  &constraint_matrix,
-                                const ComponentMask       &component_mask)
-  {
-    static const int dim = DH::dimension;
-    static const int space_dim = DH::space_dimension;
-
-    Assert (0<=direction && direction<space_dim,
-            ExcIndexRange (direction, 0, space_dim));
-
-    Assert(dim == space_dim,
-           ExcNotImplemented());
-
-    std::vector<GridTools::PeriodicFacePair
-    <typename DH::cell_iterator> > matched_faces;
-
-    // Collect matching periodic cells on the coarsest level:
-    GridTools::collect_periodic_faces(dof_handler, b_id, direction,
-                                      matched_faces, offset);
-
-    make_periodicity_constraints<DH>
-    (matched_faces, constraint_matrix, component_mask);
   }
 
 
@@ -2107,9 +2185,7 @@ namespace DoFTools
     it = periodic_faces.begin();
     end_periodic = periodic_faces.end();
 
-
-    // And apply the low level make_periodicity_constraints function to
-    // every matching pair:
+    // Loop over all periodic faces...
     for (; it!=end_periodic; ++it)
       {
         typedef typename DH::face_iterator FaceIterator;
@@ -2122,14 +2198,80 @@ namespace DoFTools
         Assert (face_1 != face_2,
                 ExcInternalError());
 
+        // ... and apply the low level make_periodicity_constraints function to
+        // every matching pair:
         make_periodicity_constraints(face_1,
                                      face_2,
                                      constraint_matrix,
                                      component_mask,
                                      it->orientation[0],
                                      it->orientation[1],
-                                     it->orientation[2]);
+                                     it->orientation[2],
+                                     it->matrix,
+                                     it->first_vector_components);
       }
+  }
+
+
+  // High level interface variants:
+
+
+  template<typename DH>
+  void
+  make_periodicity_constraints (const DH                       &dof_handler,
+                                const types::boundary_id       b_id1,
+                                const types::boundary_id       b_id2,
+                                const int                      direction,
+                                dealii::ConstraintMatrix       &constraint_matrix,
+                                const ComponentMask            &component_mask)
+  {
+    static const int space_dim = DH::space_dimension;
+    Assert (0<=direction && direction<space_dim,
+            ExcIndexRange (direction, 0, space_dim));
+
+    Assert (b_id1 != b_id2,
+            ExcMessage ("The boundary indicators b_id1 and b_id2 must be"
+                        "different to denote different boundaries."));
+
+    std::vector<GridTools::PeriodicFacePair
+    <typename DH::cell_iterator> > matched_faces;
+
+    // Collect matching periodic cells on the coarsest level:
+    GridTools::collect_periodic_faces(dof_handler, b_id1, b_id2, direction,
+                                      matched_faces);
+
+    make_periodicity_constraints<DH>
+    (matched_faces, constraint_matrix, component_mask);
+  }
+
+
+
+  template<typename DH>
+  void
+  make_periodicity_constraints (const DH                       &dof_handler,
+                                const types::boundary_id       b_id,
+                                const int                      direction,
+                                dealii::ConstraintMatrix       &constraint_matrix,
+                                const ComponentMask            &component_mask)
+  {
+    static const int dim = DH::dimension;
+    static const int space_dim = DH::space_dimension;
+
+    Assert (0<=direction && direction<space_dim,
+            ExcIndexRange (direction, 0, space_dim));
+
+    Assert(dim == space_dim,
+           ExcNotImplemented());
+
+    std::vector<GridTools::PeriodicFacePair
+    <typename DH::cell_iterator> > matched_faces;
+
+    // Collect matching periodic cells on the coarsest level:
+    GridTools::collect_periodic_faces(dof_handler, b_id, direction,
+                                      matched_faces);
+
+    make_periodicity_constraints<DH>
+    (matched_faces, constraint_matrix, component_mask);
   }
 
 

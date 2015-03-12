@@ -51,27 +51,14 @@ check_solve( SOLVER &solver,
   f = 1.;
   try
     {
-      deallog.depth_file(0);
-      solver.solve(A,u,f,P);
-      deallog.depth_file(3);
+      check_solver_within_range(
+        solver.solve(A,u,f,P),
+        solver_control.last_step(), 49, 51);
     }
   catch (std::exception &e)
     {
-      deallog.depth_file(3);
       deallog << e.what() << std::endl;
       abort ();
-    }
-
-  const unsigned int steps = solver_control.last_step();
-  if (steps >= 49 && steps <= 51)
-    {
-      deallog << "Solver stopped within 49 - 51 iterations"
-              << std::endl;
-    }
-  else
-    {
-      deallog << "Solver stopped after " << solver_control.last_step()
-              << " iterations" << std::endl;
     }
 }
 
@@ -97,13 +84,11 @@ int main(int argc, char **argv)
     FDMatrix testproblem(size, size);
     PETScWrappers::SparseMatrix  A(dim, dim, 5);
     testproblem.five_point(A);
+    A.compress (VectorOperation::insert);
 
     PETScWrappers::Vector  f(dim);
     PETScWrappers::Vector  u(dim);
     f = 1.;
-    A.compress (VectorOperation::add);
-    f.compress (VectorOperation::add);
-    u.compress (VectorOperation::add);
 
     GrowingVectorMemory<PETScWrappers::Vector> mem;
     SolverBicgstab<PETScWrappers::Vector> solver(control,mem);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,15 +26,14 @@ DEAL_II_NAMESPACE_OPEN
 namespace Functions
 {
   /**
-   *   Friendly interface to the FunctionParser class. This class is
-   *   meant as a wrapper for the FunctionParser class. It is used in the
-   *   step-34 tutorial program.
+   * Friendly interface to the FunctionParser class. This class is meant as a
+   * wrapper for the FunctionParser class. It is used in the step-34 tutorial
+   * program.
    *
-   *   It provides two
-   *   methods to declare and parse a ParameterHandler object and creates
-   *   the Function object declared in the parameter file. This class is
-   *   derived from the AutoDerivativeFunction class, so you don't need
-   *   to specify derivatives. An example of usage of this class is as follows:
+   * It provides two methods to declare and parse a ParameterHandler object
+   * and creates the Function object declared in the parameter file. This
+   * class is derived from the AutoDerivativeFunction class, so you don't need
+   * to specify derivatives. An example of usage of this class is as follows:
    *
    *   @code
    *   // A parameter handler
@@ -58,9 +57,9 @@ namespace Functions
    *
    *   @endcode
    *
-   *   And here is an example of how the input parameter could look like
-   *   (see the documentation of the FunctionParser class for a detailed
-   *   description of the syntax of the function definition):
+   * And here is an example of how the input parameter could look like (see
+   * the documentation of the FunctionParser class for a detailed description
+   * of the syntax of the function definition):
    *
    *   @code
    *
@@ -73,44 +72,28 @@ namespace Functions
    *
    *   @endcode
    *
-   *   @ingroup functions
-   *   @author Luca Heltai, 2006
+   * @ingroup functions
+   * @author Luca Heltai, 2006
    */
   template <int dim>
   class ParsedFunction :  public AutoDerivativeFunction<dim>
   {
   public:
     /**
-     * Construct a vector
-     * function. The vector
-     * function which is generated
-     * has @p n_components
-     * components (defaults to
-     * 1). The parameter @p h is
-     * used to initialize the
-     * AutoDerivativeFunction class
-     * from which this class is
+     * Construct a vector function. The vector function which is generated has
+     * @p n_components components (defaults to 1). The parameter @p h is used
+     * to initialize the AutoDerivativeFunction class from which this class is
      * derived.
      */
     ParsedFunction (const unsigned int n_components = 1, const double h=1e-8);
 
     /**
-     * Declare parameters needed by
-     * this class. The additional
-     * parameter @p n_components is
-     * used to generate the right
-     * code according to the number
-     * of components of the
-     * function that will parse
-     * this ParameterHandler. If
-     * the number of components
-     * which is parsed does not
-     * match the number of
-     * components of this object,
-     * an assertion is thrown and
-     * the program is aborted.  The
-     * default behavior for this
-     * class is to declare the
+     * Declare parameters needed by this class. The additional parameter @p
+     * n_components is used to generate the right code according to the number
+     * of components of the function that will parse this ParameterHandler. If
+     * the number of components which is parsed does not match the number of
+     * components of this object, an assertion is thrown and the program is
+     * aborted.  The default behavior for this class is to declare the
      * following entries:
      *
      *  @code
@@ -126,25 +109,15 @@ namespace Functions
                                    const unsigned int n_components = 1);
 
     /**
-     * Parse parameters needed by
-     * this class.  If the number
-     * of components which is
-     * parsed does not match the
-     * number of components of this
-     * object, an assertion is
-     * thrown and the program is
-     * aborted.  In order for the
-     * class to function properly,
-     * we follow the same
-     * convenctions declared in the
-     * FunctionParser class (look
-     * there for a detailed
-     * description of the syntax
-     * for function declarations).
+     * Parse parameters needed by this class.  If the number of components
+     * which is parsed does not match the number of components of this object,
+     * an assertion is thrown and the program is aborted.  In order for the
+     * class to function properly, we follow the same convenctions declared in
+     * the FunctionParser class (look there for a detailed description of the
+     * syntax for function declarations).
      *
-     * The three variables that can
-     * be parsed from a parameter
-     * file are the following:
+     * The three variables that can be parsed from a parameter file are the
+     * following:
      *
      *  @code
      *
@@ -154,10 +127,8 @@ namespace Functions
      *
      *  @endcode
      *
-     *  Function constants is a
-     *  collection of pairs in the
-     *  form name=value, separated
-     *  by commas, for example:
+     * Function constants is a collection of pairs in the form name=value,
+     * separated by commas, for example:
      *
      *  @code
      *
@@ -165,16 +136,10 @@ namespace Functions
      *
      *  @endcode
      *
-     *  These constants can be used
-     *  in the declaration of the
-     *  function expression, which
-     *  follows the convention of
-     *  the FunctionParser
-     *  class. In order to specify
-     *  vector functions,
-     *  semicolons have to be used
-     *  to separate the different
-     *  components, e.g.:
+     * These constants can be used in the declaration of the function
+     * expression, which follows the convention of the FunctionParser class.
+     * In order to specify vector functions, semicolons have to be used to
+     * separate the different components, e.g.:
      *
      *  @code
      *
@@ -182,11 +147,8 @@ namespace Functions
      *
      *  @endcode
      *
-     *  The variable names entry
-     *  can be used to customize
-     *  the name of the variables
-     *  used in the Function. It
-     *  defaults to
+     * The variable names entry can be used to customize the name of the
+     * variables used in the Function. It defaults to
      *
      *  @code
      *
@@ -194,7 +156,7 @@ namespace Functions
      *
      *  @endcode
      *
-     *  for one dimensional problems,
+     * for one dimensional problems,
      *
      *  @code
      *
@@ -202,7 +164,7 @@ namespace Functions
      *
      *  @endcode
      *
-     *  for two dimensional problems and
+     * for two dimensional problems and
      *
      *  @code
      *
@@ -210,53 +172,40 @@ namespace Functions
      *
      *  @endcode
      *
-     *  for three dimensional problems.
+     * for three dimensional problems.
      *
-     *  The time variable can be
-     *  set according to
-     *  specifications in the
-     *  FunctionTime base class.
+     * The time variable can be set according to specifications in the
+     * FunctionTime base class.
      */
     void parse_parameters(ParameterHandler &prm);
 
     /**
-     * Return all components of a
-     * vector-valued function at the
-     * given point @p p.
+     * Return all components of a vector-valued function at the given point @p
+     * p.
      */
     virtual void vector_value (const Point<dim> &p,
                                Vector<double>   &values) const;
 
     /**
-     * Return the value of the
-     * function at the given
-     * point. Unless there is only
-     * one component (i.e. the
-     * function is scalar), you
-     * should state the component
-     * you want to have evaluated;
-     * it defaults to zero,
-     * i.e. the first component.
+     * Return the value of the function at the given point. Unless there is
+     * only one component (i.e. the function is scalar), you should state the
+     * component you want to have evaluated; it defaults to zero, i.e. the
+     * first component.
      */
     virtual double value (const Point< dim >     &p,
                           const unsigned int  component = 0)    const;
 
     /**
-     * Set the time to a specific
-     * value for time-dependent
-     * functions.
+     * Set the time to a specific value for time-dependent functions.
      *
-     * We need to overwrite this to
-     * set the time also in the
-     * accessor
+     * We need to overwrite this to set the time also in the accessor
      * FunctionParser<dim>.
      */
     virtual void set_time(const double newtime);
 
   private:
     /**
-     * The object with which we do
-     * computations.
+     * The object with which we do computations.
      */
     FunctionParser<dim> function_object;
   };

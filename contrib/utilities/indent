@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2013, 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -24,8 +24,18 @@ if test ! -f contrib/utilities/astyle.rc ; then
   exit
 fi
 
+
+# loop over all directories in which we may have source files;
+# collect a list of files and then spawn a parallel process to
+# indent all of them
 echo "--- Indenting all deal.II header and source files"
-astyle --options=contrib/utilities/astyle.rc \
-       include/deal.II/*/*.h \
-       source/*/*.cc \
-       examples/*/*.cc
+for dir in include/deal.II/* source/* examples ; do
+  files=`find $dir | egrep '\.(cc|h)$'` ;
+  if test -n "$files" ; then
+    (astyle --options=contrib/utilities/astyle.rc $files ) &
+  fi
+done
+
+# now wait for all of these processes to finish
+wait
+

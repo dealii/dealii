@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,6 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <algorithm>
 #include <numeric>

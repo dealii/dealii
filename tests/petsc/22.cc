@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,8 +35,8 @@ void test (PETScWrappers::Vector &v,
       v(i) = i;
     else
       w(i) = i;
-  v.compress (VectorOperation::add);
-  w.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
+  w.compress (VectorOperation::insert);
 
   // make sure the scalar product is zero
   Assert (v*w == 0, ExcInternalError());

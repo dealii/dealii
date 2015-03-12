@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,175 +17,129 @@
 #define __deal2__config_h
 
 
-/**
+/***********************************************************************
  * Two macro names that we put at the top and bottom of all deal.II files
  * and that will be expanded to "namespace dealii {" and "}".
  */
+
 #define DEAL_II_NAMESPACE_OPEN namespace dealii {
 #define DEAL_II_NAMESPACE_CLOSE }
 
 
-/***********************************************
- * Configured in setup_cached_variables.cmake: *
- ***********************************************/
+/***********************************************************************
+ * Information about deal.II:
+ */
 
-#cmakedefine DEAL_II_WITH_64BIT_INDICES
-
-
-/**************************************
- * Configured in setup_deal_ii.cmake: *
- **************************************/
-
-/** Defined to the full name of this package. */
 #define DEAL_II_PACKAGE_NAME "@DEAL_II_PACKAGE_NAME@"
 
-/** Defined to the version of this package. */
 #define DEAL_II_PACKAGE_VERSION "@DEAL_II_PACKAGE_VERSION@"
 
-/** Major version number of deal.II */
 #define DEAL_II_VERSION_MAJOR @DEAL_II_VERSION_MAJOR@
-#define DEAL_II_MAJOR @DEAL_II_VERSION_MAJOR@
-
-/** Minor version number of deal.II */
 #define DEAL_II_VERSION_MINOR @DEAL_II_VERSION_MINOR@
-#define DEAL_II_MINOR @DEAL_II_VERSION_MINOR@
-
-#define DEAL_II_VERSION_GTE(major,minor,subminor) \
- ((DEAL_II_VERSION_MAJOR * 10000 + \
-    DEAL_II_VERSION_MINOR * 100 + \
-     DEAL_II_VERSION_SUBMINOR) \
-    >=  \
-    (major)*10000 + (minor)*100 + (subminor))
+#define DEAL_II_VERSION_SUBMINOR @DEAL_II_VERSION_SUBMINOR@
 
 
-/********************************************
- * Configured in check_1_compiler_features: *
- ********************************************/
+/***********************************************************************
+ * Configured deal.II features:
+ */
 
-/** Defined if the compiler can use arithmetic operations on vectorized data types */
+#cmakedefine DEAL_II_WITH_64BIT_INDICES
+#cmakedefine DEAL_II_WITH_ARPACK
+#cmakedefine DEAL_II_WITH_BZIP2
+#cmakedefine DEAL_II_WITH_CXX11
+#cmakedefine DEAL_II_WITH_HDF5
+#cmakedefine DEAL_II_WITH_LAPACK
+#cmakedefine DEAL_II_WITH_METIS
+#cmakedefine DEAL_II_WITH_MPI
+#cmakedefine DEAL_II_WITH_MUPARSER
+#cmakedefine DEAL_II_WITH_NETCDF
+#cmakedefine DEAL_II_WITH_OPENCASCADE
+#cmakedefine DEAL_II_WITH_P4EST
+#cmakedefine DEAL_II_WITH_PETSC
+#cmakedefine DEAL_II_WITH_SLEPC
+#cmakedefine DEAL_II_WITH_THREADS
+#cmakedefine DEAL_II_WITH_TRILINOS
+#cmakedefine DEAL_II_WITH_UMFPACK
+#cmakedefine DEAL_II_WITH_ZLIB
+
+
+/***********************************************************************
+ * Compiler bugs:
+ *
+ * For documentation see cmake/checks/check_03_compiler_bugs.cmake
+ */
+
+#cmakedefine DEAL_II_TEMPL_SPEC_FRIEND_BUG
+#cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
+#cmakedefine DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
+#cmakedefine DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
+#cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+#cmakedefine DEAL_II_BOOST_BIND_COMPILER_BUG
+#cmakedefine DEAL_II_BIND_NO_CONST_OP_PARENTHESES
+#cmakedefine DEAL_II_CONSTEXPR_BUG
+
+
+/***********************************************************************
+ * Compiler features:
+ *
+ * For documentation see cmake/checks/check_01_compiler_features.cmake
+ */
+
 #cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
-
-/** Defined if vector iterators are just plain pointers */
 #cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER
-
-/** Define if the compiler provides __builtin_expect */
-#cmakedefine HAVE_BUILTIN_EXPECT
-
-/** Define if the compiler provides __verbose_terminate_handler */
-#cmakedefine HAVE_VERBOSE_TERMINATE
-
-/** Define if deal.II is linked against a libc that provides stacktrace
- * debug information that can be printed out in the exception class
- * */
-#cmakedefine HAVE_GLIBC_STACKTRACE
-
-/** Defined if the std c++ library provides a demangler conforming to the
- * GCC libstdc++ interface.
- */
-#cmakedefine HAVE_LIBSTDCXX_DEMANGLER
-
-/** If already available, do not define at all. Otherwise, define to
- * __func__ if that is available. In all other cases, indicate that no
- * information about the present function is available for this compiler.
- */
+#cmakedefine DEAL_II_HAVE_BUILTIN_EXPECT
+#cmakedefine DEAL_II_HAVE_VERBOSE_TERMINATE
+#cmakedefine DEAL_II_HAVE_GLIBC_STACKTRACE
+#cmakedefine DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
-
-/** If the compiler supports it, then this variable is defined to a string
- * that when written after a function name makes the compiler emit a warning
- * whenever this function is used somewhere that its use is deprecated.
- */
 #cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
 
 
-/***************************************
- * Configured in check_1_cpu_features: *
- ***************************************/
+/***********************************************************************
+ * CPU features:
+ *
+ * For documentation see cmake/checks/check_01_cpu_features.cmake
+ */
 
-/** Defined if the system stores words with the most significant byte first */
 #cmakedefine DEAL_II_WORDS_BIGENDIAN
-
-/** Equal to 0 in the generic case, equal to 1 if CPU compiled for supports
- * SSE2, equal to 2 if CPU compiled for supports AVX, equal to 3 if AVX512
- * support is available
- */
 #define DEAL_II_COMPILER_VECTORIZATION_LEVEL @DEAL_II_COMPILER_VECTORIZATION_LEVEL@
-
-/** If openmp simd support is available this string contains the
- * corresponding pragma directive
- */
 #define DEAL_II_OPENMP_SIMD_PRAGMA @DEAL_II_OPENMP_SIMD_PRAGMA@
 
 
-/***************************************
- * Configured in check_1_cxx_features: *
- ***************************************/
-
-/** Defined if the compiler we use supports the C++2011 standard well enough
- * to allow using the standard library classes instead of the corresponding
- * BOOST classes.
+/***********************************************************************
+ * Language features:
+ *
+ * For documentation see cmake/checks/check_01_cxx_features.cmake
  */
-#cmakedefine DEAL_II_WITH_CXX11
-#ifdef DEAL_II_WITH_CXX11
-/** Compatibility definition (with naming from deal.II 8.0): */
-# define DEAL_II_USE_CXX11
-/** Compatibility definition (with naming from deal.II < 8.0): */
-# define DEAL_II_CAN_USE_CXX11
-# define DEAL_II_CAN_USE_CXX1X
-#endif
 
-/** Defined if C++11 is enabled and the standard library supports
- * template<typename T> std::is_trivially_copyable<T>
- */
 #cmakedefine DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
-
-/** Defined if isnan is available */
-#cmakedefine HAVE_ISNAN
-
-/** Defined if _isnan is available */
-#cmakedefine HAVE_UNDERSCORE_ISNAN
-
-/** Defined if std::isfinite is available */
+#cmakedefine DEAL_II_HAVE_ISNAN
+#cmakedefine DEAL_II_HAVE_UNDERSCORE_ISNAN
 #cmakedefine DEAL_II_HAVE_ISFINITE
 
 
-/******************************************
- * Configured in check_1_system_features: *
- ******************************************/
+/***********************************************************************
+ * System features:
+ *
+ * For documentation see cmake/checks/check_02_system_features.cmake
+ */
 
-/** Defined if you have the <sys/resource.h> header file */
-#cmakedefine HAVE_SYS_RESOURCE_H
+#cmakedefine DEAL_II_HAVE_SYS_RESOURCE_H
+#cmakedefine DEAL_II_HAVE_SYS_TIME_H
+#cmakedefine DEAL_II_HAVE_SYS_TIMES_H
+#cmakedefine DEAL_II_HAVE_SYS_TYPES_H
+#cmakedefine DEAL_II_HAVE_UNISTD_H
+#cmakedefine DEAL_II_HAVE_GETHOSTNAME
+#cmakedefine DEAL_II_HAVE_GETPID
+#cmakedefine DEAL_II_HAVE_RAND_R
+#cmakedefine DEAL_II_HAVE_TIMES
+#cmakedefine DEAL_II_HAVE_JN
 
-/** Defined if you have the <sys/time.h> header file. */
-#cmakedefine HAVE_SYS_TIME_H
-
-/** Defined if you have the <sys/times.h> header file. */
-#cmakedefine HAVE_SYS_TIMES_H
-
-/** Defined if you have the <sys/types.h> header file. */
-#cmakedefine HAVE_SYS_TYPES_H
-
-/** Defined if you have the <unistd.h> header file. */
-#cmakedefine HAVE_UNISTD_H
-
-/** Defined if you have the "gethostname" function. */
-#cmakedefine HAVE_GETHOSTNAME
-
-/** Defined if you have the "getpid' function. */
-#cmakedefine HAVE_GETPID
-
-/** Defined if you have the "rand_r" function */
-#cmakedefine HAVE_RAND_R
-
-/** Defined if you have the "times" function. */
-#cmakedefine HAVE_TIMES
-
-/** Defined if you have the "jn" function. */
-#cmakedefine HAVE_JN
-
-/** Defined if deal.II was configured on a native Windows platform. */
 #cmakedefine DEAL_II_MSVC
 
-/** Disable a bunch of warnings for Microsoft Visual C++. */
+/*
+ * Disable a bunch of warnings for Microsoft Visual C++.
+ */
 #ifdef _MSC_VER
 #  pragma warning( disable : 4244 ) /* implied downcasting from double to float */
 #  pragma warning( disable : 4267 ) /* implied downcasting from size_t to unsigned int */
@@ -199,203 +153,55 @@
 #  pragma warning( disable : 4700 ) /* uninitialized local variable */
 #  pragma warning( disable : 4789 ) /* destination of memory copy is too small */
 #  pragma warning( disable : 4808 ) /* case 'value' is not a valid value for switch condition of type 'bool */
-
-/** Also make sure we don't let MS Windows headers define min/max as
-   macros, see http://support.microsoft.com/kb/143208 */
+/*
+ * Also make sure we don't let MS Windows headers define min/max as
+ * macros, see http://support.microsoft.com/kb/143208
+ */
 #  define NOMINMAX
 #endif /*_MSC_VER*/
 
 
-/****************************************
- * Configured in check_3_compiler_bugs: *
- ****************************************/
-
-/** Defined if we have to work around a bug with some compilers that will not
- * allow us to specify a fully specialized class of a template as a friend.
- * See the aclocal.m4 file in the top-level directory for a description of
- * this bug.
- * */
-#cmakedefine DEAL_II_TEMPL_SPEC_FRIEND_BUG
-
-/** Defined if the compiler refuses to allow the explicit specialization of
- * static member arrays. For the exact failure mode, look at aclocal.m4 in the
- * top-level directory.
+/***********************************************************************
+ * Thread support
+ *
+ * For documentation see cmake/configure/configure_1_threads.cmake
  */
-#cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
 
-/** Defined if the compiler refuses to allow the explicit specialization of
- * static member variables.
+#cmakedefine DEAL_II_USE_MT_POSIX
+#cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS
+
+/*
+ * Depending on the use of threads, we will have to make some variables
+ * volatile. We do this here in a very old-fashioned C-style, but still
+ * convenient way.
  */
-#cmakedefine DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
+#ifdef DEAL_II_WITH_THREADS
+#  define DEAL_VOLATILE volatile
+#else
+#  define DEAL_VOLATILE
+#endif
 
-/** Defined if the compiler does not honor the explicit keyword on template
- * constructors.
+
+/***********************************************************************
+ * Various macros for version number query and comparison:
  */
-#cmakedefine DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
-/** Defined if the compiler has a bug in deducing the type of pointers to const
- * member functions.
+/*
+ * deal.II:
  */
-#cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG
 
-/** Defined if the compiler gets an internal error compiling some code that
- * involves boost::bind
+#define DEAL_II_VERSION_GTE(major,minor,subminor) \
+ ((DEAL_II_VERSION_MAJOR * 10000 + \
+    DEAL_II_VERSION_MINOR * 100 + \
+     DEAL_II_VERSION_SUBMINOR) \
+    >=  \
+    (major)*10000 + (minor)*100 + (subminor))
+
+/*
+ * p4est:
  */
-#cmakedefine DEAL_II_BOOST_BIND_COMPILER_BUG
 
-/**
- * Defined if there is no const operator() in the class type returned
- * by std::bind.
- */
-#cmakedefine DEAL_II_BIND_NO_CONST_OP_PARENTHESES
-
-/** Defined if the compiler incorrectly deduces a constexpr as not being a
- * constant integral expression under certain optimization (notably
- * gcc-4.8.1 on Windows and Mac)
- */
-#cmakedefine DEAL_II_CONSTEXPR_BUG
-
-
-/*****************************************
- * Configured in configure_arpack.cmake: *
- *****************************************/
-
-#cmakedefine DEAL_II_WITH_ARPACK
-#ifdef DEAL_II_WITH_ARPACK
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_USE_ARPACK
-#endif
-
-/*************************************************
- * Configured in configure_functionparser.cmake: *
- *************************************************/
-
-#cmakedefine DEAL_II_WITH_FUNCTIONPARSER
-#ifdef DEAL_II_WITH_FUNCTIONPARSER
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define HAVE_FUNCTIONPARSER
-#endif
-
-/***************************************
- * Configured in configure_hdf5.cmake: *
- ***************************************/
-
-#cmakedefine DEAL_II_WITH_HDF5
-#ifdef DEAL_II_WITH_HDF5
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_HAVE_HDF5
-#endif
-
-/*****************************************
- * Configured in configure_lapack.cmake: *
- *****************************************/
-
-#cmakedefine DEAL_II_WITH_LAPACK
-#ifdef DEAL_II_WITH_LAPACK
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define HAVE_LIBLAPACK
-#  define HAVE_DAXPY_
-#  define HAVE_DGEEVX_
-#  define HAVE_DGEEV_
-#  define HAVE_DGELSD_
-#  define HAVE_DGEMM_
-#  define HAVE_DGEMV_
-#  define HAVE_DGEQRF_
-#  define HAVE_DGESDD_
-#  define HAVE_DGESVD_
-#  define HAVE_DGETRF_
-#  define HAVE_DGETRI_
-#  define HAVE_DGETRS_
-#  define HAVE_DORGQR_
-#  define HAVE_DORMQR_
-#  define HAVE_DSTEV_
-#  define HAVE_DSYEVX_
-#  define HAVE_DSYGV_
-#  define HAVE_DSYGVX_
-#  define HAVE_DTRTRS_
-#  define HAVE_SAXPY_
-#  define HAVE_SGEEVX_
-#  define HAVE_SGEEV_
-#  define HAVE_SGELSD_
-#  define HAVE_SGEMM_
-#  define HAVE_SGEMV_
-#  define HAVE_SGEQRF_
-#  define HAVE_SGESDD_
-#  define HAVE_SGESVD_
-#  define HAVE_SGETRF_
-#  define HAVE_SGETRI_
-#  define HAVE_SGETRS_
-#  define HAVE_SORGQR_
-#  define HAVE_SORMQR_
-#  define HAVE_SSTEV_
-#  define HAVE_SSYEVX_
-#  define HAVE_SSYGV_
-#  define HAVE_SSYGVX_
-#  define HAVE_STRTRS_
-#endif
-
-
-
-/****************************************
- * Configured in configure_metis.cmake: *
- ****************************************/
-
-#cmakedefine DEAL_II_WITH_METIS
-#ifdef DEAL_II_WITH_METIS
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_USE_METIS
-#endif
-
-
-/**************************************
- * Configured in configure_mpi.cmake: *
- **************************************/
-
-#cmakedefine DEAL_II_WITH_MPI
-#ifdef DEAL_II_WITH_MPI
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_COMPILER_SUPPORTS_MPI
-#endif
-
-
-/*****************************************
- * Configured in configure_mumps.cmake:  *
- *****************************************/
-
-#cmakedefine DEAL_II_WITH_MUMPS
-#ifdef DEAL_II_WITH_MUMPS
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_USE_MUMPS
-#endif
-
-
-/*************************************************
- * Configured in configure_functionparser.cmake: *
- *************************************************/
-
-#cmakedefine DEAL_II_WITH_MUPARSER
-
-
-/*****************************************
- * Configured in configure_netcdf.cmake: *
- *****************************************/
-
-#cmakedefine DEAL_II_WITH_NETCDF
-#ifdef DEAL_II_WITH_NETCDF
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define HAVE_LIBNETCDF
-#endif
-
-
-/****************************************
- * Configured in configure_p4est.cmake: *
- ****************************************/
-
-#cmakedefine DEAL_II_WITH_P4EST
 #ifdef DEAL_II_WITH_P4EST
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_USE_P4EST
-
 #  define DEAL_II_P4EST_VERSION_MAJOR @P4EST_VERSION_MAJOR@
 #  define DEAL_II_P4EST_VERSION_MINOR @P4EST_VERSION_MINOR@
 #  define DEAL_II_P4EST_VERSION_SUBMINOR @P4EST_VERSION_SUBMINOR@
@@ -419,22 +225,11 @@
     0) \
     >=  \
     (major)*1000000 + (minor)*10000 + (subminor)*100 + (patch))
-
 #endif
-
-
-/****************************************
- * Configured in configure_petsc.cmake: *
- ****************************************/
-
-#cmakedefine DEAL_II_WITH_PETSC
-#ifdef DEAL_II_WITH_PETSC
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_USE_PETSC
-#endif
-
 
 /*
+ * PETSc:
+ *
  * Note: The following definitions will be set in petscconf.h and
  *       petscversion.h, so we don't repeat them here.
  *
@@ -446,7 +241,7 @@
  *  PETSC_USE_COMPLEX
  */
 
-/**
+/*
  * These macros are defined to make testing for PETSc versions within
  * the deal.II main code as simple as possible. In brief they are used
  * like this: (i) DEAL_II_PETSC_VERSION_LT is used to advance the
@@ -472,77 +267,11 @@
     >=  \
     (major)*10000 + (minor)*100 + (subminor))
 
-/****************************************
- * Configured in configure_slepc.cmake: *
- ****************************************/
-
-#cmakedefine DEAL_II_WITH_SLEPC
-#ifdef DEAL_II_WITH_SLEPC
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_USE_SLEPC
-#endif
-
-
-/******************************************
- * Configured in configure_1_bzip2.cmake: *
- ******************************************/
-
-#cmakedefine DEAL_II_WITH_BZIP2
-
-
-/********************************************
- * Configured in configure_1_threads.cmake: *
- ********************************************/
-
-#cmakedefine DEAL_II_WITH_THREADS
-#ifdef DEAL_II_WITH_THREADS
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_USE_MT
-#endif
-
-/**
- * Defined if multi-threading is to be achieved by using the POSIX functions
+/*
+ * Trilinos:
  */
-#cmakedefine DEAL_II_USE_MT_POSIX
 
-/** Defined if POSIX is supported but not the newer POSIX barrier functions.
- * Barriers will then not work in the library, but the other threading
- * functionality is available.
- */
-#cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS
-
-/**
- * Depending on the use of threads, we will have to make some variables
- * volatile. We do this here in a very old-fashioned C-style, but still
- * convenient way.
- */
-#ifdef DEAL_II_WITH_THREADS
-#  define DEAL_VOLATILE volatile
-#else
-#  define DEAL_VOLATILE
-#endif
-
-
-/*****************************************
- * Configured in configure_1_zlib.cmake: *
- *****************************************/
-
-#cmakedefine DEAL_II_WITH_ZLIB
-#ifdef DEAL_II_WITH_ZLIB
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define HAVE_LIBZ
-#endif
-
-
-/*******************************************
- * Configured in configure_trilinos.cmake: *
- *******************************************/
-
-#cmakedefine DEAL_II_WITH_TRILINOS
 #ifdef DEAL_II_WITH_TRILINOS
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define DEAL_II_USE_TRILINOS
-
 #  define DEAL_II_TRILINOS_VERSION_MAJOR @TRILINOS_VERSION_MAJOR@
 #  define DEAL_II_TRILINOS_VERSION_MINOR @TRILINOS_VERSION_MINOR@
 #  define DEAL_II_TRILINOS_VERSION_SUBMINOR @TRILINOS_VERSION_SUBMINOR@
@@ -556,25 +285,17 @@
 #endif
 
 
-/******************************************
- * Configured in configure_umfpack.cmake: *
- ******************************************/
+/***********************************************************************
+ * Final inclusions:
+ */
 
-#cmakedefine DEAL_II_WITH_UMFPACK
-#ifdef DEAL_II_WITH_UMFPACK
-/** Compatibility definition (with naming from deal.II < 8.0): */
-#  define HAVE_LIBUMFPACK
+/*
+ * Some systems require including mpi.h before stdio.h which happens in
+ * types.h
+ */
+#if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
+#  include <mpi.h>
 #endif
-
-
-/**********************************************
- * Configured in configure_opencascade.cmake: *
- **********************************************/
-
-#cmakedefine DEAL_II_WITH_OPENCASCADE
-
-
-
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/types.h>

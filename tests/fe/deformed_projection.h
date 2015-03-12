@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -147,7 +147,7 @@ void EvaluateDerivative (DoFHandler<2> *dof_handler,
       // Get values from solution vector (For Trap.Rule)
       std::vector<std::vector<Tensor<1,2> > >
       grads_here (n_q_points, std::vector<Tensor<1,2> > (n_components));
-      fe_values.get_function_grads (solution, grads_here);
+      fe_values.get_function_gradients (solution, grads_here);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         {

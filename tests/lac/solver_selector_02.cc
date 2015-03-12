@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,12 +68,6 @@ check(const MATRIX &A, const VECTOR &f)
       u = 0.;
       solver.solve(A, u, f, pre);
     }
-
-  //test deprecated constructor too:
-  GrowingVectorMemory<VECTOR> mem;
-  SolverSelector<VECTOR> solver2("gmres", mycont, mem);
-  u = 0.;
-  solver2.solve(A, u, f, pre);
 }
 
 

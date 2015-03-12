@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -24,7 +24,6 @@ IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
   INSTALL(DIRECTORY ${BOOST_FOLDER}/include/boost
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
-    PATTERN ".svn" EXCLUDE
     )
 
   ADD_SUBDIRECTORY(${BOOST_FOLDER}/libs/serialization/src)
@@ -47,7 +46,6 @@ IF(FEATURE_THREADS_BUNDLED_CONFIGURED)
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     FILES_MATCHING PATTERN "*.h"
-    PATTERN ".svn" EXCLUDE
     )
 
   ADD_SUBDIRECTORY(${TBB_FOLDER}/src)
@@ -57,6 +55,14 @@ ENDIF()
 IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
   ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/UMFPACK/Source)
   ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/AMD/Source)
+
+  INSTALL(DIRECTORY
+      ${UMFPACK_FOLDER}/UMFPACK/Include/
+      ${UMFPACK_FOLDER}/AMD/Include/
+    DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
+    COMPONENT library
+    FILES_MATCHING PATTERN "*.h"
+    )
 ENDIF()
 
 

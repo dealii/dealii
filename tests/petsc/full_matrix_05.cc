@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +37,7 @@ void test (PETScWrappers::FullMatrix &m)
           ++counter;
         }
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   // check n_nonzero_elements then
   // output a dummy number.

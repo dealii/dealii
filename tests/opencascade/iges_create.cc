@@ -13,7 +13,7 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
 #include <deal.II/opencascade/utilities.h>
 #include <TopTools.hxx>
@@ -24,7 +24,7 @@ using namespace OpenCASCADE;
 
 int main () 
 {
-  // Create a bspline passign through the points
+  // Create a bspline passing through the points
   std::vector<Point<3> > pts;
   pts.push_back(Point<3>(0,0,0));
   pts.push_back(Point<3>(0,1,0));

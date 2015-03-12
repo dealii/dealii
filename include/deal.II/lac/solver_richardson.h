@@ -29,20 +29,19 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Implementation of the preconditioned Richardson iteration method. The stopping criterion
- * is the norm of the residual.
+ * Implementation of the preconditioned Richardson iteration method. The
+ * stopping criterion is the norm of the residual.
  *
- * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the Solver base class.
+ * For the requirements on matrices and vectors in order to work with this
+ * class, see the documentation of the Solver base class.
  *
- * Like all other solver classes, this class has a local structure called
- * @p AdditionalData which is used to pass additional parameters to the
- * solver, like damping parameters or the number of temporary vectors. We
- * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the @p SolverSelector and
- * other classes much easier and guarantees that these will continue to
- * work even if number or type of the additional parameters for a certain
- * solver changes.
+ * Like all other solver classes, this class has a local structure called @p
+ * AdditionalData which is used to pass additional parameters to the solver,
+ * like damping parameters or the number of temporary vectors. We use this
+ * additional structure instead of passing these values directly to the
+ * constructor because this makes the use of the @p SolverSelector and other
+ * classes much easier and guarantees that these will continue to work even if
+ * number or type of the additional parameters for a certain solver changes.
  *
  * For the Richardson method, the additional data is the damping parameter,
  * which is the only content of the @p AdditionalData structure. By default,
@@ -51,9 +50,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Observing the progress of linear solver iterations</h3>
  *
- * The solve() function of this class uses the mechanism described
- * in the Solver base class to determine convergence. This mechanism
- * can also be used to observe the progress of the iteration.
+ * The solve() function of this class uses the mechanism described in the
+ * Solver base class to determine convergence. This mechanism can also be used
+ * to observe the progress of the iteration.
  *
  *
  * @author Ralf Hartmann
@@ -63,16 +62,12 @@ class SolverRichardson : public Solver<VECTOR>
 {
 public:
   /**
-   * Standardized data struct to
-   * pipe additional data to the
-   * solver.
+   * Standardized data struct to pipe additional data to the solver.
    */
   struct AdditionalData
   {
     /**
-     * Constructor. By default,
-     * set the damping parameter
-     * to one.
+     * Constructor. By default, set the damping parameter to one.
      */
     AdditionalData (const double omega                       = 1,
                     const bool   use_preconditioned_residual = false);
@@ -97,9 +92,8 @@ public:
                     const AdditionalData &data=AdditionalData());
 
   /**
-   * Constructor. Use an object of
-   * type GrowingVectorMemory as
-   * a default to allocate memory.
+   * Constructor. Use an object of type GrowingVectorMemory as a default to
+   * allocate memory.
    */
   SolverRichardson (SolverControl        &cn,
                     const AdditionalData &data=AdditionalData());
@@ -110,8 +104,7 @@ public:
   virtual ~SolverRichardson ();
 
   /**
-   * Solve the linear system $Ax=b$
-   * for x.
+   * Solve the linear system $Ax=b$ for x.
    */
   template<class MATRIX, class PRECONDITIONER>
   void
@@ -131,19 +124,14 @@ public:
           const PRECONDITIONER &precondition);
 
   /**
-   * Set the damping-coefficient.
-   * Default is 1., i.e. no damping.
+   * Set the damping-coefficient. Default is 1., i.e. no damping.
    */
   void set_omega (const double om=1.);
 
   /**
-   * Interface for derived class.
-   * This function gets the current
-   * iteration vector, the residual
-   * and the update vector in each
-   * step. It can be used for a
-   * graphical output of the
-   * convergence history.
+   * Interface for derived class. This function gets the current iteration
+   * vector, the residual and the update vector in each step. It can be used
+   * for a graphical output of the convergence history.
    */
   virtual void print_vectors(const unsigned int step,
                              const VECTOR &x,
@@ -152,26 +140,19 @@ public:
 
 protected:
   /**
-   * Implementation of the computation of
-   * the norm of the residual.
+   * Implementation of the computation of the norm of the residual.
    */
   virtual typename VECTOR::value_type criterion();
 
   /**
-   * Residual. Temporary vector allocated through
-   * the VectorMemory object at the start
-   * of the actual solution process and
-   * deallocated at the end.
+   * Residual. Temporary vector allocated through the VectorMemory object at
+   * the start of the actual solution process and deallocated at the end.
    */
   VECTOR *Vr;
   /**
-   * Preconditioned
-   * residual. Temporary vector
-   * allocated through the
-   * VectorMemory object at the
-   * start of the actual solution
-   * process and deallocated at the
-   * end.
+   * Preconditioned residual. Temporary vector allocated through the
+   * VectorMemory object at the start of the actual solution process and
+   * deallocated at the end.
    */
   VECTOR *Vd;
 
@@ -181,14 +162,10 @@ protected:
   AdditionalData additional_data;
 
   /**
-   * Within the iteration loop, the
-   * norm of the residual is
-   * stored in this variable. The
-   * function @p criterion uses this
-   * variable to compute the convergence
-   * value, which in this class is the
-   * norm of the residual vector and thus
-   * the square root of the @p res2 value.
+   * Within the iteration loop, the norm of the residual is stored in this
+   * variable. The function @p criterion uses this variable to compute the
+   * convergence value, which in this class is the norm of the residual vector
+   * and thus the square root of the @p res2 value.
    */
   typename VECTOR::value_type res;
 };

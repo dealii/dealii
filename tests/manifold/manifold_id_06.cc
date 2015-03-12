@@ -1,5 +1,5 @@
 //----------------------------  manifold_id_06.cc  ---------------------------
-//    Copyright (C) 2011, 2013, 2014 by the mathLab team.
+//    Copyright (C) 2011 - 2014 by the mathLab team.
 //
 //    This file is subject to LGPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,7 +14,7 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
 
 // all include files you need here

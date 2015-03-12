@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2013 by the deal.II authors
+ * Copyright (C) 2000 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -208,8 +208,8 @@ namespace Step17
     point_1(0) = 0.5;
     point_2(0) = -0.5;
 
-    if (((p-point_1).square() < 0.2*0.2) ||
-        ((p-point_2).square() < 0.2*0.2))
+    if (((p-point_1).norm_square() < 0.2*0.2) ||
+        ((p-point_2).norm_square() < 0.2*0.2))
       values(0) = 1;
     else
       values(0) = 0;
@@ -780,7 +780,7 @@ namespace Step17
                                         local_error_per_cell,
                                         ComponentMask(),
                                         0,
-                                        multithread_info.n_threads(),
+                                        MultithreadInfo::n_threads(),
                                         this_mpi_process);
 
     // Now all processes have computed error indicators for their own cells

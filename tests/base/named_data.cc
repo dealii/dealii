@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,7 @@ test_selector(const NamedData<DATA> &data)
   for (unsigned int i=0; i<select.size(); ++i)
     {
       deallog << "Selection " << i << ':';
-      if (select(i) != deal_II_numbers::invalid_unsigned_int)
+      if (select(i) != numbers::invalid_unsigned_int)
         deallog << data.name(select(i)) << ' ' << *data(select(i));
       deallog << std::endl;
     }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,51 +37,46 @@ namespace hp
  * @brief A small class collecting the different BlockIndices involved in
  * global, multilevel and local computations.
  *
- * Once a DoFHandler has been initialized with an FESystem, a data
- * object of type BlockInfo (accessed by DoFHandler::block_info() ) is
- * filled, which reflects the block structure of the degrees of
- * freedom.
+ * Once a DoFHandler has been initialized with an FESystem, a data object of
+ * type BlockInfo (accessed by DoFHandler::block_info() ) is filled, which
+ * reflects the block structure of the degrees of freedom.
  *
- * BlockInfo consists of several BlockIndices objects. The member
- * global() reflects the block structure of the system on the active
- * cell level, usually referred to as the global system. As soon as
+ * BlockInfo consists of several BlockIndices objects. The member global()
+ * reflects the block structure of the system on the active cell level,
+ * usually referred to as the global system. As soon as
  * DoFHandler::distribute_dofs() has been called, the function
- * BlockIndices::block_size() in global() will return the correct
- * sizes of each block. After DoFRenumbering::block_wise(),
- * BlockIndices::block_start() will return the start index for each of
- * the blocks.
+ * BlockIndices::block_size() in global() will return the correct sizes of
+ * each block. After DoFRenumbering::block_wise(), BlockIndices::block_start()
+ * will return the start index for each of the blocks.
  *
  * When a DoFHandler with levels is used, the same structure is automatically
- * generated for each level. The level blocks can be accessed through
- * level().
+ * generated for each level. The level blocks can be accessed through level().
  *
- * Finally, there are local() BlockIndices, which describe the block
- * structure on a single cell. This is used for instance by
- * MeshWorker::Assembler::MatrixLocalBlocksToGlobalBlocks. The local
- * indices are not filled automatically, since they change the
- * behavior of the MeshWorker::Assembler classes relying on
- * BlockInfo. They must be initialized by hand through initialize_local().
+ * Finally, there are local() BlockIndices, which describe the block structure
+ * on a single cell. This is used for instance by
+ * MeshWorker::Assembler::MatrixLocalBlocksToGlobalBlocks. The local indices
+ * are not filled automatically, since they change the behavior of the
+ * MeshWorker::Assembler classes relying on BlockInfo. They must be
+ * initialized by hand through initialize_local().
  *
  * <h3>Usage</h3>
  *
- * The most common usage for this object is initializing vectors as in
- * the following code:
+ * The most common usage for this object is initializing vectors as in the
+ * following code:
  *
- * <code>
- * MGDofHandler<dim> dof_handler(triangulation);
+ * <code> MGDofHandler<dim> dof_handler(triangulation);
  * dof_handler.distribute_dofs(fesystem);
  * DoFRenumbering::block_wise(dof_handler);
  *
  * BlockVector<double> solution(dof_handler.block_info().global());
  *
- * MGLevelObject<BlockVector<double> > mg_vector(0, triangulation.n_levels()-1);
- * for (unsigned int i=0;i<triangulation.n_levels();++i)
- *   mg_vector[i].reinit(dof_handler.block_info().level(i));
- *</code>
- * In this example, <tt>solution</tt> obtains the block structure needed to
- * represent a finite element function on the DoFHandler. Similarly,
- * all levels of <tt>mg_vector</tt> will have the block structure
- * needed on that level.
+ * MGLevelObject<BlockVector<double> > mg_vector(0,
+ * triangulation.n_levels()-1); for (unsigned int
+ * i=0;i<triangulation.n_levels();++i)
+ * mg_vector[i].reinit(dof_handler.block_info().level(i)); </code> In this
+ * example, <tt>solution</tt> obtains the block structure needed to represent
+ * a finite element function on the DoFHandler. Similarly, all levels of
+ * <tt>mg_vector</tt> will have the block structure needed on that level.
  *
  * @todo Extend the functions local() and renumber() to the concept to
  * hpDoFHandler.
@@ -93,73 +88,50 @@ class BlockInfo : public Subscriptor
 {
 public:
   /**
-   * @brief Fill the object with values
-   * describing block structure
-   * of the DoFHandler.
+   * @brief Fill the object with values describing block structure of the
+   * DoFHandler.
    *
-  * By default, this function will
-  * attempt to initialize whatever
-  * is possible. If active dofs
-  * have been assigned int the
-  * DoFHandler argument, they
-  * BlockIndices for those will be
-  * generated. The same for level
-  * dofs.
-  *
-  * This default behavior can be
-  * overridden by the two
-  * parameters, which can switch
-  * off active dofs or level dofs.
-  *
-   * This function will also clear
-   * the local() indices.
+   * By default, this function will attempt to initialize whatever is
+   * possible. If active dofs have been assigned int the DoFHandler argument,
+   * they BlockIndices for those will be generated. The same for level dofs.
+   *
+   * This default behavior can be overridden by the two parameters, which can
+   * switch off active dofs or level dofs.
+   *
+   * This function will also clear the local() indices.
    */
   template <int dim, int spacedim>
   void initialize(const DoFHandler<dim, spacedim> &, bool levels_only = false, bool active_only = false);
 
   /**
-   * @brief Initialize block structure
-   * on cells and compute
-   * renumbering between cell
-   * dofs and block cell dofs.
+   * @brief Initialize block structure on cells and compute renumbering
+   * between cell dofs and block cell dofs.
    */
   template <int dim, int spacedim>
   void initialize_local(const DoFHandler<dim, spacedim> &);
 
   /**
-   * Access the BlockIndices
-   * structure of the global
-   * system.
+   * Access the BlockIndices structure of the global system.
    */
   const BlockIndices &global() const;
 
   /**
-   * Access BlockIndices for the
-   * local system on a cell.
+   * Access BlockIndices for the local system on a cell.
    */
   const BlockIndices &local() const;
 
   /**
-   * Access the BlockIndices
-   * structure of a level in the
-   * multilevel hierarchy.
+   * Access the BlockIndices structure of a level in the multilevel hierarchy.
    */
   const BlockIndices &level(unsigned int level) const;
 
   /**
-   * Return the index after local
-   * renumbering.
+   * Return the index after local renumbering.
    *
-   * The input of this function is
-   * an index between zero and the
-   * number of dofs per cell,
-   * numbered in local block
-   * ordering, that is first all
-   * indices of the first system
-   * block, then all of the second
-   * block and so forth. The
-   * function then outputs the index
-   * in the standard local
+   * The input of this function is an index between zero and the number of
+   * dofs per cell, numbered in local block ordering, that is first all
+   * indices of the first system block, then all of the second block and so
+   * forth. The function then outputs the index in the standard local
    * numbering of DoFAccessor.
    */
   types::global_dof_index renumber (const unsigned int i) const;
@@ -170,29 +142,26 @@ public:
   unsigned int n_base_elements() const;
 
   /**
-   * Return the base element of
-   * this index.
+   * Return the base element of this index.
    */
   unsigned int base_element (const unsigned int i) const;
 
   /**
-   * Write a summary of the block
-   * structure to the stream.
+   * Write a summary of the block structure to the stream.
    */
   template <class OS>
   void
   print(OS &stream) const;
 
   /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object.
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
    */
   std::size_t memory_consumption () const;
 
   /**
-   * Read or write the data of this object to or
-   * from a stream for the purpose of serialization
+   * Read or write the data of this object to or from a stream for the purpose
+   * of serialization
    */
   template <class Archive>
   void serialize (Archive &ar,
@@ -200,8 +169,7 @@ public:
 
 private:
   /**
-   * @brief The block structure
-   * of the global system.
+   * @brief The block structure of the global system.
    */
   BlockIndices bi_global;
   /**
@@ -210,25 +178,18 @@ private:
   std::vector<BlockIndices> levels;
 
   /**
-   * @brief The block structure
-   * of the cell systems.
+   * @brief The block structure of the cell systems.
    */
   BlockIndices bi_local;
 
   /**
-   * The base element associated
-   * with each block.
+   * The base element associated with each block.
    */
   std::vector<unsigned int> base_elements;
 
   /**
-   * A vector containing the
-   * renumbering from the
-   * standard order of degrees of
-   * freedom on a cell to a
-   * component wise
-   * ordering. Filled by
-   * initialize().
+   * A vector containing the renumbering from the standard order of degrees of
+   * freedom on a cell to a component wise ordering. Filled by initialize().
    */
   std::vector<types::global_dof_index> local_renumbering;
 };

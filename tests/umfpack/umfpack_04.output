@@ -1,0 +1,31 @@
+
+DEAL::1d
+DEAL::Number of dofs = 97
+DEAL::Solver stopped within 112 - 114 iterations
+DEAL::Solver stopped within 112 - 114 iterations
+DEAL::Sparse Factorization
+DEAL::absolute norms = 6.45748 6.45748
+DEAL::relative norm distance = 0
+DEAL::Block Sparse Factorization
+DEAL::absolute norms = 6.45748 6.45748
+DEAL::relative norm distance = 0
+DEAL::2d
+DEAL::Number of dofs = 994
+DEAL::Solver stopped within 60 - 62 iterations
+DEAL::Solver stopped within 60 - 62 iterations
+DEAL::Sparse Factorization
+DEAL::absolute norms = 10.0596 10.0596
+DEAL::relative norm distance = 0
+DEAL::Block Sparse Factorization
+DEAL::absolute norms = 10.0596 10.0596
+DEAL::relative norm distance = 0
+DEAL::3d
+DEAL::Number of dofs = 669
+DEAL::Solver stopped within 24 - 26 iterations
+DEAL::Solver stopped within 24 - 26 iterations
+DEAL::Sparse Factorization
+DEAL::absolute norms = 13.7931 13.7931
+DEAL::relative norm distance = 0
+DEAL::Block Sparse Factorization
+DEAL::absolute norms = 13.7931 13.7931
+DEAL::relative norm distance = 0

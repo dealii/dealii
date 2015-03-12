@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,7 @@
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/fe_field_function.h>
+#include <deal.II/numerics/vector_tools.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -70,10 +71,10 @@ namespace Functions
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
-        const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
+        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
         AssertThrow (my_pair.first->is_locally_owned(),
-                     ExcPointNotAvailableHere());
+                     VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
         qp = my_pair.second;
@@ -121,10 +122,10 @@ namespace Functions
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
-        const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
+        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
         AssertThrow (my_pair.first->is_locally_owned(),
-                     ExcPointNotAvailableHere());
+                     VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
         qp = my_pair.second;
@@ -139,7 +140,7 @@ namespace Functions
     fe_v.reinit(cell);
     std::vector< std::vector<Tensor<1,dim> > > vgrads
     (1,  std::vector<Tensor<1,dim> >(n_components) );
-    fe_v.get_function_grads(data_vector, vgrads);
+    fe_v.get_function_gradients(data_vector, vgrads);
     gradients = vgrads[0];
   }
 
@@ -174,10 +175,10 @@ namespace Functions
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
-        const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
+        const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
           = GridTools::find_active_cell_around_point (mapping, *dh, p);
         AssertThrow (my_pair.first->is_locally_owned(),
-                     ExcPointNotAvailableHere());
+                     VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
         qp = my_pair.second;
@@ -309,7 +310,7 @@ namespace Functions
         const unsigned int nq = qpoints[i].size();
         std::vector< std::vector<Tensor<1,dim> > >
         vgrads (nq, std::vector<Tensor<1,dim> >(n_components));
-        fe_v.get_present_fe_values ().get_function_grads(data_vector, vgrads);
+        fe_v.get_present_fe_values ().get_function_gradients(data_vector, vgrads);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vgrads[q];
       }
@@ -441,11 +442,11 @@ namespace Functions
       qp = get_reference_coordinates (cell, points[0]);
       if (!qp)
         {
-          const std::pair<typename DH::active_cell_iterator, Point<dim> >
+          const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> >
           my_pair  = GridTools::find_active_cell_around_point
                      (mapping, *dh, points[0]);
           AssertThrow (my_pair.first->is_locally_owned(),
-                       ExcPointNotAvailableHere());
+                       VectorTools::ExcPointNotAvailableHere());
 
           cell = my_pair.first;
           qp = my_pair.second;
@@ -506,10 +507,10 @@ namespace Functions
         // the next cell
         if (left_over == true)
           {
-            const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
+            const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
               = GridTools::find_active_cell_around_point (mapping, *dh, points[first_outside]);
             AssertThrow (my_pair.first->is_locally_owned(),
-                         ExcPointNotAvailableHere());
+                         VectorTools::ExcPointNotAvailableHere());
 
             cells.push_back(my_pair.first);
             qpoints.push_back(std::vector<Point<dim> >(1, my_pair.second));

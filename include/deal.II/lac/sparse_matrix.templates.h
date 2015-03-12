@@ -580,7 +580,7 @@ SparseMatrix<number>::add (const size_type  row,
   for (size_type j=0; j<n_cols; ++j)
     {
       const number value = values[j];
-      Assert (numbers::is_finite(value), ExcNumberNotFinite());
+      AssertIsFinite(value);
 
 #ifdef DEBUG
       if (elide_zero_values==true && value == 0)
@@ -641,7 +641,7 @@ SparseMatrix<number>::set (const size_type  row,
       for (size_type j=0; j<n_cols; ++j)
         {
           const number value = values[j];
-          Assert (numbers::is_finite(value), ExcNumberNotFinite());
+          AssertIsFinite(value);
 
           if (value == 0)
             continue;
@@ -677,7 +677,7 @@ set_value:
       for (size_type j=0; j<n_cols; ++j)
         {
           const number value = values[j];
-          Assert (numbers::is_finite(value), ExcNumberNotFinite());
+          AssertIsFinite(value);
 
           if (index != next_row_index && my_cols[index] == col_indices[j])
             goto set_value_checked;
@@ -810,15 +810,12 @@ namespace internal
   namespace SparseMatrix
   {
     /**
-     * Perform a vmult using the SparseMatrix
-     * data structures, but only using a
-     * subinterval for the row indices.
+     * Perform a vmult using the SparseMatrix data structures, but only using
+     * a subinterval for the row indices.
      *
-     * In the sequential case, this function
-     * is called on all rows, in the parallel
-     * case it may be called on a subrange,
-     * at the discretion of the task
-     * scheduler.
+     * In the sequential case, this function is called on all rows, in the
+     * parallel case it may be called on a subrange, at the discretion of the
+     * task scheduler.
      */
     template <typename number,
               typename InVector>
@@ -873,15 +870,12 @@ namespace internal
   namespace SparseMatrix
   {
     /**
-     * Perform a vmult using the SparseMatrix
-     * data structures, but only using a
-     * subinterval for the row indices.
+     * Perform a vmult using the SparseMatrix data structures, but only using
+     * a subinterval for the row indices.
      *
-     * In the sequential case, this function
-     * is called on all rows, in the parallel
-     * case it may be called on a subrange,
-     * at the discretion of the task
-     * scheduler.
+     * In the sequential case, this function is called on all rows, in the
+     * parallel case it may be called on a subrange, at the discretion of the
+     * task scheduler.
      */
     template <typename number,
               typename InVector>
@@ -1256,15 +1250,12 @@ namespace internal
   namespace SparseMatrix
   {
     /**
-     * Perform a vmult using the SparseMatrix
-     * data structures, but only using a
-     * subinterval for the row indices.
+     * Perform a vmult using the SparseMatrix data structures, but only using
+     * a subinterval for the row indices.
      *
-     * In the sequential case, this function
-     * is called on all rows, in the parallel
-     * case it may be called on a subrange,
-     * at the discretion of the task
-     * scheduler.
+     * In the sequential case, this function is called on all rows, in the
+     * parallel case it may be called on a subrange, at the discretion of the
+     * task scheduler.
      */
     template <typename number,
               typename InVector,

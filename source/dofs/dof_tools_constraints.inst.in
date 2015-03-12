@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,43 +30,9 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
                                           const DH::face_iterator &,
                                           dealii::ConstraintMatrix &,
                                           const ComponentMask &,
-                                          bool, bool, bool);
-
-  template
-  void
-  DoFTools::make_periodicity_constraints(const DH &,
-                                         const types::boundary_id,
-                                         const types::boundary_id,
-                                         const int,
-                                         dealii::ConstraintMatrix &,
-                                         const ComponentMask &);
-
-  template
-  void
-  DoFTools::make_periodicity_constraints(const DH &,
-                                         const types::boundary_id,
-                                         const types::boundary_id,
-                                         const int,
-                                         dealii::Tensor<1,DH::space_dimension> &,
-                                         dealii::ConstraintMatrix &,
-                                         const ComponentMask &);
-
-  template
-  void
-  DoFTools::make_periodicity_constraints(const DH &,
-                                         const types::boundary_id,
-                                         const int,
-                                         dealii::ConstraintMatrix &,
-                                         const ComponentMask &);
-
-  template
-  void
-  DoFTools::make_periodicity_constraints(const DH &,
-                                         const types::boundary_id,
-                                         const int,
-                                         dealii::Tensor<1,DH::space_dimension> &,
-                                         dealii::ConstraintMatrix &,
-                                         const ComponentMask &);
+                                          bool, bool, bool,
+                                          const FullMatrix<double> &,
+                                          const std::vector<unsigned int> &);
 
   template
   void
@@ -74,20 +40,29 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
   (const std::vector<GridTools::PeriodicFacePair<DH::cell_iterator> > &,
    dealii::ConstraintMatrix &,
    const ComponentMask &);
-  
+
+
+  template
+  void
+  DoFTools::make_periodicity_constraints(const DH &,
+                                         const types::boundary_id,
+                                         const types::boundary_id,
+                                         const int,
+                                         dealii::ConstraintMatrix &,
+                                         const ComponentMask &);
+
+  template
+  void
+  DoFTools::make_periodicity_constraints(const DH &,
+                                         const types::boundary_id,
+                                         const int,
+                                         dealii::ConstraintMatrix &,
+                                         const ComponentMask &);
 #endif
 }
 
 for (deal_II_dimension : DIMENSIONS)
 {
-#if deal_II_dimension != 1
-  template
-  void
-  DoFTools::make_hanging_node_constraints (const MGDoFHandler<deal_II_dimension> &dof_handler,
-                                           ConstraintMatrix &constraints);
-
-#endif
-
 #if deal_II_dimension < 3
 
 template

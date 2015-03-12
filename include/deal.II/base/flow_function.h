@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,16 +30,15 @@ namespace Functions
    * Base class for analytic solutions to incompressible flow problems.
    *
    * Additional to the Function interface, this function provides for an
-   * offset of the pressure: if the pressure of the computed solution
-   * has an integral mean value different from zero, this value can be
-   * given to pressure_adjustment() in order to compute correct pressure
-   * errors.
+   * offset of the pressure: if the pressure of the computed solution has an
+   * integral mean value different from zero, this value can be given to
+   * pressure_adjustment() in order to compute correct pressure errors.
    *
-   * @note Derived classes should implement pressures with integral mean
-   * value zero always.
+   * @note Derived classes should implement pressures with integral mean value
+   * zero always.
    *
-   * @note Thread safety: Some of the functions make use of internal data to compute
-   * values. Therefore, every thread should obtain its own object of
+   * @note Thread safety: Some of the functions make use of internal data to
+   * compute values. Therefore, every thread should obtain its own object of
    * derived classes.
    *
    * @ingroup functions
@@ -50,8 +49,7 @@ namespace Functions
   {
   public:
     /**
-     * Constructor, setting up some
-     * internal data structures.
+     * Constructor, setting up some internal data structures.
      */
     FlowFunction();
 
@@ -61,46 +59,32 @@ namespace Functions
     virtual ~FlowFunction();
 
     /**
-     * Store an adjustment for the
-     * pressure function, such that
-     * its mean value is
-     * <tt>p</tt>.
+     * Store an adjustment for the pressure function, such that its mean value
+     * is <tt>p</tt>.
      */
     void pressure_adjustment(double p);
 
     /**
-     * Values in a structure more
-     * suitable for vector valued
-     * functions. The outer vector
-     * is indexed by solution
-     * component, the inner by
-     * quadrature point.
+     * Values in a structure more suitable for vector valued functions. The
+     * outer vector is indexed by solution component, the inner by quadrature
+     * point.
      */
     virtual void vector_values (const std::vector<Point<dim> > &points,
                                 std::vector<std::vector<double> > &values) const = 0;
     /**
-     * Gradients in a structure more
-     * suitable for vector valued
-     * functions. The outer vector
-     * is indexed by solution
-     * component, the inner by
-     * quadrature point.
+     * Gradients in a structure more suitable for vector valued functions. The
+     * outer vector is indexed by solution component, the inner by quadrature
+     * point.
      */
     virtual void vector_gradients (const std::vector<Point<dim> >            &points,
                                    std::vector<std::vector<Tensor<1,dim> > > &gradients) const = 0;
     /**
-     * Force terms in a structure more
-     * suitable for vector valued
-     * functions. The outer vector
-     * is indexed by solution
-     * component, the inner by
+     * Force terms in a structure more suitable for vector valued functions.
+     * The outer vector is indexed by solution component, the inner by
      * quadrature point.
      *
-     * @warning This is not the
-     * true Laplacian, but the
-     * force term to be used as
-     * right hand side in Stokes'
-     * equations
+     * @warning This is not the true Laplacian, but the force term to be used
+     * as right hand side in Stokes' equations
      */
     virtual void vector_laplacians (const std::vector<Point<dim> > &points,
                                     std::vector<std::vector<double> >   &values) const = 0;
@@ -112,8 +96,7 @@ namespace Functions
     virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
                                        std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
     /**
-     * The force term in the
-     * momentum equation.
+     * The force term in the momentum equation.
      */
     virtual void vector_laplacian_list (const std::vector<Point<dim> > &points,
                                         std::vector<Vector<double> >   &values) const;
@@ -122,38 +105,32 @@ namespace Functions
 
   protected:
     /**
-     * Mean value of the pressure
-     * to be added by derived
-     * classes.
+     * Mean value of the pressure to be added by derived classes.
      */
     double mean_pressure;
 
   private:
 
     /**
-     * A mutex that guards the
-     * following scratch arrays.
+     * A mutex that guards the following scratch arrays.
      */
     mutable Threads::Mutex mutex;
 
     /**
-     * Auxiliary values for the usual
-     * Function interface.
+     * Auxiliary values for the usual Function interface.
      */
     mutable std::vector<std::vector<double> > aux_values;
 
     /**
-     * Auxiliary values for the usual
-     * Function interface.
+     * Auxiliary values for the usual Function interface.
      */
     mutable std::vector<std::vector<Tensor<1,dim> > > aux_gradients;
   };
 
   /**
-   * Laminar pipe flow in two and three dimensions. The channel
-   * stretches along the <i>x</i>-axis and has radius @p radius. The
-   * @p Reynolds number is used to scale the pressure properly for a
-   * Navier-Stokes problem.
+   * Laminar pipe flow in two and three dimensions. The channel stretches
+   * along the <i>x</i>-axis and has radius @p radius. The @p Reynolds number
+   * is used to scale the pressure properly for a Navier-Stokes problem.
    *
    * @ingroup functions
    * @author Guido Kanschat, 2007
@@ -163,10 +140,8 @@ namespace Functions
   {
   public:
     /**
-     * Construct an object for the
-     * given channel radius
-     * <tt>r</tt> and the Reynolds
-     * number <tt>Re</tt>.
+     * Construct an object for the given channel radius <tt>r</tt> and the
+     * Reynolds number <tt>Re</tt>.
      */
     PoisseuilleFlow<dim> (const double r,
                           const double Re);
@@ -186,8 +161,8 @@ namespace Functions
 
 
   /**
-   * Artificial divergence free function with homogeneous boundary
-   * conditions on the cube [-1,1]<sup>dim</sup>.
+   * Artificial divergence free function with homogeneous boundary conditions
+   * on the cube [-1,1]<sup>dim</sup>.
    *
    * The function in 2D is
    * @f[
@@ -204,15 +179,12 @@ namespace Functions
   {
   public:
     /**
-     * Constructor setting the
-     * Reynolds number required for
-     * pressure computation and
-     * scaling of the right hand side.
+     * Constructor setting the Reynolds number required for pressure
+     * computation and scaling of the right hand side.
      */
     StokesCosine (const double viscosity = 1., const double reaction = 0.);
     /**
-     * Change the viscosity and the
-     * reaction parameter.
+     * Change the viscosity and the reaction parameter.
      */
     void set_parameters (const double viscosity, const double reaction);
     virtual ~StokesCosine();
@@ -278,8 +250,7 @@ namespace Functions
   /**
    * Flow solution in 2D by Kovasznay (1947).
    *
-   * This function is valid on the half plane right of the line
-   * <i>x=1/2</i>.
+   * This function is valid on the half plane right of the line <i>x=1/2</i>.
    *
    * @ingroup functions
    * @author Guido Kanschat, 2007
@@ -288,18 +259,11 @@ namespace Functions
   {
   public:
     /**
-     * Construct an object for the
-     * give Reynolds number
-     * <tt>Re</tt>. If the
-     * parameter <tt>Stokes</tt> is
-     * true, the right hand side of
-     * the momentum equation
-     * returned by
-     * vector_laplacians() contains
-     * the nonlinearity, such that
-     * the Kovasznay solution can
-     * be obtained as the solution
-     * to a Stokes problem.
+     * Construct an object for the give Reynolds number <tt>Re</tt>. If the
+     * parameter <tt>Stokes</tt> is true, the right hand side of the momentum
+     * equation returned by vector_laplacians() contains the nonlinearity,
+     * such that the Kovasznay solution can be obtained as the solution to a
+     * Stokes problem.
      */
     Kovasznay (const double Re, bool Stokes = false);
     virtual ~Kovasznay();

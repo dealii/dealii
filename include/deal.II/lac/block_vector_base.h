@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,9 +49,9 @@ template <typename> class BlockVectorBase;
  * @code
  *   IsBlockVector<BlockVector<double> >::value
  * @endcode
- * is true. This is sometimes useful in template contexts where we may
- * want to do things differently depending on whether a template type
- * denotes a regular or a block vector type.
+ * is true. This is sometimes useful in template contexts where we may want to
+ * do things differently depending on whether a template type denotes a
+ * regular or a block vector type.
  *
  * @author Wolfgang Bangerth, 2010
  */
@@ -69,26 +69,22 @@ private:
   };
 
   /**
-   * Overload returning true if the class
-   * is derived from BlockVectorBase,
+   * Overload returning true if the class is derived from BlockVectorBase,
    * which is what block vectors do.
    */
   template <typename T>
   static yes_type check_for_block_vector (const BlockVectorBase<T> *);
 
   /**
-   * Catch all for all other potential
-   * vector types that are not block
+   * Catch all for all other potential vector types that are not block
    * matrices.
    */
   static no_type check_for_block_vector (...);
 
 public:
   /**
-   * A statically computable value that
-   * indicates whether the template
-   * argument to this class is a block
-   * vector (in fact whether the type is
+   * A statically computable value that indicates whether the template
+   * argument to this class is a block vector (in fact whether the type is
    * derived from BlockVectorBase<T>).
    */
   static const bool value = (sizeof(check_for_block_vector
@@ -116,11 +112,8 @@ namespace internal
   namespace BlockVectorIterators
   {
     /**
-     * Declaration of the general
-     * template of a structure which is
-     * used to determine some types
-     * based on the template arguments
-     * of other classes.
+     * Declaration of the general template of a structure which is used to
+     * determine some types based on the template arguments of other classes.
      */
     template <class BlockVectorType, bool constness>
     struct Types
@@ -130,47 +123,34 @@ namespace internal
 
 
     /**
-     * Declaration of a specialized
-     * template of a structure which is
-     * used to determine some types
-     * based on the template arguments
-     * of other classes.
+     * Declaration of a specialized template of a structure which is used to
+     * determine some types based on the template arguments of other classes.
      *
-     * This is for the use of non-const
-     * iterators.
+     * This is for the use of non-const iterators.
      */
     template <class BlockVectorType>
     struct Types<BlockVectorType,false>
     {
       /**
-       * Type of the vector
-       * underlying the block vector
-       * used in non-const
-       * iterators. There, the
-       * vector must not be constant.
+       * Type of the vector underlying the block vector used in non-const
+       * iterators. There, the vector must not be constant.
        */
       typedef typename BlockVectorType::BlockType Vector;
 
       /**
-       * Type of the block vector
-       * used in non-const
-       * iterators. There, the block
-       * vector must not be constant.
+       * Type of the block vector used in non-const iterators. There, the
+       * block vector must not be constant.
        */
       typedef BlockVectorType BlockVector;
 
       /**
-       * Type of the numbers we point
-       * to. Here, they are not
-       * constant.
+       * Type of the numbers we point to. Here, they are not constant.
        */
       typedef typename BlockVector::value_type value_type;
 
       /**
-       * Typedef the result of a
-       * dereferencing operation for an
-       * iterator of the underlying
-       * iterator.
+       * Typedef the result of a dereferencing operation for an iterator of
+       * the underlying iterator.
        */
       typedef typename Vector::reference dereference_type;
     };
@@ -178,113 +158,67 @@ namespace internal
 
 
     /**
-     * Declaration of a specialized
-     * template of a structure which is
-     * used to determine some types
-     * based on the template arguments
-     * of other classes.
+     * Declaration of a specialized template of a structure which is used to
+     * determine some types based on the template arguments of other classes.
      *
-     * This is for the use of
-     * const_iterator.
+     * This is for the use of const_iterator.
      */
     template <class BlockVectorType>
     struct Types<BlockVectorType,true>
     {
       /**
-       * Type of the vector
-       * underlying the block vector
-       * used in
-       * const_iterator. There,
-       * the vector must be
-       * constant.
+       * Type of the vector underlying the block vector used in
+       * const_iterator. There, the vector must be constant.
        */
       typedef const typename BlockVectorType::BlockType Vector;
 
       /**
-       * Type of the block vector
-       * used in
-       * const_iterator. There,
-       * the block vector must be
-       * constant.
+       * Type of the block vector used in const_iterator. There, the block
+       * vector must be constant.
        */
       typedef const BlockVectorType BlockVector;
 
       /**
-       * Type of the numbers we point
-       * to. Here, they are constant
-       * since the block vector we
-       * use is constant.
+       * Type of the numbers we point to. Here, they are constant since the
+       * block vector we use is constant.
        */
       typedef const typename BlockVector::value_type value_type;
 
       /**
-       * Typedef the result of a
-       * dereferencing operation for an
-       * iterator of the underlying
-       * iterator. Since this is for
-       * constant iterators, we can only
-       * return values, no actual
-       * references.
+       * Typedef the result of a dereferencing operation for an iterator of
+       * the underlying iterator. Since this is for constant iterators, we can
+       * only return values, no actual references.
        */
       typedef value_type dereference_type;
     };
 
 
     /**
-     * General random-access iterator
-     * class for block vectors. Since
-     * we do not want to have two
-     * classes for non-const
-     * iterator and
-     * const_iterator, we take a
-     * second template argument which
-     * denotes whether the vector we
-     * point into is a constant object
-     * or not. The first template
-     * argument is always the number
-     * type of the block vector in use.
+     * General random-access iterator class for block vectors. Since we do not
+     * want to have two classes for non-const iterator and const_iterator, we
+     * take a second template argument which denotes whether the vector we
+     * point into is a constant object or not. The first template argument is
+     * always the number type of the block vector in use.
      *
-     * This class satisfies all
-     * requirements of random access
-     * iterators defined in the C++
-     * standard. Operations on these
-     * iterators are constant in the
-     * number of elements in the block
-     * vector. However, they are
-     * sometimes linear in the number
-     * of blocks in the vector, but
-     * since that does rarely change
-     * dynamically within an
-     * application, this is a constant
-     * and we again have that the
-     * iterator satisfies the
-     * requirements of a random access
-     * iterator.
+     * This class satisfies all requirements of random access iterators
+     * defined in the C++ standard. Operations on these iterators are constant
+     * in the number of elements in the block vector. However, they are
+     * sometimes linear in the number of blocks in the vector, but since that
+     * does rarely change dynamically within an application, this is a
+     * constant and we again have that the iterator satisfies the requirements
+     * of a random access iterator.
      *
-     * The implementation of this class
-     * has to work around some problems
-     * in compilers and standard
-     * libraries. One of these requires
-     * us to write all comparison
-     * operators twice, once comparison
-     * with iterators of the same type
-     * and once with iterators pointing
-     * to numbers of opposite constness
-     * specification. The reason is
-     * that if we would have written
-     * the comparison operators as a
-     * template on the constness of the
-     * right hand side, then gcc2.95
-     * signals an error that these
-     * operators ambiguate operators
-     * declared somewhere within the
-     * standard library. Likewise, we
-     * have to work around some
-     * problems with granting other
-     * iterators friendship. This makes
-     * the implementation somewhat
-     * non-optimal at places, but at
-     * least everything works.
+     * The implementation of this class has to work around some problems in
+     * compilers and standard libraries. One of these requires us to write all
+     * comparison operators twice, once comparison with iterators of the same
+     * type and once with iterators pointing to numbers of opposite constness
+     * specification. The reason is that if we would have written the
+     * comparison operators as a template on the constness of the right hand
+     * side, then gcc2.95 signals an error that these operators ambiguate
+     * operators declared somewhere within the standard library. Likewise, we
+     * have to work around some problems with granting other iterators
+     * friendship. This makes the implementation somewhat non-optimal at
+     * places, but at least everything works.
      *
      * @author Wolfgang Bangerth, 2001
      */
@@ -295,10 +229,8 @@ namespace internal
     {
     private:
       /**
-       * Typedef an iterator with
-       * opposite constness
-       * requirements on the elements
-       * it points to.
+       * Typedef an iterator with opposite constness requirements on the
+       * elements it points to.
        */
       typedef Iterator<BlockVectorType,!constness> InverseConstnessIterator;
 
@@ -309,12 +241,8 @@ namespace internal
       typedef types::global_dof_index size_type;
 
       /**
-       * Type of the number this
-       * iterator points
-       * to. Depending on the value
-       * of the second template
-       * parameter, this is either a
-       * constant or non-const
+       * Type of the number this iterator points to. Depending on the value of
+       * the second template parameter, this is either a constant or non-const
        * number.
        */
       typedef
@@ -322,12 +250,9 @@ namespace internal
       value_type;
 
       /**
-       * Declare some typedefs which
-       * are standard for iterators
-       * and are used by algorithms
-       * to enquire about the
-       * specifics of the iterators
-       * they work on.
+       * Declare some typedefs which are standard for iterators and are used
+       * by algorithms to enquire about the specifics of the iterators they
+       * work on.
        */
       typedef std::random_access_iterator_tag               iterator_type;
       typedef std::ptrdiff_t                                difference_type;
@@ -339,29 +264,20 @@ namespace internal
       dereference_type;
 
       /**
-       * Typedef the type of the
-       * block vector (which differs
-       * in constness, depending on
-       * the second template
-       * parameter).
+       * Typedef the type of the block vector (which differs in constness,
+       * depending on the second template parameter).
        */
       typedef
       typename Types<BlockVectorType,constness>::BlockVector
       BlockVector;
 
       /**
-       * Construct an iterator from
-       * a vector to which we point
-       * and the global index of
-       * the element pointed to.
+       * Construct an iterator from a vector to which we point and the global
+       * index of the element pointed to.
        *
-       * Depending on the value of
-       * the <tt>constness</tt> template
-       * argument of this class,
-       * the first argument of this
-       * constructor is either is a
-       * const or non-const
-       * reference.
+       * Depending on the value of the <tt>constness</tt> template argument of
+       * this class, the first argument of this constructor is either is a
+       * const or non-const reference.
        */
       Iterator (BlockVector     &parent,
                 const size_type  global_index);
@@ -372,24 +288,16 @@ namespace internal
       Iterator (const Iterator<BlockVectorType,constness> &c);
 
       /**
-       * Copy constructor for
-       * conversion between iterators
-       * with different constness
-       * requirements. This
-       * constructor throws an error
-       * if an attempt is made at
-       * converting a constant to a
-       * non-constant iterator.
+       * Copy constructor for conversion between iterators with different
+       * constness requirements. This constructor throws an error if an
+       * attempt is made at converting a constant to a non-constant iterator.
        */
       Iterator (const InverseConstnessIterator &c);
 
     private:
       /**
-       * Constructor used internally
-       * in this class. The arguments
-       * match exactly the values of
-       * the respective member
-       * variables.
+       * Constructor used internally in this class. The arguments match
+       * exactly the values of the respective member variables.
        */
       Iterator (BlockVector     &parent,
                 const size_type  global_index,
@@ -406,195 +314,146 @@ namespace internal
       Iterator &operator = (const Iterator &c);
 
       /**
-       * Dereferencing operator. If the
-       * template argument
-       * <tt>constness</tt> is
-       * <tt>true</tt>, then no writing to
-       * the result is possible, making
+       * Dereferencing operator. If the template argument <tt>constness</tt>
+       * is <tt>true</tt>, then no writing to the result is possible, making
        * this a const_iterator.
        */
       dereference_type operator * () const;
 
       /**
-       * Random access operator,
-       * grant access to arbitrary
-       * elements relative to the one
-       * presently pointed to.
+       * Random access operator, grant access to arbitrary elements relative
+       * to the one presently pointed to.
        */
       dereference_type operator [] (const difference_type d) const;
 
       /**
-       * Prefix increment operator. This
-       * operator advances the iterator to
-       * the next element and returns a
-       * reference to <tt>*this</tt>.
+       * Prefix increment operator. This operator advances the iterator to the
+       * next element and returns a reference to <tt>*this</tt>.
        */
       Iterator &operator ++ ();
 
       /**
-       * Postfix increment
-       * operator. This operator
-       * advances the iterator to
-       * the next element and
-       * returns a copy of the old
-       * value of this iterator.
+       * Postfix increment operator. This operator advances the iterator to
+       * the next element and returns a copy of the old value of this
+       * iterator.
        */
       Iterator operator ++ (int);
 
       /**
-       * Prefix decrement operator. This
-       * operator retracts the iterator to
-       * the previous element and returns a
-       * reference to <tt>*this</tt>.
+       * Prefix decrement operator. This operator retracts the iterator to the
+       * previous element and returns a reference to <tt>*this</tt>.
        */
       Iterator &operator -- ();
 
       /**
-       * Postfix decrement
-       * operator. This operator
-       * retracts the iterator to
-       * the previous element and
-       * returns a copy of the old
-       * value of this iterator.
+       * Postfix decrement operator. This operator retracts the iterator to
+       * the previous element and returns a copy of the old value of this
+       * iterator.
        */
       Iterator operator -- (int);
 
       /**
-       * Compare for equality of
-       * iterators. This operator
-       * checks whether the vectors
-       * pointed to are the same,
-       * and if not it throws an
-       * exception.
+       * Compare for equality of iterators. This operator checks whether the
+       * vectors pointed to are the same, and if not it throws an exception.
        */
       bool operator == (const Iterator &i) const;
 
       /**
-       * Same, but compare with an
-       * iterator of different
-       * constness.
+       * Same, but compare with an iterator of different constness.
        */
       bool operator == (const InverseConstnessIterator &i) const;
 
       /**
-       * Compare for inequality of
-       * iterators. This operator
-       * checks whether the vectors
-       * pointed to are the same,
-       * and if not it throws an
-       * exception.
+       * Compare for inequality of iterators. This operator checks whether the
+       * vectors pointed to are the same, and if not it throws an exception.
        */
       bool operator != (const Iterator &i) const;
 
       /**
-       * Same, but compare with an
-       * iterator of different
-       * constness.
+       * Same, but compare with an iterator of different constness.
        */
       bool operator != (const InverseConstnessIterator &i) const;
 
       /**
-       * Check whether this
-       * iterators points to an
-       * element previous to the
-       * one pointed to by the
-       * given argument. This
-       * operator checks whether
-       * the vectors pointed to are
-       * the same, and if not it
-       * throws an exception.
+       * Check whether this iterators points to an element previous to the one
+       * pointed to by the given argument. This operator checks whether the
+       * vectors pointed to are the same, and if not it throws an exception.
        */
       bool operator < (const Iterator &i) const;
 
       /**
-       * Same, but compare with an
-       * iterator of different
-       * constness.
+       * Same, but compare with an iterator of different constness.
        */
       bool operator < (const InverseConstnessIterator &i) const;
 
       /**
-       * Comparison operator alike
-       * to the one above.
+       * Comparison operator alike to the one above.
        */
       bool operator <= (const Iterator &i) const;
 
       /**
-       * Same, but compare with an
-       * iterator of different
-       * constness.
+       * Same, but compare with an iterator of different constness.
        */
       bool operator <= (const InverseConstnessIterator &i) const;
 
       /**
-       * Comparison operator alike
-       * to the one above.
+       * Comparison operator alike to the one above.
        */
       bool operator > (const Iterator &i) const;
 
       /**
-       * Same, but compare with an
-       * iterator of different
-       * constness.
+       * Same, but compare with an iterator of different constness.
        */
       bool operator > (const InverseConstnessIterator &i) const;
 
       /**
-       * Comparison operator alike
-       * to the one above.
+       * Comparison operator alike to the one above.
        */
       bool operator >= (const Iterator &i) const;
 
       /**
-       * Same, but compare with an
-       * iterator of different
-       * constness.
+       * Same, but compare with an iterator of different constness.
        */
       bool operator >= (const InverseConstnessIterator &i) const;
 
       /**
-       * Return the distance between
-       * the two iterators, in
-       * elements.
+       * Return the distance between the two iterators, in elements.
        */
       difference_type operator - (const Iterator &i) const;
 
       /**
-       * Same, but for iterators of
-       * opposite constness.
+       * Same, but for iterators of opposite constness.
        */
       difference_type operator - (const InverseConstnessIterator &i) const;
 
       /**
-       * Return an iterator which is
-       * the given number of elements
-       * in front of the present one.
+       * Return an iterator which is the given number of elements in front of
+       * the present one.
        */
       Iterator operator + (const difference_type &d) const;
 
       /**
-       * Return an iterator which is
-       * the given number of elements
-       * behind the present one.
+       * Return an iterator which is the given number of elements behind the
+       * present one.
        */
       Iterator operator - (const difference_type &d) const;
 
       /**
-       * Move the iterator <tt>d</tt>
-       * elements forward at once,
-       * and return the result.
+       * Move the iterator <tt>d</tt> elements forward at once, and return the
+       * result.
        */
       Iterator &operator += (const difference_type &d);
 
       /**
-       * Move the iterator <tt>d</tt>
-       * elements backward at once,
-       * and return the result.
+       * Move the iterator <tt>d</tt> elements backward at once, and return
+       * the result.
        */
       Iterator &operator -= (const difference_type &d);
 
-      /** @addtogroup Exceptions
-       * @{ */
+      /**
+       * @addtogroup Exceptions
+       * @{
+       */
 
       /**
        * Exception.
@@ -607,44 +466,29 @@ namespace internal
       //@}
     private:
       /**
-       * Pointer to the block
-       * vector object to which
-       * this iterator
-       * points. Depending on the
-       * value of the <tt>constness</tt>
-       * template argument of this
-       * class, this is a <tt>const</tt>
-       * or non-<tt>const</tt> pointer.
+       * Pointer to the block vector object to which this iterator points.
+       * Depending on the value of the <tt>constness</tt> template argument of
+       * this class, this is a <tt>const</tt> or non-<tt>const</tt> pointer.
        */
       BlockVector *parent;
 
       /**
-       * Global index of the
-       * element to which we
-       * presently point.
+       * Global index of the element to which we presently point.
        */
       size_type     global_index;
 
       /**
-       * Current block and index
-       * within this block of the
-       * element presently pointed
-       * to.
+       * Current block and index within this block of the element presently
+       * pointed to.
        */
       unsigned int current_block;
       size_type index_within_block;
 
       /**
-       * Indices of the global
-       * element address at which
-       * we have to move on to
-       * another block when moving
-       * forward and
-       * backward. These indices
-       * are kept as a cache since
-       * this is much more
-       * efficient than always
-       * asking the parent object.
+       * Indices of the global element address at which we have to move on to
+       * another block when moving forward and backward. These indices are
+       * kept as a cache since this is much more efficient than always asking
+       * the parent object.
        */
       size_type next_break_forward;
       size_type next_break_backward;
@@ -661,13 +505,9 @@ namespace internal
 
 
       /**
-       * Mark all other instances of
-       * this template as friends. In
-       * fact, we only need the
-       * inverse constness iterator
-       * as friend, but this is
-       * something that ISO C++ does
-       * not allow to specify.
+       * Mark all other instances of this template as friends. In fact, we
+       * only need the inverse constness iterator as friend, but this is
+       * something that ISO C++ does not allow to specify.
        */
       template <typename N, bool C>
       friend class Iterator;
@@ -677,19 +517,18 @@ namespace internal
 
 
 /**
- * A vector composed of several blocks each representing a vector of
- * its own.
+ * A vector composed of several blocks each representing a vector of its own.
  *
  * The BlockVector is a collection of Vectors (e.g. of either deal.II Vector
  * objects or PETScWrappers::Vector object). Each of the vectors inside can
  * have a different size.
  *
  * The functionality of BlockVector includes everything a Vector can do, plus
- * the access to a single Vector inside the BlockVector by
- * <tt>block(i)</tt>. It also has a complete random access iterator, just as
- * the other Vector classes or the standard C++ library template
- * <tt>std::vector</tt>. Therefore, all algorithms working on iterators also
- * work with objects of this class.
+ * the access to a single Vector inside the BlockVector by <tt>block(i)</tt>.
+ * It also has a complete random access iterator, just as the other Vector
+ * classes or the standard C++ library template <tt>std::vector</tt>.
+ * Therefore, all algorithms working on iterators also work with objects of
+ * this class.
  *
  * While this base class implements most of the functionality by dispatching
  * calls to its member functions to the respective functions on each of the
@@ -702,18 +541,17 @@ namespace internal
  *
  * <h3>Accessing individual blocks, and resizing vectors</h3>
  *
- * Apart from using this object as a whole, you can use each block
- * separately as a vector, using the block() function.  There
- * is a single caveat: if you have changed the size of one or several
- * blocks, you must call the function collect_sizes() of the block
- * vector to update its internal structures.
+ * Apart from using this object as a whole, you can use each block separately
+ * as a vector, using the block() function.  There is a single caveat: if you
+ * have changed the size of one or several blocks, you must call the function
+ * collect_sizes() of the block vector to update its internal structures.
  *
- * @attention Warning: If you change the sizes of single blocks
- * without calling collect_sizes(), results may be unpredictable. The
- * debug version does not check consistency here for performance
- * reasons!
+ * @attention Warning: If you change the sizes of single blocks without
+ * calling collect_sizes(), results may be unpredictable. The debug version
+ * does not check consistency here for performance reasons!
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <class VectorType>
@@ -721,8 +559,7 @@ class BlockVectorBase : public Subscriptor
 {
 public:
   /**
-   * Typedef the type of the underlying
-   * vector.
+   * Typedef the type of the underlying vector.
    */
   typedef VectorType BlockType;
 
@@ -746,36 +583,24 @@ public:
   typedef types::global_dof_index             size_type;
 
   /**
-   * Declare a type that has holds
-   * real-valued numbers with the
-   * same precision as the template
-   * argument to this class. If the
-   * template argument of this
-   * class is a real data type,
-   * then real_type equals the
-   * template argument. If the
-   * template argument is a
-   * std::complex type then
-   * real_type equals the type
-   * underlying the complex
-   * numbers.
+   * Declare a type that has holds real-valued numbers with the same precision
+   * as the template argument to this class. If the template argument of this
+   * class is a real data type, then real_type equals the template argument.
+   * If the template argument is a std::complex type then real_type equals the
+   * type underlying the complex numbers.
    *
-   * This typedef is used to
-   * represent the return type of
-   * norms.
+   * This typedef is used to represent the return type of norms.
    */
   typedef typename BlockType::real_type real_type;
 
   /**
-   * A variable that indicates whether this vector
-   * supports distributed data storage. If true, then
-   * this vector also needs an appropriate compress()
-   * function that allows communicating recent set or
-   * add operations to individual elements to be communicated
-   * to other processors.
+   * A variable that indicates whether this vector supports distributed data
+   * storage. If true, then this vector also needs an appropriate compress()
+   * function that allows communicating recent set or add operations to
+   * individual elements to be communicated to other processors.
    *
-   * For the current class, the variable equals the
-   * value declared for the type of the individual blocks.
+   * For the current class, the variable equals the value declared for the
+   * type of the individual blocks.
    */
   static const bool supports_distributed_data = BlockType::supports_distributed_data;
 
@@ -785,37 +610,24 @@ public:
   BlockVectorBase ();
 
   /**
-   * Update internal structures
-   * after resizing
-   * vectors. Whenever you reinited
-   * a block of a block vector, the
-   * internal data structures are
-   * corrupted. Therefore, you
-   * should call this function
-   * after al blocks got their new
+   * Update internal structures after resizing vectors. Whenever you reinited
+   * a block of a block vector, the internal data structures are corrupted.
+   * Therefore, you should call this function after al blocks got their new
    * size.
    */
   void collect_sizes ();
 
   /**
-   * Call the compress() function on all
-   * the subblocks of the matrix.
-  *
-  * This functionality only needs to be
-  * called if using MPI based vectors and
-  * exists in other objects for
-  * compatibility.
-  *
-  * See @ref GlossCompress "Compressing
-  * distributed objects" for more
-  * information.
+   * Call the compress() function on all the subblocks of the matrix.
+   *
+   * This functionality only needs to be called if using MPI based vectors and
+   * exists in other objects for compatibility.
+   *
+   * See
+   * @ref GlossCompress "Compressing distributed objects"
+   * for more information.
    */
   void compress (::dealii::VectorOperation::values operation);
-
-  /**
-   * @deprecated: use compress(VectorOperation::values) instead.
-   */
-  void compress () DEAL_II_DEPRECATED;
 
   /**
    * Access to a single block.
@@ -830,14 +642,9 @@ public:
   block (const unsigned int i) const;
 
   /**
-   * Return a reference on the
-   * object that describes the
-   * mapping between block and
-   * global indices. The use of
-   * this function is highly
-   * deprecated and it should
-   * vanish in one of the next
-   * versions
+   * Return a reference on the object that describes the mapping between block
+   * and global indices. The use of this function is highly deprecated and it
+   * should vanish in one of the next versions
    */
   const BlockIndices &
   get_block_indices () const;
@@ -848,55 +655,48 @@ public:
   unsigned int n_blocks () const;
 
   /**
-   * Return dimension of the vector. This
-   * is the sum of the dimensions of all
+   * Return dimension of the vector. This is the sum of the dimensions of all
    * components.
    */
   std::size_t size () const;
 
   /**
-   * Return an index set that describes which elements of this vector
-   * are owned by the current processor. Note that this index set does
-   * not include elements this vector may store locally as ghost
-   * elements but that are in fact owned by another processor.
-   * As a consequence, the index sets returned on different
-   * processors if this is a distributed vector will form disjoint
-   * sets that add up to the complete index set.
-   * Obviously, if a vector is created on only one processor, then
-   * the result would satisfy
+   * Return an index set that describes which elements of this vector are
+   * owned by the current processor. Note that this index set does not include
+   * elements this vector may store locally as ghost elements but that are in
+   * fact owned by another processor. As a consequence, the index sets
+   * returned on different processors if this is a distributed vector will
+   * form disjoint sets that add up to the complete index set. Obviously, if a
+   * vector is created on only one processor, then the result would satisfy
    * @code
    *   vec.locally_owned_elements() == complete_index_set (vec.size())
    * @endcode
    *
-   * For block vectors, this function returns the union of the
-   * locally owned elements of the individual blocks, shifted by
-   * their respective index offsets.
+   * For block vectors, this function returns the union of the locally owned
+   * elements of the individual blocks, shifted by their respective index
+   * offsets.
    */
   IndexSet locally_owned_elements () const;
 
   /**
-   * Return an iterator pointing to
-   * the first element.
+   * Return an iterator pointing to the first element.
    */
   iterator begin ();
 
   /**
-   * Return an iterator pointing to
-   * the first element of a
-   * constant block vector.
+   * Return an iterator pointing to the first element of a constant block
+   * vector.
    */
   const_iterator begin () const;
 
   /**
-   * Return an iterator pointing to
-   * the element past the end.
+   * Return an iterator pointing to the element past the end.
    */
   iterator end ();
 
   /**
-   * Return an iterator pointing to
-   * the element past the end of a
-   * constant block vector.
+   * Return an iterator pointing to the element past the end of a constant
+   * block vector.
    */
   const_iterator end () const;
 
@@ -906,8 +706,7 @@ public:
   value_type operator() (const size_type i) const;
 
   /**
-   * Access components, returns U(i)
-   * as a writeable reference.
+   * Access components, returns U(i) as a writeable reference.
    */
   reference operator() (const size_type i);
 
@@ -919,30 +718,25 @@ public:
   value_type operator[] (const size_type i) const;
 
   /**
-   * Access components, returns U(i)
-   * as a writeable reference.
+   * Access components, returns U(i) as a writeable reference.
    *
    * Exactly the same as operator().
    */
   reference operator[] (const size_type i);
 
   /**
-   * A collective get operation: instead
-   * of getting individual elements of a
-   * vector, this function allows to get
-   * a whole set of elements at once. The
-   * indices of the elements to be read
-   * are stated in the first argument,
-   * the corresponding values are returned in the
-   * second.
+   * A collective get operation: instead of getting individual elements of a
+   * vector, this function allows to get a whole set of elements at once. The
+   * indices of the elements to be read are stated in the first argument, the
+   * corresponding values are returned in the second.
    */
   template <typename OtherNumber>
   void extract_subvector_to (const std::vector<size_type> &indices,
                              std::vector<OtherNumber> &values) const;
 
   /**
-   * Just as the above, but with pointers.
-   * Useful in minimizing copying of data around.
+   * Just as the above, but with pointers. Useful in minimizing copying of
+   * data around.
    */
   template <typename ForwardIterator, typename OutputIterator>
   void extract_subvector_to (ForwardIterator          indices_begin,
@@ -950,39 +744,33 @@ public:
                              OutputIterator           values_begin) const;
 
   /**
-   * Copy operator: fill all components of
-   * the vector with the given scalar
+   * Copy operator: fill all components of the vector with the given scalar
    * value.
    */
   BlockVectorBase &operator = (const value_type s);
 
   /**
-   * Copy operator for arguments of the
-   * same type.
+   * Copy operator for arguments of the same type.
    */
   BlockVectorBase &
   operator= (const BlockVectorBase &V);
 
   /**
-   * Copy operator for template arguments
-   * of different types.
+   * Copy operator for template arguments of different types.
    */
   template <class VectorType2>
   BlockVectorBase &
   operator= (const BlockVectorBase<VectorType2> &V);
 
   /**
-   * Copy operator from non-block
-   * vectors to block vectors.
+   * Copy operator from non-block vectors to block vectors.
    */
   BlockVectorBase &
   operator = (const VectorType &v);
 
   /**
-   * Check for equality of two block vector
-   * types. This operation is only allowed
-   * if the two vectors already have the
-   * same block structure.
+   * Check for equality of two block vector types. This operation is only
+   * allowed if the two vectors already have the same block structure.
    */
   template <class VectorType2>
   bool
@@ -999,35 +787,31 @@ public:
   real_type norm_sqr () const;
 
   /**
-   * Return the mean value of the elements
-   * of this vector.
+   * Return the mean value of the elements of this vector.
    */
   value_type mean_value () const;
 
   /**
-   * Return the $l_1$-norm of the vector,
-   * i.e. the sum of the absolute values.
+   * Return the $l_1$-norm of the vector, i.e. the sum of the absolute values.
    */
   real_type l1_norm () const;
 
   /**
-   * Return the $l_2$-norm of the vector,
-   * i.e. the square root of the sum of
+   * Return the $l_2$-norm of the vector, i.e. the square root of the sum of
    * the squares of the elements.
    */
   real_type l2_norm () const;
 
   /**
-   * Return the maximum absolute value of
-   * the elements of this vector, which is
-   * the $l_\infty$-norm of a vector.
+   * Return the maximum absolute value of the elements of this vector, which
+   * is the $l_\infty$-norm of a vector.
    */
   real_type linfty_norm () const;
 
   /**
-   * Performs a combined operation of a vector addition and a subsequent
-   * inner product, returning the value of the inner product. In other words,
-   * the result of this function is the same as if the user called
+   * Performs a combined operation of a vector addition and a subsequent inner
+   * product, returning the value of the inner product. In other words, the
+   * result of this function is the same as if the user called
    * @code
    * this->add(a, V);
    * return_value = *this * W;
@@ -1035,89 +819,70 @@ public:
    *
    * The reason this function exists is that this operation involves less
    * memory transfer than calling the two functions separately on deal.II's
-   * vector classes (Vector<Number> and parallel::distributed::Vector<double>).
-   * This method only needs to load three vectors, @p this, @p V, @p W,
-   * whereas calling separate methods means to load the calling vector @p this
-   * twice. Since most vector operations are memory transfer limited, this
-   * reduces the time by 25\% (or 50\% if @p W equals @p this).
+   * vector classes (Vector<Number> and
+   * parallel::distributed::Vector<double>). This method only needs to load
+   * three vectors, @p this, @p V, @p W, whereas calling separate methods
+   * means to load the calling vector @p this twice. Since most vector
+   * operations are memory transfer limited, this reduces the time by 25\% (or
+   * 50\% if @p W equals @p this).
    */
   value_type add_and_dot (const value_type       a,
                           const BlockVectorBase &V,
                           const BlockVectorBase &W);
 
   /**
-   * Returns true if the given global index is
-   * in the local range of this processor.
-   * Asks the corresponding block.
+   * Returns true if the given global index is in the local range of this
+   * processor. Asks the corresponding block.
    */
   bool in_local_range (const size_type global_index) const;
 
   /**
-   * Return whether the vector contains only
-   * elements with value zero. This function
-   * is mainly for internal consistency
-   * check and should seldom be used when
-   * not in debug mode since it uses quite
-   * some time.
+   * Return whether the vector contains only elements with value zero. This
+   * function is mainly for internal consistency check and should seldom be
+   * used when not in debug mode since it uses quite some time.
    */
   bool all_zero () const;
 
   /**
-   * Return @p true if the vector has no
-   * negative entries, i.e. all entries are
-   * zero or positive. This function is
-   * used, for example, to check whether
-   * refinement indicators are really all
-   * positive (or zero).
+   * Return @p true if the vector has no negative entries, i.e. all entries
+   * are zero or positive. This function is used, for example, to check
+   * whether refinement indicators are really all positive (or zero).
    */
   bool is_non_negative () const;
 
   /**
-   * Addition operator.  Fast equivalent to
-   * <tt>U.add(1, V)</tt>.
+   * Addition operator.  Fast equivalent to <tt>U.add(1, V)</tt>.
    */
   BlockVectorBase &
   operator += (const BlockVectorBase &V);
 
   /**
-   * Subtraction operator.  Fast equivalent
-   * to <tt>U.add(-1, V)</tt>.
+   * Subtraction operator.  Fast equivalent to <tt>U.add(-1, V)</tt>.
    */
   BlockVectorBase &
   operator -= (const BlockVectorBase &V);
 
 
   /**
-   * A collective add operation:
-   * This funnction adds a whole
-   * set of values stored in @p
-   * values to the vector
-   * components specified by @p
-   * indices.
+   * A collective add operation: This funnction adds a whole set of values
+   * stored in @p values to the vector components specified by @p indices.
    */
   template <typename Number>
   void add (const std::vector<size_type> &indices,
             const std::vector<Number>    &values);
 
   /**
-   * This is a second collective
-   * add operation. As a
-   * difference, this function
-   * takes a deal.II vector of
-   * values.
+   * This is a second collective add operation. As a difference, this function
+   * takes a deal.II vector of values.
    */
   template <typename Number>
   void add (const std::vector<size_type> &indices,
             const Vector<Number>         &values);
 
   /**
-   * Take an address where
-   * <tt>n_elements</tt> are stored
-   * contiguously and add them into
-   * the vector. Handles all cases
-   * which are not covered by the
-   * other two <tt>add()</tt>
-   * functions above.
+   * Take an address where <tt>n_elements</tt> are stored contiguously and add
+   * them into the vector. Handles all cases which are not covered by the
+   * other two <tt>add()</tt> functions above.
    */
   template <typename Number>
   void add (const size_type  n_elements,
@@ -1125,56 +890,46 @@ public:
             const Number    *values);
 
   /**
-   * $U(0-DIM)+=s$.  Addition of <tt>s</tt>
-   * to all components. Note that
-   * <tt>s</tt> is a scalar and not a
-   * vector.
+   * $U(0-DIM)+=s$.  Addition of <tt>s</tt> to all components. Note that
+   * <tt>s</tt> is a scalar and not a vector.
    */
   void add (const value_type s);
 
   /**
-   * U+=V.
-   * Simple vector addition, equal to the
-   * <tt>operator +=</tt>.
+   * U+=V. Simple vector addition, equal to the <tt>operator +=</tt>.
    */
   void add (const BlockVectorBase &V);
 
   /**
-   * U+=a*V.
-   * Simple addition of a scaled vector.
+   * U+=a*V. Simple addition of a scaled vector.
    */
   void add (const value_type a, const BlockVectorBase &V);
 
   /**
-   * U+=a*V+b*W.
-   * Multiple addition of scaled vectors.
+   * U+=a*V+b*W. Multiple addition of scaled vectors.
    */
   void add (const value_type a, const BlockVectorBase &V,
             const value_type b, const BlockVectorBase &W);
 
   /**
-   * U=s*U+V.
-   * Scaling and simple vector addition.
+   * U=s*U+V. Scaling and simple vector addition.
    */
   void sadd (const value_type s, const BlockVectorBase &V);
 
   /**
-   * U=s*U+a*V.
-   * Scaling and simple addition.
+   * U=s*U+a*V. Scaling and simple addition.
    */
   void sadd (const value_type s, const value_type a, const BlockVectorBase &V);
 
   /**
-   * U=s*U+a*V+b*W.
-   * Scaling and multiple addition.
+   * U=s*U+a*V+b*W. Scaling and multiple addition.
    */
   void sadd (const value_type s, const value_type a,
              const BlockVectorBase &V,
              const value_type b, const BlockVectorBase &W);
 
   /**
-   * U=s*U+a*V+b*W+c*X.
-   * Scaling and multiple addition.
+   * U=s*U+a*V+b*W+c*X. Scaling and multiple addition.
    */
   void sadd (const value_type s, const value_type a,
              const BlockVectorBase &V,
@@ -1182,61 +937,50 @@ public:
              const value_type c, const BlockVectorBase &X);
 
   /**
-   * Scale each element of the
-   * vector by a constant
-   * value.
+   * Scale each element of the vector by a constant value.
    */
   BlockVectorBase &operator *= (const value_type factor);
 
   /**
-   * Scale each element of the
-   * vector by the inverse of the
-   * given value.
+   * Scale each element of the vector by the inverse of the given value.
    */
   BlockVectorBase &operator /= (const value_type factor);
 
   /**
-   * Multiply each element of this
-   * vector by the corresponding
-   * element of <tt>v</tt>.
+   * Multiply each element of this vector by the corresponding element of
+   * <tt>v</tt>.
    */
   template <class BlockVector2>
   void scale (const BlockVector2 &v);
 
   /**
-   *  U=a*V. Assignment.
+   * U=a*V. Assignment.
    */
   template <class BlockVector2>
   void equ (const value_type a, const BlockVector2 &V);
 
   /**
-   * U=a*V+b*W.
-   * Replacing by sum.
+   * U=a*V+b*W. Replacing by sum.
    */
   void equ (const value_type a, const BlockVectorBase &V,
             const value_type b, const BlockVectorBase &W);
 
   /**
-   * This function does nothing but is
-   * there for compatibility with the
-   * @p PETScWrappers::Vector class.
+   * This function does nothing but is there for compatibility with the @p
+   * PETScWrappers::Vector class.
    *
-   * For the PETSc vector wrapper class,
-   * this function updates the ghost
-   * values of the PETSc vector. This
-   * is necessary after any modification
+   * For the PETSc vector wrapper class, this function updates the ghost
+   * values of the PETSc vector. This is necessary after any modification
    * before reading ghost values.
    *
-   * However, for the implementation of
-   * this class, it is immaterial and thus
+   * However, for the implementation of this class, it is immaterial and thus
    * an empty function.
    */
   void update_ghost_values () const;
 
   /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object.
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
    */
   std::size_t memory_consumption () const;
 
@@ -1247,16 +991,13 @@ protected:
   std::vector<VectorType> components;
 
   /**
-   * Object managing the
-   * transformation between global
-   * indices and indices within the
-   * different blocks.
+   * Object managing the transformation between global indices and indices
+   * within the different blocks.
    */
   BlockIndices block_indices;
 
   /**
-   * Make the iterator class a
-   * friend.
+   * Make the iterator class a friend.
    */
   template <typename N, bool C>
   friend class dealii::internal::BlockVectorIterators::Iterator;
@@ -1947,16 +1688,6 @@ BlockVectorBase<VectorType>::compress (::dealii::VectorOperation::values operati
 
 template <class VectorType>
 inline
-void
-BlockVectorBase<VectorType>::compress ()
-{
-  compress(VectorOperation::unknown);
-}
-
-
-
-template <class VectorType>
-inline
 typename BlockVectorBase<VectorType>::iterator
 BlockVectorBase<VectorType>::begin()
 {
@@ -2204,7 +1935,7 @@ BlockVectorBase<VectorType>::add (const size_type  n_indices,
 template <class VectorType>
 void BlockVectorBase<VectorType>::add (const value_type a)
 {
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   for (size_type i=0; i<n_blocks(); ++i)
     {
@@ -2233,7 +1964,7 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType> &v)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2253,8 +1984,8 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType> &w)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2275,7 +2006,7 @@ void BlockVectorBase<VectorType>::sadd (const value_type x,
                                         const BlockVectorBase<VectorType> &v)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
+  AssertIsFinite(x);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2293,8 +2024,8 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType> &v)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2314,9 +2045,9 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType> &w)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2340,10 +2071,10 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType> &y)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
-  Assert (numbers::is_finite(c), ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
+  AssertIsFinite(b);
+  AssertIsFinite(c);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2380,8 +2111,8 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
                                        const BlockVectorBase<VectorType> &w)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2415,7 +2146,7 @@ void BlockVectorBase<VectorType>::equ (const value_type    a,
                                        const BlockVector2 &v)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2440,7 +2171,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator = (const value_type s)
 {
 
-  Assert (numbers::is_finite(s), ExcNumberNotFinite());
+  AssertIsFinite(s);
 
   for (size_type i=0; i<n_blocks(); ++i)
     components[i] = s;
@@ -2518,7 +2249,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator *= (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
 
   for (size_type i=0; i<n_blocks(); ++i)
     components[i] *= factor;
@@ -2534,7 +2265,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator /= (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
   Assert (factor > 0., ExcDivideByZero() );
 
   for (size_type i=0; i<n_blocks(); ++i)

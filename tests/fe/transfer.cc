@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,6 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/multigrid/mg_transfer.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <vector>
 #include <fstream>
@@ -46,8 +45,9 @@ print_matrix(Triangulation<dim> &tr,
              const FiniteElement<dim> &finel,
              const char * /*name*/)
 {
-  MGDoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(finel);
+  dof.distribute_mg_dofs(finel);
 
   MGTransferPrebuilt<Vector<double> > transfer;
   transfer.build_matrices(dof);

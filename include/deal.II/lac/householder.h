@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,15 +39,16 @@ template<typename number> class Vector;
 /**
  * QR-decomposition of a full matrix.
  *
- * Whenever an object of this class is created, it copies the matrix
- * given and computes its QR-decomposition by Householder
- * algorithm. Then, the function least_squares() can be used to
- * compute the vector <i>x</i> minimizing <i>||Ax-b||</i> for a given
- * vector <i>b</i>.
+ * Whenever an object of this class is created, it copies the matrix given and
+ * computes its QR-decomposition by Householder algorithm. Then, the function
+ * least_squares() can be used to compute the vector <i>x</i> minimizing
+ * <i>||Ax-b||</i> for a given vector <i>b</i>.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Guido Kanschat, 2005
  */
@@ -66,53 +67,41 @@ public:
   Householder ();
 
   /**
-   * Create an object holding the
-   * QR-decomposition of a matrix.
+   * Create an object holding the QR-decomposition of a matrix.
    */
   template<typename number2>
   Householder (const FullMatrix<number2> &);
 
   /**
-   * Compute the QR-decomposition
-   * of another matrix.
+   * Compute the QR-decomposition of another matrix.
    */
   template<typename number2>
   void
   initialize (const FullMatrix<number2> &);
 
   /**
-   * Solve the least-squares
-   * problem for the right hand
-   * side <tt>src</tt>. The return
-   * value is the Euclidean norm of
-   * the approximation error.
+   * Solve the least-squares problem for the right hand side <tt>src</tt>. The
+   * return value is the Euclidean norm of the approximation error.
    *
-   * @arg @c dst contains the
-   * solution of the least squares
-   * problem on return.
+   * @arg @c dst contains the solution of the least squares problem on return.
    *
-   * @arg @c src contains the right
-   * hand side <i>b</i> of the
-   * least squares problem. It will
-   * be changed during the algorithm
-   * and is unusable on return.
+   * @arg @c src contains the right hand side <i>b</i> of the least squares
+   * problem. It will be changed during the algorithm and is unusable on
+   * return.
    */
   template<typename number2>
   double least_squares (Vector<number2> &dst,
                         const Vector<number2> &src) const;
 
   /**
-   * This function does the same as
-   * the one for BlockVectors.
+   * This function does the same as the one for BlockVectors.
    */
   template<typename number2>
   double least_squares (BlockVector<number2> &dst,
                         const BlockVector<number2> &src) const;
 
   /**
-   * A wrapper to least_squares(),
-   * implementing the standard
-   * MATRIX interface.
+   * A wrapper to least_squares(), implementing the standard MATRIX interface.
    */
   template<class VECTOR>
   void vmult (VECTOR &dst, const VECTOR &src) const;
@@ -123,9 +112,7 @@ public:
 
 private:
   /**
-   * Storage for the diagonal
-   * elements of the orthogonal
-   * transformation.
+   * Storage for the diagonal elements of the orthogonal transformation.
    */
   std::vector<number> diagonal;
 };
@@ -242,7 +229,7 @@ Householder<number>::least_squares (Vector<number2> &dst,
   number2 sum = 0.;
   for (size_type i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
-  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  AssertIsFinite(sum);
 
   // Compute solution
   this->backward(dst, *aux);
@@ -287,7 +274,7 @@ Householder<number>::least_squares (BlockVector<number2> &dst,
   number2 sum = 0.;
   for (size_type i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
-  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  AssertIsFinite(sum);
 
   //backward works for
   //Vectors only, so copy

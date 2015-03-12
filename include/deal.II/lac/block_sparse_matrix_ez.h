@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,11 +40,12 @@ template <typename Number> class BlockVector;
  * A block matrix consisting of blocks of type SparseMatrixEZ.
  *
  * Like the other Block-objects, this matrix can be used like a
- * SparseMatrixEZ, when it comes to access to entries. Then, there
- * are functions for the multiplication with BlockVector and
- * access to the individual blocks.
+ * SparseMatrixEZ, when it comes to access to entries. Then, there are
+ * functions for the multiplication with BlockVector and access to the
+ * individual blocks.
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2002, 2003
  */
 template<typename Number>
@@ -57,100 +58,65 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Default constructor. The
-   * result is an empty object with
-   * zero dimensions.
+   * Default constructor. The result is an empty object with zero dimensions.
    */
   BlockSparseMatrixEZ ();
 
   /**
-   * Constructor setting up an
-   * object with given unmber of
-   * block rows and columns. The
-   * blocks themselves still have
-   * zero dimension.
+   * Constructor setting up an object with given unmber of block rows and
+   * columns. The blocks themselves still have zero dimension.
    */
   BlockSparseMatrixEZ (const unsigned int block_rows,
                        const unsigned int block_cols);
 
   /**
-   * Copy constructor. This is
-   * needed for some container
-   * classes. It creates an object
-   * of the same number of block
-   * rows and columns. Since it
-   * calls the copy constructor of
-   * SparseMatrixEZ, the
-   * block s must be empty.
+   * Copy constructor. This is needed for some container classes. It creates
+   * an object of the same number of block rows and columns. Since it calls
+   * the copy constructor of SparseMatrixEZ, the block s must be empty.
    */
   BlockSparseMatrixEZ (const BlockSparseMatrixEZ<Number> &);
 
   /**
-   * Copy operator. Like the copy
-   * constructor, this may be
-   * called for objects with empty
-   * blocks only.
+   * Copy operator. Like the copy constructor, this may be called for objects
+   * with empty blocks only.
    */
   BlockSparseMatrixEZ &operator = (const BlockSparseMatrixEZ<Number> &);
 
   /**
-   * This operator assigns a scalar to
-   * a matrix. Since this does usually
-   * not make much sense (should we set
-   * all matrix entries to this value?
-   * Only the nonzero entries of the
-   * sparsity pattern?), this operation
-   * is only allowed if the actual
-   * value to be assigned is zero. This
-   * operator only exists to allow for
-   * the obvious notation
-   * <tt>matrix=0</tt>, which sets all
-   * elements of the matrix to zero,
-   * but keep the sparsity pattern
-   * previously used.
+   * This operator assigns a scalar to a matrix. Since this does usually not
+   * make much sense (should we set all matrix entries to this value? Only the
+   * nonzero entries of the sparsity pattern?), this operation is only allowed
+   * if the actual value to be assigned is zero. This operator only exists to
+   * allow for the obvious notation <tt>matrix=0</tt>, which sets all elements
+   * of the matrix to zero, but keep the sparsity pattern previously used.
    */
   BlockSparseMatrixEZ &operator = (const double d);
 
 
   /**
-   * Set matrix to zero dimensions
-   * and release memory.
+   * Set matrix to zero dimensions and release memory.
    */
   void clear ();
 
   /**
-   * Initialize to given block
-   * numbers.  After this
-   * operation, the matrix will
-   * have the block dimensions
-   * provided. Each block will have
-   * zero dimensions and must be
-   * initialized
-   * subsequently. After setting
-   * the sizes of the blocks,
-   * collect_sizes() must be
-   * called to update internal data
+   * Initialize to given block numbers.  After this operation, the matrix will
+   * have the block dimensions provided. Each block will have zero dimensions
+   * and must be initialized subsequently. After setting the sizes of the
+   * blocks, collect_sizes() must be called to update internal data
    * structures.
    */
   void reinit (const unsigned int n_block_rows,
                const unsigned int n_block_cols);
   /**
-   * This function collects the
-   * sizes of the sub-objects and
-   * stores them in internal
-   * arrays, in order to be able to
-   * relay global indices into the
-   * matrix to indices into the
-   * subobjects. You *must* call
-   * this function each time after
-   * you have changed the size of
-   * the sub-objects.
+   * This function collects the sizes of the sub-objects and stores them in
+   * internal arrays, in order to be able to relay global indices into the
+   * matrix to indices into the subobjects. You *must* call this function each
+   * time after you have changed the size of the sub-objects.
    */
   void collect_sizes ();
 
   /**
-   * Access the block with the
-   * given coordinates.
+   * Access the block with the given coordinates.
    */
   SparseMatrixEZ<Number> &
   block (const unsigned int row,
@@ -158,137 +124,101 @@ public:
 
 
   /**
-   * Access the block with the
-   * given coordinates. Version for
-   * constant objects.
+   * Access the block with the given coordinates. Version for constant
+   * objects.
    */
   const SparseMatrixEZ<Number> &
   block (const unsigned int row,
          const unsigned int column) const;
 
   /**
-   * Return the number of blocks in a
-   * column.
+   * Return the number of blocks in a column.
    */
   unsigned int n_block_rows () const;
 
   /**
-   * Return the number of blocks in a
-   * row.
+   * Return the number of blocks in a row.
    */
   unsigned int n_block_cols () const;
 
   /**
-   * Return whether the object is
-   * empty. It is empty if no
-   * memory is allocated, which is
-   * the same as that both
-   * dimensions are zero. This
-   * function is just the
-   * concatenation of the
-   * respective call to all
-   * sub-matrices.
+   * Return whether the object is empty. It is empty if no memory is
+   * allocated, which is the same as that both dimensions are zero. This
+   * function is just the concatenation of the respective call to all sub-
+   * matrices.
    */
   bool empty () const;
 
   /**
-   * Return number of rows of this
-   * matrix, which equals the
-   * dimension of the image
-   * space. It is the sum of rows
-   * of the rows of sub-matrices.
+   * Return number of rows of this matrix, which equals the dimension of the
+   * image space. It is the sum of rows of the rows of sub-matrices.
    */
   size_type n_rows () const;
 
   /**
-   * Return number of columns of
-   * this matrix, which equals the
-   * dimension of the range
-   * space. It is the sum of
-   * columns of the columns of
-   * sub-matrices.
+   * Return number of columns of this matrix, which equals the dimension of
+   * the range space. It is the sum of columns of the columns of sub-matrices.
    */
   size_type n_cols () const;
 
   /**
-   * Return the dimension of the
-   * image space.  To remember: the
-   * matrix is of dimension
-   * $m \times n$.
+   * Return the dimension of the image space.  To remember: the matrix is of
+   * dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the
-   * range space.  To remember: the
-   * matrix is of dimension
-   * $m \times n$.
+   * Return the dimension of the range space.  To remember: the matrix is of
+   * dimension $m \times n$.
    */
   size_type n () const;
 
   /**
-   * Set the element <tt>(i,j)</tt>
-   * to @p value.  Throws an error
-   * if the entry does not exist or
-   * if <tt>value</tt> is not a
-   * finite number. Still, it is
-   * allowed to store zero values
-   * in non-existent fields.
+   * Set the element <tt>(i,j)</tt> to @p value.  Throws an error if the entry
+   * does not exist or if <tt>value</tt> is not a finite number. Still, it is
+   * allowed to store zero values in non-existent fields.
    */
   void set (const size_type i,
             const size_type j,
             const Number value);
 
   /**
-   * Add @p value to the element
-   * <tt>(i,j)</tt>.  Throws an
-   * error if the entry does not
-   * exist or if <tt>value</tt> is
-   * not a finite number. Still, it
-   * is allowed to store zero
-   * values in non-existent fields.
+   * Add @p value to the element <tt>(i,j)</tt>.  Throws an error if the entry
+   * does not exist or if <tt>value</tt> is not a finite number. Still, it is
+   * allowed to store zero values in non-existent fields.
    */
   void add (const size_type i, const size_type j,
             const Number value);
 
 
   /**
-   * Matrix-vector multiplication:
-   * let $dst = M*src$ with $M$
-   * being this matrix.
+   * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
+   * matrix.
    */
   template <typename somenumber>
   void vmult (BlockVector<somenumber>       &dst,
               const BlockVector<somenumber> &src) const;
 
   /**
-   * Matrix-vector multiplication:
-   * let $dst = M^T*src$ with $M$
-   * being this matrix. This
-   * function does the same as
-   * vmult() but takes the
-   * transposed matrix.
+   * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
+   * matrix. This function does the same as vmult() but takes the transposed
+   * matrix.
    */
   template <typename somenumber>
   void Tvmult (BlockVector<somenumber>       &dst,
                const BlockVector<somenumber> &src) const;
 
   /**
-   * Adding Matrix-vector
-   * multiplication. Add $M*src$ on
-   * $dst$ with $M$ being this
-   * matrix.
+   * Adding Matrix-vector multiplication. Add $M*src$ on $dst$ with $M$ being
+   * this matrix.
    */
   template <typename somenumber>
   void vmult_add (BlockVector<somenumber>       &dst,
                   const BlockVector<somenumber> &src) const;
 
   /**
-   * Adding Matrix-vector
-   * multiplication. Add $M^T*src$
-   * to $dst$ with $M$ being this
-   * matrix. This function does the
-   * same as vmult_add() but takes
+   * Adding Matrix-vector multiplication. Add $M^T*src$ to $dst$ with $M$
+   * being this matrix. This function does the same as vmult_add() but takes
    * the transposed matrix.
    */
   template <typename somenumber>
@@ -297,31 +227,23 @@ public:
 
 
   /**
-   * Print statistics. If @p full
-   * is @p true, prints a
-   * histogram of all existing row
-   * lengths and allocated row
-   * lengths. Otherwise, just the
-   * relation of allocated and used
-   * entries is shown.
+   * Print statistics. If @p full is @p true, prints a histogram of all
+   * existing row lengths and allocated row lengths. Otherwise, just the
+   * relation of allocated and used entries is shown.
    */
   template <class STREAM>
   void print_statistics (STREAM &s, bool full = false);
 
 private:
   /**
-   * Object storing and managing
-   * the transformation of row
-   * indices to indices of the
-   * sub-objects.
+   * Object storing and managing the transformation of row indices to indices
+   * of the sub-objects.
    */
   BlockIndices    row_indices;
 
   /**
-   * Object storing and managing
-   * the transformation of column
-   * indices to indices of the
-   * sub-objects.
+   * Object storing and managing the transformation of column indices to
+   * indices of the sub-objects.
    */
   BlockIndices    column_indices;
 
@@ -431,7 +353,7 @@ BlockSparseMatrixEZ<Number>::set (const size_type i,
                                   const Number value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   const std::pair<size_type,size_type>
   row_index = row_indices.global_to_local (i),
@@ -451,7 +373,7 @@ BlockSparseMatrixEZ<Number>::add (const size_type i,
                                   const Number value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   const std::pair<unsigned int,size_type>
   row_index = row_indices.global_to_local (i),

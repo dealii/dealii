@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -391,7 +391,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
     {
       Point<3> m(2,2,2);
       Point<3> v(3,3,3);
-      double r=std::sqrt((m-v).square()),
+      double r=std::sqrt((m-v).norm_square()),
              h=r-1.5,
              pi=std::acos(-1.);
       Boundary<3> *boundary1=new HyperBallBoundary<3>(m, r);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,22 +57,6 @@ namespace Algorithms
     vtheta = param.get_double("Theta");
     adaptive = param.get_bool("Adaptive");
     param.leave_subsection ();
-  }
-
-
-  template <class VECTOR>
-  void
-  ThetaTimestepping<VECTOR>::initialize (ParameterHandler &param)
-  {
-    parse_parameters(param);
-  }
-
-
-  template <class VECTOR>
-  void
-  ThetaTimestepping<VECTOR>::operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in)
-  {
-    Operator<VECTOR>::operator() (out, in);
   }
 
 

@@ -128,27 +128,31 @@ Hartmann's PhD thesis ("Adaptive Finite Element Methods for the
 Compressible Euler Equations", PhD thesis, University of Heidelberg, 2002).
 
 We use a time stepping scheme to substitute the time derivative in the
-above equations. At each time step, our full discretization is thus
+above equations. For simplicity, we define $ \mathbf{B}({\mathbf{w}_{n}})(\mathbf z) $ as the spatial residual at time step $n$ :
+
+@f{eqnarray*}
+ \mathbf{B}(\mathbf{w}_{n})(\mathbf z)  &=&
+- \int_{\Omega} \left(\mathbf{F}(\mathbf{w}_n),
+\nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w}_n , \nabla \mathbf{z}) \\
+&& +
+\int_{\partial \Omega} \left(\mathbf{H}(\mathbf{w}_n^+,
+\mathbf{w}^-(\mathbf{w}_n^+), \mathbf{n}), \mathbf{z}\right)
+-
+\int_{\partial \Omega} \left(\mathbf{G}(\mathbf{w}_n),
+\mathbf{z}\right) .
+@f}
+
+At each time step, our full discretization is thus
 that the residual applied to any test
 function $\mathbf z$ equals zero:
 @f{eqnarray*}
 R(\mathbf{W}_{n+1})(\mathbf z) &=&
-\int_{\Omega} \left(\frac{\mathbf{w}_{n+1} - \mathbf{w}_n}{\delta t},
-\mathbf{z}\right)
-- \int_{\Omega} \left(\mathbf{F}(\tilde{\mathbf{w}}),
-\nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z})
-\\
-&& \qquad
-+
-\int_{\partial \Omega} \left(\mathbf{H}(\tilde{\mathbf{w}}^+),
-\mathbf{w}^-(\tilde{\mathbf{w}}^+), \mathbf{n}), \mathbf{z}\right)
--
-\int_{\partial \Omega} \left(\mathbf{G}(\mathbf{w}),
-\mathbf{z}\right)
-\\
-& = & 0
+\int_{\Omega} \left(\frac{{\mathbf w}_{n+1} - \mathbf{w}_n}{\delta t},
+\mathbf{z}\right)+
+\theta \mathbf{B}({\mathbf{w}}_{n+1}) +  (1-\theta) \mathbf{B}({\mathbf w}_{n}) \\
+&=& 0
 @f}
-where $\tilde{\mathbf{w}} = \theta \mathbf{w}_{n+1} + (1-\theta) \mathbf{w}_n$ for $0 \leq \theta \leq 1$ and
+where $ \theta \in [0,1] $ and
 $\mathbf{w}_i = \sum_k \mathbf{W}_i^k \mathbf{\phi}_k$. Choosing
 $\theta=0$ results in the explicit (forward) Euler scheme, $\theta=1$
 in the stable implicit (backward) Euler scheme, and $\theta=\frac 12$
@@ -164,19 +168,19 @@ $\frac{h}{2\delta T}$ with $h$ the diameter of the face to which the flux is
 applied, and $\delta T$ the current time step.
 
 With these choices, equating the residual to zero results in a
-nonlinear system of equations which we solve the nonlinear system by a
-Newton iteration, i.e. by iterating
+nonlinear system of equations $R(\mathbf{W}_{n+1})=0$. We solve this nonlinear system by a
+Newton iteration (in the same way as explained in step-15), i.e. by iterating
 @f{eqnarray*}
-R'(\mathbf{W}^k,\delta \mathbf{W})(\mathbf z) & = & -
-R(\mathbf{W}^{k})(\mathbf z) \qquad \qquad \forall \mathbf z\in V_h \\
-\mathbf{W}^{k+1} &=& \mathbf{W}^k + \delta \mathbf{W},
+R'(\mathbf{W}^k_{n+1},\delta \mathbf{W}_{n+1}^k)(\mathbf z) & = & -
+R(\mathbf{W}^{k}_{n+1})(\mathbf z) \qquad \qquad \forall \mathbf z\in V_h \\
+\mathbf{W}^{k+1}_{n+1} &=& \mathbf{W}^k_{n+1} + \delta \mathbf{W}^k_{n+1},
 @f}
-until $|R(\mathbf{W}^k)|$ (the residual) is sufficiently small. By
+until $|R(\mathbf{W}^k_{n+1})|$ (the residual) is sufficiently small. By
 testing with the nodal basis of a finite element space instead of all
 $\mathbf z$, we arrive at a linear system for $\delta \mathbf W$:
 @f{eqnarray*}
-\mathbf R'(\mathbf{W}^k)\delta \mathbf{W} & = & -
-\mathbf R(\mathbf{W}^{k}).
+\mathbf R'(\mathbf{W}^k_{n+1})\delta \mathbf{W}^k_{n+1} & = & -
+\mathbf R(\mathbf{W}^{k}_{n+1}).
 @f}
 This linear system is, in general, neither symmetric nor has any
 particular definiteness properties. We will either use a direct solver

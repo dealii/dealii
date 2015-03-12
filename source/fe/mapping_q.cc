@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,44 +54,6 @@ MappingQ<dim,spacedim>::InternalData::memory_consumption () const
           MemoryConsumption::memory_consumption (use_mapping_q1_on_current_cell) +
           MemoryConsumption::memory_consumption (mapping_q1_data));
 }
-
-
-
-// in 1d, it is irrelevant which polynomial degree to use, since all
-// cells are scaled linearly. Unless codimension is equal to two
-template<>
-MappingQ<1>::MappingQ (const unsigned int,
-                       const bool /*use_mapping_q_on_all_cells*/)
-  :
-  degree(1),
-  n_inner(0),
-  n_outer(0),
-  tensor_pols(0),
-  n_shape_functions(2),
-  renumber(0),
-  use_mapping_q_on_all_cells (false),
-  feq(degree),
-  line_support_points(degree+1)
-{}
-
-
-template<>
-MappingQ<1>::MappingQ (const MappingQ<1> &m):
-  MappingQ1<1> (),
-  degree(1),
-  n_inner(0),
-  n_outer(0),
-  tensor_pols(0),
-  n_shape_functions(2),
-  renumber(0),
-  use_mapping_q_on_all_cells (m.use_mapping_q_on_all_cells),
-  feq(degree),
-  line_support_points(degree+1)
-{}
-
-template<>
-MappingQ<1>::~MappingQ ()
-{}
 
 
 
@@ -175,16 +137,6 @@ template<int dim, int spacedim>
 MappingQ<dim,spacedim>::~MappingQ ()
 {
   delete tensor_pols;
-}
-
-
-
-template<>
-void
-MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
-                                     MappingQ1<1>::InternalData   &data) const
-{
-  MappingQ1<1>::compute_shapes_virtual(unit_points, data);
 }
 
 
@@ -348,13 +300,15 @@ template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::fill_fe_face_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int       face_no,
-  const Quadrature<dim-1> &q,
+  const unsigned int                face_no,
+  const Quadrature<dim-1>          &q,
   typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  std::vector<Point<spacedim> >     &quadrature_points,
-  std::vector<double>          &JxW_values,
-  std::vector<Tensor<1,spacedim> >  &exterior_forms,
-  std::vector<Point<spacedim> >     &normal_vectors) const
+  std::vector<Point<spacedim> >    &quadrature_points,
+  std::vector<double>              &JxW_values,
+  std::vector<Tensor<1,spacedim> > &exterior_forms,
+  std::vector<Point<spacedim> >    &normal_vectors,
+  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -380,7 +334,7 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
     p_data=&data;
 
   const unsigned int n_q_points=q.size();
-  this->compute_fill_face (cell, face_no, deal_II_numbers::invalid_unsigned_int,
+  this->compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
                            n_q_points,
                            QProjector<dim>::DataSetDescriptor::
                            face (face_no,
@@ -391,7 +345,8 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
                            q.get_weights(),
                            *p_data,
                            quadrature_points, JxW_values,
-                           exterior_forms, normal_vectors);
+                           exterior_forms, normal_vectors, jacobians,
+                           inverse_jacobians);
 }
 
 
@@ -405,7 +360,9 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
                                                 std::vector<Point<spacedim> >     &quadrature_points,
                                                 std::vector<double>          &JxW_values,
                                                 std::vector<Tensor<1,spacedim> >  &exterior_forms,
-                                                std::vector<Point<spacedim> >     &normal_vectors) const
+                                                std::vector<Point<spacedim> >     &normal_vectors,
+                                                std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                                                std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -443,7 +400,8 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
                            q.get_weights(),
                            *p_data,
                            quadrature_points, JxW_values,
-                           exterior_forms, normal_vectors);
+                           exterior_forms, normal_vectors, jacobians,
+                           inverse_jacobians);
 }
 
 

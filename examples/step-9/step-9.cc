@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2014 by the deal.II authors
+ * Copyright (C) 2000 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -34,7 +34,6 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -49,8 +48,7 @@
 // programs. In the first one, the classes and functions are declared which we
 // need to do assembly in parallel (i.e. the
 // <code>WorkStream</code> namespace). The
-// second file has a class <code>MultithreadInfo</code> (and a global object
-// <code>multithread_info</code> of that type) which can be used to query the
+// second file has a class MultithreadInfo which can be used to query the
 // number of processors in your system, which is often useful when deciding
 // how many threads to start in parallel.
 #include <deal.II/base/work_stream.h>
@@ -330,7 +328,7 @@ namespace Step9
   {
     Assert (component == 0, ExcIndexRange (component, 0, 1));
     const double diameter = 0.1;
-    return ( (p-center_point).square() < diameter*diameter ?
+    return ( (p-center_point).norm_square() < diameter*diameter ?
              .1/std::pow(diameter,dim) :
              0);
   }
@@ -377,8 +375,8 @@ namespace Step9
   {
     Assert (component == 0, ExcIndexRange (component, 0, 1));
 
-    const double sine_term = std::sin(16*numbers::PI*std::sqrt(p.square()));
-    const double weight    = std::exp(-5*p.square()) / std::exp(-5.);
+    const double sine_term = std::sin(16*numbers::PI*std::sqrt(p.norm_square()));
+    const double weight    = std::exp(-5*p.norm_square()) / std::exp(-5.);
     return sine_term * weight;
   }
 
@@ -1255,8 +1253,8 @@ namespace Step9
         // two cells. Note that as opposed to the introduction, we denote
         // by <code>y</code> the normalized difference vector, as this is
         // the quantity used everywhere in the computations.
-        Point<dim>   y        = neighbor_center - this_center;
-        const double distance = std::sqrt(y.square());
+        Tensor<1,dim> y        = neighbor_center - this_center;
+        const double  distance = y.norm();
         y /= distance;
 
         // Then add up the contribution of this cell to the Y matrix...
@@ -1301,7 +1299,7 @@ namespace Step9
     // using this quantity and the right powers of the mesh width:
     const Tensor<2,dim> Y_inverse = invert(Y);
 
-    Point<dim> gradient;
+    Tensor<1,dim> gradient;
     contract (gradient, Y_inverse, projected_gradient);
 
     // The last part of this function is the one where we
@@ -1312,7 +1310,7 @@ namespace Step9
     // difficult:
     *(std_cxx11::get<1>(cell.iterators)) = (std::pow(std_cxx11::get<0>(cell.iterators)->diameter(),
                                                      1+1.0*dim/2) *
-                                            std::sqrt(gradient.square()));
+                                            std::sqrt(gradient.norm_square()));
 
   }
 }
@@ -1320,14 +1318,24 @@ namespace Step9
 
 // @sect3{Main function}
 
-// The <code>main</code> function is exactly like in previous examples, with
-// the only difference in the name of the main class that actually does the
-// computation.
+// The <code>main</code> function is similar to the previous examples. The main
+// difference is that we use MultithreadInfo to set the maximum
+// number of threads (see @ref threads "Parallel computing with multiple
+// processors accessing shared memory" documentation module for more
+// explanation). The number of threads used is the minimum of the environment
+// variable DEAL_II_NUM_THREADS and the parameter of
+// <code>set_thread_limit</code>. If no value is given to
+// <code>set_thread_limit</code>, the default value from the Intel Threading
+// Building Blocks (TBB) library is used. If the call to
+// <code>set_thread_limit</code> is omitted, the number of threads will be
+// chosen by TBB indepently of DEAL_II_NUM_THREADS.
 int main ()
 {
   try
     {
       dealii::deallog.depth_console (0);
+
+      dealii::MultithreadInfo::set_thread_limit();
 
       Step9::AdvectionProblem<2> advection_problem_2d;
       advection_problem_2d.run ();

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,6 @@
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <algorithm>
 #include <numeric>
@@ -1541,25 +1540,11 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim>
-  void
-  count_dofs_per_component (const DoFHandler<dim,spacedim> &dof_handler,
-                            std::vector<types::global_dof_index>      &dofs_per_component,
-                            std::vector<unsigned int>       target_component)
-  {
-    count_dofs_per_component (dof_handler, dofs_per_component,
-                              false, target_component);
-  }
-
-
-
   template <class DH>
   void
   map_dof_to_boundary_indices (const DH                  &dof_handler,
                                std::vector<types::global_dof_index> &mapping)
   {
-    Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
-
     mapping.clear ();
     mapping.insert (mapping.end(), dof_handler.n_dofs(),
                     DH::invalid_dof_index);
@@ -1600,7 +1585,6 @@ namespace DoFTools
     const std::set<types::boundary_id> &boundary_indicators,
     std::vector<types::global_dof_index>     &mapping)
   {
-    Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
     Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
             ExcInvalidBoundaryIndicator());
 

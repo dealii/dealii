@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2013 by the deal.II authors
+// Copyright (C) 2012 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,7 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>

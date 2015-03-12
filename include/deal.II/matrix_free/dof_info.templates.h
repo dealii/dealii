@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -104,7 +104,7 @@ namespace internal
           FPArrayComparator<double> >::iterator,
           bool> it = constraints.insert(next_constraint);
 
-      types::global_dof_index insert_position = deal_II_numbers::invalid_dof_index;
+      types::global_dof_index insert_position = numbers::invalid_dof_index;
       if (it.second == false)
         insert_position = it.first->second;
       else
@@ -795,7 +795,7 @@ no_constraint:
           // we would like to have enough work to do, so as first guess, try
           // to get 50 times as many chunks as we have threads on the system.
           task_info.block_size =
-            size_info.n_macro_cells / (multithread_info.n_threads() * 50);
+            size_info.n_macro_cells / (MultithreadInfo::n_threads() * 50);
 
           // if there are too few degrees of freedom per cell, need to
           // increase the block size

@@ -116,15 +116,27 @@ namespace internal
             // and invert back
             std::vector<unsigned int> scalar_inv =
               Utilities::invert_permutation(scalar_lexicographic);
-            std::vector<unsigned int> lexicographic (fe_in.dofs_per_cell);
-            for (unsigned int comp=0; comp<fe_in.n_components(); ++comp)
+            std::vector<unsigned int> lexicographic(fe_in.dofs_per_cell,
+                                                    numbers::invalid_unsigned_int);
+            unsigned int components_before = 0;
+            for (unsigned int e=0; e<base_element_number; ++e)
+              components_before += fe_in.element_multiplicity(e);
+            for (unsigned int comp=0;
+                 comp<fe_in.element_multiplicity(base_element_number); ++comp)
               for (unsigned int i=0; i<scalar_inv.size(); ++i)
-                lexicographic[fe_in.component_to_system_index(comp,i)]
+                lexicographic[fe_in.component_to_system_index(comp+components_before,i)]
                   = scalar_inv.size () * comp + scalar_inv[i];
 
-            // invert numbering again
-            lexicographic_numbering =
-              Utilities::invert_permutation(lexicographic);
+            // invert numbering again. Need to do it manually because we might
+            // have undefined blocks
+            lexicographic_numbering.resize(fe_in.element_multiplicity(base_element_number)*fe->dofs_per_cell);
+            for (unsigned int i=0; i<lexicographic.size(); ++i)
+              if (lexicographic[i] != numbers::invalid_unsigned_int)
+                {
+                  AssertIndexRange(lexicographic[i],
+                                   lexicographic_numbering.size());
+                  lexicographic_numbering[lexicographic[i]] = i;
+                }
           }
 
         // to evaluate 1D polynomials, evaluate along the line where y=z=0,

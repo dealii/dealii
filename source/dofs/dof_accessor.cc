@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,7 +49,6 @@ DoFCellAccessor<DH,lda>::update_cell_dof_indices_cache () const
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, typename BaseClass::ExcInvalidObject());
 
   internal::DoFCellAccessor::Implementation::
   update_cell_dof_indices_cache (*this);
@@ -65,7 +64,6 @@ DoFCellAccessor<DH,lda>::set_dof_indices (const std::vector<types::global_dof_in
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, typename BaseClass::ExcInvalidObject());
 
   internal::DoFCellAccessor::Implementation::
   set_dof_indices (*this, local_dof_indices);

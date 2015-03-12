@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2005 - 2013 by the deal.II authors
+ * Copyright (C) 2005 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -356,39 +356,31 @@ namespace Step20
               << std::endl;
 
     // The next task is to allocate a sparsity pattern for the matrix that we
-    // will create. The way this works is that we first obtain a guess for the
-    // maximal number of nonzero entries per row (this could be done more
-    // efficiently in this case, but we only want to solve relatively small
-    // problems for which this is not so important). In the second step, we
-    // allocate a $2 \times 2$ block pattern and then reinitialize each of the blocks
-    // to its correct size using the <code>n_u</code> and <code>n_p</code>
-    // variables defined above that hold the number of velocity and pressure
-    // variables. In this second step, we only operate on the individual
-    // blocks of the system. In the third step, we therefore have to instruct
-    // the overlying block system to update its knowledge about the sizes of
-    // the blocks it manages; this happens with the
-    // <code>sparsity_pattern.collect_sizes()</code> call:
-    const unsigned int
-    n_couplings = dof_handler.max_couplings_between_dofs();
+    // will create. We use a compressed sparsity pattern like in the previous
+    // steps, but as <code>system_matrix</code> is a block matrix we use the
+    // class <code>BlockCompressedSparsityPattern</code> instead of just
+    // <code>CompressedSparsityPattern</code>. This block sparsity pattern has
+    // four blocks in a $2 \times 2$ pattern. The blocks' sizes depend on
+    // <code>n_u</code> and <code>n_p</code>, which hold the number of velocity
+    // and pressure variables. In the second step we have to instruct the block
+    // system to update its knowledge about the sizes of the blocks it manages;
+    // this happens with the <code>c_sparsity.collect_sizes ()</code> call.
+    BlockCompressedSparsityPattern c_sparsity(2, 2);
+    c_sparsity.block(0, 0).reinit (n_u, n_u);
+    c_sparsity.block(1, 0).reinit (n_p, n_u);
+    c_sparsity.block(0, 1).reinit (n_u, n_p);
+    c_sparsity.block(1, 1).reinit (n_p, n_p);
+    c_sparsity.collect_sizes ();
+    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
 
-    sparsity_pattern.reinit (2,2);
-    sparsity_pattern.block(0,0).reinit (n_u, n_u, n_couplings);
-    sparsity_pattern.block(1,0).reinit (n_p, n_u, n_couplings);
-    sparsity_pattern.block(0,1).reinit (n_u, n_p, n_couplings);
-    sparsity_pattern.block(1,1).reinit (n_p, n_p, n_couplings);
-    sparsity_pattern.collect_sizes();
-
-    // Now that the sparsity pattern and its blocks have the correct sizes, we
-    // actually need to construct the content of this pattern, and as usual
-    // compress it, before we also initialize a block matrix with this block
-    // sparsity pattern:
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-    sparsity_pattern.compress();
-
+    // We use the compressed block sparsity pattern in the same way as the
+    // non-block version to create the sparsity pattern and then the system
+    // matrix:
+    sparsity_pattern.copy_from(c_sparsity);
     system_matrix.reinit (sparsity_pattern);
 
     // Then we have to resize the solution and right hand side vectors in
-    // exactly the same way:
+    // exactly the same way as the block compressed sparsity pattern:
     solution.reinit (2);
     solution.block(0).reinit (n_u);
     solution.block(1).reinit (n_p);

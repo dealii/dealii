@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2013 by the deal.II authors
+ * Copyright (C) 2007 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -48,6 +48,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
+#include <iostream>
 #include <fstream>
 
 // This header file contains the necessary declarations for the
@@ -59,8 +60,7 @@
 // provided by UMFPACK (see the SparseDirectUMFPACK class), for which the
 // following header file is needed.  Note that in order to compile this
 // tutorial program, the deal.II-library needs to be built with UMFPACK
-// support, which can be most easily achieved by giving the <code>
-// --with-umfpack</code> switch when configuring the library:
+// support, which is enabled by default:
 #include <deal.II/lac/sparse_direct.h>
 
 // The FESystem class allows us to stack several FE-objects to one compound,
@@ -299,12 +299,12 @@ namespace Step29
 
     virtual
     void
-    compute_derived_quantities_vector (const std::vector< Vector< double > > &uh,
-                                       const std::vector< std::vector< Tensor< 1, dim > > > &duh,
-                                       const std::vector< std::vector< Tensor< 2, dim > > > &dduh,
-                                       const std::vector< Point< dim > > &normals,
-                                       const std::vector<Point<dim> > &evaluation_points,
-                                       std::vector< Vector< double > > &computed_quantities) const;
+    compute_derived_quantities_vector (const std::vector<Vector<double> >               &uh,
+                                       const std::vector<std::vector<Tensor<1, dim> > > &duh,
+                                       const std::vector<std::vector<Tensor<2, dim> > > &dduh,
+                                       const std::vector<Point<dim> >                   &normals,
+                                       const std::vector<Point<dim> >                   &evaluation_points,
+                                       std::vector<Vector<double> >                     &computed_quantities) const;
   };
 
   // In the constructor, we need to call the constructor of the base class
@@ -346,12 +346,12 @@ namespace Step29
   template <int dim>
   void
   ComputeIntensity<dim>::compute_derived_quantities_vector (
-    const std::vector< Vector< double > >                  &uh,
-    const std::vector< std::vector< Tensor< 1, dim > > >  & /*duh*/,
-    const std::vector< std::vector< Tensor< 2, dim > > >  & /*dduh*/,
-    const std::vector< Point< dim > >                     & /*normals*/,
-    const std::vector<Point<dim> >                        & /*evaluation_points*/,
-    std::vector< Vector< double > >                        &computed_quantities
+    const std::vector<Vector<double> >                 &uh,
+    const std::vector<std::vector<Tensor<1, dim> > >   & /*duh*/,
+    const std::vector<std::vector<Tensor<2, dim> > >   & /*dduh*/,
+    const std::vector<Point<dim> >                     & /*normals*/,
+    const std::vector<Point<dim> >                     & /*evaluation_points*/,
+    std::vector<Vector<double> >                       &computed_quantities
   ) const
   {
     Assert(computed_quantities.size() == uh.size(),
@@ -488,7 +488,7 @@ namespace Step29
     for (; cell!=endc; ++cell)
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         if ( cell->face(face)->at_boundary() &&
-             ((cell->face(face)->center() - transducer).square() < 0.01) )
+             ((cell->face(face)->center() - transducer).norm_square() < 0.01) )
 
           cell->face(face)->set_boundary_indicator (1);
 
@@ -810,9 +810,7 @@ namespace Step29
   // solve our linear system with just 3 lines of code.
 
   // Note again that for compiling this example program, you need to have the
-  // deal.II library built with UMFPACK support, which can be achieved by
-  // providing the <code> --with-umfpack</code> switch to the configure script
-  // prior to compilation of the library.
+  // deal.II library built with UMFPACK support.
   template <int dim>
   void UltrasoundProblem<dim>::solve ()
   {

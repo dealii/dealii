@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -121,7 +121,8 @@ inline
 bool
 TriaAccessorBase<structdim,dim,spacedim>::operator == (const TriaAccessorBase<structdim,dim,spacedim> &a) const
 {
-  Assert (tria == a.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+  Assert (tria == a.tria || tria == 0 || a.tria == 0,
+          TriaAccessorExceptions::ExcCantCompareIterators());
   return ((present_level == a.present_level) &&
           (present_index == a.present_index));
 }
@@ -133,7 +134,8 @@ inline
 bool
 TriaAccessorBase<structdim,dim,spacedim>::operator != (const TriaAccessorBase<structdim,dim,spacedim> &a) const
 {
-  Assert (tria == a.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+  Assert (tria == a.tria || tria == 0 || a.tria == 0,
+          TriaAccessorExceptions::ExcCantCompareIterators());
   return ((present_level != a.present_level) ||
           (present_index != a.present_index));
 }
@@ -284,9 +286,8 @@ namespace internal
   namespace TriaAccessorBase
   {
     /**
-     * Out of a face object, get the
-     * sub-objects of dimensionality
-     * given by the last argument.
+     * Out of a face object, get the sub-objects of dimensionality given by
+     * the last argument.
      */
     template <int dim>
     inline
@@ -335,9 +336,8 @@ namespace internal
     }
 
     /**
-     * This function should never be
-     * used, but we need it for the
-     * template instantiation of TriaAccessorBase<dim,dim,spacedim>::objects() const
+     * This function should never be used, but we need it for the template
+     * instantiation of TriaAccessorBase<dim,dim,spacedim>::objects() const
      */
     template <int dim>
     inline
@@ -350,8 +350,7 @@ namespace internal
     }
 
     /**
-     * Copy the above functions for
-     * cell objects.
+     * Copy the above functions for cell objects.
      */
     template <int structdim, int dim>
     inline
@@ -537,9 +536,7 @@ namespace internal
     struct Implementation
     {
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int dim, int spacedim>
       static
@@ -615,9 +612,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -679,9 +674,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -727,9 +720,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -767,9 +758,7 @@ namespace internal
       }
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int dim, int spacedim>
       static
@@ -904,9 +893,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -943,9 +930,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -981,9 +966,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -1017,9 +1000,7 @@ namespace internal
       }
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class.
        */
       template <int dim, int spacedim>
       static
@@ -1082,8 +1063,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function of same
-       * name in the enclosing class.
+       * Implementation of the function of same name in the enclosing class.
        */
       template <int dim, int spacedim>
       static
@@ -2018,15 +1998,15 @@ TriaAccessor<structdim, dim, spacedim>::diameter () const
   switch (structdim)
     {
     case 1:
-      return std::sqrt((this->vertex(1)-this->vertex(0)).square());
+      return (this->vertex(1)-this->vertex(0)).norm();
     case 2:
-      return std::sqrt(std::max((this->vertex(3)-this->vertex(0)).square(),
-                                (this->vertex(2)-this->vertex(1)).square()));
+      return std::max((this->vertex(3)-this->vertex(0)).norm(),
+                      (this->vertex(2)-this->vertex(1)).norm());
     case 3:
-      return std::sqrt(std::max( std::max((this->vertex(7)-this->vertex(0)).square(),
-                                          (this->vertex(6)-this->vertex(1)).square()),
-                                 std::max((this->vertex(2)-this->vertex(5)).square(),
-                                          (this->vertex(3)-this->vertex(4)).square()) ));
+      return std::max( std::max((this->vertex(7)-this->vertex(0)).norm(),
+                                (this->vertex(6)-this->vertex(1)).norm()),
+                       std::max((this->vertex(2)-this->vertex(5)).norm(),
+                                (this->vertex(3)-this->vertex(4)).norm()) );
     default:
       Assert (false, ExcNotImplemented());
       return -1e10;
@@ -2042,14 +2022,14 @@ TriaAccessor<structdim, dim, spacedim>::minimum_vertex_distance () const
   switch (structdim)
     {
     case 1:
-      return std::sqrt((this->vertex(1)-this->vertex(0)).square());
+      return (this->vertex(1)-this->vertex(0)).norm();
     case 2:
     case 3:
     {
       double min = std::numeric_limits<double>::max();
       for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
         for (unsigned int j=i+1; j<GeometryInfo<structdim>::vertices_per_cell; ++j)
-          min = std::min(min, (this->vertex(i)-this->vertex(j)).square());
+          min = std::min(min, (this->vertex(i)-this->vertex(j)) * (this->vertex(i)-this->vertex(j)));
       return std::sqrt(min);
     }
     default:
@@ -2080,11 +2060,11 @@ is_translation_of (const TriaIterator<TriaAccessor<structdim,dim,spacedim> > &o)
   // times the distance between the zeroth
   // vertices here.
   bool is_translation = true;
-  const Point<spacedim> dist = o->vertex(0) - this->vertex(0);
+  const Tensor<1,spacedim> dist = o->vertex(0) - this->vertex(0);
   const double tol_square = 1e-24 * dist.norm_square();
   for (unsigned int i=1; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
     {
-      const Point<spacedim> dist_new = (o->vertex(i) - this->vertex(i)) - dist;
+      const Tensor<1,spacedim> dist_new = (o->vertex(i) - this->vertex(i)) - dist;
       if (dist_new.norm_square() > tol_square)
         {
           is_translation = false;
@@ -2983,7 +2963,8 @@ inline
 bool
 CellAccessor<dim,spacedim>::is_locally_owned () const
 {
-  Assert (this->active(), ExcMessage("is_locally_owned() only works on active cells!"));
+  Assert (this->active(),
+          ExcMessage("is_locally_owned() can only be called on active cells!"));
 #ifndef DEAL_II_WITH_P4EST
   return true;
 #else
@@ -3025,7 +3006,8 @@ inline
 bool
 CellAccessor<dim,spacedim>::is_ghost () const
 {
-  Assert (this->active(), ExcMessage("is_ghost() only works on active cells!"));
+  Assert (this->active(),
+          ExcMessage("is_ghost() can only be called on active cells!"));
 #ifndef DEAL_II_WITH_P4EST
   return false;
 #else
@@ -3049,7 +3031,8 @@ inline
 bool
 CellAccessor<dim,spacedim>::is_artificial () const
 {
-  Assert (this->active(), ExcMessage("is_artificial() only works on active cells!"));
+  Assert (this->active(),
+          ExcMessage("is_artificial() can only be called on active cells!"));
 #ifndef DEAL_II_WITH_P4EST
   return false;
 #else
@@ -3065,7 +3048,8 @@ types::subdomain_id
 CellAccessor<dim, spacedim>::subdomain_id () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert (this->active(), ExcMessage("subdomains only work on active cells!"));
+  Assert (this->active(),
+          ExcMessage("subdomain_id() can only be called on active cells!"));
   return this->tria->levels[this->present_level]->subdomain_ids[this->present_index];
 }
 

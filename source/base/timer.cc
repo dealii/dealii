@@ -161,7 +161,7 @@ double Timer::stop ()
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
       last_lap_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
-             - start_wall_time;
+                      - start_wall_time;
 #elif defined(DEAL_II_MSVC)
       last_lap_time = windows::wall_clock() - start_wall_time;
       cumulative_time += windows::cpu_clock() - start_time;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,9 +20,9 @@
 #include <vector>
 
 #if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
-#  include <mpi.h>
-// Check whether <mpi.h> is a suitable
-// include for us (if MPI_SEEK_SET is not
+// mpi.h included through deal.II/base/config.h
+
+// Check whether <mpi.h> is a suitable include for us (if MPI_SEEK_SET is not
 // defined, we'll die anyway):
 #  ifndef MPI_SEEK_SET
 #    error "The buildsystem included an insufficient mpi.h header that does not export MPI_SEEK_SET"
@@ -216,6 +216,8 @@ namespace Utilities
      */
     struct MinMaxAvg
     {
+      // Note: We assume a POD property of this struct in the MPI calls in
+      // min_max_avg
       double sum;
       double min;
       double max;
@@ -265,82 +267,74 @@ namespace Utilities
     class MPI_InitFinalize
     {
     public:
-
       /**
-       * Constructor. Takes the arguments from the command line (in case of
-       * MPI, the number of processes is specified there), and sets up a
-       * respective communicator by calling <tt>MPI_Init()</tt>. This
-       * constructor can only be called once in a program, since MPI cannot be
-       * initialized twice.
-       *
-       * This constructor sets max_num_threads to 1 (see other constructor).
-       */
-      MPI_InitFinalize (int    &argc,
-                        char ** &argv) /*DEAL_II_DEPRECATED*/;
-
-      /**
-       * Initialize MPI (and, if deal.II was configured to use it, PETSc)
-       * and set the number of threads used by deal.II (via the underlying
+       * Initialize MPI (and, if deal.II was configured to use it, PETSc) and
+       * set the number of threads used by deal.II (via the underlying
        * Threading Building Blocks library) to the given parameter.
        *
-       * @param[in,out] argc A reference to the 'argc' argument passed to main. This
-       *   argument is used to initialize MPI (and, possibly, PETSc) as they
-       *   read arguments from the command line.
-       * @param[in,out] argv A reference to the 'argv' argument passed to main.
-       * @param[in] max_num_threads The maximal number of threads this MPI process
-       *   should utilize. If this argument is set to
-       *   numbers::invalid_unsigned_int, the number of threads is determined by
-       *   automatically in the following way: the number of
-       *   threads to run on this MPI process is set in such a way that all of
-       *   the cores in your node are spoken for. In other words, if you
-       *   have started one MPI process per node, setting this argument is
-       *   equivalent to setting it to the number of cores present in the node
-       *   this MPI process runs on. If you have started as many MPI
-       *   processes per node as there are cores on each node, then
-       *   this is equivalent to passing 1 as the argument. On the
-       *   other hand, if, for example, you start 4 MPI processes
-       *   on each 16-core node, then this option will start 4 worker
-       *   threads for each node. If you start 3 processes on an 8 core
-       *   node, then they will start 3, 3 and 2 threads, respectively.
+       * @param[in,out] argc A reference to the 'argc' argument passed to
+       * main. This argument is used to initialize MPI (and, possibly, PETSc)
+       * as they read arguments from the command line.
+       * @param[in,out] argv A reference to the 'argv' argument passed to
+       * main.
+       * @param[in] max_num_threads The maximal number of threads this MPI
+       * process should utilize. If this argument is set to
+       * numbers::invalid_unsigned_int (the default value), then the number of
+       * threads is determined automatically in the following way: the number
+       * of threads to run on this MPI process is set in such a way that all
+       * of the cores in your node are spoken for. In other words, if you have
+       * started one MPI process per node, setting this argument is equivalent
+       * to setting it to the number of cores present in the node this MPI
+       * process runs on. If you have started as many MPI processes per node
+       * as there are cores on each node, then this is equivalent to passing 1
+       * as the argument. On the other hand, if, for example, you start 4 MPI
+       * processes on each 16-core node, then this option will start 4 worker
+       * threads for each node. If you start 3 processes on an 8 core node,
+       * then they will start 3, 3 and 2 threads, respectively.
        *
-       * @note This function calls MultithreadInfo::set_thread_limit()
-       * with either @p max_num_threads or, following the discussion above, a
-       * number of threads equal to the number of cores allocated to this
-       * MPI process. However, MultithreadInfo::set_thread_limit() in turn also
-       * evaluates the environment variable DEAL_II_NUM_THREADS. Finally, the worker
-       * threads can only be created on cores to which the current MPI process has
-       * access to; some MPI implementations limit the number of cores each process
-       * has access to to one or a subset of cores in order to ensure better cache
-       * behavior. Consequently, the number of threads that will really be created
-       * will be the minimum of the argument passed here, the environment variable
-       * (if set), and the number of cores accessible to the thread.
+       * @note This function calls MultithreadInfo::set_thread_limit() with
+       * either @p max_num_threads or, following the discussion above, a
+       * number of threads equal to the number of cores allocated to this MPI
+       * process. However, MultithreadInfo::set_thread_limit() in turn also
+       * evaluates the environment variable DEAL_II_NUM_THREADS. Finally, the
+       * worker threads can only be created on cores to which the current MPI
+       * process has access to; some MPI implementations limit the number of
+       * cores each process has access to to one or a subset of cores in order
+       * to ensure better cache behavior. Consequently, the number of threads
+       * that will really be created will be the minimum of the argument
+       * passed here, the environment variable (if set), and the number of
+       * cores accessible to the thread.
+       *
+       * @note MultithreadInfo::set_thread_limit() can only work if it is
+       * called before any threads are created. The safest place for a call to
+       * it is therefore at the beginning of <code>main()</code>.
+       * Consequently, this extends to the current class: the best place to
+       * create an object of this type is also at or close to the top of
+       * <code>main()</code>.
        */
       MPI_InitFinalize (int    &argc,
                         char ** &argv,
-                        const unsigned int max_num_threads);
+                        const unsigned int max_num_threads = numbers::invalid_unsigned_int);
 
       /**
        * Destructor. Calls <tt>MPI_Finalize()</tt> in case this class owns the
        * MPI process.
        */
       ~MPI_InitFinalize();
-
-    private:
-      /**
-       * This flag tells the class whether it owns the MPI process (i.e., it
-       * has been constructed using the argc/argv input, or it has been
-       * copied). In the former case, the command <tt>MPI_Finalize()</tt> will
-       * be called at destruction.
-       */
-      const bool owns_mpi;
-
-
-      /**
-       * A common function called by all of the constructors.
-       */
-      void do_init(int    &argc,
-                   char ** &argv);
     };
+
+    /**
+     * Return whether (i) deal.II has been compiled to support MPI (for
+     * example by compiling with <code>CXX=mpiCC</code>) and if so whether
+     * (ii) <code>MPI_Init()</code> has been called (for example using the
+     * Utilities::MPI::MPI_InitFinalize class). In other words, the result
+     * indicates whether the current job is running under MPI.
+     *
+     * @note The function does not take into account whether an MPI job
+     * actually runs on more than one processor or is, in fact, a single-node
+     * job that happens to run under MPI.
+     */
+    bool job_supports_mpi ();
 
     namespace internal
     {
@@ -404,15 +398,20 @@ namespace Utilities
            const MPI_Comm &mpi_communicator)
     {
 #ifdef DEAL_II_WITH_MPI
-      T sum;
-      MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
-                     &sum, 1, internal::mpi_type_id(&t), MPI_SUM,
-                     mpi_communicator);
-      return sum;
-#else
-      (void)mpi_communicator;
-      return t;
+      if (job_supports_mpi())
+        {
+          T sum;
+          MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
+                         &sum, 1, internal::mpi_type_id(&t), MPI_SUM,
+                         mpi_communicator);
+          return sum;
+        }
+      else
 #endif
+        {
+          (void)mpi_communicator;
+          return t;
+        }
     }
 
 
@@ -423,18 +422,23 @@ namespace Utilities
               T (&sums)[N])
     {
 #ifdef DEAL_II_WITH_MPI
-      MPI_Allreduce ((&values[0] != &sums[0]
-                      ?
-                      const_cast<void *>(static_cast<const void *>(&values[0]))
-                      :
-                      MPI_IN_PLACE),
-                     &sums[0], N, internal::mpi_type_id(values), MPI_SUM,
-                     mpi_communicator);
-#else
-      (void)mpi_communicator;
-      for (unsigned int i=0; i<N; ++i)
-        sums[i] = values[i];
+      if (job_supports_mpi())
+        {
+          MPI_Allreduce ((&values[0] != &sums[0]
+                          ?
+                          const_cast<void *>(static_cast<const void *>(&values[0]))
+                          :
+                          MPI_IN_PLACE),
+                         &sums[0], N, internal::mpi_type_id(values), MPI_SUM,
+                         mpi_communicator);
+        }
+      else
 #endif
+        {
+          (void)mpi_communicator;
+          for (unsigned int i=0; i<N; ++i)
+            sums[i] = values[i];
+        }
     }
 
 
@@ -445,18 +449,23 @@ namespace Utilities
               std::vector<T>       &sums)
     {
 #ifdef DEAL_II_WITH_MPI
-      sums.resize (values.size());
-      MPI_Allreduce ((&values[0] != &sums[0]
-                      ?
-                      const_cast<void *>(static_cast<const void *>(&values[0]))
-                      :
-                      MPI_IN_PLACE),
-                     &sums[0], values.size(), internal::mpi_type_id((T *)0), MPI_SUM,
-                     mpi_communicator);
-#else
-      (void)mpi_communicator;
-      sums = values;
+      if (job_supports_mpi())
+        {
+          sums.resize (values.size());
+          MPI_Allreduce ((&values[0] != &sums[0]
+                          ?
+                          const_cast<void *>(static_cast<const void *>(&values[0]))
+                          :
+                          MPI_IN_PLACE),
+                         &sums[0], values.size(), internal::mpi_type_id((T *)0), MPI_SUM,
+                         mpi_communicator);
+        }
+      else
 #endif
+        {
+          (void)mpi_communicator;
+          sums = values;
+        }
     }
 
 
@@ -466,15 +475,20 @@ namespace Utilities
            const MPI_Comm &mpi_communicator)
     {
 #ifdef DEAL_II_WITH_MPI
-      T sum;
-      MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
-                     &sum, 1, internal::mpi_type_id(&t), MPI_MAX,
-                     mpi_communicator);
-      return sum;
-#else
-      (void)mpi_communicator;
-      return t;
+      if (job_supports_mpi())
+        {
+          T sum;
+          MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
+                         &sum, 1, internal::mpi_type_id(&t), MPI_MAX,
+                         mpi_communicator);
+          return sum;
+        }
+      else
 #endif
+        {
+          (void)mpi_communicator;
+          return t;
+        }
     }
 
 
@@ -485,18 +499,23 @@ namespace Utilities
               T (&maxima)[N])
     {
 #ifdef DEAL_II_WITH_MPI
-      MPI_Allreduce ((&values[0] != &maxima[0]
-                      ?
-                      const_cast<void *>(static_cast<const void *>(&values[0]))
-                      :
-                      MPI_IN_PLACE),
-                     &maxima[0], N, internal::mpi_type_id(values), MPI_MAX,
-                     mpi_communicator);
-#else
-      (void)mpi_communicator;
-      for (unsigned int i=0; i<N; ++i)
-        maxima[i] = values[i];
+      if (job_supports_mpi())
+        {
+          MPI_Allreduce ((&values[0] != &maxima[0]
+                          ?
+                          const_cast<void *>(static_cast<const void *>(&values[0]))
+                          :
+                          MPI_IN_PLACE),
+                         &maxima[0], N, internal::mpi_type_id(values), MPI_MAX,
+                         mpi_communicator);
+        }
+      else
 #endif
+        {
+          (void)mpi_communicator;
+          for (unsigned int i=0; i<N; ++i)
+            maxima[i] = values[i];
+        }
     }
 
 
@@ -507,17 +526,36 @@ namespace Utilities
               std::vector<T>       &maxima)
     {
 #ifdef DEAL_II_WITH_MPI
-      maxima.resize (values.size());
-      MPI_Allreduce ((&values[0] != &maxima[0]
-                      ?
-                      const_cast<void *>(static_cast<const void *>(&values[0]))
-                      :
-                      MPI_IN_PLACE),
-                     &maxima[0], values.size(), internal::mpi_type_id((T *)0), MPI_MAX,
-                     mpi_communicator);
+      if (job_supports_mpi())
+        {
+          maxima.resize (values.size());
+          MPI_Allreduce ((&values[0] != &maxima[0]
+                          ?
+                          const_cast<void *>(static_cast<const void *>(&values[0]))
+                          :
+                          MPI_IN_PLACE),
+                         &maxima[0], values.size(), internal::mpi_type_id((T *)0), MPI_MAX,
+                         mpi_communicator);
+        }
+      else
+#endif
+        {
+          (void)mpi_communicator;
+          maxima = values;
+        }
+    }
+
+
+    inline
+    bool job_supports_mpi ()
+    {
+#ifdef DEAL_II_WITH_MPI
+      int MPI_has_been_started = 0;
+      MPI_Initialized(&MPI_has_been_started);
+
+      return (MPI_has_been_started > 0);
 #else
-      (void)mpi_communicator;
-      maxima = values;
+      return false;
 #endif
     }
   } // end of namespace MPI

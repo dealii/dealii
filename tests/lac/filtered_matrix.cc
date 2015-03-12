@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2013 by the deal.II authors
+// Copyright (C) 2007 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,6 @@
 #include <deal.II/lac/matrix_lib.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/vector.h>
-
 #include <fstream>
 
 
@@ -79,8 +78,6 @@ void test (const FilteredMatrix<VECTOR> &M)
 
   deallog << std::endl;
 }
-
-
 
 int main()
 {

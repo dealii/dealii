@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,6 +32,17 @@
 #include <functional>
 
 DEAL_II_NAMESPACE_OPEN
+
+// The following is necessary for compilation under Visual Studio which is unable to correctly
+// distinguish between dealii::DoFHandler and dealii::hp::DoFHandler.
+// Plus it makes code in dof_handler.cc easier to read.
+// Requires C++11 support which is in Visual Studio 2013 and newer.
+#if _MSC_VER >= 1800
+template <int dim, int spacedim> using HpDoFHandler = ::dealii::hp::DoFHandler<dim, spacedim>;
+#else
+// When using older Visual Studio or a different compiler just fall back.
+#define HpDoFHandler DoFHandler
+#endif
 
 namespace parallel
 {
@@ -227,7 +238,7 @@ namespace internal
           vertex_fe_association (dof_handler.finite_elements->size(),
                                  std::vector<bool> (dof_handler.tria->n_vertices(), false));
 
-          for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+          for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
                cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
             for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
               vertex_fe_association[cell->active_fe_index()][cell->vertex_index(v)]
@@ -401,7 +412,7 @@ namespace internal
           if (fe.dofs_per_line > 0)
             for (unsigned int l=0; l<GeometryInfo<2>::lines_per_cell; ++l)
               {
-                typename DoFHandler<dim,spacedim>::line_iterator
+                typename HpDoFHandler<dim,spacedim>::line_iterator
                 line = cell->line(l);
 
                 if (line->dof_index(0,fe_index) ==
@@ -464,7 +475,7 @@ namespace internal
           if (fe.dofs_per_line > 0)
             for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
               {
-                typename DoFHandler<dim,spacedim>::line_iterator
+                typename HpDoFHandler<dim,spacedim>::line_iterator
                 line = cell->line(l);
 
                 if (line->dof_index(0,fe_index) ==
@@ -477,7 +488,7 @@ namespace internal
           if (fe.dofs_per_quad > 0)
             for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
               {
-                typename DoFHandler<dim,spacedim>::quad_iterator
+                typename HpDoFHandler<dim,spacedim>::quad_iterator
                 quad = cell->quad(q);
 
                 if (quad->dof_index(0,fe_index) ==
@@ -587,7 +598,7 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+              for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -618,7 +629,7 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename DoFHandler<dim,spacedim>::cell_iterator
+              for (typename HpDoFHandler<dim,spacedim>::cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -715,7 +726,7 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+              for (typename HpDoFHandler<dim, spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -746,7 +757,7 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename DoFHandler<dim,spacedim>::cell_iterator
+              for (typename HpDoFHandler<dim,spacedim>::cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -804,7 +815,7 @@ namespace internal
             // on each level
             unsigned int n_line_slots = 0;
 
-            for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+            for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
                  cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
@@ -884,7 +895,7 @@ namespace internal
 
             unsigned int next_free_line_slot = 0;
 
-            for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+            for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
                  cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
@@ -1091,7 +1102,7 @@ namespace internal
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size = 0;
-              for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+              for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -1122,7 +1133,7 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               types::global_dof_index counter = 0;
-              for (typename DoFHandler<dim,spacedim>::cell_iterator
+              for (typename HpDoFHandler<dim,spacedim>::cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
                 if (!cell->has_children())
@@ -1179,7 +1190,7 @@ namespace internal
             // class) we will have to store
             unsigned int n_quad_slots = 0;
 
-            for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+            for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
                  cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
@@ -1266,7 +1277,7 @@ namespace internal
 
             unsigned int next_free_quad_slot = 0;
 
-            for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+            for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
                  cell=dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
@@ -1420,7 +1431,7 @@ namespace internal
                                    std::vector<bool> (dof_handler.tria->n_raw_lines(),
                                                       false));
 
-              for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+              for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active();
                    cell!=dof_handler.end(); ++cell)
                 for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
@@ -1683,7 +1694,7 @@ namespace hp
 
   template <int dim, int spacedim>
   typename DoFHandler<dim,spacedim>::cell_iterator
-  DoFHandler<dim,spacedim>::begin (const unsigned int level) const
+  DoFHandler<dim, spacedim>::begin(const unsigned int level) const
   {
     return cell_iterator (*this->get_tria().begin(level),
                           this);
@@ -1952,8 +1963,8 @@ namespace hp
     // boundaries of dimension dim-2,
     // and so every boundary line is
     // also part of a boundary face.
-    typename DoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
-                                                            endc = this->end();
+    typename HpDoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
+                                                              endc = this->end();
     for (; cell!=endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
@@ -1986,8 +1997,8 @@ namespace hp
     std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
 
-    typename DoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
-                                                            endc = this->end();
+    typename HpDoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
+                                                              endc = this->end();
     for (; cell!=endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f) &&
@@ -2022,8 +2033,8 @@ namespace hp
     std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
 
-    typename DoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
-                                                            endc = this->end();
+    typename HpDoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
+                                                              endc = this->end();
     for (; cell!=endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f) &&

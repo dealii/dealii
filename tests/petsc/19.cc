@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,7 @@ void test (PETScWrappers::Vector &v)
       v(i) = i;
       norm = std::max(norm,fabs(i));
     }
-  v.compress (VectorOperation::add);
+  v.compress (VectorOperation::insert);
 
   // then check the norm
   Assert (v.linfty_norm() == norm, ExcInternalError());

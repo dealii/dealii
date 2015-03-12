@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2013 by the deal.II authors
+// Copyright (C) 2012 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,10 +48,8 @@ class TensorProductPolynomialsConst : public TensorProductPolynomials<dim>
 {
 public:
   /**
-   * Access to the dimension of
-   * this object, for checking and
-   * automatic setting of dimension
-   * in other classes.
+   * Access to the dimension of this object, for checking and automatic
+   * setting of dimension in other classes.
    */
   static const unsigned int dimension = dim;
 

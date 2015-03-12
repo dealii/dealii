@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -246,11 +246,11 @@ BEM<spacedim>::assemble_system()
   FEValues<spacedim-1, spacedim>
   fe_values_i (fe, quadrature_formula,
                update_JxW_values |
-               update_cell_normal_vectors |
+               update_normal_vectors |
                update_quadrature_points ),
                                         fe_values_j (fe, quadrature_formula,
                                                      update_JxW_values |
-                                                     update_cell_normal_vectors |
+                                                     update_normal_vectors |
                                                      update_quadrature_points );
 
   const unsigned int        dofs_per_cell = fe.dofs_per_cell;
@@ -289,7 +289,7 @@ BEM<spacedim>::assemble_system()
     {
 
       fe_values_i.reinit (cell_i);
-      cell_normals_i = fe_values_i.get_cell_normal_vectors();
+      cell_normals_i = fe_values_i.get_normal_vectors();
       cell_i->get_dof_indices (local_dof_indices_i);
 
 //  if (cell_i->index()%100==0)
@@ -353,7 +353,7 @@ BEM<spacedim>::assemble_system()
       for (cell_j=dof_handler.begin_active(); cell_j!=endc; ++cell_j)
         {
           fe_values_j.reinit (cell_j);
-          cell_normals_j = fe_values_j.get_cell_normal_vectors();
+          cell_normals_j = fe_values_j.get_normal_vectors();
           cell_j->get_dof_indices (local_dof_indices_j);
 
           if (cell_j != cell_i)
@@ -568,7 +568,7 @@ BEM<spacedim>::solve()
                                                 q_iterated,
                                                 update_values |
                                                 update_gradients |
-                                                update_cell_normal_vectors );
+                                                update_normal_vectors );
 
   std::vector< Point<spacedim> > cell_normals(q_iterated.size());
   std::vector< Point<spacedim> > cell_tangentials(q_iterated.size());
@@ -596,7 +596,7 @@ BEM<spacedim>::solve()
 //  std::cout<<std::endl;
 
 
-      cell_normals = fe_values_q.get_cell_normal_vectors();
+      cell_normals = fe_values_q.get_normal_vectors();
       for (unsigned int i=0; i<q_iterated.size(); ++i)
         {
           cell_tangentials[i][0] = cell_normals[i][1];

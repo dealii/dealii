@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -104,8 +104,7 @@ check_boundary (const DoFHandler<dim> &dof,
   // range of 1 or below,
   // multiply matrix by 100 to
   // make test more sensitive
-  for (unsigned int i=0; i<matrix.n_nonzero_elements(); ++i)
-    matrix.global_entry(i) *= 100;
+  matrix *= 100;
 
   // finally write out matrix
   matrix.print (deallog.get_file_stream());
@@ -154,8 +153,9 @@ check ()
   // that different components should
   // not couple, so use pattern
   SparsityPattern sparsity (dof.n_dofs(), dof.n_dofs());
-  std::vector<std::vector<bool> > mask (2, std::vector<bool>(2, false));
-  mask[0][0] = mask[1][1] = true;
+  Table<2,DoFTools::Coupling> mask (2, 2);
+  mask(0,0) = mask(1,1) = DoFTools::always;
+  mask(0,1) = mask(1,0) = DoFTools::none;
   DoFTools::make_sparsity_pattern (dof, mask, sparsity);
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof, constraints);
@@ -196,9 +196,10 @@ check ()
       // range of 1 or below,
       // multiply matrix by 100 to
       // make test more sensitive
-      for (unsigned int i=0; i<matrix.n_nonzero_elements(); ++i)
-        deallog.get_file_stream() << matrix.global_entry(i) * 100
-                                  << std::endl;
+      for (SparseMatrix<double>::const_iterator p=matrix.begin();
+	   p!=matrix.end(); ++p)
+	deallog.get_file_stream() << p->value() * 100
+				  << std::endl;
     };
 
   if (dim > 1)

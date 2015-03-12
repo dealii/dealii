@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -30,12 +30,19 @@
 #
 # General configuration for cmake:
 #
+MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
+MESSAGE(STATUS "")
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
-IF(POLICY CMP0026)
-  # enable target LOCATION property
-  CMAKE_POLICY(SET CMP0026 OLD)
+#
+# We support all policy changes up to version 3.1.0. Thus, explicitly set
+# all policies CMP0001 - CMP0054 to new for version 3.1 (and later) to
+# avoid some unnecessary warnings.
+#
+IF( "${CMAKE_VERSION}" VERSION_EQUAL "3.1" OR
+    "${CMAKE_VERSION}" VERSION_GREATER "3.1" )
+  CMAKE_POLICY(VERSION 3.1.0)
 ENDIF()
 
 IF(POLICY CMP0037)
@@ -43,19 +50,17 @@ IF(POLICY CMP0037)
   CMAKE_POLICY(SET CMP0037 OLD)
 ENDIF()
 
-MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
 
-LIST(APPEND CMAKE_MODULE_PATH
-  ${CMAKE_SOURCE_DIR}/cmake/
-  ${CMAKE_SOURCE_DIR}/cmake/modules/
-  )
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
 # Load all macros:
 #
-INCLUDE(setup_external_macros)
 FILE(GLOB _macro_files "cmake/macros/*.cmake")
+MESSAGE(STATUS "Include ${CMAKE_SOURCE_DIR}/cmake/setup_external_macros.cmake")
+INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_external_macros.cmake)
 FOREACH(_file ${_macro_files})
+  MESSAGE(STATUS "Include ${_file}")
   INCLUDE(${_file})
 ENDFOREACH()
 
@@ -78,7 +83,7 @@ ENDIF()
 # We have to initialize some cached variables before PROJECT is called, so
 # do it at this point:
 #
-INCLUDE(setup_cached_variables)
+VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_cached_variables.cmake)
 
 #
 # Now, set the project and set up the rest:
@@ -86,18 +91,15 @@ INCLUDE(setup_cached_variables)
 PROJECT(deal.II CXX C)
 ENABLE_LANGUAGE_OPTIONAL(Fortran)
 
-INCLUDE(setup_deal_ii)
+VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_deal_ii.cmake)
 
-INCLUDE(setup_compiler_flags)
+VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags.cmake)
 
 #
 # Include information about bundled libraries:
 #
 IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  SET(_file ${CMAKE_SOURCE_DIR}/bundled/setup_bundled.cmake)
-  MESSAGE(STATUS "")
-  MESSAGE(STATUS "Include ${_file}")
-  INCLUDE(${_file})
+  VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/bundled/setup_bundled.cmake)
 ENDIF()
 
 #
@@ -106,9 +108,7 @@ ENDIF()
 FILE(GLOB _check_files "cmake/checks/*.cmake")
 LIST(SORT _check_files)
 FOREACH(_file ${_check_files})
-  MESSAGE(STATUS "")
-  MESSAGE(STATUS "Include ${_file}")
-  INCLUDE(${_file})
+  VERBOSE_INCLUDE(${_file})
 ENDFOREACH()
 
 #
@@ -117,18 +117,16 @@ ENDFOREACH()
 FILE(GLOB _configure_files "cmake/configure/configure_*.cmake")
 LIST(SORT _configure_files) # make sure to include in alphabetical order
 FOREACH(_file ${_configure_files})
-  MESSAGE(STATUS "")
-  MESSAGE(STATUS "Include ${_file}")
-  INCLUDE(${_file})
+  VERBOSE_INCLUDE(${_file})
 ENDFOREACH()
 
 #
 # Finalize the configuration:
 #
-INCLUDE(setup_custom_targets)
-INCLUDE(setup_finalize)
-INCLUDE(setup_write_config)
-
+VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_cpack.cmake)
+VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_custom_targets.cmake)
+VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_finalize.cmake)
+VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_write_config.cmake)
 
 ########################################################################
 #                                                                      #
@@ -155,7 +153,11 @@ ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 ADD_SUBDIRECTORY(contrib) # has to be included after source
 ADD_SUBDIRECTORY(examples)
 
-IF(DEAL_II_HAVE_TESTS_DIRECTORY)
+#
+# Do not configure testsuite on Windows targets because posix shell and
+# commands like 'test', '> /dev/null', 'rm', etc. are not available
+#
+IF(DEAL_II_HAVE_TESTS_DIRECTORY AND NOT DEAL_II_MSVC)
   ADD_SUBDIRECTORY(tests)
 ENDIF()
 

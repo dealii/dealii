@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2001 - 2013 by the deal.II authors
+## Copyright (C) 2001 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -56,4 +56,45 @@ s/^DEAL.*::_.*\n//g;
 
 # Normalize version string by replacing (for example) 'written by
 # deal.II 8.1.pre' by written by 'written by deal.II x.y.z'
-s/written by deal\.II \d+\.\d+\.(pre|\d+)/written by deal.II x.y.z/;
+s/written by deal\.II \d+\.\d+\.(pre|rc\d*|\d+)/written by deal.II x.y.z/;
+
+
+# different p4est versions output different text in VTU output. For
+# example, we get these kinds of differences:
+# ***************
+# *** 6,14 ****
+#       <PPoints>
+#         <PDataArray type="Float32" Name="Position" NumberOfComponents="3" form# at="ascii"/>
+#       </PPoints>
+# !     <PCellData Scalars="mpirank,treeid">
+# !       <PDataArray type="Int32" Name="mpirank" format="ascii"/>
+#         <PDataArray type="Int32" Name="treeid" format="ascii"/>
+#       </PCellData>
+#       <PPointData>
+#       </PPointData>
+# --- 6,15 ----
+#       <PPoints>
+#         <PDataArray type="Float32" Name="Position" NumberOfComponents="3" form# at="ascii"/>
+#       </PPoints>
+# !     <PCellData Scalars="treeid,level,mpirank">
+#         <PDataArray type="Int32" Name="treeid" format="ascii"/>
+# +       <PDataArray type="UInt8" Name="level" format="ascii"/>
+# +       <PDataArray type="Int32" Name="mpirank" format="ascii"/>
+#       </PCellData>
+#       <PPointData>
+#       </PPointData>
+#
+# To deal with these issues, we simply delete these lines
+s/.*<PCellData Scalars.*\n//g;
+s/.*<PDataArray type.*(mpirank|level).*\n//g;
+
+#
+# Different boost versions output output the opening bracket for json
+# output on a new line. Thus always transform
+#     "label": {
+#
+# into
+#     "label":
+#     {
+#
+s/^(\s*)(".*":) \{$/\1\2\n\1\{/;

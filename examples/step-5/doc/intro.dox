@@ -22,7 +22,11 @@ them are:
        into triangulations by automatic mesh generators. In order to
        use them, it is important to read coarse grids from a file. In
        this example, we will read a coarse grid in UCD (unstructured
-       cell data) format as used by AVS Explorer.
+       cell data) format. When this program was first written around
+       2000, UCD format was what the AVS Explorer used -- a program
+       reasonably widely used at the time but now no longer of
+       importance. (Nonetheless, the file format has survived and is
+       still understood by a number of programs.)
   <li> Finite element programs usually use extensive amounts of
        computing time, so some optimizations are sometimes
        necessary. We will show some of them.

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -267,8 +267,8 @@ ENDIF()
 GET_CMAKE_PROPERTY(_variables VARIABLES)
 FOREACH(_var ${_variables})
   IF( _var MATCHES "^(TEST|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
-      _var MATCHES "^(COMPAT_FILES|DOCUMENTATION|EXAMPLES|MESH_CONVERTER|PARAMETER_GUI)" OR
-      _var MATCHES "^(ARPACK|BOOST|FUNCTIONPARSER|HDF5|METIS|MPI|MUMPS)_" OR
+      _var MATCHES "^(DOCUMENTATION|EXAMPLES|MESH_CONVERTER|PARAMETER_GUI)" OR
+      _var MATCHES "^(ARPACK|BOOST|OPENCASCADE|MUPARSER|HDF5|METIS|MPI)_" OR
       _var MATCHES "^(NETCDF|P4EST|PETSC|SLEPC|THREADS|TBB|TRILINOS)_" OR
       _var MATCHES "^(UMFPACK|ZLIB|LAPACK|MUPARSER)_" OR
       _var MATCHES "^(CMAKE|DEAL_II)_(C|CXX|Fortran|BUILD)_(COMPILER|FLAGS)" OR
@@ -335,7 +335,7 @@ IF(NOT GIT_FOUND)
 ENDIF()
 
 EXECUTE_PROCESS(
-   COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"%H %h %ae"
+   COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=format:"%h"
    WORKING_DIRECTORY ${CTEST_SOURCE_DIRECTORY}
    OUTPUT_VARIABLE _git_WC_INFO
    RESULT_VARIABLE _result
@@ -346,14 +346,8 @@ IF(NOT ${_result} EQUAL 0)
   MESSAGE(FATAL_ERROR "\nCould not retrieve git information. Bailing out.\n")
 ENDIF()
 
-STRING(REGEX REPLACE "^\"([^ ]+) ([^ ]+) ([^\"]+)\""
-         "\\1" _git_WC_REV "${_git_WC_INFO}")
-
-STRING(REGEX REPLACE "^\"([^ ]+) ([^ ]+) ([^\"]+)\""
-         "\\2" _git_WC_SHORTREV "${_git_WC_INFO}")
-
-STRING(REGEX REPLACE "^\"([^ ]+) ([^ ]+) ([^\"]+)\""
-         "\\3" _git_WC_AUTHOR "${_git_WC_INFO}")
+STRING(REGEX REPLACE "^\"([^ ]+)\""
+         "\\1" _git_WC_SHORTREV "${_git_WC_INFO}")
 
 EXECUTE_PROCESS(
    COMMAND ${GIT_EXECUTABLE} symbolic-ref HEAD
@@ -365,21 +359,6 @@ EXECUTE_PROCESS(
 
 STRING(REGEX REPLACE "refs/heads/" ""
   _git_WC_BRANCH "${_git_WC_BRANCH}")
-
-#
-# Write revision log:
-#
-
-FILE(WRITE ${CTEST_BINARY_DIRECTORY}/revision.log
-"###
-#
-#  Git information:
-#    Branch: ${_git_WC_BRANCH}
-#    Commit: ${_git_WC_REV}
-#    Author: ${_git_WC_AUTHOR}
-#
-###"
-  )
 
 IF(NOT "${_git_WC_BRANCH}" STREQUAL "")
   SET(CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-${_git_WC_BRANCH}")

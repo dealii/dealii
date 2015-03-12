@@ -139,34 +139,14 @@
  * - third, the global matrix is assembled;
  * - and fourth, the matrix is finally condensed.
  *
- * To do these steps, you have (at least) two possibilities:
- *
- * <ul>
- * <li> Use two different sparsity patterns and two different matrices: you
- * may eliminate the rows and columns associated with a constrained degree
- * of freedom, and create a
- * totally new sparsity pattern and a new system matrix. This has the
- * advantage that the resulting system of equations is smaller and free from
- * artifacts of the condensation process and is therefore faster in the
- * solution process since no unnecessary multiplications occur (see
- * below). However, there are two major drawbacks: keeping two matrices at the
- * same time can be quite unacceptable if you're short of memory. Secondly,
- * the condensation process is expensive, since <em>all</em> entries of the
- * matrix have to be copied, not only those which are subject to constraints.
- *
- * This procedure is therefore not advocated and not discussed in the @ref
- * Tutorial. deal.II used to have functions that could perform these shrinking
- * operations, but for the reasons outlined above they were inefficient, rarely
- * used and consequently removed in version 8.0.
- *
- * <li> Use only one sparsity pattern and one matrix: doing it this way, the
- * condense functions add nonzero entries to the sparsity pattern of the large
+ * In the condensation process, we are not actually changing the number of
+ * rows or columns of the sparsity pattern, matrix, and vectors. Instead, the
+ * condense functions add nonzero entries to the sparsity pattern of the
  * matrix (with constrained nodes in it) where the condensation process of the
  * matrix will create additional nonzero elements. In the condensation process
  * itself, rows and columns subject to constraints are distributed to the rows
  * and columns of unconstrained nodes. The constrained degrees of freedom
- * remain in place,
- * however, unlike in the first possibility described above. In order not to
+ * remain in place. In order not to
  * disturb the solution process, these rows and columns are filled with zeros
  * and an appropriate positive value on the main diagonal (we choose an
  * average of the magnitudes of the other diagonal elements, so as to make
@@ -176,34 +156,28 @@
  * constrained node will always get the value zero upon solution of the
  * equation system and will not couple to other nodes any more.
  *
- * This method has the advantage that only one matrix and sparsity pattern is
- * needed thus using less memory. Additionally, the condensation process is
+ * Keeping the entries in the matrix has the advantage over creating a new and
+ * smaller matrix, that only one matrix and sparsity pattern is
+ * needed thus less memory is required. Additionally, the condensation process is
  * less expensive, since not all but only constrained values in the matrix
  * have to be copied. On the other hand, the solution process will take a bit
  * longer, since matrix vector multiplications will incur multiplications with
  * zeroes in the lines subject to constraints. Additionally, the vector size
- * is larger than in the first possibility, resulting in more memory
+ * is larger, resulting in more memory
  * consumption for those iterative solution methods using a larger number of
  * auxiliary vectors (e.g. methods using explicit orthogonalization
  * procedures).
- *
- * Nevertheless, this process is overall more efficient due to its lower
- * memory consumption and is the one discussed in the first few programs
+ * Nevertheless, this process is more efficient due to its lower
+ * memory consumption and is discussed in the first few programs
  * of the @ref Tutorial , for example in step-6.
- * </ul>
  *
- * The ConstraintMatrix class provides two sets of @p condense functions:
- * those taking two arguments refer to the first possibility above, those
- * taking only one do their job in-place and refer to the second possibility.
- *
- * The condensation functions exist for different argument types. The
- * in-place functions (i.e. those following the second way) exist for
- * arguments of type SparsityPattern, SparseMatrix and
+ * The condensation functions exist for different argument types: SparsityPattern,
+ * SparseMatrix and
  * BlockSparseMatrix. Note that there are no versions for arguments of type
  * PETScWrappers::SparseMatrix() or any of the other PETSc or Trilinos
  * matrix wrapper classes. This is due to the fact that it is relatively
  * hard to get a representation of the sparsity structure of PETSc matrices,
- * and to modify them; this holds in particular, if the matrix is actually
+ * and to modify them efficiently; this holds in particular, if the matrix is actually
  * distributed across a cluster of computers. If you want to use
  * PETSc/Trilinos matrices, you can either copy an already condensed deal.II
  * matrix, or assemble the PETSc/Trilinos matrix in the already condensed form,
@@ -282,8 +256,8 @@
  * leaves the values of constrained degrees of freedom undefined. To get the
  * correct values also for these degrees of freedom, you need to "distribute"
  * the unconstrained values also to their constrained colleagues. This is done
- * by the two ConstraintMatrix::distribute() functions, one working with two
- * vectors, one working in-place. The operation of distribution undoes the
+ * by the ConstraintMatrix::distribute() function.
+ * The operation of distribution undoes the
  * condensation process in some sense, but it should be noted that it is not
  * the inverse operation. Basically, distribution sets the values of the
  * constrained nodes to the value that is computed from the constraint given

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,7 @@ void test ()
 
               deallog << "    " << c << " [" << q << "] [" << pp << ']'
                       << std::endl;
-              Assert ((p-pp).square() < 1e-15*1e-15, ExcInternalError());
+              Assert ((p-pp).norm_square() < 1e-15*1e-15, ExcInternalError());
               Assert (GeometryInfo<dim>::is_inside_unit_cell (p) ==
                       GeometryInfo<dim>::is_inside_unit_cell (pp),
                       ExcInternalError());

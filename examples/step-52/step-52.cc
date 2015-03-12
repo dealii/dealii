@@ -181,17 +181,18 @@ namespace Step52
 
 
 
-  // @sect4{<code>Diffusion::assemble_system</code>} In this function, we
-  // compute $-\int D \nabla b_i \cdot \nabla b_j d\boldsymbol{r} - \int
-  // \Sigma_a b_i b_j d\boldsymbol{r}$ and the mass matrix $\int b_i b_j
-  // d\boldsymbol{r}$. The mass matrix is then inverted using a direct solver;
-  // the <code>inverse_mass_matrix</code> variable will then store the inverse
-  // of the mass matrix so that $M^{-1}$ can be applied to a vector using the
-  // <code>vmult()</code> function of that object. (Internally, UMFPACK does
-  // not really store the inverse of the matrix, but its LU factors; applying
-  // the inverse matrix is then equivalent to doing one forward and one
-  // backward solves with these two factors, which has the same complexity as
-  // applying an explicit inverse of the matrix).
+  // @sect4{<code>Diffusion::assemble_system</code>}
+  // In this function, we compute $-\int D \nabla b_i \cdot \nabla b_j
+  // d\boldsymbol{r} - \int \Sigma_a b_i b_j d\boldsymbol{r}$ and the mass
+  // matrix $\int b_i b_j d\boldsymbol{r}$. The mass matrix is then
+  // inverted using a direct solver; the <code>inverse_mass_matrix</code>
+  // variable will then store the inverse of the mass matrix so that
+  // $M^{-1}$ can be applied to a vector using the <code>vmult()</code>
+  // function of that object. (Internally, UMFPACK does not really store
+  // the inverse of the matrix, but its LU factors; applying the inverse
+  // matrix is then equivalent to doing one forward and one backward solves
+  // with these two factors, which has the same complexity as applying an
+  // explicit inverse of the matrix).
   void Diffusion::assemble_system ()
   {
     system_matrix = 0.;
@@ -543,7 +544,7 @@ namespace Step52
   // Embedded methods use a guessed time step. If the error using this time step
   // is too large, the time step will be reduced. If the error is below the
   // threshold, a larger time step will be tried for the next time step.
-  // </code>delta_t_guess</code> is the guessed time step produced by the embedded method.
+  // <code>delta_t_guess</code> is the guessed time step produced by the embedded method.
   unsigned int Diffusion::embedded_explicit_method(const TimeStepping::runge_kutta_method method,
                                                    const unsigned int                     n_time_steps,
                                                    const double                           initial_time,

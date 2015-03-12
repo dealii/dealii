@@ -6,8 +6,6 @@ DEAL:3d:/1.in::Checksum: 104595457
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -42,8 +40,6 @@ DEAL:3d:/2.in::Checksum: 377487361
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -78,8 +74,6 @@ DEAL:3d:/3.in::Checksum: 2097153
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -114,8 +108,6 @@ DEAL:3d:/4.in::Checksum: 1613561857
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -150,8 +142,6 @@ DEAL:3d:/evil_0.in::Checksum: 10485761
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -186,8 +176,6 @@ DEAL:3d:/evil_1.in::Checksum: 10485761
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -222,8 +210,6 @@ DEAL:3d:/evil_2.in::Checksum: 10485761
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -258,8 +244,6 @@ DEAL:3d:/evil_3.in::Checksum: 10485761
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>
@@ -294,8 +278,6 @@ DEAL:3d:/evil_4.in::Checksum: 10485761
     <PPoints>
       <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
     </PPoints>
-    <PCellData Scalars="mpirank,treeid">
-      <PDataArray type="Int32" Name="mpirank" format="ascii"/>
       <PDataArray type="Int32" Name="treeid" format="ascii"/>
     </PCellData>
     <PPointData>

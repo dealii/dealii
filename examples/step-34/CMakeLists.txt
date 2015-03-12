@@ -23,7 +23,7 @@ SET(TARGET_SRC
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
-FIND_PACKAGE(deal.II 8.2 QUIET
+FIND_PACKAGE(deal.II 8.3 QUIET
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 IF(NOT ${deal.II_FOUND})
@@ -37,10 +37,10 @@ ENDIF()
 #
 # Are all dependencies fullfilled?
 #
-IF(NOT DEAL_II_WITH_FUNCTIONPARSER)
+IF(NOT DEAL_II_WITH_MUPARSER)
   MESSAGE(FATAL_ERROR "
 Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
-    DEAL_II_WITH_FUNCTIONPARSER = ON
+    DEAL_II_WITH_MUPARSER = ON
 One or all of these are OFF in your installation but are required for this tutorial step."
     )
 ENDIF()

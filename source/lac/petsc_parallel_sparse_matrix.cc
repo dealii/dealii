@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,6 +105,27 @@ namespace PETScWrappers
                  preset_nonzero_locations);
     }
 
+
+    void
+    SparseMatrix::
+    reinit (const SparseMatrix &other)
+    {
+      if (&other == this)
+        return;
+
+      this->communicator = other.communicator;
+
+      int ierr;
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      ierr = MatDestroy (matrix);
+#else
+      ierr = MatDestroy (&matrix);
+#endif
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      ierr = MatDuplicate(other.matrix, MAT_DO_NOT_COPY_VALUES, &matrix);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+    }
 
 
     SparseMatrix &
@@ -546,6 +567,8 @@ namespace PETScWrappers
                                     local_columns_per_process.size()));
       Assert (this_process < local_rows_per_process.size(),
               ExcInternalError());
+      assert_is_compressed ();
+
       // for each row that we own locally, we
       // have to count how many of the
       // entries in the sparsity pattern lie
@@ -732,13 +755,12 @@ namespace PETScWrappers
               }
           }
 
-          compress ();
+          compress (VectorOperation::insert);
 
           // set the dummy entries set above
           // back to zero
           *this = 0;
 #endif // version <=2.3.3
-          compress ();
 
 
           // Tell PETSc that we are not

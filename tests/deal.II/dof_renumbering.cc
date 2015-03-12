@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,6 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
@@ -59,10 +58,10 @@ print_dofs (const DoFHandler<dim> &dof)
 
 template <int dim>
 void
-print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
+print_dofs (const DoFHandler<dim> &dof, unsigned int level)
 {
   std::vector<types::global_dof_index> v (dof.get_fe().dofs_per_cell);
-  for (typename MGDoFHandler<dim>::cell_iterator cell=dof.begin(level);
+  for (typename DoFHandler<dim>::cell_iterator cell=dof.begin(level);
        cell != dof.end(level); ++cell)
     {
       deallog << "Cell " << cell << " -- ";
@@ -76,7 +75,7 @@ print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
 
 template <int dim>
 void
-check_renumbering(MGDoFHandler<dim> &mgdof, bool discontinuous)
+check_renumbering(DoFHandler<dim> &mgdof, bool discontinuous)
 {
   const FiniteElement<dim> &element = mgdof.get_fe();
   DoFHandler<dim> &dof = mgdof;
@@ -162,15 +161,17 @@ check ()
   if (dim==1)
     tr.refine_global(2);
 
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
 
   FESystem<dim> e1 (FE_Q<dim>(2), 2, FE_DGQ<dim>(1), 1);
   mgdof.distribute_dofs(e1);
+  mgdof.distribute_mg_dofs(e1);
   check_renumbering(mgdof, false);
   mgdof.clear();
 
   FESystem<dim> e2 (FE_DGP<dim>(2), 2, FE_DGQ<dim>(1), 1);
   mgdof.distribute_dofs(e2);
+  mgdof.distribute_mg_dofs(e2);
   check_renumbering(mgdof, true);
   mgdof.clear();
 }

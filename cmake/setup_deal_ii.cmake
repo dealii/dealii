@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -32,6 +32,7 @@
 #     DEAL_II_PACKAGE_DESCRIPTION     *)
 #     DEAL_II_VERSION_MAJOR
 #     DEAL_II_VERSION_MINOR
+#     DEAL_II_VERSION_SUBMINOR
 #     DEAL_II_VERSION
 #
 # Information about paths, install locations and names:
@@ -41,14 +42,15 @@
 #     DEAL_II_DEBUG_SUFFIX            *)
 #     DEAL_II_RELEASE_SUFFIX          *)
 #
-#     DEAL_II_CMAKE_MACROS_RELDIR     *)
-#     DEAL_II_DOCHTML_RELDIR          *)
-#     DEAL_II_DOCREADME_RELDIR        *)
-#     DEAL_II_EXAMPLES_RELDIR         *)
 #     DEAL_II_EXECUTABLE_RELDIR       *)
 #     DEAL_II_INCLUDE_RELDIR          *)
 #     DEAL_II_LIBRARY_RELDIR          *)
 #     DEAL_II_PROJECT_CONFIG_RELDIR   *)
+#     DEAL_II_SHARE_RELDIR            *)
+#     DEAL_II_CMAKE_MACROS_RELDIR     *)
+#     DEAL_II_DOCREADME_RELDIR        *)
+#     DEAL_II_DOCHTML_RELDIR          *)
+#     DEAL_II_EXAMPLES_RELDIR         *)
 #
 #     DEAL_II_BUILD_TYPES
 #     DEAL_II_LIST_SUFFIXES
@@ -65,24 +67,40 @@
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
-FILE(STRINGS "${CMAKE_SOURCE_DIR}/VERSION" _version LIMIT_COUNT 1)
-SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "${_version}")
-
 SET_IF_EMPTY(DEAL_II_PACKAGE_VENDOR
   "The deal.II Authors <http://www.dealii.org/>"
   )
-
 SET_IF_EMPTY(DEAL_II_PACKAGE_DESCRIPTION
   "Library for solving partial differential equations with the finite element method"
   )
 
-STRING(REGEX REPLACE
-  "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
+FILE(STRINGS "${CMAKE_SOURCE_DIR}/VERSION" _version LIMIT_COUNT 1)
+SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "${_version}")
+
+#
+# We expect a version number of the form "X.Y.Z", where X and Y are always
+# numbers and Z is either a third number (for a release version) or a short
+# string.
+#
+STRING(REGEX REPLACE "^([0-9]+)\\..*" "\\1"
+  DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
   )
-STRING(REGEX REPLACE
-  "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_VERSION_MINOR "${DEAL_II_PACKAGE_VERSION}"
+STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
+  DEAL_II_VERSION_MINOR "${DEAL_II_PACKAGE_VERSION}"
   )
-SET(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR})
+
+#
+# If Z is not a number, replace it with "0", otherwise extract version
+# number:
+#
+IF(DEAL_II_PACKAGE_VERSION MATCHES "^[0-9]+\\.[0-9]+.*\\.[0-9]+.*")
+  STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+.*\\.([0-9]+).*" "\\1"
+    DEAL_II_VERSION_SUBMINOR "${DEAL_II_PACKAGE_VERSION}"
+    )
+ELSE()
+  SET(DEAL_II_VERSION_SUBMINOR "0")
+ENDIF()
+SET(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR}.${DEAL_II_VERSION_SUBMINOR})
 
 
 ########################################################################
@@ -98,34 +116,21 @@ SET_IF_EMPTY(DEAL_II_BASE_NAME "${_base_name}")
 SET_IF_EMPTY(DEAL_II_DEBUG_SUFFIX ".g")
 SET_IF_EMPTY(DEAL_II_RELEASE_SUFFIX "")
 
-IF(DEAL_II_COMPONENT_COMPAT_FILES)
-  #
-  # The good, old directory structure:
-  #
-  SET_IF_EMPTY(DEAL_II_CMAKE_MACROS_RELDIR "cmake/macros")
-  SET_IF_EMPTY(DEAL_II_COMMON_RELDIR "common")
-  SET_IF_EMPTY(DEAL_II_DOCHTML_RELDIR "doc")
-  SET_IF_EMPTY(DEAL_II_DOCREADME_RELDIR "")
-  SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "examples")
-  SET_IF_EMPTY(DEAL_II_EXECUTABLE_RELDIR "bin")
-  SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
-  SET_IF_EMPTY(DEAL_II_LIBRARY_RELDIR "lib")
-  SET_IF_EMPTY(DEAL_II_PROJECT_CONFIG_RELDIR "${DEAL_II_LIBRARY_RELDIR}/cmake/${DEAL_II_PROJECT_CONFIG_NAME}")
-ELSE()
-  #
-  # IF DEAL_II_COMPONENT_COMPAT_FILES=off, we assume that we have to
-  # obey the FSHS...
-  #
-  SET_IF_EMPTY(DEAL_II_CMAKE_MACROS_RELDIR "share/${DEAL_II_PACKAGE_NAME}/cmake/Macros")
-  SET_IF_EMPTY(DEAL_II_COMMON_RELDIR "share/${DEAL_II_PACKAGE_NAME}/common")
-  SET_IF_EMPTY(DEAL_II_DOCREADME_RELDIR "share/doc/${DEAL_II_PACKAGE_NAME}")
-  SET_IF_EMPTY(DEAL_II_DOCHTML_RELDIR "${DEAL_II_DOCREADME_RELDIR}/html")
-  SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "share/doc/${DEAL_II_PACKAGE_NAME}/examples")
-  SET_IF_EMPTY(DEAL_II_EXECUTABLE_RELDIR "bin")
-  SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
-  SET_IF_EMPTY(DEAL_II_LIBRARY_RELDIR "lib${LIB_SUFFIX}")
-  SET_IF_EMPTY(DEAL_II_PROJECT_CONFIG_RELDIR "${DEAL_II_LIBRARY_RELDIR}/cmake/${DEAL_II_PROJECT_CONFIG_NAME}")
-ENDIF()
+#
+# Try to obey the FSHS as close as possible ...
+#
+SET_IF_EMPTY(DEAL_II_EXECUTABLE_RELDIR "bin")
+SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
+SET_IF_EMPTY(DEAL_II_LIBRARY_RELDIR "lib${LIB_SUFFIX}")
+SET_IF_EMPTY(DEAL_II_PROJECT_CONFIG_RELDIR "${DEAL_II_LIBRARY_RELDIR}/cmake/${DEAL_II_PROJECT_CONFIG_NAME}")
+SET_IF_EMPTY(DEAL_II_SHARE_RELDIR "share/${DEAL_II_PACKAGE_NAME}")
+SET_IF_EMPTY(DEAL_II_CMAKE_MACROS_RELDIR "${DEAL_II_SHARE_RELDIR}/cmake/macros")
+#
+# ... but install the documentation into prominent places:
+#
+SET_IF_EMPTY(DEAL_II_DOCREADME_RELDIR "./")
+SET_IF_EMPTY(DEAL_II_DOCHTML_RELDIR "doc")
+SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "examples")
 
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   LIST(APPEND DEAL_II_BUILD_TYPES "DEBUG")

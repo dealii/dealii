@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,27 +30,29 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 /**
- * This class computes an Incomplete LU (ILU) decomposition of a sparse matrix,
- * using either the same sparsity pattern or a different one.
- * By incomplete we mean that unlike the exact decomposition, the incomplete
- * one is also computed using sparse factors, and entries
- * in the decomposition that do not fit into the given sparsity structure
- * are discarded.
+ * This class computes an Incomplete LU (ILU) decomposition of a sparse
+ * matrix, using either the same sparsity pattern or a different one. By
+ * incomplete we mean that unlike the exact decomposition, the incomplete one
+ * is also computed using sparse factors, and entries in the decomposition
+ * that do not fit into the given sparsity structure are discarded.
  *
- * The algorithm used by this class is essentially a copy of the
- * algorithm given in the book Y. Saad: "Iterative methods for sparse
- * linear systems", second edition, in section 10.3.2.
+ * The algorithm used by this class is essentially a copy of the algorithm
+ * given in the book Y. Saad: "Iterative methods for sparse linear systems",
+ * second edition, in section 10.3.2.
  *
  *
  * <h3>Usage and state management</h3>
  *
- * Refer to SparseLUDecomposition documentation for suggested
- * usage and state management. This class is used in the @ref
- * step_22 "step-22" tutorial program.
+ * Refer to SparseLUDecomposition documentation for suggested usage and state
+ * management. This class is used in the
+ * @ref step_22 "step-22"
+ * tutorial program.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Wolfgang Bangerth, 2008, 2009; unified interface: Ralf Hartmann
  */
@@ -66,26 +68,13 @@ public:
   /**
    * Constructor. Does nothing.
    *
-   * Call the @p initialize
-   * function before using this
-   * object as preconditioner.
+   * Call the @p initialize function before using this object as
+   * preconditioner.
    */
   SparseILU ();
 
   /**
-   * @deprecated This method is deprecated, and
-   * left for backward
-   * compatibility. It will be removed
-   * in later versions.
-   * Instead, pass the sparsity pattern that you want used for
-   * the decomposition in the AdditionalData structure.
-   */
-  SparseILU (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
-
-  /**
-   * Make
-   * SparseLUDecomposition::AdditionalData
-   * accessible to this class as
+   * Make SparseLUDecomposition::AdditionalData accessible to this class as
    * well.
    */
   typedef
@@ -93,65 +82,31 @@ public:
   AdditionalData;
 
   /**
-   * Perform the incomplete LU
-   * factorization of the given
-   * matrix.
+   * Perform the incomplete LU factorization of the given matrix.
    *
-   * This function needs to be
-   * called before an object of
-   * this class is used as
-   * preconditioner.
+   * This function needs to be called before an object of this class is used
+   * as preconditioner.
    *
-   * For more details about
-   * possible parameters, see the
-   * class documentation of
-   * SparseLUDecomposition and the
-   * documentation of the
-   * @p SparseLUDecomposition::AdditionalData
-   * class.
+   * For more details about possible parameters, see the class documentation
+   * of SparseLUDecomposition and the documentation of the @p
+   * SparseLUDecomposition::AdditionalData class.
    *
-   * According to the
-   * @p parameters, this function
-   * creates a new SparsityPattern
-   * or keeps the previous sparsity
-   * or takes the sparsity given by
-   * the user to @p data. Then,
-   * this function performs the LU
+   * According to the @p parameters, this function creates a new
+   * SparsityPattern or keeps the previous sparsity or takes the sparsity
+   * given by the user to @p data. Then, this function performs the LU
    * decomposition.
    *
-   * After this function is called
-   * the preconditioner is ready to
-   * be used.
+   * After this function is called the preconditioner is ready to be used.
    */
   template <typename somenumber>
   void initialize (const SparseMatrix<somenumber> &matrix,
                    const AdditionalData &parameters = AdditionalData());
 
   /**
-   * @deprecated This method is deprecated, and left for backward
-   * compability. It will be removed in later versions.
-   */
-  template <typename somenumber>
-  void decompose (const SparseMatrix<somenumber> &matrix,
-                  const double                    strengthen_diagonal=0.) DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated This method is deprecated, and
-   * left for backward
-   * compatibility. It will be
-   * removed in later versions.
-   */
-  template <typename somenumber>
-  void apply_decomposition (Vector<somenumber>       &dst,
-                            const Vector<somenumber> &src) const DEAL_II_DEPRECATED;
-
-  /**
-   * Apply the incomplete decomposition,
-   * i.e. do one forward-backward step
+   * Apply the incomplete decomposition, i.e. do one forward-backward step
    * $dst=(LU)^{-1}src$.
    *
-   * The initialize() function
-   * needs to be called before.
+   * The initialize() function needs to be called before.
    */
   template <typename somenumber>
   void vmult (Vector<somenumber>       &dst,
@@ -159,13 +114,10 @@ public:
 
 
   /**
-   * Apply the transpose of the
-   * incomplete decomposition,
-   * i.e. do one forward-backward step
-   * $dst=(LU)^{-T}src$.
+   * Apply the transpose of the incomplete decomposition, i.e. do one forward-
+   * backward step $dst=(LU)^{-T}src$.
    *
-   * The initialize() function
-   * needs to be called before.
+   * The initialize() function needs to be called before.
    */
   template <typename somenumber>
   void Tvmult (Vector<somenumber>       &dst,
@@ -173,14 +125,15 @@ public:
 
 
   /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object.
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
    */
   std::size_t memory_consumption () const;
 
-  /** @addtogroup Exceptions
-   * @{ */
+  /**
+   * @addtogroup Exceptions
+   * @{
+   */
 
   /**
    * Exception
@@ -189,23 +142,22 @@ public:
                   double,
                   << "The strengthening parameter " << arg1
                   << " is not greater or equal than zero!");
+  /**
+   * Exception
+   */
+  DeclException1 (ExcZeroPivot,
+                  size_type,
+                  << "While computing the ILU decomposition, the algorithm "
+                  "found a zero pivot on the diagonal of row "
+                  << arg1
+                  << ". This must stop the ILU algorithm because it means "
+                  "that the matrix for which you try to compute a "
+                  "decomposition is singular.");
   //@}
 };
 
 /*@}*/
 //---------------------------------------------------------------------------
-
-template <typename number>
-template <typename somenumber>
-inline
-void
-SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
-                                        const Vector<somenumber> &src) const
-{
-  vmult (dst, src);
-}
-
-
 
 
 DEAL_II_NAMESPACE_CLOSE

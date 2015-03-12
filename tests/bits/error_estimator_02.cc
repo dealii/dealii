@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -170,7 +170,7 @@ check ()
       KellyErrorEstimator<dim>::estimate (mapping, dof, q_face, neumann_bc,
                                           v, this_error,
                                           std::vector<bool>(), 0,
-                                          multithread_info.n_threads(),
+                                          MultithreadInfo::n_threads(),
                                           numbers::invalid_unsigned_int,
                                           material);
       this_error *= scaling_factor;

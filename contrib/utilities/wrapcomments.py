@@ -12,7 +12,7 @@ import sys
 import string
 wrapper = textwrap.TextWrapper()
 
-# take an array of lines and wrap them to 78 columns and let each lines start
+# take an array of lines and wrap them to 78 columns and let each line start
 # with @p startwith
 def wrap_block(lines, startwith):
     longline = " ".join(lines)
@@ -87,14 +87,24 @@ def format_block(lines, infostr=""):
     idx = string.find(lines[0],"/**")
     start = lines[0][:idx]+" * "
     
-    out = [lines[0]]
+    out = [lines[0].rstrip()]
     idx = 1
     endidx = len(lines)-1
     curlines = []
 
-    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@deprecated"]
+    ops_startline = ["<li>", "@param", "@returns", "@warning", "@ingroup", "@author", "@date", "@related", "@relates", "@relatesalso", "@deprecated", "@image", "@return", "@brief", "@attention", "@copydoc", "@addtogroup", "@todo", "@tparam", "@skip", "@skipline", "@until", "@line", "@dontinclude", "@include", "@see", "@note"]
+
+    # subset of ops_startline that does not want stuff from the next line appended
+    # to this.
+    ops_also_end_paragraph = ["@image"]
+
+    # stuff handled in the while loop down: @code, @verbatim, @f @ref
 
     ops_separate_line = ["<ol>", "</ol>", "<ul>", "</ul>", "@{", "@}", "<br>"]
+
+
+    #todo:
+    #  @arg @c @cond  @em @endcond @f{ @internal @name @post @pre  @sa 
 
     while idx<endidx:
         if one_in(ops_separate_line, lines[idx]):
@@ -106,6 +116,56 @@ def format_block(lines, infostr=""):
                 if it in thisline and thisline!=it:
                     print ("%s warning %s not in separate line"%(infostr, it), file=sys.stderr)
             out.append(start + thisline)
+        elif "@page" in lines[idx]:
+            # do not break @page
+            if curlines!=[]:
+                out.extend(wrap_block(remove_junk(curlines), start))
+                curlines=[]
+            thisline = remove_junk([lines[idx]])[0]
+            if not thisline.startswith("@page") and not thisline.startswith("(@page"):
+                print ("%s warning %s not at start of line"%(infostr, "@page"), file=sys.stderr)
+            out.append(start + thisline.strip())
+
+        elif "@ref" in lines[idx]:
+            # @ref link "some long description"
+            # is special, and we mustn't break it
+            if curlines!=[]:
+                out.extend(wrap_block(remove_junk(curlines), start))
+                curlines=[]
+            thisline = remove_junk([lines[idx]])[0]
+            if not thisline.startswith("@ref") and not thisline.startswith("(@ref"):
+                print ("%s warning %s not at start of line"%(infostr, "@ref"), file=sys.stderr)
+
+            # format:
+            # @ref name "some text" blub
+            # or @ref name blurb
+            withquotes = thisline.split('"')
+            if len(withquotes)==3:
+                thisline = withquotes[0]+'"'+withquotes[1]+'"'
+                remain = withquotes[2]
+                for st in [')', '.', ',', ':']:
+                    if remain.startswith(st):
+                        thisline = thisline + st
+                        remain = remain[1:]
+
+                # do not wrap the @ref line:
+                out.append(start + thisline.strip())
+                if len(withquotes[0].strip().split(' '))!=2:
+                    print ("%s warning @ref line looks broken"%(infostr), file=sys.stderr)     
+            elif len(withquotes)==1:
+                words = thisline.strip().split(" ")
+                if len(words)<2 or len(words[0])==0 or len(words[1])==0:
+                    print ("%s warning @ref line looks broken"%(infostr), file=sys.stderr)     
+                thisline = words[0] + ' ' + words[1]
+                out.append(start + thisline.strip())
+                remain = " ".join(words[2:])
+            else:
+                print ("%s warning @ref quotes are not in single line"%(infostr), file=sys.stderr)
+                remain = ''
+
+            if len(remain)>0:
+                curlines.append(remain)
+            
         elif one_in(ops_startline, lines[idx]):
             if curlines!=[]:
                 out.extend(wrap_block(remove_junk(curlines), start))
@@ -115,7 +175,10 @@ def format_block(lines, infostr=""):
                 for it in ops_startline:
                     if it in thisline:
                         print ("%s warning %s not at start of line"%(infostr, it), file=sys.stderr)
-            curlines.append(lines[idx])
+            if one_in(ops_also_end_paragraph, lines[idx]):
+                out.append(lines[idx].rstrip())
+            else:
+                curlines.append(lines[idx])
         elif one_in(["@code", "@verbatim", "@f["], lines[idx]):
             if curlines!=[]:
                 out.extend(wrap_block(remove_junk(curlines), start))
@@ -294,6 +357,62 @@ lineO = ["    /**", \
          "     * @{", \
          "     */"]
 assert(format_block(lineI)==lineO)
+
+lineI = [" /** ", \
+         "  *   bla", \
+         "  * @image testing.png", \
+         "  *  blub", \
+         "  */"]
+lineO = [" /**", \
+         "  * bla", \
+         "  * @image testing.png", \
+         "  * blub", \
+         "  */"]
+assert(format_block(lineI)==lineO)
+
+lineI = [" /** ", \
+         "  * @ref a b c d e", \
+         "  * @ref a \"b c\" d dd", \
+         "  */"]
+lineO = [" /**", \
+         "  * @ref a", \
+         "  * b c d e", \
+         "  * @ref a \"b c\"", \
+         "  * d dd", \
+         "  */"]
+assert(format_block(lineI)==lineO)
+
+long = "long "*20
+lineI = [" /** ", \
+         "  * @ref a \""+long+"\" d", \
+         "  */"]
+lineO = [" /**", \
+         "  * @ref a \""+long+"\"", \
+         "  * d", \
+         "  */"]
+assert(format_block(lineI)==lineO)
+
+lineI = [" /** ", \
+         "  * @ref a. c", \
+         "  * @ref a \"b c\". c2", \
+         "  */"]
+lineO = [" /**", \
+         "  * @ref a.", \
+         "  * c", \
+         "  * @ref a \"b c\".", \
+         "  * c2", \
+         "  */"]
+assert(format_block(lineI)==lineO)
+
+# do not break @page:
+longtext = "bla bla"*20
+lineI = [" /**", \
+         "  * @page " + longtext, \
+         "  * hello", \
+         "  */"]
+assert(format_block(lineI)==lineI)
+
+
 
 
 # now open the file and do the work

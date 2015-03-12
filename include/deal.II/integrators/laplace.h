@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,14 +39,11 @@ namespace LocalIntegrators
   namespace Laplace
   {
     /**
-     * Laplacian in weak form, namely on the cell <i>Z</i> the matrix
-     * \f[
-     * \int_Z \nu \nabla u \cdot \nabla v \, dx.
-     * \f]
+     * Laplacian in weak form, namely on the cell <i>Z</i> the matrix \f[
+     * \int_Z \nu \nabla u \cdot \nabla v \, dx. \f]
      *
-     * The FiniteElement in <tt>fe</tt> may be scalar or vector valued. In
-     * the latter case, the Laplacian is applied to each component
-     * separately.
+     * The FiniteElement in <tt>fe</tt> may be scalar or vector valued. In the
+     * latter case, the Laplacian is applied to each component separately.
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
@@ -76,9 +73,7 @@ namespace LocalIntegrators
     /**
      * Laplacian residual operator in weak form
      *
-     * \f[
-     * \int_Z \nu \nabla u \cdot \nabla v \, dx.
-     * \f]
+     * \f[ \int_Z \nu \nabla u \cdot \nabla v \, dx. \f]
      */
     template <int dim>
     inline void
@@ -105,9 +100,7 @@ namespace LocalIntegrators
     /**
      * Vector-valued Laplacian residual operator in weak form
      *
-     * \f[
-     * \int_Z \nu \nabla u : \nabla v \, dx.
-     * \f]
+     * \f[ \int_Z \nu \nabla u : \nabla v \, dx. \f]
      */
     template <int dim>
     inline void
@@ -138,13 +131,14 @@ namespace LocalIntegrators
 
 
     /**
-     * Weak boundary condition of Nitsche type for the Laplacian, namely on the face <i>F</i> the matrix
+     * Weak boundary condition of Nitsche type for the Laplacian, namely on
+     * the face <i>F</i> the matrix
      * @f[
      * \int_F \Bigl(\gamma u v - \partial_n u v - u \partial_n v\Bigr)\;ds.
      * @f]
      *
-     * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed
-     * with compute_penalty().
+     * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed with
+     * compute_penalty().
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
@@ -183,11 +177,10 @@ namespace LocalIntegrators
      * \int_F \Bigl(\gamma (u-g) v - \partial_n u v - (u-g) \partial_n v\Bigr)\;ds.
      * @f]
      *
-     * Here, <i>u</i> is the finite element function whose values and
-     * gradient are given in the arguments <tt>input</tt> and
-     * <tt>Dinput</tt>, respectively. <i>g</i> is the inhomogeneous
-     * boundary value in the argument <tt>data</tt>. $\gamma$ is the usual
-     * penalty parameter.
+     * Here, <i>u</i> is the finite element function whose values and gradient
+     * are given in the arguments <tt>input</tt> and <tt>Dinput</tt>,
+     * respectively. <i>g</i> is the inhomogeneous boundary value in the
+     * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
@@ -226,19 +219,17 @@ namespace LocalIntegrators
 
     /**
      * Weak boundary condition for the Laplace operator by Nitsche, vector
-     * valued version, namely on the face <i>F</i>
-     * the vector
+     * valued version, namely on the face <i>F</i> the vector
      * @f[
      * \int_F \Bigl(\gamma (\mathbf u- \mathbf g) \cdot \mathbf v
-     - \partial_n \mathbf u \cdot \mathbf v
-     - (\mathbf u-\mathbf g) \cdot \partial_n \mathbf v\Bigr)\;ds.
+     * - \partial_n \mathbf u \cdot \mathbf v
+     * - (\mathbf u-\mathbf g) \cdot \partial_n \mathbf v\Bigr)\;ds.
      * @f]
      *
-     * Here, <i>u</i> is the finite element function whose values and
-     * gradient are given in the arguments <tt>input</tt> and
-     * <tt>Dinput</tt>, respectively. <i>g</i> is the inhomogeneous
-     * boundary value in the argument <tt>data</tt>. $\gamma$ is the usual
-     * penalty parameter.
+     * Here, <i>u</i> is the finite element function whose values and gradient
+     * are given in the arguments <tt>input</tt> and <tt>Dinput</tt>,
+     * respectively. <i>g</i> is the inhomogeneous boundary value in the
+     * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
@@ -278,20 +269,20 @@ namespace LocalIntegrators
     }
 
     /**
-     * Flux for the interior penalty method for the Laplacian, namely on
-     * the face <i>F</i> the matrices associated with the bilinear form
+     * Flux for the interior penalty method for the Laplacian, namely on the
+     * face <i>F</i> the matrices associated with the bilinear form
      * @f[
      * \int_F \Bigl( \gamma [u][v] - \{\nabla u\}[v\mathbf n] - [u\mathbf
      * n]\{\nabla v\} \Bigr) \; ds.
      * @f]
      *
-     * The penalty parameter should always be the mean value of the
-     * penalties needed for stability on each side. In the case of
-     * constant coefficients, it can be computed using compute_penalty().
+     * The penalty parameter should always be the mean value of the penalties
+     * needed for stability on each side. In the case of constant
+     * coefficients, it can be computed using compute_penalty().
      *
-     * If <tt>factor2</tt> is missing or negative, the factor is assumed
-     * the same on both sides. If factors differ, note that the penalty
-     * parameter has to be computed accordingly.
+     * If <tt>factor2</tt> is missing or negative, the factor is assumed the
+     * same on both sides. If factors differ, note that the penalty parameter
+     * has to be computed accordingly.
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
@@ -351,9 +342,9 @@ namespace LocalIntegrators
     }
 
     /**
-     * Flux for the interior penalty method for the Laplacian applied
-     * to the tangential components of a vector field, namely on
-     * the face <i>F</i> the matrices associated with the bilinear form
+     * Flux for the interior penalty method for the Laplacian applied to the
+     * tangential components of a vector field, namely on the face <i>F</i>
+     * the matrices associated with the bilinear form
      * @f[
      * \int_F \Bigl( \gamma [u_\tau][v_\tau] - \{\nabla u_\tau\}[v_\tau\mathbf n] - [u_\tau\mathbf
      * n]\{\nabla v_\tau\} \Bigr) \; ds.
@@ -517,8 +508,8 @@ namespace LocalIntegrators
      * Vector-valued residual term for the symmetric interior penalty method:
      * @f[
      * \int_F \Bigl( \gamma [\mathbf u]\cdot[\mathbf v]
-     - \{\nabla \mathbf u\}[\mathbf v\otimes \mathbf n]
-     - [\mathbf u\otimes \mathbf n]\{\nabla \mathbf v\} \Bigr) \; ds.
+     * - \{\nabla \mathbf u\}[\mathbf v\otimes \mathbf n]
+     * - [\mathbf u\otimes \mathbf n]\{\nabla \mathbf v\} \Bigr) \; ds.
      * @f]
      *
      * @author Guido Kanschat
@@ -585,15 +576,15 @@ namespace LocalIntegrators
 
 
     /**
-     * Auxiliary function computing the penalty parameter for interior
-     * penalty methods on rectangles.
+     * Auxiliary function computing the penalty parameter for interior penalty
+     * methods on rectangles.
      *
      * Computation is done in two steps: first, we compute on each cell
      * <i>Z<sub>i</sub></i> the value <i>P<sub>i</sub> =
-     * p<sub>i</sub>(p<sub>i</sub>+1)/h<sub>i</sub></i>, where <i>p<sub>i</sub></i> is
-     * the polynomial degree on cell <i>Z<sub>i</sub></i> and
-     * <i>h<sub>i</sub></i> is the length of <i>Z<sub>i</sub></i>
-     * orthogonal to the current face.
+     * p<sub>i</sub>(p<sub>i</sub>+1)/h<sub>i</sub></i>, where
+     * <i>p<sub>i</sub></i> is the polynomial degree on cell
+     * <i>Z<sub>i</sub></i> and <i>h<sub>i</sub></i> is the length of
+     * <i>Z<sub>i</sub></i> orthogonal to the current face.
      *
      * @author Guido Kanschat
      * @date 2010

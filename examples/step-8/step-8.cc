@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2013 by the deal.II authors
+ * Copyright (C) 2000 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -36,7 +36,6 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -211,15 +210,15 @@ namespace Step8
     // If now the point <code>p</code> is in a circle (sphere) of radius 0.2
     // around one of these points, then set the force in x-direction to one,
     // otherwise to zero:
-    if (((p-point_1).square() < 0.2*0.2) ||
-        ((p-point_2).square() < 0.2*0.2))
+    if (((p-point_1).norm_square() < 0.2*0.2) ||
+        ((p-point_2).norm_square() < 0.2*0.2))
       values(0) = 1;
     else
       values(0) = 0;
 
     // Likewise, if <code>p</code> is in the vicinity of the origin, then set
     // the y-force to 1, otherwise to zero:
-    if (p.square() < 0.2*0.2)
+    if (p.norm_square() < 0.2*0.2)
       values(1) = 1;
     else
       values(1) = 0;
@@ -705,17 +704,22 @@ namespace Step8
   // example. This time, we use the square [-1,1]^d as domain, and we refine
   // it twice globally before starting the first iteration.
   //
-  // The reason is the following: we use the <code>Gauss</code> quadrature
+  // The reason for refining twice is a bit accidental: we use the QGauss quadrature
   // formula with two points in each direction for integration of the right
   // hand side; that means that there are four quadrature points on each cell
   // (in 2D). If we only refine the initial grid once globally, then there
   // will be only four quadrature points in each direction on the
   // domain. However, the right hand side function was chosen to be rather
-  // localized and in that case all quadrature points lie outside the support
-  // of the right hand side function. The right hand side vector will then
-  // contain only zeroes and the solution of the system of equations is the
-  // zero vector, i.e. a finite element function that it zero everywhere. We
-  // should not be surprised about such things happening, since we have chosen
+  // localized and in that case, by pure chance, it happens that all quadrature
+  // points lie at points where the the right hand side function is zero (in
+  // mathematical terms, the quadrature points happen to be at points outside
+  // the <i>support</i> of the right hand side function). The right hand side
+  // vector computed with quadrature will then contain only zeroes (even though
+  // it would of course be nonzero if we had computed the right hand side vector
+  // exactly using the integral) and the solution of the system of
+  // equations is the zero vector, i.e., a finite element function that is zero
+  // everywhere. In a sense, we
+  // should not be surprised that this is happening since we have chosen
   // an initial grid that is totally unsuitable for the problem at hand.
   //
   // The unfortunate thing is that if the discrete solution is constant, then
@@ -730,16 +734,9 @@ namespace Step8
   // The conclusion needs to be: while of course we will not choose the
   // initial grid to be well-suited for the accurate solution of the problem,
   // we must at least choose it such that it has the chance to capture the
-  // most striking features of the solution. In this case, it needs to be able
-  // to see the right hand side. Thus, we refine twice globally. (Note that
-  // the <code>refine_global</code> function is not part of the
-  // <code>GridRefinement</code> class in which
-  // <code>refine_and_coarsen_fixed_number</code> is declared, for
-  // example. The reason is first that it is not an algorithm that computed
-  // refinement flags from indicators, but more importantly that it actually
-  // performs the refinement, in contrast to the functions in
-  // <code>GridRefinement</code> that only flag cells without actually
-  // refining the grid.)
+  // important features of the solution. In this case, it needs to be able
+  // to see the right hand side. Thus, we refine twice globally. (Any larger
+  // number of global refinement steps would of course also work.)
   template <int dim>
   void ElasticProblem<dim>::run ()
   {

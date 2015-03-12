@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,31 +36,29 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Tensor product of given polynomials.
  *
- * Given a vector of <i>n</i> one-dimensional polynomials
- * <i>P<sub>1</sub></i> to <i>P<sub>n</sub></i>, this class generates
- * <i>n<sup>dim</sup></i> polynomials of the form
- * <i>Q<sub>ijk</sub>(x,y,z) =
+ * Given a vector of <i>n</i> one-dimensional polynomials <i>P<sub>1</sub></i>
+ * to <i>P<sub>n</sub></i>, this class generates <i>n<sup>dim</sup></i>
+ * polynomials of the form <i>Q<sub>ijk</sub>(x,y,z) =
  * P<sub>i</sub>(x)P<sub>j</sub>(y)P<sub>k</sub>(z)</i>. If the base
- * polynomials are mutually orthogonal on the interval [-1,1] or
- * [0,1], then the tensor product polynomials are orthogonal on
- * [-1,1]<sup>dim</sup> or [0,1]<sup>dim</sup>, respectively.
+ * polynomials are mutually orthogonal on the interval [-1,1] or [0,1], then
+ * the tensor product polynomials are orthogonal on [-1,1]<sup>dim</sup> or
+ * [0,1]<sup>dim</sup>, respectively.
  *
  * Indexing is as follows: the order of dim-dimensional polynomials is
- * x-coordinates running fastest, then y-coordinate, etc. The first
- * few polynomials are thus <i>P<sub>1</sub>(x)P<sub>1</sub>(y),
- * P<sub>2</sub>(x)P<sub>1</sub>(y), P<sub>3</sub>(x)P<sub>1</sub>(y),
- * ..., P<sub>1</sub>(x)P<sub>2</sub>(y),
- * P<sub>2</sub>(x)P<sub>2</sub>(y), P<sub>3</sub>(x)P<sub>2</sub>(y),
- * ...</i> and likewise in 3d.
+ * x-coordinates running fastest, then y-coordinate, etc. The first few
+ * polynomials are thus <i>P<sub>1</sub>(x)P<sub>1</sub>(y),
+ * P<sub>2</sub>(x)P<sub>1</sub>(y), P<sub>3</sub>(x)P<sub>1</sub>(y), ...,
+ * P<sub>1</sub>(x)P<sub>2</sub>(y), P<sub>2</sub>(x)P<sub>2</sub>(y),
+ * P<sub>3</sub>(x)P<sub>2</sub>(y), ...</i> and likewise in 3d.
  *
- * The output_indices() function prints the ordering of the
- * dim-dimensional polynomials, i.e. for each polynomial in the
- * polynomial space it gives the indices i,j,k of the one-dimensional
- * polynomials in x,y and z direction. The ordering of the
- * dim-dimensional polynomials can be changed by using the
+ * The output_indices() function prints the ordering of the dim-dimensional
+ * polynomials, i.e. for each polynomial in the polynomial space it gives the
+ * indices i,j,k of the one-dimensional polynomials in x,y and z direction.
+ * The ordering of the dim-dimensional polynomials can be changed by using the
  * set_numbering() function.
  *
- * @author Ralf Hartmann, 2000, 2004, Guido Kanschat, 2000, Wolfgang Bangerth 2003
+ * @author Ralf Hartmann, 2000, 2004, Guido Kanschat, 2000, Wolfgang Bangerth
+ * 2003
  */
 template <int dim, typename POLY=Polynomials::Polynomial<double> >
 class TensorProductPolynomials
@@ -194,8 +192,8 @@ protected:
 
   /**
    * Each tensor product polynomial <i>i</i> is a product of one-dimensional
-   * polynomials in each space direction. Compute the indices of these
-   * one-dimensional polynomials for each space direction, given the index
+   * polynomials in each space direction. Compute the indices of these one-
+   * dimensional polynomials for each space direction, given the index
    * <i>i</i>.
    */
   // fix to avoid compiler warnings about zero length arrays
@@ -209,16 +207,15 @@ protected:
  * Anisotropic tensor product of given polynomials.
  *
  * Given one-dimensional polynomials <tt>Px1</tt>, <tt>Px2</tt>, ... in
- * x-direction, <tt>Py1</tt>, <tt>Py2</tt>, ... in y-direction, and so on, this
- * class generates polynomials of the form  <i>Q<sub>ijk</sub>(x,y,z) =
- * Pxi(x)Pyj(y)Pzk(z)</i>. If the base polynomials are mutually
- * orthogonal on the interval $[-1,1]$ or $[0,d]$, then the tensor
- * product polynomials are orthogonal on $[-1,1]^d$ or $[0,1]^d$,
- * respectively.
+ * x-direction, <tt>Py1</tt>, <tt>Py2</tt>, ... in y-direction, and so on,
+ * this class generates polynomials of the form  <i>Q<sub>ijk</sub>(x,y,z) =
+ * Pxi(x)Pyj(y)Pzk(z)</i>. If the base polynomials are mutually orthogonal on
+ * the interval $[-1,1]$ or $[0,d]$, then the tensor product polynomials are
+ * orthogonal on $[-1,1]^d$ or $[0,1]^d$, respectively.
  *
- * Indexing is as follows: the order of dim-dimensional polynomials
- * is x-coordinates running fastest, then y-coordinate, etc. The first
- * few polynomials are thus <tt>Px1(x)Py1(y)</tt>, <tt>Px2(x)Py1(y)</tt>,
+ * Indexing is as follows: the order of dim-dimensional polynomials is
+ * x-coordinates running fastest, then y-coordinate, etc. The first few
+ * polynomials are thus <tt>Px1(x)Py1(y)</tt>, <tt>Px2(x)Py1(y)</tt>,
  * <tt>Px3(x)Py1(y)</tt>, ..., <tt>Px1(x)Py2(y)</tt>, <tt>Px2(x)Py2(y)</tt>,
  * <tt>Px3(x)Py2(y)</tt>, ..., and likewise in 3d.
  *
@@ -320,8 +317,8 @@ private:
 
   /**
    * Each tensor product polynomial @þ{i} is a product of one-dimensional
-   * polynomials in each space direction. Compute the indices of these
-   * one-dimensional polynomials for each space direction, given the index
+   * polynomials in each space direction. Compute the indices of these one-
+   * dimensional polynomials for each space direction, given the index
    * <tt>i</tt>.
    */
   void compute_index (const unsigned int i,

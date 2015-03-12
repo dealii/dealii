@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,23 +49,22 @@ namespace parallel
 
 
 /**
- * No preconditioning.  This class helps you, if you want to use a
- * linear solver without preconditioning. All solvers in LAC require a
- * preconditioner. Therefore, you must use the identity provided here
- * to avoid preconditioning. It can be used in the following way:
+ * No preconditioning.  This class helps you, if you want to use a linear
+ * solver without preconditioning. All solvers in LAC require a
+ * preconditioner. Therefore, you must use the identity provided here to avoid
+ * preconditioning. It can be used in the following way:
  *
- @code
-  SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              cg (solver_control);
-  cg.solve (system_matrix, solution, system_rhs,
-            PreconditionIdentity());
- @endcode
+ * @code
+ * SolverControl           solver_control (1000, 1e-12);
+ * SolverCG<>              cg (solver_control);
+ * cg.solve (system_matrix, solution, system_rhs,
+ *          PreconditionIdentity());
+ * @endcode
  *
- * See the step-3 tutorial program for an example and
- * additional explanations.
+ * See the step-3 tutorial program for an example and additional explanations.
  *
- * Alternatively, the IdentityMatrix class can be used to precondition
- * in this way.
+ * Alternatively, the IdentityMatrix class can be used to precondition in this
+ * way.
  *
  * @author Guido Kanschat, 1999
  */
@@ -73,12 +72,8 @@ class PreconditionIdentity : public Subscriptor
 {
 public:
   /**
-   * This function is only
-   * present to
-   * provide the interface of
-   * a preconditioner to be
-   * handed to a smoother.
-   * This does nothing.
+   * This function is only present to provide the interface of a
+   * preconditioner to be handed to a smoother.  This does nothing.
    */
   struct AdditionalData
   {
@@ -89,10 +84,8 @@ public:
   };
 
   /**
-   * The matrix
-   * argument is ignored and here
-   * just for compatibility with
-   * more complex preconditioners.
+   * The matrix argument is ignored and here just for compatibility with more
+   * complex preconditioners.
    */
   template <class MATRIX>
   void initialize (const MATRIX         &matrix,
@@ -105,11 +98,8 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner. Since this is
-   * the identity, this function is
-   * the same as
-   * vmult().
+   * Apply transpose preconditioner. Since this is the identity, this function
+   * is the same as vmult().
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
@@ -121,22 +111,15 @@ public:
   void vmult_add (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner, adding. Since this is
-   * the identity, this function is
-   * the same as
-   * vmult_add().
+   * Apply transpose preconditioner, adding. Since this is the identity, this
+   * function is the same as vmult_add().
    */
   template<class VECTOR>
   void Tvmult_add (VECTOR &, const VECTOR &) const;
 
   /**
-   * This function is only
-   * present to
-   * provide the interface of
-   * a preconditioner to be
-   * handed to a smoother.
-   * This does nothing.
+   * This function is only present to provide the interface of a
+   * preconditioner to be handed to a smoother.  This does nothing.
    */
   void clear () {}
 };
@@ -144,14 +127,14 @@ public:
 
 
 /**
- * Preconditioning with Richardson's method. This preconditioner just
- * scales the vector with a constant relaxation factor provided by the
- * AdditionalData object.
+ * Preconditioning with Richardson's method. This preconditioner just scales
+ * the vector with a constant relaxation factor provided by the AdditionalData
+ * object.
  *
- * In Krylov-space methods, this preconditioner should not have any
- * effect. Using SolverRichardson, the two relaxation parameters will
- * be just multiplied. Still, this class is useful in multigrid
- * smoother objects (MGSmootherRelaxation).
+ * In Krylov-space methods, this preconditioner should not have any effect.
+ * Using SolverRichardson, the two relaxation parameters will be just
+ * multiplied. Still, this class is useful in multigrid smoother objects
+ * (MGSmootherRelaxation).
  *
  * @author Guido Kanschat, 2005
  */
@@ -159,17 +142,14 @@ class PreconditionRichardson : public Subscriptor
 {
 public:
   /**
-   * Parameters for Richardson
-   * preconditioner.
+   * Parameters for Richardson preconditioner.
    */
   class AdditionalData
   {
   public:
     /**
-     * Constructor. Block size
-     * must be given since there
-     * is no reasonable default
-     * parameter.
+     * Constructor. Block size must be given since there is no reasonable
+     * default parameter.
      */
     AdditionalData (const double relaxation = 1.);
 
@@ -180,24 +160,19 @@ public:
   };
 
   /**
-   * Constructor, sets the
-   * relaxation parameter to its
-   * default.
+   * Constructor, sets the relaxation parameter to its default.
    */
   PreconditionRichardson();
 
   /**
-   * Change the relaxaton parameter.
+   * Change the relaxation parameter.
    */
   void initialize (const AdditionalData &parameters);
 
   /**
-   * Change the relaxaton parameter
-   * in a way consistent with other
-   * preconditioners. The matrix
-   * argument is ignored and here
-   * just for compatibility with
-   * more complex preconditioners.
+   * Change the relaxation parameter in a way consistent with other
+   * preconditioners. The matrix argument is ignored and here just for
+   * compatibility with more complex preconditioners.
    */
   template <class MATRIX>
   void initialize (const MATRIX &,
@@ -210,11 +185,8 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner. Since this is
-   * the identity, this function is
-   * the same as
-   * vmult().
+   * Apply transpose preconditioner. Since this is the identity, this function
+   * is the same as vmult().
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
@@ -225,29 +197,21 @@ public:
   void vmult_add (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner, adding. Since this is
-   * the identity, this function is
-   * the same as
-   * vmult_add().
+   * Apply transpose preconditioner, adding. Since this is the identity, this
+   * function is the same as vmult_add().
    */
   template<class VECTOR>
   void Tvmult_add (VECTOR &, const VECTOR &) const;
 
   /**
-   * This function is only
-   * present to
-   * provide the interface of
-   * a preconditioner to be
-   * handed to a smoother.
-   * This does nothing.
+   * This function is only present to provide the interface of a
+   * preconditioner to be handed to a smoother.  This does nothing.
    */
   void clear () {}
 
 private:
   /**
-   * The relaxation parameter
-   * multiplied with the vectors.
+   * The relaxation parameter multiplied with the vectors.
    */
   double relaxation;
 };
@@ -255,19 +219,18 @@ private:
 
 
 /**
- * Preconditioner using a matrix-builtin function.
- * This class forms a preconditioner suitable for the LAC solver
- * classes. Since many preconditioning methods are based on matrix
- * entries, these have to be implemented as member functions of the
- * underlying matrix implementation. This class now is intended to
- * allow easy access to these member functions from LAC solver
- * classes.
+ * Preconditioner using a matrix-builtin function.  This class forms a
+ * preconditioner suitable for the LAC solver classes. Since many
+ * preconditioning methods are based on matrix entries, these have to be
+ * implemented as member functions of the underlying matrix implementation.
+ * This class now is intended to allow easy access to these member functions
+ * from LAC solver classes.
  *
- * It seems that all builtin preconditioners have a relaxation
- * parameter, so please use PreconditionRelaxation for these.
+ * It seems that all builtin preconditioners have a relaxation parameter, so
+ * please use PreconditionRelaxation for these.
  *
- * You will usually not want to create a named object of this type,
- * although possible. The most common use is like this:
+ * You will usually not want to create a named object of this type, although
+ * possible. The most common use is like this:
  * @code
  *    SolverGMRES<SparseMatrix<double>,
  *                Vector<double> >      gmres(control,memory,500);
@@ -276,16 +239,16 @@ private:
  *                 PreconditionUseMatrix<SparseMatrix<double>,Vector<double> >
  *                 (matrix,&SparseMatrix<double>::template precondition_Jacobi<double>));
  * @endcode
- * This creates an unnamed object to be passed as the fourth parameter to
- * the solver function of the SolverGMRES class. It assumes that the
- * SparseMatrix class has a function <tt>precondition_Jacobi</tt> taking two
- * vectors (source and destination) as parameters (Actually, there is no
- * function like that, the existing function takes a third parameter,
- * denoting the relaxation parameter; this example is therefore only meant to
- * illustrate the general idea).
+ * This creates an unnamed object to be passed as the fourth parameter to the
+ * solver function of the SolverGMRES class. It assumes that the SparseMatrix
+ * class has a function <tt>precondition_Jacobi</tt> taking two vectors
+ * (source and destination) as parameters (Actually, there is no function like
+ * that, the existing function takes a third parameter, denoting the
+ * relaxation parameter; this example is therefore only meant to illustrate
+ * the general idea).
  *
- * Note that due to the default template parameters, the above example
- * could be written shorter as follows:
+ * Note that due to the default template parameters, the above example could
+ * be written shorter as follows:
  * @code
  *    ...
  *    gmres.solve (matrix, solution, right_hand_side,
@@ -300,28 +263,21 @@ class PreconditionUseMatrix : public Subscriptor
 {
 public:
   /**
-   * Type of the preconditioning
-   * function of the matrix.
+   * Type of the preconditioning function of the matrix.
    */
   typedef void ( MATRIX::* function_ptr)(VECTOR &, const VECTOR &) const;
 
   /**
-   * Constructor.
-   * This constructor stores a
-   * reference to the matrix object
-   * for later use and selects a
-   * preconditioning method, which
-   * must be a member function of
-   * that matrix.
+   * Constructor.  This constructor stores a reference to the matrix object
+   * for later use and selects a preconditioning method, which must be a
+   * member function of that matrix.
    */
   PreconditionUseMatrix(const MATRIX      &M,
                         const function_ptr method);
 
   /**
-   * Execute preconditioning. Calls the
-   * function passed to the constructor
-   * of this object with the two
-   * arguments given here.
+   * Execute preconditioning. Calls the function passed to the constructor of
+   * this object with the two arguments given here.
    */
   void vmult (VECTOR       &dst,
               const VECTOR &src) const;
@@ -333,8 +289,7 @@ private:
   const MATRIX &matrix;
 
   /**
-   * Pointer to the preconditioning
-   * function.
+   * Pointer to the preconditioning function.
    */
   const function_ptr precondition;
 };
@@ -342,9 +297,9 @@ private:
 
 
 /**
- * Base class for other preconditioners.
- * Here, only some common features Jacobi, SOR and SSOR preconditioners
- * are implemented. For preconditioning, refer to derived classes.
+ * Base class for other preconditioners. Here, only some common features
+ * Jacobi, SOR and SSOR preconditioners are implemented. For preconditioning,
+ * refer to derived classes.
  *
  * @author Guido Kanschat, 2000
  */
@@ -370,21 +325,15 @@ public:
   };
 
   /**
-   * Initialize matrix and
-   * relaxation parameter. The
-   * matrix is just stored in the
-   * preconditioner object. The
-   * relaxation parameter should be
-   * larger than zero and smaller
-   * than 2 for numerical
-   * reasons. It defaults to 1.
+   * Initialize matrix and relaxation parameter. The matrix is just stored in
+   * the preconditioner object. The relaxation parameter should be larger than
+   * zero and smaller than 2 for numerical reasons. It defaults to 1.
    */
   void initialize (const MATRIX &A,
                    const AdditionalData &parameters = AdditionalData());
 
   /**
-   * Release the matrix and reset
-   * its pointer.
+   * Release the matrix and reset its pointer.
    */
   void clear();
 
@@ -403,9 +352,9 @@ protected:
 
 
 /**
- * Jacobi preconditioner using matrix built-in function.  The
- * <tt>MATRIX</tt> class used is required to have a function
- * <tt>precondition_Jacobi(VECTOR&, const VECTOR&, double</tt>)
+ * Jacobi preconditioner using matrix built-in function.  The <tt>MATRIX</tt>
+ * class used is required to have a function <tt>precondition_Jacobi(VECTOR&,
+ * const VECTOR&, double</tt>)
  *
  * @code
  *     // Declare related objects
@@ -438,27 +387,20 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner. Since this is
-   * a symmetric preconditioner,
-   * this function is the same as
-   * vmult().
+   * Apply transpose preconditioner. Since this is a symmetric preconditioner,
+   * this function is the same as vmult().
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Perform one step of the
-   * preconditioned Richardson
-   * iteration.
+   * Perform one step of the preconditioned Richardson iteration.
    */
   template<class VECTOR>
   void step (VECTOR &x, const VECTOR &rhs) const;
 
   /**
-   * Perform one transposed step of
-   * the preconditioned Richardson
-   * iteration.
+   * Perform one transposed step of the preconditioned Richardson iteration.
    */
   template<class VECTOR>
   void Tstep (VECTOR &x, const VECTOR &rhs) const;
@@ -469,25 +411,23 @@ public:
  * SOR preconditioner using matrix built-in function.
  *
  * Assuming the matrix <i>A = D + L + U</i> is split into its diagonal
- * <i>D</i> as well as the strict lower and upper triangles <i>L</i>
- * and <i>U</i>, then the SOR preconditioner with relaxation parameter
- * <i>r</i> is
+ * <i>D</i> as well as the strict lower and upper triangles <i>L</i> and
+ * <i>U</i>, then the SOR preconditioner with relaxation parameter <i>r</i> is
  * @f[
  *  P^{-1} = r (D+rL)^{-1}.
  * @f]
- * It is this operator <i>P<sup>-1</sup></i>, which is implemented by
- * vmult() through forward substitution. Analogously, Tvmult()
- * implements the operation of <i>r(D+rU)<sup>-1</sup></i>.
+ * It is this operator <i>P<sup>-1</sup></i>, which is implemented by vmult()
+ * through forward substitution. Analogously, Tvmult() implements the
+ * operation of <i>r(D+rU)<sup>-1</sup></i>.
  *
  * The SOR iteration itself can be directly written as
  * @f[
  *  x^{k+1} = x^k - r D^{-1} \bigl(L x^{k+1} + U x^k - b\bigr).
  * @f]
- * Using the right hand side <i>b</i> and the previous iterate
- * <i>x</i>, this is the operation implemented by step().
+ * Using the right hand side <i>b</i> and the previous iterate <i>x</i>, this
+ * is the operation implemented by step().
  *
- * The MATRIX
- * class used is required to have functions
+ * The MATRIX class used is required to have functions
  * <tt>precondition_SOR(VECTOR&, const VECTOR&, double)</tt> and
  * <tt>precondition_TSOR(VECTOR&, const VECTOR&, double)</tt>.
  *
@@ -522,24 +462,19 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner.
+   * Apply transpose preconditioner.
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Perform one step of the
-   * preconditioned Richardson
-   * iteration.
+   * Perform one step of the preconditioned Richardson iteration.
    */
   template<class VECTOR>
   void step (VECTOR &x, const VECTOR &rhs) const;
 
   /**
-   * Perform one transposed step of
-   * the preconditioned Richardson
-   * iteration.
+   * Perform one transposed step of the preconditioned Richardson iteration.
    */
   template<class VECTOR>
   void Tstep (VECTOR &x, const VECTOR &rhs) const;
@@ -548,9 +483,9 @@ public:
 
 
 /**
- * SSOR preconditioner using matrix built-in function.  The
- * <tt>MATRIX</tt> class used is required to have a function
- * <tt>precondition_SSOR(VECTOR&, const VECTOR&, double)</tt>
+ * SSOR preconditioner using matrix built-in function.  The <tt>MATRIX</tt>
+ * class used is required to have a function <tt>precondition_SSOR(VECTOR&,
+ * const VECTOR&, double)</tt>
  *
  * @code
  *     // Declare related objects
@@ -588,14 +523,9 @@ public:
 
 
   /**
-   * Initialize matrix and
-   * relaxation parameter. The
-   * matrix is just stored in the
-   * preconditioner object. The
-   * relaxation parameter should be
-   * larger than zero and smaller
-   * than 2 for numerical
-   * reasons. It defaults to 1.
+   * Initialize matrix and relaxation parameter. The matrix is just stored in
+   * the preconditioner object. The relaxation parameter should be larger than
+   * zero and smaller than 2 for numerical reasons. It defaults to 1.
    */
   void initialize (const MATRIX &A,
                    const typename BaseClass::AdditionalData &parameters = typename BaseClass::AdditionalData());
@@ -607,36 +537,28 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner. Since this is
-   * a symmetric preconditioner,
-   * this function is the same as
-   * vmult().
+   * Apply transpose preconditioner. Since this is a symmetric preconditioner,
+   * this function is the same as vmult().
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
 
 
   /**
-   * Perform one step of the
-   * preconditioned Richardson
-   * iteration
+   * Perform one step of the preconditioned Richardson iteration
    */
   template<class VECTOR>
   void step (VECTOR &x, const VECTOR &rhs) const;
 
   /**
-   * Perform one transposed step of
-   * the preconditioned Richardson
-   * iteration.
+   * Perform one transposed step of the preconditioned Richardson iteration.
    */
   template<class VECTOR>
   void Tstep (VECTOR &x, const VECTOR &rhs) const;
 
 private:
   /**
-   * An array that stores for each matrix
-   * row where the first position after
+   * An array that stores for each matrix row where the first position after
    * the diagonal is located.
    */
   std::vector<std::size_t> pos_right_of_diagonal;
@@ -645,9 +567,9 @@ private:
 
 /**
  * Permuted SOR preconditioner using matrix built-in function.  The
- * <tt>MATRIX</tt> class used is required to have functions
- * <tt>PSOR(VECTOR&, const VECTOR&, double)</tt> and
- * <tt>TPSOR(VECTOR&, const VECTOR&, double)</tt>.
+ * <tt>MATRIX</tt> class used is required to have functions <tt>PSOR(VECTOR&,
+ * const VECTOR&, double)</tt> and <tt>TPSOR(VECTOR&, const VECTOR&,
+ * double)</tt>.
  *
  * @code
  *     // Declare related objects
@@ -684,23 +606,15 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Initialize matrix and
-   * relaxation parameter. The
-   * matrix is just stored in the
-   * preconditioner object.
+   * Initialize matrix and relaxation parameter. The matrix is just stored in
+   * the preconditioner object.
    *
-   * The permutation vector is
-   * stored as a
-   * pointer. Therefore, it has to
-   * be assured that the lifetime
-   * of the vector exceeds the
-   * lifetime of the
+   * The permutation vector is stored as a pointer. Therefore, it has to be
+   * assured that the lifetime of the vector exceeds the lifetime of the
    * preconditioner.
    *
-   * The relaxation parameter
-   * should be larger than zero and
-   * smaller than 2 for numerical
-   * reasons. It defaults to 1.
+   * The relaxation parameter should be larger than zero and smaller than 2
+   * for numerical reasons. It defaults to 1.
    */
   void initialize (const MATRIX &A,
                    const std::vector<size_type> &permutation,
@@ -715,8 +629,7 @@ public:
   void vmult (VECTOR &, const VECTOR &) const;
 
   /**
-   * Apply transpose
-   * preconditioner.
+   * Apply transpose preconditioner.
    */
   template<class VECTOR>
   void Tvmult (VECTOR &, const VECTOR &) const;
@@ -726,8 +639,7 @@ private:
    */
   const std::vector<size_type> *permutation;
   /**
-   * Storage for the inverse
-   * permutation vector.
+   * Storage for the inverse permutation vector.
    */
   const std::vector<size_type> *inverse_permutation;
 };
@@ -735,170 +647,12 @@ private:
 
 
 /**
- * @deprecated This class has been superseded by IterativeInverse,
- * which is more flexible and easier to use.
- *
- * Preconditioner using an iterative solver.  This preconditioner uses
- * a fully initialized LAC iterative solver for the approximate
- * inverse of the matrix. Naturally, this solver needs another
- * preconditionig method.
- *
- * Usually, the use of ReductionControl is preferred over the use of
- * the basic SolverControl in defining this solver.
- *
- * Krylov space methods like SolverCG or SolverBicgstab
- * become inefficient if soution down to machine accuracy is
- * needed. This is due to the fact, that round-off errors spoil the
- * orthogonality of the vector sequences. Therefore, a nested
- * iteration of two methods is proposed: The outer method is
- * SolverRichardson, since it is robust with respect to round-of
- * errors. The inner loop is an appropriate Krylov space method, since
- * it is fast.
- *
- * @code
- *     // Declare related objects
- *
- * SparseMatrix<double> A;
- * Vector<double> x;
- * Vector<double> b;
- * GrowingVectorMemory<Vector<double> > mem;
-
- * ReductionControl inner_control (10, 1.e-30, 1.e-2)
- * SolverCG<Vector<double> > inner_iteration (inner_control, mem);
- * PreconditionSSOR <SparseMatrix<double> > inner_precondition;
- * inner_precondition.initialize (A, 1.2);
- *
- * PreconditionLACSolver precondition;
- * precondition.initialize (inner_iteration, A, inner_precondition);
- *
- * SolverControl outer_control(100, 1.e-16);
- * SolverRichardson<Vector<double> > outer_iteration;
- *
- * outer_iteration.solve (A, x, b, precondition);
- * @endcode
- *
- * Each time we call the inner loop, reduction of the residual by a
- * factor <tt>1.e-2</tt> is attempted. Since the right hand side vector of
- * the inner iteration is the residual of the outer loop, the relative
- * errors are far from machine accuracy, even if the errors of the
- * outer loop are in the range of machine accuracy.
- *
- * @author Guido Kanschat, 1999
- */
-template<class SOLVER, class MATRIX = SparseMatrix<double>, class PRECONDITION = PreconditionIdentity>
-class PreconditionLACSolver : public Subscriptor
-{
-public:
-  /**
-   * Constructor. All work is done
-   * in initialize.
-   */
-  PreconditionLACSolver ();
-
-  /**
-   * Initialization
-   * function. Provide a solver
-   * object, a matrix, and another
-   * preconditioner for this.
-   */
-  void initialize (SOLVER &,
-                   const MATRIX &,
-                   const PRECONDITION &);
-
-  /**
-   * Execute preconditioning.
-   */
-  template<class VECTOR>
-  void vmult (VECTOR &, const VECTOR &) const;
-
-private:
-  /**
-   * The solver object to use.
-   */
-  SmartPointer<SOLVER,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > solver;
-
-  /**
-   * The matrix in use.
-   */
-  SmartPointer<const MATRIX,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > matrix;
-
-  /**
-   * The preconditioner to use.
-   */
-  SmartPointer<const PRECONDITION,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > precondition;
-} DEAL_II_DEPRECATED;
-
-
-
-/**
- * @deprecated Use ProductMatrix instead.
- *
- * Matrix with preconditioner.
- * Given a matrix $A$ and a preconditioner $P$, this class implements a new matrix
- * with the matrix-vector product $PA$. It needs an auxiliary vector for that.
- *
- * By this time, this is considered a temporary object to be plugged
- * into eigenvalue solvers. Therefore, no SmartPointer is used for
- * <tt>A</tt> and <tt>P</tt>.
- *
- * @author Guido Kanschat, 2000
- */
-template<class MATRIX, class PRECOND, class VECTOR>
-class PreconditionedMatrix : public Subscriptor
-{
-public:
-  /**
-   * Constructor. Provide matrix,
-   * preconditioner and a memory
-   * pool to obtain the auxiliary
-   * vector.
-   */
-  PreconditionedMatrix (const MATRIX          &A,
-                        const PRECOND         &P,
-                        VectorMemory<VECTOR> &mem);
-
-  /**
-   * Preconditioned
-   * matrix-vector-product.
-   */
-  void vmult (VECTOR &dst, const VECTOR &src) const;
-
-  /**
-   * Transposed preconditioned
-   * matrix-vector-product.
-   */
-  void Tvmult (VECTOR &dst, const VECTOR &src) const;
-
-  /**
-   * Residual $b-PAx$.
-   */
-  double residual (VECTOR &dst, const VECTOR &src, const VECTOR &rhs) const;
-
-private:
-  /**
-   * Storage for the matrix.
-   */
-  const MATRIX &A;
-  /**
-   * Storage for preconditioner.
-   */
-  const PRECOND &P;
-  /**
-   * Memory pool for vectors.
-   */
-  VectorMemory<VECTOR> &mem;
-} DEAL_II_DEPRECATED;
-
-
-
-/**
- * Preconditioning with a Chebyshev polynomial for symmetric positive
- * definite matrices. This preconditioner is similar to a Jacobi
- * preconditioner if the degree variable is set to one, otherwise some
- * higher order polynomial corrections are used. This preconditioner needs
- * access to the diagonal of the matrix its acts on and needs a respective
- * <tt>vmult</tt> implemention. However, it does not need to explicitly know
- * the matrix entries.
+ * Preconditioning with a Chebyshev polynomial for symmetric positive definite
+ * matrices. This preconditioner is similar to a Jacobi preconditioner if the
+ * degree variable is set to one, otherwise some higher order polynomial
+ * corrections are used. This preconditioner needs access to the diagonal of
+ * the matrix its acts on and needs a respective <tt>vmult</tt> implemention.
+ * However, it does not need to explicitly know the matrix entries.
  *
  * This class is useful e.g. in multigrid smoother objects, since it is
  * trivially %parallel (assuming that matrix-vector products are %parallel).
@@ -1443,102 +1197,6 @@ AdditionalData (const double relaxation)
 
 
 
-//////////////////////////////////////////////////////////////////////
-
-template<class SOLVER, class MATRIX, class PRECONDITION>
-PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
-::PreconditionLACSolver ()
-  :
-  solver(0), matrix(0), precondition(0)
-{}
-
-
-template<class SOLVER, class MATRIX, class PRECONDITION>
-void
-PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>
-::initialize (SOLVER &s,
-              const MATRIX &m,
-              const PRECONDITION &p)
-{
-  solver = &s;
-  matrix = &m;
-  precondition = &p;
-}
-
-
-template<class SOLVER, class MATRIX, class PRECONDITION>
-template<class VECTOR>
-void
-PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION>::vmult (VECTOR &dst,
-                                                          const VECTOR &src) const
-{
-  Assert (solver !=0 && matrix != 0 && precondition != 0,
-          ExcNotInitialized());
-
-  solver->solve(*matrix, dst, src, *precondition);
-}
-
-//////////////////////////////////////////////////////////////////////
-
-
-template<class MATRIX, class PRECOND, class VECTOR>
-inline
-PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
-::PreconditionedMatrix (const MATRIX &A,
-                        const PRECOND &P,
-                        VectorMemory<VECTOR> &mem):
-  A(A), P(P), mem(mem)
-{}
-
-
-template<class MATRIX, class PRECOND, class VECTOR>
-inline void
-PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
-::vmult (VECTOR &dst,
-         const VECTOR &src) const
-{
-  VECTOR *h = mem.alloc();
-  h->reinit(src);
-  A.vmult(*h, src);
-  P.vmult(dst, *h);
-  mem.free(h);
-}
-
-
-
-template<class MATRIX, class PRECOND, class VECTOR>
-inline void
-PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
-::Tvmult (VECTOR &dst,
-          const VECTOR &src) const
-{
-  VECTOR *h = mem.alloc();
-  h->reinit(src);
-  A.Tvmult(*h, src);
-  P.Tvmult(dst, *h);
-  mem.free(h);
-}
-
-
-
-template<class MATRIX, class PRECOND, class VECTOR>
-inline double
-PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
-::residual (VECTOR &dst,
-            const VECTOR &src,
-            const VECTOR &rhs) const
-{
-  VECTOR *h = mem.alloc();
-  h->reinit(src);
-  A.vmult(*h, src);
-  P.vmult(dst, *h);
-  mem.free(h);
-  dst.sadd(-1.,1.,rhs);
-  return dst.l2_norm ();
-}
-
-
-
 //---------------------------------------------------------------------------
 
 namespace internal
@@ -1581,30 +1239,90 @@ namespace internal
         }
     }
 
-    // worker loop for deal.II vectors
+    // worker routine for deal.II vectors. Because of vectorization, we need
+    // to put the loop into an extra structure because the virtual function of
+    // VectorUpdatesRange prevents the compiler from applying vectorization.
     template <typename Number>
-    struct VectorUpdatesRange : public parallel::ParallelForInteger
+    struct VectorUpdater
     {
-      typedef types::global_dof_index size_type;
-
-      VectorUpdatesRange (const size_t  size,
-                          const Number *src,
-                          const Number *matrix_diagonal_inverse,
-                          const bool    start_zero,
-                          const Number  factor1,
-                          const Number  factor2,
-                          Number       *update1,
-                          Number       *update2,
-                          Number       *dst)
+      VectorUpdater (const Number *src,
+                     const Number *matrix_diagonal_inverse,
+                     const bool    start_zero,
+                     const Number  factor1,
+                     const Number  factor2,
+                     Number       *update1,
+                     Number       *update2,
+                     Number       *dst)
         :
         src (src),
         matrix_diagonal_inverse (matrix_diagonal_inverse),
+        do_startup (factor1 == Number()),
         start_zero (start_zero),
         factor1 (factor1),
         factor2 (factor2),
         update1 (update1),
         update2 (update2),
         dst (dst)
+      {}
+
+      void
+      apply_to_subrange (const std::size_t begin,
+                         const std::size_t end) const
+      {
+        // To circumvent a bug in gcc
+        // (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63945), we create copies
+        // of the variables factor1 and factor2 and do not check based on
+        // factor1.
+        const Number factor1 = this->factor1;
+        const Number factor2 = this->factor2;
+        if (do_startup)
+          {
+            if (start_zero)
+              DEAL_II_OPENMP_SIMD_PRAGMA
+              for (std::size_t i=begin; i<end; ++i)
+                {
+                  dst[i] = factor2 * src[i] * matrix_diagonal_inverse[i];
+                  update1[i] = -dst[i];
+                }
+            else
+              DEAL_II_OPENMP_SIMD_PRAGMA
+              for (std::size_t i=begin; i<end; ++i)
+                {
+                  update1[i] = ((update2[i]-src[i]) *
+                                factor2*matrix_diagonal_inverse[i]);
+                  dst[i] -= update1[i];
+                }
+          }
+        else
+          DEAL_II_OPENMP_SIMD_PRAGMA
+          for (std::size_t i=begin; i<end; ++i)
+            {
+              const Number update =
+                factor1 * update1[i] + factor2 *
+                ((update2[i] - src[i]) * matrix_diagonal_inverse[i]);
+              update1[i] = update;
+              dst[i] -= update;
+            }
+      }
+
+      const Number *src;
+      const Number *matrix_diagonal_inverse;
+      const bool do_startup;
+      const bool start_zero;
+      const Number factor1;
+      const Number factor2;
+      mutable Number *update1;
+      mutable Number *update2;
+      mutable Number *dst;
+    };
+
+    template<typename Number>
+    struct VectorUpdatesRange : public parallel::ParallelForInteger
+    {
+      VectorUpdatesRange(const VectorUpdater<Number> &updater,
+                         const std::size_t size)
+        :
+        updater (updater)
       {
         if (size < internal::Vector::minimum_parallel_grain_size)
           apply_to_subrange (0, size);
@@ -1613,47 +1331,16 @@ namespace internal
                           internal::Vector::minimum_parallel_grain_size);
       }
 
-      ~VectorUpdatesRange()
-      {}
+      ~VectorUpdatesRange() {}
 
       virtual void
-      apply_to_subrange (const size_t begin,
-                         const size_t end) const
+      apply_to_subrange (const std::size_t begin,
+                         const std::size_t end) const
       {
-        if (factor1 == Number())
-          {
-            if (start_zero)
-              for (size_type i=begin; i<end; ++i)
-                {
-                  dst[i] = factor2 * src[i] * matrix_diagonal_inverse[i];
-                  update1[i] = -dst[i];
-                }
-            else
-              for (size_type i=begin; i<end; ++i)
-                {
-                  update1[i] = ((update2[i]-src[i]) *
-                                factor2*matrix_diagonal_inverse[i]);
-                  dst[i] -= update1[i];
-                }
-          }
-        else
-          for (size_type i=begin; i<end; ++i)
-            {
-              const Number update2i = ((update2[i] - src[i]) *
-                                       matrix_diagonal_inverse[i]);
-              update1[i] = factor1 * update1[i] + factor2 * update2i;
-              dst[i] -= update1[i];
-            }
+        updater.apply_to_subrange(begin, end);
       }
 
-      const Number *src;
-      const Number *matrix_diagonal_inverse;
-      const bool start_zero;
-      const Number factor1;
-      const Number factor2;
-      mutable Number *update1;
-      mutable Number *update2;
-      mutable Number *dst;
+      const VectorUpdater<Number> &updater;
     };
 
     // selection for deal.II vector
@@ -1669,10 +1356,10 @@ namespace internal
                     ::dealii::Vector<Number> &update2,
                     ::dealii::Vector<Number> &dst)
     {
-      VectorUpdatesRange<Number>(src.size(), src.begin(),
-                                 matrix_diagonal_inverse.begin(),
-                                 start_zero, factor1, factor2,
-                                 update1.begin(), update2.begin(), dst.begin());
+      VectorUpdater<Number> upd(src.begin(), matrix_diagonal_inverse.begin(),
+                                start_zero, factor1, factor2,
+                                update1.begin(), update2.begin(), dst.begin());
+      VectorUpdatesRange<Number>(upd, src.size());
     }
 
     // selection for parallel deal.II vector
@@ -1688,10 +1375,10 @@ namespace internal
                     parallel::distributed::Vector<Number> &update2,
                     parallel::distributed::Vector<Number> &dst)
     {
-      VectorUpdatesRange<Number>(src.local_size(), src.begin(),
-                                 matrix_diagonal_inverse.begin(),
-                                 start_zero, factor1, factor2,
-                                 update1.begin(), update2.begin(), dst.begin());
+      VectorUpdater<Number> upd(src.begin(), matrix_diagonal_inverse.begin(),
+                                start_zero, factor1, factor2,
+                                update1.begin(), update2.begin(), dst.begin());
+      VectorUpdatesRange<Number>(upd, src.local_size());
     }
 
     template <typename VECTOR>

@@ -34,6 +34,7 @@ SET(OPENCASCADE_DIR "" CACHE PATH "An optional hint to a OpenCASCADE installatio
 SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{OPENCASCADE_DIR}")
 SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{OCC_DIR}")
 SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{OCE_DIR}")
+SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{CASROOT}")
 
 
 DEAL_II_FIND_PATH(OPENCASCADE_INCLUDE_DIR Standard_Version.hxx
@@ -49,29 +50,9 @@ ENDIF()
 
 # These seem to be pretty much the only required ones.
 SET(_opencascade_libraries
-    TKFillet
-    TKMesh
-    TKernel
-    TKG2d
-    TKG3d
-    TKMath
-    TKIGES
-    TKSTL
-    TKShHealing
-    TKXSBase
-    TKBool
-    TKBO
-    TKBRep
-    TKTopAlgo
-    TKGeomAlgo
-    TKGeomBase
-    TKOffset
-    TKPrim
-    TKSTEP
-    TKSTEPBase
-    TKSTEPAttr
-    TKHLR
-    TKFeat
+  TKBO TKBool TKBRep TKernel TKFeat TKFillet TKG2d TKG3d TKGeomAlgo
+  TKGeomBase TKHLR TKIGES TKMath TKMesh TKOffset TKPrim TKShHealing TKSTEP
+  TKSTEPAttr TKSTEPBase TKSTL TKTopAlgo TKXSBase
   )
 
 SET(_libraries "")
@@ -80,13 +61,7 @@ FOREACH(_library ${_opencascade_libraries})
   DEAL_II_FIND_LIBRARY(OPENCASCADE_${_library}
     NAMES ${_library}
     HINTS ${OPENCASCADE_DIR}
-    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
-    NO_DEFAULT_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    NO_CMAKE_FIND_ROOT_PATH
+    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib mac64/clang/lib mac32/clang/lib lin64/gcc/lib lin32/gcc/lib
     )
 ENDFOREACH()
 

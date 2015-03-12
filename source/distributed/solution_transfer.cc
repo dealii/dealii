@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,11 @@ namespace parallel
     SolutionTransfer<dim, VECTOR, DH>::SolutionTransfer(const DH &dof)
       :
       dof_handler(&dof, typeid(*this).name())
-    {}
+    {
+      Assert (dynamic_cast<const parallel::distributed::Triangulation<dim>*>
+              (&dof_handler->get_tria()) != 0,
+              ExcMessage("parallel::distributed::SolutionTransfer requires a parallel::distributed::Triangulation object."));
+    }
 
 
 

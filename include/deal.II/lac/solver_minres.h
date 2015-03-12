@@ -32,35 +32,34 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Minimal residual method for symmetric matrices.
  *
- * For the requirements on matrices and vectors in order to work with
- * this class, see the documentation of the Solver base class.
+ * For the requirements on matrices and vectors in order to work with this
+ * class, see the documentation of the Solver base class.
  *
- * Like all other solver classes, this class has a local structure called
- * @p AdditionalData which is used to pass additional parameters to the
- * solver, like damping parameters or the number of temporary vectors. We
- * use this additional structure instead of passing these values directly
- * to the constructor because this makes the use of the @p SolverSelector and
- * other classes much easier and guarantees that these will continue to
- * work even if number or type of the additional parameters for a certain
- * solver changes.
+ * Like all other solver classes, this class has a local structure called @p
+ * AdditionalData which is used to pass additional parameters to the solver,
+ * like damping parameters or the number of temporary vectors. We use this
+ * additional structure instead of passing these values directly to the
+ * constructor because this makes the use of the @p SolverSelector and other
+ * classes much easier and guarantees that these will continue to work even if
+ * number or type of the additional parameters for a certain solver changes.
  *
- * However, since the MinRes method does not need additional data, the respective
- * structure is empty and does not offer any functionality. The constructor
- * has a default argument, so you may call it without the additional
- * parameter.
+ * However, since the MinRes method does not need additional data, the
+ * respective structure is empty and does not offer any functionality. The
+ * constructor has a default argument, so you may call it without the
+ * additional parameter.
  *
  * The preconditioner has to be positive definite and symmetric
  *
- * The algorithm is taken from the Master thesis of Astrid Battermann
- * with some changes. The full text can be found at
+ * The algorithm is taken from the Master thesis of Astrid Battermann with
+ * some changes. The full text can be found at
  * http://scholar.lib.vt.edu/theses/public/etd-12164379662151/etd-title.html
  *
  *
  * <h3>Observing the progress of linear solver iterations</h3>
  *
- * The solve() function of this class uses the mechanism described
- * in the Solver base class to determine convergence. This mechanism
- * can also be used to observe the progress of the iteration.
+ * The solve() function of this class uses the mechanism described in the
+ * Solver base class to determine convergence. This mechanism can also be used
+ * to observe the progress of the iteration.
  *
  *
  * @author Thomas Richter, 2000, Luca Heltai, 2006
@@ -70,10 +69,8 @@ class SolverMinRes : public Solver<VECTOR>
 {
 public:
   /**
-   * Standardized data struct to
-   * pipe additional data to the
-   * solver. This solver does not
-   * need additional data yet.
+   * Standardized data struct to pipe additional data to the solver. This
+   * solver does not need additional data yet.
    */
   struct AdditionalData
   {
@@ -87,9 +84,8 @@ public:
                 const AdditionalData &data=AdditionalData());
 
   /**
-   * Constructor. Use an object of
-   * type GrowingVectorMemory as
-   * a default to allocate memory.
+   * Constructor. Use an object of type GrowingVectorMemory as a default to
+   * allocate memory.
    */
   SolverMinRes (SolverControl        &cn,
                 const AdditionalData &data=AdditionalData());
@@ -100,8 +96,7 @@ public:
   virtual ~SolverMinRes ();
 
   /**
-   * Solve the linear system $Ax=b$
-   * for x.
+   * Solve the linear system $Ax=b$ for x.
    */
   template<class MATRIX, class PRECONDITIONER>
   void
@@ -110,8 +105,10 @@ public:
          const VECTOR         &b,
          const PRECONDITIONER &precondition);
 
-  /** @addtogroup Exceptions
-   * @{ */
+  /**
+   * @addtogroup Exceptions
+   * @{
+   */
 
   /**
    * Exception
@@ -121,18 +118,13 @@ public:
 
 protected:
   /**
-   * Implementation of the computation of
-   * the norm of the residual.
+   * Implementation of the computation of the norm of the residual.
    */
   virtual double criterion();
   /**
-   * Interface for derived class.
-   * This function gets the current
-   * iteration vector, the residual
-   * and the update vector in each
-   * step. It can be used for a
-   * graphical output of the
-   * convergence history.
+   * Interface for derived class. This function gets the current iteration
+   * vector, the residual and the update vector in each step. It can be used
+   * for a graphical output of the convergence history.
    */
   virtual void print_vectors(const unsigned int step,
                              const VECTOR &x,
@@ -140,24 +132,18 @@ protected:
                              const VECTOR &d) const;
 
   /**
-   * Temporary vectors, allocated through
-   * the @p VectorMemory object at the start
-   * of the actual solution process and
-   * deallocated at the end.
+   * Temporary vectors, allocated through the @p VectorMemory object at the
+   * start of the actual solution process and deallocated at the end.
    */
   VECTOR *Vu0, *Vu1, *Vu2;
   VECTOR *Vm0, *Vm1, *Vm2;
   VECTOR *Vv;
 
   /**
-   * Within the iteration loop, the
-   * square of the residual vector is
-   * stored in this variable. The
-   * function @p criterion uses this
-   * variable to compute the convergence
-   * value, which in this class is the
-   * norm of the residual vector and thus
-   * the square root of the @p res2 value.
+   * Within the iteration loop, the square of the residual vector is stored in
+   * this variable. The function @p criterion uses this variable to compute
+   * the convergence value, which in this class is the norm of the residual
+   * vector and thus the square root of the @p res2 value.
    */
   double res2;
 };

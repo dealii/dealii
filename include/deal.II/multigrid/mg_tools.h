@@ -40,11 +40,10 @@ template <typename number> class BlockSparseMatrix;
 /* @{ */
 
 /**
- * This is a collection of functions operating on, and manipulating
- * the numbers of degrees of freedom in a multilevel triangulation. It
- * is similar in purpose and function to the @p DoFTools class, but
- * operates on levels of DoFHandler
- * objects. See there and the documentation of the member functions
+ * This is a collection of functions operating on, and manipulating the
+ * numbers of degrees of freedom in a multilevel triangulation. It is similar
+ * in purpose and function to the @p DoFTools class, but operates on levels of
+ * DoFHandler objects. See there and the documentation of the member functions
  * for more information.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999 - 2005, 2012
@@ -52,8 +51,7 @@ template <typename number> class BlockSparseMatrix;
 namespace MGTools
 {
   /**
-   * Compute row length vector for
-   * multilevel methods.
+   * Compute row length vector for multilevel methods.
    */
   template <int dim, int spacedim>
   void
@@ -63,10 +61,8 @@ namespace MGTools
                             const DoFTools::Coupling flux_couplings = DoFTools::none);
 
   /**
-   * Compute row length vector for
-   * multilevel methods with
-   * optimization for block
-   * couplings.
+   * Compute row length vector for multilevel methods with optimization for
+   * block couplings.
    */
   template <int dim, int spacedim>
   void
@@ -77,18 +73,13 @@ namespace MGTools
                             const Table<2,DoFTools::Coupling> &flux_couplings);
 
   /**
-   * Write the sparsity structure
-   * of the matrix belonging to the
-   * specified @p level. The sparsity pattern
-   * is not compressed, so before
-   * creating the actual matrix
-   * you have to compress the
-   * matrix yourself, using
+   * Write the sparsity structure of the matrix belonging to the specified @p
+   * level. The sparsity pattern is not compressed, so before creating the
+   * actual matrix you have to compress the matrix yourself, using
    * <tt>SparseMatrixStruct::compress()</tt>.
    *
-   * There is no need to consider
-   * hanging nodes here, since only
-   * one level is considered.
+   * There is no need to consider hanging nodes here, since only one level is
+   * considered.
    */
   template <class DH, class SparsityPattern>
   void
@@ -97,9 +88,11 @@ namespace MGTools
                          const unsigned int       level);
 
   /**
-   * Make a sparsity pattern including fluxes
-   * of discontinuous Galerkin methods.
+   * Make a sparsity pattern including fluxes of discontinuous Galerkin
+   * methods.
+   * @see
    * @ref make_sparsity_pattern
+   * and
    * @ref DoFTools
    */
   template <int dim, class SparsityPattern, int spacedim>
@@ -109,12 +102,8 @@ namespace MGTools
                               const unsigned int       level);
 
   /**
-   * Create sparsity pattern for
-   * the fluxes at refinement
-   * edges. The matrix maps a
-   * function of the fine level
-   * space @p level to the coarser
-   * space.
+   * Create sparsity pattern for the fluxes at refinement edges. The matrix
+   * maps a function of the fine level space @p level to the coarser space.
    *
    * make_flux_sparsity_pattern()
    */
@@ -124,21 +113,13 @@ namespace MGTools
                                    SparsityPattern         &sparsity,
                                    const unsigned int       level);
   /**
-   * This function does the same as
-   * the other with the same name,
-   * but it gets two additional
-   * coefficient matrices. A matrix
-   * entry will only be generated
-   * for two basis functions, if
-   * there is a non-zero entry
-   * linking their associated
-   * components in the coefficient
-   * matrix.
+   * This function does the same as the other with the same name, but it gets
+   * two additional coefficient matrices. A matrix entry will only be
+   * generated for two basis functions, if there is a non-zero entry linking
+   * their associated components in the coefficient matrix.
    *
-   * There is one matrix for
-   * couplings in a cell and one
-   * for the couplings occurring in
-   * fluxes.
+   * There is one matrix for couplings in a cell and one for the couplings
+   * occurring in fluxes.
    */
   template <int dim, class SparsityPattern, int spacedim>
   void
@@ -149,14 +130,10 @@ namespace MGTools
                               const Table<2,DoFTools::Coupling> &flux_mask);
 
   /**
-   * Create sparsity pattern for
-   * the fluxes at refinement
-   * edges. The matrix maps a
-   * function of the fine level
-   * space @p level to the coarser
-   * space. This is the version
-   * restricting the pattern to the
-   * elements actually needed.
+   * Create sparsity pattern for the fluxes at refinement edges. The matrix
+   * maps a function of the fine level space @p level to the coarser space.
+   * This is the version restricting the pattern to the elements actually
+   * needed.
    *
    * make_flux_sparsity_pattern()
    */
@@ -168,14 +145,10 @@ namespace MGTools
                                    const Table<2,DoFTools::Coupling> &flux_mask);
 
   /**
-   * Count the dofs block-wise
-   * on each level.
+   * Count the dofs block-wise on each level.
    *
-   * Result is a vector containing
-   * for each level a vector
-   * containing the number of dofs
-   * for each block (access is
-   * <tt>result[level][block]</tt>).
+   * Result is a vector containing for each level a vector containing the
+   * number of dofs for each block (access is <tt>result[level][block]</tt>).
    */
   template <class DH>
   void
@@ -184,13 +157,10 @@ namespace MGTools
                         std::vector<unsigned int>  target_block = std::vector<unsigned int>());
 
   /**
-   * Count the dofs component-wise
-   * on each level.
+   * Count the dofs component-wise on each level.
    *
-   * Result is a vector containing
-   * for each level a vector
-   * containing the number of dofs
-   * for each component (access is
+   * Result is a vector containing for each level a vector containing the
+   * number of dofs for each component (access is
    * <tt>result[level][component]</tt>).
    */
   template <int dim, int spacedim>
@@ -199,17 +169,6 @@ namespace MGTools
                             std::vector<std::vector<types::global_dof_index> > &result,
                             const bool only_once = false,
                             std::vector<unsigned int> target_component = std::vector<unsigned int>());
-
-  /**
-   * @deprecated Wrapper for the
-   * other function with same name,
-   * introduced for compatibility.
-   */
-  template <int dim, int spacedim>
-  void
-  count_dofs_per_component (const DoFHandler<dim,spacedim> &mg_dof,
-                            std::vector<std::vector<types::global_dof_index> > &result,
-                            std::vector<unsigned int> target_component) DEAL_II_DEPRECATED;
 
   /**
    * Generate a list of those degrees of freedom at the boundary of the domain
@@ -235,8 +194,7 @@ namespace MGTools
                       const ComponentMask                   &component_mask = ComponentMask());
 
   /**
-   * The same function as above, but return
-   * an IndexSet rather than a
+   * The same function as above, but return an IndexSet rather than a
    * std::set<unsigned int> on each level.
    */
   template <int dim, int spacedim>
@@ -247,42 +205,14 @@ namespace MGTools
                       const ComponentMask               &component_mask = ComponentMask());
 
   /**
-   * @deprecated
-   */
-  template <typename number>
-  void
-  apply_boundary_values (const std::set<types::global_dof_index> &boundary_dofs,
-                         SparseMatrix<number> &matrix,
-                         const bool preserve_symmetry,
-                         const bool ignore_zeros = false) DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated
-   */
-  template <typename number>
-  void
-  apply_boundary_values (const std::set<types::global_dof_index> &boundary_dofs,
-                         BlockSparseMatrix<number> &matrix,
-                         const bool preserve_symmetry) DEAL_II_DEPRECATED;
-
-  /**
-   * For each level in a multigrid hierarchy, produce an IndexSet
-   * that indicates which of the degrees of freedom are along
-   * interfaces of this level to cells that only exist on coarser
-   * levels.
+   * For each level in a multigrid hierarchy, produce an IndexSet that
+   * indicates which of the degrees of freedom are along interfaces of this
+   * level to cells that only exist on coarser levels.
    */
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                                 std::vector<IndexSet>  &interface_dofs);
-
-  /**
-   * As above but with a deprecated data structure. This makes one additional copy.
-   */
-  template <int dim, int spacedim>
-  void
-  extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> >  &interface_dofs) DEAL_II_DEPRECATED;
 
 
   template <int dim, int spacedim>

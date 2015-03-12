@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,6 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_tools.h>
 
 #include <fstream>
@@ -43,10 +42,10 @@ using namespace std;
 
 
 template <int dim>
-void dofs(const MGDoFHandler<dim> &dof)
+void dofs(const DoFHandler<dim> &dof)
 {
-  typename MGDoFHandler<dim>::cell_iterator cell;
-  const typename MGDoFHandler<dim>::cell_iterator end = dof.end();
+  typename DoFHandler<dim>::cell_iterator cell;
+  const typename DoFHandler<dim>::cell_iterator end = dof.end();
 
   std::vector<types::global_dof_index> indices;
 
@@ -57,7 +56,7 @@ void dofs(const MGDoFHandler<dim> &dof)
       deallog << "Level " << cell->level() << std::endl;
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         {
-          typename MGDoFHandler<dim>::face_iterator face = cell->face(f);
+          typename DoFHandler<dim>::face_iterator face = cell->face(f);
           face->get_mg_dof_indices(cell->level(), indices);
 
           for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
@@ -83,8 +82,9 @@ void check_fe(FiniteElement<dim> &fe)
   typename FunctionMap<dim>::type fmap;
   fmap.insert(std::make_pair(0, &zero));
 
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
+  mgdof.distribute_mg_dofs(fe);
   dofs(mgdof);
 }
 

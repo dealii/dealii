@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,14 +89,16 @@ check ()
   // that different blocks should
   // not couple, so use pattern
   SparsityPattern sparsity (dof.n_dofs(), dof.n_dofs());
-  std::vector<std::vector<bool> > mask (dim*2,
-                                        std::vector<bool>(dim*2, false));
+  Table<2,DoFTools::Coupling> mask (2*dim, 2*dim);
+  for (unsigned int i=0; i<2*dim; ++i)
+    for (unsigned int j=0; j<2*dim; ++j)
+      mask[i][j] = DoFTools::none;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
-      mask[i][j] = true;
+      mask[i][j] = DoFTools::always;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
-      mask[dim+i][dim+j] = true;
+      mask[dim+i][dim+j] = DoFTools::always;
   DoFTools::make_sparsity_pattern (dof, mask, sparsity);
 
   ConstraintMatrix constraints;
@@ -120,8 +122,9 @@ check ()
   // multiply matrix by 100 to
   // make test more sensitive
   deallog << "Matrix: " << std::endl;
-  for (unsigned int i=0; i<matrix.n_nonzero_elements(); ++i)
-    deallog << matrix.global_entry(i) * 100
+  for (SparseMatrix<double>::const_iterator p=matrix.begin();
+       p!=matrix.end(); ++p)
+    deallog << p->value() * 100
             << std::endl;
 }
 

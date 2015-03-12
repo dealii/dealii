@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2013 by the deal.II authors
+// Copyright (C) 2012 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,17 +53,17 @@
 
 #include "../tests.h"
 
-#include <grid/tria.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/grid_out.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe_system.h>
-#include <fe/mapping_q.h>
-#include <numerics/vector_tools.h>
-#include <numerics/data_out.h>
-#include <base/exceptions.h>
-#include <base/function.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 
 
 template <int dim>

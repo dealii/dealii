@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,12 +15,11 @@
 
 
 // same as block_info, but here we use the new DoFHandler instead
-// of the MGDoFHandler
+// of the DoFHandler
 
 #include "../tests.h"
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>

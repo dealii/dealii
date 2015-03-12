@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -152,7 +152,7 @@ namespace PETScWrappers
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(true)
   {
-    Assert( multithread_info.is_running_single_threaded(),
+    Assert( MultithreadInfo::is_running_single_threaded(),
             ExcMessage("PETSc does not support multi-threaded access, set "
                        "the thread limit to 1 in MPI_InitFinalize()."));
   }
@@ -167,7 +167,7 @@ namespace PETScWrappers
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(true)
   {
-    Assert( multithread_info.is_running_single_threaded(),
+    Assert( MultithreadInfo::is_running_single_threaded(),
             ExcMessage("PETSc does not support multi-threaded access, set "
                        "the thread limit to 1 in MPI_InitFinalize()."));
 
@@ -188,7 +188,7 @@ namespace PETScWrappers
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(false)
   {
-    Assert( multithread_info.is_running_single_threaded(),
+    Assert( MultithreadInfo::is_running_single_threaded(),
             ExcMessage("PETSc does not support multi-threaded access, set "
                        "the thread limit to 1 in MPI_InitFinalize()."));
   }
@@ -213,7 +213,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator = (const PetscScalar s)
   {
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    AssertIsFinite(s);
 
     //TODO[TH]: assert(is_compressed())
 
@@ -388,8 +388,27 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::compress (::dealii::VectorOperation::values)
+  VectorBase::compress (const VectorOperation::values operation)
   {
+#ifdef DEBUG
+#ifdef DEAL_II_WITH_MPI
+    // Check that all processors agree that last_action is the same (or none!)
+
+    int my_int_last_action = last_action;
+    int all_int_last_action;
+
+    MPI_Allreduce(&my_int_last_action, &all_int_last_action, 1, MPI_INT,
+                  MPI_BOR, get_mpi_communicator());
+
+    AssertThrow(all_int_last_action != (::dealii::VectorOperation::add | ::dealii::VectorOperation::insert),
+                ExcMessage("Error: not all processors agree on the last VectorOperation before this compress() call."));
+#endif
+#endif
+
+    AssertThrow(last_action == ::dealii::VectorOperation::unknown
+                || last_action == operation,
+                ExcMessage("Missing compress() or calling with wrong VectorOperation argument."));
+
     // note that one may think that
     // we only need to do something
     // if in fact the state is
@@ -414,14 +433,6 @@ namespace PETScWrappers
     // indicate that we're back to a
     // pristine state
     last_action = ::dealii::VectorOperation::unknown;
-  }
-
-
-
-  void
-  VectorBase::compress ()
-  {
-    compress(VectorOperation::unknown);
   }
 
 
@@ -763,7 +774,7 @@ namespace PETScWrappers
   VectorBase::operator *= (const PetscScalar a)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     const int ierr = VecScale (vector, a);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -777,10 +788,10 @@ namespace PETScWrappers
   VectorBase::operator /= (const PetscScalar a)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     const PetscScalar factor = 1./a;
-    Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+    AssertIsFinite(factor);
 
     const int ierr = VecScale (vector, factor);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -818,7 +829,7 @@ namespace PETScWrappers
   VectorBase::add (const PetscScalar s)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    AssertIsFinite(s);
 
     const int ierr = VecShift (vector, s);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -839,7 +850,7 @@ namespace PETScWrappers
                    const VectorBase &v)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     const int ierr = VecAXPY (vector, a, v);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -854,8 +865,8 @@ namespace PETScWrappers
                    const VectorBase &w)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
+    AssertIsFinite(a);
+    AssertIsFinite(b);
 
     const PetscScalar weights[2] = {a,b};
     Vec               addends[2] = {v.vector, w.vector};
@@ -871,7 +882,7 @@ namespace PETScWrappers
                     const VectorBase &v)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    AssertIsFinite(s);
 
     const int ierr = VecAYPX (vector, s, v);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -885,8 +896,8 @@ namespace PETScWrappers
                     const VectorBase     &v)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(s);
+    AssertIsFinite(a);
 
     // there is nothing like a AXPAY
     // operation in Petsc, so do it in two
@@ -905,9 +916,9 @@ namespace PETScWrappers
                     const VectorBase     &w)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
+    AssertIsFinite(s);
+    AssertIsFinite(a);
+    AssertIsFinite(b);
 
     // there is no operation like MAXPAY, so
     // do it in two steps
@@ -932,10 +943,10 @@ namespace PETScWrappers
                     const VectorBase     &x)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(s), ExcNumberNotFinite());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
-    Assert (numbers::is_finite(c), ExcNumberNotFinite());
+    AssertIsFinite(s);
+    AssertIsFinite(a);
+    AssertIsFinite(b);
+    AssertIsFinite(c);
 
     // there is no operation like MAXPAY, so
     // do it in two steps
@@ -966,7 +977,7 @@ namespace PETScWrappers
                    const VectorBase &v)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    AssertIsFinite(a);
 
     Assert (size() == v.size(),
             ExcDimensionMismatch (size(), v.size()));
@@ -989,8 +1000,8 @@ namespace PETScWrappers
                    const VectorBase &w)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
-    Assert (numbers::is_finite(a), ExcNumberNotFinite());
-    Assert (numbers::is_finite(b), ExcNumberNotFinite());
+    AssertIsFinite(a);
+    AssertIsFinite(b);
 
     Assert (size() == v.size(),
             ExcDimensionMismatch (size(), v.size()));
@@ -1159,25 +1170,6 @@ namespace PETScWrappers
     // written elements or whether the list was empty
     last_action = action;
   }
-
-
-  void
-  VectorBase::update_ghost_values() const
-  {
-    // generate an error for not ghosted
-    // vectors
-    if (!ghosted)
-      AssertThrow (false, ExcInternalError());
-
-    int ierr;
-
-    ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-    ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-  }
-
-
 
 }
 

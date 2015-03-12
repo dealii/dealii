@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,9 +22,9 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
-  MGDoFHandler<dim> dof;
+  DoFHandler<dim> dof;
   dof.initialize(tr, fe);
-
+  dof.distribute_mg_dofs (fe);
 
   const unsigned int level = tr.n_levels()-1;
 

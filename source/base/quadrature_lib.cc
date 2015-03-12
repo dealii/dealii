@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -786,7 +786,7 @@ unsigned int QGaussOneOverR<2>::quad_size(const Point<2> singularity,
     if ( ( std::abs(singularity[i]  ) < eps ) ||
          ( std::abs(singularity[i]-1) < eps ) )
       on_edge = true;
-  if (on_edge && (std::abs( (singularity-Point<2>(.5, .5)).square()-.5)
+  if (on_edge && (std::abs( (singularity-Point<2>(.5, .5)).norm_square()-.5)
                   < eps) )
     on_vertex = true;
   if (on_vertex) return (2*n*n);
@@ -825,7 +825,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   double eps = 1e-8;
   unsigned int q_id = 0; // Current quad point index.
   double area = 0;
-  Point<2> dist;
+  Tensor<1,2> dist;
 
   for (unsigned int box=0; box<4; ++box)
     {

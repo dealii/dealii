@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -732,15 +732,15 @@ template<int dim, int spacedim>
 void
 MappingQ1<dim,spacedim>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const Quadrature<dim>                                     &q,
-  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-  std::vector<Point<spacedim> >                             &quadrature_points,
-  std::vector<double>                                       &JxW_values,
-  std::vector<DerivativeForm<1,dim,spacedim>   >      &jacobians,
-  std::vector<DerivativeForm<2,dim,spacedim>    >     &jacobian_grads,
-  std::vector<DerivativeForm<1,spacedim,dim>   >      &inverse_jacobians,
-  std::vector<Point<spacedim> >                             &normal_vectors,
-  CellSimilarity::Similarity                                &cell_similarity) const
+  const Quadrature<dim>                        &q,
+  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  std::vector<Point<spacedim> >                &quadrature_points,
+  std::vector<double>                          &JxW_values,
+  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+  std::vector<DerivativeForm<2,dim,spacedim> > &jacobian_grads,
+  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians,
+  std::vector<Point<spacedim> >                &normal_vectors,
+  CellSimilarity::Similarity                   &cell_similarity) const
 {
   // ensure that the following static_cast is really correct:
   Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
@@ -924,7 +924,9 @@ namespace internal
                        typename dealii::MappingQ1<dim,spacedim>::InternalData &data,
                        std::vector<double>              &JxW_values,
                        std::vector<Tensor<1,spacedim> > &boundary_forms,
-                       std::vector<Point<spacedim> >    &normal_vectors)
+                       std::vector<Point<spacedim> >    &normal_vectors,
+                       std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians)
     {
       const UpdateFlags update_flags(data.current_update_flags());
 
@@ -1028,7 +1030,7 @@ namespace internal
                   {
                     JxW_values[i] = boundary_forms[i].norm() * weights[i];
 
-                    if (subface_no!=deal_II_numbers::invalid_unsigned_int)
+                    if (subface_no!=numbers::invalid_unsigned_int)
                       {
                         const double area_ratio=GeometryInfo<dim>::subface_ratio(
                                                   cell->subface_case(face_no), subface_no);
@@ -1037,8 +1039,16 @@ namespace internal
                   }
 
                 if (update_flags & update_normal_vectors)
-                  normal_vectors[i] = boundary_forms[i] / boundary_forms[i].norm();
+                  normal_vectors[i] = Point<spacedim>(boundary_forms[i] / boundary_forms[i].norm());
               }
+
+          if (update_flags & update_jacobians)
+            for (unsigned int point=0; point<n_q_points; ++point)
+              jacobians[point] = data.contravariant[point];
+
+          if (update_flags & update_inverse_jacobians)
+            for (unsigned int point=0; point<n_q_points; ++point)
+              inverse_jacobians[point] = data.covariant[point].transpose();
         }
     }
   }
@@ -1057,17 +1067,20 @@ MappingQ1<dim,spacedim>::compute_fill_face (
   const DataSetDescriptor          data_set,
   const std::vector<double>        &weights,
   InternalData                     &data,
-  std::vector<Point<spacedim> >         &quadrature_points,
+  std::vector<Point<spacedim> >    &quadrature_points,
   std::vector<double>              &JxW_values,
   std::vector<Tensor<1,spacedim> > &boundary_forms,
-  std::vector<Point<spacedim> >    &normal_vectors) const
+  std::vector<Point<spacedim> >    &normal_vectors,
+  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
 {
   compute_fill (cell, n_q_points, data_set, CellSimilarity::none,
                 data, quadrature_points);
   internal::compute_fill_face (*this,
                                cell, face_no, subface_no, n_q_points,
                                weights, data,
-                               JxW_values, boundary_forms, normal_vectors);
+                               JxW_values, boundary_forms, normal_vectors,
+                               jacobians, inverse_jacobians);
 }
 
 
@@ -1078,10 +1091,12 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      const unsigned int                               face_no,
                      const Quadrature<dim-1>                          &q,
                      typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                     std::vector<Point<spacedim> >                         &quadrature_points,
+                     std::vector<Point<spacedim> >                    &quadrature_points,
                      std::vector<double>                              &JxW_values,
-                     std::vector<Tensor<1,spacedim> >                      &boundary_forms,
-                     std::vector<Point<spacedim> >                    &normal_vectors) const
+                     std::vector<Tensor<1,spacedim> >                 &boundary_forms,
+                     std::vector<Point<spacedim> >                    &normal_vectors,
+                     std::vector<DerivativeForm<1,dim,spacedim> >     &jacobians,
+                     std::vector<DerivativeForm<1,spacedim,dim> >     &inverse_jacobians) const
 {
   // ensure that the following cast
   // is really correct:
@@ -1091,7 +1106,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 
   const unsigned int n_q_points = q.size();
 
-  compute_fill_face (cell, face_no, deal_II_numbers::invalid_unsigned_int,
+  compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
                      n_q_points,
                      DataSetDescriptor::face (face_no,
                                               cell->face_orientation(face_no),
@@ -1103,7 +1118,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      quadrature_points,
                      JxW_values,
                      boundary_forms,
-                     normal_vectors);
+                     normal_vectors,
+                     jacobians,
+                     inverse_jacobians);
 }
 
 
@@ -1117,9 +1134,11 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const Quadrature<dim-1> &q,
                         typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                         std::vector<Point<spacedim> >     &quadrature_points,
-                        std::vector<double>          &JxW_values,
+                        std::vector<double>               &JxW_values,
                         std::vector<Tensor<1,spacedim> >  &boundary_forms,
-                        std::vector<Point<spacedim> >     &normal_vectors) const
+                        std::vector<Point<spacedim> >     &normal_vectors,
+                        std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                        std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
 {
   // ensure that the following cast
   // is really correct:
@@ -1142,7 +1161,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                      quadrature_points,
                      JxW_values,
                      boundary_forms,
-                     normal_vectors);
+                     normal_vectors,
+                     jacobians,
+                     inverse_jacobians);
 }
 
 
@@ -1699,10 +1720,10 @@ transform_real_to_unit_cell_internal
 
   compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
   Point<spacedim> p_real = transform_unit_to_real_cell_internal(mdata);
-  Point<spacedim> f = p_real-p;
+  Tensor<1,spacedim> f = p_real-p;
 
   // early out if we already have our point
-  if (f.square() < 1e-24 * cell->diameter() * cell->diameter())
+  if (f.norm_square() < 1e-24 * cell->diameter() * cell->diameter())
     return p_unit;
 
   // we need to compare the position of the computed p(x) against the given
@@ -1788,7 +1809,7 @@ transform_real_to_unit_cell_internal
 
           // f(x)
           Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal(mdata);
-          const Point<spacedim> f_trial = p_real_trial-p;
+          const Tensor<1,spacedim> f_trial = p_real_trial-p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
           std::cout << "     step_length=" << step_length << std::endl
@@ -1917,8 +1938,8 @@ transform_real_to_unit_cell_internal_codim1
 
   Point<spacedim1> p_minus_F;
 
-  Point<spacedim1>  DF[dim1];
-  Point<spacedim1>  D2F[dim1][dim1];
+  Tensor<1,spacedim1>  DF[dim1];
+  Tensor<1,spacedim1>  D2F[dim1][dim1];
 
   Point<dim1> p_unit = initial_p_unit;
   Point<dim1> f;
