@@ -382,7 +382,8 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/03/13)
   </li>
 
-  <li> New: Add MueLu preconditioner from Trilinos. This is a new algebraic 
+  <li> New: Add MueLu preconditioner from Trilinos through the class
+  TrilinosWrappers::PreconditionAMGMueLu. This is a new algebraic
   multigrid package. The input parameters are almost the same as the ones 
   from ML so that the two preconditioners can be easily swapped.
   <br>
