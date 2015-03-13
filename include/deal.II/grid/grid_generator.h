@@ -705,6 +705,44 @@ namespace GridGenerator
                               const Triangulation<dim, spacedim> &triangulation_2,
                               Triangulation<dim, spacedim>       &result);
 
+  /**
+   * This function creates a triangulation that consists of the same cells
+   * as are present in the first argument, except those cells that are listed
+   * in the second argument. The purpose of the function is to generate
+   * geometries <i>subtractively</i> from the geometry described by an
+   * existing triangulation. A prototypical case is a 2d domain with
+   * rectangular holes. This can be achieved by first meshing the entire
+   * domain and then using this function to get rid of the cells that
+   * are located at the holes. Likewise, you could create the mesh
+   * that GridGenerator::hyper_L() produces by starting with a
+   * GridGenerator::hyper_cube(), refining it once, and then calling
+   * the current function with a single cell in the second argument.
+   *
+   * @param[in] input_triangulation The original triangulation that serves as
+   *   the template from which the new one is to be created.
+   * @param[in] cells_to_remove A list of cells of the triangulation provided
+   *   as first argument that should be removed (i.e., that should not
+   *   show up in the result.
+   * @param[out] result The resulting triangulation that consists of the same
+   *   cells as are in @p input_triangulation, with the exception of the cells
+   *   listed in @p cells_to_remove.
+   *
+   * @pre Because we cannot create triangulations de novo that contain
+   *   adaptively refined cells, the input triangulation needs to have all
+   *   of its cells on the same level. Oftentimes, this will in fact be
+   *   the coarsest level, but it is allowed to pass in a triangulation
+   *   that has been refined <i>globally</i> a number of times. The output
+   *   triangulation will in that case simply be a mesh with only one
+   *   level that consists of the active cells of the input minus the
+   *   ones listed in the second argument. However, the input triangulation
+   *   must not have been <i>adaptively</i> refined.
+   */
+  template <int dim, int spacedim>
+  void
+  create_triangulation_with_removed_cells (const Triangulation<dim, spacedim> &input_triangulation,
+                                           const std::set<typename Triangulation<dim, spacedim>::active_cell_iterator> &cells_to_remove,
+                                           Triangulation<dim, spacedim>       &result);
+
 
   /**
    * Take a 2d Triangulation that is being extruded in z direction by the

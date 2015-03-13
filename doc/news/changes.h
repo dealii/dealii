@@ -376,6 +376,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: GridGenerator::create_triangulation_with_removed_cells() creates
+  a new mesh out of an existing one by dropping individual cells.
+  <br>
+  (Wolfgang Bangerth, 2015/03/13)
+  </li>
+
   <li> New: Add MueLu preconditioner from Trilinos. This is a new algebraic 
   multigrid package. The input parameters are almost the same as the ones 
   from ML so that the two preconditioners can be easily swapped.
