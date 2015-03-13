@@ -461,9 +461,16 @@ public:
   void clear ();
 
   /**
-   * Read or write the data of this object to or from a stream for the purpose
-   * of serialization.
-   */
+  * Remove all values added at the current row. This is useful when,
+  * for example, a time-step is rejected and all data recorded about
+  * it needs to be discarded.
+  */
+  void clear_current_row ();
+
+  /**
+  * Read or write the data of this object to or from a stream for the purpose
+  * of serialization.
+  */
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version);
 
