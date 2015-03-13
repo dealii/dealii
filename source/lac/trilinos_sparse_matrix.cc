@@ -788,8 +788,8 @@ namespace TrilinosWrappers
     else
       nonlocal_matrix.reset ();
 
-    compress(VectorOperation::insert);
     last_action = Zero;
+    compress(VectorOperation::insert);
   }
 
 
@@ -805,12 +805,14 @@ namespace TrilinosWrappers
     nonlocal_matrix_exporter.reset();
     matrix.reset (new Epetra_FECrsMatrix
                   (Copy, sparse_matrix.trilinos_sparsity_pattern(), false));
+
     if (sparse_matrix.nonlocal_matrix != 0)
       nonlocal_matrix.reset (new Epetra_CrsMatrix
                              (Copy, sparse_matrix.nonlocal_matrix->Graph()));
     else
       nonlocal_matrix.reset();
 
+    last_action = Zero;
     compress(VectorOperation::insert);
   }
 
