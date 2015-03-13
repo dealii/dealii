@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,11 +33,11 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This is a very simple class which provides information about both the CPU
- * time and the wallclock time elapsed since the timer was started last time.
- * Information is retrieved from the system on the basis of clock cycles since
- * last time the computer was booted for the CPU time. The wall time is based
- * on the system clock accessed by @p gettimeofday, with a typical accuracy of
- * 0.01 ms on linux systems.
+ * time and the wallclock time elapsed since the timer was started last
+ * time. Information is retrieved from the system on the basis of clock cycles
+ * since last time the computer was booted for the CPU time. The wall time is
+ * based on the system clock accessed by @p gettimeofday, with a typical
+ * accuracy of 0.01 ms on linux systems.
  *
  *
  * <h3>Usage</h3>
@@ -60,10 +60,10 @@ DEAL_II_NAMESPACE_OPEN
  *   timer.reset();
  * @endcode
  *
- * Alternatively, you can also restart the timer instead of resetting it. The
- * times between successive calls to start() / stop() will then be
- * accumulated. The usage of this class is also explained in the step-28,
- * step-29 and step-30 tutorial programs.
+ * Alternatively, you can also restart the timer instead of resetting
+ * it. The times between successive calls to start() / stop() will then be
+ * accumulated. The usage of this class is also explained in the
+ * step-28, step-29 and step-30 tutorial programs.
  *
  * @note Implementation of this class is system dependent. In case
  * multithreaded routines (matrix-vector products, error estimators, etc.) are
@@ -82,27 +82,37 @@ public:
 
 #ifdef DEAL_II_WITH_MPI
   /**
-   * Constructor that takes an MPI communicator as input. A timer constructed
-   * this way will sum up the CPU times over all processors in the MPI network
-   * when requested by the operator ().
+   * Constructor that takes an MPI
+   * communicator as input. A timer
+   * constructed this way will sum up the
+   * CPU times over all processors in the
+   * MPI network when requested by the
+   * operator ().
    *
    * Starts the timer at 0 sec.
    *
-   * If @p sync_wall_time is true, the wall time is synchronized between all
-   * CPUs using a MPI_Barrier() and a collective operation. Note that this
-   * only works if you stop() the timer before querying for the wall time. The
-   * time for the MPI operations are not included in the timing but may slow
+   * If @p sync_wall_time is true, the wall
+   * time is synchronized between all CPUs
+   * using a MPI_Barrier() and a collective
+   * operation. Note that this only works
+   * if you stop() the timer before
+   * querying for the wall time. The time
+   * for the MPI operations are not
+   * included in the timing but may slow
    * down your program.
    *
-   * This constructor is only available if the deal.II compiler is an MPI
+   * This constructor is only available
+   * if the deal.II compiler is an MPI
    * compiler.
    */
   Timer (MPI_Comm mpi_communicator,
          const bool sync_wall_time = false);
 
   /**
-   * Returns a reference to the data structure with global timing information.
-   * Filled after calling stop().
+   * Returns a reference to the data
+   * structure with global timing
+   * information. Filled after calling
+   * stop().
    */
   const Utilities::MPI::MinMaxAvg &get_data() const;
 
@@ -116,42 +126,52 @@ public:
 #endif
 
   /**
-   * Re-start the timer at the point where it was stopped. This way a
-   * cumulative measurement of time is possible.
+   * Re-start the timer at the point where
+   * it was stopped. This way a cumulative
+   * measurement of time is possible.
    */
   void start ();
 
   /**
-   * Sets the current time as next starting time and return the elapsed time
-   * in seconds.
+   * Sets the current time as next
+   * starting time and return the
+   * elapsed time in seconds.
    */
   double stop ();
 
   /**
-   * Stop the timer if necessary and reset the elapsed time to zero.
+   * Stop the timer if necessary and reset
+   * the elapsed time to zero.
    */
   void reset ();
 
   /**
-   * Resets the elapsed time to zero and starts the timer. This corresponds to
-   * calling @p reset() and @p start() on the Timer object.
+   * Resets the elapsed time to zero and
+   * starts the timer. This corresponds to
+   * calling @p reset() and @p start() on
+   * the Timer object.
    */
   void restart();
 
   /**
-   * Access to the current CPU time without disturbing time measurement. The
-   * elapsed time is returned in units of seconds.
+   * Access to the current CPU time
+   * without disturbing time
+   * measurement. The elapsed time is
+   * returned in units of seconds.
    */
   double operator() () const;
 
   /**
-   * Access to the current wall time without disturbing time measurement. The
-   * elapsed time is returned in units of seconds.
+   * Access to the current wall time
+   * without disturbing time
+   * measurement. The elapsed time is
+   * returned in units of seconds.
    */
   double wall_time () const;
 
   /**
-   * Returns the last lap time; the time taken between the last start()/stop()
+   * Returns the last lap time; the
+   * time taken between the last start()/stop()
    * call.
    */
   double get_lap_time () const;
@@ -159,70 +179,94 @@ public:
 private:
 
   /**
-   * Value of the user time when start() was called the last time or when the
-   * object was created and no stop() was issued in between.
+   * Value of the user time when start()
+   * was called the last time or when the
+   * object was created and no stop() was
+   * issued in between.
    */
   double              start_time;
 
 
   /**
-   * Similar to #start_time, but needed for children threads in multithread
-   * mode. Value of the user time when start() was called the last time or
-   * when the object was created and no stop() was issued in between.
+   * Similar to #start_time, but
+   * needed for children threads
+   * in multithread mode. Value of
+   * the user time when start()
+   * was called the last time or
+   * when the object was created
+   * and no stop() was issued in
+   * between.
    *
-   * For some reason (error in operating system?) the function call
-   * <tt>getrusage(RUSAGE_CHILDREN,.)</tt> gives always 0 (at least on
-   * Solaris7). Hence the Timer class still does not yet work for
-   * multithreading mode.
+   * For some reason (error in
+   * operating system?) the
+   * function call
+   * <tt>getrusage(RUSAGE_CHILDREN,.)</tt>
+   * gives always 0 (at least
+   * on Solaris7). Hence the
+   * Timer class still does not
+   * yet work for multithreading
+   * mode.
    */
   double              start_time_children;
 
   /**
-   * Value of the wall time when start() was called the last time or when the
-   * object was created and no stop() was issued in between.
+   * Value of the wall time when start()
+   * was called the last time or when the
+   * object was created and no stop() was
+   * issued in between.
    */
   double              start_wall_time;
 
   /**
-   * Accumulated time for all previous start()/stop() cycles. The time for the
-   * present cycle is not included.
+   * Accumulated time for all previous
+   * start()/stop() cycles. The time for
+   * the present cycle is not included.
    */
   double              cumulative_time;
 
   /**
-   * Accumulated wall time for all previous start()/stop() cycles. The wall
-   * time for the present cycle is not included.
+   * Accumulated wall time for all
+   * previous start()/stop() cycles. The
+   * wall time for the present cycle is
+   * not included.
    */
   double              cumulative_wall_time;
 
   /**
-   * Stores the last lap time; the time between the last start()/stop() cycle.
+   * Stores the last lap time; the time
+   * between the last start()/stop() cycle.
    */
   double              last_lap_time;
 
   /**
-   * Store whether the timer is presently running.
+   * Store whether the timer is presently
+   * running.
    */
   bool                running;
 
   /**
-   * Store whether the timer is presently running.
+   * Store whether the timer is presently
+   * running.
    */
   MPI_Comm            mpi_communicator;
 
 #ifdef DEAL_II_WITH_MPI
   /**
-   * Store whether the wall time is synchronized between machines.
+   * Store whether the wall time is
+   * synchronized between machines.
    */
   bool sync_wall_time;
 
   /**
-   * A structure for parallel wall time measurement that includes the minimum
-   * time recorded among all processes, the maximum time as well as the
-   * average time defined as the sum of all individual times divided by the
-   * number of MPI processes in the MPI_Comm.
+   * A structure for parallel wall time
+   * measurement that includes the minimum
+   * time recorded among all processes, the
+   * maximum time as well as the average
+   * time defined as the sum of all
+   * individual times divided by the number
+   * of MPI processes in the MPI_Comm.
    */
-  Utilities::MPI::MinMaxAvg mpi_data;
+  Utilities::System::MinMaxAvg mpi_data;
 #endif
 };
 
@@ -230,13 +274,13 @@ private:
 
 //TODO: The following class is not thread-safe
 /**
- * This class can be used to generate formatted output from time measurements
- * of different subsections in a program. It is possible to create several
- * sections that perform certain aspects of the program. A section can be
- * entered several times. By changing the options in OutputFrequency and
- * OutputType, the user can choose whether output should be generated every
- * time a section is joined or just in the end of the program. Moreover, it is
- * possible to show CPU times, wall times or both.
+ * This class can be used to generate formatted output from time
+ * measurements of different subsections in a program. It is possible to
+ * create several sections that perform certain aspects of the program. A
+ * section can be entered several times. By changing the options in
+ * OutputFrequency and OutputType, the user can choose whether output should
+ * be generated every time a section is joined or just in the end of the
+ * program. Moreover, it is possible to show CPU times, wall times or both.
  *
  * <h3>Usage</h3>
  *
@@ -279,11 +323,11 @@ private:
  * | Setup dof system                |         1 |      3.97s |       4.5% |
  * +---------------------------------+-----------+------------+------------+
  * @endcode
- * The output will see that we entered the assembly and solve section twice,
- * and reports how much time we spent there. Moreover, the class measures the
- * total time spent from start to termination of the TimerOutput object. In
- * this case, we did a lot of other stuff, so that the time proportions of the
- * functions we measured are far away from 100 precent.
+ * The output will see that we entered the assembly and solve section
+ * twice, and reports how much time we spent there. Moreover, the class
+ * measures the total time spent from start to termination of the TimerOutput
+ * object. In this case, we did a lot of other stuff, so that the time
+ * proportions of the functions we measured are far away from 100 precent.
  *
  *
  * <h3>Using scoped timers</h3>
@@ -293,13 +337,13 @@ private:
  * awkward if the sections in between these calls contain <code>return</code>
  * statements or may throw exceptions. In that case, it is easy to forget that
  * one nevertheless needs to leave the section somehow, somewhere. An easier
- * approach is to use "scoped" sections. This is a variable that when you
- * create it enters a section, and leaves the section when you destroy it. If
- * this is a variable local to a particular scope (a code block between curly
- * braces) and you leave this scope due to a <code>return</code> statements or
- * an exception, then the variable is destroyed and the timed section is left
- * automatically. Consequently, we could have written the code piece above as
- * follows, with exactly the same result but now exception-safe:
+ * approach is to use "scoped" sections. This is a variable that when you create
+ * it enters a section, and leaves the section when you destroy it. If this is
+ * a variable local to a particular scope (a code block between curly braces)
+ * and you leave this scope due to a <code>return</code> statements or an
+ * exception, then the variable is destroyed and the timed section is left
+ * automatically. Consequently, we could have written the code piece above
+ * as follows, with exactly the same result but now exception-safe:
  * @code
  *   TimerOutput timer (std::cout, TimerOutput::summary,
  *                      TimerOutput::wall_times);
@@ -335,52 +379,54 @@ private:
  *
  * <h3>Usage in parallel programs using MPI</h3>
  *
- * In a parallel program built on MPI, using the class in a way such as the
- * one shown above would result in a situation where each process times the
- * corresponding sections and then outputs the resulting timing information at
- * the end. This is annoying since you'd get a lot of output -- one set of
- * timing information from each processor.
+ * In a parallel program built on MPI, using the class in a way such
+ * as the one shown above would result in a situation where each
+ * process times the corresponding sections and then outputs the resulting
+ * timing information at the end. This is annoying since you'd get a lot
+ * of output -- one set of timing information from each processor.
  *
  * This can be avoided by only letting one processor generate screen output,
  * typically by using an object of type ConditionalOStream instead of
  * <code>std::cout</code> to write to screen (see, for example, step-17,
  * step-18, step-32 and step-40, all of which use this method).
  *
- * This way, only a single processor outputs timing information, typically the
- * first process in the MPI universe. However, if you take the above code
- * snippet as an example, imagine what would happen if
- * <code>setup_dofs()</code> is fast on processor zero and slow on at least
- * one of the other processors; and if the first thing
+ * This way, only a single processor outputs timing information, typically
+ * the first process in the MPI universe. However,
+ * if you take the above code snippet as an example, imagine what would happen
+ * if <code>setup_dofs()</code> is fast on processor zero and slow on at
+ * least one of the other processors; and if the first thing
  * <code>assemble_system_1()</code> does is something that requires all
  * processors to communicate. In this case, on processor zero, the timing
- * section with name <code>"Setup dof system"</code> will yield a short run
- * time on processor zero, whereas the section <code> "Assemble"</code> will
- * take a long time: not because <code>assemble_system_1()</code> takes a
- * particularly long time, but because on the processor on which we time (or,
- * rather, the one on which we generate output) happens to have to wait for a
- * long time till the other processor is finally done with
- * <code>setup_dofs()</code> and starts to participate in
+ * section with name <code>"Setup dof system"</code> will yield a short
+ * run time on processor zero, whereas the section <code> "Assemble"</code>
+ * will take a long time: not because <code>assemble_system_1()</code>
+ * takes a particularly long time, but because on the processor on which
+ * we time (or, rather, the one on which we generate output) happens to
+ * have to wait for a long time till the other processor is finally done
+ * with <code>setup_dofs()</code> and starts to participate in
  * <code>assemble_system_1()</code>. In other words, the timing that is
- * reported is unreliable because it reflects run times from other processors.
- * Furthermore, the run time of this section on processor zero has nothing to
- * do with the run time of the section on other processors but instead with
- * the run time of <i>the previous section</i> on another processor.
+ * reported is unreliable because it reflects run times from other
+ * processors. Furthermore, the run time of this section on processor zero
+ * has nothing to do with the run time of the section on other processors
+ * but instead with the run time of <i>the previous section</i> on another
+ * processor.
  *
  * The usual way to avoid this is to introduce a barrier into the parallel
- * code just before we start and stop timing sections. This ensures that all
- * processes are at the same place and the timing information then reflects
- * the maximal run time across all processors. To achieve this, you need to
- * initialize the TimerOutput object with an MPI communicator object, for
- * example as in the following code:
+ * code just before we start and stop timing sections. This ensures that
+ * all processes are at the same place and the timing information then
+ * reflects the maximal run time across all processors. To achieve this,
+ * you need to initialize the TimerOutput object with an MPI communicator
+ * object, for example as in the following code:
  * @code
  *   TimerOutput timer (MPI_COMM_WORLD,
  *                      pcout,
  *                      TimerOutput::summary,
  *                      TimerOutput::wall_times);
  * @endcode
- * Here, <code>pcout</code> is an object of type ConditionalOStream that makes
- * sure that we only generate output on a single processor. See the step-32
- * and step-40 tutorial programs for this kind of usage of this class.
+ * Here, <code>pcout</code> is an object of type ConditionalOStream that
+ * makes sure that we only generate output on a single processor.
+ * See the step-32 and step-40 tutorial programs for this kind of usage
+ * of this class.
  *
  * @ingroup utilities
  * @author M. Kronbichler, 2009.
@@ -389,9 +435,9 @@ class TimerOutput
 {
 public:
   /**
-   * Helper class to enter/exit sections in TimerOutput be constructing a
-   * simple scope-based object. The purpose of this class is explained in the
-   * documentation of TimerOutput.
+   * Helper class to enter/exit sections in TimerOutput be constructing
+   * a simple scope-based object. The purpose of this class is explained
+   * in the documentation of TimerOutput.
    */
   class Scope
   {
@@ -450,12 +496,11 @@ public:
   /**
    * Constructor.
    *
-   * @param stream The stream (of type std::ostream) to which output is
-   * written.
-   * @param output_frequency A variable indicating when output is to be
-   * written to the given stream.
+   * @param stream The stream (of type std::ostream) to which output is written.
+   * @param output_frequency A variable indicating when output is to be written
+   *   to the given stream.
    * @param output_type A variable indicating what kind of timing the output
-   * should represent (CPU or wall time).
+   *   should represent (CPU or wall time).
    */
   TimerOutput (std::ostream              &stream,
                const enum OutputFrequency output_frequency,
@@ -464,12 +509,11 @@ public:
   /**
    * Constructor.
    *
-   * @param stream The stream (of type ConditionalOstream) to which output is
-   * written.
-   * @param output_frequency A variable indicating when output is to be
-   * written to the given stream.
+   * @param stream The stream (of type ConditionalOstream) to which output is written.
+   * @param output_frequency A variable indicating when output is to be written
+   *   to the given stream.
    * @param output_type A variable indicating what kind of timing the output
-   * should represent (CPU or wall time).
+   *   should represent (CPU or wall time).
    */
   TimerOutput (ConditionalOStream        &stream,
                const enum OutputFrequency output_frequency,
@@ -477,27 +521,26 @@ public:
 
 #ifdef DEAL_II_WITH_MPI
   /**
-   * Constructor that takes an MPI communicator as input. A timer constructed
-   * this way will sum up the CPU times over all processors in the MPI network
-   * for calculating the CPU time, or take the maximum over all processors,
-   * depending on the value of @p output_type . See the documentation of this
-   * class for the rationale for this constructor and an example.
+   * Constructor that takes an MPI communicator as input. A timer
+   * constructed this way will sum up the CPU times over all
+   * processors in the MPI network for calculating the CPU time, or
+   * take the maximum over all processors, depending on the value of
+   * @p output_type . See the documentation of this class for the
+   * rationale for this constructor and an example.
    *
    * @param mpi_comm An MPI communicator across which we should accumulate or
-   * otherwise synchronize the timing information we produce on every MPI
-   * process.
-   * @param stream The stream (of type std::ostream) to which output is
-   * written.
-   * @param output_frequency A variable indicating when output is to be
-   * written to the given stream.
+   *   otherwise synchronize the timing information we produce on every MPI process.
+   * @param stream The stream (of type std::ostream) to which output is written.
+   * @param output_frequency A variable indicating when output is to be written
+   *   to the given stream.
    * @param output_type A variable indicating what kind of timing the output
-   * should represent (CPU or wall time). In this parallel context, when this
-   * argument selects CPU time, then times are accumulated over all processes
-   * participating in the MPI communicator. If this argument selects wall
-   * time, then reported times are the maximum over all processors' run times
-   * for this section. (The latter is computed by placing an
-   * <code>MPI_Barrier</code> call before starting and stopping the timer for
-   * each section.
+   *   should represent (CPU or wall time). In this parallel context, when this
+   *   argument selects CPU time, then times are accumulated over all processes
+   *   participating in the MPI communicator. If this argument selects wall
+   *   time, then reported times are the maximum over all processors' run times
+   *   for this section. (The latter is computed by placing an
+   *   <code>MPI_Barrier</code> call before starting and stopping the timer
+   *   for each section.
    */
   TimerOutput (MPI_Comm                   mpi_comm,
                std::ostream              &stream,
@@ -505,27 +548,26 @@ public:
                const enum OutputType      output_type);
 
   /**
-   * Constructor that takes an MPI communicator as input. A timer constructed
-   * this way will sum up the CPU times over all processors in the MPI network
-   * for calculating the CPU time, or take the maximum over all processors,
-   * depending on the value of @p output_type . See the documentation of this
-   * class for the rationale for this constructor and an example.
+   * Constructor that takes an MPI communicator as input. A timer
+   * constructed this way will sum up the CPU times over all
+   * processors in the MPI network for calculating the CPU time, or
+   * take the maximum over all processors, depending on the value of
+   * @p output_type . See the documentation of this class for the
+   * rationale for this constructor and an example.
    *
    * @param mpi_comm An MPI communicator across which we should accumulate or
-   * otherwise synchronize the timing information we produce on every MPI
-   * process.
-   * @param stream The stream (of type ConditionalOstream) to which output is
-   * written.
-   * @param output_frequency A variable indicating when output is to be
-   * written to the given stream.
+   *   otherwise synchronize the timing information we produce on every MPI process.
+   * @param stream The stream (of type ConditionalOstream) to which output is written.
+   * @param output_frequency A variable indicating when output is to be written
+   *   to the given stream.
    * @param output_type A variable indicating what kind of timing the output
-   * should represent (CPU or wall time). In this parallel context, when this
-   * argument selects CPU time, then times are accumulated over all processes
-   * participating in the MPI communicator. If this argument selects wall
-   * time, then reported times are the maximum over all processors' run times
-   * for this section. (The latter is computed by placing an
-   * <code>MPI_Barrier</code> call before starting and stopping the timer for
-   * each section.)
+   *   should represent (CPU or wall time). In this parallel context, when this
+   *   argument selects CPU time, then times are accumulated over all processes
+   *   participating in the MPI communicator. If this argument selects wall
+   *   time, then reported times are the maximum over all processors' run times
+   *   for this section. (The latter is computed by placing an
+   *   <code>MPI_Barrier</code> call before starting and stopping the timer
+   *   for each section.)
    */
   TimerOutput (MPI_Comm                   mpi_comm,
                ConditionalOStream        &stream,
@@ -538,14 +580,17 @@ public:
 #endif
 
   /**
-   * Destructor. Calls print_summary() in case the option for writing the
+   * Destructor. Calls print_summary() in
+   * case the option for writing the
    * summary output is set.
    */
   ~TimerOutput();
 
   /**
-   * Open a section by given a string name of it. In case the name already
-   * exists, that section is entered once again and times are accumulated.
+   * Open a section by given a string name
+   * of it. In case the name already
+   * exists, that section is entered once
+   * again and times are accumulated.
    */
   void enter_subsection (const std::string &section_name);
 
@@ -557,8 +602,9 @@ public:
   //TODO: make some of these functions DEPRECATED (I would keep enter/exit_section)
 
   /**
-   * Leave a section. If no name is given, the last section that was entered
-   * is left.
+   * Leave a section. If no name is given,
+   * the last section that was entered is
+   * left.
    */
   void leave_subsection (const std::string &section_name = std::string());
 
@@ -568,24 +614,33 @@ public:
   void exit_section (const std::string &section_name = std::string());
 
   /**
-   * Print a formatted table that summarizes the time consumed in the various
-   * sections.
+   * Print a formatted table that
+   * summarizes the time consumed in the
+   * various sections.
    */
   void print_summary () const;
 
   /**
-   * By calling this function, all output can be disabled. This function
-   * together with enable_output() can be useful if one wants to control the
-   * output in a flexible way without putting a lot of <tt>if</tt> clauses in
-   * the program.
+   * By calling this function, all output
+   * can be disabled. This function
+   * together with enable_output() can be
+   * useful if one wants to control the
+   * output in a flexible way without
+   * putting a lot of <tt>if</tt> clauses
+   * in the program.
    */
   void disable_output ();
 
   /**
-   * This function re-enables output of this class if it was previously
-   * disabled with disable_output(). This function together with
-   * disable_output() can be useful if one wants to control the output in a
-   * flexible way without putting a lot of <tt>if</tt> clauses in the program.
+   * This function re-enables output of
+   * this class if it was previously
+   * disabled with disable_output(). This
+   * function together with
+   * disable_output() can be useful if
+   * one wants to control the output in a
+   * flexible way without putting a lot
+   * of <tt>if</tt> clauses in the
+   * program.
    */
   void enable_output ();
 
@@ -601,20 +656,24 @@ private:
   OutputFrequency output_frequency;
 
   /**
-   * Whether to show CPU times, wall times, or both CPU and wall times.
+   * Whether to show CPU times, wall
+   * times, or both CPU and wall times.
    */
   OutputType output_type;
 
 
   /**
-   * A timer object for the overall run time. If we are using MPI, this timer
-   * also accumulates over all MPI processes.
+   * A timer object for the overall
+   * run time. If we are using MPI,
+   * this timer also accumulates
+   * over all MPI processes.
    */
   Timer              timer_all;
 
   /**
-   * A structure that groups all information that we collect about each of the
-   * sections.
+   * A structure that groups all
+   * information that we collect
+   * about each of the sections.
    */
   struct Section
   {
@@ -625,25 +684,33 @@ private:
   };
 
   /**
-   * A list of all the sections and their information.
+   * A list of all the sections and
+   * their information.
    */
   std::map<std::string, Section> sections;
 
   /**
-   * The stream object to which we are to output.
+   * The stream object to which we
+   * are to output.
    */
   ConditionalOStream out_stream;
 
   /**
-   * A boolean variable that sets whether output of this class is currently on
+   * A boolean variable that sets whether
+   * output of this class is currently on
    * or off.
    */
   bool output_is_enabled;
 
   /**
-   * A list of the sections that have been entered and not exited. The list is
-   * kept in the order in which sections have been entered, but elements may
-   * be removed in the middle if an argument is given to the exit_section()
+   * A list of the sections that
+   * have been entered and not
+   * exited. The list is kept in
+   * the order in which sections
+   * have been entered, but
+   * elements may be removed in the
+   * middle if an argument is given
+   * to the exit_section()
    * function.
    */
   std::list<std::string> active_sections;
@@ -654,8 +721,9 @@ private:
   MPI_Comm            mpi_communicator;
 
   /**
-   * A lock that makes sure that this class gives reasonable results even when
-   * used with several threads.
+   * A lock that makes sure that this
+   * class gives reasonable results even
+   * when used with several threads.
    */
   Threads::Mutex mutex;
 };
@@ -677,7 +745,7 @@ void Timer::restart ()
 #ifdef DEAL_II_WITH_MPI
 
 inline
-const Utilities::MPI::MinMaxAvg &
+const Utilities::System::MinMaxAvg &
 Timer::get_data() const
 {
   return mpi_data;

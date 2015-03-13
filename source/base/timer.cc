@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2015 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,10 @@
 #include <algorithm>
 #include <stddef.h>
 
-#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
+// these includes should probably be properly
+// ./configure'd using the AC_HEADER_TIME macro:
+
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
 #  include <sys/time.h>
 #  include <sys/resource.h>
 #endif
@@ -108,7 +111,7 @@ void Timer::start ()
     MPI_Barrier(mpi_communicator);
 #endif
 
-#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
 
 //TODO: Break this out into a function like the functions in
 //namespace windows above
@@ -141,7 +144,7 @@ double Timer::stop ()
     {
       running = false;
 
-#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
 //TODO: Break this out into a function like the functions in
 //namespace windows above
       rusage usage;
@@ -167,7 +170,7 @@ double Timer::stop ()
 #endif
 
 #ifdef DEAL_II_WITH_MPI
-      if (sync_wall_time && Utilities::MPI::job_supports_mpi())
+      if (sync_wall_time && Utilities::System::job_supports_mpi())
         {
           this->mpi_data
             = Utilities::MPI::min_max_avg (last_lap_time, mpi_communicator);
@@ -185,8 +188,16 @@ double Timer::stop ()
 
 double Timer::get_lap_time() const
 {
-  // time already has the difference between the last start()/stop() cycle.
-  return Utilities::MPI::max (last_lap_time, mpi_communicator);
+  // time already has the difference
+  // between the last start()/stop()
+  // cycle.
+#ifdef DEAL_II_WITH_MPI
+  if (Utilities::System::job_supports_mpi())
+    return Utilities::MPI::max (last_lap_time, mpi_communicator);
+  else
+#endif
+    return last_lap_time;
+
 }
 
 
@@ -195,7 +206,7 @@ double Timer::operator() () const
 {
   if (running)
     {
-#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
@@ -208,12 +219,16 @@ double Timer::operator() () const
       const double running_time = dtime - start_time + dtime_children
                                   - start_time_children + cumulative_time;
 
-      // in case of MPI, need to get the time passed by summing the time over
-      // all processes in the network. works also in case we just want to have
-      // the time of a single thread, since then the communicator is
-      // MPI_COMM_SELF
-      return Utilities::MPI::sum (running_time, mpi_communicator);
-
+      if (Utilities::System::job_supports_mpi())
+        // in case of MPI, need to get the time
+        // passed by summing the time over all
+        // processes in the network. works also
+        // in case we just want to have the time
+        // of a single thread, since then the
+        // communicator is MPI_COMM_SELF
+        return Utilities::MPI::sum (running_time, mpi_communicator);
+      else
+        return running_time;
 #elif defined(DEAL_II_MSVC)
       const double running_time = windows::cpu_clock() - start_time + cumulative_time;
       return running_time;
@@ -223,7 +238,10 @@ double Timer::operator() () const
     }
   else
     {
-      return Utilities::MPI::sum (cumulative_time, mpi_communicator);
+      if (Utilities::System::job_supports_mpi())
+        return Utilities::MPI::sum (cumulative_time, mpi_communicator);
+      else
+        return cumulative_time;
     }
 }
 
@@ -233,7 +251,7 @@ double Timer::wall_time () const
 {
   if (running)
     {
-#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H)
       struct timeval wall_timer;
       gettimeofday(&wall_timer, NULL);
       return (wall_timer.tv_sec
@@ -408,7 +426,11 @@ TimerOutput::leave_subsection (const std::string &section_name)
   // initialize the Timers here according to that
   double cpu_time = sections[actual_section_name].timer();
   sections[actual_section_name].total_cpu_time
-  += Utilities::MPI::sum (cpu_time, mpi_communicator);
+  += (Utilities::System::job_supports_mpi()
+      ?
+      Utilities::MPI::sum (cpu_time, mpi_communicator)
+      :
+      cpu_time);
 
   // in case we have to print out something, do that here...
   if ((output_frequency == every_call || output_frequency == every_call_and_summary)
@@ -452,7 +474,12 @@ TimerOutput::print_summary () const
   // in case we want to write CPU times
   if (output_type != wall_times)
     {
-      double total_cpu_time = Utilities::MPI::sum(timer_all(), mpi_communicator);
+      double total_cpu_time = (Utilities::System::job_supports_mpi()
+                               ?
+                               Utilities::MPI::sum (timer_all(),
+                                                    mpi_communicator)
+                               :
+                               timer_all());
 
       // check that the sum of all times is
       // less or equal than the total
