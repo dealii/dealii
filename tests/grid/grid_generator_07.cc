@@ -15,7 +15,7 @@
 
 
 
-// Test GridGenerator::extrude
+// Test GridGenerator::create_triangulation_with_removed_cells
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -32,14 +32,24 @@
 template<int dim>
 void test(std::ostream &out)
 {
-  Triangulation<2> triangulation;
-  Triangulation<3> tr;
-  GridGenerator::hyper_rectangle (triangulation, Point<2>(0,0), Point<2>(1,1), true);
+  Triangulation<dim> triangulation;
+  Triangulation<dim> tr;
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (3);
 
-  GridGenerator::extrude_triangulation(triangulation, 3, 2.0, tr);
+  // remove all cells but the first. this is the hardest case to handle as it
+  // makes a bunch of vertices unused
+  std::set<typename Triangulation<dim>::active_cell_iterator>
+    cells_to_remove;
+  for (typename Triangulation<dim>::active_cell_iterator
+	 cell = ++triangulation.begin_active();
+       cell != triangulation.end(); ++cell)
+    cells_to_remove.insert (cell);
+  
+  GridGenerator::create_triangulation_with_removed_cells(triangulation,
+							 cells_to_remove, tr);
   GridOut go;
-  go.set_flags (GridOutFlags::Ucd(true));
-  go.write_ucd(tr, out);
+  go.write_gnuplot(tr, out);
 }
 
 
@@ -50,5 +60,6 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
+  test<2>(logfile);
   test<3>(logfile);
 }

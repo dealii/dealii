@@ -370,7 +370,14 @@ namespace Step26
          cell = triangulation.begin_active(min_grid_level);
          cell != triangulation.end_active(min_grid_level); ++cell)
       cell->clear_coarsen_flag ();
-
+    // These two loops above are slightly different but this is easily
+    // explained. In the first loop, instead of calling
+    // <code>triangulation.end()</code> we may as well have called
+    // <code>triangulation.end_active(max_grid_level)</code>. The two
+    // calls should yield the same iterator since iterators are sorted
+    // by level and there should not be any cells on levels higher than
+    // on level <code>max_grid_level</code>. In fact, this very piece
+    // of code makes sure that this is the case.
 
     // As part of mesh refinement we need to transfer the solution vectors
     // from the old mesh to the new one. To this end we use the
@@ -419,6 +426,22 @@ namespace Step26
   // out mesh (we choose the zero function here, which of course we could
   // do in a simpler way by just setting the solution vector to zero). We
   // also output the initial time step once.
+  //
+  // @note If you're an experienced programmer, you may be surprised
+  // that we use a <code>goto</code> statement in this piece of code!
+  // <code>goto</code> statements are not particularly well liked any
+  // more since Edsgar Dijkstra, one of the greats of computer science,
+  // wrote a letter in 1968 called "Go To Statement considered harmful"
+  // (see <a href="http://en.wikipedia.org/wiki/Considered_harmful">here</a>).
+  // The author of this code subscribes to this notion whole-heartedly:
+  // <code>goto</code> is hard to understand. In fact, deal.II contains
+  // virtually no occurrences: excluding code that was essentially
+  // transcribed from books and not counting duplicated code pieces,
+  // there are 3 locations in about 600,000 lines of code; we also
+  // use it in 4 tutorial programs, in exactly the same context
+  // as here. Instead of trying to justify the occurrence here,
+  // let's first look at the code and we'll come back to the issue
+  // at the end of function.
   template<int dim>
   void HeatEquation<dim>::run()
   {
@@ -570,6 +593,65 @@ start_time_iteration:
       }
   }
 }
+// Now that you have seen what the function does, let us come back to the issue
+// of the <code>goto</code>. In essence, what the code does is
+// something like this:
+// @code
+//   void run ()
+//   {
+//     initialize;
+//   start_time_iteration:
+//     for (timestep=1...)
+//     {
+//        solve timestep;
+//        if (timestep==1 && not happy with the result)
+//        {
+//          adjust some data structures;
+//          goto start_time_iteration; // simply try again
+//        }
+//        postprocess;
+//     }
+//   }
+// @endcode
+// Here, the condition "happy with the result" is whether we'd like to keep
+// the current mesh or would rather refine the mesh and start over on the
+// new mesh. We could of course replace the use of the <code>goto</code>
+// by the following:
+// @code
+//   void run ()
+//   {
+//     initialize;
+//     while (true)
+//     {
+//        solve timestep;
+//        if (not happy with the result)
+//           adjust some data structures;
+//        else
+//           break;
+//     }
+//     postprocess;
+//
+//     for (timestep=2...)
+//     {
+//        solve timestep;
+//        postprocess;
+//     }
+//   }
+// @endcode
+// This has the advantage of getting rid of the <code>goto</code>
+// but the disadvantage of having to duplicate the code that implements
+// the "solve timestep" and "postprocess" operations in two different
+// places. This could be countered by putting these parts of the code
+// (sizable chunks in the actual implementation above) into their
+// own functions, but a <code>while(true)</code> loop with a
+// <code>break</code> statement is not really all that much easier
+// to read or understand than a <code>goto</code>.
+//
+// In the end, one might simply agree that <i>in general</i>
+// <code>goto</code> statements are a bad idea but be pragmatic
+// and state that there may be occasions where they can help avoid
+// code duplication and awkward control flow. This may be one of these
+// places.
 
 
 // @sect3{The <code>main</code> function}
