@@ -42,6 +42,12 @@ namespace GridGenerator
       (const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation_1,
        const Triangulation<deal_II_dimension, deal_II_space_dimension> &triangulation_2,
        Triangulation<deal_II_dimension, deal_II_space_dimension>       &result);
+
+    template
+      void
+      create_triangulation_with_removed_cells (const Triangulation<deal_II_dimension, deal_II_space_dimension> &input_triangulation,
+                                               const std::set<typename Triangulation<deal_II_dimension, deal_II_space_dimension>::active_cell_iterator> &cells_to_remove,
+                                               Triangulation<deal_II_dimension, deal_II_space_dimension>       &result);
       
 #endif
 \}  
