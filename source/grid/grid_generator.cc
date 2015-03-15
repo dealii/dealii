@@ -3397,6 +3397,12 @@ namespace GridGenerator
     Assert (GridTools::have_same_coarse_mesh (triangulation_1, triangulation_2),
             ExcMessage ("The two input triangulations are not derived from "
                         "the same coarse mesh as required."));
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation_1) == 0)
+            &&
+            (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation_2) == 0),
+            ExcMessage ("The source triangulations for this function must both "
+                        "be available entirely locally, and not be distributed "
+                        "triangulations."));
 
     // first copy triangulation_1, and
     // then do as many iterations as

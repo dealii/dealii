@@ -698,6 +698,10 @@ namespace GridGenerator
    * meshes, for example in order to compose a mesh for a complicated geometry
    * from meshes for simpler geometries, then this is not the function for
    * you. Instead, consider GridGenerator::merge_triangulations().
+   *
+   * @pre Both of the source conditions need to be available entirely
+   *   locally. In other words, they can not be objects of type
+   *   parallel::distributed::Triangulation.
    */
   template <int dim, int spacedim>
   void
