@@ -579,7 +579,8 @@ public:
   /**
    * Exception.
    */
-  DeclException0 (ExcInvalidPosition);
+  DeclExceptionMsg (ExcInvalidPosition,
+                    "You cannot insert a time step at the specified position.");
 
 protected:
   /**
@@ -802,11 +803,6 @@ public:
    */
   virtual std::size_t memory_consumption () const;
 
-  /**
-   * Exception
-   */
-  DeclException0 (ExcCantComputeTimestep);
-
 protected:
   /**
    * Pointer to the previous time step object in the list.
@@ -960,13 +956,6 @@ namespace TimeStepBase_Tria_Flags
      * to * @p sleep the grid shall be deleted.
      */
     const unsigned int sleep_level_to_delete_grid;
-
-    /**
-     * Exception
-     */
-    DeclException1 (ExcInvalidParameter,
-                    int,
-                    << "The parameter " << arg1 << " has an invalid value.");
   };
 
 
@@ -1195,7 +1184,9 @@ namespace TimeStepBase_Tria_Flags
      */
     DeclException1 (ExcInvalidValue,
                     double,
-                    << "The following value does not fulfill the requirements: " << arg1);
+                    << "The value " << arg1
+                    << " for the cell number corridor does not fulfill "
+                    "its natural requirements.");
   };
 
 
@@ -1234,7 +1225,9 @@ namespace TimeStepBase_Tria_Flags
      */
     DeclException1 (ExcInvalidValue,
                     double,
-                    << "The following value does not fulfill the requirements: " << arg1);
+                    << "The value " << arg1
+                    << " for the cell refinement thresholds does not fulfill "
+                    "its natural requirements.");
   };
 }
 
@@ -1404,7 +1397,9 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcGridNotDeleted);
+  DeclExceptionMsg (ExcGridNotDeleted,
+                    "When calling restore_grid(), you must have previously "
+                    "deleted the triangulation.");
 
 protected:
 

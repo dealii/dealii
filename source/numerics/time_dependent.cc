@@ -342,7 +342,9 @@ TimeStepBase::get_timestep_no () const
 double
 TimeStepBase::get_backward_timestep () const
 {
-  Assert (previous_timestep != 0, ExcCantComputeTimestep());
+  Assert (previous_timestep != 0,
+          ExcMessage("The backward time step cannot be computed because "
+                     "there is no previous time step."));
   return time - previous_timestep->time;
 }
 
@@ -351,7 +353,9 @@ TimeStepBase::get_backward_timestep () const
 double
 TimeStepBase::get_forward_timestep () const
 {
-  Assert (next_timestep != 0, ExcCantComputeTimestep());
+  Assert (next_timestep != 0,
+          ExcMessage("The forward time step cannot be computed because "
+                     "there is no next time step."));
   return next_timestep->time - time;
 }
 
