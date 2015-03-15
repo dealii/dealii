@@ -340,6 +340,8 @@ void LaplaceProblem<dim>::assemble_reference ()
         local_assemble(*p, assembly_data, copy_data);
         copy_local_to_global(copy_data);
       }
+  test_matrix.compress(VectorOperation::add);
+  test_rhs.compress(VectorOperation::add);
 
   reference_matrix.add(1., test_matrix);
   reference_rhs = test_rhs;
@@ -369,6 +371,8 @@ void LaplaceProblem<dim>::assemble_test ()
          Assembly::Copy::Data (),
          2*MultithreadInfo::n_threads(),
          1);
+  test_matrix.compress(VectorOperation::add);
+  test_rhs.compress(VectorOperation::add);
 
   test_matrix.add(-1, reference_matrix);
 
