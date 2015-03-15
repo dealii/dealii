@@ -934,7 +934,9 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   for (typename FunctionMap<spacedim>::type::const_iterator i=neumann_bc.begin();
        i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components,
-            ExcInvalidBoundaryFunction());
+            ExcInvalidBoundaryFunction(i->first,
+                                       i->second->n_components,
+                                       n_components));
 
   Assert (component_mask.represents_n_components(n_components),
           ExcInvalidComponentMask());
@@ -948,7 +950,8 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
 
   for (unsigned int n=0; n<solutions.size(); ++n)
     Assert (solutions[n]->size() == dof_handler.n_dofs(),
-            ExcInvalidSolutionVector());
+            ExcDimensionMismatch(solutions[n]->size(),
+                                 dof_handler.n_dofs()));
 
   const unsigned int n_solution_vectors = solutions.size();
 
