@@ -53,11 +53,10 @@ void DataOutStack<dim,spacedim,DH>::new_parameter_value (const double p,
   parameter      = p;
   parameter_step = dp;
 
-  // check whether the user called @p{finish_...}
-  // at the end of the previous parameter step
+  // check whether the user called finish_parameter_value() at the end of the previous
+  // parameter step
   //
-  // this is to prevent serious waste of
-  // memory
+  // this is to prevent serious waste of memory
   for (typename std::vector<DataVector>::const_iterator i=dof_data.begin();
        i!=dof_data.end(); ++i)
     Assert (i->data.size() == 0,
