@@ -2191,19 +2191,13 @@ namespace VectorTools
 
 
   /**
-   * Exception.
-   */
-  DeclException0(ExcInvalidMaterialIndicator);
-
-  /**
    * Exception
    */
-  DeclException0 (ExcInvalidBoundaryIndicator);
-
-  /**
-   * Exception
-   */
-  DeclException0 (ExcNonInterpolatingFE);
+  DeclExceptionMsg (ExcNonInterpolatingFE,
+                    "You are attempting an operation that requires the "
+                    "finite element involved to be 'interpolating', i.e., "
+                    "it needs to have support points. The finite element "
+                    "you are using here does not appear to have those.");
 
   /**
    * Exception

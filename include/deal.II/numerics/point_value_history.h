@@ -521,36 +521,41 @@ public:
   bool deep_check (const bool strict);
 
   /**
-   * A call has been made to @p push_back_independent when no independent
-   * values were requested.
+   * Exception
    */
-  DeclException0(ExcNoIndependent);
+  DeclExceptionMsg(ExcNoIndependent,
+                   "A call has been made to push_back_independent() when "
+                   "no independent values were requested.");
 
   /**
-   * This error is thrown to indicate that the data sets appear to be out of
-   * sync.  The class requires that the number of dataset keys is the same as
-   * the number of independent values sets and mesh linked value sets. The
-   * number of each of these is allowed to differ by one to allow new values
-   * to be added with out restricting the order the user choses to do so.
-   * Special cases of no @p DoFHandler and no independent values should not
-   * trigger this error.
+   * Exception
    */
-  DeclException0(ExcDataLostSync);
+  DeclExceptionMsg(ExcDataLostSync,
+                   "This error is thrown to indicate that the data sets appear to be out of "
+                   "sync. The class requires that the number of dataset keys is the same as "
+                   "the number of independent values sets and mesh linked value sets. The "
+                   "number of each of these is allowed to differ by one to allow new values "
+                   "to be added with out restricting the order the user choses to do so. "
+                   "Special cases of no FHandler and no independent values should not "
+                   "trigger this error.");
 
 
   /**
-   * A method which requires access to a @p DoFHandler to be meaningful has
-   * been called when @p have_dof_handler is false (most likely due to default
-   * constructor being called). Only independent variables may be logged with
-   * no DoFHandler.
+   * Exception
    */
-  DeclException0(ExcDoFHandlerRequired);
+  DeclExceptionMsg(ExcDoFHandlerRequired,
+                   "A method which requires access to a @p DoFHandler to be meaningful has "
+                   "been called when have_dof_handler is false (most likely due to default "
+                   "constructor being called). Only independent variables may be logged with "
+                   "no DoFHandler.");
 
   /**
-   * The triangulation indicated that mesh has been refined in some way. This
-   * suggests that the internal dof indices stored are no longer meaningful.
+   * Exception
    */
-  DeclException0(ExcDoFHandlerChanged);
+  DeclExceptionMsg(ExcDoFHandlerChanged,
+                   "The triangulation has been refined or coarsened in some way. This "
+                   "suggests that the internal DoF indices stored by the current "
+                   "object are no longer meaningful.");
 
 private:
   /**

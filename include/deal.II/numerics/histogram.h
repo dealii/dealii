@@ -145,15 +145,9 @@ public:
   /**
    * Exception.
    */
-  DeclException0 (ExcEmptyData);
-  /**
-   * Exception.
-   */
-  DeclException0 (ExcInvalidIntervals);
-  /**
-   * Exception.
-   */
-  DeclException0 (ExcInvalidData);
+  DeclExceptionMsg (ExcEmptyData,
+                    "Your input argument to this function does not appear to "
+                    "have any data in it.");
   /**
    * Exception.
    */

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/numerics/data_out_dof_data.h>
 
 #include <string>
 #include <vector>
@@ -247,50 +248,23 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcNoDoFHandlerSelected);
-  /**
-   * Exception
-   */
-  DeclException3 (ExcInvalidVectorSize,
-                  int, int, int,
-                  << "The vector has size " << arg1
-                  << " but the DoFHandler objects says there are " << arg2
-                  << " degrees of freedom and there are " << arg3
-                  << " active cells.");
-  /**
-   * Exception
-   */
-  DeclException2 (ExcInvalidCharacter,
-                  std::string, size_t,
-                  << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
-                  << "description strings since some graphics formats will only accept these."
-                  << std::endl
-                  << "The string you gave was <" << arg1
-                  << ">, the invalid character is <" << arg1[arg2]
-                  << ">." << std::endl);
-  /**
-   * Exception
-   */
-  DeclException2 (ExcInvalidNumberOfNames,
-                  int, int,
-                  << "You have to give one name per component in your "
-                  << "data vector. The number you gave was " << arg1
-                  << ", but the number of components is " << arg2);
-  /**
-   * Exception
-   */
   DeclException1 (ExcVectorNotDeclared,
                   std::string,
                   << "The data vector for which the first component has the name "
-                  << arg1 << " has not been declared before.");
+                  << arg1 << " has not been added before.");
   /**
    * Exception
    */
-  DeclException0 (ExcDataNotCleared);
+  DeclExceptionMsg (ExcDataNotCleared,
+                    "You cannot start a new time/parameter step before calling "
+                    "finish_parameter_value() on the previous step.");
   /**
    * Exception
    */
-  DeclException0 (ExcDataAlreadyAdded);
+  DeclExceptionMsg (ExcDataAlreadyAdded,
+                    "You cannot declare additional vectors after already calling "
+                    "build_patches(). All data vectors need to be declared "
+                    "before you call this function the first time.");
   /**
    * Exception
    */
@@ -298,13 +272,6 @@ public:
                   std::string,
                   << "You tried to declare a component of a data vector with "
                   << "the name <" << arg1 << ">, but that name is already used.");
-  /**
-   * Exception
-   */
-  DeclException1 (ExcInvalidNumberOfSubdivisions,
-                  int,
-                  << "The number of subdivisions per patch, " << arg1
-                  << ", is not valid.");
 
 private:
   /**

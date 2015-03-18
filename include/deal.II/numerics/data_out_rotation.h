@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -181,16 +181,15 @@ public:
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidNumberOfSubdivisions,
-                  int,
-                  << "The number of subdivisions per patch, " << arg1
-                  << ", is not valid.");
-  /**
-   * Exception
-   */
   DeclException1 (ExcRadialVariableHasNegativeValues,
                   double,
-                  << "The radial variable attains a negative value of " << arg1);
+                  << "You are attempting to use this class on a triangulation "
+                  "in which some vertices have a negative radial coordinate "
+                  "value of "
+                  << arg1
+                  << ". If you rotate such a triangulation around an "
+                  "axis, you will get (dim+1)-dimensional meshes "
+                  "that are not likely what you hoped to see.");
 
 private:
   /**

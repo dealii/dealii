@@ -974,8 +974,8 @@ namespace DerivativeApproximation
                             Vector<float>         &derivative_norm)
     {
       Assert (derivative_norm.size() == dof_handler.get_tria().n_active_cells(),
-              ExcInvalidVectorLength (derivative_norm.size(),
-                                      dof_handler.get_tria().n_active_cells()));
+              ExcVectorLengthVsNActiveCells (derivative_norm.size(),
+                                             dof_handler.get_tria().n_active_cells()));
       Assert (component < dof_handler.get_fe().n_components(),
               ExcIndexRange (component, 0, dof_handler.get_fe().n_components()));
 

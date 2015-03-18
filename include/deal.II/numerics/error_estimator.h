@@ -442,34 +442,51 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidBoundaryIndicator);
+  DeclExceptionMsg (ExcInvalidComponentMask,
+                    "You provided a ComponentMask argument that is invalid. "
+                    "Component masks need to be either default constructed "
+                    "(in which case they indicate that every component is "
+                    "selected) or need to have a length equal to the number "
+                    "of vector components of the finite element in use "
+                    "by the DoFHandler object. In the latter case, at "
+                    "least one component needs to be selected.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidComponentMask);
+  DeclExceptionMsg (ExcInvalidCoefficient,
+                    "If you do specify the argument for a (possibly "
+                    "spatially variable) coefficient function for this function, "
+                    "then it needs to refer to a coefficient that is either "
+                    "scalar (has one vector component) or has as many vector "
+                    "components as there are in the finite element used by "
+                    "the DoFHandler argument.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidCoefficient);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcInvalidBoundaryFunction);
+  DeclException3 (ExcInvalidBoundaryFunction,
+                  types::boundary_id,
+                  int,
+                  int,
+                  << "You provided a function map that for boundary indicator "
+                  << arg1 << " specifies a function with "
+                  << arg2 << " vector components. However, the finite "
+                  "element in use has "
+                  << arg2 << " components, and these two numbers need to match.");
   /**
    * Exception
    */
   DeclException2 (ExcIncompatibleNumberOfElements,
                   int, int,
-                  << "The number of elements " << arg1 << " and " << arg2
-                  << " of the vectors do not match!");
+                  << "The number of input vectors, " << arg1
+                  << " needs to be equal to the number of output vectors, "
+                  << arg2
+                  << ". This is not the case in your call of this function.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidSolutionVector);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcNoSolutions);
+  DeclExceptionMsg (ExcNoSolutions,
+                    "You need to specify at least one solution vector as "
+                    "input.");
 };
 
 
@@ -655,34 +672,51 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidBoundaryIndicator);
+  DeclExceptionMsg (ExcInvalidComponentMask,
+                    "You provided a ComponentMask argument that is invalid. "
+                    "Component masks need to be either default constructed "
+                    "(in which case they indicate that every component is "
+                    "selected) or need to have a length equal to the number "
+                    "of vector components of the finite element in use "
+                    "by the DoFHandler object. In the latter case, at "
+                    "least one component needs to be selected.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidComponentMask);
+  DeclExceptionMsg (ExcInvalidCoefficient,
+                    "If you do specify the argument for a (possibly "
+                    "spatially variable) coefficient function for this function, "
+                    "then it needs to refer to a coefficient that is either "
+                    "scalar (has one vector component) or has as many vector "
+                    "components as there are in the finite element used by "
+                    "the DoFHandler argument.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidCoefficient);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcInvalidBoundaryFunction);
+  DeclException3 (ExcInvalidBoundaryFunction,
+                  types::boundary_id,
+                  int,
+                  int,
+                  << "You provided a function map that for boundary indicator "
+                  << arg1 << " specifies a function with "
+                  << arg2 << " vector components. However, the finite "
+                  "element in use has "
+                  << arg3 << " components, and these two numbers need to match.");
   /**
    * Exception
    */
   DeclException2 (ExcIncompatibleNumberOfElements,
                   int, int,
-                  << "The number of elements " << arg1 << " and " << arg2
-                  << " of the vectors do not match!");
+                  << "The number of input vectors, " << arg1
+                  << " needs to be equal to the number of output vectors, "
+                  << arg2
+                  << ". This is not the case in your call of this function.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidSolutionVector);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcNoSolutions);
+  DeclExceptionMsg (ExcNoSolutions,
+                    "You need to specify at least one solution vector as "
+                    "input.");
 };
 
 

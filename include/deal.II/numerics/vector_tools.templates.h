@@ -352,7 +352,8 @@ namespace VectorTools
       return;
 
     Assert( function_map.find(numbers::invalid_material_id) == function_map.end(),
-            ExcInvalidMaterialIndicator() );
+            ExcMessage("You cannot specify the invalid material indicator "
+                       "in your function map."));
 
     for ( typename std::map< types::material_id, const Function<DH::space_dimension>* >::const_iterator
           iter  = function_map.begin();
@@ -1740,7 +1741,8 @@ namespace VectorTools
         return;
 
       Assert (function_map.find(numbers::internal_face_boundary_id) == function_map.end(),
-              ExcInvalidBoundaryIndicator());
+              ExcMessage("You cannot specify the special boundary indicator "
+                         "for interior faces in your function map."));
 
       const unsigned int        n_components = DoFTools::n_components(dof);
       const bool                fe_is_system = (n_components != 1);
