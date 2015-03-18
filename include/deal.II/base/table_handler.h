@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -506,7 +506,9 @@ public:
    */
   DeclException1 (ExcUndefinedTexFormat,
                   std::string,
-                  << "<" << arg1 << "> is not a tex column format. Use l,c,r.");
+                  << "<" << arg1 << "> is not a tex column format. Use "
+                  << "'l', 'c', or 'r' to indicate left, centered, or "
+                  << "right aligned text.");
   //@}
 protected:
 
