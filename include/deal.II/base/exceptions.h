@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -768,7 +768,41 @@ namespace StandardExceptions
    * be used anyway, even though the respective function may only be called if
    * a derived class is used.
    */
-  DeclException0 (ExcPureFunctionCalled);
+  DeclExceptionMsg (ExcPureFunctionCalled,
+                    "You (or a place in the library) are trying to call a "
+                    "function that is declared as a virtual function in a "
+                    "base class but that has not been overridden in your "
+                    "derived class."
+                    "\n\n"
+                    "This exception happens in cases where the base class "
+                    "cannot provide a useful default implementation for "
+                    "the virtual function, but where we also do not want "
+                    "to mark the function as abstract (i.e., with '=0' at the end) "
+                    "because the function is not essential to the class in many "
+                    "contexts. In cases like this, the base class provides "
+                    "a dummy implementation that makes the compiler happy, but "
+                    "that then throws the current exception."
+                    "\n\n"
+                    "A concrete example would be the 'Function' class. It declares "
+                    "the existence of 'value()' and 'gradient()' member functions, "
+                    "and both are marked as 'virtual'. Derived classes have to "
+                    "override these functions for the values and gradients of a "
+                    "particular function. On the other hand, not every function "
+                    "has a gradient, and even for those that do, not every program "
+                    "actually needs to evaluate it. Consequently, there is no "
+                    "*requirement* that a derived class actually override the "
+                    "'gradient()' function (as there would be had it been marked "
+                    "as abstract). But, since the base class cannot know how to "
+                    "compute the gradient, if a derived class does not override "
+                    "the 'gradient()' function and it is called anyway, then the "
+                    "default implementation in the base class will simply throw "
+                    "an exception."
+                    "\n\n"
+                    "The exception you see is what happens in cases such as the "
+                    "one just illustrated. To fix the problem, you need to "
+                    "investigate whether the function being called should indeed have "
+                    "been called; if the answer is 'yes', then you need to "
+                    "implement the missing override in your class.");
 
   /**
    * Used for constructors that are disabled. Examples are copy constructors
