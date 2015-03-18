@@ -406,13 +406,13 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
   // template parameter
   Assert (dim==dimension, ExcDimensionMismatch(dim, dimension));
   Assert (this->triangulation != 0,
-          DataOutExceptions::ExcNoTriangulationSelected());
+          Exceptions::DataOut::ExcNoTriangulationSelected());
 
   const unsigned int n_subdivisions = (nnnn_subdivisions != 0)
                                       ? nnnn_subdivisions
                                       : this->default_subdivisions;
   Assert (n_subdivisions >= 1,
-          DataOutExceptions::ExcInvalidNumberOfSubdivisions(n_subdivisions));
+          Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   unsigned int n_datasets=this->cell_data.size();
   for (unsigned int i=0; i<this->dof_data.size(); ++i)

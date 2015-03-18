@@ -284,10 +284,10 @@ void DataOutFaces<dim,DH>::build_patches (const Mapping<dimension> &mapping,
                                       : this->default_subdivisions;
 
   Assert (n_subdivisions >= 1,
-          DataOutExceptions::ExcInvalidNumberOfSubdivisions(n_subdivisions));
+          Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   Assert (this->triangulation != 0,
-          DataOutExceptions::ExcNoTriangulationSelected());
+          Exceptions::DataOut::ExcNoTriangulationSelected());
 
   unsigned int n_datasets     = this->cell_data.size();
   for (unsigned int i=0; i<this->dof_data.size(); ++i)

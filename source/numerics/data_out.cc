@@ -322,13 +322,13 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
   Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
 
   Assert (this->triangulation != 0,
-          DataOutExceptions::ExcNoTriangulationSelected());
+          Exceptions::DataOut::ExcNoTriangulationSelected());
 
   const unsigned int n_subdivisions = (n_subdivisions_ != 0)
                                       ? n_subdivisions_
                                       : this->default_subdivisions;
   Assert (n_subdivisions >= 1,
-          DataOutExceptions::ExcInvalidNumberOfSubdivisions(n_subdivisions));
+          Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   // First count the cells we want to create patches of. Also fill the object
   // that maps the cell indices to the patch numbers, as this will be needed

@@ -38,105 +38,109 @@ DEAL_II_NAMESPACE_OPEN
 template <int, int> class FEValuesBase;
 
 
-/**
- * A namespace for exceptions that are used throughout the DataOut*
- * collection of classes.
- */
-namespace DataOutExceptions
+namespace Exceptions
 {
   /**
-   * Exception
+   * A namespace for exceptions that are used throughout the DataOut*
+   * collection of classes.
    */
-  DeclException1 (ExcInvalidNumberOfSubdivisions,
-                  int,
-                  << "The number of subdivisions per patch, " << arg1
-                  << ", is not valid. It needs to be greater or equal to "
-                  "one, or zero if you want it to be determined "
-                  "automatically.");
+  namespace DataOut
+  {
+    /**
+     * Exception
+     */
+    DeclException1 (ExcInvalidNumberOfSubdivisions,
+                    int,
+                    << "The number of subdivisions per patch, " << arg1
+                    << ", is not valid. It needs to be greater or equal to "
+                    "one, or zero if you want it to be determined "
+                    "automatically.");
 
-  /**
-   * Exception
-   */
-  DeclExceptionMsg (ExcNoTriangulationSelected,
-                    "For the operation you are attempting, you first need to "
-                    "tell the DataOut or related object which DoFHandler or "
-                    "triangulation you would like to work on.");
+    /**
+     * Exception
+     */
+    DeclExceptionMsg (ExcNoTriangulationSelected,
+                      "For the operation you are attempting, you first need to "
+                      "tell the DataOut or related object which DoFHandler or "
+                      "triangulation you would like to work on.");
 
-  /**
-   * Exception
-   */
-  DeclExceptionMsg (ExcNoDoFHandlerSelected,
-                    "For the operation you are attempting, you first need to "
-                    "tell the DataOut or related object which DoFHandler "
-                    "you would like to work on.");
+    /**
+     * Exception
+     */
+    DeclExceptionMsg (ExcNoDoFHandlerSelected,
+                      "For the operation you are attempting, you first need to "
+                      "tell the DataOut or related object which DoFHandler "
+                      "you would like to work on.");
 
-  /**
-   * Exception
-   */
-  DeclException3 (ExcInvalidVectorSize,
-                  int, int, int,
-                  << "The vector has size " << arg1
-                  << " but the DoFHandler object says that there are " << arg2
-                  << " degrees of freedom and there are " << arg3
-                  << " active cells. The size of your vector needs to be"
-                  << " either equal to the number of degrees of freedom, or"
-                  << " equal to the number of active cells.");
-  /**
-   * Exception
-   */
-  DeclException2 (ExcInvalidCharacter,
-                  std::string, size_t,
-                  << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
-                  << "description strings since some graphics formats will only accept these."
-                  << std::endl
-                  << "The string you gave was <" << arg1
-                  << ">, within which the invalid character is <" << arg1[arg2]
-                  << ">." << std::endl);
-  /**
-   * Exception
-   */
-  DeclExceptionMsg (ExcOldDataStillPresent,
-                    "When attaching a triangulation or DoFHandler object, it is "
-                    "not allowed if old data vectors are still referenced. If "
-                    "you want to reuse an object of the current type, you first "
-                    "need to call the 'clear_data_vector()' function.");
-  /**
-   * Exception
-   */
-  DeclException2 (ExcInvalidNumberOfNames,
-                  int, int,
-                  << "You have to give one name per component in your "
-                  << "data vector. The number you gave was " << arg1
-                  << ", but the number of components is " << arg2);
-  /**
-   * Exception
-   */
-  DeclExceptionMsg (ExcIncompatibleDatasetNames,
-                    "While merging sets of patches, the two sets to be merged "
-                    "need to refer to data that agrees on the names of the "
-                    "various variables represented. In other words, you "
-                    "cannot merge sets of patches that originate from "
-                    "entirely unrelated simulations.");
-  /**
-   * Exception
-   */
-  DeclExceptionMsg (ExcIncompatiblePatchLists,
-                    "While merging sets of patches, the two sets to be merged "
-                    "need to refer to data that agrees on the number of "
-                    "subdivisions and other properties. In other words, you "
-                    "cannot merge sets of patches that originate from "
-                    "entirely unrelated simulations.");
+    /**
+     * Exception
+     */
+    DeclException3 (ExcInvalidVectorSize,
+                    int, int, int,
+                    << "The vector has size " << arg1
+                    << " but the DoFHandler object says that there are " << arg2
+                    << " degrees of freedom and there are " << arg3
+                    << " active cells. The size of your vector needs to be"
+                    << " either equal to the number of degrees of freedom, or"
+                    << " equal to the number of active cells.");
+    /**
+     * Exception
+     */
+    DeclException2 (ExcInvalidCharacter,
+                    std::string, size_t,
+                    << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
+                    << "description strings since some graphics formats will only accept these."
+                    << std::endl
+                    << "The string you gave was <" << arg1
+                    << ">, within which the invalid character is <" << arg1[arg2]
+                    << ">." << std::endl);
+    /**
+     * Exception
+     */
+    DeclExceptionMsg (ExcOldDataStillPresent,
+                      "When attaching a triangulation or DoFHandler object, it is "
+                      "not allowed if old data vectors are still referenced. If "
+                      "you want to reuse an object of the current type, you first "
+                      "need to call the 'clear_data_vector()' function.");
+    /**
+     * Exception
+     */
+    DeclException2 (ExcInvalidNumberOfNames,
+                    int, int,
+                    << "You have to give one name per component in your "
+                    << "data vector. The number you gave was " << arg1
+                    << ", but the number of components is " << arg2
+                    << ".");
+    /**
+     * Exception
+     */
+    DeclExceptionMsg (ExcIncompatibleDatasetNames,
+                      "While merging sets of patches, the two sets to be merged "
+                      "need to refer to data that agrees on the names of the "
+                      "various variables represented. In other words, you "
+                      "cannot merge sets of patches that originate from "
+                      "entirely unrelated simulations.");
+    /**
+     * Exception
+     */
+    DeclExceptionMsg (ExcIncompatiblePatchLists,
+                      "While merging sets of patches, the two sets to be merged "
+                      "need to refer to data that agrees on the number of "
+                      "subdivisions and other properties. In other words, you "
+                      "cannot merge sets of patches that originate from "
+                      "entirely unrelated simulations.");
 
-  DeclException2 (ExcInvalidVectorDeclaration,
-                  int, std::string,
-                  << "When declaring that a number of components in a data\n"
-                  << "set to be output logically form a vector instead of\n"
-                  << "simply a set of scalar fields, you need to specify\n"
-                  << "this for all relevant components. Furthermore,\n"
-                  << "vectors must always consist of exactly <dim>\n"
-                  << "components. However, the vector component at\n"
-                  << "position " << arg1 << " with name <" << arg2
-                  << "> does not satisfy these conditions.");
+    DeclException2 (ExcInvalidVectorDeclaration,
+                    int, std::string,
+                    << "When declaring that a number of components in a data "
+                    << "set to be output logically form a vector instead of "
+                    << "simply a set of scalar fields, you need to specify "
+                    << "this for all relevant components. Furthermore, "
+                    << "vectors must always consist of exactly <dim> "
+                    << "components. However, the vector component at "
+                    << "position " << arg1 << " with name <" << arg2
+                    << "> does not satisfy these conditions.");
+  }
 }
 
 
@@ -895,17 +899,17 @@ merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
   // check equality of component
   // names
   Assert (get_dataset_names() == source.get_dataset_names(),
-          DataOutExceptions::ExcIncompatibleDatasetNames());
+          Exceptions::DataOut::ExcIncompatibleDatasetNames());
   // make sure patches are compatible. we'll
   // assume that if the first respective
   // patches are ok that all the other ones
   // are ok as well
   Assert (patches[0].n_subdivisions == source_patches[0].n_subdivisions,
-          DataOutExceptions::ExcIncompatiblePatchLists());
+          Exceptions::DataOut::ExcIncompatiblePatchLists());
   Assert (patches[0].data.n_rows() == source_patches[0].data.n_rows(),
-          DataOutExceptions::ExcIncompatiblePatchLists());
+          Exceptions::DataOut::ExcIncompatiblePatchLists());
   Assert (patches[0].data.n_cols() == source_patches[0].data.n_cols(),
-          DataOutExceptions::ExcIncompatiblePatchLists());
+          Exceptions::DataOut::ExcIncompatiblePatchLists());
 
   // check equality of the vector data
   // specifications

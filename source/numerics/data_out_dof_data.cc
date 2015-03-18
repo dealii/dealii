@@ -326,10 +326,10 @@ namespace internal
         Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "0123456789_<>()") == std::string::npos,
-                DataOutExceptions::ExcInvalidCharacter (names[i],
-                                                        names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                                            "0123456789_<>()")));
+                Exceptions::DataOut::ExcInvalidCharacter (names[i],
+                                                          names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                                              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                              "0123456789_<>()")));
     }
 
 
@@ -355,10 +355,10 @@ namespace internal
         Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "0123456789_<>()") == std::string::npos,
-                DataOutExceptions::ExcInvalidCharacter (names[i],
-                                                        names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                                            "0123456789_<>()")));
+                Exceptions::DataOut::ExcInvalidCharacter (names[i],
+                                                          names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                                              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                              "0123456789_<>()")));
     }
 
 
@@ -651,9 +651,9 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 attach_dof_handler (const DH &d)
 {
   Assert (dof_data.size() == 0,
-          DataOutExceptions::ExcOldDataStillPresent());
+          Exceptions::DataOut::ExcOldDataStillPresent());
   Assert (cell_data.size() == 0,
-          DataOutExceptions::ExcOldDataStillPresent());
+          Exceptions::DataOut::ExcOldDataStillPresent());
 
   triangulation = SmartPointer<const Triangulation<DH::dimension,DH::space_dimension> >(&d.get_tria(), typeid(*this).name());
   dofs = SmartPointer<const DH>(&d, typeid(*this).name());
@@ -667,9 +667,9 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 attach_triangulation (const Triangulation<DH::dimension,DH::space_dimension> &tria)
 {
   Assert (dof_data.size() == 0,
-          DataOutExceptions::ExcOldDataStillPresent());
+          Exceptions::DataOut::ExcOldDataStillPresent());
   Assert (cell_data.size() == 0,
-          DataOutExceptions::ExcOldDataStillPresent());
+          Exceptions::DataOut::ExcOldDataStillPresent());
 
   triangulation = SmartPointer<const Triangulation<DH::dimension,DH::space_dimension> >(&tria, typeid(*this).name());
 }
@@ -688,7 +688,7 @@ add_data_vector (const VECTOR                             &vec,
                  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
 {
   Assert (triangulation != 0,
-          DataOutExceptions::ExcNoTriangulationSelected ());
+          Exceptions::DataOut::ExcNoTriangulationSelected ());
   const unsigned int n_components =
     dofs != 0 ? dofs->get_fe().n_components () : 1;
 
@@ -727,7 +727,7 @@ add_data_vector (const VECTOR                             &vec,
                  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation_)
 {
   Assert (triangulation != 0,
-          DataOutExceptions::ExcNoTriangulationSelected ());
+          Exceptions::DataOut::ExcNoTriangulationSelected ());
 
   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &
   data_component_interpretation
@@ -761,19 +761,19 @@ add_data_vector (const VECTOR                             &vec,
               ExcDimensionMismatch (vec.size(),
                                     triangulation->n_active_cells()));
       Assert (names.size() == 1,
-              DataOutExceptions::ExcInvalidNumberOfNames (names.size(), 1));
+              Exceptions::DataOut::ExcInvalidNumberOfNames (names.size(), 1));
       break;
 
     case type_dof_data:
       Assert (dofs != 0,
-              DataOutExceptions::ExcNoDoFHandlerSelected ());
+              Exceptions::DataOut::ExcNoDoFHandlerSelected ());
       Assert (vec.size() == dofs->n_dofs(),
-              DataOutExceptions::ExcInvalidVectorSize (vec.size(),
-                                                       dofs->n_dofs(),
-                                                       triangulation->n_active_cells()));
+              Exceptions::DataOut::ExcInvalidVectorSize (vec.size(),
+                                                         dofs->n_dofs(),
+                                                         triangulation->n_active_cells()));
       Assert (names.size() == dofs->get_fe().n_components(),
-              DataOutExceptions::ExcInvalidNumberOfNames (names.size(),
-                                                          dofs->get_fe().n_components()));
+              Exceptions::DataOut::ExcInvalidNumberOfNames (names.size(),
+                                                            dofs->get_fe().n_components()));
       break;
 
     case type_automatic:
@@ -806,12 +806,12 @@ add_data_vector (const VECTOR                           &vec,
   // stuff and use a different constructor of DataEntry
 
   Assert (dofs != 0,
-          DataOutExceptions::ExcNoDoFHandlerSelected ());
+          Exceptions::DataOut::ExcNoDoFHandlerSelected ());
 
   Assert (vec.size() == dofs->n_dofs(),
-          DataOutExceptions::ExcInvalidVectorSize (vec.size(),
-                                                   dofs->n_dofs(),
-                                                   dofs->get_tria().n_active_cells()));
+          Exceptions::DataOut::ExcInvalidVectorSize (vec.size(),
+                                                     dofs->n_dofs(),
+                                                     dofs->get_tria().n_active_cells()));
 
   internal::DataOut::DataEntryBase<DH> *new_entry
     = new internal::DataOut::DataEntry<DH,VECTOR>(dofs, &vec, &data_postprocessor);
@@ -1026,14 +1026,14 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
           // deal with vectors
           Assert (i+patch_space_dim <=
                   (*d)->n_output_variables,
-                  DataOutExceptions::ExcInvalidVectorDeclaration (i,
-                                                                  (*d)->names[i]));
+                  Exceptions::DataOut::ExcInvalidVectorDeclaration (i,
+                                                                    (*d)->names[i]));
           for (unsigned int dd=1; dd<patch_space_dim; ++dd)
             Assert ((*d)->data_component_interpretation[i+dd]
                     ==
                     DataComponentInterpretation::component_is_part_of_vector,
-                    DataOutExceptions::ExcInvalidVectorDeclaration (i,
-                                                                    (*d)->names[i]));
+                    Exceptions::DataOut::ExcInvalidVectorDeclaration (i,
+                                                                      (*d)->names[i]));
 
           // all seems alright, so figure out
           // whether there is a common name
@@ -1110,7 +1110,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_finite_elements() const
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     {
       Assert (dof_data[i]->dof_handler != 0,
-              DataOutExceptions::ExcNoDoFHandlerSelected ());
+              Exceptions::DataOut::ExcNoDoFHandlerSelected ());
 
       // avoid creating too many finite elements and doing a lot of work on
       // initializing FEValues downstream: if two DoFHandlers are the same
