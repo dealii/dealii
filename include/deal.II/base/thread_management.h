@@ -219,8 +219,8 @@ namespace Threads
      */
     DeclException1 (ExcBarrierSizeNotUseful,
                     int,
-                    << "In single-thread mode, other barrier sizes than 1 are not "
-                    << "useful. You gave " << arg1);
+                    << "In single-thread mode, barrier sizes other than 1 are not "
+                    << "useful. You gave " << arg1 << ".");
 
     //@}
   };
@@ -3058,7 +3058,10 @@ namespace Threads
     /**
      * Exception
      */
-    DeclException0 (ExcNoTask);
+    DeclExceptionMsg (ExcNoTask,
+                      "The current object is not associated with a task that "
+                      "can be joined. It may have been detached, or you "
+                      "may have already joined it in the past.");
     //@}
   private:
     /**
