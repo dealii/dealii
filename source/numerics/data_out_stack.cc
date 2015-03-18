@@ -168,7 +168,8 @@ template <typename number>
 void DataOutStack<dim,spacedim,DH>::add_data_vector (const Vector<number> &vec,
                                                      const std::vector<std::string> &names)
 {
-  Assert (dof_handler != 0, ExcNoDoFHandlerSelected ());
+  Assert (dof_handler != 0,
+          DataOutExceptions::ExcNoDoFHandlerSelected ());
   // either cell data and one name,
   // or dof data and n_components names
   Assert (((vec.size() == dof_handler->get_tria().n_active_cells()) &&
@@ -176,15 +177,16 @@ void DataOutStack<dim,spacedim,DH>::add_data_vector (const Vector<number> &vec,
           ||
           ((vec.size() == dof_handler->n_dofs()) &&
            (names.size() == dof_handler->get_fe().n_components())),
-          ExcInvalidNumberOfNames (names.size(), dof_handler->get_fe().n_components()));
+          DataOutExceptions::ExcInvalidNumberOfNames (names.size(),
+                                                      dof_handler->get_fe().n_components()));
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                        "0123456789_<>()") == std::string::npos,
-            ExcInvalidCharacter (names[i],
-                                 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                                            "0123456789_<>()")));
+            DataOutExceptions::ExcInvalidCharacter (names[i],
+                                                    names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                        "0123456789_<>()")));
 
   if (vec.size() == dof_handler->n_dofs())
     {
@@ -240,8 +242,9 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
                                 : this->default_subdivisions;
 
   Assert (n_subdivisions >= 1,
-          ExcInvalidNumberOfSubdivisions(n_subdivisions));
-  Assert (dof_handler != 0, ExcNoDoFHandlerSelected());
+          DataOutExceptions::ExcInvalidNumberOfSubdivisions(n_subdivisions));
+  Assert (dof_handler != 0,
+          DataOutExceptions::ExcNoDoFHandlerSelected());
 
   const unsigned int n_components   = dof_handler->get_fe().n_components();
   const unsigned int n_datasets     = dof_data.size() * n_components +

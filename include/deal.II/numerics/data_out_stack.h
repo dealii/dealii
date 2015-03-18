@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,7 @@
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/numerics/data_out_dof_data.h>
 
 #include <string>
 #include <vector>
@@ -247,43 +248,6 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcNoDoFHandlerSelected,
-                    "For the operation you are attempting, you first need to "
-                    "tell the DataOut or related object which DoFHandler "
-                    "you would like to work on.");
-  /**
-   * Exception
-   */
-  DeclException3 (ExcInvalidVectorSize,
-                  int, int, int,
-                  << "The vector has size " << arg1
-                  << " but the DoFHandler object says that there are " << arg2
-                  << " degrees of freedom and there are " << arg3
-                  << " active cells. The size of your vector needs to be"
-                  << " either equal to the number of degrees of freedom, or"
-                  << " equal to the number of active cells.");
-  /**
-   * Exception
-   */
-  DeclException2 (ExcInvalidCharacter,
-                  std::string, size_t,
-                  << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
-                  << "description strings since some graphics formats will only accept these."
-                  << std::endl
-                  << "The string you gave was <" << arg1
-                  << ">, within which the invalid character is <" << arg1[arg2]
-                  << ">." << std::endl);
-  /**
-   * Exception
-   */
-  DeclException2 (ExcInvalidNumberOfNames,
-                  int, int,
-                  << "You have to give one name per component in your "
-                  << "data vector. The number you gave was " << arg1
-                  << ", but the number of components is " << arg2);
-  /**
-   * Exception
-   */
   DeclException1 (ExcVectorNotDeclared,
                   std::string,
                   << "The data vector for which the first component has the name "
@@ -308,14 +272,6 @@ public:
                   std::string,
                   << "You tried to declare a component of a data vector with "
                   << "the name <" << arg1 << ">, but that name is already used.");
-  /**
-   * Exception
-   */
-  DeclException1 (ExcInvalidNumberOfSubdivisions,
-                  int,
-                  << "The number of subdivisions per patch, " << arg1
-                  << ", is not valid. It needs to be greater or equal "
-                  << "to one.");
 
 private:
   /**

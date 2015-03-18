@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -217,15 +217,6 @@ public:
    * two functions should be done with care.
    */
   virtual FaceDescriptor next_face (const FaceDescriptor &face);
-
-  /**
-   * Exception
-   */
-  DeclException1 (ExcInvalidNumberOfSubdivisions,
-                  int,
-                  << "The number of subdivisions per patch, " << arg1
-                  << ", is not valid. It needs to be greater or equal "
-                  << "to one.");
 
 private:
   /**
