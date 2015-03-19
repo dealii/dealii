@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,26 +79,10 @@ public:
                           const types::global_dof_index index) const;
 
   /**
-   * @deprecated Determine whether a dof index is at an edge that is not a
-   * refinement edge.
-   */
-  bool non_refinement_edge_index (const unsigned int level,
-                                  const types::global_dof_index index) const DEAL_II_DEPRECATED;
-
-  /**
    * Determine whether a dof index is at the refinement edge.
    */
   bool at_refinement_edge (const unsigned int level,
                            const types::global_dof_index index) const;
-
-  /**
-   * @deprecated Use is_boundary_index() instead. The logic behind this
-   * function here is unclear and for practical purposes, the other is needed.
-   *
-   * Determine whether a dof index is subject to a boundary constraint.
-   */
-  bool at_refinement_edge_boundary (const unsigned int level,
-                                    const types::global_dof_index index) const DEAL_II_DEPRECATED;
 
   /**
    * Return the indices of dofs for each level that are subject to boundary
@@ -237,14 +221,6 @@ MGConstrainedDoFs::is_boundary_index (const unsigned int level,
 
 inline
 bool
-MGConstrainedDoFs::non_refinement_edge_index (const unsigned int level,
-                                              const types::global_dof_index index) const
-{
-  return !at_refinement_edge (level, index);
-}
-
-inline
-bool
 MGConstrainedDoFs::at_refinement_edge (const unsigned int level,
                                        const types::global_dof_index index) const
 {
@@ -253,14 +229,6 @@ MGConstrainedDoFs::at_refinement_edge (const unsigned int level,
   return refinement_edge_indices[level].is_element(index);
 }
 
-
-inline
-bool
-MGConstrainedDoFs::at_refinement_edge_boundary (const unsigned int level,
-                                                const types::global_dof_index index) const
-{
-  return is_boundary_index(level, index);
-}
 
 inline
 const std::vector<std::set<types::global_dof_index> > &

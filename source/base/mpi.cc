@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -230,6 +230,21 @@ namespace Utilities
     min_max_avg(const double my_value,
                 const MPI_Comm &mpi_communicator)
     {
+      // If MPI was not started, we have a serial computation and cannot run
+      // the other MPI commands
+      if (job_supports_mpi() == false)
+        {
+          MinMaxAvg result;
+          result.sum = my_value;
+          result.avg = my_value;
+          result.min = my_value;
+          result.max = my_value;
+          result.min_index = 0;
+          result.max_index = 0;
+
+          return result;
+        }
+
       // To avoid uninitialized values on some MPI implementations, provide
       // result with a default value already...
       MinMaxAvg result = { 0., std::numeric_limits<double>::max(),
@@ -317,17 +332,64 @@ namespace Utilities
     MPI_InitFinalize::MPI_InitFinalize (int    &argc,
                                         char ** &argv,
                                         const unsigned int max_num_threads)
-      :
-      owns_mpi (true)
     {
-      do_init(argc, argv);
+      static bool constructor_has_already_run = false;
+      Assert (constructor_has_already_run == false,
+              ExcMessage ("You can only create a single object of this class "
+                          "in a program since it initializes the MPI system."));
 
+
+
+#ifdef DEAL_II_WITH_MPI
+      // if we have PETSc, we will initialize it and let it handle MPI.
+      // Otherwise, we will do it.
+      int MPI_has_been_started = 0;
+      MPI_Initialized(&MPI_has_been_started);
+      AssertThrow (MPI_has_been_started == 0,
+                   ExcMessage ("MPI error. You can only start MPI once!"));
+
+      int mpi_err, provided;
+      // this works likempi_err = MPI_Init (&argc, &argv); but tells MPI that
+      // we might use several threads but never call two MPI functions at the
+      // same time. For an explanation see on why we do this see
+      // http://www.open-mpi.org/community/lists/users/2010/03/12244.php
+      int wanted = MPI_THREAD_SERIALIZED;
+      mpi_err = MPI_Init_thread(&argc, &argv, wanted, &provided);
+      AssertThrow (mpi_err == 0,
+                   ExcMessage ("MPI could not be initialized."));
+
+      // disable for now because at least some implementations always return MPI_THREAD_SINGLE.
+      //Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
+      //    ExcMessage("MPI reports that we are not allowed to use multiple threads."));
+#else
+      // make sure the compiler doesn't warn
+      // about these variables
+      (void)argc;
+      (void)argv;
+#endif
+
+      // we are allowed to call MPI_Init ourselves and PETScInitialize will
+      // detect this. This allows us to use MPI_Init_thread instead.
+#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_SLEPC
+      // Initialize SLEPc (with PETSc):
+      SlepcInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+#  else
+      // or just initialize PETSc alone:
+      PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+#  endif
+#endif
+
+      constructor_has_already_run = true;
+
+
+      // Now also see how many threads we'd like to run
       if (max_num_threads != numbers::invalid_unsigned_int)
         {
           // set maximum number of threads (also respecting the environment
           // variable that the called function evaluates) based on what
           // the user asked
-          multithread_info.set_thread_limit(max_num_threads);
+          MultithreadInfo::set_thread_limit(max_num_threads);
         }
       else
         // user wants automatic choice
@@ -375,92 +437,21 @@ namespace Utilities
           // if the number would be zero, round up to one since every
           // process needs to have at least one thread
           const unsigned int n_threads
-            = std::max(multithread_info.n_cpus / n_local_processes
+            = std::max(MultithreadInfo::n_cores() / n_local_processes
                        +
-                       (nth_process_on_host <= multithread_info.n_cpus % n_local_processes
+                       (nth_process_on_host <= MultithreadInfo::n_cores() % n_local_processes
                         ?
                         1
                         :
                         0),
                        1U);
 #else
-          const unsigned int n_threads = multithread_info.n_cpus;
+          const unsigned int n_threads = MultithreadInfo::n_cores();
 #endif
 
           // finally set this number of threads
-          multithread_info.set_thread_limit(n_threads);
+          MultithreadInfo::set_thread_limit(n_threads);
         }
-    }
-
-
-
-
-    MPI_InitFinalize::MPI_InitFinalize (int    &argc,
-                                        char ** &argv)
-      :
-      owns_mpi (true)
-    {
-      do_init(argc, argv);
-
-      // set maximum number of threads (also respecting the environment
-      // variable that the called function evaluates)
-      multithread_info.set_thread_limit(1);
-    }
-
-
-    void
-    MPI_InitFinalize::do_init(int    &argc,
-                              char ** &argv)
-    {
-      static bool constructor_has_already_run = false;
-      Assert (constructor_has_already_run == false,
-              ExcMessage ("You can only create a single object of this class "
-                          "in a program since it initializes the MPI system."));
-
-
-
-#ifdef DEAL_II_WITH_MPI
-      // if we have PETSc, we will initialize it and let it handle MPI.
-      // Otherwise, we will do it.
-      int MPI_has_been_started = 0;
-      MPI_Initialized(&MPI_has_been_started);
-      AssertThrow (MPI_has_been_started == 0,
-                   ExcMessage ("MPI error. You can only start MPI once!"));
-
-      int mpi_err, provided;
-      // this works likempi_err = MPI_Init (&argc, &argv); but tells MPI that
-      // we might use several threads but never call two MPI functions at the
-      // same time. For an explanation see on why we do this see
-      // http://www.open-mpi.org/community/lists/users/2010/03/12244.php
-      int wanted = MPI_THREAD_SERIALIZED;
-      mpi_err = MPI_Init_thread(&argc, &argv, wanted, &provided);
-      AssertThrow (mpi_err == 0,
-                   ExcMessage ("MPI could not be initialized."));
-
-      // disable for now because at least some implementations always return MPI_THREAD_SINGLE.
-      //Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
-      //    ExcMessage("MPI reports that we are not allowed to use multiple threads."));
-#else
-      // make sure the compiler doesn't warn
-      // about these variables
-      (void)argc;
-      (void)argv;
-      (void)owns_mpi;
-#endif
-
-      // we are allowed to call MPI_Init ourselves and PETScInitialize will
-      // detect this. This allows us to use MPI_Init_thread instead.
-#ifdef DEAL_II_WITH_PETSC
-#  ifdef DEAL_II_WITH_SLEPC
-      // Initialize SLEPc (with PETSc):
-      SlepcInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
-#  else
-      // or just initialize PETSc alone:
-      PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
-#  endif
-#endif
-
-      constructor_has_already_run = true;
     }
 
 
@@ -525,12 +516,7 @@ namespace Utilities
       // when running PETSc, because we initialize MPI ourselves before calling
       // PetscInitialize
 #ifdef DEAL_II_WITH_MPI
-      int mpi_err = 0;
-
-      int MPI_has_been_started = 0;
-      MPI_Initialized(&MPI_has_been_started);
-      if (Utilities::System::job_supports_mpi() == true && owns_mpi == true &&
-          MPI_has_been_started != 0)
+      if (job_supports_mpi() == true)
         {
           if (std::uncaught_exception())
             {
@@ -540,12 +526,12 @@ namespace Utilities
                         << std::endl;
             }
           else
-            mpi_err = MPI_Finalize();
+            {
+              const int mpi_err = MPI_Finalize();
+              AssertThrow (mpi_err == 0,
+                           ExcMessage ("An error occurred while calling MPI_Finalize()"));
+            }
         }
-
-
-      AssertThrow (mpi_err == 0,
-                   ExcMessage ("An error occurred while calling MPI_Finalize()"));
 #endif
     }
 

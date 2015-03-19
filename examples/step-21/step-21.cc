@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2006 - 2013 by the deal.II authors
+ * Copyright (C) 2006 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -57,6 +57,7 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -411,7 +412,7 @@ namespace Step21
 
           double permeability = 0;
           for (unsigned int i=0; i<centers.size(); ++i)
-            permeability += std::exp(-(points[p]-centers[i]).square()
+            permeability += std::exp(-(points[p]-centers[i]).norm_square()
                                      / (0.05 * 0.05));
 
           const double normalized_permeability

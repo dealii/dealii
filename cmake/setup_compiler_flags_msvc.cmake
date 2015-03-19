@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2014 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -72,6 +72,6 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   LIST(APPEND DEAL_II_USER_DEFINITIONS_DEBUG "DEBUG")
 
   # generate some debug info:
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "/Zi")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "/Zi /MDd")
 ENDIF()
 

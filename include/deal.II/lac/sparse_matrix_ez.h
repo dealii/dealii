@@ -847,7 +847,7 @@ private:
 
 template <typename number>
 inline
-SparseMatrixEZ<number>::Entry::Entry(size_type column,
+SparseMatrixEZ<number>::Entry::Entry(const size_type column,
                                      const number &value)
   :
   column(column),
@@ -1197,7 +1197,7 @@ void SparseMatrixEZ<number>::set (const size_type i,
                                   const number value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
@@ -1224,7 +1224,7 @@ void SparseMatrixEZ<number>::add (const size_type i,
                                   const number value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));

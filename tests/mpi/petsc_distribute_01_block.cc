@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,7 @@ void test()
     vec.block(0)(i) = i;
   for (unsigned int i=vec.block(1).local_range().first; i<vec.block(1).local_range().second; ++i)
     vec.block(1)(i) = i;
-  vec.compress(VectorOperation::add);
+  vec.compress(VectorOperation::insert);
 
   // verify correctness so far
   {

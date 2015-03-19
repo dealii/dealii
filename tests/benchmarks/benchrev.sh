@@ -12,7 +12,6 @@ echo "testing $PREVREVISION"
   echo "configure"
   cd build
   cmake ../deal.II || exit 2
-  #./configure --disable-threads --with-petsc=no || exit 2
   echo "compiling" 
   $MAKECMD || exit 3
   

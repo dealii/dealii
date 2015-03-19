@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -418,51 +418,6 @@ Multigrid<VECTOR>::vcycle()
   level_v_step (maxlevel);
 }
 
-
-template <class VECTOR>
-void
-Multigrid<VECTOR>::vmult(VECTOR &dst, const VECTOR &src) const
-{
-  Multigrid<VECTOR> &mg = const_cast<Multigrid<VECTOR>&>(*this);
-  mg.defect[maxlevel] = src;
-  for (unsigned int level=maxlevel; level>minlevel; --level)
-    {
-      mg.defect[level-1] = 0.;
-      mg.transfer->restrict_and_add (level,
-                                     mg.defect[level-1],
-                                     mg.defect[level]);
-    }
-
-  mg.cycle();
-  dst = mg.solution[maxlevel];
-}
-
-
-template <class VECTOR>
-void
-Multigrid<VECTOR>::vmult_add(VECTOR &dst, const VECTOR &src) const
-{
-  Multigrid<VECTOR> &mg = const_cast<Multigrid<VECTOR>&>(*this);
-  mg.defect[maxlevel] = src;
-  mg.cycle();
-  dst += mg.solution[maxlevel];
-}
-
-
-template <class VECTOR>
-void
-Multigrid<VECTOR>::Tvmult(VECTOR &, const VECTOR &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <class VECTOR>
-void
-Multigrid<VECTOR>::Tvmult_add(VECTOR &, const VECTOR &) const
-{
-  Assert(false, ExcNotImplemented());
-}
 
 DEAL_II_NAMESPACE_CLOSE
 

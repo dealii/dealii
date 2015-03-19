@@ -40,11 +40,12 @@ namespace hp
 
 
 /**
- * Implementation of the error indicator by Kelly, Gago, Zienkiewicz and
+ * Implementation of the error indicator by Kelly, De S. R. Gago, Zienkiewicz and
  * Babuska.  This error indicator tries to approximate the error per cell by
  * integration of the jump of the gradient of the solution along the faces of
  * each cell.  It can be understood as a gradient recovery estimator; see the
- * survey of Ainsworth for a complete discussion.
+ * survey of Ainsworth and Oden, "A Posteriori Error Estimation in Finite Element
+ * Analysis" (Wiley, 2000) for a complete discussion.
  *
  * @note In spite of the name, this is not truly an a posteriori error
  * estimator, even if applied to the Poisson problem only. It gives good hints
@@ -58,10 +59,25 @@ namespace hp
  * the conormal derivative $a\frac{du}{dn} = g$.
  *
  * The error estimator returns a vector of estimated errors per cell which can
- * be used to feed the <tt>Triangulation<dim>::refine_*</tt> functions. This
+ * be used to feed the GridRefinement::refine_fixed_fraction,
+ * GridRefinement::refine_fixed_number, and similar functions. This
  * vector contains elements of data type @p float, rather than @p double,
- * since accuracy is not so important here, and since this can save rather a
- * lot of memory, when using many cells.
+ * since accuracy is not important in the current context.
+ *
+ * The full reference for the paper in which this error estimator is defined
+ * is as follows:
+ * @code
+ * @Article{KGZB83,
+ *   author =       {Kelly, D. W. and {De S. R. Gago}, J. P. and Zienkiewicz, O. C.
+ *                   and Babu\v{s}ka, I.},
+ *   title =        {A posteriori error analysis and adaptive processes
+ *                   in the finite element method: Part {I}--Error Analysis},
+ *   journal =      {Int. J. Num. Meth. Engrg.},
+ *   year =         {1983},
+ *   volume =       {19},
+ *   pages =        {1593--1619}
+ * }
+ * @endcode
  *
  *
  * <h3>Implementation</h3>
@@ -236,10 +252,11 @@ public:
    * You might give a list of components you want to evaluate, in case the
    * finite element used by the DoFHandler object is vector-valued. You then
    * have to set those entries to true in the bit-vector @p component_mask
-   * (see @ref GlossComponentMask) for which the respective component is to be
-   * used in the error estimator. The default is to use all components, which
-   * is done by either providing a bit-vector with all-set entries, or an
-   * empty bit-vector.
+   * (see
+   * @ref GlossComponentMask
+   * ) for which the respective component is to be used in the error
+   * estimator. The default is to use all components, which is done by either
+   * providing a bit-vector with all-set entries, or an empty bit-vector.
    *
    * The @p subdomain_id parameter indicates whether we shall compute
    * indicators for all cells (in case its value is the default,
@@ -425,34 +442,51 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidBoundaryIndicator);
+  DeclExceptionMsg (ExcInvalidComponentMask,
+                    "You provided a ComponentMask argument that is invalid. "
+                    "Component masks need to be either default constructed "
+                    "(in which case they indicate that every component is "
+                    "selected) or need to have a length equal to the number "
+                    "of vector components of the finite element in use "
+                    "by the DoFHandler object. In the latter case, at "
+                    "least one component needs to be selected.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidComponentMask);
+  DeclExceptionMsg (ExcInvalidCoefficient,
+                    "If you do specify the argument for a (possibly "
+                    "spatially variable) coefficient function for this function, "
+                    "then it needs to refer to a coefficient that is either "
+                    "scalar (has one vector component) or has as many vector "
+                    "components as there are in the finite element used by "
+                    "the DoFHandler argument.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidCoefficient);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcInvalidBoundaryFunction);
+  DeclException3 (ExcInvalidBoundaryFunction,
+                  types::boundary_id,
+                  int,
+                  int,
+                  << "You provided a function map that for boundary indicator "
+                  << arg1 << " specifies a function with "
+                  << arg2 << " vector components. However, the finite "
+                  "element in use has "
+                  << arg2 << " components, and these two numbers need to match.");
   /**
    * Exception
    */
   DeclException2 (ExcIncompatibleNumberOfElements,
                   int, int,
-                  << "The number of elements " << arg1 << " and " << arg2
-                  << " of the vectors do not match!");
+                  << "The number of input vectors, " << arg1
+                  << " needs to be equal to the number of output vectors, "
+                  << arg2
+                  << ". This is not the case in your call of this function.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidSolutionVector);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcNoSolutions);
+  DeclExceptionMsg (ExcNoSolutions,
+                    "You need to specify at least one solution vector as "
+                    "input.");
 };
 
 
@@ -638,34 +672,51 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidBoundaryIndicator);
+  DeclExceptionMsg (ExcInvalidComponentMask,
+                    "You provided a ComponentMask argument that is invalid. "
+                    "Component masks need to be either default constructed "
+                    "(in which case they indicate that every component is "
+                    "selected) or need to have a length equal to the number "
+                    "of vector components of the finite element in use "
+                    "by the DoFHandler object. In the latter case, at "
+                    "least one component needs to be selected.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidComponentMask);
+  DeclExceptionMsg (ExcInvalidCoefficient,
+                    "If you do specify the argument for a (possibly "
+                    "spatially variable) coefficient function for this function, "
+                    "then it needs to refer to a coefficient that is either "
+                    "scalar (has one vector component) or has as many vector "
+                    "components as there are in the finite element used by "
+                    "the DoFHandler argument.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidCoefficient);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcInvalidBoundaryFunction);
+  DeclException3 (ExcInvalidBoundaryFunction,
+                  types::boundary_id,
+                  int,
+                  int,
+                  << "You provided a function map that for boundary indicator "
+                  << arg1 << " specifies a function with "
+                  << arg2 << " vector components. However, the finite "
+                  "element in use has "
+                  << arg3 << " components, and these two numbers need to match.");
   /**
    * Exception
    */
   DeclException2 (ExcIncompatibleNumberOfElements,
                   int, int,
-                  << "The number of elements " << arg1 << " and " << arg2
-                  << " of the vectors do not match!");
+                  << "The number of input vectors, " << arg1
+                  << " needs to be equal to the number of output vectors, "
+                  << arg2
+                  << ". This is not the case in your call of this function.");
   /**
    * Exception
    */
-  DeclException0 (ExcInvalidSolutionVector);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcNoSolutions);
+  DeclExceptionMsg (ExcNoSolutions,
+                    "You need to specify at least one solution vector as "
+                    "input.");
 };
 
 

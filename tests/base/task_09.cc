@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,7 +66,7 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  for (unsigned int i=0; i<multithread_info.n_cpus*2; ++i)
+  for (unsigned int i=0; i<MultithreadInfo::n_cores()*2; ++i)
     Threads::new_task (outer);
 
   deallog << "OK" << std::endl;

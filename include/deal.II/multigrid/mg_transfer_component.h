@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -346,12 +346,11 @@ private:
   unsigned int mg_selected_component;
 
   /**
-   * The degrees of freedom on the the refinement edges. For each level (outer
-   * vector) and each dof index (inner vector), this bool is true if the level
-   * degree of freedom is on the refinement edge towards the lower level
-   * excluding boundary dofs.
+   * The degrees of freedom on the refinement edges. For each level the index
+   * set denotes which level degrees of freedom are on the refinement edge
+   * towards the lower level, excluding boundary dofs.
    */
-  std::vector<std::vector<bool> > interface_dofs;
+  std::vector<IndexSet> interface_dofs;
 
   /**
    * The constraints of the global system.

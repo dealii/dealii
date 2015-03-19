@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,8 +31,10 @@ DEAL_II_NAMESPACE_OPEN
  * subject to change. Rather create new exception classes using the
  * <tt>DeclException</tt> macro family.
  *
- * See the @ref Exceptions module for more details on this class and what can
- * be done with classes derived from it.
+ * See the
+ * @ref Exceptions
+ * module for more details on this class and what can be done with classes
+ * derived from it.
  *
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
@@ -132,7 +134,7 @@ protected:
    */
   int n_stacktrace_frames;
 
-#ifdef HAVE_GLIBC_STACKTRACE
+#ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
   /**
    * array of pointers that contains the raw stack trace
    */
@@ -342,7 +344,7 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
-#ifdef HAVE_BUILTIN_EXPECT
+#ifdef DEAL_II_HAVE_BUILTIN_EXPECT
 #define AssertThrow(cond, exc)                                              \
   {                                                                           \
     if (__builtin_expect(!(cond), false))                                     \
@@ -350,7 +352,7 @@ namespace deal_II_exceptions
       issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
                   __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
   }
-#else /*ifdef HAVE_BUILTIN_EXPECT*/
+#else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #define AssertThrow(cond, exc)                                              \
   {                                                                           \
     if (!(cond))                                                              \
@@ -358,7 +360,7 @@ namespace deal_II_exceptions
       issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
                   __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
   }
-#endif /*ifdef HAVE_BUILTIN_EXPECT*/
+#endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 
 
 
@@ -373,6 +375,27 @@ namespace deal_II_exceptions
 #define DeclException0(Exception0)                                        \
   class Exception0 :  public dealii::ExceptionBase {}
 
+
+/**
+ * Declare an exception class derived from ExceptionBase that can take
+ * one runtime argument, but if none is given in the place where you
+ * want to throw the exception, it simply reverts to the default text
+ * provided when declaring the exception class through this macro.
+ *
+ * @ingroup Exceptions
+ */
+#define DeclExceptionMsg(Exception, defaulttext)                          \
+  class Exception :  public dealii::ExceptionBase                         \
+  {                                                                       \
+  public:                                                                 \
+    Exception (const std::string &msg = defaulttext) : arg (msg) {}       \
+    virtual ~Exception () throw () {}                                     \
+    virtual void print_info (std::ostream &out) const {                   \
+      out << arg << std::endl;                                            \
+    }                                                                     \
+  private:                                                                \
+    const std::string arg;                                                \
+  }
 
 /**
  * Declare an exception class derived from ExceptionBase with one additional
@@ -497,6 +520,16 @@ namespace deal_II_exceptions
 #define DeclException0(Exception0)                                        \
   static dealii::ExceptionBase& Exception0 ()
 
+/**
+ * Declare an exception class derived from ExceptionBase that can take
+ * one runtime argument, but if none is given in the place where you
+ * want to throw the exception, it simply reverts to the default text
+ * provided when declaring the exception class through this macro.
+ *
+ * @ingroup Exceptions
+ */
+#define DeclExceptionMsg(Exception, defaulttext)                          \
+  static dealii::ExceptionBase& Exception ()
 
 /**
  * Declare an exception class derived from ExceptionBase with one additional
@@ -570,13 +603,10 @@ namespace StandardExceptions
 
   /**
    * Exception denoting a division by zero.
-   *
-   * @note Unfortunately, automatic detection of division by zero is very
-   * hardware dependent and requires severe hacking on some architectures.
-   * Therefore, this exception is only raised if the test is performed
-   * explicitly.
    */
-  DeclException0 (ExcDivideByZero);
+  DeclExceptionMsg (ExcDivideByZero,
+                    "A piece of code is attempting a division by zero. This is "
+                    "likely going to lead to results that make no sense.");
 
   /**
    * Exception raised if a number is not finite.
@@ -584,13 +614,52 @@ namespace StandardExceptions
    * This exception should be used to catch infinite or not a number results
    * of arithmetic operations that do not result from a division by zero (use
    * ExcDivideByZero for those).
+   *
+   * The exception uses std::complex as its argument to ensure that we can
+   * use it for all scalar arguments (real or complex-valued).
    */
-  DeclException0 (ExcNumberNotFinite);
+  DeclException1 (ExcNumberNotFinite,
+                  std::complex<double>,
+                  << "In a significant number of places, deal.II checks that some intermediate "
+                  << "value is a finite number (as opposed to plus or minus infinity, or "
+                  << "NaN/Not a Number). In the current function, we encountered a number "
+                  << "that is not finite (its value is " << arg1 << " and therefore "
+                  << "violates the current assertion.\n\n"
+                  << "This may be due to the fact that some operation in this function "
+                  << "created such a value, or because one of the arguments you passed "
+                  << "to the function already had this value from some previous "
+                  << "operation. In the latter case, this function only triggered the "
+                  << "error but may not actually be responsible for the computation of "
+                  << "the number that is not finite.\n\n"
+                  << "There are two common cases where this situation happens. First, your "
+                  << "code (or something in deal.II) divides by zero in a place where this "
+                  << "should not happen. Or, you are trying to solve a linear system "
+                  << "with an unsuitable solver (such as an indefinite or non-symmetric "
+                  << "linear system using a Conjugate Gradient solver); such attempts "
+                  << "oftentimes yield an operation somewhere that tries to divide "
+                  << "by zero or take the square root of a negative value.\n\n"
+                  << "In any case, when trying to find the source of the error, "
+                  << "recall that the location where you are getting this error is "
+                  << "simply the first place in the program where there is a check "
+                  << "that a number (e.g., an element of a solution vector) is in fact "
+                  << "finite, but that the actual error that computed the number "
+                  << "may have happened far earlier. To find this location, you "
+                  << "may want to add checks for finiteness in places of your "
+                  << "program visited before the place where this error is produced."
+                  << "One way to check for finiteness is to use the 'AssertIsFinite' "
+                  << "macro.");
 
   /**
    * Trying to allocate a new object failed due to lack of free memory.
    */
-  DeclException0 (ExcOutOfMemory);
+  DeclExceptionMsg (ExcOutOfMemory,
+                    "Your program tried to allocate some memory but this "
+                    "allocation failed. Typically, this either means that "
+                    "you simply do not have enough memory in your system, "
+                    "or that you are (erroneously) trying to allocate "
+                    "a chunk of memory that is simply beyond all reasonable "
+                    "size, for example because the size of the object has "
+                    "been computed incorrectly.");
 
   /**
    * A memory handler reached a point where all allocated objects should have
@@ -603,7 +672,28 @@ namespace StandardExceptions
   /**
    * An error occurred reading or writing a file.
    */
-  DeclException0 (ExcIO);
+  DeclExceptionMsg (ExcIO,
+                    "An input/output error has occurred. There are a number of "
+                    "reasons why this may be happening, both for reading and "
+                    "writing operations."
+                    "\n\n"
+                    "If this happens during an operation that tries to read "
+                    "data: First, you may be "
+                    "trying to read from a file that doesn't exist or that is "
+                    "not readable given its file permissions. Second, deal.II "
+                    "uses this error at times if it tries to "
+                    "read information from a file but where the information "
+                    "in the file does not correspond to the expected format. "
+                    "An example would be a truncated file, or a mesh file "
+                    "that contains not only sections that describe the "
+                    "vertices and cells, but also sections for additional "
+                    "data that deal.II does not understand."
+                    "\n\n"
+                    "If this happens during an operation that tries to write "
+                    "data: you may be trying to write to a file to which file "
+                    "or directory permissions do not allow you to write. A "
+                    "typical example is where you specify an output file in "
+                    "a directory that does not exist.");
 
   /**
    * An error occurred opening the named file.
@@ -623,7 +713,17 @@ namespace StandardExceptions
    * corresponding place and see whether it can be implemented without too
    * much effort.
    */
-  DeclException0 (ExcNotImplemented);
+  DeclExceptionMsg (ExcNotImplemented,
+                    "You are trying to use functionality in deal.II that is "
+                    "currently not implemented. In many cases, this indicates "
+                    "that there simply didn't appear much of a need for it, or "
+                    "that the author of the original code did not have the "
+                    "time to implement a particular case. If you hit this "
+                    "exception, it is therefore worth the time to look into "
+                    "the code to find out whether you may be able to "
+                    "implement the missing functionality. If you do, please "
+                    "consider providing a patch to the deal.II development "
+                    "sources (see the deal.II website on how to contribute).");
 
   /**
    * This exception usually indicates that some condition which the programmer
@@ -645,7 +745,22 @@ namespace StandardExceptions
    * cases. These cases will then be trapped sooner or later by the exception,
    * so that the algorithm can then be fixed for these cases as well.
    */
-  DeclException0 (ExcInternalError);
+  DeclExceptionMsg (ExcInternalError,
+                    "This exception -- which is used in many places in the "
+                    "library -- usually indicates that some condition which "
+                    "the author of the code thought must be satisfied at a "
+                    "certain point in an algorithm, is not fulfilled. An "
+                    "example would be that the first part of an algorithm "
+                    "sorts elements of an array in ascending order, and "
+                    "a second part of the algorithm later encounters an "
+                    "an element that is not larger than the previous one."
+                    "\n\n"
+                    "There is usually not very much you can do if you "
+                    "encounter such an exception since it indicates an error "
+                    "in deal.II, not in your own program. Try to come up with "
+                    "the smallest possible program that still demonstrates "
+                    "the error and contact the deal.II mailing lists with it "
+                    "to obtain help.");
 
   /**
    * This exception is used in functions that may not be called (i.e. in pure
@@ -680,18 +795,28 @@ namespace StandardExceptions
    */
   DeclException1 (ExcImpossibleInDim,
                   int,
-                  << "Impossible in " << arg1 << "d.");
+                  << "You are trying to execute functionality that is "
+                  << "impossible in " << arg1
+                  << "d or simply does not make any sense.");
 
   /**
    * A number is zero, but it should not be here.
    */
-  DeclException0(ExcZero);
+  DeclExceptionMsg(ExcZero,
+                   "In a check in the code, deal.II encountered a zero in "
+                   "a place where this does not make sense. See the condition "
+                   "that was being checked and that is printed further up "
+                   "in the error message to get more information on what "
+                   "the erroneous zero corresponds to.");
 
   /**
    * The object should have been filled with something before this member
    * function is called.
    */
-  DeclException0(ExcEmptyObject);
+  DeclExceptionMsg(ExcEmptyObject,
+                   "The object you are trying to access is empty but it makes "
+                   "no sense to attempt the operation you are trying on an "
+                   "empty object.");
 
   /**
    * This exception is raised whenever the sizes of two objects were assumed
@@ -774,13 +899,21 @@ namespace StandardExceptions
    * Typically, this will be an internal error of deal.II, because the
    * increment and decrement operators should never yield an invalid iterator.
    */
-  DeclException0 (ExcInvalidIterator);
+  DeclExceptionMsg (ExcInvalidIterator,
+                    "You are trying to use an iterator, but the iterator is "
+                    "in an invalid state. This may indicate that the iterator "
+                    "object has not been initialized, or that it has been "
+                    "moved beyond the end of the range of valid elements.");
 
   /**
    * This exception is thrown if the iterator you incremented or decremented
    * was already at its final state.
    */
-  DeclException0 (ExcIteratorPastEnd);
+  DeclExceptionMsg (ExcIteratorPastEnd,
+                    "You are trying to use an iterator, but the iterator is "
+                    "pointing past the end of the range of valid elements. "
+                    "It is not valid to dereference the iterator in this "
+                    "case.");
 
   /**
    * This exception works around a design flaw in the <tt>DeclException0</tt>
@@ -802,7 +935,12 @@ namespace StandardExceptions
   /**
    * Parallel vectors with ghost elements are read-only vectors.
    */
-  DeclException0 (ExcGhostsPresent);
+  DeclExceptionMsg (ExcGhostsPresent,
+                    "You are trying an operation on a vector that is only "
+                    "allowed if the vector has no ghost elements, but the "
+                    "vector you are operating on does have ghost elements. "
+                    "See the glossary entry on 'Ghosted vectors' for more "
+                    "information.");
 
   /**
    * Some of our numerical classes allow for setting alll entries to zero
@@ -811,7 +949,10 @@ namespace StandardExceptions
    * In many cases, this assignment operator makes sense <b>only</b> for the
    * argument zero. In other cases, this exception is thrown.
    */
-  DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
+  DeclExceptionMsg (ExcScalarAssignmentOnlyForZeroValue,
+                    "You are trying an operation of the form 'vector=s' with "
+                    "a nonzero scalar value 's'. However, such assignments "
+                    "are only allowed if the right hand side is zero.");
 
   /**
    * This function requires support for the LAPACK library.
@@ -877,6 +1018,19 @@ namespace StandardExceptions
 
 #define AssertGlobalIndexRange(index,range) Assert((index) < (range), \
                                                    ExcIndexRange<types::global_dof_index>((index),0,(range)))
+
+/**
+ * An assertion that checks whether a number is finite or not.
+ * We explicitly cast the number to std::complex to match
+ * the signature of the exception (see there for an explanation
+ * of why we use std::complex at all) and to satisfy the
+ * fact that std::complex has no implicit conversions.
+ *
+ * @ingroup Exceptions
+ * @author Wolfgang Bangerth, 2015
+ */
+#define AssertIsFinite(number) Assert(dealii::numbers::is_finite(number), \
+                                      ExcNumberNotFinite(std::complex<double>(number)))
 
 using namespace StandardExceptions;
 

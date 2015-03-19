@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,6 @@
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/mapping.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <algorithm>
 #include <memory>
@@ -120,8 +119,9 @@ namespace internal
  * order tensor components consisting of <code>(dim*dim + dim)/2</code>
  * elements
  *
- * See the description of the @ref vector_valued module for examples how to
- * use the features of this namespace.
+ * See the description of the
+ * @ref vector_valued
+ * module for examples how to use the features of this namespace.
  *
  * @ingroup feaccess vector_valued
  */
@@ -130,7 +130,8 @@ namespace FEValuesViews
   /**
    * A class representing a view to a single scalar component of a possibly
    * vector-valued finite element. Views are discussed in the
-   * @ref vector_valued module.
+   * @ref vector_valued
+   * module.
    *
    * You get an object of this type if you apply a FEValuesExtractors::Scalar
    * to an FEValues, FEFaceValues or FESubfaceValues object.
@@ -341,7 +342,9 @@ namespace FEValuesViews
   /**
    * A class representing a view to a set of <code>spacedim</code> components
    * forming a vector part of a vector-valued finite element. Views are
-   * discussed in the @ref vector_valued module.
+   * discussed in the
+   * @ref vector_valued
+   * module.
    *
    * Note that in the current context, a vector is meant in the sense physics
    * uses it: it has <code>spacedim</code> components that behave in specific
@@ -731,7 +734,9 @@ namespace FEValuesViews
   /**
    * A class representing a view to a set of <code>(dim*dim + dim)/2</code>
    * components forming a symmetric second-order tensor from a vector-valued
-   * finite element. Views are discussed in the @ref vector_valued module.
+   * finite element. Views are discussed in the
+   * @ref vector_valued
+   * module.
    *
    * This class allows to query the value and divergence of (components of)
    * shape functions and solutions representing symmetric tensors. The
@@ -935,7 +940,9 @@ namespace FEValuesViews
   /**
    * A class representing a view to a set of <code>dim*dim</code> components
    * forming a second-order tensor from a vector-valued finite element. Views
-   * are discussed in the @ref vector_valued module.
+   * are discussed in the
+   * @ref vector_valued
+   * module.
    *
    * This class allows to query the value and divergence of (components of)
    * shape functions and solutions representing tensors. The divergence of a
@@ -1598,14 +1605,6 @@ public:
                  const unsigned int point_no) const;
 
   /**
-   * @deprecated Wrapper for shape_hessian()
-   */
-  const Tensor<2,spacedim> &
-  shape_2nd_derivative (const unsigned int function_no,
-                        const unsigned int point_no) const DEAL_II_DEPRECATED;
-
-
-  /**
    * Return one vector component of the gradient of a shape function at a
    * quadrature point. If the finite element is scalar, then only component
    * zero is allowed and the return value equals that of the shape_hessian()
@@ -1625,15 +1624,6 @@ public:
   shape_hessian_component (const unsigned int function_no,
                            const unsigned int point_no,
                            const unsigned int component) const;
-
-  /**
-   * @deprecated Wrapper for shape_hessian_component()
-   */
-  Tensor<2,spacedim>
-  shape_2nd_derivative_component (const unsigned int function_no,
-                                  const unsigned int point_no,
-                                  const unsigned int component) const DEAL_II_DEPRECATED;
-
 
   //@}
   /// @name Access to values of global finite element fields
@@ -1865,37 +1855,6 @@ public:
                                VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > > gradients,
                                bool quadrature_points_fastest = false) const;
 
-  /**
-   * @deprecated Use get_function_gradients() instead.
-   */
-  template <class InputVector>
-  void get_function_grads (const InputVector      &fe_function,
-                           std::vector<Tensor<1,spacedim> > &gradients) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use get_function_gradients() instead.
-   */
-  template <class InputVector>
-  void get_function_grads (const InputVector               &fe_function,
-                           std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use get_function_gradients() instead.
-   */
-  template <class InputVector>
-  void get_function_grads (const InputVector &fe_function,
-                           const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                           std::vector<Tensor<1,spacedim> > &gradients) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use get_function_gradients() instead.
-   */
-  template <class InputVector>
-  void get_function_grads (const InputVector &fe_function,
-                           const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                           std::vector<std::vector<Tensor<1,spacedim> > > &gradients,
-                           bool quadrature_points_fastest = false) const DEAL_II_DEPRECATED;
-
   //@}
   /// @name Access to second derivatives (Hessian matrices and Laplacians) of global finite element fields
   //@{
@@ -1985,23 +1944,6 @@ public:
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
     VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > > hessians,
     bool quadrature_points_fastest = false) const;
-
-  /**
-   * @deprecated Wrapper for get_function_hessians()
-   */
-  template <class InputVector>
-  void
-  get_function_2nd_derivatives (const InputVector &,
-                                std::vector<Tensor<2,spacedim> > &) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Wrapper for get_function_hessians()
-   */
-  template <class InputVector>
-  void
-  get_function_2nd_derivatives (const InputVector &,
-                                std::vector<std::vector<Tensor<2,spacedim> > > &,
-                                bool = false) const DEAL_II_DEPRECATED;
 
   /**
    * Compute the (scalar) Laplacian (i.e. the trace of the tensor of second
@@ -2228,21 +2170,6 @@ public:
                   const std::vector<Tensor<1,dim> > &original,
                   MappingType mapping) const;
 
-  /**
-   * @deprecated Use normal_vector() instead.
-   *
-   * Return the outward normal vector to the cell at the <tt>i</tt>th
-   * quadrature point. The length of the vector is normalized to one.
-   */
-  const Point<spacedim> &cell_normal_vector (const unsigned int i) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use get_normal_vectors() instead.
-   *
-   * Returns the vectors normal to the cell in each of the quadrature points.
-   */
-  const std::vector<Point<spacedim> > &get_cell_normal_vectors () const DEAL_II_DEPRECATED;
-
   //@}
 
   /// @name Extractors Methods to extract individual components
@@ -2252,7 +2179,9 @@ public:
    * Create a view of the current FEValues object that represents a particular
    * scalar component of the possibly vector-valued finite element. The
    * concept of views is explained in the documentation of the namespace
-   * FEValuesViews and in particular in the @ref vector_valued module.
+   * FEValuesViews and in particular in the
+   * @ref vector_valued
+   * module.
    */
   const FEValuesViews::Scalar<dim,spacedim> &
   operator[] (const FEValuesExtractors::Scalar &scalar) const;
@@ -2261,7 +2190,8 @@ public:
    * Create a view of the current FEValues object that represents a set of
    * <code>dim</code> scalar components (i.e. a vector) of the vector-valued
    * finite element. The concept of views is explained in the documentation of
-   * the namespace FEValuesViews and in particular in the @ref vector_valued
+   * the namespace FEValuesViews and in particular in the
+   * @ref vector_valued
    * module.
    */
   const FEValuesViews::Vector<dim,spacedim> &
@@ -2272,7 +2202,9 @@ public:
    * <code>(dim*dim + dim)/2</code> scalar components (i.e. a symmetric 2nd
    * order tensor) of the vector-valued finite element. The concept of views
    * is explained in the documentation of the namespace FEValuesViews and in
-   * particular in the @ref vector_valued module.
+   * particular in the
+   * @ref vector_valued
+   * module.
    */
   const FEValuesViews::SymmetricTensor<2,dim,spacedim> &
   operator[] (const FEValuesExtractors::SymmetricTensor<2> &tensor) const;
@@ -2283,7 +2215,8 @@ public:
    * <code>(dim*dim)</code> scalar components (i.e. a 2nd order tensor) of the
    * vector-valued finite element. The concept of views is explained in the
    * documentation of the namespace FEValuesViews and in particular in the
-   * @ref vector_valued module.
+   * @ref vector_valued
+   * module.
    */
   const FEValuesViews::Tensor<2,dim,spacedim> &
   operator[] (const FEValuesExtractors::Tensor<2> &tensor) const;
@@ -2677,7 +2610,8 @@ public:
 
   /**
    * Boundary form of the transformation of the cell at the <tt>i</tt>th
-   * quadrature point.  See @ref GlossBoundaryForm .
+   * quadrature point.  See
+   * @ref GlossBoundaryForm.
    *
    * @dealiiRequiresUpdateFlags{update_boundary_forms}
    */
@@ -3928,17 +3862,6 @@ FEValuesBase<dim,spacedim>::shape_hessian (const unsigned int i,
 
 template <int dim, int spacedim>
 inline
-const Tensor<2,spacedim> &
-FEValuesBase<dim,spacedim>::shape_2nd_derivative (const unsigned int i,
-                                                  const unsigned int j) const
-{
-  return shape_hessian(i,j);
-}
-
-
-
-template <int dim, int spacedim>
-inline
 Tensor<2,spacedim>
 FEValuesBase<dim,spacedim>::shape_hessian_component (const unsigned int i,
                                                      const unsigned int j,
@@ -3963,18 +3886,6 @@ FEValuesBase<dim,spacedim>::shape_hessian_component (const unsigned int i,
   const unsigned int
   row = this->shape_function_to_row_table[i * fe->n_components() + component];
   return this->shape_hessians[row][j];
-}
-
-
-
-template <int dim, int spacedim>
-inline
-Tensor<2,spacedim>
-FEValuesBase<dim,spacedim>::shape_2nd_derivative_component (const unsigned int i,
-                                                            const unsigned int j,
-                                                            const unsigned int component) const
-{
-  return shape_hessian_component(i,j,component);
 }
 
 
@@ -4139,87 +4050,6 @@ FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
 
 
 template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::get_function_grads (const InputVector           &fe_function,
-                                                std::vector<Tensor<1,spacedim> > &gradients) const
-{
-  get_function_gradients(fe_function, gradients);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::get_function_grads (
-  const InputVector &fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<Tensor<1,spacedim> > &values) const
-{
-  get_function_gradients(fe_function, indices, values);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::
-get_function_grads (const InputVector                         &fe_function,
-                    std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const
-{
-  get_function_gradients(fe_function, gradients);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::get_function_grads (
-  const InputVector &fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-  std::vector<std::vector<Tensor<1,spacedim> > > &values,
-  bool q_points_fastest) const
-{
-  get_function_gradients(fe_function, indices, values, q_points_fastest);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::
-get_function_2nd_derivatives (const InputVector           &fe_function,
-                              std::vector<Tensor<2,spacedim> > &hessians) const
-{
-  get_function_hessians(fe_function, hessians);
-}
-
-
-
-template <int dim, int spacedim>
-template <class InputVector>
-inline
-void
-FEValuesBase<dim,spacedim>::
-get_function_2nd_derivatives (const InputVector                         &fe_function,
-                              std::vector<std::vector<Tensor<2,spacedim> > > &hessians,
-                              bool quadrature_points_fastest) const
-{
-  get_function_hessians(fe_function, hessians, quadrature_points_fastest);
-}
-
-
-
-template <int dim, int spacedim>
 inline
 const Point<spacedim> &
 FEValuesBase<dim,spacedim>::normal_vector (const unsigned int i) const
@@ -4232,17 +4062,6 @@ FEValuesBase<dim,spacedim>::normal_vector (const unsigned int i) const
 
   return this->normal_vectors[i];
 }
-
-
-
-template <int dim, int spacedim>
-inline
-const Point<spacedim> &
-FEValuesBase<dim,spacedim>::cell_normal_vector (const unsigned int i) const
-{
-  return this->normal_vector(i);
-}
-
 
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,6 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_precondition.h>
 
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_transfer.h>
@@ -396,9 +395,9 @@ namespace Step50
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices);
     mg_smoother.set_steps(2);
-    MGMatrix<matrix_t,vector_t> mg_matrix(&mg_matrices);
-    MGMatrix<matrix_t,vector_t> mg_interface_up(&mg_interface_matrices);
-    MGMatrix<matrix_t,vector_t> mg_interface_down(&mg_interface_matrices);
+    mg::Matrix<vector_t> mg_matrix(mg_matrices);
+    mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
+    mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
 
     // Now, we are ready to set up the
     // V-cycle operator and the
@@ -505,7 +504,7 @@ namespace Step50
 // in step-6:
 int main (int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
   mpi_initlog();
 
   try

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2003 - 2013 by the deal.II authors
+ * Copyright (C) 2003 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -93,7 +93,6 @@
 // The rest of the include files deals with
 // the mechanics of multigrid as a linear
 // operator (solver or preconditioner).
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_transfer.h>
@@ -103,6 +102,7 @@
 #include <deal.II/multigrid/mg_matrix.h>
 
 // This is C++:
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -713,23 +713,25 @@ namespace Step50
     // algorithms on adaptive meshes; if some of the things below seem
     // strange, take a look at the @ref mg_paper.
     //
-    // Our first job is to identify those degrees of freedom on each
-    // level that are located on interfaces between adaptively refined
-    // levels, and those that lie on the interface but also on the
-    // exterior boundary of the domain. As in many other parts of the
-    // library, we do this by using Boolean masks, i.e. vectors of
-    // Booleans each element of which indicates whether the
-    // corresponding degree of freedom index is an interface DoF or
-    // not. The <code>MGConstraints</code> already computed the
+    // Our first job is to identify those degrees of freedom on each level
+    // that are located on interfaces between adaptively refined levels, and
+    // those that lie on the interface but also on the exterior boundary of
+    // the domain. The <code>MGConstraints</code> already computed the
     // information for us when we called initialize in
+
     // <code>setup_system()</code>.
-//    std::vector<std::vector<bool> > interface_dofs
+    // of type IndexSet on each level (get_refinement_edge_indices(),
+    // get_refinement_edge_boundary_indices()).
+
+
+    //    std::vector<std::vector<bool> > interface_dofs
 //      = mg_constrained_dofs.get_refinement_edge_indices ();
 //    std::vector<std::vector<bool> > boundary_interface_dofs
 //      = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
 
 
     // now communicate mg_constraint_dofs
+    if (true)
     {
       for (unsigned int l=0;l<triangulation.n_global_levels(); ++l)
         {
@@ -994,10 +996,18 @@ namespace Step50
           // matrix. Since it is only the transpose, we will later (in
           // the <code>solve()</code> function) be able to just pass
           // the transpose matrix where necessary.
+
+          const IndexSet &interface_dofs_on_level
+            = mg_constrained_dofs.get_refinement_edge_indices(cell->level());
+
+
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             for (unsigned int j=0; j<dofs_per_cell; ++j)
-              if (!mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[i])
-                || mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[j]))
+	      /** old HEAD:
+		  if (!mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[i])
+		  || mg_constrained_dofs.at_refinement_edge(cell->level(),local_dof_indices[j])) */
+              if ( !(interface_dofs_on_level.is_element(local_dof_indices[i])==true &&
+                     interface_dofs_on_level.is_element(local_dof_indices[j])==false))
                 cell_matrix(i,j) = 0;
 
           boundary_interface_constraints[cell->level()]
@@ -1116,9 +1126,9 @@ namespace Step50
     // both up and down versions of the
     // operator with the matrices we already
     // built:
-    MGMatrix<matrix_t,vector_t> mg_matrix(&mg_matrices);
-    MGMatrix<matrix_t,vector_t> mg_interface_up(&mg_interface_matrices);
-    MGMatrix<matrix_t,vector_t> mg_interface_down(&mg_interface_matrices);
+    mg::Matrix<vector_t> mg_matrix(mg_matrices);
+    mg::Matrix<vector_t> mg_interface_up(mg_interface_matrices);
+    mg::Matrix<vector_t> mg_interface_down(mg_interface_matrices);
 
     // Now, we are ready to set up the
     // V-cycle operator and the
@@ -1430,7 +1440,7 @@ namespace Step50
 // in step-6:
 int main (int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   try
     {

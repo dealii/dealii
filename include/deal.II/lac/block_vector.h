@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,9 +51,12 @@ namespace TrilinosWrappers
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <typename Number>
@@ -166,8 +169,9 @@ public:
    * This functionality only needs to be called if using MPI based vectors and
    * exists in other objects for compatibility.
    *
-   * See @ref GlossCompress "Compressing distributed objects" for more
-   * information.
+   * See
+   * @ref GlossCompress "Compressing distributed objects"
+   * for more information.
    */
   void compress (::dealii::VectorOperation::values operation
                  =::dealii::VectorOperation::unknown);
@@ -270,16 +274,6 @@ public:
   template <typename Number2>
   void reinit (const BlockVector<Number2> &V,
                const bool                 fast=false);
-
-  /**
-   * Scale each element of the vector by the given factor.
-   *
-   * This function is deprecated and will be removed in a future version. Use
-   * <tt>operator *=</tt> and <tt>operator /=</tt> instead.
-   *
-   * @deprecated Use <tt>operator*=</tt> instead.
-   */
-  void scale (const value_type factor) DEAL_II_DEPRECATED;
 
   /**
    * Multiply each element of this vector by the corresponding element of
@@ -386,7 +380,7 @@ BlockVector<Number> &
 BlockVector<Number>::operator = (const value_type s)
 {
 
-  Assert (numbers::is_finite(s), ExcNumberNotFinite());
+  AssertIsFinite(s);
 
   BaseClass::operator = (s);
   return *this;
@@ -434,18 +428,6 @@ void BlockVector<Number>::compress (::dealii::VectorOperation::values operation)
 {
   for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i].compress(operation);
-}
-
-
-
-template <typename Number>
-void BlockVector<Number>::scale (const value_type factor)
-{
-
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
-
-  for (size_type i=0; i<this->n_blocks(); ++i)
-    this->components[i] *= factor;
 }
 
 

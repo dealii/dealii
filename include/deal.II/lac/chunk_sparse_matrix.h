@@ -399,7 +399,9 @@ namespace ChunkSparseMatrixIterators
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Wolfgang Bangerth, 2008
  */
@@ -830,10 +832,11 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
-   * member access is expensive, this function is not efficient. In
-   * particular, if you want to multiply with BlockVector objects, you should
-   * consider using a BlockChunkSparseMatrix as well.
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random member
+   * access is expensive, this function is not efficient. In particular, if
+   * you want to multiply with BlockVector objects, you should consider using
+   * a BlockChunkSparseMatrix as well.
    *
    * Source and destination must not be the same vector.
    */
@@ -848,10 +851,11 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
-   * member access is expensive, this function is not efficient. In
-   * particular, if you want to multiply with BlockVector objects, you should
-   * consider using a BlockChunkSparseMatrix as well.
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random member
+   * access is expensive, this function is not efficient. In particular, if
+   * you want to multiply with BlockVector objects, you should consider using
+   * a BlockChunkSparseMatrix as well.
    *
    * Source and destination must not be the same vector.
    */
@@ -865,10 +869,11 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
-   * member access is expensive, this function is not efficient. In
-   * particular, if you want to multiply with BlockVector objects, you should
-   * consider using a BlockChunkSparseMatrix as well.
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random member
+   * access is expensive, this function is not efficient. In particular, if
+   * you want to multiply with BlockVector objects, you should consider using
+   * a BlockChunkSparseMatrix as well.
    *
    * Source and destination must not be the same vector.
    */
@@ -883,10 +888,11 @@ public:
    *
    * Note that while this function can operate on all vectors that offer
    * iterator classes, it is only really effective for objects of type
-   * @ref Vector. For all classes for which iterating over elements, or random
-   * member access is expensive, this function is not efficient. In
-   * particular, if you want to multiply with BlockVector objects, you should
-   * consider using a BlockChunkSparseMatrix as well.
+   * @ref Vector.
+   * For all classes for which iterating over elements, or random member
+   * access is expensive, this function is not efficient. In particular, if
+   * you want to multiply with BlockVector objects, you should consider using
+   * a BlockChunkSparseMatrix as well.
    *
    * Source and destination must not be the same vector.
    */
@@ -1413,7 +1419,7 @@ void ChunkSparseMatrix<number>::set (const size_type i,
                                      const number value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   Assert (cols != 0, ExcNotInitialized());
   // it is allowed to set elements of the matrix that are not part of the
@@ -1436,7 +1442,7 @@ void ChunkSparseMatrix<number>::add (const size_type i,
                                      const number value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   Assert (cols != 0, ExcNotInitialized());
 

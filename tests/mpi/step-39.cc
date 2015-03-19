@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,6 @@
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
@@ -564,7 +563,7 @@ namespace Step39
     SolverControl coarse_solver_control (1000, 1e-10, false, false);
     SolverCG<TrilinosWrappers::MPI::Vector> coarse_solver(coarse_solver_control);
     PreconditionIdentity identity;
-    TrilinosWrappers::SparseMatrix coarse_matrix = mg_matrix[0];
+    TrilinosWrappers::SparseMatrix & coarse_matrix = mg_matrix[0];
     MGCoarseGridLACIteration<SolverCG<TrilinosWrappers::MPI::Vector>,TrilinosWrappers::MPI::Vector>
     coarse_grid_solver(coarse_solver, coarse_matrix, identity);
 
@@ -573,9 +572,9 @@ namespace Step39
     mg_smoother.initialize(mg_matrix, .7);
     mg_smoother.set_steps(2);
 
-    MGMatrix<TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector> mgmatrix(&mg_matrix);
-    MGMatrix<TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector> mgdown(&mg_matrix_dg_down);
-    MGMatrix<TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector> mgup(&mg_matrix_dg_up);
+    mg::Matrix<TrilinosWrappers::MPI::Vector> mgmatrix(mg_matrix);
+    mg::Matrix<TrilinosWrappers::MPI::Vector> mgdown(mg_matrix_dg_down);
+    mg::Matrix<TrilinosWrappers::MPI::Vector> mgup(mg_matrix_dg_up);
 
     Multigrid<TrilinosWrappers::MPI::Vector > mg(dof_handler, mgmatrix,
                                                  coarse_grid_solver, mg_transfer,
@@ -765,7 +764,7 @@ namespace Step39
 
 int main(int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
   MPILogInitAll log;
   
   using namespace dealii;

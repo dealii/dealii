@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,8 +75,9 @@ template <typename> class VectorView;
  * It is used in the various compress() functions. They also exist in serial
  * codes for compatibility and are empty there.
  *
- * See @ref GlossCompress "Compressing distributed objects" for more
- * information.
+ * See
+ * @ref GlossCompress "Compressing distributed objects"
+ * for more information.
  */
 struct VectorOperation
 {
@@ -99,7 +100,8 @@ struct VectorOperation
  * @<double@>, @<long double@>, @<std::complex@<float@>@>,
  * @<std::complex@<double@>@>, @<std::complex@<long double@>@></tt>; others
  * can be generated in application programs (see the section on
- * @ref Instantiations in the manual).
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
@@ -704,17 +706,6 @@ public:
              const Vector<Number> &X);
 
   /**
-   * Scale each element of the vector by the given factor.
-   *
-   * @deprecated This function is deprecated and will be removed in a future
-   * version. Use <tt>operator *=</tt> and <tt>operator /=</tt> instead.
-   */
-  void scale (const Number factor) DEAL_II_DEPRECATED
-  {
-    this->operator *= (factor);
-  }
-
-  /**
    * Scale each element of the vector by a constant value.
    *
    * @dealiiOperationIsMultithreaded
@@ -974,9 +965,10 @@ protected:
 private:
 
   /**
-   * Allocate and align @p v along 64-byte boundaries.
+   * Allocate and align @p val along 64-byte boundaries. The size
+   * of the allocated memory is determined by @p max_vec_size .
    */
-  void allocate(const size_type n);
+  void allocate();
 
   /**
    * Deallocate @p val.
@@ -1059,9 +1051,8 @@ void Vector<Number>::reinit (const size_type n, const bool fast)
   if (n>max_vec_size)
     {
       if (val) deallocate();
-      allocate(n);
-      Assert (val != 0, ExcOutOfMemory());
       max_vec_size = n;
+      allocate();
     };
   vec_size = n;
   if (fast == false)
@@ -1236,7 +1227,7 @@ inline
 Vector<Number> &
 Vector<Number>::operator /= (const Number factor)
 {
-  Assert (numbers::is_finite(factor),ExcNumberNotFinite());
+  AssertIsFinite(factor);
   Assert (factor != Number(0.), ExcZero() );
 
   this->operator *= (Number(1.)/factor);
@@ -1356,12 +1347,14 @@ inline
 void
 Vector<Number>::load (Archive &ar, const unsigned int)
 {
-  // forward to serialization function in the base class.
-  ar   &static_cast<Subscriptor &>(*this);
+  // get rid of previous content
+  deallocate();
 
+  // the load stuff again from the archive
+  ar &static_cast<Subscriptor &>(*this);
   ar &vec_size &max_vec_size ;
 
-  allocate(max_vec_size);
+  allocate();
   ar &boost::serialization::make_array(val, max_vec_size);
 }
 

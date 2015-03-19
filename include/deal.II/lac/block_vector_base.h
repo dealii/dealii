@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -550,7 +550,8 @@ namespace internal
  * calling collect_sizes(), results may be unpredictable. The debug version
  * does not check consistency here for performance reasons!
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <class VectorType>
@@ -622,15 +623,11 @@ public:
    * This functionality only needs to be called if using MPI based vectors and
    * exists in other objects for compatibility.
    *
-   * See @ref GlossCompress "Compressing distributed objects" for more
-   * information.
+   * See
+   * @ref GlossCompress "Compressing distributed objects"
+   * for more information.
    */
   void compress (::dealii::VectorOperation::values operation);
-
-  /**
-   * @deprecated: use compress(VectorOperation::values) instead.
-   */
-  void compress () DEAL_II_DEPRECATED;
 
   /**
    * Access to a single block.
@@ -1691,16 +1688,6 @@ BlockVectorBase<VectorType>::compress (::dealii::VectorOperation::values operati
 
 template <class VectorType>
 inline
-void
-BlockVectorBase<VectorType>::compress ()
-{
-  compress(VectorOperation::unknown);
-}
-
-
-
-template <class VectorType>
-inline
 typename BlockVectorBase<VectorType>::iterator
 BlockVectorBase<VectorType>::begin()
 {
@@ -1948,7 +1935,7 @@ BlockVectorBase<VectorType>::add (const size_type  n_indices,
 template <class VectorType>
 void BlockVectorBase<VectorType>::add (const value_type a)
 {
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   for (size_type i=0; i<n_blocks(); ++i)
     {
@@ -1977,7 +1964,7 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType> &v)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -1997,8 +1984,8 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType> &w)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2019,7 +2006,7 @@ void BlockVectorBase<VectorType>::sadd (const value_type x,
                                         const BlockVectorBase<VectorType> &v)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
+  AssertIsFinite(x);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2037,8 +2024,8 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType> &v)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2058,9 +2045,9 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType> &w)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2084,10 +2071,10 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType> &y)
 {
 
-  Assert (numbers::is_finite(x), ExcNumberNotFinite());
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
-  Assert (numbers::is_finite(c), ExcNumberNotFinite());
+  AssertIsFinite(x);
+  AssertIsFinite(a);
+  AssertIsFinite(b);
+  AssertIsFinite(c);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2124,8 +2111,8 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
                                        const BlockVectorBase<VectorType> &w)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
-  Assert (numbers::is_finite(b), ExcNumberNotFinite());
+  AssertIsFinite(a);
+  AssertIsFinite(b);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2159,7 +2146,7 @@ void BlockVectorBase<VectorType>::equ (const value_type    a,
                                        const BlockVector2 &v)
 {
 
-  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  AssertIsFinite(a);
 
   Assert (n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2184,7 +2171,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator = (const value_type s)
 {
 
-  Assert (numbers::is_finite(s), ExcNumberNotFinite());
+  AssertIsFinite(s);
 
   for (size_type i=0; i<n_blocks(); ++i)
     components[i] = s;
@@ -2262,7 +2249,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator *= (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
 
   for (size_type i=0; i<n_blocks(); ++i)
     components[i] *= factor;
@@ -2278,7 +2265,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator /= (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
   Assert (factor > 0., ExcDivideByZero() );
 
   for (size_type i=0; i<n_blocks(); ++i)

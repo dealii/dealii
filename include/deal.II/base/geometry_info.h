@@ -1098,7 +1098,9 @@ struct GeometryInfo<0>
  * places in application programs where you need this information actually,
  * but a few places in the library make use of this. Note that in 2d, the
  * result is always @p true. More information on the topic can be found in
- * this @ref GlossFaceOrientation "glossary" article.
+ * this
+ * @ref GlossFaceOrientation "glossary"
+ * article.
  *
  * In order to allow all kinds of meshes in 3d, including
  * <em>Moebius</em>-loops, a face might even be rotated looking from one cell,
@@ -1112,8 +1114,8 @@ struct GeometryInfo<0>
  * This information is available as the <tt>line_orientation</tt> flag for
  * cells and faces in 3d. Again, this is something that should be internal to
  * the library and application program will probably never have to bother
- * about it. For more information on this see also @ref GlossFaceOrientation
- * "this glossary entry" .
+ * about it. For more information on this see also
+ * @ref GlossFaceOrientation "this glossary entry".
  *
  *
  * <h4>Children</h4>
@@ -1303,7 +1305,8 @@ struct GeometryInfo<0>
  *
  * @note Instantiations for this template are provided for dimensions 1,2,3,4,
  * and there is a specialization for dim=0 (see the section on
- * @ref Instantiations in the manual).
+ * @ref Instantiations
+ * in the manual).
  *
  * @ingroup grid geomprimitives aniso
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005, Tobias Leicht, 2007
@@ -1546,7 +1549,8 @@ struct GeometryInfo
    * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
    * default to <tt>false</tt> (standard orientation) and has no effect in 2d.
    * The concept of face orientations is explained in this
-   * @ref GlossFaceOrientation "glossary" entry.
+   * @ref GlossFaceOrientation "glossary"
+   * entry.
    *
    * In the case of anisotropically refined cells and faces, the @p
    * RefinementCase of the face, <tt>face_ref_case</tt>, might have an
@@ -1593,8 +1597,9 @@ struct GeometryInfo
    * the standard and non-standard orientation. <tt>face_orientation</tt>
    * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
    * default to <tt>false</tt> (standard orientation). In 2d only
-   * <tt>face_flip</tt> is considered. See this @ref GlossFaceOrientation
-   * "glossary" article for more information.
+   * <tt>face_flip</tt> is considered. See this
+   * @ref GlossFaceOrientation "glossary"
+   * article for more information.
    *
    * As the children of a cell are ordered according to the vertices of the
    * cell, this call is passed down to the child_cell_on_face() function.
@@ -1846,7 +1851,9 @@ struct GeometryInfo
    * tangential to the quad mapped into three-dimensional space.
    *
    * This function is used in order to determine how distorted a cell is (see
-   * the entry on @ref GlossDistorted "distorted cells" in the glossary).
+   * the entry on
+   * @ref GlossDistorted "distorted cells"
+   * in the glossary).
    */
   template <int spacedim>
   static void
@@ -1883,7 +1890,8 @@ struct GeometryInfo
    * least in 3d, actual faces of cells in a triangulation can also have the
    * opposite orientation, depending on a flag that one can query from the
    * cell it belongs to. For more information, see the
-   * @ref GlossFaceOrientation "glossary" entry on face orientation.
+   * @ref GlossFaceOrientation "glossary"
+   * entry on face orientation.
    */
   static const int unit_normal_orientation[faces_per_cell];
 
@@ -2307,7 +2315,7 @@ GeometryInfo<1>::cell_to_child_coordinates (const Point<1>         &p,
           ExcInternalError());
   (void)refine_case; // removes -Wunused-parameter warning in optimized mode
 
-  return p*2.0-unit_cell_vertex(child_index);
+  return Point<1>(p*2.0-unit_cell_vertex(child_index));
 }
 
 

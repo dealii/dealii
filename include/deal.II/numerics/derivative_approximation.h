@@ -25,7 +25,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/filtered_iterator.h>
 #ifdef _MSC_VER
-#include <deal.II/dofs/dof_accessor.h>
+#  include <deal.II/dofs/dof_accessor.h>
 #endif
 #include <utility>
 
@@ -166,7 +166,7 @@ namespace DerivativeApproximation
   /**
    * This function is used to obtain an approximation of the gradient. Pass it
    * the DoF handler object that describes the finite element field, a nodal
-   * value vector, and receive the cell-wise Euclidian norm of the
+   * value vector, and receive the cell-wise Euclidean norm of the
    * approximated gradient.
    *
    * The last parameter denotes the solution component, for which the gradient
@@ -284,14 +284,21 @@ namespace DerivativeApproximation
   /**
    * Exception
    */
-  DeclException2 (ExcInvalidVectorLength,
+  DeclException2 (ExcVectorLengthVsNActiveCells,
                   int, int,
-                  << "Vector has length " << arg1 << ", but should have "
-                  << arg2);
+                  << "The output vector needs to have a size equal "
+                  "to the number of active cells of your triangulation "
+                  "but has length " << arg1 << "There are "
+                  << arg2 << " active cells in your triangulation.");
   /**
    * Exception
    */
-  DeclException0 (ExcInsufficientDirections);
+  DeclExceptionMsg (ExcInsufficientDirections,
+                    "We have encountered a cell on which the number of linearly "
+                    "independent directions that span the matrix Y (discussed "
+                    "in the documentation of the DerivativeApproximation "
+                    "class) is not equal to dim. The matrix Y then is "
+                    "rank deficient and can not be inverted.");
 }
 
 

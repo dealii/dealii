@@ -16,13 +16,13 @@
 
 #include <deal.II/opencascade/utilities.h>
 
-#include <base/logstream.h>
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/grid_out.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_boundary_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
 #include <gp_Pnt.hxx>
 #include <gp_Dir.hxx>

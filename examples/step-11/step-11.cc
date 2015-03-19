@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2013 by the deal.II authors
+ * Copyright (C) 2001 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -31,7 +31,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -413,8 +413,9 @@ namespace Step11
   void LaplaceProblem<dim>::run ()
   {
     GridGenerator::hyper_ball (triangulation);
-    static const HyperBallBoundary<dim> boundary;
-    triangulation.set_boundary (0, boundary);
+    static const SphericalManifold<dim> boundary;
+    triangulation.set_all_manifold_ids_on_boundary(0);
+    triangulation.set_manifold (0, boundary);
 
     for (unsigned int cycle=0; cycle<6; ++cycle, triangulation.refine_global(1))
       {

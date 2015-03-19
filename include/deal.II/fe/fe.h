@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,19 +75,22 @@ namespace hp
  * <h3>Components and blocks</h3>
  *
  * For vector valued elements shape functions may have nonzero entries in one
- * or several @ref GlossComponent "components" of the vector valued function.
- * If the element is @ref GlossPrimitive "primitive", there is indeed a single
- * component with a nonzero entry for each shape function. This component can
- * be determined by system_to_component_index(), the number of components is
- * FiniteElementData::n_components().
+ * or several
+ * @ref GlossComponent "components"
+ * of the vector valued function. If the element is
+ * @ref GlossPrimitive "primitive",
+ * there is indeed a single component with a nonzero entry for each shape
+ * function. This component can be determined by system_to_component_index(),
+ * the number of components is FiniteElementData::n_components().
  *
- * Furthermore, you may want to split your linear system into @ref GlossBlock
- * "blocks" for the use in BlockVector, BlockSparseMatrix, BlockMatrixArray
- * and so on. If you use non-primitive elements, you cannot determine the
- * block number by system_to_component_index(). Instead, you can use
- * system_to_block_index(), which will automatically take care of the
- * additional components occupied by vector valued elements. The number of
- * generated blocks can be determined by FiniteElementData::n_blocks().
+ * Furthermore, you may want to split your linear system into
+ * @ref GlossBlock "blocks"
+ * for the use in BlockVector, BlockSparseMatrix, BlockMatrixArray and so on.
+ * If you use non-primitive elements, you cannot determine the block number by
+ * system_to_component_index(). Instead, you can use system_to_block_index(),
+ * which will automatically take care of the additional components occupied by
+ * vector valued elements. The number of generated blocks can be determined by
+ * FiniteElementData::n_blocks().
  *
  * If you decide to operate by base element and multiplicity, the function
  * first_block_of_base() will be helpful.
@@ -95,11 +98,12 @@ namespace hp
  * <h3>Support points</h3>
  *
  * Since a FiniteElement does not have information on the actual grid cell, it
- * can only provide @ref GlossSupport "support points" on the unit cell.
- * Support points on the actual grid cell must be computed by mapping these
- * points. The class used for this kind of operation is FEValues. In most
- * cases, code of the following type will serve to provide the mapped support
- * points.
+ * can only provide
+ * @ref GlossSupport "support points"
+ * on the unit cell. Support points on the actual grid cell must be computed
+ * by mapping these points. The class used for this kind of operation is
+ * FEValues. In most cases, code of the following type will serve to provide
+ * the mapped support points.
  *
  * @code
  * Quadrature<dim> dummy_quadrature (fe.get_unit_support_points());
@@ -266,12 +270,13 @@ namespace hp
  *
  * First, already the basis of the shape function space may be difficult to
  * implement for arbitrary order and dimension. On the other hand, if the
- * @ref GlossNodes "node values" are given, then the duality relation
- * between node functionals and basis functions defines the basis. As a
- * result, the shape function space may be defined with arbitrary "raw"
- * basis functions, such that the actual finite element basis is computed
- * from linear combinations of them. The coefficients of these combinations
- * are determined by the duality of node values.
+ * @ref GlossNodes "node values"
+ * are given, then the duality relation between node functionals and basis
+ * functions defines the basis. As a result, the shape function space may be
+ * defined with arbitrary "raw" basis functions, such that the actual finite
+ * element basis is computed from linear combinations of them. The
+ * coefficients of these combinations are determined by the duality of node
+ * values.
  *
  * Using this matrix allows the construction of the basis of shape functions
  * in two steps.
@@ -689,18 +694,15 @@ public:
   bool restriction_is_additive (const unsigned int index) const;
 
   /**
-   * Return a read only reference to the matrix which describes the
-   * constraints at the interface between a refined and an unrefined cell.
+   * Return a read only reference to the matrix that describes the constraints
+   * at the interface between a refined and an unrefined cell.
    *
-   * The matrix is obviously empty in only one dimension, since there are no
-   * constraints then.
-   *
-   * Note that some finite elements do not (yet) implement hanging node
-   * constraints. If this is the case, then this function will generate an
-   * exception, since no useful return value can be generated. If you should
-   * have a way to live with this, then you might want to use the
-   * constraints_are_implemented() function to check up front whether this
-   * function will succeed or generate the exception.
+   * Some finite elements do not (yet) implement hanging node constraints. If
+   * this is the case, then this function will generate an exception, since no
+   * useful return value can be generated. If you should have a way to live
+   * with this, then you might want to use the constraints_are_implemented()
+   * function to check up front whether this function will succeed or generate
+   * the exception.
    */
   const FullMatrix<double> &constraints (const dealii::internal::SubfaceCase<dim> &subface_case=dealii::internal::SubfaceCase<dim>::case_isotropic) const;
 
@@ -848,7 +850,8 @@ public:
    * neither dominates, or if either could dominate.
    *
    * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the @ref hp_paper "hp paper".
+   * particular the
+   * @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination
@@ -894,8 +897,10 @@ public:
    * #system_to_base_table field and the system_to_base_index() function.
    *
    * The use of this function is explained extensively in the step-8 and
-   * @ref step_20 "step-20" tutorial programs as well as in the
-   * @ref vector_valued module.
+   * @ref step_20 "step-20"
+   * tutorial programs as well as in the
+   * @ref vector_valued
+   * module.
    */
   std::pair<unsigned int, unsigned int>
   system_to_component_index (const unsigned int index) const;
@@ -963,13 +968,17 @@ public:
    * @param face The number of the face this degree of freedom lives on. This
    * number must be between zero and GeometryInfo::faces_per_cell.
    * @param face_orientation One part of the description of the orientation of
-   * the face. See @ref GlossFaceOrientation .
+   * the face. See
+   * @ref GlossFaceOrientation.
    * @param face_flip One part of the description of the orientation of the
-   * face. See @ref GlossFaceOrientation .
+   * face. See
+   * @ref GlossFaceOrientation.
    * @param face_rotation One part of the description of the orientation of
-   * the face. See @ref GlossFaceOrientation . @return The index of this
-   * degree of freedom within the set of degrees of freedom on the entire
-   * cell. The returned value will be between zero and dofs_per_cell.
+   * the face. See
+   * @ref GlossFaceOrientation.
+   * @return The index of this degree of freedom within the set of degrees of
+   * freedom on the entire cell. The returned value will be between zero and
+   * dofs_per_cell.
    *
    * @note This function exists in this class because that is where it was
    * first implemented. However, it can't really work in the most general case
@@ -1170,11 +1179,13 @@ public:
    * Return a component mask with as many elements as this object has vector
    * components and of which exactly the one component is true that
    * corresponds to the given argument. See
-   * @ref GlossComponentMask "the glossary" for more information.
+   * @ref GlossComponentMask "the glossary"
+   * for more information.
    *
    * @param scalar An object that represents a single scalar vector component
-   * of this finite element. @return A component mask that is false in all
-   * components except for the one that corresponds to the argument.
+   * of this finite element.
+   * @return A component mask that is false in all components except for the
+   * one that corresponds to the argument.
    */
   ComponentMask
   component_mask (const FEValuesExtractors::Scalar &scalar) const;
@@ -1183,11 +1194,13 @@ public:
    * Return a component mask with as many elements as this object has vector
    * components and of which exactly the <code>dim</code> components are true
    * that correspond to the given argument. See
-   * @ref GlossComponentMask "the glossary" for more information.
+   * @ref GlossComponentMask "the glossary"
+   * for more information.
    *
    * @param vector An object that represents dim vector components of this
-   * finite element. @return A component mask that is false in all components
-   * except for the ones that corresponds to the argument.
+   * finite element.
+   * @return A component mask that is false in all components except for the
+   * ones that corresponds to the argument.
    */
   ComponentMask
   component_mask (const FEValuesExtractors::Vector &vector) const;
@@ -1196,26 +1209,30 @@ public:
    * Return a component mask with as many elements as this object has vector
    * components and of which exactly the <code>dim*(dim+1)/2</code> components
    * are true that correspond to the given argument. See
-   * @ref GlossComponentMask "the glossary" for more information.
+   * @ref GlossComponentMask "the glossary"
+   * for more information.
    *
    * @param sym_tensor An object that represents dim*(dim+1)/2 components of
    * this finite element that are jointly to be interpreted as forming a
-   * symmetric tensor.  @return A component mask that is false in all
-   * components except for the ones that corresponds to the argument.
+   * symmetric tensor.
+   * @return A component mask that is false in all components except for the
+   * ones that corresponds to the argument.
    */
   ComponentMask
   component_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
   /**
-   * Given a block mask (see @ref GlossBlockMask "this glossary entry"),
+   * Given a block mask (see
+   * @ref GlossBlockMask "this glossary entry"),
    * produce a component mask (see
-   * @ref GlossComponentMask "this glossary entry") that represents the
-   * components that correspond to the blocks selected in the input
-   * argument. This is essentially a conversion operator from BlockMask to
-   * ComponentMask.
+   * @ref GlossComponentMask "this glossary entry")
+   * that represents the components that correspond to the blocks selected in
+   * the input argument. This is essentially a conversion operator from
+   * BlockMask to ComponentMask.
    *
    * @param block_mask The mask that selects individual blocks of the finite
-   * element @return A mask that selects those components corresponding to the
+   * element
+   * @return A mask that selects those components corresponding to the
    * selected blocks of the input argument.
    */
   ComponentMask
@@ -1224,7 +1241,9 @@ public:
   /**
    * Return a block mask with as many elements as this object has blocks and
    * of which exactly the one component is true that corresponds to the given
-   * argument. See @ref GlossBlockMask "the glossary" for more information.
+   * argument. See
+   * @ref GlossBlockMask "the glossary"
+   * for more information.
    *
    * @note This function will only succeed if the scalar referenced by the
    * argument encompasses a complete block. In other words, if, for example,
@@ -1235,8 +1254,9 @@ public:
    * exception.
    *
    * @param scalar An object that represents a single scalar vector component
-   * of this finite element. @return A component mask that is false in all
-   * components except for the one that corresponds to the argument.
+   * of this finite element.
+   * @return A component mask that is false in all components except for the
+   * one that corresponds to the argument.
    */
   BlockMask
   block_mask (const FEValuesExtractors::Scalar &scalar) const;
@@ -1245,15 +1265,17 @@ public:
    * Return a component mask with as many elements as this object has vector
    * components and of which exactly the <code>dim</code> components are true
    * that correspond to the given argument. See
-   * @ref GlossBlockMask "the glossary" for more information.
+   * @ref GlossBlockMask "the glossary"
+   * for more information.
    *
    * @note The same caveat applies as to the version of the function above:
    * The extractor object passed as argument must be so that it corresponds to
    * full blocks and does not split blocks of this element.
    *
    * @param vector An object that represents dim vector components of this
-   * finite element. @return A component mask that is false in all components
-   * except for the ones that corresponds to the argument.
+   * finite element.
+   * @return A component mask that is false in all components except for the
+   * ones that corresponds to the argument.
    */
   BlockMask
   block_mask (const FEValuesExtractors::Vector &vector) const;
@@ -1261,8 +1283,9 @@ public:
   /**
    * Return a component mask with as many elements as this object has vector
    * components and of which exactly the <code>dim*(dim+1)/2</code> components
-   * are true that correspond to the given argument. See @ref GlossBlockMask
-   * "the glossary" for more information.
+   * are true that correspond to the given argument. See
+   * @ref GlossBlockMask "the glossary"
+   * for more information.
    *
    * @note The same caveat applies as to the version of the function above:
    * The extractor object passed as argument must be so that it corresponds to
@@ -1270,19 +1293,21 @@ public:
    *
    * @param sym_tensor An object that represents dim*(dim+1)/2 components of
    * this finite element that are jointly to be interpreted as forming a
-   * symmetric tensor. @return A component mask that is false in all
-   * components except for the ones that corresponds to the argument.
+   * symmetric tensor.
+   * @return A component mask that is false in all components except for the
+   * ones that corresponds to the argument.
    */
   BlockMask
   block_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
   /**
    * Given a component mask (see
-   * @ref GlossComponentMask "this glossary entry"), produce a block mask
-   * (see @ref GlossBlockMask "this glossary entry") that represents the
-   * blocks that correspond to the components selected in the input
-   * argument. This is essentially a conversion operator from ComponentMask
-   * to BlockMask.
+   * @ref GlossComponentMask "this glossary entry"),
+   * produce a block mask (see
+   * @ref GlossBlockMask "this glossary entry")
+   * that represents the blocks that correspond to the components selected in
+   * the input argument. This is essentially a conversion operator from
+   * ComponentMask to BlockMask.
    *
    * @note This function will only succeed if the components referenced by the
    * argument encompasses complete blocks. In other words, if, for example,
@@ -1293,8 +1318,9 @@ public:
    * exception.
    *
    * @param component_mask The mask that selects individual components of the
-   * finite element @return A mask that selects those blocks corresponding to
-   * the selected blocks of the input argument.
+   * finite element
+   * @return A mask that selects those blocks corresponding to the selected
+   * blocks of the input argument.
    */
   BlockMask
   block_mask (const ComponentMask &component_mask) const;
@@ -1443,7 +1469,7 @@ public:
    * Return a support point vector for generalized interpolation.
    *
    * See the
-   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+   * @ref GlossGeneralizedSupport "glossary entry on generalized points"
    * for more information.
    */
   const std::vector<Point<dim> > &
@@ -1599,7 +1625,7 @@ public:
   DeclException0 (ExcUnitShapeValuesDoNotExist);
 
   /**
-   * Attempt to access support points of a finite element which is not
+   * Attempt to access support points of a finite element that is not
    * Lagrangian.
    *
    * @ingroup Exceptions
@@ -1607,7 +1633,7 @@ public:
   DeclException0 (ExcFEHasNoSupportPoints);
 
   /**
-   * Attempt to access embedding matrices of a finite element which did not
+   * Attempt to access embedding matrices of a finite element that did not
    * implement these matrices.
    *
    * @ingroup Exceptions
@@ -1615,22 +1641,13 @@ public:
   DeclException0 (ExcEmbeddingVoid);
 
   /**
-   * Attempt to access restriction matrices of a finite element which did not
+   * Attempt to access restriction matrices of a finite element that did not
    * implement these matrices.
    *
    * Exception
    * @ingroup Exceptions
    */
   DeclException0 (ExcProjectionVoid);
-
-  /**
-   * Attempt to access constraint matrices of a finite element which did not
-   * implement these matrices.
-   *
-   * Exception
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcConstraintsVoid);
 
   /**
    * Exception

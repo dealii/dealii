@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3964,7 +3964,7 @@ namespace DataOutBase
                   const EpsFlags                          &flags,
                   std::ostream                            &out)
   {
-    Assert (out, ExcIO());
+    AssertThrow (out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed
@@ -6488,7 +6488,7 @@ namespace DataOutBase
   std::pair<unsigned int, unsigned int>
   determine_intermediate_format_dimensions (std::istream &input)
   {
-    Assert (input, ExcIO());
+    AssertThrow (input, ExcIO());
 
     unsigned int dim, spacedim;
     input >> dim >> spacedim;
@@ -6657,7 +6657,7 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
       std::stringstream ss;
       DataOutBase::write_vtu_header(ss, vtk_flags);
       header_size = ss.str().size();
-      MPI_File_write(fh, const_cast<char *>(ss.str().c_str()), header_size, MPI_CHAR, NULL);
+      MPI_File_write(fh, const_cast<char *>(ss.str().c_str()), header_size, MPI_CHAR, MPI_STATUS_IGNORE);
     }
 
   MPI_Bcast(&header_size, 1, MPI_INT, 0, comm);
@@ -6668,7 +6668,7 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
     DataOutBase::write_vtu_main (get_patches(), get_dataset_names(),
                                  get_vector_data_ranges(),
                                  vtk_flags, ss);
-    MPI_File_write_ordered(fh, const_cast<char *>(ss.str().c_str()), ss.str().size(), MPI_CHAR, NULL);
+    MPI_File_write_ordered(fh, const_cast<char *>(ss.str().c_str()), ss.str().size(), MPI_CHAR, MPI_STATUS_IGNORE);
   }
 
   //write footer
@@ -6677,7 +6677,7 @@ void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename
       std::stringstream ss;
       DataOutBase::write_vtu_footer(ss);
       unsigned int footer_size = ss.str().size();
-      MPI_File_write_shared(fh, const_cast<char *>(ss.str().c_str()), footer_size, MPI_CHAR, NULL);
+      MPI_File_write_shared(fh, const_cast<char *>(ss.str().c_str()), footer_size, MPI_CHAR, MPI_STATUS_IGNORE);
     }
   MPI_File_close( &fh );
 #endif
@@ -6875,17 +6875,6 @@ write_deal_II_intermediate (std::ostream &out) const
                                            get_vector_data_ranges(),
                                            deal_II_intermediate_flags, out);
 }
-
-
-template <int dim, int spacedim>
-XDMFEntry DataOutInterface<dim,spacedim>::
-create_xdmf_entry (const std::string &h5_filename, const double cur_time, MPI_Comm comm) const
-{
-  DataOutBase::DataOutFilter  data_filter(DataOutBase::DataOutFilterFlags(false, true));
-  write_filtered_data(data_filter);
-  return create_xdmf_entry(data_filter, h5_filename, cur_time, comm);
-}
-
 
 
 template <int dim, int spacedim>
@@ -7154,14 +7143,7 @@ void DataOutBase::write_filtered_data (const std::vector<Patch<dim,spacedim> > &
     }
 }
 
-template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::
-write_hdf5_parallel (const std::string &filename, MPI_Comm comm) const
-{
-  DataOutBase::DataOutFilter  data_filter(DataOutBase::DataOutFilterFlags(false, true));
-  write_filtered_data(data_filter);
-  write_hdf5_parallel(data_filter, filename, comm);
-}
+
 
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
@@ -7171,6 +7153,8 @@ write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
   DataOutBase::write_hdf5_parallel(get_patches(), data_filter, filename, comm);
 }
 
+
+
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
 write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
@@ -7178,6 +7162,8 @@ write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
 {
   DataOutBase::write_hdf5_parallel(get_patches(), data_filter, write_mesh_file, mesh_filename, solution_filename, comm);
 }
+
+
 
 template <int dim, int spacedim>
 void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
@@ -7187,6 +7173,8 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 {
   write_hdf5_parallel(patches, data_filter, true, filename, filename, comm);
 }
+
+
 
 template <int dim, int spacedim>
 void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
@@ -7208,7 +7196,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   (void)comm;
   AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
 #else
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -7781,7 +7769,7 @@ template <int dim, int spacedim>
 void
 DataOutReader<dim,spacedim>::read (std::istream &in)
 {
-  Assert (in, ExcIO());
+  AssertThrow (in, ExcIO());
 
   // first empty previous content
   {
@@ -7886,7 +7874,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
       std_cxx11::get<2>(vector_data_ranges[i]) = name;
     }
 
-  Assert (in, ExcIO());
+  AssertThrow (in, ExcIO());
 }
 
 
@@ -8028,7 +8016,7 @@ namespace DataOutBase
   operator >> (std::istream                     &in,
                Patch<dim,spacedim> &patch)
   {
-    Assert (in, ExcIO());
+    AssertThrow (in, ExcIO());
 
     // read a header line and compare
     // it to what we usually
@@ -8071,7 +8059,7 @@ namespace DataOutBase
       for (unsigned int j=0; j<patch.data.n_cols(); ++j)
         in >> patch.data[i][j];
 
-    Assert (in, ExcIO());
+    AssertThrow (in, ExcIO());
 
     return in;
   }

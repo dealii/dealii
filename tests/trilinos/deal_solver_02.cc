@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,27 +52,14 @@ check_solve( SOLVER &solver,
   f = 1.;
   try
     {
-      deallog.depth_file(0);
-      solver.solve(A,u,f,P);
-      deallog.depth_file(3);
+      check_solver_within_range(
+        solver.solve(A,u,f,P),
+        solver_control.last_step(), 49, 51);
     }
   catch (std::exception &e)
     {
-      deallog.depth_file(3);
       deallog << e.what() << std::endl;
       abort ();
-    }
-
-  const unsigned int steps = solver_control.last_step();
-  if (steps >= 49 && steps <= 51)
-    {
-      deallog << "Solver stopped within 49 - 51 iterations"
-              << std::endl;
-    }
-  else
-    {
-      deallog << "Solver stopped after " << solver_control.last_step()
-              << " iterations" << std::endl;
     }
 }
 
@@ -85,7 +72,7 @@ int main(int argc, char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
 
 
   {
@@ -107,9 +94,9 @@ int main(int argc, char **argv)
     TrilinosWrappers::Vector  f(dim);
     TrilinosWrappers::Vector  u(dim);
     f = 1.;
-    A.compress ();
-    f.compress ();
-    u.compress ();
+    A.compress (VectorOperation::insert);
+    f.compress (VectorOperation::insert);
+    u.compress (VectorOperation::insert);
 
     GrowingVectorMemory<TrilinosWrappers::Vector> mem;
     SolverBicgstab<TrilinosWrappers::Vector> solver(control,mem);

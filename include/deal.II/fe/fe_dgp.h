@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,12 +39,16 @@ template <int dim, int spacedim> class MappingQ;
  * can not be continuous.
  *
  * The basis functions used in this element for the space described above are
- * chosen to form a Legendre basis on the unit square. As a consequence, the
- * first basis function of this element is always the function that is
- * constant and equal to one.  As a result of the orthogonality of the basis
- * functions, the mass matrix is diagonal if the grid cells are
- * parallelograms. Note that this is in contrast to the FE_DGPMonomial class
- * that actually uses the monomial basis listed above as basis functions.
+ * chosen to form a Legendre basis on the unit square, i.e., in particular
+ * they are $L_2$-orthogonal and normalized on the reference cell (but not
+ * necessarily on the real cell). As a consequence, the first basis function
+ * of this element is always the function that is constant and equal to one,
+ * regardless of the polynomial degree of the element. In addition, as a
+ * result of the orthogonality of the basis functions, the mass matrix is
+ * diagonal if the grid cells are parallelograms. Note that this is in
+ * contrast to the FE_DGPMonomial class that actually uses the monomial basis
+ * listed above as basis functions, without transformation from reference to
+ * real cell.
  *
  * The shape functions are defined in the class PolynomialSpace. The
  * polynomials used inside PolynomialSpace are Polynomials::Legendre up to
@@ -81,7 +85,8 @@ template <int dim, int spacedim> class MappingQ;
  * elements of type FE_DGP(1) or FE_DGPMonomial(1).
  *
  * This can be understood by the following 2-d example: consider the cell with
- * vertices at $(0,0),(1,0),(0,1),(s,s)$: @image html dgp_doesnt_contain_p.png
+ * vertices at $(0,0),(1,0),(0,1),(s,s)$:
+ * @image html dgp_doesnt_contain_p.png
  *
  * For this cell, a bilinear transformation $F$ produces the relations $x=\hat
  * x+\hat x\hat y$ and $y=\hat y+\hat x\hat y$ that correlate reference
@@ -99,6 +104,206 @@ template <int dim, int spacedim> class MappingQ;
  * linear combincation of them. Consequently, the linear functions are not
  * within the range of the mapped $P_1$ polynomials.
  *
+ * <h3>Visualization of shape functions</h3> In 2d, the shape functions of
+ * this element look as follows.
+ *
+ * <h4>$P_0$ element</h4>
+ *
+ * <table> <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0000.png
+ * </td>
+ *
+ * <td align="center"> </td> </tr> <tr> <td align="center"> $P_0$ element,
+ * shape function 0 </td>
+ *
+ * <td align="center"></tr> </table>
+ *
+ * <h4>$P_1$ element</h4>
+ *
+ * <table> <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0000.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0001.png
+ * </td> </tr> <tr> <td align="center"> $P_1$ element, shape function 0 </td>
+ *
+ * <td align="center"> $P_1$ element, shape function 1 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P1/P1_DGP_shape0002.png
+ * </td>
+ *
+ * <td align="center"> </td> </tr> <tr> <td align="center"> $P_1$ element,
+ * shape function 2 </td>
+ *
+ * <td align="center"></td> </tr> </table>
+ *
+ *
+ * <h4>$P_2$ element</h4>
+ *
+ * <table> <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0000.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0001.png
+ * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 0 </td>
+ *
+ * <td align="center"> $P_2$ element, shape function 1 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0002.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0003.png
+ * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 2 </td>
+ *
+ * <td align="center"> $P_2$ element, shape function 3 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0004.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P2/P2_DGP_shape0005.png
+ * </td> </tr> <tr> <td align="center"> $P_2$ element, shape function 4 </td>
+ *
+ * <td align="center"> $P_2$ element, shape function 5 </td> </tr> </table>
+ *
+ *
+ * <h4>$P_3$ element</h4>
+ *
+ * <table> <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0000.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0001.png
+ * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 0 </td>
+ *
+ * <td align="center"> $P_3$ element, shape function 1 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0002.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0003.png
+ * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 2 </td>
+ *
+ * <td align="center"> $P_3$ element, shape function 3 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0004.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0005.png
+ * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 4 </td>
+ *
+ * <td align="center"> $P_3$ element, shape function 5 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0006.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0007.png
+ * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 6 </td>
+ *
+ * <td align="center"> $P_3$ element, shape function 7 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0008.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P3/P3_DGP_shape0009.png
+ * </td> </tr> <tr> <td align="center"> $P_3$ element, shape function 8 </td>
+ *
+ * <td align="center"> $P_3$ element, shape function 9 </td> </tr> </table>
+ *
+ *
+ * <h4>$P_4$ element</h4> <table> <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0000.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0001.png
+ * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 0 </td>
+ *
+ * <td align="center"> $P_4$ element, shape function 1 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0002.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0003.png
+ * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 2 </td>
+ *
+ * <td align="center"> $P_4$ element, shape function 3 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0004.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0005.png
+ * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 4 </td>
+ *
+ * <td align="center"> $P_4$ element, shape function 5 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0006.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0007.png
+ * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 6 </td>
+ *
+ * <td align="center"> $P_4$ element, shape function 7 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0008.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0009.png
+ * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 8 </td>
+ *
+ * <td align="center"> $P_4$ element, shape function 9 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0010.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0011.png
+ * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 10 </td>
+ *
+ * <td align="center"> $P_4$ element, shape function 11 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0012.png
+ * </td>
+ *
+ * <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0013.png
+ * </td> </tr> <tr> <td align="center"> $P_4$ element, shape function 12 </td>
+ *
+ * <td align="center"> $P_4$ element, shape function 13 </td> </tr>
+ *
+ * <tr> <td align="center">
+ * @image html http://www.dealii.org/images/shape-functions/DGP/P4/P4_DGP_shape0014.png
+ * </td>
+ *
+ * <td align="center"> </td> </tr> <tr> <td align="center"> $P_4$ element,
+ * shape function 14 </td>
+ *
+ * <td align="center"></td> </tr> </table>
  *
  * @author Guido Kanschat, 2001, 2002, Ralf Hartmann 2004
  */
@@ -183,7 +388,8 @@ public:
    * neither dominates, or if either could dominate.
    *
    * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the @ref hp_paper "hp paper".
+   * particular the
+   * @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination

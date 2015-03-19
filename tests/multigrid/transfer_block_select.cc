@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_transfer_block.h>
 #include <deal.II/multigrid/mg_tools.h>
 
@@ -44,7 +43,7 @@ using namespace std;
 template <int dim, typename number, int spacedim>
 void
 reinit_vector_by_blocks (
-  const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+  const dealii::DoFHandler<dim,spacedim> &mg_dof,
   MGLevelObject<dealii::Vector<number> > &v,
   const unsigned int selected_block,
   std::vector<std::vector<types::global_dof_index> > &ndofs)
@@ -82,9 +81,10 @@ void check_select(const FiniteElement<dim> &fe, unsigned int selected)
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
   DoFHandler<dim> &dof=mgdof;
   mgdof.distribute_dofs(fe);
+  mgdof.distribute_mg_dofs(fe);
   DoFRenumbering::component_wise(mgdof);
   vector<types::global_dof_index> ndofs(fe.n_blocks());
   DoFTools::count_dofs_per_block(mgdof, ndofs);

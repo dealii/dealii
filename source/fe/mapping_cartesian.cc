@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -390,88 +390,19 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
 
 
-// template <>
-// void
-// MappingCartesian<1,1>::fill_fe_face_values (
-//   const typename Triangulation<1,1>::cell_iterator &,
-//   const unsigned int,
-//   const Quadrature<0>&,
-//   typename Mapping<1,1>::InternalDataBase&,
-//   std::vector<Point<1> >&,
-//   std::vector<double>&,
-//   std::vector<Tensor<1,1> >&,
-//   std::vector<Point<1> >&) const
-// {
-//   Assert(false, ExcNotImplemented());
-// }
-
-
-// template <>
-// void
-// MappingCartesian<1,2>::fill_fe_face_values (
-//   const typename Triangulation<1,2>::cell_iterator &,
-//   const unsigned int,
-//   const Quadrature<0>&,
-//   typename Mapping<1,2>::InternalDataBase&,
-//   std::vector<Point<1> >&,
-//   std::vector<double>&,
-//   std::vector<Tensor<1,1> >&,
-//   std::vector<Point<2> >&) const
-// {
-//   Assert(false, ExcNotImplemented());
-// }
-
-
-
-// template <>
-// void
-// MappingCartesian<1,1>::fill_fe_subface_values (
-//   const typename Triangulation<1,1>::cell_iterator &,
-//   const unsigned int,
-//   const unsigned int,
-//   const Quadrature<0>&,
-//   typename Mapping<1,1>::InternalDataBase&,
-//   std::vector<Point<1> >&,
-//   std::vector<double>&,
-//   std::vector<Tensor<1,1> >&,
-//   std::vector<Point<1> >&) const
-// {
-//   Assert(false, ExcNotImplemented());
-// }
-
-
-
-// template <>
-// void
-// MappingCartesian<1,2>::fill_fe_subface_values (
-//   const typename Triangulation<1,2>::cell_iterator &,
-//   const unsigned int,
-//   const unsigned int,
-//   const Quadrature<0>&,
-//   typename Mapping<1,2>::InternalDataBase&,
-//   std::vector<Point<1> >&,
-//   std::vector<double>&,
-//   std::vector<Tensor<1,1> >&,
-//   std::vector<Point<2> >&) const
-// {
-//   Assert(false, ExcNotImplemented());
-// }
-
-
-
-// Implementation for dim != 1
-
 template<int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::fill_fe_face_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int            face_no,
-  const Quadrature<dim-1>      &q,
+  const unsigned int             face_no,
+  const Quadrature<dim-1>       &q,
   typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  std::vector<Point<dim> >     &quadrature_points,
-  std::vector<double>          &JxW_values,
-  std::vector<Tensor<1,dim> >  &boundary_forms,
-  std::vector<Point<spacedim> >     &normal_vectors) const
+  std::vector<Point<dim> >      &quadrature_points,
+  std::vector<double>           &JxW_values,
+  std::vector<Tensor<1,dim> >   &boundary_forms,
+  std::vector<Point<spacedim> > &normal_vectors,
+  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -511,6 +442,22 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (
         J *= data.length[d];
       data.volume_element = J;
     }
+
+  if (data.current_update_flags() & update_jacobians)
+    for (unsigned int i=0; i<jacobians.size(); ++i)
+      {
+        jacobians[i] = DerivativeForm<1,dim,spacedim>();
+        for (unsigned int d=0; d<dim; ++d)
+          jacobians[i][d][d] = data.length[d];
+      }
+
+  if (data.current_update_flags() & update_inverse_jacobians)
+    for (unsigned int i=0; i<inverse_jacobians.size(); ++i)
+      {
+        inverse_jacobians[i] = DerivativeForm<1,dim,spacedim>();
+        for (unsigned int d=0; d<dim; ++d)
+          inverse_jacobians[i][d][d] = 1./data.length[d];
+      }
 }
 
 
@@ -519,14 +466,16 @@ template<int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::fill_fe_subface_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int       face_no,
-  const unsigned int       sub_no,
-  const Quadrature<dim-1> &q,
+  const unsigned int             face_no,
+  const unsigned int             sub_no,
+  const Quadrature<dim-1>       &q,
   typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  std::vector<Point<dim> >     &quadrature_points,
-  std::vector<double>          &JxW_values,
-  std::vector<Tensor<1,dim> >  &boundary_forms,
-  std::vector<Point<spacedim> >     &normal_vectors) const
+  std::vector<Point<dim> >      &quadrature_points,
+  std::vector<double>           &JxW_values,
+  std::vector<Tensor<1,dim> >   &boundary_forms,
+  std::vector<Point<spacedim> > &normal_vectors,
+  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -580,6 +529,22 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (
         J *= data.length[d];
       data.volume_element = J;
     }
+
+  if (data.current_update_flags() & update_jacobians)
+    for (unsigned int i=0; i<jacobians.size(); ++i)
+      {
+        jacobians[i] = DerivativeForm<1,dim,spacedim>();
+        for (unsigned int d=0; d<dim; ++d)
+          jacobians[i][d][d] = data.length[d];
+      }
+
+  if (data.current_update_flags() & update_inverse_jacobians)
+    for (unsigned int i=0; i<inverse_jacobians.size(); ++i)
+      {
+        inverse_jacobians[i] = DerivativeForm<1,spacedim,dim>();
+        for (unsigned int d=0; d<dim; ++d)
+          inverse_jacobians[i][d][d] = 1./data.length[d];
+      }
 }
 
 

@@ -49,7 +49,7 @@ namespace std_cxx11
   using boost::ref;
   using boost::cref;
   using boost::reference_wrapper;
-  
+
   // now also import the _1, _2 placeholders from the global namespace
   // into the current one as suggested above
   using ::_1;

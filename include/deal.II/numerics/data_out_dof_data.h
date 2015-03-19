@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,6 +36,113 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int, int> class FEValuesBase;
+
+
+namespace Exceptions
+{
+  /**
+   * A namespace for exceptions that are used throughout the DataOut*
+   * collection of classes.
+   */
+  namespace DataOut
+  {
+    /**
+     * Exception
+     */
+    DeclException1 (ExcInvalidNumberOfSubdivisions,
+                    int,
+                    << "The number of subdivisions per patch, " << arg1
+                    << ", is not valid. It needs to be greater or equal to "
+                    "one, or zero if you want it to be determined "
+                    "automatically.");
+
+    /**
+     * Exception
+     */
+    DeclExceptionMsg (ExcNoTriangulationSelected,
+                      "For the operation you are attempting, you first need to "
+                      "tell the DataOut or related object which DoFHandler or "
+                      "triangulation you would like to work on.");
+
+    /**
+     * Exception
+     */
+    DeclExceptionMsg (ExcNoDoFHandlerSelected,
+                      "For the operation you are attempting, you first need to "
+                      "tell the DataOut or related object which DoFHandler "
+                      "you would like to work on.");
+
+    /**
+     * Exception
+     */
+    DeclException3 (ExcInvalidVectorSize,
+                    int, int, int,
+                    << "The vector has size " << arg1
+                    << " but the DoFHandler object says that there are " << arg2
+                    << " degrees of freedom and there are " << arg3
+                    << " active cells. The size of your vector needs to be"
+                    << " either equal to the number of degrees of freedom, or"
+                    << " equal to the number of active cells.");
+    /**
+     * Exception
+     */
+    DeclException2 (ExcInvalidCharacter,
+                    std::string, size_t,
+                    << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
+                    << "description strings since some graphics formats will only accept these."
+                    << std::endl
+                    << "The string you gave was <" << arg1
+                    << ">, within which the invalid character is <" << arg1[arg2]
+                    << ">." << std::endl);
+    /**
+     * Exception
+     */
+    DeclExceptionMsg (ExcOldDataStillPresent,
+                      "When attaching a triangulation or DoFHandler object, it is "
+                      "not allowed if old data vectors are still referenced. If "
+                      "you want to reuse an object of the current type, you first "
+                      "need to call the 'clear_data_vector()' function.");
+    /**
+     * Exception
+     */
+    DeclException2 (ExcInvalidNumberOfNames,
+                    int, int,
+                    << "You have to give one name per component in your "
+                    << "data vector. The number you gave was " << arg1
+                    << ", but the number of components is " << arg2
+                    << ".");
+    /**
+     * Exception
+     */
+    DeclExceptionMsg (ExcIncompatibleDatasetNames,
+                      "While merging sets of patches, the two sets to be merged "
+                      "need to refer to data that agrees on the names of the "
+                      "various variables represented. In other words, you "
+                      "cannot merge sets of patches that originate from "
+                      "entirely unrelated simulations.");
+    /**
+     * Exception
+     */
+    DeclExceptionMsg (ExcIncompatiblePatchLists,
+                      "While merging sets of patches, the two sets to be merged "
+                      "need to refer to data that agrees on the number of "
+                      "subdivisions and other properties. In other words, you "
+                      "cannot merge sets of patches that originate from "
+                      "entirely unrelated simulations.");
+
+    DeclException2 (ExcInvalidVectorDeclaration,
+                    int, std::string,
+                    << "When declaring that a number of components in a data "
+                    << "set to be output logically form a vector instead of "
+                    << "simply a set of scalar fields, you need to specify "
+                    << "this for all relevant components. Furthermore, "
+                    << "vectors must always consist of exactly <dim> "
+                    << "components. However, the vector component at "
+                    << "position " << arg1 << " with name <" << arg2
+                    << "> does not satisfy these conditions.");
+  }
+}
+
 
 namespace internal
 {
@@ -256,7 +363,7 @@ namespace internal
 /**
  * This is an abstract class which provides the functionality to generate
  * patches for output by base classes from data vectors on a grid. It allows
- * to store one or more pointers to a DoFHandler and attached node and cell
+ * to attach one or more pointers to a DoFHandler and attached node and cell
  * data denoting functions on the grid which shall later be written in any of
  * the implemented data formats.
  *
@@ -321,22 +428,23 @@ namespace internal
  * independent scalar field, or whether some of them together form logically a
  * vector-field (see the
  * DataComponentInterpretation::DataComponentInterpretation enum, and the
- * @ref step_22 "step-22" tutorial program).
+ * @ref step_22 "step-22"
+ * tutorial program).
  *
- * It should be noted that this class does not copy the vector given to it
- * through the add_data_vector() functions, for memory consumption reasons. It
- * only stores a reference to it, so it is in your responsibility to make sure
- * that the data vectors exist long enough.
+ * This class does not copy the vector given to it through the
+ * add_data_vector() functions, for memory consumption reasons. It only stores
+ * a reference to it, so it is in your responsibility to make sure that the
+ * data vectors exist long enough.
  *
  * After adding all data vectors, you need to call a function which generates
- * the patches for output from the stored data. Derived classes name this
- * function build_patches(). Finally, you write() the data in one format or
- * other, to a file.
+ * the patches (i.e., some intermediate data representation) for output from
+ * the stored data. Derived classes name this function build_patches().
+ * Finally, you write() the data in one format or other, to a file.
  *
- * Please note that in the example above, an object of type DataOut was used,
- * i.e. an object of a derived class. This is necessary since this class does
- * not provide means to actually generate the patches, only aids to store and
- * access data.
+ * In the example above, an object of type DataOut was used, i.e. an object of
+ * a derived class. This is necessary since the current class does not provide
+ * means to actually generate the patches, only aids to store and access data.
+ * Any real functionality is implemented in derived classes such as DataOut.
  *
  * Note that the base class of this class, DataOutInterface offers several
  * functions to ease programming with run-time determinable output formats
@@ -350,18 +458,18 @@ namespace internal
  *
  * <h3>Information for derived classes</h3>
  *
- * What is actually missing this class is a way to produce the patches for
- * output itself, from the stored data and degree of freedom information.
- * Since this task is often application dependent it is left to derived
- * classes. For example, in many applications, it might be wanted to limit the
- * depth of output to a certain number of refinement levels and write data
- * from finer cells only in a way interpolated to coarser cells, to reduce the
- * amount of output. Also, it might be wanted to use different numbers of
- * subdivisions on different cells when forming a patch, for example to
- * accomplish for different polynomial degrees of the trial space on different
- * cells. Also, the output need not necessarily consist of a patch for each
- * cell, but might be made up of patches for faces, of other things. Take a
- * look at derived classes to what is possible in this respect.
+ * What this class lacks is a way to produce the patches for output itself,
+ * from the stored data and degree of freedom information. Since this task is
+ * often application dependent it is left to derived classes. For example, in
+ * many applications, it might be wanted to limit the depth of output to a
+ * certain number of refinement levels and write data from finer cells only in
+ * a way interpolated to coarser cells, to reduce the amount of output. Also,
+ * it might be wanted to use different numbers of subdivisions on different
+ * cells when forming a patch, for example to accomplish for different
+ * polynomial degrees of the trial space on different cells. Also, the output
+ * need not necessarily consist of a patch for each cell, but might be made up
+ * of patches for faces, of other things. Take a look at derived classes to
+ * what is possible in this respect.
  *
  * For this reason, it is left to a derived class to provide a function, named
  * usually build_patches() or the like, which fills the #patches array of this
@@ -697,77 +805,6 @@ public:
    */
   std::size_t memory_consumption () const;
 
-  /**
-   * Exception
-   */
-  DeclException0 (ExcNoTriangulationSelected);
-
-  /**
-   * Exception
-   */
-  DeclException0 (ExcNoDoFHandlerSelected);
-
-  /**
-   * Exception
-   */
-  DeclException0 (ExcDataPostprocessingIsNotPossibleForCellData);
-
-  /**
-   * Exception
-   */
-  DeclException3 (ExcInvalidVectorSize,
-                  int, int, int,
-                  << "The vector has size " << arg1
-                  << " but the DoFHandler objects says there are " << arg2
-                  << " degrees of freedom and there are " << arg3
-                  << " active cells.");
-  /**
-   * Exception
-   */
-  DeclException2 (ExcInvalidCharacter,
-                  std::string, size_t,
-                  << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
-                  << "description strings since some graphics formats will only accept these."
-                  << std::endl
-                  << "The string you gave was <" << arg1
-                  << ">, the invalid character is <" << arg1[arg2]
-                  << ">." << std::endl);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcOldDataStillPresent);
-  /**
-   * Exception
-   */
-  DeclException2 (ExcInvalidNumberOfNames,
-                  int, int,
-                  << "You have to give one name per component in your "
-                  << "data vector. The number you gave was " << arg1
-                  << ", but the number of components is " << arg2);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcNoPatches);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcIncompatibleDatasetNames);
-  /**
-   * Exception
-   */
-  DeclException0 (ExcIncompatiblePatchLists);
-
-  DeclException2 (ExcInvalidVectorDeclaration,
-                  int, std::string,
-                  << "When declaring that a number of components in a data\n"
-                  << "set to be output logically form a vector instead of\n"
-                  << "simply a set of scalar fields, you need to specify\n"
-                  << "this for all relevant components. Furthermore,\n"
-                  << "vectors must always consist of exactly <dim>\n"
-                  << "components. However, the vector component at\n"
-                  << "position " << arg1 << " with name <" << arg2
-                  << "> does not satisfy these conditions.");
-
 protected:
   /**
    * Abbreviate the somewhat lengthy name for the Patch class.
@@ -851,22 +888,28 @@ merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
                const Point<patch_space_dim> &shift)
 {
   const std::vector<Patch> source_patches = source.get_patches ();
-  Assert (patches.size () != 0,        ExcNoPatches ());
-  Assert (source_patches.size () != 0, ExcNoPatches ());
+  Assert ((patches.size () != 0) &&
+          (source_patches.size () != 0),
+          ExcMessage ("When calling this function, both the current "
+                      "object and the one being merged need to have a "
+                      "nonzero number of patches associated with it. "
+                      "Either you called this function on objects that "
+                      "are empty, or you may have forgotten to call "
+                      "the 'build_patches()' function."));
   // check equality of component
   // names
   Assert (get_dataset_names() == source.get_dataset_names(),
-          ExcIncompatibleDatasetNames());
+          Exceptions::DataOut::ExcIncompatibleDatasetNames());
   // make sure patches are compatible. we'll
   // assume that if the first respective
   // patches are ok that all the other ones
   // are ok as well
   Assert (patches[0].n_subdivisions == source_patches[0].n_subdivisions,
-          ExcIncompatiblePatchLists());
+          Exceptions::DataOut::ExcIncompatiblePatchLists());
   Assert (patches[0].data.n_rows() == source_patches[0].data.n_rows(),
-          ExcIncompatiblePatchLists());
+          Exceptions::DataOut::ExcIncompatiblePatchLists());
   Assert (patches[0].data.n_cols() == source_patches[0].data.n_cols(),
-          ExcIncompatiblePatchLists());
+          Exceptions::DataOut::ExcIncompatiblePatchLists());
 
   // check equality of the vector data
   // specifications

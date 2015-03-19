@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,9 +82,9 @@ namespace Utilities
    * template parameters: dim (the topological dimension of the object) and
    * spacedim (the dimension of the embedding Euclidean space).  Since in all
    * deal.II classes, by default spacedim is equal to dimension, the above
-   * string is usually contracted to "<dim>", instead of "<dim,spacedim>". This
-   * function returns a string containing "dim" if dim is equal to spacedim,
-   * otherwhise it returns "dim,spacedim".
+   * string is usually contracted to "<dim>", instead of "<dim,spacedim>".
+   * This function returns a string containing "dim" if dim is equal to
+   * spacedim, otherwhise it returns "dim,spacedim".
    */
   std::string dim_string(const int dim, const int spacedim);
 
@@ -113,10 +113,44 @@ namespace Utilities
   /**
    * Given a string that contains text separated by a @p delimiter, split it
    * into its components; for each component, remove leading and trailing
-   * spaces.
-   *
-   * The default value of the delimiter is a comma, so that the function
+   * spaces. The default value of the delimiter is a comma, so that the function
    * splits comma separated lists of strings.
+   *
+   * To make data input from tables simpler, if the input string ends in
+   * a delimiter (possibly followed by an arbitrary amount of whitespace),
+   * then this last delimiter is ignored. For example,
+   * @code
+   *   Utilities::split_string_list("abc; def; ghi; ", ';');
+   * @endcode
+   * yields the same 3-element list of output <code>{"abc","def","ghi"}</code>
+   * as you would get if the input had been
+   * @code
+   *   Utilities::split_string_list("abc; def; ghi", ';');
+   * @endcode
+   * or
+   * @code
+   *   Utilities::split_string_list("abc; def; ghi;", ';');
+   * @endcode
+   * As a consequence of this rule, a call like
+   * @code
+   *   Utilities::split_string_list(" ; ", ';');
+   * @endcode
+   * yields a one-element list. Because of the trimming of
+   * whitespace, the single element is the empty string.
+   *
+   * This function can digest the case that the delimiter is a space. In this
+   * case, it returns all words in the string. Combined with the rules above,
+   * this implies that
+   * @code
+   *   Utilities::split_string_list("abc def ghi ", ' ');
+   * @endcode
+   * yields again the 3-element list of output <code>{"abc","def","ghi"}</code>
+   * from above despite the presence of space at the end of the string.
+   * Furthermore,
+   * @code
+   *   Utilities::split_string_list("      ", ' ');
+   * @endcode
+   * yields an empty list regardless of the number of spaces in the string.
    */
   std::vector<std::string>
   split_string_list (const std::string &s,
@@ -342,89 +376,9 @@ namespace Utilities
     std::string get_time ();
 
     /**
-     * Return whether (i) deal.II has been compiled to support MPI (for
-     * example by compiling with <code>CXX=mpiCC</code>) and if so whether
-     * (ii) <code>MPI_Init()</code> has been called (for example using the
-     * Utilities::System::MPI_InitFinalize class). In other words, the result
-     * indicates whether the current job is running under MPI.
-     *
-     * @note The function does not take into account whether an MPI job
-     * actually runs on more than one processor or is, in fact, a single-node
-     * job that happens to run under MPI.
+     * @deprecated Use Utilities::MPI::job_supports_mpi() instead.
      */
-    bool job_supports_mpi ();
-
-    /**
-     * Alias for job_supports_mpi().
-     *
-     * @deprecated
-     */
-    bool program_uses_mpi () DEAL_II_DEPRECATED;
-
-    /**
-     * @name Functions that work in parallel via MPI. The functions following
-     * here are all deprecated and have been moved to namespace
-     * Utilities::MPI.
-     */
-    /** @{ */
-
-    /**
-     * This function is an alias for Utilities::MPI::n_mpi_processes.
-     *
-     * @deprecated
-     */
-    unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator) DEAL_II_DEPRECATED;
-
-    /**
-     * This function is an alias for Utilities::MPI::this_mpi_process.
-     *
-     * @deprecated
-     */
-    unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator) DEAL_II_DEPRECATED;
-
-
-    /**
-     * This function is an alias for
-     * Utilities::MPI::compute_point_to_point_communication_pattern.
-     *
-     * @deprecated
-     */
-    using
-    Utilities::MPI::compute_point_to_point_communication_pattern;
-
-
-    /**
-     * This function is an alias for Utilities::MPI::duplicate_communicator.
-     *
-     * @deprecated
-     */
-    using Utilities::MPI::duplicate_communicator;
-
-    /**
-     * An alias for Utilities::MPI::MinMaxAvg.
-     *
-     * @deprecated
-     */
-    using Utilities::MPI::MinMaxAvg;
-
-    /**
-     * An alias for Utilities::MPI::min_max_avg.
-     *
-     * @deprecated
-     */
-    void
-    calculate_collective_mpi_min_max_avg (const MPI_Comm &mpi_communicator,
-                                          const double my_value,
-                                          MinMaxAvg &result) DEAL_II_DEPRECATED;
-
-    /**
-     * An alias for Utilities::MPI::MPI_InitFinalize.
-     *
-     * @deprecated
-     */
-    using Utilities::MPI::MPI_InitFinalize;
-
-    /** @} */
+    bool job_supports_mpi () DEAL_II_DEPRECATED;
   }
 
 

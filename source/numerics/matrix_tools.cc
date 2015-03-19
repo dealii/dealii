@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1118,13 +1118,12 @@ namespace MatrixCreator
                         if (copy_data.dof_is_on_face[pos][j] &&
                             dof_to_boundary_mapping[copy_data.dofs[j]] != numbers::invalid_dof_index)
                           {
-                            Assert(numbers::is_finite(copy_data.cell_matrix[pos](i,j)),
-                                   ExcNumberNotFinite());
+                            AssertIsFinite(copy_data.cell_matrix[pos](i,j));
                             matrix.add(dof_to_boundary_mapping[copy_data.dofs[i]],
                                        dof_to_boundary_mapping[copy_data.dofs[j]],
                                        copy_data.cell_matrix[pos](i,j));
                           }
-                      Assert(numbers::is_finite(copy_data.cell_vector[pos](i)), ExcNumberNotFinite());
+                      AssertIsFinite(copy_data.cell_vector[pos](i));
                       rhs_vector(dof_to_boundary_mapping[copy_data.dofs[i]]) += copy_data.cell_vector[pos](i);
                     }
                 }
@@ -2410,7 +2409,6 @@ namespace MatrixTools
           }
 
         // clean up
-        matrix.compress ();
         solution.compress (VectorOperation::insert);
         right_hand_side.compress (VectorOperation::insert);
       }
@@ -2445,9 +2443,6 @@ namespace MatrixTools
     // used for both petsc matrix types
     internal::PETScWrappers::apply_boundary_values (boundary_values, matrix, solution,
                                                     right_hand_side, eliminate_columns);
-
-    // compress the matrix once we're done
-    matrix.compress ();
   }
 
 
@@ -2466,8 +2461,6 @@ namespace MatrixTools
             ExcNotQuadratic());
 
     const unsigned int n_blocks = matrix.n_block_rows();
-
-    matrix.compress();
 
     // We need to find the subdivision
     // into blocks for the boundary values.
@@ -2563,12 +2556,6 @@ namespace MatrixTools
             Assert (local_range == solution.local_range(),
                     ExcInternalError());
 
-            // we have to read and write from this
-            // matrix (in this order). this will only
-            // work if we compress the matrix first,
-            // done here
-            matrix.compress ();
-
             // determine the first nonzero diagonal
             // entry from within the part of the
             // matrix that we can see. if we can't
@@ -2631,7 +2618,7 @@ namespace MatrixTools
           }
 
         // clean up
-        matrix.compress ();
+        matrix.compress (VectorOperation::insert);
         solution.compress (VectorOperation::insert);
         right_hand_side.compress (VectorOperation::insert);
       }
@@ -2656,8 +2643,6 @@ namespace MatrixTools
                 ExcNotQuadratic());
 
         const unsigned int n_blocks = matrix.n_block_rows();
-
-        matrix.compress();
 
         // We need to find the subdivision
         // into blocks for the boundary values.

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,7 +21,7 @@
 // check
 //   DoFTools::
 //   make_sparsity_pattern (const DoFHandler<dim> &,
-//                          std::vector<std::vector<bool> > &,
+//                          Table<2,DoFTools::Coupling> &,
 //                      SparsityPattern       &);
 
 
@@ -34,10 +34,12 @@ check_this (const DoFHandler<dim> &dof_handler)
 {
   // set up X-shape mask
   const unsigned int n_components = dof_handler.get_fe().n_components();
-  std::vector<std::vector<bool> > mask (n_components,
-                                        std::vector<bool>(n_components,false));
+  Table<2,DoFTools::Coupling> mask (n_components, n_components);
   for (unsigned int i=0; i<n_components; ++i)
-    mask[i][i] = mask[i][n_components-i-1] = true;
+    for (unsigned int j=0; j<n_components; ++j)
+      mask(i,j) = DoFTools::none;
+  for (unsigned int i=0; i<n_components; ++i)
+    mask[i][i] = mask[i][n_components-i-1] = DoFTools::always;
 
   // create sparsity pattern
   SparsityPattern sp (dof_handler.n_dofs(),
@@ -65,9 +67,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   unsigned int hash = 0;
   for (unsigned int l=0; l<sp.n_rows(); ++l)
     hash += l*(sp.row_length(l) +
-               sp.get_rowstart_indices()[l] +
-               sp.get_column_numbers()[sp.get_rowstart_indices()[l]
-                                       +
-                                       (sp.row_length(l)>1 ? 1 : 0)]);
+               (sp.begin(l)-sp.begin()) +
+               (sp.row_length(l)>1 ? ++sp.begin(l) : sp.begin(l))->column());
   deallog << hash << std::endl;
 }

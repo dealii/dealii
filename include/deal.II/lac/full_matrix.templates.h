@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -150,7 +150,7 @@ FullMatrix<number> &
 FullMatrix<number>::operator *= (const number factor)
 {
 
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
 
   number       *p = &(*this)(0,0);
   const number *e = &(*this)(0,0) + n()*m();
@@ -167,14 +167,14 @@ FullMatrix<number> &
 FullMatrix<number>::operator /= (const number factor)
 {
 
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
 
   number       *p = &(*this)(0,0);
   const number *e = &(*this)(0,0) + n()*m();
 
   const number factor_inv = number(1.)/factor;
 
-  Assert (numbers::is_finite(factor_inv), ExcNumberNotFinite());
+  AssertIsFinite(factor_inv);
 
   while (p != e)
     *p++ *= factor_inv;
@@ -296,7 +296,7 @@ void FullMatrix<number>::forward (Vector<number2>       &dst,
       for (j=0; j<i; ++j)
         s -= number(dst(j)) * (*this)(i,j);
       dst(i) = s/(*this)(i,i);
-      Assert(numbers::is_finite(dst(i)), ExcNumberNotFinite());
+      AssertIsFinite(dst(i));
     }
 }
 
@@ -317,7 +317,7 @@ void FullMatrix<number>::backward (Vector<number2>       &dst,
       for (j=i+1; j<nu; ++j)
         s -= dst(j) * number2((*this)(i,j));
       dst(i) = s/number2((*this)(i,i));
-      Assert(numbers::is_finite(dst(i)), ExcNumberNotFinite());
+      AssertIsFinite(dst(i));
     }
 }
 
@@ -546,7 +546,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+#ifdef DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -554,7 +554,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.n() > 300)
       {
-        // In case we have the BLAS function gemm detected at configure, we
+        // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
         // provides better performance than the deal.II native function (it
         // uses cache and register blocking in order to access local data).
@@ -616,7 +616,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+#ifdef DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -624,7 +624,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.n() > 300)
       {
-        // In case we have the BLAS function gemm detected at configure, we
+        // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
         // provides better performance than the deal.II native function (it
         // uses cache and register blocking in order to access local data).
@@ -706,7 +706,7 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+#ifdef DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -714,7 +714,7 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.m() > 300)
       {
-        // In case we have the BLAS function gemm detected at configure, we
+        // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
         // provides better performance than the deal.II native function (it
         // uses cache and register blocking in order to access local data).
@@ -794,7 +794,7 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
-#if defined(HAVE_DGEMM_) && defined (HAVE_SGEMM_)
+#ifdef DEAL_II_WITH_LAPACK
   if ((types_are_equal<number,double>::value
        ||
        types_are_equal<number,float>::value)
@@ -802,7 +802,7 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
       types_are_equal<number,number2>::value)
     if (this->n()*this->m()*src.m() > 300)
       {
-        // In case we have the BLAS function gemm detected at configure, we
+        // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
         // provides better performance than the deal.II native function (it
         // uses cache and register blocking in order to access local data).
@@ -1713,15 +1713,14 @@ FullMatrix<number>::gauss_jordan ()
   // works for us (it is usually not
   // efficient to use Lapack for very small
   // matrices):
-#if defined(HAVE_DGETRF_) && defined (HAVE_SGETRF_) && \
-    defined(HAVE_DGETRI_) && defined (HAVE_SGETRI_)
+#ifdef DEAL_II_WITH_LAPACK
   if (types_are_equal<number,double>::value
       ||
       types_are_equal<number,float>::value)
     if (this->n_cols() > 15)
       {
         // In case we have the LAPACK functions
-        // getrf and getri detected at configure,
+        // getrf and getri detected by CMake,
         // we use these algorithms for inversion
         // since they provide better performance
         // than the deal.II native functions.

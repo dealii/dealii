@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,7 +51,7 @@ void check (TRIA &tr)
 
 int main (int argc, char *argv[])
 {
-  // Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  // Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   initlog();
   deal_II_exceptions::disable_abort_on_exception();

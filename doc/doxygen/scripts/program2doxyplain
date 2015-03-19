@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2006 - 2013 by the deal.II authors
+## Copyright (C) 2006 - 2013, 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -23,14 +23,11 @@ while (<>) {
     # comments that doxygen doesn't get confused; do so by simply
     # adding a space
     #
-    # we also need to somehow strip the $ signs out of the svn Id: string
-    # to avoid trouble. The same holds for the $Name:$ tags. All other $
-    # signs are simply removed.
+    # also remove all $ signs to avoid confusing doxygen with what
+    # may or may not be a formula
     if ( ! m!^\s*//! ) {
         s!/\*!/ \*!g;
         s!\*/!\* /!g;
-
-	s!\$Name:?(.*)\$!Name: \1!g;
 
         s!\$!!g;
 

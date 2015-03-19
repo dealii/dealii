@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,28 +12,6 @@
 // the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
-
-
-for (deal_II_dimension : DIMENSIONS)
-{
-    namespace VectorTools \{
-      template
-        void interpolate_boundary_values (
-          const MGDoFHandler<deal_II_dimension> &,
-          const types::boundary_id,
-          const Function<deal_II_dimension>   &,
-	  ConstraintMatrix&,
-          const ComponentMask    &);
-
-      template
-        void interpolate_boundary_values (
-          const MGDoFHandler<deal_II_dimension> &,
-          const types::boundary_id,
-          const Function<deal_II_dimension>   &,
-          std::map<types::global_dof_index,double>       &,
-          const ComponentMask    &);
-    \}
-}
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; DH : DOFHANDLER_TEMPLATES)
@@ -157,6 +135,22 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
          const Mapping<deal_II_dimension>&);
       template
         void project_boundary_values_curl_conforming<deal_II_dimension>
+        (const hp::DoFHandler<deal_II_dimension>&,
+         const unsigned int,
+         const Function<deal_II_dimension>&,
+         const types::boundary_id,
+         ConstraintMatrix&,
+         const hp::MappingCollection<deal_II_dimension>&);
+      template
+        void project_boundary_values_curl_conforming_l2<deal_II_dimension>
+        (const DoFHandler<deal_II_dimension>&,
+         const unsigned int,
+         const Function<deal_II_dimension>&,
+         const types::boundary_id,
+         ConstraintMatrix&,
+         const Mapping<deal_II_dimension>&);
+      template
+        void project_boundary_values_curl_conforming_l2<deal_II_dimension>
         (const hp::DoFHandler<deal_II_dimension>&,
          const unsigned int,
          const Function<deal_II_dimension>&,

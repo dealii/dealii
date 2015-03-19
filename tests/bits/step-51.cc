@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -122,8 +122,8 @@ namespace Step51
     double return_value = 0;
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
-        const Point<dim> x_minus_xi = p - this->source_centers[i];
-        return_value += std::exp(-x_minus_xi.square() /
+        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
+        return_value += std::exp(-x_minus_xi.norm_square() /
                                  (this->width * this->width));
       }
 
@@ -141,10 +141,10 @@ namespace Step51
 
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
-        const Point<dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
 
         return_value += (-2 / (this->width * this->width) *
-                         std::exp(-x_minus_xi.square() /
+                         std::exp(-x_minus_xi.norm_square() /
                                   (this->width * this->width)) *
                          x_minus_xi);
       }
@@ -241,13 +241,13 @@ namespace Step51
     double return_value = 0;
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
-        const Point<dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
 
         return_value +=
-          ((2*dim - 2*convection*x_minus_xi - 4*x_minus_xi.square()/
+          ((2*dim - 2*convection*x_minus_xi - 4*x_minus_xi.norm_square()/
             (this->width * this->width)) /
            (this->width * this->width) *
-           std::exp(-x_minus_xi.square() /
+           std::exp(-x_minus_xi.norm_square() /
                     (this->width * this->width)));
       }
 
@@ -949,19 +949,13 @@ namespace Step51
         output_results (cycle);
       }
 
-    convergence_table.set_precision("val L2", 3);
+    convergence_table.set_precision("val L2", 8);
     convergence_table.set_scientific("val L2", true);
-    convergence_table.set_precision("grad L2", 3);
+    convergence_table.set_precision("grad L2", 8);
     convergence_table.set_scientific("grad L2", true);
-    convergence_table.set_precision("val L2-post", 3);
+    convergence_table.set_precision("val L2-post", 8);
     convergence_table.set_scientific("val L2-post", true);
 
-    convergence_table
-      .evaluate_convergence_rates("val L2", "cells", ConvergenceTable::reduction_rate_log2, dim);
-    convergence_table
-      .evaluate_convergence_rates("grad L2", "cells", ConvergenceTable::reduction_rate_log2, dim);
-    convergence_table
-      .evaluate_convergence_rates("val L2-post", "cells", ConvergenceTable::reduction_rate_log2, dim);
     convergence_table.write_text(deallog.get_file_stream());
   }
 

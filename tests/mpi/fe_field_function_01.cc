@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,7 +101,7 @@ void test()
           Assert (std::fabs(value - (p[0]+2)) < 1e-8* std::fabs(value + (p[0]+2)),
                   ExcInternalError());
         }
-      catch (typename Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>::ExcPointNotAvailableHere &)
+      catch (typename VectorTools::ExcPointNotAvailableHere &)
         {
           point_found = false;
         }

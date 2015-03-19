@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -114,8 +114,9 @@ namespace PETScWrappers
    * A class that implements the interface to use the PETSc Jacobi
    * preconditioner.
    *
-   * See the comment in the base class @ref PreconditionerBase for when this
-   * preconditioner may or may not work.
+   * See the comment in the base class
+   * @ref PreconditionerBase
+   * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -173,8 +174,9 @@ namespace PETScWrappers
    * the matrix for preconditioning. This can be changed, as is explained in
    * the relevant section of the PETSc manual, but is not implemented here.
    *
-   * See the comment in the base class @ref PreconditionerBase for when this
-   * preconditioner may or may not work.
+   * See the comment in the base class
+   * @ref PreconditionerBase
+   * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -224,8 +226,9 @@ namespace PETScWrappers
    * A class that implements the interface to use the PETSc SOR
    * preconditioner.
    *
-   * See the comment in the base class @ref PreconditionerBase for when this
-   * preconditioner may or may not work.
+   * See the comment in the base class
+   * @ref PreconditionerBase
+   * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -285,8 +288,9 @@ namespace PETScWrappers
    * A class that implements the interface to use the PETSc SSOR
    * preconditioner.
    *
-   * See the comment in the base class @ref PreconditionerBase for when this
-   * preconditioner may or may not work.
+   * See the comment in the base class
+   * @ref PreconditionerBase
+   * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -346,8 +350,9 @@ namespace PETScWrappers
    * A class that implements the interface to use the PETSc Eisenstat
    * preconditioner.
    *
-   * See the comment in the base class @ref PreconditionerBase for when this
-   * preconditioner may or may not work.
+   * See the comment in the base class
+   * @ref PreconditionerBase
+   * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -407,8 +412,9 @@ namespace PETScWrappers
    * A class that implements the interface to use the PETSc Incomplete
    * Cholesky preconditioner.
    *
-   * See the comment in the base class @ref PreconditionerBase for when this
-   * preconditioner may or may not work.
+   * See the comment in the base class
+   * @ref PreconditionerBase
+   * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -468,8 +474,9 @@ namespace PETScWrappers
    * A class that implements the interface to use the PETSc ILU
    * preconditioner.
    *
-   * See the comment in the base class @ref PreconditionerBase for when this
-   * preconditioner may or may not work.
+   * See the comment in the base class
+   * @ref PreconditionerBase
+   * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
@@ -530,8 +537,9 @@ namespace PETScWrappers
    * The LU decomposition is only implemented for single processor machines.
    * It should provide a convenient interface to another direct solver.
    *
-   * See the comment in the base class @ref PreconditionerBase for when this
-   * preconditioner may or may not work.
+   * See the comment in the base class
+   * @ref PreconditionerBase
+   * for when this preconditioner may or may not work.
    *
    * @ingroup PETScWrappers
    * @author Oliver Kayser-Herold, 2004

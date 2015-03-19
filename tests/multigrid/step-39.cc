@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,6 @@
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
@@ -360,7 +359,7 @@ namespace Step39
     Triangulation<dim>        triangulation;
     const MappingQ1<dim>      mapping;
     const FiniteElement<dim> &fe;
-    MGDoFHandler<dim>         mg_dof_handler;
+    DoFHandler<dim>         mg_dof_handler;
     DoFHandler<dim>          &dof_handler;
 
     SparsityPattern      sparsity;
@@ -396,6 +395,7 @@ namespace Step39
   InteriorPenaltyProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
+    dof_handler.distribute_mg_dofs(fe);
     unsigned int n_dofs = dof_handler.n_dofs();
     solution.reinit(n_dofs);
     right_hand_side.reinit(n_dofs);
@@ -475,7 +475,7 @@ namespace Step39
 
     MatrixIntegrator<dim> integrator;
     MeshWorker::integration_loop<dim, dim> (
-      mg_dof_handler.begin(), mg_dof_handler.end(),
+      mg_dof_handler.begin_mg(), mg_dof_handler.end_mg(),
       dof_info, info_box,
       integrator, assembler);
   }
@@ -534,9 +534,9 @@ namespace Step39
     mg_smoother.set_symmetric(true);
     mg_smoother.set_variable(false);
 
-    MGMatrix<SparseMatrix<double>, Vector<double> > mgmatrix(&mg_matrix);
-    MGMatrix<SparseMatrix<double>, Vector<double> > mgdown(&mg_matrix_dg_down);
-    MGMatrix<SparseMatrix<double>, Vector<double> > mgup(&mg_matrix_dg_up);
+    mg::Matrix<Vector<double> > mgmatrix(mg_matrix);
+    mg::Matrix<Vector<double> > mgdown(mg_matrix_dg_down);
+    mg::Matrix<Vector<double> > mgup(mg_matrix_dg_up);
 
     Multigrid<Vector<double> > mg(mg_dof_handler, mgmatrix,
                                   mg_coarse, mg_transfer,

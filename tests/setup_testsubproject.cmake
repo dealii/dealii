@@ -63,11 +63,10 @@ FOREACH(_var
   TEST_TIME_LIMIT
   TEST_PICKUP_REGEX
   )
-  # Environment wins:
   IF(DEFINED ENV{${_var}})
     SET(${_var} $ENV{${_var}})
   ENDIF()
-  IF(NOT "${_var}" STREQUAL "")
+  IF(NOT "${${_var}}" STREQUAL "")
     SET(${_var} "${${_var}}" CACHE STRING "" FORCE)
   ENDIF()
 ENDFOREACH()

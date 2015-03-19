@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,7 @@ void test (PETScWrappers::SparseMatrix &m)
       if ((i+2*j+1) % 3 == 0)
         m.set (i,j, i*j*.5+.5);
 
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
 
   // then divide everything by 4/3 and
   // make sure we retrieve the values we

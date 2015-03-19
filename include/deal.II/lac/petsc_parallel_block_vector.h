@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,8 @@ namespace PETScWrappers
      * specify the sizes of the individual blocks, but also the number of
      * elements of each of these blocks to be stored on the local process.
      *
-     * @ingroup Vectors @see @ref GlossBlockLA "Block (linear algebra)"
+     * @ingroup Vectors @see
+     * @ref GlossBlockLA "Block (linear algebra)"
      * @author Wolfgang Bangerth, 2004
      */
     class BlockVector : public BlockVectorBase<Vector>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,8 +56,10 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
                           const unsigned int                  n_intervals,
                           const IntervalSpacing               interval_spacing)
 {
-  Assert (values.size() > 0, ExcEmptyData());
-  Assert (n_intervals > 0, ExcInvalidIntervals());
+  Assert (values.size() > 0,
+          ExcMessage("Your input data needs to contain at least one input vector."));
+  Assert (n_intervals > 0,
+          ExcMessage("The number of intervals needs to be at least one."));
   for (unsigned int i=0; i<values.size(); ++i)
     Assert (values[i].size() > 0, ExcEmptyData());
   Assert (values.size() == y_values_.size(),
@@ -216,7 +218,9 @@ void Histogram::evaluate (const Vector<number>    &values,
 void Histogram::write_gnuplot (std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
-  Assert (!intervals.empty(), ExcEmptyData());
+  Assert (!intervals.empty(),
+          ExcMessage("There is nothing to write into the output file. "
+                     "Did you forget to call the evaluate() function?"));
 
   // do a simple 2d plot, if only
   // one data set is available

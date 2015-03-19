@@ -30,10 +30,10 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class represents a mask that can be used to select individual vector
  * blocks of a finite element (see also
- * @ref GlossBlockMask "this glossary entry"). It will typically have as
- * many elements as the finite element has blocks, and one can use
- * <code>operator[]</code> to query whether a particular block has been
- * selected.
+ * @ref GlossBlockMask "this glossary entry").
+ * It will typically have as many elements as the finite element has blocks,
+ * and one can use <code>operator[]</code> to query whether a particular block
+ * has been selected.
  *
  * The semantics of this class are the same as the related ComponentMask
  * class, i.e., a default constructed mask represents all possible blocks. See
@@ -44,7 +44,8 @@ DEAL_II_NAMESPACE_OPEN
  * These objects can either be created by hand, or, simpler, by asking the
  * finite element to generate a block mask from certain selected blocks using
  * code such as this where we create a mask that only denotes the velocity
- * block of a Stokes element (see @ref vector_valued):
+ * block of a Stokes element (see
+ * @ref vector_valued):
  * @code
  *   FESystem<dim> stokes_fe (FESystem<dim>(FE_Q<dim>(2), dim), 1,    // Q2 element for the velocities
  *                            FE_Q<dim>(1),                     1);     // Q1 element for the pressure

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2013 by the deal.II authors
+ * Copyright (C) 2010 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -65,6 +65,7 @@
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -287,7 +288,7 @@ namespace Step43
 
           double permeability = 0;
           for (unsigned int i=0; i<centers.size(); ++i)
-            permeability += std::exp(-(points[p]-centers[i]).square()
+            permeability += std::exp(-(points[p]-centers[i]).norm_square()
                                      / (0.05 * 0.05));
 
           const double normalized_permeability
@@ -1388,8 +1389,8 @@ namespace Step43
 
     saturation_fe_values.get_function_values (old_saturation_solution, old_saturation_solution_values);
     saturation_fe_values.get_function_values (old_old_saturation_solution, old_old_saturation_solution_values);
-    saturation_fe_values.get_function_grads (old_saturation_solution, old_grad_saturation_solution_values);
-    saturation_fe_values.get_function_grads (old_old_saturation_solution, old_old_grad_saturation_solution_values);
+    saturation_fe_values.get_function_gradients (old_saturation_solution, old_grad_saturation_solution_values);
+    saturation_fe_values.get_function_gradients (old_old_saturation_solution, old_old_grad_saturation_solution_values);
     darcy_fe_values.get_function_values (darcy_solution, present_darcy_solution_values);
 
     const double nu
@@ -1686,8 +1687,8 @@ namespace Step43
       for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
         {
           fe_values.reinit(cell);
-          fe_values.get_function_grads (extrapolated_saturation_solution,
-                                        grad_saturation);
+          fe_values.get_function_gradients (extrapolated_saturation_solution,
+                                            grad_saturation);
 
           refinement_indicators(cell_no) = grad_saturation[0].norm();
         }
@@ -2153,8 +2154,6 @@ namespace Step43
     const double global_scaling = c_R * porosity * (global_max_u_F_prime) * global_S_variation /
                                   std::pow(global_Omega_diameter, alpha - 2.);
 
-//    return (beta * (max_velocity_times_dF_dS) * cell_diameter);
-
     return (beta *
             (max_velocity_times_dF_dS) *
             std::min (cell_diameter,
@@ -2241,9 +2240,10 @@ start_time_iteration:
 
 // @sect3{The <code>main()</code> function}
 //
-// The main function looks almost the same as in all other programs. In
-// particular, it is essentially the same as in step-31 where we also explain
-// the need to initialize the MPI subsystem.
+// The main function looks almost the same as in all other programs. The need
+// to initialize the MPI subsystem for a program that uses Trilinos -- even
+// for programs that do not actually run in parallel -- is explained in
+// step-31.
 int main (int argc, char *argv[])
 {
   try
@@ -2253,7 +2253,8 @@ int main (int argc, char *argv[])
 
       deallog.depth_console (0);
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
+                                                           numbers::invalid_unsigned_int);
 
       TwoPhaseFlowProblem<2> two_phase_flow_problem(1);
       two_phase_flow_problem.run ();

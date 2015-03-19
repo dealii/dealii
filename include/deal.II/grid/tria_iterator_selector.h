@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,8 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 1D case only. See the @ref Iterators
+     * These are the declararions for the 1D case only. See the
+     * @ref Iterators
      * module for more information.
      *
      * A @p line_iterator is typdef'd to an iterator operating on the @p lines
@@ -88,7 +89,8 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 2D case only. See the @ref Iterators
+     * These are the declararions for the 2D case only. See the
+     * @ref Iterators
      * module for more information.
      *
      * A @p line_iterator is typdef'd to an iterator operating on the @p lines
@@ -142,7 +144,8 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 3D case only. See the @ref Iterators
+     * These are the declararions for the 3D case only. See the
+     * @ref Iterators
      * module for more information.
      *
      * For the declarations of the data types, more or less the same holds as

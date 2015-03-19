@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,9 +62,8 @@ namespace internal
  *
  * This class is an actual implementation of the functionality proposed by the
  * DataOut_DoFData class. It offers a function build_patches() that generates
- * the patches to be written in some graphics format from the data stored in
- * the base class. Most of the interface and an example of its use is
- * described in the documentation of the base class.
+ * the data to be written in some graphics format. Most of the interface and
+ * an example of its use is described in the documentation of this base class.
  *
  * The only thing this class offers is the function build_patches() which
  * loops over all cells of the triangulation stored by the
@@ -98,7 +97,7 @@ namespace internal
  * <h3>User interface information</h3>
  *
  * The base classes of this class, DataOutBase, DataOutInterface and
- * DataOut_DoFData() offer several interfaces of their own. Refer to the
+ * DataOut_DoFData offer several interfaces of their own. Refer to the
  * DataOutBase class's documentation for a discussion of the different output
  * formats presently supported, DataOutInterface for ways of selecting which
  * format to use upon output at run-time and without the need to adapt your
@@ -179,11 +178,43 @@ public:
 
   /**
    * This is the central function of this class since it builds the list of
-   * patches to be written by the low-level functions of the base class. See
-   * the general documentation of this class for further information.
+   * patches to be written by the low-level functions of the base class. A
+   * patch is, in essence, some intermediate representation of the data on
+   * each cell of a triangulation and DoFHandler object that can then be used
+   * to write files in some format that is readable by visualization programs.
    *
-   * The default value <tt>0</tt> of <tt>n_subdivisions</tt> indicates that
-   * the value stored in DataOutInterface::default_subdivisions is to be used.
+   * You can find an overview of the use of this function in the general
+   * documentation of this class. An example is also provided in the
+   * documentation of this class's base class DataOut_DoFData.
+   *
+   * @param n_subdivisions A parameter that determines how many "patches" this
+   * function will build out of every cell. If you do not specify this value
+   * in calling, or provide the default value zero, then this is interpreted
+   * as DataOutInterface::default_subdivisions which most of the time will be
+   * equal to one (unless you have set it to something else). The purpose of
+   * this parameter is to subdivide each cell of the mesh into $2\times 2,
+   * 3\times 3, \ldots$ "patches" in 2d, and $2\times 2\times 2, 3\times
+   * 3\times 3, \ldots$ (if passed the value 2, 3, etc) where each patch
+   * represents the data from a regular subdivision of the cell into equal
+   * parts. Most of the times, this is not necessary and outputting one patch
+   * per cell is exactly what you want to plot the solution. That said, the
+   * data we write into files for visualization can only represent (bi-,
+   * tri)linear data on each cell, and most visualization programs can in fact
+   * only visualize this kind of data. That's good enough if you work with
+   * (bi-, tri)linear finite elements, in which case what you get to see is
+   * exactly what has been computed. On the other hand, if you work with (bi-,
+   * tri)quadratic elements, then what is written into the output file is just
+   * a (bi-, tri)linear interpolation onto the current mesh, i.e., only the
+   * values at the vertices. If this is not good enough, you can, for example,
+   * specify @p n_subdivisions equal to 2 to plot the solution on a once-
+   * refined mesh, or if set to 3, on a mesh where each cell is represented by
+   * 3-by-3 patches. On each of these smaller patches, given the limitations
+   * of output formats, the data is still linearly interpolated, but a linear
+   * interpolation of quadratic data on a finer mesh is still a better
+   * representation of the actual quadratic surface than on the original mesh.
+   * In other words, using this parameter can not help you plot the solution
+   * exactly, but it can get you closer if you use finite elements of higher
+   * polynomial degree.
    */
   virtual void build_patches (const unsigned int n_subdivisions = 0);
 
@@ -235,14 +266,6 @@ public:
    * good idea.
    */
   virtual cell_iterator next_cell (const cell_iterator &cell);
-
-  /**
-   * Exception
-   */
-  DeclException1 (ExcInvalidNumberOfSubdivisions,
-                  int,
-                  << "The number of subdivisions per patch, " << arg1
-                  << ", is not valid.");
 
 private:
 

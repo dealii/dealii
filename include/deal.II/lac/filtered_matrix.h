@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -409,10 +409,16 @@ public:
    * Apply the constraints to a right hand side vector. This needs to be done
    * before starting to solve with the filtered matrix. If the matrix is
    * symmetric (i.e. the matrix itself, not only its sparsity pattern), set
-   * the second parameter to @p true to use a faster algorithm.
+   * the second parameter to @p true to use a faster algorithm. Note: This
+   * method is deprecated as matrix_is_symmetric parameter is no longer used.
    */
   void apply_constraints (VECTOR     &v,
-                          const bool  matrix_is_symmetric) const;
+                          const bool  matrix_is_symmetric) const DEAL_II_DEPRECATED;
+  /**
+   * Apply the constraints to a right hand side vector. This needs to be done
+   * before starting to solve with the filtered matrix.
+   */
+  void apply_constraints (VECTOR     &v) const;
 
   /**
    * Matrix-vector multiplication: this operation performs pre_filter(),
@@ -812,6 +818,16 @@ FilteredMatrix<VECTOR>::apply_constraints (
   VECTOR     &v,
   const bool  /* matrix_is_symmetric */) const
 {
+  apply_constraints(v);
+}
+
+
+template <class VECTOR>
+inline
+void
+FilteredMatrix<VECTOR>::apply_constraints (
+  VECTOR     &v) const
+{
   GrowingVectorMemory<VECTOR> mem;
   typename VectorMemory<VECTOR>::Pointer tmp_vector(mem);
   tmp_vector->reinit(v);
@@ -819,7 +835,7 @@ FilteredMatrix<VECTOR>::apply_constraints (
   const const_index_value_iterator e = constraints.end();
   for (; i!=e; ++i)
     {
-      Assert(numbers::is_finite(i->second), ExcNumberNotFinite());
+      AssertIsFinite(i->second);
       (*tmp_vector)(i->first) = -i->second;
     }
 
@@ -831,11 +847,10 @@ FilteredMatrix<VECTOR>::apply_constraints (
   // entries themselves
   for (i=constraints.begin(); i!=e; ++i)
     {
-      Assert(numbers::is_finite(i->second), ExcNumberNotFinite());
+      AssertIsFinite(i->second);
       v(i->first) = i->second;
     }
 }
-
 
 
 template <class VECTOR>
@@ -865,7 +880,7 @@ FilteredMatrix<VECTOR>::post_filter (const VECTOR &in,
   const const_index_value_iterator e = constraints.end();
   for (; i!=e; ++i)
     {
-      Assert(numbers::is_finite(in(i->first)), ExcNumberNotFinite());
+      AssertIsFinite(in(i->first));
       out(i->first) = in(i->first);
     }
 }

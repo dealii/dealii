@@ -2,7 +2,7 @@
 template<int dim, class MATRIX>
 void
 Helmholtz::build_mgmatrix(MGLevelObject<MATRIX>& A,
-			  const MGDoFHandler<dim>& dof,
+			  const DoFHandler<dim>& dof,
 			  const Quadrature<dim>& quadrature)
 {
   const unsigned int fe_dofs = dof.get_fe().n_dofs_per_cell();
@@ -19,7 +19,7 @@ Helmholtz::build_mgmatrix(MGLevelObject<MATRIX>& A,
 ////////////////////////////////////////////////////
     
     DoFHandler<dim>::cell_iterator dc = dof.DoFHandler<dim>::begin();
-    for (MGDoFHandler<dim>::cell_iterator c = dof.begin()
+    for (DoFHandler<dim>::cell_iterator c = dof.begin()
 				     ; c != dof.end() ; ++c, ++dc)
     {
       elmat.clear();

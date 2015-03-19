@@ -92,29 +92,29 @@ end
 @endverbatim
 
 When we run the program, we get the following kind of output:
-@code
+@verbatim
 ...
 T=0.14
-   Number of active cells:       1801
-   Number of degrees of freedom: 7676
+   Number of active cells:       1807
+   Number of degrees of freedom: 7696
 
    NonLin Res     Lin Iter       Lin Res
    _____________________________________
-   1.033e-02        0007        7.41e-13
-   4.079e-05        0007        3.24e-15
-   3.475e-09        0008        1.75e-20
-   5.441e-16        (converged)
+   7.015e-03        0008        3.39e-13
+   2.150e-05        0008        1.56e-15
+   2.628e-09        0008        5.09e-20
+   5.243e-16        (converged)
 
 T=0.16
-   Number of active cells:       1804
-   Number of degrees of freedom: 7684
+   Number of active cells:       1807
+   Number of degrees of freedom: 7696
 
    NonLin Res     Lin Iter       Lin Res
    _____________________________________
-   1.116e-02        0007        9.05e-13
-   5.045e-05        0007        4.37e-15
-   4.986e-09        0008        3.80e-20
-   5.720e-16        (converged)
+   7.145e-03        0008        3.80e-13
+   2.548e-05        0008        7.20e-16
+   4.063e-09        0008        2.49e-19
+   5.970e-16        (converged)
 
 T=0.18
    Number of active cells:       1807
@@ -122,90 +122,60 @@ T=0.18
 
    NonLin Res     Lin Iter       Lin Res
    _____________________________________
-   1.241e-02        0007        2.82e-13
-   7.053e-05        0007        3.71e-15
-   9.275e-09        0007        3.89e-19
-   6.131e-16        (converged)
+   7.395e-03        0008        6.69e-13
+   2.867e-05        0008        1.33e-15
+   4.091e-09        0008        3.35e-19
+   5.617e-16        (converged)
 ...
-@endcode
+@endverbatim
 
 This output reports the progress of the Newton iterations and the time
 stepping. Note that our implementation of the Newton iteration indeed shows
 the expected quadratic convergence order: the norm of the nonlinear residual
 in each step is roughly the norm of the previous step squared. This leads to
-the very rapid convergence we can see here. This holds at least for
-times up to $t=8.32$ at which time the nonlinear iteration reports a
-lack of convergence; the cause and possible remedies are discussed below.
-
-The result of running these computations is a bunch of output files that we
-can pass to our visualization program of choice. When we collate them into a
-movie, the results looks like this:
-
-<img src="http://www.dealii.org/images/steps/developer/step-33.slide.gif" alt="">
-
-As we see, the heavy mass of fluid is drawn down the slope by gravity, where
-it collides with the ski lodge and is flung into the air!  Hopefully everyone
-escapes!
-
-We can also visualize the evolution of the adaptively refined grid:
-
-<img src="http://www.dealii.org/images/steps/developer/step-33.slide_adapt.gif" alt="">
-
-The adaptivity follows and precedes the flow pattern, based on the heuristic
-refinement scheme discussed above.
-
-
-
-
-<a name="extensions"></a>
-<h3>Possibilities for extensions</h3>
-
-<h4>Adaptive time stepping</h4>
-
-In the computations shown above, we use a fixed time step. This would
-appear sub-optimal: we should take larger steps whenever the problem
-is still solvable with Newton's method in 3 or 4 iterations; certainly
-more importantly we should take smaller steps whenever we can't solve
-the problem at hand any more with Newton's method. The latter is what
-happens to the calculation the screen output of which was shown above:
-@code
+the very rapid convergence we can see here. This holds until
+times up to $t=1.9$ at which time the nonlinear iteration reports a
+lack of convergence:
+@verbatim
 ...
 
-T=8.3
-   Number of active cells:       2314
-   Number of degrees of freedom: 10264
+T=1.88
+   Number of active cells:       2119
+   Number of degrees of freedom: 9096
 
    NonLin Res     Lin Iter       Lin Res
    _____________________________________
-   4.069e-02        0018        3.74e-12
-   3.570e-04        0020        6.83e-15
-   8.349e-07        0020        2.51e-17
-   2.858e-11        (converged)
+   2.251e-01        0012        9.78e-12
+   5.698e-03        0012        2.04e-13
+   3.896e-05        0012        1.48e-15
+   3.915e-09        0012        1.94e-19
+   8.800e-16        (converged)
 
-T=8.32
-   Number of active cells:       2320
-   Number of degrees of freedom: 10292
+T=1.9
+   Number of active cells:       2140
+   Number of degrees of freedom: 9184
 
    NonLin Res     Lin Iter       Lin Res
    _____________________________________
-   5.607e-02        0240        4.36e-12
-   5.807e-04        0300        1.54e-05
-   1.538e-05        0300        1.22e-05
-   1.218e-05        0300        9.15e-06
-   9.146e-06        0300        4.27e-06
-   4.264e-06        0300        3.69e-06
-   3.693e-06        0300        3.31e-06
-   3.308e-06        0300        2.81e-06
-   2.809e-06        0300        2.77e-07
-   2.781e-07        0300        2.33e-07
-   2.328e-07        0300        1.89e-07
+   2.320e-01        0013        3.94e-12
+   1.235e-01        0016        6.62e-12
+   8.494e-02        0016        6.05e-12
+   1.199e+01        0026        5.72e-10
+   1.198e+03        0002        1.20e+03
+   7.030e+03        0001        nan
+   7.030e+03        0001        nan
+   7.030e+03        0001        nan
+   7.030e+03        0001        nan
+   7.030e+03        0001        nan
+   7.030e+03        0001        nan
 
 
 ----------------------------------------------------
 Exception on processing:
+
 --------------------------------------------------------
-An error occurred in line <3119> of file <\step-33.cc> in function
-    void ConservationLaw<dim>::run() [with int dim = 2]
+An error occurred in line <2476> of file <\step-33.cc> in function
+    void Step33::ConservationLaw<dim>::run() [with int dim = 2]
 The violated condition was:
     nonlin_iter <= 10
 The name and call sequence of the exception was:
@@ -216,25 +186,50 @@ No convergence in nonlinear solver
 
 Aborting!
 ----------------------------------------------------
-@endcode
+@endverbatim
 
-From looking at the graphical output, it isn't immediately clear if
-there is a physical event that triggers this breakdown. However,
-whatever the matter, the solver should certainly not just break down.
+We may find out the cause and possible remedies by looking at the animation of the solution.
 
-If this happens nevertheless, it would be nice if we could either (i)
-detect the problem up front and reduce the time step before we even
-start the time step, or (ii) accept the failure at this time step and
-then simply start over from the previous time step trying with a
-reduced step size.
+The result of running these computations is a bunch of output files that we
+can pass to our visualization program of choice. When we collate them into a
+movie, the results of last several time steps looks like this:
 
+<img src="https://www.dealii.org/images/steps/developer/step-33.oscillation.gif " alt="" height="300">
+
+As we see, when the heavy mass of fluid hits the left bottom corner,
+some oscillation occurs and lead to the divergence of the iteration. A lazy solution to
+this issue is add more viscosity. If we set the diffusion power $\eta = 1.5$ instead of $2.0$,
+the simulation would be able to survive this crisis. Then, the result looks like this:
+
+
+<img src="https://www.dealii.org/images/steps/developer/step-33.slide.ed2.gif " alt="" height="300">
+
+The heavy mass of fluid is drawn down the slope by gravity, where
+it collides with the ski lodge and is flung into the air!  Hopefully everyone
+escapes! And also, we can see the boundary between heavy mass and light mass blur quickly
+due to the artificial viscosity.
+
+We can also visualize the evolution of the adaptively refined grid:
+
+<img src="https://www.dealii.org/images/steps/developer/step-33.slide.adapt.ed2.gif " alt="" height="300">
+
+The adaptivity follows and precedes the flow pattern, based on the heuristic
+refinement scheme discussed above.
+
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
 
 <h4>Stabilization</h4>
 
 The numerical scheme we have chosen is not particularly
-stable. Furthermore, it is known how to make it more stable, for
-example by using streamline diffusion or least-squares stabilization
-terms.
+stable when the artificial viscosity is samll while is too diffusive when
+the artificial viscosity is large. Furthermore, it is known there are more
+advanced techniques to stabilize the solution, for example streamline
+diffusion, least-squares stabilization terms, entropy viscosity.
+
 
 
 <h4>Better linear solvers</h4>
@@ -261,6 +256,23 @@ convergence order, and we have to expect to do a few more nonlinear
 iterations; however, given that we don't have to spend the time to
 build the Newton matrix each time, the resulting scheme may well be
 faster.
+
+
+<h4>Cache the explicit part of residual</h4>
+
+The residual calulated in ConservationLaw::assemble_cell_term function
+reads 
+   $R_i = \left(\frac{\mathbf{w}^{k}_{n+1} - \mathbf{w}_n}{\delta t}
+    , \mathbf{z}_i \right)_K  +
+      \theta \mathbf{B}({\mathbf{w}^{k}_{n+1}})(\mathbf{z}_i)_K +
+      (1-\theta) \mathbf{B}({\mathbf{w}_{n}}) (\mathbf{z}_i)_K $
+This means that we calculate the spatial residual twice at one Newton
+iteration step: once respect to the current solution $\mathbf{w}^{k}_{n+1}$
+and once more respect to the last time step solution $\mathbf{w}_{n}$ which
+remains the same during all Newton iterations through one timestep.
+Cache up the explicit part of residual
+ $ \mathbf{B}({\mathbf{w}_{n}}) (\mathbf{z}_i)_K$
+during Newton iteration will save lots of labor.
 
 
 <h4>Other conservation laws</h4>

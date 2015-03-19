@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -142,8 +142,8 @@ namespace internal
                      const unsigned int version);
 
       /**
-       * Make the DoFHandler and MGDoFHandler classes a friend, so that they
-       * can resize arrays as necessary.
+       * Declare the classes that store levels and faces of DoFs friends so
+       * that they can resize arrays.
        */
       template <int> friend class DoFLevel;
       template <int> friend class DoFFaces;

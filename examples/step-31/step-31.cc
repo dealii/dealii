@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2013 by the deal.II authors
+ * Copyright (C) 2007 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -64,8 +64,9 @@
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 
-// Finally, here are two C++ headers that haven't been included yet by one of
+// Finally, here are a few C++ headers that haven't been included yet by one of
 // the aforelisted header files:
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <limits>
@@ -2093,7 +2094,8 @@ namespace Step31
   // solution and refinement, but without actually advancing in time. Rather,
   // we use the vilified <code>goto</code> statement to jump out of the time
   // loop right after mesh refinement to start all over again on the new mesh
-  // beginning at the <code>start_time_iteration</code> label.
+  // beginning at the <code>start_time_iteration</code> label. (The use of the
+  // <code>goto</code> is discussed in step-26.)
   //
   // Before we start, we project the initial values to the grid and obtain the
   // first data for the <code>old_temperature_solution</code> vector. Then, we
@@ -2200,7 +2202,8 @@ int main (int argc, char *argv[])
 
       deallog.depth_console (0);
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
+                                                           numbers::invalid_unsigned_int);
 
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();

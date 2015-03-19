@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2011 - 2013 by the deal.II authors
+ * Copyright (C) 2011 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -58,6 +58,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 

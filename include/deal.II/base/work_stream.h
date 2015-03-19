@@ -47,9 +47,9 @@ DEAL_II_NAMESPACE_OPEN
  * uses the Intel Threading Building Blocks (TBB) to load balance the
  * individual subranges onto the available threads. For a lengthy discussion
  * of the rationale of this class, see the
- * @ref threads "Parallel computing with multiple processors" module. It is
- * used in the tutorial first in step-9, and again in step-13, step-14,
- * step-32 and others.
+ * @ref threads "Parallel computing with multiple processors"
+ * module. It is used in the tutorial first in step-9, and again in step-13,
+ * step-14, step-32 and others.
  *
  * The class is built on the following premise: One frequently has some work
  * that needs to be done on a sequence of objects; a prototypical example is
@@ -150,7 +150,8 @@ namespace WorkStream
      * A namespace for the implementation of details of the WorkStream pattern
      * and function. This namespace holds classes that deal with the second
      * implementation described in the paper by Turcksin, Kronbichler and
-     * Bangerth (see @ref workstream_paper).
+     * Bangerth (see
+     * @ref workstream_paper).
      *
      * Even though this implementation is slower than the third implementation
      * discussed in that paper, we need to keep it around for two reasons: (i)
@@ -700,7 +701,8 @@ namespace WorkStream
      * A namespace for the implementation of details of the WorkStream pattern
      * and function. This namespace holds classes that deal with the third
      * implementation described in the paper by Turcksin, Kronbichler and
-     * Bangerth (see @ref workstream_paper).
+     * Bangerth (see
+     * @ref workstream_paper).
      */
     namespace Implementation3
     {
@@ -917,15 +919,15 @@ namespace WorkStream
    * This is one of two main functions of the WorkStream concept, doing work
    * as described in the introduction to this namespace. It corresponds to
    * implementation 3 of the paper by Turcksin, Kronbichler and Bangerth, see
-   * @ref workstream_paper . As such, it takes not a range of iterators
-   * described by a begin and end iterator, but a "colored" graph of iterators
-   * where each color represents cells for which writing the cell
-   * contributions into the global object does not conflict (in other words,
-   * these cells are not neighbors). Each "color" is represented by
-   * std::vectors of cells. The first argument to this function, a set of sets
-   * of cells (which are represent as a vector of vectors, for efficiency), is
-   * typically constructed by calling GraphColoring::make_graph_coloring().
-   * See there for more information.
+   * @ref workstream_paper.
+   * As such, it takes not a range of iterators described by a begin and end
+   * iterator, but a "colored" graph of iterators where each color represents
+   * cells for which writing the cell contributions into the global object
+   * does not conflict (in other words, these cells are not neighbors). Each
+   * "color" is represented by std::vectors of cells. The first argument to
+   * this function, a set of sets of cells (which are represent as a vector of
+   * vectors, for efficiency), is typically constructed by calling
+   * GraphColoring::make_graph_coloring(). See there for more information.
    *
    * This function that can be used for worker and copier objects that are
    * either pointers to non-member functions or objects that allow to be
@@ -958,7 +960,7 @@ namespace WorkStream
        Copier                                     copier,
        const ScratchData                         &sample_scratch_data,
        const CopyData                            &sample_copy_data,
-       const unsigned int queue_length = 2*multithread_info.n_threads(),
+       const unsigned int queue_length = 2*MultithreadInfo::n_threads(),
        const unsigned int                         chunk_size = 8);
 
 
@@ -1008,7 +1010,7 @@ namespace WorkStream
        Copier                                   copier,
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
-       const unsigned int queue_length = 2*multithread_info.n_threads(),
+       const unsigned int queue_length = 2*MultithreadInfo::n_threads(),
        const unsigned int                       chunk_size = 8)
   {
     Assert (queue_length > 0,
@@ -1027,7 +1029,7 @@ namespace WorkStream
     // we want to use TBB if we have support and if it is not disabled at
     // runtime:
 #ifdef DEAL_II_WITH_THREADS
-    if (multithread_info.n_threads()==1)
+    if (MultithreadInfo::n_threads()==1)
 #endif
       {
         // need to copy the sample since it is marked const
@@ -1133,7 +1135,7 @@ namespace WorkStream
     // we want to use TBB if we have support and if it is not disabled at
     // runtime:
 #ifdef DEAL_II_WITH_THREADS
-    if (multithread_info.n_threads()==1)
+    if (MultithreadInfo::n_threads()==1)
 #endif
       {
         // need to copy the sample since it is marked const
@@ -1195,7 +1197,8 @@ namespace WorkStream
    * This is a variant of one of the two main functions of the WorkStream
    * concept, doing work as described in the introduction to this namespace.
    * It corresponds to implementation 2 of the paper by Turcksin, Kronbichler
-   * and Bangerth (see @ref workstream_paper).
+   * and Bangerth (see
+   * @ref workstream_paper).
    *
    * This is the function that can be used for worker and copier functions
    * that are member functions of a class. If the copier is an empty function,
@@ -1233,7 +1236,7 @@ namespace WorkStream
        void (MainClass::*copier) (const CopyData &),
        const ScratchData                       &sample_scratch_data,
        const CopyData                          &sample_copy_data,
-       const unsigned int queue_length =        2*multithread_info.n_threads(),
+       const unsigned int queue_length =        2*MultithreadInfo::n_threads(),
        const unsigned int chunk_size =          8)
   {
     // forward to the other function

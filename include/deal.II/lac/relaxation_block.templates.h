@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -204,7 +204,7 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
 #ifdef DEBUG
           for (unsigned int i=0; i<x_cell.size(); ++i)
             {
-              Assert(numbers::is_finite(x_cell(i)), ExcNumberNotFinite());
+              AssertIsFinite(x_cell(i));
             }
 #endif
           // Store in result vector

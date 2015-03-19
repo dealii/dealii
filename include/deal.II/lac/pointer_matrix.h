@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -159,7 +159,8 @@ public:
 
   /**
    * Assign a new matrix pointer. Deletes the old pointer and releases its
-   * matrix. @see SmartPointer
+   * matrix.
+   * @see SmartPointer
    */
   const PointerMatrix &operator= (const MATRIX *M);
 
@@ -268,7 +269,8 @@ public:
 
   /**
    * Assign a new matrix pointer. Deletes the old pointer and releases its
-   * matrix. @see SmartPointer
+   * matrix.
+   * @see SmartPointer
    */
   const PointerMatrixAux &operator= (const MATRIX *M);
 
@@ -374,7 +376,8 @@ public:
 
   /**
    * Assign a new matrix pointer. Deletes the old pointer and releases its
-   * matrix. @see SmartPointer
+   * matrix.
+   * @see SmartPointer
    */
   const PointerMatrixVector &operator= (const Vector<number> *M);
 

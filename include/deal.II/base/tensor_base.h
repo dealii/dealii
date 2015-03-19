@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table_indices.h>
+#include <deal.II/base/template_constraints.h>
 #include <vector>
 
 #include <cmath>
@@ -40,7 +41,7 @@ template <typename number> class Vector;
 // this file must be included when using something like Tensor<1,dim>, and
 // Point and Tensor must not be forward declared without the number type
 // specified)
-template <int dim, typename Number=double> class Point;
+template <int dim, typename Number> class Point;
 
 // general template; specialized for rank==1; the general template is in
 // tensor.h
@@ -61,6 +62,20 @@ template <int dim, typename Number> class Tensor<1,dim,Number>;
  * @p dim and @p spacedim. We therefore need a class that acts as a scalar
  * (i.e. @p Number) for all purposes but is part of the Tensor template
  * family.
+ *
+ * @tparam dim An integer that denotes the dimension of the space in which
+ * this tensor operates. This of course equals the number of coordinates that
+ * identify a point and rank-1 tensor. Since the current object is a rank-0
+ * tensor (a scalar), this template argument has no meaning for this class.
+ * @tparam Number The data type in which the tensor elements are to be stored.
+ * This will, in almost all cases, simply be the default @p double, but there
+ * are cases where one may want to store elements in a different (and always
+ * scalar) type. It can be used to base tensors on @p float or @p complex
+ * numbers or any other data type that implements basic arithmetic operations.
+ * Another example would be a type that allows for Automatic Differentiation
+ * (see, for example, the Sacado type used in step-33) and thereby can
+ * generate analytic (spatial) derivatives of a function that takes a tensor
+ * as argument.
  *
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 2009
@@ -113,7 +128,16 @@ public:
   /**
    * Copy constructor.
    */
-  Tensor (const Tensor<0,dim,Number> &);
+  Tensor (const Tensor<0,dim,Number> &initializer);
+
+  /**
+   * Copy constructor from tensors with different underlying scalar type. This
+   * obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
+   */
+  template <typename OtherNumber>
+  explicit
+  Tensor (const Tensor<0,dim,OtherNumber> &initializer);
 
   /**
    * Conversion to Number. Since rank-0 tensors are scalars, this is a natural
@@ -133,7 +157,15 @@ public:
   /**
    * Assignment operator.
    */
-  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &);
+  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &rhs);
+
+  /**
+   * Assignment operator from tensors with different underlying scalar type.
+   * This obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
+   */
+  template <typename OtherNumber>
+  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
    * Assignment operator.
@@ -143,25 +175,25 @@ public:
   /**
    * Test for equality of two tensors.
    */
-  bool operator == (const Tensor<0,dim,Number> &) const;
+  bool operator == (const Tensor<0,dim,Number> &rhs) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  bool operator != (const Tensor<0,dim,Number> &) const;
+  bool operator != (const Tensor<0,dim,Number> &rhs) const;
 
   /**
    * Add another vector, i.e. move this point by the given offset.
    */
-  Tensor<0,dim,Number> &operator += (const Tensor<0,dim,Number> &);
+  Tensor<0,dim,Number> &operator += (const Tensor<0,dim,Number> &rhs);
 
   /**
    * Subtract another vector.
    */
-  Tensor<0,dim,Number> &operator -= (const Tensor<0,dim,Number> &);
+  Tensor<0,dim,Number> &operator -= (const Tensor<0,dim,Number> &rhs);
 
   /**
-   * Scale the vector by <tt>factor</tt>, i.e. multiply all coordinates by
+   * Scale the vector by <tt>factor</tt>, i.e. multiply all elements by
    * <tt>factor</tt>.
    */
   Tensor<0,dim,Number> &operator *= (const Number factor);
@@ -261,13 +293,26 @@ private:
  * points that make up geometric objects. As such, they have a small number of
  * additional operations over general tensors of rank 1 for which we use the
  * <tt>Tensor<1,dim,Number></tt> class. In particular, there is a distance()
- * function to compute the Euclidian distance between two points in space.
+ * function to compute the Euclidean distance between two points in space.
  *
  * However, the <tt>Point</tt> class is really only used where the coordinates
  * of an object can be thought to possess the dimension of a length. For all
  * other uses, such as the gradient of a scalar function (which is a tensor of
  * rank 1, or vector, with as many elements as a point object, but with
  * different physical units), we use the <tt>Tensor<1,dim,Number></tt> class.
+ *
+ * @tparam dim An integer that denotes the dimension of the space in which
+ * this tensor operates. This of course equals the number of coordinates that
+ * identify a point and rank-1 tensor.
+ * @tparam Number The data type in which the tensor elements are to be stored.
+ * This will, in almost all cases, simply be the default @p double, but there
+ * are cases where one may want to store elements in a different (and always
+ * scalar) type. It can be used to base tensors on @p float or @p complex
+ * numbers or any other data type that implements basic arithmetic operations.
+ * Another example would be a type that allows for Automatic Differentiation
+ * (see, for example, the Sacado type used in step-33) and thereby can
+ * generate analytic (spatial) derivatives of a function that takes a tensor
+ * as argument.
  *
  * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 1998-2005
@@ -326,7 +371,8 @@ public:
    * Constructor. Initialize all entries to zero if <tt>initialize==true</tt>;
    * this is the default behaviour.
    */
-  explicit Tensor (const bool initialize = true);
+  explicit
+  Tensor (const bool initialize = true);
 
   /**
    * Copy constructor, where the data is copied from a C-style array.
@@ -336,7 +382,16 @@ public:
   /**
    * Copy constructor.
    */
-  Tensor (const Tensor<1,dim,Number> &);
+  Tensor (const Tensor<1,dim,Number> &initializer);
+
+  /**
+   * Copy constructor from tensors with different underlying scalar type. This
+   * obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
+   */
+  template <typename OtherNumber>
+  explicit
+  Tensor (const Tensor<1,dim,OtherNumber> &initializer);
 
   /**
    * Read access to the <tt>index</tt>th coordinate.
@@ -367,7 +422,15 @@ public:
   /**
    * Assignment operator.
    */
-  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,Number> &);
+  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,Number> &rhs);
+
+  /**
+   * Assignment operator from tensors with different underlying scalar type.
+   * This obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
+   */
+  template <typename OtherNumber>
+  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,OtherNumber> &rhs);
 
   /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
@@ -380,22 +443,22 @@ public:
   /**
    * Test for equality of two tensors.
    */
-  bool operator == (const Tensor<1,dim,Number> &) const;
+  bool operator == (const Tensor<1,dim,Number> &rhs) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  bool operator != (const Tensor<1,dim,Number> &) const;
+  bool operator != (const Tensor<1,dim,Number> &rhs) const;
 
   /**
    * Add another vector, i.e. move this point by the given offset.
    */
-  Tensor<1,dim,Number> &operator += (const Tensor<1,dim,Number> &);
+  Tensor<1,dim,Number> &operator += (const Tensor<1,dim,Number> &rhs);
 
   /**
    * Subtract another vector.
    */
-  Tensor<1,dim,Number> &operator -= (const Tensor<1,dim,Number> &);
+  Tensor<1,dim,Number> &operator -= (const Tensor<1,dim,Number> &rhs);
 
   /**
    * Scale the vector by <tt>factor</tt>, i.e. multiply all coordinates by
@@ -602,6 +665,17 @@ Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,Number> &p)
 
 
 
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,OtherNumber> &p)
+{
+  Assert (dim>0, ExcDimTooSmall(dim));
+
+  value = Number(p.value);
+}
+
+
 
 template <int dim, typename Number>
 inline
@@ -629,6 +703,14 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Numbe
   return *this;
 }
 
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,OtherNumber> &p)
+{
+  value = Number(p.value);
+  return *this;
+}
 
 
 template <int dim, typename Number>
@@ -815,6 +897,19 @@ Tensor<1,dim,Number>::Tensor (const Tensor<1,dim,Number> &p)
 
 
 
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<1,dim,Number>::Tensor (const Tensor<1,dim,OtherNumber> &p)
+{
+  Assert (dim>0, ExcDimTooSmall(dim));
+
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] = Number(p.values[i]);
+}
+
+
+
 template <>
 inline
 Tensor<1,0,double>::Tensor (const Tensor<1,0,double> &)
@@ -895,6 +990,20 @@ Tensor<1,dim,Number>::operator = (const Tensor<1,dim,Number> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
+
+  return *this;
+}
+
+
+
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<1,dim,Number> &
+Tensor<1,dim,Number>::operator = (const Tensor<1,dim,OtherNumber> &p)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] = Number(p.values[i]);
 
   return *this;
 }
@@ -1238,6 +1347,86 @@ operator * (const Number                factor,
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] * factor;
   return tt;
+}
+
+
+#ifndef DEAL_II_WITH_CXX11
+
+template <typename T, typename U, int dim>
+struct ProductType<T,Tensor<1,dim,U> >
+{
+  typedef Tensor<1,dim,typename ProductType<T,U>::type> type;
+};
+
+template <typename T, typename U, int dim>
+struct ProductType<Tensor<1,dim,T>,U>
+{
+  typedef Tensor<1,dim,typename ProductType<T,U>::type> type;
+};
+
+#endif
+
+/**
+ * Multiplication of a tensor of rank 1 with a scalar number from the right.
+ *
+ * The purpose of this operator is to enable only multiplication of a tensor
+ * by a scalar number (i.e., a floating point number, a complex floating point
+ * number, etc.). The function is written in a way that only allows the
+ * compiler to consider the function if the second argument is indeed a scalar
+ * number -- in other words, @p OtherNumber will not match, for example
+ * <code>std::vector@<double@></code> as the product of a tensor and a vector
+ * clearly would make no sense. The mechanism by which the compiler is
+ * prohibited of considering this operator for multiplication with non-scalar
+ * types are explained in the documentation of the EnableIfScalar class.
+ *
+ * The return type of the function is chosen so that it matches the types of
+ * both the tensor and the scalar argument. For example, if you multiply a
+ * <code>Tensor@<1,dim,double@></code> by <code>std::complex@<double@></code>,
+ * then the result will be a
+ * <code>Tensor@<1,dim,std::complex@<double@>@></code>. In other words, the
+ * type with which the returned tensor stores its components equals the type
+ * you would get if you multiplied an individual component of the input tensor
+ * by the scalar factor.
+ *
+ * @relates Tensor<1,dim,Number>
+ * @relates EnableIfScalar
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+Tensor<1,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const Tensor<1,dim,Number> &t,
+            const OtherNumber           factor)
+{
+  // form the product. we have to convert the two factors into the final
+  // type via explicit casts because, for awkward reasons, the C++
+  // standard committee saw it fit to not define an
+  //   operator*(float,std::complex<double>)
+  // (as well as with switched arguments and double<->float).
+  typedef typename ProductType<Number,OtherNumber>::type product_type;
+  Tensor<1,dim,product_type> tt (false);
+  for (unsigned int d=0; d<dim; ++d)
+    tt[d] = product_type(t[d]) * product_type(factor);
+  return tt;
+}
+
+
+
+/**
+ * Multiplication of a tensor of rank 1 with a scalar number from the left.
+ * See the discussion with the operator with switched arguments for more
+ * information about template arguments and the return type.
+ *
+ * @relates Tensor<1,dim,Number>
+ * @relates EnableIfScalar
+ */
+template <int dim, typename Number, typename OtherNumber>
+inline
+Tensor<1,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const Number                     factor,
+            const Tensor<1,dim,OtherNumber> &t)
+{
+  // simply forward to the other operator with switched arguments
+  return (t*factor);
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,11 +82,6 @@ namespace Algorithms
      * Read the parameters in the ParameterHandler.
      */
     void parse_parameters (ParameterHandler &param);
-
-    /**
-     * @deprecated Use parse_parameters().
-     */
-    void initialize (ParameterHandler &param) DEAL_II_DEPRECATED;
 
     /**
      * Initialize the pointer data_out for debugging.

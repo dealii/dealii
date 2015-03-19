@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -315,21 +315,20 @@ void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions)
 
 template <int dim, class DH>
 void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimension> &mapping,
-                                     const unsigned int nnnn_subdivisions,
+                                     const unsigned int n_subdivisions_,
                                      const CurvedCellRegion curved_region)
 {
   // Check consistency of redundant template parameter
   Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
 
-  typedef DataOut_DoFData<DH, DH::dimension, DH::space_dimension> BaseClass;
   Assert (this->triangulation != 0,
-          typename BaseClass::ExcNoTriangulationSelected());
+          Exceptions::DataOut::ExcNoTriangulationSelected());
 
-  const unsigned int n_subdivisions = (nnnn_subdivisions != 0)
-                                      ? nnnn_subdivisions
+  const unsigned int n_subdivisions = (n_subdivisions_ != 0)
+                                      ? n_subdivisions_
                                       : this->default_subdivisions;
   Assert (n_subdivisions >= 1,
-          ExcInvalidNumberOfSubdivisions(n_subdivisions));
+          Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   // First count the cells we want to create patches of. Also fill the object
   // that maps the cell indices to the patch numbers, as this will be needed
@@ -460,7 +459,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
                      // about 10% improvement) and the items in flight at any
                      // given time (another 5% on the testcase discussed in
                      // @ref workstream_paper, on 32 cores) and if
-                     8*multithread_info.n_threads(),
+                     8*MultithreadInfo::n_threads(),
                      64);
 }
 

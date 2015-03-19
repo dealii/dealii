@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2013 by the deal.II authors
+ * Copyright (C) 1999 - 2014 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -24,7 +24,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 // However, the next file is new. We need this include file for the
 // association of degrees of freedom ("DoF"s) to vertices, lines, and cells:
@@ -71,8 +71,8 @@ using namespace dealii;
 // thing we would like to comment on is this:
 //
 // Since we want to export the triangulation through this function's
-// parameter, we need to make sure that the boundary object lives at least as
-// long as the triangulation does. However, in step-1, the boundary object is
+// parameter, we need to make sure that the manifold object lives at least as
+// long as the triangulation does. However, in step-1, the manifold object is
 // a local variable, and it would be deleted at the end of the function, which
 // is too early. We avoid the problem by declaring it 'static' which makes
 // sure that the object is initialized the first time control the program
@@ -87,8 +87,9 @@ void make_grid (Triangulation<2> &triangulation)
                               center, inner_radius, outer_radius,
                               10);
 
-  static const HyperShellBoundary<2> boundary_description(center);
-  triangulation.set_boundary (0, boundary_description);
+  static const SphericalManifold<2> manifold_description(center);
+  triangulation.set_all_manifold_ids(0);
+  triangulation.set_manifold (0, manifold_description);
 
   for (unsigned int step=0; step<5; ++step)
     {

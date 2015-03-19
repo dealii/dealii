@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -139,23 +139,29 @@ public:
 
   /**
    * This is the central function of this class since it builds the list of
-   * patches to be written by the low-level functions of the base class. See
-   * the general documentation of this class for further information.
+   * patches to be written by the low-level functions of the base class. A
+   * patch is, in essence, some intermediate representation of the data on
+   * each cell of a triangulation and DoFHandler object that can then be used
+   * to write files in some format that is readable by visualization programs.
    *
-   * In addition to the same parameters as found in the respective function of
-   * the DataOut class, the first parameter denotes into how many intervals
-   * the angular (rotation) variable is to be subdivided.
+   * You can find an overview of the use of this function in the general
+   * documentation of this class. An example is also provided in the
+   * documentation of this class's base class DataOut_DoFData.
    *
-   * The function supports multithreading, if deal.II is compiled in
-   * multithreading mode.
+   * @param n_patches_per_circle Denotes into how many intervals the angular
+   * (rotation) variable is to be subdivided.
+   *
+   * @param n_subdivisions See DataOut::build_patches() for an extensive
+   * description of this parameter.
    */
   virtual void build_patches (const unsigned int n_patches_per_circle,
                               const unsigned int n_subdivisions = 0);
 
   /**
    * Return the first cell which we want output for. The default
-   * implementation returns the first @ref GlossActive "active cell", but you
-   * might want to return other cells in a derived class.
+   * implementation returns the first
+   * @ref GlossActive "active cell",
+   * but you might want to return other cells in a derived class.
    */
   virtual cell_iterator first_cell ();
 
@@ -175,16 +181,15 @@ public:
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidNumberOfSubdivisions,
-                  int,
-                  << "The number of subdivisions per patch, " << arg1
-                  << ", is not valid.");
-  /**
-   * Exception
-   */
   DeclException1 (ExcRadialVariableHasNegativeValues,
                   double,
-                  << "The radial variable attains a negative value of " << arg1);
+                  << "You are attempting to use this class on a triangulation "
+                  "in which some vertices have a negative radial coordinate "
+                  "value of "
+                  << arg1
+                  << ". If you rotate such a triangulation around an "
+                  "axis, you will get (dim+1)-dimensional meshes "
+                  "that are not likely what you hoped to see.");
 
 private:
   /**

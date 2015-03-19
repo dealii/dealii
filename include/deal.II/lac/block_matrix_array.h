@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,9 +77,11 @@ template <typename> class Vector;
  * @dontinclude block_matrix_array.cc
  *
  * Obviously, we have to include the header file containing the definition of
- * BlockMatrixArray: @skipline block_matrix_array.h
+ * BlockMatrixArray:
+ * @skipline block_matrix_array.h
  *
- * First, we set up some matrices to be entered into the blocks. @skip main
+ * First, we set up some matrices to be entered into the blocks.
+ * @skip main
  * @until C.fill
  *
  * The BlockMatrixArray needs a VectorMemory&lt;Vector&lt;number&gt; &gt;
@@ -90,23 +92,28 @@ template <typename> class Vector;
  *
  * @line Growing
  *
- * Now, we are ready to build a <i>2x2</i> BlockMatrixArray. @line Block
- * First, we enter the matrix <tt>A</tt> multiplied by 2 in the upper left
- * block @line enter Now -1 times <tt>B1</tt> in the upper right block. @line
- * enter We add the transpose of <tt>B2</tt> to the upper right block and
- * continue in a similar fashion. In the end, the block matrix structure is
- * printed into an LaTeX table. @until latex
+ * Now, we are ready to build a <i>2x2</i> BlockMatrixArray.
+ * @line Block First, we enter the matrix <tt>A</tt> multiplied by 2 in the
+ * upper left block
+ * @line enter Now -1 times <tt>B1</tt> in the upper right block.
+ * @line enter We add the transpose of <tt>B2</tt> to the upper right block
+ * and continue in a similar fashion. In the end, the block matrix structure
+ * is printed into an LaTeX table.
+ * @until latex
  *
  * Now, we set up vectors to be multiplied with this matrix and do a
- * multiplication. @until vmult
+ * multiplication.
+ * @until vmult
  *
  * Finally, we solve a linear system with BlockMatrixArray, using no
- * preconditioning and the conjugate gradient method. @until Error
+ * preconditioning and the conjugate gradient method.
+ * @until Error
  *
  * The remaining code of this sample program concerns preconditioning and is
  * described in the documentation of BlockTrianglePrecondition.
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat
  * @date 2000-2005, 2010
  */
@@ -139,27 +146,6 @@ public:
                    const unsigned int n_block_cols);
 
   /**
-   * Constructor fixing the dimensions.
-   *
-   * @deprecated The last argument is ignored. Use the constructor with only
-   * the first two arguments.
-   */
-  BlockMatrixArray (const unsigned int n_block_rows,
-                    const unsigned int n_block_cols,
-                    VectorMemory<Vector<number> > &mem) DEAL_II_DEPRECATED;
-
-  /**
-   * Initialize object completely. This is the function to call for an object
-   * created by the default constructor.
-   *
-   * @deprecated The last argument is ignored. Use the function with same name
-   * but only the first two arguments.
-   */
-  void initialize (const unsigned int n_block_rows,
-                   const unsigned int n_block_cols,
-                   VectorMemory<Vector<number> > &mem) DEAL_II_DEPRECATED;
-
-  /**
    * Adjust the matrix to a new size and delete all blocks.
    */
   void reinit (const unsigned int n_block_rows,
@@ -181,22 +167,6 @@ public:
               const unsigned int  col,
               const double        prefix = 1.,
               const bool          transpose = false);
-
-  /**
-   * Add an entry like with enter, but use PointerMatrixAux for matrices not
-   * having functions vmult_add() and TVmult_add().
-   *
-   * @deprecated The first argument is ignored. Use the function with same
-   * name but without the first argument.
-   */
-  template <class MATRIX>
-  void enter_aux (VectorMemory<Vector<number> > &mem,
-                  const MATRIX       &matrix,
-                  const unsigned int  row,
-                  const unsigned int  col,
-                  const double        prefix = 1.,
-                  const bool          transpose = false) DEAL_II_DEPRECATED;
-
 
   /**
    * Delete all entries, i.e. reset the matrix to an empty state.
@@ -399,24 +369,30 @@ private:
  *
  * In order to set up the preconditioner, we have to compute the inverses of
  * the diagonal blocks ourselves. Since we used FullMatrix objects, this is
- * fairly easy. @dontinclude block_matrix_array.cc @skip Error @until
- * Cinv.invert
+ * fairly easy.
+ * @dontinclude block_matrix_array.cc
+ * @skip Error
+ * @until Cinv.invert
  *
  * After creating a <i>2x2</i> BlockTrianglePrecondition object, we only fill
  * its diagonals. The scaling factor <i>1/2</i> used for <tt>A</tt> is the
  * reciprocal of the scaling factor used for the <tt>matrix</tt> itself.
  * Remember, this preconditioner actually <b>multiplies</b> with the diagonal
- * blocks. @until Cinv
+ * blocks.
+ * @until Cinv
  *
  * Now, we have a block Jacobi preconditioner, which is still symmetric, since
  * the blocks are symmetric. Therefore, we can still use the preconditioned
- * conjugate gradient method. @until Error
+ * conjugate gradient method.
+ * @until Error
  *
  * Now, we enter the subdiagonal block. This is the same as in
- * <tt>matrix</tt>. @until B2
+ * <tt>matrix</tt>.
+ * @until B2
  *
  * Since the preconditioner is not symmetric anymore, we use the GMRES method
- * for solving. @until Error
+ * for solving.
+ * @until Error
  *
  *
  * @ingroup Preconditioners
@@ -445,28 +421,6 @@ public:
   BlockTrianglePrecondition (const unsigned int n_blocks);
 
   /**
-   * Constructor. This matrix must be block-quadratic. The additional
-   * parameter allows for backward insertion instead of forward.
-   *
-   * @deprecated The second argument is ignored. Use the constructor with only
-   * the first and third argument.
-   */
-  BlockTrianglePrecondition (const unsigned int n_block_rows,
-                             VectorMemory<Vector<number> > &mem,
-                             const bool backward = false) DEAL_II_DEPRECATED;
-
-  /**
-   * Initialize object completely. This is the function to call for an object
-   * created by the default constructor.
-   *
-   * @deprecated The second argument is ignored. Use the function without that
-   * argument.
-   */
-  void initialize (const unsigned int n_block_rows,
-                   VectorMemory<Vector<number> > &mem,
-                   const bool backward = false) DEAL_II_DEPRECATED;
-
-  /**
    * Resize preconditioner to a new size and clear all blocks.
    */
   void reinit (const unsigned int n_block_rows);
@@ -482,21 +436,6 @@ public:
               const size_type col,
               const double    prefix = 1.,
               const bool      transpose = false);
-
-  /**
-   * Enter a block. This calls BlockMatrixArray::enter_aux(). Remember that
-   * the diagonal blocks should actually be inverse matrices or
-   * preconditioners.
-   *
-   * @deprecated The first argument is ignored. Use enter() instead.
-   */
-  template <class MATRIX>
-  void enter_aux (VectorMemory<Vector<double> > &mem,
-                  const MATRIX   &matrix,
-                  const size_type row,
-                  const size_type col,
-                  const double    prefix = 1.,
-                  const bool      transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Preconditioning.
@@ -617,24 +556,6 @@ BlockMatrixArray<number>::enter (
 
 
 template <typename number>
-template <class MATRIX>
-inline
-void
-BlockMatrixArray<number>::enter_aux (
-  VectorMemory<Vector<number> > &mem,
-  const MATRIX &matrix,
-  unsigned int row,
-  unsigned int col,
-  double prefix,
-  bool transpose)
-{
-  Assert(row<n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(col<n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
-  entries.push_back(Entry(matrix, row, col, prefix, transpose, mem));
-}
-
-
-template <typename number>
 template <class STREAM>
 inline
 void
@@ -706,23 +627,6 @@ BlockTrianglePrecondition<number>::enter (const MATRIX &matrix,
                                           double prefix, bool transpose)
 {
   BlockMatrixArray<number>::enter(matrix, row, col, prefix, transpose);
-}
-
-
-
-template <typename number>
-template <class MATRIX>
-inline
-void
-BlockTrianglePrecondition<number>::enter_aux (
-  VectorMemory<Vector<double> > &mem,
-  const MATRIX &matrix,
-  size_type row,
-  size_type col,
-  double prefix,
-  bool transpose)
-{
-  BlockMatrixArray<number>::enter_aux(mem, matrix, row, col, prefix, transpose);
 }
 
 

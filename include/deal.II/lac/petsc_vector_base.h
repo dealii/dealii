@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -266,15 +266,11 @@ namespace PETScWrappers
      * necessary after writing into a vector element-by-element and before
      * anything else can be done on it.
      *
-     * See @ref GlossCompress "Compressing distributed objects" for more
-     * information.
+     * See
+     * @ref GlossCompress "Compressing distributed objects"
+     * for more information.
      */
-    void compress (::dealii::VectorOperation::values operation);
-
-    /**
-     * @deprecated: use compress(VectorOperation::values) instead.
-     */
-    void compress () DEAL_II_DEPRECATED;
+    void compress (const VectorOperation::values operation);
 
     /**
      * Set all components of the vector to the given number @p s. Simply pass
@@ -355,7 +351,8 @@ namespace PETScWrappers
     /**
      * Return if the vector contains ghost elements.
      *
-     * @see @ref GlossGhostedVector "vectors with ghost elements"
+     * @see
+     * @ref GlossGhostedVector "vectors with ghost elements"
      */
     bool has_ghost_elements() const;
 
@@ -664,16 +661,6 @@ namespace PETScWrappers
                 const VectorBase &b);
 
     /**
-     * Updates the ghost values of this vector. As ghosted vectors are now
-     * read-only and assignments from a non-ghosted vector update the ghost
-     * values automatically, this method does not need to be called in user
-     * code.
-     * @deprecated: calling this method is no longer necessary.
-     */
-    void update_ghost_values() const DEAL_II_DEPRECATED;
-
-
-    /**
      * Prints the PETSc vector object values using PETSc internal vector
      * viewer function <tt>VecView</tt>. The default format prints the
      * vector's contents, including indices of vector elements. For other
@@ -754,7 +741,7 @@ namespace PETScWrappers
      * variable is @p mutable so that the accessor classes can write to it,
      * even though the vector object they refer to is constant.
      */
-    mutable ::dealii::VectorOperation::values last_action;
+    mutable VectorOperation::values last_action;
 
     /**
      * Make the reference class a friend.

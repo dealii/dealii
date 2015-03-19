@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,7 @@ void test ()
   m.set (0,0,1);
   m.set (1,1,2);
   m.set (1,2,3);
-  m.compress (VectorOperation::add);
+  m.compress (VectorOperation::insert);
   PETScWrappers::FullMatrix::const_iterator i = m.begin();
   deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
   ++i;

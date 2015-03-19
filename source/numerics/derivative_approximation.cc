@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -103,7 +103,7 @@ namespace DerivativeApproximation
 
       /**
        * Return the norm of the derivative object. Here, for the gradient, we
-       * choose the Euclidian norm of the gradient vector.
+       * choose the Euclidean norm of the gradient vector.
        */
       static double derivative_norm (const Derivative &d);
 
@@ -863,8 +863,8 @@ namespace DerivativeApproximation
           // direction between
           // the centers of two
           // cells
-          Point<dim>   y        = neighbor_center - this_center;
-          const double distance = std::sqrt(y.square());
+          Tensor<1,dim> y        = neighbor_center - this_center;
+          const double  distance = y.norm();
           // normalize y
           y /= distance;
           // *** note that unlike in
@@ -974,8 +974,8 @@ namespace DerivativeApproximation
                             Vector<float>         &derivative_norm)
     {
       Assert (derivative_norm.size() == dof_handler.get_tria().n_active_cells(),
-              ExcInvalidVectorLength (derivative_norm.size(),
-                                      dof_handler.get_tria().n_active_cells()));
+              ExcVectorLengthVsNActiveCells (derivative_norm.size(),
+                                             dof_handler.get_tria().n_active_cells()));
       Assert (component < dof_handler.get_fe().n_components(),
               ExcIndexRange (component, 0, dof_handler.get_fe().n_components()));
 

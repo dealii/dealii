@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,8 +62,9 @@ main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
+  plot_FE_FaceQ_shape_functions<1>();
   plot_FE_FaceQ_shape_functions<2>();
-//  plot_FE_FaceQ_shape_functions<3>();
+  plot_FE_FaceQ_shape_functions<3>();
 
   return 0;
 }

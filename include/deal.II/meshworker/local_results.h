@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 class BlockIndices;
 template<int,int> class DoFHandler;
-template<int,int> class MGDoFHandler;
+
 
 /**
  * A collection of functions and classes for the mesh loops that are an

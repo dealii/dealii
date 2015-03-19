@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -324,6 +324,13 @@ namespace PETScWrappers
                    const IndexSet &local_columns,
                    const SparsityType         &sparsity_pattern,
                    const MPI_Comm                  &communicator);
+
+      /**
+       * Initialize this matrix to have the same structure as @p other. This
+       * will not copy the values of the other matrix, but you can use
+       * copy_from() for this.
+       */
+      void reinit (const SparseMatrix &other);
 
       /**
        * Return a reference to the MPI communicator object in use with this

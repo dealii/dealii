@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -518,7 +518,7 @@ public:
       n_independent_components;
 
   /**
-   * Default constructor. Creates a zero tensor.
+   * Default constructor. Creates a tensor with all entries equal to zero.
    */
   SymmetricTensor ();
 
@@ -550,6 +550,15 @@ public:
    * older compilers.
    */
   SymmetricTensor (const Number (&array) [n_independent_components]);
+
+  /**
+   * Copy constructor from tensors with different underlying scalar type. This
+   * obviously requires that the @p OtherNumber type is convertible to @p
+   * Number.
+   */
+  template <typename OtherNumber>
+  explicit
+  SymmetricTensor (const SymmetricTensor<rank,dim,OtherNumber> &initializer);
 
   /**
    * Assignment operator.
@@ -952,6 +961,19 @@ SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Tensor<2,dim,Number> &t
       Assert (false, ExcNotImplemented());
     }
 }
+
+
+
+template <int rank, int dim, typename Number>
+template <typename OtherNumber>
+inline
+SymmetricTensor<rank,dim,Number>::
+SymmetricTensor (const SymmetricTensor<rank,dim,OtherNumber> &initializer)
+{
+  for (unsigned int i=0; i<n_independent_components; ++i)
+    data[i] = initializer.data[i];
+}
+
 
 
 
@@ -2645,7 +2667,8 @@ symmetrize (const Tensor<2,3,Number> &t)
 
 /**
  * Multiplication of a symmetric tensor of general rank with a scalar from the
- * right.
+ * right. This version of the operator is used if the scalar has the same data
+ * type as is used to store the elements of the symmetric tensor.
  *
  * @relates SymmetricTensor
  */
@@ -2664,7 +2687,8 @@ operator * (const SymmetricTensor<rank,dim,Number> &t,
 
 /**
  * Multiplication of a symmetric tensor of general rank with a scalar from the
- * left.
+ * left. This version of the operator is used if the scalar has the same data
+ * type as is used to store the elements of the symmetric tensor.
  *
  * @relates SymmetricTensor
  */
@@ -2674,9 +2698,89 @@ SymmetricTensor<rank,dim,Number>
 operator * (const Number                            factor,
             const SymmetricTensor<rank,dim,Number> &t)
 {
-  SymmetricTensor<rank,dim,Number> tt = t;
-  tt *= factor;
+  // simply forward to the other operator
+  return t*factor;
+}
+
+
+#ifndef DEAL_II_WITH_CXX11
+
+template <typename T, typename U, int rank, int dim>
+struct ProductType<T,SymmetricTensor<rank,dim,U> >
+{
+  typedef SymmetricTensor<rank,dim,typename ProductType<T,U>::type> type;
+};
+
+template <typename T, typename U, int rank, int dim>
+struct ProductType<SymmetricTensor<rank,dim,T>,U>
+{
+  typedef SymmetricTensor<rank,dim,typename ProductType<T,U>::type> type;
+};
+
+#endif
+
+
+
+/**
+ * Multiplication of a symmetric tensor with a scalar number from the right.
+ *
+ * The purpose of this operator is to enable only multiplication of a tensor
+ * by a scalar number (i.e., a floating point number, a complex floating point
+ * number, etc.). The function is written in a way that only allows the
+ * compiler to consider the function if the second argument is indeed a scalar
+ * number -- in other words, @p OtherNumber will not match, for example
+ * <code>std::vector@<double@></code> as the product of a tensor and a vector
+ * clearly would make no sense. The mechanism by which the compiler is
+ * prohibited of considering this operator for multiplication with non-scalar
+ * types are explained in the documentation of the EnableIfScalar class.
+ *
+ * The return type of the function is chosen so that it matches the types of
+ * both the tensor and the scalar argument. For example, if you multiply a
+ * <code>SymmetricTensor@<2,dim,double@></code> by
+ * <code>std::complex@<double@></code>, then the result will be a
+ * <code>SymmetricTensor@<2,dim,std::complex@<double@>@></code>. In other
+ * words, the type with which the returned tensor stores its components equals
+ * the type you would get if you multiplied an individual component of the
+ * input tensor by the scalar factor.
+ *
+ * @relates SymmetricTensor
+ * @relates EnableIfScalar
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+SymmetricTensor<rank,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const SymmetricTensor<rank,dim,Number> &t,
+            const OtherNumber                    factor)
+{
+  // form the product. we have to convert the two factors into the final
+  // type via explicit casts because, for awkward reasons, the C++
+  // standard committee saw it fit to not define an
+  //   operator*(float,std::complex<double>)
+  // (as well as with switched arguments and double<->float).
+  typedef typename ProductType<Number,OtherNumber>::type product_type;
+  SymmetricTensor<rank,dim,product_type> tt(t);
+  tt *= product_type(factor);
   return tt;
+}
+
+
+
+/**
+ * Multiplication of a symmetric tensor with a scalar number from the left.
+ * See the discussion with the operator with switched arguments for more
+ * information about template arguments and the return type.
+ *
+ * @relates SymmetricTensor
+ * @relates EnableIfScalar
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+SymmetricTensor<rank,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
+operator * (const Number                     factor,
+            const SymmetricTensor<rank,dim,OtherNumber> &t)
+{
+  // simply forward to the other operator with switched arguments
+  return (t*factor);
 }
 
 

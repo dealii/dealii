@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,8 +41,8 @@ template<typename number> class SparseMatrix;
  * stack products of three or more matrices by making one of the two matrices
  * an object of the current type handles be a ProductMatrix itself.
  *
- * Here is an example multiplying two different FullMatrix objects: @include
- * product_matrix.cc
+ * Here is an example multiplying two different FullMatrix objects:
+ * @include product_matrix.cc
  *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
  */
@@ -403,7 +403,9 @@ private:
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Guido Kanschat, 2005
  */

@@ -67,20 +67,6 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector (const MPI_Comm     &communicator,
-                    const IndexSet   &local,
-                    const IndexSet &ghost)
-      :
-      communicator (communicator)
-    {
-      Assert(local.is_contiguous(), ExcNotImplemented());
-
-      IndexSet ghost_set = ghost;
-      ghost_set.subtract_set(local);
-
-      Vector::create_vector(local.size(), local.n_elements(), ghost_set);
-    }
-
     Vector::Vector (const IndexSet   &local,
                     const IndexSet &ghost,
                     const MPI_Comm     &communicator)
@@ -105,15 +91,6 @@ namespace PETScWrappers
       Vector::create_vector(local.size(), local.n_elements());
     }
 
-
-    Vector::Vector (const MPI_Comm     &communicator,
-                    const IndexSet   &local)
-      :
-      communicator (communicator)
-    {
-      Assert(local.is_contiguous(), ExcNotImplemented());
-      Vector::create_vector(local.size(), local.n_elements());
-    }
 
     void
     Vector::reinit (const MPI_Comm  &comm,
@@ -181,14 +158,6 @@ namespace PETScWrappers
 
 
     void
-    Vector::reinit (const MPI_Comm     &comm,
-                    const IndexSet   &local,
-                    const IndexSet &ghost)
-    {
-      reinit(local, ghost, comm);
-    }
-
-    void
     Vector::reinit (const IndexSet   &local,
                     const IndexSet &ghost,
                     const MPI_Comm     &comm)
@@ -209,13 +178,6 @@ namespace PETScWrappers
       ghost_set.subtract_set(local);
 
       create_vector(local.size(), local.n_elements(), ghost_set);
-    }
-
-    void
-    Vector::reinit (const MPI_Comm     &comm,
-                    const IndexSet   &local)
-    {
-      reinit(local, comm);
     }
 
     void
@@ -275,7 +237,12 @@ namespace PETScWrappers
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       if (has_ghost_elements())
-        update_ghost_values();
+        {
+          ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        }
       return *this;
     }
 

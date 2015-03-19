@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,17 +26,18 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 /**
- * Modified incomplete Cholesky (MIC(0)) preconditioner.  This class conforms
- * to the state and usage specification in SparseLUDecomposition.
+ * Implementation of the Modified Incomplete Cholesky (MIC(0)) preconditioner
+ * for symmetric matrices. This class conforms to the state and usage
+ * specification in SparseLUDecomposition.
  *
  *
  * <h3>The decomposition</h3>
  *
- * Let a sparse matrix $A$ be in the form $A = - L - U + D$, where $-L$ and
- * $-U$ are strictly lower and upper triangular matrices. The MIC(0)
- * decomposition of the matrix $A$ is defined by $B = (X-L)X^(-1)(X-U)$, where
- * $X$ is a diagonal matrix, defined by the condition $\text{rowsum}(A) =
- * \text{rowsum}(B)$.
+ * Let a symmetric, positive-definite, sparse matrix $A$ be in the form $A = D
+ * - L - L^T$, where $D$ is the diagonal part of $A$ and $-L$ is a strictly
+ * lower triangular matrix. The MIC(0) decomposition of the matrix $A$ is
+ * defined by $B = (X-L)X^{-1}(X-L^T)$, where $X$ is a diagonal matrix defined
+ * by the condition $\text{rowsum}(A) = \text{rowsum}(B)$.
  *
  * @author Stephen "Cheffo" Kolaroff, 2002, unified interface: Ralf Hartmann
  * 2003.
@@ -55,14 +56,6 @@ public:
    * afterwards.
    */
   SparseMIC ();
-
-  /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions.  Instead, pass the
-   * sparsity pattern that you want used for the decomposition in the
-   * AdditionalData structure.
-   */
-  SparseMIC (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
   /**
    * Destructor.
@@ -84,12 +77,6 @@ public:
   AdditionalData;
 
   /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions.
-   */
-  void reinit (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
-
-  /**
    * Perform the incomplete LU factorization of the given matrix.
    *
    * This function needs to be called before an object of this class is used
@@ -109,14 +96,6 @@ public:
   template <typename somenumber>
   void initialize (const SparseMatrix<somenumber> &matrix,
                    const AdditionalData &parameters = AdditionalData());
-
-  /**
-   * @deprecated This method is deprecated, and left for backward compability.
-   * It will be removed in later versions. Use initialize() instead.
-   */
-  template <typename somenumber>
-  void decompose (const SparseMatrix<somenumber> &matrix,
-                  const double                   strengthen_diagonal=0.) DEAL_II_DEPRECATED;
 
   /**
    * Apply the incomplete decomposition, i.e. do one forward-backward step

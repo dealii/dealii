@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,18 @@
 
 #include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/filtered_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -22,9 +34,6 @@
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -33,7 +42,7 @@
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -161,8 +170,8 @@ namespace GridTools
         std::vector<bool>::const_iterator pj = pi+1;
         for (unsigned int j=i+1; j<N; ++j, ++pj)
           if ((*pi==true) && (*pj==true) &&
-              ((vertices[i]-vertices[j]).square() > max_distance_sqr))
-            max_distance_sqr = (vertices[i]-vertices[j]).square();
+              ((vertices[i]-vertices[j]).norm_square() > max_distance_sqr))
+            max_distance_sqr = (vertices[i]-vertices[j]).norm_square();
       };
 
     return std::sqrt(max_distance_sqr);
@@ -627,15 +636,136 @@ namespace GridTools
   }
 
 
+  namespace
+  {
+    /**
+     * Solve the Laplace equation for the @p laplace_transform function for one
+     * of the @p dim space dimensions. Factorized into a function of its own
+     * in order to allow parallel execution.
+     */
+    void laplace_solve (const SparseMatrix<double> &S,
+                        const std::map<unsigned int,double> &m,
+                        Vector<double> &u)
+    {
+      const unsigned int n_dofs=S.n();
+      FilteredMatrix<Vector<double> > SF (S);
+      PreconditionJacobi<SparseMatrix<double> > prec;
+      prec.initialize(S, 1.2);
+      FilteredMatrix<Vector<double> > PF (prec);
+
+      SolverControl control (n_dofs, 1.e-10, false, false);
+      GrowingVectorMemory<Vector<double> > mem;
+      SolverCG<Vector<double> > solver (control, mem);
+
+      Vector<double> f(n_dofs);
+
+      SF.add_constraints(m);
+      SF.apply_constraints (f, true);
+      solver.solve(SF, u, f, PF);
+    }
+  }
+
+
+
+  // Implementation for 1D only
+  template <>
+  void laplace_transform (const std::map<unsigned int,Point<1> > &,
+                          Triangulation<1> &,
+                          const Function<1> *)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
+
+  // Implementation for dimensions except 1
   template <int dim>
   void
   laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
                      Triangulation<dim> &triangulation,
                      const Function<dim> *coefficient)
   {
-    //TODO: Move implementation of this function into the current
-    // namespace
-    GridGenerator::laplace_transformation(triangulation, new_points, coefficient);
+    // first provide everything that is
+    // needed for solving a Laplace
+    // equation.
+    MappingQ1<dim> mapping_q1;
+    FE_Q<dim> q1(1);
+
+    DoFHandler<dim> dof_handler(triangulation);
+    dof_handler.distribute_dofs(q1);
+
+    CompressedSparsityPattern c_sparsity_pattern (dof_handler.n_dofs (),
+                                                  dof_handler.n_dofs ());
+    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity_pattern);
+    c_sparsity_pattern.compress ();
+
+    SparsityPattern sparsity_pattern;
+    sparsity_pattern.copy_from (c_sparsity_pattern);
+    sparsity_pattern.compress ();
+
+    SparseMatrix<double> S(sparsity_pattern);
+
+    QGauss<dim> quadrature(4);
+
+    MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S,coefficient);
+
+    // set up the boundary values for
+    // the laplace problem
+    std::vector<std::map<unsigned int,double> > m(dim);
+    typename std::map<unsigned int,Point<dim> >::const_iterator map_end=new_points.end();
+
+    // fill these maps using the data
+    // given by new_points
+    typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin_active(),
+                                            endc=dof_handler.end();
+    for (; cell!=endc; ++cell)
+      {
+        for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+          {
+            const typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
+
+            // loop over all vertices of the cell and see if it is listed in the map
+            // given as first argument of the function
+            for (unsigned int vertex_no=0;
+                 vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
+              {
+                const unsigned int vertex_index=face->vertex_index(vertex_no);
+
+                const typename std::map<unsigned int,Point<dim> >::const_iterator map_iter
+                  = new_points.find(vertex_index);
+
+                if (map_iter!=map_end)
+                  for (unsigned int i=0; i<dim; ++i)
+                    m[i].insert(std::pair<unsigned int,double> (
+                                  face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
+              }
+          }
+      }
+
+    // solve the dim problems with
+    // different right hand sides.
+    Vector<double> us[dim];
+    for (unsigned int i=0; i<dim; ++i)
+      us[i].reinit (dof_handler.n_dofs());
+
+    // solve linear systems in parallel
+    Threads::TaskGroup<> tasks;
+    for (unsigned int i=0; i<dim; ++i)
+      tasks += Threads::new_task (&laplace_solve,
+                                  S, m[i], us[i]);
+    tasks.join_all ();
+
+    // change the coordinates of the
+    // points of the triangulation
+    // according to the computed values
+    for (cell=dof_handler.begin_active(); cell!=endc; ++cell)
+      for (unsigned int vertex_no=0;
+           vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
+        {
+          Point<dim> &v=cell->vertex(vertex_no);
+          const unsigned int dof_index=cell->vertex_dof_index(vertex_no, 0);
+          for (unsigned int i=0; i<dim; ++i)
+            v(i)=us[i](dof_index);
+        }
   }
 
 
@@ -764,7 +894,7 @@ namespace GridTools
                 }
             }
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
         distributed_triangulation
         ->communicate_locally_moved_vertices(locally_owned_vertices);
 #else
@@ -890,14 +1020,14 @@ namespace GridTools
     Assert(first != used.end(), ExcInternalError());
 
     unsigned int best_vertex = std::distance(used.begin(), first);
-    double       best_dist   = (p - vertices[best_vertex]).square();
+    double       best_dist   = (p - vertices[best_vertex]).norm_square();
 
     // For all remaining vertices, test
     // whether they are any closer
     for (unsigned int j = best_vertex+1; j < vertices.size(); j++)
       if (used[j])
         {
-          double dist = (p - vertices[j]).square();
+          double dist = (p - vertices[j]).norm_square();
           if (dist < best_dist)
             {
               best_vertex = j;
@@ -1747,17 +1877,6 @@ next_cell:
 
 
 
-  template <int dim, int spacedim>
-  void
-  create_union_triangulation (const Triangulation<dim, spacedim> &triangulation_1,
-                              const Triangulation<dim, spacedim> &triangulation_2,
-                              Triangulation<dim, spacedim>       &result)
-  {
-    // this function is deprecated. call the function that replaced it
-    GridGenerator::create_union_triangulation (triangulation_1, triangulation_2, result);
-  }
-
-
   namespace internal
   {
     namespace FixUpDistortedChildCells
@@ -2044,7 +2163,7 @@ next_cell:
               {
                 const double eps = step_length/10;
 
-                Point<spacedim> h;
+                Tensor<1,spacedim> h;
                 h[d] = eps/2;
 
                 if (respect_manifold == false)
@@ -2363,23 +2482,6 @@ next_cell:
     return patch;
   }
 
-
-
-
-  template <template <int,int> class Container, int dim, int spacedim>
-#ifndef _MSC_VER
-  std::map<typename Container<dim-1,spacedim>::cell_iterator,
-      typename Container<dim,spacedim>::face_iterator>
-#else
-  typename ExtractBoundaryMesh<Container,dim,spacedim>::return_type
-#endif
-      extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
-                             Container<dim-1,spacedim>     &surface_mesh,
-                             const std::set<types::boundary_id> &boundary_ids)
-  {
-    // this function is deprecated. call the one that replaced it
-    return GridGenerator::extract_boundary_mesh (volume_mesh, surface_mesh, boundary_ids);
-  }
 
 
 
@@ -2761,6 +2863,50 @@ next_cell:
                           "in default orientation"));
       }
 #endif
+  }
+
+  template <int dim, int spacedim>
+  void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                                    const bool reset_boundary_ids)
+  {
+
+    typename Triangulation<dim,spacedim>::active_cell_iterator
+    cell=tria.begin_active(), endc=tria.end();
+
+    for (; cell != endc; ++cell)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+        if (cell->face(f)->at_boundary())
+          {
+            cell->face(f)->set_manifold_id
+            (static_cast<types::manifold_id>(cell->face(f)->boundary_indicator()));
+            if (reset_boundary_ids == true)
+              cell->face(f)->set_boundary_indicator(0);
+          }
+  }
+
+  template <int dim, int spacedim>
+  void copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                                    const bool compute_face_ids)
+  {
+    typename Triangulation<dim,spacedim>::active_cell_iterator
+    cell=tria.begin_active(), endc=tria.end();
+
+    for (; cell != endc; ++cell)
+      {
+        cell->set_manifold_id(cell->material_id());
+        if (compute_face_ids == true)
+          {
+            for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+              {
+                if (cell->neighbor(f) != endc)
+                  cell->face(f)->set_manifold_id
+                  (std::min(cell->material_id(),
+                            cell->neighbor(f)->material_id()));
+                else
+                  cell->face(f)->set_manifold_id(cell->material_id());
+              }
+          }
+      }
   }
 
 } /* namespace GridTools */

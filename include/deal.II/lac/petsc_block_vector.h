@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,7 +43,10 @@ namespace PETScWrappers
    * interface, this class handles the actual allocation of vectors and
    * provides functions that are specific to the underlying vector type.
    *
-   * @ingroup Vectors @see @ref GlossBlockLA "Block (linear algebra)"
+   * @ingroup Vectors
+   *
+   * @see
+   * @ref GlossBlockLA "Block (linear algebra)"
    * @author Wolfgang Bangerth, 2004
    */
   class BlockVector : public BlockVectorBase<Vector>

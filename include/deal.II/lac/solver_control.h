@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -178,9 +178,9 @@ public:
    * The iteration is also aborted if the residual becomes a denormalized
    * value (@p NaN). Note, however, that this check is only performed if the
    * @p isnan function is provided by the operating system, which is not
-   * always true. The @p configure scripts checks for this and sets the flag
-   * @p HAVE_ISNAN in the file <tt>Make.global_options</tt> if this function
-   * was found.
+   * always true. CMake checks this with the 'check_01_cxx_features.cmake'
+   * test and sets the flag @p DEAL_II_HAVE_ISNAN in the include file
+   * <tt>deal.II/base/config.h</tt> if this function was found.
    *
    * <tt>check()</tt> additionally preserves @p step and @p check_value. These
    * values are accessible by <tt>last_value()</tt> and <tt>last_step()</tt>.
@@ -497,13 +497,14 @@ public:
 
   /**
    * Initialize with a SolverControl object. The result will emulate
-   * SolverControl by setting #reduce to zero.
+   * SolverControl by setting the reduction target to zero.
    */
   IterationNumberControl (const SolverControl &c);
 
   /**
    * Assign a SolverControl object to ReductionControl. The result of the
-   * assignment will emulate SolverControl by setting #reduce to zero.
+   * assignment will emulate SolverControl by setting the reduction target to
+   * zero.
    */
   IterationNumberControl &operator= (const SolverControl &c);
 

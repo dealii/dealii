@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -335,42 +335,6 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 
 
 
-template <>
-void
-StraightBoundary<1>::
-get_intermediate_points_on_line (const Triangulation<1>::line_iterator &,
-                                 std::vector<Point<1> > &) const
-{
-  Assert(false, ExcImpossibleInDim(1));
-}
-
-template <>
-void
-StraightBoundary<1, 2>::
-get_intermediate_points_on_line (const Triangulation<1, 2>::line_iterator &line,
-                                 std::vector<Point<2> > &points) const
-{
-  const unsigned int spacedim = 2;
-  const unsigned int n=points.size();
-  Assert(n>0, ExcInternalError());
-
-  // Use interior points of QGaussLobatto quadrature formula support points
-  // for consistency with MappingQ
-  const std::vector<Point<1> > &line_points = this->get_line_support_points(n);
-  const Point<spacedim> vertices[2] = { line->vertex(0),
-                                        line->vertex(1)
-                                      };
-
-  for (unsigned int i=0; i<n; ++i)
-    {
-      const double x = line_points[i+1][0];
-      points[i] = (1-x)*vertices[0] + x*vertices[1];
-    }
-}
-
-
-
-
 template <int dim, int spacedim>
 void
 StraightBoundary<dim, spacedim>::
@@ -604,6 +568,7 @@ normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
 
   const double eps = 1e-12;
   Tensor<1,spacedim> grad_F[facedim];
+  unsigned int iteration = 0;
   while (true)
     {
       Point<spacedim> F;
@@ -628,8 +593,16 @@ normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
           for (unsigned int k=0; k<spacedim; ++k)
             H[i][j] += grad_F[i][k] * grad_F[j][k];
 
-      const Point<facedim> delta_xi = -invert(H) * J;
+      const Tensor<1,facedim> delta_xi = -invert(H) * J;
       xi += delta_xi;
+      ++iteration;
+
+      Assert (iteration<10,
+              ExcMessage("The Newton iteration to find the reference point "
+                         "did not converge in 10 iterations. Do you have a "
+                         "deformed cell? (See the glossary for a definition "
+                         "of what a deformed cell is. You may want to output "
+                         "the vertices of your cell."));
 
       if (delta_xi.norm() < eps)
         break;
@@ -847,7 +820,7 @@ namespace internal
               H_k += (object->vertex(i) * object->vertex(j)) * tmp;
             }
 
-        const Point<dim> delta_xi = - invert(H_k) * F_k;
+        const Tensor<1,dim> delta_xi = - invert(H_k) * F_k;
         xi += delta_xi;
 
         x_k = Point<spacedim>();

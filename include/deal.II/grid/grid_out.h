@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -311,7 +311,9 @@ namespace GridOutFlags
 
     /**
      * Should lines with a set @p user_flag be drawn in a different color
-     * (red)?  See @ref GlossUserFlags for information about user flags.
+     * (red)?  See
+     * @ref GlossUserFlags
+     * for information about user flags.
      */
     bool color_lines_on_user_flag;
 
@@ -522,14 +524,6 @@ namespace GridOutFlags
       /// Convert the level subdomain id into the cell color
       level_subdomain_id
     } color_by;
-
-    /**
-     * @deprecated Use the color_by enum instead.
-     *
-     * Change color depending on level. Default is false, therefore, color is
-     * coded by material or boundary id.
-     */
-    bool level_color DEAL_II_DEPRECATED;
 
     /**
      * Code level to depth. Default is true. If false, color depends on

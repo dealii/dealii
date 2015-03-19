@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2002 - 2014 by the deal.II authors
+ * Copyright (C) 2002 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -259,8 +259,8 @@ namespace Step14
               fe_values.reinit (cell);
               // and extract the gradients of the solution vector at the
               // vertices:
-              fe_values.get_function_grads (solution,
-                                            solution_gradients);
+              fe_values.get_function_gradients (solution,
+                                                solution_gradients);
 
               // Now we have the gradients at all vertices, so pick out that
               // one which belongs to the evaluation point (note that the
@@ -1371,7 +1371,12 @@ namespace Step14
 
     // As stated above, the grid for this example is the square [-1,1]^2 with
     // the square [-1/2,1/2]^2 as hole in it. We create the coarse grid as 4
-    // times 4 cells with the middle four ones missing.
+    // times 4 cells with the middle four ones missing. To understand how
+    // exactly the mesh is going to look, it may be simplest to just look
+    // at the "Results" section of this tutorial program first. In general,
+    // if you'd like to understand more about creating meshes either from
+    // scratch by hand, as we do here, or using other techniques, you
+    // should take a look at step-49.
     //
     // Of course, the example has an extension to 3d, but since this function
     // cannot be written in a dimension independent way we choose not to
@@ -1388,18 +1393,18 @@ namespace Step14
     Exercise_2_3<2>::
     create_coarse_grid (Triangulation<2> &coarse_grid)
     {
-      // First define the space dimension, to allow those parts of the
+      // We first define the space dimension, to allow those parts of the
       // function that are actually dimension independent to use this
-      // variable. That makes it simpler if you later takes this as a starting
-      // point to implement the 3d version.
-      const unsigned int dim = 2;
-
-      // Then have a list of vertices. Here, they are 24 (5 times 5, with the
+      // variable. That makes it simpler if you later take this as a starting
+      // point to implement a 3d version of this mesh. The next step is then
+      // to have a list of vertices. Here, they are 24 (5 times 5, with the
       // middle one omitted). It is probably best to draw a sketch here. Note
       // that we leave the number of vertices open at first, but then let the
       // compiler compute this number afterwards. This reduces the possibility
       // of having the dimension to large and leaving the last ones
       // uninitialized.
+      const unsigned int dim = 2;
+
       static const Point<2> vertices_1[]
         = {  Point<2> (-1.,   -1.),
              Point<2> (-1./2, -1.),
@@ -2707,8 +2712,8 @@ namespace Step14
       // corresponding to this side of the face, and extract the gradients
       // using that object.
       face_data.fe_face_values_cell.reinit (cell, face_no);
-      face_data.fe_face_values_cell.get_function_grads (primal_solution,
-                                                        face_data.cell_grads);
+      face_data.fe_face_values_cell.get_function_gradients (primal_solution,
+                                                            face_data.cell_grads);
 
       // The second step is then to extract the gradients of the finite
       // element solution at the quadrature points on the other side of the
@@ -2732,8 +2737,8 @@ namespace Step14
       // gradients on that cell:
       const active_cell_iterator neighbor = cell->neighbor(face_no);
       face_data.fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor);
-      face_data.fe_face_values_neighbor.get_function_grads (primal_solution,
-                                                            face_data.neighbor_grads);
+      face_data.fe_face_values_neighbor.get_function_gradients (primal_solution,
+                                                                face_data.neighbor_grads);
 
       // Now that we have the gradients on this and the neighboring cell,
       // compute the jump residual by multiplying the jump in the gradient
@@ -2833,13 +2838,13 @@ namespace Step14
           // Now start the work by again getting the gradient of the solution
           // first at this side of the interface,
           face_data.fe_subface_values_cell.reinit (cell, face_no, subface_no);
-          face_data.fe_subface_values_cell.get_function_grads (primal_solution,
-                                                               face_data.cell_grads);
+          face_data.fe_subface_values_cell.get_function_gradients (primal_solution,
+                                                                   face_data.cell_grads);
           // then at the other side,
           face_data.fe_face_values_neighbor.reinit (neighbor_child,
                                                     neighbor_neighbor);
-          face_data.fe_face_values_neighbor.get_function_grads (primal_solution,
-                                                                face_data.neighbor_grads);
+          face_data.fe_face_values_neighbor.get_function_gradients (primal_solution,
+                                                                    face_data.neighbor_grads);
 
           // and finally building the jump residuals. Since we take the normal
           // vector from the other cell this time, revert the sign of the

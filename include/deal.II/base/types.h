@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 #include <cstddef>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -30,27 +32,14 @@ namespace types
   /**
    * The type used to denote subdomain_ids of cells.
    *
-   * See the @ref GlossSubdomainId "glossary" for more information.
+   * See the
+   * @ref GlossSubdomainId "glossary"
+   * for more information.
    *
    * There is a special value, numbers::invalid_subdomain_id that is used to
    * indicate an invalid value of this type.
    */
   typedef unsigned int subdomain_id;
-
-  /**
-   * @deprecated Old name for the typedef above.
-   */
-  typedef subdomain_id subdomain_id_t DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use numbers::invalid_subdomain_id
-   */
-  const unsigned int invalid_subdomain_id DEAL_II_DEPRECATED = static_cast<subdomain_id>(-1);
-
-  /**
-   * @deprecated Use numbers::artificial_subdomain_id
-   */
-  const unsigned int artificial_subdomain_id DEAL_II_DEPRECATED = static_cast<subdomain_id>(-2);
 
 #ifdef DEAL_II_WITH_64BIT_INDICES
   /**
@@ -62,8 +51,9 @@ namespace types
    *
    * The data type always indicates an unsigned integer type.
    *
-   * See the @ref GlobalDoFIndex page for guidance on when this type should or
-   * should not be used.
+   * See the
+   * @ref GlobalDoFIndex
+   * page for guidance on when this type should or should not be used.
    */
   // TODO: we should check that unsigned long long int
   // has the same size as uint64_t
@@ -93,12 +83,6 @@ namespace types
 #  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED
 #endif
 
-
-  /**
-   * @deprecated Use numbers::invalid_dof_index
-   */
-  const global_dof_index invalid_dof_index DEAL_II_DEPRECATED = static_cast<global_dof_index>(-1);
-
   /**
    * The type used to denote boundary indicators associated with every piece
    * of the boundary and, in the case of meshes that describe manifolds in
@@ -109,7 +93,8 @@ namespace types
    * boundary indicator for faces that are in the interior of the domain and
    * therefore not part of any addressable boundary component.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   typedef unsigned char boundary_id;
 
@@ -120,15 +105,10 @@ namespace types
    * There is a special value, numbers::flat_manifold_id that is used to
    * indicate the standard cartesian manifold.
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   typedef unsigned int manifold_id;
-
-
-  /**
-   * @deprecated Old name for the typedef above.
-   */
-  typedef boundary_id boundary_id_t DEAL_II_DEPRECATED;
 
   /**
    * The type used to denote material indicators associated with every cell.
@@ -137,12 +117,6 @@ namespace types
    * indicate an invalid value of this type.
    */
   typedef unsigned char material_id;
-
-  /**
-   * @deprecated Old name for the typedef above.
-   */
-  typedef material_id material_id_t DEAL_II_DEPRECATED;
-
 }
 
 namespace TrilinosWrappers
@@ -204,7 +178,8 @@ namespace numbers
    * We assume that all valid boundary_ids lie in the range [0,
    * invalid_boundary_id).
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   const types::boundary_id invalid_boundary_id = static_cast<types::boundary_id>(-1);
 
@@ -218,7 +193,8 @@ namespace numbers
    * faces that lie in the interior of the domain. You should never try to
    * assign this boundary indicator to anything in user code.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   const types::boundary_id internal_face_boundary_id = static_cast<types::boundary_id>(-1);
 
@@ -227,14 +203,16 @@ namespace numbers
    * We assume that all valid manifold_ids lie in the range [0,
    * invalid_maifold_id).
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   const types::manifold_id invalid_manifold_id = static_cast<types::manifold_id>(-1);
 
   /**
    * A manifold_id we reserve for the default flat Cartesian manifold.
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   const types::manifold_id flat_manifold_id = static_cast<types::manifold_id>(-1);
 
@@ -243,7 +221,9 @@ namespace numbers
    * valid id but is used, for example, for default arguments to indicate a
    * subdomain id that is not to be used.
    *
-   * See the @ref GlossSubdomainId "glossary" for more information.
+   * See the
+   * @ref GlossSubdomainId "glossary"
+   * for more information.
    */
   const types::subdomain_id invalid_subdomain_id = static_cast<types::subdomain_id>(-1);
 
@@ -253,9 +233,13 @@ namespace numbers
    * that is kept distributed on many processors. Such cells are called
    * "artificial".
    *
-   * See the glossary entries on @ref GlossSubdomainId "subdomain ids" and
-   * @ref GlossArtificialCell "artificial cells" as well as the
-   * @ref distributed module for more information.
+   * See the glossary entries on
+   * @ref GlossSubdomainId "subdomain ids"
+   * and
+   * @ref GlossArtificialCell "artificial cells"
+   * as well as the
+   * @ref distributed
+   * module for more information.
    */
   const types::subdomain_id artificial_subdomain_id = static_cast<types::subdomain_id>(-2);
 }

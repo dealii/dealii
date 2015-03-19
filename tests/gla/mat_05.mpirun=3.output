@@ -1,0 +1,49 @@
+
+DEAL:0:PETSc::numproc=3
+DEAL:0:PETSc::l1-norm: 5.00000
+DEAL:0:PETSc::mat(0,1): 3.00000
+DEAL:0:PETSc::* reinit(other):
+DEAL:0:PETSc::l1-norm: 0.00000
+DEAL:0:PETSc::mat(0,1): 0.00000
+DEAL:0:PETSc::after adding mat(0,1): 0.900000
+DEAL:0:PETSc::* copy_from():
+DEAL:0:PETSc::l1-norm: 5.00000
+DEAL:0:PETSc::mat(0,1): 3.00000
+DEAL:0:PETSc::after adding mat(0,1): 3.90000
+DEAL:0:PETSc::OK
+DEAL:0:Trilinos::numproc=3
+DEAL:0:Trilinos::l1-norm: 5.00000
+DEAL:0:Trilinos::mat(0,1): 3.00000
+DEAL:0:Trilinos::* reinit(other):
+DEAL:0:Trilinos::l1-norm: 0.00000
+DEAL:0:Trilinos::mat(0,1): 0.00000
+DEAL:0:Trilinos::after adding mat(0,1): 0.900000
+DEAL:0:Trilinos::* copy_from():
+DEAL:0:Trilinos::l1-norm: 5.00000
+DEAL:0:Trilinos::mat(0,1): 3.00000
+DEAL:0:Trilinos::after adding mat(0,1): 3.90000
+DEAL:0:Trilinos::OK
+
+DEAL:1:PETSc::l1-norm: 5.00000
+DEAL:1:PETSc::* reinit(other):
+DEAL:1:PETSc::l1-norm: 0.00000
+DEAL:1:PETSc::* copy_from():
+DEAL:1:PETSc::l1-norm: 5.00000
+DEAL:1:Trilinos::l1-norm: 5.00000
+DEAL:1:Trilinos::* reinit(other):
+DEAL:1:Trilinos::l1-norm: 0.00000
+DEAL:1:Trilinos::* copy_from():
+DEAL:1:Trilinos::l1-norm: 5.00000
+
+
+DEAL:2:PETSc::l1-norm: 5.00000
+DEAL:2:PETSc::* reinit(other):
+DEAL:2:PETSc::l1-norm: 0.00000
+DEAL:2:PETSc::* copy_from():
+DEAL:2:PETSc::l1-norm: 5.00000
+DEAL:2:Trilinos::l1-norm: 5.00000
+DEAL:2:Trilinos::* reinit(other):
+DEAL:2:Trilinos::l1-norm: 0.00000
+DEAL:2:Trilinos::* copy_from():
+DEAL:2:Trilinos::l1-norm: 5.00000
+

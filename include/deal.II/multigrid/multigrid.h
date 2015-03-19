@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,7 +25,6 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <vector>
 
@@ -136,40 +135,6 @@ public:
    * The actual work for this function is done in level_v_step().
    */
   void vcycle ();
-
-  /**
-   * @deprecated This function is purely experimental and will probably never
-   * be implemented in a way that it can be released.
-   *
-   * Perform a multigrid cycle with a vector which is already a level vector.
-   * Use of this function assumes that there is NO local refinement and that
-   * both vectors are on the finest level of this Multigrid object.
-   */
-  void vmult(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated This function is purely experimental and will probably never
-   * be implemented in a way that it can be released.
-   *
-   * Perform a multigrid cycle with a vector which is already a level vector.
-   * Use of this function assumes that there is NO local refinement and that
-   * both vectors are on the finest level of this Multigrid object.
-   */
-  void vmult_add(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Even worse than vmult(), this function is not even
-   * implemented, but just declared such that certain objects relying on it
-   * can be constructed.
-   */
-  void Tvmult(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Even worse than vmult(), this function is not even
-   * implemented, but just declared such that certain objects relying on it
-   * can be constructed.
-   */
-  void Tvmult_add(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
 
   /**
    * Set additional matrices to correct residual computation at refinement

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013, 2014 by the deal.II authors
+## Copyright (C) 2013, 2014, 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -109,12 +109,12 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
     IF(_match OR "${_configuration}" STREQUAL "")
 
       #
-      # Setup a bunch of variables describing the test:
+      # Set up a bunch of variables describing this particular test:
       #
       STRING(TOLOWER ${_build} _build_lowercase)
       SET(_target ${_test_name}.${_build_lowercase}) # target name
 
-      # If _n_cpu is equal to "0", a normal, sequental test will be run,
+      # If _n_cpu is equal to "0", a normal, sequential test will be run,
       # otherwise run the test with mpirun:
       IF("${_n_cpu}" STREQUAL "0")
 
@@ -178,8 +178,10 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       #
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
-        COMMAND rm -f ${_test_directory}/failing_output
-        COMMAND touch ${_test_directory}/output
+        COMMAND
+          rm -f ${_test_directory}/failing_output
+        COMMAND
+          touch ${_test_directory}/output
         COMMAND
           ${_run_command}
           || (mv ${_test_directory}/output
@@ -199,8 +201,10 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
         )
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
-        COMMAND rm -f ${_test_directory}/failing_diff
-        COMMAND touch ${_test_directory}/diff
+        COMMAND
+          rm -f ${_test_directory}/failing_diff
+        COMMAND
+          touch ${_test_directory}/diff
         COMMAND
 	  # run diff or numdiff (if available) to determine
 	  # whether files are the same. if they are not, output
@@ -231,13 +235,15 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           ${_comparison_file}
         )
 
-      ADD_CUSTOM_TARGET(${_diff_target} DEPENDS ${_test_directory}/diff
+      ADD_CUSTOM_TARGET(${_diff_target}
         COMMAND
              echo "${_test_full}: BUILD successful."
           && echo "${_test_full}: RUN successful."
           && echo "${_test_full}: DIFF successful."
           && echo "${_test_full}: PASSED."
-        )
+        DEPENDS
+          ${_test_directory}/diff
+      )
 
       #
       # And finally add the test:

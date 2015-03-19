@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -329,9 +329,12 @@ namespace BlockMatrixIterators
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2000, 2004
  */
 template <typename MatrixType>
@@ -619,15 +622,11 @@ public:
    * Call the compress() function on all the subblocks of the matrix.
    *
    *
-   * See @ref GlossCompress "Compressing distributed objects" for more
-   * information.
+   * See
+   * @ref GlossCompress "Compressing distributed objects"
+   * for more information.
    */
   void compress (::dealii::VectorOperation::values operation);
-
-  /**
-   * @deprecated: use compress() with VectorOperation instead.
-   */
-  void compress () DEAL_II_DEPRECATED;
 
   /**
    * Multiply the entire matrix by a fixed factor.
@@ -1633,7 +1632,7 @@ BlockMatrixBase<MatrixType>::set (const size_type i,
 {
   prepare_set_operation();
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   const std::pair<unsigned int,size_type>
   row_index = row_block_indices.global_to_local (i),
@@ -1819,7 +1818,7 @@ BlockMatrixBase<MatrixType>::add (const size_type  i,
                                   const value_type value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   prepare_add_operation();
 
@@ -2065,7 +2064,7 @@ void
 BlockMatrixBase<MatrixType>::add (const value_type                   factor,
                                   const BlockMatrixBase<MatrixType> &matrix)
 {
-  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  AssertIsFinite(factor);
 
   prepare_add_operation();
 
@@ -2140,14 +2139,6 @@ BlockMatrixBase<MatrixType>::compress (::dealii::VectorOperation::values operati
   for (unsigned int r=0; r<n_block_rows(); ++r)
     for (unsigned int c=0; c<n_block_cols(); ++c)
       block(r,c).compress (operation);
-}
-
-template <class MatrixType>
-inline
-void
-BlockMatrixBase<MatrixType>::compress ()
-{
-  compress(::dealii::VectorOperation::unknown);
 }
 
 

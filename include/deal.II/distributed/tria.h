@@ -71,9 +71,9 @@ namespace internal
     /**
      * A structure whose explicit specializations contain typedefs to the
      * relevant p4est_* and p8est_* types. Using this structure, for example
-     * by saying <tt>types<dim>::connectivity</tt> we can write code in
-     * a dimension independent way, either referring to p4est_connectivity_t
-     * or p8est_connectivity_t, depending on template argument.
+     * by saying <tt>types<dim>::connectivity</tt> we can write code in a
+     * dimension independent way, either referring to p4est_connectivity_t or
+     * p8est_connectivity_t, depending on template argument.
      */
     template <int> struct types;
 
@@ -172,15 +172,19 @@ namespace parallel
      * dealii::Triangulation class but there are a number of difficult
      * algorithms under the hood that ensure we always have a load-balanced,
      * fully distributed mesh. Use of this class is explained in step-40,
-     * step-32, the @ref distributed documentation module, as well as the
-     * @ref distributed_paper . See there for more information. This class
-     * satisfies the requirements outlined in @ref GlossMeshAsAContainer
-     * "Meshes as containers".
+     * step-32, the
+     * @ref distributed
+     * documentation module, as well as the
+     * @ref distributed_paper.
+     * See there for more information. This class satisfies the requirements
+     * outlined in
+     * @ref GlossMeshAsAContainer "Meshes as containers".
      *
      * @note This class does not support anisotropic refinement, because it
      * relies on the p4est library that does not support this. Attempts to
-     * refine cells anisotropically will result in errors. @note There is
-     * currently no support for distributing 1d triangulations.
+     * refine cells anisotropically will result in errors.
+     *
+     * @note There is currently no support for distributing 1d triangulations.
      *
      *
      * <h3> Interaction with boundary description </h3>
@@ -191,12 +195,13 @@ namespace parallel
      * mesh that we want to store here from what we have stored before
      * therefore may involve several cycles of refining and coarsening the
      * locally stored set of cells until we have finally gotten from the
-     * previous to the next triangulation. (This process is described in more
-     * detail in the @ref distributed_paper.) Unfortunately, in this process,
-     * some information can get lost relating to flags that are set by user
-     * code and that are inherited from mother to child cell but that are not
-     * moved along with a cell if that cell is migrated from one processor to
-     * another.
+     * previous to the next triangulation. This process is described in more
+     * detail in the
+     * @ref distributed_paper.
+     * Unfortunately, in this process, some information can get lost relating
+     * to flags that are set by user code and that are inherited from mother
+     * to child cell but that are not moved along with a cell if that cell is
+     * migrated from one processor to another.
      *
      * An example are boundary indicators. Assume, for example, that you start
      * with a single cell that is refined once globally, yielding four
@@ -344,8 +349,8 @@ namespace parallel
 
       /**
        * A typedef that is used to to identify
-       * @ref GlossActive "active cell iterators". The concept of iterators
-       * is discussed at length in the
+       * @ref GlossActive "active cell iterators".
+       * The concept of iterators is discussed at length in the
        * @ref Iterators "iterators documentation module".
        *
        * The current typedef identifies active cells in a triangulation. You
@@ -540,7 +545,9 @@ namespace parallel
        * As a consequence of the remark above, the result of this function is
        * always smaller or equal to the result of the function with the same
        * name in the ::Triangulation base class, which includes the active
-       * ghost and artificial cells (see also @ref GlossArtificialCell and
+       * ghost and artificial cells (see also
+       * @ref GlossArtificialCell
+       * and
        * @ref GlossGhostCell).
        */
       unsigned int n_locally_owned_active_cells () const;
@@ -570,8 +577,9 @@ namespace parallel
        * 2:1 relationship between cells, this may mean that there are hanging
        * nodes between cells that are not locally owned or ghost cells (i.e.,
        * between ghost cells and artificial cells, or between artificial and
-       * artificial cells; see @ref GlossArtificialCell "the glossary"). One
-       * is not typically interested in this case, so the function returns
+       * artificial cells; see
+       * @ref GlossArtificialCell "the glossary").
+       * One is not typically interested in this case, so the function returns
        * whether there are hanging nodes between any two cells of the "global"
        * mesh, i.e., the union of locally owned cells on all processors.
        */

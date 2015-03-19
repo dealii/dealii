@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -929,7 +929,7 @@ namespace DataOutBase
      * the instructions provided in
      * http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
      * unless it is at its default value of
-     * std::numeric_limits<double>::min().
+     * @verbatim std::numeric_limits<unsigned int>::min() @endverbatim.
      */
     double time;
 
@@ -941,7 +941,7 @@ namespace DataOutBase
      * the instructions provided in
      * http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
      * unless it is at its default value of
-     * std::numeric_limits<unsigned int>::min().
+     * @verbatim std::numeric_limits<unsigned int>::min() @endverbatim.
      */
     unsigned int cycle;
 
@@ -2319,14 +2319,6 @@ public:
   void write_deal_II_intermediate (std::ostream &out) const;
 
   /**
-   * Create an XDMFEntry based on the data in this DataOutInterface.
-   * @deprecated: use create_xdmf_entry(DataOutFilter, ...) instead
-   */
-  XDMFEntry create_xdmf_entry (const std::string &h5_filename,
-                               const double cur_time,
-                               MPI_Comm comm) const DEAL_II_DEPRECATED;
-
-  /**
    * Create an XDMFEntry based on the data in the data_filter. This assumes
    * the mesh and solution data were written to a single file. See
    * write_xdmf_file() for an example of usage.
@@ -2372,14 +2364,6 @@ public:
                         MPI_Comm comm) const;
 
   /**
-   * Write the data in this class without redundancy filtering to a single
-   * HDF5 file containing both the mesh and solution values.
-   * @deprecated: use write_hdf5_parallel(DataOutFilter, ...) instead
-   */
-  void write_hdf5_parallel (const std::string &filename,
-                            MPI_Comm comm) const DEAL_II_DEPRECATED;
-
-  /**
    * Write the data in data_filter to a single HDF5 file containing both the
    * mesh and solution values. Below is an example of how to use this function
    * with the DataOutFilter:
@@ -2393,7 +2377,8 @@ public:
    * @endcode
    */
   void write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
-                            const std::string &filename, MPI_Comm comm) const;
+                            const std::string &filename,
+                            MPI_Comm comm) const;
 
   /**
    * Write the data in data_filter to HDF5 file(s). If write_mesh_file is
@@ -2403,7 +2388,10 @@ public:
    * and solution values.
    */
   void write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
-                            const bool write_mesh_file, const std::string &mesh_filename, const std::string &solution_filename, MPI_Comm comm) const;
+                            const bool write_mesh_file,
+                            const std::string &mesh_filename,
+                            const std::string &solution_filename,
+                            MPI_Comm comm) const;
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of

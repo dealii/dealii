@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -164,7 +164,7 @@ assemble(const DoFHandler<dim> &dof_handler, SparseMatrix<double> &matrix)
 
 template <int dim>
 void
-assemble(const MGDoFHandler<dim> &dof_handler,
+assemble(const DoFHandler<dim> &dof_handler,
          MGLevelObject<SparseMatrix<double> > matrix,
          MGLevelObject<SparseMatrix<double> > dg_up,
          MGLevelObject<SparseMatrix<double> > dg_down)
@@ -199,7 +199,7 @@ assemble(const MGDoFHandler<dim> &dof_handler,
 
 template <int dim>
 void
-test_simple(MGDoFHandler<dim> &mgdofs)
+test_simple(DoFHandler<dim> &mgdofs)
 {
   SparsityPattern pattern;
   SparseMatrix<double> matrix;
@@ -278,8 +278,9 @@ test(const FiniteElement<dim> &fe)
        cell != tr.end(); ++cell, ++cn)
     cell->set_user_index(cn);
 
-  MGDoFHandler<dim> dofs(tr);
+  DoFHandler<dim> dofs(tr);
   dofs.distribute_dofs(fe);
+  dofs.distribute_mg_dofs(fe);
   deallog << "DoFHandler " << dofs.n_dofs() << " levels";
   for (unsigned int l=0; l<tr.n_levels(); ++l)
     deallog << ' ' << l << ':' << dofs.n_dofs(l);

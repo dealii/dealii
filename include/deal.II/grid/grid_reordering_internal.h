@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -276,8 +276,8 @@ namespace internal
        * side_hop(&qnum, &lsn) has qnum being the quadnumber of a quad in the
        * triangulation, and a local side number. side_hop then sets qnum to
        * the quadnumber across the other side of the side, and sets lsn so
-       * that quads[qnum].sides[lsn] is the same before and after the call.
-       * if there is no other quad on the other side of the current quad, then
+       * that quads[qnum].sides[lsn] is the same before and after the call. If
+       * there is no other quad on the other side of the current quad, then
        * side_hop returns false.
        */
       bool side_hop (unsigned int &qnum,

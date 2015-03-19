@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +20,7 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/precondition_block_base.h>
-#include <deal.II/lac/block_list.h>
+#include <deal.II/lac/sparsity_pattern.h>
 
 #include <vector>
 #include <set>
@@ -28,9 +28,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * @warning The part of the interface based on BlockList may change in a
- * future release.
- *
  * Base class for the implementation of overlapping, multiplicative Schwarz
  * relaxation methods and smoothers.
  *
@@ -223,10 +220,10 @@ protected:
  *
  * This class implements the step() and Tstep() functions expected by
  * SolverRelaxation and MGSmootherRelaxation. They perform an additive Schwarz
- * method on the blocks provided in the BlockList of AdditionalData. Differing
- * from PreconditionBlockJacobi, these blocks may be of varying size, non-
- * contiguous, and overlapping. On the other hand, this class does not
- * implement the preconditioner interface expected by Solver objects.
+ * method on the blocks provided in the block list of AdditionalData.
+ * Differing from PreconditionBlockJacobi, these blocks may be of varying
+ * size, non- contiguous, and overlapping. On the other hand, this class does
+ * not implement the preconditioner interface expected by Solver objects.
  *
  * @ingroup Preconditioners
  * @author Guido Kanschat
@@ -307,7 +304,7 @@ public:
  *
  * This class implements the step() and Tstep() functions expected by
  * SolverRelaxation and MGSmootherRelaxation. They perform a multiplicative
- * Schwarz method on the blocks provided in the BlockList of AdditionalData.
+ * Schwarz method on the blocks provided in the block list of AdditionalData.
  * Differing from PreconditionBlockSOR, these blocks may be of varying size,
  * non-contiguous, and overlapping. On the other hand, this class does not
  * implement the preconditioner interface expected by Solver objects.
@@ -386,9 +383,9 @@ public:
  *
  * This class implements the step() and Tstep() functions expected by
  * SolverRelaxation and MGSmootherRelaxation. They perform a multiplicative
- * Schwarz method on the blocks provided in the BlockList of AdditionalData in
- * symmetric fashion. Differing from PreconditionBlockSSOR, these blocks may
- * be of varying size, non-contiguous, and overlapping. On the other hand,
+ * Schwarz method on the blocks provided in the block list of AdditionalData
+ * in symmetric fashion. Differing from PreconditionBlockSSOR, these blocks
+ * may be of varying size, non-contiguous, and overlapping. On the other hand,
  * this class does not implement the preconditioner interface expected by
  * Solver objects.
  *

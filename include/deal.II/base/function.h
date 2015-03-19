@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,25 +49,25 @@ template <int rank, int dim, typename Number> class TensorFunction;
  * object represents. Access to function objects therefore is through the
  * following methods:
  * @code
- *                 // access to one component at one point
- *   double value        (const Point<dim, Number>   &p,
+ *   // access to one component at one point
+ *   double value        (const Point<dim>   &p,
  *                        const unsigned int  component = 0) const;
  *
- *                 // return all components at one point
- *   void   vector_value (const Point<dim, Number>   &p,
+ *   // return all components at one point
+ *   void   vector_value (const Point<dim>   &p,
  *                        Vector<double>     &value) const;
  * @endcode
  *
  * For more efficiency, there are other functions returning one or all
  * components at a list of points at once:
  * @code
- *                 // access to one component at several points
- *   void   value_list (const std::vector<Point<dim, Number> >  &point_list,
+ *   // access to one component at several points
+ *   void   value_list (const std::vector<Point<dim> >  &point_list,
  *                      std::vector<double>             &value_list,
  *                      const unsigned int  component = 0) const;
  *
- *                 // return all components at several points
- *   void   vector_value_list (const std::vector<Point<dim, Number> >    &point_list,
+ *   // return all components at several points
+ *   void   vector_value_list (const std::vector<Point<dim> >    &point_list,
  *                             std::vector<Vector<double> >      &value_list) const;
  * @endcode
  *
@@ -80,29 +80,48 @@ template <int rank, int dim, typename Number> class TensorFunction;
  * vector_value(), and gradient analogs), while those ones will throw an
  * exception when called but not overloaded.
  *
- * Note however, that conversely the functions returning all components of the
- * function at one or several points (i.e. vector_value(),
- * vector_value_list()), will not call the function returning one component at
- * one point repeatedly, once for each point and component. The reason is
- * efficiency: this would amount to too many virtual function calls. If you
- * have vector-valued functions, you should therefore also provide overloads
- * of the virtual functions for all components at a time.
+ * Conversely, the functions returning all components of the function at one
+ * or several points (i.e. vector_value(), vector_value_list()), will
+ * <em>not</em> call the function returning one component at one point
+ * repeatedly, once for each point and component. The reason is efficiency:
+ * this would amount to too many virtual function calls. If you have vector-
+ * valued functions, you should therefore also provide overloads of the
+ * virtual functions for all components at a time.
  *
  * Also note, that unless only called a very small number of times, you should
  * overload all sets of functions (returning only one value, as well as those
  * returning a whole array), since the cost of evaluation of a point value is
  * often less than the virtual function call itself.
  *
- *
  * Support for time dependent functions can be found in the base class
  * FunctionTime.
  *
- * @note If the functions you are dealing with have sizes which are a priori
- * known (for example, <tt>dim</tt> elements), you might consider using the
- * TensorFunction class instead. On the other hand, functions like
- * VectorTools::interpolate or VectorTools::interpolate_boundary_values
- * definitely only want objects of the current type. You can use the
- * VectorFunctionFromTensorFunction class to convert the former to the latter.
+ *
+ * <h3>Functions that return tensors</h3>
+ *
+ * If the functions you are dealing with have a number of components that are
+ * a priori known (for example, <tt>dim</tt> elements), you might consider
+ * using the TensorFunction class instead. This is, in particular, true if the
+ * objects you return have the properties of a tensor, i.e., they are for
+ * example dim-dimensional vectors or dim-by-dim matrices. On the other hand,
+ * functions like VectorTools::interpolate or
+ * VectorTools::interpolate_boundary_values definitely only want objects of
+ * the current type. You can use the VectorFunctionFromTensorFunction class to
+ * convert the former to the latter.
+ *
+ *
+ * <h3>Functions that return different fields</h3>
+ *
+ * Most of the time, your functions will have the form $f : \Omega \rightarrow
+ * {\mathbb R}^{n_\text{components}}$. However, there are occasions where you
+ * want the function to return vectors (or scalars) over a different number
+ * field, for example functions that return complex numbers or vectors of
+ * complex numbers: $f : \Omega \rightarrow {\mathbb
+ * C}^{n_\text{components}}$. In such cases, you can use the second template
+ * argument of this class: it describes the scalar type to be used for each
+ * component of your return values. It defaults to @p double, but in the
+ * example above, it could be set to <code>std::complex@<double@></code>.
+ *
  *
  * @ingroup functions
  * @author Wolfgang Bangerth, 1998, 1999, Luca Heltai 2014
@@ -168,7 +187,7 @@ public:
    * component you want to have evaluated; it defaults to zero, i.e. the first
    * component.
    */
-  virtual Number value (const Point<dim, Number>   &p,
+  virtual Number value (const Point<dim>   &p,
                         const unsigned int  component = 0) const;
 
   /**
@@ -178,7 +197,7 @@ public:
    *
    * The default implementation will call value() for each component.
    */
-  virtual void vector_value (const Point<dim, Number>   &p,
+  virtual void vector_value (const Point<dim>   &p,
                              Vector<Number>     &values) const;
 
   /**
@@ -190,7 +209,7 @@ public:
    * By default, this function repeatedly calls value() for each point
    * separately, to fill the output array.
    */
-  virtual void value_list (const std::vector<Point<dim, Number> > &points,
+  virtual void value_list (const std::vector<Point<dim> > &points,
                            std::vector<Number>            &values,
                            const unsigned int              component = 0) const;
 
@@ -204,7 +223,7 @@ public:
    * By default, this function repeatedly calls vector_value() for each point
    * separately, to fill the output array.
    */
-  virtual void vector_value_list (const std::vector<Point<dim, Number> > &points,
+  virtual void vector_value_list (const std::vector<Point<dim> > &points,
                                   std::vector<Vector<Number> >   &values) const;
 
   /**
@@ -215,20 +234,20 @@ public:
    * value_list() for each component. In order to improve performance, this
    * can be reimplemented in derived classes to speed up performance.
    */
-  virtual void vector_values (const std::vector<Point<dim, Number> > &points,
+  virtual void vector_values (const std::vector<Point<dim> > &points,
                               std::vector<std::vector<Number> > &values) const;
 
   /**
    * Return the gradient of the specified component of the function at the
    * given point.
    */
-  virtual Tensor<1,dim, Number> gradient (const Point<dim, Number>   &p,
+  virtual Tensor<1,dim, Number> gradient (const Point<dim>   &p,
                                           const unsigned int  component = 0) const;
 
   /**
    * Return the gradient of all components of the function at the given point.
    */
-  virtual void vector_gradient (const Point<dim, Number>            &p,
+  virtual void vector_gradient (const Point<dim>            &p,
                                 std::vector<Tensor<1,dim, Number> > &gradients) const;
 
   /**
@@ -237,7 +256,7 @@ public:
    * already has the right size, i.e.  the same size as the <tt>points</tt>
    * array.
    */
-  virtual void gradient_list (const std::vector<Point<dim, Number> > &points,
+  virtual void gradient_list (const std::vector<Point<dim> > &points,
                               std::vector<Tensor<1,dim, Number> >    &gradients,
                               const unsigned int              component = 0) const;
 
@@ -249,7 +268,7 @@ public:
    * value_list() for each component. In order to improve performance, this
    * can be reimplemented in derived classes to speed up performance.
    */
-  virtual void vector_gradients (const std::vector<Point<dim, Number> >            &points,
+  virtual void vector_gradients (const std::vector<Point<dim> >            &points,
                                  std::vector<std::vector<Tensor<1,dim, Number> > > &gradients) const;
 
   /**
@@ -261,33 +280,33 @@ public:
    * The outer loop over <tt>gradients</tt> is over the points in the list,
    * the inner loop over the different components of the function.
    */
-  virtual void vector_gradient_list (const std::vector<Point<dim, Number> >            &points,
+  virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
                                      std::vector<std::vector<Tensor<1,dim, Number> > > &gradients) const;
 
   /**
    * Compute the Laplacian of a given component at point <tt>p</tt>.
    */
-  virtual Number laplacian (const Point<dim, Number>   &p,
+  virtual Number laplacian (const Point<dim>   &p,
                             const unsigned int  component = 0) const;
 
   /**
    * Compute the Laplacian of all components at point <tt>p</tt> and store
    * them in <tt>values</tt>.
    */
-  virtual void vector_laplacian (const Point<dim, Number>   &p,
+  virtual void vector_laplacian (const Point<dim>   &p,
                                  Vector<Number>     &values) const;
 
   /**
    * Compute the Laplacian of one component at a set of points.
    */
-  virtual void laplacian_list (const std::vector<Point<dim, Number> > &points,
+  virtual void laplacian_list (const std::vector<Point<dim> > &points,
                                std::vector<Number>            &values,
                                const unsigned int              component = 0) const;
 
   /**
    * Compute the Laplacians of all components at a set of points.
    */
-  virtual void vector_laplacian_list (const std::vector<Point<dim, Number> > &points,
+  virtual void vector_laplacian_list (const std::vector<Point<dim> > &points,
                                       std::vector<Vector<Number> >   &values) const;
 
   /**
@@ -329,30 +348,30 @@ public:
    */
   virtual ~ZeroFunction ();
 
-  virtual Number value (const Point<dim, Number>   &p,
+  virtual Number value (const Point<dim>   &p,
                         const unsigned int  component) const;
 
-  virtual void vector_value (const Point<dim, Number> &p,
+  virtual void vector_value (const Point<dim> &p,
                              Vector<Number>   &return_value) const;
 
-  virtual void value_list (const std::vector<Point<dim, Number> > &points,
+  virtual void value_list (const std::vector<Point<dim> > &points,
                            std::vector<Number>            &values,
                            const unsigned int              component = 0) const;
 
-  virtual void vector_value_list (const std::vector<Point<dim, Number> > &points,
+  virtual void vector_value_list (const std::vector<Point<dim> > &points,
                                   std::vector<Vector<Number> >   &values) const;
 
-  virtual Tensor<1,dim, Number> gradient (const Point<dim, Number> &p,
+  virtual Tensor<1,dim, Number> gradient (const Point<dim> &p,
                                           const unsigned int component = 0) const;
 
-  virtual void vector_gradient (const Point<dim, Number>            &p,
+  virtual void vector_gradient (const Point<dim>            &p,
                                 std::vector<Tensor<1,dim, Number> > &gradients) const;
 
-  virtual void gradient_list (const std::vector<Point<dim, Number> > &points,
+  virtual void gradient_list (const std::vector<Point<dim> > &points,
                               std::vector<Tensor<1,dim, Number> >    &gradients,
                               const unsigned int              component = 0) const;
 
-  virtual void vector_gradient_list (const std::vector<Point<dim, Number> >            &points,
+  virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
                                      std::vector<std::vector<Tensor<1,dim, Number> > > &gradients) const;
 };
 
@@ -397,17 +416,17 @@ public:
    */
   virtual ~ConstantFunction ();
 
-  virtual Number value (const Point<dim, Number>   &p,
+  virtual Number value (const Point<dim>   &p,
                         const unsigned int  component) const;
 
-  virtual void   vector_value (const Point<dim, Number> &p,
+  virtual void   vector_value (const Point<dim> &p,
                                Vector<Number>   &return_value) const;
 
-  virtual void value_list (const std::vector<Point<dim, Number> > &points,
+  virtual void value_list (const std::vector<Point<dim> > &points,
                            std::vector<Number>            &values,
                            const unsigned int              component = 0) const;
 
-  virtual void vector_value_list (const std::vector<Point<dim, Number> > &points,
+  virtual void vector_value_list (const std::vector<Point<dim> > &points,
                                   std::vector<Vector<Number> >   &values) const;
 
   std::size_t memory_consumption () const;
@@ -428,7 +447,8 @@ protected:
  * VectorTools::integrate_difference, where it allows to integrate only one or
  * a few vector components, rather than the entire vector-valued solution. In
  * other words, it acts as a component mask with a single component selected
- * (see the @ref GlossComponentMask "the glossary entry on component masks").
+ * (see the
+ * @ref GlossComponentMask "the glossary entry on component masks").
  * See the step-20 tutorial program for a detailed explanation and a use case.
  *
  * @ingroup functions
@@ -467,7 +487,7 @@ public:
   /**
    * Return the value of the function at the given point for all components.
    */
-  virtual void   vector_value (const Point<dim, Number> &p,
+  virtual void   vector_value (const Point<dim> &p,
                                Vector<Number>   &return_value) const;
 
   /**
@@ -476,7 +496,7 @@ public:
    * already has the right size, i.e. the same size as the <tt>points</tt>
    * array.
    */
-  virtual void vector_value_list (const std::vector<Point<dim, Number> > &points,
+  virtual void vector_value_list (const std::vector<Point<dim> > &points,
                                   std::vector<Vector<Number> >   &values) const;
 
   /**
@@ -500,7 +520,7 @@ protected:
 /**
  * This class provides a way to convert a scalar function of the kind
  * @code
- *   Number foo (const Point<dim, Number> &);
+ *   Number foo (const Point<dim> &);
  * @endcode
  * into an object of type Function@<dim@>. Since the argument returns a
  * scalar, the result is clearly a Function object for which
@@ -529,7 +549,7 @@ protected:
  *   template <int dim, typename Number>
  *   class Norm : public Function<dim, Number> {
  *     public:
- *       virtual Number value (const Point<dim, Number> &p,
+ *       virtual Number value (const Point<dim> &p,
  *                             const unsigned int component) const {
  *         Assert (component == 0, ExcMessage ("This object is scalar!"));
  *         return p.norm();
@@ -541,7 +561,7 @@ protected:
  * and then pass the <code>my_norm_object</code> around, or you could write it
  * like so:
  * @code
- *   ScalarFunctionFromFunctionObject<dim, Number> my_norm_object (&Point<dim, Number>::norm);
+ *   ScalarFunctionFromFunctionObject<dim, Number> my_norm_object (&Point<dim>::norm);
  * @endcode
  *
  * Similarly, to generate an object that computes the distance to a point
@@ -550,14 +570,14 @@ protected:
  *   template <int dim, typename Number>
  *   class DistanceTo : public Function<dim, Number> {
  *     public:
- *       DistanceTo (const Point<dim, Number> &q) : q(q) {}
- *       virtual Number value (const Point<dim, Number> &p,
+ *       DistanceTo (const Point<dim> &q) : q(q) {}
+ *       virtual Number value (const Point<dim> &p,
  *                             const unsigned int component) const {
  *         Assert (component == 0, ExcMessage ("This object is scalar!"));
  *         return q.distance(p);
  *       }
  *     private:
- *       const Point<dim, Number> q;
+ *       const Point<dim> q;
  *    };
  *
  *    Point<2> q (2,3);
@@ -566,7 +586,7 @@ protected:
  * or we could write it like so:
  * @code
  *    ScalarFunctionFromFunctionObject<dim, Number>
- *      my_distance_object (std_cxx11::bind (&Point<dim, Number>::distance,
+ *      my_distance_object (std_cxx11::bind (&Point<dim>::distance,
  *                                           q,
  *                                           std_cxx11::_1));
  * @endcode
@@ -583,13 +603,13 @@ public:
    * convert this into an object that matches the Function<dim, Number>
    * interface.
    */
-  ScalarFunctionFromFunctionObject (const std_cxx11::function<Number (const Point<dim, Number> &)> &function_object);
+  ScalarFunctionFromFunctionObject (const std_cxx11::function<Number (const Point<dim> &)> &function_object);
 
   /**
    * Return the value of the function at the given point. Returns the value
    * the function given to the constructor produces for this point.
    */
-  virtual Number value (const Point<dim, Number>   &p,
+  virtual Number value (const Point<dim>   &p,
                         const unsigned int  component = 0) const;
 
 private:
@@ -597,7 +617,7 @@ private:
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    */
-  const std_cxx11::function<Number (const Point<dim, Number> &)> function_object;
+  const std_cxx11::function<Number (const Point<dim> &)> function_object;
 };
 
 
@@ -650,7 +670,7 @@ public:
    * @param selected_component The single component that should be filled by
    * the first argument.
    */
-  VectorFunctionFromScalarFunctionObject (const std_cxx11::function<Number (const Point<dim, Number> &)> &function_object,
+  VectorFunctionFromScalarFunctionObject (const std_cxx11::function<Number (const Point<dim> &)> &function_object,
                                           const unsigned int selected_component,
                                           const unsigned int n_components);
 
@@ -658,7 +678,7 @@ public:
    * Return the value of the function at the given point. Returns the value
    * the function given to the constructor produces for this point.
    */
-  virtual Number value (const Point<dim, Number>   &p,
+  virtual Number value (const Point<dim>   &p,
                         const unsigned int  component = 0) const;
 
   /**
@@ -666,7 +686,7 @@ public:
    *
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    */
-  virtual void vector_value (const Point<dim, Number>   &p,
+  virtual void vector_value (const Point<dim>   &p,
                              Vector<Number>     &values) const;
 
 private:
@@ -674,7 +694,7 @@ private:
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    */
-  const std_cxx11::function<Number (const Point<dim, Number> &)> function_object;
+  const std_cxx11::function<Number (const Point<dim> &)> function_object;
 
   /**
    * The vector component whose value is to be filled by the given scalar
@@ -751,7 +771,7 @@ public:
   /**
    * Return a single component of a vector-valued function at a given point.
    */
-  virtual Number value (const Point<dim, Number> &p,
+  virtual Number value (const Point<dim> &p,
                         const unsigned int component = 0) const;
 
   /**
@@ -759,7 +779,7 @@ public:
    *
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    */
-  virtual void vector_value (const Point<dim, Number> &p,
+  virtual void vector_value (const Point<dim> &p,
                              Vector<Number>   &values) const;
 
   /**
@@ -769,7 +789,7 @@ public:
    * element of the vector will be passed to vector_value() to evaluate the
    * function
    */
-  virtual void vector_value_list (const std::vector<Point<dim, Number> > &points,
+  virtual void vector_value_list (const std::vector<Point<dim> > &points,
                                   std::vector<Vector<Number> >   &value_list) const;
 
 private:

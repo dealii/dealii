@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,6 +37,11 @@
 #  include <Teuchos_ParameterList.hpp>
 #  include <Epetra_RowMatrix.h>
 #  include <Epetra_Vector.h>
+
+#  if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
+#  include <MueLu.hpp>
+#  include <Teuchos_RCP.hpp>
+#  endif
 
 // forward declarations
 class Ifpack_Preconditioner;
@@ -886,14 +891,14 @@ namespace TrilinosWrappers
 
 
   /**
-   * A wrapper class for an incomplete LU factorization (ILU) preconditioner
-   * for Trilinos matrices. This preconditioner works both in serial and in
-   * parallel, depending on the matrix it is based on. In general, an
-   * incomplete factorization does not take all fill-in elements that would
-   * appear in a full factorization (that is the basis for a direct solve).
-   * Trilinos allows to set the amount of fill-in elements, governed by the
-   * additional data argument <tt>ilu_fill</tt>, so one can gradually choose
-   * between a factorization on the sparse matrix structure only
+   * A wrapper class for an incomplete LU factorization (ILU(k))
+   * preconditioner for Trilinos matrices. This preconditioner works both in
+   * serial and in parallel, depending on the matrix it is based on. In
+   * general, an incomplete factorization does not take all fill-in elements
+   * that would appear in a full factorization (that is the basis for a direct
+   * solve). Trilinos allows to set the amount of fill-in elements, governed
+   * by the additional data argument <tt>ilu_fill</tt>, so one can gradually
+   * choose between a factorization on the sparse matrix structure only
    * (<tt>ilu_fill=0</tt>) to a full factorization (<tt>ilu_fill</tt> in the
    * range of 10 to 50, depending on the spatial dimension of the PDE problem
    * and the degree of the finite element basis functions; generally, more
@@ -901,13 +906,7 @@ namespace TrilinosWrappers
    * integer value).
    *
    * The AdditionalData data structure allows to set preconditioner options.
-   * Besides the fill-in argument, these options are some options for
-   * perturbations (see the documentation of the AdditionalData structure for
-   * details), and a parameter <tt>overlap</tt> that determines if and how
-   * much overlap there should be between the matrix partitions on the various
-   * MPI processes. The default settings are 0 for the additional fill-in, 0
-   * for the absolute augmentation tolerance, 1 for the relative augmentation
-   * tolerance, 0 for the overlap.
+   * See the documentation of the AdditionalData structure for details.
    *
    * Note that a parallel application of the ILU preconditioner is actually a
    * block-Jacobi preconditioner with block size equal to the local matrix
@@ -925,29 +924,43 @@ namespace TrilinosWrappers
   public:
     /**
      * Standardized data struct to pipe additional parameters to the
-     * preconditioner. The Trilinos ILU decomposition allows for some fill-in,
-     * so it actually is a threshold incomplete LU factorization. The amount
-     * of fill-in, and hence, the amount of memory used by this
-     * preconditioner, is controlled by the parameter <tt>ilu_fill</tt>, which
-     * specifies this as a double. When forming the preconditioner, for
-     * certain problems bad conditioning (or just bad luck) can cause the
-     * preconditioner to be very poorly conditioned. Hence it can help to add
-     * diagonal perturbations to the original matrix and form the
-     * preconditioner for this slightly better matrix. <tt>ilu_atol</tt> is an
-     * absolute perturbation that is added to the diagonal before forming the
-     * prec, and <tt>ilu_rtol</tt> is a scaling factor $rtol \geq 1$. The last
-     * parameter specifies the overlap of the partitions when the
-     * preconditioner runs in parallel.
+     * preconditioner:
+     * <ul>
+     *
+     * <li> @p ilu_fill: This specifies the amount of additional fill-in
+     * elements besides the original sparse matrix structure. If $k$ is @p
+     * fill, the sparsity pattern of $A^{k+1}$ is used for the storage of the
+     * result of the Gaussian elemination. This is known as ILU($k$) in the
+     * literature.  When @p fill is large, the preconditioner comes closer to
+     * a (direct) sparse LU decomposition. Note, however, that this will
+     * drastically increase the memory requirement, especially when the
+     * preconditioner is used in 3D.
+     *
+     * <li> @p ilu_atol and @p ilu_rtol: These two parameters allow
+     * perturbation of the diagonal of the matrix, which sometimes can help to
+     * get better preconditioners especially in the case of bad conditioning.
+     * Before factorization, the diagonal entry $a_{ii}$ is replaced by
+     * $\alpha sign(a_{ii}) + \beta a_{ii}$, where $\alpha\geq 0$ is the
+     * absolute threshold @p ilu_atol and $\beta\geq 1$ is the relative
+     * threshold @p ilu_rtol. The default values ($\alpha = 0$, $\beta = 1$)
+     * therefore use the original, unmodified diagonal entry. Suggested values
+     * are in the order of $10^{-5}$ to $10^{-2}$ for @p ilu_atol and 1.01 for
+     * @p ilu_rtol.
+     *
+     * <li> @p overlap: This determines how large the overlap of the local
+     * matrix portions on each processor in a parallel application should be.
+     * An overlap of 0 corresponds to a block diagonal decomposition on each
+     * processor, an overlap of 1 will additionally include a row j if there
+     * is a nonzero entry in column j in one of the own rows. Higher overlap
+     * numbers work accordingly in a recursive fashion. Increasing @p overlap
+     * will increase communication and storage cost. According to the IFPACK
+     * documentation, an overlap of 1 is often effective and values of more
+     * than 3 are rarely needed.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, the level of extra fill-ins is set to be
-       * zero (just use the matrix structure, do not generate any additional
-       * fill-in), the tolerance level are 0 and 1, respectively, and the
-       * overlap in case of a parallel execution is zero. This overlap in a
-       * block-application of the ILU in the parallel case makes the
-       * preconditioner a so-called additive Schwarz preconditioner.
+       * Constructor with default values for all parameters.
        */
       AdditionalData (const unsigned int ilu_fill = 0,
                       const double       ilu_atol = 0.,
@@ -955,31 +968,24 @@ namespace TrilinosWrappers
                       const unsigned int overlap  = 0);
 
       /**
-       * This specifies the amount of additional fill-in elements besides the
-       * sparse matrix structure. When <tt>ilu_fill</tt> is large, this means
-       * that many fill-ins will be added, so that the ILU preconditioner
-       * comes closer to a (direct) sparse LU decomposition. Note, however,
-       * that this will drastically increase the memory requirement,
-       * especially when the preconditioner is used in 3D.
+       * Additional fill-in, see class documentation above.
        */
       unsigned int ilu_fill;
 
       /**
-       * This specifies the amount of an absolute perturbation that will be
-       * added to the diagonal of the matrix, which sometimes can help to get
-       * better preconditioners.
+       * The amount of perturbation to add to diagonal entries. See the class
+       * documentation above for details.
        */
       double ilu_atol;
 
       /**
-       * This specifies the factor by which the diagonal of the matrix will be
-       * scaled, which sometimes can help to get better preconditioners.
+       * Scaling actor for diagonal entries. See the class documentation above
+       * for details.
        */
       double ilu_rtol;
 
       /**
-       * This determines how large the overlap of the local matrix portions on
-       * each processor in a parallel application should be.
+       * Overlap between processors. See the class documentation for details.
        */
       unsigned int overlap;
     };
@@ -1537,6 +1543,235 @@ namespace TrilinosWrappers
      */
     std_cxx11::shared_ptr<SparseMatrix> trilinos_matrix;
   };
+
+
+
+#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
+  /**
+   * This class implements an algebraic multigrid (AMG) preconditioner based
+   * on the Trilinos MueLu implementation, which is a black-box preconditioner
+   * that works well for many PDE-based linear problems. The interface of
+   * PreconditionerAMGMueLu is the same as the interface of PreconditionerAMG
+   * except for the higher_order_elements parameter which does not exist in
+   * PreconditionerAMGMueLu.
+   *
+   * This class requires Trilinos 11.14 or higher.
+   *
+   * This interface should not be considered as stable.
+   *
+   * @ingroup TrilinosWrappers
+   * @ingroup Preconditioners
+   * @author Bruno Turcksin, 2014
+   */
+  class PreconditionAMGMueLu : public PreconditionBase
+  {
+  public:
+
+
+    /**
+     * A data structure that is used to control details of how the algebraic
+     * multigrid is set up. The flags detailed in here are then passed to
+     * the Trilinos MueLu implementation. A structure of the current type are
+     * passed to the constructor of PreconditionAMGMueLu.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor. By default, we pretend to work on elliptic problems with
+       * linear finite elements on a scalar equation.
+       */
+      AdditionalData (const bool                             elliptic = true,
+                      const unsigned int                     n_cycles = 1,
+                      const bool                             w_cyle = false,
+                      const double                           aggregation_threshold = 1e-4,
+                      const std::vector<std::vector<bool> > &constant_modes = std::vector<std::vector<bool> > (0),
+                      const unsigned int                     smoother_sweeps = 2,
+                      const unsigned int                     smoother_overlap = 0,
+                      const bool                             output_details = false,
+                      const char                            *smoother_type = "Chebyshev",
+                      const char                            *coarse_type = "Amesos-KLU");
+
+      /**
+       * Determines whether the AMG preconditioner should be optimized for
+       * elliptic problems (MueLu option smoothed aggregation SA, using a
+       * Chebyshev smoother) or for non-elliptic problems (MueLu option
+       * non-symmetric smoothed aggregation NSSA, smoother is SSOR with
+       * underrelaxation).
+       */
+      bool elliptic;
+
+      /**
+       * Defines how many multigrid cycles should be performed by the
+       * preconditioner.
+       */
+      unsigned int n_cycles;
+
+      /**
+       * Defines whether a w-cycle should be used instead of the standard
+       * setting of a v-cycle.
+       */
+      bool w_cycle;
+
+      /**
+       * This threshold tells the AMG setup how the coarsening should be
+       * performed. In the AMG used by MueLu, all points that strongly couple
+       * with the tentative coarse-level point form one aggregate. The term
+       * <em>strong coupling</em> is controlled by the variable
+       * <tt>aggregation_threshold</tt>, meaning that all elements that are
+       * not smaller than <tt>aggregation_threshold</tt> times the diagonal
+       * element do couple strongly.
+       */
+      double aggregation_threshold;
+
+      /**
+       * Specifies the constant modes (near null space) of the matrix. This
+       * parameter tells AMG whether we work on a scalar equation (where the
+       * near null space only consists of ones) or on a vector-valued
+       * equation.
+       */
+      std::vector<std::vector<bool> > constant_modes;
+
+      /**
+       * Determines how many sweeps of the smoother should be performed. When
+       * the flag <tt>elliptic</tt> is set to <tt>true</tt>, i.e., for
+       * elliptic or almost elliptic problems, the polynomial degree of the
+       * Chebyshev smoother is set to <tt>smoother_sweeps</tt>. The term
+       * sweeps refers to the number of matrix-vector products performed in
+       * the Chebyshev case. In the non-elliptic case,
+       * <tt>smoother_sweeps</tt> sets the number of SSOR relaxation sweeps
+       * for post-smoothing to be performed.
+       */
+      unsigned int smoother_sweeps;
+
+      /**
+       * Determines the overlap in the SSOR/Chebyshev error smoother when run
+       * in parallel.
+       */
+      unsigned int smoother_overlap;
+
+      /**
+       * If this flag is set to <tt>true</tt>, then internal information from
+       * the ML preconditioner is printed to screen. This can be useful when
+       * debugging the preconditioner.
+       */
+      bool output_details;
+
+      /**
+       * Determines which smoother to use for the AMG cycle. Possibilities
+       * for smoother_type are the following:
+       * <ul>
+       *   <li>  "Aztec" </li>
+       *   <li>  "IFPACK" </li>
+       *   <li>  "Jacobi" </li>
+       *   <li>  "ML symmetric Gauss-Seidel" </li>
+       *   <li>  "symmetric Gauss-Seidel" </li>
+       *   <li>  "ML Gauss-Seidel" </li>
+       *   <li>  "Gauss-Seidel" </li>
+       *   <li>  "block Gauss-Seidel" </li>
+       *   <li>  "symmetric block Gauss-Seidel" </li>
+       *   <li>  "Chebyshev" </li>
+       *   <li>  "MLS" </li>
+       *   <li>  "Hiptmair" </li>
+       *   <li>  "Amesos-KLU" </li>
+       *   <li>  "Amesos-Superlu" </li>
+       *   <li>  "Amesos-UMFPACK" </li>
+       *   <li>  "Amesos-Superludist" </li>
+       *   <li>  "Amesos-MUMPS" </li>
+       *   <li>  "user-defined" </li>
+       *   <li>  "SuperLU" </li>
+       *   <li>  "IFPACK-Chebyshev" </li>
+       *   <li>  "self" </li>
+       *   <li>  "do-nothing" </li>
+       *   <li>  "IC" </li>
+       *   <li>  "ICT" </li>
+       *   <li>  "ILU" </li>
+       *   <li>  "ILUT" </li>
+       *   <li>  "Block Chebyshev" </li>
+       *   <li>  "IFPACK-Block Chebyshev" </li>
+       * </ul>
+       */
+      const char *smoother_type;
+
+      /**
+       * Determines which solver to use on the coarsest level. The same
+       * settings as for the smoother type are possible.
+       */
+      const char *coarse_type;
+    };
+
+    /**
+     * Destructor.
+     */
+    ~PreconditionAMGMueLu();
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. The function uses the matrix
+     * format specified in TrilinosWrappers::SparseMatrix.
+     */
+    void initialize (const SparseMatrix   &matrix,
+                     const AdditionalData &additional_data = AdditionalData());
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. As opposed to the other initialize
+     * function above, this function uses an object of type Epetra_CrsMatrixCrs.
+     */
+    void initialize (const Epetra_CrsMatrix &matrix,
+                     const AdditionalData   &additional_data = AdditionalData());
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. The function uses the matrix
+     * format specified in TrilinosWrappers::SparseMatrix.
+     *
+     * This function is similar to the one above, but allows the user to set
+     * most of the options of the Trilinos ML preconditioner. In order to find out
+     * about all the options for ML, we refer to the <a
+     * href=http://trilinos.sandia.gov/packages/ml/mlguide5.pdf>ML user's
+     * guide</a>. Not all ML options have a corresponding MueLu option.
+     */
+    void initialize (const SparseMatrix   &matrix,
+                     Teuchos::ParameterList &muelu_parameters);
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. As opposed to the other initialize
+     * function above, this function uses an object of type Epetra_CrsMatrix.
+     */
+    void initialize (const Epetra_CrsMatrix &matrix,
+                     Teuchos::ParameterList &muelu_parameters);
+
+    /**
+     * Let Trilinos compute a multilevel hierarchy for the solution of a
+     * linear system with the given matrix. This function takes a deal.ii
+     * matrix and copies the content into a Trilinos matrix, so the function
+     * can be considered rather inefficient.
+     */
+    template <typename number>
+    void initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
+                     const AdditionalData                 &additional_data = AdditionalData(),
+                     const double                          drop_tolerance = 1e-13,
+                     const ::dealii::SparsityPattern      *use_this_sparsity = 0);
+
+    /**
+     * Destroys the preconditioner, leaving an object like just after having
+     * called the constructor.
+     */
+    void clear ();
+
+    /**
+     * Prints an estimate of the memory consumption of this class.
+     */
+    size_type memory_consumption () const;
+
+  private:
+    /**
+     * A copy of the deal.II matrix into Trilinos format.
+     */
+    std_cxx11::shared_ptr<SparseMatrix> trilinos_matrix;
+  };
+#endif
 
 
 

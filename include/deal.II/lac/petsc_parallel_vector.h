@@ -153,7 +153,8 @@ namespace PETScWrappers
      * operations at the same time, for example by placing zero additions if
      * necessary.
      *
-     * @see @ref GlossGhostedVector "vectors with ghost elements"
+     * @see
+     * @ref GlossGhostedVector "vectors with ghost elements"
      *
      * @ingroup PETScWrappers
      * @ingroup Vectors
@@ -234,29 +235,6 @@ namespace PETScWrappers
                        const VectorBase   &v,
                        const size_type     local_size);
 
-
-      /**
-       * Constructs a new parallel ghosted PETSc vector from an Indexset. Note
-       * that @p local must be contiguous and the global size of the vector is
-       * determined by local.size(). The global indices in @p ghost are
-       * supplied as ghost indices that can also be read locally.
-       *
-       * Note that the @p ghost IndexSet may be empty and that any indices
-       * already contained in @p local are ignored during construction. That
-       * way, the ghost parameter can equal the set of locally relevant
-       * degrees of freedom, see step-32.
-       *
-       * @deprecated Use Vector::Vector(const IndexSet &,const IndexSet
-       * &,const MPI_Comm &) instead.
-       *
-       * @note This operation always creates a ghosted vector.
-       *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
-       */
-      explicit Vector (const MPI_Comm     &communicator,
-                       const IndexSet   &local,
-                       const IndexSet &ghost) DEAL_II_DEPRECATED;
-
       /**
        * Constructs a new parallel ghosted PETSc vector from an Indexset. Note
        * that @p local must be contiguous and the global size of the vector is
@@ -270,21 +248,12 @@ namespace PETScWrappers
        *
        * @note This operation always creates a ghosted vector.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const IndexSet &local,
               const IndexSet &ghost,
               const MPI_Comm &communicator);
-
-      /**
-       * Constructs a new parallel PETSc vector from an IndexSet. This creates
-       * a non ghosted vector.
-       *
-       * @deprecated Use Vector::Vector(const IndexSet &,const MPI_Comm &)
-       * instead.
-       */
-      explicit Vector (const MPI_Comm &communicator,
-                       const IndexSet &local) DEAL_II_DEPRECATED;
 
       /**
        * Constructs a new parallel PETSc vector from an IndexSet. This creates
@@ -370,22 +339,11 @@ namespace PETScWrappers
                    const bool    fast = false);
 
       /**
-       * Reinit as a ghosted vector. See constructor with same signature for
-       * more details.
-       *
-       * @deprecated Use Vector::reinit(const IndexSet &, const IndexSet &,
-       * const MPI_Comm &) instead.
-       *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
-       */
-      void reinit (const MPI_Comm     &communicator,
-                   const IndexSet   &local,
-                   const IndexSet &ghost) DEAL_II_DEPRECATED;
-      /**
        * Reinit as a vector without ghost elements. See the constructor with
        * same signature for more details.
        *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &local,
                    const IndexSet &ghost,
@@ -395,17 +353,8 @@ namespace PETScWrappers
        * Reinit as a vector without ghost elements. See constructor with same
        * signature for more details.
        *
-       * @deprecated Use Vector::reinit(const IndexSet &, const MPI_Comm &)
-       * instead.
-       */
-      void reinit (const MPI_Comm     &communicator,
-                   const IndexSet   &local) DEAL_II_DEPRECATED;
-
-      /**
-       * Reinit as a vector without ghost elements. See constructor with same
-       * signature for more details.
-       *
-       * @see @ref GlossGhostedVector "vectors with ghost elements"
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const IndexSet &local,
                    const MPI_Comm &communicator);

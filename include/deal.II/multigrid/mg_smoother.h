@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,25 +47,12 @@ class MGSmoother : public MGSmootherBase<VECTOR>
 {
 public:
   /**
-   * Constructor. Sets smoothing parameters and creates a private
-   * GrowingVectorMemory object to be used to retrieve vectors.
+   * Constructor.
    */
   MGSmoother(const unsigned int steps = 1,
              const bool variable = false,
              const bool symmetric = false,
              const bool transpose = false);
-
-  /**
-   * @deprecated Since GrowingVectorMemory now uses a joint memory pool, it is
-   * recommended to use the constructor without the memory object.
-   *
-   * Constructor. Sets memory and smoothing parameters.
-   */
-  MGSmoother(VectorMemory<VECTOR> &mem,
-             const unsigned int steps = 1,
-             const bool variable = false,
-             const bool symmetric = false,
-             const bool transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Modify the number of smoothing steps on finest level.
@@ -94,13 +81,15 @@ public:
    */
   void set_debug (const unsigned int level);
 
-private:
-  /**
-   * The memory object to be used if none is given to the constructor.
-   */
-  GrowingVectorMemory<VECTOR> my_memory;
-
 protected:
+  /**
+   * A memory object to be used for temporary vectors.
+   *
+   * The object is marked as mutable since we will need to use it to allocate
+   * temporary vectors also in functions that are const.
+   */
+  mutable GrowingVectorMemory<VECTOR> vector_memory;
+
   /**
    * Number of smoothing steps on the finest level. If no #variable smoothing
    * is chosen, this is the number of steps on all levels.
@@ -129,11 +118,6 @@ protected:
    * Output debugging information to @p deallog if this is nonzero.
    */
   unsigned int debug;
-
-  /**
-   * Memory for auxiliary vectors.
-   */
-  SmartPointer<VectorMemory<VECTOR>, MGSmoother<VECTOR> > mem;
 };
 
 
@@ -201,7 +185,7 @@ namespace mg
   {
   public:
     /**
-     * Constructor. Sets memory and smoothing parameters.
+     * Constructor. Sets smoothing parameters.
      */
     SmootherRelaxation(const unsigned int steps = 1,
                        const bool variable = false,
@@ -310,17 +294,6 @@ public:
                        const bool variable = false,
                        const bool symmetric = false,
                        const bool transpose = false);
-
-  /**
-   * Constructor. Sets memory and smoothing parameters.
-   *
-   * @deprecated Use the constructor without the vector memory object
-   */
-  MGSmootherRelaxation(VectorMemory<VECTOR> &mem,
-                       const unsigned int steps = 1,
-                       const bool variable = false,
-                       const bool symmetric = false,
-                       const bool transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Initialize for matrices. This function stores pointers to the level
@@ -452,17 +425,6 @@ public:
                          const bool transpose = false);
 
   /**
-   * Constructor. Sets memory and smoothing parameters.
-   *
-   * @deprecated Use the constructor without the vector memory object
-   */
-  MGSmootherPrecondition(VectorMemory<VECTOR> &mem,
-                         const unsigned int steps = 1,
-                         const bool variable = false,
-                         const bool symmetric = false,
-                         const bool transpose = false) DEAL_II_DEPRECATED;
-
-  /**
    * Initialize for matrices. This function stores pointers to the level
    * matrices and initializes the smoothing operator with the same smoother
    * for each level.
@@ -579,26 +541,7 @@ MGSmoother<VECTOR>::MGSmoother(
   variable(variable),
   symmetric(symmetric),
   transpose(transpose),
-  debug(0),
-  mem(&my_memory)
-{}
-
-
-template <class VECTOR>
-inline
-MGSmoother<VECTOR>::MGSmoother(
-  VectorMemory<VECTOR> &mem,
-  const unsigned int steps,
-  const bool variable,
-  const bool symmetric,
-  const bool transpose)
-  :
-  steps(steps),
-  variable(variable),
-  symmetric(symmetric),
-  transpose(transpose),
-  debug(0),
-  mem(&mem)
+  debug(0)
 {}
 
 
@@ -738,26 +681,12 @@ namespace mg
     return sizeof(*this)
            -sizeof(MGLevelObject<RELAX>)
            + MGLevelObject<RELAX>::memory_consumption()
-           + this->mem->memory_consumption();
+           + this->vector_memory.memory_consumption();
   }
 }
 
 
 //----------------------------------------------------------------------//
-
-template <class MATRIX, class RELAX, class VECTOR>
-inline
-MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::MGSmootherRelaxation(
-  VectorMemory<VECTOR> &mem,
-  const unsigned int steps,
-  const bool variable,
-  const bool symmetric,
-  const bool transpose)
-  :
-  MGSmoother<VECTOR>(mem, steps, variable, symmetric, transpose)
-{}
-
-
 
 template <class MATRIX, class RELAX, class VECTOR>
 inline
@@ -921,25 +850,11 @@ memory_consumption () const
   return sizeof(*this)
          + matrices.memory_consumption()
          + smoothers.memory_consumption()
-         + this->mem->memory_consumption();
+         + this->vector_memory.memory_consumption();
 }
 
 
 //----------------------------------------------------------------------//
-
-template <class MATRIX, class PRECONDITIONER, class VECTOR>
-inline
-MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::MGSmootherPrecondition(
-  VectorMemory<VECTOR> &mem,
-  const unsigned int steps,
-  const bool variable,
-  const bool symmetric,
-  const bool transpose)
-  :
-  MGSmoother<VECTOR>(mem, steps, variable, symmetric, transpose)
-{}
-
-
 
 template <class MATRIX, class PRECONDITIONER, class VECTOR>
 inline
@@ -1083,8 +998,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
   if (this->variable)
     steps2 *= (1<<(maxlevel-level));
 
-  typename VectorMemory<VECTOR>::Pointer r(*this->mem);
-  typename VectorMemory<VECTOR>::Pointer d(*this->mem);
+  typename VectorMemory<VECTOR>::Pointer r(this->vector_memory);
+  typename VectorMemory<VECTOR>::Pointer d(this->vector_memory);
 
   r->reinit(u,true);
   d->reinit(u,true);
@@ -1150,7 +1065,7 @@ memory_consumption () const
   return sizeof(*this)
          + matrices.memory_consumption()
          + smoothers.memory_consumption()
-         + this->mem->memory_consumption();
+         + this->vector_memory.memory_consumption();
 }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
 
 
   {
@@ -91,9 +91,9 @@ int main(int argc, char **argv)
     TrilinosWrappers::Vector  f(dim);
     TrilinosWrappers::Vector  u(dim);
     f = 1.;
-    A.compress ();
-    f.compress ();
-    u.compress ();
+    A.compress (VectorOperation::insert);
+    f.compress (VectorOperation::insert);
+    u.compress (VectorOperation::insert);
 
     GrowingVectorMemory<TrilinosWrappers::Vector> mem;
     SolverRichardson<TrilinosWrappers::Vector> solver(control,mem,0.1);

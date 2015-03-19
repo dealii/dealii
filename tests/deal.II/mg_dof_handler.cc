@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-/* Author: Ralf Hartmann, 2005; the MGDoFHandler class had troubles
+/* Author: Ralf Hartmann, 2005; the DoFHandler class had troubles
    when the triangulation had unused vertices before, make sure that
    this is now fixed. */
 
@@ -26,7 +26,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <fstream>
 
@@ -45,7 +45,7 @@ int main ()
   GridGenerator::hyper_cube(tria);
 
   FE_DGQ<dim> fe(1);
-  MGDoFHandler<dim> dof_handler(tria);
+  DoFHandler<dim> dof_handler(tria);
 
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();

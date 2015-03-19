@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * type is really only useful in two contexts: preconditioning and
  * initializing other matrices.
  *
- *  <h4>Initialization</h4>
+ * <h4>Initialization</h4>
  *
  * The main usefulness of this class lies in its ability to initialize other
  * matrix, like this:

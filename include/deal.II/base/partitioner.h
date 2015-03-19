@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2013 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -238,6 +238,13 @@ namespace Utilities
       const MPI_Comm &get_communicator() const;
 
       /**
+       * Returns whether ghost indices have been explicitly added as a @p
+       * ghost_indices argument. Only true if a reinit call or constructor
+       * provided that argument.
+       */
+      bool ghost_indices_initialized() const;
+
+      /**
        * Computes the memory consumption of this structure.
        */
       std::size_t memory_consumption() const;
@@ -320,6 +327,11 @@ namespace Utilities
        * The MPI communicator involved in the problem
        */
       const MPI_Comm communicator;
+
+      /**
+       * Stores whether the ghost indices have been explicitly set.
+       */
+      bool have_ghost_indices;
     };
 
 
@@ -379,8 +391,7 @@ namespace Utilities
     bool
     Partitioner::is_ghost_entry (const types::global_dof_index global_index) const
     {
-      // if the index is in the global range, it is
-      // trivially not a ghost
+      // if the index is in the global range, it is trivially not a ghost
       if (in_local_range(global_index) == true)
         return false;
       else
@@ -401,10 +412,8 @@ namespace Utilities
         return (local_size() +
                 static_cast<unsigned int>(ghost_indices_data.index_within_set (global_index)));
       else
-        // should only end up here in
-        // optimized mode, when we use this
-        // large number to trigger a segfault
-        // when using this method for array
+        // should only end up here in optimized mode, when we use this large
+        // number to trigger a segfault when using this method for array
         // access
         return numbers::invalid_unsigned_int;
     }
@@ -480,8 +489,8 @@ namespace Utilities
     bool
     Partitioner::is_compatible (const Partitioner &part) const
     {
-      // is the partitioner points to the same
-      // memory location as the calling processor
+      // is the partitioner points to the same memory location as the calling
+      // processor
       if (&part == this)
         return true;
       else
@@ -495,11 +504,9 @@ namespace Utilities
     unsigned int
     Partitioner::this_mpi_process() const
     {
-      // return the id from the variable stored in
-      // this class instead of
-      // Utilities::MPI::this_mpi_process() in order
-      // to make this query also work when MPI is
-      // not initialized.
+      // return the id from the variable stored in this class instead of
+      // Utilities::MPI::this_mpi_process() in order to make this query also
+      // work when MPI is not initialized.
       return my_pid;
     }
 
@@ -509,11 +516,9 @@ namespace Utilities
     unsigned int
     Partitioner::n_mpi_processes() const
     {
-      // return the number of MPI processes from the
-      // variable stored in this class instead of
-      // Utilities::MPI::n_mpi_processes() in order
-      // to make this query also work when MPI is
-      // not initialized.
+      // return the number of MPI processes from the variable stored in this
+      // class instead of Utilities::MPI::n_mpi_processes() in order to make
+      // this query also work when MPI is not initialized.
       return n_procs;
     }
 
@@ -524,6 +529,15 @@ namespace Utilities
     Partitioner::get_communicator() const
     {
       return communicator;
+    }
+
+
+
+    inline
+    bool
+    Partitioner::ghost_indices_initialized() const
+    {
+      return have_ghost_indices;
     }
 
 #endif  // ifndef DOXYGEN

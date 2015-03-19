@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,6 @@
 #include <deal.II/base/point.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <vector>
 
@@ -163,10 +162,13 @@ DEAL_II_NAMESPACE_OPEN
  * The component_wise() function allows not only to honor enumeration based on
  * vector components, but also allows to group together vector components into
  * "blocks" using a defaulted argument to the various
- * DoFRenumber::component_wise() functions (see @ref GlossComponent vs
- * @ref GlossBlock for a description of the difference). The blocks designated
- * through this argument may, but do not have to be, equal to the blocks that
- * the finite element reports. For example, a typical Stokes element would be
+ * DoFRenumber::component_wise() functions (see
+ * @ref GlossComponent
+ * vs
+ * @ref GlossBlock
+ * for a description of the difference). The blocks designated through this
+ * argument may, but do not have to be, equal to the blocks that the finite
+ * element reports. For example, a typical Stokes element would be
  * @code
  *   FESystem<dim> stokes_fe (FE_Q<dim>(2), dim,   // dim velocities
  *                            FE_Q<dim>(1), 1);    // one pressure
@@ -246,13 +248,15 @@ DEAL_II_NAMESPACE_OPEN
  * ordering than with another one, then this means that the actual solver is
  * actually several times faster.
  *
- * <table> <tr>
- * <td> @image html "reorder_sparsity_step_31_original.png" </td>
- * <td> @image html "reorder_sparsity_step_31_random.png" </td>
- * <td> @image html "reorder_sparsity_step_31_deal_cmk.png" </td>
- * </tr> <tr> <td>
- * Enumeration as produced by deal.II's DoFHandler::distribute_dofs function
- * and no further reordering apart from the component-wise one.
+ * <table> <tr> <td>
+ * @image html "reorder_sparsity_step_31_original.png"
+ * </td> <td>
+ * @image html "reorder_sparsity_step_31_random.png"
+ * </td> <td>
+ * @image html "reorder_sparsity_step_31_deal_cmk.png"
+ * </td> </tr> <tr> <td> Enumeration as produced by deal.II's
+ * DoFHandler::distribute_dofs function and no further reordering apart from
+ * the component-wise one.
  *
  * With this renumbering, we needed an average of 92.2 iterations for the
  * testcase outlined above, and a runtime of 7min53s. </td> <td> Random
@@ -274,13 +278,15 @@ DEAL_II_NAMESPACE_OPEN
  * With this renumbering, we needed an average of 57.3 iterations for the
  * testcase outlined above, and a runtime of 6min10s. </td> </td> </tr>
  *
- * <tr> <td> @image html "reorder_sparsity_step_31_boost_cmk.png" </td>
- * <td> @image html "reorder_sparsity_step_31_boost_king.png" </td>
- * <td> @image html "reorder_sparsity_step_31_boost_md.png" </td>
- * </tr> <tr> <td> Cuthill-
- * McKee enumeration as produced by calling the BOOST implementation of the
- * algorithm provided by DoFRenumbering::boost::Cuthill_McKee after
- * DoFHandler::distribute_dofs.
+ * <tr> <td>
+ * @image html "reorder_sparsity_step_31_boost_cmk.png"
+ * </td> <td>
+ * @image html "reorder_sparsity_step_31_boost_king.png"
+ * </td> <td>
+ * @image html "reorder_sparsity_step_31_boost_md.png"
+ * </td> </tr> <tr> <td> Cuthill- McKee enumeration as produced by calling the
+ * BOOST implementation of the algorithm provided by
+ * DoFRenumbering::boost::Cuthill_McKee after DoFHandler::distribute_dofs.
  *
  * With this renumbering, we needed an average of 51.7 iterations for the
  * testcase outlined above, and a runtime of 5min52s. </td> <td> King
@@ -310,8 +316,9 @@ DEAL_II_NAMESPACE_OPEN
  * With this renumbering, we needed an average of 58.9 iterations for the
  * testcase outlined above, and a runtime of 6min11s. </td> </tr>
  *
- * <tr> <td> @image html "reorder_sparsity_step_31_downstream.png" </td> <td>
- * </td> <td> </td> </tr> <tr> <td> Downstream enumeration using
+ * <tr> <td>
+ * @image html "reorder_sparsity_step_31_downstream.png"
+ * </td> <td> </td> <td> </td> </tr> <tr> <td> Downstream enumeration using
  * DoFRenumbering::downstream using a direction that points diagonally through
  * the domain.
  *
@@ -343,7 +350,7 @@ namespace DoFRenumbering
     /**
      * Constructor.
      */
-    CompareDownstream (const Point<dim> &dir)
+    CompareDownstream (const Tensor<1,dim> &dir)
       :
       dir(dir)
     {}
@@ -352,7 +359,7 @@ namespace DoFRenumbering
      */
     bool operator () (const Iterator &c1, const Iterator &c2) const
     {
-      const Point<dim> diff = c2->center() - c1->center();
+      const Tensor<1,dim> diff = c2->center() - c1->center();
       return (diff*dir > 0);
     }
 
@@ -360,7 +367,7 @@ namespace DoFRenumbering
     /**
      * Flow direction.
      */
-    const Point<dim> dir;
+    const Tensor<1,dim> dir;
   };
 
 
@@ -377,7 +384,7 @@ namespace DoFRenumbering
     /**
      * Constructor.
      */
-    ComparePointwiseDownstream (const Point<dim> &dir)
+    ComparePointwiseDownstream (const Tensor<1,dim> &dir)
       :
       dir(dir)
     {}
@@ -387,7 +394,7 @@ namespace DoFRenumbering
     bool operator () (const std::pair<Point<dim>,types::global_dof_index> &c1,
                       const std::pair<Point<dim>,types::global_dof_index> &c2) const
     {
-      const Point<dim> diff = c2.first-c1.first;
+      const Tensor<1,dim> diff = c2.first-c1.first;
       return (diff*dir > 0 || (diff*dir==0 && c1.second<c2.second));
     }
 
@@ -395,8 +402,10 @@ namespace DoFRenumbering
     /**
      * Flow direction.
      */
-    const Point<dim> dir;
+    const Tensor<1,dim> dir;
   };
+
+
 
   /**
    * A namespace for the implementation of some renumbering algorithms based
@@ -586,10 +595,6 @@ namespace DoFRenumbering
    *
    * For finite elements with only one component, or a single non-primitive
    * base element, this function is the identity operation.
-   *
-   * @note A similar function, which renumbered all levels existed for
-   * MGDoFHandler. This function was deleted. Thus, you have to call the level
-   * function for each level now.
    */
   template <int dim, int spacedim>
   void
@@ -610,24 +615,13 @@ namespace DoFRenumbering
   /**
    * Sort the degrees of freedom by component. It does the same thing as the
    * above function, only that it does this for one single level of a multi-
-   * level discretization. The non-multigrid part of the MGDoFHandler is not
+   * level discretization. The non-multigrid part of the the DoFHandler is not
    * touched.
    */
   template <class DH>
   void
   component_wise (DH &dof_handler,
                   const unsigned int level,
-                  const std::vector<unsigned int> &target_component = std::vector<unsigned int>());
-
-
-  /**
-   * Sort the degrees of freedom by component. It does the same thing as the
-   * previous functions, but more: it renumbers not only every level of the
-   * multigrid part, but also the global, i.e. non-multigrid components.
-   */
-  template <int dim>
-  void
-  component_wise (MGDoFHandler<dim>               &dof_handler,
                   const std::vector<unsigned int> &target_component = std::vector<unsigned int>());
 
   /**
@@ -670,8 +664,9 @@ namespace DoFRenumbering
    *
    * This function only succeeds if each of the elements in the
    * hp::FECollection attached to the hp::DoFHandler argument has exactly the
-   * same number of blocks (see @ref GlossBlock "the glossary" for more
-   * information). Note that this is not always given: while the
+   * same number of blocks (see
+   * @ref GlossBlock "the glossary"
+   * for more information). Note that this is not always given: while the
    * hp::FECollection class ensures that all of its elements have the same
    * number of vector components, they need not have the same number of
    * blocks. At the same time, this function here needs to match individual
@@ -682,27 +677,6 @@ namespace DoFRenumbering
   template <int dim>
   void
   block_wise (hp::DoFHandler<dim> &dof_handler);
-
-  /**
-   * Sort the degrees of freedom by block. It does the same thing as the above
-   * function, only that it does this for one single level of a multi-level
-   * discretization. The non-multigrid part of the MGDoFHandler is not
-   * touched.
-   */
-  template <int dim>
-  void
-  block_wise (MGDoFHandler<dim>  &dof_handler,
-              const unsigned int  level);
-
-
-  /**
-   * Sort the degrees of freedom by block. It does the same thing as the
-   * previous functions, but more: it renumbers not only every level of the
-   * multigrid part, but also the global, i.e. non-multigrid components.
-   */
-  template <int dim>
-  void
-  block_wise (MGDoFHandler<dim> &dof_handler);
 
   /**
    * Computes the renumbering vector needed by the block_wise() functions.
@@ -834,41 +808,6 @@ namespace DoFRenumbering
               const bool         dof_wise_renumbering = false);
 
   /**
-   * @deprecated Use downstream() instead.
-   */
-  template <class DH>
-  void
-  downstream_dg (DH &dof,
-                 const Point<DH::space_dimension> &direction) DEAL_II_DEPRECATED;
-
-  template <class DH>
-  void
-  downstream_dg (DH &dof,
-                 const Point<DH::space_dimension> &direction)
-  {
-    downstream(dof, direction);
-  }
-
-
-  /**
-   * @deprecated Use downstream() instead.
-   */
-  template <class DH>
-  void
-  downstream_dg (DH &dof,
-                 unsigned int level,
-                 const Point<DH::space_dimension> &direction) DEAL_II_DEPRECATED;
-
-  template <class DH>
-  void
-  downstream_dg (DH &dof,
-                 unsigned int level,
-                 const Point<DH::space_dimension> &direction)
-  {
-    downstream(dof, level, direction);
-  }
-
-  /**
    * Computes the renumbering vector needed by the downstream() function. Does
    * not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
@@ -986,9 +925,10 @@ namespace DoFRenumbering
                                    const std::vector<bool>   &selected_dofs);
 
   /**
-   * Computes the renumbering vector on each level needed by the
+   * This function computes the renumbering vector on each level needed by the
    * sort_selected_dofs_back() function. Does not perform the renumbering on
-   * the MGDoFHandler dofs but returns the renumbering vector.
+   * the DoFHandler dofs but only computes the renumbering and returns the
+   * renumbering vector.
    *
    * @pre The @p selected_dofs array must have as many elements as the @p
    * dof_handler has degrees of freedom on the given level.

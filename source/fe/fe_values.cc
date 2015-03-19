@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3148,14 +3148,6 @@ FEValuesBase<dim,spacedim>::get_normal_vectors () const
 
 
 template <int dim, int spacedim>
-const std::vector<Point<spacedim> > &
-FEValuesBase<dim,spacedim>::get_cell_normal_vectors () const
-{
-  return this->get_normal_vectors ();
-}
-
-
-template <int dim, int spacedim>
 void
 FEValuesBase<dim,spacedim>::transform (
   std::vector<Tensor<1,spacedim> > &transformed,
@@ -3291,7 +3283,7 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
   //
   // TODO: Is it reasonable to introduce a flag "unsafe" in the constructor of
   // FEValues to re-enable this feature?
-  if (multithread_info.n_threads() > 1)
+  if (MultithreadInfo::n_threads() > 1)
     {
       cell_similarity = CellSimilarity::none;
       return;
@@ -3710,11 +3702,12 @@ void FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spaced
 template <int dim, int spacedim>
 void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
 {
-  // first of all, set the
-  // present_face_index (if
-  // available)
+  // first of all, set the present_face_index (if available)
   const typename Triangulation<dim,spacedim>::cell_iterator cell=*this->present_cell;
   this->present_face_index=cell->face_index(face_no);
+
+  Assert(!(this->update_flags & update_jacobian_grads),
+         ExcNotImplemented());
 
   this->get_mapping().fill_fe_face_values(*this->present_cell, face_no,
                                           this->quadrature,
@@ -3722,7 +3715,9 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
                                           this->quadrature_points,
                                           this->JxW_values,
                                           this->boundary_forms,
-                                          this->normal_vectors);
+                                          this->normal_vectors,
+                                          this->jacobians,
+                                          this->inverse_jacobians);
 
   this->get_fe().fill_fe_face_values(this->get_mapping(),
                                      *this->present_cell, face_no,
@@ -3955,8 +3950,10 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
       this->present_face_index=subface_index;
     }
 
-  // now ask the mapping and the finite element
-  // to do the actual work
+  Assert(!(this->update_flags & update_jacobian_grads),
+         ExcNotImplemented());
+
+  // now ask the mapping and the finite element to do the actual work
   this->get_mapping().fill_fe_subface_values(*this->present_cell,
                                              face_no, subface_no,
                                              this->quadrature,
@@ -3964,7 +3961,9 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
                                              this->quadrature_points,
                                              this->JxW_values,
                                              this->boundary_forms,
-                                             this->normal_vectors);
+                                             this->normal_vectors,
+                                             this->jacobians,
+                                             this->inverse_jacobians);
 
   this->get_fe().fill_fe_subface_values(this->get_mapping(),
                                         *this->present_cell,

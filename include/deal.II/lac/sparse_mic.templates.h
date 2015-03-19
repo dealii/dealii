@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,17 +31,6 @@ SparseMIC<number>::SparseMIC ()
   inner_sums(0)
 {}
 
-
-
-template <typename number>
-SparseMIC<number>::SparseMIC (const SparsityPattern &sparsity)
-  :
-  diag(0),
-  inv_diag(0),
-  inner_sums(0)
-{
-  SparseMatrix<number>::reinit (sparsity);
-}
 
 
 template <typename number>
@@ -77,49 +66,18 @@ inline
 void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
                                     const AdditionalData &data)
 {
-  SparseLUDecomposition<number>::initialize(matrix, data);
-
-  decompose(matrix, data.strengthen_diagonal);
-}
-
-
-
-template <typename number>
-void SparseMIC<number>::reinit (const SparsityPattern &sparsity)
-{
-  {
-    std::vector<number> tmp;
-    tmp.swap (diag);
-  }
-  {
-    std::vector<number> tmp;
-    tmp.swap (inv_diag);
-  }
-  {
-    std::vector<number> tmp;
-    tmp.swap (inner_sums);
-  }
-
-  SparseMatrix<number>::reinit(sparsity);
-  this->decomposed = false;
-}
-
-
-
-template <typename number>
-template <typename somenumber>
-void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
-                                   const double                    strengthen_diagonal)
-{
-  SparseLUDecomposition<number>::decompose(matrix, strengthen_diagonal);
-
   Assert (matrix.m()==matrix.n(), ExcNotQuadratic ());
+  Assert (data.strengthen_diagonal>=0, ExcInvalidStrengthening (data.strengthen_diagonal));
+
+  SparseLUDecomposition<number>::initialize(matrix, data);
+  this->strengthen_diagonal = data.strengthen_diagonal;
+  this->prebuild_lower_bound ();
+  this->copy_from (matrix);
+
   Assert (this->m()==this->n(),   ExcNotQuadratic ());
   Assert (matrix.m()==this->m(),  ExcDimensionMismatch(matrix.m(), this->m()));
 
-  Assert (strengthen_diagonal>=0, ExcInvalidStrengthening (strengthen_diagonal));
-
-  if (strengthen_diagonal > 0)
+  if (data.strengthen_diagonal > 0)
     this->strengthen_diagonal_impl ();
 
   // MIC implementation: (S. Margenov lectures)
@@ -185,7 +143,6 @@ void
 SparseMIC<number>::vmult (Vector<somenumber>       &dst,
                           const Vector<somenumber> &src) const
 {
-  SparseLUDecomposition<number>::vmult (dst, src);
   Assert (dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
 

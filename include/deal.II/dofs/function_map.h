@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,14 +27,15 @@ template <int spacedim, typename Number> class Function;
 
 /**
  * This class declares a local typedef that denotes a mapping between a
- * boundary indicator (see @ref GlossBoundaryIndicator) that is used to
- * describe what kind of boundary condition holds on a particular piece of the
- * boundary, and the function describing the actual function that provides the
- * boundary values on this part of the boundary. This type is required in many
- * functions in the library where, for example, we need to know about the
- * functions $h_i(\mathbf x)$ used in boundary conditions @f{align*} \mathbf n
- * \cdot \nabla u = h_i \qquad \qquad \text{on}\
- * \Gamma_i\subset\partial\Omega. @f} An example is the function
+ * boundary indicator (see
+ * @ref GlossBoundaryIndicator)
+ * that is used to describe what kind of boundary condition holds on a
+ * particular piece of the boundary, and the function describing the actual
+ * function that provides the boundary values on this part of the boundary.
+ * This type is required in many functions in the library where, for example,
+ * we need to know about the functions $h_i(\mathbf x)$ used in boundary
+ * conditions @f{align*} \mathbf n \cdot \nabla u = h_i \qquad \qquad
+ * \text{on}\ \Gamma_i\subset\partial\Omega. @f} An example is the function
  * KellyErrorEstimator::estimate() that allows us to provide a set of
  * functions $h_i$ for all those boundary indicators $i$ for which the
  * boundary condition is supposed to be of Neumann type. Of course, the same

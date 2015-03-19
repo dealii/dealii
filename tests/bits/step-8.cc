@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -122,13 +122,13 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
   point_1(0) = 0.5;
   point_2(0) = -0.5;
 
-  if (((p-point_1).square() < 0.2*0.2) ||
-      ((p-point_2).square() < 0.2*0.2))
+  if (((p-point_1).norm_square() < 0.2*0.2) ||
+      ((p-point_2).norm_square() < 0.2*0.2))
     values(0) = 1;
   else
     values(0) = 0;
 
-  if (p.square() < 0.2*0.2)
+  if (p.norm_square() < 0.2*0.2)
     values(1) = 1;
   else
     values(1) = 0;

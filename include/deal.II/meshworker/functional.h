@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2013 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -252,7 +252,7 @@ namespace MeshWorker
     {
       BlockVector<double> *v;
       if (separate_faces &&
-          info.face_number != deal_II_numbers::invalid_unsigned_int)
+          info.face_number != numbers::invalid_unsigned_int)
         v = results.entry<BlockVector<double>*>(1);
       else
         v = results.entry<BlockVector<double>*>(0);

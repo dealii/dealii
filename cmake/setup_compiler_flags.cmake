@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -67,7 +67,6 @@
 
 IF(NOT "${DEAL_II_CXX_FLAGS_SAVED}" STREQUAL "${CACHED_DEAL_II_CXX_FLAGS_SAVED}"
    OR NOT "${DEAL_II_LINKER_FLAGS_SAVED}" STREQUAL "${CACHED_DEAL_II_LINKER_FLAGS_SAVED}")
-  MESSAGE(STATUS "")
   # Rerun this test if cxx flags changed:
   UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
 ELSE()
@@ -105,15 +104,13 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   #
   # *Hooray* We are allowed to set compiler flags :-]
   #
-  MESSAGE(STATUS "")
-  MESSAGE(STATUS "Setting up default compiler flags.")
 
   #
   # General setup for GCC and compilers sufficiently close to GCC:
   #
   IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
       CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-    INCLUDE(setup_compiler_flags_gnu)
+    VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_gnu.cmake)
     SET(DEAL_II_KNOWN_COMPILER TRUE)
   ENDIF()
 
@@ -121,7 +118,7 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   # Setup for ICC compiler (version >= 10):
   #
   IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    INCLUDE(setup_compiler_flags_intel)
+    VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_intel.cmake)
     SET(DEAL_II_KNOWN_COMPILER TRUE)
   ENDIF()
 
@@ -129,7 +126,7 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   # Setup for MSVC compiler (version >= 2012):
   #
    IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    INCLUDE(setup_compiler_flags_msvc)
+    VERBOSE_INCLUDE(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_msvc.cmake)
     SET(DEAL_II_KNOWN_COMPILER TRUE)
   ENDIF()
 
@@ -143,7 +140,6 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
 ELSE(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
-  MESSAGE(STATUS "")
   MESSAGE(STATUS
     "Skipped setup of default compiler flags "
     "(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF)"

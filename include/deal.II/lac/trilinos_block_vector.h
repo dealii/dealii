@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2013 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,8 @@ namespace TrilinosWrappers
    * processor, since the Trilinos matrices are inherently parallel.
    *
    * @ingroup Vectors
-   * @ingroup TrilinosWrappers @see @ref GlossBlockLA "Block (linear algebra)"
+   * @ingroup TrilinosWrappers @see
+   * @ref GlossBlockLA "Block (linear algebra)"
    * @author Martin Kronbichler, 2008
    */
   class BlockVector : public BlockVectorBase<Vector>
@@ -152,21 +153,6 @@ namespace TrilinosWrappers
      * Destructor. Clears memory
      */
     ~BlockVector ();
-
-    /**
-     * use compress(VectorOperation) instead
-     *
-     * @deprecated
-     *
-     * See @ref GlossCompress "Compressing distributed objects" for more
-     * information.
-     */
-    void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
-
-    /**
-     * so it is not hidden
-     */
-    using BlockVectorBase<Vector>::compress;
 
     /**
      * Copy operator: fill all components of the vector that are locally
@@ -409,19 +395,6 @@ namespace TrilinosWrappers
 
     for (size_type i=0; i<this->n_blocks(); ++i)
       this->components[i] = v.components[i];
-  }
-
-
-  inline
-  void
-  BlockVector::compress (const Epetra_CombineMode last_action)
-  {
-    if (last_action == Add)
-      this->compress(::dealii::VectorOperation::add);
-    else if (last_action == Insert)
-      this->compress(::dealii::VectorOperation::insert);
-    else
-      AssertThrow(false, ExcNotImplemented());
   }
 
 

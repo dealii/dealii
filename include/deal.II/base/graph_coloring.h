@@ -1,7 +1,7 @@
 
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,8 +42,9 @@ namespace GraphColoring
      * whether they will have a nonempty intersection. The actual intersection
      * is not computed.
      * @param indices1 A set of indices, assumed sorted.
-     * @param indices2 A set of indices, assumed sorted. @return Whether the
-     * two sets of indices do have a nonempty intersection.
+     * @param indices2 A set of indices, assumed sorted.
+     * @return Whether the two sets of indices do have a nonempty
+     * intersection.
      */
     inline
     bool
@@ -95,11 +96,11 @@ namespace GraphColoring
      * @param[in] end The element past the end of the range of iterators.
      * @param[in] get_conflict_indices A user defined function object
      * returning a set of indicators that are descriptive of what represents a
-     * conflict. See above for a more thorough discussion. @return A set of
-     * sets of iterators (where sets are represented by std::vector for
-     * efficiency). Each element of the outermost set corresponds to the
-     * iterators pointing to objects that are in the same partition (i.e., the
-     * same zone).
+     * conflict. See above for a more thorough discussion.
+     * @return A set of sets of iterators (where sets are represented by
+     * std::vector for efficiency). Each element of the outermost set
+     * corresponds to the iterators pointing to objects that are in the same
+     * partition (i.e., the same zone).
      *
      * @author Martin Kronbichler, Bruno Turcksin
      */
@@ -450,7 +451,7 @@ namespace GraphColoring
    * different cells may be to the same matrix entries if the cells share
    * degrees of freedom and, consequently, can not happen at the same time
    * unless we want to risk a race condition (see
-   * http://en.wikipedia.org/wiki/Race_condition ). Thus, we call these two
+   * http://en.wikipedia.org/wiki/Race_condition). Thus, we call these two
    * cells in conflict, and we can only allow operations in parallel from
    * cells that do not conflict. In other words, two cells are in conflict if
    * the set of matrix entries (for example characterized by the rows) have a
@@ -492,19 +493,20 @@ namespace GraphColoring
    * color.
    *
    * @note The algorithm used in this function is described in a paper by
-   * Turcksin, Kronbichler and Bangerth, see @ref workstream_paper .
+   * Turcksin, Kronbichler and Bangerth, see
+   * @ref workstream_paper.
    *
    * @param[in] begin The first element of a range of iterators for which a
    * coloring is sought.
    * @param[in] end The element past the end of the range of iterators.
    * @param[in] get_conflict_indices A user defined function object returning
    * a set of indicators that are descriptive of what represents a conflict.
-   * See above for a more thorough discussion. @return A set of sets of
-   * iterators (where sets are represented by std::vector for efficiency).
-   * Each element of the outermost set corresponds to the iterators pointing
-   * to objects that are in the same partition (have the same color) and
-   * consequently do not conflict. The elements of different sets may
-   * conflict.
+   * See above for a more thorough discussion.
+   * @return A set of sets of iterators (where sets are represented by
+   * std::vector for efficiency). Each element of the outermost set
+   * corresponds to the iterators pointing to objects that are in the same
+   * partition (have the same color) and consequently do not conflict. The
+   * elements of different sets may conflict.
    *
    * @author Martin Kronbichler, Bruno Turcksin
    */

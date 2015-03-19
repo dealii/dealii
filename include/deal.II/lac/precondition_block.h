@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,7 +75,8 @@ class PreconditionBlockJacobi;
  * for example, <tt>number==double, inverse_type=float</tt> might be a viable
  * choice.
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Ralf Hartmann, Guido Kanschat
  * @date 1999, 2000, 2010
  */
@@ -297,13 +298,6 @@ public:
   size_type block_size () const;
 
   /**
-   * @deprecated Use size() instead.
-   *
-   * The number of blocks of the matrix.
-   */
-  unsigned int n_blocks() const DEAL_II_DEPRECATED;
-
-  /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
@@ -359,10 +353,6 @@ protected:
    * The inverse permutation vector
    */
   std::vector<size_type> inverse_permutation;
-
-  /**
-   * Flag for diagonal compression. @ref set_same_diagonal()
-   */
 };
 
 
@@ -373,7 +363,9 @@ protected:
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
@@ -523,10 +515,6 @@ public:
   using PreconditionBlockBase<inverse_type>::inverse_householder;
   using PreconditionBlockBase<inverse_type>::inverse_svd;
   using PreconditionBlockBase<inverse_type>::log_statistics;
-  /**
-   * @deprecated Use size() instead
-   */
-  using PreconditionBlock<MATRIX, inverse_type>::n_blocks;
   using PreconditionBlock<MATRIX, inverse_type>::set_permutation;
 
   /**
@@ -639,7 +627,9 @@ private:
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
@@ -794,7 +784,9 @@ protected:
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
@@ -882,14 +874,6 @@ PreconditionBlock<MATRIX, inverse_type>::empty () const
   if (A == 0)
     return true;
   return A->empty();
-}
-
-
-template<class MATRIX, typename inverse_type>
-inline unsigned int
-PreconditionBlock<MATRIX, inverse_type>::n_blocks () const
-{
-  return this->size();
 }
 
 

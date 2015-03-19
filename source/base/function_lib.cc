@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -131,7 +131,7 @@ namespace Functions
             ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i=0; i<points.size(); ++i)
-      gradients[i] = points[i]*2;
+      gradients[i] = static_cast<Tensor<1,dim> >(points[i])*2;
   }
 
 
@@ -1839,7 +1839,7 @@ namespace Functions
 
   template <int dim>
   FourierCosineFunction<dim>::
-  FourierCosineFunction (const Point<dim> &fourier_coefficients)
+  FourierCosineFunction (const Tensor<1,dim> &fourier_coefficients)
     :
     Function<dim> (1),
     fourier_coefficients (fourier_coefficients)
@@ -1875,7 +1875,7 @@ namespace Functions
                                          const unsigned int  component) const
   {
     Assert (component==0, ExcIndexRange(component,0,1));
-    return fourier_coefficients.square() * (-std::cos(fourier_coefficients * p));
+    return (fourier_coefficients * fourier_coefficients) * (-std::cos(fourier_coefficients * p));
   }
 
 
@@ -1887,7 +1887,7 @@ namespace Functions
 
   template <int dim>
   FourierSineFunction<dim>::
-  FourierSineFunction (const Point<dim> &fourier_coefficients)
+  FourierSineFunction (const Tensor<1,dim> &fourier_coefficients)
     :
     Function<dim> (1),
     fourier_coefficients (fourier_coefficients)
@@ -1923,7 +1923,7 @@ namespace Functions
                                        const unsigned int  component) const
   {
     Assert (component==0, ExcIndexRange(component,0,1));
-    return fourier_coefficients.square() * (-std::sin(fourier_coefficients * p));
+    return (fourier_coefficients * fourier_coefficients) * (-std::sin(fourier_coefficients * p));
   }
 
 
@@ -1994,7 +1994,7 @@ namespace Functions
     const unsigned int n = weights.size();
     double sum = 0;
     for (unsigned int s=0; s<n; ++s)
-      sum -= fourier_coefficients[s].square() * std::sin(fourier_coefficients[s] * p);
+      sum -= (fourier_coefficients[s] * fourier_coefficients[s]) * std::sin(fourier_coefficients[s] * p);
 
     return sum;
   }
@@ -2066,7 +2066,7 @@ namespace Functions
     const unsigned int n = weights.size();
     double sum = 0;
     for (unsigned int s=0; s<n; ++s)
-      sum -= fourier_coefficients[s].square() * std::cos(fourier_coefficients[s] * p);
+      sum -= (fourier_coefficients[s] * fourier_coefficients[s]) * std::cos(fourier_coefficients[s] * p);
 
     return sum;
   }
@@ -2177,10 +2177,10 @@ namespace Functions
   {
     Assert(dim==2, ExcNotImplemented());
     const double r = p.distance(center);
-#ifdef HAVE_JN
+#ifdef DEAL_II_HAVE_JN
     return jn(order, r*wave_number);
 #else
-    Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
     return r;
 #endif
   }
@@ -2197,11 +2197,11 @@ namespace Functions
     AssertDimension(points.size(), values.size());
     for (unsigned int k=0; k<points.size(); ++k)
       {
-#ifdef HAVE_JN
+#ifdef DEAL_II_HAVE_JN
         const double r = points[k].distance(center);
         values[k] = jn(order, r*wave_number);
 #else
-        Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+        Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
 #endif
       }
   }
@@ -2217,7 +2217,7 @@ namespace Functions
     const double co = (r==0.) ? 0. : (p(0)-center(0))/r;
     const double si = (r==0.) ? 0. : (p(1)-center(1))/r;
 
-#ifdef HAVE_JN
+#ifdef DEAL_II_HAVE_JN
     const double dJn = (order==0)
                        ? (-jn(1, r*wave_number))
                        : (.5*(jn(order-1, wave_number*r) -jn(order+1, wave_number*r)));
@@ -2226,7 +2226,7 @@ namespace Functions
     result[1] = wave_number * si * dJn;
     return result;
 #else
-    Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
     return Tensor<1,dim>();
 #endif
   }
@@ -2249,13 +2249,13 @@ namespace Functions
         const double co = (r==0.) ? 0. : (p(0)-center(0))/r;
         const double si = (r==0.) ? 0. : (p(1)-center(1))/r;
 
-#ifdef HAVE_JN
+#ifdef DEAL_II_HAVE_JN
         const double dJn = (order==0)
                            ? (-jn(1, r*wave_number))
                            : (.5*(jn(order-1, wave_number*r) -jn(order+1, wave_number*r)));
 #else
         const double dJn = 0.;
-        Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+        Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
 #endif
         Tensor<1,dim> &result = gradients[k];
         result[0] = wave_number * co * dJn;

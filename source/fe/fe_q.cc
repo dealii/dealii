@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,9 @@ FE_Q<dim,spacedim>::FE_Q (const unsigned int degree)
 {
   Assert (degree > 0,
           ExcMessage ("This element can only be used for polynomial degrees "
-                      "greater than zero"));
+                      "greater than zero. If you want an element of polynomial "
+                      "degree zero, then it cannot be continuous and you "
+                      "will want to use FE_DGQ<dim>(0)."));
   std::vector<Point<1> > support_points_1d(degree+1);
   for (unsigned int i=0; i<=degree; ++i)
     support_points_1d[i][0] = static_cast<double>(i)/degree;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -665,13 +665,13 @@ namespace MeshWorker
     for (unsigned int i=0; i<fevalv.size(); ++i)
       {
         FEValuesBase<dim, spacedim> &febase = *fevalv[i];
-        if (info.sub_number != deal_II_numbers::invalid_unsigned_int)
+        if (info.sub_number != numbers::invalid_unsigned_int)
           {
             // This is a subface
             FESubfaceValues<dim> &fe = dynamic_cast<FESubfaceValues<dim>&> (febase);
             fe.reinit(info.cell, info.face_number, info.sub_number);
           }
-        else if (info.face_number != deal_II_numbers::invalid_unsigned_int)
+        else if (info.face_number != numbers::invalid_unsigned_int)
           {
             // This is a face
             FEFaceValues<dim> &fe = dynamic_cast<FEFaceValues<dim>&> (febase);

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -57,7 +57,7 @@ ENDMACRO()
 MACRO(FIND_UMFPACK_LIBRARY _comp _name)
   STRING(TOUPPER ${_comp} _comp_uppercase)
   DEAL_II_FIND_LIBRARY(${_comp}_LIBRARY
-    NAMES ${_name}
+    NAMES ${_name} lib${_name}
     HINTS
       ${${_comp_uppercase}_DIR}
       ${SUITESPARSE_DIR}/${_comp}
@@ -152,6 +152,9 @@ DEAL_II_PACKAGE_HANDLE(UMFPACK
     REQUIRED AMD_LIBRARY
     OPTIONAL METIS_LIBRARIES LAPACK_LIBRARIES rt_LIBRARY
   INCLUDE_DIRS
+    REQUIRED UMFPACK_INCLUDE_DIR AMD_INCLUDE_DIR
+    OPTIONAL SuiteSparse_config_INCLUDE_DIR
+  USER_INCLUDE_DIRS
     REQUIRED UMFPACK_INCLUDE_DIR AMD_INCLUDE_DIR
     OPTIONAL SuiteSparse_config_INCLUDE_DIR
   LINKER_FLAGS

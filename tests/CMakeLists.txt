@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -61,8 +61,8 @@ ENDFOREACH()
 SET(_categories
   a-framework algorithms all-headers aniso arpack base bits build_tests
   codim_one deal.II distributed_grids fe gla grid hp integrators lac lapack
-  manifold matrix_free mesh_converter metis mpi multigrid mumps opencascade
-  petsc serialization slepc trilinos umfpack
+  manifold matrix_free mesh_converter metis mpi multigrid opencascade petsc
+  serialization slepc trilinos umfpack
   )
 
 #

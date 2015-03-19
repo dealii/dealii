@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,12 +44,15 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Usage and state management</h3>
  *
  * Refer to SparseLUDecomposition documentation for suggested usage and state
- * management. This class is used in the @ref step_22 "step-22" tutorial
- * program.
+ * management. This class is used in the
+ * @ref step_22 "step-22"
+ * tutorial program.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Wolfgang Bangerth, 2008, 2009; unified interface: Ralf Hartmann
  */
@@ -69,14 +72,6 @@ public:
    * preconditioner.
    */
   SparseILU ();
-
-  /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions. Instead, pass the
-   * sparsity pattern that you want used for the decomposition in the
-   * AdditionalData structure.
-   */
-  SparseILU (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
   /**
    * Make SparseLUDecomposition::AdditionalData accessible to this class as
@@ -106,22 +101,6 @@ public:
   template <typename somenumber>
   void initialize (const SparseMatrix<somenumber> &matrix,
                    const AdditionalData &parameters = AdditionalData());
-
-  /**
-   * @deprecated This method is deprecated, and left for backward compability.
-   * It will be removed in later versions.
-   */
-  template <typename somenumber>
-  void decompose (const SparseMatrix<somenumber> &matrix,
-                  const double                    strengthen_diagonal=0.) DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated This method is deprecated, and left for backward
-   * compatibility. It will be removed in later versions.
-   */
-  template <typename somenumber>
-  void apply_decomposition (Vector<somenumber>       &dst,
-                            const Vector<somenumber> &src) const DEAL_II_DEPRECATED;
 
   /**
    * Apply the incomplete decomposition, i.e. do one forward-backward step
@@ -163,23 +142,22 @@ public:
                   double,
                   << "The strengthening parameter " << arg1
                   << " is not greater or equal than zero!");
+  /**
+   * Exception
+   */
+  DeclException1 (ExcZeroPivot,
+                  size_type,
+                  << "While computing the ILU decomposition, the algorithm "
+                  "found a zero pivot on the diagonal of row "
+                  << arg1
+                  << ". This must stop the ILU algorithm because it means "
+                  "that the matrix for which you try to compute a "
+                  "decomposition is singular.");
   //@}
 };
 
 /*@}*/
 //---------------------------------------------------------------------------
-
-template <typename number>
-template <typename somenumber>
-inline
-void
-SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
-                                        const Vector<somenumber> &src) const
-{
-  vmult (dst, src);
-}
-
-
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,7 +72,8 @@ DEAL_II_NAMESPACE_OPEN
  * N is the constructor parameter of QGauss.
  *
  * @note Instantiations for this template are provided for dimensions 0, 1, 2,
- * and 3 (see the section on @ref Instantiations).
+ * and 3 (see the section on
+ * @ref Instantiations).
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005, 2009
  */

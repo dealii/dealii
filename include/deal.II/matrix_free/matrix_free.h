@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2014 by the deal.II authors
+// Copyright (C) 2011 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,6 @@
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/matrix_free/helper_functions.h>
@@ -204,7 +203,7 @@ public:
     /**
      * Sets the number of so-called macro cells that should form one
      * partition. If zero size is given, the class tries to find a good size
-     * for the blocks based on multithread_info.n_threads() and the number of
+     * for the blocks based on MultithreadInfo::n_threads() and the number of
      * cells present. Otherwise, the given number is used. If the given number
      * is larger than one third of the number of total cells, this means no
      * parallelism. Note that in the case vectorization is used, a macro cell
@@ -600,7 +599,7 @@ public:
    * range in @p cell_loop runs from zero to n_macro_cells() (exclusive), so
    * this is the appropriate size if you want to store arrays of data for all
    * cells to be worked on. This number is approximately
-   * n_physical_cells()/VectorizedArray<number>::n_array_elements (depending on how
+   * n_physical_cells()/VectorizedArray::n_array_elements (depending on how
    * many cell chunks that do not get filled up completely).
    */
   unsigned int n_macro_cells () const;
@@ -1583,38 +1582,6 @@ reinit(const Mapping<dim>                         &mapping,
 
 
 
-namespace internal
-{
-  namespace MatrixFree
-  {
-    // resolve DoFHandler types
-
-    // MGDoFHandler is deprecated in deal.II but might still be present in
-    // user code, so we need to resolve its type (fortunately, it is derived
-    // from DoFHandler, so we can static_cast it to a DoFHandler<dim>)
-    template <typename DH>
-    inline
-    std::vector<const dealii::DoFHandler<DH::dimension> *>
-    resolve_dof_handler (const std::vector<const DH *> &dof_handler)
-    {
-      std::vector<const dealii::DoFHandler<DH::dimension> *> conversion(dof_handler.size());
-      for (unsigned int i=0; i<dof_handler.size(); ++i)
-        conversion[i] = static_cast<const dealii::DoFHandler<DH::dimension> *>(dof_handler[i]);
-      return conversion;
-    }
-
-    template <int dim>
-    inline
-    std::vector<const dealii::hp::DoFHandler<dim> *>
-    resolve_dof_handler (const std::vector<const dealii::hp::DoFHandler<dim> *> &dof_handler)
-    {
-      return dof_handler;
-    }
-  }
-}
-
-
-
 template <int dim, typename Number>
 template <typename DH, typename Quad>
 void MatrixFree<dim,Number>::
@@ -1630,7 +1597,7 @@ reinit(const Mapping<dim>                         &mapping,
   for (unsigned int q=0; q<quad.size(); ++q)
     quad_hp.push_back (hp::QCollection<1>(quad[q]));
   internal_reinit (mapping,
-                   internal::MatrixFree::resolve_dof_handler(dof_handler),
+                   dof_handler,
                    constraint, locally_owned_set, quad_hp, additional_data);
 }
 

@@ -34,8 +34,9 @@
 // #else
 // #define DEAL_II_COMPILER_VECTORIZATION_LEVEL 0
 // #endif
-// In addition to checking the flags __AVX__ and __SSE2__, a configure test
-// ensures that these feature are not only present but also working properly.
+// In addition to checking the flags __AVX__ and __SSE2__, a CMake test,
+// 'check_01_cpu_features.cmake', ensures that these feature are not only
+// present but also working properly.
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 // AVX, AVX-512
 #include <immintrin.h>

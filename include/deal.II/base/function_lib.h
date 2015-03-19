@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -635,7 +635,7 @@ namespace Functions
      * Constructor. Take the Fourier coefficients in each space direction as
      * argument.
      */
-    FourierCosineFunction (const Point<dim> &fourier_coefficients);
+    FourierCosineFunction (const Tensor<1,dim> &fourier_coefficients);
 
     /**
      * Return the value of the function at the given point. Unless there is
@@ -662,7 +662,7 @@ namespace Functions
     /**
      * Stored Fourier coefficients.
      */
-    const Point<dim> fourier_coefficients;
+    const Tensor<1,dim> fourier_coefficients;
   };
 
 
@@ -687,7 +687,7 @@ namespace Functions
      * Constructor. Take the Fourier coefficients in each space direction as
      * argument.
      */
-    FourierSineFunction (const Point<dim> &fourier_coefficients);
+    FourierSineFunction (const Tensor<1,dim> &fourier_coefficients);
 
     /**
      * Return the value of the function at the given point. Unless there is
@@ -714,7 +714,7 @@ namespace Functions
     /**
      * Stored Fourier coefficients.
      */
-    const Point<dim> fourier_coefficients;
+    const Tensor<1,dim> fourier_coefficients;
   };
 
 
@@ -1091,10 +1091,10 @@ namespace Functions
    * A scalar function that computes its values by (bi-, tri-)linear
    * interpolation from a set of point data that are arranged on a possibly
    * non-uniform tensor product mesh. In other words, considering the three-
-   * dimensional case, let there be points $x_0,\ldotx, x_{K-1}$,
+   * dimensional case, let there be points $x_0,\ldots, x_{K-1}$,
    * $y_0,\ldots,y_{L-1}$, $z_1,\ldots,z_{M-1}$, and data $d_{klm}$ defined at
    * point $(x_k,y_l,z_m)^T$, then evaluating the function at a point $\mathbf
-   * x=(x,y,z)$ will find the box so that $x_k\le x\le x_{k+1}, y_l\le x\le
+   * x=(x,y,z)$ will find the box so that $x_k\le x\le x_{k+1}, y_l\le y\le
    * y_{l+1}, z_m\le z\le z_{m+1}$, and do a trilinear interpolation of the
    * data on this cell. Similar operations are done in lower dimensions.
    *
@@ -1126,7 +1126,7 @@ namespace Functions
     /**
      * Constructor.
      * @param coordinate_values An array of dim arrays. Each of the inner
-     * arrays contains the coordinate values $x_0,\ldotx, x_{K-1}$ and
+     * arrays contains the coordinate values $x_0,\ldots, x_{K-1}$ and
      * similarly for the other coordinate directions. These arrays need not
      * have the same size. Obviously, we need dim such arrays for a dim-
      * dimensional function object. The coordinate values within this array
@@ -1145,9 +1145,9 @@ namespace Functions
      *
      * @param p The point at which the function is to be evaluated.
      * @param component The vector component. Since this function is scalar,
-     * only zero is a valid argument here. @return The interpolated value at
-     * this point. If the point lies outside the set of coordinates, the
-     * function is extended by a constant.
+     * only zero is a valid argument here.
+     * @return The interpolated value at this point. If the point lies outside
+     * the set of coordinates, the function is extended by a constant.
      */
     virtual
     double
@@ -1171,13 +1171,13 @@ namespace Functions
    * A scalar function that computes its values by (bi-, tri-)linear
    * interpolation from a set of point data that are arranged on a uniformly
    * spaced tensor product mesh. In other words, considering the three-
-   * dimensional case, let there be points $x_0,\ldotx, x_{K-1}$ that result
+   * dimensional case, let there be points $x_0,\ldots, x_{K-1}$ that result
    * from a uniform subdivision of the interval $[x_0,x_{K-1}]$ into $K-1$
    * sub-intervals of size $\Delta x = (x_{K-1}-x_0)/(K-1)$, and similarly
    * $y_0,\ldots,y_{L-1}$, $z_1,\ldots,z_{M-1}$. Also consider data $d_{klm}$
    * defined at point $(x_k,y_l,z_m)^T$, then evaluating the function at a
    * point $\mathbf x=(x,y,z)$ will find the box so that $x_k\le x\le x_{k+1},
-   * y_l\le x\le y_{l+1}, z_m\le z\le z_{m+1}$, and do a trilinear
+   * y_l\le y\le y_{l+1}, z_m\le z\le z_{m+1}$, and do a trilinear
    * interpolation of the data on this cell. Similar operations are done in
    * lower dimensions.
    *
@@ -1210,11 +1210,11 @@ namespace Functions
      * Constructor
      * @param interval_endpoints The left and right end points of the
      * (uniformly subdivided) intervals in each of the coordinate directions.
-     * @param n_subintervals The number of subintervals in
-     * each coordinate direction. A value of one for a coordinate means that
-     * the interval is considered as one subinterval consisting of the entire
-     * range. A value of two means that there are two subintervals each with
-     * one half of the range, etc.
+     * @param n_subintervals The number of subintervals in each coordinate
+     * direction. A value of one for a coordinate means that the interval is
+     * considered as one subinterval consisting of the entire range. A value
+     * of two means that there are two subintervals each with one half of the
+     * range, etc.
      * @param data_values A dim-dimensional table of data at each of the mesh
      * points defined by the coordinate arrays above. Note that the Table
      * class has a number of conversion constructors that allow converting
@@ -1230,9 +1230,9 @@ namespace Functions
      *
      * @param p The point at which the function is to be evaluated.
      * @param component The vector component. Since this function is scalar,
-     * only zero is a valid argument here. @return The interpolated value at
-     * this point. If the point lies outside the set of coordinates, the
-     * function is extended by a constant.
+     * only zero is a valid argument here.
+     * @return The interpolated value at this point. If the point lies outside
+     * the set of coordinates, the function is extended by a constant.
      */
     virtual
     double

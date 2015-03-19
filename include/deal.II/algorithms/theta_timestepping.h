@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -212,11 +212,6 @@ namespace Algorithms
     virtual void operator() (AnyData &out, const AnyData &in);
 
     /**
-     * @deprecated Use  the function with AnyData arguments
-     */
-    virtual void operator() (NamedData<VECTOR *> &out, const NamedData<VECTOR *> &in);
-
-    /**
      * Register an event triggered by an outer iteration.
      */
     virtual void notify(const Event &);
@@ -237,10 +232,6 @@ namespace Algorithms
      */
     void parse_parameters (ParameterHandler &param);
 
-    /**
-     * @deprecated Use parse_parameters().
-     */
-    void initialize (ParameterHandler &param) DEAL_II_DEPRECATED;
     /**
      * The current time in the timestepping scheme.
      */

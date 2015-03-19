@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -119,6 +119,27 @@ template <typename number> class Vector;
  * In addition, for some solvers there has to be a global function
  * <tt>swap(VECTOR &a, VECTOR &b)</tt> that exchanges the values of the two
  * vectors.
+ *
+ * Finally, the solvers also expect an instantiation of
+ * GrowingVectorMemory@<VECTOR@>. These instantiations are provided by the
+ * deal.II library for the built-in vector types, but must be explicitly added
+ * for user-provided vector classes. Otherwise, the linker will complain that
+ * it cannot find the constructors and destructors of GrowingVectorMemory that
+ * happen in the @p Solver class.
+ *
+ * @code
+ * // Definition and implementation of vector class
+ * class UserVector { ... };
+ *
+ * // Create explicit instantiation for the vector class. If your project
+ * // consists of multiple files, including header files, this instantiation
+ * // must be put in a <code>.cc</code> file in order to instantiate only
+ * // once.
+ * #include <deal.II/lac/vector_memory.templates.h>
+ *
+ * template class VectorMemory<UserVector>;
+ * template class GrowingVectorMemory<UserVector>;
+ * @endcode
  *
  * The preconditioners used must have the same interface as matrices, i.e. in
  * particular they have to provide a member function @p vmult which denotes
@@ -289,8 +310,7 @@ template <typename number> class Vector;
  * @image html "cg-monitor-smoothing-3.png"
  * </td> <td>
  * @image html "cg-monitor-smoothing-4.png"
- * </td>
- * <td>
+ * </td> <td>
  * @image html "cg-monitor-smoothing-5.png"
  * </td> </tr> </table>
  *

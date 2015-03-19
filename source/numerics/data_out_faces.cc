@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -245,7 +245,10 @@ build_one_patch (const FaceDescriptor *cell_and_face,
           // we need to get at the number of the cell to which this face
           // belongs in order to access the cell data. this is not readily
           // available, so choose the following rather inefficient way:
-          Assert (cell_and_face->first->active(), ExcCellNotActiveForCellData());
+          Assert (cell_and_face->first->active(),
+                  ExcMessage("The current function is trying to generate cell-data output "
+                             "for a face that does not belong to an active cell. This is "
+                             "not supported."));
           const unsigned int cell_number
             = std::distance (this->triangulation->begin_active(),
                              typename Triangulation<dimension,space_dimension>::active_cell_iterator(cell_and_face->first));
@@ -281,11 +284,10 @@ void DataOutFaces<dim,DH>::build_patches (const Mapping<dimension> &mapping,
                                       : this->default_subdivisions;
 
   Assert (n_subdivisions >= 1,
-          ExcInvalidNumberOfSubdivisions(n_subdivisions));
+          Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
-  typedef DataOut_DoFData<DH,dimension+1> BaseClass;
   Assert (this->triangulation != 0,
-          typename BaseClass::ExcNoTriangulationSelected());
+          Exceptions::DataOut::ExcNoTriangulationSelected());
 
   unsigned int n_datasets     = this->cell_data.size();
   for (unsigned int i=0; i<this->dof_data.size(); ++i)

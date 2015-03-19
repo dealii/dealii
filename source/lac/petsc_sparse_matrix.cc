@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -262,7 +262,7 @@ namespace PETScWrappers
                           row_lengths[i], &row_entries[0],
                           &row_values[0], INSERT_VALUES);
           }
-        compress ();
+        compress (VectorOperation::insert);
 
 
         // Tell PETSc that we are not

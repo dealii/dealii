@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2014 by the deal.II authors
+ * Copyright (C) 2008 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -64,6 +64,7 @@
 #include <deal.II/lac/sparse_ilu.h>
 
 // This is C++:
+#include <iostream>
 #include <fstream>
 #include <sstream>
 

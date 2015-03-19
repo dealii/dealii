@@ -34,6 +34,7 @@ SET(OPENCASCADE_DIR "" CACHE PATH "An optional hint to a OpenCASCADE installatio
 SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{OPENCASCADE_DIR}")
 SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{OCC_DIR}")
 SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{OCE_DIR}")
+SET_IF_EMPTY(OPENCASCADE_DIR "$ENV{CASROOT}")
 
 
 DEAL_II_FIND_PATH(OPENCASCADE_INCLUDE_DIR Standard_Version.hxx
@@ -60,7 +61,7 @@ FOREACH(_library ${_opencascade_libraries})
   DEAL_II_FIND_LIBRARY(OPENCASCADE_${_library}
     NAMES ${_library}
     HINTS ${OPENCASCADE_DIR}
-    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
+    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib mac64/clang/lib mac32/clang/lib lin64/gcc/lib lin32/gcc/lib
     )
 ENDFOREACH()
 

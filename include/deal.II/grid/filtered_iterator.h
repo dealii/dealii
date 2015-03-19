@@ -62,7 +62,8 @@ namespace IteratorFilters
   /**
    * Filter that evaluates to true if either the iterator points to an object
    * for which the user flag is set or an iterator past the end. See
-   * @ref GlossUserFlags for information about user flags.
+   * @ref GlossUserFlags
+   * for information about user flags.
    *
    * @ingroup Iterators
    */
@@ -170,7 +171,8 @@ namespace IteratorFilters
    * @ref GlossLocallyOwnedCell "locally owned cell".
    *
    * This class is used in step-32, in connection with the methods of the
-   * @ref distributed module.
+   * @ref distributed
+   * module.
    *
    * @ingroup Iterators
    */

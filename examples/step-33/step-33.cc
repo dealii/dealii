@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2013 by the deal.II authors
+ * Copyright (C) 2007 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -28,6 +28,7 @@
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/std_cxx11/array.h>
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/compressed_sparsity_pattern.h>
@@ -185,12 +186,12 @@ namespace Step33
     // to the <code>i</code>th element, and then dereference it. This works
     // for both kinds of vectors -- not the prettiest solution, but one that
     // works.
-    template <typename number, typename InputVector>
+    template <typename Number, typename InputVector>
     static
-    number
+    Number
     compute_kinetic_energy (const InputVector &W)
     {
-      number kinetic_energy = 0;
+      Number kinetic_energy = 0;
       for (unsigned int d=0; d<dim; ++d)
         kinetic_energy += *(W.begin()+first_momentum_component+d) *
                           *(W.begin()+first_momentum_component+d);
@@ -200,14 +201,14 @@ namespace Step33
     }
 
 
-    template <typename number, typename InputVector>
+    template <typename Number, typename InputVector>
     static
-    number
+    Number
     compute_pressure (const InputVector &W)
     {
       return ((gas_gamma-1.0) *
               (*(W.begin() + energy_component) -
-               compute_kinetic_energy<number>(W)));
+               compute_kinetic_energy<Number>(W)));
     }
 
 
@@ -227,15 +228,15 @@ namespace Step33
     // use the automatic differentiation type here.  Similarly, we will call
     // the function with different input vector data types, so we templatize
     // on it as well:
-    template <typename InputVector, typename number>
+    template <typename InputVector, typename Number>
     static
     void compute_flux_matrix (const InputVector &W,
-                              number (&flux)[n_components][dim])
+                              std_cxx11::array <std_cxx11::array <Number, dim>, EulerEquations<dim>::n_components > &flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
       // correspond to the momentum terms:
-      const number pressure = compute_pressure<number> (W);
+      const Number pressure = compute_pressure<Number> (W);
 
       for (unsigned int d=0; d<dim; ++d)
         {
@@ -266,16 +267,15 @@ namespace Step33
     // numerical flux function to enforce boundary conditions.  This routine
     // is the basic Lax-Friedrich's flux with a stabilization parameter
     // $\alpha$. It's form has also been given already in the introduction:
-    template <typename InputVector>
+    template <typename InputVector, typename Number>
     static
-    void numerical_normal_flux (const Point<dim>          &normal,
-                                const InputVector         &Wplus,
-                                const InputVector         &Wminus,
-                                const double               alpha,
-                                Sacado::Fad::DFad<double> (&normal_flux)[n_components])
+    void numerical_normal_flux (const Point<dim>                   &normal,
+                                const InputVector                  &Wplus,
+                                const InputVector                  &Wminus,
+                                const double                        alpha,
+                                std_cxx11::array < Number, n_components> &normal_flux)
     {
-      Sacado::Fad::DFad<double> iflux[n_components][dim];
-      Sacado::Fad::DFad<double> oflux[n_components][dim];
+      std_cxx11::array <std_cxx11::array <Number, dim>, EulerEquations<dim>::n_components > iflux, oflux;
 
       compute_flux_matrix (Wplus, iflux);
       compute_flux_matrix (Wminus, oflux);
@@ -300,10 +300,10 @@ namespace Step33
     // \right)^T$, shown here for the 3d case. More specifically, we will
     // consider only $\mathbf g=(0,0,-1)^T$ in 3d, or $\mathbf g=(0,-1)^T$ in
     // 2d. This naturally leads to the following function:
-    template <typename InputVector, typename number>
+    template <typename InputVector, typename Number>
     static
     void compute_forcing_vector (const InputVector &W,
-                                 number (&forcing)[n_components])
+                                 std_cxx11::array < Number, n_components> &forcing)
     {
       const double gravity = -1.0;
 
@@ -314,9 +314,7 @@ namespace Step33
             forcing[c] = gravity * W[density_component];
             break;
           case energy_component:
-            forcing[c] = gravity *
-                         W[density_component] *
-                         W[first_momentum_component+dim-1];
+            forcing[c] = gravity * W[first_momentum_component+dim-1];
             break;
           default:
             forcing[c] = 0;
@@ -436,7 +434,7 @@ namespace Step33
             // component here so that the average of the velocities is
             // orthogonal to the surface normal.  This creates sensitivities of
             // across the velocity components.
-            Sacado::Fad::DFad<double> vdotn = 0;
+            typename DataVector::value_type vdotn = 0;
             for (unsigned int d = 0; d < dim; d++)
               {
                 vdotn += Wplus[d]*normal_vector[d];
@@ -491,7 +489,7 @@ namespace Step33
       for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
         {
           fe_v.reinit(cell);
-          fe_v.get_function_grads (solution, dU);
+          fe_v.get_function_gradients (solution, dU);
 
           refinement_indicators(cell_no)
             = std::log(1+
@@ -1620,25 +1618,31 @@ namespace Step33
   // residual, adding its negative to the right hand side vector, and adding
   // its derivative with respect to the local variables to the Jacobian
   // (i.e. the Newton matrix). Recall that the cell contributions to the
-  // residual read $F_i = \left(\frac{\mathbf{w}_{n+1} - \mathbf{w}_n}{\delta
-  // t},\mathbf{z}_i\right)_K - \left(\mathbf{F}(\tilde{\mathbf{w}}),
-  // \nabla\mathbf{z}_i\right)_K + h^{\eta}(\nabla \mathbf{w} , \nabla
-  // \mathbf{z}_i)_K - (\mathbf{G}(\tilde{\mathbf w}), \mathbf{z}_i)_K$ where
-  // $\tilde{\mathbf w}$ is represented by the variable <code>W_theta</code>,
-  // $\mathbf{z}_i$ is the $i$th test function, and the scalar product
-  // $\left(\mathbf{F}(\tilde{\mathbf{w}}), \nabla\mathbf{z}\right)_K$ is
+  // residual read
+  // $R_i = \left(\frac{\mathbf{w}^{k}_{n+1} - \mathbf{w}_n}{\delta t} ,
+  // \mathbf{z}_i \right)_K $ $ +
+  // \theta \mathbf{B}(\mathbf{w}^{k}_{n+1})(\mathbf{z}_i)_K $ $ +
+  // (1-\theta) \mathbf{B}(\mathbf{w}_{n}) (\mathbf{z}_i)_K $ where
+  // $\mathbf{B}(\mathbf{w})(\mathbf{z}_i)_K =
+  // - \left(\mathbf{F}(\mathbf{w}),\nabla\mathbf{z}_i\right)_K $ $
+  // + h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}_i)_K $ $
+  // - (\mathbf{G}(\mathbf {w}), \mathbf{z}_i)_K $ for both
+  // $\mathbf{w} = \mathbf{w}^k_{n+1}$ and $\mathbf{w} = \mathbf{w}_{n}$ ,
+  // $\mathbf{z}_i$ is the $i$th vector valued test function.
+  //   Furthermore, the scalar product
+  // $\left(\mathbf{F}(\mathbf{w}), \nabla\mathbf{z}_i\right)_K$ is
   // understood as $\int_K \sum_{c=1}^{\text{n\_components}}
-  // \sum_{d=1}^{\text{dim}} \mathbf{F}(\tilde{\mathbf{w}})_{cd}
-  // \frac{\partial z_c}{x_d}$.
+  // \sum_{d=1}^{\text{dim}} \mathbf{F}(\mathbf{w})_{cd}
+  // \frac{\partial z^c_i}{x_d}$ where $z^c_i$ is the $c$th component of
+  // the $i$th test function.
+  //
   //
   // At the top of this function, we do the usual housekeeping in terms of
   // allocating some local variables that we will need later. In particular,
   // we will allocate variables that will hold the values of the current
   // solution $W_{n+1}^k$ after the $k$th Newton iteration (variable
-  // <code>W</code>), the previous time step's solution $W_{n}$ (variable
-  // <code>W_old</code>), as well as the linear combination $\theta W_{n+1}^k
-  // + (1-\theta)W_n$ that results from choosing different time stepping
-  // schemes (variable <code>W_theta</code>).
+  // <code>W</code>) and the previous time step's solution $W_{n}$ (variable
+  // <code>W_old</code>).
   //
   // In addition to these, we need the gradients of the current variables.  It
   // is a bit of a shame that we have to compute these; we almost don't.  The
@@ -1657,7 +1661,7 @@ namespace Step33
   // Table class also supports.
   //
   // Secondly, we want to use automatic differentiation. To this end, we use
-  // the Sacado::Fad::DFad template for everything that is a computed from the
+  // the Sacado::Fad::DFad template for everything that is computed from the
   // variables with respect to which we would like to compute
   // derivatives. This includes the current solution and gradient at the
   // quadrature points (which are linear combinations of the degrees of
@@ -1681,11 +1685,11 @@ namespace Step33
     Table<2,double>
     W_old (n_q_points, EulerEquations<dim>::n_components);
 
-    Table<2,Sacado::Fad::DFad<double> >
-    W_theta (n_q_points, EulerEquations<dim>::n_components);
-
     Table<3,Sacado::Fad::DFad<double> >
     grad_W (n_q_points, EulerEquations<dim>::n_components, dim);
+
+    Table<3,double>
+    grad_W_old(n_q_points, EulerEquations<dim>::n_components, dim);
 
     std::vector<double> residual_derivatives (dofs_per_cell);
 
@@ -1711,8 +1715,8 @@ namespace Step33
       independent_local_dof_values[i].diff (i, dofs_per_cell);
 
     // After all these declarations, let us actually compute something. First,
-    // the values of <code>W</code>, <code>W_old</code>, <code>W_theta</code>,
-    // and <code>grad_W</code>, which we can compute from the local DoF values
+    // the values of <code>W</code>, <code>W_old</code>, <code>grad_W</code>
+    // and <code>grad_W_old</code>, which we can compute from the local DoF values
     // by using the formula $W(x_q)=\sum_i \mathbf W_i \Phi_i(x_q)$, where
     // $\mathbf W_i$ is the $i$th entry of the (local part of the) solution
     // vector, and $\Phi_i(x_q)$ the value of the $i$th vector-valued shape
@@ -1720,7 +1724,7 @@ namespace Step33
     // computed in a similar way.
     //
     // Ideally, we could compute this information using a call into something
-    // like FEValues::get_function_values and FEValues::get_function_grads,
+    // like FEValues::get_function_values and FEValues::get_function_gradients,
     // but since (i) we would have to extend the FEValues class for this, and
     // (ii) we don't want to make the entire <code>old_solution</code> vector
     // fad types, only the local cell variables, we explicitly code the loop
@@ -1731,9 +1735,11 @@ namespace Step33
         {
           W[q][c]       = 0;
           W_old[q][c]   = 0;
-          W_theta[q][c] = 0;
           for (unsigned int d=0; d<dim; ++d)
-            grad_W[q][c][d] = 0;
+            {
+              grad_W[q][c][d] = 0;
+              grad_W_old[q][c][d] = 0;
+            }
         }
 
     for (unsigned int q=0; q<n_q_points; ++q)
@@ -1745,59 +1751,76 @@ namespace Step33
                      fe_v.shape_value_component(i, q, c);
           W_old[q][c] += old_solution(dof_indices[i]) *
                          fe_v.shape_value_component(i, q, c);
-          W_theta[q][c] += (parameters.theta *
-                            independent_local_dof_values[i]
-                            +
-                            (1-parameters.theta) *
-                            old_solution(dof_indices[i])) *
-                           fe_v.shape_value_component(i, q, c);
 
           for (unsigned int d = 0; d < dim; d++)
-            grad_W[q][c][d] += independent_local_dof_values[i] *
-                               fe_v.shape_grad_component(i, q, c)[d];
+            {
+              grad_W[q][c][d] += independent_local_dof_values[i] *
+                                 fe_v.shape_grad_component(i, q, c)[d];
+              grad_W_old[q][c][d] += old_solution(dof_indices[i]) *
+                                     fe_v.shape_grad_component(i, q, c)[d];
+            }
         }
 
 
     // Next, in order to compute the cell contributions, we need to evaluate
-    // $F(\tilde{\mathbf w})$ and $G(\tilde{\mathbf w})$ at all quadrature
+    // $\mathbf{F}({\mathbf w}^k_{n+1})$, $\mathbf{G}({\mathbf w}^k_{n+1})$ and
+    // $\mathbf{F}({\mathbf w}_n)$, $\mathbf{G}({\mathbf w}_n)$ at all quadrature
     // points. To store these, we also need to allocate a bit of memory. Note
     // that we compute the flux matrices and right hand sides in terms of
     // autodifferentiation variables, so that the Jacobian contributions can
     // later easily be computed from it:
-    typedef Sacado::Fad::DFad<double> FluxMatrix[EulerEquations<dim>::n_components][dim];
-    FluxMatrix *flux = new FluxMatrix[n_q_points];
 
-    typedef Sacado::Fad::DFad<double> ForcingVector[EulerEquations<dim>::n_components];
-    ForcingVector *forcing = new ForcingVector[n_q_points];
+    std::vector <
+    std_cxx11::array <std_cxx11::array <Sacado::Fad::DFad<double>, dim>, EulerEquations<dim>::n_components >
+    > flux(n_q_points);
+
+    std::vector <
+    std_cxx11::array <std_cxx11::array <double, dim>, EulerEquations<dim>::n_components >
+    > flux_old(n_q_points);
+
+    std::vector < std_cxx11::array< Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> > forcing(n_q_points);
+
+    std::vector < std_cxx11::array< double, EulerEquations<dim>::n_components> > forcing_old(n_q_points);
 
     for (unsigned int q=0; q<n_q_points; ++q)
       {
-        EulerEquations<dim>::compute_flux_matrix (W_theta[q], flux[q]);
-        EulerEquations<dim>::compute_forcing_vector (W_theta[q], forcing[q]);
+        EulerEquations<dim>::compute_flux_matrix (W_old[q], flux_old[q]);
+        EulerEquations<dim>::compute_forcing_vector (W_old[q], forcing_old[q]);
+        EulerEquations<dim>::compute_flux_matrix (W[q], flux[q]);
+        EulerEquations<dim>::compute_forcing_vector (W[q], forcing[q]);
       }
 
 
     // We now have all of the pieces in place, so perform the assembly.  We
     // have an outer loop through the components of the system, and an inner
     // loop over the quadrature points, where we accumulate contributions to
-    // the $i$th residual $F_i$. The general formula for this residual is
+    // the $i$th residual $R_i$. The general formula for this residual is
     // given in the introduction and at the top of this function. We can,
     // however, simplify it a bit taking into account that the $i$th
     // (vector-valued) test function $\mathbf{z}_i$ has in reality only a
     // single nonzero component (more on this topic can be found in the @ref
     // vector_valued module). It will be represented by the variable
     // <code>component_i</code> below. With this, the residual term can be
-    // re-written as $F_i = \left(\frac{(\mathbf{w}_{n+1} -
+    // re-written as
+    // @f{eqnarray*}
+    // R_i &=&
+    // \left(\frac{(\mathbf{w}_{n+1} -
     // \mathbf{w}_n)_{\text{component\_i}}}{\delta
-    // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K$ $-
-    // \sum_{d=1}^{\text{dim}} \left(\mathbf{F}
-    // (\tilde{\mathbf{w}})_{\text{component\_i},d},
+    // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K
+    // \\ &-& \sum_{d=1}^{\text{dim}} \left(  \theta \mathbf{F}
+    // ({\mathbf{w}^k_{n+1}})_{\text{component\_i},d} + (1-\theta)
+    // \mathbf{F} ({\mathbf{w}_{n}})_{\text{component\_i},d}  ,
     // \frac{\partial(\mathbf{z}_i)_{\text{component\_i}}} {\partial
-    // x_d}\right)_K$ $+ \sum_{d=1}^{\text{dim}} h^{\eta} \left(\frac{\partial
-    // \mathbf{w}_{\text{component\_i}}}{\partial x_d} , \frac{\partial
-    // (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d} \right)_K$
-    // $-(\mathbf{G}(\tilde{\mathbf{w}} )_{\text{component\_i}},
-    // (\mathbf{z}_i)_{\text{component\_i}})_K$, where integrals are
+    // x_d}\right)_K
+    // \\ &+& \sum_{d=1}^{\text{dim}} h^{\eta} \left( \theta \frac{\partial
+    // (\mathbf{w}^k_{n+1})_{\text{component\_i}}}{\partial x_d} + (1-\theta)
+    // \frac{\partial (\mathbf{w}_n)_{\text{component\_i}}}{\partial x_d} ,
+    // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d} \right)_K
+    // \\ &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}} +
+    // (1-\theta)\mathbf{G}({\mathbf{w}_n})_{\text{component\_i}} ,
+    // (\mathbf{z}_i)_{\text{component\_i}} \right)_K ,
+    // @f}
+    // where integrals are
     // understood to be evaluated through summation over quadrature points.
     //
     // We initially sum all contributions of the residual in the positive
@@ -1806,7 +1829,7 @@ namespace Step33
     // this residual.
     for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
       {
-        Sacado::Fad::DFad<double> F_i = 0;
+        Sacado::Fad::DFad<double> R_i = 0;
 
         const unsigned int
         component_i = fe_v.get_fe().system_to_component_index(i).first;
@@ -1819,24 +1842,27 @@ namespace Step33
         for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
           {
             if (parameters.is_stationary == false)
-              F_i += 1.0 / parameters.time_step *
+              R_i += 1.0 / parameters.time_step *
                      (W[point][component_i] - W_old[point][component_i]) *
                      fe_v.shape_value_component(i, point, component_i) *
                      fe_v.JxW(point);
 
             for (unsigned int d=0; d<dim; d++)
-              F_i -= flux[point][component_i][d] *
+              R_i -= ( parameters.theta * flux[point][component_i][d] +
+                       (1.0-parameters.theta) * flux_old[point][component_i][d] ) *
                      fe_v.shape_grad_component(i, point, component_i)[d] *
                      fe_v.JxW(point);
 
             for (unsigned int d=0; d<dim; d++)
-              F_i += 1.0*std::pow(fe_v.get_cell()->diameter(),
+              R_i += 1.0*std::pow(fe_v.get_cell()->diameter(),
                                   parameters.diffusion_power) *
-                     grad_W[point][component_i][d] *
+                     ( parameters.theta * grad_W[point][component_i][d] +
+                       (1.0-parameters.theta) * grad_W_old[point][component_i][d] ) *
                      fe_v.shape_grad_component(i, point, component_i)[d] *
                      fe_v.JxW(point);
 
-            F_i -= forcing[point][component_i] *
+            R_i -= ( parameters.theta  * forcing[point][component_i] +
+                     (1.0 - parameters.theta) * forcing_old[point][component_i] ) *
                    fe_v.shape_value_component(i, point, component_i) *
                    fe_v.JxW(point);
           }
@@ -1844,24 +1870,21 @@ namespace Step33
         // At the end of the loop, we have to add the sensitivities to the
         // matrix and subtract the residual from the right hand side. Trilinos
         // FAD data type gives us access to the derivatives using
-        // <code>F_i.fastAccessDx(k)</code>, so we store the data in a
+        // <code>R_i.fastAccessDx(k)</code>, so we store the data in a
         // temporary array. This information about the whole row of local dofs
         // is then added to the Trilinos matrix at once (which supports the
         // data types we have chosen).
         for (unsigned int k=0; k<dofs_per_cell; ++k)
-          residual_derivatives[k] = F_i.fastAccessDx(k);
+          residual_derivatives[k] = R_i.fastAccessDx(k);
         system_matrix.add(dof_indices[i], dof_indices, residual_derivatives);
-        right_hand_side(dof_indices[i]) -= F_i.val();
+        right_hand_side(dof_indices[i]) -= R_i.val();
       }
-
-    delete[] forcing;
-    delete[] flux;
   }
 
 
   // @sect4{ConservationLaw::assemble_face_term}
   //
-  // Here, we do essentially the same as in the previous function. t the top,
+  // Here, we do essentially the same as in the previous function. At the top,
   // we introduce the independent variables. Because the current function is
   // also used if we are working on an internal face between two cells, the
   // independent variables are not only the degrees of freedom on the current
@@ -1907,28 +1930,31 @@ namespace Step33
 
 
     // Next, we need to define the values of the conservative variables
-    // $\tilde {\mathbf W}$ on this side of the face ($\tilde {\mathbf W}^+$)
-    // and on the opposite side ($\tilde {\mathbf W}^-$). The former can be
+    // ${\mathbf W}$ on this side of the face ($ {\mathbf W}^+$)
+    // and on the opposite side (${\mathbf W}^-$), for both ${\mathbf W} =
+    // {\mathbf W}^k_{n+1}$ and  ${\mathbf W} = {\mathbf W}_n$.
+    // The "this side" values can be
     // computed in exactly the same way as in the previous function, but note
     // that the <code>fe_v</code> variable now is of type FEFaceValues or
     // FESubfaceValues:
     Table<2,Sacado::Fad::DFad<double> >
     Wplus (n_q_points, EulerEquations<dim>::n_components),
           Wminus (n_q_points, EulerEquations<dim>::n_components);
+    Table<2,double>
+    Wplus_old(n_q_points, EulerEquations<dim>::n_components),
+              Wminus_old(n_q_points, EulerEquations<dim>::n_components);
 
     for (unsigned int q=0; q<n_q_points; ++q)
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         {
           const unsigned int component_i = fe_v.get_fe().system_to_component_index(i).first;
-          Wplus[q][component_i] += (parameters.theta *
-                                    independent_local_dof_values[i]
-                                    +
-                                    (1.0-parameters.theta) *
-                                    old_solution(dof_indices[i])) *
-                                   fe_v.shape_value_component(i, q, component_i);
+          Wplus[q][component_i] +=  independent_local_dof_values[i] *
+                                    fe_v.shape_value_component(i, q, component_i);
+          Wplus_old[q][component_i] +=  old_solution(dof_indices[i]) *
+                                        fe_v.shape_value_component(i, q, component_i);
         }
 
-    // Computing $\tilde {\mathbf W}^-$ is a bit more complicated. If this is
+    // Computing "opposite side" is a bit more complicated. If this is
     // an internal face, we can compute it as above by simply using the
     // independent variables from the neighbor:
     if (external_face == false)
@@ -1938,16 +1964,14 @@ namespace Step33
             {
               const unsigned int component_i = fe_v_neighbor.get_fe().
                                                system_to_component_index(i).first;
-              Wminus[q][component_i] += (parameters.theta *
-                                         independent_neighbor_dof_values[i]
-                                         +
-                                         (1.0-parameters.theta) *
-                                         old_solution(dof_indices_neighbor[i]))*
+              Wminus[q][component_i] += independent_neighbor_dof_values[i] *
                                         fe_v_neighbor.shape_value_component(i, q, component_i);
+              Wminus_old[q][component_i] += old_solution(dof_indices_neighbor[i])*
+                                            fe_v_neighbor.shape_value_component(i, q, component_i);
             }
       }
     // On the other hand, if this is an external boundary face, then the
-    // values of $W^-$ will be either functions of $W^+$, or they will be
+    // values of $\mathbf{W}^-$ will be either functions of $\mathbf{W}^+$, or they will be
     // prescribed, depending on the kind of boundary condition imposed here.
     //
     // To start the evaluation, let us ensure that the boundary id specified
@@ -1974,11 +1998,20 @@ namespace Step33
                                   boundary_values);
 
         for (unsigned int q = 0; q < n_q_points; q++)
-          EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
-                                               fe_v.normal_vector(q),
-                                               Wplus[q],
-                                               boundary_values[q],
-                                               Wminus[q]);
+          {
+            EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
+                                                 fe_v.normal_vector(q),
+                                                 Wplus[q],
+                                                 boundary_values[q],
+                                                 Wminus[q]);
+            // Here we assume that boundary type, boundary normal vector and boundary data values
+            // maintain the same during time advancing.
+            EulerEquations<dim>::compute_Wminus (parameters.boundary_conditions[boundary_id].kind,
+                                                 fe_v.normal_vector(q),
+                                                 Wplus_old[q],
+                                                 boundary_values[q],
+                                                 Wminus_old[q]);
+          }
       }
 
 
@@ -1987,8 +2020,9 @@ namespace Step33
     // w^-, \mathbf n)$ for each quadrature point. Before calling the function
     // that does so, we also need to determine the Lax-Friedrich's stability
     // parameter:
-    typedef Sacado::Fad::DFad<double> NormalFlux[EulerEquations<dim>::n_components];
-    NormalFlux *normal_fluxes = new NormalFlux[n_q_points];
+
+    std::vector< std_cxx11::array < Sacado::Fad::DFad<double>, EulerEquations<dim>::n_components> >  normal_fluxes(n_q_points);
+    std::vector< std_cxx11::array < double, EulerEquations<dim>::n_components> >  normal_fluxes_old(n_q_points);
 
     double alpha;
 
@@ -2006,9 +2040,14 @@ namespace Step33
       }
 
     for (unsigned int q=0; q<n_q_points; ++q)
-      EulerEquations<dim>::numerical_normal_flux(fe_v.normal_vector(q),
-                                                 Wplus[q], Wminus[q], alpha,
-                                                 normal_fluxes[q]);
+      {
+        EulerEquations<dim>::numerical_normal_flux(fe_v.normal_vector(q),
+                                                   Wplus[q], Wminus[q], alpha,
+                                                   normal_fluxes[q]);
+        EulerEquations<dim>::numerical_normal_flux(fe_v.normal_vector(q),
+                                                   Wplus_old[q], Wminus_old[q], alpha,
+                                                   normal_fluxes_old[q]);
+      }
 
     // Now assemble the face term in exactly the same way as for the cell
     // contributions in the previous function. The only difference is that if
@@ -2019,34 +2058,33 @@ namespace Step33
     for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
       if (fe_v.get_fe().has_support_on_face(i, face_no) == true)
         {
-          Sacado::Fad::DFad<double> F_i = 0;
+          Sacado::Fad::DFad<double> R_i = 0;
 
           for (unsigned int point=0; point<n_q_points; ++point)
             {
               const unsigned int
               component_i = fe_v.get_fe().system_to_component_index(i).first;
 
-              F_i += normal_fluxes[point][component_i] *
+              R_i += ( parameters.theta * normal_fluxes[point][component_i] +
+                       (1.0 - parameters.theta) * normal_fluxes_old[point][component_i] ) *
                      fe_v.shape_value_component(i, point, component_i) *
                      fe_v.JxW(point);
             }
 
           for (unsigned int k=0; k<dofs_per_cell; ++k)
-            residual_derivatives[k] = F_i.fastAccessDx(k);
+            residual_derivatives[k] = R_i.fastAccessDx(k);
           system_matrix.add(dof_indices[i], dof_indices, residual_derivatives);
 
           if (external_face == false)
             {
               for (unsigned int k=0; k<dofs_per_cell; ++k)
-                residual_derivatives[k] = F_i.fastAccessDx(dofs_per_cell+k);
+                residual_derivatives[k] = R_i.fastAccessDx(dofs_per_cell+k);
               system_matrix.add (dof_indices[i], dof_indices_neighbor,
                                  residual_derivatives);
             }
 
-          right_hand_side(dof_indices[i]) -= F_i.val();
+          right_hand_side(dof_indices[i]) -= R_i.val();
         }
-
-    delete[] normal_fluxes;
   }
 
 

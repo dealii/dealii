@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -523,15 +523,11 @@ namespace PETScWrappers
      * operations where before only assembly functions were allowed. This
      * function must therefore be called once you have assembled the matrix.
      *
-     * See @ref GlossCompress "Compressing distributed objects" for more
-     * information. more information.
+     * See
+     * @ref GlossCompress "Compressing distributed objects"
+     * for more information.
      */
-    void compress (::dealii::VectorOperation::values operation);
-
-    /**
-     * @deprecated: use compress() with VectorOperation instead.
-     */
-    void compress () DEAL_II_DEPRECATED;
+    void compress (const VectorOperation::values operation);
 
     /**
      * Return the value of the entry (<i>i,j</i>).  This may be an expensive
@@ -912,33 +908,23 @@ namespace PETScWrappers
     Mat matrix;
 
     /**
-     * PETSc doesn't allow to mix additions to matrix entries and overwriting
-     * them (to make synchronisation of parallel computations simpler). Since
-     * the interface of the existing classes don't support the notion of not
-     * interleaving things, we have to emulate this ourselves. The way we do
-     * it is to, for each access operation, store whether it is an insertion
-     * or an addition. If the previous one was of different type, then we
-     * first have to flush the PETSc buffers; otherwise, we can simply go on.
-     *
-     * The following structure and variable declare and store the previous
-     * state.
-     */
-    struct LastAction
-    {
-      enum Values { none, insert, add };
-    };
-
-    /**
      * Store whether the last action was a write or add operation.
      */
-    LastAction::Values last_action;
+    VectorOperation::values last_action;
 
     /**
      * Ensure that the add/set mode that is required for actions following
      * this call is compatible with the current mode. Should be called from
      * all internal functions accessing matrix elements.
      */
-    void prepare_action(const LastAction::Values new_action);
+    void prepare_action(const VectorOperation::values new_action);
+
+    /**
+     * Internal function that checks that there are no pending insert/add
+     * operations. Throws an exception otherwise. Useful before calling
+     * any PETSc internal functions modifying the matrix.
+     */
+    void assert_is_compressed();
 
     /**
      * For some matrix storage formats, in particular for the PETSc
@@ -1173,7 +1159,7 @@ namespace PETScWrappers
                    const size_type   j,
                    const PetscScalar value)
   {
-    Assert (numbers::is_finite(value), ExcNumberNotFinite());
+    AssertIsFinite(value);
 
     set (i, 1, &j, &value, false);
   }
@@ -1240,7 +1226,7 @@ namespace PETScWrappers
                    const PetscScalar  *values,
                    const bool         elide_zero_values)
   {
-    prepare_action(LastAction::insert);
+    prepare_action(VectorOperation::insert);
 
     const PetscInt petsc_i = row;
     PetscInt *col_index_ptr;
@@ -1272,7 +1258,7 @@ namespace PETScWrappers
         for (size_type j=0; j<n_cols; ++j)
           {
             const PetscScalar value = values[j];
-            Assert (numbers::is_finite(value), ExcNumberNotFinite());
+            AssertIsFinite(value);
             if (value != PetscScalar())
               {
                 column_indices[n_columns] = col_indices[j];
@@ -1301,7 +1287,7 @@ namespace PETScWrappers
                    const PetscScalar value)
   {
 
-    Assert (numbers::is_finite(value), ExcNumberNotFinite());
+    AssertIsFinite(value);
 
     if (value == PetscScalar())
       {
@@ -1315,7 +1301,7 @@ namespace PETScWrappers
         // zero. However, these actions are done
         // in case we pass on to the other
         // function.
-        prepare_action(LastAction::add);
+        prepare_action(VectorOperation::add);
 
         return;
       }
@@ -1386,7 +1372,7 @@ namespace PETScWrappers
                    const bool         elide_zero_values,
                    const bool          /*col_indices_are_sorted*/)
   {
-    prepare_action(LastAction::add);
+    prepare_action(VectorOperation::add);
 
     const PetscInt petsc_i = row;
     PetscInt *col_index_ptr;
@@ -1418,7 +1404,7 @@ namespace PETScWrappers
         for (size_type j=0; j<n_cols; ++j)
           {
             const PetscScalar value = values[j];
-            Assert (numbers::is_finite(value), ExcNumberNotFinite());
+            AssertIsFinite(value);
             if (value != PetscScalar())
               {
                 column_indices[n_columns] = col_indices[j];
@@ -1519,14 +1505,24 @@ namespace PETScWrappers
 
   inline
   void
-  MatrixBase::prepare_action(const LastAction::Values new_action)
+  MatrixBase::prepare_action(const VectorOperation::values new_action)
   {
-    if (last_action == new_action)
-      ;
-    else if (last_action == LastAction::none)
+    if (last_action == VectorOperation::unknown)
       last_action = new_action;
-    else
-      Assert (false, ExcWrongMode (last_action, new_action));
+
+    Assert (last_action == new_action, ExcWrongMode (last_action, new_action));
+  }
+
+
+
+  inline
+  void
+  MatrixBase::assert_is_compressed ()
+  {
+    // compress() sets the last action to none, which allows us to check if there
+    // are pending add/insert operations:
+    AssertThrow (last_action == VectorOperation::unknown,
+                 ExcMessage("Error: missing compress() call."));
   }
 
 
@@ -1535,7 +1531,7 @@ namespace PETScWrappers
   void
   MatrixBase::prepare_add()
   {
-    prepare_action(LastAction::add);
+    prepare_action(VectorOperation::add);
   }
 
 
@@ -1544,7 +1540,7 @@ namespace PETScWrappers
   void
   MatrixBase::prepare_set()
   {
-    prepare_action(LastAction::insert);
+    prepare_action(VectorOperation::insert);
   }
 
 #endif // DOXYGEN

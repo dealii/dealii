@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3581,19 +3581,19 @@ namespace internal
           // in this plane. we chose the first one
           // to be the projection of the z-axis
           // to this plane
-          const Point<dim> vector1
+          const Tensor<1,dim> vector1
             = Point<dim>(0,0,1) - ((Point<dim>(0,0,1) * view_direction) * view_direction);
-          const Point<dim> unit_vector1 = vector1 / std::sqrt(vector1.square());
+          const Tensor<1,dim> unit_vector1 = vector1 / vector1.norm();
 
           // now the third vector is fixed. we
           // chose the projection of a more or
           // less arbitrary vector to the plane
           // perpendicular to the first one
-          const Point<dim> vector2
+          const Tensor<1,dim> vector2
             = (Point<dim>(1,0,0)
                - ((Point<dim>(1,0,0) * view_direction) * view_direction)
                - ((Point<dim>(1,0,0) * unit_vector1)   * unit_vector1));
-          const Point<dim> unit_vector2 = vector2 / std::sqrt(vector2.square());
+          const Tensor<1,dim> unit_vector2 = vector2 / vector2.norm();
 
 
           for (; cell!=endc; ++cell)

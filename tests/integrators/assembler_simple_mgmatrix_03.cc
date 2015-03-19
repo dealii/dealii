@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2013 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,7 +26,6 @@
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/meshworker/local_results.h>
@@ -67,16 +66,18 @@ void test(FiniteElement<dim> &fe)
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
 
-  MGDoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
+  dof.distribute_mg_dofs(fe);
   dof.initialize_local_block_info();
-  DoFRenumbering::component_wise(dof);
+  for (unsigned int level=0; level<tr.n_levels(); ++level)
+    DoFRenumbering::component_wise(dof, level);
 
   deallog << "DoFs " << dof.n_dofs() << std::endl;
 
-  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin_active();
-  typename MGDoFHandler<dim>::face_iterator face = cell->face(1);
-  typename MGDoFHandler<dim>::cell_iterator neighbor = cell->neighbor(1);
+  typename DoFHandler<dim>::level_cell_iterator cell = dof.begin_active();
+  typename DoFHandler<dim>::face_iterator face = cell->face(1);
+  typename DoFHandler<dim>::level_cell_iterator neighbor = cell->neighbor(1);
 
   MGLevelObject<SparsityPattern> sparsity(0, tr.n_levels()-1);
   MGLevelObject<SparseMatrix<double> > matrix(0, tr.n_levels()-1);

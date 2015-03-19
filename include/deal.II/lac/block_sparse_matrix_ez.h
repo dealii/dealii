@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,8 @@ template <typename Number> class BlockVector;
  * functions for the multiplication with BlockVector and access to the
  * individual blocks.
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2002, 2003
  */
 template<typename Number>
@@ -352,7 +353,7 @@ BlockSparseMatrixEZ<Number>::set (const size_type i,
                                   const Number value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   const std::pair<size_type,size_type>
   row_index = row_indices.global_to_local (i),
@@ -372,7 +373,7 @@ BlockSparseMatrixEZ<Number>::add (const size_type i,
                                   const Number value)
 {
 
-  Assert (numbers::is_finite(value), ExcNumberNotFinite());
+  AssertIsFinite(value);
 
   const std::pair<unsigned int,size_type>
   row_index = row_indices.global_to_local (i),

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -226,7 +226,6 @@ public:
    * the FunctionParser, as declared in the constructor. If this is not the
    * case, an exception is thrown.
    *
-   *
    * <b>constants</b>: a map of constants used to pass any necessary constant
    * that we want to specify in our expressions (in the example above the
    * number pi). An expression is valid if and only if it contains only
@@ -247,36 +246,6 @@ public:
                    const bool time_dependent = false);
 
   /**
-   * Same as above, but with an additional parameter: <b>use_degrees</b>.
-   * Parameter to decide if the trigonometric functions work in radians or
-   * degrees. The default for this parameter is false, i.e. use radians and
-   * not degrees.
-   *
-   * @note: this function is deprecated. Use the function without this
-   * argument instead (which has the default use_degrees=false).
-   */
-  void initialize (const std::string              &vars,
-                   const std::vector<std::string> &expressions,
-                   const ConstMap                 &constants,
-                   const bool time_dependent,
-                   const bool use_degrees) DEAL_II_DEPRECATED;
-
-
-  /**
-   * Initialize the function. Same as above, but with an additional argument
-   * <b> units </b> - a map of units passed to FunctionParser via AddUnint.
-   *
-   * Can be used as "3cm". Have higher precedence in parsing, i.e. if cm=10
-   * then 3/2cm is 3 /(2*10).
-   */
-  void initialize (const std::string              &vars,
-                   const std::vector<std::string> &expressions,
-                   const ConstMap                 &constants,
-                   const ConstMap                 &units,
-                   const bool time_dependent = false,
-                   const bool use_degrees = false) DEAL_II_DEPRECATED;
-
-  /**
    * Initialize the function. Same as above, but accepts a string rather than
    * a vector of strings. If this is a vector valued function, its components
    * are expected to be separated by a semicolon. An exception is thrown if
@@ -287,31 +256,6 @@ public:
                    const std::string &expression,
                    const ConstMap    &constants,
                    const bool time_dependent = false);
-
-  /**
-   * Same as above, but with an additional parameter: <b>use_degrees</b>.
-   * Parameter to decide if the trigonometric functions work in radians or
-   * degrees. The default for this parameter is false, i.e. use radians and
-   * not degrees.
-   *
-   * @note: this function is deprecated. Use the function without this
-   * argument instead (which has the default use_degrees=false).
-   */
-  void initialize (const std::string &vars,
-                   const std::string &expression,
-                   const ConstMap    &constants,
-                   const bool time_dependent,
-                   const bool use_degrees) DEAL_II_DEPRECATED;
-
-  /**
-   * Initialize the function. Same as above, but with <b>units</b>.
-   */
-  void initialize (const std::string &vars,
-                   const std::string &expression,
-                   const ConstMap    &constants,
-                   const ConstMap    &units,
-                   const bool time_dependent = false,
-                   const bool use_degrees = false) DEAL_II_DEPRECATED;
 
   /**
    * A function that returns default names for variables, to be used in the

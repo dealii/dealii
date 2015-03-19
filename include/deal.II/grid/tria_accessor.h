@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -130,9 +130,11 @@ namespace TriaAccessorExceptions
    */
   DeclException0 (ExcCellNotUsed);
   /**
-   * The cell is not an @ref GlossActive "active" cell, but it already has
-   * children. Some operations, like setting refinement flags or accessing
-   * degrees of freedom are only possible on active cells.
+   * The cell is not an
+   * @ref GlossActive "active"
+   * cell, but it already has children. Some operations, like setting
+   * refinement flags or accessing degrees of freedom are only possible on
+   * active cells.
    *
    * @ingroup Exceptions
    */
@@ -233,7 +235,7 @@ namespace TriaAccessorExceptions
  * (<tt>structdim&lt;dim</tt>).
  *
  * Some internals of this class are discussed in
- * @ref IteratorAccessorInternals .
+ * @ref IteratorAccessorInternals.
  *
  * @ingroup grid
  * @ingroup Accessors
@@ -648,7 +650,8 @@ public:
    * assignment, thereby moving the vertex of a cell within the triangulation.
    * Of course, doing so requires that you ensure that the new location of the
    * vertex remains useful -- for example, avoiding inverted or otherwise
-   * distorted (see also @ref GlossDistorted "this glossary entry").
+   * distorted (see also
+   * @ref GlossDistorted "this glossary entry").
    *
    * @note When a cell is refined, its children inherit the position of the
    * vertex positions of those vertices they share with the mother cell (plus
@@ -666,16 +669,17 @@ public:
    * @note The behavior described above is relevant if you have a
    * parallel::distributed::Triangulation object. There, refining a mesh
    * always involves a re-partitioning. In other words, vertices of locally
-   * owned cells (see @ref GlossLocallyOwnedCell "this glossary entry") that
-   * you may have moved to a different location on one processor may be moved
-   * to a different processor upon mesh refinement (even if these particular
-   * cells were not refined) which will re-create their position based on the
-   * position of the coarse cells they previously had, not based on the
-   * position these vertices had on the processor that previously owned them.
-   * In other words, in parallel computations, you will probably have to move
-   * nodes explicitly after every mesh refinement because vertex positions may
-   * or may not be preserved across the re-partitioning that accompanies mesh
-   * refinement.
+   * owned cells (see
+   * @ref GlossLocallyOwnedCell "this glossary entry")
+   * that you may have moved to a different location on one processor may be
+   * moved to a different processor upon mesh refinement (even if these
+   * particular cells were not refined) which will re-create their position
+   * based on the position of the coarse cells they previously had, not based
+   * on the position these vertices had on the processor that previously owned
+   * them. In other words, in parallel computations, you will probably have to
+   * move nodes explicitly after every mesh refinement because vertex
+   * positions may or may not be preserved across the re-partitioning that
+   * accompanies mesh refinement.
    */
   Point<spacedim> &vertex (const unsigned int i) const;
 
@@ -868,7 +872,8 @@ public:
    * numbers::internal_face_boundary_id, then this object is in the interior
    * of the domain.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   types::boundary_id boundary_indicator () const;
 
@@ -898,7 +903,8 @@ public:
    *
    * @ingroup boundary
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_boundary_indicator (const types::boundary_id) const;
 
@@ -929,7 +935,8 @@ public:
    *
    * @ingroup boundary
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_all_boundary_indicators (const types::boundary_id) const;
 
@@ -955,8 +962,8 @@ public:
    * As explained in
    * @ref boundary "Boundary and manifold description for triangulations",
    * the process involved in finding the appropriate manifold description
-   * involves querying both the manifold or boundary indicators. See there
-   * for more information.
+   * involves querying both the manifold or boundary indicators. See there for
+   * more information.
    */
   const Manifold<dim,spacedim> &get_manifold () const;
 
@@ -977,7 +984,8 @@ public:
    * If the return value is the special value numbers::flat_manifold_id, then
    * this object is associated with a standard Cartesian Manifold Description.
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   types::manifold_id manifold_id () const;
 
@@ -995,7 +1003,8 @@ public:
    *
    * @ingroup manifold
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   void set_manifold_id (const types::manifold_id) const;
 
@@ -1009,7 +1018,8 @@ public:
    *
    * @ingroup manifold
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   void set_all_manifold_ids (const types::manifold_id) const;
 
@@ -1025,35 +1035,44 @@ public:
    * @{
    */
   /**
-   * Read the user flag. See @ref GlossUserFlags for more information.
+   * Read the user flag. See
+   * @ref GlossUserFlags
+   * for more information.
    */
   bool user_flag_set () const;
 
   /**
-   * Set the user flag. See @ref GlossUserFlags for more information.
+   * Set the user flag. See
+   * @ref GlossUserFlags
+   * for more information.
    */
   void set_user_flag () const;
 
   /**
-   * Clear the user flag. See @ref GlossUserFlags for more information.
+   * Clear the user flag. See
+   * @ref GlossUserFlags
+   * for more information.
    */
   void clear_user_flag () const;
 
   /**
-   * Set the user flag for this and all descendants. See @ref GlossUserFlags
+   * Set the user flag for this and all descendants. See
+   * @ref GlossUserFlags
    * for more information.
    */
   void recursively_set_user_flag () const;
 
   /**
-   * Clear the user flag for this and all descendants. See @ref GlossUserFlags
+   * Clear the user flag for this and all descendants. See
+   * @ref GlossUserFlags
    * for more information.
    */
   void recursively_clear_user_flag () const;
 
   /**
    * Reset the user data to zero, independent if pointer or index. See
-   * @ref GlossUserData for more information.
+   * @ref GlossUserData
+   * for more information.
    */
   void clear_user_data () const;
 
@@ -1064,13 +1083,16 @@ public:
    * you can only use one of them, unless you call
    * Triangulation::clear_user_data() in between.
    *
-   * See @ref GlossUserData for more information.
+   * See
+   * @ref GlossUserData
+   * for more information.
    */
   void set_user_pointer (void *p) const;
 
   /**
-   * Reset the user pointer to a @p NULL pointer. See @ref GlossUserData for
-   * more information.
+   * Reset the user pointer to a @p NULL pointer. See
+   * @ref GlossUserData
+   * for more information.
    */
   void clear_user_pointer () const;
 
@@ -1084,7 +1106,9 @@ public:
    * Triangulation::clear_user_data() in between. <tt>A
    * *a=static_cast<A*>(cell->user_pointer());</tt>.
    *
-   * See @ref GlossUserData for more information.
+   * See
+   * @ref GlossUserData
+   * for more information.
    */
   void *user_pointer () const;
 
@@ -1105,14 +1129,17 @@ public:
    * you can only use one of them, unless you call
    * Triangulation::clear_user_data() in between.
    *
-   * See @ref GlossUserData for more information.
+   * See
+   * @ref GlossUserData
+   * for more information.
    */
   void recursively_set_user_pointer (void *p) const;
 
   /**
    * Clear the user pointer of this object and all of its descendants. The
    * same holds as said for the recursively_set_user_pointer() function. See
-   * @ref GlossUserData for more information.
+   * @ref GlossUserData
+   * for more information.
    */
   void recursively_clear_user_pointer () const;
 
@@ -1121,13 +1148,16 @@ public:
    *
    * @note User pointers and user indices are mutually exclusive. Therefore,
    * you can only use one of them, unless you call
-   * Triangulation::clear_user_data() in between. See @ref GlossUserData for
-   * more information.
+   * Triangulation::clear_user_data() in between. See
+   * @ref GlossUserData
+   * for more information.
    */
   void set_user_index (const unsigned int p) const;
 
   /**
-   * Reset the user index to 0. See @ref GlossUserData for more information.
+   * Reset the user index to 0. See
+   * @ref GlossUserData
+   * for more information.
    */
   void clear_user_index () const;
 
@@ -1138,7 +1168,9 @@ public:
    * you can only use one of them, unless you call
    * Triangulation::clear_user_data() in between.
    *
-   * See @ref GlossUserData for more information.
+   * See
+   * @ref GlossUserData
+   * for more information.
    */
   unsigned int user_index () const;
 
@@ -1155,7 +1187,9 @@ public:
    * you can only use one of them, unless you call
    * Triangulation::clear_user_data() in between.
    *
-   * See @ref GlossUserData for more information.
+   * See
+   * @ref GlossUserData
+   * for more information.
    */
   void recursively_set_user_index (const unsigned int p) const;
 
@@ -1163,7 +1197,9 @@ public:
    * Clear the user index of this object and all of its descendants. The same
    * holds as said for the recursively_set_user_index() function.
    *
-   * See @ref GlossUserData for more information.
+   * See
+   * @ref GlossUserData
+   * for more information.
    */
   void recursively_clear_user_index () const;
   /**
@@ -1204,15 +1240,16 @@ public:
 
   /**
    * Returns a point belonging to the Manifold<dim,spacedim> where this object
-   * lives, given its parametric coordinates on the reference @p structdim cell.
-   * This function queries the underlying manifold object, and can be used to
-   * obtain the exact geometrical location of arbitrary points on this object.
+   * lives, given its parametric coordinates on the reference @p structdim
+   * cell. This function queries the underlying manifold object, and can be
+   * used to obtain the exact geometrical location of arbitrary points on this
+   * object.
    *
    * Notice that the argument @p coordinates are the coordinates on the
-   * <em>reference cell</em>, given in reference coordinates. In other
-   * words, the argument provides a weighting between the different vertices.
-   * For example, for lines, calling this function with argument Point<1>(.5),
-   * is equivalent to asking the line for its center.
+   * <em>reference cell</em>, given in reference coordinates. In other words,
+   * the argument provides a weighting between the different vertices. For
+   * example, for lines, calling this function with argument Point<1>(.5), is
+   * equivalent to asking the line for its center.
    */
   Point<spacedim> intermediate_point(const Point<structdim> &coordinates) const;
 
@@ -1658,14 +1695,16 @@ public:
    * numbers::internal_face_boundary_id, then this object is in the interior
    * of the domain.
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   types::boundary_id boundary_indicator () const;
 
   /**
    * Return the manifold indicator of this object.
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   types::manifold_id manifold_id () const;
 
@@ -1790,7 +1829,8 @@ public:
    *
    * @ingroup boundary
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void
   set_boundary_indicator (const types::boundary_id);
@@ -1812,7 +1852,8 @@ public:
    *
    * @ingroup boundary
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void
   set_all_boundary_indicators (const types::boundary_id);
@@ -1825,7 +1866,8 @@ public:
    *
    * @ingroup manifold
    *
-   * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
 
   void
@@ -2021,10 +2063,24 @@ public:
 
   /**
    * Return a pointer to the @p ith neighbor.  If the neighbor does not exist,
+   * i.e., if the @p ith face of the current object is at the boundary, then
    * an invalid iterator is returned.
    *
-   * <b>Note</b> (cf. TriaLevel<0>): The neighbor of a cell has at most the
-   * same level as this cell, i.e. it may or may not be refined.
+   * The neighbor of a cell has at most the same level as this cell. For
+   * example, consider the following situation:
+   * @image html limit_level_difference_at_vertices.png ""
+   * Here, if you are on the top right cell and you ask for its left neighbor
+   * (which is, according to the conventions spelled out in the GeometryInfo
+   * class, its <i>zeroth</i> neighbor), then you will get the mother cell of
+   * the four small cells at the top left. In other words, the cell you get as
+   * neighbor has the same refinement level as the one you're on right now
+   * (the top right one) and it may have children.
+   *
+   * On the other hand, if you were at the top right cell of the four small
+   * cells at the top left, and you asked for the right neighbor (which is
+   * associated with index <code>i=1</code>), then you would get the large
+   * cell at the top right which in this case has a lower refinement level and
+   * no children of its own.
    */
   TriaIterator<CellAccessor<dim, spacedim>  >
   neighbor (const unsigned int i) const;
@@ -2222,20 +2278,26 @@ public:
   /**
    * Return the material id of this cell.
    *
-   * For a typical use of this function, see the @ref step_28 "step-28"
+   * For a typical use of this function, see the
+   * @ref step_28 "step-28"
    * tutorial program.
    *
-   * See the @ref GlossMaterialId "glossary" for more information.
+   * See the
+   * @ref GlossMaterialId "glossary"
+   * for more information.
    */
   types::material_id material_id () const;
 
   /**
    * Set the material id of this cell.
    *
-   * For a typical use of this function, see the @ref step_28 "step-28"
+   * For a typical use of this function, see the
+   * @ref step_28 "step-28"
    * tutorial program.
    *
-   * See the @ref GlossMaterialId "glossary" for more information.
+   * See the
+   * @ref GlossMaterialId "glossary"
+   * for more information.
    */
   void set_material_id (const types::material_id new_material_id) const;
 
@@ -2243,7 +2305,9 @@ public:
    * Set the material id of this cell and all its children (and grand-
    * children, and so on) to the given value.
    *
-   * See the @ref GlossMaterialId "glossary" for more information.
+   * See the
+   * @ref GlossMaterialId "glossary"
+   * for more information.
    */
   void recursively_set_material_id (const types::material_id new_material_id) const;
   /**
@@ -2260,7 +2324,9 @@ public:
   /**
    * Return the subdomain id of this cell.
    *
-   * See the @ref GlossSubdomainId "glossary" for more information.
+   * See the
+   * @ref GlossSubdomainId "glossary"
+   * for more information.
    *
    * @note The subdomain of a cell is a property only defined for active
    * cells, i.e., cells that are not further refined. Consequently, you can
@@ -2274,8 +2340,9 @@ public:
   /**
    * Set the subdomain id of this cell.
    *
-   * See the @ref GlossSubdomainId "glossary" for more information. This
-   * function should not be called if you use a
+   * See the
+   * @ref GlossSubdomainId "glossary"
+   * for more information. This function should not be called if you use a
    * parallel::distributed::Triangulation object.
    *
    * @note The subdomain of a cell is a property only defined for active
@@ -2309,8 +2376,9 @@ public:
    * and grand children of this cell that are actually active, skipping
    * intermediate child cells.
    *
-   * See the @ref GlossSubdomainId "glossary" for more information. This
-   * function should not be called if you use a
+   * See the
+   * @ref GlossSubdomainId "glossary"
+   * for more information. This function should not be called if you use a
    * parallel::distributed::Triangulation object since there the subdomain id
    * is implicitly defined by which processor you're on.
    */
@@ -2329,7 +2397,8 @@ public:
   /**
    * Return the orientation of this cell.
    *
-   * For the meaning of this flag, see @ref GlossDirectionFlag .
+   * For the meaning of this flag, see
+   * @ref GlossDirectionFlag.
    */
   bool direction_flag () const;
 
@@ -2365,7 +2434,9 @@ public:
    * Test whether the cell has children (this is the criterion for activity of
    * a cell).
    *
-   * See the @ref GlossActive "glossary" for more information.
+   * See the
+   * @ref GlossActive "glossary"
+   * for more information.
    */
   bool active () const;
 
@@ -2375,8 +2446,11 @@ public:
    * object of type dealii::Triangulation, but may yield false if the
    * triangulation is of type parallel::distributed::Triangulation.
    *
-   * See the @ref GlossGhostCell "glossary" and the @ref distributed module
-   * for more information.
+   * See the
+   * @ref GlossGhostCell "glossary"
+   * and the
+   * @ref distributed
+   * module for more information.
    *
    * @post The returned value is equal to <code>!is_ghost() &&
    * !is_artificial()</code>.
@@ -2403,8 +2477,11 @@ public:
    * parallel::distributed::Triangulation. In all other cases, the returned
    * value is always false.
    *
-   * See the @ref GlossGhostCell "glossary" and the @ref distributed module
-   * for more information.
+   * See the
+   * @ref GlossGhostCell "glossary"
+   * and the
+   * @ref distributed
+   * module for more information.
    *
    * @post The returned value is equal to <code>!is_locally_owned() &&
    * !is_artificial()</code>.
@@ -2428,7 +2505,10 @@ public:
    * parallel::distributed::Triangulation. In all other cases, the returned
    * value is always false.
    *
-   * See the @ref GlossArtificialCell "glossary" and the @ref distributed
+   * See the
+   * @ref GlossArtificialCell "glossary"
+   * and the
+   * @ref distributed
    * module for more information.
    *
    * @post The returned value is equal to <code>!is_ghost() &&
@@ -2536,7 +2616,8 @@ private:
   /**
    * Set the orientation of this cell.
    *
-   * For the meaning of this flag, see @ref GlossDirectionFlag .
+   * For the meaning of this flag, see
+   * @ref GlossDirectionFlag.
    */
   void set_direction_flag (const bool new_direction_flag) const;
   /**

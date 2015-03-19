@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,6 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
@@ -56,8 +55,9 @@ void check_simple(const FiniteElement<dim> &fe)
   tr.begin(2)->set_refine_flag();
   tr.execute_coarsening_and_refinement();
 
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
+  mgdof.distribute_mg_dofs(fe);
 
   ConstraintMatrix     hanging_node_constraints;
   DoFTools::make_hanging_node_constraints (mgdof, hanging_node_constraints);

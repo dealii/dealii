@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -179,7 +179,7 @@ BoundaryValues<dim>::value (const Point<dim>   &p,
 {
   double sum = 0;
   for (unsigned int d=0; d<dim; ++d)
-    sum += std::sin(deal_II_numbers::PI*p[d]);
+    sum += std::sin(numbers::PI*p[d]);
   return sum;
 }
 
@@ -400,7 +400,7 @@ void LaplaceProblem<dim>::assemble_test_1 ()
                           std_cxx11::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
          Assembly::Copy::Data (),
-         multithread_info.n_threads(),
+         MultithreadInfo::n_threads(),
          1);
 }
 
@@ -425,7 +425,7 @@ void LaplaceProblem<dim>::assemble_test_2 ()
                           std_cxx11::_1),
          Assembly::Scratch::Data<dim>(fe_collection, quadrature_collection),
          Assembly::Copy::Data (true),
-         2*multithread_info.n_threads(),
+         2*MultithreadInfo::n_threads(),
          1);
 }
 

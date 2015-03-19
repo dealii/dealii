@@ -250,11 +250,16 @@ estimate (const Mapping<1,spacedim>                    &mapping,
 
   // sanity checks
   Assert (neumann_bc.find(numbers::internal_face_boundary_id) == neumann_bc.end(),
-          ExcInvalidBoundaryIndicator());
+          ExcMessage("You are not allowed to list the special boundary "
+                     "indicator for internal boundaries in your boundary "
+                     "value map."));
 
   for (typename FunctionMap<spacedim>::type::const_iterator i=neumann_bc.begin();
        i!=neumann_bc.end(); ++i)
-    Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());
+    Assert (i->second->n_components == n_components,
+            ExcInvalidBoundaryFunction(i->first,
+                                       i->second->n_components,
+                                       n_components));
 
   Assert (component_mask.represents_n_components(n_components),
           ExcInvalidComponentMask());
@@ -272,7 +277,8 @@ estimate (const Mapping<1,spacedim>                    &mapping,
           ExcIncompatibleNumberOfElements(solutions.size(), errors.size()));
   for (unsigned int n=0; n<solutions.size(); ++n)
     Assert (solutions[n]->size() == dof_handler.n_dofs(),
-            ExcInvalidSolutionVector());
+            ExcDimensionMismatch(solutions[n]->size(),
+                                 dof_handler.n_dofs()));
 
   Assert ((coefficient == 0) ||
           (coefficient->n_components == n_components) ||
@@ -282,7 +288,9 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   for (typename FunctionMap<spacedim>::type::const_iterator i=neumann_bc.begin();
        i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components,
-            ExcInvalidBoundaryFunction());
+            ExcInvalidBoundaryFunction(i->first,
+                                       i->second->n_components,
+                                       n_components));
 
   // reserve one slot for each cell and set it to zero
   for (unsigned int n=0; n<n_solution_vectors; ++n)

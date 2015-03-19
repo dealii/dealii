@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -117,8 +117,8 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
         {
           values[start][0] = monovali[0][0];
           values[start][1] = -unit_point(1) * monovali[0][1];
-          values[start+1][0] = -unit_point(0) * monovali[1][1];
-          values[start+1][1] = monovali[1][0];
+          values[start+1][0] = unit_point(0) * monovali[1][1];
+          values[start+1][1] = -monovali[1][0];
         }
       if (grads.size() != 0)
         {
@@ -126,10 +126,10 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
           grads[start][0][1] = 0.;
           grads[start][1][0] = -unit_point(1) * monovali[0][2];
           grads[start][1][1] = -monovali[0][1];
-          grads[start+1][0][0] = -monovali[1][1];
-          grads[start+1][0][1] = -unit_point(0) * monovali[1][2];
+          grads[start+1][0][0] = monovali[1][1];
+          grads[start+1][0][1] = unit_point(0) * monovali[1][2];
           grads[start+1][1][0] = 0.;
-          grads[start+1][1][1] = monovali[1][1];
+          grads[start+1][1][1] = -monovali[1][1];
         }
       if (grad_grads.size() != 0)
         {
@@ -142,13 +142,13 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
           grad_grads[start][1][1][0] = -monovali[0][2];
           grad_grads[start][1][1][1] = 0.;
           grad_grads[start+1][0][0][0] = 0;
-          grad_grads[start+1][0][0][1] = -monovali[1][2];
-          grad_grads[start+1][0][1][0] = -monovali[1][2];
-          grad_grads[start+1][0][1][1] = -unit_point(0) * monovali[1][3];
+          grad_grads[start+1][0][0][1] = monovali[1][2];
+          grad_grads[start+1][0][1][0] = monovali[1][2];
+          grad_grads[start+1][0][1][1] = unit_point(0) * monovali[1][3];
           grad_grads[start+1][1][0][0] = 0.;
           grad_grads[start+1][1][0][1] = 0.;
           grad_grads[start+1][1][1][0] = 0.;
-          grad_grads[start+1][1][1][1] = monovali[1][2];
+          grad_grads[start+1][1][1][1] = -monovali[1][2];
         }
     }
   else // dim == 3

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -205,12 +205,6 @@ void TimeDependent::start_sweep (const unsigned int s)
 
 
 
-void TimeDependent::end_sweep (const unsigned int)
-{
-  end_sweep ();
-}
-
-
 void TimeDependent::end_sweep ()
 {
   void (TimeDependent::*p) (const unsigned int, const unsigned int)
@@ -348,7 +342,9 @@ TimeStepBase::get_timestep_no () const
 double
 TimeStepBase::get_backward_timestep () const
 {
-  Assert (previous_timestep != 0, ExcCantComputeTimestep());
+  Assert (previous_timestep != 0,
+          ExcMessage("The backward time step cannot be computed because "
+                     "there is no previous time step."));
   return time - previous_timestep->time;
 }
 
@@ -357,7 +353,9 @@ TimeStepBase::get_backward_timestep () const
 double
 TimeStepBase::get_forward_timestep () const
 {
-  Assert (next_timestep != 0, ExcCantComputeTimestep());
+  Assert (next_timestep != 0,
+          ExcMessage("The forward time step cannot be computed because "
+                     "there is no next time step."));
   return next_timestep->time - time;
 }
 

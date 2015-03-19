@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -187,14 +187,16 @@ namespace Patterns
 
   private:
     /**
-     * Value of the lower bound. A number that satisfies the @ref match
+     * Value of the lower bound. A number that satisfies the
+     * @ref match
      * operation of this class must be equal to this value or larger, if the
      * bounds of the interval for a valid range.
      */
     const int lower_bound;
 
     /**
-     * Value of the upper bound. A number that satisfies the @ref match
+     * Value of the upper bound. A number that satisfies the
+     * @ref match
      * operation of this class must be equal to this value or less, if the
      * bounds of the interval for a valid range.
      */
@@ -279,14 +281,16 @@ namespace Patterns
 
   private:
     /**
-     * Value of the lower bound. A number that satisfies the @ref match
+     * Value of the lower bound. A number that satisfies the
+     * @ref match
      * operation of this class must be equal to this value or larger, if the
      * bounds of the interval for a valid range.
      */
     const double lower_bound;
 
     /**
-     * Value of the upper bound. A number that satisfies the @ref match
+     * Value of the upper bound. A number that satisfies the
+     * @ref match
      * operation of this class must be equal to this value or less, if the
      * bounds of the interval for a valid range.
      */
@@ -301,9 +305,11 @@ namespace Patterns
   /**
    * Test for the string being one of a sequence of values given like a
    * regular expression. For example, if the string given to the constructor
-   * is <tt>"red|blue|black"</tt>, then the @ref match function returns
-   * <tt>true</tt> exactly if the string is either "red" or "blue" or "black".
-   * Spaces around the pipe signs do not matter and are eliminated.
+   * is <tt>"red|blue|black"</tt>, then the
+   * @ref match
+   * function returns <tt>true</tt> exactly if the string is either "red" or
+   * "blue" or "black". Spaces around the pipe signs do not matter and are
+   * eliminated.
    */
   class Selection : public PatternBase
   {
@@ -885,9 +891,10 @@ namespace Patterns
  * Input may be sorted into subsection trees in order to give the input a
  * logical structure, and input files may include other files.
  *
- * The ParameterHandler class is discussed in detail in the @ref step_19
- * "step-19" example program, and is used in more realistic situations in
- * step-29, step-33 and step-34.
+ * The ParameterHandler class is discussed in detail in the
+ * @ref step_19 "step-19"
+ * example program, and is used in more realistic situations in step-29,
+ * step-33 and step-34.
  *
  * <h3>Declaring entries</h3>
  *
@@ -1437,10 +1444,12 @@ namespace Patterns
  *
  * Given this explanation, the code above will lead to a hierarchical
  * representation of data that looks like this (the content of files is
- * indicated at the right in a different font): @image html
- * parameter_handler.png Once parameters have been read in, the contents of
- * the <code>value</code> "files" may be different while the other files
- * remain untouched.
+ * indicated at the right in a different font):
+ *
+ * @image html parameter_handler.png
+ *
+ * Once parameters have been read in, the contents of the <code>value</code>
+ * "files" may be different while the other files remain untouched.
  *
  * Using the ParameterHandler::print_parameters() function with
  * ParameterHandler::XML as second argument, we can get a complete
@@ -1644,10 +1653,9 @@ public:
   void enter_subsection (const std::string &subsection);
 
   /**
-   * Leave present subsection. Return <tt>false</tt> if there is no subsection
-   * to leave; <tt>true</tt> otherwise.
+   * Leave present subsection.
    */
-  bool leave_subsection ();
+  void leave_subsection ();
 
   /**
    * Return value of entry <tt>entry_string</tt>.  If the entry was changed,

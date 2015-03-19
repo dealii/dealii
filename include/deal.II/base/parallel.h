@@ -45,6 +45,30 @@ namespace parallel
   namespace internal
   {
     /**
+     * Helper struct to tell us if we can use SIMD instructions for the given @p
+     * Number type.
+     */
+    template <typename Number>
+    struct EnableOpenMPSimdFor
+    {
+      static const bool value = true;
+    };
+
+#ifdef __INTEL_COMPILER
+    // Disable long double SIMD instructions on ICC. This is to work around a bug
+    // that generates wrong code at least up to intel 15 (see
+    // tests/lac/vector-vector, tests/lac/intel-15-bug, and the discussion at
+    // https://github.com/dealii/dealii/issues/598).
+    template <>
+    struct EnableOpenMPSimdFor<long double>
+    {
+      static const bool value = false;
+    };
+#endif
+
+
+
+    /**
      * Convert a function object of type F into an object that can be applied
      * to all elements of a range of synchronous iterators.
      */
@@ -149,7 +173,8 @@ namespace parallel
    *
    * For a discussion of the kind of problems to which this function is
    * applicable, see the
-   * @ref threads "Parallel computing with multiple processors" module.
+   * @ref threads "Parallel computing with multiple processors"
+   * module.
    */
   template <typename InputIterator,
             typename OutputIterator,
@@ -202,7 +227,8 @@ namespace parallel
    *
    * For a discussion of the kind of problems to which this function is
    * applicable, see the
-   * @ref threads "Parallel computing with multiple processors" module.
+   * @ref threads "Parallel computing with multiple processors"
+   * module.
    */
   template <typename InputIterator1,
             typename InputIterator2,
@@ -259,7 +285,8 @@ namespace parallel
    *
    * For a discussion of the kind of problems to which this function is
    * applicable, see the
-   * @ref threads "Parallel computing with multiple processors" module.
+   * @ref threads "Parallel computing with multiple processors"
+   * module.
    */
   template <typename InputIterator1,
             typename InputIterator2,
@@ -383,7 +410,8 @@ namespace parallel
    *
    * For a discussion of the kind of problems to which this function is
    * applicable, see also the
-   * @ref threads "Parallel computing with multiple processors" module.
+   * @ref threads "Parallel computing with multiple processors"
+   * module.
    */
   template <typename RangeType, typename Function>
   void apply_to_subranges (const RangeType                          &begin,
@@ -623,7 +651,8 @@ namespace parallel
    *
    * For a discussion of the kind of problems to which this function is
    * applicable, see also the
-   * @ref threads "Parallel computing with multiple processors" module.
+   * @ref threads "Parallel computing with multiple processors"
+   * module.
    */
   template <typename ResultType, typename RangeType, typename Function>
   ResultType accumulate_from_subranges (const Function &f,

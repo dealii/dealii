@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -103,16 +103,6 @@ public:
    * Constructor, filling in default values
    */
   SolverSelector ();
-
-  /**
-   * @deprecated Use the default constructor, set_control() and select().
-   *
-   * Constructor. Use the arguments to initialize actual solver objects. The
-   * VectorMemory argument is ignored.
-   */
-  SolverSelector (const std::string    &solvername,
-                  SolverControl        &control,
-                  VectorMemory<VECTOR> &vector_memory) DEAL_II_DEPRECATED;
 
   /**
    * Destructor
@@ -241,15 +231,6 @@ private:
 
 template <class VECTOR>
 SolverSelector<VECTOR>::SolverSelector()
-{}
-
-
-template <class VECTOR>
-SolverSelector<VECTOR>::SolverSelector(const std::string    &solver_name,
-                                       SolverControl        &control,
-                                       VectorMemory<VECTOR> &) :
-  control(&control),
-  solver_name(solver_name)
 {}
 
 

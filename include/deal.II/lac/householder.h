@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,9 @@ template<typename number> class Vector;
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
- * section on @ref Instantiations in the manual).
+ * section on
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Guido Kanschat, 2005
  */
@@ -227,7 +229,7 @@ Householder<number>::least_squares (Vector<number2> &dst,
   number2 sum = 0.;
   for (size_type i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
-  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  AssertIsFinite(sum);
 
   // Compute solution
   this->backward(dst, *aux);
@@ -272,7 +274,7 @@ Householder<number>::least_squares (BlockVector<number2> &dst,
   number2 sum = 0.;
   for (size_type i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
-  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  AssertIsFinite(sum);
 
   //backward works for
   //Vectors only, so copy

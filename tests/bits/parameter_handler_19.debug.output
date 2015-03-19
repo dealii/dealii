@@ -1,0 +1,35 @@
+
+DEAL::* no subsection to leave: 
+DEAL::Exception 
+--------------------------------------------------------
+An error occurred in file <parameter_handler.cc> in function
+    void dealii::ParameterHandler::leave_subsection()
+The violated condition was: 
+    subsection_path.size() != 0
+The name and call sequence of the exception was:
+    ExcAlreadyAtTopLevel()
+Additional Information: 
+(none)
+--------------------------------------------------------
+
+DEAL::
+DEAL::* read_input with missing 'end':
+DEAL::success? 0 (should fail)
+DEAL::Exception 
+--------------------------------------------------------
+An error occurred in file <parameter_handler.cc> in function
+    void dealii::ParameterHandler::leave_subsection()
+The violated condition was: 
+    subsection_path.size() != 0
+The name and call sequence of the exception was:
+    ExcAlreadyAtTopLevel()
+Additional Information: 
+(none)
+--------------------------------------------------------
+
+DEAL::
+DEAL::* Check non empty path before read_input()
+DEAL::success? 1 (should work), x correct? 1
+DEAL::
+DEAL::* Check read_input() catches messing with path:
+DEAL::success = 0 -- (should fail)

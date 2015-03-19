@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -102,20 +102,20 @@ namespace internal
  * <ol>
  * <li>Firstly, the @p evaluate_field version that does not take a @p
  * DataPostprocessor object selects the nearest support point (see
- * @ref GlossSupport "this entry in the glossary") to a given point to extract
- * data from. This makes the code that needs to be run at each time step
- * very
- * short, since looping over the mesh to extract the needed dof_index can be
- * done just once at the start. However, this method is not suitable for
- * FiniteElement objects that do not assign dofs to actual mesh locations
- * (i.e. FEs without @ref GlossSupport "support points") or if adaptive mesh
- * refinement is used. The reason for the latter restriction is that the
- * location of the closest support point to a given point may change upon mesh
- * refinement. The class will throw an exception if any change to the
- * triangulation is made (Although the nearest support point could be re-
- * computed upon mesh refinement, the location of the support point will most
- * likely change slightly, making the interpretation of the data difficult,
- * hence this is not implemented currently.)
+ * @ref GlossSupport "this entry in the glossary"
+ * ) to a given point to extract data from. This makes the code that needs to
+ * be run at each time step very short, since looping over the mesh to extract
+ * the needed dof_index can be done just once at the start. However, this
+ * method is not suitable for FiniteElement objects that do not assign dofs to
+ * actual mesh locations (i.e. FEs without
+ * @ref GlossSupport "support points"
+ * ) or if adaptive mesh refinement is used. The reason for the latter
+ * restriction is that the location of the closest support point to a given
+ * point may change upon mesh refinement. The class will throw an exception if
+ * any change to the triangulation is made (Although the nearest support point
+ * could be re- computed upon mesh refinement, the location of the support
+ * point will most likely change slightly, making the interpretation of the
+ * data difficult, hence this is not implemented currently.)
  *
  * <li> Secondly, @p evaluate_field_at_requested_location calls @p
  * VectorTools::point_value to compute values at the specific point requested.
@@ -151,17 +151,20 @@ namespace internal
  * </ol>
  *
  * When recording a new mnemonic name, the user must supply a component_mask
- * (see @ref GlossComponentMask "this glossary entry") to indicate the
- * @ref GlossComponent "(vector) components" to be extracted from the given
- * input. If the user simply wants to extract all the components, the mask
- * need not be explicitly supplied to the @p add_field_name method and the
- * default value of the parameter is sufficient. If the @p evaluate_field
- * with a @p DataPostprocessor object is used, the component_mask is
- * interpreted as the mask of the @p DataPostprocessor return vector. The
- * size of this mask can be different to that of the FE space, but must be
- * provided when the @p add_field_name method is called. One variant of the
- * @p add_field_name method allows an unsigned int input to construct a
- * suitable mask, if all values from the @p DataPostprocessor are desired.
+ * (see
+ * @ref GlossComponentMask "this glossary entry"
+ * ) to indicate the
+ * @ref GlossComponent "(vector) components"
+ * to be extracted from the given input. If the user simply wants to extract
+ * all the components, the mask need not be explicitly supplied to the @p
+ * add_field_name method and the default value of the parameter is sufficient.
+ * If the @p evaluate_field with a @p DataPostprocessor object is used, the
+ * component_mask is interpreted as the mask of the @p DataPostprocessor
+ * return vector. The size of this mask can be different to that of the FE
+ * space, but must be provided when the @p add_field_name method is called.
+ * One variant of the @p add_field_name method allows an unsigned int input to
+ * construct a suitable mask, if all values from the @p DataPostprocessor are
+ * desired.
  *
  * The class automatically generates names for the data stored based on the
  * mnemonics supplied. The methods @p add_component_names and @p
@@ -423,10 +426,9 @@ public:
    * Return a @p Vector with the indices of selected points flagged with a 1.
    * This method is mainly for testing and verifying that the class is working
    * correctly. By passing this vector to a DataOut object, the user can
-   * verify that the positions returned by @p get_points
-   * agree with the positions that @p DataOut interprets from
-   * the @p Vector returned. The code snippet below demonstrates how this
-   * could be done:
+   * verify that the positions returned by @p get_points agree with the
+   * positions that @p DataOut interprets from the @p Vector returned. The
+   * code snippet below demonstrates how this could be done:
    * @code
    * // Make a DataOut object and attach the dof_handler
    * DataOut<dim> data_out;
@@ -443,18 +445,6 @@ public:
    * @endcode
    */
   Vector<double> mark_support_locations();
-
-
-  /**
-   * @deprecated
-   *
-   * This function only exists for backward compatibility as this is the
-   * interface provided by previous versions of the library. The function
-   * mark_support_locations replaces it and reflects the fact that the
-   * locations marked are actually the support points.
-   */
-  Vector<double> mark_locations() DEAL_II_DEPRECATED;
-
 
   /**
    * Stores the actual location of each support point selected by the @p
@@ -531,36 +521,41 @@ public:
   bool deep_check (const bool strict);
 
   /**
-   * A call has been made to @p push_back_independent when no independent
-   * values were requested.
+   * Exception
    */
-  DeclException0(ExcNoIndependent);
+  DeclExceptionMsg(ExcNoIndependent,
+                   "A call has been made to push_back_independent() when "
+                   "no independent values were requested.");
 
   /**
-   * This error is thrown to indicate that the data sets appear to be out of
-   * sync.  The class requires that the number of dataset keys is the same as
-   * the number of independent values sets and mesh linked value sets. The
-   * number of each of these is allowed to differ by one to allow new values
-   * to be added with out restricting the order the user choses to do so.
-   * Special cases of no @p DoFHandler and no independent values should not
-   * trigger this error.
+   * Exception
    */
-  DeclException0(ExcDataLostSync);
+  DeclExceptionMsg(ExcDataLostSync,
+                   "This error is thrown to indicate that the data sets appear to be out of "
+                   "sync. The class requires that the number of dataset keys is the same as "
+                   "the number of independent values sets and mesh linked value sets. The "
+                   "number of each of these is allowed to differ by one to allow new values "
+                   "to be added with out restricting the order the user choses to do so. "
+                   "Special cases of no FHandler and no independent values should not "
+                   "trigger this error.");
 
 
   /**
-   * A method which requires access to a @p DoFHandler to be meaningful has
-   * been called when @p have_dof_handler is false (most likely due to default
-   * constructor being called). Only independent variables may be logged with
-   * no DoFHandler.
+   * Exception
    */
-  DeclException0(ExcDoFHandlerRequired);
+  DeclExceptionMsg(ExcDoFHandlerRequired,
+                   "A method which requires access to a @p DoFHandler to be meaningful has "
+                   "been called when have_dof_handler is false (most likely due to default "
+                   "constructor being called). Only independent variables may be logged with "
+                   "no DoFHandler.");
 
   /**
-   * The triangulation indicated that mesh has been refined in some way. This
-   * suggests that the internal dof indices stored are no longer meaningful.
+   * Exception
    */
-  DeclException0(ExcDoFHandlerChanged);
+  DeclExceptionMsg(ExcDoFHandlerChanged,
+                   "The triangulation has been refined or coarsened in some way. This "
+                   "suggests that the internal DoF indices stored by the current "
+                   "object are no longer meaningful.");
 
 private:
   /**

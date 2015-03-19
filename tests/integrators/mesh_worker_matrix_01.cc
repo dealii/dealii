@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -150,13 +150,16 @@ test_simple(DoFHandler<dim> &dofs, bool faces)
   MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> > assembler;
   assembler.initialize(matrix);
 
+  MeshWorker::LoopControl lctrl;
+  lctrl.cells_first = true;
+  lctrl.own_faces = MeshWorker::LoopControl::one;
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
   (dofs.begin_active(), dofs.end(),
    dof_info, info_box,
    std_cxx11::bind (&Local<dim>::cell, local, std_cxx11::_1, std_cxx11::_2),
    std_cxx11::bind (&Local<dim>::bdry, local, std_cxx11::_1, std_cxx11::_2),
    std_cxx11::bind (&Local<dim>::face, local, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
-   assembler, true);
+   assembler, lctrl);
 
   //matrix.print_formatted(deallog.get_file_stream(), 0, false, 4);
   matrix.print(deallog.get_file_stream(), false, false);

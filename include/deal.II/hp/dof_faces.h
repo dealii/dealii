@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -198,6 +198,14 @@ namespace internal
        * object.
        */
       std::size_t memory_consumption () const;
+
+      /**
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
+       */
+      template <class Archive>
+      void serialize(Archive &ar,
+                     const unsigned int version);
     };
 
 
@@ -249,6 +257,14 @@ namespace internal
        * object.
        */
       std::size_t memory_consumption () const;
+
+      /**
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
+       */
+      template <class Archive>
+      void serialize(Archive &ar,
+                     const unsigned int version);
     };
 
     /**
@@ -272,6 +288,14 @@ namespace internal
        * object.
        */
       std::size_t memory_consumption () const;
+
+      /**
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
+       */
+      template <class Archive>
+      void serialize(Archive &ar,
+                     const unsigned int version);
     };
 
     /**
@@ -300,10 +324,38 @@ namespace internal
        * object.
        */
       std::size_t memory_consumption () const;
+
+      /**
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
+       */
+      template <class Archive>
+      void serialize(Archive &ar,
+                     const unsigned int version);
     };
 
 
     // --------------------- inline and template functions ------------------
+    template <class Archive>
+    void DoFIndicesOnFaces<1>::serialize(Archive &,
+                                         const unsigned int)
+    {}
+
+
+    template <class Archive>
+    void DoFIndicesOnFaces<2>::serialize(Archive &ar,
+                                         const unsigned int)
+    {
+      ar &lines;
+    }
+
+
+    template <class Archive>
+    void DoFIndicesOnFaces<3>::serialize(Archive &ar,
+                                         const unsigned int)
+    {
+      ar &lines &quads;
+    }
 
     template <int structdim>
     template <int dim, int spacedim>
@@ -319,11 +371,6 @@ namespace internal
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (fe_index < dof_handler.get_fe().size(),
               ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
       Assert (local_index <
@@ -381,11 +428,6 @@ namespace internal
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (fe_index < dof_handler.get_fe().size(),
               ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
       Assert (local_index <
@@ -438,11 +480,6 @@ namespace internal
     n_active_fe_indices (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                          const unsigned int                obj_index) const
     {
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
@@ -488,11 +525,6 @@ namespace internal
                          const unsigned int                obj_index,
                          const unsigned int                n) const
     {
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
@@ -549,11 +581,6 @@ namespace internal
                         const unsigned int                fe_index,
                         const unsigned int                obj_level) const
     {
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, static_cast<unsigned int>(dof_offsets.size())));
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
@@ -591,6 +618,15 @@ namespace internal
                          dof_handler.get_fe()[*pointer]
                          .template n_dofs_per_object<structdim>()+1);
         }
+    }
+
+    template <int structdim>
+    template <class Archive>
+    void DoFIndicesOnFacesOrEdges<structdim>::serialize(Archive &ar,
+                                                        const unsigned int)
+    {
+      ar &dofs;
+      ar &dof_offsets;
     }
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,9 +51,12 @@ namespace parallel
      *
      * @note Instantiations for this template are provided for <tt>@<float@>
      * and @<double@></tt>; others can be generated in application programs
-     * (see the section on @ref Instantiations in the manual).
+     * (see the section on
+     * @ref Instantiations
+     * in the manual).
      *
-     * @see @ref GlossBlockLA "Block (linear algebra)"
+     * @see
+     * @ref GlossBlockLA "Block (linear algebra)"
      * @author Katharina Kormann, Martin Kronbichler, 2011
      */
     template <typename Number>
@@ -256,8 +259,9 @@ namespace parallel
       /**
        * This function copies the data that has accumulated in the data buffer
        * for ghost indices to the owning processor. For the meaning of the
-       * argument @p operation, see the entry on @ref GlossCompress
-       * "Compressing distributed vectors and matrices" in the glossary.
+       * argument @p operation, see the entry on
+       * @ref GlossCompress "Compressing distributed vectors and matrices"
+       * in the glossary.
        *
        * There are two variants for this function. If called with argument @p
        * VectorOperation::add adds all the data accumulated in ghost elements
@@ -395,16 +399,6 @@ namespace parallel
       Number add_and_dot (const Number               a,
                           const BlockVector<Number> &V,
                           const BlockVector<Number> &W);
-
-      /**
-       * Scale each element of the vector by the given factor.
-       *
-       * This function is deprecated and will be removed in a future version.
-       * Use <tt>operator *=</tt> and <tt>operator /=</tt> instead.
-       *
-       * @deprecated Use <tt>operator*=</tt> instead.
-       */
-      void scale (const value_type factor) DEAL_II_DEPRECATED;
 
       /**
        * Multiply each element of this vector by the corresponding element of
@@ -588,7 +582,7 @@ namespace parallel
     BlockVector<Number>::operator = (const value_type s)
     {
 
-      Assert (numbers::is_finite(s), ExcNumberNotFinite());
+      AssertIsFinite(s);
 
       BaseClass::operator = (s);
       return *this;
@@ -978,18 +972,6 @@ namespace parallel
       for (size_type i=0; i<this->n_blocks(); ++i)
         dealii::swap (this->components[i], v.components[i]);
       dealii::swap (this->block_indices, v.block_indices);
-    }
-
-
-
-    template <typename Number>
-    void BlockVector<Number>::scale (const value_type factor)
-    {
-
-      Assert (numbers::is_finite(factor), ExcNumberNotFinite());
-
-      for (size_type i=0; i<this->n_blocks(); ++i)
-        this->components[i].scale(factor);
     }
 
 

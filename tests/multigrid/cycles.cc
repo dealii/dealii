@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,7 +70,7 @@ void test_cycles(unsigned int minlevel, unsigned int maxlevel)
   MGLevelObject<FullMatrix<double> > level_matrices(0, maxlevel);
   for (unsigned int i=0; i<=maxlevel; ++i)
     level_matrices[i].reinit(N, N);
-  MGMatrix<FullMatrix<double>, VECTOR> mgmatrix(&level_matrices);
+  mg::Matrix<VECTOR> mgmatrix(level_matrices);
 
   Multigrid<VECTOR> mg1(minlevel, maxlevel, mgmatrix, all, all, all, all,
                         Multigrid<VECTOR>::v_cycle);

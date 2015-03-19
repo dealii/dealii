@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,8 +94,8 @@ enum MappingType
  * the class is as follows: first, call the functions @p update_once and @p
  * update_each with the update flags you need. This includes the flags needed
  * by the FiniteElement. Then call <tt>get_*_data</tt> and with the or'd
- * results.  This will initialize and return some internal data structures.
- * On the first cell, call <tt>fill_fe_*_values</tt> with the result of @p
+ * results.  This will initialize and return some internal data structures. On
+ * the first cell, call <tt>fill_fe_*_values</tt> with the result of @p
  * update_once. Finally, on each cell, use <tt>fill_fe_*_values</tt> with the
  * result of @p update_each to compute values for a special cell.
  *
@@ -432,7 +432,7 @@ public:
    * Jacobians of spacedim-vector valued differentiable functions are
    * transformed this way.
    * </ul>
-   *  @note It would have been more reasonable to make this transform a
+   * @note It would have been more reasonable to make this transform a
    * template function with the rank in <code>DerivativeForm@<1, dim,
    * rank@></code>. Unfortunately C++ does not allow templatized virtual
    * functions. This is why we identify <code>DerivativeForm@<1, dim,
@@ -479,7 +479,7 @@ public:
    * J^{-1}(\mathbf{\hat x}).
    * @f]
    * </ul>
-   *  @todo The formulas for mapping_covariant_gradient(),
+   * @todo The formulas for mapping_covariant_gradient(),
    * mapping_contravariant_gradient() and mapping_piola_gradient() are only
    * true as stated for linear mappings. If, for example, the mapping is
    * bilinear then there is a missing term associated with the derivative of
@@ -491,43 +491,6 @@ public:
              VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
              const InternalDataBase &internal,
              const MappingType type) const = 0;
-
-  /**
-   * @deprecated Use transform() instead.
-   */
-  void
-  transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-                       const unsigned int                                    offset,
-                       VectorSlice<std::vector<Tensor<1,spacedim> > >        output,
-                       const InternalDataBase &internal) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use transform() instead.
-   */
-  void
-  transform_covariant (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> > > input,
-                       const unsigned int                 offset,
-                       VectorSlice<std::vector<Tensor<2,spacedim> > >      output,
-                       const InternalDataBase &internal) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use transform() instead.
-   */
-  void
-  transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-                           const unsigned int                 offset,
-                           VectorSlice<std::vector<Tensor<1,spacedim> > >      output,
-                           const typename Mapping<dim,spacedim>::InternalDataBase &internal) const DEAL_II_DEPRECATED;
-
-  /**
-   * @deprecated Use transform() instead.
-   */
-
-  void
-  transform_contravariant (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
-                           const unsigned int                 offset,
-                           const VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-                           const typename Mapping<dim,spacedim>::InternalDataBase &internal) const DEAL_II_DEPRECATED;
 
   /**
    * The transformed (generalized) support point.
@@ -614,7 +577,8 @@ private:
    * fields not asked for by FEValues, but computed for efficiency reasons
    * will be notified here.
    *
-   * See @ref UpdateFlagsEssay.
+   * See
+   * @ref UpdateFlagsEssay.
    */
   virtual UpdateFlags update_once (const UpdateFlags) const = 0;
 
@@ -622,7 +586,8 @@ private:
    * The same as update_once(), but for the flags to be updated for each grid
    * cell.
    *
-   * See @ref UpdateFlagsEssay.
+   * See
+   * @ref UpdateFlagsEssay.
    */
   virtual UpdateFlags update_each (const UpdateFlags) const = 0;
 
@@ -677,50 +642,56 @@ private:
    */
   virtual void
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim>                                     &quadrature,
-                  InternalDataBase                                          &internal,
-                  std::vector<Point<spacedim> >                             &quadrature_points,
-                  std::vector<double>                                       &JxW_values,
-                  std::vector<DerivativeForm<1,dim,spacedim>  >       &jacobians,
-                  std::vector<DerivativeForm<2,dim,spacedim>  >       &jacobian_grads,
-                  std::vector<DerivativeForm<1,spacedim,dim>  >       &inverse_jacobians,
-                  std::vector<Point<spacedim> >                             &cell_normal_vectors,
-                  CellSimilarity::Similarity                           &cell_similarity
+                  const Quadrature<dim>                         &quadrature,
+                  InternalDataBase                              &internal,
+                  std::vector<Point<spacedim> >                 &quadrature_points,
+                  std::vector<double>                           &JxW_values,
+                  std::vector<DerivativeForm<1,dim,spacedim>  > &jacobians,
+                  std::vector<DerivativeForm<2,dim,spacedim>  > &jacobian_grads,
+                  std::vector<DerivativeForm<1,spacedim,dim>  > &inverse_jacobians,
+                  std::vector<Point<spacedim> >                 &cell_normal_vectors,
+                  CellSimilarity::Similarity                    &cell_similarity
                  ) const=0;
 
 
 
   /**
    * Performs the same as @p fill_fe_values on a face. Additionally, @p
-   * boundary_form (see @ref GlossBoundaryForm) and @p normal_vectors can be
-   * computed on surfaces. Since the boundary form already contains the
-   * determinant of the Jacobian of the transformation, it is sometimes more
-   * economic to use the boundary form instead of the product of the unit
-   * normal and the transformed quadrature weight.
+   * boundary_form (see
+   * @ref GlossBoundaryForm
+   * ) and @p normal_vectors can be computed on surfaces. Since the boundary
+   * form already contains the determinant of the Jacobian of the
+   * transformation, it is sometimes more economic to use the boundary form
+   * instead of the product of the unit normal and the transformed quadrature
+   * weight.
    */
   virtual void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int                                        face_no,
-                       const Quadrature<dim-1>                                   &quadrature,
-                       InternalDataBase                                          &internal,
-                       std::vector<Point<spacedim> >                             &quadrature_points,
-                       std::vector<double>                                       &JxW_values,
-                       std::vector<Tensor<1,spacedim> >                          &boundary_form,
-                       std::vector<Point<spacedim> >                             &normal_vectors) const = 0;
+                       const unsigned int                            face_no,
+                       const Quadrature<dim-1>                      &quadrature,
+                       InternalDataBase                             &internal,
+                       std::vector<Point<spacedim> >                &quadrature_points,
+                       std::vector<double>                          &JxW_values,
+                       std::vector<Tensor<1,spacedim> >             &boundary_form,
+                       std::vector<Point<spacedim> >                &normal_vectors,
+                       std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const = 0;
 
   /**
    * See above.
    */
   virtual void
   fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int                        face_no,
-                          const unsigned int                        sub_no,
-                          const Quadrature<dim-1>                  &quadrature,
-                          InternalDataBase                         &internal,
-                          std::vector<Point<spacedim> >        &quadrature_points,
-                          std::vector<double>                      &JxW_values,
-                          std::vector<Tensor<1,spacedim> >     &boundary_form,
-                          std::vector<Point<spacedim> >        &normal_vectors) const = 0;
+                          const unsigned int                face_no,
+                          const unsigned int                sub_no,
+                          const Quadrature<dim-1>          &quadrature,
+                          InternalDataBase                 &internal,
+                          std::vector<Point<spacedim> >    &quadrature_points,
+                          std::vector<double>              &JxW_values,
+                          std::vector<Tensor<1,spacedim> > &boundary_form,
+                          std::vector<Point<spacedim> >    &normal_vectors,
+                          std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const = 0;
 
   /**
    * Give class @p FEValues access to the private <tt>get_...data</tt> and

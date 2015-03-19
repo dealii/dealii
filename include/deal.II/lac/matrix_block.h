@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,7 +94,10 @@ namespace internal
  * complement.
  *
  * @ingroup Matrix2
- * @ingroup vector_valued @see @ref GlossBlockLA "Block (linear algebra)"
+ * @ingroup vector_valued
+ *
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2006
  */
 template <class MATRIX>
@@ -579,8 +582,8 @@ template <class MATRIX>
 inline
 MatrixBlock<MATRIX>::MatrixBlock()
   :
-  row(deal_II_numbers::invalid_size_type),
-  column(deal_II_numbers::invalid_size_type)
+  row(numbers::invalid_size_type),
+  column(numbers::invalid_size_type)
 {}
 
 

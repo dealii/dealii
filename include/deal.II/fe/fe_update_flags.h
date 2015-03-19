@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,8 @@ DEAL_II_NAMESPACE_OPEN
  * flags.
  *
  * The mechanism by which all this is accomplished is also discussed on the
- * page on @ref UpdateFlagsEssay.
+ * page on
+ * @ref UpdateFlagsEssay.
  */
 enum UpdateFlags
 {

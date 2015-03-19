@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,6 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
 
@@ -47,7 +46,7 @@ using namespace std;
 
 template <int dim, typename number, int spacedim>
 void
-reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
                MGLevelObject<dealii::Vector<number> > &v)
 {
   for (unsigned int level=v.min_level();
@@ -95,8 +94,9 @@ void check_simple(const FiniteElement<dim> &fe)
   refine_mesh(tr);
   refine_mesh(tr);
 
-  MGDoFHandler<dim> mgdof(tr);
+  DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
+  mgdof.distribute_mg_dofs(fe);
 
   MGTransferPrebuilt<Vector<double> > transfer;
   transfer.build_matrices(mgdof);

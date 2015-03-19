@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -86,9 +86,8 @@ main ()
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
       sparsity.push_back (std::set<unsigned int,std::greater<unsigned int> >());
-      for (const types::global_dof_index *p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
-           p != sp3.get_column_numbers()+sp3.get_rowstart_indices()[row+1]; ++p)
-        sparsity.back().insert (*p);
+      for (SparsityPattern::const_iterator p=sp3.begin(row); p!=sp3.end(row); ++p)
+        sparsity.back().insert (p->column());
     };
   SparsityPattern sp4;
   sp4.copy_from ((N-1)*(N-1), (N-1)*(N-1),
@@ -97,14 +96,9 @@ main ()
   // now check for equivalence of sp3 and sp4
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
-      const types::global_dof_index
-      *sp3_p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
-      const types::global_dof_index
-      *sp4_p=sp4.get_column_numbers()+sp4.get_rowstart_indices()[row];
-      for (; sp3_p != (sp3.get_column_numbers() +
-                       sp3.get_rowstart_indices()[row+1]);
-           ++sp3_p, ++sp4_p)
-        Assert (*sp3_p == *sp4_p, ExcInternalError());
+      SparsityPattern::const_iterator p3=sp3.begin(row), p4=sp4.begin(row);
+      for (; p3!=sp3.end(row); ++p3, ++p4)
+        Assert (p3->column() == p4->column(), ExcInternalError());
     };
 
 
@@ -159,15 +153,10 @@ main ()
 
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
-      const types::global_dof_index
-      *sp3_p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
-      const types::global_dof_index
-      *sp5_p=sp5.get_column_numbers()+sp5.get_rowstart_indices()[row];
-      for (; sp3_p != (sp3.get_column_numbers() +
-                       sp3.get_rowstart_indices()[row+1]);
-           ++sp3_p, ++sp5_p)
-        Assert (*sp3_p == *sp5_p, ExcInternalError());
-    };
+      SparsityPattern::const_iterator p3=sp3.begin(row), p5=sp5.begin(row);
+      for (; p3!=sp3.end(row); ++p3, ++p5)
+        Assert (p3->column() == p5->column(), ExcInternalError());
+    }
 }
 
 

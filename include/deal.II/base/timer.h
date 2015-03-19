@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -222,7 +222,7 @@ private:
    * average time defined as the sum of all individual times divided by the
    * number of MPI processes in the MPI_Comm.
    */
-  Utilities::System::MinMaxAvg mpi_data;
+  Utilities::MPI::MinMaxAvg mpi_data;
 #endif
 };
 
@@ -677,7 +677,7 @@ void Timer::restart ()
 #ifdef DEAL_II_WITH_MPI
 
 inline
-const Utilities::System::MinMaxAvg &
+const Utilities::MPI::MinMaxAvg &
 Timer::get_data() const
 {
   return mpi_data;

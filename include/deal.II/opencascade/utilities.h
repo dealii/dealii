@@ -23,8 +23,12 @@
 #ifdef DEAL_II_WITH_OPENCASCADE
 
 #include <deal.II/grid/tria.h>
+#include <deal.II/base/point.h>
 
 #include <string>
+
+// opencascade needs "HAVE_CONFIG_H" to be exported...
+#define HAVE_CONFIG_H
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Edge.hxx>
@@ -36,8 +40,8 @@
 #include <TopoDS_Wire.hxx>
 #include <IFSelect_ReturnStatus.hxx>
 #include <gp_Pnt.hxx>
+#undef HAVE_CONFIG_H
 
-#include <deal.II/base/point.h>
 
 
 DEAL_II_NAMESPACE_OPEN

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -216,7 +216,7 @@ void MinimizationProblem<dim>::assemble_step ()
 
       fe_values.get_function_values (present_solution,
                                      local_solution_values);
-      fe_values.get_function_grads (present_solution,
+      fe_values.get_function_gradients (present_solution,
                                     local_solution_grads);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
@@ -414,8 +414,8 @@ void MinimizationProblem<1>::refine_grid ()
     {
       fe_values.reinit (cell);
       fe_values.get_function_values (present_solution, local_values);
-      fe_values.get_function_grads (present_solution, local_gradients);
-      fe_values.get_function_2nd_derivatives (present_solution, local_2nd_derivs);
+      fe_values.get_function_gradients (present_solution, local_gradients);
+      fe_values.get_function_hessians (present_solution, local_2nd_derivs);
 
       double cell_residual_norm = 0;
       for (unsigned int q=0; q<quadrature.size(); ++q)
@@ -457,7 +457,7 @@ void MinimizationProblem<1>::refine_grid ()
             left_neighbor = left_neighbor->child(1);
 
           neighbor_fe_values.reinit (left_neighbor);
-          neighbor_fe_values.get_function_grads (present_solution, local_gradients);
+          neighbor_fe_values.get_function_gradients (present_solution, local_gradients);
 
           const double neighbor_u_prime_left = local_gradients[1][0];
 
@@ -475,7 +475,7 @@ void MinimizationProblem<1>::refine_grid ()
             right_neighbor = right_neighbor->child(0);
 
           neighbor_fe_values.reinit (right_neighbor);
-          neighbor_fe_values.get_function_grads (present_solution, local_gradients);
+          neighbor_fe_values.get_function_gradients (present_solution, local_gradients);
 
           const double neighbor_u_prime_right = local_gradients[0][0];
 
@@ -536,7 +536,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
       fe_values.reinit (cell);
       fe_values.get_function_values (function,
                                      local_solution_values);
-      fe_values.get_function_grads (function,
+      fe_values.get_function_gradients (function,
                                     local_solution_grads);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)

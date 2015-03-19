@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -394,9 +394,11 @@ int main()
 
   std::remove ("sparse_matrices.tmp");
 
-  for (unsigned int i=0; i<A.n_nonzero_elements(); ++i)
-    if (std::fabs(A.global_entry(i) - A_tmp.global_entry(i)) <=
-        std::fabs(1e-14*A.global_entry(i)))
+  SparseMatrix<double>::const_iterator p    =A.begin(),
+				       p_tmp=A_tmp.begin();
+  for (; p!=A.end(); ++p, ++p_tmp)
+    if (std::fabs(p->value() - p_tmp->value()) <=
+        std::fabs(1e-14*p->value()))
       deallog << "write/read-error at global position "
-              << i << std::endl;
+              << (p-A.begin()) << std::endl;
 }

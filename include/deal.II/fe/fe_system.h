@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,11 @@ DEAL_II_NAMESPACE_OPEN
  * that are possibly of different type. The result is then a vector-valued
  * finite element. %Vector valued elements are discussed in a number of
  * tutorial programs, for example step-8, step-20, step-21, and in particular
- * in the @ref vector_valued module.
+ * in the
+ * @ref vector_valued
+ * module.
+ *
+ * @dealiiVideoLecture{19,20}
  *
  * <h3>FESystem, components and blocks</h3>
  *
@@ -56,12 +60,13 @@ DEAL_II_NAMESPACE_OPEN
  * partial differential equation, the finite element side looks a bit
  * different Since not only FESystem, but also vector-valued elements like
  * FE_RaviartThomas, have several components. The concept needed here is a
- * @ref GlossBlock "block". Each block encompasses the set of degrees of
- * freedom associated with a single base element of an FESystem, where base
- * elements with multiplicities count multiple times. These blocks are usually
- * addressed using the information in DoFHandler::block_info(). The number of
- * blocks of a FESystem object is simply the sum of all multiplicities of base
- * elements and is given by n_blocks().
+ * @ref GlossBlock "block".
+ * Each block encompasses the set of degrees of freedom associated with a
+ * single base element of an FESystem, where base elements with multiplicities
+ * count multiple times. These blocks are usually addressed using the
+ * information in DoFHandler::block_info(). The number of blocks of a FESystem
+ * object is simply the sum of all multiplicities of base elements and is
+ * given by n_blocks().
  *
  * For example, the FESystem for the Taylor-Hood element for the three-
  * dimensional Stokes problem can be built using the code
@@ -153,17 +158,34 @@ class FESystem : public FiniteElement<dim,spacedim>
 public:
 
   /**
-   * Constructor. Take a finite element type and the number of elements you
-   * want to group together using this class.
+   * Constructor. Take a finite element and the number of elements you want to
+   * group together using this class.
    *
-   * In fact, the object @p fe is not used, apart from getting the number of
-   * dofs per vertex, line, etc for that finite element class. The objects
-   * creates its own copy of the finite element object at construction time
-   * (but after the initialization of the base class @p FiniteElement, which
-   * is why we need a valid finite element object passed to the constructor).
+   * The object @p fe is not actually used for anything other than creating a
+   * copy that will then be owned by the current object. In other words, it is
+   * completely fine to call this constructor with a temporary object for the
+   * finite element, as in this code snippet:
+   * @code
+   *   FESystem<dim> fe (FE_Q<dim>(2), 2);
+   * @endcode
+   * Here, <code>FE_Q@<dim@>(2)</code> constructs an unnamed, temporary object
+   * that is passed to the FESystem constructor to create a finite element
+   * that consists of two components, both of which are quadratic FE_Q
+   * elements. The temporary is destroyed again at the end of the code that
+   * corresponds to this line, but this does not matter because FESystem
+   * creates its own copy of the FE_Q object.
    *
-   * Obviously, the template finite element class needs to be of the same
-   * dimension as is this object.
+   * This constructor (or its variants below) is used in essentially all
+   * tutorial programs that deal with vector valued problems. See step-8,
+   * step-20, step-22 and others for use cases. Also see the module on
+   * @ref vector_valued "Handling vector valued problems".
+   *
+   * @dealiiVideoLecture{19,20}
+   *
+   * @param[in] fe The finite element that will be used to represent the
+   * components of this composed element.
+   * @param[in] n_elements An integer denoting how many copies of @p fe this
+   * element should consist of.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe,
             const unsigned int n_elements);
@@ -171,7 +193,8 @@ public:
   /**
    * Constructor for mixed discretizations with two base elements.
    *
-   * See the other constructor.
+   * See the other constructor above for an explanation of the general idea of
+   * composing elements.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
             const FiniteElement<dim,spacedim> &fe2, const unsigned int n2);
@@ -179,7 +202,8 @@ public:
   /**
    * Constructor for mixed discretizations with three base elements.
    *
-   * See the other constructor.
+   * See the other constructor above for an explanation of the general idea of
+   * composing elements.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
             const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
@@ -188,7 +212,8 @@ public:
   /**
    * Constructor for mixed discretizations with four base elements.
    *
-   * See the other constructor.
+   * See the first of the other constructors above for an explanation of the
+   * general idea of composing elements.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
             const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
@@ -198,7 +223,8 @@ public:
   /**
    * Constructor for mixed discretizations with five base elements.
    *
-   * See the other constructor.
+   * See the first of the other constructors above for an explanation of the
+   * general idea of composing elements.
    */
   FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
             const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
@@ -210,8 +236,181 @@ public:
    * Same as above but for any number of base elements. Pointers to the base
    * elements and their multiplicities are passed as vectors to this
    * constructor. The lengths of these vectors are assumed to be equal.
+   *
+   * As above, the finite element objects pointed to by the first argument are
+   * not actually used other than to create copies internally. Consequently,
+   * you can delete these pointers immediately again after calling this
+   * constructor.
+   *
+   * <h4>How to use this constructor</h4>
+   *
+   * Using this constructor is a bit awkward at times because you need to pass
+   * two vectors in a place where it may not be straightforward to construct
+   * such a vector -- for example, in the member initializer list of a class
+   * with an FESystem member variable. For example, if your main class looks
+   * like this:
+   * @code
+   *   template <int dim>
+   *   class MySimulator {
+   *   public:
+   *     MySimulator (const unsigned int polynomial_degree);
+   *   private:
+   *     FESystem<dim> fe;
+   *   };
+   *
+   *   template <int dim>
+   *   MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
+   *     :
+   *     fe (...)  // what to pass here???
+   *   {}
+   * @endcode
+   *
+   * If your compiler supports the C++11 language standard (or later) and
+   * deal.II has been configured to use it, then you could do something like
+   * this to create an element with four base elements and multiplicities 1,
+   * 2, 3 and 4:
+   * @code
+   *   template <int dim>
+   *   MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
+   *     :
+   *     fe (std::vector<const FiniteElement<dim>*> { new FE_Q<dim>(1),
+   *                                                  new FE_Q<dim>(2),
+   *                                                  new FE_Q<dim>(3),
+   *                                                  new FE_Q<dim>(4) },
+   *         std::vector<unsigned int> { 1, 2, 3, 4 })
+   *   {}
+   * @endcode
+   * This creates two vectors in place and initializes them using the
+   * initializer list enclosed in braces <code>{ ... }</code>.
+   *
+   * This code has a problem: it creates four memory leaks because the first
+   * vector above is created with pointers to elements that are allocated with
+   * <code>new</code> but never destroyed. Without C++11, you have another
+   * problem: brace-initializer don't exist in earlier C++ standards.
+   *
+   * The solution to the second of these problems is to create two static
+   * member functions that can create vectors. Here is an example:
+   * @code
+   *   template <int dim>
+   *   class MySimulator {
+   *   public:
+   *     MySimulator (const unsigned int polynomial_degree);
+   *
+   *   private:
+   *     FESystem<dim> fe;
+   *
+   *     static std::vector<const FiniteElement<dim>*>
+   *     create_fe_list (const unsigned int polynomial_degree);
+   *
+   *     static std::vector<unsigned int>
+   *     create_fe_multiplicities ();
+   *   };
+   *
+   *   template <int dim>
+   *   std::vector<const FiniteElement<dim>*>
+   *   MySimulator<dim>::create_fe_list (const unsigned int polynomial_degree)
+   *   {
+   *     std::vector<const FiniteElement<dim>*> fe_list;
+   *     fe_list.push_back (new FE_Q<dim>(1));
+   *     fe_list.push_back (new FE_Q<dim>(2));
+   *     fe_list.push_back (new FE_Q<dim>(3));
+   *     fe_list.push_back (new FE_Q<dim>(4));
+   *     return fe_list;
+   *   }
+   *
+   *   template <int dim>
+   *   std::vector<unsigned int>
+   *   MySimulator<dim>::create_fe_multiplicities ()
+   *   {
+   *     std::vector<unsigned int> multiplicities;
+   *     multiplicities.push_back (1);
+   *     multiplicities.push_back (2);
+   *     multiplicities.push_back (3);
+   *     multiplicities.push_back (4);
+   *     return multiplicities;
+   *   }
+   *
+   *   template <int dim>
+   *   MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
+   *     :
+   *     fe (create_fe_list (polynomial_degree),
+   *         create_fe_multiplicities ())
+   *   {}
+   * @endcode
+   *
+   * The way this works is that we have two static member functions that
+   * create the necessary vectors to pass to the constructor of the member
+   * variable <code>fe</code>. They need to be static because they are called
+   * during the constructor of <code>MySimulator</code> at a time when the
+   * <code>*this</code> object isn't fully constructed and, consequently,
+   * regular member functions cannot be called yet.
+   *
+   * The code above does not solve the problem with the memory leak yet,
+   * though: the <code>create_fe_list()</code> function creates a vector of
+   * pointers, but nothing destroys these. This is the solution:
+   * @code
+   *   template <int dim>
+   *   class MySimulator {
+   *   public:
+   *     MySimulator (const unsigned int polynomial_degree);
+   *
+   *   private:
+   *     FESystem<dim> fe;
+   *
+   *     struct VectorElementDestroyer {
+   *       const std::vector<const FiniteElement<dim>*> data;
+   *       VectorElementDestroyer (const std::vector<const FiniteElement<dim>*> &pointers);
+   *       ~VectorElementDestroyer (); // destructor to delete the pointers
+   *       const std::vector<const FiniteElement<dim>*> & get_data () const;
+   *     };
+   *
+   *     static std::vector<const FiniteElement<dim>*>
+   *     create_fe_list (const unsigned int polynomial_degree);
+   *
+   *     static std::vector<unsigned int>
+   *     create_fe_multiplicities ();
+   *   };
+   *
+   *   template <int dim>
+   *   MySimulator<dim>::VectorElementDestroyer::
+   *   VectorElementDestroyer (const std::vector<const FiniteElement<dim>*> &pointers)
+   *     : data(pointers)
+   *   {}
+   *
+   *   template <int dim>
+   *   MySimulator<dim>::VectorElementDestroyer::
+   *   ~VectorElementDestroyer ()
+   *   {
+   *     for (unsigned int i=0; i<data.size(); ++i)
+   *       delete data[i];
+   *   }
+   *
+   *   template <int dim>
+   *   const std::vector<const FiniteElement<dim>*> &
+   *   MySimulator<dim>::VectorElementDestroyer::
+   *   get_data () const
+   *   {
+   *     return data;
+   *   }
+   *
+   *
+   *   template <int dim>
+   *   MySimulator<dim>::MySimulator (const unsigned int polynomial_degree)
+   *     :
+   *     fe (VectorElementDestroyer(create_fe_list (polynomial_degree)).get_data(),
+   *         create_fe_multiplicities ())
+   *   {}
+   * @endcode
+   *
+   * In other words, the vector we receive from the
+   * <code>create_fe_list()</code> is packed into a temporary object of type
+   * <code>VectorElementDestroyer</code>; we then get the vector from this
+   * temporary object immediately to pass it to the constructor of
+   * <code>fe</code>; and finally, the <code>VectorElementDestroyer</code>
+   * destructor is called at the end of the entire expression (after the
+   * constructor of <code>fe</code> has finished) and destroys the elements of
+   * the temporary vector. Voila: not short nor elegant, but it works!
    */
-
   FESystem (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
             const std::vector<unsigned int>                   &multiplicities);
 
@@ -430,13 +629,17 @@ public:
    * @param face The number of the face this degree of freedom lives on. This
    * number must be between zero and GeometryInfo::faces_per_cell.
    * @param face_orientation One part of the description of the orientation of
-   * the face. See @ref GlossFaceOrientation .
+   * the face. See
+   * @ref GlossFaceOrientation.
    * @param face_flip One part of the description of the orientation of the
-   * face. See @ref GlossFaceOrientation .
+   * face. See
+   * @ref GlossFaceOrientation.
    * @param face_rotation One part of the description of the orientation of
-   * the face. See @ref GlossFaceOrientation . @return The index of this
-   * degree of freedom within the set of degrees of freedom on the entire
-   * cell. The returned value will be between zero and dofs_per_cell.
+   * the face. See
+   * @ref GlossFaceOrientation.
+   * @return The index of this degree of freedom within the set of degrees of
+   * freedom on the entire cell. The returned value will be between zero and
+   * dofs_per_cell.
    */
   virtual
   unsigned int face_to_cell_index (const unsigned int face_dof_index,
@@ -558,7 +761,8 @@ public:
    * neither dominates, or if either could dominate.
    *
    * For a definition of domination, see FiniteElementBase::Domination and in
-   * particular the @ref hp_paper "hp paper".
+   * particular the
+   * @ref hp_paper "hp paper".
    */
   virtual
   FiniteElementDomination::Domination

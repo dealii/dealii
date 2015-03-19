@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -405,15 +405,14 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
   // Check consistency of redundant
   // template parameter
   Assert (dim==dimension, ExcDimensionMismatch(dim, dimension));
-  typedef DataOut_DoFData<DH,dimension+1> BaseClass;
   Assert (this->triangulation != 0,
-          typename BaseClass::ExcNoTriangulationSelected());
+          Exceptions::DataOut::ExcNoTriangulationSelected());
 
   const unsigned int n_subdivisions = (nnnn_subdivisions != 0)
                                       ? nnnn_subdivisions
                                       : this->default_subdivisions;
   Assert (n_subdivisions >= 1,
-          ExcInvalidNumberOfSubdivisions(n_subdivisions));
+          Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   unsigned int n_datasets=this->cell_data.size();
   for (unsigned int i=0; i<this->dof_data.size(); ++i)

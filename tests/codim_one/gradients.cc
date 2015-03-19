@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,7 @@ void test(std::string filename)
   FEValues<dim,spacedim> fe_values (fe, q_midpoint,
                                     update_values |
                                     update_JxW_values |
-                                    update_cell_normal_vectors |
+                                    update_normal_vectors |
                                     update_gradients);
 
   // finite elements used for the
@@ -83,7 +83,7 @@ void test(std::string filename)
   DoFHandler<dim,spacedim> dof_handler_help (triangulation);
   dof_handler_help.distribute_dofs (fe_help);
   FEValues<dim,spacedim> fe_values_help (fe_help, q_midpoint,
-                                         update_cell_normal_vectors);
+                                         update_normal_vectors);
 
   deallog
       << "no. of cells "<< triangulation.n_cells() <<std::endl;
@@ -140,7 +140,7 @@ void test(std::string filename)
 
       fe_values.reinit(cell);
       cell-> get_dof_indices (local_dof_indices);
-      cell_normals = fe_values.get_cell_normal_vectors();
+      cell_normals = fe_values.get_normal_vectors();
 
       // The cell tangential is calculated
       // in the midpoint of the cell. For

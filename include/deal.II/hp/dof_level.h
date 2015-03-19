@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -228,9 +228,9 @@ namespace internal
        * @param obj_index The number of the cell we are looking at.
        * @param dofs_per_cell The number of DoFs per cell for this cell. This
        * is not used for the hp case but necessary to keep the interface the
-       * same as for the non-hp case. @return A pointer to the first DoF index
-       * for the current cell. The next dofs_per_cell indices are for the
-       * current cell.
+       * same as for the non-hp case.
+       * @return A pointer to the first DoF index for the current cell. The
+       * next dofs_per_cell indices are for the current cell.
        */
       const types::global_dof_index *
       get_cell_cache_start (const unsigned int obj_index,
@@ -241,6 +241,14 @@ namespace internal
        * object.
        */
       std::size_t memory_consumption () const;
+
+      /**
+       * Read or write the data of this object to or from a stream for the
+       * purpose of serialization
+       */
+      template <class Archive>
+      void serialize(Archive &ar,
+                     const unsigned int version);
 
     private:
       /**
@@ -388,6 +396,19 @@ namespace internal
               ExcInternalError());
 
       return &cell_dof_indices_cache[cell_cache_offsets[obj_index]];
+    }
+
+    template <class Archive>
+    inline
+    void
+    DoFLevel::serialize(Archive &ar,
+                        const unsigned int)
+    {
+      ar &this->active_fe_indices;
+      ar &this->cell_cache_offsets;
+      ar &this->cell_dof_indices_cache;
+      ar &this->dof_indices;
+      ar &this->dof_offsets;
     }
   } // namespace hp
 

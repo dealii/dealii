@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@
 #include <cmath>
 #include <sstream>
 
-#ifdef HAVE_SYS_TIMES_H
+#ifdef DEAL_II_HAVE_SYS_TIMES_H
 #  include <sys/times.h>
 #else
 struct tms

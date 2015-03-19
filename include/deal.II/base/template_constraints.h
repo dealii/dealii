@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,9 @@
 
 
 #include <deal.II/base/config.h>
+
+#include <complex>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -297,6 +300,283 @@ struct types_are_equal<T,T>
 
 
 
+/**
+ * A class with a local typedef that represents the type that results from the
+ * product of two variables of type @p T and @p U. In other words, we would
+ * like to infer the type of the <code>product</code> variable in code like
+ * this:
+ * @code
+ *   T t;
+ *   U u;
+ *   auto product = t*u;
+ * @endcode
+ * The local typedef of this structure represents the type the variable
+ * <code>product</code> would have.
+ *
+ *
+ * <h3>Where is this useful</h3>
+ *
+ * The purpose of this class is principally to represent the type one needs to
+ * use to represent the values or gradients of finite element fields at
+ * quadrature points. For example, assume you are storing the values $U_j$ of
+ * unknowns in a Vector<float>, then evaluating $u_h(x_q) = \sum_j U_j
+ * \varphi_j(x_q)$ at quadrature points results in values $u_h(x_q)$ that need
+ * to be stored as @p double variables because the $U_j$ are @p float values
+ * and the $\varphi_j(x_q)$ are computed as @p double values, and the product
+ * are then @p double values. On the other hand, if you store your unknowns
+ * $U_j$ as <code>std::complex@<double@></code> values and you try to evaluate
+ * $\nabla u_h(x_q) = \sum_j U_j \nabla\varphi_j(x_q)$ at quadrature points,
+ * then the gradients $\nabla u_h(x_q)$ need to be stored as objects of type
+ * <code>Tensor@<1,dim,std::complex@<double@>@></code> because that's what you
+ * get when you multiply a complex number by a <code>Tensor@<1,dim@></code>
+ * (the type used to represent the gradient of shape functions of scalar
+ * finite elements).
+ *
+ * Likewise, if you are using a vector valued element (with dim components)
+ * and the $U_j$ are stored as @p double variables, then $u_h(x_q) = \sum_j
+ * U_j \varphi_j(x_q)$ needs to have type <code>Tensor@<1,dim@></code>
+ * (because the shape functions have type <code>Tensor@<1,dim@></code>).
+ * Finally, if you store the $U_j$ as objects of type
+ * <code>std::complex@<double@></code> and you have a vector valued element,
+ * then the gradients $\nabla u_h(x_q) = \sum_j U_j \nabla\varphi_j(x_q)$ will
+ * result in objects of type <code>Tensor@<2,dim,std::complex@<double@>
+ * @></code>.
+ *
+ * In all of these cases, this type is used to identify which type needs to be
+ * used for the result of computing the product of unknowns and the values,
+ * gradients, or other properties of shape functions.
+ *
+ * @author Wolfgang Bangerth, 2015
+ */
+template <typename T, typename U>
+struct ProductType
+{
+#ifdef DEAL_II_WITH_CXX11
+  typedef decltype(T() * U()) type;
+#endif
+};
+
+#ifndef DEAL_II_WITH_CXX11
+
+template <typename T>
+struct ProductType<T,T>
+{
+  typedef T type;
+};
+
+template <typename T>
+struct ProductType<T,bool>
+{
+  typedef T type;
+};
+
+template <typename T>
+struct ProductType<bool, T>
+{
+  typedef T type;
+};
+
+template <>
+struct ProductType<bool,double>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<double,bool>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<double,float>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<float,double>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<double,long double>
+{
+  typedef long double type;
+};
+
+template <>
+struct ProductType<long double,double>
+{
+  typedef long double type;
+};
+
+template <>
+struct ProductType<double,int>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<int,double>
+{
+  typedef double type;
+};
+
+template <>
+struct ProductType<float,int>
+{
+  typedef float type;
+};
+
+template <>
+struct ProductType<int,float>
+{
+  typedef float type;
+};
+
+
+#endif
+
+
+// Annoyingly, there is no std::complex<T>::operator*(U) for scalars U
+// other than T. Consequently, even with C++11, we need the following
+// specializations:
+template <typename T>
+struct ProductType<std::complex<T>,std::complex<T> >
+{
+  typedef std::complex<T> type;
+};
+
+template <typename T, typename U>
+struct ProductType<std::complex<T>,std::complex<U> >
+{
+  typedef std::complex<typename ProductType<T,U>::type> type;
+};
+
+template <typename U>
+struct ProductType<double,std::complex<U> >
+{
+  typedef std::complex<typename ProductType<double,U>::type> type;
+};
+
+template <typename T>
+struct ProductType<std::complex<T>,double>
+{
+  typedef std::complex<typename ProductType<T,double>::type> type;
+};
+
+
+template <typename U>
+struct ProductType<float,std::complex<U> >
+{
+  typedef std::complex<typename ProductType<float,U>::type> type;
+};
+
+template <typename T>
+struct ProductType<std::complex<T>,float>
+{
+  typedef std::complex<typename ProductType<T,float>::type> type;
+};
+
+
+
+/**
+ * This class provides a local typedef @p type that is equal to the template
+ * argument but only if the template argument corresponds to a scalar type
+ * (i.e., one of the floating point types, signed or unsigned integer, or a
+ * complex number). If the template type @p T is not a scalar, then no class
+ * <code>EnableIfScalar@<T@></code> is declared and, consequently, no local
+ * typedef is available.
+ *
+ * The purpose of the class is to disable certain template functions if one of
+ * the arguments is not a scalar number. By way of (nonsensical) example,
+ * consider the following function:
+ * @code
+ *   template <typename T>
+ *   T multiply (const T t1, const T t2) { return t1*t2; }
+ * @endcode
+ * This function can be called with any two arguments of the same type @p T.
+ * This includes arguments for which this clearly makes no sense.
+ * Consequently, one may want to restrict the function to only scalars, and
+ * this can be written as
+ * @code
+ *   template <typename T>
+ *   typename EnableIfScalar<T>::type
+ *   multiply (const T t1, const T t2) { return t1*t2; }
+ * @endcode
+ * At a place where you call the function, the compiler will deduce the type
+ * @p T from the arguments. For example, in
+ * @code
+ *   multiply(1.234, 2.345);
+ * @endcode
+ * it will deduce @p T to be @p double, and because
+ * <code>EnableIfScalar@<double@>::type</code> equals @p double, the compiler
+ * will instantiate a function <code>double multiply(const double, const
+ * double)</code> from the template above. On the other hand, in a context
+ * like
+ * @code
+ *   std::vector<char> v1, v2;
+ *   multiply(v1, v2);
+ * @endcode
+ * the compiler will deduce @p T to be <code>std::vector@<char@></code> but
+ * because <code>EnableIfScalar@<std::vector@<char@>@>::type</code> does not
+ * exist the compiler does not consider the template for instantiation. This
+ * technique is called "Substitution Failure is not an Error (SFINAE)". It
+ * makes sure that the template function can not even be called, rather than
+ * leading to a later error about the fact that the operation
+ * <code>t1*t2</code> is not defined (or may lead to some nonsensical result).
+ * It also allows the declaration of overloads of a function such as @p
+ * multiply for different types of arguments, without resulting in ambiguous
+ * call errors by the compiler.
+ *
+ * @author Wolfgang Bangerth, 2015
+ */
+template <typename T>
+struct EnableIfScalar;
+
+
+template <> struct EnableIfScalar<double>
+{
+  typedef double type;
+};
+
+
+template <> struct EnableIfScalar<float>
+{
+  typedef float type;
+};
+
+
+template <> struct EnableIfScalar<long double>
+{
+  typedef long double type;
+};
+
+
+template <> struct EnableIfScalar<int>
+{
+  typedef int type;
+};
+
+
+template <> struct EnableIfScalar<unsigned int>
+{
+  typedef unsigned int type;
+};
+
+
+
+template <typename T> struct EnableIfScalar<std::complex<T> >
+{
+  typedef std::complex<T> type;
+};
+
+
+
+
+
 // --------------- inline functions -----------------
 
 
@@ -317,7 +597,6 @@ PointerComparison::equal (const T *p1, const T *p2)
 {
   return (p1==p2);
 }
-
 
 
 DEAL_II_NAMESPACE_CLOSE

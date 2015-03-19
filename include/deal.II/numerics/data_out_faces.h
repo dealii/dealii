@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -142,11 +142,17 @@ public:
 
   /**
    * This is the central function of this class since it builds the list of
-   * patches to be written by the low-level functions of the base class. See
-   * the general documentation of this class for further information.
+   * patches to be written by the low-level functions of the base class. A
+   * patch is, in essence, some intermediate representation of the data on
+   * each face of a triangulation and DoFHandler object that can then be used
+   * to write files in some format that is readable by visualization programs.
    *
-   * The function supports multithreading, if deal.II is compiled in
-   * multithreading mode.
+   * You can find an overview of the use of this function in the general
+   * documentation of this class. An example is also provided in the
+   * documentation of this class's base class DataOut_DoFData.
+   *
+   * @param n_subdivisions See DataOut::build_patches() for an extensive
+   * description of this parameter.
    */
   virtual void
   build_patches (const unsigned int n_subdivisions = 0);
@@ -211,19 +217,6 @@ public:
    * two functions should be done with care.
    */
   virtual FaceDescriptor next_face (const FaceDescriptor &face);
-
-  /**
-   * Exception
-   */
-  DeclException1 (ExcInvalidNumberOfSubdivisions,
-                  int,
-                  << "The number of subdivisions per patch, " << arg1
-                  << ", is not valid.");
-
-  /**
-   * Exception
-   */
-  DeclException0 (ExcCellNotActiveForCellData);
 
 private:
   /**

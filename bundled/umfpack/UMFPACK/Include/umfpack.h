@@ -88,7 +88,7 @@ extern "C" {
 #include "umfpack_tictoc.h"
 
 /* AMD */
-#include "../../AMD/Include/amd.h"
+#include <amd.h>
 
 /* global function pointers */
 #include "umfpack_global.h"

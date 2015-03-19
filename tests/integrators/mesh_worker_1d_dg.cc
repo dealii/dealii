@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -251,6 +251,10 @@ namespace Advection
     data.add(rhs, "Residual");
     assembler.initialize(data);
 
+    MeshWorker::LoopControl lctrl;
+    lctrl.cells_first = true;
+    lctrl.own_faces = MeshWorker::LoopControl::one;
+
     MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
     (dof_handler.begin_active(), dof_handler.end(),
      dof_info, info_box,
@@ -260,7 +264,7 @@ namespace Advection
                      this, std_cxx11::_1, std_cxx11::_2),
      std_cxx11::bind(&AdvectionProblem<dim>::integrate_face_term,
                      this, std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::_4),
-     assembler, true);
+     assembler, lctrl);
 
   }//assemble_system
 

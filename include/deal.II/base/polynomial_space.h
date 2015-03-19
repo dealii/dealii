@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2013 by the deal.II authors
+// Copyright (C) 2002 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,25 +53,40 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <dl> <dt> 1D <dd> <i> x<sup>0</sup>, x<sup>1</sup>,...,x<sup>n</sup></i>
  * <dt> 2D: <dd> <i> x<sup>0</sup>y<sup>0</sup>,
- * x<sup>1</sup>y<sup>0</sup>,...,
- * x<sup>n</sup>y<sup>0</sup>,<br>
+ * x<sup>1</sup>y<sup>0</sup>,..., x<sup>n</sup>y<sup>0</sup>,
+ * <br>
  * x<sup>0</sup>y<sup>1</sup>, x<sup>1</sup>y<sup>1</sup>,...,
- * x<sup>n-1</sup>y<sup>1</sup>,<br>
- * x<sup>0</sup>y<sup>2</sup>,...
- * x<sup>n-2</sup>y<sup>2</sup>,<br>...<br>
- * x<sup>0</sup>y<sup>n-1</sup>,
- * x<sup>1</sup>y<sup>n-1</sup>,<br>
+ * x<sup>n-1</sup>y<sup>1</sup>,
+ * <br>
+ * x<sup>0</sup>y<sup>2</sup>,... x<sup>n-2</sup>y<sup>2</sup>,
+ * <br>
+ * ...
+ * <br>
+ * x<sup>0</sup>y<sup>n-1</sup>, x<sup>1</sup>y<sup>n-1</sup>,
+ * <br>
  * x<sup>0</sup>y<sup>n</sup> </i> <dt> 3D: <dd> <i>
  * x<sup>0</sup>y<sup>0</sup>z<sup>0</sup>,...,
- * x<sup>n</sup>y<sup>0</sup>z<sup>0</sup>,<br>
+ * x<sup>n</sup>y<sup>0</sup>z<sup>0</sup>,
+ * <br>
  * x<sup>0</sup>y<sup>1</sup>z<sup>0</sup>,...,
- * x<sup>n-1</sup>y<sup>1</sup>z<sup>0</sup>,<br>...<br>
- * x<sup>0</sup>y<sup>n</sup>z<sup>0</sup>,<br>
+ * x<sup>n-1</sup>y<sup>1</sup>z<sup>0</sup>,
+ * <br>
+ * ...
+ * <br>
+ * x<sup>0</sup>y<sup>n</sup>z<sup>0</sup>,
+ * <br>
  * x<sup>0</sup>y<sup>0</sup>z<sup>1</sup>,...
- * x<sup>n-1</sup>y<sup>0</sup>z<sup>1</sup>,<br>...<br>
- * x<sup>0</sup>y<sup>n-1</sup>z<sup>1</sup>,<br>
+ * x<sup>n-1</sup>y<sup>0</sup>z<sup>1</sup>,
+ * <br>
+ * ...
+ * <br>
+ * x<sup>0</sup>y<sup>n-1</sup>z<sup>1</sup>,
+ * <br>
  * x<sup>0</sup>y<sup>0</sup>z<sup>2</sup>,...
- * x<sup>n-2</sup>y<sup>0</sup>z<sup>2</sup>,<br>...<br>
+ * x<sup>n-2</sup>y<sup>0</sup>z<sup>2</sup>,
+ * <br>
+ * ...
+ * <br>
  * x<sup>0</sup>y<sup>0</sup>z<sup>n</sup> </i> </dl>
  *
  * @ingroup Polynomials

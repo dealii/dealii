@@ -43,21 +43,21 @@ namespace std_cxx11
   using boost::make_tuple;
   using boost::get;
 
-				   // boost::tuples::length has been renamed
-				   // by the standard to std::tuple_size
+  // boost::tuples::length has been renamed
+  // by the standard to std::tuple_size
   template <typename T>
-  struct tuple_size 
+  struct tuple_size
   {
-      static const std::size_t value = boost::tuples::length<T>::value;
+    static const std::size_t value = boost::tuples::length<T>::value;
   };
 
-				   // similarly, boost::tuples::element has
-				   // been renamed by the standard to
-				   // std::tuple_element
+  // similarly, boost::tuples::element has
+  // been renamed by the standard to
+  // std::tuple_element
   template <int N, typename T>
   struct tuple_element
   {
-      typedef typename boost::tuples::element<N,T>::type type;
+    typedef typename boost::tuples::element<N,T>::type type;
   };
 }
 DEAL_II_NAMESPACE_CLOSE

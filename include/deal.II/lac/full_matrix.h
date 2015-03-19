@@ -55,7 +55,8 @@ template <typename number> class LAPACKFullMatrix;
  * @<double@>, @<long double@>, @<std::complex@<float@>@>,
  * @<std::complex@<double@>@>, @<std::complex@<long double@>@></tt>; others
  * can be generated in application programs (see the section on
- * @ref Instantiations in the manual).
+ * @ref Instantiations
+ * in the manual).
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2004
  */
@@ -1359,7 +1360,7 @@ inline
 number
 FullMatrix<number>::Accessor::value() const
 {
-  Assert (numbers::is_finite( matrix->el(a_row, a_col) ), ExcNumberNotFinite());
+  AssertIsFinite(matrix->el(a_row, a_col));
   return matrix->el(a_row, a_col);
 }
 

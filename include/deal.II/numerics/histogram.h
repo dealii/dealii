@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -145,15 +145,9 @@ public:
   /**
    * Exception.
    */
-  DeclException0 (ExcEmptyData);
-  /**
-   * Exception.
-   */
-  DeclException0 (ExcInvalidIntervals);
-  /**
-   * Exception.
-   */
-  DeclException0 (ExcInvalidData);
+  DeclExceptionMsg (ExcEmptyData,
+                    "Your input argument to this function does not appear to "
+                    "have any data in it.");
   /**
    * Exception.
    */

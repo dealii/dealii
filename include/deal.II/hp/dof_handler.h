@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,8 @@
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/number_cache.h>
 #include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/dof_faces.h>
+#include <deal.II/hp/dof_level.h>
 
 #include <vector>
 #include <map>
@@ -39,8 +41,6 @@ namespace internal
   namespace hp
   {
     class DoFLevel;
-    template <int> class DoFIndicesOnFaces;
-    template <int> class DoFIndicesOnFacesOrEdges;
 
     namespace DoFHandler
     {
@@ -88,7 +88,8 @@ namespace hp
    *
    * The whole process of working with objects of this type is explained in
    * step-27. Many of the algorithms this class implements are described in
-   * the @ref hp_paper "hp paper".
+   * the
+   * @ref hp_paper "hp paper".
    *
    *
    * <h3>Active FE indices and their behavior under mesh refinement</h3>
@@ -133,8 +134,8 @@ namespace hp
 
     /**
      * A typedef that is used to to identify
-     * @ref GlossActive "active cell iterators". The concept of iterators
-     * is discussed at length in the
+     * @ref GlossActive "active cell iterators".
+     * The concept of iterators is discussed at length in the
      * @ref Iterators "iterators documentation module".
      *
      * The current typedef identifies active cells in a hp::DoFHandler object.
@@ -151,7 +152,11 @@ namespace hp
      *
      * @ingroup Iterators
      */
+#ifndef _MSC_VER
     typedef typename ActiveSelector::active_cell_iterator active_cell_iterator;
+#else
+    typedef TriaActiveIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > > active_cell_iterator;
+#endif
 
     typedef typename LevelSelector::cell_iterator         level_cell_iterator;
 
@@ -162,11 +167,11 @@ namespace hp
      *
      * The current typedef identifies cells in a DoFHandler object. Some of
      * these cells may in fact be active (see
-     * @ref GlossActive "active cell iterators") in which case they can in
-     * fact be asked for the degrees of freedom that live on them. On the
-     * other hand, if the cell is not active, any such query will result in
-     * an error. Note that this is what distinguishes this typedef from the
-     * level_cell_iterator typedef.
+     * @ref GlossActive "active cell iterators"
+     * ) in which case they can in fact be asked for the degrees of freedom
+     * that live on them. On the other hand, if the cell is not active, any
+     * such query will result in an error. Note that this is what
+     * distinguishes this typedef from the level_cell_iterator typedef.
      *
      * While the actual data type of the typedef is hidden behind a few layers
      * of (unfortunately necessary) indirections, it is in essence
@@ -181,7 +186,12 @@ namespace hp
      *
      * @ingroup Iterators
      */
+#ifndef _MSC_VER
     typedef typename ActiveSelector::cell_iterator        cell_iterator;
+#else
+    typedef TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >        cell_iterator;
+#endif
+
 
     typedef typename ActiveSelector::face_iterator        face_iterator;
     typedef typename ActiveSelector::active_face_iterator active_face_iterator;
@@ -316,7 +326,8 @@ namespace hp
      * As for ::DoFHandler::max_couplings_between_dofs(), the result of this
      * function is often not very accurate for 3d and/or high polynomial
      * degrees. The consequences are discussed in the documentation of the
-     * module on @ref Sparsity.
+     * module on
+     * @ref Sparsity.
      */
     unsigned int max_couplings_between_dofs () const;
 
@@ -329,7 +340,8 @@ namespace hp
      *
      * @note The same applies to this function as to max_couplings_per_dofs()
      * as regards the performance of this function. Think about one of the
-     * dynamic sparsity pattern classes instead (see @ref Sparsity).
+     * dynamic sparsity pattern classes instead (see
+     * @ref Sparsity).
      */
     unsigned int max_couplings_between_boundary_dofs () const;
 
@@ -394,7 +406,8 @@ namespace hp
     /**
      * Return an iterator range that contains all active cells that make up
      * this DoFHandler. Such a range is useful to initialize range-based for
-     * loops as supported by C++11, see also @ref CPP11 "C++11 standard".
+     * loops as supported by C++11, see also
+     * @ref CPP11 "C++11 standard".
      *
      * Range-based for loops are useful in that they require much less code
      * than traditional loops (see <a
@@ -441,7 +454,8 @@ namespace hp
      * in the documentation of active_cell_iterators().
      *
      * @param[in] level A given level in the refinement hierarchy of this
-     * triangulation. @return The half open range <code>[this->begin(level),
+     * triangulation.
+     * @return The half open range <code>[this->begin(level),
      * this->end(level))</code>
      *
      * @pre level must be less than this->n_levels().
@@ -457,8 +471,9 @@ namespace hp
      * in the documentation of active_cell_iterators().
      *
      * @param[in] level A given level in the refinement hierarchy of this
-     * triangulation. @return The half open range
-     * <code>[this->begin_active(level), this->end(level))</code>
+     * triangulation.
+     * @return The half open range <code>[this->begin_active(level),
+     * this->end(level))</code>
      *
      * @pre level must be less than this->n_levels().
      *
@@ -487,7 +502,8 @@ namespace hp
      * processors.
      *
      * In either case, included in the returned number are those DoFs which
-     * are constrained by hanging nodes, see @ref constraints.
+     * are constrained by hanging nodes, see
+     * @ref constraints.
      */
     types::global_dof_index n_dofs () const;
 
@@ -590,6 +606,22 @@ namespace hp
      * object might be a derived class.
      */
     virtual std::size_t memory_consumption () const;
+
+    /**
+     * Write the data of this object to a stream for the purpose of
+     * serialization.
+     */
+    template <class Archive>
+    void save(Archive &ar, const unsigned int version) const;
+
+    /**
+     * Read the data of this object from a stream for the purpose of
+     * serialization.
+     */
+    template <class Archive>
+    void load(Archive &ar, const unsigned int version);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     /**
      * Exception
@@ -860,6 +892,60 @@ namespace hp
 
 
   /* ----------------------- Inline functions ---------------------------------- */
+
+  template <int dim, int spacedim>
+  template <class Archive>
+  void DoFHandler<dim, spacedim>::save(Archive &ar, unsigned int) const
+  {
+    ar &vertex_dofs;
+    ar &vertex_dofs_offsets;
+    ar &number_cache;
+    ar &levels;
+    ar &faces;
+    ar &has_children;
+
+    // write out the number of triangulation cells and later check during
+    // loading that this number is indeed correct;
+    unsigned int n_cells = tria->n_cells();
+
+    ar &n_cells;
+  }
+
+  template <int dim, int spacedim>
+  template <class Archive>
+  void DoFHandler<dim, spacedim>::load(Archive &ar, unsigned int)
+  {
+    ar &vertex_dofs;
+    ar &vertex_dofs_offsets;
+    ar &number_cache;
+
+    // boost::serialization can restore pointers just fine, but if the
+    // pointer object still points to something useful, that object is not
+    // destroyed and we end up with a memory leak. consequently, first delete
+    // previous content before re-loading stuff
+    for (unsigned int i = 0; i<levels.size(); ++i)
+      delete levels[i];
+    for (unsigned int i = 0; i<has_children.size(); ++i)
+      delete has_children[i];
+    levels.resize(0);
+    has_children.resize(0);
+    delete faces;
+    faces = 0;
+
+    ar &levels;
+    ar &faces;
+    ar &has_children;
+
+    // these are the checks that correspond to the last block in the save()
+    // function
+    unsigned int n_cells;
+
+    ar &n_cells;
+
+    AssertThrow(n_cells == tria->n_cells(),
+                ExcMessage("The object being loaded into does not match the triangulation "
+                           "that has been stored previously."));
+  }
 
   template <int dim, int spacedim>
   inline

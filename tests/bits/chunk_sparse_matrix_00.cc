@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2013 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@ void test (const unsigned int chunk_size)
 {
   deallog << "Chunk size = " << chunk_size << std::endl;
 
-  ChunkSparsityPattern sp (5,5,3,chunk_size,false);
+  ChunkSparsityPattern sp (5,5,3,chunk_size);
   for (unsigned int i=0; i<5; ++i)
     for (unsigned int j=0; j<5; ++j)
       if ((i+2*j+1) % 3 == 0)

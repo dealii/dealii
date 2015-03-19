@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,17 +70,21 @@ namespace internals
 /**
  * This class implements dealing with linear (possibly inhomogeneous)
  * constraints on degrees of freedom. The concept and origin of such
- * constraints is extensively described in the @ref constraints module. The
- * class is meant to deal with a limited number of constraints relative to the
- * total number of degrees of freedom, for example a few per cent up to maybe
- * 30 per cent; and with a linear combination of <i>M</i> other degrees of
- * freedom where <i>M</i> is also relatively small (no larger than at most
- * around the average number of entries per row of a linear system). It is
- * <em>not</em> meant to describe full rank linear systems.
+ * constraints is extensively described in the
+ * @ref constraints
+ * module. The class is meant to deal with a limited number of constraints
+ * relative to the total number of degrees of freedom, for example a few per
+ * cent up to maybe 30 per cent; and with a linear combination of <i>M</i>
+ * other degrees of freedom where <i>M</i> is also relatively small (no larger
+ * than at most around the average number of entries per row of a linear
+ * system). It is <em>not</em> meant to describe full rank linear systems.
  *
  * The algorithms used in the implementation of this class are described in
- * some detail in the @ref hp_paper "hp paper". There is also a significant
- * amount of documentation on how to use this class in the @ref constraints
+ * some detail in the
+ * @ref hp_paper "hp paper".
+ * There is also a significant amount of documentation on how to use this
+ * class in the
+ * @ref constraints
  * module.
  *
  *
@@ -126,12 +130,13 @@ namespace internals
  * and sorts the entries.
  *
  * @note Many of the algorithms this class implements are discussed in the
- * @ref hp_paper . The algorithms are also related to those shown in <i>M. S.
- * Shephard: Linear multipoint constraints applied via transformation as part
- * of a direct stiffness assembly process. Int. J. Numer. Meth. Engrg., vol.
- * 20 (1984), pp. 2107-2112.</i>, with the difference that the algorithms
- * shown there completely eliminated constrained degrees of freedom, whereas
- * we usually keep them as part of the linear system.
+ * @ref hp_paper.
+ * The algorithms are also related to those shown in <i>M. S. Shephard: Linear
+ * multipoint constraints applied via transformation as part of a direct
+ * stiffness assembly process. Int. J. Numer. Meth. Engrg., vol. 20 (1984),
+ * pp. 2107-2112.</i>, with the difference that the algorithms shown there
+ * completely eliminated constrained degrees of freedom, whereas we usually
+ * keep them as part of the linear system.
  *
  * @ingroup dofs
  * @ingroup constraints
@@ -514,31 +519,23 @@ public:
    * @{
    */
 
-  /**
-   * Condense a given sparsity pattern. This function assumes the uncondensed
-   * matrix struct to be compressed and the one to be filled to be empty. The
-   * condensed structure is compressed afterwards.
-   *
-   * The constraint matrix object must be closed to call this function.
-   *
-   * @note The hanging nodes are completely eliminated from the linear system
-   * referring to <tt>condensed</tt>. Therefore, the dimension of
-   * <tt>condensed</tt> is the dimension of <tt>uncondensed</tt> minus the
-   * number of constrained degrees of freedom.
-   */
-  void condense (const SparsityPattern &uncondensed,
-                 SparsityPattern       &condensed) const;
-
 
   /**
-   * This function does much the same as the above one, except that it
-   * condenses the matrix struct 'in-place'. It does not remove nonzero
-   * entries from the matrix but adds those needed for the process of
-   * distribution of the constrained degrees of freedom.
+   * Condense a sparsity pattern. The name of the function mimics the name of
+   * the function we use to condense linear systems, but it is a bit of a
+   * misnomer for the current context. This is because in the context of
+   * linear systems, we eliminate certain rows and columns of the linear
+   * system, i.e., we "reduce" or "condense" the linear system. On the other
+   * hand, in the current context, the functions does not remove nonzero
+   * entries from the sparsity pattern. Rather, it adds those nonzero entry
+   * locations to the sparsity pattern that will later be needed for the
+   * process of condensation of constrained degrees of freedom from a linear
+   * system.
    *
    * Since this function adds new nonzero entries to the sparsity pattern, the
-   * argument must not be compressed. However the constraint matrix must be
-   * closed. The matrix struct is compressed at the end of the function.
+   * given sparsity pattern must not be compressed. The constraint matrix
+   * (i.e., the current object) must be closed. The sparsity pattern is
+   * compressed at the end of the function.
    */
   void condense (SparsityPattern &sparsity) const;
 
@@ -557,9 +554,10 @@ public:
    * or millions of unknowns are involved and for problems with many nonzero
    * elements per row (for example for vector-valued problems or hp finite
    * elements). In this case, it is advisable to use the
-   * CompressedSetSparsityPattern class instead, see for example @ref step_27
-   * "step-27", or to use the CompressedSimpleSparsityPattern class, see for
-   * example @ref step_31 "step-31".
+   * CompressedSetSparsityPattern class instead, see for example
+   * @ref step_27 "step-27",
+   * or to use the CompressedSimpleSparsityPattern class, see for example
+   * @ref step_31 "step-31".
    */
   void condense (CompressedSparsityPattern &sparsity) const;
 
@@ -586,7 +584,9 @@ public:
    * nonzero elements per row (for example for vector-valued problems or hp
    * finite elements). In this case, it is advisable to use the
    * BlockCompressedSetSparsityPattern class instead, see for example
-   * @ref step_27 "step-27" and @ref step_31 "step-31".
+   * @ref step_27 "step-27"
+   * and
+   * @ref step_31 "step-31".
    */
   void condense (BlockCompressedSparsityPattern &sparsity) const;
 
@@ -602,26 +602,12 @@ public:
    */
   void condense (BlockCompressedSimpleSparsityPattern &sparsity) const;
 
-
   /**
-   * Condense a given matrix. The associated matrix struct should be condensed
-   * and compressed. It is the user's responsibility to guarantee that all
-   * entries in the @p condensed matrix be zero!
+   * Condense a given matrix, i.e., eliminate the rows and columns of the
+   * matrix that correspond to constrained degrees of freedom.
    *
-   * The constraint matrix object must be closed to call this function.
-   *
-   * @deprecated The functions converting an uncondensed matrix into its
-   * condensed form are deprecated. Use the functions doing the in-place
-   * condensation leaving the size of the linear system unchanged.
-   */
-  template<typename number>
-  void condense (const SparseMatrix<number> &uncondensed,
-                 SparseMatrix<number>       &condensed) const DEAL_II_DEPRECATED;
-
-  /**
-   * This function does much the same as the above one, except that it
-   * condenses the matrix 'in-place'. See the general documentation of this
-   * class for more detailed information.
+   * See the general documentation of this class for more detailed
+   * information.
    */
   template<typename number>
   void condense (SparseMatrix<number> &matrix) const;
@@ -657,28 +643,16 @@ public:
                  VectorType       &output) const;
 
   /**
-   * Condense a given matrix and a given vector. The associated matrix struct
-   * should be condensed and compressed. It is the user's responsibility to
-   * guarantee that all entries in the @p condensed matrix and vector be zero!
-   * This function is the appropriate choice for applying inhomogeneous
-   * constraints.
+   * Condense a given matrix and a given vector by eliminating rows and
+   * columns of the linear system that correspond to constrained degrees of
+   * freedom. The sparsity pattern associated with the matrix needs to be
+   * condensed and compressed.  This function is the appropriate choice for
+   * applying inhomogeneous constraints.
    *
    * The constraint matrix object must be closed to call this function.
    *
-   * @deprecated The functions converting an uncondensed matrix into its
-   * condensed form are deprecated. Use the functions doing the in-place
-   * condensation leaving the size of the linear system unchanged.
-   */
-  template<typename number, class VectorType>
-  void condense (const SparseMatrix<number> &uncondensed_matrix,
-                 const VectorType           &uncondensed_vector,
-                 SparseMatrix<number>       &condensed_matrix,
-                 VectorType                 &condensed_vector) const DEAL_II_DEPRECATED;
-
-  /**
-   * This function does much the same as the above one, except that it
-   * condenses matrix and vector 'in-place'. See the general documentation of
-   * this class for more detailed information.
+   * See the general documentation of this class for more detailed
+   * information.
    */
   template<typename number, class VectorType>
   void condense (SparseMatrix<number> &matrix,
@@ -939,7 +913,8 @@ public:
    * according to the constraints specified by the calling ConstraintMatrix.
    * This function can correctly handle inhomogeneous constraints as well. For
    * the parameter use_inhomogeneities_for_rhs see the documentation in
-   * @ref constraints module.
+   * @ref constraints
+   * module.
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function
@@ -964,12 +939,13 @@ public:
    * freedom, except that here we don't write into a matrix but only allocate
    * sparsity pattern entries.
    *
-   * As explained in the @ref hp_paper "hp paper" and in step-27, first
-   * allocating a sparsity pattern and later coming back and allocating
-   * additional entries for those matrix entries that will be written to due
-   * to the elimination of constrained degrees of freedom (using
-   * ConstraintMatrix::condense() ), can be a very expensive procedure. It is
-   * cheaper to allocate these entries right away without having to do a
+   * As explained in the
+   * @ref hp_paper "hp paper"
+   * and in step-27, first allocating a sparsity pattern and later coming back
+   * and allocating additional entries for those matrix entries that will be
+   * written to due to the elimination of constrained degrees of freedom
+   * (using ConstraintMatrix::condense() ), can be a very expensive procedure.
+   * It is cheaper to allocate these entries right away without having to do a
    * second pass over the sparsity pattern object. This function does exactly
    * that.
    *
@@ -1063,22 +1039,6 @@ public:
    * @name Dealing with constraints after solving a linear system
    * @{
    */
-
-  /**
-   * Re-distribute the elements of the vector @p condensed to @p uncondensed.
-   * It is the user's responsibility to guarantee that all entries of @p
-   * uncondensed be zero!
-   *
-   * This function undoes the action of @p condense somehow, but it should be
-   * noted that it is not the inverse of @p condense.
-   *
-   * The @p VectorType may be a Vector<float>, Vector<double>,
-   * BlockVector<tt><...></tt>, a PETSc or Trilinos vector wrapper class, or
-   * any other type having the same interface.
-   */
-  template <class VectorType>
-  void distribute (const VectorType &condensed,
-                   VectorType       &uncondensed) const;
 
   /**
    * Re-distribute the elements of the vector in-place. The @p VectorType may

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,7 +17,6 @@
 #define __deal2__sparse_direct_h
 
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
@@ -27,9 +26,11 @@
 #include <deal.II/lac/sparse_matrix_ez.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 
-#ifdef DEAL_II_WITH_MUMPS
-#  include <deal.II/base/utilities.h>
-#  include <dmumps_c.h>
+#ifdef DEAL_II_WITH_UMFPACK
+#  include <umfpack.h>
+#endif
+#ifndef SuiteSparse_long
+#  define SuiteSparse_long long int
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -41,7 +42,10 @@ DEAL_II_NAMESPACE_OPEN
  * systems, Ax=b, using the Unsymmetric-pattern MultiFrontal method and direct
  * sparse LU factorization. Matrices may have symmetric or unsymmetrix
  * sparsity patterns, and may have unsymmetric entries. The use of this class
- * is explained in the @ref step_22 "step-22" and @ref step_29 "step-29"
+ * is explained in the
+ * @ref step_22 "step-22"
+ * and
+ * @ref step_29 "step-29"
  * tutorial programs.
  *
  * This matrix class implements the usual interface of preconditioners, that
@@ -52,13 +56,9 @@ DEAL_II_NAMESPACE_OPEN
  * class provides an older interface, consisting of the functions factorize()
  * and solve(). Both interfaces are interchangeable.
  *
- * @note This class only exists if support for <a
- * href="http://www.cise.ufl.edu/research/sparse/umfpack">UMFPACK</a> was
- * enabled during configure and if the <a
- * href="http://www.cise.ufl.edu/research/sparse/umfpack">UMFPACK</a> library
- * was configured. The steps to do this are explained in the deal.II ReadMe
- * file. If you do nothing at the time you configure deal.II, then this class
- * will simply not work.
+ * @note This class exists if the <a
+ * href="http://faculty.cse.tamu.edu/davis/suitesparse.html">UMFPACK</a>
+ * interface was not explicitly disabled during configuration.
  *
  * @note UMFPACK has its own license, independent of that of deal.II. If you
  * want to use the UMFPACK you have to accept that license. It is linked to
@@ -262,9 +262,37 @@ public:
    */
   DeclException2 (ExcUMFPACKError, char *, int,
                   << "UMFPACK routine " << arg1
-                  << " returned error status " << arg2
-                  << ". See the file <bundled/umfpack/UMFPACK/Include/umfpack.h>"
-                  << " for a description of 'status codes'.");
+                  << " returned error status " << arg2 << "."
+                  << "\n\n"
+                  << ("A complete list of error codes can be found in the file "
+                      "<bundled/umfpack/UMFPACK/Include/umfpack.h>."
+                      "\n\n"
+                      "That said, the two most common errors that can happen are "
+                      "that your matrix cannot be factorized because it is "
+                      "rank deficient, and that UMFPACK runs out of memory "
+                      "because your problem is too large."
+                      "\n\n"
+                      "The first of these cases most often happens if you "
+                      "forget terms in your bilinear form necessary to ensure "
+                      "that the matrix has full rank, or if your equation has a "
+                      "spatially variable coefficient (or nonlinearity) that is "
+                      "supposed to be strictly positive but, for whatever "
+                      "reasons, is negative or zero. In either case, you probably "
+                      "want to check your assembly procedure. Similarly, a "
+                      "matrix can be rank deficient if you forgot to apply the "
+                      "appropriate boundary conditions. For example, the "
+                      "Laplace equation without boundary conditions has a "
+                      "single zero eigenvalue and its rank is therefore "
+                      "deficient by one."
+                      "\n\n"
+                      "The other common situation is that you run out of memory."
+                      "On a typical laptop or desktop, it should easily be possible "
+                      "to solve problems with 100,000 unknowns in 2d. If you are "
+                      "solving problems with many more unknowns than that, in "
+                      "particular if you are in 3d, then you may be running out "
+                      "of memory and you will need to consider iterative "
+                      "solvers instead of the direct solver employed by "
+                      "UMFPACK."));
 
 private:
   /**
@@ -296,125 +324,18 @@ private:
   void sort_arrays (const BlockSparseMatrix<number> &);
 
   /**
-   * The arrays in which we store the data for the solver.
+   * The arrays in which we store the data for the solver. SuiteSparse_long
+   * has to be used here for Windows 64 build, if we used only long int,
+   * compilation would fail.
    */
-  std::vector<long int> Ap;
-  std::vector<long int> Ai;
+  std::vector<SuiteSparse_long> Ap;
+  std::vector<SuiteSparse_long> Ai;
   std::vector<double> Ax;
 
   /**
    * Control and info arrays for the solver routines.
    */
   std::vector<double> control;
-};
-
-
-/**
- * This class provides an interface to the parallel sparse direct solver <a
- * href="http://mumps.enseeiht.fr">MUMPS</a>. MUMPS is direct method based on
- * a multifrontal approach, which performs a direct LU factorization. The
- * matrix coming in may have either symmetric or nonsymmetric sparsity
- * pattern.
- *
- * @note This class is useable if and only if a working installation of <a
- * href="http://mumps.enseeiht.fr">MUMPS</a> exists on your system and was
- * detected during configuration of <code>deal.II</code>.
- *
- * <h4>Instantiations</h4>
- *
- * There are instantiations of this class for SparseMatrix<double>,
- * SparseMatrix<float>, BlockSparseMatrix<double>, and
- * BlockSparseMatrix<float>.
- *
- * @author Markus Buerg, 2010
- */
-class SparseDirectMUMPS
-{
-private:
-
-#ifdef DEAL_II_WITH_MUMPS
-  DMUMPS_STRUC_C id;
-#endif // DEAL_II_WITH_MUMPS
-
-  double   *a;
-  std::vector<double> rhs;
-  int      *irn;
-  int      *jcn;
-  types::global_dof_index n;
-  types::global_dof_index nz;
-
-  /**
-   * This function initializes a MUMPS instance and hands over the system's
-   * matrix <tt>matrix</tt>.
-   */
-  template<class Matrix>
-  void initialize_matrix (const Matrix &matrix);
-
-  /**
-   * Copy the computed solution into the solution vector.
-   */
-  void copy_solution (Vector<double> &vector);
-
-  /**
-   *
-   */
-  void copy_rhs_to_mumps(const Vector<double> &rhs);
-
-  /**
-   * Flags storing whether the function <tt>initialize ()</tt> has already
-   * been called.
-   */
-  bool initialize_called;
-
-public:
-  /**
-   * Declare type for container size.
-   */
-  typedef types::global_dof_index size_type;
-
-  /**
-   * Constructor
-   */
-  SparseDirectMUMPS ();
-
-  /**
-   * Destructor
-   */
-  ~SparseDirectMUMPS ();
-
-  /**
-   * Exception
-   */
-  DeclException0 (ExcInitializeAlreadyCalled);
-
-  /**
-   * This function initializes a MUMPS instance and hands over the system's
-   * matrix <tt>matrix</tt> and right-hand side <tt>vector</tt> to the solver.
-   */
-  template <class Matrix>
-  void initialize (const Matrix &matrix,
-                   const Vector<double>       &vector);
-
-  /**
-   * This function initializes a MUMPS instance and computes the factorization
-   * of the system's matrix <tt>matrix</tt>.
-   */
-  template <class Matrix>
-  void initialize (const Matrix &matrix);
-
-  /**
-   * A function in which the linear system is solved and the solution vector
-   * is copied into the given <tt>vector</tt>. The right-hand side need to be
-   * supplied in initialize(matrix, vector);
-   */
-  void solve (Vector<double> &vector);
-
-  /**
-   * A function in which the inverse of the matrix is applied to the input
-   * vector <tt>src</tt> and the solution is written into the output vector
-   * <tt>dst</tt>.
-   */
-  void vmult (Vector<double> &dst, const Vector<double> &src);
 };
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2013 by the deal.II authors
+// Copyright (C) 2001 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,7 +89,8 @@ DEAL_II_NAMESPACE_OPEN
  *   schur.postprocess (u, p);
  * @endcode
  *
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2000, 2001, 2002
  */
 template <class MA_inverse, class MB, class MDt, class MC>
@@ -111,7 +112,7 @@ public:
               const MDt &Dt,
               const MC &C,
               VectorMemory<BlockVector<double> > &mem,
-              const std::vector<unsigned int> &signature = std::vector<unsigned int>(0));
+              const std::vector<types::global_dof_index> &signature = std::vector<types::global_dof_index>(0));
 
   /**
    * Do block elimination of the right hand side. Given right hand sides for
@@ -207,7 +208,7 @@ SchurMatrix<MA_inverse, MB, MDt, MC>
               const MDt &Dt,
               const MC &C,
               VectorMemory<BlockVector<double> > &mem,
-              const std::vector<unsigned int> &signature)
+              const std::vector<types::global_dof_index> &signature)
   : Ainv(&Ainv), B(&B), Dt(&Dt), C(&C),
     mem(mem),
     signature(signature),
@@ -270,7 +271,7 @@ double SchurMatrix<MA_inverse, MB, MDt, MC>
            const BlockVector<double> &rhs) const
 {
   vmult(dst, src);
-  dst.scale(-1.);
+  dst *= -1.;
   dst += rhs;
   return dst.l2_norm();
 }

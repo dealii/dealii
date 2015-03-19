@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2013 by the deal.II authors
+// Copyright (C) 1999 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -126,11 +126,14 @@ public:
  * operate on all components of the solution.
  *
  * @note For the following, it is important to realize the difference between
- * a solution @ref GlossComponent "component" and a solution @ref GlossBlock
- * "block". The distinction only applies if vector valued elements are used,
- * but is quite important then. This is reflected in the fact that it is not
- * possible right now to use transfer classes based on MGTransferComponentBase
- * for genuine vector valued elements, but descendants of MGTransferBlockBase
+ * a solution
+ * @ref GlossComponent "component"
+ * and a solution
+ * @ref GlossBlock "block".
+ * The distinction only applies if vector valued elements are used, but is
+ * quite important then. This is reflected in the fact that it is not possible
+ * right now to use transfer classes based on MGTransferComponentBase for
+ * genuine vector valued elements, but descendants of MGTransferBlockBase
  * would have to be applied. In the following text, we will use the term
  * <em>block</em>, but remark that it might refer to components as well.
  *

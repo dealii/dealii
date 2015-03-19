@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,7 +27,7 @@
 
 void test_mpi()
 {
-  Assert( Utilities::System::job_supports_mpi(), ExcInternalError());
+  Assert( Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
@@ -108,7 +108,7 @@ void test_mpi()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
