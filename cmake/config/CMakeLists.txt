@@ -104,12 +104,21 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   ENDIF()
 
   SET(_reldir "\${DEAL_II_LIBRARY_RELDIR}")
+
+  IF(MSVC)
+    SET(CONFIG_LIBRARIES_${_build}
+      "\${DEAL_II_PATH}/${_reldir}/${_build}/${CMAKE_${_type}_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_${_type}_LIBRARY_SUFFIX}"
+      ${DEAL_II_LIBRARIES_${_build}}
+      ${DEAL_II_LIBRARIES}
+      )
+  ELSE(MSVC)
+    SET(CONFIG_LIBRARIES_${_build}
+      "\${DEAL_II_PATH}/${_reldir}/${CMAKE_${_type}_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_${_type}_LIBRARY_SUFFIX}"
+      ${DEAL_II_LIBRARIES_${_build}}
+      ${DEAL_II_LIBRARIES}
+      )
+  ENDIF(MSVC)
   
-  SET(CONFIG_LIBRARIES_${_build}
-    "\${DEAL_II_PATH}/${_reldir}/${CMAKE_${_type}_LIBRARY_PREFIX}${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}${CMAKE_${_type}_LIBRARY_SUFFIX}"
-    ${DEAL_II_LIBRARIES_${_build}}
-    ${DEAL_II_LIBRARIES}
-    )
   TO_STRING(MAKEFILE_LIBRARIES_${_build} ${CONFIG_LIBRARIES_${_build}})
   TO_STRING(MAKEFILE_USER_DEFINITIONS_${_build} ${DEAL_II_USER_DEFINITIONS_${_build}})
   LIST(APPEND CONFIG_LIBRARIES ${_keyword} \${DEAL_II_LIBRARIES_${_build}})
