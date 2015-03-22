@@ -1314,6 +1314,30 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 }
 
 
+namespace
+{
+  template <typename number>
+  void check_nonzero_diagonal (const SparseMatrix<number> &matrix)
+  {
+    for (typename SparseMatrix<number>::size_type row=0; row<matrix.m(); ++row)
+      Assert(matrix.diag_element(row) != 0.,
+             ExcMessage("There is a zero on the diagonal of this matrix "
+                        "in row "
+                        +
+                        Utilities::int_to_string(row)
+                        +
+                        ". The preconditioner you selected cannot work if that "
+                        "is the case because one of its steps requires "
+                        "division by the diagonal elements of the matrix."
+                        "\n\n"
+                        "You should check whether you have correctly "
+                        "assembled the matrix that you use for this "
+                        "preconditioner. If it is correct that there are "
+                        "zeros on the diagonal, then you will have to chose "
+                        "a different preconditioner."));
+  }
+}
+
 
 template <typename number>
 template <typename somenumber>
@@ -1327,6 +1351,8 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   AssertDimension (m(), n());
   AssertDimension (dst.size(), n());
   AssertDimension (src.size(), n());
+
+  check_nonzero_diagonal(*this);
 
   const size_type n = src.size();
   somenumber            *dst_ptr = dst.begin();
@@ -1372,6 +1398,8 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
   AssertDimension (dst.size(), n());
   AssertDimension (src.size(), n());
 
+  check_nonzero_diagonal(*this);
+
   const size_type    n            = src.size();
   const std::size_t *rowstart_ptr = &cols->rowstart[0];
   somenumber        *dst_ptr      = &dst(0);
@@ -1398,9 +1426,8 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 
           // divide by diagonal element
           *dst_ptr -= s * om;
-          Assert(val[*rowstart_ptr]!= 0., ExcDivideByZero());
           *dst_ptr /= val[*rowstart_ptr];
-        };
+        }
 
       rowstart_ptr = &cols->rowstart[0];
       dst_ptr      = &dst(0);
@@ -1420,7 +1447,6 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
             s += val[j] * dst(cols->colnums[j]);
 
           *dst_ptr -= s * om;
-          Assert(val[*rowstart_ptr]!= 0., ExcDivideByZero());
           *dst_ptr /= val[*rowstart_ptr];
         };
       return;
@@ -1524,6 +1550,8 @@ SparseMatrix<number>::SOR (Vector<somenumber> &dst,
   AssertDimension (m(), n());
   AssertDimension (dst.size(), n());
 
+  check_nonzero_diagonal(*this);
+
   for (size_type row=0; row<m(); ++row)
     {
       somenumber s = dst(row);
@@ -1534,7 +1562,6 @@ SparseMatrix<number>::SOR (Vector<somenumber> &dst,
             s -= val[j] * dst(col);
         }
 
-      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       dst(row) = s * om / val[cols->rowstart[row]];
     }
 }
@@ -1551,6 +1578,8 @@ SparseMatrix<number>::TSOR (Vector<somenumber> &dst,
   AssertDimension (m(), n());
   AssertDimension (dst.size(), n());
 
+  check_nonzero_diagonal(*this);
+
   size_type row=m()-1;
   while (true)
     {
@@ -1559,7 +1588,6 @@ SparseMatrix<number>::TSOR (Vector<somenumber> &dst,
         if (cols->colnums[j] > row)
           s -= val[j] * dst(cols->colnums[j]);
 
-      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       dst(row) = s * om / val[cols->rowstart[row]];
 
       if (row == 0)
@@ -1588,6 +1616,8 @@ SparseMatrix<number>::PSOR (Vector<somenumber> &dst,
   Assert (m() == inverse_permutation.size(),
           ExcDimensionMismatch(m(), inverse_permutation.size()));
 
+  check_nonzero_diagonal(*this);
+
   for (size_type urow=0; urow<m(); ++urow)
     {
       const size_type row = permutation[urow];
@@ -1602,7 +1632,6 @@ SparseMatrix<number>::PSOR (Vector<somenumber> &dst,
             }
         }
 
-      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       dst(row) = s * om / val[cols->rowstart[row]];
     }
 }
@@ -1626,6 +1655,8 @@ SparseMatrix<number>::TPSOR (Vector<somenumber> &dst,
   Assert (m() == inverse_permutation.size(),
           ExcDimensionMismatch(m(), inverse_permutation.size()));
 
+  check_nonzero_diagonal(*this);
+
   for (size_type urow=m(); urow != 0;)
     {
       --urow;
@@ -1638,7 +1669,6 @@ SparseMatrix<number>::TPSOR (Vector<somenumber> &dst,
             s -= val[j] * dst(col);
         }
 
-      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       dst(row) = s * om / val[cols->rowstart[row]];
     }
 }
@@ -1689,6 +1719,8 @@ SparseMatrix<number>::SOR_step (Vector<somenumber> &v,
   Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
 
+  check_nonzero_diagonal(*this);
+
   for (size_type row=0; row<m(); ++row)
     {
       somenumber s = b(row);
@@ -1696,7 +1728,6 @@ SparseMatrix<number>::SOR_step (Vector<somenumber> &v,
         {
           s -= val[j] * v(cols->colnums[j]);
         }
-      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       v(row) += s * om / val[cols->rowstart[row]];
     }
 }
@@ -1716,6 +1747,8 @@ SparseMatrix<number>::TSOR_step (Vector<somenumber> &v,
   Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
 
+  check_nonzero_diagonal(*this);
+
   for (int row=m()-1; row>=0; --row)
     {
       somenumber s = b(row);
@@ -1723,7 +1756,6 @@ SparseMatrix<number>::TSOR_step (Vector<somenumber> &v,
         {
           s -= val[j] * v(cols->colnums[j]);
         }
-      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       v(row) += s * om / val[cols->rowstart[row]];
     }
 }
@@ -1757,6 +1789,8 @@ SparseMatrix<number>::SSOR (Vector<somenumber> &dst,
   AssertDimension (m(), n());
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
+  check_nonzero_diagonal(*this);
+
   const size_type n = dst.size();
   size_type j;
   somenumber s;
@@ -1773,7 +1807,6 @@ SparseMatrix<number>::SSOR (Vector<somenumber> &dst,
             }
         }
       dst(i) -= s * om;
-      Assert(val[cols->rowstart[i]]!= 0., ExcDivideByZero());
       dst(i) /= val[cols->rowstart[i]];
     }
 
@@ -1788,7 +1821,6 @@ SparseMatrix<number>::SSOR (Vector<somenumber> &dst,
               if (static_cast<size_type>(i)<j) s += val[j] * dst(p);
             }
         }
-      Assert(val[cols->rowstart[i]]!= 0., ExcDivideByZero());
       dst(i) -= s * om / val[cols->rowstart[i]];
     }
 }
