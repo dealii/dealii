@@ -61,10 +61,14 @@ int main ()
         prm.declare_entry ("int",
                            "1",
                            Patterns::Integer());
+        prm.declare_alias ("int",
+                           "int_alias");
         prm.declare_entry ("double",
                            "3.1415926",
                            Patterns::Double(),
                            "docs 3");
+        prm.declare_alias ("double",
+                           "double_alias");
       }
       prm.leave_subsection ();
 

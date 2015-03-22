@@ -2140,7 +2140,9 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
       for (boost::property_tree::ptree::const_assoc_iterator
            p = current_section.ordered_begin();
            p != current_section.not_found(); ++p)
-        if (is_parameter_node (p->second) == true)
+        if ((is_parameter_node (p->second) == true)
+            ||
+            (is_alias_node (p->second) == true))
           {
             parameters_exist_here = true;
             break;
@@ -2198,6 +2200,33 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 // also output possible values
                 out << "{\\it Possible values:} "
                     << p->second.get<std::string> ("pattern_description")
+                    << std::endl;
+              }
+            else if (is_alias_node (p->second) == true)
+              {
+                const std::string alias = p->second.get<std::string>("alias");
+
+                // print name
+                out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n"
+                    << "\\phantomsection\\label{parameters:";
+                for (unsigned int i=0; i<subsection_path.size(); ++i)
+                  out << subsection_path[i] << "/";
+                out << demangle(p->first);
+                out << "}\n\n"
+                    << std::endl;
+
+                out << "\\index[prmindex]{"
+                    << demangle(p->first)
+                    << "}\n";
+                out << "\\index[prmindexfull]{";
+                for (unsigned int i=0; i<subsection_path.size(); ++i)
+                  out << subsection_path[i] << "!";
+                out << demangle(p->first)
+                    << "}\n";
+
+                // finally print value and default
+                out << "This parameter is an alias for the parameter ``\\texttt{"
+                    << alias << "}''.\n\n"
                     << std::endl;
               }
           out << "\\end{itemize}" << std::endl;

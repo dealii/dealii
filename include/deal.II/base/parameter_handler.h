@@ -1809,7 +1809,7 @@ public:
    * <tt>ParameterHandler</tt> in order to get a valid XML document and all
    * subsections under it.
    *
-   * In <tt>Text</tt> format, the output contains the same information but in
+   * In <tt>LaTeX</tt> format, the output contains the same information but in
    * a format so that the resulting file can be input into a latex document
    * such as a manual for the code for which this object handles run-time
    * parameters. The various sections of parameters are then represented by

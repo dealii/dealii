@@ -24,6 +24,15 @@
 
 
 {\it Possible values:} [Double -1.79769e+308...1.79769e+308 (inclusive)]
+\item {\it Parameter name:} {\tt double_alias}
+\phantomsection\label{parameters:Testing/double_alias}
+
+
+\index[prmindex]{double_alias}
+\index[prmindexfull]{Testing!double_alias}
+This parameter is an alias for the parameter ``\texttt{double}''.
+
+
 \item {\it Parameter name:} {\tt int}
 \phantomsection\label{parameters:Testing/int}
 
@@ -37,6 +46,15 @@
 
 
 {\it Possible values:} [Integer range -2147483648...2147483647 (inclusive)]
+\item {\it Parameter name:} {\tt int_alias}
+\phantomsection\label{parameters:Testing/int_alias}
+
+
+\index[prmindex]{int_alias}
+\index[prmindexfull]{Testing!int_alias}
+This parameter is an alias for the parameter ``\texttt{int}''.
+
+
 \item {\it Parameter name:} {\tt string list}
 \phantomsection\label{parameters:Testing/string list}
 
