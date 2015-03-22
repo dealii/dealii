@@ -195,7 +195,7 @@ class MATRIX
  * will not be used and be de-allocated upon compression.
  *
  * To avoid this, deal.II contains a "dynamic" or "compressed" sparsity
- * pattern called DynamicSparsityPattern that only allocate as much memory as
+ * pattern called DynamicSparsityPattern that only allocates as much memory as
  * necessary to hold the currently added entries. While this saves much memory
  * compared to the worst-case behavior mentioned above, it requires the use of
  * less efficient storage schemes for insertion of elements, and the frequent
