@@ -1648,7 +1648,7 @@ public:
                       const std::string           &documentation = std::string());
 
   /**
-   * Enter a subsection; if not yet existent, declare it.
+   * Enter a subsection. If it does not yet exist, create it.
    */
   void enter_subsection (const std::string &subsection);
 
@@ -1887,12 +1887,6 @@ public:
   DeclException1 (ExcEntryUndeclared,
                   std::string,
                   << "You can't ask for entry <" << arg1 << "> you have not yet declared");
-  /**
-   * Exception
-   */
-  DeclException1 (ExcConversionError,
-                  std::string,
-                  << "Error when trying to convert the following string: " << arg1);
   //@}
 private:
   /**
