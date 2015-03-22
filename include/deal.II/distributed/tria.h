@@ -380,12 +380,17 @@ namespace parallel
        * geometric multigrid functionality. This option requires additional
        * computation and communication. Note: geometric multigrid is still a
        * work in progress.
+       *
+       * @p no_automatic_repartitioning will disable automatic repartioning of
+       * the cells after a refinement cycle. It can be executed manually by
+       * calling repartition().
        */
       enum Settings
       {
         default_setting = 0x0,
         mesh_reconstruction_after_repartitioning = 0x1,
-        construct_multigrid_hierarchy = 0x2
+        construct_multigrid_hierarchy = 0x2,
+        no_automatic_repartitioning = 0x4
       };
 
 
@@ -468,6 +473,26 @@ namespace parallel
        * affected by flags set on locally owned cells.
        */
       virtual void execute_coarsening_and_refinement ();
+
+      /**
+       * Manually repartition the active cells between processors. Normally
+       * this repartitioning will happen automatically when calling
+       * execute_coarsening_and_refinement() (or refine_global()) unless the
+       * @p no_automatic_repartitioning is set in the constructor. Setting the
+       * flag and then calling repartition() gives the same result.
+       *
+       * If you want to transfer data (using SolutionTransfer or manually with
+       * register_data_attach() and notify_ready_to_unpack()), you need to set
+       * it up twice: once when calling execute_coarsening_and_refinement(),
+       * which will handle coarsening and refinement but obviously won't ship
+       * any data between processors, and a second time when calling
+       * repartition().  Here, no coarsening and refinement will be done but
+       * information will be packed and shipped to different processors. In
+       * other words, you probably want to treat a call to repartition() in
+       * the same way as execute_coarsening_and_refinement() with respect to
+       * dealing with data movement (SolutionTransfer, etc..).
+       */
+      void repartition ();
 
       /**
        * When vertices have been moved locally, for example using code like

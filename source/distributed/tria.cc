@@ -3414,10 +3414,11 @@ namespace parallel
       attach_mesh_data();
 
       // partition the new mesh between all processors
-      dealii::internal::p4est::functions<dim>::
-      partition (parallel_forest,
-                 /* prepare coarsening */ 1,
-                 /* weight_callback */ NULL);
+      if (!(settings & no_automatic_repartitioning))
+        dealii::internal::p4est::functions<dim>::
+        partition (parallel_forest,
+                   /* prepare coarsening */ 1,
+                   /* weight_callback */ NULL);
 
       // finally copy back from local part of tree to deal.II
       // triangulation. before doing so, make sure there are no refine or
@@ -3447,6 +3448,49 @@ namespace parallel
       update_number_cache ();
     }
 
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim,spacedim>::repartition ()
+    {
+      AssertThrow(settings & no_automatic_repartitioning,
+                  ExcMessage("You need to set no_automatic_repartition when calling repartition() manually."));
+
+#ifdef DEBUG
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator
+           cell = this->begin_active();
+           cell != this->end(); ++cell)
+        if (cell->is_locally_owned())
+          Assert (
+            !cell->refine_flag_set() && !cell->coarsen_flag_set(),
+            ExcMessage ("Error: There shouldn't be any cells flagged for coarsening/refinement when calling repartition()."));
+#endif
+
+      refinement_in_progress = true;
+
+      // before repartitioning the mesh let others attach mesh related info
+      // (such as SolutionTransfer data) to the p4est
+      attach_mesh_data();
+
+      dealii::internal::p4est::functions<dim>::
+      partition (parallel_forest,
+                 /* prepare coarsening */ 1,
+                 /* weight_callback */ NULL);
+
+      try
+        {
+          copy_local_forest_to_triangulation ();
+        }
+      catch (const typename Triangulation<dim>::DistortedCellList &)
+        {
+          // the underlying triangulation should not be checking for distorted
+          // cells
+          AssertThrow (false, ExcInternalError());
+        }
+
+      refinement_in_progress = false;
+
+      update_number_cache ();
+    }
 
 
     template <int dim, int spacedim>

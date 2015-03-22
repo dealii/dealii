@@ -326,6 +326,16 @@ inconvenience this causes.
 
 <ol>
 
+  <li> New: A new flag no_automatic_repartitioning in
+  parallel::distributed::Triangulation will disable the automatic
+  repartitioning when calling execute_coarsening_and_refinement() (or things
+  like refine_global(), ...), resulting in all cells staying on the processor
+  they were before. The new function repartition() will execute the
+  repartitioning as done automatically before.
+  <br>
+  (Timo Heister, 2015/03/22)
+  </li>
+
   <li> Changed: All (Block)Compressed*SparsityPattern classes got
   replaced by DynamicSparsityPattern and
   BlockDynamicSparsityPattern, respectively and all examples now
