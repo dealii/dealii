@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1271,12 +1271,29 @@ ParameterHandler::demangle (const std::string &s)
 
 
 
-bool
-ParameterHandler::is_parameter_node (const boost::property_tree::ptree &p)
+namespace
 {
-  return static_cast<bool>(p.get_optional<std::string>("value"));
-}
+  /**
+   * Return whether a given node is a parameter node (as opposed
+   * to being a subsection or alias node)
+   */
+  bool
+  is_parameter_node (const boost::property_tree::ptree &p)
+  {
+    return static_cast<bool>(p.get_optional<std::string>("value"));
+  }
 
+
+  /**
+   * Return whether a given node is a alias node (as opposed
+   * to being a subsection or parameter node)
+   */
+  bool
+  is_alias_node (const boost::property_tree::ptree &p)
+  {
+    return static_cast<bool>(p.get_optional<std::string>("alias"));
+  }
+}
 
 
 std::string
@@ -1486,6 +1503,13 @@ namespace
                 return false;
               }
           }
+        else if (p->second.get_optional<std::string>("alias"))
+          {
+            // it is an alias node. alias nodes are static and
+            // there is nothing to do here (but the same applies as
+            // mentioned in the comment above about the static
+            // nodes inside parameter nodes
+          }
         else
           {
             // it must be a subsection
@@ -1610,6 +1634,52 @@ ParameterHandler::declare_entry (const std::string           &entry,
 
 
 
+void
+ParameterHandler::declare_alias(const std::string &existing_entry_name,
+                                const std::string &alias_name)
+{
+  // see if there is anything to refer to already
+  Assert (entries->get_optional<std::string>(get_current_full_path(existing_entry_name)),
+          ExcMessage ("You are trying to declare an alias entry <"
+                      + alias_name +
+                      "> that references an entry <"
+                      + existing_entry_name +
+                      ">, but the latter does not exist."));
+
+  // now also make sure that if the alias has already been
+  // declared, that it is also an alias and refers to the same
+  // entry
+  if (entries->get_optional<std::string>(get_current_full_path(alias_name)))
+    {
+      Assert (entries->get_optional<std::string> (get_current_full_path(alias_name) + path_separator + "alias"),
+              ExcMessage ("You are trying to declare an alias entry <"
+                          + alias_name +
+                          "> but a non-alias entry already exists in this "
+                          "subsection (i.e., there is either a preexisting "
+                          "further subsection, or a parameter entry, with "
+                          "the same name as the alias)."));
+      Assert (entries->get<std::string> (get_current_full_path(alias_name) + path_separator + "alias")
+              ==
+              existing_entry_name,
+              ExcMessage ("You are trying to declare an alias entry <"
+                          + alias_name +
+                          "> but an alias entry already exists in this "
+                          "subsection and this existing alias references a "
+                          "different parameter entry. Specifically, "
+                          "you are trying to reference the entry <"
+                          + existing_entry_name +
+                          "> whereas the existing alias references "
+                          "the entry <"
+                          + entries->get<std::string> (get_current_full_path(alias_name) + path_separator + "alias") +
+                          ">."));
+    }
+
+  entries->put (get_current_full_path(alias_name) + path_separator + "alias",
+                existing_entry_name);
+}
+
+
+
 void ParameterHandler::enter_subsection (const std::string &subsection)
 {
   const std::string current_path = get_current_path ();
@@ -1717,21 +1787,24 @@ void
 ParameterHandler::set (const std::string &entry_string,
                        const std::string &new_value)
 {
-  // assert that the entry is indeed
-  // declared
-  if (entries->get_optional<std::string>
-      (get_current_full_path(entry_string) + path_separator + "value"))
+  // resolve aliases before looking up the correct entry
+  std::string path = get_current_full_path(entry_string);
+  if (entries->get_optional<std::string>(path + path_separator + "alias"))
+    path = get_current_full_path(entries->get<std::string>(path + path_separator + "alias"));
+
+  // assert that the entry is indeed declared
+  if (entries->get_optional<std::string>(path + path_separator + "value"))
     {
       const unsigned int pattern_index
-        = entries->get<unsigned int> (get_current_full_path(entry_string) + path_separator + "pattern");
+        = entries->get<unsigned int> (path + path_separator + "pattern");
       AssertThrow (patterns[pattern_index]->match(new_value),
                    ExcValueDoesNotMatchPattern (new_value,
                                                 entries->get<std::string>
-                                                (get_current_full_path(entry_string) +
+                                                (path +
                                                  path_separator +
                                                  "pattern_description")));
 
-      entries->put (get_current_full_path(entry_string) + path_separator + "value",
+      entries->put (path + path_separator + "value",
                     new_value);
     }
   else
@@ -2219,7 +2292,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
            p != current_section.end(); ++p)
         if (is_parameter_node (p->second) == true)
           ++n_parameters;
-        else
+        else if (is_alias_node (p->second) == false)
           ++n_sections;
 
       if ((style != Description)
@@ -2236,7 +2309,9 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
       for (boost::property_tree::ptree::const_assoc_iterator
            p = current_section.ordered_begin();
            p != current_section.not_found(); ++p)
-        if (is_parameter_node (p->second) == false)
+        if ((is_parameter_node (p->second) == false)
+            &&
+            (is_alias_node (p->second) == false))
           {
             // first print the subsection header
             switch (style)
@@ -2482,11 +2557,14 @@ ParameterHandler::scan_line (std::string         line,
       std::string entry_name  (line, 0, line.find('='));
       std::string entry_value (line, line.find('=')+1, std::string::npos);
 
-      const std::string current_path = get_current_path ();
+      // resolve aliases before we look up the entry
+      std::string path = get_current_full_path(entry_name);
+      if (entries->get_optional<std::string>(path + path_separator + "alias"))
+        path = get_current_full_path(entries->get<std::string>(path + path_separator + "alias"));
 
       // assert that the entry is indeed
       // declared
-      if (entries->get_optional<std::string> (get_current_full_path(entry_name) + path_separator + "value"))
+      if (entries->get_optional<std::string> (path + path_separator + "value"))
         {
           // if entry was declared:
           // does it match the regex? if not,
@@ -2497,7 +2575,7 @@ ParameterHandler::scan_line (std::string         line,
           if (entry_value.find ('{') == std::string::npos)
             {
               const unsigned int pattern_index
-                = entries->get<unsigned int> (get_current_full_path(entry_name) + path_separator + "pattern");
+                = entries->get<unsigned int> (path + path_separator + "pattern");
               if (!patterns[pattern_index]->match(entry_value))
                 {
                   std::cerr << "Line <" << lineno
@@ -2514,7 +2592,7 @@ ParameterHandler::scan_line (std::string         line,
                 }
             }
 
-          entries->put (get_current_full_path(entry_name) + path_separator + "value",
+          entries->put (path + path_separator + "value",
                         entry_value);
           return true;
         }

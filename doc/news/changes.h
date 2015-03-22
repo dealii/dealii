@@ -411,6 +411,14 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/03/23)
   </li>
 
+  <li> New: ParameterHandler::declare_alias() allows to define
+  alternate names for parameters. This is primarily intended to allow
+  for backward compatible ways of changing the names of parameters
+  to applications.
+  <br>
+  (Wolfgang Bangerth, 2015/03/22)
+  </li>
+
   <li> New: GridGenerator::create_triangulation_with_removed_cells() creates
   a new mesh out of an existing one by dropping individual cells.
   <br>

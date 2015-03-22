@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1648,6 +1648,47 @@ public:
                       const std::string           &documentation = std::string());
 
   /**
+   * Create an alias for an existing entry. This provides a way to refer
+   * to a parameter in the input file using an alternate name. The
+   * alias will be in the current section, and the referenced entry needs
+   * to be an existing entry in the current section.
+   *
+   * The primary purpose of this function is to allow for a backward
+   * compatible way of changing names in input files of applications
+   * for which backward compatibility is important. This can be
+   * achieved by changing the name of the parameter in the call to
+   * declare_entry(), and then creating an alias that maps the old
+   * name to the new name. This way, old input files can continue
+   * to refer to parameters under the old name, and they will
+   * automatically be mapped to the new parameter name.
+   *
+   * It is valid to reference in a parameter file to the same parameter
+   * multiple times. The value that will ultimately be chosen in such
+   * cases is simply the last value set. This rule also applies to
+   * aliases, where the final value of a parameter is the last value
+   * set either through the current name of the parameter or through
+   * any of its possible multiple aliases. For example, if you have
+   * an input file that looks like
+   * @code
+   *   set parm1       = 1
+   *   set parm1_alias = 2
+   * @endcode
+   * where <code>parm1_alias</code> is an alias declared via
+   * @code
+   *   prm.declare_alias ("parm1", "parm1_alias");
+   * @endcode
+   * then the final value for the parameter called <code>parm1</code>
+   * will be 2, not 1.
+   *
+   * @param existing_entry_name The name of an existing parameter
+   *   in the current section that the alias should refer to.
+   * @param alias_name An alternate name for the parameter referenced
+   *   by the first argument.
+   */
+  void declare_alias (const std::string &existing_entry_name,
+                      const std::string &alias_name);
+
+  /**
    * Enter a subsection. If it does not yet exist, create it.
    */
   void enter_subsection (const std::string &subsection);
@@ -1921,11 +1962,6 @@ private:
    * Unmangle a string into its original form.
    */
   static std::string demangle (const std::string &s);
-
-  /**
-   * Return whether a given node is a parameter node or a subsection node.
-   */
-  static bool is_parameter_node (const boost::property_tree::ptree &);
 
   /**
    * Path of presently selected subsections; empty list means top level
