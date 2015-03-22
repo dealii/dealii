@@ -380,12 +380,17 @@ namespace parallel
        * geometric multigrid functionality. This option requires additional
        * computation and communication. Note: geometric multigrid is still a
        * work in progress.
+       *
+       * @p no_automatic_repartitioning will disable automatic repartioning of
+       * the cells after a refinement cycle. It can be executed manually by
+       * calling repartition().
        */
       enum Settings
       {
         default_setting = 0x0,
         mesh_reconstruction_after_repartitioning = 0x1,
-        construct_multigrid_hierarchy = 0x2
+        construct_multigrid_hierarchy = 0x2,
+        no_automatic_repartitioning = 0x4
       };
 
 
@@ -468,6 +473,22 @@ namespace parallel
        * affected by flags set on locally owned cells.
        */
       virtual void execute_coarsening_and_refinement ();
+
+      /**
+       * Redistribute the active cells between processors. Normally this will
+       * be executed automatically when calling
+       * execute_coarsening_and_refinement() unless @p
+       * no_automatic_repartitioning is set in the constructor.
+       *
+       * @note When using SolutionTransfer or manual transfer using
+       * register_data_attach() and notify_ready_to_unpack() you need to do
+       * this twice: once when calling execute_coarsening_and_refinement(),
+       * which will handle coarsening and refinement but obviously won't ship
+       * any data between processors, and a second time when calling this
+       * function. Here, no coarsening and refinement will be done but
+       * information will be packed and shipped to different processors.
+       */
+      void repartition ();
 
       /**
        * When vertices have been moved locally, for example using code like
