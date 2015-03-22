@@ -91,7 +91,7 @@ namespace LinearAlgebraPETSc
      */
     typedef PETScWrappers::MPI::BlockSparseMatrix BlockSparseMatrix;
 
-    typedef dealii::BlockCompressedSimpleSparsityPattern BlockCompressedSparsityPattern;
+    typedef dealii::BlockDynamicSparsityPattern BlockCompressedSparsityPattern;
 
     /**
      * Typedef for the AMG preconditioner type.

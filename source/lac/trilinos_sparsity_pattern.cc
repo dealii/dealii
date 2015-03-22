@@ -19,9 +19,7 @@
 
 #  include <deal.II/base/utilities.h>
 #  include <deal.II/lac/sparsity_pattern.h>
-#  include <deal.II/lac/compressed_sparsity_pattern.h>
-#  include <deal.II/lac/compressed_set_sparsity_pattern.h>
-#  include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#  include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #  include <Epetra_Export.h>
 
@@ -1014,11 +1012,7 @@ namespace TrilinosWrappers
   template void
   SparsityPattern::copy_from (const dealii::SparsityPattern &);
   template void
-  SparsityPattern::copy_from (const dealii::CompressedSparsityPattern &);
-  template void
-  SparsityPattern::copy_from (const dealii::CompressedSetSparsityPattern &);
-  template void
-  SparsityPattern::copy_from (const dealii::CompressedSimpleSparsityPattern &);
+  SparsityPattern::copy_from (const dealii::DynamicSparsityPattern &);
 
 
   template void
@@ -1027,17 +1021,8 @@ namespace TrilinosWrappers
                            bool);
   template void
   SparsityPattern::reinit (const Epetra_Map &,
-                           const dealii::CompressedSparsityPattern &,
+                           const dealii::DynamicSparsityPattern &,
                            bool);
-  template void
-  SparsityPattern::reinit (const Epetra_Map &,
-                           const dealii::CompressedSetSparsityPattern &,
-                           bool);
-  template void
-  SparsityPattern::reinit (const Epetra_Map &,
-                           const dealii::CompressedSimpleSparsityPattern &,
-                           bool);
-
 
   template void
   SparsityPattern::reinit (const Epetra_Map &,
@@ -1047,19 +1032,8 @@ namespace TrilinosWrappers
   template void
   SparsityPattern::reinit (const Epetra_Map &,
                            const Epetra_Map &,
-                           const dealii::CompressedSparsityPattern &,
+                           const dealii::DynamicSparsityPattern &,
                            bool);
-  template void
-  SparsityPattern::reinit (const Epetra_Map &,
-                           const Epetra_Map &,
-                           const dealii::CompressedSetSparsityPattern &,
-                           bool);
-  template void
-  SparsityPattern::reinit (const Epetra_Map &,
-                           const Epetra_Map &,
-                           const dealii::CompressedSimpleSparsityPattern &,
-                           bool);
-
 
 
   template void
@@ -1069,17 +1043,7 @@ namespace TrilinosWrappers
                            bool);
   template void
   SparsityPattern::reinit (const IndexSet &,
-                           const dealii::CompressedSparsityPattern &,
-                           const MPI_Comm &,
-                           bool);
-  template void
-  SparsityPattern::reinit (const IndexSet &,
-                           const dealii::CompressedSetSparsityPattern &,
-                           const MPI_Comm &,
-                           bool);
-  template void
-  SparsityPattern::reinit (const IndexSet &,
-                           const dealii::CompressedSimpleSparsityPattern &,
+                           const dealii::DynamicSparsityPattern &,
                            const MPI_Comm &,
                            bool);
 
@@ -1093,19 +1057,7 @@ namespace TrilinosWrappers
   template void
   SparsityPattern::reinit (const IndexSet &,
                            const IndexSet &,
-                           const dealii::CompressedSparsityPattern &,
-                           const MPI_Comm &,
-                           bool);
-  template void
-  SparsityPattern::reinit (const IndexSet &,
-                           const IndexSet &,
-                           const dealii::CompressedSetSparsityPattern &,
-                           const MPI_Comm &,
-                           bool);
-  template void
-  SparsityPattern::reinit (const IndexSet &,
-                           const IndexSet &,
-                           const dealii::CompressedSimpleSparsityPattern &,
+                           const dealii::DynamicSparsityPattern &,
                            const MPI_Comm &,
                            bool);
 

@@ -80,15 +80,11 @@ FEVALUES_BASES := { FEValuesBase<deal_II_dimension>;
 	            FEFaceValuesBase<deal_II_dimension> }
 
 SPARSITY_PATTERNS := { SparsityPattern;
-                       CompressedSparsityPattern;
-                       CompressedSetSparsityPattern;
-                       CompressedSimpleSparsityPattern;
+                       DynamicSparsityPattern;
                        @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@;
 
                        BlockSparsityPattern;
-                       BlockCompressedSparsityPattern;
-                       BlockCompressedSetSparsityPattern;
-                       BlockCompressedSimpleSparsityPattern;
+                       BlockDynamicSparsityPattern;
                        @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@; }
 
 DIMENSIONS := { 1; 2; 3 }

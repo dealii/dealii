@@ -26,7 +26,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
@@ -249,12 +249,12 @@ namespace Step26
                                              constraints);
     constraints.close();
 
-    CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler,
-                                    c_sparsity,
+                                    dsp,
                                     constraints,
                                     /*keep_constrained_dofs = */ true);
-    sparsity_pattern.copy_from(c_sparsity);
+    sparsity_pattern.copy_from(dsp);
 
     mass_matrix.reinit(sparsity_pattern);
     laplace_matrix.reinit(sparsity_pattern);

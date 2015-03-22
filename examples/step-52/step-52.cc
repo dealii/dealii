@@ -169,9 +169,9 @@ namespace Step52
     VectorTools::interpolate_boundary_values(dof_handler,1,ZeroFunction<2>(),constraint_matrix);
     constraint_matrix.close();
 
-    CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(dof_handler,c_sparsity,constraint_matrix);
-    sparsity_pattern.copy_from(c_sparsity);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern(dof_handler,dsp,constraint_matrix);
+    sparsity_pattern.copy_from(dsp);
 
     system_matrix.reinit(sparsity_pattern);
     mass_matrix.reinit(sparsity_pattern);

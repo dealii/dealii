@@ -521,42 +521,21 @@ namespace Step22
     // BlockSparsityPattern. This is entirely analogous to what we already did
     // in step-11 and step-18.
     //
-    // There is one snag again here, though: it turns out that using the
-    // CompressedSparsityPattern (or the block version
-    // BlockCompressedSparsityPattern we would use here) has a bottleneck that
-    // makes the algorithm to build the sparsity pattern be quadratic in the
-    // number of degrees of freedom. This doesn't become noticeable until we
-    // get well into the range of several 100,000 degrees of freedom, but
-    // eventually dominates the setup of the linear system when we get to more
-    // than a million degrees of freedom. This is due to the data structures
-    // used in the CompressedSparsityPattern class, nothing that can easily be
-    // changed. Fortunately, there is an easy solution: the
-    // CompressedSimpleSparsityPattern class (and its block variant
-    // BlockCompressedSimpleSparsityPattern) has exactly the same interface,
-    // uses a different %internal data structure and is linear in the number
-    // of degrees of freedom and therefore much more efficient for large
-    // problems. As another alternative, we could also have chosen the class
-    // BlockCompressedSetSparsityPattern that uses yet another strategy for
-    // %internal memory management. Though, that class turns out to be more
-    // memory-demanding than BlockCompressedSimpleSparsityPattern for this
-    // example.
-    //
-    // Consequently, this is the class that we will use for our intermediate
-    // sparsity representation. All this is done inside a new scope, which
-    // means that the memory of <code>csp</code> will be released once the
+    // All this is done inside a new scope, which
+    // means that the memory of <code>dsp</code> will be released once the
     // information has been copied to <code>sparsity_pattern</code>.
     {
-      BlockCompressedSimpleSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern dsp (2,2);
 
-      csp.block(0,0).reinit (n_u, n_u);
-      csp.block(1,0).reinit (n_p, n_u);
-      csp.block(0,1).reinit (n_u, n_p);
-      csp.block(1,1).reinit (n_p, n_p);
+      dsp.block(0,0).reinit (n_u, n_u);
+      dsp.block(1,0).reinit (n_p, n_u);
+      dsp.block(0,1).reinit (n_u, n_p);
+      dsp.block(1,1).reinit (n_p, n_p);
 
-      csp.collect_sizes();
+      dsp.collect_sizes();
 
-      DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
-      sparsity_pattern.copy_from (csp);
+      DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
+      sparsity_pattern.copy_from (dsp);
     }
 
     // Finally, the system matrix, solution and right hand side are created

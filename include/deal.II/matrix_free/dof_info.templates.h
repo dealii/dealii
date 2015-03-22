@@ -16,7 +16,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/helper_functions.h>
@@ -913,7 +913,7 @@ no_constraint:
                                   (task_info.block_size*(task_info.n_blocks-1));
 
       // create the connectivity graph with internal blocking
-      CompressedSimpleSparsityPattern connectivity;
+      DynamicSparsityPattern connectivity;
       make_connectivity_graph (size_info, task_info, renumbering,irregular_cells,
                                true, connectivity);
 
@@ -977,7 +977,7 @@ no_constraint:
                 {
                   Assert(cell_partition[neighbor_list[j]]==partition-1,
                          ExcInternalError());
-                  CompressedSimpleSparsityPattern::row_iterator neighbor =
+                  DynamicSparsityPattern::row_iterator neighbor =
                     connectivity.row_begin(neighbor_list[j]),
                     end = connectivity.row_end(neighbor_list[j]);
                   for (; neighbor!=end ; ++neighbor)
@@ -1027,7 +1027,7 @@ no_constraint:
               color_finder.resize(n_neighbors+1);
               for (unsigned int j=0; j<=n_neighbors; ++j)
                 color_finder[j]=true;
-              CompressedSimpleSparsityPattern::row_iterator
+              DynamicSparsityPattern::row_iterator
               neighbor = connectivity.row_begin(cell),
               end      = connectivity.row_end(cell);
               for (; neighbor!=end ; ++neighbor)
@@ -1167,7 +1167,7 @@ no_constraint:
       unsigned int cluster_size = task_info.block_size*vectorization_length;
 
       // create the connectivity graph without internal blocking
-      CompressedSimpleSparsityPattern connectivity;
+      DynamicSparsityPattern connectivity;
       make_connectivity_graph (size_info, task_info, renumbering,irregular_cells,
                                false, connectivity);
 
@@ -1249,7 +1249,7 @@ no_constraint:
                 }
               index--;
               unsigned int additional = neighbor_list[index];
-              CompressedSimpleSparsityPattern::row_iterator neighbor =
+              DynamicSparsityPattern::row_iterator neighbor =
                 connectivity.row_begin(additional),
                 end = connectivity.row_end(additional);
               for (; neighbor!=end ; ++neighbor)
@@ -1277,7 +1277,7 @@ no_constraint:
                 {
                   Assert(cell_partition[neighbor_list[j]]==partition-1,
                          ExcInternalError());
-                  CompressedSimpleSparsityPattern::row_iterator neighbor =
+                  DynamicSparsityPattern::row_iterator neighbor =
                     connectivity.row_begin(neighbor_list[j]),
                     end = connectivity.row_end(neighbor_list[j]);
                   for (; neighbor!=end ; ++neighbor)
@@ -1312,7 +1312,7 @@ no_constraint:
                     }
                   index--;
                   unsigned int additional = neighbor_neighbor_list[index];
-                  CompressedSimpleSparsityPattern::row_iterator neighbor =
+                  DynamicSparsityPattern::row_iterator neighbor =
                     connectivity.row_begin(additional),
                     end = connectivity.row_end(additional);
                   for (; neighbor!=end ; ++neighbor)
@@ -1412,7 +1412,7 @@ not_connect:
                                ExcInternalError());
                         Assert(cell_partition_l2[neighbor_list[j]]==partition_l2-1,
                                ExcInternalError());
-                        CompressedSimpleSparsityPattern::row_iterator neighbor =
+                        DynamicSparsityPattern::row_iterator neighbor =
                           connectivity.row_begin(neighbor_list[j]),
                           end = connectivity.row_end(neighbor_list[j]);
                         for (; neighbor!=end ; ++neighbor)
@@ -1504,7 +1504,7 @@ not_connect:
                           // go through the neighbors of the last cell in the
                           // current partition and check if we find some to
                           // fill up with.
-                          CompressedSimpleSparsityPattern::row_iterator
+                          DynamicSparsityPattern::row_iterator
                           neighbor =
                             connectivity.row_begin(additional),
                             end = connectivity.row_end(additional);
@@ -1694,7 +1694,7 @@ not_connect:
      const std::vector<unsigned int> &renumbering,
      const std::vector<unsigned int> &irregular_cells,
      const bool                       do_blocking,
-     CompressedSimpleSparsityPattern &connectivity) const
+     DynamicSparsityPattern &connectivity) const
     {
       AssertDimension (row_starts.size()-1, size_info.n_active_cells);
       const unsigned int n_rows =

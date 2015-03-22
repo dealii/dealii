@@ -386,12 +386,7 @@ namespace TrilinosWrappers
   template void
   BlockSparseMatrix::reinit (const dealii::BlockSparsityPattern &);
   template void
-  BlockSparseMatrix::reinit (const dealii::BlockCompressedSparsityPattern &);
-  template void
-  BlockSparseMatrix::reinit (const dealii::BlockCompressedSetSparsityPattern &);
-  template void
-  BlockSparseMatrix::reinit (const dealii::BlockCompressedSimpleSparsityPattern &);
-
+  BlockSparseMatrix::reinit (const dealii::BlockDynamicSparsityPattern &);
 
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
@@ -399,20 +394,12 @@ namespace TrilinosWrappers
                              const bool);
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-                             const dealii::BlockCompressedSparsityPattern &,
-                             const bool);
-  template void
-  BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-                             const dealii::BlockCompressedSetSparsityPattern &,
-                             const bool);
-  template void
-  BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-                             const dealii::BlockCompressedSimpleSparsityPattern &,
+                             const dealii::BlockDynamicSparsityPattern &,
                              const bool);
 
   template void
   BlockSparseMatrix::reinit (const std::vector<IndexSet> &,
-                             const dealii::BlockCompressedSimpleSparsityPattern &,
+                             const dealii::BlockDynamicSparsityPattern &,
                              const MPI_Comm &,
                              const bool);
 

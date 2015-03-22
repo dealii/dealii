@@ -151,13 +151,13 @@ namespace Step36
   // sure that we do not need to re-allocate memory and free the one used
   // previously. One way to do that would be to use code like this:
   // @code
-  //   CompressedSimpleSparsityPattern
-  //      csp (dof_handler.n_dofs(),
+  //   DynamicSparsityPattern
+  //      dsp (dof_handler.n_dofs(),
   //           dof_handler.n_dofs());
-  //   DoFTools::make_sparsity_pattern (dof_handler, csp);
-  //   csp.compress ();
-  //   stiffness_matrix.reinit (csp);
-  //   mass_matrix.reinit (csp);
+  //   DoFTools::make_sparsity_pattern (dof_handler, dsp);
+  //   dsp.compress ();
+  //   stiffness_matrix.reinit (dsp);
+  //   mass_matrix.reinit (dsp);
   // @endcode
   // instead of the two <code>reinit()</code> calls for the
   // stiffness and mass matrices below.

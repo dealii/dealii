@@ -19,9 +19,7 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <iostream>
 #include <iomanip>
@@ -966,9 +964,7 @@ SparsityPattern::memory_consumption () const
 
 // explicit instantiations
 template void SparsityPattern::copy_from<SparsityPattern> (const SparsityPattern &);
-template void SparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &);
-template void SparsityPattern::copy_from<CompressedSetSparsityPattern> (const CompressedSetSparsityPattern &);
-template void SparsityPattern::copy_from<CompressedSimpleSparsityPattern> (const CompressedSimpleSparsityPattern &);
+template void SparsityPattern::copy_from<DynamicSparsityPattern> (const DynamicSparsityPattern &);
 template void SparsityPattern::copy_from<float> (const FullMatrix<float> &);
 template void SparsityPattern::copy_from<double> (const FullMatrix<double> &);
 

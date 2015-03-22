@@ -37,9 +37,6 @@ DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
 class BlockSparsityPattern;
-class BlockCompressedSparsityPattern;
-class BlockCompressedSetSparsityPattern;
-class BlockCompressedSimpleSparsityPattern;
 template <typename number> class BlockSparseMatrix;
 
 

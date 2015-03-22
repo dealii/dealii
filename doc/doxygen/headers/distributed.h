@@ -272,8 +272,8 @@
  * <h5>Sparsity patterns</h5>
  *
  * At the time of writing this, the only class equipped to deal with the
- * situation just explained is CompressedSimpleSparsityPattern. A version of
- * the function CompressedSimpleSparsityPattern::reinit() exists that takes an
+ * situation just explained is DynamicSparsityPattern. A version of
+ * the function DynamicSparsityPattern::reinit() exists that takes an
  * IndexSet argument that indicates which lines of the sparsity pattern to
  * allocate memory for. In other words, it is safe to create such an object
  * that will report as its size 1 billion, but in fact only stores only as
@@ -301,7 +301,7 @@
  * When creating the sparsity pattern as well as when assembling the linear
  * system, we need to know about constraints on degrees of freedom, for
  * example resulting from hanging nodes or boundary conditions. Like the
- * CompressedSimpleSparsityPattern class, the ConstraintMatrix can also take
+ * DynamicSparsityPattern class, the ConstraintMatrix can also take
  * an IndexSet upon construction that indicates for which of the possibly very
  * large number of degrees of freedom it should actually store
  * constraints. Unlike for the sparsity pattern, these are now only those
@@ -323,7 +323,7 @@
  * store all necessary constraints on each processor: you will just generate
  * wrong matrix entries, but the program will not abort. This is opposed to
  * the situation of the sparsity pattern: there, if the IndexSet passed to the
- * CompressedSimpleSparsityPattern indicates that it should store too few rows
+ * DynamicSparsityPattern indicates that it should store too few rows
  * of the matrix, the program will either abort when you attempt to write into
  * matrix entries that do not exist or the matrix class will silently allocate
  * more memory to accommodate them. As a consequence, it is useful to err on

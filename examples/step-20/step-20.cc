@@ -358,25 +358,25 @@ namespace Step20
     // The next task is to allocate a sparsity pattern for the matrix that we
     // will create. We use a compressed sparsity pattern like in the previous
     // steps, but as <code>system_matrix</code> is a block matrix we use the
-    // class <code>BlockCompressedSparsityPattern</code> instead of just
-    // <code>CompressedSparsityPattern</code>. This block sparsity pattern has
+    // class <code>BlockDynamicSparsityPattern</code> instead of just
+    // <code>DynamicSparsityPattern</code>. This block sparsity pattern has
     // four blocks in a $2 \times 2$ pattern. The blocks' sizes depend on
     // <code>n_u</code> and <code>n_p</code>, which hold the number of velocity
     // and pressure variables. In the second step we have to instruct the block
     // system to update its knowledge about the sizes of the blocks it manages;
-    // this happens with the <code>c_sparsity.collect_sizes ()</code> call.
-    BlockCompressedSparsityPattern c_sparsity(2, 2);
-    c_sparsity.block(0, 0).reinit (n_u, n_u);
-    c_sparsity.block(1, 0).reinit (n_p, n_u);
-    c_sparsity.block(0, 1).reinit (n_u, n_p);
-    c_sparsity.block(1, 1).reinit (n_p, n_p);
-    c_sparsity.collect_sizes ();
-    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+    // this happens with the <code>dsp.collect_sizes ()</code> call.
+    BlockDynamicSparsityPattern dsp(2, 2);
+    dsp.block(0, 0).reinit (n_u, n_u);
+    dsp.block(1, 0).reinit (n_p, n_u);
+    dsp.block(0, 1).reinit (n_u, n_p);
+    dsp.block(1, 1).reinit (n_p, n_p);
+    dsp.collect_sizes ();
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
 
     // We use the compressed block sparsity pattern in the same way as the
     // non-block version to create the sparsity pattern and then the system
     // matrix:
-    sparsity_pattern.copy_from(c_sparsity);
+    sparsity_pattern.copy_from(dsp);
     system_matrix.reinit (sparsity_pattern);
 
     // Then we have to resize the solution and right hand side vectors in

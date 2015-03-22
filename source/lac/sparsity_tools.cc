@@ -24,9 +24,7 @@
 
 #ifdef DEAL_II_WITH_MPI
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #endif
 
@@ -642,8 +640,7 @@ namespace SparsityTools
       const IndexSet & myrange)
 
 #ifdef DEAL_II_WITH_MPI
-SPARSITY_FUNCTIONS(CompressedSparsityPattern);
-SPARSITY_FUNCTIONS(CompressedSimpleSparsityPattern);
+SPARSITY_FUNCTIONS(DynamicSparsityPattern);
 
 template void SparsityTools::distribute_sparsity_pattern
 <BlockCompressedSimpleSparsityPattern>

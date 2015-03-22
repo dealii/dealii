@@ -40,13 +40,9 @@ DEAL_II_NAMESPACE_OPEN
 template<int dim, class T> class Table;
 template <typename> class FullMatrix;
 class SparsityPattern;
-class CompressedSparsityPattern;
-class CompressedSetSparsityPattern;
-class CompressedSimpleSparsityPattern;
+class DynamicSparsityPattern;
 class BlockSparsityPattern;
-class BlockCompressedSparsityPattern;
-class BlockCompressedSetSparsityPattern;
-class BlockCompressedSimpleSparsityPattern;
+class BlockDynamicSparsityPattern;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 class BlockIndices;
@@ -547,60 +543,14 @@ public:
   /**
    * Same function as above, but condenses square compressed sparsity
    * patterns.
-   *
-   * Given the data structure used by CompressedSparsityPattern, this function
-   * becomes quadratic in the number of degrees of freedom for large problems
-   * and can dominate setting up linear systems when several hundred thousand
-   * or millions of unknowns are involved and for problems with many nonzero
-   * elements per row (for example for vector-valued problems or hp finite
-   * elements). In this case, it is advisable to use the
-   * CompressedSetSparsityPattern class instead, see for example
-   * @ref step_27 "step-27",
-   * or to use the CompressedSimpleSparsityPattern class, see for example
-   * @ref step_31 "step-31".
    */
-  void condense (CompressedSparsityPattern &sparsity) const;
-
-  /**
-   * Same function as above, but condenses compressed sparsity patterns, which
-   * are based on the std::set container.
-   */
-  void condense (CompressedSetSparsityPattern &sparsity) const;
-
-  /**
-   * Same function as above, but condenses compressed sparsity patterns, which
-   * are based on the ''simple'' aproach.
-   */
-  void condense (CompressedSimpleSparsityPattern &sparsity) const;
-
-  /**
-   * Same function as above, but condenses square compressed sparsity
-   * patterns.
-   *
-   * Given the data structure used by BlockCompressedSparsityPattern, this
-   * function becomes quadratic in the number of degrees of freedom for large
-   * problems and can dominate setting up linear systems when several hundred
-   * thousand or millions of unknowns are involved and for problems with many
-   * nonzero elements per row (for example for vector-valued problems or hp
-   * finite elements). In this case, it is advisable to use the
-   * BlockCompressedSetSparsityPattern class instead, see for example
-   * @ref step_27 "step-27"
-   * and
-   * @ref step_31 "step-31".
-   */
-  void condense (BlockCompressedSparsityPattern &sparsity) const;
+  void condense (DynamicSparsityPattern &sparsity) const;
 
   /**
    * Same function as above, but condenses square compressed sparsity
    * patterns.
    */
-  void condense (BlockCompressedSetSparsityPattern &sparsity) const;
-
-  /**
-   * Same function as above, but condenses square compressed sparsity
-   * patterns.
-   */
-  void condense (BlockCompressedSimpleSparsityPattern &sparsity) const;
+  void condense (BlockDynamicSparsityPattern &sparsity) const;
 
   /**
    * Condense a given matrix, i.e., eliminate the rows and columns of the

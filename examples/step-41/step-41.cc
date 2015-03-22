@@ -31,7 +31,7 @@
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -246,14 +246,14 @@ namespace Step41
                                               constraints);
     constraints.close ();
 
-    CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler,
-                                     c_sparsity,
+                                     dsp,
                                      constraints,
                                      false);
 
-    system_matrix.reinit (c_sparsity);
-    complete_system_matrix.reinit (c_sparsity);
+    system_matrix.reinit (dsp);
+    complete_system_matrix.reinit (dsp);
 
     solution.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
@@ -266,7 +266,7 @@ namespace Step41
     // diagonal, and in the following then first compute all of this as a
     // matrix and then extract the diagonal elements for later use:
     TrilinosWrappers::SparseMatrix mass_matrix;
-    mass_matrix.reinit (c_sparsity);
+    mass_matrix.reinit (dsp);
     assemble_mass_matrix_diagonal (mass_matrix);
     diagonal_of_mass_matrix.reinit (dof_handler.n_dofs());
     for (unsigned int j=0; j<solution.size (); j++)

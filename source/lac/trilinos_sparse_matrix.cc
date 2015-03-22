@@ -21,9 +21,7 @@
 #  include <deal.II/lac/sparse_matrix.h>
 #  include <deal.II/lac/trilinos_sparsity_pattern.h>
 #  include <deal.II/lac/sparsity_pattern.h>
-#  include <deal.II/lac/compressed_sparsity_pattern.h>
-#  include <deal.II/lac/compressed_set_sparsity_pattern.h>
-#  include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/sparsity_tools.h>
 
 #  include <Epetra_Export.h>
@@ -616,7 +614,7 @@ namespace TrilinosWrappers
   void
   SparseMatrix::reinit (const Epetra_Map    &input_row_map,
                         const Epetra_Map    &input_col_map,
-                        const CompressedSimpleSparsityPattern &sparsity_pattern,
+                        const DynamicSparsityPattern &sparsity_pattern,
                         const bool           exchange_data)
   {
     matrix.reset();
@@ -1710,12 +1708,9 @@ namespace TrilinosWrappers
 {
   template void
   SparseMatrix::reinit (const dealii::SparsityPattern &);
+
   template void
-  SparseMatrix::reinit (const CompressedSparsityPattern &);
-  template void
-  SparseMatrix::reinit (const CompressedSetSparsityPattern &);
-  template void
-  SparseMatrix::reinit (const CompressedSimpleSparsityPattern &);
+  SparseMatrix::reinit (const DynamicSparsityPattern &);
 
   template void
   SparseMatrix::reinit (const Epetra_Map &,
@@ -1723,15 +1718,7 @@ namespace TrilinosWrappers
                         const bool);
   template void
   SparseMatrix::reinit (const Epetra_Map &,
-                        const CompressedSparsityPattern &,
-                        const bool);
-  template void
-  SparseMatrix::reinit (const Epetra_Map &,
-                        const CompressedSetSparsityPattern &,
-                        const bool);
-  template void
-  SparseMatrix::reinit (const Epetra_Map &,
-                        const CompressedSimpleSparsityPattern &,
+                        const DynamicSparsityPattern &,
                         const bool);
 
 
@@ -1740,15 +1727,11 @@ namespace TrilinosWrappers
                         const Epetra_Map &,
                         const dealii::SparsityPattern &,
                         const bool);
+
   template void
   SparseMatrix::reinit (const Epetra_Map &,
                         const Epetra_Map &,
-                        const CompressedSparsityPattern &,
-                        const bool);
-  template void
-  SparseMatrix::reinit (const Epetra_Map &,
-                        const Epetra_Map &,
-                        const CompressedSetSparsityPattern &,
+                        const DynamicSparsityPattern &,
                         const bool);
 
 }

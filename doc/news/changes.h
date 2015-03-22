@@ -325,6 +325,15 @@ inconvenience this causes.
 
 
 <ol>
+
+  <li> Changed: All (Block)Compressed*SparsityPattern classes got
+  replaced by DynamicSparsityPattern and
+  BlockDynamicSparsityPattern, respectively and all examples now
+  teach the dynamic way of creating dynamic sparsity patterns.
+  <br>
+  (Timo Heister, 2015/03/22)
+  </li>
+
   <li> Improved: We have traditionally had a large number of exceptions
   that did not output any useful error message other than the name
   of the exception class. This name was suggestive of the error that
@@ -384,7 +393,7 @@ inconvenience this causes.
 
   <li> New: Add MueLu preconditioner from Trilinos through the class
   TrilinosWrappers::PreconditionAMGMueLu. This is a new algebraic
-  multigrid package. The input parameters are almost the same as the ones 
+  multigrid package. The input parameters are almost the same as the ones
   from ML so that the two preconditioners can be easily swapped.
   <br>
   (Bruno Turcksin, 2015/03/11)
@@ -528,7 +537,7 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/01/16)
   </li>
 
-  <li> New: dealii::multithread_info.n_cpus returns the correct number of CPU 
+  <li> New: dealii::multithread_info.n_cpus returns the correct number of CPU
   on FreeBSD.
   <br>
   (Bruno Turcksin, 2015/01/14)

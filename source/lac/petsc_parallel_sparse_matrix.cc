@@ -19,8 +19,7 @@
 
 #  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/sparsity_pattern.h>
-#  include <deal.II/lac/compressed_sparsity_pattern.h>
-#  include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#  include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -818,14 +817,7 @@ namespace PETScWrappers
                                 const bool);
     template
     SparseMatrix::SparseMatrix (const MPI_Comm &,
-                                const CompressedSparsityPattern &,
-                                const std::vector<size_type> &,
-                                const std::vector<size_type> &,
-                                const unsigned int,
-                                const bool);
-    template
-    SparseMatrix::SparseMatrix (const MPI_Comm &,
-                                const CompressedSimpleSparsityPattern &,
+                                const DynamicSparsityPattern &,
                                 const std::vector<size_type> &,
                                 const std::vector<size_type> &,
                                 const unsigned int,
@@ -840,14 +832,7 @@ namespace PETScWrappers
                           const bool);
     template void
     SparseMatrix::reinit (const MPI_Comm &,
-                          const CompressedSparsityPattern &,
-                          const std::vector<size_type> &,
-                          const std::vector<size_type> &,
-                          const unsigned int,
-                          const bool);
-    template void
-    SparseMatrix::reinit (const MPI_Comm &,
-                          const CompressedSimpleSparsityPattern &,
+                          const DynamicSparsityPattern &,
                           const std::vector<size_type> &,
                           const std::vector<size_type> &,
                           const unsigned int,
@@ -857,7 +842,7 @@ namespace PETScWrappers
     SparseMatrix::
     reinit (const IndexSet &,
             const IndexSet &,
-            const CompressedSimpleSparsityPattern &,
+            const DynamicSparsityPattern &,
             const MPI_Comm &);
 
     template void
@@ -867,13 +852,7 @@ namespace PETScWrappers
                              const unsigned int ,
                              const bool);
     template void
-    SparseMatrix::do_reinit (const CompressedSparsityPattern &,
-                             const std::vector<size_type> &,
-                             const std::vector<size_type> &,
-                             const unsigned int ,
-                             const bool);
-    template void
-    SparseMatrix::do_reinit (const CompressedSimpleSparsityPattern &,
+    SparseMatrix::do_reinit (const DynamicSparsityPattern &,
                              const std::vector<size_type> &,
                              const std::vector<size_type> &,
                              const unsigned int ,
@@ -883,7 +862,7 @@ namespace PETScWrappers
     SparseMatrix::
     do_reinit (const IndexSet &,
                const IndexSet &,
-               const CompressedSimpleSparsityPattern &);
+               const DynamicSparsityPattern &);
 
 
     PetscScalar

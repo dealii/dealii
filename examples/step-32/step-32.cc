@@ -1803,7 +1803,7 @@ namespace Step32
   // is that the matrices we want to set up are distributed across multiple
   // processors. Since we still want to build up the sparsity pattern first
   // for efficiency reasons, we could continue to build the <i>entire</i>
-  // sparsity pattern as a BlockCompressedSimpleSparsityPattern, as we did in
+  // sparsity pattern as a BlockDynamicSparsityPattern, as we did in
   // step-31. However, that would be inefficient: every processor would build
   // the same sparsity pattern, but only initialize a small part of the matrix
   // using it. It also violates the principle that every processor should only

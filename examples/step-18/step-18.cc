@@ -29,7 +29,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
@@ -966,11 +966,11 @@ namespace Step18
     // going to work with, and make sure that the condensation of hanging node
     // constraints add the necessary additional entries in the sparsity
     // pattern:
-    CompressedSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
-                                                dof_handler.n_dofs());
+    DynamicSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
+                                             dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
     hanging_node_constraints.condense (sparsity_pattern);
-    // Note that we have used the <code>CompressedSparsityPattern</code> class
+    // Note that we have used the <code>DynamicSparsityPattern</code> class
     // here that was already introduced in step-11, rather than the
     // <code>SparsityPattern</code> class that we have used in all other
     // cases. The reason for this is that for the latter class to work we have
@@ -989,7 +989,7 @@ namespace Step18
     // too much memory can lead to out-of-memory situations.
     //
     // In order to avoid this, we resort to the
-    // <code>CompressedSparsityPattern</code> class that is slower but does
+    // <code>DynamicSparsityPattern</code> class that is slower but does
     // not require any up-front estimate on the number of nonzero entries per
     // row. It therefore only ever allocates as much memory as it needs at any
     // given time, and we can build it even for large 3d problems.

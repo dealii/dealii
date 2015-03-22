@@ -36,11 +36,6 @@ template <typename number> class SparseLUDecomposition;
 template <typename number> class SparseILU;
 template <class VECTOR> class VectorSlice;
 
-class CompressedSparsityPattern;
-class CompressedSetSparsityPattern;
-class CompressedSimpleSparsityPattern;
-
-
 namespace ChunkSparsityPatternIterators
 {
   class Accessor;
