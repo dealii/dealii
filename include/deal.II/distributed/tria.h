@@ -475,18 +475,22 @@ namespace parallel
       virtual void execute_coarsening_and_refinement ();
 
       /**
-       * Redistribute the active cells between processors. Normally this will
-       * be executed automatically when calling
-       * execute_coarsening_and_refinement() unless @p
-       * no_automatic_repartitioning is set in the constructor.
+       * Manually repartition the active cells between processors. Normally
+       * this repartitioning will happen automatically when calling
+       * execute_coarsening_and_refinement() (or refine_global()) unless the
+       * @p no_automatic_repartitioning is set in the constructor. Setting the
+       * flag and then calling repartition() gives the same result.
        *
-       * @note When using SolutionTransfer or manual transfer using
-       * register_data_attach() and notify_ready_to_unpack() you need to do
-       * this twice: once when calling execute_coarsening_and_refinement(),
+       * If you want to transfer data (using SolutionTransfer or manually with
+       * register_data_attach() and notify_ready_to_unpack()), you need to set
+       * it up twice: once when calling execute_coarsening_and_refinement(),
        * which will handle coarsening and refinement but obviously won't ship
-       * any data between processors, and a second time when calling this
-       * function. Here, no coarsening and refinement will be done but
-       * information will be packed and shipped to different processors.
+       * any data between processors, and a second time when calling
+       * repartition().  Here, no coarsening and refinement will be done but
+       * information will be packed and shipped to different processors. In
+       * other words, you probably want to treat a call to repartition() in
+       * the same way as execute_coarsening_and_refinement() with respect to
+       * dealing with data movement (SolutionTransfer, etc..).
        */
       void repartition ();
 

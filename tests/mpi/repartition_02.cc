@@ -32,13 +32,6 @@
 
 #include <fstream>
 
-std::string id_to_string(const CellId &id)
-{
-  std::ostringstream ss;
-  ss << id;
-  return ss.str();
-}
-
 template<int dim>
 void pack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
                     const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,

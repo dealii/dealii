@@ -1,0 +1,73 @@
+
+DEAL:0::*** 1. everything on one core:
+DEAL:0::locally owned cells: 0 / 16
+DEAL:0::*** 2. repartition:
+DEAL:0::locally owned cells: 4 / 16
+DEAL:0::0_2:00
+DEAL:0::0_2:01
+DEAL:0::0_2:02
+DEAL:0::0_2:03
+DEAL:0::*** 3. repartition again (noop):
+DEAL:0::locally owned cells: 4 / 16
+DEAL:0::0_2:00
+DEAL:0::0_2:01
+DEAL:0::0_2:02
+DEAL:0::0_2:03
+DEAL:0::Checksum: 3877634849
+DEAL:0::OK
+
+DEAL:1::*** 1. everything on one core:
+DEAL:1::locally owned cells: 0 / 16
+DEAL:1::*** 2. repartition:
+DEAL:1::locally owned cells: 8 / 16
+DEAL:1::0_2:10
+DEAL:1::0_2:11
+DEAL:1::0_2:12
+DEAL:1::0_2:13
+DEAL:1::0_2:20
+DEAL:1::0_2:21
+DEAL:1::0_2:22
+DEAL:1::0_2:23
+DEAL:1::*** 3. repartition again (noop):
+DEAL:1::locally owned cells: 8 / 16
+DEAL:1::0_2:10
+DEAL:1::0_2:11
+DEAL:1::0_2:12
+DEAL:1::0_2:13
+DEAL:1::0_2:20
+DEAL:1::0_2:21
+DEAL:1::0_2:22
+DEAL:1::0_2:23
+
+
+DEAL:2::*** 1. everything on one core:
+DEAL:2::locally owned cells: 16 / 16
+DEAL:2::0_2:00
+DEAL:2::0_2:01
+DEAL:2::0_2:02
+DEAL:2::0_2:03
+DEAL:2::0_2:10
+DEAL:2::0_2:11
+DEAL:2::0_2:12
+DEAL:2::0_2:13
+DEAL:2::0_2:20
+DEAL:2::0_2:21
+DEAL:2::0_2:22
+DEAL:2::0_2:23
+DEAL:2::0_2:30
+DEAL:2::0_2:31
+DEAL:2::0_2:32
+DEAL:2::0_2:33
+DEAL:2::*** 2. repartition:
+DEAL:2::locally owned cells: 4 / 16
+DEAL:2::0_2:30
+DEAL:2::0_2:31
+DEAL:2::0_2:32
+DEAL:2::0_2:33
+DEAL:2::*** 3. repartition again (noop):
+DEAL:2::locally owned cells: 4 / 16
+DEAL:2::0_2:30
+DEAL:2::0_2:31
+DEAL:2::0_2:32
+DEAL:2::0_2:33
+

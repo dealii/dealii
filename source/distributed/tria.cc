@@ -3455,6 +3455,16 @@ namespace parallel
       AssertThrow(settings & no_automatic_repartitioning,
                   ExcMessage("You need to set no_automatic_repartition when calling repartition() manually."));
 
+#ifdef DEBUG
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator
+           cell = this->begin_active();
+           cell != this->end(); ++cell)
+        if (cell->is_locally_owned())
+          Assert (
+            !cell->refine_flag_set() && !cell->coarsen_flag_set(),
+            ExcMessage ("Error: There shouldn't be any cells flagged for coarsening/refinement when calling repartition()."));
+#endif
+
       refinement_in_progress = true;
 
       // before repartitioning the mesh let others attach mesh related info
