@@ -1540,10 +1540,32 @@ namespace internal
               case 2:
                 break;
               default:
-                // a node must have one
-                // or two adjacent
-                // lines
-                AssertThrow (false, ExcInternalError());
+                // in 1d, a node must have one or two adjacent lines
+                if (spacedim==1)
+                  AssertThrow (false, ExcInternalError())
+                  else
+                    AssertThrow (false,
+                                 ExcMessage ("You have a vertex in your triangulation "
+                                             "at which more than two cells come together. "
+                                             "(For one dimensional triangulation, cells are "
+                                             "line segments.)"
+                                             "\n\n"
+                                             "This is not currently supported because the "
+                                             "Triangulation class makes the assumption that "
+                                             "every cell has zero or one neighbors behind "
+                                             "each face (here, behind each vertex), but in your "
+                                             "situation there would be more than one."
+                                             "\n\n"
+                                             "Support for this is not currently implemented. "
+                                             "If you need to work with triangulations where "
+                                             "more than two cells come together at a vertex, "
+                                             "duplicate the vertices once per cell (i.e., put "
+                                             "multiple vertices at the same physical location, "
+                                             "but using different vertex indices for each) "
+                                             "and then ensure continuity of the solution by "
+                                             "explicitly creating constraints that the degrees "
+                                             "of freedom at these vertices have the same "
+                                             "value, using the ConstraintMatrix class."));
               }
 
           // assert there are no more
@@ -1818,11 +1840,37 @@ namespace internal
              line!=triangulation.end_line(); ++line)
           {
             const unsigned int n_adj_cells = adjacent_cells[line->index()].size();
-            // assert that every line has
-            // one or two adjacent cells
-            AssertThrow ((n_adj_cells >= 1) &&
-                         (n_adj_cells <= 2),
-                         ExcInternalError());
+
+            // assert that every line has one or two adjacent cells.
+            // this has to be the case for 2d triangulations in 2d.
+            // in higher dimensions, this may happen but is not
+            // implemented
+            if (spacedim==2)
+              AssertThrow ((n_adj_cells >= 1) &&
+                           (n_adj_cells <= 2),
+                           ExcInternalError())
+              else
+                AssertThrow ((n_adj_cells >= 1) &&
+                             (n_adj_cells <= 2),
+                             ExcMessage ("You have a line in your triangulation "
+                                         "at which more than two cells come together. "
+                                         "\n\n"
+                                         "This is not currently supported because the "
+                                         "Triangulation class makes the assumption that "
+                                         "every cell has zero or one neighbors behind "
+                                         "each face (here, behind each line), but in your "
+                                         "situation there would be more than one."
+                                         "\n\n"
+                                         "Support for this is not currently implemented. "
+                                         "If you need to work with triangulations where "
+                                         "more than two cells come together at a line, "
+                                         "duplicate the vertices once per cell (i.e., put "
+                                         "multiple vertices at the same physical location, "
+                                         "but using different vertex indices for each) "
+                                         "and then ensure continuity of the solution by "
+                                         "explicitly creating constraints that the degrees "
+                                         "of freedom at these lines have the same "
+                                         "value, using the ConstraintMatrix class."));
 
             // if only one cell: line is at
             // boundary -> give it the
