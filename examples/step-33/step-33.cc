@@ -1401,11 +1401,11 @@ namespace Step33
   template <int dim>
   void ConservationLaw<dim>::setup_system ()
   {
-    DynamicSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
-                                             dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
 
-    system_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit (dsp);
   }
 
 

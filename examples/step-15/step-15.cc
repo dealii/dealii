@@ -208,12 +208,12 @@ namespace Step15
     newton_update.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
 
-    DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
 
-    hanging_node_constraints.condense (c_sparsity);
+    hanging_node_constraints.condense (dsp);
 
-    sparsity_pattern.copy_from(c_sparsity);
+    sparsity_pattern.copy_from(dsp);
     system_matrix.reinit (sparsity_pattern);
   }
 

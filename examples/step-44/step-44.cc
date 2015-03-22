@@ -1582,20 +1582,20 @@ namespace Step44
       const types::global_dof_index n_dofs_p = dofs_per_block[p_dof];
       const types::global_dof_index n_dofs_J = dofs_per_block[J_dof];
 
-      BlockDynamicSparsityPattern csp(n_blocks, n_blocks);
+      BlockDynamicSparsityPattern dsp(n_blocks, n_blocks);
 
-      csp.block(u_dof, u_dof).reinit(n_dofs_u, n_dofs_u);
-      csp.block(u_dof, p_dof).reinit(n_dofs_u, n_dofs_p);
-      csp.block(u_dof, J_dof).reinit(n_dofs_u, n_dofs_J);
+      dsp.block(u_dof, u_dof).reinit(n_dofs_u, n_dofs_u);
+      dsp.block(u_dof, p_dof).reinit(n_dofs_u, n_dofs_p);
+      dsp.block(u_dof, J_dof).reinit(n_dofs_u, n_dofs_J);
 
-      csp.block(p_dof, u_dof).reinit(n_dofs_p, n_dofs_u);
-      csp.block(p_dof, p_dof).reinit(n_dofs_p, n_dofs_p);
-      csp.block(p_dof, J_dof).reinit(n_dofs_p, n_dofs_J);
+      dsp.block(p_dof, u_dof).reinit(n_dofs_p, n_dofs_u);
+      dsp.block(p_dof, p_dof).reinit(n_dofs_p, n_dofs_p);
+      dsp.block(p_dof, J_dof).reinit(n_dofs_p, n_dofs_J);
 
-      csp.block(J_dof, u_dof).reinit(n_dofs_J, n_dofs_u);
-      csp.block(J_dof, p_dof).reinit(n_dofs_J, n_dofs_p);
-      csp.block(J_dof, J_dof).reinit(n_dofs_J, n_dofs_J);
-      csp.collect_sizes();
+      dsp.block(J_dof, u_dof).reinit(n_dofs_J, n_dofs_u);
+      dsp.block(J_dof, p_dof).reinit(n_dofs_J, n_dofs_p);
+      dsp.block(J_dof, J_dof).reinit(n_dofs_J, n_dofs_J);
+      dsp.collect_sizes();
 
       // The global system matrix initially has the following structure
       // @f{align*}
@@ -1630,10 +1630,10 @@ namespace Step44
             coupling[ii][jj] = DoFTools::always;
       DoFTools::make_sparsity_pattern(dof_handler_ref,
                                       coupling,
-                                      csp,
+                                      dsp,
                                       constraints,
                                       false);
-      sparsity_pattern.copy_from(csp);
+      sparsity_pattern.copy_from(dsp);
     }
 
     tangent_matrix.reinit(sparsity_pattern);

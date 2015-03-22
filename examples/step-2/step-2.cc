@@ -202,18 +202,18 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
   // to initialize this intermediate data structure, we have to give it the
   // size of the matrix, which in our case will be square with as many rows
   // and columns as there are degrees of freedom on the grid:
-  DynamicSparsityPattern compressed_sparsity_pattern(dof_handler.n_dofs(),
-                                                     dof_handler.n_dofs());
+  DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),
+                                                  dof_handler.n_dofs());
 
   // We then fill this object with the places where nonzero elements will be
   // located given the present numbering of degrees of freedom:
-  DoFTools::make_sparsity_pattern (dof_handler, compressed_sparsity_pattern);
+  DoFTools::make_sparsity_pattern (dof_handler, dynamic_sparsity_pattern);
 
   // Now we are ready to create the actual sparsity pattern that we could
   // later use for our matrix. It will just contain the data already assembled
   // in the DynamicSparsityPattern.
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from (compressed_sparsity_pattern);
+  sparsity_pattern.copy_from (dynamic_sparsity_pattern);
 
   // With this, we can now write the results to a file:
   std::ofstream out ("sparsity_pattern.1");
@@ -265,12 +265,12 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee (dof_handler);
 
-  DynamicSparsityPattern compressed_sparsity_pattern(dof_handler.n_dofs(),
-                                                     dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, compressed_sparsity_pattern);
+  DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),
+                                                  dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, dynamic_sparsity_pattern);
 
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from (compressed_sparsity_pattern);
+  sparsity_pattern.copy_from (dynamic_sparsity_pattern);
 
   std::ofstream out ("sparsity_pattern.2");
   sparsity_pattern.print_gnuplot (out);

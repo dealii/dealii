@@ -55,17 +55,17 @@ int main()
   std::vector<unsigned int> dofs_per_block(fe.n_blocks());
   DoFTools::count_dofs_per_block(dof, dofs_per_block);
 
-  BlockDynamicSparsityPattern c_sparsity(fe.n_blocks(), fe.n_blocks());
+  BlockDynamicSparsityPattern dsp(fe.n_blocks(), fe.n_blocks());
   for (unsigned int i=0; i<fe.n_blocks(); ++i)
     for (unsigned int j=0; j<fe.n_blocks(); ++j)
-      c_sparsity.block(i,j).reinit(dofs_per_block[i],dofs_per_block[j]);
-  c_sparsity.collect_sizes();
+      dsp.block(i,j).reinit(dofs_per_block[i],dofs_per_block[j]);
+  dsp.collect_sizes();
 
-  DoFTools::make_sparsity_pattern(dof, c_sparsity);
-  constraints.condense(c_sparsity);
+  DoFTools::make_sparsity_pattern(dof, dsp);
+  constraints.condense(dsp);
 
   BlockSparsityPattern sparsity;
-  sparsity.copy_from(c_sparsity);
+  sparsity.copy_from(dsp);
 
   unsigned int ig = 0;
   for (unsigned int ib=0; ib<fe.n_blocks(); ++ib)

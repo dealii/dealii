@@ -364,19 +364,19 @@ namespace Step20
     // <code>n_u</code> and <code>n_p</code>, which hold the number of velocity
     // and pressure variables. In the second step we have to instruct the block
     // system to update its knowledge about the sizes of the blocks it manages;
-    // this happens with the <code>c_sparsity.collect_sizes ()</code> call.
-    BlockDynamicSparsityPattern c_sparsity(2, 2);
-    c_sparsity.block(0, 0).reinit (n_u, n_u);
-    c_sparsity.block(1, 0).reinit (n_p, n_u);
-    c_sparsity.block(0, 1).reinit (n_u, n_p);
-    c_sparsity.block(1, 1).reinit (n_p, n_p);
-    c_sparsity.collect_sizes ();
-    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+    // this happens with the <code>dsp.collect_sizes ()</code> call.
+    BlockDynamicSparsityPattern dsp(2, 2);
+    dsp.block(0, 0).reinit (n_u, n_u);
+    dsp.block(1, 0).reinit (n_p, n_u);
+    dsp.block(0, 1).reinit (n_u, n_p);
+    dsp.block(1, 1).reinit (n_p, n_p);
+    dsp.collect_sizes ();
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
 
     // We use the compressed block sparsity pattern in the same way as the
     // non-block version to create the sparsity pattern and then the system
     // matrix:
-    sparsity_pattern.copy_from(c_sparsity);
+    sparsity_pattern.copy_from(dsp);
     system_matrix.reinit (sparsity_pattern);
 
     // Then we have to resize the solution and right hand side vectors in

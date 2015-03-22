@@ -531,10 +531,10 @@ namespace Step7
                                              hanging_node_constraints);
     hanging_node_constraints.close ();
 
-    DynamicSparsityPattern csp (dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, csp);
-    hanging_node_constraints.condense (csp);
-    sparsity_pattern.copy_from (csp);
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    hanging_node_constraints.condense (dsp);
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit (sparsity_pattern);
 

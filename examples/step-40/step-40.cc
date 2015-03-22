@@ -315,18 +315,18 @@ namespace Step40
     // entries that will exist in that part of the finite element matrix that
     // it will own. The final step is to initialize the matrix with the
     // sparsity pattern.
-    DynamicSparsityPattern csp (locally_relevant_dofs);
+    DynamicSparsityPattern dsp (locally_relevant_dofs);
 
-    DoFTools::make_sparsity_pattern (dof_handler, csp,
+    DoFTools::make_sparsity_pattern (dof_handler, dsp,
                                      constraints, false);
-    SparsityTools::distribute_sparsity_pattern (csp,
+    SparsityTools::distribute_sparsity_pattern (dsp,
                                                 dof_handler.n_locally_owned_dofs_per_processor(),
                                                 mpi_communicator,
                                                 locally_relevant_dofs);
 
     system_matrix.reinit (locally_owned_dofs,
                           locally_owned_dofs,
-                          csp,
+                          dsp,
                           mpi_communicator);
   }
 

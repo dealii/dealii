@@ -344,9 +344,9 @@ void Step6<dim>::setup_system ()
   // constraints after assembling, we would have to pass <code>true</code>
   // instead because then we would first write into these locations only to
   // later set them to zero again during condensation.
-  DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
+  DynamicSparsityPattern dsp(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler,
-                                  c_sparsity,
+                                  dsp,
                                   constraints,
                                   /*keep_constrained_dofs = */ false);
 
@@ -354,7 +354,7 @@ void Step6<dim>::setup_system ()
   // regularly assembling the matrix and those that were introduced by
   // eliminating constraints). We can thus copy our intermediate object to the
   // sparsity pattern:
-  sparsity_pattern.copy_from(c_sparsity);
+  sparsity_pattern.copy_from(dsp);
 
   // Finally, the so-constructed sparsity pattern serves as the basis on top
   // of which we will create the sparse matrix:

@@ -212,10 +212,10 @@ namespace Step27
                                               constraints);
     constraints.close ();
 
-    DynamicSparsityPattern csp (dof_handler.n_dofs(),
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
                                 dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
-    sparsity_pattern.copy_from (csp);
+    DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit (sparsity_pattern);
   }

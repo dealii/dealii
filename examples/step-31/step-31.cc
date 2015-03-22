@@ -958,14 +958,14 @@ namespace Step31
     {
       stokes_matrix.clear ();
 
-      BlockDynamicSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern dsp (2,2);
 
-      csp.block(0,0).reinit (n_u, n_u);
-      csp.block(0,1).reinit (n_u, n_p);
-      csp.block(1,0).reinit (n_p, n_u);
-      csp.block(1,1).reinit (n_p, n_p);
+      dsp.block(0,0).reinit (n_u, n_u);
+      dsp.block(0,1).reinit (n_u, n_p);
+      dsp.block(1,0).reinit (n_p, n_u);
+      dsp.block(1,1).reinit (n_p, n_p);
 
-      csp.collect_sizes ();
+      dsp.collect_sizes ();
 
       Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
@@ -976,10 +976,10 @@ namespace Step31
           else
             coupling[c][d] = DoFTools::none;
 
-      DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
+      DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, dsp,
                                        stokes_constraints, false);
 
-      stokes_matrix.reinit (csp);
+      stokes_matrix.reinit (dsp);
     }
 
     {
@@ -987,14 +987,14 @@ namespace Step31
       Mp_preconditioner.reset ();
       stokes_preconditioner_matrix.clear ();
 
-      BlockDynamicSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern dsp (2,2);
 
-      csp.block(0,0).reinit (n_u, n_u);
-      csp.block(0,1).reinit (n_u, n_p);
-      csp.block(1,0).reinit (n_p, n_u);
-      csp.block(1,1).reinit (n_p, n_p);
+      dsp.block(0,0).reinit (n_u, n_u);
+      dsp.block(0,1).reinit (n_u, n_p);
+      dsp.block(1,0).reinit (n_p, n_u);
+      dsp.block(1,1).reinit (n_p, n_p);
 
-      csp.collect_sizes ();
+      dsp.collect_sizes ();
 
       Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
       for (unsigned int c=0; c<dim+1; ++c)
@@ -1004,10 +1004,10 @@ namespace Step31
           else
             coupling[c][d] = DoFTools::none;
 
-      DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, csp,
+      DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, dsp,
                                        stokes_constraints, false);
 
-      stokes_preconditioner_matrix.reinit (csp);
+      stokes_preconditioner_matrix.reinit (dsp);
     }
 
     // The creation of the temperature matrix (or, rather, matrices, since we
@@ -1027,11 +1027,11 @@ namespace Step31
       temperature_stiffness_matrix.clear ();
       temperature_matrix.clear ();
 
-      DynamicSparsityPattern csp (n_T, n_T);
-      DoFTools::make_sparsity_pattern (temperature_dof_handler, csp,
+      DynamicSparsityPattern dsp (n_T, n_T);
+      DoFTools::make_sparsity_pattern (temperature_dof_handler, dsp,
                                        temperature_constraints, false);
 
-      temperature_matrix.reinit (csp);
+      temperature_matrix.reinit (dsp);
       temperature_mass_matrix.reinit (temperature_matrix);
       temperature_stiffness_matrix.reinit (temperature_matrix);
     }

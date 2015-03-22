@@ -470,10 +470,10 @@ namespace Step51
     // to the number of dofs on a face, when copying this into the final
     // sparsity pattern.
     {
-      DynamicSparsityPattern csp (dof_handler.n_dofs());
-      DoFTools::make_sparsity_pattern (dof_handler, csp,
+      DynamicSparsityPattern dsp (dof_handler.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler, dsp,
                                        constraints, false);
-      sparsity_pattern.copy_from(csp, fe.dofs_per_face);
+      sparsity_pattern.copy_from(dsp, fe.dofs_per_face);
     }
     system_matrix.reinit (sparsity_pattern);
   }

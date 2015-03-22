@@ -522,20 +522,20 @@ namespace Step22
     // in step-11 and step-18.
     //
     // All this is done inside a new scope, which
-    // means that the memory of <code>csp</code> will be released once the
+    // means that the memory of <code>dsp</code> will be released once the
     // information has been copied to <code>sparsity_pattern</code>.
     {
-      BlockDynamicSparsityPattern csp (2,2);
+      BlockDynamicSparsityPattern dsp (2,2);
 
-      csp.block(0,0).reinit (n_u, n_u);
-      csp.block(1,0).reinit (n_p, n_u);
-      csp.block(0,1).reinit (n_u, n_p);
-      csp.block(1,1).reinit (n_p, n_p);
+      dsp.block(0,0).reinit (n_u, n_u);
+      dsp.block(1,0).reinit (n_p, n_u);
+      dsp.block(0,1).reinit (n_u, n_p);
+      dsp.block(1,1).reinit (n_p, n_p);
 
-      csp.collect_sizes();
+      dsp.collect_sizes();
 
-      DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
-      sparsity_pattern.copy_from (csp);
+      DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
+      sparsity_pattern.copy_from (dsp);
     }
 
     // Finally, the system matrix, solution and right hand side are created

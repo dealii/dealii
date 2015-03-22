@@ -44,7 +44,7 @@
 #include <deal.II/numerics/matrix_tools.h>
 
 // Just this one is new: it declares a class
-// <code>DynamicSparsityPattern</code>, which we will use and explain
+// DynamicSparsityPattern, which we will use and explain
 // further down below.
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
@@ -202,7 +202,7 @@ namespace Step11
     //
     // Since this can be so difficult that no reasonable answer can be given
     // that allows allocation of only a reasonable amount of memory, there is
-    // a class <code>DynamicSparsityPattern</code>, that can help us out
+    // a class DynamicSparsityPattern, that can help us out
     // here. It does not require that we know in advance how many entries rows
     // could have, but allows just about any length. It is thus significantly
     // more flexible in case you do not have good estimates of row lengths,
@@ -215,15 +215,15 @@ namespace Step11
     // pattern due to the differential operator, then condense it with the
     // constraints object which adds those positions in the sparsity pattern
     // that are required for the elimination of the constraint.
-    DynamicSparsityPattern csp (dof_handler.n_dofs(),
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
                                 dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, csp);
-    mean_value_constraints.condense (csp);
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    mean_value_constraints.condense (dsp);
 
     // Finally, once we have the full pattern, we can initialize an object of
     // type <code>SparsityPattern</code> from it and in turn initialize the
     // matrix with it. Note that this is actually necessary, since the
-    // <code>DynamicSparsityPattern</code> is so inefficient compared to
+    // DynamicSparsityPattern is so inefficient compared to
     // the <code>SparsityPattern</code> class due to the more flexible data
     // structures it has to use, that we can impossibly base the sparse matrix
     // class on it, but rather need an object of type
@@ -236,7 +236,7 @@ namespace Step11
     // compressed object right from the start, to which you cannot add new
     // entries anymore. The <code>compress</code> call is therefore implicit
     // in the <code>copy_from</code> call.
-    sparsity_pattern.copy_from (csp);
+    sparsity_pattern.copy_from (dsp);
     system_matrix.reinit (sparsity_pattern);
   }
 

@@ -270,9 +270,9 @@ void Step5<dim>::setup_system ()
             << dof_handler.n_dofs()
             << std::endl;
 
-  DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
-  sparsity_pattern.copy_from(c_sparsity);
+  DynamicSparsityPattern dsp(dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, dsp);
+  sparsity_pattern.copy_from(dsp);
 
   system_matrix.reinit (sparsity_pattern);
 

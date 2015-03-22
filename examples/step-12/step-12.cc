@@ -222,9 +222,9 @@ namespace Step12
     // To build the sparsity pattern for DG discretizations, we can call the
     // function analogue to DoFTools::make_sparsity_pattern, which is called
     // DoFTools::make_flux_sparsity_pattern:
-    DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_flux_sparsity_pattern (dof_handler, c_sparsity);
-    sparsity_pattern.copy_from(c_sparsity);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
+    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp);
+    sparsity_pattern.copy_from(dsp);
 
     // Finally, we set up the structure of all components of the linear
     // system.

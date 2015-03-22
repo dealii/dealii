@@ -180,14 +180,14 @@ namespace Step45
     // Then we create the sparsity pattern and the system matrix and
     // initialize the solution and right-hand side vectors. This is again as
     // in step-3 or step-6, for example:
-    DynamicSparsityPattern c_sparsity_pattern (dof_handler.n_dofs(),
-                                               dof_handler.n_dofs());
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler,
-                                     c_sparsity_pattern,
+                                     dsp,
                                      constraints,
                                      false);
-    c_sparsity_pattern.compress ();
-    sparsity_pattern.copy_from (c_sparsity_pattern);
+    dsp.compress ();
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit (sparsity_pattern);
     system_rhs.reinit (dof_handler.n_dofs());

@@ -553,12 +553,12 @@ namespace Step9
                                              hanging_node_constraints);
     hanging_node_constraints.close ();
 
-    DynamicSparsityPattern csp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler,
-                                    csp,
+                                    dsp,
                                     hanging_node_constraints,
                                     /*keep_constrained_dofs = */ true);
-    sparsity_pattern.copy_from (csp);
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit (sparsity_pattern);
 

@@ -502,9 +502,9 @@ namespace Step39
     // not know the row sizes in advance, we first fill a temporary
     // DynamicSparsityPattern object and copy it to the regular
     // SparsityPattern once it is complete.
-    DynamicSparsityPattern c_sparsity(n_dofs);
-    DoFTools::make_flux_sparsity_pattern(dof_handler, c_sparsity);
-    sparsity.copy_from(c_sparsity);
+    DynamicSparsityPattern dsp(n_dofs);
+    DoFTools::make_flux_sparsity_pattern(dof_handler, dsp);
+    sparsity.copy_from(dsp);
     matrix.reinit(sparsity);
 
     const unsigned int n_levels = triangulation.n_levels();
@@ -529,9 +529,9 @@ namespace Step39
       {
         // These are roughly the same lines as above for the global matrix,
         // now for each level.
-        DynamicSparsityPattern c_sparsity(dof_handler.n_dofs(level));
-        MGTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, level);
-        mg_sparsity[level].copy_from(c_sparsity);
+        DynamicSparsityPattern dsp(dof_handler.n_dofs(level));
+        MGTools::make_flux_sparsity_pattern(dof_handler, dsp, level);
+        mg_sparsity[level].copy_from(dsp);
         mg_matrix[level].reinit(mg_sparsity[level]);
 
         // Additionally, we need to initialize the transfer matrices at the
@@ -540,10 +540,10 @@ namespace Step39
         // object on level 0.
         if (level>0)
           {
-            DynamicSparsityPattern ci_sparsity;
-            ci_sparsity.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
-            MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
-            mg_sparsity_dg_interface[level].copy_from(ci_sparsity);
+            DynamicSparsityPattern dsp;
+            dsp.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
+            MGTools::make_flux_sparsity_pattern_edge(dof_handler, dsp, level);
+            mg_sparsity_dg_interface[level].copy_from(dsp);
             mg_matrix_dg_up[level].reinit(mg_sparsity_dg_interface[level]);
             mg_matrix_dg_down[level].reinit(mg_sparsity_dg_interface[level]);
           }

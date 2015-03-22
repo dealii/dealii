@@ -249,12 +249,12 @@ namespace Step26
                                              constraints);
     constraints.close();
 
-    DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler,
-                                    c_sparsity,
+                                    dsp,
                                     constraints,
                                     /*keep_constrained_dofs = */ true);
-    sparsity_pattern.copy_from(c_sparsity);
+    sparsity_pattern.copy_from(dsp);
 
     mass_matrix.reinit(sparsity_pattern);
     laplace_matrix.reinit(sparsity_pattern);

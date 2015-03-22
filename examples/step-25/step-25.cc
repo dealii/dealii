@@ -307,9 +307,9 @@ namespace Step25
               << dof_handler.n_dofs()
               << std::endl;
 
-    DynamicSparsityPattern csp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, csp);
-    sparsity_pattern.copy_from (csp);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    sparsity_pattern.copy_from (dsp);
 
     system_matrix.reinit  (sparsity_pattern);
     mass_matrix.reinit    (sparsity_pattern);

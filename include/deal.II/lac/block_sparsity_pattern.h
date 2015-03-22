@@ -49,15 +49,15 @@ namespace TrilinosWrappers
 
 /**
  * This is the base class for block versions of the sparsity pattern and
- * compressed sparsity pattern classes. It has not much functionality, but
- * only administrates an array of sparsity pattern objects and delegates work
- * to them. It has mostly the same interface as has the SparsityPattern,
- * CompressedSparsityPattern, and CompressedSetSparsityPattern classes, and
- * simply transforms calls to its member functions to calls to the respective
- * member functions of the member sparsity patterns.
+ * dynamic sparsity pattern classes. It has not much functionality, but only
+ * administrates an array of sparsity pattern objects and delegates work to
+ * them. It has mostly the same interface as has the SparsityPattern, and
+ * DynamicSparsityPattern, and simply transforms calls to its member functions
+ * to calls to the respective member functions of the member sparsity
+ * patterns.
  *
  * The largest difference between the SparsityPattern and
- * CompressedSparsityPattern classes and this class is that mostly, the
+ * DynamicSparsityPattern classes and this class is that mostly, the
  * matrices have different properties and you will want to work on the blocks
  * making up the matrix rather than the whole matrix. You can access the
  * different blocks using the <tt>block(row,col)</tt> function.
@@ -469,13 +469,14 @@ public:
  * the use of block indices causes some additional complications, we give a
  * short example.
  *
- * @dontinclude compressed_block_sparsity_pattern.cc
+ * @dontinclude block_dynamic_sparsity_pattern.cc
  *
  * After the the DoFHandler <tt>dof</tt> and the ConstraintMatrix
  * <tt>constraints</tt> have been set up with a system element, we must count
  * the degrees of freedom in each matrix block:
  *
- * @skipline dofs_per_block @until count
+ * @skipline dofs_per_block
+ * @until count
  *
  * Now, we are ready to set up the BlockDynamicSparsityPattern.
  *

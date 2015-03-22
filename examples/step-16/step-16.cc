@@ -277,8 +277,8 @@ namespace Step16
                   ? ")" : ", ");
     deallog << std::endl;
 
-    DynamicSparsityPattern csp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, csp);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
 
     solution.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
@@ -296,8 +296,8 @@ namespace Step16
                                               constraints);
     constraints.close ();
     hanging_node_constraints.close ();
-    constraints.condense (csp);
-    sparsity_pattern.copy_from (csp);
+    constraints.condense (dsp);
+    sparsity_pattern.copy_from (dsp);
     system_matrix.reinit (sparsity_pattern);
 
     // The multigrid constraints have to be initialized. They need to know
@@ -343,11 +343,11 @@ namespace Step16
     // matrices.
     for (unsigned int level=0; level<n_levels; ++level)
       {
-        DynamicSparsityPattern csp (dof_handler.n_dofs(level),
+        DynamicSparsityPattern dsp (dof_handler.n_dofs(level),
                                     dof_handler.n_dofs(level));
-        MGTools::make_sparsity_pattern(dof_handler, csp, level);
+        MGTools::make_sparsity_pattern(dof_handler, dsp, level);
 
-        mg_sparsity_patterns[level].copy_from (csp);
+        mg_sparsity_patterns[level].copy_from (dsp);
 
         mg_matrices[level].reinit(mg_sparsity_patterns[level]);
         mg_interface_in[level].reinit(mg_sparsity_patterns[level]);

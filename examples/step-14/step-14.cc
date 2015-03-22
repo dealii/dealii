@@ -711,11 +711,13 @@ namespace Step14
         = &DoFTools::make_hanging_node_constraints;
 
       // Start a side task then continue on the main thread
-      Threads::Task<> side_task(std_cxx11::bind(mhnc_p,std_cxx11::cref(dof_handler),
-                                                std_cxx11::ref(hanging_node_constraints)));
+      Threads::Task<> side_task
+        = Threads::new_task (mhnc_p,
+                             dof_handler,
+                             hanging_node_constraints);
 
-      DynamicSparsityPattern csp(dof_handler.n_dofs(), dof_handler.n_dofs());
-      DoFTools::make_sparsity_pattern (dof_handler, csp);
+      DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler, dsp);
 
 
 
@@ -723,8 +725,8 @@ namespace Step14
       side_task.join();
 
       hanging_node_constraints.close ();
-      hanging_node_constraints.condense (csp);
-      sparsity_pattern.copy_from(csp);
+      hanging_node_constraints.condense (dsp);
+      sparsity_pattern.copy_from(dsp);
 
       matrix.reinit (sparsity_pattern);
       rhs.reinit (dof_handler.n_dofs());

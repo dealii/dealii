@@ -155,7 +155,7 @@ namespace PETScWrappers
        */
       void reinit(const std::vector<IndexSet> &rows,
                   const std::vector<IndexSet> &cols,
-                  const BlockDynamicSparsityPattern &bcsp,
+                  const BlockDynamicSparsityPattern &bdsp,
                   const MPI_Comm &com);
 
 
@@ -163,7 +163,7 @@ namespace PETScWrappers
        * Same as above but for a symmetric structure only.
        */
       void reinit(const std::vector<IndexSet> &sizes,
-                  const BlockDynamicSparsityPattern &bcsp,
+                  const BlockDynamicSparsityPattern &bdsp,
                   const MPI_Comm &com);
 
 

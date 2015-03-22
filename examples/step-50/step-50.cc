@@ -371,9 +371,9 @@ namespace Step50
     constraints.close ();
     hanging_node_constraints.close ();
 
-    DynamicSparsityPattern csp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (mg_dof_handler, csp, constraints);
-    system_matrix.reinit (mg_dof_handler.locally_owned_dofs(), csp, MPI_COMM_WORLD, true);
+    DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (mg_dof_handler, dsp, constraints);
+    system_matrix.reinit (mg_dof_handler.locally_owned_dofs(), dsp, MPI_COMM_WORLD, true);
 
     // The multigrid constraints have to be
     // initialized. They need to know about
@@ -434,18 +434,18 @@ namespace Step50
     // matrices.
     for (unsigned int level=0; level<n_levels; ++level)
       {
-        DynamicSparsityPattern csp(mg_dof_handler.n_dofs(level),
+        DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(level),
                                    mg_dof_handler.n_dofs(level));
-        MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
+        MGTools::make_sparsity_pattern(mg_dof_handler, dsp, level);
 
         mg_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
                                   mg_dof_handler.locally_owned_mg_dofs(level),
-                                  csp,
+                                  dsp,
                                   MPI_COMM_WORLD, true);
 
         mg_interface_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
                                             mg_dof_handler.locally_owned_mg_dofs(level),
-                                            csp,
+                                            dsp,
                                             MPI_COMM_WORLD, true);
       }
   }

@@ -259,12 +259,12 @@ namespace Step47
     constraints.close();
 
 
-    DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
 
-    constraints.condense (c_sparsity);
+    constraints.condense (dsp);
 
-    sparsity_pattern.copy_from(c_sparsity);
+    sparsity_pattern.copy_from(dsp);
 
     system_matrix.reinit (sparsity_pattern);
   }
