@@ -465,7 +465,7 @@ category/test.output
       Comparison file can actually be named in a more complex way than
       just <code>category/test.output</code>:
 <pre>
-category/test.[compiler=&lt;regex&gt;=&lt;yes|no&gt;.]*[with_&lt;feature&gt;=&lt;on|off&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
+category/test.[compiler=&lt;regex&gt;=&lt;yes|no&gt;.]*[with_&lt;feature&gt;=&lt;on|off|&lt;version&gt;&gt;.]*[mpirun=&lt;x&gt;.][expect=&lt;y&gt;.][binary.][&lt;debug|release&gt;.]output
 </pre>
       Normally, a test will be set up so that it runs twice, once in debug and
       once in release configuration.
@@ -507,18 +507,28 @@ category/test.compiler=ICC-14=no.output
     <h3>Restricting tests to feature configurations</h3>
     <p>
       In a similar vain as for build configurations, it is possible to restrict
-      tests to specific feature configurations, e.g.:
+      tests to specific feature configurations, e.g.,
 <pre>
 category/test.with_umfpack=on.output, or
 category/test.with_zlib=off.output
 </pre>
       These tests will only be set up if the specified feature was configured.
       It is possible to provide different output files for disabled/enabled
-      features, e.g.
+      features, e.g.,
 <pre>
 category/test.with_64bit_indices=on.output
 category/test.with_64bit_indices=off.output
 </pre>
+      Furthermore, a test can be restricted to be run only for a specific
+      minimum version of a feature being available being available. For example
+<pre>
+category/test.with_trilinos=11.14.1.output
+</pre>
+      will only be run if (a) trilinos is available, i.e.,
+      <code>DEAL_II_WITH_TRILINOS=TRUE</code> and (b) if trilinos is at least
+      of version 11.14.1.
+    </p>
+    <p>
       It is also possible to declare multiple constraints subsequently, e.g.
 <pre>
 category/test.with_umfpack=on.with_zlib=on.output
