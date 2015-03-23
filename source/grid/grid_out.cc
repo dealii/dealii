@@ -2963,7 +2963,7 @@ namespace internal
               << cell->vertex(1)
               << ' ' << cell->level()
               << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
-              << '\n';
+              << "\n\n";
         }
 
       // make sure everything now gets to

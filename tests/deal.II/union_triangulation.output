@@ -2,14 +2,18 @@
 0.0 2 0
 0.25 2 0
 
+
 0.25 2 0
 0.50 2 0
 
+
 0.50 2 0
 0.75 2 0
 
+
 0.75 2 0
 1.0 2 0
+
 
 DEAL::     Total number of cells        = 7
 DEAL::     Total number of active cells = 4
