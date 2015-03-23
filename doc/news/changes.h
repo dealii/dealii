@@ -395,6 +395,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The various file format writers of class GridOut were not
+  instantiated for 1d meshes in 3d space. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/03/23)
+  </li>
+
   <li> New: GridGenerator::create_triangulation_with_removed_cells() creates
   a new mesh out of an existing one by dropping individual cells.
   <br>

@@ -3368,6 +3368,15 @@ namespace internal
       Assert(false, ExcNotImplemented());
     }
 
+    void write_eps (const dealii::Triangulation<1,3> &,
+                    std::ostream &,
+                    const Mapping<1,3> *,
+                    const GridOutFlags::Eps<2> &,
+                    const GridOutFlags::Eps<3> &)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
     void write_eps (const dealii::Triangulation<2,3> &,
                     std::ostream &,
                     const Mapping<2,3> *,
