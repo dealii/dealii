@@ -109,7 +109,9 @@ The feature \"DEAL_II_${_feature}\" does not exist.\n"
       STRING(REGEX MATCH "([0-9]+(\\.[0-9]+)*)$" _version ${_match})
       IF(NOT "${_version}" STREQUAL "")
 
-        SET(_define_test ${DEAL_II_WITH_${_feature}})
+        IF(NOT ${DEAL_II_WITH_${_feature}})
+          SET(_define_test FALSE)
+        ENDIF()
 
         IF("${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}")
           SET(_define_test FALSE)
