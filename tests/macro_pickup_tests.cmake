@@ -76,29 +76,46 @@ MACRO(DEAL_II_PICKUP_TESTS)
     #
 
     STRING(REGEX MATCHALL
-      "with_([0-9]|[a-z]|_)*=(on|off|yes|no|true|false)" _matches ${_test}
+      "with_([0-9]|[a-z]|_)*=(on|off|yes|no|true|false|[0-9]+(\\.[0-9]+)*)"
+      _matches ${_test}
       )
+
     FOREACH(_match ${_matches})
-      STRING(REGEX REPLACE
-        "^(with_([0-9]|[a-z]|_)*)=(on|off|yes|no|true|false)$" "\\1"
-        _feature ${_match}
-        )
+      STRING(REGEX REPLACE "^with_(([0-9]|[a-z]|_)*)=.*" "\\1" _feature ${_match})
       STRING(TOUPPER ${_feature} _feature)
 
-      # Make sure that _match is a valid feature constraint:
-      IF(DEFINED DEAL_II_${_feature})
-        STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
-        IF( (DEAL_II_${_feature} AND NOT ${_boolean}) OR
-            (NOT DEAL_II_${_feature} AND ${_boolean}) )
-          SET(_define_test FALSE)
-        ENDIF()
-      ELSE()
+      IF(NOT DEFINED DEAL_II_WITH_${_feature})
         MESSAGE(FATAL_ERROR "
 Invalid feature constraint \"${_match}\" in file
 \"${_comparison}\":
 The feature \"DEAL_II_${_feature}\" does not exist.\n"
           )
       ENDIF()
+
+      #
+      # First process simple yes/no feature constraints:
+      #
+      STRING(REGEX MATCH "(on|off|yes|no|true|false)$" _boolean ${_match})
+      IF(NOT "${_boolean}" STREQUAL "")
+        IF( (DEAL_II_WITH_${_feature} AND NOT ${_boolean}) OR
+            (NOT DEAL_II_WITH_${_feature} AND ${_boolean}) )
+          SET(_define_test FALSE)
+        ENDIF()
+      ENDIF()
+
+      #
+      # Process version constraints:
+      #
+      STRING(REGEX MATCH "([0-9]+(\\.[0-9]+)*)$" _version ${_match})
+      IF(NOT "${_version}" STREQUAL "")
+
+        SET(_define_test ${DEAL_II_WITH_${_feature}})
+
+        IF("${DEAL_II_${_feature}_VERSION}" VERSION_LESS "${_version}")
+          SET(_define_test FALSE)
+        ENDIF()
+      ENDIF()
+
     ENDFOREACH()
 
     IF(_define_test)
