@@ -482,6 +482,13 @@ BlockDynamicSparsityPattern (const std::vector<IndexSet> &partitioning)
 }
 
 
+BlockDynamicSparsityPattern::
+BlockDynamicSparsityPattern (const BlockIndices &row_indices,
+                             const BlockIndices &col_indices)
+{
+  reinit(row_indices, col_indices);
+}
+
 
 void
 BlockDynamicSparsityPattern::reinit (
@@ -507,6 +514,20 @@ BlockDynamicSparsityPattern::reinit (
       this->block(i,j).reinit(partitioning[i].size(),
                               partitioning[j].size(),
                               partitioning[i]);
+  this->collect_sizes();
+}
+
+void
+BlockDynamicSparsityPattern::reinit (
+  const BlockIndices &row_indices,
+  const BlockIndices &col_indices)
+{
+  BlockSparsityPatternBase<DynamicSparsityPattern>::reinit(row_indices.size(),
+                                                           col_indices.size());
+  for (size_type i=0; i<row_indices.size(); ++i)
+    for (size_type j=0; j<col_indices.size(); ++j)
+      this->block(i,j).reinit(row_indices.block_size(i),
+                              col_indices.block_size(j));
   this->collect_sizes();
 }
 
