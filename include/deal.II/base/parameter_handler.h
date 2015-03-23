@@ -1684,9 +1684,17 @@ public:
    *   in the current section that the alias should refer to.
    * @param alias_name An alternate name for the parameter referenced
    *   by the first argument.
+   * @param alias_is_deprecated If true, mark the alias as deprecated.
+   *   This will then be listed in the description of the alias if you call
+   *   print_parameters(), and you will get a warning on the screen
+   *   when reading an input file that contains this deprecated alias.
+   *   The purpose of this argument is to be able to allow the use of
+   *   an old name for a parameter (see above) but make it clear that
+   *   this old name will eventually be removed.
    */
   void declare_alias (const std::string &existing_entry_name,
-                      const std::string &alias_name);
+                      const std::string &alias_name,
+                      const bool         alias_is_deprecated = false);
 
   /**
    * Enter a subsection. If it does not yet exist, create it.

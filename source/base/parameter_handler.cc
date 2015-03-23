@@ -1636,7 +1636,8 @@ ParameterHandler::declare_entry (const std::string           &entry,
 
 void
 ParameterHandler::declare_alias(const std::string &existing_entry_name,
-                                const std::string &alias_name)
+                                const std::string &alias_name,
+                                const bool         alias_is_deprecated)
 {
   // see if there is anything to refer to already
   Assert (entries->get_optional<std::string>(get_current_full_path(existing_entry_name)),
@@ -1676,6 +1677,8 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
 
   entries->put (get_current_full_path(alias_name) + path_separator + "alias",
                 existing_entry_name);
+  entries->put (get_current_full_path(alias_name) + path_separator + "deprecation_status",
+                (alias_is_deprecated ? "true" : "false"));
 }
 
 
@@ -2224,9 +2227,15 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 out << demangle(p->first)
                     << "}\n";
 
-                // finally print value and default
+                // finally print alias and indicate if it is deprecated
                 out << "This parameter is an alias for the parameter ``\\texttt{"
-                    << alias << "}''.\n\n"
+                    << alias << "}''."
+                    << (p->second.get<std::string>("deprecation_status") == "true"
+                        ?
+                        " Its use is deprecated."
+                        :
+                        "")
+                    << "\n\n"
                     << std::endl;
               }
           out << "\\end{itemize}" << std::endl;
@@ -2586,13 +2595,25 @@ ParameterHandler::scan_line (std::string         line,
       std::string entry_name  (line, 0, line.find('='));
       std::string entry_value (line, line.find('=')+1, std::string::npos);
 
-      // resolve aliases before we look up the entry
+      // resolve aliases before we look up the entry. if necessary, print
+      // a warning that the alias is deprecated
       std::string path = get_current_full_path(entry_name);
       if (entries->get_optional<std::string>(path + path_separator + "alias"))
-        path = get_current_full_path(entries->get<std::string>(path + path_separator + "alias"));
+        {
+          if (entries->get<std::string>(path + path_separator + "deprecation_status") == "true")
+            {
+              std::cerr << "Warning in line <" << lineno
+                        << "> of file <" << input_filename
+                        << ">: You are using the deprecated spelling <"
+                        << entry_name
+                        << "> of the parameter <"
+                        << entries->get<std::string>(path + path_separator + "alias")
+                        << ">." << std::endl;
+            }
+          path = get_current_full_path(entries->get<std::string>(path + path_separator + "alias"));
+        }
 
-      // assert that the entry is indeed
-      // declared
+      // assert that the entry is indeed declared
       if (entries->get_optional<std::string> (path + path_separator + "value"))
         {
           // if entry was declared:
