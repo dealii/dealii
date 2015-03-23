@@ -532,6 +532,14 @@ public:
   BlockDynamicSparsityPattern (const std::vector<IndexSet> &partitioning);
 
   /**
+   * Initialize the pattern with two BlockIndices for the block structures of
+   * matrix rows and columns.
+   */
+  BlockDynamicSparsityPattern (const BlockIndices &row_indices,
+                               const BlockIndices &col_indices);
+
+
+  /**
    * Resize the pattern to a tensor product of matrices with dimensions
    * defined by the arguments.
    *
@@ -547,6 +555,13 @@ public:
    * IndexSet. See the constructor taking a vector of IndexSets for details.
    */
   void reinit(const std::vector<IndexSet> &partitioning);
+
+  /**
+   * Resize the matrix to a tensor product of matrices with dimensions defined
+   * by the arguments. The two BlockIndices objects must be initialized and
+   * the sparsity pattern will have the same block structure afterwards.
+   */
+  void reinit (const BlockIndices &row_indices, const BlockIndices &col_indices);
 
   /**
    * Access to column number field. Return the column number of the @p index
