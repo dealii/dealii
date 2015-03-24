@@ -294,9 +294,11 @@ public:
   /**
    * Exception.
    */
-  DeclException1 (ExcInvalidTensorIndex,
+  DeclException1 (ExcInvalidTensorContractionIndex,
                   int,
-                  << "Invalid tensor index " << arg1);
+                  << "You have requested contraction of tensors over index "
+                  << arg1
+                  << ", but this is not possible for tensors of the current type.");
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
@@ -1023,7 +1025,7 @@ void contract (Tensor<2,dim,Number>       &dest,
 
         default:
           Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
         };
       break;
     case 2:
@@ -1044,12 +1046,12 @@ void contract (Tensor<2,dim,Number>       &dest,
 
         default:
           Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
         };
       break;
 
     default:
-      Assert (false, (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index1)));
+      Assert (false, (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
     };
 }
 
@@ -1097,7 +1099,7 @@ void contract (Tensor<2,dim,Number>       &dest,
 
     default:
       Assert (false,
-              (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index1)));
+              (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
     };
 }
 
@@ -1166,7 +1168,7 @@ void contract (Tensor<3,dim,Number>       &dest,
           break;
         default:
           Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
         }
 
       break;
@@ -1189,7 +1191,7 @@ void contract (Tensor<3,dim,Number>       &dest,
           break;
         default:
           Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
         }
 
       break;
@@ -1212,13 +1214,13 @@ void contract (Tensor<3,dim,Number>       &dest,
           break;
         default:
           Assert (false,
-                  (typename Tensor<2,dim,Number>::ExcInvalidTensorIndex (index2)));
+                  (typename Tensor<2,dim,Number>::ExcInvalidTensorContractionIndex (index2)));
         }
 
       break;
     default:
       Assert (false,
-              (typename Tensor<3,dim,Number>::ExcInvalidTensorIndex (index1)));
+              (typename Tensor<3,dim,Number>::ExcInvalidTensorContractionIndex (index1)));
     }
 }
 

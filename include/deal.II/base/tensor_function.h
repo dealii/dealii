@@ -102,19 +102,6 @@ public:
    */
   virtual void gradient_list (const std::vector<Point<dim> >   &points,
                               std::vector<gradient_type> &gradients) const;
-
-  /**
-   * Exception
-   */
-  DeclException0 (ExcPureFunctionCalled);
-  /**
-   * Exception
-   */
-  DeclException2 (ExcVectorHasWrongSize,
-                  int, int,
-                  << "The vector has size " << arg1 << " but should have "
-                  << arg2 << " elements.");
-
 };
 
 

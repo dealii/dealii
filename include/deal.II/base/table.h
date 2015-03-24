@@ -193,7 +193,7 @@ namespace internal
       DeclException3 (ExcIndexRange, int, int, int,
                       << "Index " << N-P+1 << "has a value of "
                       << arg1 << " but needs to be in the range ["
-                      << arg2 << "," << arg3 << "[");
+                      << arg2 << "," << arg3 << "[.");
     private:
       /**
        * Store the data given to the constructor. There are no non-const
