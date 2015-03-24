@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1648,7 +1648,56 @@ public:
                       const std::string           &documentation = std::string());
 
   /**
-   * Enter a subsection; if not yet existent, declare it.
+   * Create an alias for an existing entry. This provides a way to refer
+   * to a parameter in the input file using an alternate name. The
+   * alias will be in the current section, and the referenced entry needs
+   * to be an existing entry in the current section.
+   *
+   * The primary purpose of this function is to allow for a backward
+   * compatible way of changing names in input files of applications
+   * for which backward compatibility is important. This can be
+   * achieved by changing the name of the parameter in the call to
+   * declare_entry(), and then creating an alias that maps the old
+   * name to the new name. This way, old input files can continue
+   * to refer to parameters under the old name, and they will
+   * automatically be mapped to the new parameter name.
+   *
+   * It is valid to reference in a parameter file to the same parameter
+   * multiple times. The value that will ultimately be chosen in such
+   * cases is simply the last value set. This rule also applies to
+   * aliases, where the final value of a parameter is the last value
+   * set either through the current name of the parameter or through
+   * any of its possible multiple aliases. For example, if you have
+   * an input file that looks like
+   * @code
+   *   set parm1       = 1
+   *   set parm1_alias = 2
+   * @endcode
+   * where <code>parm1_alias</code> is an alias declared via
+   * @code
+   *   prm.declare_alias ("parm1", "parm1_alias");
+   * @endcode
+   * then the final value for the parameter called <code>parm1</code>
+   * will be 2, not 1.
+   *
+   * @param existing_entry_name The name of an existing parameter
+   *   in the current section that the alias should refer to.
+   * @param alias_name An alternate name for the parameter referenced
+   *   by the first argument.
+   * @param alias_is_deprecated If true, mark the alias as deprecated.
+   *   This will then be listed in the description of the alias if you call
+   *   print_parameters(), and you will get a warning on the screen
+   *   when reading an input file that contains this deprecated alias.
+   *   The purpose of this argument is to be able to allow the use of
+   *   an old name for a parameter (see above) but make it clear that
+   *   this old name will eventually be removed.
+   */
+  void declare_alias (const std::string &existing_entry_name,
+                      const std::string &alias_name,
+                      const bool         alias_is_deprecated = false);
+
+  /**
+   * Enter a subsection. If it does not yet exist, create it.
    */
   void enter_subsection (const std::string &subsection);
 
@@ -1768,7 +1817,7 @@ public:
    * <tt>ParameterHandler</tt> in order to get a valid XML document and all
    * subsections under it.
    *
-   * In <tt>Text</tt> format, the output contains the same information but in
+   * In <tt>LaTeX</tt> format, the output contains the same information but in
    * a format so that the resulting file can be input into a latex document
    * such as a manual for the code for which this object handles run-time
    * parameters. The various sections of parameters are then represented by
@@ -1887,12 +1936,6 @@ public:
   DeclException1 (ExcEntryUndeclared,
                   std::string,
                   << "You can't ask for entry <" << arg1 << "> you have not yet declared");
-  /**
-   * Exception
-   */
-  DeclException1 (ExcConversionError,
-                  std::string,
-                  << "Error when trying to convert the following string: " << arg1);
   //@}
 private:
   /**
@@ -1927,11 +1970,6 @@ private:
    * Unmangle a string into its original form.
    */
   static std::string demangle (const std::string &s);
-
-  /**
-   * Return whether a given node is a parameter node or a subsection node.
-   */
-  static bool is_parameter_node (const boost::property_tree::ptree &);
 
   /**
    * Path of presently selected subsections; empty list means top level
