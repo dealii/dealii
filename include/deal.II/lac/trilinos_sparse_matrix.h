@@ -2352,8 +2352,8 @@ namespace TrilinosWrappers
     begin = matrix->RowMap().MinMyGID();
     end = matrix->RowMap().MaxMyGID()+1;
 #else
-    begin = matrix->RowMap().MinMyGID();
-    end = matrix->RowMap().MaxMyGID()+1;
+    begin = matrix->RowMap().MinMyGID64();
+    end = matrix->RowMap().MaxMyGID64()+1;
 #endif
 
     return ((index >= static_cast<size_type>(begin)) &&
