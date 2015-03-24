@@ -395,6 +395,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: TrilinosWrappers::SparseMatrix::local_range() erroneously
+  threw an exception in 64-bit mode. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/03/24)
+  </li>
+
   <li> New: The GridOut::write_gnuplot() function produced output
   for 1d meshes embedded in higher dimensional spaces that was
   invalid in that the lines showing individual cells were connected.
