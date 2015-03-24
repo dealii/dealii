@@ -395,6 +395,22 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The GridOut::write_gnuplot() function produced output
+  for 1d meshes embedded in higher dimensional spaces that was
+  invalid in that the lines showing individual cells were connected.
+  While this is not wrong for singly connected 1d meshes, it leads to wrong
+  results if the domain is not singly connected and not every cell is the
+  right neighbor of the previous cell.
+  <br>
+  (Wolfgang Bangerth, 2015/03/23)
+  </li>
+
+  <li> New: The various file format writers of class GridOut were not
+  instantiated for 1d meshes in 3d space. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, 2015/03/23)
+  </li>
+
   <li> New: GridGenerator::create_triangulation_with_removed_cells() creates
   a new mesh out of an existing one by dropping individual cells.
   <br>

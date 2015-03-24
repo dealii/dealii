@@ -2963,7 +2963,7 @@ namespace internal
               << cell->vertex(1)
               << ' ' << cell->level()
               << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
-              << '\n';
+              << "\n\n";
         }
 
       // make sure everything now gets to
@@ -3362,6 +3362,15 @@ namespace internal
     void write_eps (const dealii::Triangulation<1,2> &,
                     std::ostream &,
                     const Mapping<1,2> *,
+                    const GridOutFlags::Eps<2> &,
+                    const GridOutFlags::Eps<3> &)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+    void write_eps (const dealii::Triangulation<1,3> &,
+                    std::ostream &,
+                    const Mapping<1,3> *,
                     const GridOutFlags::Eps<2> &,
                     const GridOutFlags::Eps<3> &)
     {
