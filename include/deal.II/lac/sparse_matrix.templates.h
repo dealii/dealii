@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1316,9 +1316,12 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 
 namespace
 {
+  // assert that the matrix has no zeros on the diagonal. this is important
+  // for preconditioners such as Jacobi or SSOR
   template <typename number>
-  void check_nonzero_diagonal (const SparseMatrix<number> &matrix)
+  void AssertNoZerosOnDiagonal (const SparseMatrix<number> &matrix)
   {
+#ifdef DEBUG
     for (typename SparseMatrix<number>::size_type row=0; row<matrix.m(); ++row)
       Assert(matrix.diag_element(row) != 0.,
              ExcMessage("There is a zero on the diagonal of this matrix "
@@ -1335,6 +1338,7 @@ namespace
                         "preconditioner. If it is correct that there are "
                         "zeros on the diagonal, then you will have to chose "
                         "a different preconditioner."));
+#endif
   }
 }
 
@@ -1352,7 +1356,7 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   AssertDimension (dst.size(), n());
   AssertDimension (src.size(), n());
 
-  check_nonzero_diagonal(*this);
+  AssertNoZerosOnDiagonal(*this);
 
   const size_type n = src.size();
   somenumber            *dst_ptr = dst.begin();
@@ -1398,7 +1402,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
   AssertDimension (dst.size(), n());
   AssertDimension (src.size(), n());
 
-  check_nonzero_diagonal(*this);
+  AssertNoZerosOnDiagonal(*this);
 
   const size_type    n            = src.size();
   const std::size_t *rowstart_ptr = &cols->rowstart[0];
@@ -1550,7 +1554,7 @@ SparseMatrix<number>::SOR (Vector<somenumber> &dst,
   AssertDimension (m(), n());
   AssertDimension (dst.size(), n());
 
-  check_nonzero_diagonal(*this);
+  AssertNoZerosOnDiagonal(*this);
 
   for (size_type row=0; row<m(); ++row)
     {
@@ -1578,7 +1582,7 @@ SparseMatrix<number>::TSOR (Vector<somenumber> &dst,
   AssertDimension (m(), n());
   AssertDimension (dst.size(), n());
 
-  check_nonzero_diagonal(*this);
+  AssertNoZerosOnDiagonal(*this);
 
   size_type row=m()-1;
   while (true)
@@ -1616,7 +1620,7 @@ SparseMatrix<number>::PSOR (Vector<somenumber> &dst,
   Assert (m() == inverse_permutation.size(),
           ExcDimensionMismatch(m(), inverse_permutation.size()));
 
-  check_nonzero_diagonal(*this);
+  AssertNoZerosOnDiagonal(*this);
 
   for (size_type urow=0; urow<m(); ++urow)
     {
@@ -1655,7 +1659,7 @@ SparseMatrix<number>::TPSOR (Vector<somenumber> &dst,
   Assert (m() == inverse_permutation.size(),
           ExcDimensionMismatch(m(), inverse_permutation.size()));
 
-  check_nonzero_diagonal(*this);
+  AssertNoZerosOnDiagonal(*this);
 
   for (size_type urow=m(); urow != 0;)
     {
@@ -1719,7 +1723,7 @@ SparseMatrix<number>::SOR_step (Vector<somenumber> &v,
   Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
 
-  check_nonzero_diagonal(*this);
+  AssertNoZerosOnDiagonal(*this);
 
   for (size_type row=0; row<m(); ++row)
     {
@@ -1747,7 +1751,7 @@ SparseMatrix<number>::TSOR_step (Vector<somenumber> &v,
   Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
 
-  check_nonzero_diagonal(*this);
+  AssertNoZerosOnDiagonal(*this);
 
   for (int row=m()-1; row>=0; --row)
     {
@@ -1789,7 +1793,7 @@ SparseMatrix<number>::SSOR (Vector<somenumber> &dst,
   AssertDimension (m(), n());
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
-  check_nonzero_diagonal(*this);
+  AssertNoZerosOnDiagonal(*this);
 
   const size_type n = dst.size();
   size_type j;
