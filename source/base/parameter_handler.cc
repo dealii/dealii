@@ -1646,6 +1646,16 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
                       "> that references an entry <"
                       + existing_entry_name +
                       ">, but the latter does not exist."));
+  // then also make sure that what is being referred to is in
+  // fact a parameter (not an alias or subsection)
+  Assert (entries->get_optional<std::string>(get_current_full_path(existing_entry_name) + path_separator + "value"),
+          ExcMessage ("You are trying to declare an alias entry <"
+                      + alias_name +
+                      "> that references an entry <"
+                      + existing_entry_name +
+                      ">, but the latter does not seem to be a "
+                      "parameter declaration."));
+
 
   // now also make sure that if the alias has already been
   // declared, that it is also an alias and refers to the same

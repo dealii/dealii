@@ -1662,8 +1662,8 @@ public:
    * to refer to parameters under the old name, and they will
    * automatically be mapped to the new parameter name.
    *
-   * It is valid to reference in a parameter file to the same parameter
-   * multiple times. The value that will ultimately be chosen in such
+   * It is valid to set the same parameter multiple times in an input file.
+   * The value that will ultimately be chosen in such
    * cases is simply the last value set. This rule also applies to
    * aliases, where the final value of a parameter is the last value
    * set either through the current name of the parameter or through
