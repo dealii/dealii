@@ -11,7 +11,7 @@ For the impatient:
 
 Let's say you've unpacked the .tar.gz file, or cloned the git repository into
 a directory /path/to/dealii/sources. Then configure, compile, and install the
-deal.II library with: 
+deal.II library with:
 
     $ mkdir build
     $ cd build
