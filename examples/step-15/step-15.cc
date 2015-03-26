@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2012 - 2014 by the deal.II authors
+ * Copyright (C) 2012 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -639,8 +639,9 @@ namespace Step15
     //
     // At the beginning of the loop, we do a bit of setup work. In the first
     // go around, we compute the solution on the twice globally refined mesh
-    // after setting up the basic data structures. In all following mesh
-    // refinement loops, the mesh will be refined adaptively.
+    // after setting up the basic data structures and ensuring that the first
+    // Newton iterate already has the correct boundary values. In all
+    // following mesh refinement loops, the mesh will be refined adaptively.
     double previous_res = 0;
     while (first_step || (previous_res>1e-3))
       {
@@ -652,6 +653,8 @@ namespace Step15
 
             setup_system (true);
             set_boundary_values ();
+
+            first_step = false;
           }
         else
           {
@@ -683,7 +686,6 @@ namespace Step15
 
             solve ();
 
-            first_step = false;
             std::cout << "  Residual: "
                       << compute_residual(0)
                       << std::endl;
