@@ -14,7 +14,8 @@
 ## ---------------------------------------------------------------------
 
 #
-# A macro to set up testing and pick up all tests in a test subdirectory.
+# A macro to set up testing and pick up all tests in the current
+# subdirectory.
 #
 # If TEST_PICKUP_REGEX is set, only tests matching the regex will be
 # processed.
@@ -24,8 +25,17 @@
 # command line:
 #
 #     TEST_DIFF
+#       - specifying the executable and command line of the diff command to
+#         use
+#
+#     TEST_LIBRARIES
+#     TEST_LIBRARIES_DEBUG
+#     TEST_LIBRARIES_RELEASE
+#       - specifying additional libraries (and targets) to link against.
+#
 #     TEST_TIME_LIMIT
-#     TEST_PICKUP_REGEX
+#       - specifying the maximal wall clock time in seconds a test is
+#         allowed to run
 #
 # Usage:
 #     DEAL_II_PICKUP_TESTS()
@@ -33,17 +43,15 @@
 
 
 #
-# Used in DEAL_II_PICKUP_TESTS
+# Two very small macros that are used below:
 #
+
 MACRO(SET_IF_EMPTY _variable)
   IF("${${_variable}}" STREQUAL "")
     SET(${_variable} ${ARGN})
   ENDIF()
 ENDMACRO()
 
-#
-# Used in DEAL_II_ADD_TEST
-#
 MACRO(ITEM_MATCHES _var _regex)
   SET(${_var})
   FOREACH (_item ${ARGN})
@@ -63,11 +71,6 @@ MACRO(DEAL_II_PICKUP_TESTS)
       "projects after the inclusion of deal.IIConfig.cmake. It is not "
       "intended for internal use.\n\n"
       )
-  ENDIF()
-
-  IF(NOT DEAL_II_TARGET_CONFIG_INCLUDED)
-    INCLUDE(${DEAL_II_TARGET_CONFIG})
-    SET(DEAL_II_TARGET_CONFIG_INCLUDED TRUE)
   ENDIF()
 
   #

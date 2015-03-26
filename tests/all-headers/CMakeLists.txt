@@ -66,15 +66,7 @@ FOREACH(_header ${_headers})
       ADD_LIBRARY(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc
         ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
         )
-
-      SET_TARGET_PROPERTIES(${_target} PROPERTIES
-        LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-        COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
-        COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-        )
-      SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-        INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
-        )
+      DEAL_II_SETUP_TARGET(${_target} ${_build})
       SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
         COMPILE_DEFINITIONS HEADER=<deal.II/${_header}>
         )

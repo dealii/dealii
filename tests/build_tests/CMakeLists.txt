@@ -70,7 +70,7 @@ FOREACH(_step_full ${_steps})
       FILE(GLOB _files ${_step_full}/*)
       SET(_command)
       FOREACH(_file ${_files})
-        IF(NOT _file MATCHES "/(CMakeCache.txt|CMakeFiles|doc|.svn)")
+        IF(NOT _file MATCHES "/(CMakeCache.txt|CMakeFiles|doc)")
           LIST(APPEND _command
             COMMAND ${CMAKE_COMMAND} -E copy ${_file} ${_step_dir}
             )
