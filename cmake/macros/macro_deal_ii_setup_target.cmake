@@ -21,8 +21,21 @@
 #       DEAL_II_SETUP_TARGET(target)
 #       DEAL_II_SETUP_TARGET(target DEBUG|RELEASE)
 #
-# This appends necessary include directories, linker flags, compile
-# definitions and the deal.II library link interface to the given target.
+# This appends necessary include directories, linker flags, compile flags
+# and compile definitions and the deal.II library link interface to the
+# given target. In particular:
+#
+# INCLUDE_DIRECTORIES is appended with
+#   "${DEAL_II_INCLUDE_DIRS}"
+#
+# COMPILE_FLAGS is appended with
+#   "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_<build type>}"
+#
+# LINK_FLAGS is appended with
+#   "${DEAL_II_LINKER_FLAGS ${DEAL_II_LINKER_FLAGS_<build type>}"
+#
+# COMPILE_DEFINITIONS is appended with
+#   "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_<build type>}"
 #
 # If no "DEBUG" or "RELEASE" keyword is specified after the target, the
 # current CMAKE_BUILD_TYPE determines which compiler and linker flags as
@@ -53,70 +66,49 @@ MACRO(DEAL_II_SETUP_TARGET _target)
   CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
   #
-  # Append include directories, and build-type independent linker flags and
-  # compile definitions
-  #
-  SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-    INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
-    )
-  SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
-    LINK_FLAGS " ${DEAL_II_LINKER_FLAGS}"
-    )
-  SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-    COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS}"
-    )
-
-  #
-  # Append build type dependent flags and definitions.
-  #
   # Every build type that (case insensitively) matches "debug" is
   # considered a debug build:
   #
-  SET(_on_debug_build FALSE)
+  SET(_build "RELEASE")
   STRING(TOLOWER "${CMAKE_BUILD_TYPE}" _cmake_build_type)
   IF("${_cmake_build_type}" MATCHES "debug")
-    SET(_on_debug_build TRUE)
+    SET(_build "DEBUG")
   ENDIF()
 
   #
   # Override _on_debug_build if ${ARGN} is set:
   #
-  IF("${ARGN}" MATCHES "^DEBUG$")
-    SET(_on_debug_build TRUE)
-  ELSEIF ("${ARGN}" MATCHES "^RELEASE$")
-    SET(_on_debug_build FALSE)
+  IF("${ARGN}" MATCHES "^(DEBUG|RELEASE)$")
+    SET(_build "${ARGN}")
   ENDIF()
 
   #
   # We can only append DEBUG link flags and compile definitions if deal.II
   # was built with the Debug or DebugRelease build type. So test for this:
   #
-  IF(_on_debug_build AND DEAL_II_BUILD_TYPE MATCHES "Debug")
-    SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
-      LINK_FLAGS " ${DEAL_II_LINKER_FLAGS_DEBUG}"
-      )
-    SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-      COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS_DEBUG}"
-      )
-  ELSE()
-    SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
-      LINK_FLAGS " ${DEAL_II_LINKER_FLAGS_RELEASE}"
-      )
-    SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-      COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS_RELEASE}"
-      )
+  IF("${_build}" STREQUAL "DEBUG" AND NOT DEAL_II_BUILD_TYPE MATCHES "Debug")
+    SET(_build "RELEASE")
   ENDIF()
+
+  SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+    INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
+    )
+  SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
+    COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+    )
+  SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
+    LINK_FLAGS " ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+    )
+  SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+    COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
+    )
 
   #
   # Set up the link interface:
   #
   GET_PROPERTY(_type TARGET ${_target} PROPERTY TYPE)
   IF(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
-    IF(_on_debug_build AND DEAL_II_BUILD_TYPE MATCHES "Debug")
-      TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET_DEBUG})
-    ELSE()
-      TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET_RELEASE})
-    ENDIF()
+    TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET_${_build}})
   ENDIF()
 
   #
