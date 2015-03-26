@@ -14,17 +14,122 @@
 ## ---------------------------------------------------------------------
 
 #
-# A macro to pick up all tests in a test subdirectory
+# A macro to set up testing and pick up all tests in a test subdirectory.
 #
 # If TEST_PICKUP_REGEX is set, only tests matching the regex will be
 # processed.
+#
+# Furthermore, the macro sets up (if necessary) deal.II, perl, a diff tool
+# and the following variables, that can be overwritten by environment or
+# command line:
+#
+#     TEST_DIFF
+#     TEST_TIME_LIMIT
+#     TEST_PICKUP_REGEX
 #
 # Usage:
 #     DEAL_II_PICKUP_TESTS()
 #
 
+
+#
+# Used in DEAL_II_PICKUP_TESTS
+#
+MACRO(SET_IF_EMPTY _variable)
+  IF("${${_variable}}" STREQUAL "")
+    SET(${_variable} ${ARGN})
+  ENDIF()
+ENDMACRO()
+
+#
+# Used in DEAL_II_ADD_TEST
+#
+MACRO(ITEM_MATCHES _var _regex)
+  SET(${_var})
+  FOREACH (_item ${ARGN})
+    IF("${_item}" MATCHES ${_regex})
+      SET(${_var} TRUE)
+      BREAK()
+    ENDIF()
+  ENDFOREACH()
+ENDMACRO()
+
+
 MACRO(DEAL_II_PICKUP_TESTS)
+
+  IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
+    MESSAGE(FATAL_ERROR
+      "\nDEAL_II_PICKUP_TESTS can only be called in external (test sub-) "
+      "projects after the inclusion of deal.IIConfig.cmake. It is not "
+      "intended for internal use.\n\n"
+      )
+  ENDIF()
+
+  IF(NOT DEAL_II_TARGET_CONFIG_INCLUDED)
+    INCLUDE(${DEAL_II_TARGET_CONFIG})
+    SET(DEAL_II_TARGET_CONFIG_INCLUDED TRUE)
+  ENDIF()
+
+  #
+  # We need perl:
+  #
+
+  FIND_PACKAGE(Perl REQUIRED)
+
+  #
+  # We need a diff tool, preferably numdiff:
+  #
+
+  FIND_PROGRAM(DIFF_EXECUTABLE
+    NAMES diff
+    HINTS ${DIFF_DIR}
+    PATH_SUFFIXES bin
+    )
+
+  FIND_PROGRAM(NUMDIFF_EXECUTABLE
+    NAMES numdiff
+    HINTS ${NUMDIFF_DIR}
+    PATH_SUFFIXES bin
+    )
+
+  MARK_AS_ADVANCED(DIFF_EXECUTABLE NUMDIFF_EXECUTABLE)
+
+  SET_IF_EMPTY(TEST_DIFF "$ENV{TEST_DIFF}")
+  IF("${TEST_DIFF}" STREQUAL "")
+    #
+    # No TEST_DIFF is set, specify one:
+    #
+
+    IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
+      SET(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \\t\\n:<>=,;')
+      IF(DIFF_EXECUTABLE MATCHES "-NOTFOUND")
+        SET(DIFF_EXECUTABLE ${NUMDIFF_EXECUTABLE})
+      ENDIF()
+    ELSEIF(NOT DIFF_EXECUTABLE MATCHES "-NOTFOUND")
+      SET(TEST_DIFF ${DIFF_EXECUTABLE})
+    ELSE()
+      MESSAGE(FATAL_ERROR
+        "Could not find diff or numdiff. One of those are required for running the testsuite.\n"
+        "Please specify TEST_DIFF by hand."
+        )
+    ENDIF()
+  ENDIF()
+
+  SET_IF_EMPTY(TEST_TIME_LIMIT "$ENV{TEST_TIME_LIMIT}")
+  SET_IF_EMPTY(TEST_TIME_LIMIT 600)
+
+  #
+  # Enable testing...
+  #
+
+  ENABLE_TESTING()
+
+  #
+  # ... and finally pick up tests:
+  #
+
   SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
+
 
   GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
