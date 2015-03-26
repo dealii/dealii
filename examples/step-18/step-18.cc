@@ -41,7 +41,7 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -835,60 +835,26 @@ namespace Step18
               cell->face(f)->set_boundary_indicator (3);
           }
 
-    // In order to make sure that new vertices are placed correctly on mesh
-    // refinement, we have to associate objects describing those parts of the
-    // boundary that do not consist of straight parts. Corresponding to the
-    // cylinder shell generator function used above, there are classes that
-    // can be used to describe the geometry of cylinders. We need to use
-    // different objects for the inner and outer parts of the cylinder, with
-    // different radii; the second argument to the constructor indicates the
-    // axis around which the cylinder revolves -- in this case the
-    // z-axis. Note that the boundary objects need to live as long as the
-    // triangulation does; we can achieve this by making the objects static,
-    // which means that they live as long as the program runs:
-    static const CylinderBoundary<dim> inner_cylinder (inner_radius, 2);
-    static const CylinderBoundary<dim> outer_cylinder (outer_radius, 2);
-    // We then attach these two objects to the triangulation, and make them
-    // correspond to boundary indicators 2 and 3:
-    triangulation.set_boundary (2, inner_cylinder);
-    triangulation.set_boundary (3, outer_cylinder);
+    // In order to make sure that new vertices are placed correctly on
+    // mesh refinement, we have to associate objects describing those
+    // parts of the boundary that do not consist of straight
+    // parts. Corresponding to the cylinder shell generator function
+    // used above, there are classes that can be used to describe the
+    // geometry of cylinders. The library implements both boundary
+    // classes as well as manifold classes, where also the interior
+    // part of mesh is refined according to the geometrical
+    // description. For this example, we use a single cylindrical
+    // manifold both for the interior part and for the boundary
+    // parts. Note that the manifold object need to live as long as
+    // the triangulation does; we can achieve this by making the
+    // objects static, which means that they live as long as the
+    // program runs:
+    static const CylindricalManifold<dim> cylindrical_manifold (2);
 
-    // There's one more thing we have to take care of (we should have done so
-    // above already, but for didactic reasons it was more appropriate to
-    // handle it after discussing boundary objects). %Boundary indicators in
-    // deal.II, for mostly historic reasons, serve a dual purpose: they
-    // describe the type of a boundary for other places in a program where
-    // different boundary conditions are implemented; and they describe which
-    // boundary object (as the ones associated above) should be queried when
-    // new boundary points need to be placed upon mesh refinement. In the
-    // prefix to this function, we have discussed the boundary condition
-    // issue, and the boundary geometry issue was mentioned just above. But
-    // there is a case where we have to be careful with geometry: what happens
-    // if a cell is refined that has two faces with different boundary
-    // indicators? For example one at the edges of the cylinder? In that case,
-    // the library wouldn't know where to put new points in the middle of
-    // edges (one of the twelve lines of a hexahedron). In fact, the library
-    // doesn't even care about the boundary indicator of adjacent faces when
-    // refining edges: it considers the boundary indicators associated with
-    // the edges themselves. So what do we want to happen with the edges of
-    // the cylinder shell: they sit on both faces with boundary indicators 2
-    // or 3 (inner or outer shell) and 0 or 1 (for which no boundary objects
-    // have been specified, and for which the library therefore assumes
-    // straight lines). Obviously, we want these lines to follow the curved
-    // shells, so we have to assign all edges along faces with boundary
-    // indicators 2 or 3 these same boundary indicators to make sure they are
-    // refined using the appropriate geometry objects. This is easily done:
-    for (typename Triangulation<dim>::active_face_iterator
-         face=triangulation.begin_active_face();
-         face!=triangulation.end_face(); ++face)
-      if (face->at_boundary())
-        if ((face->boundary_indicator() == 2)
-            ||
-            (face->boundary_indicator() == 3))
-          for (unsigned int edge = 0; edge<GeometryInfo<dim>::lines_per_face;
-               ++edge)
-            face->line(edge)
-            ->set_boundary_indicator (face->boundary_indicator());
+    // We tell the triangulation to reset all its manifold indicators
+    // to 0, and then attach the cylindrical manifold to it:
+    triangulation.set_all_manifold_ids(0);
+    triangulation.set_manifold (0, cylindrical_manifold);
 
     // Once all this is done, we can refine the mesh once globally:
     triangulation.refine_global (1);
