@@ -181,12 +181,16 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           ${_test_name}.cc
           ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
           )
+
         DEAL_II_SETUP_TARGET(${_target} ${_build})
         TARGET_LINK_LIBRARIES(${_target}
           ${TEST_LIBRARIES} ${TEST_LIBRARIES_${_build}}
           )
 
-        SET_TARGET_PROPERTIES(${_target} PROPERTIES
+        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+          COMPILE_DEFINITIONS SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+          )
+        SET_PROPERTY(TARGET ${_target} PROPERTY
           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target}"
           )
 
