@@ -27,7 +27,7 @@
 #
 #
 # Usage:
-#     DEAL_II_ADD_TEST(category test_name comparison_file [ARGN])
+#     DEAL_II_ADD_TEST(category test_name comparison_file)
 #
 # This macro assumes that a source file "./tests/category/<test_name>.cc"
 # as well as the comparison file "<comparison_file>" is available in the
@@ -102,6 +102,10 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
     STRING(TOUPPER ${_expect} _expect)
   ENDIF()
 
+  #
+  # Determine for which build types a test should be defined:
+  #
+
 
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
 
@@ -152,25 +156,19 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
           )
 
-        ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${_test_name}.cc
+        ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL
+          ${_test_name}.cc
           ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
+          )
+        DEAL_II_SETUP_TARGET(${_target} ${_build})
+        TARGET_LINK_LIBRARIES(${_target}
+          ${TARGET_LIBRARIES} ${TARGET_LIBRARIES_${_build}}
           )
 
         SET_TARGET_PROPERTIES(${_target} PROPERTIES
-          LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-          COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
-          COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-          LINKER_LANGUAGE "CXX"
           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target}"
           )
-        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-          INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
-          )
-        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-          COMPILE_DEFINITIONS
-            SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
-          )
-        TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET_${_build}})
+
       ENDIF()
 
       #
