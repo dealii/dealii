@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,7 +16,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
-INCLUDE(${DEAL_II_TARGET_CONFIG})
+
+#
+# Set up test environment (does not pick up anything):
+#
+DEAL_II_PICKUP_TESTS()
 
 #
 # build_tests tests are special:
@@ -66,7 +70,7 @@ FOREACH(_step_full ${_steps})
       FILE(GLOB _files ${_step_full}/*)
       SET(_command)
       FOREACH(_file ${_files})
-        IF(NOT _file MATCHES "/(CMakeCache.txt|CMakeFiles|doc|.svn)")
+        IF(NOT _file MATCHES "/(CMakeCache.txt|CMakeFiles|doc)")
           LIST(APPEND _command
             COMMAND ${CMAKE_COMMAND} -E copy ${_file} ${_step_dir}
             )
@@ -181,7 +185,7 @@ FOREACH(_step_full ${_steps})
         COMMAND ${CMAKE_COMMAND} -DTRGT=${_target} -DTEST=${_test}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${_step_dir}/interrupt_guard
-          -P ${DEAL_II_SOURCE_DIR}/tests/run_test.cmake
+          -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
       SET_TESTS_PROPERTIES(${_test} PROPERTIES

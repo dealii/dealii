@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2014 by the deal.II authors
+## Copyright (C) 2013 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,7 +16,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
-INCLUDE(${DEAL_II_TARGET_CONFIG})
+
+#
+# Set up test environment (does not pick up anything):
+#
+DEAL_II_PICKUP_TESTS()
 
 #
 # Tests for the mesh_converter executable

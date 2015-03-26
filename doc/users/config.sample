@@ -626,10 +626,6 @@
 #   "Library suffix for the release library"
 #   )
 #
-# SET(DEAL_II_CMAKE_MACROS_RELDIR "cmake/macros" CACHE STRING
-#   "Relative installation directory for macros"
-#   )
-#
 # SET(DEAL_II_DOCHTML_RELDIR "doc" CACHE STRING
 #   "Relative installation directory for html documentation"
 #   )

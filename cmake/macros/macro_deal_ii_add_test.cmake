@@ -16,23 +16,13 @@
 #
 # A Macro to set up tests for the testsuite
 #
-# The following variables must be set:
-#
-# TEST_DIFF
-#   - specifying the executable and command line of the diff command to use
-#
-# TEST_TIME_LIMIT
-#   - specifying the maximal wall clock time in seconds a test is allowed
-#     to run
-#
-#
-# Usage:
-#     DEAL_II_ADD_TEST(category test_name comparison_file [ARGN])
-#
 # This macro assumes that a source file "./tests/category/<test_name>.cc"
 # as well as the comparison file "<comparison_file>" is available in the
 # testsuite. The output of compiled source file is compared against the
 # file comparison file.
+#
+# For every deal.II build type (given by the variable DEAL_II_BUILD_TYPES) that
+# is a (case insensitive) substring of CMAKE_BUILD_TYPE a test is defined.
 #
 # This macro gets the following options from the comparison file name (have
 # a look at the testsuite documentation for details):
@@ -40,12 +30,31 @@
 #  - valid build configurations
 #  - expected test stage
 #
+# The following variables must be set:
+#
+#   TEST_DIFF
+#     - specifying the executable and command line of the diff command to use
+#
+#   TEST_TIME_LIMIT
+#     - specifying the maximal wall clock time in seconds a test is allowed
+#       to run
+#
+# The following variables may be set:
+#
+#   TEST_LIBRARIES
+#   TEST_LIBRARIES_DEBUG
+#   TEST_LIBRARIES_RELEASE
+#     - specifying additional libraries (and targets) to link against.
+#
+# Usage:
+#     DEAL_II_ADD_TEST(category test_name comparison_file)
+#
 
 MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
   IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
-      "\nDEAL_II_ADD_TEST can only be called in external test subprojects after "
+      "\nDEAL_II_ADD_TEST can only be called in external (test sub-) projects after "
       "the inclusion of deal.IIConfig.cmake. It is not intended for "
       "internal use.\n\n"
       )
@@ -102,9 +111,25 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
     STRING(TOUPPER ${_expect} _expect)
   ENDIF()
 
-
+  #
+  # Determine for which build types a test should be defined. Every deal.II
+  # build type (given by the list DEAL_II_BUILD_TYPES) that is a  (case
+  # insensitive) substring of CMAKE_BUILD_TYPE:
+  #
+  SET(_build_types "")
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
+    STRING(TOLOWER ${_build} _build_lowercase)
+    STRING(TOLOWER ${CMAKE_BUILD_TYPE} _cmake_build_type)
+    IF("${_cmake_build_type}" MATCHES "${_build_lowercase}")
+      LIST(APPEND _build_types ${_build})
+    ENDIF()
+  ENDFOREACH()
 
+  FOREACH(_build ${_build_types})
+
+    #
+    # Obey "debug" and "release" keywords in the output file:
+    #
     ITEM_MATCHES(_match "${_build}" ${_configuration})
     IF(_match OR "${_configuration}" STREQUAL "")
 
@@ -152,25 +177,19 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
           )
 
-        ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${_test_name}.cc
+        ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL
+          ${_test_name}.cc
           ${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
+          )
+        DEAL_II_SETUP_TARGET(${_target} ${_build})
+        TARGET_LINK_LIBRARIES(${_target}
+          ${TEST_LIBRARIES} ${TEST_LIBRARIES_${_build}}
           )
 
         SET_TARGET_PROPERTIES(${_target} PROPERTIES
-          LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-          COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
-          COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-          LINKER_LANGUAGE "CXX"
           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${_target}"
           )
-        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-          INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
-          )
-        SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-          COMPILE_DEFINITIONS
-            SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
-          )
-        TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET_${_build}})
+
       ENDIF()
 
       #
@@ -191,14 +210,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
               && echo "${_test_full}: RUN failed. ------ Partial output:"
               && cat ${_test_directory}/failing_output
               && exit 1)
-        COMMAND
-          ${PERL_EXECUTABLE} -pi ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
-                                 ${_test_directory}/output
+        COMMAND ${PERL_EXECUTABLE}
+          -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
+          ${_test_directory}/output
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
           ${_target}
-          ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
+          ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
         )
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND
@@ -206,8 +225,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         COMMAND
           touch ${_test_directory}/diff
         COMMAND
-	  # run diff or numdiff (if available) to determine
-	  # whether files are the same. if they are not, output
+          # run diff or numdiff (if available) to determine
+          # whether files are the same. if they are not, output
           # the first few lines of the output of numdiff, followed
           # by the results of regular diff since the latter is just
           # more readable
@@ -256,7 +275,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           -DEXPECT=${_expect}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
-          -P ${DEAL_II_SOURCE_DIR}/tests/run_test.cmake
+          -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )
       SET_TESTS_PROPERTIES(${_test_full} PROPERTIES
