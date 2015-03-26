@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -54,10 +54,8 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
   # equal to Debug or Release or unsupported by the current build type:
   #
   STRING(TOLOWER "${CMAKE_BUILD_TYPE}" _cmake_build_type)
-  STRING(TOLOWER "${DEAL_II_BUILD_TYPE}" _deal_ii_build_type)
 
-  IF( NOT "${_cmake_build_type}" MATCHES "^(debug|release)$"
-      OR NOT _deal_ii_build_type MATCHES "${_cmake_build_type}" )
+  IF(NOT "${_cmake_build_type}" MATCHES "^(debug|release|debugrelease)$")
 
     IF("${DEAL_II_BUILD_TYPE}" STREQUAL "DebugRelease")
       SET(_new_build_type "Debug")
@@ -81,6 +79,7 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
       "Choose the type of build, options are: Debug, Release"
       FORCE
       )
+
   ENDIF()
 
 

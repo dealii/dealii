@@ -16,29 +16,38 @@
 #
 # A Macro to set up tests for the testsuite
 #
-# The following variables must be set:
-#
-# TEST_DIFF
-#   - specifying the executable and command line of the diff command to use
-#
-# TEST_TIME_LIMIT
-#   - specifying the maximal wall clock time in seconds a test is allowed
-#     to run
-#
-#
-# Usage:
-#     DEAL_II_ADD_TEST(category test_name comparison_file)
-#
 # This macro assumes that a source file "./tests/category/<test_name>.cc"
 # as well as the comparison file "<comparison_file>" is available in the
 # testsuite. The output of compiled source file is compared against the
 # file comparison file.
+#
+# For every deal.II build type (given by the variable DEAL_II_BUILD_TYPES) that
+# is a (case insensitive) substring of CMAKE_BUILD_TYPE a test is defined.
 #
 # This macro gets the following options from the comparison file name (have
 # a look at the testsuite documentation for details):
 #  - usage of mpirun and number of simultaneous processes
 #  - valid build configurations
 #  - expected test stage
+#
+# The following variables must be set:
+#
+#   TEST_DIFF
+#     - specifying the executable and command line of the diff command to use
+#
+#   TEST_TIME_LIMIT
+#     - specifying the maximal wall clock time in seconds a test is allowed
+#       to run
+#
+# The following variables may be set:
+#
+#   TEST_LIBRARIES
+#   TEST_LIBRARIES_DEBUG
+#   TEST_LIBRARIES_RELEASE
+#     - specifying additional libraries (and targets) to link against.
+#
+# Usage:
+#     DEAL_II_ADD_TEST(category test_name comparison_file)
 #
 
 MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
@@ -103,12 +112,24 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   ENDIF()
 
   #
-  # Determine for which build types a test should be defined:
+  # Determine for which build types a test should be defined. Every deal.II
+  # build type (given by the list DEAL_II_BUILD_TYPES) that is a  (case
+  # insensitive) substring of CMAKE_BUILD_TYPE:
   #
-
-
+  SET(_build_types "")
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
+    STRING(TOLOWER ${_build} _build_lowercase)
+    STRING(TOLOWER ${CMAKE_BUILD_TYPE} _cmake_build_type)
+    IF("${_cmake_build_type}" MATCHES "${_build_lowercase}")
+      LIST(APPEND _build_types ${_build})
+    ENDIF()
+  ENDFOREACH()
 
+  FOREACH(_build ${_build_types})
+
+    #
+    # Obey "debug" and "release" keywords in the output file:
+    #
     ITEM_MATCHES(_match "${_build}" ${_configuration})
     IF(_match OR "${_configuration}" STREQUAL "")
 
@@ -162,7 +183,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           )
         DEAL_II_SETUP_TARGET(${_target} ${_build})
         TARGET_LINK_LIBRARIES(${_target}
-          ${TARGET_LIBRARIES} ${TARGET_LIBRARIES_${_build}}
+          ${TEST_LIBRARIES} ${TEST_LIBRARIES_${_build}}
           )
 
         SET_TARGET_PROPERTIES(${_target} PROPERTIES
@@ -204,8 +225,8 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         COMMAND
           touch ${_test_directory}/diff
         COMMAND
-	  # run diff or numdiff (if available) to determine
-	  # whether files are the same. if they are not, output
+          # run diff or numdiff (if available) to determine
+          # whether files are the same. if they are not, output
           # the first few lines of the output of numdiff, followed
           # by the results of regular diff since the latter is just
           # more readable
