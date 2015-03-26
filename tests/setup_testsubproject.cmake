@@ -41,7 +41,6 @@ FOREACH(_var
   SET(${_var} ${${_var}})
 ENDFOREACH()
 
-
 #
 # Load all macros:
 #
@@ -49,9 +48,6 @@ FILE(GLOB _macro_files ${DEAL_II_SOURCE_DIR}/cmake/macros/*.cmake)
 FOREACH(_file ${_macro_files})
   INCLUDE(${_file})
 ENDFOREACH()
-
-INCLUDE(${DEAL_II_SOURCE_DIR}/tests/macro_add_test.cmake)
-INCLUDE(${DEAL_II_SOURCE_DIR}/tests/macro_pickup_tests.cmake)
 
 #
 # Pick up values from environment:

@@ -45,7 +45,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
   IF(NOT DEAL_II_PROJECT_CONFIG_INCLUDED)
     MESSAGE(FATAL_ERROR
-      "\nDEAL_II_ADD_TEST can only be called in external test subprojects after "
+      "\nDEAL_II_ADD_TEST can only be called in external (test sub-) projects after "
       "the inclusion of deal.IIConfig.cmake. It is not intended for "
       "internal use.\n\n"
       )
@@ -191,14 +191,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
               && echo "${_test_full}: RUN failed. ------ Partial output:"
               && cat ${_test_directory}/failing_output
               && exit 1)
-        COMMAND
-          ${PERL_EXECUTABLE} -pi ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
-                                 ${_test_directory}/output
+        COMMAND ${PERL_EXECUTABLE}
+          -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
+          ${_test_directory}/output
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
           ${_target}
-          ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
+          ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
         )
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
         COMMAND
@@ -256,7 +256,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           -DEXPECT=${_expect}
           -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}/interrupt_guard.cc
-          -P ${DEAL_II_SOURCE_DIR}/tests/run_test.cmake
+          -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )
       SET_TESTS_PROPERTIES(${_test_full} PROPERTIES

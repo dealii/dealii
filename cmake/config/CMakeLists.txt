@@ -38,7 +38,7 @@ CONFIGURE_FILE( # for binary dir:
 
 ########################################################################
 #                                                                      #
-#              Setup and install the convenience macros:               #
+#                   Setup and install cmake macros:                    #
 #                                                                      #
 ########################################################################
 
@@ -47,12 +47,14 @@ SET(_macros
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_query_git_information.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_add_test.cmake
+  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_pickup_tests.cmake
   )
 FILE(COPY ${_macros}
-  DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_CMAKE_MACROS_RELDIR}
+  DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/macros
   )
 INSTALL(FILES ${_macros}
-  DESTINATION ${DEAL_II_CMAKE_MACROS_RELDIR}
+  DESTINATION ${DEAL_II_SHARE_RELDIR}/macros
   COMPONENT library
   )
 
