@@ -108,7 +108,7 @@ FOREACH(_step_full ${_steps})
       ADD_CUSTOM_COMMAND(OUTPUT ${_step_dir}/configure_output
         COMMAND rm -f ${_step_dir}/failing_configure_output
         COMMAND ${CMAKE_COMMAND}
-          -DDEAL_II_DIR=${DEAL_II_BINARY_DIR} -DCMAKE_BUILD_TYPE=${_build} .
+          -DDEAL_II_DIR=${DEAL_II_DIR} -DCMAKE_BUILD_TYPE=${_build} .
           > ${_step_dir}/configure_output 2>&1
           || (mv ${_step_dir}/configure_output
                  ${_step_dir}/failing_configure_output
@@ -188,7 +188,7 @@ FOREACH(_step_full ${_steps})
       # And finally add the test:
       ADD_TEST(NAME ${_test}
         COMMAND ${CMAKE_COMMAND} -DTRGT=${_target} -DTEST=${_test}
-          -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
+          -DBINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${_step_dir}/interrupt_guard
           -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
