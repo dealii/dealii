@@ -98,7 +98,7 @@ FOREACH(_full_file ${_meshes})
         -DTRGT=${_mesh}.diff
         -DTEST=${_test_full}
         -DBINARY_DIR=${CMAKE_BINARY_DIR}
-        -P ${DEAL_II_SOURCE_DIR}/tests/run_test.cmake
+        -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
       WORKING_DIRECTORY ${_test_directory}
       )
     SET_TESTS_PROPERTIES(${_test_full} PROPERTIES
