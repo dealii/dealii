@@ -97,7 +97,7 @@ FOREACH(_full_file ${_meshes})
       COMMAND ${CMAKE_COMMAND}
         -DTRGT=${_mesh}.diff
         -DTEST=${_test_full}
-        -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
+        -DBINARY_DIR=${CMAKE_BINARY_DIR}
         -P ${DEAL_II_SOURCE_DIR}/tests/run_test.cmake
       WORKING_DIRECTORY ${_test_directory}
       )

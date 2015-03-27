@@ -20,7 +20,7 @@
 #
 #   TRGT - the name of the target that should be invoked
 #   TEST - the test name (used for status messages)
-#   DEAL_II_BINARY_DIR - the build directory that contains the target
+#   BINARY_DIR - the build directory that contains the target
 #
 # Optional options:
 #   EXPECT - the stage this test must reach to be considered successful
@@ -53,7 +53,7 @@ IF("${EXPECT}" STREQUAL "")
 ENDIF()
 
 EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND}
-  --build ${DEAL_II_BINARY_DIR} --target ${TRGT}
+  --build ${BINARY_DIR} --target ${TRGT}
   RESULT_VARIABLE _result_code # ignored ;-)
   OUTPUT_VARIABLE _output
   )

@@ -188,7 +188,7 @@ FOREACH(_step_full ${_steps})
       # And finally add the test:
       ADD_TEST(NAME ${_test}
         COMMAND ${CMAKE_COMMAND} -DTRGT=${_target} -DTEST=${_test}
-          -DDEAL_II_BINARY_DIR=${CMAKE_BINARY_DIR}
+          -DBINARY_DIR=${CMAKE_BINARY_DIR}
           -DGUARD_FILE=${_step_dir}/interrupt_guard
           -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
