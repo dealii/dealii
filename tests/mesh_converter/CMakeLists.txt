@@ -22,6 +22,11 @@ PROJECT(testsuite CXX)
 #
 DEAL_II_PICKUP_TESTS()
 
+IF(NOT DEAL_II_TARGET_CONFIG_INCLUDED)
+  INCLUDE(${DEAL_II_TARGET_CONFIG})
+  SET(DEAL_II_TARGET_CONFIG_INCLUDED TRUE)
+ENDIF()
+
 #
 # Tests for the mesh_converter executable
 #
@@ -61,10 +66,10 @@ FOREACH(_full_file ${_meshes})
             && cat ${_test_directory}/failing_output
             && exit 1)
       COMMAND
-        ${PERL_EXECUTABLE} -pi ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
+        ${PERL_EXECUTABLE} -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
                                ${_test_directory}/output
       WORKING_DIRECTORY ${_test_directory}
-      DEPENDS mesh_converter_exe ${DEAL_II_SOURCE_DIR}/tests/normalize.pl
+      DEPENDS mesh_converter_exe ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
       )
     ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
       COMMAND rm -f ${_test_directory}/failing_diff
