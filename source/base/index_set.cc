@@ -432,6 +432,30 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 {
   compress ();
 
+#ifdef DEBUG
+  if (!overlapping)
+    {
+      const unsigned int n_global_elements
+        = Utilities::MPI::sum (n_elements(), communicator);
+      Assert (n_global_elements == size(),
+              ExcMessage ("You are trying to create an Epetra_Map object "
+                          "that partitions elements of an index set "
+                          "between processors. However, the union of the "
+                          "index sets on different processors does not "
+                          "contain all indices exactly once: the sum of "
+                          "the number of entries the various processors "
+                          "want to store locally is "
+                          + Utilities::int_to_string (n_global_elements) +
+                          " whereas the total size of the object to be "
+                          "allocated is "
+                          + Utilities::int_to_string (size()) +
+                          ". In other words, there are "
+                          "either indices that are not spoken for "
+                          "by any processor, or there are indices that are "
+                          "claimed by multiple processors."));
+    }
+#endif
+
   if ((is_contiguous() == true) && (!overlapping))
     return Epetra_Map (TrilinosWrappers::types::int_type(size()),
                        TrilinosWrappers::types::int_type(n_elements()),

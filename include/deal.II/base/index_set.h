@@ -305,7 +305,7 @@ public:
    * The last argument only plays a role if the communicator is a parallel
    * one, distributing computations across multiple processors. In that case,
    * if the last argument is false, then it is assumed that the index sets
-   * this function is called on on all processors are mutually exclusive but
+   * this function is called with on all processors are mutually exclusive but
    * together enumerate each index exactly once. In other words, if you call
    * this function on two processors, then the index sets this function is
    * called with must together have all possible indices from zero to
