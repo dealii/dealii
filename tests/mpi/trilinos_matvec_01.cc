@@ -112,7 +112,7 @@ void test ()
   for (unsigned int i=0; i<row_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = row_partitioning.nth_index_in_set(i);
-      Assert (dy(global_index) == y(global_index), ExcInternalError());
+      AssertThrow (dy(global_index) == y(global_index), ExcInternalError());
     }
   if (my_id == 0) deallog << "OK" << std::endl;
 }

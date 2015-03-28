@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,11 +34,11 @@ void check ()
       deallog << i << "  --  "
               << S::unrolled_to_component_indices (i)
               << std::endl;
-      Assert (S::component_to_unrolled_index
-              (S::unrolled_to_component_indices (i))
-              ==
-              i,
-              ExcInternalError());
+      AssertThrow (S::component_to_unrolled_index
+                   (S::unrolled_to_component_indices (i))
+                   ==
+                   i,
+                   ExcInternalError());
     }
 }
 

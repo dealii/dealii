@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,12 +63,18 @@ void test()
   DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
 
   for (unsigned int i=0; i<dofh.n_dofs(); ++i)
-    if (relevant_set.is_element(i))
-      Assert (points.find(i) != points.end(),
-              ExcInternalError())
+    {
+      if (relevant_set.is_element(i))
+        {
+          AssertThrow (points.find(i) != points.end(),
+                       ExcInternalError());
+        }
       else
-        Assert (points.find(i) == points.end(),
-                ExcInternalError());
+        {
+          AssertThrow (points.find(i) == points.end(),
+                       ExcInternalError());
+        }
+    }
 }
 
 

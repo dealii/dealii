@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,20 +56,20 @@ void test ()
 
   for (unsigned int i=0; i<is3.size(); ++i)
     {
-      Assert ((is1.is_element(i) && !is2.is_element(i))
-              ==
-              is3.is_element(i),
-              ExcInternalError());
+      AssertThrow ((is1.is_element(i) && !is2.is_element(i))
+                   ==
+                   is3.is_element(i),
+                   ExcInternalError());
     }
 
   IndexSet empty(100);
   is3 = is1;
   is3.subtract_set(empty);
 
-  Assert (is3 == is1, ExcInternalError());
+  AssertThrow (is3 == is1, ExcInternalError());
 
   is3.subtract_set(is1);
-  Assert (is3 == empty, ExcInternalError());
+  AssertThrow (is3 == empty, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

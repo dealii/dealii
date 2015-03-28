@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,9 +82,9 @@ void test (const Triangulation<dim> &tr,
             for (unsigned int d=0; d<dim; ++d)
               grad[d] = vector_values[q][c+d];
 
-            Assert (std::fabs(selected_vector_values[q] - trace(grad))
-                    <= 1e-12 * std::fabs(selected_vector_values[q]),
-                    ExcInternalError());
+            AssertThrow (std::fabs(selected_vector_values[q] - trace(grad))
+                         <= 1e-12 * std::fabs(selected_vector_values[q]),
+                         ExcInternalError());
           }
       }
 }

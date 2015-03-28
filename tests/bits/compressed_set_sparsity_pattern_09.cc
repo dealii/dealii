@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,10 +28,10 @@ void test ()
 {
   const unsigned int N = 1000;
   CompressedSetSparsityPattern csp;
-  Assert (csp.empty() == true, ExcInternalError());
+  AssertThrow (csp.empty() == true, ExcInternalError());
 
   csp.reinit (N, N);
-  Assert (csp.empty() == false, ExcInternalError());
+  AssertThrow (csp.empty() == false, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

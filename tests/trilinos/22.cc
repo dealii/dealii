@@ -40,7 +40,7 @@ void test (TrilinosWrappers::Vector &v,
   w.compress (VectorOperation::insert);
 
   // make sure the scalar product is zero
-  Assert (v*w == 0, ExcInternalError());
+  AssertThrow (v*w == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

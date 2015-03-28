@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -91,8 +91,8 @@ void check ()
   for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
        cell != tria.end (); ++cell)
     for (unsigned int child = 0; child < cell->n_children (); ++child)
-      Assert (cell->child (child)->parent () == cell,
-              ExcInternalError ());
+      AssertThrow (cell->child (child)->parent () == cell,
+                   ExcInternalError ());
 
   // coarsen the mesh globally and
   // verify that the parent relation
@@ -106,8 +106,8 @@ void check ()
   for (typename Triangulation<dim>::cell_iterator cell = tria.begin ();
        cell != tria.end(); ++cell)
     for (unsigned int child = 0; child < cell->n_children (); ++child)
-      Assert (cell->child (child)->parent () == cell,
-              ExcInternalError());
+      AssertThrow (cell->child (child)->parent () == cell,
+                   ExcInternalError());
 
   deallog << "OK for " << dim << "d" << std::endl;
 }

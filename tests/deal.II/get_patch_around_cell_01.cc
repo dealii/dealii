@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,7 +58,7 @@ void test()
            cell != triangulation.end(); ++cell, ++index)
         if (flags[index])
           cell->set_refine_flag();
-      Assert (index == triangulation.n_active_cells(), ExcInternalError());
+      AssertThrow (index == triangulation.n_active_cells(), ExcInternalError());
 
       // flag all other cells for coarsening
       // (this should ensure that at least
@@ -77,19 +77,19 @@ void test()
   // now extract patches and print every fifth of them
   unsigned int index = 0;
   for (typename Triangulation<dim>::active_cell_iterator
-	 cell = triangulation.begin_active();
+       cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell, ++index)
     {
       std::vector<typename Triangulation<dim>::active_cell_iterator> patch_cells
-	= GridTools::get_patch_around_cell<Triangulation<dim> > (cell);
+        = GridTools::get_patch_around_cell<Triangulation<dim> > (cell);
 
       if (index % 5 == 0)
-	{
-	  deallog << "Patch around cell " << cell << ": ";
-	  for (unsigned int i=0; i<patch_cells.size(); ++i)
-	    deallog << patch_cells[i] << ' ';
-	  deallog << std::endl;
-	}
+        {
+          deallog << "Patch around cell " << cell << ": ";
+          for (unsigned int i=0; i<patch_cells.size(); ++i)
+            deallog << patch_cells[i] << ' ';
+          deallog << std::endl;
+        }
     }
 }
 

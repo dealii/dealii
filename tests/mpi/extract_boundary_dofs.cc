@@ -55,8 +55,8 @@ void test()
   // this
   DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
   boundary_dofs.subtract_set (relevant_set);
-  Assert (boundary_dofs.n_elements() == 0,
-          ExcInternalError());
+  AssertThrow (boundary_dofs.n_elements() == 0,
+               ExcInternalError());
 }
 
 

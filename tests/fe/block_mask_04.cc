@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2014 by the deal.II authors
+// Copyright (C) 2012 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,8 +31,8 @@
 
 void test ()
 {
-  Assert (BlockMask(12, false).size() == 12, ExcInternalError());
-  Assert (BlockMask().size() == 0, ExcInternalError());
+  AssertThrow (BlockMask(12, false).size() == 12, ExcInternalError());
+  AssertThrow (BlockMask().size() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

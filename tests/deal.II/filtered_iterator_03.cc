@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,7 +76,7 @@ void test ()
       for (unsigned int d=0; d<2; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1<<d);
-      Assert (subdomain < (1<<2), ExcInternalError());
+      AssertThrow (subdomain < (1<<2), ExcInternalError());
 
       cell->set_subdomain_id (subdomain);
     };

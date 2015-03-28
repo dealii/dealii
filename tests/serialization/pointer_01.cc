@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,8 +71,8 @@ void test ()
   // p2 should have been created, and should
   // have been different from the address of
   // p1
-  Assert (p2 != 0, ExcInternalError());
-  Assert (p1 != p2, ExcInternalError());
+  AssertThrow (p2 != 0, ExcInternalError());
+  AssertThrow (p1 != p2, ExcInternalError());
 
   delete p1;
   delete p2;

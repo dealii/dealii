@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,10 +63,10 @@ void test (const char *filename)
           // face is misoriented,
           // then there must be a
           // neighbor over there
-          Assert (cell->neighbor(f)
-                  ->face_orientation(cell->neighbor_of_neighbor(f))
-                  == true,
-                  ExcInternalError());
+          AssertThrow (cell->neighbor(f)
+                       ->face_orientation(cell->neighbor_of_neighbor(f))
+                       == true,
+                       ExcInternalError());
         }
   deallog << "  " << misoriented_faces << " misoriented faces" << std::endl;
 }

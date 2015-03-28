@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,16 +69,16 @@ void test ()
   triangulation.refine_global (3);
   std::map<types::material_id, const Function<dim>*> functions;
   for (typename Triangulation<dim>::active_cell_iterator
-	 cell = triangulation.begin_active();
+       cell = triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
     {
       cell->set_material_id(cell->index() % 128);
       if (functions.find(cell->index() % 128) == functions.end())
-	functions[cell->index() % 128]
-	  = new ConstantFunction<dim>(cell->index() % 128);
+        functions[cell->index() % 128]
+          = new ConstantFunction<dim>(cell->index() % 128);
     }
-  
+
   for (unsigned int p=1; p<7-dim; ++p)
     {
       FE_DGQ<dim>              fe(p);
@@ -87,19 +87,19 @@ void test ()
 
       Vector<double> interpolant (dof_handler.n_dofs());
       VectorTools::interpolate_based_on_material_id (MappingQ1<dim>(),
-						     dof_handler,
-						     functions,
-						     interpolant);
+                                                     dof_handler,
+                                                     functions,
+                                                     interpolant);
       for (typename DoFHandler<dim>::active_cell_iterator
-	     cell = dof_handler.begin_active();
-	   cell != dof_handler.end();
-	   ++cell)
-	{
-	  Vector<double> values (fe.dofs_per_cell);
-	  cell->get_dof_values (interpolant, values);
-	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	    Assert (values[i] == cell->index() % 128, ExcInternalError());
-	}
+           cell = dof_handler.begin_active();
+           cell != dof_handler.end();
+           ++cell)
+        {
+          Vector<double> values (fe.dofs_per_cell);
+          cell->get_dof_values (interpolant, values);
+          for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+            AssertThrow (values[i] == cell->index() % 128, ExcInternalError());
+        }
     }
   deallog << "OK" << std::endl;
 }

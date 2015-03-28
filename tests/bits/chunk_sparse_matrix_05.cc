@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,11 +55,15 @@ void test (const unsigned int chunk_size)
 
   deallog << m.n_nonzero_elements() << std::endl;
   if (chunk_size == 1)
-    Assert (m.n_nonzero_elements() == counter,
-            ExcInternalError())
-    else
+    {
+      Assert (m.n_nonzero_elements() == counter,
+              ExcInternalError());
+    }
+  else
+    {
       Assert (m.n_nonzero_elements() >= counter,
               ExcInternalError());
+    }
 
   deallog << "OK" << std::endl;
 }

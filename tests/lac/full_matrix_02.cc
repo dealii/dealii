@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,7 +57,7 @@ main ()
   A.mTmult(C,B);
 
   D.add(-1,C);
-  Assert ( D.frobenius_norm() < 1e-15,
-           ExcInternalError());
+  AssertThrow ( D.frobenius_norm() < 1e-15,
+                ExcInternalError());
   deallog << "OK" << std::endl;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,19 +79,19 @@ int main()
   B.reinit (sparsity_pattern);
 
   // check some sizes
-  Assert (B.m() == B.block(0,0).m() + B.block(1,1).m(),
-          ExcInternalError());
-  Assert (B.n() == B.block(0,0).n() + B.block(1,1).n(),
-          ExcInternalError());
-  Assert (B.n_block_rows() == 2, ExcInternalError());
-  Assert (B.n_block_cols() == 2, ExcInternalError());
+  AssertThrow (B.m() == B.block(0,0).m() + B.block(1,1).m(),
+               ExcInternalError());
+  AssertThrow (B.n() == B.block(0,0).n() + B.block(1,1).n(),
+               ExcInternalError());
+  AssertThrow (B.n_block_rows() == 2, ExcInternalError());
+  AssertThrow (B.n_block_cols() == 2, ExcInternalError());
 
   // then clear, and check again
   B.clear ();
-  Assert (B.m() == 0, ExcInternalError());
-  Assert (B.n() == 0, ExcInternalError());
-  Assert (B.n_block_rows() == 0, ExcInternalError());
-  Assert (B.n_block_cols() == 0, ExcInternalError());
+  AssertThrow (B.m() == 0, ExcInternalError());
+  AssertThrow (B.n() == 0, ExcInternalError());
+  AssertThrow (B.n_block_rows() == 0, ExcInternalError());
+  AssertThrow (B.n_block_cols() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 

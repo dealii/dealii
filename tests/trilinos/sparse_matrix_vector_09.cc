@@ -48,7 +48,7 @@ void test (Vector<double> &v,
       double result = 0;
       for (unsigned int j=0; j<m.m(); ++j)
         result += (j+2*i)*j;
-      Assert (w(i) == result, ExcInternalError());
+      AssertThrow (w(i) == result, ExcInternalError());
     }
 
   m.Tvmult_add (w, v);
@@ -58,7 +58,7 @@ void test (Vector<double> &v,
       double result = 0;
       for (unsigned int j=0; j<m.m(); ++j)
         result += (j+2*i)*j;
-      Assert (w(i) == result+result, ExcInternalError());
+      AssertThrow (w(i) == result+result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

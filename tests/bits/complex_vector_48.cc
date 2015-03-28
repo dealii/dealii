@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,14 +44,14 @@ void test (Vector<std::complex<double> > &v,
   // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (w(i) == std::complex<double> (i+2., i+3.),
-              ExcInternalError());
-      Assert (x(i) == std::complex<double> (i+3., i+4.),
-              ExcInternalError());
-      Assert (std::abs(v(i) -
-                       std::complex<double> (i+2., i+3.) /
-                       std::complex<double> (i+3., i+4.)) < 1e-14*std::abs(v(i)),
-              ExcInternalError());
+      AssertThrow (w(i) == std::complex<double> (i+2., i+3.),
+                   ExcInternalError());
+      AssertThrow (x(i) == std::complex<double> (i+3., i+4.),
+                   ExcInternalError());
+      AssertThrow (std::abs(v(i) -
+                            std::complex<double> (i+2., i+3.) /
+                            std::complex<double> (i+3., i+4.)) < 1e-14*std::abs(v(i)),
+                   ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

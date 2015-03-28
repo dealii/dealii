@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,7 +48,7 @@ void test ()
   // compare against the exact value of the
   // l2-norm (max row-sum)
   deallog << m.frobenius_norm() << std::endl;
-  Assert (std::fabs((m.frobenius_norm() - norm)/norm) < 1e-14, ExcInternalError());
+  AssertThrow (std::fabs((m.frobenius_norm() - norm)/norm) < 1e-14, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

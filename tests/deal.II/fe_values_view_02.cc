@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2014 by the deal.II authors
+// Copyright (C) 2007 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,32 +81,32 @@ void test (const Triangulation<dim> &tr,
 
               for (unsigned int d=0; d<dim; ++d)
                 {
-                  Assert (fe_values[vec_components].value (i,q)[d]
-                          ==
-                          fe_values.shape_value_component (i,q,c+d),
-                          ExcInternalError());
+                  AssertThrow (fe_values[vec_components].value (i,q)[d]
+                               ==
+                               fe_values.shape_value_component (i,q,c+d),
+                               ExcInternalError());
 
-                  Assert (fe_values[vec_components].gradient (i,q)[d]
-                          ==
-                          fe_values.shape_grad_component (i,q,c+d),
-                          ExcInternalError());
+                  AssertThrow (fe_values[vec_components].gradient (i,q)[d]
+                               ==
+                               fe_values.shape_grad_component (i,q,c+d),
+                               ExcInternalError());
 
-                  Assert (fe_values[vec_components].symmetric_gradient (i,q)
-                          ==
-                          (fe_values[vec_components].gradient(i,q) +
-                           transpose(fe_values[vec_components].gradient(i,q)))/2,
-                          ExcInternalError());
+                  AssertThrow (fe_values[vec_components].symmetric_gradient (i,q)
+                               ==
+                               (fe_values[vec_components].gradient(i,q) +
+                                transpose(fe_values[vec_components].gradient(i,q)))/2,
+                               ExcInternalError());
 
-                  Assert (fe_values[vec_components].hessian (i,q)[d]
-                          ==
-                          fe_values.shape_hessian_component (i,q,c+d),
-                          ExcInternalError());
+                  AssertThrow (fe_values[vec_components].hessian (i,q)[d]
+                               ==
+                               fe_values.shape_hessian_component (i,q,c+d),
+                               ExcInternalError());
                 }
 
-              Assert (fe_values[vec_components].divergence (i,q)
-                      ==
-                      trace (fe_values[vec_components].gradient (i,q)),
-                      ExcInternalError());
+              AssertThrow (fe_values[vec_components].divergence (i,q)
+                           ==
+                           trace (fe_values[vec_components].gradient (i,q)),
+                           ExcInternalError());
             }
       }
 }

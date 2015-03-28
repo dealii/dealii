@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,8 +39,8 @@ void test (Vector<std::complex<double> > &v,
   // but then copy elements and make sure the
   // vectors are actually equal
   v = w;
-  Assert (! (v!=w), ExcInternalError());
-  Assert (! (w!=v), ExcInternalError());
+  AssertThrow (! (v!=w), ExcInternalError());
+  AssertThrow (! (w!=v), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

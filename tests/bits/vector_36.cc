@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,13 +46,13 @@ void test (Vector<double> &v,
     {
       if (i%3 == 0)
         {
-          Assert (w(i) == i+1., ExcInternalError());
-          Assert (v(i) == i-(i+1.), ExcInternalError());
+          AssertThrow (w(i) == i+1., ExcInternalError());
+          AssertThrow (v(i) == i-(i+1.), ExcInternalError());
         }
       else
         {
-          Assert (w(i) == 0, ExcInternalError());
-          Assert (v(i) == i, ExcInternalError());
+          AssertThrow (w(i) == 0, ExcInternalError());
+          AssertThrow (v(i) == i, ExcInternalError());
         }
     }
 

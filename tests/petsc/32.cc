@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,8 +37,8 @@ void test (PETScWrappers::Vector &v)
 
   // then check the norm
   const double eps=typeid(PetscScalar)==typeid(double) ? 1e-14 : 1e-5;
-  Assert (std::fabs(v.mean_value() - sum/v.size()) < eps*sum/v.size(),
-          ExcInternalError());
+  AssertThrow (std::fabs(v.mean_value() - sum/v.size()) < eps*sum/v.size(),
+               ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

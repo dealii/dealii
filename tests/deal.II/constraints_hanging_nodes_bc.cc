@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -111,23 +111,23 @@ void test ()
   deallog << "Check that both constraint matrices are identical... ";
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      Assert (correct_constraints.is_constrained(i) ==
-              library_constraints.is_constrained(i), ExcInternalError());
+      AssertThrow (correct_constraints.is_constrained(i) ==
+                   library_constraints.is_constrained(i), ExcInternalError());
       typedef const std::vector<std::pair<types::global_dof_index, double> > &constraint_format;
       if (correct_constraints.is_constrained(i))
         {
           constraint_format correct = *correct_constraints.get_constraint_entries(i);
           constraint_format library = *library_constraints.get_constraint_entries(i);
-          Assert (correct.size() == library.size(), ExcInternalError());
+          AssertThrow (correct.size() == library.size(), ExcInternalError());
           for (unsigned int q=0; q<correct.size(); ++q)
             {
-              Assert (correct[q].first == library[q].first, ExcInternalError());
-              Assert (std::fabs(correct[q].second-library[q].second) < 1e-14,
-                      ExcInternalError());
+              AssertThrow (correct[q].first == library[q].first, ExcInternalError());
+              AssertThrow (std::fabs(correct[q].second-library[q].second) < 1e-14,
+                           ExcInternalError());
             }
-          Assert (std::fabs(correct_constraints.get_inhomogeneity(i)-
-                            library_constraints.get_inhomogeneity(i))<1e-14,
-                  ExcInternalError());
+          AssertThrow (std::fabs(correct_constraints.get_inhomogeneity(i)-
+                                 library_constraints.get_inhomogeneity(i))<1e-14,
+                       ExcInternalError());
         }
     }
   deallog << "OK." << std::endl;

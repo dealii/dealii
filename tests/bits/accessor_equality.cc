@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,18 +45,18 @@ void test ()
   {
     const typename Triangulation<dim>::active_cell_iterator
     cell = tria.begin_active();
-    Assert (cell == cell, ExcInternalError());
-    Assert (! (cell != cell), ExcInternalError());
-    Assert (! (cell < cell), ExcInternalError());
+    AssertThrow (cell == cell, ExcInternalError());
+    AssertThrow (! (cell != cell), ExcInternalError());
+    AssertThrow (! (cell < cell), ExcInternalError());
   }
 
   // same with non-active iterators
   {
     const typename Triangulation<dim>::cell_iterator
     cell = tria.begin();
-    Assert (cell == cell, ExcInternalError());
-    Assert (! (cell != cell), ExcInternalError());
-    Assert (! (cell < cell), ExcInternalError());
+    AssertThrow (cell == cell, ExcInternalError());
+    AssertThrow (! (cell != cell), ExcInternalError());
+    AssertThrow (! (cell < cell), ExcInternalError());
   }
 
   FE_Q<dim> fe (1);
@@ -68,16 +68,16 @@ void test ()
   {
     const typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active();
-    Assert (cell == cell, ExcInternalError());
-    Assert (! (cell != cell), ExcInternalError());
-    Assert (! (cell < cell), ExcInternalError());
+    AssertThrow (cell == cell, ExcInternalError());
+    AssertThrow (! (cell != cell), ExcInternalError());
+    AssertThrow (! (cell < cell), ExcInternalError());
   }
   {
     const typename DoFHandler<dim>::cell_iterator
     cell = dof_handler.begin();
-    Assert (cell == cell, ExcInternalError());
-    Assert (! (cell != cell), ExcInternalError());
-    Assert (! (cell < cell), ExcInternalError());
+    AssertThrow (cell == cell, ExcInternalError());
+    AssertThrow (! (cell != cell), ExcInternalError());
+    AssertThrow (! (cell < cell), ExcInternalError());
   }
 
   // finally check that two iterators

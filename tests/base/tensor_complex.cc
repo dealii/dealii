@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,8 +54,8 @@ int main ()
   Tensor<2,dim,std::complex<double> > t(a);
   Tensor<2,dim,std::complex<double> > tt;
   Tensor<2,dim,std::complex<double> > result(b);
-  Assert (transpose(transpose(t)) == t, ExcInternalError());
-  Assert (transpose(transpose(result)) == result, ExcInternalError());
+  AssertThrow (transpose(transpose(t)) == t, ExcInternalError());
+  AssertThrow (transpose(transpose(result)) == result, ExcInternalError());
 
   Vector<std::complex<double> > unrolled(9);
 

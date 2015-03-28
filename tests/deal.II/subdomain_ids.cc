@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,7 @@ void test ()
       for (unsigned int d=0; d<dim; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1<<d);
-      Assert (subdomain < (1<<dim), ExcInternalError());
+      AssertThrow (subdomain < (1<<dim), ExcInternalError());
 
       cell->set_subdomain_id (subdomain);
     };
@@ -79,13 +79,13 @@ void test ()
       std::vector<unsigned int> subdomain_cells(1<<dim, 0);
       for (; cell!=endc; ++cell)
         {
-          Assert (cell->subdomain_id() < (1<<dim), ExcInternalError());
+          AssertThrow (cell->subdomain_id() < (1<<dim), ExcInternalError());
           ++subdomain_cells[cell->subdomain_id()];
         };
       for (unsigned int i=0; i<(1<<dim); ++i)
-        Assert (subdomain_cells[i] == tria.n_active_cells()/(1<<dim),
-                ExcNumberMismatch(subdomain_cells[i],
-                                  tria.n_active_cells()/(1<<dim)));
+        AssertThrow (subdomain_cells[i] == tria.n_active_cells()/(1<<dim),
+                     ExcNumberMismatch(subdomain_cells[i],
+                                       tria.n_active_cells()/(1<<dim)));
       deallog << "Check 1 (dim=" << dim << ") ok" << std::endl;
     };
 
@@ -103,13 +103,13 @@ void test ()
       std::vector<unsigned int> subdomain_cells(1<<dim, 0);
       for (; cell!=endc; ++cell)
         {
-          Assert (cell->subdomain_id() < (1<<dim), ExcInternalError());
+          AssertThrow (cell->subdomain_id() < (1<<dim), ExcInternalError());
           ++subdomain_cells[cell->subdomain_id()];
         };
       for (unsigned int i=0; i<(1<<dim); ++i)
-        Assert (subdomain_cells[i] == tria.n_active_cells()/(1<<dim),
-                ExcNumberMismatch(subdomain_cells[i],
-                                  tria.n_active_cells()/(1<<dim)));
+        AssertThrow (subdomain_cells[i] == tria.n_active_cells()/(1<<dim),
+                     ExcNumberMismatch(subdomain_cells[i],
+                                       tria.n_active_cells()/(1<<dim)));
       deallog << "Check 2 (dim=" << dim << ") ok" << std::endl;
     };
 
@@ -127,15 +127,15 @@ void test ()
         {
           DoFTools::extract_subdomain_dofs (dof_handler, subdomain,
                                             selected_dofs);
-          Assert (static_cast<unsigned int>(std::count (selected_dofs.begin(),
-                                                        selected_dofs.end(),
-                                                        true))
-                  ==
-                  dof_handler.n_dofs() / (1<<dim),
-                  ExcNumberMismatch(std::count (selected_dofs.begin(),
-                                                selected_dofs.end(),
-                                                true),
-                                    dof_handler.n_dofs() / (1<<dim)));
+          AssertThrow (static_cast<unsigned int>(std::count (selected_dofs.begin(),
+                                                             selected_dofs.end(),
+                                                             true))
+                       ==
+                       dof_handler.n_dofs() / (1<<dim),
+                       ExcNumberMismatch(std::count (selected_dofs.begin(),
+                                                     selected_dofs.end(),
+                                                     true),
+                                         dof_handler.n_dofs() / (1<<dim)));
         }
       deallog << "Check 3 (dim=" << dim << ") ok" << std::endl;
     };
@@ -160,16 +160,16 @@ void test ()
         {
           DoFTools::extract_subdomain_dofs (dof_handler, subdomain,
                                             selected_dofs);
-          Assert (static_cast<unsigned int>(std::count (selected_dofs.begin(),
-                                                        selected_dofs.end(),
-                                                        true))
-                  ==
-                  std::pow(static_cast<double>(cells_per_direction/2+1),dim),
-                  ExcNumberMismatch(std::count (selected_dofs.begin(),
-                                                selected_dofs.end(),
-                                                true),
-                                    static_cast<unsigned int>(std::pow(static_cast<double>(
-                                                                cells_per_direction/2+1),dim))));
+          AssertThrow (static_cast<unsigned int>(std::count (selected_dofs.begin(),
+                                                             selected_dofs.end(),
+                                                             true))
+                       ==
+                       std::pow(static_cast<double>(cells_per_direction/2+1),dim),
+                       ExcNumberMismatch(std::count (selected_dofs.begin(),
+                                                     selected_dofs.end(),
+                                                     true),
+                                         static_cast<unsigned int>(std::pow(static_cast<double>(
+                                                                     cells_per_direction/2+1),dim))));
         }
       deallog << "Check 4 (dim=" << dim << ") ok" << std::endl;
     };

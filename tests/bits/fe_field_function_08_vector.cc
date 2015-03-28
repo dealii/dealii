@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -109,15 +109,15 @@ void test()
   fe_function.vector_laplacian (point, m);
 
   {
-    Assert (std::fabs(m(0) - point.square()*4*3)
-            <
-            1e-8 * std::fabs(m(0) + point.square()*4*3),
-            ExcInternalError());
+    AssertThrow (std::fabs(m(0) - point.square()*4*3)
+                 <
+                 1e-8 * std::fabs(m(0) + point.square()*4*3),
+                 ExcInternalError());
 
-    Assert (std::fabs(m(1))
-            <
-            1e-10,
-            ExcInternalError());
+    AssertThrow (std::fabs(m(1))
+                 <
+                 1e-10,
+                 ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

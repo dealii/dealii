@@ -49,7 +49,7 @@ void test (parallel::distributed::Vector<double> &v,
       double result = 0;
       for (unsigned int j=0; j<m.n(); ++j)
         result += (i+2*j)*j;
-      Assert (w(i) == result, ExcInternalError());
+      AssertThrow (w(i) == result, ExcInternalError());
     }
 
   m.vmult_add (w, v);
@@ -59,7 +59,7 @@ void test (parallel::distributed::Vector<double> &v,
       double result = 0;
       for (unsigned int j=0; j<m.n(); ++j)
         result += (i+2*j)*j;
-      Assert (w(i) == result+result, ExcInternalError());
+      AssertThrow (w(i) == result+result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

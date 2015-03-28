@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -100,15 +100,15 @@ void test()
   fe_function.vector_value (point, m);
 
   {
-    Assert (std::fabs(m(0) - point.square())
-            <
-            1e-10 * std::fabs(m(0) + point.square()),
-            ExcInternalError());
+    AssertThrow (std::fabs(m(0) - point.square())
+                 <
+                 1e-10 * std::fabs(m(0) + point.square()),
+                 ExcInternalError());
 
-    Assert (std::fabs(m(1))
-            <
-            1e-10,
-            ExcInternalError());
+    AssertThrow (std::fabs(m(1))
+                 <
+                 1e-10,
+                 ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,7 +34,7 @@ void test ()
       t[i][j] = (1.+(i+1)*(j*2));
 
   SymmetricTensor<2,dim> x = identity_tensor<dim>() * t;
-  Assert ((x-t).norm() < 1e-15*t.norm(), ExcInternalError());
+  AssertThrow ((x-t).norm() < 1e-15*t.norm(), ExcInternalError());
 
   deallog << "x=" << std::endl;
   for (unsigned int i=0; i<dim; ++i)

@@ -38,7 +38,7 @@ void test (TrilinosWrappers::Vector &v,
         w(i) = i+1.;
     }
 
-  Assert (!(v==w), ExcInternalError());
+  AssertThrow (!(v==w), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

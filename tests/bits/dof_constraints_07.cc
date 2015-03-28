@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,11 +82,17 @@ void test ()
   // constrained rows are zero, and that all
   // the other elements are unchanged
   for (unsigned int i=0; i<b.size(); ++i)
-    if (constraints.is_constrained(i))
-      Assert (b(i) == 0, ExcInternalError())
+    {
+      if (constraints.is_constrained(i))
+        {
+          AssertThrow (b(i) == 0, ExcInternalError());
+        }
       else
-        Assert (std::fabs(b(i) - (1.+1.*i*i)/3) < 1e-14*std::fabs(b(i)),
-                ExcInternalError());
+        {
+          AssertThrow (std::fabs(b(i) - (1.+1.*i*i)/3) < 1e-14*std::fabs(b(i)),
+                       ExcInternalError());
+        }
+    }
 }
 
 

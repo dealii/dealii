@@ -31,10 +31,10 @@
 template <typename T, typename U, typename CompareType>
 void check()
 {
-  Assert (typeid(typename ProductType<T,U>::type) == typeid(CompareType),
-	  ExcInternalError());
-  Assert (typeid(typename ProductType<T,U>::type) == typeid(T() * U()),
-	  ExcInternalError());
+  AssertThrow (typeid(typename ProductType<T,U>::type) == typeid(CompareType),
+               ExcInternalError());
+  AssertThrow (typeid(typename ProductType<T,U>::type) == typeid(T() * U()),
+               ExcInternalError());
 }
 
 

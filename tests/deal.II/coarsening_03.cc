@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,8 +97,8 @@ void test()
 
   // verify that none of the cells
   // violates the level-1-at-vertex rule
-  Assert (satisfies_level1_at_vertex_rule (triangulation),
-          ExcInternalError());
+  AssertThrow (satisfies_level1_at_vertex_rule (triangulation),
+               ExcInternalError());
 }
 
 

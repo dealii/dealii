@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -234,7 +234,7 @@ void LaplaceProblem<dim>::assemble_system ()
   // and compare whether we really got the
   // same right hand side vector
   test -= system_rhs;
-  Assert (test.l2_norm() <= 1e-12, ExcInternalError());
+  AssertThrow (test.l2_norm() <= 1e-12, ExcInternalError());
 }
 
 template <int dim>

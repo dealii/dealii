@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,7 +38,7 @@
 
 template <int dim>
 std::vector<types::global_dof_index> get_conflict_indices(
-    const typename DoFHandler<dim>::active_cell_iterator &it)
+  const typename DoFHandler<dim>::active_cell_iterator &it)
 {
   std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
   it->get_dof_indices(local_dof_indices);
@@ -52,45 +52,45 @@ void check ()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_shell (triangulation,
-      Point<dim>(),
-      1, 2,
-      (dim==3) ? 96 : 12,
-      true);
+                              Point<dim>(),
+                              1, 2,
+                              (dim==3) ? 96 : 12,
+                              true);
 
   triangulation.refine_global (3);
 
   for (unsigned int i=0; i<3; ++i)
-  {
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-    for (unsigned int i=0; i< estimated_error_per_cell.size(); ++i)
-      estimated_error_per_cell(i) = i;
-    GridRefinement::
+    {
+      Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+      for (unsigned int i=0; i< estimated_error_per_cell.size(); ++i)
+        estimated_error_per_cell(i) = i;
+      GridRefinement::
       refine_and_coarsen_fixed_fraction (triangulation,
-          estimated_error_per_cell,
-          0.3, 0.1);
-    triangulation.execute_coarsening_and_refinement();
-  }
-  
+                                         estimated_error_per_cell,
+                                         0.3, 0.1);
+      triangulation.execute_coarsening_and_refinement();
+    }
+
   FE_Q<dim> fe(1);
   DoFHandler<dim> stokes_dof_handler (triangulation);
   stokes_dof_handler.distribute_dofs (fe);
 
   for (typename DoFHandler<dim>::active_cell_iterator cell=stokes_dof_handler.begin_active();
-      cell != stokes_dof_handler.end(); ++cell)
+       cell != stokes_dof_handler.end(); ++cell)
     cell->clear_user_flag ();
-  std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator> > coloring 
+  std::vector<std::vector<typename DoFHandler<dim>::active_cell_iterator> > coloring
     = GraphColoring::make_graph_coloring(stokes_dof_handler.begin_active(),
-        stokes_dof_handler.end(),
-        std_cxx11::function<std::vector<types::global_dof_index> (
-          const typename DoFHandler<dim>::active_cell_iterator &)>(&get_conflict_indices<dim>));
+                                         stokes_dof_handler.end(),
+                                         std_cxx11::function<std::vector<types::global_dof_index> (
+                                           const typename DoFHandler<dim>::active_cell_iterator &)>(&get_conflict_indices<dim>));
 
   for (unsigned int c=0; c<coloring.size(); ++c)
     for (unsigned int i=0; i<coloring[c].size(); ++i)
       coloring[c][i]->set_user_flag();
 
   for (typename DoFHandler<dim>::active_cell_iterator cell=stokes_dof_handler.begin_active();
-      cell != stokes_dof_handler.end(); ++cell)
-    Assert (cell->user_flag_set () == true, ExcInternalError());
+       cell != stokes_dof_handler.end(); ++cell)
+    AssertThrow (cell->user_flag_set () == true, ExcInternalError());
 
   deallog<<"OK"<<std::endl;
 }

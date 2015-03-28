@@ -47,12 +47,12 @@ void test (TrilinosWrappers::Vector &v,
   // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (v(i) == i, ExcInternalError());
+      AssertThrow (v(i) == i, ExcInternalError());
 
       double result = 0;
       for (unsigned int j=0; j<m.m(); ++j)
         result += (j+2*i)*j;
-      Assert (w(i) == result, ExcInternalError());
+      AssertThrow (w(i) == result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

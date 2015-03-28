@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,8 +53,8 @@ void test ()
   cell = tria.begin_active (),
   endc = tria.end ();
   for (; cell!=endc; ++cell)
-    Assert (cell->subdomain_id() == 42,
-            ExcInternalError());
+    AssertThrow (cell->subdomain_id() == 42,
+                 ExcInternalError());
   deallog << "OK" << std::endl;
 }
 

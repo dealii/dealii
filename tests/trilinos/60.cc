@@ -47,8 +47,8 @@ void test (TrilinosWrappers::Vector &v)
 
   for (unsigned int i=0; i<v.size(); ++i)
     {
-      Assert (v(i) == w(i), ExcInternalError());
-      Assert (v(i) == x(i), ExcInternalError());
+      AssertThrow (v(i) == w(i), ExcInternalError());
+      AssertThrow (v(i) == x(i), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
