@@ -1,0 +1,96 @@
+
+DEAL::0.0
+DEAL::0: true false false
+DEAL::1: true false false
+DEAL::2: true false false
+DEAL::3: true false false
+DEAL::4: true false false
+DEAL::5: true false false
+DEAL::0: true
+DEAL::1: true
+DEAL::2: true
+DEAL::3: true
+DEAL::4: true
+DEAL::5: true
+DEAL::6: true
+DEAL::7: true
+DEAL::8: true
+DEAL::9: true
+DEAL::10: true
+DEAL::11: true
+DEAL::0.1
+DEAL::0: true false false
+DEAL::1: true false false
+DEAL::2: true false false
+DEAL::3: true false false
+DEAL::4: false false false
+DEAL::5: true false false
+DEAL::0: true
+DEAL::1: true
+DEAL::2: true
+DEAL::3: true
+DEAL::4: true
+DEAL::5: true
+DEAL::6: true
+DEAL::7: true
+DEAL::8: true
+DEAL::9: true
+DEAL::10: true
+DEAL::11: true
+DEAL::0.2
+DEAL::0: true false false
+DEAL::1: true false false
+DEAL::2: true false false
+DEAL::3: true false false
+DEAL::4: true false false
+DEAL::5: true false false
+DEAL::0: true
+DEAL::1: true
+DEAL::2: true
+DEAL::3: true
+DEAL::4: true
+DEAL::5: true
+DEAL::6: true
+DEAL::7: true
+DEAL::8: true
+DEAL::9: true
+DEAL::10: true
+DEAL::11: true
+DEAL::0.3
+DEAL::0: true false false
+DEAL::1: true false false
+DEAL::2: true false false
+DEAL::3: true false false
+DEAL::4: true false false
+DEAL::5: false false false
+DEAL::0: true
+DEAL::1: true
+DEAL::2: true
+DEAL::3: true
+DEAL::4: true
+DEAL::5: true
+DEAL::6: true
+DEAL::7: true
+DEAL::8: true
+DEAL::9: true
+DEAL::10: true
+DEAL::11: true
+DEAL::0.4
+DEAL::0: true false false
+DEAL::1: false false false
+DEAL::2: true false false
+DEAL::3: true false false
+DEAL::4: true false false
+DEAL::5: false false false
+DEAL::0: true
+DEAL::1: true
+DEAL::2: true
+DEAL::3: true
+DEAL::4: true
+DEAL::5: true
+DEAL::6: true
+DEAL::7: true
+DEAL::8: true
+DEAL::9: true
+DEAL::10: true
+DEAL::11: true
