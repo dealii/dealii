@@ -316,11 +316,12 @@ public:
    * owned by one.
    *
    * On the other hand, if the second argument is true, then the index sets
-   * can be overlapping, though they still need to contain each index exactly
-   * once on all processors taken together. This is a useful operation if we
-   * want to create vectors that not only contain the locally owned indices,
-   * but for example also the elements that correspond to degrees of freedom
-   * located on ghost cells.
+   * can be overlapping, and they also do not need to span the whole index
+   * set. This is a useful operation if we want to create vectors that not
+   * only contain the locally owned indices, but for example also the elements
+   * that correspond to degrees of freedom located on ghost cells. Another
+   * application of this method is to select a subset of the elements of a
+   * vector, e.g. for extracting only certain solution components.
    */
   Epetra_Map make_trilinos_map (const MPI_Comm &communicator = MPI_COMM_WORLD,
                                 const bool      overlapping  = false) const;
