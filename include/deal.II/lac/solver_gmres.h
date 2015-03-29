@@ -30,6 +30,7 @@
 
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -154,6 +155,18 @@ namespace internal
  * to observe the progress of the iteration.
  *
  *
+ * <h3>Eigenvalue and condition number estimates</h3>
+ *
+ * This class can estimate eigenvalues and condition number during the solution
+ * process. This is done by creating the Hessenberg matrix during the inner
+ * iterations. The eigenvalues are estimated as the eigenvalues of the
+ * Hessenberg matrix and the condition number is estimated as the ratio of the
+ * largest and smallest singular value of the Hessenberg matrix. The estimates
+ * can be obtained by connecting a function as a slot using
+ * @p connect_condition_number_slot and @p connect_eigenvalues_slot. These slots
+ * will then be called from the solver with the estimates as argument.
+ *
+ *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
  */
 template <class VECTOR = Vector<double> >
@@ -174,8 +187,18 @@ public:
     AdditionalData (const unsigned int max_n_tmp_vectors = 30,
                     const bool right_preconditioning = false,
                     const bool use_default_residual = true,
-                    const bool force_re_orthogonalization = false,
-                    const bool compute_eigenvalues = false);
+                    const bool force_re_orthogonalization = false);
+
+    /**
+     * Constructor.
+     * @deprecated To obtain the estimated eigenvalues instead use:
+     * connect_eigenvalues_slot
+     */
+    AdditionalData (const unsigned int max_n_tmp_vectors,
+                    const bool right_preconditioning,
+                    const bool use_default_residual,
+                    const bool force_re_orthogonalization,
+                    const bool compute_eigenvalues) DEAL_II_DEPRECATED;
 
     /**
      * Maximum number of temporary vectors. This parameter controls the size
@@ -242,6 +265,28 @@ public:
          const VECTOR         &b,
          const PRECONDITIONER &precondition);
 
+  /**
+   * Connect a slot to retrieve the estimated condition number.
+   * Called on each outer iteration if every_iteration=true, otherwise called
+   * once when iterations are ended (i.e., either because convergence has been
+   * achieved, or because divergence has been detected).
+   */
+  boost::signals2::connection
+  connect_condition_number_slot(const std_cxx11::function<void (double)> &slot,
+                                const bool every_iteration=false);
+
+  /**
+   * Connect a slot to retrieve the estimated eigenvalues.
+   * Called on each outer iteration if every_iteration=true, otherwise called
+   * once when iterations are ended (i.e., either because convergence has been
+   * achieved, or because divergence has been detected).
+   */
+  boost::signals2::connection
+  connect_eigenvalues_slot(
+    const std_cxx11::function<void (const std::vector<std::complex<double> > &)> &slot,
+    const bool every_iteration=false);
+
+
   DeclException1 (ExcTooFewTmpVectors,
                   int,
                   << "The number of temporary vectors you gave ("
@@ -249,10 +294,36 @@ public:
                   << "any results, and much more for reasonable ones.");
 
 protected:
+
   /**
    * Includes the maximum number of tmp vectors.
    */
   AdditionalData additional_data;
+
+  /**
+   * Signal used to retrieve the estimated condition number.
+   * Called once when all iterations are ended.
+   */
+  boost::signals2::signal<void (double)> condition_number_signal;
+
+  /**
+   * Signal used to retrieve the estimated condition numbers.
+   * Called on each outer iteration.
+   */
+  boost::signals2::signal<void (double)> all_condition_numbers_signal;
+
+  /**
+   * Signal used to retrieve the estimated eigenvalues.
+   * Called once when all iterations are ended.
+   */
+  boost::signals2::signal<void (const std::vector<std::complex<double> > &)> eigenvalues_signal;
+
+  /**
+   * Signal used to retrieve the estimated eigenvalues.
+   * Called on each outer iteration.
+   */
+  boost::signals2::signal<void (const std::vector<std::complex<double> > &)> all_eigenvalues_signal;
+
 
   /**
    * Implementation of the computation of the norm of the residual.
@@ -283,6 +354,21 @@ protected:
                          VECTOR             &vv,
                          Vector<double>     &h,
                          bool               &re_orthogonalize);
+
+  /**
+    * Estimates the eigenvalues from the Hessenberg matrix, H_orig, generated
+    * during the inner iterations. Uses these estimate to compute the condition
+    * number. Calls the signals eigenvalues_signal and cond_signal with these
+    * estimates as arguments. Outputs the eigenvalues to deallog if
+    * log_eigenvalues is true.
+    */
+  static void
+  compute_eigs_and_cond(
+    const FullMatrix<double> &H_orig ,
+    const unsigned int dim,
+    const boost::signals2::signal<void (const std::vector<std::complex<double> > &)> &eigenvalues_signal,
+    const boost::signals2::signal<void(double)> &cond_signal,
+    const bool log_eigenvalues);
 
   /**
    * Projected system matrix
@@ -463,6 +549,23 @@ SolverGMRES<VECTOR>::AdditionalData::
 AdditionalData (const unsigned int max_n_tmp_vectors,
                 const bool         right_preconditioning,
                 const bool         use_default_residual,
+                const bool         force_re_orthogonalization)
+  :
+  max_n_tmp_vectors(max_n_tmp_vectors),
+  right_preconditioning(right_preconditioning),
+  use_default_residual(use_default_residual),
+  force_re_orthogonalization(force_re_orthogonalization),
+  compute_eigenvalues(false)
+{}
+
+
+
+template <class VECTOR>
+inline
+SolverGMRES<VECTOR>::AdditionalData::
+AdditionalData (const unsigned int max_n_tmp_vectors,
+                const bool         right_preconditioning,
+                const bool         use_default_residual,
                 const bool         force_re_orthogonalization,
                 const bool         compute_eigenvalues)
   :
@@ -470,8 +573,9 @@ AdditionalData (const unsigned int max_n_tmp_vectors,
   right_preconditioning(right_preconditioning),
   use_default_residual(use_default_residual),
   force_re_orthogonalization(force_re_orthogonalization),
-  compute_eigenvalues (compute_eigenvalues)
+  compute_eigenvalues(compute_eigenvalues)
 {}
+
 
 
 template <class VECTOR>
@@ -585,6 +689,57 @@ SolverGMRES<VECTOR>::modified_gram_schmidt (const internal::SolverGMRES::TmpVect
 
 
 template<class VECTOR>
+inline void
+SolverGMRES<VECTOR>::compute_eigs_and_cond(
+  const FullMatrix<double> &H_orig,
+  const unsigned int dim,
+  const boost::signals2::signal<void (const std::vector<std::complex<double> > &)> &eigenvalues_signal,
+  const boost::signals2::signal<void (double)> &cond_signal,
+  const bool log_eigenvalues)
+{
+  //Avoid copying the Hessenberg matrix if it isn't needed.
+  if (!eigenvalues_signal.empty() || !cond_signal.empty() || log_eigenvalues )
+    {
+      LAPACKFullMatrix<double> mat(dim,dim);
+      for (unsigned int i=0; i<dim; ++i)
+        for (unsigned int j=0; j<dim; ++j)
+          mat(i,j) = H_orig(i,j);
+      //Avoid computing eigenvalues if they are not needed.
+      if (!eigenvalues_signal.empty() || log_eigenvalues )
+        {
+          //Copy mat so that we can compute svd below. Necessary since
+          //compute_eigenvalues will leave mat in state LAPACKSupport::unusable.
+          LAPACKFullMatrix<double> mat_eig(mat);
+          mat_eig.compute_eigenvalues();
+          std::vector<std::complex<double> > eigenvalues(dim);
+          for (unsigned int i=0; i<mat_eig.n(); ++i)
+            eigenvalues[i] = mat_eig.eigenvalue(i);
+          eigenvalues_signal(eigenvalues);
+          if (log_eigenvalues)
+            {
+              //Sort eigenvalues for nicer output.
+              std::sort(eigenvalues.begin(), eigenvalues.end(),
+                        internal::SolverGMRES::complex_less_pred);
+              deallog << "Eigenvalue estimate: ";
+              for (unsigned int i=0; i<mat_eig.n(); ++i)
+                deallog << ' ' << eigenvalues[i];
+              deallog << std::endl;
+            }
+        }
+      //Calculate condition number, avoid calculating the svd if a slot
+      //isn't connected. Need at least a 2-by-2 matrix to do the estimate.
+      if (!cond_signal.empty() && (mat.n()>1))
+        {
+          mat.compute_svd();
+          double condition_number=mat.singular_value(0)/mat.singular_value(mat.n()-1);
+          cond_signal(condition_number);
+        }
+    }
+}
+
+
+
+template<class VECTOR>
 template<class MATRIX, class PRECONDITIONER>
 void
 SolverGMRES<VECTOR>::solve (const MATRIX         &A,
@@ -610,10 +765,16 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
   // restart
   unsigned int accumulated_iterations = 0;
 
+  const bool do_eigenvalues=
+    !condition_number_signal.empty()
+    |!all_condition_numbers_signal.empty()
+    |!eigenvalues_signal.empty()
+    |!all_eigenvalues_signal.empty()
+    |additional_data.compute_eigenvalues;
   // for eigenvalue computation, need to collect the Hessenberg matrix (before
   // applying Givens rotations)
   FullMatrix<double> H_orig;
-  if (additional_data.compute_eigenvalues)
+  if (do_eigenvalues)
     H_orig.reinit(n_tmp_vectors, n_tmp_vectors-1);
 
   // matrix used for the orthogonalization process later
@@ -765,7 +926,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
           // for eigenvalues, get the resulting coefficients from the
           // orthogonalization process
-          if (additional_data.compute_eigenvalues)
+          if (do_eigenvalues)
             for (unsigned int i=0; i<dim+1; ++i)
               H_orig(i,inner_iteration) = h(i);
 
@@ -840,27 +1001,9 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
         for (unsigned int j=0; j<dim; ++j)
           H1(i,j) = H(i,j);
 
-      // compute eigenvalues from the Hessenberg matrix generated during the
-      // inner iterations
-      if (additional_data.compute_eigenvalues)
-        {
-          LAPACKFullMatrix<double> mat(dim,dim);
-          for (unsigned int i=0; i<dim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              mat(i,j) = H_orig(i,j);
-          mat.compute_eigenvalues();
-          std::vector<std::complex<double> > eigenvalues(dim);
-          for (unsigned int i=0; i<mat.n(); ++i)
-            eigenvalues[i] = mat.eigenvalue(i);
-
-          std::sort(eigenvalues.begin(), eigenvalues.end(),
-                    internal::SolverGMRES::complex_less_pred);
-
-          deallog << "Eigenvalue estimate: ";
-          for (unsigned int i=0; i<mat.n(); ++i)
-            deallog << ' ' << eigenvalues[i];
-          deallog << std::endl;
-        }
+      compute_eigs_and_cond(H_orig,dim,all_eigenvalues_signal,
+                            all_condition_numbers_signal,
+                            additional_data.compute_eigenvalues);
 
       H1.backward(h,gamma);
 
@@ -880,6 +1023,8 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
     }
   while (iteration_state == SolverControl::iterate);
 
+  compute_eigs_and_cond(H_orig,dim,eigenvalues_signal,condition_number_signal,
+                        false);
   if (!use_default_residual)
     {
       this->memory.free(r);
@@ -894,6 +1039,42 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
   AssertThrow(iteration_state == SolverControl::success,
               SolverControl::NoConvergence (accumulated_iterations,
                                             last_res));
+}
+
+
+
+template<class VECTOR>
+boost::signals2::connection
+SolverGMRES<VECTOR>::connect_condition_number_slot(
+  const std_cxx11::function<void(double)> &slot,
+  const bool every_iteration)
+{
+  if (every_iteration)
+    {
+      return all_condition_numbers_signal.connect(slot);
+    }
+  else
+    {
+      return condition_number_signal.connect(slot);
+    }
+}
+
+
+
+template<class VECTOR>
+boost::signals2::connection
+SolverGMRES<VECTOR>::connect_eigenvalues_slot(
+  const std_cxx11::function<void (const std::vector<std::complex<double> > &)> &slot,
+  const bool every_iteration)
+{
+  if (every_iteration)
+    {
+      return all_eigenvalues_signal.connect(slot);
+    }
+  else
+    {
+      return eigenvalues_signal.connect(slot);
+    }
 }
 
 
