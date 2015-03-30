@@ -361,7 +361,7 @@ xx: ===============================    OUTPUT END   ============================
       </ol>
       In order to achieve the first two, configure the library with
       <pre>
-  cmake -DCMAKE_BUILD_TYPE=Debug -DDEAL_II_SETUP_COVERAGE=YES <...>
+  cmake -DCMAKE_BUILD_TYPE=Debug -DDEAL_II_SETUP_COVERAGE=ON <...>
       </pre>
       You can then build the library and run the tests as usual.
     </p>
@@ -377,7 +377,7 @@ xx: ===============================    OUTPUT END   ============================
       </pre>
       when running the testsuite, or directly by
       <pre>
-	ctest <...> -S ../tests/run_coverage.cmake
+  ctest <...> -S ../tests/run_coverage.cmake
       </pre>
     </p>
 
@@ -800,8 +800,8 @@ DESCRIPTION
   - A string that is appended to CTEST_BUILD_NAME
 
 COVERAGE
-  - If set to TRUE deal.II will be configured with
-    DEAL_II_SETUP_COVERAGE=TRUE, CMAKE_BUILD_TYPE=Debug and the
+  - If set to ON deal.II will be configured with
+    DEAL_II_SETUP_COVERAGE=ON, CMAKE_BUILD_TYPE=Debug and the
     CTEST_COVERAGE() stage will be run. Test results must go into the
     "Experimental" section.
 
