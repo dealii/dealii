@@ -77,15 +77,11 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   # A "binary" in the output file indicates binary output. In this case we
   # have to switch to plain diff instead of (possibly) numdiff, which can
   # only work on plain text files.
-  #
-  # TODO: The indirection with ${${_test_diff_variable}} is necessary to
-  # avoid quoting issues with the command line :-/ - come up with a fix for
-  # that
-  #
 
-  SET(_test_diff_variable TEST_DIFF)
   IF(_file MATCHES "\\.binary\\.")
-    SET(_test_diff_variable DIFF_EXECUTABLE)
+    SET(_test_diff ${DIFF_EXECUTABLE})
+  ELSE()
+    SET(_test_diff ${NUMDIFF_EXECUTABLE})
   ENDIF()
 
   #
@@ -146,14 +142,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         SET(_diff_target ${_target}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}) # directory to run the test in
-        SET(_run_command ${_target}) # the command to issue
+        SET(_run_command ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target}) # the command to issue
 
       ELSE()
 
         SET(_diff_target ${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}/mpirun=${_n_cpu}) # directory to run the test in
-        SET(_run_command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${_n_cpu} ${MPIEXEC_PREFLAGS} ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target} ${MPIEXEC_POSTFLAGS}) # the command to issue
+        SET(_run_command "${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${_n_cpu} ${MPIEXEC_PREFLAGS} ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target} ${MPIEXEC_POSTFLAGS}") # the command to issue
 
       ENDIF()
 
@@ -201,23 +197,9 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       #
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
-        COMMAND
-          rm -f ${_test_directory}/failing_output
-        COMMAND
-          rm -f ${_test_directory}/output
-        COMMAND
-          ${_run_command} > ${_test_directory}/stdout
-          || ((test -f ${_test_directory}/output ||
-               cp ${_test_directory}/stdout ${_test_directory}/output)
-              && mv ${_test_directory}/output ${_test_directory}/failing_output
-              && echo "${_test_full}: BUILD successful."
-              && echo "${_test_full}: RUN failed. ------ Result: ${_test_directory}/failing_output"
-              && echo "${_test_full}: RUN failed. ------ Partial output:"
-              && cat ${_test_directory}/failing_output
-              && exit 1)
-        COMMAND
-          test -f ${_test_directory}/output ||
-          cp ${_test_directory}/stdout ${_test_directory}/output
+        COMMAND sh ${DEAL_II_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+          run "${_test_full}" "${_run_command}" "${_test_diff}"
+          "${DIFF_EXECUTABLE}" "${_comparison_file}"
         COMMAND ${PERL_EXECUTABLE}
           -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
           ${_test_directory}/output
@@ -226,51 +208,28 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         DEPENDS
           ${_target}
           ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
+        VERBATIM
         )
+
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
-        COMMAND
-          rm -f ${_test_directory}/failing_diff
-        COMMAND
-          touch ${_test_directory}/diff
-        COMMAND
-          # run diff or numdiff (if available) to determine
-          # whether files are the same. if they are not, output
-          # the first few lines of the output of numdiff, followed
-          # by the results of regular diff since the latter is just
-          # more readable
-          ${${_test_diff_variable}} # see comment above about redirection
-            ${_comparison_file}
-            ${_test_directory}/output
-            > ${_test_directory}/diff
-          || (mv ${_test_directory}/diff
-                 ${_test_directory}/failing_diff
-              && echo "${_test_full}: BUILD successful."
-              && echo "${_test_full}: RUN successful."
-              && echo "${_test_full}: DIFF failed. ------ Source: ${_comparison_file}"
-              && echo "${_test_full}: DIFF failed. ------ Result: ${_test_directory}/output"
-              && echo "Check ${_test_directory}/output ${_comparison_file}"
-              && echo "${_test_full}: DIFF failed. ------ Diff:   ${_test_directory}/failing_diff"
-              && echo "${_test_full}: DIFF failed. ------ First 8 lines of numdiff/diff output:"
-              && cat ${_test_directory}/failing_diff | head -n 8
-              && echo "${_test_full}: DIFF failed. ------ First 50 lines diff output:"
-              && ${DIFF_EXECUTABLE} -c ${_comparison_file} ${_test_directory}/output | head -n 50
-              && exit 1)
+        COMMAND sh ${DEAL_II_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+          diff "${_test_full}" "${_run_command}" "${_test_diff}"
+          "${DIFF_EXECUTABLE}" "${_comparison_file}"
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
           ${_test_directory}/output
           ${_comparison_file}
+        VERBATIM
         )
 
       ADD_CUSTOM_TARGET(${_diff_target}
-        COMMAND
-             echo "${_test_full}: BUILD successful."
-          && echo "${_test_full}: RUN successful."
-          && echo "${_test_full}: DIFF successful."
-          && echo "${_test_full}: PASSED."
-        DEPENDS
-          ${_test_directory}/diff
-      )
+        COMMAND echo "${_test_full}: BUILD successful."
+        COMMAND echo "${_test_full}: RUN successful."
+        COMMAND echo "${_test_full}: DIFF successful."
+        COMMAND echo "${_test_full}: PASSED."
+        DEPENDS ${_test_directory}/diff
+        )
 
       #
       # And finally add the test:

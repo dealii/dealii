@@ -24,10 +24,6 @@
 # and the following variables, that can be overwritten by environment or
 # command line:
 #
-#     TEST_DIFF
-#       - specifying the executable and command line of the diff command to
-#         use
-#
 #     TEST_LIBRARIES
 #     TEST_LIBRARIES_DEBUG
 #     TEST_LIBRARIES_RELEASE
@@ -97,26 +93,25 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   MARK_AS_ADVANCED(DIFF_EXECUTABLE NUMDIFF_EXECUTABLE)
 
-  SET_IF_EMPTY(TEST_DIFF "$ENV{TEST_DIFF}")
-  IF("${TEST_DIFF}" STREQUAL "")
-    #
-    # No TEST_DIFF is set, specify one:
-    #
-
-    IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
-      SET(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \\t\\n:<>=,;')
-      IF(DIFF_EXECUTABLE MATCHES "-NOTFOUND")
-        SET(DIFF_EXECUTABLE ${NUMDIFF_EXECUTABLE})
-      ENDIF()
-    ELSEIF(NOT DIFF_EXECUTABLE MATCHES "-NOTFOUND")
-      SET(TEST_DIFF ${DIFF_EXECUTABLE})
-    ELSE()
-      MESSAGE(FATAL_ERROR
-        "Could not find diff or numdiff. One of those are required for running the testsuite.\n"
-        "Please specify TEST_DIFF by hand."
-        )
-    ENDIF()
+  IF( NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND" AND
+      DIFF_EXECUTABLE MATCHES "-NOTFOUND" )
+    MESSAGE(FATAL_ERROR
+      "Could not find diff or numdiff. One of those are required for running the testsuite.\n"
+      "Please specify DIFF_DIR or NUMDIFF_DIR to a location containing the binaries."
+      )
   ENDIF()
+
+  IF(DIFF_EXECUTABLE MATCHES "-NOTFOUND")
+    SET(DIFF_EXECUTABLE ${NUMDIFF_EXECUTABLE})
+  ENDIF()
+
+  IF(NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
+    SET(NUMDIFF_EXECUTABLE ${DIFF_EXECUTABLE})
+  ENDIF()
+
+  #
+  # Set time limit:
+  #
 
   SET_IF_EMPTY(TEST_TIME_LIMIT "$ENV{TEST_TIME_LIMIT}")
   SET_IF_EMPTY(TEST_TIME_LIMIT 600)
