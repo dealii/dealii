@@ -439,6 +439,75 @@ public:
                   const std::pair<double, Point<dim> > &b);
 };
 
+/**
+ * Telles quadrature of arbitrary order.
+ *
+ * The coefficients of these quadrature rules are computed using
+ * a non linear change of variables starting from a Gauss-Legendre
+ * quadrature formula.
+ * This is done using a cubic polynomial,
+ * $n = a x^3 + b x^2 + c x + d$
+ * in order to integrate
+ * a singular integral, with singularity at a given point x_0.
+ *
+ * We start from a Gauss Quadrature Formula with arbitrary
+ * function. Then we apply the cubic variable change.
+ * In the paper, J.C.F.Telles:A Self-Adaptive Co-ordinate Transformation
+ * For Efficient Numerical Evaluation of General Boundary Element Integrals.
+ * International Journal for Numerical Methods in Engineering, vol 24,
+ * pages 959–973. year 1987, the author applies the transformation on the
+ * reference cell $[-1, 1]$ getting
+ * @f{align*} n(1) &= 1, \\ n(-1) &= -1, \\ dn/dx $= 0 at x = x_0, \\
+ d2n/dx2 = 0 at x &= x_0 @f}
+ * We get
+ * @f{align*} a &= 1/q, \\ b &= -3gamma_bar/q, \\ c &= 3gamma_bar/q, \\
+ d &= -b, @f}
+ * with
+ * @f{align*} eta_star &= eta_bar^2 - 1, \\ gamma_bar 6 &= nthroot( eta_bar
+ * eta_star + abs(eta_star) ,3) + nthroot(eta_bar*eta_star - abs(eta_star),3)
+ + eta_bar, \\ q &= ((gamma-gamma_bar).^3 + gamma_bar*(gamma_bar^2+3))
+ /(1+3*gamma_bar^2) @f}.
+ * Since the library assumes [0,1] as reference interval, we will map
+ * these values on the proper reference interval in the implementation.
+ *
+ * This variable change can be used to integrate singular integrals.
+ * One example is $\f(x)/abs(x-x_0)$ on the reference interval $[0,1]$,
+ * where $x_0$ is given at construction time, and is the location of the
+ * singularity $x_0$, and $f(x)$ is a smooth non singular function.
+ *
+ * Singular quadrature formula are rather expensive, nevertheless Telles'
+ * quadrature formula are much easier to compute with respect to other singular
+ * integration techniques as Lachat-Watson.
+ *
+ * We have implemented the case for $dim = 1$. When we deal the case $dim >1$
+ * we have computed the quadrature formula has a tensorial product of one
+ * dimensional Telles' quadrature formulas considering the different components
+ * of the singularity.
+ *
+ * The weights and functions for Gauss Legendre formula have been tabulated up
+ * to order 12.
+ *
+ * @author Nicola Giuliani, Luca Heltai 2015
+ */
+template <int dim>
+class QTelles: public Quadrature<dim>
+{
+public:
+  /**
+  * A constructor that takes a quadrature formula and a singular point as
+  * argument. The quadrature formula will be mapped using Telles' rule. Make
+  * sure that the order of the quadrature rule is appropriate for the
+  * singularity in question.
+  **/
+  QTelles (const Quadrature<1> &base_quad, const Point<dim> &singularity);
+  /**
+  * A variant of above constructor that takes as parameters the order @p n
+  * and location of a singularity. A Gauss Legendre quadrature of order n
+  * will be used
+  **/
+  QTelles (const unsigned int n, const Point<dim> &singularity);
+
+};
 
 /*@}*/
 
@@ -470,6 +539,7 @@ template <> QWeddle<1>::QWeddle ();
 template <> QGaussLog<1>::QGaussLog (const unsigned int n, const bool revert);
 template <> QGaussLogR<1>::QGaussLogR (const unsigned int n, const Point<1> x0, const double alpha, const bool flag);
 template <> QGaussOneOverR<2>::QGaussOneOverR (const unsigned int n, const unsigned int index, const bool flag);
+template <> QTelles<1>::QTelles(const Quadrature<1> &base_quad, const Point<1> &singularity);
 
 
 
