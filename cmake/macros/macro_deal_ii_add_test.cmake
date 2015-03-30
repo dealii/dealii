@@ -196,7 +196,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       #
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
-        COMMAND sh ${DEAL_II_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+        COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
           run "${_test_full}" "${_run_command}" "${_test_diff}"
           "${DIFF_EXECUTABLE}" "${_comparison_file}"
         COMMAND ${PERL_EXECUTABLE}
@@ -211,7 +211,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         )
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
-        COMMAND sh ${DEAL_II_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+        COMMAND sh ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
           diff "${_test_full}" "${_run_command}" "${_test_diff}"
           "${DIFF_EXECUTABLE}" "${_comparison_file}"
         WORKING_DIRECTORY
