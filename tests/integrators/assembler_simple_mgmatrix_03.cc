@@ -92,7 +92,6 @@ void test(FiniteElement<dim> &fe)
 
   MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > ass;
   ass.initialize(matrix);
-  ass.initialize_local_blocks(dof.block_info().local());
   MeshWorker::DoFInfo<dim> info(dof.block_info());
   ass.initialize_info(info, false);
   MeshWorker::DoFInfo<dim> infon(dof.block_info());
