@@ -77,7 +77,7 @@ diff() {
   esac
 
   if [ $? -ne 0 ]; then
-    mv diff /failing_diff
+    mv diff failing_diff
     echo "${TEST_FULL}: BUILD successful."
     echo "${TEST_FULL}: RUN successful."
     echo "${TEST_FULL}: DIFF failed. ------ Source: ${COMPARISON_FILE}"
