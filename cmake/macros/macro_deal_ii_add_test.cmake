@@ -16,13 +16,14 @@
 #
 # A Macro to set up tests for the testsuite
 #
-# This macro assumes that a source file "./tests/category/<test_name>.cc"
-# as well as the comparison file "<comparison_file>" is available in the
-# testsuite. The output of compiled source file is compared against the
-# file comparison file.
+# This macro assumes that a source file "${test_name}.cc" as well as the
+# comparison file "${comparison_file}" is available in the testsuite. The
+# output of the compiled source file is compared against the file
+# comparison file.
 #
-# For every deal.II build type (given by the variable DEAL_II_BUILD_TYPES) that
-# is a (case insensitive) substring of CMAKE_BUILD_TYPE a test is defined.
+# For every deal.II build type (given by the variable DEAL_II_BUILD_TYPES)
+# that is a (case insensitive) substring of CMAKE_BUILD_TYPE a test is
+# defined.
 #
 # This macro gets the following options from the comparison file name (have
 # a look at the testsuite documentation for details):
@@ -32,8 +33,9 @@
 #
 # The following variables must be set:
 #
-#   TEST_DIFF
-#     - specifying the executable and command line of the diff command to use
+#   NUMDIFF_EXECUTABLE, DIFF_EXECUTABLE
+#     - pointing to valid diff executables. If NUMDIFF_EXECUTABLE is not
+#       "numdiff" it will be ignored and DIFF_EXECUTABLE is used instead.
 #
 #   TEST_TIME_LIMIT
 #     - specifying the maximal wall clock time in seconds a test is allowed
@@ -65,7 +67,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   #
   # Determine valid build configurations for this test:
   #
-
   SET(_configuration)
   IF(_file MATCHES "\\.debug\\.")
     SET(_configuration DEBUG)
@@ -78,20 +79,15 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   # have to switch to plain diff instead of (possibly) numdiff, which can
   # only work on plain text files.
   #
-  # TODO: The indirection with ${${_test_diff_variable}} is necessary to
-  # avoid quoting issues with the command line :-/ - come up with a fix for
-  # that
-  #
-
-  SET(_test_diff_variable TEST_DIFF)
   IF(_file MATCHES "\\.binary\\.")
-    SET(_test_diff_variable DIFF_EXECUTABLE)
+    SET(_test_diff ${DIFF_EXECUTABLE})
+  ELSE()
+    SET(_test_diff ${NUMDIFF_EXECUTABLE})
   ENDIF()
 
   #
   # Determine whether the test should be run with mpirun:
   #
-
   STRING(REGEX MATCH "mpirun=([0-9]*)" _n_cpu ${_file})
   IF("${_n_cpu}" STREQUAL "")
     SET(_n_cpu 0) # 0 indicates that no mpirun should be used
@@ -102,7 +98,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   #
   # Determine the expected build stage of this test:
   #
-
   STRING(REGEX MATCH "expect=([a-z]*)" _expect ${_file})
   IF("${_expect}" STREQUAL "")
     SET(_expect "PASSED")
@@ -146,14 +141,15 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         SET(_diff_target ${_target}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}) # directory to run the test in
-        SET(_run_command ${_target}) # the command to issue
+        SET(_run_command ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target}) # the command to issue
 
       ELSE()
 
         SET(_diff_target ${_test_name}.mpirun${_n_cpu}.${_build_lowercase}.diff) # diff target name
         SET(_test_full ${_category}/${_test_name}.mpirun=${_n_cpu}.${_build_lowercase}) # full test name
         SET(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_target}/mpirun=${_n_cpu}) # directory to run the test in
-        SET(_run_command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${_n_cpu} ${MPIEXEC_PREFLAGS} ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target} ${MPIEXEC_POSTFLAGS}) # the command to issue
+        # the command to issue
+        SET(_run_command "${DEAL_II_MPIEXEC} ${DEAL_II_MPIEXEC_NUMPROC_FLAG} ${_n_cpu} ${DEAL_II_MPIEXEC_PREFLAGS} ${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target} ${DEAL_II_MPIEXEC_POSTFLAGS}")
 
       ENDIF()
 
@@ -161,10 +157,9 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
       #
       # Add an executable for the current test and set up compile
-      # definitions and the full link interface:
+      # definitions and the full link interface. Only add the target once.
       #
       IF(NOT TARGET ${_target})
-        # only add the target once
 
         #
         # Add a "guard file" rule: The purpose of interrupt_guard.cc is to
@@ -201,23 +196,9 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
       #
 
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/output
-        COMMAND
-          rm -f ${_test_directory}/failing_output
-        COMMAND
-          rm -f ${_test_directory}/output
-        COMMAND
-          ${_run_command} > ${_test_directory}/stdout
-          || ((test -f ${_test_directory}/output ||
-               cp ${_test_directory}/stdout ${_test_directory}/output)
-              && mv ${_test_directory}/output ${_test_directory}/failing_output
-              && echo "${_test_full}: BUILD successful."
-              && echo "${_test_full}: RUN failed. ------ Result: ${_test_directory}/failing_output"
-              && echo "${_test_full}: RUN failed. ------ Partial output:"
-              && cat ${_test_directory}/failing_output
-              && exit 1)
-        COMMAND
-          test -f ${_test_directory}/output ||
-          cp ${_test_directory}/stdout ${_test_directory}/output
+        COMMAND sh ${DEAL_II_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+          run "${_test_full}" "${_run_command}" "${_test_diff}"
+          "${DIFF_EXECUTABLE}" "${_comparison_file}"
         COMMAND ${PERL_EXECUTABLE}
           -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
           ${_test_directory}/output
@@ -226,54 +207,31 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         DEPENDS
           ${_target}
           ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
+        VERBATIM
         )
+
       ADD_CUSTOM_COMMAND(OUTPUT ${_test_directory}/diff
-        COMMAND
-          rm -f ${_test_directory}/failing_diff
-        COMMAND
-          touch ${_test_directory}/diff
-        COMMAND
-          # run diff or numdiff (if available) to determine
-          # whether files are the same. if they are not, output
-          # the first few lines of the output of numdiff, followed
-          # by the results of regular diff since the latter is just
-          # more readable
-          ${${_test_diff_variable}} # see comment above about redirection
-            ${_comparison_file}
-            ${_test_directory}/output
-            > ${_test_directory}/diff
-          || (mv ${_test_directory}/diff
-                 ${_test_directory}/failing_diff
-              && echo "${_test_full}: BUILD successful."
-              && echo "${_test_full}: RUN successful."
-              && echo "${_test_full}: DIFF failed. ------ Source: ${_comparison_file}"
-              && echo "${_test_full}: DIFF failed. ------ Result: ${_test_directory}/output"
-              && echo "Check ${_test_directory}/output ${_comparison_file}"
-              && echo "${_test_full}: DIFF failed. ------ Diff:   ${_test_directory}/failing_diff"
-              && echo "${_test_full}: DIFF failed. ------ First 8 lines of numdiff/diff output:"
-              && cat ${_test_directory}/failing_diff | head -n 8
-              && echo "${_test_full}: DIFF failed. ------ First 50 lines diff output:"
-              && ${DIFF_EXECUTABLE} -c ${_comparison_file} ${_test_directory}/output | head -n 50
-              && exit 1)
+        COMMAND sh ${DEAL_II_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
+          diff "${_test_full}" "${_run_command}" "${_test_diff}"
+          "${DIFF_EXECUTABLE}" "${_comparison_file}"
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
           ${_test_directory}/output
           ${_comparison_file}
+        VERBATIM
         )
 
       ADD_CUSTOM_TARGET(${_diff_target}
-        COMMAND
-             echo "${_test_full}: BUILD successful."
-          && echo "${_test_full}: RUN successful."
-          && echo "${_test_full}: DIFF successful."
-          && echo "${_test_full}: PASSED."
-        DEPENDS
-          ${_test_directory}/diff
-      )
+        COMMAND echo "${_test_full}: BUILD successful."
+        COMMAND echo "${_test_full}: RUN successful."
+        COMMAND echo "${_test_full}: DIFF successful."
+        COMMAND echo "${_test_full}: PASSED."
+        DEPENDS ${_test_directory}/diff
+        )
 
       #
-      # And finally add the test:
+      # And finally define the test:
       #
 
       ADD_TEST(NAME ${_test_full}

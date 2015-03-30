@@ -24,10 +24,6 @@
 # and the following variables, that can be overwritten by environment or
 # command line:
 #
-#     TEST_DIFF
-#       - specifying the executable and command line of the diff command to
-#         use
-#
 #     TEST_LIBRARIES
 #     TEST_LIBRARIES_DEBUG
 #     TEST_LIBRARIES_RELEASE
@@ -36,6 +32,10 @@
 #     TEST_TIME_LIMIT
 #       - specifying the maximal wall clock time in seconds a test is
 #         allowed to run
+#
+# Either numdiff (if available), or diff are used for the comparison of
+# test results. Their location can be specified with NUMDIFF_DIR and
+# DIFF_DIR.
 #
 # Usage:
 #     DEAL_II_PICKUP_TESTS()
@@ -74,14 +74,10 @@ MACRO(DEAL_II_PICKUP_TESTS)
   ENDIF()
 
   #
-  # We need perl:
+  # Necessary external interpreters and programs:
   #
 
   FIND_PACKAGE(Perl REQUIRED)
-
-  #
-  # We need a diff tool, preferably numdiff:
-  #
 
   FIND_PROGRAM(DIFF_EXECUTABLE
     NAMES diff
@@ -97,43 +93,36 @@ MACRO(DEAL_II_PICKUP_TESTS)
 
   MARK_AS_ADVANCED(DIFF_EXECUTABLE NUMDIFF_EXECUTABLE)
 
-  SET_IF_EMPTY(TEST_DIFF "$ENV{TEST_DIFF}")
-  IF("${TEST_DIFF}" STREQUAL "")
-    #
-    # No TEST_DIFF is set, specify one:
-    #
-
-    IF(NOT NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
-      SET(TEST_DIFF ${NUMDIFF_EXECUTABLE} -a 1e-6 -r 1e-8 -s ' \\t\\n:<>=,;')
-      IF(DIFF_EXECUTABLE MATCHES "-NOTFOUND")
-        SET(DIFF_EXECUTABLE ${NUMDIFF_EXECUTABLE})
-      ENDIF()
-    ELSEIF(NOT DIFF_EXECUTABLE MATCHES "-NOTFOUND")
-      SET(TEST_DIFF ${DIFF_EXECUTABLE})
-    ELSE()
-      MESSAGE(FATAL_ERROR
-        "Could not find diff or numdiff. One of those are required for running the testsuite.\n"
-        "Please specify TEST_DIFF by hand."
-        )
-    ENDIF()
+  IF( NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND" AND
+      DIFF_EXECUTABLE MATCHES "-NOTFOUND" )
+    MESSAGE(FATAL_ERROR
+      "Could not find diff or numdiff. One of those are required for running the testsuite.\n"
+      "Please specify DIFF_DIR or NUMDIFF_DIR to a location containing the binaries."
+      )
   ENDIF()
+
+  IF(DIFF_EXECUTABLE MATCHES "-NOTFOUND")
+    SET(DIFF_EXECUTABLE ${NUMDIFF_EXECUTABLE})
+  ENDIF()
+
+  IF(NUMDIFF_EXECUTABLE MATCHES "-NOTFOUND")
+    SET(NUMDIFF_EXECUTABLE ${DIFF_EXECUTABLE})
+  ENDIF()
+
+  #
+  # Set time limit:
+  #
 
   SET_IF_EMPTY(TEST_TIME_LIMIT "$ENV{TEST_TIME_LIMIT}")
   SET_IF_EMPTY(TEST_TIME_LIMIT 600)
 
   #
-  # Enable testing...
+  # ... and finally pick up tests:
   #
 
   ENABLE_TESTING()
 
-  #
-  # ... and finally pick up tests:
-  #
-
   SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
-
-
   GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
   SET(DEAL_II_SOURCE_DIR) # avoid a bogus warning
@@ -155,7 +144,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
     ENDIF()
 
     #
-    # Respect compiler constraint:
+    # Respect compiler constraints:
     #
 
     STRING(REGEX MATCHALL
@@ -230,7 +219,7 @@ The feature \"DEAL_II_${_feature}\" does not exist.\n"
 
     IF(_define_test)
       STRING(REGEX REPLACE "\\..*" "" _test ${_test})
-      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison} ${_add_output})
+      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison})
     ENDIF()
 
   ENDFOREACH()
