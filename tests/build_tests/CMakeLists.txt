@@ -56,7 +56,16 @@ SET(_release_steps
   step-47 step-48 step-49
   )
 
-FILE(GLOB _steps ${DEAL_II_PATH}/${DEAL_II_EXAMPLES_RELDIR}/step-*)
+#
+# Glob together all tests:
+#
+IF(DEAL_II_BUILD_DIR)
+  LIST(GET DEAL_II_INCLUDE_DIRS 1 _include_dir)
+  GET_FILENAME_COMPONENT(_binary_dir ${_include_dir} PATH)
+  FILE(GLOB _steps ${_binary_dir}/examples/step-*)
+ELSE()
+  FILE(GLOB _steps ${DEAL_II_PATH}/${DEAL_II_EXAMPLES_RELDIR}/step-*)
+ENDIF()
 
 FOREACH(_step_full ${_steps})
   GET_FILENAME_COMPONENT(_step ${_step_full} NAME)
@@ -75,7 +84,7 @@ FOREACH(_step_full ${_steps})
       FILE(GLOB _files ${_step_full}/*)
       SET(_command)
       FOREACH(_file ${_files})
-        IF(NOT _file MATCHES "/(CMakeCache.txt|CMakeFiles|doc)")
+        IF(NOT _file MATCHES "/(CMakeCache.txt|CMakeFiles|doc)$")
           LIST(APPEND _command
             COMMAND ${CMAKE_COMMAND} -E copy ${_file} ${_step_dir}
             )
