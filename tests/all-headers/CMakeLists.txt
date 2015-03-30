@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
+INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
 
 #
@@ -36,8 +36,13 @@ SET(_category all-headers)
 # Glob together all header files and strip SOURCE_DIR/include/deal.II to
 # get a correct relative path:
 #
-FILE(GLOB_RECURSE _headers RELATIVE ${DEAL_II_SOURCE_DIR}/include/deal.II
-  ${DEAL_II_SOURCE_DIR}/include/deal.II/*.h
+IF(DEAL_II_BUILD_DIR)
+  LIST(GET DEAL_II_INCLUDE_DIRS 1 _include_dir)
+ELSE()
+  LIST(GET DEAL_II_INCLUDE_DIRS 0 _include_dir)
+ENDIF()
+FILE(GLOB_RECURSE _headers RELATIVE ${_include_dir}/deal.II
+  ${_include_dir}/deal.II/*.h
   )
 
 FOREACH(_header ${_headers})

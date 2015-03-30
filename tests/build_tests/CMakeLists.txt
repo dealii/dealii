@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
+INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
 
 #
@@ -56,7 +56,7 @@ SET(_release_steps
   step-47 step-48 step-49
   )
 
-FILE(GLOB _steps ${DEAL_II_SOURCE_DIR}/examples/step-*)
+FILE(GLOB _steps ${DEAL_II_PATH}/${DEAL_II_EXAMPLES_RELDIR}/step-*)
 
 FOREACH(_step_full ${_steps})
   GET_FILENAME_COMPONENT(_step ${_step_full} NAME)

@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
-INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
+INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
 IF(DEAL_II_WITH_PETSC AND DEAL_II_WITH_SLEPC)
   DEAL_II_PICKUP_TESTS()

@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
-INCLUDE(${DEAL_II_SOURCE_DIR}/tests/setup_testsubproject.cmake)
+INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
 
 #

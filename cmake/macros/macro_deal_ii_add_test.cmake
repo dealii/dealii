@@ -204,16 +204,20 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         COMMAND
           rm -f ${_test_directory}/failing_output
         COMMAND
-          touch ${_test_directory}/output
+          rm -f ${_test_directory}/output
         COMMAND
-          ${_run_command}
-          || (mv ${_test_directory}/output
-                 ${_test_directory}/failing_output
+          ${_run_command} > ${_test_directory}/stdout
+          || ((test -f ${_test_directory}/output ||
+               cp ${_test_directory}/stdout ${_test_directory}/output)
+              && mv ${_test_directory}/output ${_test_directory}/failing_output
               && echo "${_test_full}: BUILD successful."
               && echo "${_test_full}: RUN failed. ------ Result: ${_test_directory}/failing_output"
               && echo "${_test_full}: RUN failed. ------ Partial output:"
               && cat ${_test_directory}/failing_output
               && exit 1)
+        COMMAND
+          test -f ${_test_directory}/output ||
+          cp ${_test_directory}/stdout ${_test_directory}/output
         COMMAND ${PERL_EXECUTABLE}
           -pi ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
           ${_test_directory}/output
