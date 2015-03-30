@@ -16,13 +16,14 @@
 #
 # A Macro to set up tests for the testsuite
 #
-# This macro assumes that a source file "./tests/category/<test_name>.cc"
-# as well as the comparison file "<comparison_file>" is available in the
-# testsuite. The output of compiled source file is compared against the
-# file comparison file.
+# This macro assumes that a source file "${test_name}.cc" as well as the
+# comparison file "${comparison_file}" is available in the testsuite. The
+# output of the compiled source file is compared against the file
+# comparison file.
 #
-# For every deal.II build type (given by the variable DEAL_II_BUILD_TYPES) that
-# is a (case insensitive) substring of CMAKE_BUILD_TYPE a test is defined.
+# For every deal.II build type (given by the variable DEAL_II_BUILD_TYPES)
+# that is a (case insensitive) substring of CMAKE_BUILD_TYPE a test is
+# defined.
 #
 # This macro gets the following options from the comparison file name (have
 # a look at the testsuite documentation for details):
@@ -32,8 +33,9 @@
 #
 # The following variables must be set:
 #
-#   TEST_DIFF
-#     - specifying the executable and command line of the diff command to use
+#   NUMDIFF_EXECUTABLE, DIFF_EXECUTABLE
+#     - pointing to valid diff executables. If NUMDIFF_EXECUTABLE is not
+#       "numdiff" it will be ignored and DIFF_EXECUTABLE is used instead.
 #
 #   TEST_TIME_LIMIT
 #     - specifying the maximal wall clock time in seconds a test is allowed
@@ -65,7 +67,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   #
   # Determine valid build configurations for this test:
   #
-
   SET(_configuration)
   IF(_file MATCHES "\\.debug\\.")
     SET(_configuration DEBUG)
@@ -77,7 +78,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   # A "binary" in the output file indicates binary output. In this case we
   # have to switch to plain diff instead of (possibly) numdiff, which can
   # only work on plain text files.
-
+  #
   IF(_file MATCHES "\\.binary\\.")
     SET(_test_diff ${DIFF_EXECUTABLE})
   ELSE()
@@ -87,7 +88,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   #
   # Determine whether the test should be run with mpirun:
   #
-
   STRING(REGEX MATCH "mpirun=([0-9]*)" _n_cpu ${_file})
   IF("${_n_cpu}" STREQUAL "")
     SET(_n_cpu 0) # 0 indicates that no mpirun should be used
@@ -98,7 +98,6 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
   #
   # Determine the expected build stage of this test:
   #
-
   STRING(REGEX MATCH "expect=([a-z]*)" _expect ${_file})
   IF("${_expect}" STREQUAL "")
     SET(_expect "PASSED")
@@ -157,10 +156,9 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
 
       #
       # Add an executable for the current test and set up compile
-      # definitions and the full link interface:
+      # definitions and the full link interface. Only add the target once.
       #
       IF(NOT TARGET ${_target})
-        # only add the target once
 
         #
         # Add a "guard file" rule: The purpose of interrupt_guard.cc is to
@@ -232,7 +230,7 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         )
 
       #
-      # And finally add the test:
+      # And finally define the test:
       #
 
       ADD_TEST(NAME ${_test_full}

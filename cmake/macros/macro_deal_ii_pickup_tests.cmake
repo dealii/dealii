@@ -33,6 +33,10 @@
 #       - specifying the maximal wall clock time in seconds a test is
 #         allowed to run
 #
+# Either numdiff (if available), or diff are used for the comparison of
+# test results. Their location can be specified with NUMDIFF_DIR and
+# DIFF_DIR.
+#
 # Usage:
 #     DEAL_II_PICKUP_TESTS()
 #
@@ -70,14 +74,10 @@ MACRO(DEAL_II_PICKUP_TESTS)
   ENDIF()
 
   #
-  # We need perl:
+  # Necessary external interpreters and programs:
   #
 
   FIND_PACKAGE(Perl REQUIRED)
-
-  #
-  # We need a diff tool, preferably numdiff:
-  #
 
   FIND_PROGRAM(DIFF_EXECUTABLE
     NAMES diff
@@ -117,18 +117,12 @@ MACRO(DEAL_II_PICKUP_TESTS)
   SET_IF_EMPTY(TEST_TIME_LIMIT 600)
 
   #
-  # Enable testing...
+  # ... and finally pick up tests:
   #
 
   ENABLE_TESTING()
 
-  #
-  # ... and finally pick up tests:
-  #
-
   SET_IF_EMPTY(TEST_PICKUP_REGEX "$ENV{TEST_PICKUP_REGEX}")
-
-
   GET_FILENAME_COMPONENT(_category ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
   SET(DEAL_II_SOURCE_DIR) # avoid a bogus warning
@@ -150,7 +144,7 @@ MACRO(DEAL_II_PICKUP_TESTS)
     ENDIF()
 
     #
-    # Respect compiler constraint:
+    # Respect compiler constraints:
     #
 
     STRING(REGEX MATCHALL
@@ -225,7 +219,7 @@ The feature \"DEAL_II_${_feature}\" does not exist.\n"
 
     IF(_define_test)
       STRING(REGEX REPLACE "\\..*" "" _test ${_test})
-      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison} ${_add_output})
+      DEAL_II_ADD_TEST(${_category} ${_test} ${_comparison})
     ENDIF()
 
   ENDFOREACH()
