@@ -769,7 +769,7 @@ namespace GridTools
   }
 
   template <int dim, int spacedim>
-  std::map<unsigned int,Point<spacedim> >
+  std::map<unsigned int, Point<spacedim> >
   get_all_vertices_at_boundary (const Triangulation<dim, spacedim> &tria)
   {
     std::map<unsigned int, Point<spacedim> > vertex_map;
@@ -780,13 +780,14 @@ namespace GridTools
       {
         for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
           {
-            const auto face = cell->face(i);
+            const typename Triangulation<dim, spacedim>::face_iterator &face
+              = cell->face(i);
             if (face->at_boundary())
               {
                 for (unsigned j = 0; j < GeometryInfo<dim>::vertices_per_face; ++j)
                   {
-                    const auto vertex = face->vertex(j);
-                    const auto vertex_index = face->vertex_index(j);
+                    const Point<spacedim> &vertex = face->vertex(j);
+                    const unsigned int vertex_index = face->vertex_index(j);
                     vertex_map[vertex_index] = vertex;
                   }
               }
