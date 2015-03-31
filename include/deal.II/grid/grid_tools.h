@@ -297,6 +297,14 @@ namespace GridTools
                           const Function<dim,double> *coefficient = 0);
 
   /**
+  *
+  *
+  */
+  template<int dim>
+  std::map<unsigned int,Point<dim> >
+  get_all_vertex_at_boundary (const Triangulation<dim> &tria);
+
+  /**
    * Scale the entire triangulation by the given factor. To preserve the
    * orientation of the triangulation, the factor must be positive.
    *

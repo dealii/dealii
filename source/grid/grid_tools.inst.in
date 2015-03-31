@@ -211,6 +211,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     laplace_transform (const std::map<unsigned int,Point<deal_II_dimension> > &new_points,
                        Triangulation<deal_II_dimension> &triangulation,
                        const Function<deal_II_dimension> *coefficient);
+
+    template
+    std::map<unsigned int,Point<deal_II_dimension> >
+    get_all_vertex_at_boundary (const Triangulation<deal_II_dimension> &tria);
+
 #  endif
 
     template
