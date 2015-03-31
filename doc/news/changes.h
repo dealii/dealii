@@ -402,9 +402,9 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> New: A new funtion to get a map with all vertices at boundaries
-  has been added in GridTools::get_all_vertices_at_boundary.
-  This function will return a map wich can be used in functions
+  <li> New: A function to get a map with all vertices at boundaries
+  has been added at GridTools::get_all_vertices_at_boundary.
+  This function will return a map which can be used in functions
   like GridTools::Laplace_transform.
   <br>
   (Fernando Posada, 2015/03/31)
