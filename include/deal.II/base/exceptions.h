@@ -873,11 +873,11 @@ namespace StandardExceptions
                   << " nor to " << arg3);
 
   /**
-   * This exception is one of the most often used ones, and indicates that an
-   * index is not within the expected range. For example, you might try to
+   * This exception indicates that an index is not within the
+   * expected range. For example, it may be that you are trying to
    * access an element of a vector which does not exist.
    *
-   * The constructor takes three <tt>int</tt>, namely
+   * The constructor takes three <tt>int</tt> arguments, namely
    * <ol>
    * <li> the violating index
    * <li> the lower bound
@@ -886,35 +886,35 @@ namespace StandardExceptions
    */
   DeclException3 (ExcIndexRange,
                   int, int, int,
-                  << "Index " << arg1 << " is not in [" << arg2 << ","
-                  << arg3 << "[");
+                  << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
+                  << arg3 << "[.");
 
   /**
    * This generic exception will allow(enforce) the user to specify the type
    * of indices which adds type safety to the program.
    */
-  template<typename T>
+  template <typename T>
   DeclException3 (ExcIndexRangeType,
                   T,T,T,
-                  << "Index " << arg1 << " is not in [" << arg2 << ","
-                  << arg3 << "[");
+                  << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
+                  << arg3 << "[.");
 
   /**
    * A number is too small.
    */
   DeclException2 (ExcLowerRange,
                   int, int,
-                  << "Number " << arg1 << " must be larger or equal "
-                  << arg2);
+                  << "Number " << arg1 << " must be larger than or equal "
+                  << arg2 << ".");
 
   /**
    * A generic exception definition for the ExcLowerRange above.
    */
-  template<typename T>
+  template <typename T>
   DeclException2 (ExcLowerRangeType,
                   T, T,
-                  << "Number " << arg1 << " must be larger or equal "
-                  << arg2);
+                  << "Number " << arg1 << " must be larger than or equal "
+                  << arg2 << ".");
 
   /**
    * This exception indicates that the first argument should be an integer
