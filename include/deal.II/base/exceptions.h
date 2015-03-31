@@ -887,7 +887,7 @@ namespace StandardExceptions
   DeclException3 (ExcIndexRange,
                   int, int, int,
                   << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
-                  << arg3 << "[");
+                  << arg3 << "[.");
 
   /**
    * This generic exception will allow(enforce) the user to specify the type
