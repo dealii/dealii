@@ -768,7 +768,32 @@ namespace GridTools
         }
   }
 
-
+  template <int dim, int spacedim>
+  std::map<unsigned int,Point<spacedim> >
+  get_all_vertices_at_boundary (const Triangulation<dim, spacedim> &tria)
+  {
+    std::map<unsigned int, Point<spacedim> > vertex_map;
+    typename Triangulation<dim,spacedim>::active_cell_iterator
+    cell = tria.begin_active(),
+    endc = tria.end();
+    for (; cell!=endc; ++cell)
+      {
+        for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+          {
+            const auto face = cell->face(i);
+            if (face->at_boundary())
+              {
+                for (unsigned j = 0; j < GeometryInfo<dim>::vertices_per_face; ++j)
+                  {
+                    const auto vertex = face->vertex(j);
+                    const auto vertex_index = face->vertex_index(j);
+                    vertex_map[vertex_index] = vertex;
+                  }
+              }
+          }
+      }
+    return vertex_map;
+  }
 
   /**
     * Distort a triangulation in
@@ -1560,7 +1585,6 @@ next_cell:
     // now compress the so-built connectivity pattern
     cell_connectivity.compress ();
   }
-
 
 
   template <int dim, int spacedim>
