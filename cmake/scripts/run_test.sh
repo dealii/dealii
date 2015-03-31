@@ -28,7 +28,7 @@ set -u
 STAGE="$1"
 TEST_FULL="$2"
 RUN_COMMAND="$3"
-NUMDIFF_EXECUTABLE="$5"
+NUMDIFF_EXECUTABLE="$4"
 DIFF_EXECUTABLE="$5"
 COMPARISON_FILE="$6"
 
@@ -77,7 +77,7 @@ diff() {
   esac
 
   if [ $? -ne 0 ]; then
-    mv diff /failing_diff
+    mv diff failing_diff
     echo "${TEST_FULL}: BUILD successful."
     echo "${TEST_FULL}: RUN successful."
     echo "${TEST_FULL}: DIFF failed. ------ Source: ${COMPARISON_FILE}"
