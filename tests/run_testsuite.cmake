@@ -87,7 +87,8 @@
 # Furthermore, the following variables controlling the testsuite can be set
 # and will be automatically handed down to cmake:
 #
-#   TEST_DIFF
+#   NUMDIFF_DIR
+#   DIFF_DIR
 #   TEST_TIME_LIMIT
 #   TEST_PICKUP_REGEX
 #
