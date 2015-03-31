@@ -297,12 +297,13 @@ namespace GridTools
                           const Function<dim,double> *coefficient = 0);
 
   /**
+  * Returns a std::map with all vertices of faces located in the boundary
   *
-  *
+  * @param[in] tria The Triangulation object.
   */
-  template<int dim>
-  std::map<unsigned int,Point<dim> >
-  get_all_vertex_at_boundary (const Triangulation<dim> &tria);
+  template <int dim, int spacedim>
+  std::map<unsigned int,Point<spacedim> >
+  get_all_vertices_at_boundary (const Triangulation<dim, spacedim> &tria);
 
   /**
    * Scale the entire triangulation by the given factor. To preserve the
