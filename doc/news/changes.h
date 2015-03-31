@@ -424,6 +424,11 @@ inconvenience this causes.
   (Nicola Giuliani, 2015/04/01)
   <li>
 
+  <li> New: Added FE_Bernstein: a scalar finite element based on Bernstein basis polynomials.
+  <br>
+  (Marco Tezzele, Luca Heltai, 2015/03/31)
+  </li>
+
   <li> New: A function to get a map with all vertices at boundaries has
   been added at GridTools::get_all_vertices_at_boundary(). This function
   will return a map which can be used in functions like

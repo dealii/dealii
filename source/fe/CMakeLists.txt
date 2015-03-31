@@ -21,6 +21,7 @@ SET(_src
   fe_abf.cc
   fe_bdm.cc
   fe.cc
+  fe_bernstein.cc
   fe_data.cc
   fe_dgp.cc
   fe_dgp_monomial.cc
@@ -58,6 +59,7 @@ SET(_src
 SET(_inst
   fe_abf.inst.in
   fe_bdm.inst.in
+  fe_bernstein.inst.in
   fe_dgp.inst.in
   fe_dgp_monomial.inst.in
   fe_dgp_nonparametric.inst.in
