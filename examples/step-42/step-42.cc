@@ -50,7 +50,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
@@ -911,8 +911,9 @@ namespace Step42
         GridTools::transform(&rotate_half_sphere, triangulation);
         GridTools::shift(Point<dim>(0.5, 0.5, 0.5), triangulation);
 
-        static HyperBallBoundary<dim> boundary_description(Point<dim>(0.5, 0.5, 0.5), radius);
-        triangulation.set_boundary(0, boundary_description);
+        static SphericalManifold<dim> manifold_description(Point<dim>(0.5, 0.5, 0.5));
+	GridTools::copy_boundary_to_manifold_id(triangulation);
+        triangulation.set_manifold(0, manifold_description);
       }
     // Alternatively, create a hypercube mesh. After creating it,
     // assign boundary indicators as follows:
