@@ -28,7 +28,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -316,8 +316,7 @@ namespace Step38
   template <int spacedim>
   void LaplaceBeltramiProblem<spacedim>::make_grid_and_dofs ()
   {
-    static HyperBallBoundary<dim,spacedim> surface_description;
-    triangulation.set_boundary (0, surface_description);
+    static SphericalManifold<dim,spacedim> surface_description;
 
     {
       Triangulation<spacedim> volume_mesh;
@@ -329,6 +328,9 @@ namespace Step38
       GridGenerator::extract_boundary_mesh (volume_mesh, triangulation,
                                             boundary_ids);
     }
+    triangulation.set_all_manifold_ids(0);
+    triangulation.set_manifold (0, surface_description);
+
     triangulation.refine_global(4);
 
     std::cout << "Surface mesh has " << triangulation.n_active_cells()
