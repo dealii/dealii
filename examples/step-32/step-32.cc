@@ -50,7 +50,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/filtered_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
 
@@ -3577,9 +3577,9 @@ namespace Step32
                                 EquationData::R1,
                                 (dim==3) ? 96 : 12,
                                 true);
-    static HyperShellBoundary<dim> boundary;
-    triangulation.set_boundary (0, boundary);
-    triangulation.set_boundary (1, boundary);
+    triangulation.set_all_manifold_ids(0);
+    static SphericalManifold<dim> manifold;
+    triangulation.set_manifold (0, manifold);
 
     global_Omega_diameter = GridTools::diameter (triangulation);
 
