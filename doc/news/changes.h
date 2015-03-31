@@ -333,6 +333,14 @@ inconvenience this causes.
 
 <ol>
 
+  <li> New: A new funtion to get a map with all vertices at boundaries 
+  has been added in GridTools::get_all_vertices_at_boundary. 
+  This function will return a map wich can be used in functions 
+  like GridTools::Laplace_transform.
+  <br>
+  (Fernando Posada, 2015/03/31)
+  </li>
+
   <li> New: A new flag no_automatic_repartitioning in
   parallel::distributed::Triangulation will disable the automatic
   repartitioning when calling execute_coarsening_and_refinement() (or things
