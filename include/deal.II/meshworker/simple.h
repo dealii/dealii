@@ -120,25 +120,34 @@ namespace MeshWorker
 
 
     /**
-     * Assemble local matrices into a single global matrix. If this global
-     * matrix has a block structure, this structure is not used, but rather
+     * Assemble local matrices into a single global matrix or several
+     * global matrices associated with the same DoFHandler. If these global
+     * matrix have a block structure, this structure is not used, but rather
      * the global numbering of degrees of freedom.
      *
-     * After being initialized with a SparseMatrix object (or another matrix
-     * offering the same functionality as SparseMatrix::add()), this class can
-     * be used in a MeshWorker::loop() to assemble the cell and face matrices
-     * into the global matrix.
+     * After being initialized with a SparseMatrix object (or another
+     * matrix offering the same functionality as SparseMatrix::add())
+     * or a vector of such, this class can be used in a
+     * MeshWorker::loop() to assemble the cell and face matrices into
+     * the global matrix.
      *
      * If a ConstraintMatrix has been provided during initialization, this
      * matrix will be used (ConstraintMatrix::distribute_local_to_global(), to
      * be precise) to enter the local matrix into the global sparse matrix.
      *
-     * The assembler can handle two different types of local data. First, by
-     * default, the obvious choice of taking a single local matrix with
-     * dimensions equal to the number of degrees of freedom of the cell.
-     * Alternatively, a local block structure can be initialized in DoFInfo.
-     * After this, the local data will be arranged as an array of n by n
-     * FullMatrix blocks, which are ordered lexicographically in DoFInfo.
+     * The assembler can handle two different types of local
+     * data. First, by default, the obvious choice of taking a single
+     * local matrix with dimensions equal to the number of degrees of
+     * freedom of the cell.  Alternatively, a local block structure
+     * can be initialized in DoFInfo.  After this, the local data will
+     * be arranged as an array of n by n FullMatrix blocks (n being
+     * the number of blocks in the FESystem used by the DoFHandler in
+     * DoFInfo), which are ordered lexicographically with column index
+     * fastest in DoFInfo. If the matrix was initialized with a vector
+     * of several matrices and local block structure is used, then the
+     * first n<sup>2</sup> matrices in LocalResults will be used for
+     * the first matrix in this vector, the second set of
+     * n<sup>2</sup> for the second, and so on.
      *
      * @ingroup MeshWorker
      * @author Guido Kanschat, 2009
@@ -183,14 +192,14 @@ namespace MeshWorker
       void initialize_info(DOFINFO &info, bool face) const;
 
       /**
-       * Assemble the matrix DoFInfo::M1[0] into the global matrix.
+       * Assemble the local matrices associated with a single cell into the global matrix.
        */
       template<class DOFINFO>
       void assemble(const DOFINFO &info);
 
       /**
-       * Assemble both local matrices in the info objects into the global
-       * matrix.
+       * Assemble all local matrices associated with an interior face
+       * in the info objects into the global matrix.
        */
       template<class DOFINFO>
       void assemble(const DOFINFO &info1,
@@ -206,7 +215,7 @@ namespace MeshWorker
                     const std::vector<types::global_dof_index> &i2);
 
       /**
-       * The global matrix being assembled.
+       * The vector of global matrices being assembled.
        */
       std::vector<SmartPointer<MATRIX,MatrixSimple<MATRIX> > > matrix;
       /**
