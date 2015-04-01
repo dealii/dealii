@@ -3496,10 +3496,14 @@ namespace GridGenerator
                         Triangulation<3,3> &result)
   {
     Assert (input.n_levels() == 1,
-            ExcMessage ("The input triangulations must be coarse meshes."));
-    Assert(result.n_cells()==0, ExcMessage("resultin Triangulation need to be empty upon calling extrude_triangulation."));
-    Assert(height>0, ExcMessage("The height in extrude_triangulation needs to be positive."));
-    Assert(n_slices>=2, ExcMessage("The number of slices in extrude_triangulation needs to be at least 2."));
+            ExcMessage ("The input triangulation must be a coarse mesh, i.e., it must "
+                        "not have been refined."));
+    Assert(result.n_cells()==0,
+           ExcMessage("The output triangulation object needs to be empty."));
+    Assert(height>0,
+           ExcMessage("The given height for extrusion must be positive."));
+    Assert(n_slices>=2,
+           ExcMessage("The number of slices for extrusion must be at least 2."));
 
     std::vector<Point<3> > points(n_slices*input.n_vertices());
     std::vector<CellData<3> > cells;
