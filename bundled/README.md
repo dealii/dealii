@@ -18,6 +18,12 @@ and licensed under the Boost Software License Version 1.0. See
 
 A full version of the library can be downloaded at http://www.boost.org/.
 
+cowsay-*
+--------
+
+Contains cowsay written by Tony Monroe and dual licensed under the
+Artistic License and the GNU General Public License version 2.
+See `cowsay-*/README` and `cowsay-*/LICENSE`
 
 muparser_*
 ----------

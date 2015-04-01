@@ -30,6 +30,36 @@ OPTION(DEAL_II_FORCE_BUNDLED_BOOST
 
 SET(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.56.0")
 
+#
+# Cowsay:
+#
+
+SET(COWSAY_FOLDER "${CMAKE_SOURCE_DIR}/bundled/cowsay-3.03")
+
+#
+# UMFPACK, AMD and UFCONFIG:
+#
+
+SET(FEATURE_UMFPACK_HAVE_BUNDLED TRUE)
+
+OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
+  "Always use the bundled umfpack library instead of an external one."
+  OFF)
+
+SET(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
+
+
+#
+# muparser
+#
+SET(FEATURE_MUPARSER_HAVE_BUNDLED TRUE)
+
+OPTION(DEAL_II_FORCE_BUNDLED_MUPARSER
+  "Always use the bundled functionparser library instead of an external one."
+  OFF)
+
+SET(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_2_3/")
+
 
 #
 # Threading Building Blocks library

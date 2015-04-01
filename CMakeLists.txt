@@ -163,5 +163,21 @@ ENDIF()
 #
 # And finally, print the configuration:
 #
-FILE(READ ${CMAKE_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)
-MESSAGE("${DEAL_II_LOG_SUMMARY}")
+FIND_PACKAGE(Perl QUIET)
+IF(PERL_FOUND AND DEAL_II_HAVE_BUNDLED_DIRECTORY)
+  EXECUTE_PROCESS(
+    COMMAND ls ${COWSAY_FOLDER}/cows
+    COMMAND sort -R
+    COMMAND head -n 1
+    OUTPUT_VARIABLE _cow
+    )
+  STRING(REGEX REPLACE "(.*cow).*" "\\1"_cow "${_cow}")
+  EXECUTE_PROCESS(
+    COMMAND ${PERL_EXECUTABLE} ${COWSAY_FOLDER}/cowsay
+      -f ${COWSAY_FOLDER}/cows/${_cow} -n
+    INPUT_FILE ${CMAKE_BINARY_DIR}/summary.log
+    )
+ELSE()
+  FILE(READ ${CMAKE_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)
+  MESSAGE("${DEAL_II_LOG_SUMMARY}")
+ENDIF()
