@@ -29,8 +29,7 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/vector_memory.h>
@@ -753,7 +752,7 @@ namespace VectorTools
       dealii::Vector<double> vec (dof.n_dofs());
       SparsityPattern sparsity;
       {
-        CompressedSimpleSparsityPattern csp (dof.n_dofs(), dof.n_dofs());
+        DynamicSparsityPattern csp (dof.n_dofs(), dof.n_dofs());
         DoFTools::make_sparsity_pattern (dof, csp, constraints,
                                          !constraints_are_compatible);
 
@@ -2177,7 +2176,7 @@ namespace VectorTools
         return;
 
       // set up sparsity structure
-      CompressedSparsityPattern c_sparsity(dof.n_boundary_dofs (boundary_functions),
+      DynamicSparsityPattern c_sparsity(dof.n_boundary_dofs (boundary_functions),
                                            dof.n_boundary_dofs (boundary_functions));
       DoFTools::make_boundary_sparsity_pattern (dof,
                                                 boundary_functions,

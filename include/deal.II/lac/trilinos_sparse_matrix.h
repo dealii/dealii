@@ -460,7 +460,7 @@ namespace TrilinosWrappers
    * <ul>
    * <li> The matrix uses only one MPI process.
    * <li> The matrix has been initialized with the reinit() method with a
-   * CompressedSimpleSparsityPattern (that includes the set of locally
+   * DynamicSparsityPattern (that includes the set of locally
    * relevant rows, i.e., the rows that an assembly routine will possibly
    * write into).
    * <li> The matrix has been initialized from a
@@ -722,11 +722,11 @@ namespace TrilinosWrappers
      * optional argument @p exchange_data can be used for reinitialization
      * with a sparsity pattern that is not fully constructed. This feature is
      * only implemented for input sparsity patterns of type
-     * CompressedSimpleSparsityPattern. If the flag is not set, each processor
+     * DynamicSparsityPattern. If the flag is not set, each processor
      * just sets the elements in the sparsity pattern that belong to its rows.
      *
      * If the sparsity pattern given to this function is of type
-     * CompressedSimpleSparsity pattern, then a matrix will be created that
+     * DynamicSparsity pattern, then a matrix will be created that
      * allows several threads to write into different rows of the matrix at
      * the same also with MPI, as opposed to most other reinit() methods.
      *
@@ -745,7 +745,7 @@ namespace TrilinosWrappers
      * optional argument @p exchange_data can be used for reinitialization
      * with a sparsity pattern that is not fully constructed. This feature is
      * only implemented for input sparsity patterns of type
-     * CompressedSimpleSparsityPattern.
+     * DynamicSparsityPattern.
      *
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
@@ -882,7 +882,7 @@ namespace TrilinosWrappers
      * to the deal.II own object. The optional argument @p exchange_data can
      * be used for reinitialization with a sparsity pattern that is not fully
      * constructed. This feature is only implemented for input sparsity
-     * patterns of type CompressedSimpleSparsityPattern. If the flag is not
+     * patterns of type DynamicSparsityPattern. If the flag is not
      * set, each processor just sets the elements in the sparsity pattern that
      * belong to its rows.
      *
@@ -902,7 +902,7 @@ namespace TrilinosWrappers
      * optional argument @p exchange_data can be used for reinitialization
      * with a sparsity pattern that is not fully constructed. This feature is
      * only implemented for input sparsity patterns of type
-     * CompressedSimpleSparsityPattern.
+     * DynamicSparsityPattern.
      *
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.

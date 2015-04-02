@@ -623,8 +623,7 @@ public:
                   const ForwardIterator end);
 
   /**
-   * Copy data from an object of type CompressedSparsityPattern,
-   * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern. Although
+   * Copy data from an object of type DynamicSparsityPattern. Although
    * not a compressed sparsity pattern, this function is also instantiated if
    * the argument is of type SparsityPattern (i.e., the current class).
    * Previous content of this object is lost, and the sparsity pattern is in

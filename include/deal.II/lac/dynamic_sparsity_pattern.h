@@ -70,13 +70,13 @@ template <typename number> class SparseMatrix;
  *
  * Use this class as follows:
  * @code
- * DynamicSparsityPattern compressed_pattern (dof_handler.n_dofs());
+ * DynamicSparsityPattern dynamic_pattern (dof_handler.n_dofs());
  * DoFTools::make_sparsity_pattern (dof_handler,
- *                                  compressed_pattern);
- * constraints.condense (compressed_pattern);
+ *                                  dynamic_pattern);
+ * constraints.condense (dynamic_pattern);
  *
  * SparsityPattern sp;
- * sp.copy_from (compressed_pattern);
+ * sp.copy_from (dynamic_pattern);
  * @endcode
  *
  * @author Timo Heister, 2008

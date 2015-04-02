@@ -362,9 +362,9 @@ namespace DoFTools
    * Remember using SparsityPattern::compress() after generating the pattern.
    *
    * The actual type of the sparsity pattern may be SparsityPattern,
-   * CompressedSparsityPattern, BlockSparsityPattern,
-   * BlockCompressedSparsityPattern, BlockCompressedSetSparsityPattern,
-   * BlockCompressedSimpleSparsityPattern, or any other class that satisfies
+   * DynamicSparsityPattern, BlockSparsityPattern,
+   * BlockDynamicSparsityPattern, BlockDynamicSetSparsityPattern,
+   * BlockDynamicSimpleSparsityPattern, or any other class that satisfies
    * similar requirements. It is assumed that the size of the sparsity pattern
    * matches the number of degrees of freedom and that enough unused nonzero
    * entries are left to fill the sparsity pattern. The nonzero entries
@@ -446,8 +446,8 @@ namespace DoFTools
    * resulting sparsity pattern.
    *
    * The actual type of the sparsity pattern may be SparsityPattern,
-   * CompressedSparsityPattern, BlockSparsityPattern,
-   * BlockCompressedSparsityPattern, BlockCompressedSetSparsityPattern, or any
+   * DynamicSparsityPattern, BlockSparsityPattern,
+   * BlockDynamicSparsityPattern, BlockDynamicSetSparsityPattern, or any
    * other class that satisfies similar requirements.
    *
    * There is a complication if some or all of the shape functions of the
@@ -529,8 +529,8 @@ namespace DoFTools
    * documentation of this class for more information.
    *
    * The actual type of the sparsity pattern may be SparsityPattern,
-   * CompressedSparsityPattern, BlockSparsityPattern,
-   * BlockCompressedSparsityPattern, BlockCompressedSetSparsityPattern, or any
+   * DynamicSparsityPattern, BlockSparsityPattern,
+   * BlockDynamicSparsityPattern, BlockDynamicSetSparsityPattern, or any
    * other class that satisfies similar requirements. It is assumed that the
    * size of the sparsity pattern is already correct.
    */

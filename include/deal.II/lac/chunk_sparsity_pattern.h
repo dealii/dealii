@@ -481,8 +481,8 @@ public:
                   const size_type chunk_size);
 
   /**
-   * Copy data from an object of type CompressedSparsityPattern,
-   * CompressedSetSparsityPattern or CompressedSimpleSparsityPattern. Previous
+   * Copy data from an object of type DynamicSparsityPattern,
+   * DynamicSetSparsityPattern or DynamicSimpleSparsityPattern. Previous
    * content of this object is lost, and the sparsity pattern is in compressed
    * mode afterwards.
    */

@@ -152,7 +152,7 @@ namespace SparsityTools
    *
    * @param myrange indicates the range of elements stored locally and should
    * be the one used in the constructor of the
-   * CompressedSimpleSparsityPattern.  This should be the locally relevant
+   * DynamicSparsityPattern.  This should be the locally relevant
    * set.  Only rows contained in myrange are checked in csp for transfer.
    * This function needs to be used with PETScWrappers::MPI::SparseMatrix for
    * it to work correctly in a parallel computation.
@@ -165,7 +165,7 @@ namespace SparsityTools
 
   /**
    * similar to the function above, but includes support for
-   * BlockCompressedSimpleSparsityPattern. @p owned_set_per_cpu is typically
+   * BlockDynamicSparsityPattern. @p owned_set_per_cpu is typically
    * DoFHandler::locally_owned_dofs_per_processor and @p myrange are
    * locally_relevant_dofs.
    */

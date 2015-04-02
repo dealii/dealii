@@ -643,8 +643,8 @@ namespace SparsityTools
 SPARSITY_FUNCTIONS(DynamicSparsityPattern);
 
 template void SparsityTools::distribute_sparsity_pattern
-<BlockCompressedSimpleSparsityPattern>
-(BlockCompressedSimpleSparsityPattern &csp,
+<BlockDynamicSparsityPattern>
+(BlockDynamicSparsityPattern &csp,
  const std::vector<IndexSet> &owned_set_per_cpu,
  const MPI_Comm &mpi_comm,
  const IndexSet &myrange);

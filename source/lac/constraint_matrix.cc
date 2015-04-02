@@ -965,7 +965,7 @@ void ConstraintMatrix::condense (BlockDynamicSparsityPattern &sparsity) const
         // the loop over cols may get longer.
         //
         // don't try to be clever here as in the algorithm for the
-        // CompressedSparsityPattern, as that would be much more
+        // DynamicSparsityPattern, as that would be much more
         // complicated here. after all, we know that compressed patterns
         // are inefficient...
         {

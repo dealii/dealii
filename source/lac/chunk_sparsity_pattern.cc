@@ -15,9 +15,7 @@
 
 
 #include <deal.II/lac/chunk_sparsity_pattern.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/compressed_set_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 
 
@@ -626,7 +624,7 @@ template
 void ChunkSparsityPattern::create_from<DynamicSparsityPattern>
 (const unsigned int,
  const unsigned int,
- const CompressedSparsityPattern &,
+ const DynamicSparsityPattern &,
  const unsigned int,
  const bool);
 template

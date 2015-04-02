@@ -27,7 +27,7 @@
 #include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -168,7 +168,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // increment dofs_per_cell
       // since a useless diagonal
       // element will be stored
-      CompressedSimpleSparsityPattern csp (sizes[level+1],
+      DynamicSparsityPattern csp (sizes[level+1],
                                            sizes[level]);
       std::vector<types::global_dof_index> entries (dofs_per_cell);
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);

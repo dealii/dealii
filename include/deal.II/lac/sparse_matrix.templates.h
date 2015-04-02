@@ -27,7 +27,7 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/vector_memory.h>
 
 #include <ostream>
@@ -967,9 +967,9 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
       // rows in the matrix A, and for each column in a row we add the whole
       // row of matrix B with that row number. This means that we will insert
       // a lot of entries to each row, which is best handled by the
-      // CompressedSimpleSparsityPattern class.
+      // DynamicSparsityPattern class.
       {
-        CompressedSimpleSparsityPattern csp (m(), B.n());
+        DynamicSparsityPattern csp (m(), B.n());
         for (size_type i = 0; i < csp.n_rows(); ++i)
           {
             const size_type *rows = &sp_A.colnums[sp_A.rowstart[i]];
@@ -1094,9 +1094,9 @@ SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
       // rows in the matrix A, and for each column in a row we add the whole
       // row of matrix B with that row number. This means that we will insert
       // a lot of entries to each row, which is best handled by the
-      // CompressedSimpleSparsityPattern class.
+      // DynamicSparsityPattern class.
       {
-        CompressedSimpleSparsityPattern csp (n(), B.n());
+        DynamicSparsityPattern csp (n(), B.n());
         for (size_type i = 0; i < sp_A.n_rows(); ++i)
           {
             const size_type *rows =

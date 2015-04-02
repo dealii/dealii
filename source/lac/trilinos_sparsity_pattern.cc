@@ -628,7 +628,7 @@ namespace TrilinosWrappers
     std::vector<TrilinosWrappers::types::int_type> row_indices;
 
     // Include possibility to exchange data
-    // since CompressedSimpleSparsityPattern is
+    // since DynamicSparsityPattern is
     // able to do so
     if (exchange_data==false)
       for (size_type row=first_row; row<last_row; ++row)

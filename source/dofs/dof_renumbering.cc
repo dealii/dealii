@@ -21,7 +21,7 @@
 
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/constraint_matrix.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -101,7 +101,7 @@ namespace DoFRenumbering
           if (use_constraints)
             DoFTools::make_hanging_node_constraints (dof_handler, constraints);
           constraints.close ();
-          CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
+          DynamicSparsityPattern csp (dof_handler.n_dofs(),
                                                dof_handler.n_dofs());
           DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
 
@@ -411,7 +411,7 @@ namespace DoFRenumbering
       }
     else
       {
-        CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
+        DynamicSparsityPattern csp (dof_handler.n_dofs(),
                                              dof_handler.n_dofs(),
                                              dof_handler.locally_owned_dofs());
         DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
@@ -433,7 +433,7 @@ namespace DoFRenumbering
               {
                 const types::global_dof_index row = locally_owned.nth_index_in_set(i);
                 row_entries.resize(0);
-                for (CompressedSimpleSparsityPattern::row_iterator it =
+                for (DynamicSparsityPattern::row_iterator it =
                        csp.row_begin(row); it != csp.row_end(row); ++it)
                   if (*it != row && locally_owned.is_element(*it))
                     row_entries.push_back(locally_owned.index_within_set(*it));
@@ -487,7 +487,7 @@ namespace DoFRenumbering
       }
     else
       {
-        CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(level),
+        DynamicSparsityPattern csp (dof_handler.n_dofs(level),
                                              dof_handler.n_dofs(level));
         MGTools::make_sparsity_pattern (dof_handler, csp, level);
         sparsity.copy_from (csp);
