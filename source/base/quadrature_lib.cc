@@ -1067,7 +1067,7 @@ QTelles<1>::QTelles (
   const double eta_star = eta_bar * eta_bar - 1.;
   double gamma_bar;
 
-  std::vector<Point<1>> quadrature_points_dummy(quadrature_points.size());
+  std::vector<Point<1> > quadrature_points_dummy(quadrature_points.size());
   std::vector<double> weights_dummy(weights.size());
   unsigned int cont = 0;
   const double tol = 1e-10;
