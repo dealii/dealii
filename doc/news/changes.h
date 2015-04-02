@@ -402,9 +402,16 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> New: A function to get a map with all vertices at boundaries
-  has been added at GridTools::get_all_vertices_at_boundary.
-  This function will return a map which can be used in functions
+  <li> New: There is now a new quadrature formula in quadrature_lib. It is
+  now possible to use Telles' quadrature rules through the function QTelles
+  to integrate singular integrals
+  <br>
+  (Nicola Giuliani, 2015/04/01)
+  <li>
+
+  <li> New: A new function to get a map with all vertices at boundaries
+  has been added in GridTools::get_all_vertices_at_boundary.
+  This function will return a map wich can be used in functions
   like GridTools::Laplace_transform.
   <br>
   (Fernando Posada, 2015/03/31)

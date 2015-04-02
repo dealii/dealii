@@ -1014,6 +1014,118 @@ QWeddle<dim>::QWeddle ()
   Quadrature<dim> (QWeddle<dim-1>(), QWeddle<1>())
 {}
 
+template <int dim>
+QTelles<dim>::QTelles (
+  const Quadrature<1> &base_quad, const Point<dim> &singularity)
+  :
+/**
+* We need the explicit implementation if dim == 1. If dim > 1 we use the
+* former implementation and apply a tensorial product to obtain the higher
+* dimensions.
+**/
+  Quadrature<dim>(
+    dim == 2 ?
+    QAnisotropic<dim>(
+      QTelles<1>(base_quad, Point<1>(singularity[0])),
+      QTelles<1>(base_quad, Point<1>(singularity[1]))) :
+    dim == 3 ?
+    QAnisotropic<dim>(
+      QTelles<1>(base_quad, Point<1>(singularity[0])),
+      QTelles<1>(base_quad, Point<1>(singularity[1])),
+      QTelles<1>(base_quad, Point<1>(singularity[2]))) :
+    Quadrature<dim>())
+{
+}
+
+template <int dim>
+QTelles<dim>::QTelles (
+  const unsigned int n, const Point<dim> &singularity)
+  :
+/**
+* In this case we map the standard Gauss Legendre formula using the given
+* singularity point coordinates.
+**/
+  Quadrature<dim>(QTelles<dim>(QGauss<1>(n), singularity))
+{}
+
+
+
+template <>
+QTelles<1>::QTelles (
+  const Quadrature<1> &base_quad, const Point<1> &singularity)
+  :
+/**
+* We explicitly implement the Telles' variable change if dim == 1.
+**/
+  Quadrature<1>(base_quad)
+{
+  /**
+  * We define all the constants to be used in the implementation of
+  * Telles' rule
+  **/
+  const double eta_bar = singularity[0] * 2. - 1.;
+  const double eta_star = eta_bar * eta_bar - 1.;
+  double gamma_bar;
+
+  std::vector<Point<1>> quadrature_points_dummy(quadrature_points.size());
+  std::vector<double> weights_dummy(weights.size());
+  unsigned int cont = 0;
+  const double tol = 1e-10;
+  for (unsigned int d = 0; d < quadrature_points.size(); ++d)
+    {
+      if (std::abs(quadrature_points[d][0] - singularity[0]) > tol)
+        {
+          quadrature_points_dummy[d-cont] = quadrature_points[d];
+          weights_dummy[d-cont] = weights[d];
+        }
+      else
+        {
+          // We need to remove the singularity point from the quadrature point
+          // list. To do so we use the variable cont.
+          cont = 1;
+        }
+
+    }
+  if (cont == 1)
+    {
+      quadrature_points.resize(quadrature_points_dummy.size()-1);
+      weights.resize(weights_dummy.size()-1);
+      for (unsigned int d = 0; d < quadrature_points.size()-1; ++d)
+        {
+          quadrature_points[d] = quadrature_points_dummy[d];
+          weights[d] = weights_dummy[d];
+        }
+    }
+  // We need to check if the singularity is at the boundary of the interval.
+  if (std::abs(eta_star) <= tol)
+    {
+      gamma_bar = std::pow((eta_bar * eta_star + std::abs(eta_star)),1.0 / 3.0)
+                  + std::pow((eta_bar * eta_star - std::abs(eta_star)), 1.0 / 3.0)
+                  + eta_bar;
+    }
+  else
+    {
+      gamma_bar = (eta_bar * eta_star + std::abs(eta_star))/std::abs(eta_bar * eta_star + std::abs(eta_star))*
+                  std::pow(std::abs(eta_bar * eta_star + std::abs(eta_star)),1.0 / 3.0)
+                  + (eta_bar * eta_star - std::abs(eta_star))/std::abs(eta_bar * eta_star - std::abs(eta_star))*
+                  std::pow(std::abs(eta_bar * eta_star - std::abs(eta_star)), 1.0 / 3.0)
+                  + eta_bar;
+    }
+  for (unsigned int q = 0; q < quadrature_points.size(); ++q)
+    {
+      double gamma = quadrature_points[q][0] * 2 - 1;
+      double eta = (std::pow(gamma - gamma_bar, 3.0)
+                    + gamma_bar * (gamma_bar * gamma_bar + 3))
+                   / (1 + 3 * gamma_bar * gamma_bar);
+
+      double J = 3 * ((gamma - gamma_bar) *(gamma - gamma_bar))
+                 / (1 + 3 * gamma_bar * gamma_bar);
+
+      quadrature_points[q][0] = (eta + 1) / 2.0;
+      weights[q] = J * weights[q];
+
+    }
+}
 
 // explicit specialization
 // note that 1d formulae are specialized by implementation above
@@ -1036,5 +1148,9 @@ template class QWeddle<3>;
 template class QSorted<1>;
 template class QSorted<2>;
 template class QSorted<3>;
+
+template class QTelles<1> ;
+template class QTelles<2> ;
+template class QTelles<3> ;
 
 DEAL_II_NAMESPACE_CLOSE
