@@ -410,6 +410,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: Added missing hp-related functions to FE_Q_Hierarchical together with
+  a couple of unit tests. Improved code comments.
+  <br>
+  (Denis Davydov, 2015/04/10)
+  <li>
+
   <li> Fixed: deal.II did not compile on 32-bit systems when using newer
   p4est versions (1.0 and later) due to a type mismatch. This is now fixed.
   <br>
