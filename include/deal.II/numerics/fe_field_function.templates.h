@@ -320,7 +320,7 @@ namespace Functions
             std::vector< Tensor<1,dim> > &viq = values[maps[i][q]];
             const unsigned int s = vgrads[q].size();
             viq.resize(s);
-            for (unsigned int l=0;l<s;l++)
+            for (unsigned int l=0; l<s; l++)
               viq[l] = vgrads[q][l];
           }
       }

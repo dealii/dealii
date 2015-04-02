@@ -567,7 +567,7 @@ namespace internal
       //FIXME
       std::vector<typename VectorType::value_type> tmp (patch_values.size());
       fe_patch_values.get_function_values (*vector, tmp);
-      for (unsigned int i = 0; i < tmp.size();i++)
+      for (unsigned int i = 0; i < tmp.size(); i++)
         patch_values[i] = tmp[i];
     }
 
@@ -581,11 +581,11 @@ namespace internal
     {
       //FIXME
       std::vector<std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_gradients_system.size());
-      for (unsigned int i = 0; i < tmp.size();i++)
+      for (unsigned int i = 0; i < tmp.size(); i++)
         tmp[i].resize(patch_gradients_system.size());
       fe_patch_values.get_function_gradients (*vector, tmp);
-      for (unsigned int i = 0; i < tmp.size();i++)
-        for (unsigned int j = 0; j < tmp[i].size();j++)
+      for (unsigned int i = 0; i < tmp.size(); i++)
+        for (unsigned int j = 0; j < tmp[i].size(); j++)
           patch_gradients_system[i][j] = tmp[i][j];
     }
 
@@ -601,7 +601,7 @@ namespace internal
       std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> >  tmp;
       tmp.resize(patch_gradients.size());
       fe_patch_values.get_function_gradients (*vector, tmp);
-      for (unsigned int i = 0; i < tmp.size();i++)
+      for (unsigned int i = 0; i < tmp.size(); i++)
         patch_gradients[i] = tmp[i];
     }
 
