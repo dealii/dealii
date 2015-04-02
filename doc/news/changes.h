@@ -410,6 +410,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: In the spirit of the changes made to the distinction
+  between Point and Tensor objects discussed above, the first argument
+  to GridTools::shift() has been changed from a Point to a Tensor@<1,dim@>.
+  <br>
+  (Wolfgang Bangerth, 2015/04/02)
+  <li>
+
   <li> New: There is now a new quadrature formula in quadrature_lib. It is
   now possible to use Telles' quadrature rules through the function QTelles
   to integrate singular integrals

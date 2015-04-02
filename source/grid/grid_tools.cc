@@ -556,7 +556,7 @@ namespace GridTools
     class ShiftPoint
     {
     public:
-      ShiftPoint (const Point<spacedim> &shift)
+      ShiftPoint (const Tensor<1,spacedim> &shift)
         :
         shift(shift)
       {}
@@ -565,7 +565,7 @@ namespace GridTools
         return p+shift;
       }
     private:
-      const Point<spacedim> shift;
+      const Tensor<1,spacedim> shift;
     };
 
 
@@ -609,7 +609,7 @@ namespace GridTools
 
   template <int dim, int spacedim>
   void
-  shift (const Point<spacedim>   &shift_vector,
+  shift (const Tensor<1,spacedim>   &shift_vector,
          Triangulation<dim, spacedim> &triangulation)
   {
     transform (ShiftPoint<spacedim>(shift_vector), triangulation);

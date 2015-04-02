@@ -242,7 +242,7 @@ namespace GridTools
    * triangulation stated there hold for this function as well.
    */
   template <int dim, int spacedim>
-  void shift (const Point<spacedim>   &shift_vector,
+  void shift (const Tensor<1,spacedim>    &shift_vector,
               Triangulation<dim,spacedim> &triangulation);
 
 
