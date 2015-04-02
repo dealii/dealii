@@ -6998,6 +6998,21 @@ namespace VectorTools
       }
   }
 
+  // move to deal.ii/base/numbers.h ?
+  namespace internal
+  {
+    template <typename Number>
+    void set_possibly_complex_number(Number &n, const double &r, const double &i)
+    {
+      n = r;
+    }
+
+    template <typename Type>
+    void set_possibly_complex_number(std::complex<Type> &n, const double &r, const double &i)
+    {
+      n = std::complex<Type>(r,i);
+    }
+  }
 
 
   template <int dim, class InVector, int spacedim>
@@ -7044,16 +7059,16 @@ namespace VectorTools
         p_d_triangulation
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(&dof.get_tria()))
       {
-        double mean_double = mean;
-        double my_values[2] = { mean_double, area };
-        double global_values[2];
+        std::complex<double> mean_double = mean;
+        double my_values[3] = { mean_double.real(), mean_double.imag(), area };
+        double global_values[3];
 
-        MPI_Allreduce (&my_values, &global_values, 2, MPI_DOUBLE,
+        MPI_Allreduce (&my_values, &global_values, 3, MPI_DOUBLE,
                        MPI_SUM,
                        p_d_triangulation->get_communicator());
 
-        mean = global_values[0];
-        area = global_values[1];
+        internal::set_possibly_complex_number(mean,global_values[0],global_values[1]);
+        area = global_values[2];
       }
 #endif
 
