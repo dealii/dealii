@@ -6070,9 +6070,9 @@ namespace VectorTools
     IDScratchData<dim,spacedim>::IDScratchData (const IDScratchData &data)
       :
       x_fe_values(data.x_fe_values.get_mapping_collection(),
-                  data.x_fe_values.get_fe_collection(),
-                  data.x_fe_values.get_quadrature_collection(),
-                  data.x_fe_values.get_update_flags())
+                 data.x_fe_values.get_fe_collection(),
+                 data.x_fe_values.get_quadrature_collection(),
+                 data.x_fe_values.get_update_flags())
     {}
 
     template <int dim, int spacedim>

@@ -25,13 +25,13 @@ namespace internal
 {
   namespace Vector
   {
-    template void copy_vector<int,double> (const dealii::Vector<int>&,
-                                           dealii::Vector<double>&);
+    template void copy_vector<int,double> (const dealii::Vector<int> &,
+                                           dealii::Vector<double> &);
   }
 }
 
 template
-void Vector<int>::reinit<double>(const Vector<double>&, const bool);
+void Vector<int>::reinit<double>(const Vector<double> &, const bool);
 
 
 // do a few functions that currently don't fit the scheme because they have
