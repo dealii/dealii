@@ -99,7 +99,7 @@ namespace MeshWorker
 
   template <class VECTOR, int dim, int spacedim>
   void
-  VectorData<VECTOR, dim, spacedim>::initialize(const NamedData<VECTOR *> &d)
+  VectorData<VECTOR, dim, spacedim>::initialize(const AnyData &d)
   {
     this->data = d;
     VectorSelector::initialize(d);
@@ -182,7 +182,7 @@ namespace MeshWorker
 
   template <class VECTOR, int dim, int spacedim>
   void
-  MGVectorData<VECTOR, dim, spacedim>::initialize(const NamedData<MGLevelObject<VECTOR>*> &d)
+  MGVectorData<VECTOR, dim, spacedim>::initialize(const AnyData &d)
   {
     this->data = d;
     VectorSelector::initialize(d);

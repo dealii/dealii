@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/named_data.h>
+#include <deal.II/algorithms/named_selection.h>
 #include <deal.II/algorithms/any_data.h>
 
 DEAL_II_NAMESPACE_OPEN

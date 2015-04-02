@@ -649,13 +649,12 @@ namespace Step39
 
     // Since this assembler allows us to fill several vectors, the interface is
     // a little more complicated as above. The pointers to the vectors have to
-    // be stored in a NamedData object. While this seems to cause two extra
+    // be stored in a AnyData object. While this seems to cause two extra
     // lines of code here, it actually comes handy in more complex
     // applications.
     MeshWorker::Assembler::ResidualSimple<Vector<double> > assembler;
-    NamedData<Vector<double>* > data;
-    Vector<double> *rhs = &right_hand_side;
-    data.add(rhs, "RHS");
+    AnyData data;
+    data.add<Vector<double>*>(&right_hand_side, "RHS");
     assembler.initialize(data);
 
     RHSIntegrator<dim> integrator;
@@ -763,10 +762,10 @@ namespace Step39
     info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
 
     // but now we need to notify the info box of the finite element function we
-    // want to evaluate in the quadrature points. First, we create a NamedData
+    // want to evaluate in the quadrature points. First, we create an AnyData
     // object with this vector, which is the solution we just computed.
-    NamedData<Vector<double>* > solution_data;
-    solution_data.add(&solution, "solution");
+    AnyData solution_data;
+    solution_data.add<const Vector<double>*>(&solution, "solution");
 
     // Then, we tell the Meshworker::VectorSelector for cells, that we need
     // the second derivatives of this solution (to compute the
@@ -783,16 +782,15 @@ namespace Step39
     // flags are already adjusted to the values and derivatives we requested
     // above.
     info_box.add_update_flags_boundary(update_quadrature_points);
-    info_box.initialize(fe, mapping, solution_data);
+    info_box.initialize(fe, mapping, solution_data, solution);
 
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
     // The assembler stores one number per cell, but else this is the same as
     // in the computation of the right hand side.
     MeshWorker::Assembler::CellsAndFaces<double> assembler;
-    NamedData<BlockVector<double>* > out_data;
-    BlockVector<double> *est = &estimates;
-    out_data.add(est, "cells");
+    AnyData out_data;
+    out_data.add<BlockVector<double>*>(&estimates, "cells");
     assembler.initialize(out_data, false);
 
     Estimator<dim> integrator;
@@ -831,8 +829,8 @@ namespace Step39
     const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
     info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
 
-    NamedData<Vector<double>* > solution_data;
-    solution_data.add(&solution, "solution");
+    AnyData solution_data;
+    solution_data.add<Vector<double>*>(&solution, "solution");
 
     info_box.cell_selector.add("solution", true, true, false);
     info_box.boundary_selector.add("solution", true, false, false);
@@ -840,14 +838,13 @@ namespace Step39
 
     info_box.add_update_flags_cell(update_quadrature_points);
     info_box.add_update_flags_boundary(update_quadrature_points);
-    info_box.initialize(fe, mapping, solution_data);
+    info_box.initialize(fe, mapping, solution_data, solution);
 
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
     MeshWorker::Assembler::CellsAndFaces<double> assembler;
-    NamedData<BlockVector<double>* > out_data;
-    BlockVector<double> *est = &errors;
-    out_data.add(est, "cells");
+    AnyData out_data;
+    out_data.add<BlockVector<double>* >(&errors, "cells");
     assembler.initialize(out_data, false);
 
     ErrorIntegrator<dim> integrator;

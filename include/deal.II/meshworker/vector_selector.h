@@ -16,8 +16,8 @@
 #ifndef __deal2__mesh_worker_vector_selector_h
 #define __deal2__mesh_worker_vector_selector_h
 
-#include <deal.II/base/named_data.h>
 #include <deal.II/algorithms/any_data.h>
+#include <deal.II/algorithms/named_selection.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/mg_level_object.h>
@@ -82,12 +82,6 @@ namespace MeshWorker
     void initialize(const AnyData &);
 
     /**
-     * @deprecated Use AnyData instead of NamedData.
-     */
-    template <class DATA>
-    void initialize(const NamedData<DATA> &);
-
-    /**
      * Check whether any vector is selected.
      */
     bool empty () const;
@@ -142,12 +136,6 @@ namespace MeshWorker
      */
     template <class STREAM, typename DATA>
     void print (STREAM &s, const AnyData &v) const;
-
-    /**
-     * @deprecated Use AnyData instead of NamedData.
-     */
-    template <class STREAM, typename DATA>
-    void print (STREAM &s, const NamedData<DATA> &v) const;
 
     /**
      * Print the number of selections to the stream.
@@ -311,9 +299,9 @@ namespace MeshWorker
     VectorData(const VectorSelector &);
 
     /**
-     * @deprecated Use AnyData instead of NamedData.
+     * Initialize with an object of named vectors.
      */
-    void initialize(const NamedData<VECTOR *> &);
+    void initialize(const AnyData &);
 
     /**
      * Initialize with a single vector and cache the indices in the
@@ -377,9 +365,9 @@ namespace MeshWorker
     MGVectorData(const VectorSelector &);
 
     /**
-     * @deprecated Use AnyData instead of NamedData.
+     * Initialize with an object of named vectors
      */
-    void initialize(const NamedData<MGLevelObject<VECTOR>*> &);
+    void initialize(const AnyData &);
 
     /**
      * Initialize with a single vector and cache the indices in the
@@ -428,15 +416,6 @@ namespace MeshWorker
 
   inline void
   VectorSelector::initialize(const AnyData &src)
-  {
-    value_selection.initialize(src);
-    gradient_selection.initialize(src);
-    hessian_selection.initialize(src);
-  }
-
-  template <typename DATA>
-  inline void
-  VectorSelector::initialize(const NamedData<DATA> &src)
   {
     value_selection.initialize(src);
     gradient_selection.initialize(src);
@@ -529,23 +508,6 @@ namespace MeshWorker
   template <class STREAM, typename DATA>
   inline void
   VectorSelector::print(STREAM &s, const AnyData &v) const
-  {
-    s << "values:   ";
-    for (unsigned int i=0; i<n_values(); ++i)
-      s << " '" << v.name(value_selection(i)) << '\'';
-    s << std::endl << "gradients:";
-    for (unsigned int i=0; i<n_gradients(); ++i)
-      s << " '" << v.name(gradient_selection(i)) << '\'';
-    s << std::endl << "hessians: ";
-    for (unsigned int i=0; i<n_hessians(); ++i)
-      s << " '" << v.name(hessian_selection(i)) << '\'';
-    s << std::endl;
-  }
-
-
-  template <class STREAM, typename DATA>
-  inline void
-  VectorSelector::print(STREAM &s, const NamedData<DATA> &v) const
   {
     s << "values:   ";
     for (unsigned int i=0; i<n_values(); ++i)

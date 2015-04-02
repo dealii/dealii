@@ -38,13 +38,21 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li>Removed: The class NamedData has been removed after it had been
+  superceded by AnyData a while ago. This affects the use of classes
+  in Algorithms and MeshWorker
+  <br>
+  (Guido KAnschat, 2015/04/02)
+  </li>
+
   <li> Removed: The CMake configuration does not use the variable
   <code>DEAL_II_CMAKE_MACROS_RELDIR</code> any more. Instead, the fixed
   location <code>${DEAL_II_SHARE_RELDIR}/macros</code> is used
   unconditionally
   <br>
   (Matthias Maier, 2015/03/26)
-
+  </li>
+  
   <li> Changed: The TrilinosWrappers::SparseMatrix::clear_row() function used
   to call TrilinosWrappers::SparseMatrix::compress() before doing its work,
   but this is neither efficient nor safe. You will now have to do this

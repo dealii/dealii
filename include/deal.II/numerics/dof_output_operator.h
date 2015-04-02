@@ -19,7 +19,6 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/named_data.h>
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/base/event.h>
 #include <deal.II/algorithms/operator.h>

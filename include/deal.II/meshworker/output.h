@@ -18,7 +18,6 @@
 #define __deal2__mesh_worker_output_h
 
 #include <deal.II/meshworker/dof_info.h>
-#include <deal.II/base/named_data.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/block_vector.h>

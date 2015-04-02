@@ -317,21 +317,17 @@ namespace MeshWorker
                     const VECTOR &dummy,
                     const BlockInfo *block_info = 0);
     /**
-     * @deprecated Use AnyData instead of NamedData.
+     * Initialize the IntegrationInfo objects contained.
+     *
+     * Before doing so, add update flags necessary to produce the data needed
+     * and also set uninitialized quadrature rules to Gauss formulas, which
+     * integrate polynomial bilinear forms exactly.
      */
     template <typename VECTOR>
     void initialize(const FiniteElement<dim, spacedim> &el,
                     const Mapping<dim, spacedim> &mapping,
-                    const NamedData<VECTOR *> &data,
-                    const BlockInfo *block_info = 0);
-
-    /**
-     * @deprecated Use AnyData instead of NamedData.
-     */
-    template <typename VECTOR>
-    void initialize(const FiniteElement<dim, spacedim> &el,
-                    const Mapping<dim, spacedim> &mapping,
-                    const NamedData<MGLevelObject<VECTOR>*> &data,
+                    const AnyData &data,
+                    const MGLevelObject<VECTOR> &dummy,
                     const BlockInfo *block_info = 0);
     /**
      * @name FEValues setup
@@ -813,68 +809,42 @@ namespace MeshWorker
     neighbor.initialize_data(p);
   }
 
-
   template <int dim, int sdim>
   template <typename VECTOR>
   void
   IntegrationInfoBox<dim,sdim>::initialize(
     const FiniteElement<dim,sdim> &el,
     const Mapping<dim,sdim> &mapping,
-    const NamedData<VECTOR *> &data,
-    const BlockInfo *block_info)
-  {
-    initialize(el, mapping, block_info);
-    std_cxx11::shared_ptr<VectorData<VECTOR, dim, sdim> > p;
-
-    p = std_cxx11::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (cell_selector));
-    p->initialize(data);
-    cell_data = p;
-    cell.initialize_data(p);
-
-    p = std_cxx11::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (boundary_selector));
-    p->initialize(data);
-    boundary_data = p;
-    boundary.initialize_data(p);
-
-    p = std_cxx11::shared_ptr<VectorData<VECTOR, dim, sdim> >(new VectorData<VECTOR, dim, sdim> (face_selector));
-    p->initialize(data);
-    face_data = p;
-    face.initialize_data(p);
-    subface.initialize_data(p);
-    neighbor.initialize_data(p);
-  }
-
-
-  template <int dim, int sdim>
-  template <typename VECTOR>
-  void
-  IntegrationInfoBox<dim,sdim>::initialize(
-    const FiniteElement<dim,sdim> &el,
-    const Mapping<dim,sdim> &mapping,
-    const NamedData<MGLevelObject<VECTOR>*> &data,
+    const AnyData &data,
+    const MGLevelObject<VECTOR> &dummy,
     const BlockInfo *block_info)
   {
     initialize(el, mapping, block_info);
     std_cxx11::shared_ptr<MGVectorData<VECTOR, dim, sdim> > p;
+    VectorDataBase<dim,sdim> *pp;
 
     p = std_cxx11::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (cell_selector));
-    p->initialize(data);
+    // Public member function of parent class was not found without
+    // explicit cast
+    pp = &*p;
+    pp->initialize(data);
     cell_data = p;
     cell.initialize_data(p);
 
     p = std_cxx11::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (boundary_selector));
-    p->initialize(data);
+    pp = &*p;
+    pp->initialize(data);
     boundary_data = p;
     boundary.initialize_data(p);
 
     p = std_cxx11::shared_ptr<MGVectorData<VECTOR, dim, sdim> >(new MGVectorData<VECTOR, dim, sdim> (face_selector));
-    p->initialize(data);
+    pp = &*p;
+    pp->initialize(data);
     face_data = p;
     face.initialize_data(p);
     subface.initialize_data(p);
     neighbor.initialize_data(p);
   }
-
 
   template <int dim, int sdim>
   template <class DOFINFO>
