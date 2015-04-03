@@ -317,11 +317,10 @@ namespace Functions
         fe_v.get_present_fe_values ().get_function_gradients(data_vector, vgrads);
         for (unsigned int q=0; q<nq; ++q)
           {
-            std::vector< Tensor<1,dim> > &viq = values[maps[i][q]];
             const unsigned int s = vgrads[q].size();
-            viq.resize(s);
+            values[maps[i][q]].resize(s);
             for (unsigned int l=0; l<s; l++)
-              viq[l] = vgrads[q][l];
+              values[maps[i][q]][l] = vgrads[q][l];
           }
       }
   }
