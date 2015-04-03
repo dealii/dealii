@@ -86,8 +86,8 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_values);
     fe_v.reinit(cell);
-    std::vector< Vector<typename VECTOR::value_type> > vvalues (1);
-    vvalues[0].reinit(values.size());
+    std::vector< Vector<typename VECTOR::value_type> >
+      vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
     fe_v.get_function_values(data_vector, vvalues);
     values = vvalues[0];
   }
@@ -194,8 +194,8 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_hessians);
     fe_v.reinit(cell);
-    std::vector< Vector<typename VECTOR::value_type> > vvalues (1);
-    vvalues[0].reinit(values.size());
+    std::vector< Vector<typename VECTOR::value_type> >
+      vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
     fe_v.get_function_laplacians(data_vector, vvalues);
     values = vvalues[0];
   }
