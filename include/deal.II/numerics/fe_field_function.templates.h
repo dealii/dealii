@@ -139,13 +139,14 @@ namespace Functions
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_gradients);
     fe_v.reinit(cell);
+
+    // FIXME: we need a temp argument because get_function_values wants to put
+    // its data into an object storing the correct scalar type, but this
+    // function wants to return everything in a vector<double>
     std::vector< std::vector<Tensor<1,dim,typename VECTOR::value_type> > > vgrads
     (1,  std::vector<Tensor<1,dim,typename VECTOR::value_type> >(n_components) );
     fe_v.get_function_gradients(data_vector, vgrads);
-    const unsigned int s = vgrads[0].size();
-    gradients.resize(s);
-    for (unsigned int i = 0; i < s; i++)
-      gradients[i] = vgrads[0][i];
+    gradients = std::vector<Tensor<1,dim> >(vgrads[0].begin(), vgrads[0].end());
   }
 
 
@@ -318,11 +319,10 @@ namespace Functions
         fe_v.get_present_fe_values ().get_function_gradients(data_vector, vgrads);
         for (unsigned int q=0; q<nq; ++q)
           {
-            std::vector< Tensor<1,dim> > &viq = values[maps[i][q]];
             const unsigned int s = vgrads[q].size();
-            viq.resize(s);
+            values[maps[i][q]].resize(s);
             for (unsigned int l=0; l<s; l++)
-              viq[l] = vgrads[q][l];
+              values[maps[i][q]][l] = vgrads[q][l];
           }
       }
   }
