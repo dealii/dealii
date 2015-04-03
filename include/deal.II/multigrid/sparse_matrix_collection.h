@@ -87,9 +87,9 @@ namespace mg
     for (unsigned int level=sparsity.min_level();
          level<=sparsity.max_level(); ++level)
       {
-        DynamicSparsityPattern c_sparsity(dof_handler.n_dofs(level));
-        MGTools::make_flux_sparsity_pattern(dof_handler, c_sparsity, level);
-        sparsity[level].copy_from(c_sparsity);
+        DynamicSparsityPattern dsp(dof_handler.n_dofs(level));
+        MGTools::make_flux_sparsity_pattern(dof_handler, dsp, level);
+        sparsity[level].copy_from(dsp);
         matrix[level].reinit(sparsity[level]);
         matrix_in[level].reinit(sparsity[level]);
         matrix_out[level].reinit(sparsity[level]);

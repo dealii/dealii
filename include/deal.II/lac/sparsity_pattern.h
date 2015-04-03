@@ -630,7 +630,7 @@ public:
    * compressed mode afterwards.
    */
   template <typename CompressedSparsityType>
-  void copy_from (const CompressedSparsityType &csp);
+  void copy_from (const CompressedSparsityType &dsp);
 
 
   /**

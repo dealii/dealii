@@ -138,7 +138,7 @@ namespace SparsityTools
   /**
    * Communciate rows in a compressed sparsity pattern over MPI.
    *
-   * @param csp is the sparsity pattern that has been built locally and for
+   * @param dsp is the sparsity pattern that has been built locally and for
    * which we need to exchange entries with other processors to make sure that
    * each processor knows all the elements of the rows of a matrix it stores
    * and that may eventually be written to. This sparsity pattern will be
@@ -153,13 +153,13 @@ namespace SparsityTools
    * @param myrange indicates the range of elements stored locally and should
    * be the one used in the constructor of the
    * DynamicSparsityPattern.  This should be the locally relevant
-   * set.  Only rows contained in myrange are checked in csp for transfer.
+   * set.  Only rows contained in myrange are checked in dsp for transfer.
    * This function needs to be used with PETScWrappers::MPI::SparseMatrix for
    * it to work correctly in a parallel computation.
    */
-  template <class CSP_t>
-  void distribute_sparsity_pattern(CSP_t &csp,
-                                   const std::vector<typename CSP_t::size_type> &rows_per_cpu,
+  template <class DSP_t>
+  void distribute_sparsity_pattern(DSP_t &dsp,
+                                   const std::vector<typename DSP_t::size_type> &rows_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange);
 
@@ -169,8 +169,8 @@ namespace SparsityTools
    * DoFHandler::locally_owned_dofs_per_processor and @p myrange are
    * locally_relevant_dofs.
    */
-  template <class CSP_t>
-  void distribute_sparsity_pattern(CSP_t &csp,
+  template <class DSP_t>
+  void distribute_sparsity_pattern(DSP_t &dsp,
                                    const std::vector<IndexSet> &owned_set_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange);

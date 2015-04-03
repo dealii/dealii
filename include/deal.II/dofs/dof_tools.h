@@ -363,8 +363,7 @@ namespace DoFTools
    *
    * The actual type of the sparsity pattern may be SparsityPattern,
    * DynamicSparsityPattern, BlockSparsityPattern,
-   * BlockDynamicSparsityPattern, BlockDynamicSetSparsityPattern,
-   * BlockDynamicSimpleSparsityPattern, or any other class that satisfies
+   * BlockDynamicSparsityPattern, or any other class that satisfies
    * similar requirements. It is assumed that the size of the sparsity pattern
    * matches the number of degrees of freedom and that enough unused nonzero
    * entries are left to fill the sparsity pattern. The nonzero entries

@@ -419,16 +419,16 @@ BlockSparsityPattern::memory_consumption () const
 
 
 void
-BlockSparsityPattern::copy_from  (const BlockDynamicSparsityPattern &csp)
+BlockSparsityPattern::copy_from  (const BlockDynamicSparsityPattern &dsp)
 {
   // delete old content, set block
   // sizes anew
-  reinit (csp.n_block_rows(), csp.n_block_cols());
+  reinit (dsp.n_block_rows(), dsp.n_block_cols());
 
   // copy over blocks
   for (size_type i=0; i<n_block_rows(); ++i)
     for (size_type j=0; j<n_block_cols(); ++j)
-      block(i,j).copy_from (csp.block(i,j));
+      block(i,j).copy_from (dsp.block(i,j));
 
   // and finally enquire their new
   // sizes

@@ -969,8 +969,8 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
       // a lot of entries to each row, which is best handled by the
       // DynamicSparsityPattern class.
       {
-        DynamicSparsityPattern csp (m(), B.n());
-        for (size_type i = 0; i < csp.n_rows(); ++i)
+        DynamicSparsityPattern dsp (m(), B.n());
+        for (size_type i = 0; i < dsp.n_rows(); ++i)
           {
             const size_type *rows = &sp_A.colnums[sp_A.rowstart[i]];
             const size_type *const end_rows =
@@ -988,13 +988,13 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
                 if (sp_B.n_rows() == sp_B.n_cols())
                   {
                     ++new_cols;
-                    csp.add(i, col);
+                    dsp.add(i, col);
                   }
 
-                csp.add_entries (i, new_cols, end_new_cols, true);
+                dsp.add_entries (i, new_cols, end_new_cols, true);
               }
           }
-        sp_C.copy_from (csp);
+        sp_C.copy_from (dsp);
       }
 
       // reinit matrix C from that information
@@ -1096,14 +1096,14 @@ SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
       // a lot of entries to each row, which is best handled by the
       // DynamicSparsityPattern class.
       {
-        DynamicSparsityPattern csp (n(), B.n());
+        DynamicSparsityPattern dsp (n(), B.n());
         for (size_type i = 0; i < sp_A.n_rows(); ++i)
           {
             const size_type *rows =
               &sp_A.colnums[sp_A.rowstart[i]];
             const size_type *const end_rows =
               &sp_A.colnums[sp_A.rowstart[i+1]];
-            // cast away constness to conform with csp.add_entries interface
+            // cast away constness to conform with dsp.add_entries interface
             size_type *new_cols = const_cast<size_type *>
                                   (&sp_B.colnums[sp_B.rowstart[i]]);
             size_type *end_new_cols = const_cast<size_type *>
@@ -1119,12 +1119,12 @@ SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
                 // if B has a diagonal, need to add that manually. this way,
                 // we maintain sortedness.
                 if (sp_B.n_rows() == sp_B.n_cols())
-                  csp.add(row, i);
+                  dsp.add(row, i);
 
-                csp.add_entries (row, new_cols, end_new_cols, true);
+                dsp.add_entries (row, new_cols, end_new_cols, true);
               }
           }
-        sp_C.copy_from (csp);
+        sp_C.copy_from (dsp);
       }
 
       // reinit matrix C from that information

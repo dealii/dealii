@@ -478,33 +478,33 @@ SparsityPattern::compress ()
 
 
 
-template <typename CSP>
+template <typename DSP>
 void
-SparsityPattern::copy_from (const CSP &csp)
+SparsityPattern::copy_from (const DSP &dsp)
 {
   // first determine row lengths for each row. if the matrix is quadratic,
   // then we might have to add an additional entry for the diagonal, if that
   // is not yet present. as we have to call compress anyway later on, don't
   // bother to check whether that diagonal entry is in a certain row or not
-  const bool do_diag_optimize = (csp.n_rows() == csp.n_cols());
-  std::vector<unsigned int> row_lengths (csp.n_rows());
-  for (size_type i=0; i<csp.n_rows(); ++i)
+  const bool do_diag_optimize = (dsp.n_rows() == dsp.n_cols());
+  std::vector<unsigned int> row_lengths (dsp.n_rows());
+  for (size_type i=0; i<dsp.n_rows(); ++i)
     {
-      row_lengths[i] = csp.row_length(i);
-      if (do_diag_optimize && !csp.exists(i,i))
+      row_lengths[i] = dsp.row_length(i);
+      if (do_diag_optimize && !dsp.exists(i,i))
         ++row_lengths[i];
     }
-  reinit (csp.n_rows(), csp.n_cols(), row_lengths);
+  reinit (dsp.n_rows(), dsp.n_cols(), row_lengths);
 
   // now enter all the elements into the matrix, if there are any. note that
   // if the matrix is quadratic, then we already have the diagonal element
   // preallocated
   if (n_rows() != 0 && n_cols() != 0)
-    for (size_type row = 0; row<csp.n_rows(); ++row)
+    for (size_type row = 0; row<dsp.n_rows(); ++row)
       {
         size_type *cols = &colnums[rowstart[row]] + (do_diag_optimize ? 1 : 0);
-        typename CSP::row_iterator col_num = csp.row_begin (row),
-                                   end_row = csp.row_end (row);
+        typename DSP::row_iterator col_num = dsp.row_begin (row),
+                                   end_row = dsp.row_end (row);
 
         for (; col_num != end_row; ++col_num)
           {
@@ -515,7 +515,7 @@ SparsityPattern::copy_from (const CSP &csp)
       }
 
   // do not need to compress the sparsity pattern since we already have
-  // allocated the right amount of data, and the CSP data is sorted, too.
+  // allocated the right amount of data, and the DSP data is sorted, too.
   compressed = true;
 }
 

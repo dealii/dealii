@@ -692,13 +692,13 @@ namespace GridTools
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(q1);
 
-    DynamicSparsityPattern c_sparsity_pattern (dof_handler.n_dofs (),
-                                                  dof_handler.n_dofs ());
-    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity_pattern);
-    c_sparsity_pattern.compress ();
+    DynamicSparsityPattern dsp (dof_handler.n_dofs (),
+                                dof_handler.n_dofs ());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    dsp.compress ();
 
     SparsityPattern sparsity_pattern;
-    sparsity_pattern.copy_from (c_sparsity_pattern);
+    sparsity_pattern.copy_from (dsp);
     sparsity_pattern.compress ();
 
     SparseMatrix<double> S(sparsity_pattern);

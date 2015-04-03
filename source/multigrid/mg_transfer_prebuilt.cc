@@ -168,8 +168,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // increment dofs_per_cell
       // since a useless diagonal
       // element will be stored
-      DynamicSparsityPattern csp (sizes[level+1],
-                                           sizes[level]);
+      DynamicSparsityPattern dsp (sizes[level+1],
+                                  sizes[level]);
       std::vector<types::global_dof_index> entries (dofs_per_cell);
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
@@ -202,7 +202,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                     for (unsigned int j=0; j<dofs_per_cell; ++j)
                       if (prolongation(i,j) != 0)
                         entries.push_back (dof_indices_parent[j]);
-                    csp.add_entries (dof_indices_child[i],
+                    dsp.add_entries (dof_indices_child[i],
                                      entries.begin(), entries.end());
                   }
               }
@@ -211,9 +211,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       internal::MatrixSelector<VECTOR>::reinit(*prolongation_matrices[level],
                                                *prolongation_sparsities[level],
                                                level,
-                                               csp,
+                                               dsp,
                                                mg_dof);
-      csp.reinit(0,0);
+      dsp.reinit(0,0);
 
       FullMatrix<double> prolongation;
 
