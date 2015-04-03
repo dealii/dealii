@@ -6374,10 +6374,11 @@ namespace VectorTools
       dealii::hp::FECollection<dim,spacedim> fe_collection (dof.get_fe());
       IDScratchData<dim,spacedim> data(mapping, fe_collection, q, update_flags);
 
-      //FIXME
-      // temporary vectors of consistent with InVector type
+      // FIXME
+      // temporary vectors of consistent with InVector type.
+      // Need these because IDScratchData does not have a template type for the InVector
       std::vector<dealii::Vector<Number>> function_values;
-      std::vector<std::vector<Tensor<1,spacedim,Number> >> function_grads;
+      std::vector<std::vector<Tensor<1,spacedim,Number> > > function_grads;
 
       // loop over all cells
       typename DH::active_cell_iterator cell = dof.begin_active(),
@@ -6894,6 +6895,11 @@ namespace VectorTools
         p_d_triangulation
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(&dof.get_tria()))
       {
+        // The type used to store the elements of the global vector may be a
+        // real or a complex number. Do the global reduction always with real
+        // and imaginary types so that we don't have to distinguish, and to this
+        // end just copy everything into a complex number and, later, back into
+        // the original data type.
         std::complex<double> mean_double = mean;
         double my_values[3] = { mean_double.real(), mean_double.imag(), area };
         double global_values[3];
