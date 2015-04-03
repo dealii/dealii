@@ -611,6 +611,7 @@ namespace internal
     get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                            std::vector<std::vector<Tensor<2,DH::space_dimension> > >   &patch_hessians_system) const
     {
+      // FIXME
       std::vector<std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_hessians_system.size());
       for (unsigned int i = 0; i < tmp.size(); i++)
         tmp[i].resize(patch_hessians_system[i].size());
@@ -628,6 +629,7 @@ namespace internal
     get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                            std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const
     {
+      // FIXME
       std::vector<Tensor<2,DH::space_dimension,typename VectorType::value_type> > tmp(patch_hessians.size());
       fe_patch_values.get_function_hessians (*vector, tmp);
       for (unsigned int i = 0; i < tmp.size(); i++)
