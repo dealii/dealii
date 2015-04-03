@@ -293,17 +293,17 @@ namespace Step15
               {
                 for (unsigned int j=0; j<dofs_per_cell; ++j)
                   {
-                    cell_matrix(i, j) += (fe_values.shape_grad(i, q_point)
-                                          * coeff
-                                          * (fe_values.shape_grad(j, q_point)
-                                             -
-                                             coeff * coeff
+                    cell_matrix(i, j) += ( ((fe_values.shape_grad(i, q_point)
+                                             * coeff
+                                             * fe_values.shape_grad(j, q_point))
+                                            -
+                                            (fe_values.shape_grad(i, q_point)
+                                             * coeff * coeff * coeff
                                              * (fe_values.shape_grad(j, q_point)
                                                 *
                                                 old_solution_gradients[q_point])
-                                             * old_solution_gradients[q_point]
-                                            )
-                                          * fe_values.JxW(q_point));
+                                             * old_solution_gradients[q_point]))
+                                           * fe_values.JxW(q_point));
                   }
 
                 cell_rhs(i) -= (fe_values.shape_grad(i, q_point)
