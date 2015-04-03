@@ -48,10 +48,10 @@ namespace internal
     typedef ::dealii::SparsityPattern Sparsity;
     typedef ::dealii::SparseMatrix<typename VECTOR::value_type> Matrix;
 
-    template <class CSP, class DH>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const CSP &csp, const DH &)
+    template <class DSP, class DH>
+    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, const DH &)
     {
-      sparsity.copy_from (csp);
+      sparsity.copy_from (dsp);
       matrix.reinit (sparsity);
     }
   };
@@ -63,12 +63,12 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
-    template <class CSP, class DH>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const CSP &csp, DH &dh)
+    template <class DSP, class DH>
+    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, DH &dh)
     {
       matrix.reinit(dh.locally_owned_mg_dofs(level+1),
                     dh.locally_owned_mg_dofs(level),
-                    csp, MPI_COMM_WORLD, true);
+                    dsp, MPI_COMM_WORLD, true);
     }
 
   };
@@ -79,8 +79,8 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
-    template <class CSP, class DH>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const CSP &csp, DH &dh)
+    template <class DSP, class DH>
+    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, DH &dh)
     {
     }
   };

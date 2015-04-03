@@ -377,29 +377,29 @@ namespace SparsityTools
   }
 
 #ifdef DEAL_II_WITH_MPI
-  template <class CSP_t>
-  void distribute_sparsity_pattern(CSP_t &csp,
-                                   const std::vector<typename CSP_t::size_type> &rows_per_cpu,
+  template <class DSP_t>
+  void distribute_sparsity_pattern(DSP_t &dsp,
+                                   const std::vector<typename DSP_t::size_type> &rows_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
-    std::vector<typename CSP_t::size_type> start_index(rows_per_cpu.size()+1);
+    std::vector<typename DSP_t::size_type> start_index(rows_per_cpu.size()+1);
     start_index[0]=0;
-    for (typename CSP_t::size_type i=0; i<rows_per_cpu.size(); ++i)
+    for (typename DSP_t::size_type i=0; i<rows_per_cpu.size(); ++i)
       start_index[i+1]=start_index[i]+rows_per_cpu[i];
 
-    typedef std::map<typename CSP_t::size_type, std::vector<typename CSP_t::size_type> > map_vec_t;
+    typedef std::map<typename DSP_t::size_type, std::vector<typename DSP_t::size_type> > map_vec_t;
 
     map_vec_t send_data;
 
     {
       unsigned int dest_cpu=0;
 
-      typename CSP_t::size_type n_local_rel_rows = myrange.n_elements();
-      for (typename CSP_t::size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
+      typename DSP_t::size_type n_local_rel_rows = myrange.n_elements();
+      for (typename DSP_t::size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
         {
-          typename CSP_t::size_type row=myrange.nth_index_in_set(row_idx);
+          typename DSP_t::size_type row=myrange.nth_index_in_set(row_idx);
 
           //calculate destination CPU
           while (row>=start_index[dest_cpu+1])
@@ -412,21 +412,21 @@ namespace SparsityTools
               continue;
             }
 
-          typename CSP_t::size_type rlen = csp.row_length(row);
+          typename DSP_t::size_type rlen = dsp.row_length(row);
 
           //skip empty lines
           if (!rlen)
             continue;
 
           //save entries
-          std::vector<typename CSP_t::size_type> &dst = send_data[dest_cpu];
+          std::vector<typename DSP_t::size_type> &dst = send_data[dest_cpu];
 
           dst.push_back(rlen); // number of entries
           dst.push_back(row); // row index
-          for (typename CSP_t::size_type c=0; c<rlen; ++c)
+          for (typename DSP_t::size_type c=0; c<rlen; ++c)
             {
               //columns
-              typename CSP_t::size_type column = csp.column_number(row, c);
+              typename DSP_t::size_type column = dsp.column_number(row, c);
               dst.push_back(column);
             }
         }
@@ -462,11 +462,11 @@ namespace SparsityTools
     }
 
 //TODO: In the following, we read individual bytes and then reinterpret them
-//    as typename CSP_t::size_type objects. this is error prone. use properly typed reads that
+//    as typename DSP_t::size_type objects. this is error prone. use properly typed reads that
 //    match the write above
     {
       //receive
-      std::vector<typename CSP_t::size_type> recv_buf;
+      std::vector<typename DSP_t::size_type> recv_buf;
       for (unsigned int index=0; index<num_receive; ++index)
         {
           MPI_Status status;
@@ -475,22 +475,22 @@ namespace SparsityTools
           Assert (status.MPI_TAG==124, ExcInternalError());
 
           MPI_Get_count(&status, MPI_BYTE, &len);
-          Assert( len%sizeof(typename CSP_t::size_type)==0, ExcInternalError());
+          Assert( len%sizeof(typename DSP_t::size_type)==0, ExcInternalError());
 
-          recv_buf.resize(len/sizeof(typename CSP_t::size_type));
+          recv_buf.resize(len/sizeof(typename DSP_t::size_type));
 
           MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
                    status.MPI_TAG, mpi_comm, &status);
 
-          typename std::vector<typename CSP_t::size_type>::const_iterator ptr = recv_buf.begin();
-          typename std::vector<typename CSP_t::size_type>::const_iterator end = recv_buf.end();
+          typename std::vector<typename DSP_t::size_type>::const_iterator ptr = recv_buf.begin();
+          typename std::vector<typename DSP_t::size_type>::const_iterator end = recv_buf.end();
           while (ptr+1<end)
             {
-              typename CSP_t::size_type num=*(ptr++);
-              typename CSP_t::size_type row=*(ptr++);
+              typename DSP_t::size_type num=*(ptr++);
+              typename DSP_t::size_type row=*(ptr++);
               for (unsigned int c=0; c<num; ++c)
                 {
-                  csp.add(row, *ptr);
+                  dsp.add(row, *ptr);
                   ptr++;
                 }
             }
@@ -503,24 +503,24 @@ namespace SparsityTools
 
   }
 
-  template <class CSP_t>
-  void distribute_sparsity_pattern(CSP_t &csp,
+  template <class DSP_t>
+  void distribute_sparsity_pattern(DSP_t &dsp,
                                    const std::vector<IndexSet> &owned_set_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
 
-    typedef std::map<typename CSP_t::size_type, std::vector<typename CSP_t::size_type> > map_vec_t;
+    typedef std::map<typename DSP_t::size_type, std::vector<typename DSP_t::size_type> > map_vec_t;
     map_vec_t send_data;
 
     {
       unsigned int dest_cpu=0;
 
-      typename CSP_t::size_type n_local_rel_rows = myrange.n_elements();
-      for (typename CSP_t::size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
+      typename DSP_t::size_type n_local_rel_rows = myrange.n_elements();
+      for (typename DSP_t::size_type row_idx=0; row_idx<n_local_rel_rows; ++row_idx)
         {
-          typename CSP_t::size_type row=myrange.nth_index_in_set(row_idx);
+          typename DSP_t::size_type row=myrange.nth_index_in_set(row_idx);
 
           // calculate destination CPU, note that we start the search
           // at last destination cpu, because even if the owned ranges
@@ -536,21 +536,21 @@ namespace SparsityTools
           if (dest_cpu==myid)
             continue;
 
-          typename CSP_t::size_type rlen = csp.row_length(row);
+          typename DSP_t::size_type rlen = dsp.row_length(row);
 
           //skip empty lines
           if (!rlen)
             continue;
 
           //save entries
-          std::vector<typename CSP_t::size_type> &dst = send_data[dest_cpu];
+          std::vector<typename DSP_t::size_type> &dst = send_data[dest_cpu];
 
           dst.push_back(rlen); // number of entries
           dst.push_back(row); // row index
-          for (typename CSP_t::size_type c=0; c<rlen; ++c)
+          for (typename DSP_t::size_type c=0; c<rlen; ++c)
             {
               //columns
-              typename CSP_t::size_type column = csp.column_number(row, c);
+              typename DSP_t::size_type column = dsp.column_number(row, c);
               dst.push_back(column);
             }
         }
@@ -586,11 +586,11 @@ namespace SparsityTools
     }
 
 //TODO: In the following, we read individual bytes and then reinterpret them
-//    as typename CSP_t::size_type objects. this is error prone. use properly typed reads that
+//    as typename DSP_t::size_type objects. this is error prone. use properly typed reads that
 //    match the write above
     {
       //receive
-      std::vector<typename CSP_t::size_type> recv_buf;
+      std::vector<typename DSP_t::size_type> recv_buf;
       for (unsigned int index=0; index<num_receive; ++index)
         {
           MPI_Status status;
@@ -599,22 +599,22 @@ namespace SparsityTools
           Assert (status.MPI_TAG==124, ExcInternalError());
 
           MPI_Get_count(&status, MPI_BYTE, &len);
-          Assert( len%sizeof(typename CSP_t::size_type)==0, ExcInternalError());
+          Assert( len%sizeof(typename DSP_t::size_type)==0, ExcInternalError());
 
-          recv_buf.resize(len/sizeof(typename CSP_t::size_type));
+          recv_buf.resize(len/sizeof(typename DSP_t::size_type));
 
           MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
                    status.MPI_TAG, mpi_comm, &status);
 
-          typename std::vector<typename CSP_t::size_type>::const_iterator ptr = recv_buf.begin();
-          typename std::vector<typename CSP_t::size_type>::const_iterator end = recv_buf.end();
+          typename std::vector<typename DSP_t::size_type>::const_iterator ptr = recv_buf.begin();
+          typename std::vector<typename DSP_t::size_type>::const_iterator end = recv_buf.end();
           while (ptr+1<end)
             {
-              typename CSP_t::size_type num=*(ptr++);
-              typename CSP_t::size_type row=*(ptr++);
+              typename DSP_t::size_type num=*(ptr++);
+              typename DSP_t::size_type row=*(ptr++);
               for (unsigned int c=0; c<num; ++c)
                 {
-                  csp.add(row, *ptr);
+                  dsp.add(row, *ptr);
                   ptr++;
                 }
             }
@@ -634,7 +634,7 @@ namespace SparsityTools
 //explicit instantiations
 
 #define SPARSITY_FUNCTIONS(SparsityType) \
-  template void SparsityTools::distribute_sparsity_pattern<SparsityType> (SparsityType & csp, \
+  template void SparsityTools::distribute_sparsity_pattern<SparsityType> (SparsityType & dsp, \
       const std::vector<SparsityType::size_type> & rows_per_cpu,\
       const MPI_Comm & mpi_comm,\
       const IndexSet & myrange)
@@ -643,8 +643,8 @@ namespace SparsityTools
 SPARSITY_FUNCTIONS(DynamicSparsityPattern);
 
 template void SparsityTools::distribute_sparsity_pattern
-<BlockCompressedSimpleSparsityPattern>
-(BlockCompressedSimpleSparsityPattern &csp,
+<BlockDynamicSparsityPattern>
+(BlockDynamicSparsityPattern &dsp,
  const std::vector<IndexSet> &owned_set_per_cpu,
  const MPI_Comm &mpi_comm,
  const IndexSet &myrange);

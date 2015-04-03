@@ -22,11 +22,10 @@
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -693,13 +692,13 @@ namespace GridTools
     DoFHandler<dim> dof_handler(triangulation);
     dof_handler.distribute_dofs(q1);
 
-    CompressedSparsityPattern c_sparsity_pattern (dof_handler.n_dofs (),
-                                                  dof_handler.n_dofs ());
-    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity_pattern);
-    c_sparsity_pattern.compress ();
+    DynamicSparsityPattern dsp (dof_handler.n_dofs (),
+                                dof_handler.n_dofs ());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    dsp.compress ();
 
     SparsityPattern sparsity_pattern;
-    sparsity_pattern.copy_from (c_sparsity_pattern);
+    sparsity_pattern.copy_from (dsp);
     sparsity_pattern.compress ();
 
     SparseMatrix<double> S(sparsity_pattern);

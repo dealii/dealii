@@ -255,9 +255,7 @@ namespace TrilinosWrappers
    * with the difference that this class can work fully in %parallel according
    * to a partitioning of the sparsity pattern rows.
    *
-   * This class has many similarities to the compressed sparsity pattern
-   * classes of deal.II (i.e., the classes CompressedSparsityPattern,
-   * CompressedSetSparsityPattern, and CompressedSimpleSparsityPattern), since
+   * This class has many similarities to the  DynamicSparsityPattern, since
    * it can dynamically add elements to the pattern without any memory being
    * previously reserved for it. However, it also has a method
    * SparsityPattern::compress(), that finalizes the pattern and enables its
@@ -301,7 +299,7 @@ namespace TrilinosWrappers
      * not have this kind of information before building the sparsity pattern
      * (the usual case when the function DoFTools::make_sparsity_pattern() is
      * called). The entries are allocated dynamically in a similar manner as
-     * for the deal.II CompressedSparsityPattern classes. However, a good
+     * for the deal.II DynamicSparsityPattern classes. However, a good
      * estimate will reduce the setup time of the sparsity pattern.
      */
     SparsityPattern (const size_type  m,
@@ -339,7 +337,7 @@ namespace TrilinosWrappers
      * The number of columns entries per row is specified as the maximum
      * number of entries argument.  This does not need to be an accurate
      * number since the entries are allocated dynamically in a similar manner
-     * as for the deal.II CompressedSparsityPattern classes, but a good
+     * as for the deal.II DynamicSparsityPattern classes, but a good
      * estimate will reduce the setup time of the sparsity pattern.
      */
     void
@@ -547,7 +545,7 @@ namespace TrilinosWrappers
      * current Trilinos sparsity pattern. The optional argument @p
      * exchange_data can be used for reinitialization with a sparsity pattern
      * that is not fully constructed. This feature is only implemented for
-     * input sparsity patterns of type CompressedSimpleSparsityPattern.
+     * input sparsity patterns of type DynamicSparsityPattern.
      */
     template<typename SparsityType>
     void
@@ -562,7 +560,7 @@ namespace TrilinosWrappers
      * current Trilinos sparsity pattern. The optional argument @p
      * exchange_data can be used for reinitialization with a sparsity pattern
      * that is not fully constructed. This feature is only implemented for
-     * input sparsity patterns of type CompressedSimpleSparsityPattern.
+     * input sparsity patterns of type DynamicSparsityPattern.
      */
     template<typename SparsityType>
     void
@@ -777,7 +775,7 @@ namespace TrilinosWrappers
      * sparsity pattern. The optional argument @p exchange_data can be used
      * for reinitialization with a sparsity pattern that is not fully
      * constructed. This feature is only implemented for input sparsity
-     * patterns of type CompressedSimpleSparsityPattern.
+     * patterns of type DynamicSparsityPattern.
      */
     template<typename SparsityType>
     void
@@ -793,7 +791,7 @@ namespace TrilinosWrappers
      * current Trilinos sparsity pattern. The optional argument @p
      * exchange_data can be used for reinitialization with a sparsity pattern
      * that is not fully constructed. This feature is only implemented for
-     * input sparsity patterns of type CompressedSimpleSparsityPattern.
+     * input sparsity patterns of type DynamicSparsityPattern.
      */
     template<typename SparsityType>
     void

@@ -21,7 +21,7 @@
 
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/constraint_matrix.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -101,14 +101,14 @@ namespace DoFRenumbering
           if (use_constraints)
             DoFTools::make_hanging_node_constraints (dof_handler, constraints);
           constraints.close ();
-          CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                               dof_handler.n_dofs());
-          DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
+          DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                      dof_handler.n_dofs());
+          DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
 
           // submit the entries to the boost graph
-          for (unsigned int row=0; row<csp.n_rows(); ++row)
-            for (unsigned int col=0; col < csp.row_length(row); ++col)
-              add_edge (row, csp.column_number (row, col), graph);
+          for (unsigned int row=0; row<dsp.n_rows(); ++row)
+            for (unsigned int col=0; col < dsp.row_length(row); ++col)
+              add_edge (row, dsp.column_number (row, col), graph);
         }
 
         boosttypes::graph_traits<boosttypes::Graph>::vertex_iterator ui, ui_end;
@@ -411,21 +411,21 @@ namespace DoFRenumbering
       }
     else
       {
-        CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                             dof_handler.n_dofs(),
-                                             dof_handler.locally_owned_dofs());
-        DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
+        DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                    dof_handler.n_dofs(),
+                                    dof_handler.locally_owned_dofs());
+        DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
 
         // If the index set is not complete, need to get indices in local
         // index space.
         if (dof_handler.locally_owned_dofs().n_elements() !=
             dof_handler.locally_owned_dofs().size())
           {
-            // Create sparsity pattern from csp by transferring its indices to
+            // Create sparsity pattern from dsp by transferring its indices to
             // processor-local index space and doing Cuthill-McKee there
             std::vector<unsigned int> row_lengths(locally_owned.n_elements());
             for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
-              row_lengths[i] = csp.row_length(locally_owned.nth_index_in_set(i));
+              row_lengths[i] = dsp.row_length(locally_owned.nth_index_in_set(i));
             sparsity.reinit(locally_owned.n_elements(), locally_owned.n_elements(),
                             row_lengths);
             std::vector<types::global_dof_index> row_entries;
@@ -433,8 +433,8 @@ namespace DoFRenumbering
               {
                 const types::global_dof_index row = locally_owned.nth_index_in_set(i);
                 row_entries.resize(0);
-                for (CompressedSimpleSparsityPattern::row_iterator it =
-                       csp.row_begin(row); it != csp.row_end(row); ++it)
+                for (DynamicSparsityPattern::row_iterator it =
+                       dsp.row_begin(row); it != dsp.row_end(row); ++it)
                   if (*it != row && locally_owned.is_element(*it))
                     row_entries.push_back(locally_owned.index_within_set(*it));
                 sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
@@ -443,7 +443,7 @@ namespace DoFRenumbering
             sparsity.compress();
           }
         else
-          sparsity.copy_from(csp);
+          sparsity.copy_from(dsp);
       }
 
     // constraints are not needed anymore
@@ -487,10 +487,10 @@ namespace DoFRenumbering
       }
     else
       {
-        CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(level),
-                                             dof_handler.n_dofs(level));
-        MGTools::make_sparsity_pattern (dof_handler, csp, level);
-        sparsity.copy_from (csp);
+        DynamicSparsityPattern dsp (dof_handler.n_dofs(level),
+                                    dof_handler.n_dofs(level));
+        MGTools::make_sparsity_pattern (dof_handler, dsp, level);
+        sparsity.copy_from (dsp);
       }
 
     std::vector<types::global_dof_index> new_indices(sparsity.n_rows());

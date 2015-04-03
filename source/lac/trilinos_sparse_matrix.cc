@@ -480,21 +480,21 @@ namespace TrilinosWrappers
       // distinguish between compressed sparsity types that define row_begin()
       // and SparsityPattern that uses begin() as iterator type
       template <typename Sparsity>
-      void copy_row (const Sparsity        &csp,
+      void copy_row (const Sparsity        &dsp,
                      const size_type        row,
                      std::vector<TrilinosWrappers::types::int_type> &row_indices)
       {
-        typename Sparsity::row_iterator col_num = csp.row_begin (row);
-        for (size_type col=0; col_num != csp.row_end (row); ++col_num, ++col)
+        typename Sparsity::row_iterator col_num = dsp.row_begin (row);
+        for (size_type col=0; col_num != dsp.row_end (row); ++col_num, ++col)
           row_indices[col] = *col_num;
       }
 
-      void copy_row (const dealii::SparsityPattern &csp,
+      void copy_row (const dealii::SparsityPattern &dsp,
                      const size_type                row,
                      std::vector<TrilinosWrappers::types::int_type> &row_indices)
       {
-        dealii::SparsityPattern::iterator col_num = csp.begin (row);
-        for (size_type col=0; col_num != csp.end (row); ++col_num, ++col)
+        dealii::SparsityPattern::iterator col_num = dsp.begin (row);
+        for (size_type col=0; col_num != dsp.end (row); ++col_num, ++col)
           row_indices[col] = col_num->column();
       }
     }

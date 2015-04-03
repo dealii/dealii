@@ -446,7 +446,7 @@ public:
    * contents of each of the subobjects. Previous content of this object is
    * lost.
    */
-  void copy_from (const BlockDynamicSparsityPattern &csp);
+  void copy_from (const BlockDynamicSparsityPattern &dsp);
 };
 
 
