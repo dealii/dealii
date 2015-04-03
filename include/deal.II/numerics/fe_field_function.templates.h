@@ -88,7 +88,7 @@ namespace Functions
                        update_values);
     fe_v.reinit(cell);
     std::vector< Vector<typename VECTOR::value_type> >
-      vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
+    vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
     fe_v.get_function_values(data_vector, vvalues);
     values = vvalues[0];
   }
@@ -197,7 +197,7 @@ namespace Functions
                        update_hessians);
     fe_v.reinit(cell);
     std::vector< Vector<typename VECTOR::value_type> >
-      vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
+    vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
     fe_v.get_function_laplacians(data_vector, vvalues);
     values = vvalues[0];
   }
