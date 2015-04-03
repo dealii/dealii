@@ -734,7 +734,7 @@ void TableHandler::clear_current_row ()
 {
   // Figure out what is the currect (max) length of the columns
   // so that we "shave" one off.
-  unsigned long n = 0;
+  std::vector<internal::TableEntry>::size_type n = 0;
   for (std::map< std::string, Column >::iterator p = columns.begin(); p != columns.end(); ++p)
     n = std::max(n, p->second.entries.size());
 
