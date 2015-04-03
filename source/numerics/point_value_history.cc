@@ -736,7 +736,9 @@ void PointValueHistory<dim>
                 }
             }
 
-          //FIXME
+          // FIXME
+          // We need tmp vectors belowe because the data postprocessors are not
+          // equipped to deal with anything but doubles (scalars and tensors).
           const Vector< typename VECTOR::value_type >                        &uh_s   = uh[selected_point];
           const std::vector< Tensor< 1, dim, typename VECTOR::value_type > > &duh_s  = duh[selected_point];
           const std::vector< Tensor< 2, dim, typename VECTOR::value_type > > &dduh_s = dduh[selected_point];
