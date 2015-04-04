@@ -7177,7 +7177,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &/*patches*/,
                                        const DataOutBase::DataOutFilter &data_filter,
                                        const bool write_mesh_file,
                                        const std::string &mesh_filename,
@@ -7188,7 +7188,6 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   // throw an exception, but first make
   // sure the compiler does not warn about
   // the now unused function arguments
-  (void)patches;
   (void)data_filter;
   (void)write_mesh_file;
   (void)mesh_filename;
