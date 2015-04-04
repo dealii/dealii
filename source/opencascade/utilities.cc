@@ -298,7 +298,7 @@ namespace OpenCASCADE
                                const double c_y,
                                const double c_z,
                                const double c,
-                               const double tolerance)
+                               const double /*tolerance*/)
   {
     Handle(Geom_Plane) plane = new Geom_Plane(c_x,c_y,c_z,c);
     BRepAlgo_Section section(in_shape, plane);
@@ -590,7 +590,7 @@ namespace OpenCASCADE
   push_forward_and_differential_forms(const TopoDS_Face &face,
                                       const double u,
                                       const double v,
-                                      const double tolerance)
+                                      const double /*tolerance*/)
   {
     Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
     GeomLProp_SLProps props(SurfToProj, u, v, 1, 1e-7);

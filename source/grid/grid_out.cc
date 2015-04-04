@@ -1407,7 +1407,8 @@ void GridOut::write_xfig (
 
 
 template <int dim, int spacedim>
-void GridOut::write_svg(const Triangulation<dim,spacedim> &tria, std::ostream &out) const
+void GridOut::write_svg (const Triangulation<dim,spacedim> &tria,
+                         std::ostream &/*out*/) const
 {
   Assert(false, ExcNotImplemented());
 }

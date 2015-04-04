@@ -609,7 +609,7 @@ namespace PETScWrappers
 
   void
   MatrixBase::print (std::ostream &out,
-                     const bool    alternative_output) const
+                     const bool    /*alternative_output*/) const
   {
     std::pair<MatrixBase::size_type, MatrixBase::size_type>
     loc_range = local_range();
