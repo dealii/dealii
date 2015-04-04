@@ -342,7 +342,7 @@ namespace internal
     template <int dim>
     inline
     dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<3> > *
-    get_objects (dealii::internal::Triangulation::TriaFaces<dim> *faces,
+    get_objects (dealii::internal::Triangulation::TriaFaces<dim> *,
                  const dealii::internal::int2type<3>)
     {
       Assert (false, ExcInternalError());
