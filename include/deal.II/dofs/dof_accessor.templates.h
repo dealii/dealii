@@ -2033,9 +2033,9 @@ namespace internal
     template <bool level_dof_access, class DH>
     inline
     typename dealii::internal::DoFHandler::Iterators<DH, level_dof_access>::quad_iterator
-    get_quad(const dealii::Triangulation<DH::dimension, DH::space_dimension> *tria,
-             DH *dof_handler)
+    get_quad(const dealii::Triangulation<DH::dimension, DH::space_dimension> *,
              unsigned int /*index*/,
+             DH *)
     {
     }
 
