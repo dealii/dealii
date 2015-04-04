@@ -193,11 +193,13 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
 
   #
-  # Disable a bunch of warnings caused by Trilinos headers:
+  # Disable a bunch of warnings caused by Trilinos headers in older versions:
   #
-  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused")
-  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-extra")
-  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-overloaded-virtual")
+  IF(TRILINOS_VERSION VERSION_LESS "11.12")
+    ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused")
+    ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-extra")
+    ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-overloaded-virtual")
+  ENDIF()
 ENDMACRO()
 
 
