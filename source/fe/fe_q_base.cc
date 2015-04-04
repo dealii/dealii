@@ -119,7 +119,7 @@ struct FE_Q_Base<POLY,xdim,xspacedim>::Implementation
 
   template <int spacedim>
   static
-  void initialize_constraints (const std::vector<Point<1> > &points,
+  void initialize_constraints (const std::vector<Point<1> > &/*points*/,
                                FE_Q_Base<POLY,2,spacedim> &fe)
   {
     const unsigned int dim = 2;
@@ -222,7 +222,7 @@ struct FE_Q_Base<POLY,xdim,xspacedim>::Implementation
 
   template <int spacedim>
   static
-  void initialize_constraints (const std::vector<Point<1> > &points,
+  void initialize_constraints (const std::vector<Point<1> > &/*points*/,
                                FE_Q_Base<POLY,3,spacedim> &fe)
   {
     const unsigned int dim = 3;

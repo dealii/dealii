@@ -363,7 +363,7 @@ template <int spacedim>
 void
 FE_FaceQ<1,spacedim>::
 get_subface_interpolation_matrix (const FiniteElement<1,spacedim> &x_source_fe,
-                                  const unsigned int        subface,
+                                  const unsigned int        /*subface*/,
                                   FullMatrix<double>       &interpolation_matrix) const
 {
   Assert (interpolation_matrix.n() == this->dofs_per_face,
@@ -412,7 +412,7 @@ FE_FaceQ<1,spacedim>::hp_constraints_are_implemented () const
 template <int spacedim>
 FiniteElementDomination::Domination
 FE_FaceQ<1,spacedim>::
-compare_for_face_domination (const FiniteElement<1,spacedim> &fe_other) const
+compare_for_face_domination (const FiniteElement<1,spacedim> &/*fe_other*/) const
 {
   return FiniteElementDomination::no_requirements;
 }

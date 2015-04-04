@@ -4437,7 +4437,7 @@ namespace parallel
     template <int spacedim>
     void
     Triangulation<1,spacedim>::communicate_locally_moved_vertices
-    (const std::vector<bool> &vertex_locally_moved)
+    (const std::vector<bool> &/*vertex_locally_moved*/)
     {
       Assert (false, ExcNotImplemented());
     }
@@ -4490,7 +4490,7 @@ namespace parallel
     Triangulation<1,spacedim>::
     fill_vertices_with_ghost_neighbors
     (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &vertices_with_ghost_neighbors)
+     &/*vertices_with_ghost_neighbors*/)
     {
       Assert (false, ExcNotImplemented());
     }

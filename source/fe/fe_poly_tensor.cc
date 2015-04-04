@@ -86,8 +86,8 @@ namespace
 
 
   void
-  get_face_sign_change_rt (const Triangulation<3>::cell_iterator &cell,
-                           const unsigned int                      dofs_per_face,
+  get_face_sign_change_rt (const Triangulation<3>::cell_iterator &/*cell*/,
+                           const unsigned int                     /*dofs_per_face*/,
                            std::vector<double>                   &face_sign)
   {
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
@@ -95,8 +95,8 @@ namespace
   }
 
   void
-  get_face_sign_change_nedelec (const Triangulation<1>::cell_iterator &,
-                                const unsigned int                     ,
+  get_face_sign_change_nedelec (const Triangulation<1>::cell_iterator &/*cell*/,
+                                const unsigned int                     /*dofs_per_face*/,
                                 std::vector<double>                   &face_sign)
   {
     // nothing to do in 1d
@@ -106,8 +106,8 @@ namespace
 
 
   void
-  get_face_sign_change_nedelec (const Triangulation<2>::cell_iterator &cell,
-                                const unsigned int                     dofs_per_face,
+  get_face_sign_change_nedelec (const Triangulation<2>::cell_iterator &/*cell*/,
+                                const unsigned int                     /*dofs_per_face*/,
                                 std::vector<double>                   &face_sign)
   {
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
@@ -117,7 +117,7 @@ namespace
 
   void
   get_face_sign_change_nedelec (const Triangulation<3>::cell_iterator &cell,
-                                const unsigned int                      dofs_per_face,
+                                const unsigned int                     /*dofs_per_face*/,
                                 std::vector<double>                   &face_sign)
   {
     const unsigned int dim = 3;
