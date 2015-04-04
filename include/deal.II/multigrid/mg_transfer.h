@@ -81,7 +81,7 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
     template <class DSP, class DH>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, DH &dh)
+    static void reinit(Matrix &, Sparsity &, int /*level*/, const DSP &, DH &)
     {
     }
   };

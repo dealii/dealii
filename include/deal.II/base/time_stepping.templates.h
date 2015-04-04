@@ -138,7 +138,7 @@ namespace TimeStepping
   template <typename VECTOR>
   double ExplicitRungeKutta<VECTOR>::evolve_one_time_step(
     std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
-    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> /*id_minus_tau_J_inverse*/,
     double t,
     double delta_t,
     VECTOR &y)
@@ -674,7 +674,7 @@ namespace TimeStepping
   template <typename VECTOR>
   double EmbeddedExplicitRungeKutta<VECTOR>::evolve_one_time_step(
     std_cxx11::function<VECTOR (const double, const VECTOR &)> f,
-    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> id_minus_tau_J_inverse,
+    std_cxx11::function<VECTOR (const double, const double, const VECTOR &)> /*id_minus_tau_J_inverse*/,
     double t,
     double delta_t,
     VECTOR &y)
