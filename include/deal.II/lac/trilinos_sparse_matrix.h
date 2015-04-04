@@ -3111,8 +3111,10 @@ namespace TrilinosWrappers
 
     internal::SparseMatrix::check_vector_map_equality(*matrix, dst, src);
     const size_type dst_local_size = dst.end() - dst.begin();
+    (void)dst_local_size;
     AssertDimension (dst_local_size, static_cast<size_type>(matrix->DomainMap().NumMyElements()));
     const size_type src_local_size = src.end() - src.begin();
+    (void)src_local_size;
     AssertDimension (src_local_size, static_cast<size_type>(matrix->RangeMap().NumMyElements()));
 
     Epetra_MultiVector tril_dst (View, matrix->DomainMap(), dst.begin(),

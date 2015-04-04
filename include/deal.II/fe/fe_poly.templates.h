@@ -62,6 +62,7 @@ FE_Poly<POLY,dim,spacedim>::shape_value_component (const unsigned int i,
                                                    const Point<dim> &p,
                                                    const unsigned int component) const
 {
+  (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return poly_space.compute_value(i, p);
@@ -86,6 +87,7 @@ FE_Poly<POLY,dim,spacedim>::shape_grad_component (const unsigned int i,
                                                   const Point<dim> &p,
                                                   const unsigned int component) const
 {
+  (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return poly_space.compute_grad(i, p);
@@ -110,6 +112,7 @@ FE_Poly<POLY,dim,spacedim>::shape_grad_grad_component (const unsigned int i,
                                                        const Point<dim> &p,
                                                        const unsigned int component) const
 {
+  (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return poly_space.compute_grad_grad(i, p);

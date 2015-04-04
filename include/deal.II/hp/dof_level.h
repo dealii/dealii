@@ -292,6 +292,7 @@ namespace internal
                    const unsigned int                fe_index,
                    const unsigned int                local_index) const
     {
+      (void)fe_index;
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
@@ -324,6 +325,7 @@ namespace internal
                    const unsigned int                local_index,
                    const types::global_dof_index     global_index)
     {
+      (void)fe_index;
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
 
@@ -388,6 +390,7 @@ namespace internal
     DoFLevel::get_cell_cache_start (const unsigned int obj_index,
                                     const unsigned int dofs_per_cell) const
     {
+      (void)dofs_per_cell;
       Assert (obj_index < cell_cache_offsets.size(),
               ExcInternalError());
       Assert (cell_cache_offsets[obj_index]+dofs_per_cell

@@ -302,6 +302,7 @@ namespace PETScWrappers
     // first set sizes of blocks, but
     // don't initialize them as we will
     // copy elements soon
+    (void)end;
     reinit (n, true);
     InputIterator start = first;
     for (unsigned int b=0; b<n.size(); ++b)

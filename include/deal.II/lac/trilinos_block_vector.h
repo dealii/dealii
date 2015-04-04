@@ -348,6 +348,7 @@ namespace TrilinosWrappers
     // first set sizes of blocks, but
     // don't initialize them as we will
     // copy elements soon
+    (void)end;
     reinit (n, true);
     InputIterator start = first;
     for (size_type b=0; b<n.size(); ++b)
