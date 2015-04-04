@@ -2396,7 +2396,7 @@ TriaAccessor<0, 1, spacedim>::manifold_id () const
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::face_orientation (const unsigned int face)
+bool TriaAccessor<0, 1, spacedim>::face_orientation (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2405,7 +2405,7 @@ bool TriaAccessor<0, 1, spacedim>::face_orientation (const unsigned int face)
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::face_flip (const unsigned int face)
+bool TriaAccessor<0, 1, spacedim>::face_flip (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2414,7 +2414,7 @@ bool TriaAccessor<0, 1, spacedim>::face_flip (const unsigned int face)
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::face_rotation (const unsigned int face)
+bool TriaAccessor<0, 1, spacedim>::face_rotation (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2423,7 +2423,7 @@ bool TriaAccessor<0, 1, spacedim>::face_rotation (const unsigned int face)
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::line_orientation (const unsigned int line)
+bool TriaAccessor<0, 1, spacedim>::line_orientation (const unsigned int /*line*/)
 {
   return false;
 }

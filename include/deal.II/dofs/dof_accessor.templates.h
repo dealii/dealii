@@ -811,8 +811,8 @@ namespace internal
       static
       unsigned int
       n_active_fe_indices (const dealii::hp::DoFHandler<1,spacedim> &,
-                           const unsigned int obj_level,
-                           const unsigned int obj_index,
+                           const unsigned int /*obj_level*/,
+                           const unsigned int /*obj_index*/,
                            const dealii::internal::int2type<1> &)
       {
         // on a cell, the number of active elements is one
@@ -900,8 +900,8 @@ namespace internal
       static
       unsigned int
       n_active_fe_indices (const dealii::hp::DoFHandler<2,spacedim> &,
-                           const unsigned int obj_level,
-                           const unsigned int obj_index,
+                           const unsigned int /*obj_level*/,
+                           const unsigned int /*obj_index*/,
                            const dealii::internal::int2type<2> &)
       {
         // on a cell, the number of active elements is one
@@ -1037,8 +1037,8 @@ namespace internal
       static
       unsigned int
       n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &,
-                           const unsigned int obj_level,
-                           const unsigned int obj_index,
+                           const unsigned int /*obj_level*/,
+                           const unsigned int /*obj_index*/,
                            const dealii::internal::int2type<3> &)
       {
         // on a cell, the number of active elements is one
@@ -2034,8 +2034,8 @@ namespace internal
     inline
     typename dealii::internal::DoFHandler::Iterators<DH, level_dof_access>::quad_iterator
     get_quad(const dealii::Triangulation<DH::dimension, DH::space_dimension> *tria,
-             unsigned int index,
              DH *dof_handler)
+             unsigned int /*index*/,
     {
     }
 

@@ -3946,11 +3946,11 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_eps (const std::vector<Patch<dim,spacedim> > &patches,
+  void write_eps (const std::vector<Patch<dim,spacedim> > &/*patches*/,
                   const std::vector<std::string>          &/*data_names*/,
                   const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
-                  const EpsFlags                          &flags,
-                  std::ostream                            &out)
+                  const EpsFlags                          &/*flags*/,
+                  std::ostream                            &/*out*/)
   {
     // not implemented, see the documentation of the function
     AssertThrow (dim==2, ExcNotImplemented());
@@ -5802,8 +5802,8 @@ namespace DataOutBase
 
   template <int spacedim>
   void write_svg (const std::vector<Patch<2,spacedim> > &patches,
-                  const std::vector<std::string> &data_names,
-                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                  const std::vector<std::string> &/*data_names*/,
+                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &/*vector_data_ranges*/,
                   const SvgFlags &flags,
                   std::ostream &out)
   {
