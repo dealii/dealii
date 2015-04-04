@@ -16,7 +16,7 @@
 
 /**
  * @file Test initialization of Assembler::MatrixSimple and
- * DoFInfo including assigning of local block sizes
+ * DoFInfo with multiple matrices
  */
 
 #include "../tests.h"
@@ -31,51 +31,20 @@
 #include <deal.II/meshworker/simple.h>
 
 #include <deal.II/fe/fe_dgp.h>
-#include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 
 using namespace dealii;
 
-template <int dim>
-void test(FiniteElement<dim> &fe)
+template <class DOFINFO, class MATRIX>
+void test(DOFINFO &info, MeshWorker::Assembler::MatrixSimple<MATRIX> &ass)
 {
-  deallog << fe.get_name() << std::endl;
-
-  Triangulation<dim> tr;
-  GridGenerator::hyper_cube(tr);
-  tr.refine_global(1);
-  tr.begin_active()->neighbor(1)->set_refine_flag();
-  tr.execute_coarsening_and_refinement();
-
-  DoFHandler<dim> dof(tr);
-  dof.distribute_dofs(fe);
-  dof.initialize_local_block_info();
-
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  typename DoFHandler<dim>::face_iterator face = cell->face(1);
-
-  std::vector<FullMatrix<double> > matrices(2);
-  MeshWorker::Assembler::MatrixSimple<FullMatrix<double> > ass;
-  ass.initialize(matrices[0]);
-
-  MeshWorker::DoFInfo<dim> info(dof.block_info());
   ass.initialize_info(info, false);
-
-  deallog.push("cell");
-  info.reinit(cell);
+  deallog << "No faces" << std::endl;
   info.print_debug(deallog);
-  deallog.pop();
 
-  deallog.push("face1");
-  info.reinit(cell, face, 1);
-  info.print_debug(deallog);
-  deallog.pop();
-
-  deallog.push("face2");
   ass.initialize_info(info, true);
-  info.reinit(cell, face, 1);
+  deallog << "With faces" << std::endl;
   info.print_debug(deallog);
-  deallog.pop();
 }
 
 int main()
@@ -85,16 +54,35 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console (0);
 
-  FE_DGP<2> p0(0);
-  FE_DGP<2> p1(1);
-  FE_DGP<2> p2(2);
-  FE_RaviartThomas<2> rt0(0);
+  Triangulation<2,2> tr;
+  GridGenerator::hyper_cube(tr);
+  FE_DGP<2,2> fe1(1);
+  FE_DGP<2,2> fe2(2);
+  FE_DGP<2,2> fe3(3);
+  FE_DGP<2,2> fe5(5);
+  FESystem<2,2> fes1(fe3,1,fe5,1,fe1,1);
+  FESystem<2,2> fes2(fe3,1,fe5,1,fe1,1, fe2,1);
 
-  FESystem<2> sys1(p0,1, p1, 1);
-  FESystem<2> sys2(p2,2,p0,3,p1,1);
-  FESystem<2> sys3(p0, 2, rt0, 1);
+  DoFHandler<2,2> dof1(tr);
+  dof1.distribute_dofs(fes1);
+  DoFHandler<2,2> dof2(tr);
+  dof2.distribute_dofs(fes2);
+  dof1.initialize_local_block_info();
+  dof2.initialize_local_block_info();
+  MeshWorker::DoFInfo<2,2,double> info1(dof1);
+  MeshWorker::DoFInfo<2,2,double> info1b(dof1.block_info());
+  MeshWorker::DoFInfo<2,2,double> info2b(dof2.block_info());
 
-  test(sys1);
-  test(sys2);
-  test(sys3);
+  std::vector<FullMatrix<double> > matrices(2);
+  MeshWorker::Assembler::MatrixSimple<FullMatrix<double> > ass1;
+  ass1.initialize(matrices);
+  
+  deallog.push("Single block");
+  test(info1, ass1);
+  deallog.pop();
+  deallog.push("Multiple blocks");
+  test(info1b, ass1);
+  deallog.pop();
+  deallog.push("More blocks");
+  test(info2b, ass1);
 }

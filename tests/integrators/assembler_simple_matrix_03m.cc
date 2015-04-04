@@ -15,8 +15,8 @@
 
 
 /**
- * @file Test integration with Assembler::MatrixSimple and
- * compare local block version to monolithic
+ * @file Test whether Assembler::MatrixSimple writes the local blocks
+ * into the right global positions of multiple matrices
  */
 
 #include "../tests.h"
@@ -49,9 +49,11 @@ void fill_matrices(MeshWorker::LocalResults<number> &results, bool face)
       for (unsigned int i=0; i<M.m(); ++i)
         for (unsigned int j=0; j<M.n(); ++j)
           {
-            M(i,j) = base + 10*i+j;
+	    number entry = base + 10*i+j;
+//	    if (k >= results.n_matrices()/2) entry *= -1;
+            M(i,j) = entry;
             if (face)
-              results.matrix(k, true).matrix(i,j) = base + 10*i+j;
+              results.matrix(k, true).matrix(i,j) = entry;
           }
     }
 }
@@ -77,11 +79,13 @@ void test(FiniteElement<dim> &fe)
   typename DoFHandler<dim>::face_iterator face = cell->face(1);
   typename DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(1);
 
-  CompressedSparsityPattern csp(dof.n_dofs(),dof.n_dofs());
+  DynamicSparsityPattern csp(dof.n_dofs(),dof.n_dofs());
   DoFTools::make_flux_sparsity_pattern(dof, csp);
   SparsityPattern sparsity;
   sparsity.copy_from(csp);
-  SparseMatrix<double> M(sparsity);
+  std::vector<SparseMatrix<double> > M(2);
+  M[0].reinit(sparsity);
+  M[1].reinit(sparsity);
 
   MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> > ass;
   ass.initialize(M);
@@ -94,8 +98,9 @@ void test(FiniteElement<dim> &fe)
   info.reinit(cell);
   fill_matrices(info, false);
   ass.assemble(info);
-  M.print_formatted(deallog.get_file_stream(), 0, false, 6);
-  M = 0.;
+  M[1].print_formatted(deallog.get_file_stream(), 0, false, 6);
+  M[0] = 0.;
+  M[1] = 0.;
 
   deallog << "face" << std::endl;
   ass.initialize_info(info, true);
@@ -104,15 +109,12 @@ void test(FiniteElement<dim> &fe)
   fill_matrices(info, true);
   fill_matrices(infon, true);
   ass.assemble(info, infon);
-  M.print_formatted(deallog.get_file_stream(), 0, false, 6);
+  M[1].print_formatted(deallog.get_file_stream(), 0, false, 6);
 }
 
 int main()
 {
-  const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
-  deallog.depth_console (0);
+  initlog();
 
   FE_DGP<2> p0(0);
   FE_DGP<2> p1(1);
