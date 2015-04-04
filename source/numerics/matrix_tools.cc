@@ -867,7 +867,7 @@ namespace MatrixCreator
     template <int dim, int spacedim>
     void
     create_boundary_mass_matrix_1 (typename DoFHandler<dim,spacedim>::active_cell_iterator const &cell,
-                                   MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch,
+                                   MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                    MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,
                                    spacedim> > &copy_data,
                                    Mapping<dim, spacedim> const &mapping,
@@ -1135,14 +1135,13 @@ namespace MatrixCreator
 
     template <>
     void
-                                        MatrixCreator::internal::AssemblerBoundary::Scratch const
-                                        &scratch,
     create_boundary_mass_matrix_1<1,3> (DoFHandler<1,3>::active_cell_iterator const &/*cell*/,
+                                        MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                         MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<1,
-                                        Mapping<1,3> const &mapping,
-                                        FiniteElement<1,3> const &fe,
-                                        Quadrature<0> const &q,
                                         3> > &/*copy_data*/,
+                                        Mapping<1,3> const &,
+                                        FiniteElement<1,3> const &,
+                                        Quadrature<0> const &,
                                         FunctionMap<3>::type const &/*boundary_functions*/,
                                         Function<3> const *const /*coefficient*/,
                                         std::vector<unsigned int> const &/*component_mapping*/)
@@ -1231,7 +1230,7 @@ namespace MatrixCreator
     void
     create_hp_boundary_mass_matrix_1 (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator const
                                       &cell,
-                                      MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch,
+                                      MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                       MatrixCreator::internal::AssemblerBoundary
                                       ::CopyData<hp::DoFHandler<dim,spacedim> > &copy_data,
                                       hp::MappingCollection<dim,spacedim> const &mapping,
@@ -1704,7 +1703,7 @@ namespace MatrixCreator
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix   &)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
   }
@@ -1763,7 +1762,7 @@ namespace MatrixCreator
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix   &)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
                           matrix, rhs, rhs_vector, coefficient);
@@ -1816,7 +1815,7 @@ namespace MatrixCreator
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix   &)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
   }
@@ -1872,7 +1871,7 @@ namespace MatrixCreator
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix   &)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
                           matrix, rhs, rhs_vector, coefficient);
