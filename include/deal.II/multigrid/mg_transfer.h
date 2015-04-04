@@ -52,6 +52,7 @@ namespace internal
     static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, const DH &)
     {
       sparsity.copy_from (dsp);
+      (void)level;
       matrix.reinit (sparsity);
     }
   };

@@ -2139,6 +2139,8 @@ TriaAccessor (const Triangulation<1,spacedim> *tria,
   // of the iterator which calls the accessor with argument list (0,-2,-2,0), so
   // in this particular case accept this call and create an object that corresponds
   // to the default constructed (invalid) vertex accessor
+  (void)level;
+  (void)index;
   Assert ((level == -2) && (index == -2), ExcInternalError());
 }
 

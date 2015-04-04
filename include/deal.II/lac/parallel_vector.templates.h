@@ -308,6 +308,8 @@ namespace parallel
     Vector<Number>::compress_start (const unsigned int counter,
                                     ::dealii::VectorOperation::values operation)
     {
+      (void)counter;
+      (void)operation;
       Assert (vector_is_ghosted == false,
               ExcMessage ("Cannot call compress() on a ghosted vector"));
 
@@ -386,12 +388,9 @@ namespace parallel
       if (compress_requests.size() > 0)
         {
           int ierr = MPI_Startall(compress_requests.size(),&compress_requests[0]);
+          (void)ierr;
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
         }
-
-#else // ifdef DEAL_II_WITH_MPI
-      (void)counter;
-      (void)operation;
 #endif
     }
 
@@ -434,6 +433,7 @@ namespace parallel
         {
           int ierr = MPI_Waitall (n_import_targets, &compress_requests[0],
                                   MPI_STATUSES_IGNORE);
+          (void)ierr;
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
 
           Number *read_position = import_data;
@@ -466,6 +466,7 @@ namespace parallel
           int ierr = MPI_Waitall (n_ghost_targets,
                                   &compress_requests[n_import_targets],
                                   MPI_STATUSES_IGNORE);
+          (void)ierr;
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
         }
       else
@@ -558,6 +559,7 @@ namespace parallel
         {
           int ierr = MPI_Startall(update_ghost_values_requests.size(),
                                   &update_ghost_values_requests[0]);
+          (void)ierr;
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
         }
 #else
@@ -585,6 +587,7 @@ namespace parallel
           int ierr = MPI_Waitall (update_ghost_values_requests.size(),
                                   &update_ghost_values_requests[0],
                                   MPI_STATUSES_IGNORE);
+          (void)ierr;
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
         }
 #endif

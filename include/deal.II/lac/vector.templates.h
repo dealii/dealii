@@ -1192,6 +1192,7 @@ namespace internal
           // work on the regular part. The innermost 32 values are expanded in
           // order to obtain known loop bounds for most of the work.
           const Number *X_original = X;
+          (void)X_original;
           ResultType outer_results [128];
           size_type n_chunks = vec_size / 32;
           const size_type remainder = vec_size % 32;

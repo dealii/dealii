@@ -1937,6 +1937,7 @@ namespace internal
       component_to_unrolled_index
       (const TableIndices<rank> &indices)
       {
+        (void)indices;
         Assert (false, ExcNotImplemented());
         return numbers::invalid_unsigned_int;
       }
@@ -2031,6 +2032,7 @@ namespace internal
       (const unsigned int i,
        const int2type<rank> &)
       {
+        (void)i;
         Assert ((i < dealii::SymmetricTensor<rank,dim,double>::n_independent_components),
                 ExcIndexRange(i, 0, dealii::SymmetricTensor<rank,dim,double>::n_independent_components));
         Assert (false, ExcNotImplemented());
