@@ -1468,9 +1468,7 @@ template <>
 void GridIn<2>::read_netcdf (const std::string &filename)
 {
 #ifndef DEAL_II_WITH_NETCDF
-  // do something with unused
-  // filename
-  filename.c_str();
+  (void)filename;
   AssertThrow(false, ExcNeedsNetCDF());
 #else
   const unsigned int dim=2;
