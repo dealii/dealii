@@ -2122,7 +2122,7 @@ namespace VectorTools
   point_gradient (const DoFHandler<dim,spacedim>    &dof,
                   const InVector                    &fe_function,
                   const Point<spacedim>             &point,
-                  std::vector<Tensor<1, spacedim> > &value);
+                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &value);
 
   /**
    * Same as above for hp.
@@ -2135,7 +2135,7 @@ namespace VectorTools
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
                   const InVector                     &fe_function,
                   const Point<spacedim>              &point,
-                  std::vector<Tensor<1, spacedim> >  &value);
+                  std::vector<Tensor<1, spacedim, typename InVector::value_type> >  &value);
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
@@ -2149,7 +2149,7 @@ namespace VectorTools
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
   template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim>
+  Tensor<1, spacedim, typename InVector::value_type>
   point_gradient (const DoFHandler<dim,spacedim> &dof,
                   const InVector                 &fe_function,
                   const Point<spacedim>          &point);
@@ -2161,7 +2161,7 @@ namespace VectorTools
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
   template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim>
+  Tensor<1, spacedim, typename InVector::value_type>
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
                   const InVector                     &fe_function,
                   const Point<spacedim>              &point);
@@ -2183,7 +2183,7 @@ namespace VectorTools
                   const DoFHandler<dim,spacedim>    &dof,
                   const InVector                    &fe_function,
                   const Point<spacedim>             &point,
-                  std::vector<Tensor<1, spacedim> > &value);
+                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &value);
 
   /**
    * Same as above for hp.
@@ -2197,7 +2197,7 @@ namespace VectorTools
                   const hp::DoFHandler<dim,spacedim>         &dof,
                   const InVector                             &fe_function,
                   const Point<spacedim>                      &point,
-                  std::vector<Tensor<1, spacedim> >          &value);
+                  std::vector<Tensor<1, spacedim, typename InVector::value_type> >          &value);
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
@@ -2211,7 +2211,7 @@ namespace VectorTools
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
   template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim>
+  Tensor<1, spacedim, typename InVector::value_type>
   point_gradient (const Mapping<dim,spacedim>    &mapping,
                   const DoFHandler<dim,spacedim> &dof,
                   const InVector                 &fe_function,
@@ -2224,7 +2224,7 @@ namespace VectorTools
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    */
   template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim>
+  Tensor<1, spacedim, typename InVector::value_type>
   point_gradient (const hp::MappingCollection<dim,spacedim> &mapping,
                   const hp::DoFHandler<dim,spacedim>        &dof,
                   const InVector                            &fe_function,
