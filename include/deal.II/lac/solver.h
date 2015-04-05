@@ -323,6 +323,11 @@ class Solver : public Subscriptor
 {
 public:
   /**
+   * A typedef for the underlying vector type
+   */
+  typedef VECTOR vector_type;
+
+  /**
    * Constructor. Takes a control object which evaluates the conditions for
    * convergence, and an object that allows solvers to allocate memory for
    * temporary objects.
