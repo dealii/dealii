@@ -552,10 +552,10 @@ namespace GridTools
   namespace
   {
     template <int spacedim>
-    class ShiftPoint
+    class Shift
     {
     public:
-      ShiftPoint (const Point<spacedim> &shift)
+      Shift (const Tensor<1,spacedim> &shift)
         :
         shift(shift)
       {}
@@ -564,7 +564,7 @@ namespace GridTools
         return p+shift;
       }
     private:
-      const Point<spacedim> shift;
+      const Tensor<1,spacedim> shift;
     };
 
 
@@ -589,10 +589,10 @@ namespace GridTools
 
 
     template <int spacedim>
-    class ScalePoint
+    class Scale
     {
     public:
-      ScalePoint (const double factor)
+      Scale (const double factor)
         :
         factor(factor)
       {}
@@ -608,10 +608,10 @@ namespace GridTools
 
   template <int dim, int spacedim>
   void
-  shift (const Point<spacedim>   &shift_vector,
+  shift (const Tensor<1,spacedim>   &shift_vector,
          Triangulation<dim, spacedim> &triangulation)
   {
-    transform (ShiftPoint<spacedim>(shift_vector), triangulation);
+    transform (Shift<spacedim>(shift_vector), triangulation);
   }
 
 
@@ -631,7 +631,7 @@ namespace GridTools
          Triangulation<dim, spacedim> &triangulation)
   {
     Assert (scaling_factor>0, ExcScalingFactorNotPositive (scaling_factor));
-    transform (ScalePoint<spacedim>(scaling_factor), triangulation);
+    transform (Scale<spacedim>(scaling_factor), triangulation);
   }
 
 
