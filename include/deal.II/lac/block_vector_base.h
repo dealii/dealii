@@ -2266,7 +2266,7 @@ BlockVectorBase<VectorType>::operator /= (const value_type factor)
 {
 
   AssertIsFinite(factor);
-  Assert (factor > 0., ExcDivideByZero() );
+  Assert (factor != 0., ExcDivideByZero() );
 
   for (size_type i=0; i<n_blocks(); ++i)
     components[i] /= factor;
