@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * The MappingFE is a generalization of the MappingQEulerian class, for arbitrary
+ * The MappingFEField is a generalization of the MappingQEulerian class, for arbitrary
  * vectorial finite elements. The main difference is that this class uses a vector
  * of absolute positions instead of a vector of displacements.
  * In particular we think of a collections of a FE_Q or
@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * solution field and one to describe the geometry of the problem. Historically
  * in the deal.II library there was not such a distinction. The differences
  * between this mapping and the MappingQ class are quite important.
- * The MappingFE, being a generalization, requires a higher level of abstraction.
+ * The MappingFEField, being a generalization, requires a higher level of abstraction.
  * This is the reason why it takes a DoFHandler and a vector of control points
  * that are the coefficients of the shape function (so in general it is a vector
  * of coefficient).
@@ -62,7 +62,7 @@ DEAL_II_NAMESPACE_OPEN
  *    dhq.distribute_dofs(fesystem);
  *    Vector<double> eulerq(dhq.n_dofs());
  *    const ComponentMask mask(spacedim, true);
- *    MappingFE<dim,spacedim> map(eulerq, dhq, mask);
+ *    MappingFEField<dim,spacedim> map(eulerq, dhq, mask);
  *    map.update_euler_vector_using_triangulation(eulerq);
  * @endcode
 
@@ -73,7 +73,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim=dim,
           class DH=DoFHandler<dim,spacedim>,
           class VECTOR=Vector<double> >
-class MappingFE : public Mapping<dim,spacedim>
+class MappingFEField : public Mapping<dim,spacedim>
 {
 public:
   /**
@@ -82,7 +82,7 @@ public:
    * configuration. This is filled calling the method
    * update_euler_vector_using_triangulation.
    */
-  MappingFE (const VECTOR  &euler_vector,
+  MappingFEField (const VECTOR  &euler_vector,
              const DH      &euler_dof_handler,
              const ComponentMask mask=ComponentMask());
 
@@ -91,12 +91,12 @@ public:
    * points to instead of simply copying the #tensor_pols pointer as done by a
    * default copy constructor.
    */
-  MappingFE (const MappingFE<dim,spacedim,DH,VECTOR> &mapping);
+  MappingFEField (const MappingFEField<dim,spacedim,DH,VECTOR> &mapping);
 
   /**
    * Destructor.
    */
-  virtual ~MappingFE ();
+  virtual ~MappingFEField ();
 
   /** Fill the euler vector with
   the information coming from
@@ -537,7 +537,7 @@ protected:
   * Reference to the vector of shifts.
   */
 
-  SmartPointer<const VECTOR, MappingFE<dim,spacedim,DH,VECTOR> >euler_vector;
+  SmartPointer<const VECTOR, MappingFEField<dim,spacedim,DH,VECTOR> >euler_vector;
   /**
    * A FiniteElement object which is only needed in 3D, since it knows how to reorder
    * shape functions/DoFs on non-standard faces. This is used to reorder
@@ -545,13 +545,13 @@ protected:
    * construction in 1D and 2D, but since memory and time requirements are not
    * particularly high this seems unnecessary at the moment.
    */
-  SmartPointer<const FiniteElement<dim,spacedim>, MappingFE<dim,spacedim,DH,VECTOR> > fe;
+  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,DH,VECTOR> > fe;
 
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DH,MappingFE<dim,spacedim,DH,VECTOR> >euler_dof_handler;
+  SmartPointer<const DH,MappingFEField<dim,spacedim,DH,VECTOR> >euler_dof_handler;
 
 
 
@@ -576,7 +576,7 @@ private:
 
   virtual void
   compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
-                          typename MappingFE<dim, spacedim>::InternalData &data) const;
+                          typename MappingFEField<dim, spacedim>::InternalData &data) const;
 
   UpdateFlags
   update_once (const UpdateFlags in) const;
@@ -630,9 +630,9 @@ private:
 
 
   /**
-   * Declare other MappingFE classes friends.
+   * Declare other MappingFEField classes friends.
    */
-  template <int,int,class,class> friend class MappingFE;
+  template <int,int,class,class> friend class MappingFEField;
 };
 
 /*@}*/
@@ -645,7 +645,7 @@ private:
 template<int dim, int spacedim, class DH, class VECTOR>
 inline
 double
-MappingFE<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoint,
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoint,
                                                         const unsigned int shape_nr) const
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
@@ -659,7 +659,7 @@ MappingFE<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoin
 template<int dim, int spacedim, class DH, class VECTOR>
 inline
 double &
-MappingFE<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoint,
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoint,
                                                         const unsigned int shape_nr)
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
@@ -672,7 +672,7 @@ MappingFE<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoin
 template<int dim, int spacedim, class DH, class VECTOR>
 inline
 Tensor<1,dim>
-MappingFE<dim,spacedim,DH,VECTOR>::InternalData::derivative (const unsigned int qpoint,
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::derivative (const unsigned int qpoint,
     const unsigned int shape_nr) const
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
@@ -686,7 +686,7 @@ MappingFE<dim,spacedim,DH,VECTOR>::InternalData::derivative (const unsigned int 
 template<int dim, int spacedim, class DH, class VECTOR>
 inline
 Tensor<1,dim> &
-MappingFE<dim,spacedim,DH,VECTOR>::InternalData::derivative (const unsigned int qpoint,
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::derivative (const unsigned int qpoint,
     const unsigned int shape_nr)
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_derivatives.size(),
@@ -699,7 +699,7 @@ MappingFE<dim,spacedim,DH,VECTOR>::InternalData::derivative (const unsigned int 
 template <int dim, int spacedim, class DH, class VECTOR>
 inline
 Tensor<2,dim>
-MappingFE<dim,spacedim,DH,VECTOR>::InternalData::second_derivative (const unsigned int qpoint,
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::second_derivative (const unsigned int qpoint,
     const unsigned int shape_nr) const
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
@@ -713,7 +713,7 @@ MappingFE<dim,spacedim,DH,VECTOR>::InternalData::second_derivative (const unsign
 template <int dim, int spacedim, class DH, class VECTOR>
 inline
 Tensor<2,dim> &
-MappingFE<dim,spacedim,DH,VECTOR>::InternalData::second_derivative (const unsigned int qpoint,
+MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::second_derivative (const unsigned int qpoint,
     const unsigned int shape_nr)
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_second_derivatives.size(),
@@ -726,7 +726,7 @@ MappingFE<dim,spacedim,DH,VECTOR>::InternalData::second_derivative (const unsign
 template <int dim, int spacedim, class DH, class VECTOR>
 inline
 bool
-MappingFE<dim,spacedim,DH,VECTOR>::preserves_vertex_locations () const
+MappingFEField<dim,spacedim,DH,VECTOR>::preserves_vertex_locations () const
 {
   return false;
 }
