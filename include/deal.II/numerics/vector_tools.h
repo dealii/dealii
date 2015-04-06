@@ -668,7 +668,7 @@ namespace VectorTools
    * @ref GlossComponentMask.
    * As an example, assume that you are solving the Stokes equations in 2d,
    * with variables $(u,v,p)$ and that you only want to interpolate boundary
-   * values for the pressure, then the component mask should correspond to
+   * values for the velocity, then the component mask should correspond to
    * <code>(true,true,false)</code>.
    *
    * @note Whether a component mask has been specified or not, the number of
