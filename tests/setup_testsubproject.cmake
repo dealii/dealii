@@ -3,13 +3,9 @@ FIND_PACKAGE(deal.II 8.0 REQUIRED HINTS ${DEAL_II_DIR})
 SET(CMAKE_BUILD_TYPE DebugRelease CACHE STRING "" FORCE)
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
-#
-# Silence warnings:
-#
 FOREACH(_var DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT)
-  IF(DEFINED ${_var})
-    SET(_bogus "${${_var}}")
-  ENDIF()
+  SET_IF_EMPTY(${_var} "${${_var}}")
+  SET(${_var} "${${_var}}" CACHE STRING "" FORCE)
 ENDFOREACH()
 
 #
