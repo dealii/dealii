@@ -65,8 +65,11 @@ void mesh_info(const Triangulation<dim> &tria,
             << " dimension: " << dim << std::endl
             << " no. of cells: " << tria.n_active_cells() << std::endl;
 
-  // Next loop over all faces of all cells and find how often each boundary
-  // indicator is used:
+  // Next loop over all faces of all cells and find how often each
+  // boundary indicator is used (recall that if you access an element
+  // of a std::map object that doesn't exist, it is implicitly created
+  // and default initialized -- to zero, in the current case -- before
+  // we then increment it):
   {
     std::map<unsigned int, unsigned int> boundary_count;
     typename Triangulation<dim>::active_cell_iterator
