@@ -516,7 +516,7 @@ namespace Step34
     GridIn<dim-1, dim> gi;
     gi.attach_triangulation (tria);
     gi.read_ucd (in);
-    
+
     tria.set_all_manifold_ids(1);
     tria.set_manifold(1, manifold);
   }

@@ -1062,7 +1062,7 @@ namespace Step47
             //GridGenerator::hyper_cube (triangulation, -1, 1);
 
             static const SphericalManifold<dim> boundary;
-	    triangulation.set_all_manifold_ids_on_boundary(0);
+            triangulation.set_all_manifold_ids_on_boundary(0);
             triangulation.set_manifold (0, boundary);
 
             triangulation.refine_global (2);

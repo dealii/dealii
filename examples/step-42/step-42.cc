@@ -912,7 +912,7 @@ namespace Step42
         GridTools::shift(Point<dim>(0.5, 0.5, 0.5), triangulation);
 
         static SphericalManifold<dim> manifold_description(Point<dim>(0.5, 0.5, 0.5));
-	GridTools::copy_boundary_to_manifold_id(triangulation);
+        GridTools::copy_boundary_to_manifold_id(triangulation);
         triangulation.set_manifold(0, manifold_description);
       }
     // Alternatively, create a hypercube mesh. After creating it,
