@@ -511,6 +511,12 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/04/08)
   </li>
 
+  <li> New: A new MappingFEField() class has been added to the library
+  that generalizes MappingQEulerian to allow arbitrary FiniteElements.
+  <br>
+  (Marco Tezzele, Luca Heltai, 2015/04/06)
+  <li>
+
   <li> Changed: In the spirit of the changes made to the distinction
   between Point and Tensor objects discussed above, the first argument
   to GridTools::shift() has been changed from a Point to a Tensor@<1,dim@>.
