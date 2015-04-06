@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * The MappingFE is a generalization of the MappingQEulerian class, for arbitrary
  * vectorial finite elements. The main difference is that this class uses a vector
- * of absolute positions instead of a vector of displacement.
+ * of absolute positions instead of a vector of displacements.
  * In particular we think of a collections of a FE_Q or
  * Bezier finite element (FE_Bernstein) repeated a number of times equal to the space
  * dimension. The idea is to construct the mapping using a vector of control
