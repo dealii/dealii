@@ -32,29 +32,29 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * The MappingFEField is a generalization of the MappingQEulerian class, for arbitrary
- * vectorial finite elements. The main difference is that this class uses a vector
- * of absolute positions instead of a vector of displacements.
- * In particular we think of a collections of a FE_Q or
- * Bezier finite element (FE_Bernstein) repeated a number of times equal to the space
- * dimension. The idea is to construct the mapping using a vector of control
- * points, a DoFHandler associated to the geometry of the problem and a
- * ComponentMask that tells us which components to use for the mapping.
- * This mapping will grab from the DoFHandler the finite element, or better
- * the collection of finite elements, to compute the mapping shape functions.
- * So we will have two different Finite Element and DoFHandler, one for the
- * solution field and one to describe the geometry of the problem. Historically
- * in the deal.II library there was not such a distinction. The differences
- * between this mapping and the MappingQ class are quite important.
- * The MappingFEField, being a generalization, requires a higher level of abstraction.
- * This is the reason why it takes a DoFHandler and a vector of control points
- * that are the coefficients of the shape function (so in general it is a vector
- * of coefficient).
+ * The MappingFEField is a generalization of the MappingQEulerian
+ * class, for arbitrary vector finite elements. The two main
+ * differences are that this class uses a vector of absolute positions
+ * instead of a vector of displacements, and it allows for arbitrary
+ * FiniteElement types, instead of only FE_Q.
  *
+ * This class effectively decouples the topology from the geometry, by
+ * relegating all geometrical information to some components of a
+ * FiniteElement vector field. The components that are used for the
+ * geometry can be arbitrarily selected at construction time.
  *
- * Typically, the DoFHandler operates on a finite element that is constructed
- * as a system element (FESystem) from continuous FE_Q() objects. An example
- * is shown below:
+ * The idea is to consider the Triangulation as a parameter
+ * configuration space, on which we  construct an arbitrary
+ * geometrical mapping, using the instruments of the deal.II library:
+ * a vector of degrees of freedom, a DoFHandler associated to the
+ * geometry of the problem and a ComponentMask that tells us which
+ * components of the FiniteElement to use for the mapping.
+ *
+ * Typically, the DoFHandler operates on a finite element that is
+ * constructed as a system element (FESystem) from continuous FE_Q()
+ * (for iso-parametric discretizations) or FE_Bernstein() (for
+ * iso-geometric discretizations) objects. An example is shown below:
+ * 
  * @code
  *    const FE_Q<dim,spacedim> feq(1);
  *    const FESystem<dim,spacedim> fesystem(feq, spacedim);
@@ -65,8 +65,6 @@ DEAL_II_NAMESPACE_OPEN
  *    MappingFEField<dim,spacedim> map(eulerq, dhq, mask);
  *    map.update_euler_vector_using_triangulation(eulerq);
  * @endcode
-
-
  *
  * @author Luca Heltai, Marco Tezzele 2013, 2015
  */
@@ -79,8 +77,43 @@ public:
   /**
    * Constructor. The first argument is a VECTOR that specifies the
    * transformation of the domain from the reference to the current
-   * configuration. This is filled calling the method
-   * update_euler_vector_using_triangulation.
+   * configuration.
+   *
+   * In general this class decouples geometry from topology, allowing
+   * users to define geometries which are only topologically
+   * equivalent to the underlying Triangulation, but which may
+   * otherwise be arbitrary. Differently from what happens in
+   * MappingQEulerian, the FiniteElement field which is passed to the
+   * constructor is interpreted as an absolute geometrical
+   * configuration, therefore one has to make sure that the
+   * euler_vector actually represents a valid geometry (i.e., one with
+   * no inverted cells, or with no zero-volume cells).
+   *
+   * In order to facilitate the user, we provide an
+   * update_euler_vector_using_triangulation() method to initialize a
+   * euler_vector in a way similar to what happens in
+   * MappingQEulerian, by creating a euler_vector which interpolates
+   * the underlying Triangulation.
+   *
+   * If the underlying FiniteElement is a system of FE_Q(), and
+   * euler_vector is initialized using
+   * update_euler_vector_using_triangulation(), then this class is in
+   * all respects identical to MappingQ().
+   *
+   * The optional ComponentMask argument can be used to specify what
+   * components of the FiniteElement to use for the geometrical
+   * transformation. If no mask is specified at construction time,
+   * then a default one is used, which makes this class works in the
+   * same way of MappingQEulerian(), i.e., the first spacedim
+   * components of the FiniteElement are assumed to represent the
+   * geometry of the problem.
+   *
+   * Notice that if a mask is specified, it has to match in size the
+   * underlying FiniteElement, and it has to have exactly spacedim
+   * non-zero elements, indicating the components (in order) of the
+   * FiniteElement which will be used for the geometry.
+   *
+   * If an incompatible mask is passed, an exception is thrown.
    */
   MappingFEField (const VECTOR  &euler_vector,
              const DH      &euler_dof_handler,
@@ -98,14 +131,22 @@ public:
    */
   virtual ~MappingFEField ();
 
-  /** Fill the euler vector with
-  the information coming from
-  the triangulation. Makes this
-  map equivalent to MappingQ1,
-  and it works ONLY if the
-  underlying fe has support
-  points. */
-  void update_euler_vector_using_triangulation(VECTOR &vector);
+  /**
+   * Helper function to fill the given euler vector with information
+   * coming from the triangulation, by interpolating the geometry of
+   * the Triangulation associated with the DoFHandler used at
+   * construction time.
+   *
+   * The resulting map is guaranteed to be interpolatory at the
+   * vertices of the Triangulation. Notice that this may or may not be
+   * meaningful, depending on the FiniteElement you have used to
+   * construct this MappingFEField.
+   *
+   * If the underlying FiniteElement is a system of FE_Q(), and
+   * euler_vector is initialized using this function, then this class
+   * is in all respects identical to MappingQ().
+   */
+  void update_euler_vector_using_triangulation(VECTOR &vector) const;
 
 
 
@@ -336,20 +377,26 @@ public:
     std::vector<std::vector<Tensor<1,spacedim> > > aux;
 
     /**
-     * Number of shape
-     * functions. If this is a Q1
-     * mapping, then it is simply
-     * the number of vertices per
-     * cell. However, since also
-     * derived classes use this
-     * class (e.g. the
-     * Mapping_Q() class),
-     * the number of shape
-     * functions may also be
-     * different.
+     * Number of shape functions. If this is a Q1 mapping, then it is
+     * simply the number of vertices per cell. However, since also
+     * derived classes use this class (e.g. the Mapping_Q() class),
+     * the number of shape functions may also be different.
      */
     unsigned int n_shape_functions;
 
+    /**
+     * Stores the mask given at construction time. If no mask was
+     * specified at construction time, then a default one is used,
+     * which makes this class works in the same way of
+     * MappingQEulerian(), i.e., the first spacedim components of the
+     * FiniteElement are used for the euler_vector and the euler_dh.
+     *
+     * If a mask is specified, then it has to match the underlying
+     * FiniteElement, and it has to have exactly spacedim non-zero
+     * elements, indicating the components (in order) of the
+     * FiniteElement which will be used for the euler vector and the
+     * euler dof handler. 
+     */
     ComponentMask mask;
   };
 
