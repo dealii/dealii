@@ -54,7 +54,7 @@ DEAL_II_NAMESPACE_OPEN
  * constructed as a system element (FESystem) from continuous FE_Q()
  * (for iso-parametric discretizations) or FE_Bernstein() (for
  * iso-geometric discretizations) objects. An example is shown below:
- * 
+ *
  * @code
  *    const FE_Q<dim,spacedim> feq(1);
  *    const FESystem<dim,spacedim> fesystem(feq, spacedim);
@@ -116,8 +116,8 @@ public:
    * If an incompatible mask is passed, an exception is thrown.
    */
   MappingFEField (const VECTOR  &euler_vector,
-             const DH      &euler_dof_handler,
-             const ComponentMask mask=ComponentMask());
+                  const DH      &euler_dof_handler,
+                  const ComponentMask mask=ComponentMask());
 
   /**
    * Copy constructor. Performs a deep copy, i.e. duplicates what #tensor_pols
@@ -395,7 +395,7 @@ public:
      * FiniteElement, and it has to have exactly spacedim non-zero
      * elements, indicating the components (in order) of the
      * FiniteElement which will be used for the euler vector and the
-     * euler dof handler. 
+     * euler dof handler.
      */
     ComponentMask mask;
   };
@@ -693,7 +693,7 @@ template<int dim, int spacedim, class DH, class VECTOR>
 inline
 double
 MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoint,
-                                                        const unsigned int shape_nr) const
+    const unsigned int shape_nr) const
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
          ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,
@@ -707,7 +707,7 @@ template<int dim, int spacedim, class DH, class VECTOR>
 inline
 double &
 MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoint,
-                                                        const unsigned int shape_nr)
+    const unsigned int shape_nr)
 {
   Assert(qpoint*n_shape_functions + shape_nr < shape_values.size(),
          ExcIndexRange(qpoint*n_shape_functions + shape_nr, 0,

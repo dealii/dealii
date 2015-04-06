@@ -64,8 +64,8 @@ MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::memory_consumption () cons
 
 template<int dim, int spacedim, class DH, class VECTOR>
 MappingFEField<dim,spacedim,DH,VECTOR>::MappingFEField (const VECTOR  &euler_vector,
-                                              const DH      &euler_dof_handler,
-                                              const ComponentMask mask)
+                                                        const DH      &euler_dof_handler,
+                                                        const ComponentMask mask)
   :
   euler_vector(&euler_vector),
   fe(&euler_dof_handler.get_fe()),
@@ -239,9 +239,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::update_each (const UpdateFlags in) const
 template<int dim, int spacedim, class DH, class VECTOR>
 void
 MappingFEField<dim,spacedim,DH,VECTOR>::compute_data (const UpdateFlags      update_flags,
-                                                 const Quadrature<dim>  &q,
-                                                 const unsigned int     n_original_q_points,
-                                                 InternalData           &data) const
+                                                      const Quadrature<dim>  &q,
+                                                      const unsigned int     n_original_q_points,
+                                                      InternalData           &data) const
 {
   const unsigned int n_q_points = q.size();
 
@@ -277,9 +277,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::compute_data (const UpdateFlags      upd
 template<int dim, int spacedim, class DH, class VECTOR>
 void
 MappingFEField<dim,spacedim,DH,VECTOR>::compute_face_data (const UpdateFlags update_flags,
-                                                      const Quadrature<dim> &q,
-                                                      const unsigned int n_original_q_points,
-                                                      InternalData &data) const
+                                                           const Quadrature<dim> &q,
+                                                           const unsigned int n_original_q_points,
+                                                           InternalData &data) const
 {
   compute_data (update_flags, q, n_original_q_points, data);
 
@@ -344,7 +344,7 @@ MappingFEField<dim,spacedim,DH,VECTOR>::compute_face_data (const UpdateFlags upd
 template<int dim, int spacedim, class DH, class VECTOR>
 typename Mapping<dim,spacedim>::InternalDataBase *
 MappingFEField<dim,spacedim,DH,VECTOR>::get_data (const UpdateFlags update_flags,
-                                             const Quadrature<dim> &quadrature) const
+                                                  const Quadrature<dim> &quadrature) const
 {
   InternalData *data = new InternalData(*fe, fe_mask);
   this->compute_data (update_flags, quadrature,
@@ -357,7 +357,7 @@ MappingFEField<dim,spacedim,DH,VECTOR>::get_data (const UpdateFlags update_flags
 template<int dim, int spacedim, class DH, class VECTOR>
 typename Mapping<dim,spacedim>::InternalDataBase *
 MappingFEField<dim,spacedim,DH,VECTOR>::get_face_data (const UpdateFlags update_flags,
-                                                  const Quadrature<dim-1>& quadrature) const
+                                                       const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(*fe, fe_mask);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
@@ -371,7 +371,7 @@ MappingFEField<dim,spacedim,DH,VECTOR>::get_face_data (const UpdateFlags update_
 template<int dim, int spacedim, class DH, class VECTOR>
 typename Mapping<dim,spacedim>::InternalDataBase *
 MappingFEField<dim,spacedim,DH,VECTOR>::get_subface_data (const UpdateFlags update_flags,
-                                                     const Quadrature<dim-1>& quadrature) const
+                                                          const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(*fe, fe_mask);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
@@ -617,16 +617,16 @@ MappingFEField<dim,spacedim,DH,VECTOR>::fill_fe_face_values (
 template<int dim, int spacedim, class DH, class VECTOR>
 void
 MappingFEField<dim,spacedim,DH,VECTOR>::fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                                           const unsigned int       face_no,
-                                                           const unsigned int       sub_no,
-                                                           const Quadrature<dim-1> &q,
-                                                           typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                                                           std::vector<Point<spacedim> >     &quadrature_points,
-                                                           std::vector<double>          &JxW_values,
-                                                           std::vector<Tensor<1,spacedim> > &exterior_forms,
-                                                           std::vector<Point<spacedim> >    &normal_vectors,
-                                                           std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                                                           std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
+    const unsigned int       face_no,
+    const unsigned int       sub_no,
+    const Quadrature<dim-1> &q,
+    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+    std::vector<Point<spacedim> >     &quadrature_points,
+    std::vector<double>          &JxW_values,
+    std::vector<Tensor<1,spacedim> > &exterior_forms,
+    std::vector<Point<spacedim> >    &normal_vectors,
+    std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
+    std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
 // std::vector<Tensor<1,spacedim> >  &exterior_forms,
 // std::vector<Point<spacedim> >     &normal_vectors) const
 {
