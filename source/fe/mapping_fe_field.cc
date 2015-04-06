@@ -44,8 +44,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
-MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::InternalData (const FiniteElement<dim,spacedim> &fe,
+template<int dim, int spacedim, class VECTOR, class DH>
+MappingFEField<dim,spacedim,VECTOR,DH>::InternalData::InternalData (const FiniteElement<dim,spacedim> &fe,
     const ComponentMask mask)
   :
   n_shape_functions (fe.dofs_per_cell),
@@ -54,16 +54,16 @@ MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::InternalData (const Finite
 
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 std::size_t
-MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::memory_consumption () const
+MappingFEField<dim,spacedim,VECTOR,DH>::InternalData::memory_consumption () const
 {
   return 0;
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
-MappingFEField<dim,spacedim,DH,VECTOR>::MappingFEField (const VECTOR  &euler_vector,
+template<int dim, int spacedim, class VECTOR, class DH>
+MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const VECTOR  &euler_vector,
                                                         const DH      &euler_dof_handler,
                                                         const ComponentMask mask)
   :
@@ -87,8 +87,8 @@ MappingFEField<dim,spacedim,DH,VECTOR>::MappingFEField (const VECTOR  &euler_vec
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
-MappingFEField<dim,spacedim,DH,VECTOR>::MappingFEField (const MappingFEField<dim,spacedim,DH,VECTOR> &mapping)
+template<int dim, int spacedim, class VECTOR, class DH>
+MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const MappingFEField<dim,spacedim,VECTOR,DH> &mapping)
   :
   euler_vector(mapping.euler_vector),
   fe(mapping.fe),
@@ -100,8 +100,8 @@ MappingFEField<dim,spacedim,DH,VECTOR>::MappingFEField (const MappingFEField<dim
 {}
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
-MappingFEField<dim,spacedim,DH,VECTOR>::~MappingFEField ()
+template<int dim, int spacedim, class VECTOR, class DH>
+MappingFEField<dim,spacedim,VECTOR,DH>::~MappingFEField ()
 {
   euler_dof_handler = NULL;
   fe = NULL;
@@ -109,9 +109,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::~MappingFEField ()
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::compute_shapes_virtual (
+MappingFEField<dim,spacedim,VECTOR,DH>::compute_shapes_virtual (
   const std::vector<Point<dim> > &unit_points,
   typename MappingFEField<dim, spacedim>::InternalData &data) const
 {
@@ -135,9 +135,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::compute_shapes_virtual (
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 UpdateFlags
-MappingFEField<dim,spacedim,DH,VECTOR>::update_once (const UpdateFlags in) const
+MappingFEField<dim,spacedim,VECTOR,DH>::update_once (const UpdateFlags in) const
 {
   UpdateFlags out = UpdateFlags(in & (update_transformation_values
                                       | update_transformation_gradients));
@@ -162,9 +162,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::update_once (const UpdateFlags in) const
 
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 UpdateFlags
-MappingFEField<dim,spacedim,DH,VECTOR>::update_each (const UpdateFlags in) const
+MappingFEField<dim,spacedim,VECTOR,DH>::update_each (const UpdateFlags in) const
 {
   // Select flags of concern for the
   // transformation.
@@ -236,9 +236,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::update_each (const UpdateFlags in) const
 
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::compute_data (const UpdateFlags      update_flags,
+MappingFEField<dim,spacedim,VECTOR,DH>::compute_data (const UpdateFlags      update_flags,
                                                       const Quadrature<dim>  &q,
                                                       const unsigned int     n_original_q_points,
                                                       InternalData           &data) const
@@ -274,9 +274,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::compute_data (const UpdateFlags      upd
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::compute_face_data (const UpdateFlags update_flags,
+MappingFEField<dim,spacedim,VECTOR,DH>::compute_face_data (const UpdateFlags update_flags,
                                                            const Quadrature<dim> &q,
                                                            const unsigned int n_original_q_points,
                                                            InternalData &data) const
@@ -341,9 +341,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::compute_face_data (const UpdateFlags upd
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 typename Mapping<dim,spacedim>::InternalDataBase *
-MappingFEField<dim,spacedim,DH,VECTOR>::get_data (const UpdateFlags update_flags,
+MappingFEField<dim,spacedim,VECTOR,DH>::get_data (const UpdateFlags update_flags,
                                                   const Quadrature<dim> &quadrature) const
 {
   InternalData *data = new InternalData(*fe, fe_mask);
@@ -354,9 +354,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::get_data (const UpdateFlags update_flags
 
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 typename Mapping<dim,spacedim>::InternalDataBase *
-MappingFEField<dim,spacedim,DH,VECTOR>::get_face_data (const UpdateFlags update_flags,
+MappingFEField<dim,spacedim,VECTOR,DH>::get_face_data (const UpdateFlags update_flags,
                                                        const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(*fe, fe_mask);
@@ -368,9 +368,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::get_face_data (const UpdateFlags update_
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 typename Mapping<dim,spacedim>::InternalDataBase *
-MappingFEField<dim,spacedim,DH,VECTOR>::get_subface_data (const UpdateFlags update_flags,
+MappingFEField<dim,spacedim,VECTOR,DH>::get_subface_data (const UpdateFlags update_flags,
                                                           const Quadrature<dim-1>& quadrature) const
 {
   InternalData *data = new InternalData(*fe, fe_mask);
@@ -384,9 +384,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::get_subface_data (const UpdateFlags upda
 
 // Note that the CellSimilarity flag is modifyable, since MappingFEField can need to
 // recalculate data even when cells are similar.
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::fill_fe_values (
+MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                                     &q,
   typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
@@ -568,9 +568,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::fill_fe_values (
 
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::fill_fe_face_values (
+MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_face_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int       face_no,
   const Quadrature<dim-1> &q,
@@ -614,9 +614,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::fill_fe_face_values (
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     const unsigned int       face_no,
     const unsigned int       sub_no,
     const Quadrature<dim-1> &q,
@@ -661,9 +661,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::fill_fe_subface_values (const typename T
 
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::transform (
+MappingFEField<dim,spacedim,VECTOR,DH>::transform (
   const VectorSlice<const std::vector<Tensor<1,dim> > > input,
   VectorSlice<std::vector<Tensor<1,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
@@ -676,9 +676,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::transform (
 
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::transform (
+MappingFEField<dim,spacedim,VECTOR,DH>::transform (
   const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim>  > >  input,
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
@@ -696,8 +696,8 @@ MappingFEField<dim,spacedim,DH,VECTOR>::transform (
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
-void MappingFEField<dim,spacedim,DH,VECTOR>::transform
+template<int dim, int spacedim, class VECTOR, class DH>
+void MappingFEField<dim,spacedim,VECTOR,DH>::transform
 (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
  VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
@@ -709,9 +709,9 @@ void MappingFEField<dim,spacedim,DH,VECTOR>::transform
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 template < int rank >
-void MappingFEField<dim,spacedim,DH,VECTOR>::transform_fields(
+void MappingFEField<dim,spacedim,VECTOR,DH>::transform_fields(
   const VectorSlice<const std::vector<Tensor<rank,dim> > > input,
   VectorSlice<std::vector<Tensor<rank,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
@@ -771,9 +771,9 @@ void MappingFEField<dim,spacedim,DH,VECTOR>::transform_fields(
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 template < int rank >
-void MappingFEField<dim,spacedim,DH,VECTOR>::transform_differential_forms(
+void MappingFEField<dim,spacedim,VECTOR,DH>::transform_differential_forms(
   const VectorSlice<const std::vector<DerivativeForm<rank, dim,spacedim> > >    input,
   VectorSlice<std::vector<DerivativeForm<rank, spacedim,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
@@ -805,9 +805,9 @@ void MappingFEField<dim,spacedim,DH,VECTOR>::transform_differential_forms(
 
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 Point<spacedim>
-MappingFEField<dim,spacedim,DH,VECTOR>::
+MappingFEField<dim,spacedim,VECTOR,DH>::
 transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<dim>                                 &p) const
 {
@@ -826,9 +826,9 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 Point<spacedim>
-MappingFEField<dim,spacedim,DH,VECTOR>::
+MappingFEField<dim,spacedim,VECTOR,DH>::
 transform_unit_to_real_cell_internal (const InternalData &data) const
 {
   Point<spacedim> p_real;
@@ -845,9 +845,9 @@ transform_unit_to_real_cell_internal (const InternalData &data) const
 
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 Point<dim>
-MappingFEField<dim,spacedim,DH,VECTOR>::
+MappingFEField<dim,spacedim,VECTOR,DH>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<spacedim>                            &p) const
 {
@@ -885,9 +885,9 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 Point<dim>
-MappingFEField<dim,spacedim,DH,VECTOR>::
+MappingFEField<dim,spacedim,VECTOR,DH>::
 transform_real_to_unit_cell_internal
 (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
  const Point<spacedim>                            &p,
@@ -1033,9 +1033,9 @@ failure:
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::compute_fill (
+MappingFEField<dim,spacedim,VECTOR,DH>::compute_fill (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int  n_q_points,
   const typename QProjector<dim>::DataSetDescriptor  data_set,
@@ -1129,9 +1129,9 @@ MappingFEField<dim,spacedim,DH,VECTOR>::compute_fill (
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::compute_fill_face (
+MappingFEField<dim,spacedim,VECTOR,DH>::compute_fill_face (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int      face_no,
   const unsigned int      subface_no,
@@ -1268,33 +1268,33 @@ MappingFEField<dim,spacedim,DH,VECTOR>::compute_fill_face (
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 unsigned int
-MappingFEField<dim,spacedim,DH,VECTOR>::get_degree() const
+MappingFEField<dim,spacedim,VECTOR,DH>::get_degree() const
 {
   return fe->degree;
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 ComponentMask
-MappingFEField<dim,spacedim,DH,VECTOR>::get_fe_mask() const
+MappingFEField<dim,spacedim,VECTOR,DH>::get_fe_mask() const
 {
   return this->fe_mask;
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 Mapping<dim,spacedim> *
-MappingFEField<dim,spacedim,DH,VECTOR>::clone () const
+MappingFEField<dim,spacedim,VECTOR,DH>::clone () const
 {
-  return new MappingFEField<dim,spacedim,DH,VECTOR>(*this);
+  return new MappingFEField<dim,spacedim,VECTOR,DH>(*this);
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
+template<int dim, int spacedim, class VECTOR, class DH>
 void
-MappingFEField<dim,spacedim,DH,VECTOR>::update_internal_dofs (
+MappingFEField<dim,spacedim,VECTOR,DH>::update_internal_dofs (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
   if (euler_dof_handler == 0)
@@ -1315,8 +1315,8 @@ MappingFEField<dim,spacedim,DH,VECTOR>::update_internal_dofs (
 }
 
 
-template<int dim, int spacedim, class DH, class VECTOR>
-void MappingFEField<dim,spacedim,DH,VECTOR>::update_euler_vector_using_triangulation
+template<int dim, int spacedim, class VECTOR, class DH>
+void MappingFEField<dim,spacedim,VECTOR,DH>::update_euler_vector_using_triangulation
 (VECTOR &vector) const
 {
   if ( fe->has_support_points() )
@@ -1353,7 +1353,7 @@ void MappingFEField<dim,spacedim,DH,VECTOR>::update_euler_vector_using_triangula
       dhq.distribute_dofs(feq);
       VECTOR eulerq(dhq.n_dofs());
       const ComponentMask maskq(spacedim, true);
-      MappingFEField<dim,spacedim,DH,VECTOR> newfe(eulerq, dhq, maskq);
+      MappingFEField<dim,spacedim,VECTOR,DH> newfe(eulerq, dhq, maskq);
 
       newfe.update_euler_vector_using_triangulation(eulerq);
 

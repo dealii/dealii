@@ -69,8 +69,8 @@ DEAL_II_NAMESPACE_OPEN
  * @author Luca Heltai, Marco Tezzele 2013, 2015
  */
 template <int dim, int spacedim=dim,
-          class DH=DoFHandler<dim,spacedim>,
-          class VECTOR=Vector<double> >
+          class VECTOR=Vector<double>,
+          class DH=DoFHandler<dim,spacedim> >
 class MappingFEField : public Mapping<dim,spacedim>
 {
 public:
@@ -124,7 +124,7 @@ public:
    * points to instead of simply copying the #tensor_pols pointer as done by a
    * default copy constructor.
    */
-  MappingFEField (const MappingFEField<dim,spacedim,DH,VECTOR> &mapping);
+  MappingFEField (const MappingFEField<dim,spacedim,VECTOR,DH> &mapping);
 
   /**
    * Destructor.
