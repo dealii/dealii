@@ -205,7 +205,7 @@ public:
    * Return the ComponentMask of the mapping, i.e. which components to use for
    * the mapping.
    */
-  ComponentMask get_fe_mask () const;
+  ComponentMask get_component_mask () const;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy

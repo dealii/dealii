@@ -1278,7 +1278,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::get_degree() const
 
 template<int dim, int spacedim, class VECTOR, class DH>
 ComponentMask
-MappingFEField<dim,spacedim,VECTOR,DH>::get_fe_mask() const
+MappingFEField<dim,spacedim,VECTOR,DH>::get_component_mask() const
 {
   return this->fe_mask;
 }
