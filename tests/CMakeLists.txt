@@ -75,13 +75,10 @@ ENDIF()
 FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
 
 #
-# Append further configuration to _options:
+# Always undefine the following variables in the setup_tests target:
 #
 FOREACH(_var DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT)
   LIST(APPEND _options "-U${_var}")
-  IF(DEFINED ${_var})
-    LIST(APPEND _options "-D${_var}=${${_var}}")
-  ENDIF()
 ENDFOREACH()
 
 SET(_categories
@@ -136,6 +133,7 @@ FOREACH(_category ${_categories})
     COMMAND
       test ! -d ${CMAKE_CURRENT_BINARY_DIR}/${_category} || ${CMAKE_COMMAND}
       --build ${CMAKE_CURRENT_BINARY_DIR}/${_category} --target regenerate
+      > /dev/null
     COMMENT "Processing tests/${_category}"
     )
   ADD_DEPENDENCIES(regen_tests regen_tests_${_category})
