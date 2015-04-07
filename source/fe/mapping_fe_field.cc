@@ -176,11 +176,11 @@ MappingFEField<dim,spacedim,VECTOR,DH>::update_each (const UpdateFlags in) const
   // set operations. this leads to
   // some circular logic. the only
   // way to treat this is to
-  // iterate. since there are 4
+  // iterate. since there are 5
   // if-clauses in the loop, it will
-  // take at most 3 iterations to
+  // take at most 4 iterations to
   // converge. do them:
-  for (unsigned int i=0; i<4; ++i)
+  for (unsigned int i=0; i<5; ++i)
     {
       // The following is a little incorrect:
       // If not applied on a face,
@@ -393,14 +393,6 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
   // exception if that is not possible
   Assert (dynamic_cast<InternalData *> (&mapping_data) != 0, ExcInternalError());
   InternalData &data = static_cast<InternalData &> (mapping_data);
-
-  // depending on this result, use this or the other data object for the
-  // mapping. furthermore, we need to ensure that the flag indicating whether
-  // we can use some similarity has to be modified - for a general MappingFEField,
-  // the data needs to be recomputed anyway since then the mapping changes the
-  // data. this needs to be known also for later operations, so modify the
-  // variable here. this also affects the calculation of the next cell -- if
-  // we use Q1 data on the next cell, the data will still be invalid.
 
   if (get_degree() > 1)
     cell_similarity = CellSimilarity::invalid_next_cell;
@@ -1242,11 +1234,7 @@ void
 MappingFEField<dim,spacedim,VECTOR,DH>::update_internal_dofs (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
-  if (euler_dof_handler == 0)
-    {
-      std::cout << "euler_dof_handler is empty!" << std::endl;
-      return;
-    }
+  Assert(euler_dof_handler != 0, ExcMessage("euler_dof_handler is empty"));
 
   typename DH::cell_iterator dof_cell(*cell, euler_dof_handler);
   Assert (dof_cell->active() == true, ExcInactiveCell());
@@ -1254,9 +1242,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::update_internal_dofs (
   dof_cell->get_dof_indices(dof_indices);
 
   for (unsigned int i=0; i<local_dofs.size(); ++i)
-    {
-      local_dofs[i] = (*euler_vector)(dof_indices[i]);
-    }
+    local_dofs[i] = (*euler_vector)(dof_indices[i]);
 }
 
 
