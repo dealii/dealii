@@ -1250,6 +1250,7 @@ template<int dim, int spacedim, class VECTOR, class DH>
 void MappingFEField<dim,spacedim,VECTOR,DH>::update_euler_vector_using_triangulation
 (VECTOR &vector) const
 {
+  AssertDimension(vector.size(), euler_dof_handler->n_dofs());
   if ( fe->has_support_points() )
     {
       typename DH::active_cell_iterator cell;
@@ -1274,7 +1275,6 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::update_euler_vector_using_triangula
                 vector(dofs[q]) = points[q][fe_to_real[comp]];
             }
         }
-
     }
   else
     {
