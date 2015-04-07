@@ -1252,15 +1252,14 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::update_euler_vector_using_triangula
 {
   if ( fe->has_support_points() )
     {
-      std::vector<Point<dim> > support_points = fe->get_unit_support_points();
       typename DH::active_cell_iterator cell;
-      Quadrature<dim> quad(support_points);
+      const Quadrature<dim> quad(fe->get_unit_support_points());
 
       MappingQ<dim,spacedim> map_q(fe->degree);
       FEValues<dim,spacedim> fe_v(map_q, *fe, quad, update_quadrature_points);
       std::vector<unsigned int> dofs(fe->dofs_per_cell);
 
-      AssertDimension(fe->dofs_per_cell, support_points.size());
+      AssertDimension(fe->dofs_per_cell, fe->get_unit_support_points().size());
       Assert(fe->is_primitive(), ExcMessage("FE is not Primitive! This won't work."));
 
       for (cell = euler_dof_handler->begin_active(); cell != euler_dof_handler->end(); ++cell)
