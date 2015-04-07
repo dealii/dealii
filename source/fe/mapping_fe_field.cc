@@ -1270,7 +1270,8 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::update_euler_vector_using_triangula
           for (unsigned int q = 0; q < points.size(); ++q)
             {
               unsigned int comp = fe->system_to_component_index(q).first;
-              vector(dofs[q]) = points[q][comp];
+              if (fe_mask[comp])
+                vector(dofs[q]) = points[q][fe_to_real[comp]];
             }
         }
 
@@ -1290,7 +1291,7 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::update_euler_vector_using_triangula
       FullMatrix<double> transfer(fe->dofs_per_cell, feq.dofs_per_cell);
       std::vector<Point<dim> > points = feq.get_unit_support_points();
 
-      // Here construct the matrix!!!!
+      // Here construct the matrix
       for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
         {
           for (unsigned int j=0; j<points.size(); ++j)
