@@ -100,11 +100,6 @@ MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const MappingFEField<dim
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
-MappingFEField<dim,spacedim,VECTOR,DH>::~MappingFEField ()
-{}
-
-
-template<int dim, int spacedim, class VECTOR, class DH>
 void
 MappingFEField<dim,spacedim,VECTOR,DH>::compute_shapes_virtual (
   const std::vector<Point<dim> > &unit_points,
@@ -638,7 +633,6 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_subface_values (const typename T
 
 
 
-
 template<int dim, int spacedim, class VECTOR, class DH>
 void
 MappingFEField<dim,spacedim,VECTOR,DH>::transform (
@@ -795,6 +789,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 
   Threads::Mutex::ScopedLock lock(mutex);
   update_internal_dofs(cell);
+
   const Quadrature<dim> point_quadrature(p);
   std::auto_ptr<InternalData>
   mdata (dynamic_cast<InternalData *> (
@@ -829,24 +824,15 @@ MappingFEField<dim,spacedim,VECTOR,DH>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<spacedim>                            &p) const
 {
-  {
-    Threads::Mutex::ScopedLock lock(mutex);
-    update_internal_dofs(cell);
-  }
+  Threads::Mutex::ScopedLock lock(mutex);
+  update_internal_dofs(cell);
+
   // first a Newton iteration based on the real mapping. It uses the center
   // point of the cell as a starting point
   Point<dim> initial_p_unit;
 
   for (unsigned int d=0; d<dim; ++d)
     initial_p_unit[d] = 0.5;
-
-  // use the full mapping. in case the function above should have given us
-  // something back that lies outside the unit cell (that might happen
-  // because we may have given a point 'p' that lies inside the cell with
-  // the higher order mapping, but outside the Q1-mapped reference cell),
-  // then project it back into the reference cell in hopes that this gives
-  // a better starting point to the following iteration
-  //initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
 
   const Quadrature<dim> point_quadrature(initial_p_unit);
 
@@ -871,12 +857,6 @@ transform_real_to_unit_cell_internal
  const Point<dim>                                 &initial_p_unit,
  InternalData                                     &mdata) const
 {
-  {
-    Threads::Mutex::ScopedLock lock(mutex);
-
-    update_internal_dofs(cell);
-  }
-
   const unsigned int n_shapes=mdata.shape_values.size();
   Assert(n_shapes!=0, ExcInternalError());
   AssertDimension (mdata.shape_derivatives.size(), n_shapes);
@@ -893,12 +873,8 @@ transform_real_to_unit_cell_internal
   // of the mapping at this point are
   // previously computed.
 
-  // For the <2,3>  case there is a
-  // template specialization.
-
   // f(x)
 
-  //Point<spacedim> p_minus_F;
   Point<dim> p_unit = initial_p_unit;
   Point<dim> f;
 
@@ -962,7 +938,6 @@ transform_real_to_unit_cell_internal
 
           // f(x)
           Point<spacedim> p_real_trial = transform_unit_to_real_cell_internal(mdata);
-          //const Point<spacedim> f_trial = p - p_real_trial;
           const Tensor<1,spacedim> f_trial = p - p_real_trial;
 
           // see if we are making progress with the current step length
@@ -978,21 +953,13 @@ transform_real_to_unit_cell_internal
           else if (step_length > 0.05)
             step_length /= 2;
           else
-            {
-              std::cout << "Line search failed. With dim = " << dim << " spacedim = "
-                        << spacedim << std::endl;
-              goto failure;
-            }
+            goto failure;
         }
       while (true);
 
       ++newton_iteration;
       if (newton_iteration > newton_iteration_limit)
-        {
-          std::cout << "Too many newton iterations. With dim = " << dim << " spacedim = "
-                    << spacedim << std::endl;
-          goto failure;
-        }
+        goto failure;
     }
 
   return p_unit;
@@ -1021,8 +988,10 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_fill (
   std::vector<Point<spacedim> > &quadrature_points) const
 {
   const UpdateFlags update_flags(data.current_update_flags());
-  Threads::Mutex::ScopedLock lock(mutex);
-  update_internal_dofs(cell);
+  {
+    Threads::Mutex::ScopedLock lock(mutex);
+    update_internal_dofs(cell);
+  }
 
   // first compute quadrature points
   if (update_flags & update_quadrature_points)

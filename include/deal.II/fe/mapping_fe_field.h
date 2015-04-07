@@ -127,11 +127,6 @@ public:
   MappingFEField (const MappingFEField<dim,spacedim,VECTOR,DH> &mapping);
 
   /**
-   * Destructor.
-   */
-  virtual ~MappingFEField ();
-
-  /**
    * Helper function to fill the given euler vector with information
    * coming from the triangulation, by interpolating the geometry of
    * the Triangulation associated with the DoFHandler used at
@@ -173,19 +168,27 @@ public:
     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     const Point<spacedim>                            &p) const;
 
-
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   virtual void
   transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
              VectorSlice<std::vector<Tensor<1,spacedim> > > output,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   virtual void
   transform (const VectorSlice<const std::vector<DerivativeForm<1, dim, spacedim> > >    input,
              VectorSlice<std::vector<Tensor<2,spacedim> > > output,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   virtual
   void
   transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
@@ -610,49 +613,78 @@ private:
   void update_internal_dofs(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   mutable std::vector<double> local_dofs;
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   mutable std::vector<unsigned int> dof_indices;
 
   /**
    * Mutex to protect local_dofs.
    */
-
   mutable Threads::Mutex mutex;
 
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   virtual void
   compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
                           typename MappingFEField<dim, spacedim>::InternalData &data) const;
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   UpdateFlags
   update_once (const UpdateFlags in) const;
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   UpdateFlags
   update_each (const UpdateFlags in) const;
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   void
   compute_data (const UpdateFlags      update_flags,
                 const Quadrature<dim>  &q,
                 const unsigned int     n_original_q_points,
                 InternalData           &data) const;
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   void
   compute_face_data (const UpdateFlags      update_flags,
                      const Quadrature<dim>  &q,
                      const unsigned int     n_original_q_points,
                      InternalData           &data) const;
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_data (const UpdateFlags,
             const Quadrature<dim> &quadrature) const;
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags flags,
                  const Quadrature<dim-1>& quadrature) const;
 
+  /* Reimplemented from Mapping. See the documentation of the base class for
+   * detailed information.
+   */
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags flags,
