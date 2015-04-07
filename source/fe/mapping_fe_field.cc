@@ -1297,9 +1297,8 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::update_euler_vector_using_triangula
           unsigned int comp_i = fe->system_to_component_index(i).first;
           for (unsigned int j=0; j<points.size(); ++j)
             {
-              unsigned int comp_j = feq.system_to_component_index(j).first;
-              if ( comp_i == comp_j )
-                transfer(j, i) = fe->shape_value(i, points[j]);
+              if ( fe_to_real[comp_i] == feq.system_to_component_index(j).first)
+                transfer(i, j) = fe->shape_value(i, points[j]);
             }
         }
       VectorTools::interpolate(dhq, *euler_dof_handler, transfer, eulerq, vector);
