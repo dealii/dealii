@@ -17,7 +17,7 @@
 
 // on a somewhat deformed cube, verify that if we push forward a bunch
 // of points from the reference to the real cell and then call
-// MappingFE::transform_unit_to_real_cell that we get the same point as
+// MappingFEField::transform_unit_to_real_cell that we get the same point as
 // we had in the beginning.
 
 #include "../tests.h"
@@ -25,7 +25,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/fe/mapping_fe.h>
+#include <deal.II/fe/mapping_fe_field.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -80,7 +80,7 @@ void test_real_to_unit_cell()
  Vector<double> eulerq(dhq.n_dofs());
  const ComponentMask mask(spacedim, true);
 
- MappingFE<dim,spacedim> map(eulerq, dhq, mask);
+ MappingFEField<dim,spacedim> map(eulerq, dhq, mask);
 
  map.update_euler_vector_using_triangulation(eulerq);
 

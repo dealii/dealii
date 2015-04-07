@@ -49,7 +49,7 @@ SET(_src
   mapping_c1.cc
   mapping_cartesian.cc
   mapping.cc
-  mapping_fe.cc
+  mapping_fe_field.cc
   mapping_q1.cc
   mapping_q1_eulerian.cc
   mapping_q.cc
@@ -90,7 +90,7 @@ SET(_inst
   mapping_c1.inst.in
   mapping_cartesian.inst.in
   mapping.inst.in
-  mapping_fe.inst.in
+  mapping_fe_field.inst.in
   mapping_q1_eulerian.inst.in
   mapping_q1.inst.in
   mapping_q_eulerian.inst.in
