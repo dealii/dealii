@@ -107,21 +107,20 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_shapes_virtual (
 {
   const unsigned int n_points=unit_points.size();
 
-  if (data.shape_values.size()!=0 || data.shape_derivatives.size()!=0)
-    for (unsigned int point=0; point<n_points; ++point)
-      {
-        if (data.shape_values.size()!=0)
-          for (unsigned int i=0; i<data.n_shape_functions; ++i)
-            data.shape(point, i) = fe->shape_value(i, unit_points[point]);
+  for (unsigned int point=0; point<n_points; ++point)
+    {
+      if (data.shape_values.size()!=0)
+        for (unsigned int i=0; i<data.n_shape_functions; ++i)
+          data.shape(point, i) = fe->shape_value(i, unit_points[point]);
 
-        if (data.shape_derivatives.size()!=0)
-          for (unsigned int i=0; i<data.n_shape_functions; ++i)
-            data.derivative(point, i) = fe->shape_grad(i, unit_points[point]);
+      if (data.shape_derivatives.size()!=0)
+        for (unsigned int i=0; i<data.n_shape_functions; ++i)
+          data.derivative(point, i) = fe->shape_grad(i, unit_points[point]);
 
-        if (data.shape_second_derivatives.size()!=0)
-          for (unsigned int i=0; i<data.n_shape_functions; ++i)
-            data.second_derivative(point, i) = fe->shape_grad_grad(i, unit_points[point]);
-      }
+      if (data.shape_second_derivatives.size()!=0)
+        for (unsigned int i=0; i<data.n_shape_functions; ++i)
+          data.second_derivative(point, i) = fe->shape_grad_grad(i, unit_points[point]);
+    }
 }
 
 
