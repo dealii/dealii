@@ -76,7 +76,6 @@ MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const VECTOR  &euler_vec
           ComponentMask(fe->get_nonzero_components(0).size(), true)),
   fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
 {
-
   unsigned int size = 0;
   for (unsigned int i=0; i<fe_mask.size(); ++i)
     {
@@ -102,11 +101,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const MappingFEField<dim
 
 template<int dim, int spacedim, class VECTOR, class DH>
 MappingFEField<dim,spacedim,VECTOR,DH>::~MappingFEField ()
-{
-  euler_dof_handler = NULL;
-  fe = NULL;
-  euler_vector = NULL;
-}
+{}
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
@@ -270,7 +265,6 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_data (const UpdateFlags      upd
     data.shape_second_derivatives.resize(data.n_shape_functions * n_q_points);
 
   compute_shapes_virtual (q.get_points(), data);
-
 }
 
 
@@ -581,16 +575,9 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_face_values (
   std::vector<Point<spacedim> >                &normal_vectors,
   std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
   std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
-// std::vector<Tensor<1,spacedim> >  &exterior_forms,
-// std::vector<Point<spacedim> >     &normal_vectors) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-
-//  AssertThrow(false, ExcNotImplemented());
-
-
-
   Assert (dynamic_cast<InternalData *> (&mapping_data) != 0,
           ExcInternalError());
   InternalData &data = static_cast<InternalData &> (mapping_data);
@@ -609,8 +596,6 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_face_values (
                            quadrature_points, JxW_values,
                            exterior_forms, normal_vectors, jacobians,
                            inverse_jacobians);
-  // quadrature_points, JxW_values,
-  // exterior_forms, normal_vectors);
 }
 
 
@@ -627,12 +612,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_subface_values (const typename T
     std::vector<Point<spacedim> >    &normal_vectors,
     std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
     std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
-// std::vector<Tensor<1,spacedim> >  &exterior_forms,
-// std::vector<Point<spacedim> >     &normal_vectors) const
 {
-  //AssertThrow(false, ExcNotImplemented());
-
-
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
   Assert (dynamic_cast<InternalData *> (&mapping_data) != 0,
@@ -654,8 +634,6 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_subface_values (const typename T
                            quadrature_points, JxW_values,
                            exterior_forms, normal_vectors, jacobians,
                            inverse_jacobians);
-  // quadrature_points, JxW_values,
-  // exterior_forms, normal_vectors);
 }
 
 
@@ -859,7 +837,6 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   // point of the cell as a starting point
   Point<dim> initial_p_unit;
 
-
   for (unsigned int d=0; d<dim; ++d)
     initial_p_unit[d] = 0.5;
 
@@ -869,7 +846,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   // the higher order mapping, but outside the Q1-mapped reference cell),
   // then project it back into the reference cell in hopes that this gives
   // a better starting point to the following iteration
-  initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
+  //initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
 
   const Quadrature<dim> point_quadrature(initial_p_unit);
 
