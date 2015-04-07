@@ -1278,7 +1278,12 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::update_euler_vector_using_triangula
     }
   else
     {
-      // Construct a MappingFEField with an FEQ
+      // Construct a MappingFEField with an FEQ, and construct a
+      // standard iso-parametric interpolation on the Triangulation.
+      //
+      // Once we have this, interpolate with the given finite element
+      // to get a Mapping which is interpolatory at the support points
+      // of FE_Q(fe->degree())
       FESystem<dim,spacedim> feq(FE_Q<dim,spacedim>(fe->degree), spacedim);
       DH dhq(euler_dof_handler->get_tria());
       dhq.distribute_dofs(feq);
@@ -1289,9 +1294,13 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::update_euler_vector_using_triangula
       newfe.update_euler_vector_using_triangulation(eulerq);
 
       FullMatrix<double> transfer(fe->dofs_per_cell, feq.dofs_per_cell);
-      std::vector<Point<dim> > points = feq.get_unit_support_points();
+      const std::vector<Point<dim> > &points = feq.get_unit_support_points();
 
-      // Here construct the matrix
+      // Here construct the interpolation matrix from FE_Q^spacedim to
+      // the FiniteElement used by euler_dof_handler.
+      //
+      // The interpolation matrix is then passed to the
+      // VectorTools::interpolate() function to generate
       for (unsigned int i=0; i<fe->dofs_per_cell; ++i)
         {
           unsigned int comp_i = fe->system_to_component_index(i).first;
