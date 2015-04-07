@@ -43,7 +43,6 @@
         <li><a href="#run">Running the testsuite</a></li>
         <ol>
           <li><a href="#runoutput">How to interpret the output</a></li>
-          <li><a href="#runmakeopts">Parallelizing testsuite configuration</a></li>
           <li><a href="#coverage">Generating coverage information</a></li>
         </ol>
         <li><a href="#layout">Testsuite development</a></li>
@@ -293,29 +292,6 @@ xx: ===============================    OUTPUT END   ============================
       Typically, tests fail because the output has changed, and you will see
       this in the DIFF phase of the test.
     </p>
-
-
-    <a name="runmakeopts"></a>
-    <h3>Parallelizing testsuite configuration</h3>
-
-    <p>
-      If you have set up the testsuite (or at least a few hundred tests by
-      providing a sufficiently general regular expression
-      as <code>TEST_PICKUP_REGEX</code>) you'll notice that a 
-      reconfiguration of the build directory takes a noticeable time (in the
-      order of minutes instead of seconds) with
-      <code>Reconfiguring testsuite subprojects</code>.
-      By default (with the "Unix Makefiles" generator) this is due to the
-      fact that the reconfiguration processes the subprojects sequentally.
-      If you want to increase the parallelism, specify e.g.
-      <code>MAKEOPTS="-j8"</code> as environment variable or as CMake
-      variable.
-    </p>
-    <p>
-      Alternatively, you can use <code>Ninja</code> as your build tool instead
-      of <code>make</code>.
-    </p>
-
 
 
     <a name="coverage"></a>
