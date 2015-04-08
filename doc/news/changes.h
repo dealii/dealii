@@ -352,6 +352,16 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: A LinearOperator class that stores the abstract concept of a
+  linear operator. The class is fully compatible with the solver and
+  preconditioner interfaces. The primary purpose of this class is to
+  provide syntactic sugar for complex matrix-vector operations and free the
+  user from having to create, set up and handle intermediate storage
+  locations by hand.
+  <br>
+  (Matthias Maier, 2015/04/08)
+  </li>
+
   <li> Fixed: There were a number of places in the library where we unconditionally
   called functions <code>_mm_malloc()/_mm_free()</code> to allocate and free
   memory with a known alignment. This function, however, is only available on
