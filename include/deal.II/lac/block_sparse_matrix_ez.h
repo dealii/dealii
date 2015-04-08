@@ -151,14 +151,15 @@ public:
 
   /**
    * Return number of rows of this matrix, which equals the dimension of
-   * the codomain (or range) space. It is the sum of rows of the rows of
-   * sub-matrices.
+   * the codomain (or range) space. It is the sum of the number of rows over the
+   * sub-matrix blocks of this matrix.
    */
   size_type n_rows () const;
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
-   * the domain space. It is the sum of columns of the columns of sub-matrices.
+   * the domain space. It is the sum of the number of columns over the
+   * sub-matrix blocks of this matrix.
    */
   size_type n_cols () const;
 
