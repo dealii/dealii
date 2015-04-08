@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -150,25 +150,26 @@ public:
   bool empty () const;
 
   /**
-   * Return number of rows of this matrix, which equals the dimension of the
-   * image space. It is the sum of rows of the rows of sub-matrices.
+   * Return number of rows of this matrix, which equals the dimension of
+   * the codomain (or range) space. It is the sum of rows of the rows of
+   * sub-matrices.
    */
   size_type n_rows () const;
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
-   * the range space. It is the sum of columns of the columns of sub-matrices.
+   * the domain space. It is the sum of columns of the columns of sub-matrices.
    */
   size_type n_cols () const;
 
   /**
-   * Return the dimension of the image space.  To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return the dimension of the codomain (or range) space. To remember:
+   * the matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the range space.  To remember: the matrix is of
+   * Return the dimension of the domain space. To remember: the matrix is of
    * dimension $m \times n$.
    */
   size_type n () const;
