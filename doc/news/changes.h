@@ -450,6 +450,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: TrilinosWrappers::BlockSparseMatrix now has member functions
+  TrilinosWrappers::BlockSparseMatrix::domain_paritioner() and
+  TrilinosWrappers::BlockSparseMatrix::range_partitioner() that return a
+  vector of the underlying block Epetra_Map.
+  <br>
+  (Matthias Maier, 2015/04/08)
+
+  </li>
   <li> Fixed: The class SymmetricTensor<2,dim> is now usable also for dim>3.
   <br>
   (Martin Kronbichler, 2015/04/14)

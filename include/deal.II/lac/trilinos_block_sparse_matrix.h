@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -224,6 +224,23 @@ namespace TrilinosWrappers
     size_type n_nonzero_elements () const;
 
     /**
+     * Return a vector of the underlying Trilinos Epetra_Map that sets the
+     * partitioning of the domain space of this block matrix, i.e., the
+     * partitioning of the individual block vectors this matrix has to be
+     * multiplied with.
+     */
+    std::vector<Epetra_Map> domain_partitioner () const;
+
+    /**
+     * Return a vector of the underlying Trilinos Epetra_Map that sets the
+     * partitioning of the range space of this block matrix, i.e., the
+     * partitioning of the individual block vectors that are the result
+     * from matrix-vector products.
+     */
+    std::vector<Epetra_Map> range_partitioner () const;
+
+
+    /**
      * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
      * matrix. The vector types can be block vectors or non-block vectors
      * (only if the matrix has only one row or column, respectively), and need
@@ -410,6 +427,38 @@ namespace TrilinosWrappers
   /*@}*/
 
 // ------------- inline and template functions -----------------
+
+
+
+  inline
+  std::vector<Epetra_Map>
+  BlockSparseMatrix::domain_partitioner () const
+  {
+    Assert (this->n_block_cols() != 0, ExcNotInitialized());
+    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+
+    std::vector<Epetra_Map> domain_partitioner;
+    for (size_type c = 0; c < this->n_block_cols(); ++c)
+      domain_partitioner.push_back(this->sub_objects[0][c]->domain_partitioner());
+
+    return domain_partitioner;
+  }
+
+
+
+  inline
+  std::vector<Epetra_Map>
+  BlockSparseMatrix::range_partitioner () const
+  {
+    Assert (this->n_block_cols() != 0, ExcNotInitialized());
+    Assert (this->n_block_rows() != 0, ExcNotInitialized());
+
+    std::vector<Epetra_Map> range_partitioner;
+    for (size_type r = 0; r < this->n_block_rows(); ++r)
+      range_partitioner.push_back(this->sub_objects[r][0]->range_partitioner());
+
+    return range_partitioner;
+  }
 
 
 
