@@ -336,7 +336,7 @@ inline
 typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::m () const
 {
-  return n_rows();
+  return row_indices.total_size();
 }
 
 
@@ -346,7 +346,7 @@ inline
 typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::n () const
 {
-  return n_cols();
+  return column_indices.total_size();
 }
 
 
