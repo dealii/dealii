@@ -410,6 +410,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: TrilinosWrappers::BlockSparseMatrix now has member functions
+  TrilinosWrappers::BlockSparseMatrix::domain_paritioner() and
+  TrilinosWrappers::BlockSparseMatrix::range_partitioner() that return a
+  vector of the underlying block Epetra_Map.
+  <br>
+  (Matthias Maier, 2015/04/08)
+  <li>
+
   <li> Changed: In the spirit of the changes made to the distinction
   between Point and Tensor objects discussed above, the first argument
   to GridTools::shift() has been changed from a Point to a Tensor@<1,dim@>.

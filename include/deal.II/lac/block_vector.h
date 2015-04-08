@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,6 +36,9 @@ namespace TrilinosWrappers
 }
 #endif
 
+// forward declaration
+template <typename> class ReinitRangeFactory;
+template <typename> class ReinitDomainFactory;
 
 
 /*! @addtogroup Vectors
@@ -457,6 +460,46 @@ void swap (BlockVector<Number> &u,
 {
   u.swap (v);
 }
+
+
+/**
+ * Specialization for BlockVector<number>.
+ */
+template<typename number>
+class ReinitRangeFactory<BlockVector<number> >
+{
+public:
+
+  template <typename Matrix>
+  std::function<void(BlockVector<number> &, bool)>
+  operator()(const Matrix &matrix)
+  {
+    return [&matrix](BlockVector<number> &v, bool fast)
+    {
+      v.reinit(matrix.get_column_indices(), fast);
+    };
+  }
+};
+
+
+/**
+ * Specialization for BlockVector<number>.
+ */
+template<typename number>
+class ReinitDomainFactory<BlockVector<number> >
+{
+public:
+
+  template <typename Matrix>
+  std::function<void(BlockVector<number> &, bool)>
+  operator()(const Matrix &matrix)
+  {
+    return [&matrix](BlockVector<number> &v, bool fast)
+    {
+      v.reinit(matrix.get_row_indices(), fast);
+    };
+  }
+};
 
 DEAL_II_NAMESPACE_CLOSE
 
