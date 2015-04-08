@@ -20,15 +20,16 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/vector_memory.h>
 
-#include <functional>
-
 #ifdef DEAL_II_WITH_CXX11
+
+#include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations:
 
 template <typename Number> class Vector;
+template <typename Number> class BlockVector;
 
 template <typename Range, typename Domain> class LinearOperator;
 template <typename Range = Vector<double>,
@@ -39,11 +40,26 @@ LinearOperator<Range, Domain> linop(const Matrix &matrix);
 /**
  * A class to store the abstract concept of a linear operator.
  *
- * This is achieved by storing the concept of such operations in an
- * "abstract" class LinearOperator that only holds knowledge of how to
- * apply a linear operation via an std::function object vmult (vmult_add,
- * Tvmult, Tvmult_add), as well as, information on how to create an
- * appropriate Domain and Range vector.
+ * The class essentially consists of <code>std::function</code> objects * that
+ * store the knowledge of how to apply the linear operator by implementing the
+ * abstract @ref Matrix interface:
+ * @code
+ * std::function<const void(Range &, const Domain &)> vmult;
+ * std::function<const void(Range &, const Domain &)> vmult_add;
+ * std::function<const void(Domain &, const Range &)> Tvmult;
+ * std::function<const void(Domain &, const Range &)> Tvmult_add;
+ * @endcode
+ *
+ * But, in contrast to a usual matrix object, the domain and range of the linear
+ * operator are also bound to the <code>LinearOperator</code> class on the type
+ * level. Because of this, the <code>LinearOperator<Range, Domain></code> has two
+ * additional function objects
+ * @code
+ *   std::function<void(Range &, bool)> reinit_range_vector;
+ *   std::function<void(Domain &, bool)> reinit_domain_vector;
+ * @endcode
+ * that store the knowledge how to initialize (resize + internal data structures)
+ * an arbitrary vector of the Range and Domain space.
  *
  * The primary purpose of this class is to provide syntactic sugar for
  * complex matrix-vector operations and free the user from having to
@@ -67,7 +83,7 @@ LinearOperator<Range, Domain> linop(const Matrix &matrix);
  * const auto op = (op_a + k * op_b) * op_c;
  * @endcode
  *
- * This class is only available if deal.II was configured with C++11
+ * @note: This class is only available if deal.II was configured with C++11
  * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during
  * cmake configure.
  *
@@ -567,8 +583,9 @@ inverse_linop(Solver &solver,
 
 
 /**
- * A factory class that is responsible to create a reinit_range_vector
- * object for a given pair of vector type Range and matrix type Matrix.
+ * A factory class that is responsible for the creation of a
+ * reinit_range_vector object for a given pair of vector type Range and matrix
+ * type Matrix.
  *
  * The generic version of this class just calls Range::reinit() with the
  * result of Matrix::m(). This class is specialized for more complicated
@@ -592,8 +609,9 @@ public:
 
 
 /**
- * A factory class that is responsible to create a reinit_domain_vector
- * object for a given pair of vector type Domain and matrix type Matrix.
+ * A factory class that is responsible for the creation of a
+ * reinit_domain_vector object for a given pair of vector type Domain and
+ * matrix type Matrix.
  *
  * The generic version of this class just calls Domain::reinit() with the
  * result of Matrix::n(). This class is specialized for more complicated
