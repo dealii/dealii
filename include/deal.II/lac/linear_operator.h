@@ -23,6 +23,7 @@
 #ifdef DEAL_II_WITH_CXX11
 
 #include <functional>
+#include <array>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -580,6 +581,115 @@ inverse_linop(Solver &solver,
 
   return return_op;
 }
+
+
+
+/**
+ * A function that encapsulates a given collection @p ops of
+ * LinearOperators into a block structure. Hereby, it is assumed that Range
+ * and Domain are blockvectors, i.e., derived from @ref
+ * BlockVectorBase<typename Vector>. The individual linear operators in @p
+ * ops must act on a the underlying vector type of the block vectors, i.e.,
+ * on Domain::BlockType yielding a result in Range::BlockType.
+ *
+ * The list @p ops is best passed as an initializer list. Consider for
+ * example a linear operator block (acting on Vector<double>)
+ * @code
+ *  op_a00 | op_a01
+ *         |
+ *  ---------------
+ *         |
+ *  op_a10 | op_a11
+ * @endcode
+ * the coresponding block_linop invocation takes the form
+ * @code
+ * block_linop<2, 2, BlockVector<double>>({op_a00, op_a01, op_a10, op_a11});
+ * @endcode
+ */
+template <unsigned int m, unsigned int n,
+          typename Range = BlockVector<double>,
+          typename Domain = Range>
+LinearOperator<Range, Domain>
+block_linop(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, m> &ops)
+{
+  static_assert(m > 0 && n > 0,
+                "a blocked LinearOperator must consist of at least one block");
+
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = [ops](Range &v, bool fast)
+  {
+    // Reinitialize the block vector to m blocks:
+    v.reinit(m);
+
+    // And reinitialize every individual block with reinit_range_vectors:
+    for (unsigned int i = 0; i < m; ++i)
+      ops[i][0].reinit_range_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.reinit_domain_vector = [ops](Domain &v, bool fast)
+  {
+    // Reinitialize the block vector to n blocks:
+    v.reinit(n);
+
+    // And reinitialize every individual block with reinit_domain_vectors:
+    for (unsigned int i = 0; i < n; ++i)
+      ops[0][i].reinit_domain_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.vmult = [ops](Range &v, const Domain &u)
+  {
+    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
+
+    for (unsigned int i = 0; i < m; ++i)
+      {
+        ops[i][0].vmult(v.block(i), u.block(0));
+        for (unsigned int j = 1; j < n; ++j)
+          ops[i][j].vmult_add(v.block(i), u.block(j));
+      }
+  };
+
+  return_op.vmult_add = [ops](Range &v, const Domain &u)
+  {
+    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
+
+    for (unsigned int i = 0; i < m; ++i)
+      for (unsigned int j = 0; j < n; ++j)
+        ops[i][j].vmult_add(v.block(i), u.block(j));
+  };
+
+  return_op.Tvmult = [ops](Domain &v, const Range &u)
+  {
+    Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
+    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+    for (unsigned int i = 0; i < n; ++i)
+      {
+        ops[0][i].Tvmult(v.block(i), u.block(0));
+        for (unsigned int j = 1; j < m; ++j)
+          ops[j][i].Tvmult_add(v.block(i), u.block(j));
+      }
+  };
+
+  return_op.Tvmult_add = [ops](Domain &v, const Range &u)
+  {
+    Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
+    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+    for (unsigned int i = 0; i < n; ++i)
+      for (unsigned int j = 0; j < m; ++j)
+        ops[j][i].Tvmult_add(v.block(i), u.block(j));
+  };
+
+  return return_op;
+}
+
 
 
 /**
