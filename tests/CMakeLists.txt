@@ -79,6 +79,9 @@ FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
 #
 FOREACH(_var DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT)
   LIST(APPEND _options "-U${_var}")
+  IF(NOT "${${_var}}" STREQUAL "")
+    LIST(APPEND _options "-D${_var}=${${_var}}")
+  ENDIF()
 ENDFOREACH()
 
 SET(_categories
