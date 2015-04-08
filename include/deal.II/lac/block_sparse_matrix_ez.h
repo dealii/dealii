@@ -168,14 +168,18 @@ public:
   size_type n_cols () const DEAL_II_DEPRECATED;
 
   /**
-   * Return the dimension of the codomain (or range) space. To remember:
-   * the matrix is of dimension $m \times n$.
+   * Return number of rows of this matrix, which equals the dimension of
+   * the codomain (or range) space. It is the sum of the number of rows over the
+   * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
+   * times n().
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the domain space. To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return number of columns of this matrix, which equals the dimension of
+   * the domain space. It is the sum of the number of columns over the
+   * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
+   * times n().
    */
   size_type n () const;
 
