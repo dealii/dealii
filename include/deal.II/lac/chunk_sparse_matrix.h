@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -584,14 +584,14 @@ public:
   bool empty () const;
 
   /**
-   * Return the dimension of the image space.  To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return the dimension of the codomain (or range) space. To remember:
+   * the matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the range space.  To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return the dimension of the domain space. To remember: the matrix is
+   * of dimension $m \times n$.
    */
   size_type n () const;
 

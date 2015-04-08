@@ -641,13 +641,13 @@ public:
   bool empty () const;
 
   /**
-   * Return the dimension of the image space. To remember: the matrix is of
-   * dimension $m \times n$.
+   * Return the dimension of the codomain (or range) space. To remember:
+   * the matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the range space. To remember: the matrix is of
+   * Return the dimension of the domain space. To remember: the matrix is of
    * dimension $m \times n$.
    */
   size_type n () const;
