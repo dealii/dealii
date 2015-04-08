@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -204,7 +204,11 @@ namespace internal
       static
       int (&connectivity_is_valid) (types<2>::connectivity *connectivity);
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
+#if DEAL_II_P4EST_VERSION_GTE(1,0,0,0)
+      static
+      types<2>::connectivity *(&connectivity_load) (const char *filename,
+                                                    size_t *length);
+#elif DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       static
       types<2>::connectivity *(&connectivity_load) (const char *filename,
                                                     long unsigned *length);
@@ -384,7 +388,12 @@ namespace internal
                                                 *connectivity)
       = p4est_connectivity_is_valid;
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
+#if DEAL_II_P4EST_VERSION_GTE(1,0,0,0)
+    types<2>::connectivity *
+    (&functions<2>::connectivity_load) (const char *filename,
+                                        size_t *length)
+      = p4est_connectivity_load;
+#elif DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
     types<2>::connectivity *
     (&functions<2>::connectivity_load) (const char *filename,
                                         long unsigned *length)
@@ -564,7 +573,11 @@ namespace internal
       static
       int (&connectivity_is_valid) (types<3>::connectivity *connectivity);
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
+#if DEAL_II_P4EST_VERSION_GTE(1,0,0,0)
+      static
+      types<3>::connectivity *(&connectivity_load) (const char *filename,
+                                                    size_t *length);
+#elif DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       static
       types<3>::connectivity *(&connectivity_load) (const char *filename,
                                                     long unsigned *length);
@@ -747,7 +760,12 @@ namespace internal
                                                 *connectivity)
       = p8est_connectivity_is_valid;
 
-#if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
+#if DEAL_II_P4EST_VERSION_GTE(1,0,0,0)
+    types<3>::connectivity *
+    (&functions<3>::connectivity_load) (const char *filename,
+                                        size_t *length)
+      = p8est_connectivity_load;
+#elif DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
     types<3>::connectivity *
     (&functions<3>::connectivity_load) (const char *filename,
                                         long unsigned *length)
