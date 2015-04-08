@@ -40,6 +40,9 @@ DEAL_II_NAMESPACE_OPEN
 // forward declaration
 template <typename> class Vector;
 
+template <typename> class ReinitRangeFactory;
+template <typename> class ReinitDomainFactory;
+
 /**
  * @addtogroup TrilinosWrappers
  * @{
@@ -936,7 +939,87 @@ namespace TrilinosWrappers
 #endif
 
 
-}
+} /* namespace TrilinosWrappers */
+
+
+/**
+ * Specialization for TrilinosWrappers::MPI::Vector.
+ */
+template<>
+class ReinitRangeFactory<TrilinosWrappers::MPI::Vector>
+{
+public:
+
+  template <typename Matrix>
+  std::function<void(TrilinosWrappers::MPI::Vector &, bool)>
+  operator()(const Matrix &matrix)
+  {
+    return [&matrix](TrilinosWrappers::MPI::Vector &v, bool fast)
+    {
+      v.reinit(matrix.range_partitioner(), fast);
+    };
+  }
+};
+
+
+/**
+ * Specialization for TrilinosWrappers::MPI::Vector.
+ */
+template<>
+class ReinitDomainFactory<TrilinosWrappers::MPI::Vector>
+{
+public:
+
+  template <typename Matrix>
+  std::function<void(TrilinosWrappers::MPI::Vector &, bool)>
+  operator()(const Matrix &matrix)
+  {
+    return [&matrix](TrilinosWrappers::MPI::Vector &v, bool fast)
+    {
+      v.reinit(matrix.domain_partitioner(), fast);
+    };
+  }
+};
+
+
+/**
+ * Specialization for TrilinosWrappers::MPI::Vector.
+ */
+template<>
+class ReinitRangeFactory<TrilinosWrappers::Vector>
+{
+public:
+
+  template <typename Matrix>
+  std::function<void(TrilinosWrappers::Vector &, bool)>
+  operator()(const Matrix &matrix)
+  {
+    return [&matrix](TrilinosWrappers::Vector &v, bool fast)
+    {
+      v.reinit(matrix.range_partitioner(), fast);
+    };
+  }
+};
+
+
+/**
+ * Specialization for TrilinosWrappers::MPI::Vector.
+ */
+template<>
+class ReinitDomainFactory<TrilinosWrappers::Vector>
+{
+public:
+
+  template <typename Matrix>
+  std::function<void(TrilinosWrappers::Vector &, bool)>
+  operator()(const Matrix &matrix)
+  {
+    return [&matrix](TrilinosWrappers::Vector &v, bool fast)
+    {
+      v.reinit(matrix.domain_partitioner(), fast);
+    };
+  }
+};
 
 
 /*@}*/

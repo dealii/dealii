@@ -447,7 +447,87 @@ namespace TrilinosWrappers
     u.swap (v);
   }
 
-}
+} /* namespace TrilinosWrappers */
+
+
+/**
+ * Specialization for TrilinosWrappers::MPI::BlockVector.
+ */
+template<>
+class ReinitRangeFactory<TrilinosWrappers::MPI::BlockVector>
+{
+public:
+
+  template <typename Matrix>
+  std::function<void(TrilinosWrappers::MPI::BlockVector &, bool)>
+  operator()(const Matrix &matrix)
+  {
+    return [&matrix](TrilinosWrappers::MPI::BlockVector &v, bool fast)
+    {
+      v.reinit(matrix.range_partitioner(), fast);
+    };
+  }
+};
+
+
+/**
+ * Specialization for TrilinosWrappers::MPI::BlockVector.
+ */
+template<>
+class ReinitDomainFactory<TrilinosWrappers::MPI::BlockVector>
+{
+public:
+
+  template <typename Matrix>
+  std::function<void(TrilinosWrappers::MPI::BlockVector &, bool)>
+  operator()(const Matrix &matrix)
+  {
+    return [&matrix](TrilinosWrappers::MPI::BlockVector &v, bool fast)
+    {
+      v.reinit(matrix.domain_partitioner(), fast);
+    };
+  }
+};
+
+
+/**
+ * Specialization for TrilinosWrappers::BlockVector.
+ */
+template<>
+class ReinitRangeFactory<TrilinosWrappers::BlockVector>
+{
+public:
+
+  template <typename Matrix>
+  std::function<void(TrilinosWrappers::BlockVector &, bool)>
+  operator()(const Matrix &matrix)
+  {
+    return [&matrix](TrilinosWrappers::BlockVector &v, bool fast)
+    {
+      v.reinit(matrix.range_partitioner(), fast);
+    };
+  }
+};
+
+
+/**
+ * Specialization for TrilinosWrappers::BlockVector.
+ */
+template<>
+class ReinitDomainFactory<TrilinosWrappers::BlockVector>
+{
+public:
+
+  template <typename Matrix>
+  std::function<void(TrilinosWrappers::BlockVector &, bool)>
+  operator()(const Matrix &matrix)
+  {
+    return [&matrix](TrilinosWrappers::BlockVector &v, bool fast)
+    {
+      v.reinit(matrix.domain_partitioner(), fast);
+    };
+  }
+};
 
 /*@}*/
 
