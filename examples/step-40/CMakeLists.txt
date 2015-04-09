@@ -47,5 +47,6 @@ One or all of these are OFF in your installation but are required for this tutor
 ENDIF()
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
+SET(CLEAN_UP_FILES *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.vtk *.ucd *.d2 *.vtu *.pvtu)
 PROJECT(${TARGET})
 DEAL_II_INVOKE_AUTOPILOT()
