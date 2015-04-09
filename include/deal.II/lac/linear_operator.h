@@ -48,9 +48,9 @@ LinearOperator<Range, Domain> linop (const Matrix &);
 /**
  * A class to store the abstract concept of a linear operator.
  *
- * The class essentially consists of <code>std::function</code> objects * that
- * store the knowledge of how to apply the linear operator by implementing the
- * abstract @ref Matrix interface:
+ * The class essentially consists of <code>std::function</code> objects
+ * that store the knowledge of how to apply the linear operator by
+ * implementing the abstract @ref Matrix interface:
  * @code
  * std::function<const void(Range &, const Domain &)> vmult;
  * std::function<const void(Range &, const Domain &)> vmult_add;
@@ -58,16 +58,16 @@ LinearOperator<Range, Domain> linop (const Matrix &);
  * std::function<const void(Domain &, const Range &)> Tvmult_add;
  * @endcode
  *
- * But, in contrast to a usual matrix object, the domain and range of the linear
- * operator are also bound to the <code>LinearOperator</code> class on the type
- * level. Because of this, the <code>LinearOperator<Range, Domain></code> has two
- * additional function objects
+ * But, in contrast to a usual matrix object, the domain and range of the
+ * linear operator are also bound to the LinearOperator class on the type
+ * level. Because of this, <code>LinearOperator <@tref Range, @tref
+ * Domain></code> has two additional function objects
  * @code
  *   std::function<void(Range &, bool)> reinit_range_vector;
  *   std::function<void(Domain &, bool)> reinit_domain_vector;
  * @endcode
  * that store the knowledge how to initialize (resize + internal data structures)
- * an arbitrary vector of the Range and Domain space.
+ * an arbitrary vector of the @tref Range and @tref Domain space.
  *
  * The primary purpose of this class is to provide syntactic sugar for
  * complex matrix-vector operations and free the user from having to
@@ -95,16 +95,16 @@ LinearOperator<Range, Domain> linop (const Matrix &);
  * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during
  * cmake configure.
  *
- * @author: Luca Heltai, Matthias Maier, 2015
+ * @author Luca Heltai, Matthias Maier, 2015
  */
 template <typename Range, typename Domain> class LinearOperator
 {
 public:
 
   /**
-   * Create an empty LinearOperator object. All std::function objects are
-   * initialized with default variants that throw an exception upon
-   * invocation.
+   * Create an empty LinearOperator object. All <code>std::function</code>
+   * member objects are initialized with default variants that throw an
+   * exception upon invocation.
    */
   LinearOperator ()
   {
@@ -166,37 +166,38 @@ public:
   }
 
   /**
-   * Application of the LinearOperator object to a vector @p u of the
-   * Domain space giving a vector @p v of the Range space.
+   * Application of the LinearOperator object to a vector u of the @tref
+   * Domain space giving a vector v of the @tref Range space.
    */
   std::function<const void(Range &v, const Domain &u)> vmult;
 
   /**
-   * Application of the LinearOperator object to a vector @p u of the
-   * Domain space. The result is added to the vector @p v.
+   * Application of the LinearOperator object to a vector u of the @tref
+   * Domain space. The result is added to the vector v.
    */
   std::function<const void(Range &v, const Domain &u)> vmult_add;
 
   /**
-   * Application of the transpose LinearOperator object to a vector @p u of
-   * the Range space giving a vector @p v of the Domain space.
+   * Application of the transpose LinearOperator object to a vector u of
+   * the @tref Range space giving a vector v of the @tref Domain
+   * space.
    */
   std::function<const void(Domain &v, const Range &u)> Tvmult;
 
   /**
    * Application of the transpose LinearOperator object to a vector @p u of
-   * the Range space. The result is added to the vector @p v.
+   * the @tref Range space.The result is added to the vector @p v.
    */
   std::function<const void(Domain &v, const Range &u)> Tvmult_add;
 
   /**
-   * Initializes a vector of the Range space to be directly usable as the
-   * destination parameter in an application of vmult. Similar to the
-   * reinit functions of the vector classes, the boolean determines whether
-   * a fast initalization is done, i.e., if it is set to false the content
-   * of the vector is set to 0.
+   * Initializes a vector v of the Range space to be directly usable
+   * as the destination parameter in an application of vmult. Similar to
+   * the reinit functions of the vector classes, the boolean determines
+   * whether a fast initalization is done, i.e., if it is set to false the
+   * content of the vector is set to 0.
    */
-  std::function<void(Range &, bool)> reinit_range_vector;
+  std::function<void(Range &v, bool fast)> reinit_range_vector;
 
   /**
    * Initializes a vector of the Domain space to be directly usable as the
@@ -205,24 +206,24 @@ public:
    * initalization is done, i.e., if it is set to false the content of the
    * vector is set to 0.
    */
-  std::function<void(Domain &, bool)> reinit_domain_vector;
+  std::function<void(Domain &v, bool fast)> reinit_domain_vector;
 
   /**
-   * A memory object for vectors of Range space used for intermediate
-   * storage during computations in vmult, etc.
+   * A memory object for vectors of @tref Range space used for intermediate
+   * storage during computations in @ref vmult, etc.
    */
   mutable GrowingVectorMemory<Range> range_vector_memory;
 
   /**
-   * A memory object for vectors of Domain space used for intermediate
-   * storage during computations in vmult, etc.
+   * A memory object for vectors of @tref Domain space used for intermediate
+   * storage during computations in @ref vmult, etc.
    */
   mutable GrowingVectorMemory<Domain> domain_vector_memory;
 
 
   /**
-   * Addition with a LinearOperator @p second_op with the same Domain
-   * and Range.
+   * Addition with a LinearOperator @p second_op with the same @tref Domain
+   * and @tref Range.
    */
   LinearOperator<Range, Domain> &
   operator+=(const LinearOperator<Range, Domain> &second_op)
@@ -232,8 +233,8 @@ public:
   }
 
   /**
-   * Subtraction with a LinearOperator @p second_op with the same Domain
-   * and Range.
+   * Subtraction with a LinearOperator @p second_op with the same @tref Domain
+   * and @tref Range.
    */
   LinearOperator<Range, Domain> &
   operator-=(const LinearOperator<Range, Domain> &second_op)
@@ -243,8 +244,8 @@ public:
   }
 
   /**
-   * Concatenation of the LinearOperator with an endormorphism @p second_op
-   * on the Domain space.
+   * Concatenation of the LinearOperator with an endomorphism @p second_op
+   * on the @tref Domain space.
    */
   LinearOperator<Range, Domain> &
   operator*=(const LinearOperator<Domain, Domain> &second_op)
@@ -257,6 +258,8 @@ public:
 
 
 /**
+ * \relates LinearOperator
+ *
  * Addition of two linear operators @p first_op and @p second_op given
  * by $(\text{first_op}+\text{second_op})x:=\text{first_op}(x)+\text{second_op}(x)$
  */
@@ -302,6 +305,8 @@ operator+(const LinearOperator<Range, Domain> &first_op,
 
 
 /**
+ * \relates LinearOperator
+ *
  * Subtraction of two linear operators @p first_op and @p second_op given
  * by $(\text{first_op}-\text{second_op})x:=\text{first_op}(x)-\text{second_op}(x)$
  */
@@ -316,6 +321,8 @@ operator-(const LinearOperator<Range, Domain> &first_op,
 
 
 /**
+ * \relates LinearOperator
+ *
  * Concatenation of two linear operators @p first_op and @p second_op given
  * by $(\text{first_op}*\text{second_op})x:=\text{first_op}(\text{second_op}(x))$
  */
@@ -380,15 +387,18 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
 
 
 /**
- * Scalar multiplication of a ScalarOperator object from the left.
+ * \relates LinearOperator
  *
- * The Domain and Range types must implement the following
+ * Scalar multiplication of a ScalarOperator object @p op with @p
+ * number from the left.
+ *
+ * The @tref Domain and @tref Range types must implement the following
  * <code>operator*=</code> member functions accepting the appropriate
  * scalar Number type for rescaling:
  *
  * @code
- * Domain & operator *=(Number);
- * Range & operator *=(Number);
+ * Domain & operator *=(Domain::value_type);
+ * Range & operator *=(Range::value_type);
  * @endcode
  */
 template <typename Range, typename Domain>
@@ -436,14 +446,16 @@ operator*(typename Range::value_type  number,
 
 
 /**
+ * \relates LinearOperator
+ *
  * Scalar multiplication of a ScalarOperator object from the right.
  *
- * The Domain and Range types must implement the following
+ * The @tref Domain and @tref Range types must implement the following
  * <code>operator*=</code> member functions for rescaling:
  *
  * @code
- * Domain & operator *=(Number);
- * Range & operator *=(Number);
+ * Domain & operator *=(Domain::value_type);
+ * Range & operator *=(Range::value_type);
  * @endcode
  */
 template <typename Range, typename Domain>
@@ -460,7 +472,9 @@ operator*(const LinearOperator<Range, Domain> &op,
 
 
 /**
- * Returns the transpose linear operations of @p op.
+ * \relates LinearOperator
+ *
+ * Returns the transpose linear operations of @ref op.
  */
 template <typename Range, typename Domain>
 LinearOperator<Domain, Range>
@@ -481,12 +495,14 @@ transpose_linop(const LinearOperator<Range, Domain> &op)
 
 
 /**
- * Returns a LinearOperator that is the identity of the vector space
- * Domain.
+ * \relates LinearOperator
  *
- * The function takes an <code>std::function</code> object @p
- * exemplar as an argument to initialize the reinit_range_vector
- * and reinit_domain_vector objects of the LinearOperator object.
+ * Returns a LinearOperator that is the identity of the vector space
+ * @tref Range.
+ *
+ * The function takes an <code>std::function</code> object @ref exemplar as
+ * an argument to initialize the <code>reinit_range_vector</code> and
+ * <code>reinit_domain_vector</code> objects of the LinearOperator object.
  */
 template <typename Range>
 LinearOperator<Range, Range>
@@ -522,6 +538,8 @@ identity_linop(const std::function<void(Range &, bool)> &exemplar)
 
 
 /**
+ * \relates LinearOperator
+ *
  * Returns an object representing the inverse of the LinearOperator @p op.
  *
  * The function takes references @p solver and @p preconditioner to an
@@ -532,8 +550,8 @@ identity_linop(const std::function<void(Range &, bool)> &exemplar)
  * The LinearOperator object that is created stores a reference to @p
  * solver and @p preconditioner. Thus, both objects must remain a valid
  * reference for the whole lifetime of the LinearOperator object. Internal
- * data structures of the @p solver object will be modified upon invocation
- * of <code>vmult</code> or <code>Tvmult</code>.
+ * data structures of the @p solver object will be modified upon
+ * invocation of <code>vmult</code> or <code>Tvmult</code>.
  */
 template <typename Solver, typename Preconditioner>
 LinearOperator<typename Solver::vector_type, typename Solver::vector_type>
@@ -590,14 +608,15 @@ inverse_linop(Solver &solver,
 }
 
 
-
 /**
+ * \relates LinearOperator
+ *
  * A function that encapsulates a given collection @p ops of
  * LinearOperators into a block structure. Hereby, it is assumed that Range
- * and Domain are blockvectors, i.e., derived from @ref
- * BlockVectorBase<typename Vector>. The individual linear operators in @p
- * ops must act on a the underlying vector type of the block vectors, i.e.,
- * on Domain::BlockType yielding a result in Range::BlockType.
+ * and Domain are blockvectors, i.e., derived from @ref BlockVectorBase.
+ * The individual linear operators in @p ops must act on a the underlying
+ * vector type of the block vectors, i.e., on Domain::BlockType yielding a
+ * result in Range::BlockType.
  *
  * The list @p ops is best passed as an initializer list. Consider for
  * example a linear operator block (acting on Vector<double>)
@@ -700,12 +719,15 @@ block_linop(const std::array<std::array<LinearOperator<typename Range::BlockType
 
 
 /**
+ * \relates LinearOperator
+ *
  * A factory class that is responsible for the creation of a
  * reinit_range_vector object for a given pair of vector type Range and matrix
  * type Matrix.
  *
- * The generic version of this class just calls Range::reinit() with the
- * result of Matrix::m(). This class is specialized for more complicated
+ * The generic version of this class just calls
+ * <code>Range::reinit()</code> with the result of
+ * <code>Matrix::m()</code>. This class is specialized for more complicated
  * data structures, such as TrilinosWrappers::MPI::Vector, etc.
  */
 template<typename Range>
@@ -726,12 +748,15 @@ public:
 
 
 /**
+ * \relates LinearOperator
+ *
  * A factory class that is responsible for the creation of a
  * reinit_domain_vector object for a given pair of vector type Domain and
  * matrix type Matrix.
  *
- * The generic version of this class just calls Domain::reinit() with the
- * result of Matrix::n(). This class is specialized for more complicated
+ * The generic version of this class just calls
+ * <code>Domain::reinit()</code> with the result of
+ * <code>Matrix::n()</code>. This class is specialized for more complicated
  * data structures, such as TrilinosWrappers::MPI::Vector, etc.
  */
 template<typename Domain>
@@ -866,6 +891,8 @@ namespace
 
 
 /**
+ * \relates LinearOperator
+ *
  * A function that encapsulates generic @p matrix objects that act on a
  * compatible Vector type into a LinearOperator. The LinearOperator object
  * that is created stores a reference to the matrix object. Thus, @p matrix
@@ -917,7 +944,7 @@ namespace
  * <code>vmult</code> and <code>Tvmult</code> (requiring intermediate
  * storage).
  *
- * @author: Matthias Maier, 2015
+ * @author Matthias Maier, 2015
  */
 template <typename Range = Vector<double>,
           typename Domain = Range,
@@ -930,6 +957,8 @@ LinearOperator<Range, Domain> linop(const Matrix &matrix)
 
 
 /**
+ * \relates LinearOperator
+ *
  * Variant of above function that takes an Exemplar object @p exemplar as
  * an additional reference. This object is used to populate the
  * reinit_domain_vector and reinit_range_vector function objects. The
@@ -939,7 +968,7 @@ LinearOperator<Range, Domain> linop(const Matrix &matrix)
  * (that typically do not expose any information about the underlying
  * matrix).
  *
- * @author: Matthias Maier, 2015
+ * @author Matthias Maier, 2015
  */
 template <typename Range = Vector<double>,
           typename Domain = Range,

@@ -155,17 +155,25 @@ INCLUDE_FILE_PATTERNS  =
 # not configured
 PREDEFINED             = DOXYGEN=1 \
                          DEBUG=1 \
+                         DEAL_II_USE_MT_POSIX=1 \
+                         DEAL_II_WITH_ARPACK=1 \
+                         DEAL_II_WITH_BOOST=1 \
+                         DEAL_II_WITH_CXX11=1 \
+                         DEAL_II_WITH_HDF5=1 \
+                         DEAL_II_WITH_LAPACK=1 \
+                         DEAL_II_WITH_METIS=1 \
+                         DEAL_II_WITH_MPI=1 \
+                         DEAL_II_WITH_MUPARSER=1 \
+                         DEAL_II_WITH_NETCDF=1 \
+                         DEAL_II_WITH_OPENCASCADE=1 \
+                         DEAL_II_WITH_P4EST=1 \
                          DEAL_II_WITH_PETSC=1 \
                          DEAL_II_WITH_SLEPC=1 \
-                         DEAL_II_WITH_TRILINOS=1 \
-                         DEAL_II_WITH_OPENCASCADE=1 \
                          DEAL_II_WITH_THREADS=1 \
-                         DEAL_II_USE_MT_POSIX=1 \
-			 DEAL_II_WITH_ARPACK=1 \
-			 DEAL_II_WITH_METIS=1 \
-			 DEAL_II_WITH_MUPARSER=1 \
-			 DEAL_II_WITH_P4EST=1 \
-			 DEAL_II_WITH_MPI=1
+                         DEAL_II_WITH_TRILINOS=1 \
+                         DEAL_II_WITH_TRILINOS =1 \
+                         DEAL_II_WITH_UMFPACK=1 \
+                         DEAL_II_WITH_ZLIB=1
 
 # do not expand exception declarations
 EXPAND_AS_DEFINED      = DeclException0 \
