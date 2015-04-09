@@ -457,16 +457,16 @@ public:
  * International Journal for Numerical Methods in Engineering, vol 24,
  * pages 959–973. year 1987, the author applies the transformation on the
  * reference cell $[-1, 1]$ getting
- \begin{align*} n(1) &= 1, \\ n(-1) &= -1, \\ \frac{dn}{dx} &= 0 \text{ at }
- x = x_0, \\ \frac{d^2n}{dx^2} &= 0 \text{ at  } x = x_0 \end{align*}
+ @f{align*} n(1) &= 1, \\ n(-1) &= -1, \\ \frac{dn}{dx} &= 0 \text{ at }
+ x = x_0, \\ \frac{d^2n}{dx^2} &= 0 \text{ at  } x = x_0 @f}
  * We get
- \begin{align*} a &= \frac{1}{q}, \\ b &= -3 \frac{\bar{\Gamma}}{q}, \\
- c &= 3\frac{\bar{\Gamma}}{q}, \\ d &= -b, \end{align*}
+ @f{align*} a &= \frac{1}{q}, \\ b &= -3 \frac{\bar{\Gamma}}{q}, \\
+ c &= 3\frac{\bar{\Gamma}}{q}, \\ d &= -b, @f}
  * with
- \begin{align*}  \eta^{*} &= \bar{\eta}^2 - 1, \\ \bar{\Gamma}  &= \sqrt[3]{
+ @f{align*}  \eta^{*} &= \bar{\eta}^2 - 1, \\ \bar{\Gamma}  &= \sqrt[3]{
  \bar{\eta} \eta^{*} + |\eta^{*} | } + \sqrt[3]{ \bar{\eta} \eta^{*} -
  |\eta^{*} | } + \bar{\eta}, \\ q &= (\Gamma-\bar{\Gamma})^3 + \bar{\Gamma}
- \frac{\bar{\Gamma}^2+3}{1+3\bar{\Gamma}^2} \end{align*}
+ \frac{\bar{\Gamma}^2+3}{1+3\bar{\Gamma}^2} @f}
  * Since the library assumes $[0,1]$ as reference interval, we will map
  * these values on the proper reference interval in the implementation.
  *
