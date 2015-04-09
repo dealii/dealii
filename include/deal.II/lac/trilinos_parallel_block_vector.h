@@ -460,11 +460,57 @@ namespace TrilinosWrappers
       u.swap (v);
     }
 
-  } /* end of namespace MPI */
+  } /* namespace MPI */
 
-}
+} /* namespace TrilinosWrappers */
 
 /*@}*/
+
+namespace internal
+{
+  template <typename> class ReinitRangeFactory;
+  template <typename> class ReinitDomainFactory;
+
+  /*
+   * A factory class internally used in linear_operator.h.
+   * Specialization for TrilinosWrappers::MPI::BlockVector.
+   */
+  template<>
+  class ReinitRangeFactory<TrilinosWrappers::MPI::BlockVector>
+  {
+  public:
+    template <typename Matrix>
+    std::function<void(TrilinosWrappers::MPI::BlockVector &, bool)>
+    operator()(const Matrix &matrix)
+    {
+      return [&matrix](TrilinosWrappers::MPI::BlockVector &v, bool fast)
+      {
+        v.reinit(matrix.range_partitioner(), fast);
+      };
+    }
+  };
+
+  /*
+   * A factory class internally used in linear_operator.h.
+   * Specialization for TrilinosWrappers::MPI::BlockVector.
+   */
+  template<>
+  class ReinitDomainFactory<TrilinosWrappers::MPI::BlockVector>
+  {
+  public:
+    template <typename Matrix>
+    std::function<void(TrilinosWrappers::MPI::BlockVector &, bool)>
+    operator()(const Matrix &matrix)
+    {
+      return [&matrix](TrilinosWrappers::MPI::BlockVector &v, bool fast)
+      {
+        v.reinit(matrix.domain_partitioner(), fast);
+      };
+    }
+  };
+} /* namespace internal */
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 
