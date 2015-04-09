@@ -33,10 +33,17 @@ template <typename Number> class Vector;
 template <typename Number> class BlockVector;
 
 template <typename Range, typename Domain> class LinearOperator;
+
+template <typename Range = Vector<double>,
+          typename Domain = Range,
+          typename Exemplar,
+          typename Matrix>
+LinearOperator<Range, Domain> linop (const Exemplar &, const Matrix &);
+
 template <typename Range = Vector<double>,
           typename Domain = Range,
           typename Matrix>
-LinearOperator<Range, Domain> linop(const Matrix &matrix);
+LinearOperator<Range, Domain> linop (const Matrix &);
 
 /**
  * A class to store the abstract concept of a linear operator.
@@ -744,6 +751,120 @@ public:
 };
 
 
+namespace
+{
+  // A trait class that determines whether type T provides public
+  // (templated or non-templated) vmult_add and Tvmult_add member functions
+
+  template <typename Range, typename Domain, typename T>
+  class has_vmult_add
+  {
+    template <typename C>
+    static std::false_type test(...);
+
+    template <typename C>
+    static std::true_type test(decltype(&C::vmult_add),
+                               decltype(&C::Tvmult_add));
+
+    template <typename C>
+    static std::true_type test(decltype(&C::template vmult_add<Range>),
+                               decltype(&C::template Tvmult_add<Range>));
+
+    template <typename C>
+    static std::true_type test(decltype(&C::template vmult_add<Range, Domain>),
+                               decltype(&C::template Tvmult_add<Domain, Range>));
+
+  public:
+    // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
+    // otherwise it is std::false_type
+
+    typedef decltype(test<T>(0, 0)) type;
+  };
+
+
+  // A helper class to add the full matrix interface to a LinearOperator
+
+  template <typename Range, typename Domain>
+  class MatrixInterfaceWithVmultAdd
+  {
+  public:
+
+    template <typename Matrix>
+    void operator()(LinearOperator<Range, Domain> &op, const Matrix &matrix)
+    {
+      op.vmult = [&matrix](Range &v, const Domain &u)
+      {
+        matrix.vmult(v,u);
+      };
+
+      op.vmult_add = [&matrix](Range &v, const Domain &u)
+      {
+        matrix.vmult_add(v,u);
+      };
+
+      op.Tvmult = [&matrix](Domain &v, const Range &u)
+      {
+        matrix.Tvmult(v,u);
+      };
+
+      op.Tvmult_add = [&matrix](Domain &v, const Range &u)
+      {
+        matrix.Tvmult_add(v,u);
+      };
+    }
+  };
+
+
+  // A helper class to add a reduced matrix interface to a LinearOperator
+  // (typically provided by Preconditioner classes)
+
+  template <typename Range, typename Domain>
+  class MatrixInterfaceWithoutVmultAdd
+  {
+  public:
+
+    template <typename Matrix>
+    void operator()(LinearOperator<Range, Domain> &op, const Matrix &matrix)
+    {
+      op.vmult = [&matrix](Range &v, const Domain &u)
+      {
+        matrix.vmult(v,u);
+      };
+
+      op.vmult_add = [op](Range &v, const Domain &u)
+      {
+        // Capture op by value to have a valid GrowingVectorMemory object
+        // that is bound to the lifetime of this function object
+
+        Range *i = op.range_vector_memory.alloc();
+        op.reinit_range_vector(*i, /*bool fast =*/true);
+        op.vmult(*i, u);
+        v += *i;
+        op.range_vector_memory.free(i);
+      };
+
+      op.Tvmult = [&matrix](Domain &v, const Range &u)
+      {
+        matrix.Tvmult(v,u);
+      };
+
+      op.Tvmult_add = [op](Domain &v, const Range &u)
+      {
+        // Capture op by value to have a valid GrowingVectorMemory object
+        // that is bound to the lifetime of this function object
+
+        Domain *i = op.domain_vector_memory.alloc();
+        op.reinit_domain_vector(*i, /*bool fast =*/true);
+        op.Tvmult(*i, u);
+        v += *i;
+        op.domain_vector_memory.free(i);
+      };
+    }
+  };
+
+} /* namespace */
+
+
 /**
  * A function that encapsulates generic @p matrix objects that act on a
  * compatible Vector type into a LinearOperator. The LinearOperator object
@@ -769,20 +890,32 @@ public:
  *   // Application of matrix to vector src, writes the result into dst.
  *   vmult(VECTOR &dst, const VECTOR &src);
  *
- *   // Application of matrix to vector src, adds the result to dst.
- *   vmult_add(VECTOR &dst, const VECTOR &src);
- *
  *   // Application of the transpose of matrix to vector src, writes the
  *   // result into dst. (Depending on the usage of the linear operator
  *   // class this can be a dummy implementation throwing an error.)
  *   Tvmult(VECTOR &dst, const VECTOR &src);
+ * };
+ * @endcode
+ *
+ * The following (optional) interface is used if available:
+ *
+ * @code
+ * class Matrix
+ * {
+ * public:
+ *   // Application of matrix to vector src, adds the result to dst.
+ *   vmult_add(VECTOR &dst, const VECTOR &src);
  *
  *   // Application of the transpose of matrix to vector src, adds the
- *   // result to dst. (Depending on the usage of the linear operator class
- *   // this can be a dummy implementation throwing an error.)
+ *   // result to dst.
  *   Tvmult_add(VECTOR &dst, const VECTOR &src);
  * };
  * @endcode
+ *
+ * If the Matrix does not provide <code>vmult_add</code> and
+ * <code>Tvmult_add</code>, they are implemented in terms of
+ * <code>vmult</code> and <code>Tvmult</code> (requiring intermediate
+ * storage).
  *
  * @author: Matthias Maier, 2015
  */
@@ -791,38 +924,48 @@ template <typename Range = Vector<double>,
           typename Matrix>
 LinearOperator<Range, Domain> linop(const Matrix &matrix)
 {
+  // implement with the more generic variant below...
+  return linop<Range, Domain, Matrix, Matrix>(matrix, matrix);
+}
+
+
+/**
+ * Variant of above function that takes an Exemplar object @p exemplar as
+ * an additional reference. This object is used to populate the
+ * reinit_domain_vector and reinit_range_vector function objects. The
+ * reference @p matrix is used to construct vmult, Tvmult, etc.
+ *
+ * This variant can, for example, be used to encapsulate preconditioners
+ * (that typically do not expose any information about the underlying
+ * matrix).
+ *
+ * @author: Matthias Maier, 2015
+ */
+template <typename Range = Vector<double>,
+          typename Domain = Range,
+          typename Exemplar,
+          typename Matrix>
+LinearOperator<Range, Domain> linop(const Exemplar &exemplar,
+                                    const Matrix   &matrix)
+{
   LinearOperator<Range, Domain> return_op;
 
-  // Always store a reference to matrix in the lambda functions.
-  // This ensures that a modification of the matrix after the creation of a
-  // LinearOperator wrapper is respected - further a matrix cannot usually
-  // be copied...
+  // Always store a reference to matrix and exemplar in the lambda
+  // functions. This ensures that a modification of the matrix after the
+  // creation of a LinearOperator wrapper is respected - further a matrix
+  // or an exemplar cannot usually be copied...
 
   return_op.reinit_range_vector =
-    ReinitRangeFactory<Range>().operator()(matrix);
+    ReinitRangeFactory<Range>().operator()(exemplar);
 
   return_op.reinit_domain_vector =
-    ReinitDomainFactory<Domain>().operator()(matrix);
+    ReinitDomainFactory<Domain>().operator()(exemplar);
 
-  return_op.vmult = [&matrix](Range &v, const Domain &u)
-  {
-    matrix.vmult(v,u);
-  };
-
-  return_op.vmult_add = [&matrix](Range &v, const Domain &u)
-  {
-    matrix.vmult_add(v,u);
-  };
-
-  return_op.Tvmult = [&matrix](Domain &v, const Range &u)
-  {
-    matrix.Tvmult(v,u);
-  };
-
-  return_op.Tvmult_add = [&matrix](Domain &v, const Range &u)
-  {
-    matrix.Tvmult_add(v,u);
-  };
+  typename std::conditional<
+  has_vmult_add<Range, Domain, Matrix>::type::value,
+                MatrixInterfaceWithVmultAdd<Range, Domain>,
+                MatrixInterfaceWithoutVmultAdd<Range, Domain>>::type().
+                operator()(return_op, matrix);
 
   return return_op;
 }
