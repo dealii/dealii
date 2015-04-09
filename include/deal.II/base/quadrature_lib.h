@@ -457,21 +457,21 @@ public:
  * International Journal for Numerical Methods in Engineering, vol 24,
  * pages 959–973. year 1987, the author applies the transformation on the
  * reference cell $[-1, 1]$ getting
- * @f{align*} n(1) &= 1, \\ n(-1) &= -1, \\ dn/dx $= 0 at x = x_0, \\
- d2n/dx2 = 0 at x &= x_0 @f}
+ \begin{align*} n(1) &= 1, \\ n(-1) &= -1, \\ \frac{dn}{dx} &= 0 \text{ at }
+ x = x_0, \\ \frac{d^2n}{dx^2} &= 0 \text{ at  } x = x_0 \end{align*}
  * We get
- * @f{align*} a &= 1/q, \\ b &= -3gamma_bar/q, \\ c &= 3gamma_bar/q, \\
- d &= -b, @f}
+ \begin{align*} a &= \frac{1}{q}, \\ b &= -3 \frac{\bar{\Gamma}}{q}, \\
+ c &= 3\frac{\bar{\Gamma}}{q}, \\ d &= -b, \end{align*}
  * with
- * @f{align*} eta_star &= eta_bar^2 - 1, \\ gamma_bar 6 &= nthroot( eta_bar
- * eta_star + abs(eta_star) ,3) + nthroot(eta_bar*eta_star - abs(eta_star),3)
- + eta_bar, \\ q &= ((gamma-gamma_bar).^3 + gamma_bar*(gamma_bar^2+3))
- /(1+3*gamma_bar^2) @f}.
- * Since the library assumes [0,1] as reference interval, we will map
+ \begin{align*}  \eta^{*} &= \bar{\eta}^2 - 1, \\ \bar{\Gamma}  &= \sqrt[3]{
+ \bar{\eta} \eta^{*} + |\eta^{*} | } + \sqrt[3]{ \bar{\eta} \eta^{*} -
+ |\eta^{*} | } + \bar{\eta}, \\ q &= (\Gamma-\bar{\Gamma})^3 + \bar{\Gamma}
+ \frac{\bar{\Gamma}^2+3}{1+3\bar{\Gamma}^2} \end{align*}
+ * Since the library assumes $[0,1]$ as reference interval, we will map
  * these values on the proper reference interval in the implementation.
  *
  * This variable change can be used to integrate singular integrals.
- * One example is $\f(x)/abs(x-x_0)$ on the reference interval $[0,1]$,
+ * One example is $f(x)/|x-x_0|$ on the reference interval $[0,1]$,
  * where $x_0$ is given at construction time, and is the location of the
  * singularity $x_0$, and $f(x)$ is a smooth non singular function.
  *
