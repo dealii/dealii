@@ -274,7 +274,11 @@ namespace internal
                                    const unsigned int)
     {
       ar &refine_flags &coarsen_flags;
-      ar &active_cell_indices;
+
+      // do not serialize 'active_cell_indices' here. instead of storing them
+      // to the stream and re-reading them again later, we just rebuild them
+      // in Triangulation::load()
+
       ar &neighbors;
       ar &subdomain_ids;
       ar &level_subdomain_ids;
@@ -290,7 +294,11 @@ namespace internal
                                  const unsigned int)
     {
       ar &refine_flags &coarsen_flags;
-      ar &active_cell_indices;
+
+      // do not serialize 'active_cell_indices' here. instead of storing them
+      // to the stream and re-reading them again later, we just rebuild them
+      // in Triangulation::load()
+
       ar &neighbors;
       ar &subdomain_ids;
       ar &level_subdomain_ids;

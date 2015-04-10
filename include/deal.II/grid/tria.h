@@ -3315,6 +3315,27 @@ Triangulation<dim,spacedim>::load (Archive &ar,
   ar &anisotropic_refinement;
   ar &number_cache;
 
+  // the levels do not serialize the active_cell_indices because
+  // they are easy enough to rebuild upon re-loading data. do
+  // this here. don't forget to first resize the fields appropriately
+  {
+    for (unsigned int l=0; l<levels.size(); ++l)
+      levels[l]->active_cell_indices.resize (levels[l]->refine_flags.size());
+
+    unsigned int active_cell_index = 0;
+    for (cell_iterator cell=begin(); cell!=end(); ++cell)
+      if (cell->has_children())
+        cell->set_active_cell_index (numbers::invalid_unsigned_int);
+      else
+        {
+          cell->set_active_cell_index (active_cell_index);
+          ++active_cell_index;
+        }
+
+    Assert (active_cell_index == n_active_cells(), ExcInternalError());
+  }
+
+
   bool my_check_for_distorted_cells;
   ar &my_check_for_distorted_cells;
 
