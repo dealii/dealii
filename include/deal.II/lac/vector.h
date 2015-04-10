@@ -955,7 +955,7 @@ protected:
   /**
    * LAPACK matrices need access to the data.
    */
-  friend class LAPACKFullMatrix<Number>;
+  template <typename Number2> friend class LAPACKFullMatrix;
 
   /**
    * VectorView will access the pointer.

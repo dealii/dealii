@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -130,10 +130,11 @@ LAPACKFullMatrix<number>::operator = (const double d)
 
 
 template <typename number>
+template <typename number2>
 void
 LAPACKFullMatrix<number>::vmult (
-  Vector<number>       &w,
-  const Vector<number> &v,
+  Vector<number2>       &w,
+  const Vector<number2> &v,
   const bool            adding) const
 {
   const int mm = this->n_rows();
@@ -188,10 +189,11 @@ LAPACKFullMatrix<number>::vmult (
 
 
 template <typename number>
+template <typename number2>
 void
 LAPACKFullMatrix<number>::Tvmult (
-  Vector<number>       &w,
-  const Vector<number> &v,
+  Vector<number2>       &w,
+  const Vector<number2> &v,
   const bool            adding) const
 {
   const int mm = this->n_rows();
@@ -955,31 +957,6 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
         }
     }
   state = LAPACKSupport::State(eigenvalues | unusable);
-}
-
-
-// template <typename number>
-// LAPACKFullMatrix<number>::()
-// {}
-
-
-template <typename number>
-void
-LAPACKFullMatrix<number>::vmult_add (
-  Vector<number>       &w,
-  const Vector<number> &v) const
-{
-  vmult(w, v, true);
-}
-
-
-template <typename number>
-void
-LAPACKFullMatrix<number>::Tvmult_add (
-  Vector<number>       &w,
-  const Vector<number> &v) const
-{
-  Tvmult(w, v, true);
 }
 
 
