@@ -97,6 +97,10 @@ namespace dealii
 	if (c1->active() && c2->active())
 	  if (c1->active_cell_index() != c2->active_cell_index())
 	    return false;
+
+	if (c1->level()>0)
+	  if (c1->parent_index() != c2->parent_index())
+	    return false;
       }
 
     // also check the order of raw iterators as they contain
