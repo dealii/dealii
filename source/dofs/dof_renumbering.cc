@@ -398,63 +398,48 @@ namespace DoFRenumbering
     constraints.close ();
 
     IndexSet locally_owned = dof_handler.locally_owned_dofs();
-    SparsityPattern sparsity;
 
     // otherwise compute the Cuthill-McKee permutation
-    if (DH::dimension == 1)
-      {
-        sparsity.reinit (dof_handler.n_dofs(),
-                         dof_handler.n_dofs(),
-                         dof_handler.max_couplings_between_dofs());
-        DoFTools::make_sparsity_pattern (dof_handler, sparsity, constraints);
-        sparsity.compress();
-      }
-    else
-      {
-        DynamicSparsityPattern dsp (dof_handler.n_dofs(),
-                                    dof_handler.n_dofs(),
-                                    dof_handler.locally_owned_dofs());
-        DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
-
-        // If the index set is not complete, need to get indices in local
-        // index space.
-        if (dof_handler.locally_owned_dofs().n_elements() !=
-            dof_handler.locally_owned_dofs().size())
-          {
-            // Create sparsity pattern from dsp by transferring its indices to
-            // processor-local index space and doing Cuthill-McKee there
-            std::vector<unsigned int> row_lengths(locally_owned.n_elements());
-            for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
-              row_lengths[i] = dsp.row_length(locally_owned.nth_index_in_set(i));
-            sparsity.reinit(locally_owned.n_elements(), locally_owned.n_elements(),
-                            row_lengths);
-            std::vector<types::global_dof_index> row_entries;
-            for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
-              {
-                const types::global_dof_index row = locally_owned.nth_index_in_set(i);
-                row_entries.resize(0);
-                for (DynamicSparsityPattern::row_iterator it =
-                       dsp.row_begin(row); it != dsp.row_end(row); ++it)
-                  if (*it != row && locally_owned.is_element(*it))
-                    row_entries.push_back(locally_owned.index_within_set(*it));
-                sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
-                                     true);
-              }
-            sparsity.compress();
-          }
-        else
-          sparsity.copy_from(dsp);
-      }
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                dof_handler.n_dofs(),
+                                dof_handler.locally_owned_dofs());
+    DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
 
     // constraints are not needed anymore
     constraints.clear ();
 
-    Assert(new_indices.size() == sparsity.n_rows(),
-           ExcDimensionMismatch(new_indices.size(),
-                                sparsity.n_rows()));
+    // If the index set is not complete, need to get indices in local index
+    // space.
+    if (dof_handler.locally_owned_dofs().n_elements() !=
+        dof_handler.locally_owned_dofs().size())
+      {
+        // Create sparsity pattern from dsp by transferring its indices to
+        // processor-local index space and doing Cuthill-McKee there
+        DynamicSparsityPattern sparsity(locally_owned.n_elements(),
+                                        locally_owned.n_elements());
+        std::vector<types::global_dof_index> row_entries;
+        for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
+          {
+            const types::global_dof_index row = locally_owned.nth_index_in_set(i);
+            row_entries.resize(0);
+            for (DynamicSparsityPattern::row_iterator it =
+                   dsp.row_begin(row); it != dsp.row_end(row); ++it)
+              if (*it != row && locally_owned.is_element(*it))
+                row_entries.push_back(locally_owned.index_within_set(*it));
+            sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
+                                 true);
+          }
 
-    SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
-                                          starting_indices);
+        AssertDimension(new_indices.size(), sparsity.n_rows());
+        SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
+                                              starting_indices);
+      }
+    else
+      {
+        AssertDimension(new_indices.size(), dsp.n_rows());
+        SparsityTools::reorder_Cuthill_McKee (dsp, new_indices,
+                                              starting_indices);
+      }
 
     if (reversed_numbering)
       new_indices = Utilities::reverse_permutation (new_indices);
@@ -476,25 +461,12 @@ namespace DoFRenumbering
            ExcNotInitialized());
 
     // make the connection graph
-    SparsityPattern sparsity;
-    if (DH::dimension < 2)
-      {
-        sparsity.reinit (dof_handler.n_dofs(level),
-                         dof_handler.n_dofs(level),
-                         dof_handler.max_couplings_between_dofs());
-        MGTools::make_sparsity_pattern (dof_handler, sparsity, level);
-        sparsity.compress();
-      }
-    else
-      {
-        DynamicSparsityPattern dsp (dof_handler.n_dofs(level),
-                                    dof_handler.n_dofs(level));
-        MGTools::make_sparsity_pattern (dof_handler, dsp, level);
-        sparsity.copy_from (dsp);
-      }
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(level),
+                                dof_handler.n_dofs(level));
+    MGTools::make_sparsity_pattern (dof_handler, dsp, level);
 
-    std::vector<types::global_dof_index> new_indices(sparsity.n_rows());
-    SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
+    std::vector<types::global_dof_index> new_indices(dsp.n_rows());
+    SparsityTools::reorder_Cuthill_McKee (dsp, new_indices,
                                           starting_indices);
 
     if (reversed_numbering)

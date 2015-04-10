@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <vector>
 
@@ -129,9 +130,19 @@ namespace SparsityTools
    * part of the algorithm that chooses starting indices.
    */
   void
-  reorder_Cuthill_McKee (const SparsityPattern     &sparsity,
+  reorder_Cuthill_McKee (const DynamicSparsityPattern &sparsity,
+                         std::vector<DynamicSparsityPattern::size_type> &new_indices,
+                         const std::vector<DynamicSparsityPattern::size_type> &starting_indices = std::vector<DynamicSparsityPattern::size_type>());
+
+  /**
+   * As above, but taking a SparsityPattern object instead.
+   *
+   * @deprecated
+   */
+  void
+  reorder_Cuthill_McKee (const SparsityPattern &sparsity,
                          std::vector<SparsityPattern::size_type> &new_indices,
-                         const std::vector<SparsityPattern::size_type> &starting_indices = std::vector<SparsityPattern::size_type>());
+                         const std::vector<SparsityPattern::size_type> &starting_indices = std::vector<SparsityPattern::size_type>()) DEAL_II_DEPRECATED;
 
 
 #ifdef DEAL_II_WITH_MPI

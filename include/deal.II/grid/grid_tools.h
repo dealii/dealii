@@ -573,7 +573,17 @@ namespace GridTools
   template <int dim, int spacedim>
   void
   get_face_connectivity_of_cells (const Triangulation<dim, spacedim> &triangulation,
-                                  SparsityPattern                    &connectivity);
+                                  DynamicSparsityPattern             &connectivity);
+
+  /**
+   * As above, but filling a SparsityPattern object instead.
+   *
+   * @deprecated
+   */
+  template <int dim, int spacedim>
+  void
+  get_face_connectivity_of_cells (const Triangulation<dim, spacedim> &triangulation,
+                                  SparsityPattern                    &connectivity) DEAL_II_DEPRECATED;
 
   /**
    * Use the METIS partitioner to generate a partitioning of the active cells
