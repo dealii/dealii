@@ -416,31 +416,64 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: The cells of coarse meshes in
+  parallel::distributed::Triangulation used to be ordered in a Cuthill-McKee
+  numbering, which yields very high surface-to-volume ratios of the individual
+  processors' partition in case the coarse mesh consists of many cells, in
+  particular in 3D. The algorithm now uses SparsityTools::reorder_hierarchical
+  in order to get more compact partitions, similarly to the z-ordering applied
+  by p4est.
+  <br>
+  (Martin Kronbichler, 2015/04/10)
+  </li>
+
+  <li> New: There is now a new method
+  GridTools::get_vertex_connectivity_of_cells.
+  <br>
+  (Martin Kronbichler, 2015/04/10)
+  </li>
+
+  <li> New: There is now a new method SparsityTools::reorder_hierarchical to
+  sort nodes of a graph (sparsity pattern) in a z-like way by hierarchical
+  grouping of neighboring nodes.
+  <br>
+  (Martin Kronbichler, 2015/04/10)
+  </li>
+
+  <li> Changed: The methods SparsityTools::reorder_Cuthill_McKee and
+  GridTools::get_face_connectivity_of_cells used to take a SparsityPattern as
+  argument. The data type has been changed to DynamicSparsityPattern in order
+  to avoid copying things around. The old interface is still available but
+  marked as deprecated.
+  <br>
+  (Martin Kronbichler, 2015/04/10)
+  </li>
+
   <li> Fixed: Added missing hp-related functions to FE_Q_Hierarchical together with
   a couple of unit tests. Improved code comments.
   <br>
   (Denis Davydov, 2015/04/10)
-  <li>
+  </li>
 
   <li> Fixed: deal.II did not compile on 32-bit systems when using newer
   p4est versions (1.0 and later) due to a type mismatch. This is now fixed.
   <br>
   (Wolfgang Bangerth, 2015/04/08)
-  <li>
+  </li>
 
   <li> Changed: In the spirit of the changes made to the distinction
   between Point and Tensor objects discussed above, the first argument
   to GridTools::shift() has been changed from a Point to a Tensor@<1,dim@>.
   <br>
   (Wolfgang Bangerth, 2015/04/02)
-  <li>
+  </li>
 
   <li> New: There is now a new quadrature formula in quadrature_lib. It is
   now possible to use Telles' quadrature rules through the function QTelles
   to integrate singular integrals
   <br>
   (Nicola Giuliani, 2015/04/01)
-  <li>
+  </li>
 
   <li> New: Added FE_Bernstein: a scalar finite element based on Bernstein basis polynomials.
   <br>
