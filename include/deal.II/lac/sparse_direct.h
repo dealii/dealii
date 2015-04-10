@@ -186,8 +186,8 @@ public:
                const BlockVector<double> &src) const;
 
   /**
-   * Same as vmult(), but adding to the previous solution. Not implemented yet
-   * but necessary for compiling certain other classes.
+   * Same as vmult(), but adding to the result to @p dst instead of
+   * overwriting the previous contents of the vector.
    */
   void vmult_add (Vector<double> &dst,
                   const Vector<double> &src) const;
