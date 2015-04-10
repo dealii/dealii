@@ -9101,8 +9101,23 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
       throw;
     }
 
+  // update our counts of the various elements of a triangulation, and set
+  // active_cell_indices of all cells
   internal::Triangulation::Implementation
   ::compute_number_cache (*this, levels.size(), number_cache);
+  {
+    unsigned int active_cell_index = 0;
+    for (cell_iterator cell=begin(); cell!=end(); ++cell)
+      if (cell->has_children())
+        cell->set_active_cell_index (numbers::invalid_unsigned_int);
+      else
+        {
+          cell->set_active_cell_index (active_cell_index);
+          ++active_cell_index;
+        }
+
+    Assert (active_cell_index == n_active_cells(), ExcInternalError());
+  }
 
   // now verify that there are indeed no distorted cells. as per the
   // documentation of this class, we first collect all distorted cells
@@ -11497,9 +11512,22 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
     Assert (satisfies_level1_at_vertex_rule (*this) == true,
             ExcInternalError());
 
-  // finally build up neighbor connectivity
-  // information
+  // finally build up neighbor connectivity information, and set
+  // active cell indices
   update_neighbors(*this);
+  {
+    unsigned int active_cell_index = 0;
+    for (cell_iterator cell=begin(); cell!=end(); ++cell)
+      if (cell->has_children())
+        cell->set_active_cell_index (numbers::invalid_unsigned_int);
+      else
+        {
+          cell->set_active_cell_index (active_cell_index);
+          ++active_cell_index;
+        }
+
+    Assert (active_cell_index == n_active_cells(), ExcInternalError());
+  }
 
   // Inform all listeners about end of refinement.
   signals.post_refinement();
