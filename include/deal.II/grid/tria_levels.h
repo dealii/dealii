@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,6 +69,14 @@ namespace internal
        * coarsened.
        */
       std::vector<bool> coarsen_flags;
+
+
+      /**
+       * An integer that, for every active cell, stores the how
+       * many-th active cell this is. For non-active cells, this value
+       * is unused and set to an invalid value.
+       */
+      std::vector<unsigned int> active_cell_indices;
 
       /**
        * Levels and indices of the neighbors of the cells. Convention is, that
@@ -200,9 +208,9 @@ namespace internal
 //TODO: Replace TriaObjectsHex to avoid this specialization
 
     /**
-     * Specialization of TriaLevels for 3D. Since we need TriaObjectsHex
-     * instead of TriaObjects. Refer to the documentation of the template for
-     * details.
+     * Specialization of TriaLevels for 3D. Since we need
+     * TriaObjectsHex instead of TriaObjects. Refer to the
+     * documentation of the general class template for details.
      */
     template<>
     class TriaLevel<3>
@@ -210,6 +218,7 @@ namespace internal
     public:
       std::vector<unsigned char> refine_flags;
       std::vector<bool> coarsen_flags;
+      std::vector<unsigned int> active_cell_indices;
       std::vector<std::pair<int,int> > neighbors;
       std::vector<types::subdomain_id> subdomain_ids;
       std::vector<types::subdomain_id> level_subdomain_ids;
@@ -265,6 +274,7 @@ namespace internal
                                    const unsigned int)
     {
       ar &refine_flags &coarsen_flags;
+      ar &active_cell_indices;
       ar &neighbors;
       ar &subdomain_ids;
       ar &level_subdomain_ids;
@@ -280,6 +290,7 @@ namespace internal
                                  const unsigned int)
     {
       ar &refine_flags &coarsen_flags;
+      ar &active_cell_indices;
       ar &neighbors;
       ar &subdomain_ids;
       ar &level_subdomain_ids;
