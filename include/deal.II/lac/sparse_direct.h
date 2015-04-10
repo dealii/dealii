@@ -186,20 +186,6 @@ public:
                const BlockVector<double> &src) const;
 
   /**
-   * Same as vmult(), but adding to the result to @p dst instead of
-   * overwriting the previous contents of the vector.
-   */
-  void vmult_add (Vector<double> &dst,
-                  const Vector<double> &src) const;
-
-  /**
-   * Same as before, but uses the transpose of the matrix, i.e. this function
-   * multiplies with $A^{-T}$.
-   */
-  void Tvmult_add (Vector<double> &dst,
-                   const Vector<double> &src) const;
-
-  /**
    * @}
    */
 

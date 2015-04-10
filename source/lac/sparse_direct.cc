@@ -469,25 +469,6 @@ SparseDirectUMFPACK::Tvmult (
 }
 
 
-void
-SparseDirectUMFPACK::vmult_add (
-  Vector<double> &,
-  const Vector<double> &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-void
-SparseDirectUMFPACK::Tvmult_add (
-  Vector<double> &,
-  const Vector<double> &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
 // explicit instantiations for SparseMatrixUMFPACK
 #define InstantiateUMFPACK(MATRIX)                        \
   template                                                \
