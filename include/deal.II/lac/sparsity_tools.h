@@ -144,6 +144,30 @@ namespace SparsityTools
                          std::vector<SparsityPattern::size_type> &new_indices,
                          const std::vector<SparsityPattern::size_type> &starting_indices = std::vector<SparsityPattern::size_type>()) DEAL_II_DEPRECATED;
 
+  /**
+   * For a given sparsity pattern, compute a re-enumeration of row/column
+   * indices in a hierarchical way, similar to what
+   * DoFRenumbering::hierarchical does for degrees of freedom on
+   * hierarchically refined meshes.
+   *
+   * This algorithm first selects a node with the minimum number of neighbors
+   * and puts that node and its direct neighbors into one chunk. Next, it
+   * selects one of the neighbors of the already selected nodes, adds the node
+   * and its direct neighbors that are not part of one of the previous chunks,
+   * into the next. After this sweep, neighboring nodes are grouped
+   * together. To ensure a similar grouping on a more global level, this
+   * grouping is called recursively on the groups so formed. The recursion
+   * stops when no further grouping is possible. Eventually, the ordering
+   * obtained by this method passes through the indices represented in the
+   * sparsity pattern in a z-like way.
+   *
+   * If the graph has two or more unconnected components, the algorithm will
+   * number each component consecutively, starting with the components with
+   * the lowest number of nodes.
+   */
+  void
+  reorder_hierarchical (const DynamicSparsityPattern                   &sparsity,
+                        std::vector<DynamicSparsityPattern::size_type> &new_indices);
 
 #ifdef DEAL_II_WITH_MPI
   /**

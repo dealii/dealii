@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <set>
 
 #ifdef DEAL_II_WITH_MPI
 #include <deal.II/base/utilities.h>
@@ -341,10 +342,163 @@ namespace SparsityTools
     for (unsigned int row=0; row<sparsity.n_rows(); ++row)
       {
         for (SparsityPattern::iterator it=sparsity.begin(row); it!=sparsity.end(row)
-               && it->is_valid_entry() ; ++it)
+             && it->is_valid_entry() ; ++it)
           dsp.add(row, it->column());
       }
     reorder_Cuthill_McKee(dsp, new_indices, starting_indices);
+  }
+
+
+
+  namespace internal
+  {
+    void
+    reorder_hierarchical (const DynamicSparsityPattern                   &connectivity,
+                          std::vector<DynamicSparsityPattern::size_type> &renumbering)
+    {
+      AssertDimension (connectivity.n_rows(), connectivity.n_cols());
+      AssertDimension (connectivity.n_rows(), renumbering.size());
+
+      std::vector<types::global_dof_index> touched_nodes(connectivity.n_rows(),
+                                                         numbers::invalid_dof_index);
+      std::set<types::global_dof_index> current_neighbors;
+      std::vector<std::vector<types::global_dof_index> > groups;
+
+      // This outer loop is typically traversed only once, unless the global
+      // graph is not connected
+      while (true)
+        {
+          // Find cell with the minimal number of neighbors (typically a corner
+          // node when based on FEM meshes). If no cell is left, we are done.
+          std::pair<types::global_dof_index,types::global_dof_index> min_neighbors
+          (numbers::invalid_unsigned_int, numbers::invalid_unsigned_int);
+          for (types::global_dof_index i=0; i<touched_nodes.size(); ++i)
+            if (touched_nodes[i] == numbers::invalid_unsigned_int)
+              if (connectivity.row_length(i) < min_neighbors.second)
+                min_neighbors = std::make_pair(i, connectivity.row_length(i));
+          if (min_neighbors.first == numbers::invalid_unsigned_int)
+            break;
+
+          current_neighbors.clear();
+          current_neighbors.insert(min_neighbors.first);
+          while (!current_neighbors.empty())
+            {
+              // Find cell with minimum number of untouched neighbors among the
+              // next set of possible neighbors
+              min_neighbors = std::make_pair (numbers::invalid_unsigned_int,
+                                              numbers::invalid_unsigned_int);
+              for (std::set<types::global_dof_index>::iterator it=current_neighbors.begin();
+                   it != current_neighbors.end(); ++it)
+                {
+                  AssertThrow(touched_nodes[*it] == numbers::invalid_unsigned_int,
+                              ExcInternalError());
+                  types::global_dof_index active_row_length = 0;
+                  for (CompressedSimpleSparsityPattern::row_iterator rowit
+                       = connectivity.row_begin(*it);
+                       rowit != connectivity.row_end(*it); ++rowit)
+                    if (touched_nodes[*rowit] == numbers::invalid_unsigned_int)
+                      ++active_row_length;
+                  if (active_row_length < min_neighbors.second)
+                    min_neighbors = std::make_pair(*it, active_row_length);
+                }
+              // Among the set of cells with the minimal number of neighbors,
+              // choose the one with the largest number of touched neighbors,
+              // i.e., the one with the largest row length
+              const types::global_dof_index best_row_length = min_neighbors.second;
+              for (std::set<types::global_dof_index>::iterator it=current_neighbors.begin();
+                   it != current_neighbors.end(); ++it)
+                {
+                  types::global_dof_index active_row_length = 0;
+                  for (CompressedSimpleSparsityPattern::row_iterator rowit
+                       = connectivity.row_begin(*it);
+                       rowit != connectivity.row_end(*it); ++rowit)
+                    if (touched_nodes[*rowit] == numbers::invalid_unsigned_int)
+                      ++active_row_length;
+                  if (active_row_length == best_row_length)
+                    if (connectivity.row_length(*it) > min_neighbors.second)
+                      min_neighbors = std::make_pair(*it, connectivity.row_length(*it));
+                }
+
+              // Add the pivot cell to the current list
+              groups.push_back(std::vector<types::global_dof_index>());
+              std::vector<types::global_dof_index> &new_entries = groups.back();
+              new_entries.push_back(min_neighbors.first);
+              touched_nodes[min_neighbors.first] = groups.size()-1;
+
+              // Add all direct neighbors of the pivot cell not yet touched to
+              // the current list
+              for (CompressedSimpleSparsityPattern::row_iterator it
+                   = connectivity.row_begin(min_neighbors.first);
+                   it != connectivity.row_end(min_neighbors.first); ++it)
+                {
+                  if (touched_nodes[*it] == numbers::invalid_unsigned_int)
+                    {
+                      new_entries.push_back(*it);
+                      touched_nodes[*it] = groups.size()-1;
+                    }
+                }
+
+              // Add all neighbors of the current list not yet touched to the
+              // set of possible next pivots. Delete the entries of the current
+              // list from the set of possible next pivots.
+              for (types::global_dof_index i=0; i<new_entries.size(); ++i)
+                {
+                  for (CompressedSimpleSparsityPattern::row_iterator it
+                       = connectivity.row_begin(new_entries[i]);
+                       it != connectivity.row_end(new_entries[i]); ++it)
+                    if (touched_nodes[*it] == numbers::invalid_unsigned_int)
+                      current_neighbors.insert(*it);
+                  current_neighbors.erase(new_entries[i]);
+                }
+            }
+        }
+      // If the number of groups is smaller than the number of nodes, we can
+      // continue by recursively calling this method
+      if (groups.size() < connectivity.n_rows())
+        {
+          // Form the connectivity of the groups
+          DynamicSparsityPattern connectivity_next(groups.size(),
+                                                   groups.size());
+          for (types::global_dof_index i=0; i<groups.size(); ++i)
+            for (types::global_dof_index col=0; col<groups[i].size(); ++col)
+              for (CompressedSimpleSparsityPattern::row_iterator it
+                   = connectivity.row_begin(groups[i][col]);
+                   it != connectivity.row_end(groups[i][col]); ++it)
+                {
+                  if (touched_nodes[*it] != i)
+                    connectivity_next.add(i, touched_nodes[*it]);
+                }
+
+          // Recursively call the reordering
+          std::vector<types::global_dof_index> renumbering_next(groups.size());
+          reorder_hierarchical(connectivity_next, renumbering_next);
+
+          // Renumber the indices group by group according to the incoming
+          // ordering for the groups
+          for (types::global_dof_index i=0,count=0; i<groups.size(); ++i)
+            for (types::global_dof_index col=0; col<groups[renumbering_next[i]].size(); ++col, ++count)
+              renumbering[count] = groups[renumbering_next[i]][col];
+        }
+      else
+        {
+          // All groups should have size one and no more recursion is possible,
+          // so use the numbering of the groups
+          for (types::global_dof_index i=0,count=0; i<groups.size(); ++i)
+            for (types::global_dof_index col=0; col<groups[i].size(); ++col, ++count)
+              renumbering[count] = groups[i][col];
+        }
+    }
+  }
+
+  void
+  reorder_hierarchical (const DynamicSparsityPattern                   &connectivity,
+                        std::vector<DynamicSparsityPattern::size_type> &renumbering)
+  {
+    // the internal renumbering keeps the numbering the wrong way around (but
+    // we cannot invert the numbering inside that method because it is used
+    // recursively), so invert it here
+    internal::reorder_hierarchical(connectivity, renumbering);
+    renumbering = Utilities::invert_permutation(renumbering);
   }
 
 
