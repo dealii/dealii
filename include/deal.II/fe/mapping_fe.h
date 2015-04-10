@@ -565,7 +565,7 @@ private:
 
   mutable std::vector<double> local_dofs;
 
-  mutable std::vector<unsigned int> dof_indices;
+  mutable std::vector<types::global_dof_index> dof_indices;
 
   /**
    * Mutex to protect local_dofs.
