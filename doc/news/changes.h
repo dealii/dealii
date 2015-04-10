@@ -473,6 +473,13 @@ inconvenience this causes.
   (Martin Kronbichler, 2015/04/10)
   </li>
 
+  <li> New: One can now ask a cell the how many-th active cell it is,
+  using CellAccessor::active_cell_index() (which is called as
+  <code>cell-@>active_cell_index()</code>).
+  <br>
+  (Wolfgang Bangerth, 2015/04/10)
+  <li>
+
   <li> Fixed: Added missing hp-related functions to FE_Q_Hierarchical together with
   a couple of unit tests. Improved code comments.
   <br>
