@@ -1579,6 +1579,34 @@ next_cell:
 
   template <int dim, int spacedim>
   void
+  get_vertex_connectivity_of_cells (const Triangulation<dim,spacedim> &triangulation,
+                                    DynamicSparsityPattern            &cell_connectivity)
+  {
+    std::vector<std::vector<unsigned int> > vertex_to_cell(triangulation.n_vertices());
+    unsigned int index = 0;
+    for (typename Triangulation<dim,spacedim>::active_cell_iterator cell=
+           triangulation.begin_active(); cell != triangulation.end(); ++cell, ++index)
+      {
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          vertex_to_cell[cell->vertex_index(v)].push_back(index);
+      }
+
+    cell_connectivity.reinit (triangulation.n_active_cells(),
+                              triangulation.n_active_cells());
+    index = 0;
+    for (typename Triangulation<dim,spacedim>::active_cell_iterator cell=
+           triangulation.begin_active(); cell != triangulation.end(); ++cell, ++index)
+      {
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          for (unsigned int n=0; n<vertex_to_cell[cell->vertex_index(v)].size(); ++n)
+            cell_connectivity.add(index, vertex_to_cell[cell->vertex_index(v)][n]);
+      }
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   partition_triangulation (const unsigned int           n_partitions,
                            Triangulation<dim,spacedim> &triangulation)
   {

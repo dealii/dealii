@@ -586,6 +586,19 @@ namespace GridTools
                                   SparsityPattern                    &connectivity) DEAL_II_DEPRECATED;
 
   /**
+   * Produce a sparsity pattern in which nonzero entries indicate that two
+   * cells are connected via a common vertex. The diagonal entries of the
+   * sparsity pattern are also set.
+   *
+   * The rows and columns refer to the cells as they are traversed in their
+   * natural order using cell iterators.
+   */
+  template <int dim, int spacedim>
+  void
+  get_vertex_connectivity_of_cells (const Triangulation<dim, spacedim> &triangulation,
+                                    DynamicSparsityPattern             &connectivity);
+
+  /**
    * Use the METIS partitioner to generate a partitioning of the active cells
    * making up the entire domain. After calling this function, the subdomain
    * ids of all active cells will have values between zero and @p
