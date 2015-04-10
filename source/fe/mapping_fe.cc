@@ -1327,7 +1327,7 @@ void MappingFE<dim,spacedim,DH,VECTOR>::update_euler_vector_using_triangulation
 
       MappingQ<dim,spacedim> map_q(fe->degree);
       FEValues<dim,spacedim> fe_v(map_q, *fe, quad, update_quadrature_points);
-      std::vector<unsigned int> dofs(fe->dofs_per_cell);
+      std::vector<types::global_dof_index> dofs(fe->dofs_per_cell);
 
       AssertDimension(fe->dofs_per_cell, support_points.size());
       Assert(fe->is_primitive(), ExcMessage("FE is not Primitive! This won't work."));
