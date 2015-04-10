@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,7 @@ template <typename number> class SparseBlockVanka;
  * matrices the application of Jacobi or Gauss-Seidel methods is impossible,
  * because some diagonal elements are zero in the rows of the Lagrange
  * multiplier. The approach of Vanka is to solve a small (usually indefinite)
- * system of equations for each Langrange multiplie variable (we will also
+ * system of equations for each Langrange multiplier variable (we will also
  * call the pressure in Stokes' equation a Langrange multiplier since it can
  * be interpreted as such).
  *
@@ -91,23 +91,21 @@ template <typename number> class SparseBlockVanka;
  * parameter optimization. The Lagrange multiplier is the third component of
  * the finite element used. The system is solved by the GMRES method.
  * @code
- *                        // tag the Lagrange multiplier variable
+ *    // tag the Lagrange multiplier variable
  *    vector<bool> signature(3);
  *    signature[0] = signature[1] = false;
  *    signature[2] = true;
  *
- *                        // tag all dofs belonging to the
- *                        // Lagrange multiplier
+ *    // tag all dofs belonging to the Lagrange multiplier
  *    vector<bool> selected_dofs (dof.n_dofs(), false);
  *    DoFTools::extract_dofs(dof, signature, p_select);
- *                        // create the Vanka object
+ *    // create the Vanka object
  *    SparseVanka<double> vanka (global_matrix, selected_dofs);
  *
- *                        // create the solver
- *    SolverGMRES<PreconditionedSparseMatrix<double>,
- *                Vector<double> >    gmres(control,memory,504);
+ *    // create the solver
+ *    SolverGMRES<> gmres(control,memory,504);
  *
- *                        // solve
+ *    // solve
  *    gmres.solve (global_matrix, solution, right_hand_side,
  *                 vanka);
  * @endcode
