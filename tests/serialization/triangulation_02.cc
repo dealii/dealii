@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,6 +95,10 @@ namespace dealii
 	
 	if (c1->manifold_id() != c2->manifold_id())
 	  return false;
+
+	if (c1->active() && c2->active())
+	  if (c1->active_cell_index() != c2->active_cell_index())
+	    return false;
       }
 
     // also check the order of raw iterators as they contain
