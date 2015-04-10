@@ -38,11 +38,24 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li>Removed: The generic, templated vmult, Tvmult, etc. -interfaces of
+  LAPACKFullMatrix - they were never implemented.
+  <br>
+  (Matthias Maier, 2015/04/10)
+  </li>
+
+  <li>Removed: SparseDirectUMFPACK::vmult_add and
+  SparseDirectUMFPACK::Tvmult_add - they were never
+  implemented.
+  <br>
+  (Matthias Maier, 2015/04/10)
+  </li>
+
   <li>Removed: The class NamedData has been removed after it had been
   superceded by AnyData a while ago. This affects the use of classes
   in Algorithms and MeshWorker
   <br>
-  (Guido KAnschat, 2015/04/02)
+  (Guido Kanschat, 2015/04/02)
   </li>
 
   <li> Removed: The CMake configuration does not use the variable

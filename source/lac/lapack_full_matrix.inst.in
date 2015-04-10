@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,4 +28,12 @@ for (S1, S2 : REAL_SCALARS)
 
     template LAPACKFullMatrix<S1> &
     LAPACKFullMatrix<S1>::operator = (const SparseMatrix<S2> &M);
+
+    template
+      void LAPACKFullMatrix<S1>::vmult<S2>(
+      Vector<S2>&, const Vector<S2>&, bool) const;
+    template
+      void LAPACKFullMatrix<S1>::Tvmult<S2>(
+      Vector<S2>&, const Vector<S2>&, bool) const;
   }
+
