@@ -129,12 +129,12 @@ public:
   const ConditionalOStream &
   operator<< (std::ostream& (*p) (std::ostream &)) const;
 
-private:
   /**
    * Reference to the stream we want to write to.
    */
   std::ostream  &output_stream;
 
+private:
   /**
    * Stores the actual condition the object is in.
    */
