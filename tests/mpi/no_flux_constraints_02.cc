@@ -18,8 +18,7 @@
 // check ConstraintMatrix for a distributed mesh on hyper shell with both
 // hanging nodes and no-normal-flux constraints on the outer boundary of the
 // shell.
-// fails because DoFRenumbering::hierarchical does not work correctly with
-// p4est right now. Also see test renumber_z_order_02
+// Also see test renumber_z_order_02
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -51,9 +50,8 @@ void test()
 
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
 
-  // create hypershell mesh and refine some
-  // cells. use some large numbers which make
-  // round-off influence more pronounced
+  // create hypershell mesh and refine some cells. use some large numbers
+  // which make round-off influence more pronounced
   const double R0      = 6371000.-2890000.;     /* m          */
   const double R1      = 6371000.-  35000.;     /* m          */
   GridGenerator::hyper_shell (triangulation,
