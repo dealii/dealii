@@ -627,7 +627,7 @@ inverse_linop(Solver &solver,
  *         |
  *  op_a10 | op_a11
  * @endcode
- * the coresponding block_linop invocation takes the form
+ * The coresponding block_linop invocation takes the form
  * @code
  * block_linop<2, 2, BlockVector<double>>({op_a00, op_a01, op_a10, op_a11});
  * @endcode
@@ -711,6 +711,180 @@ block_linop(const std::array<std::array<LinearOperator<typename Range::BlockType
     for (unsigned int i = 0; i < n; ++i)
       for (unsigned int j = 0; j < m; ++j)
         ops[j][i].Tvmult_add(v.block(i), u.block(j));
+  };
+
+  return return_op;
+}
+
+
+/**
+ * \relates LinearOperator
+ *
+ * A variant of above function that builds up a block diagonal linear
+ * operator from an array @p ops of diagonal elements (off-diagonal blocks
+ * are assumed to be 0).
+ *
+ * The list @p ops is best passed as an initializer list. Consider for
+ * example a linear operator block (acting on Vector<double>)
+ * <code>diag(op_a0, op_a1, ..., op_am)</code>. The coresponding
+ * block_linop invocation takes the form
+ * @code
+ * blockdiagonal_linop<m, BlockVector<double>>({op_00, op_a1, ..., op_am});
+ * @endcode
+ */
+template <unsigned int m,
+          typename Range = BlockVector<double>,
+          typename Domain = Range>
+LinearOperator<Range, Domain>
+blockdiag_linop(const std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, m> &ops)
+{
+  static_assert(m > 0,
+                "a blockdiagonal LinearOperator must consist of at least one block");
+
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = [ops](Range &v, bool fast)
+  {
+    // Reinitialize the block vector to m blocks:
+    v.reinit(m);
+
+    // And reinitialize every individual block with reinit_range_vectors:
+    for (unsigned int i = 0; i < m; ++i)
+      ops[i].reinit_range_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.reinit_domain_vector = [ops](Domain &v, bool fast)
+  {
+    // Reinitialize the block vector to m blocks:
+    v.reinit(m);
+
+    // And reinitialize every individual block with reinit_domain_vectors:
+    for (unsigned int i = 0; i < m; ++i)
+      ops[i].reinit_domain_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.vmult = [ops](Range &v, const Domain &u)
+  {
+    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+    for (unsigned int i = 0; i < m; ++i)
+      ops[i].vmult(v.block(i), u.block(i));
+  };
+
+  return_op.vmult_add = [ops](Range &v, const Domain &u)
+  {
+    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+    for (unsigned int i = 0; i < m; ++i)
+      ops[i].vmult_add(v.block(i), u.block(i));
+  };
+
+  return_op.Tvmult = [ops](Domain &v, const Range &u)
+  {
+    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+    for (unsigned int i = 0; i < m; ++i)
+      ops[i].Tvmult(v.block(i), u.block(i));
+  };
+
+  return_op.Tvmult_add = [ops](Domain &v, const Range &u)
+  {
+    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+    for (unsigned int i = 0; i < m; ++i)
+      ops[i].Tvmult_add(v.block(i), u.block(i));
+  };
+
+  return return_op;
+}
+
+
+/**
+ * \relates LinearOperator
+ *
+ * A variant of above function that only takes a single LinearOperator
+ * argument @p op and creates a blockdiagonal linear operator with @p m
+ * copies of it.
+ */
+template <unsigned int m,
+          typename Range = BlockVector<double>,
+          typename Domain = Range>
+LinearOperator<Range, Domain>
+blockdiag_linop(const LinearOperator<typename Range::BlockType, typename Domain::BlockType> &op)
+{
+
+  static_assert(m > 0,
+                "a blockdiagonal LinearOperator must consist of at least "
+                "one block");
+
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = [op](Range &v, bool fast)
+  {
+    // Reinitialize the block vector to m blocks:
+    v.reinit(m);
+
+    // And reinitialize every individual block with reinit_range_vectors:
+    for (unsigned int i = 0; i < m; ++i)
+      op.reinit_range_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.reinit_domain_vector = [op](Domain &v, bool fast)
+  {
+    // Reinitialize the block vector to m blocks:
+    v.reinit(m);
+
+    // And reinitialize every individual block with reinit_domain_vectors:
+    for (unsigned int i = 0; i < m; ++i)
+      op.reinit_domain_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.vmult = [op](Range &v, const Domain &u)
+  {
+    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+    for (unsigned int i = 0; i < m; ++i)
+      op.vmult(v.block(i), u.block(i));
+  };
+
+  return_op.vmult_add = [op](Range &v, const Domain &u)
+  {
+    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+    for (unsigned int i = 0; i < m; ++i)
+      op.vmult_add(v.block(i), u.block(i));
+  };
+
+  return_op.Tvmult = [op](Domain &v, const Range &u)
+  {
+    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+    for (unsigned int i = 0; i < m; ++i)
+      op.Tvmult(v.block(i), u.block(i));
+  };
+
+  return_op.Tvmult_add = [op](Domain &v, const Range &u)
+  {
+    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+    for (unsigned int i = 0; i < m; ++i)
+      op.Tvmult_add(v.block(i), u.block(i));
   };
 
   return return_op;
