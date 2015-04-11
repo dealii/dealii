@@ -1826,7 +1826,7 @@ TriaAccessor<structdim, dim, spacedim>::number_of_children () const
 
 template <int structdim, int dim, int spacedim>
 types::boundary_id
-TriaAccessor<structdim, dim, spacedim>::boundary_indicator () const
+TriaAccessor<structdim, dim, spacedim>::boundary_id () const
 {
   Assert (structdim<dim, ExcImpossibleInDim(dim));
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
@@ -1837,9 +1837,19 @@ TriaAccessor<structdim, dim, spacedim>::boundary_indicator () const
 
 
 template <int structdim, int dim, int spacedim>
+types::boundary_id
+TriaAccessor<structdim, dim, spacedim>::boundary_indicator () const
+{
+  return boundary_id();
+}
+
+
+
+
+template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::
-set_boundary_indicator (const types::boundary_id boundary_ind) const
+set_boundary_id (const types::boundary_id boundary_ind) const
 {
   Assert (structdim<dim, ExcImpossibleInDim(dim));
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
@@ -1852,9 +1862,19 @@ set_boundary_indicator (const types::boundary_id boundary_ind) const
 template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::
-set_all_boundary_indicators (const types::boundary_id boundary_ind) const
+set_boundary_indicator (const types::boundary_id boundary_ind) const
 {
-  set_boundary_indicator (boundary_ind);
+  set_boundary_id (boundary_ind);
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+void
+TriaAccessor<structdim, dim, spacedim>::
+set_all_boundary_ids (const types::boundary_id boundary_ind) const
+{
+  set_boundary_id (boundary_ind);
 
   switch (structdim)
     {
@@ -1867,7 +1887,7 @@ set_all_boundary_indicators (const types::boundary_id boundary_ind) const
       // for boundary quads also set
       // boundary_id of bounding lines
       for (unsigned int i=0; i<4; ++i)
-        this->line(i)->set_boundary_indicator (boundary_ind);
+        this->line(i)->set_boundary_id (boundary_ind);
       break;
 
     default:
@@ -1878,12 +1898,22 @@ set_all_boundary_indicators (const types::boundary_id boundary_ind) const
 
 
 template <int structdim, int dim, int spacedim>
+void
+TriaAccessor<structdim, dim, spacedim>::
+set_all_boundary_indicators (const types::boundary_id boundary_ind) const
+{
+  set_all_boundary_ids (boundary_ind);
+}
+
+
+
+template <int structdim, int dim, int spacedim>
 bool
 TriaAccessor<structdim, dim, spacedim>::at_boundary () const
 {
   // error checking is done
-  // in boundary_indicator()
-  return (boundary_indicator() != numbers::internal_face_boundary_id);
+  // in boundary_id()
+  return (boundary_id() != numbers::internal_face_boundary_id);
 }
 
 
@@ -2318,7 +2348,7 @@ TriaAccessor<0, 1, spacedim>::at_boundary () const
 template <int spacedim>
 inline
 types::boundary_id
-TriaAccessor<0, 1, spacedim>::boundary_indicator () const
+TriaAccessor<0, 1, spacedim>::boundary_id () const
 {
   switch (vertex_kind)
     {
@@ -2335,8 +2365,19 @@ TriaAccessor<0, 1, spacedim>::boundary_indicator () const
     default:
       return numbers::internal_face_boundary_id;
     }
-
 }
+
+
+
+template <int spacedim>
+inline
+types::boundary_id
+TriaAccessor<0, 1, spacedim>::boundary_indicator () const
+{
+  return boundary_id();
+}
+
+
 
 template <int spacedim>
 inline
@@ -2463,10 +2504,11 @@ int TriaAccessor<0, 1, spacedim>::isotropic_child_index (const unsigned int)
 }
 
 
+
 template <int spacedim>
 inline
 void
-TriaAccessor<0, 1, spacedim>::set_boundary_indicator (const types::boundary_id b)
+TriaAccessor<0, 1, spacedim>::set_boundary_id (const types::boundary_id b)
 {
   Assert (tria->vertex_to_boundary_id_map_1d->find (this->vertex_index())
           != tria->vertex_to_boundary_id_map_1d->end(),
@@ -2474,6 +2516,18 @@ TriaAccessor<0, 1, spacedim>::set_boundary_indicator (const types::boundary_id b
 
   (*tria->vertex_to_boundary_id_map_1d)[this->vertex_index()] = b;
 }
+
+
+
+template <int spacedim>
+inline
+void
+TriaAccessor<0, 1, spacedim>::set_boundary_indicator (const types::boundary_id b)
+{
+  set_boundary_id (b);
+}
+
+
 
 
 template <int spacedim>
@@ -2488,9 +2542,18 @@ TriaAccessor<0, 1, spacedim>::set_manifold_id (const types::manifold_id b)
 
 template <int spacedim>
 inline
+void TriaAccessor<0, 1, spacedim>::set_all_boundary_ids (const types::boundary_id b)
+{
+  set_boundary_id (b);
+}
+
+
+
+template <int spacedim>
+inline
 void TriaAccessor<0, 1, spacedim>::set_all_boundary_indicators (const types::boundary_id b)
 {
-  set_boundary_indicator (b);
+  set_all_boundary_ids (b);
 }
 
 

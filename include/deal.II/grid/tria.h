@@ -780,7 +780,7 @@ namespace internal
  * have boundary indicator zero while rightmost vertices have boundary
  * indicator one. In either case, the boundary indicator of a face can be
  * changed using a call of the kind
- * <code>cell-@>face(1)-@>set_boundary_indicator(42);</code>.
+ * <code>cell-@>face(1)-@>set_boundary_id(42);</code>.
  *
  * @see
  * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -1683,7 +1683,14 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  std::vector<types::boundary_id> get_boundary_indicators() const;
+  std::vector<types::boundary_id> get_boundary_ids() const;
+
+  /**
+   * Deprecated spelling of get_boundary_ids().
+   *
+   * @deprecated Use get_boundary_ids() instead.
+   */
+  std::vector<types::boundary_id> get_boundary_indicators() const DEAL_II_DEPRECATED;
 
   /**
    * Returns a vector containing all manifold indicators assigned to the
@@ -3112,7 +3119,7 @@ private:
    * fields of this class that can be modified by the TriaAccessor hierarchy
    * are pointers, and so these accessor classes store a const pointer to the
    * triangulation. We could no longer do so for TriaAccessor<0,1,spacedim> if
-   * this field (that can be modified by TriaAccessor::set_boundary_indicator)
+   * this field (that can be modified by TriaAccessor::set_boundary_id)
    * were not a pointer.
    */
   std::map<unsigned int, types::boundary_id> *vertex_to_boundary_id_map_1d;
@@ -3134,7 +3141,7 @@ private:
    * fields of this class that can be modified by the TriaAccessor hierarchy
    * are pointers, and so these accessor classes store a const pointer to the
    * triangulation. We could no longer do so for TriaAccessor<0,1,spacedim> if
-   * this field (that can be modified by TriaAccessor::set_boundary_indicator)
+   * this field (that can be modified by TriaAccessor::set_boundary_id)
    * were not a pointer.
    */
   std::map<unsigned int, types::manifold_id> *vertex_to_manifold_id_map_1d;
