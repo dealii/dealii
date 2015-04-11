@@ -4632,6 +4632,7 @@ namespace internal
                   // two child lines.  To this end, find a pair of
                   // unused lines
                   bool pair_found=false;
+                  (void)pair_found;
                   for (; next_unused_line!=endl; ++next_unused_line)
                     if (!next_unused_line->used() &&
                         !(++next_unused_line)->used())

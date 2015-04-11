@@ -68,6 +68,7 @@ namespace OpenCASCADE
   project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
                        const Point<spacedim> &candidate) const
   {
+    (void)surrounding_points;
 #ifdef DEBUG
     for (unsigned int i=0; i<surrounding_points.size(); ++i)
       Assert(closest_point(sh, surrounding_points[i], tolerance)
@@ -97,6 +98,7 @@ namespace OpenCASCADE
   project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
                        const Point<spacedim> &candidate) const
   {
+    (void)surrounding_points;
 #ifdef DEBUG
     for (unsigned int i=0; i<surrounding_points.size(); ++i)
       Assert(closest_point(sh, surrounding_points[i],tolerance)

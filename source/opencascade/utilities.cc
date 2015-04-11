@@ -551,6 +551,7 @@ namespace OpenCASCADE
     // something is wrong
     std_cxx11::tuple<unsigned int, unsigned int, unsigned int> numbers =
       count_elements(out_shape);
+    (void)numbers;
 
     Assert(std_cxx11::get<0>(numbers) > 0,
            ExcMessage("Could not find normal: the shape containing the closest point has 0 faces."));

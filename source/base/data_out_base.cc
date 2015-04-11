@@ -245,6 +245,7 @@ namespace
                              (const Bytef *) &data[0],
                              data.size() * sizeof(T),
                              Z_BEST_COMPRESSION);
+        (void)err;
         Assert (err == Z_OK, ExcInternalError());
 
         // now encode the compression header
@@ -398,6 +399,7 @@ namespace DataOutBase
            patch != patches.end(); ++patch)
         {
           const unsigned int n_subdivisions = patch->n_subdivisions;
+          (void)n_subdivisions;
 
           Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
                   (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
@@ -3610,6 +3612,7 @@ namespace DataOutBase
     Assert (spacedim==2, ExcNotImplemented());
 
     const unsigned int n_data_sets = data_names.size();
+    (void)n_data_sets;
 
     // write preamble
     if (true)

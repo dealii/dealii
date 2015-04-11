@@ -580,6 +580,7 @@ namespace MatrixCreator
                                VectorType *right_hand_side)
     {
       const unsigned int dofs_per_cell = data.dof_indices.size();
+      (void)dofs_per_cell;
 
       Assert (data.cell_matrix.m() == dofs_per_cell,
               ExcInternalError());
@@ -2130,6 +2131,7 @@ namespace MatrixTools
     for (; dof != endd; ++dof)
       {
         Assert (dof->first < n_dofs, ExcInternalError());
+        (void)n_dofs;
 
         // get global index and index
         // in the block in which this
@@ -2323,6 +2325,7 @@ namespace MatrixTools
                              PETScVector      &right_hand_side,
                              const bool        eliminate_columns)
       {
+        (void)eliminate_columns;
         Assert (eliminate_columns == false, ExcNotImplemented());
 
         Assert (matrix.n() == right_hand_side.size(),
@@ -2537,6 +2540,7 @@ namespace MatrixTools
                              const bool           eliminate_columns)
       {
         Assert (eliminate_columns == false, ExcNotImplemented());
+        (void)eliminate_columns;
 
         Assert (matrix.n() == right_hand_side.size(),
                 ExcDimensionMismatch(matrix.n(), right_hand_side.size()));

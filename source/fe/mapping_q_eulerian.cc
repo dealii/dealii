@@ -108,6 +108,8 @@ compute_mapping_support_points
 
   const types::global_dof_index n_dofs  = euler_dof_handler->n_dofs();
   const types::global_dof_index vector_size = euler_vector->size();
+  (void)n_dofs;
+  (void)vector_size;
 
   AssertDimension(vector_size,n_dofs);
 

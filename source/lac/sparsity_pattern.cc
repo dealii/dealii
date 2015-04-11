@@ -61,6 +61,7 @@ SparsityPattern::SparsityPattern (const SparsityPattern &s)
   compressed(false),
   store_diagonal_first_in_row(false)
 {
+  (void)s;
   Assert (s.rowstart == 0, ExcInvalidConstructorCall());
   Assert (s.colnums == 0, ExcInvalidConstructorCall());
   Assert (s.rows == 0, ExcInvalidConstructorCall());
@@ -224,6 +225,7 @@ SparsityPattern::~SparsityPattern ()
 SparsityPattern &
 SparsityPattern::operator = (const SparsityPattern &s)
 {
+  (void)s;
   Assert (s.rowstart == 0, ExcInvalidConstructorCall());
   Assert (s.colnums == 0, ExcInvalidConstructorCall());
   Assert (s.rows == 0, ExcInvalidConstructorCall());

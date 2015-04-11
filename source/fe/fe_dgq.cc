@@ -430,6 +430,7 @@ get_face_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
   // faces and the face interpolation matrix
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
+  (void)interpolation_matrix;
   typedef FiniteElement<dim,spacedim> FE;
   AssertThrow ((dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented());
@@ -457,6 +458,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_f
   // faces and the face interpolation matrix
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
+  (void)interpolation_matrix;
   typedef FiniteElement<dim, spacedim> FE;
   AssertThrow ((dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented());

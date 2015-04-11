@@ -2729,6 +2729,7 @@ next_cell:
    const std::vector<unsigned int>                  &first_vector_components)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
+    (void)space_dim;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
@@ -2795,6 +2796,8 @@ next_cell:
   {
     static const int dim = CONTAINER::dimension;
     static const int space_dim = CONTAINER::space_dimension;
+    (void)dim;
+    (void)space_dim;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
@@ -2849,6 +2852,8 @@ next_cell:
   {
     static const int dim = CONTAINER::dimension;
     static const int space_dim = CONTAINER::space_dimension;
+    (void)dim;
+    (void)space_dim;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 

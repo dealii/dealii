@@ -419,6 +419,7 @@ namespace TrilinosWrappers
   VectorBase::print (const char *format) const
   {
     Assert (global_length(*vector)!=0, ExcEmptyObject());
+    (void)global_length;
 
     for (size_type j=0; j<size(); ++j)
       {
