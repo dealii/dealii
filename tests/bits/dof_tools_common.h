@@ -62,7 +62,7 @@ void
 set_boundary_ids (Triangulation<dim> &tria)
 {
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-    tria.begin_active()->face(f)->set_boundary_indicator (f);
+    tria.begin_active()->face(f)->set_boundary_id (f);
 }
 
 

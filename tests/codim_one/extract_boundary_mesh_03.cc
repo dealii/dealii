@@ -111,7 +111,7 @@ int main ()
          cell != volume_mesh.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
-          cell->face(f)->set_all_boundary_indicators (1);
+          cell->face(f)->set_all_boundary_ids (1);
     volume_mesh.set_boundary (1, boundary_description);
     volume_mesh.refine_global (1);
 

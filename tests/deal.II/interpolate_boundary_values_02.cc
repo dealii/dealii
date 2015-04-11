@@ -51,8 +51,8 @@ void test ()
   DoFHandler<dim>      dof_handler(triangulation);
 
   GridGenerator::hyper_cube (triangulation, 0, 1);
-  triangulation.begin_active()->face(0)->set_boundary_indicator(10);
-  triangulation.begin_active()->face(1)->set_boundary_indicator(20);
+  triangulation.begin_active()->face(0)->set_boundary_id(10);
+  triangulation.begin_active()->face(1)->set_boundary_id(20);
   triangulation.refine_global (1);
 
   dof_handler.distribute_dofs (fe);

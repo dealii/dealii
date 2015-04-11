@@ -67,7 +67,7 @@ void check (const unsigned int n)
        cell != tria.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
-        deallog << cell->face(f) << ' ' << (int)cell->face(f)->boundary_indicator()
+        deallog << cell->face(f) << ' ' << (int)cell->face(f)->boundary_id()
                 << ' ' << cell->face(f)->center().norm() << std::endl;
 }
 

@@ -33,11 +33,11 @@ void test ()
   Triangulation<1,spacedim> tria;
   GridGenerator::hyper_cube (tria);
 
-  tria.begin_active()->face(0)->set_boundary_indicator(2);
-  tria.begin_active()->face(1)->set_boundary_indicator(4);
+  tria.begin_active()->face(0)->set_boundary_id(2);
+  tria.begin_active()->face(1)->set_boundary_id(4);
 
-  deallog << (int)tria.begin_active()->face(0)->boundary_indicator() << std::endl;
-  deallog << (int)tria.begin_active()->face(1)->boundary_indicator() << std::endl;
+  deallog << (int)tria.begin_active()->face(0)->boundary_id() << std::endl;
+  deallog << (int)tria.begin_active()->face(1)->boundary_id() << std::endl;
 }
 
 

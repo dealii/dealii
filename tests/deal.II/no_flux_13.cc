@@ -36,7 +36,7 @@ void test()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation,-1.0,1.0);
-  triangulation.begin_active()->face(1)->set_all_boundary_indicators(1);
+  triangulation.begin_active()->face(1)->set_all_boundary_ids(1);
 
   FE_Q<dim> fe(1);
   DoFHandler<dim> dof_handler(triangulation);

@@ -120,7 +120,7 @@ void check ()
   // set bottom face to use MyBoundary
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
     if (coarse_grid.begin_active()->face(f)->center()[dim-1] == -1)
-      coarse_grid.begin_active()->face(f)->set_boundary_indicator (1);
+      coarse_grid.begin_active()->face(f)->set_boundary_id (1);
   coarse_grid.set_boundary (1, my_boundary);
 
   // now try to refine this one

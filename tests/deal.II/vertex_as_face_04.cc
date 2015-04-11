@@ -34,8 +34,8 @@ void test ()
   GridGenerator::hyper_cube (tria);
 
   deallog << "Coarse mesh:" << std::endl;
-  deallog << "Left vertex=" << (int)tria.begin_active()->face(0)->boundary_indicator() << std::endl;
-  deallog << "Right vertex=" << (int)tria.begin_active()->face(1)->boundary_indicator() << std::endl;
+  deallog << "Left vertex=" << (int)tria.begin_active()->face(0)->boundary_id() << std::endl;
+  deallog << "Right vertex=" << (int)tria.begin_active()->face(1)->boundary_id() << std::endl;
 
   tria.refine_global (2);
 
@@ -44,8 +44,8 @@ void test ()
        cell != tria.end(); ++cell)
     {
       deallog << "Cell: " << cell << std::endl;
-      deallog << "Left vertex=" << (int)cell->face(0)->boundary_indicator() << std::endl;
-      deallog << "Right vertex=" << (int)cell->face(1)->boundary_indicator() << std::endl;
+      deallog << "Left vertex=" << (int)cell->face(0)->boundary_id() << std::endl;
+      deallog << "Right vertex=" << (int)cell->face(1)->boundary_id() << std::endl;
     }
 }
 

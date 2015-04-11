@@ -269,8 +269,8 @@ void ElasticProblem<dim>::make_grid ()
   triangulationR.begin_active()->set_material_id(id_of_lagrange_mult);
 
   for (unsigned int i=0;i<n_faces_per_cell;i++) {
-    triangulationL.begin_active()->face(i)->set_boundary_indicator(i);
-    triangulationR.begin_active()->face(i)->set_boundary_indicator(n_faces_per_cell+i);
+    triangulationL.begin_active()->face(i)->set_boundary_id(i);
+    triangulationR.begin_active()->face(i)->set_boundary_id(n_faces_per_cell+i);
   }
     
   GridGenerator::merge_triangulations (triangulationL, triangulationR, triangulation);

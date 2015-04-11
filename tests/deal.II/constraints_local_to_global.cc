@@ -48,7 +48,7 @@ void test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
-  tria.begin()->face(0)->set_boundary_indicator(1);
+  tria.begin()->face(0)->set_boundary_id(1);
   tria.refine_global(1);
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();

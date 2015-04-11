@@ -119,7 +119,7 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
         // id was invented after the above was
         // written, so we are not very strict
         // here with using these flags
-        && (line->boundary_indicator() == 1))
+        && (line->boundary_id() == 1))
       return middle;
 
 
@@ -265,8 +265,8 @@ void TestCases<dim>::run (const unsigned int test_case)
     {
       if (dim==3)
         {
-          tria->begin_active()->face(4)->set_boundary_indicator(1);
-          tria->begin_active()->face(5)->set_boundary_indicator(1);
+          tria->begin_active()->face(4)->set_boundary_id(1);
+          tria->begin_active()->face(5)->set_boundary_id(1);
         };
 
       // set the boundary function

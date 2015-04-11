@@ -15,7 +15,7 @@
 
 
 // verify that we can do things like cell->face() in 1d as well. here:
-// Triangulation::get_boundary_indicators()
+// Triangulation::get_boundary_ids()
 
 
 #include "../tests.h"
@@ -35,7 +35,7 @@ void test ()
   tria.refine_global (2);
 
   std::vector<types::boundary_id>
-  boundary_ids = tria.get_boundary_indicators ();
+  boundary_ids = tria.get_boundary_ids ();
 
   for (unsigned int i=0; i<boundary_ids.size(); ++i)
     deallog << (int)boundary_ids[i] << std::endl;

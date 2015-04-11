@@ -69,7 +69,7 @@ void test_hyper_cube()
   GridGenerator::hyper_cube(tr);
 
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
-    tr.begin_active()->face(i)->set_boundary_indicator (i);
+    tr.begin_active()->face(i)->set_boundary_id (i);
 
   tr.refine_global(2);
 

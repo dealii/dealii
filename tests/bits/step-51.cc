@@ -691,7 +691,7 @@ namespace Step51
 
                 if (cell->face(face)->at_boundary()
                     &&
-                    (cell->face(face)->boundary_indicator() == 1))
+                    (cell->face(face)->boundary_id() == 1))
                   {
                     const double neumann_value =
                       - scratch.exact_solution.gradient (quadrature_point) * normal
@@ -931,7 +931,7 @@ namespace Step51
         if (cell->face(face)->at_boundary())
           for (unsigned int d=0; d<dim; ++d)
             if ((std::fabs(cell->face(face)->center()(d) - (1)) < 1e-12))
-              cell->face(face)->set_boundary_indicator (1);
+              cell->face(face)->set_boundary_id (1);
   }
 
 
