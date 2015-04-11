@@ -328,12 +328,12 @@
  *     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
  *       if (cell->face(f)->at_boundary())
  *         if (cell->face(f)->center()[0] == -1)
- *           cell->face(f)->set_boundary_indicator (42);
+ *           cell->face(f)->set_boundary_id (42);
  * @endcode
- * This calls functions TriaAccessor::set_boundary_indicator. In 3d, it may
- * also be appropriate to call TriaAccessor::set_all_boundary_indicators instead
+ * This calls functions TriaAccessor::set_boundary_id. In 3d, it may
+ * also be appropriate to call TriaAccessor::set_all_boundary_ids instead
  * on each of the selected faces. To query the boundary indicator of a particular
- * face or edge, use TriaAccessor::boundary_indicator.
+ * face or edge, use TriaAccessor::boundary_id.
  *
  * In older versions of the library (prior to 8.2), if you wanted also
  * to change the way the Triangulation class treated the boundary for
