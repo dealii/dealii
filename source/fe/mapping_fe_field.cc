@@ -511,7 +511,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
               const Tensor<2,dim> *second =
                 &data.second_derivative(point+data_set, 0);
 
-              double result [spacedim][dim][dim];
+              DerivativeForm<2,dim,spacedim> result;
 
               for (unsigned int k=0; k<data.n_shape_functions; ++k)
                 {
