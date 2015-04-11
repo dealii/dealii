@@ -119,11 +119,8 @@ namespace OpenCASCADE
     tolerance(tolerance)
   {
     Assert(spacedim == 3, ExcNotImplemented());
-
-    std_cxx11::tuple<unsigned int, unsigned int, unsigned int>
-    counts = count_elements(sh);
-
-    Assert(std_cxx11::get<0>(counts) > 0, ExcMessage("NormalToMeshProjectionBoundary needs a shape containing faces to operate."));
+    Assert(std_cxx11::get<0>(count_elements(sh)) > 0,
+           ExcMessage("NormalToMeshProjectionBoundary needs a shape containing faces to operate."));
   }
 
 

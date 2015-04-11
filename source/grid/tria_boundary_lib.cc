@@ -601,10 +601,8 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
   else
     r = radius;
 
-
-  const double r2=r*r;
-  Assert(std::fabs(v0*v0-r2)<eps*r2, ExcInternalError());
-  Assert(std::fabs(v1*v1-r2)<eps*r2, ExcInternalError());
+  Assert(std::fabs(v0*v0-r*r)<eps*r*r, ExcInternalError());
+  Assert(std::fabs(v1*v1-r*r)<eps*r*r, ExcInternalError());
 
   const double alpha=std::acos((v0*v1)/std::sqrt((v0*v0)*(v1*v1)));
   const Tensor<1,spacedim> pm=0.5*(v0+v1);
