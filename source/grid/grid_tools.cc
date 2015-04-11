@@ -1520,21 +1520,10 @@ next_cell:
   template <int dim, int spacedim>
   void
   get_face_connectivity_of_cells (const Triangulation<dim,spacedim> &triangulation,
-                                  SparsityPattern          &cell_connectivity)
+                                  DynamicSparsityPattern            &cell_connectivity)
   {
-    // as built in this function, we
-    // only consider face neighbors,
-    // which leads to a fixed number of
-    // entries per row (don't forget
-    // that each cell couples with
-    // itself, and that neighbors can
-    // be refined)
     cell_connectivity.reinit (triangulation.n_active_cells(),
-                              triangulation.n_active_cells(),
-                              GeometryInfo<dim>::faces_per_cell
-                              * GeometryInfo<dim>::max_children_per_face
-                              +
-                              1);
+                              triangulation.n_active_cells());
 
     // create a map pair<lvl,idx> -> SparsityPattern index
     // TODO: we are no longer using user_indices for this because we can get
@@ -1548,22 +1537,13 @@ next_cell:
          cell != triangulation.end(); ++cell, ++index)
       indexmap[std::pair<unsigned int,unsigned int>(cell->level(),cell->index())] = index;
 
-    // next loop over all cells and
-    // their neighbors to build the
-    // sparsity pattern. note that it's
-    // a bit hard to enter all the
-    // connections when a neighbor has
-    // children since we would need to
-    // find out which of its children
-    // is adjacent to the current
-    // cell. this problem can be
-    // omitted if we only do something
-    // if the neighbor has no children
-    // -- in that case it is either on
-    // the same or a coarser level than
-    // we are. in return, we have to
-    // add entries in both directions
-    // for both cells
+    // next loop over all cells and their neighbors to build the sparsity
+    // pattern. note that it's a bit hard to enter all the connections when a
+    // neighbor has children since we would need to find out which of its
+    // children is adjacent to the current cell. this problem can be omitted
+    // if we only do something if the neighbor has no children -- in that case
+    // it is either on the same or a coarser level than we are. in return, we
+    // have to add entries in both directions for both cells
     index = 0;
     for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
          cell = triangulation.begin_active();
@@ -1581,10 +1561,48 @@ next_cell:
               cell_connectivity.add (other_index, index);
             }
       }
-
-    // now compress the so-built connectivity pattern
-    cell_connectivity.compress ();
   }
+
+
+
+  template <int dim, int spacedim>
+  void
+  get_face_connectivity_of_cells (const Triangulation<dim,spacedim> &triangulation,
+                                  SparsityPattern                   &cell_connectivity)
+  {
+    DynamicSparsityPattern dsp;
+    get_face_connectivity_of_cells(triangulation, dsp);
+    cell_connectivity.copy_from(dsp);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  get_vertex_connectivity_of_cells (const Triangulation<dim,spacedim> &triangulation,
+                                    DynamicSparsityPattern            &cell_connectivity)
+  {
+    std::vector<std::vector<unsigned int> > vertex_to_cell(triangulation.n_vertices());
+    unsigned int index = 0;
+    for (typename Triangulation<dim,spacedim>::active_cell_iterator cell=
+           triangulation.begin_active(); cell != triangulation.end(); ++cell, ++index)
+      {
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          vertex_to_cell[cell->vertex_index(v)].push_back(index);
+      }
+
+    cell_connectivity.reinit (triangulation.n_active_cells(),
+                              triangulation.n_active_cells());
+    index = 0;
+    for (typename Triangulation<dim,spacedim>::active_cell_iterator cell=
+           triangulation.begin_active(); cell != triangulation.end(); ++cell, ++index)
+      {
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          for (unsigned int n=0; n<vertex_to_cell[cell->vertex_index(v)].size(); ++n)
+            cell_connectivity.add(index, vertex_to_cell[cell->vertex_index(v)][n]);
+      }
+  }
+
 
 
   template <int dim, int spacedim>

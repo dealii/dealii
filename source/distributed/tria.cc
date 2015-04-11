@@ -18,7 +18,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -2489,12 +2489,12 @@ namespace parallel
     void
     Triangulation<dim,spacedim>::setup_coarse_cell_to_p4est_tree_permutation ()
     {
-      SparsityPattern cell_connectivity;
-      GridTools::get_face_connectivity_of_cells (*this, cell_connectivity);
+      DynamicSparsityPattern cell_connectivity;
+      GridTools::get_vertex_connectivity_of_cells (*this, cell_connectivity);
       coarse_cell_to_p4est_tree_permutation.resize (this->n_cells(0));
       SparsityTools::
-      reorder_Cuthill_McKee (cell_connectivity,
-                             coarse_cell_to_p4est_tree_permutation);
+      reorder_hierarchical (cell_connectivity,
+                            coarse_cell_to_p4est_tree_permutation);
 
       p4est_tree_to_coarse_cell_permutation
         = Utilities::invert_permutation (coarse_cell_to_p4est_tree_permutation);

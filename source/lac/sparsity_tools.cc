@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <set>
 
 #ifdef DEAL_II_WITH_MPI
 #include <deal.II/base/utilities.h>
@@ -144,29 +145,20 @@ namespace SparsityTools
      * invalid_size_type indicates that a node has not been numbered yet),
      * pick a valid starting index among the as-yet unnumbered one.
      */
-    SparsityPattern::size_type
-    find_unnumbered_starting_index (const SparsityPattern     &sparsity,
-                                    const std::vector<SparsityPattern::size_type> &new_indices)
+    DynamicSparsityPattern::size_type
+    find_unnumbered_starting_index (const DynamicSparsityPattern &sparsity,
+                                    const std::vector<DynamicSparsityPattern::size_type> &new_indices)
     {
       {
-        SparsityPattern::size_type starting_point   = numbers::invalid_size_type;
-        SparsityPattern::size_type min_coordination = sparsity.n_rows();
-        for (SparsityPattern::size_type row=0; row<sparsity.n_rows(); ++row)
+        DynamicSparsityPattern::size_type starting_point   = numbers::invalid_size_type;
+        DynamicSparsityPattern::size_type min_coordination = sparsity.n_rows();
+        for (DynamicSparsityPattern::size_type row=0; row<sparsity.n_rows(); ++row)
           // look over all as-yet unnumbered indices
           if (new_indices[row] == numbers::invalid_size_type)
             {
-              SparsityPattern::iterator j = sparsity.begin(row);
-
-              // loop until we hit the end of this row's entries
-              for ( ; j<sparsity.end(row); ++j)
-                if (j->is_valid_entry() == false)
-                  break;
-              // post-condition after loop: coordination, i.e. the number of
-              // entries in this row is now j-rowstart[row]
-              if (static_cast<SparsityPattern::size_type>(j-sparsity.begin(row)) <
-                  min_coordination)
+              if (sparsity.row_length(row) < min_coordination)
                 {
-                  min_coordination = j-sparsity.begin(row);
+                  min_coordination = sparsity.row_length(row);
                   starting_point   = row;
                 }
             }
@@ -180,7 +172,7 @@ namespace SparsityTools
         // starting point, e.g. the first unnumbered one
         if (starting_point == numbers::invalid_size_type)
           {
-            for (SparsityPattern::size_type i=0; i<new_indices.size(); ++i)
+            for (DynamicSparsityPattern::size_type i=0; i<new_indices.size(); ++i)
               if (new_indices[i] == numbers::invalid_size_type)
                 {
                   starting_point = i;
@@ -197,10 +189,11 @@ namespace SparsityTools
   }
 
 
+
   void
-  reorder_Cuthill_McKee (const SparsityPattern                         &sparsity,
-                         std::vector<SparsityPattern::size_type>       &new_indices,
-                         const std::vector<SparsityPattern::size_type> &starting_indices)
+  reorder_Cuthill_McKee (const DynamicSparsityPattern                         &sparsity,
+                         std::vector<DynamicSparsityPattern::size_type>       &new_indices,
+                         const std::vector<DynamicSparsityPattern::size_type> &starting_indices)
   {
     Assert (sparsity.n_rows() == sparsity.n_cols(),
             ExcDimensionMismatch (sparsity.n_rows(), sparsity.n_cols()));
@@ -214,20 +207,20 @@ namespace SparsityTools
 
     // store the indices of the dofs renumbered in the last round. Default to
     // starting points
-    std::vector<SparsityPattern::size_type> last_round_dofs (starting_indices);
+    std::vector<DynamicSparsityPattern::size_type> last_round_dofs (starting_indices);
 
     // initialize the new_indices array with invalid values
     std::fill (new_indices.begin(), new_indices.end(),
                numbers::invalid_size_type);
 
     // delete disallowed elements
-    for (SparsityPattern::size_type i=0; i<last_round_dofs.size(); ++i)
+    for (DynamicSparsityPattern::size_type i=0; i<last_round_dofs.size(); ++i)
       if ((last_round_dofs[i]==numbers::invalid_size_type) ||
           (last_round_dofs[i]>=sparsity.n_rows()))
         last_round_dofs[i] = numbers::invalid_size_type;
 
     std::remove_if (last_round_dofs.begin(), last_round_dofs.end(),
-                    std::bind2nd(std::equal_to<SparsityPattern::size_type>(),
+                    std::bind2nd(std::equal_to<DynamicSparsityPattern::size_type>(),
                                  numbers::invalid_size_type));
 
     // now if no valid points remain: find dof with lowest coordination number
@@ -237,81 +230,55 @@ namespace SparsityTools
                                                             new_indices));
 
     // store next free dof index
-    SparsityPattern::size_type next_free_number = 0;
+    DynamicSparsityPattern::size_type next_free_number = 0;
 
     // enumerate the first round dofs
-    for (SparsityPattern::size_type i=0; i!=last_round_dofs.size(); ++i)
+    for (DynamicSparsityPattern::size_type i=0; i!=last_round_dofs.size(); ++i)
       new_indices[last_round_dofs[i]] = next_free_number++;
 
-    // now do as many steps as needed to
-    // renumber all dofs
+    // now do as many steps as needed to renumber all dofs
     while (true)
       {
-        // store the indices of the dofs to be
-        // renumbered in the next round
-        std::vector<SparsityPattern::size_type> next_round_dofs;
+        // store the indices of the dofs to be renumbered in the next round
+        std::vector<DynamicSparsityPattern::size_type> next_round_dofs;
 
-        // find all neighbors of the
-        // dofs numbered in the last
-        // round
-        for (SparsityPattern::size_type i=0; i<last_round_dofs.size(); ++i)
-          for (SparsityPattern::iterator j=sparsity.begin(last_round_dofs[i]);
-               j<sparsity.end(last_round_dofs[i]); ++j)
-            if (j->is_valid_entry() == false)
-              break;
-            else
-              next_round_dofs.push_back (j->column());
+        // find all neighbors of the dofs numbered in the last round
+        for (DynamicSparsityPattern::size_type i=0; i<last_round_dofs.size(); ++i)
+          for (DynamicSparsityPattern::row_iterator j=sparsity.row_begin(last_round_dofs[i]);
+               j<sparsity.row_end(last_round_dofs[i]); ++j)
+            next_round_dofs.push_back (*j);
 
         // sort dof numbers
         std::sort (next_round_dofs.begin(), next_round_dofs.end());
 
         // delete multiple entries
-        std::vector<SparsityPattern::size_type>::iterator end_sorted;
+        std::vector<DynamicSparsityPattern::size_type>::iterator end_sorted;
         end_sorted = std::unique (next_round_dofs.begin(), next_round_dofs.end());
         next_round_dofs.erase (end_sorted, next_round_dofs.end());
 
-        // eliminate dofs which are
-        // already numbered
+        // eliminate dofs which are already numbered
         for (int s=next_round_dofs.size()-1; s>=0; --s)
           if (new_indices[next_round_dofs[s]] != numbers::invalid_size_type)
             next_round_dofs.erase (next_round_dofs.begin() + s);
 
-        // check whether there are
-        // any new dofs in the
-        // list. if there are none,
-        // then we have completely
-        // numbered the current
-        // component of the
-        // graph. check if there are
-        // as yet unnumbered
-        // components of the graph
-        // that we would then have to
-        // do next
+        // check whether there are any new dofs in the list. if there are
+        // none, then we have completely numbered the current component of the
+        // graph. check if there are as yet unnumbered components of the graph
+        // that we would then have to do next
         if (next_round_dofs.empty())
           {
             if (std::find (new_indices.begin(), new_indices.end(),
                            numbers::invalid_size_type)
                 ==
                 new_indices.end())
-              // no unnumbered
-              // indices, so we can
-              // leave now
+              // no unnumbered indices, so we can leave now
               break;
 
-            // otherwise find a valid
-            // starting point for the
-            // next component of the
-            // graph and continue
-            // with numbering that
-            // one. we only do so if
-            // no starting indices
-            // were provided by the
-            // user (see the
-            // documentation of this
-            // function) so produce
-            // an error if we got
-            // here and starting
-            // indices were given
+            // otherwise find a valid starting point for the next component of
+            // the graph and continue with numbering that one. we only do so
+            // if no starting indices were provided by the user (see the
+            // documentation of this function) so produce an error if we got
+            // here and starting indices were given
             Assert (starting_indices.empty(),
                     ExcMessage ("The input graph appears to have more than one "
                                 "component, but as stated in the documentation "
@@ -326,48 +293,36 @@ namespace SparsityTools
 
 
 
-        // store for each coordination
-        // number the dofs with these
-        // coordination number
-        std::multimap<SparsityPattern::size_type, int> dofs_by_coordination;
+        // store for each coordination number the dofs with these coordination
+        // number
+        std::multimap<DynamicSparsityPattern::size_type, int> dofs_by_coordination;
 
-        // find coordination number for
-        // each of these dofs
-        for (std::vector<SparsityPattern::size_type>::iterator s=next_round_dofs.begin();
+        // find coordination number for each of these dofs
+        for (std::vector<DynamicSparsityPattern::size_type>::iterator s=next_round_dofs.begin();
              s!=next_round_dofs.end(); ++s)
           {
-            SparsityPattern::size_type coordination = 0;
-            for (SparsityPattern::iterator j=sparsity.begin(*s);
-                 j<sparsity.end(*s); ++j)
-              if (j->is_valid_entry() == false)
-                break;
-              else
-                ++coordination;
+            DynamicSparsityPattern::size_type coordination = 0;
+            for (DynamicSparsityPattern::row_iterator j=sparsity.row_begin(*s);
+                 j<sparsity.row_end(*s); ++j)
+              ++coordination;
 
-            // insert this dof at its
-            // coordination number
-            const std::pair<const SparsityPattern::size_type, int> new_entry (coordination, *s);
+            // insert this dof at its coordination number
+            const std::pair<const DynamicSparsityPattern::size_type, int> new_entry (coordination, *s);
             dofs_by_coordination.insert (new_entry);
           }
 
-        // assign new DoF numbers to
-        // the elements of the present
-        // front:
-        std::multimap<SparsityPattern::size_type, int>::iterator i;
+        // assign new DoF numbers to the elements of the present front:
+        std::multimap<DynamicSparsityPattern::size_type, int>::iterator i;
         for (i = dofs_by_coordination.begin(); i!=dofs_by_coordination.end(); ++i)
           new_indices[i->second] = next_free_number++;
 
-        // after that: copy this round's
-        // dofs for the next round
+        // after that: copy this round's dofs for the next round
         last_round_dofs = next_round_dofs;
       }
 
-    // test for all indices
-    // numbered. this mostly tests
-    // whether the
-    // front-marching-algorithm (which
-    // Cuthill-McKee actually is) has
-    // reached all points.
+    // test for all indices numbered. this mostly tests whether the
+    // front-marching-algorithm (which Cuthill-McKee actually is) has reached
+    // all points.
     Assert ((std::find (new_indices.begin(), new_indices.end(), numbers::invalid_size_type)
              ==
              new_indices.end())
@@ -375,6 +330,178 @@ namespace SparsityTools
             (next_free_number == sparsity.n_rows()),
             ExcInternalError());
   }
+
+
+
+  void
+  reorder_Cuthill_McKee (const SparsityPattern                   &sparsity,
+                         std::vector<SparsityPattern::size_type> &new_indices,
+                         const std::vector<SparsityPattern::size_type> &starting_indices)
+  {
+    DynamicSparsityPattern dsp(sparsity.n_rows(), sparsity.n_cols());
+    for (unsigned int row=0; row<sparsity.n_rows(); ++row)
+      {
+        for (SparsityPattern::iterator it=sparsity.begin(row); it!=sparsity.end(row)
+             && it->is_valid_entry() ; ++it)
+          dsp.add(row, it->column());
+      }
+    reorder_Cuthill_McKee(dsp, new_indices, starting_indices);
+  }
+
+
+
+  namespace internal
+  {
+    void
+    reorder_hierarchical (const DynamicSparsityPattern                   &connectivity,
+                          std::vector<DynamicSparsityPattern::size_type> &renumbering)
+    {
+      AssertDimension (connectivity.n_rows(), connectivity.n_cols());
+      AssertDimension (connectivity.n_rows(), renumbering.size());
+
+      std::vector<types::global_dof_index> touched_nodes(connectivity.n_rows(),
+                                                         numbers::invalid_dof_index);
+      std::set<types::global_dof_index> current_neighbors;
+      std::vector<std::vector<types::global_dof_index> > groups;
+
+      // This outer loop is typically traversed only once, unless the global
+      // graph is not connected
+      while (true)
+        {
+          // Find cell with the minimal number of neighbors (typically a corner
+          // node when based on FEM meshes). If no cell is left, we are done.
+          std::pair<types::global_dof_index,types::global_dof_index> min_neighbors
+          (numbers::invalid_unsigned_int, numbers::invalid_unsigned_int);
+          for (types::global_dof_index i=0; i<touched_nodes.size(); ++i)
+            if (touched_nodes[i] == numbers::invalid_unsigned_int)
+              if (connectivity.row_length(i) < min_neighbors.second)
+                min_neighbors = std::make_pair(i, connectivity.row_length(i));
+          if (min_neighbors.first == numbers::invalid_unsigned_int)
+            break;
+
+          current_neighbors.clear();
+          current_neighbors.insert(min_neighbors.first);
+          while (!current_neighbors.empty())
+            {
+              // Find cell with minimum number of untouched neighbors among the
+              // next set of possible neighbors
+              min_neighbors = std::make_pair (numbers::invalid_unsigned_int,
+                                              numbers::invalid_unsigned_int);
+              for (std::set<types::global_dof_index>::iterator it=current_neighbors.begin();
+                   it != current_neighbors.end(); ++it)
+                {
+                  AssertThrow(touched_nodes[*it] == numbers::invalid_unsigned_int,
+                              ExcInternalError());
+                  types::global_dof_index active_row_length = 0;
+                  for (CompressedSimpleSparsityPattern::row_iterator rowit
+                       = connectivity.row_begin(*it);
+                       rowit != connectivity.row_end(*it); ++rowit)
+                    if (touched_nodes[*rowit] == numbers::invalid_unsigned_int)
+                      ++active_row_length;
+                  if (active_row_length < min_neighbors.second)
+                    min_neighbors = std::make_pair(*it, active_row_length);
+                }
+              // Among the set of cells with the minimal number of neighbors,
+              // choose the one with the largest number of touched neighbors,
+              // i.e., the one with the largest row length
+              const types::global_dof_index best_row_length = min_neighbors.second;
+              for (std::set<types::global_dof_index>::iterator it=current_neighbors.begin();
+                   it != current_neighbors.end(); ++it)
+                {
+                  types::global_dof_index active_row_length = 0;
+                  for (CompressedSimpleSparsityPattern::row_iterator rowit
+                       = connectivity.row_begin(*it);
+                       rowit != connectivity.row_end(*it); ++rowit)
+                    if (touched_nodes[*rowit] == numbers::invalid_unsigned_int)
+                      ++active_row_length;
+                  if (active_row_length == best_row_length)
+                    if (connectivity.row_length(*it) > min_neighbors.second)
+                      min_neighbors = std::make_pair(*it, connectivity.row_length(*it));
+                }
+
+              // Add the pivot cell to the current list
+              groups.push_back(std::vector<types::global_dof_index>());
+              std::vector<types::global_dof_index> &new_entries = groups.back();
+              new_entries.push_back(min_neighbors.first);
+              touched_nodes[min_neighbors.first] = groups.size()-1;
+
+              // Add all direct neighbors of the pivot cell not yet touched to
+              // the current list
+              for (CompressedSimpleSparsityPattern::row_iterator it
+                   = connectivity.row_begin(min_neighbors.first);
+                   it != connectivity.row_end(min_neighbors.first); ++it)
+                {
+                  if (touched_nodes[*it] == numbers::invalid_unsigned_int)
+                    {
+                      new_entries.push_back(*it);
+                      touched_nodes[*it] = groups.size()-1;
+                    }
+                }
+
+              // Add all neighbors of the current list not yet touched to the
+              // set of possible next pivots. Delete the entries of the current
+              // list from the set of possible next pivots.
+              for (types::global_dof_index i=0; i<new_entries.size(); ++i)
+                {
+                  for (CompressedSimpleSparsityPattern::row_iterator it
+                       = connectivity.row_begin(new_entries[i]);
+                       it != connectivity.row_end(new_entries[i]); ++it)
+                    if (touched_nodes[*it] == numbers::invalid_unsigned_int)
+                      current_neighbors.insert(*it);
+                  current_neighbors.erase(new_entries[i]);
+                }
+            }
+        }
+      // If the number of groups is smaller than the number of nodes, we can
+      // continue by recursively calling this method
+      if (groups.size() < connectivity.n_rows())
+        {
+          // Form the connectivity of the groups
+          DynamicSparsityPattern connectivity_next(groups.size(),
+                                                   groups.size());
+          for (types::global_dof_index i=0; i<groups.size(); ++i)
+            for (types::global_dof_index col=0; col<groups[i].size(); ++col)
+              for (CompressedSimpleSparsityPattern::row_iterator it
+                   = connectivity.row_begin(groups[i][col]);
+                   it != connectivity.row_end(groups[i][col]); ++it)
+                {
+                  if (touched_nodes[*it] != i)
+                    connectivity_next.add(i, touched_nodes[*it]);
+                }
+
+          // Recursively call the reordering
+          std::vector<types::global_dof_index> renumbering_next(groups.size());
+          reorder_hierarchical(connectivity_next, renumbering_next);
+
+          // Renumber the indices group by group according to the incoming
+          // ordering for the groups
+          for (types::global_dof_index i=0,count=0; i<groups.size(); ++i)
+            for (types::global_dof_index col=0; col<groups[renumbering_next[i]].size(); ++col, ++count)
+              renumbering[count] = groups[renumbering_next[i]][col];
+        }
+      else
+        {
+          // All groups should have size one and no more recursion is possible,
+          // so use the numbering of the groups
+          for (types::global_dof_index i=0,count=0; i<groups.size(); ++i)
+            for (types::global_dof_index col=0; col<groups[i].size(); ++col, ++count)
+              renumbering[count] = groups[i][col];
+        }
+    }
+  }
+
+  void
+  reorder_hierarchical (const DynamicSparsityPattern                   &connectivity,
+                        std::vector<DynamicSparsityPattern::size_type> &renumbering)
+  {
+    // the internal renumbering keeps the numbering the wrong way around (but
+    // we cannot invert the numbering inside that method because it is used
+    // recursively), so invert it here
+    internal::reorder_hierarchical(connectivity, renumbering);
+    renumbering = Utilities::invert_permutation(renumbering);
+  }
+
+
 
 #ifdef DEAL_II_WITH_MPI
   template <class DSP_t>
