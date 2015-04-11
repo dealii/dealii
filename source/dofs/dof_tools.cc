@@ -515,7 +515,7 @@ namespace DoFTools
   extract_boundary_dofs (const DH                      &dof_handler,
                          const ComponentMask           &component_mask,
                          std::vector<bool>             &selected_dofs,
-                         const std::set<types::boundary_id> &boundary_indicators)
+                         const std::set<types::boundary_id> &boundary_ids)
   {
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
              (&dof_handler.get_tria())
@@ -525,7 +525,7 @@ namespace DoFTools
 
     IndexSet indices;
     extract_boundary_dofs (dof_handler, component_mask,
-                           indices, boundary_indicators);
+                           indices, boundary_ids);
 
     // clear and reset array by default values
     selected_dofs.clear ();
@@ -541,11 +541,11 @@ namespace DoFTools
   extract_boundary_dofs (const DH                      &dof_handler,
                          const ComponentMask       &component_mask,
                          IndexSet             &selected_dofs,
-                         const std::set<types::boundary_id> &boundary_indicators)
+                         const std::set<types::boundary_id> &boundary_ids)
   {
     Assert (component_mask.represents_n_components(n_components(dof_handler)),
             ExcMessage ("Component mask has invalid size."));
-    Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
             ExcInvalidBoundaryIndicator());
     const unsigned int dim=DH::dimension;
 
@@ -555,7 +555,7 @@ namespace DoFTools
 
     // let's see whether we have to check for certain boundary indicators
     // or whether we can accept all
-    const bool check_boundary_indicator = (boundary_indicators.size() != 0);
+    const bool check_boundary_id = (boundary_ids.size() != 0);
 
     // also see whether we have to check whether a certain vector component
     // is selected, or all
@@ -583,9 +583,9 @@ namespace DoFTools
         for (unsigned int face=0;
              face<GeometryInfo<DH::dimension>::faces_per_cell; ++face)
           if (cell->at_boundary(face))
-            if (! check_boundary_indicator ||
-                (boundary_indicators.find (cell->face(face)->boundary_indicator())
-                 != boundary_indicators.end()))
+            if (! check_boundary_id ||
+                (boundary_ids.find (cell->face(face)->boundary_id())
+                 != boundary_ids.end()))
               {
                 const FiniteElement<DH::dimension, DH::space_dimension> &fe = cell->get_fe();
 
@@ -648,16 +648,16 @@ namespace DoFTools
   extract_dofs_with_support_on_boundary (const DH                      &dof_handler,
                                          const ComponentMask           &component_mask,
                                          std::vector<bool>             &selected_dofs,
-                                         const std::set<types::boundary_id> &boundary_indicators)
+                                         const std::set<types::boundary_id> &boundary_ids)
   {
     Assert (component_mask.represents_n_components (n_components(dof_handler)),
             ExcMessage ("This component mask has the wrong size."));
-    Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
             ExcInvalidBoundaryIndicator());
 
     // let's see whether we have to check for certain boundary indicators
     // or whether we can accept all
-    const bool check_boundary_indicator = (boundary_indicators.size() != 0);
+    const bool check_boundary_id = (boundary_ids.size() != 0);
 
     // also see whether we have to check whether a certain vector component
     // is selected, or all
@@ -681,9 +681,9 @@ namespace DoFTools
       for (unsigned int face=0;
            face<GeometryInfo<DH::dimension>::faces_per_cell; ++face)
         if (cell->at_boundary(face))
-          if (! check_boundary_indicator ||
-              (boundary_indicators.find (cell->face(face)->boundary_indicator())
-               != boundary_indicators.end()))
+          if (! check_boundary_id ||
+              (boundary_ids.find (cell->face(face)->boundary_id())
+               != boundary_ids.end()))
             {
               const FiniteElement<DH::dimension, DH::space_dimension> &fe = cell->get_fe();
 
@@ -1580,10 +1580,10 @@ namespace DoFTools
   template <class DH>
   void map_dof_to_boundary_indices (
     const DH                      &dof_handler,
-    const std::set<types::boundary_id> &boundary_indicators,
+    const std::set<types::boundary_id> &boundary_ids,
     std::vector<types::global_dof_index>     &mapping)
   {
-    Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
             ExcInvalidBoundaryIndicator());
 
     mapping.clear ();
@@ -1591,7 +1591,7 @@ namespace DoFTools
                     DH::invalid_dof_index);
 
     // return if there is nothing to do
-    if (boundary_indicators.size() == 0)
+    if (boundary_ids.size() == 0)
       return;
 
     std::vector<types::global_dof_index> dofs_on_face;
@@ -1602,8 +1602,8 @@ namespace DoFTools
                                       endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
-        if (boundary_indicators.find (cell->face(f)->boundary_indicator()) !=
-            boundary_indicators.end())
+        if (boundary_ids.find (cell->face(f)->boundary_id()) !=
+            boundary_ids.end())
           {
             const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
             dofs_on_face.resize (dofs_per_face);
@@ -1614,7 +1614,7 @@ namespace DoFTools
           }
 
     AssertDimension (next_boundary_index,
-                     dof_handler.n_boundary_dofs (boundary_indicators));
+                     dof_handler.n_boundary_dofs (boundary_ids));
   }
 
   namespace internal

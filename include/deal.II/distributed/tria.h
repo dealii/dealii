@@ -242,7 +242,7 @@ namespace parallel
      *     #include <deal.II/base/std_cxx11/bind.h>
      *
      *     template <int dim>
-     *     void set_boundary_indicators (parallel::distributed::Triangulation<dim> &triangulation)
+     *     void set_boundary_ids (parallel::distributed::Triangulation<dim> &triangulation)
      *     {
      *       ... set boundary indicators on the triangulation object ...
      *     }
@@ -255,7 +255,7 @@ namespace parallel
      *       ... create the coarse mesh ...
      *
      *       coarse_grid.signals.post_refinement.connect
-     *         (std_cxx11::bind (&set_boundary_indicators<dim>,
+     *         (std_cxx11::bind (&set_boundary_ids<dim>,
      *                           std_cxx11::ref(coarse_grid)));
      *
      *     }
@@ -267,7 +267,7 @@ namespace parallel
      * argument but permanently fix this one argument to a reference to the
      * coarse grid triangulation. After each refinement step, the
      * triangulation will then call the object so created which will in turn
-     * call <code>set_boundary_indicators<dim></code> with the reference to
+     * call <code>set_boundary_ids<dim></code> with the reference to
      * the coarse grid as argument.
      *
      * This approach can be generalized. In the example above, we have used a
@@ -275,7 +275,7 @@ namespace parallel
      * that this function is in fact a member function of the class that
      * generates the mesh, for example because it needs to access run-time
      * parameters. This can be achieved as follows: assuming the
-     * <code>set_boundary_indicators()</code> function has been declared as a
+     * <code>set_boundary_ids()</code> function has been declared as a
      * (non-static, but possibly private) member function of the
      * <code>MyClass</code> class, then the following will work:
      * @code
@@ -284,7 +284,7 @@ namespace parallel
      *     template <int dim>
      *     void
      *     MyClass<dim>::
-     *     set_boundary_indicators (parallel::distributed::Triangulation<dim> &triangulation) const
+     *     set_boundary_ids (parallel::distributed::Triangulation<dim> &triangulation) const
      *     {
      *       ... set boundary indicators on the triangulation object ...
      *     }
@@ -297,21 +297,21 @@ namespace parallel
      *       ... create the coarse mesh ...
      *
      *       coarse_grid.signals.post_refinement.connect
-     *         (std_cxx11::bind (&MyGeometry<dim>::set_boundary_indicators,
+     *         (std_cxx11::bind (&MyGeometry<dim>::set_boundary_ids,
      *                           std_cxx11::cref(*this),
      *                           std_cxx11::ref(coarse_grid)));
      *     }
      * @endcode
      * Here, like any other member function,
-     * <code>set_boundary_indicators</code> implicitly takes a pointer or
+     * <code>set_boundary_ids</code> implicitly takes a pointer or
      * reference to the object it belongs to as first argument.
      * <code>std::bind</code> again creates an object that can be called like
      * a global function with no arguments, and this object in turn calls
-     * <code>set_boundary_indicators</code> with a pointer to the current
+     * <code>set_boundary_ids</code> with a pointer to the current
      * object and a reference to the triangulation to work on. Note that
      * because the <code>create_coarse_mesh</code> function is declared as
      * <code>const</code>, it is necessary that the
-     * <code>set_boundary_indicators</code> function is also declared
+     * <code>set_boundary_ids</code> function is also declared
      * <code>const</code>.
      *
      * <b>Note:</b>For reasons that have to do with the way the

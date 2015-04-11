@@ -653,7 +653,7 @@ namespace VectorTools
    *
    * The parameter @p function_map provides a list of boundary indicators to
    * be handled by this function and corresponding boundary value functions.
-   * The keys of this map correspond to the number @p boundary_indicator of
+   * The keys of this map correspond to the number @p boundary_id of
    * the face.  numbers::internal_face_boundary_id is an illegal value for
    * this key since it is reserved for interior faces.
    *
@@ -784,7 +784,7 @@ namespace VectorTools
    * @ref constraints.
    *
    * The parameter @p boundary_component corresponds to the number @p
-   * boundary_indicator of the face.
+   * boundary_id of the face.
    *
    * The flags in the last parameter, @p component_mask denote which
    * components of the finite element space shall be interpolated. If it is
@@ -1063,7 +1063,7 @@ namespace VectorTools
    * $z$-component.
    *
    * The parameter @p boundary_component corresponds to the number @p
-   * boundary_indicator of the face. numbers::internal_face_boundary_id is an
+   * boundary_id of the face. numbers::internal_face_boundary_id is an
    * illegal value, since it is reserved for interior faces.
    *
    * The last argument is denoted to compute the normal vector $\vec{n}$ at
@@ -1180,7 +1180,7 @@ namespace VectorTools
    * that are ordered in the same way as we usually order the coordinate directions,
    * i.e. $x$-, $y$-, and finally $z$-component.
    *
-   * The parameter @p boundary_component corresponds to the number @p boundary_indicator
+   * The parameter @p boundary_component corresponds to the number @p boundary_id
    * of the face. numbers::internal_face_boundary_id is an illegal value, since it is
    * reserved for interior faces.
    *
@@ -1245,7 +1245,7 @@ namespace VectorTools
    * $z$-component.
    *
    * The parameter @p boundary_component corresponds to the @p
-   * boundary_indicator of the faces where the boundary conditions are
+   * boundary_id of the faces where the boundary conditions are
    * applied. numbers::internal_face_boundary_id is an illegal value, since it
    * is reserved for interior faces. The @p mapping is used to compute the
    * normal vector $\vec{n}$ at the boundary points.
@@ -1719,7 +1719,7 @@ namespace VectorTools
                                         const Quadrature<dim-1> &q,
                                         const Function<spacedim,double>     &rhs,
                                         Vector<double>          &rhs_vector,
-                                        const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
+                                        const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
    * Calls the create_boundary_right_hand_side() function, see above, with
@@ -1733,7 +1733,7 @@ namespace VectorTools
                                         const Quadrature<dim-1> &q,
                                         const Function<spacedim,double>     &rhs,
                                         Vector<double>          &rhs_vector,
-                                        const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
+                                        const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
    * Same as the set of functions above, but for hp objects.
@@ -1747,7 +1747,7 @@ namespace VectorTools
                                         const hp::QCollection<dim-1> &q,
                                         const Function<spacedim,double>     &rhs,
                                         Vector<double>          &rhs_vector,
-                                        const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
+                                        const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
    * Calls the create_boundary_right_hand_side() function, see above, with a
@@ -1762,7 +1762,7 @@ namespace VectorTools
                                         const hp::QCollection<dim-1> &q,
                                         const Function<spacedim,double>     &rhs,
                                         Vector<double>          &rhs_vector,
-                                        const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
+                                        const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   //@}
   /**

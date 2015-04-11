@@ -938,7 +938,7 @@ namespace Step42
 
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
 
-        /* boundary_indicators:
+        /* boundary_ids:
 
          */
         Triangulation<3>::active_cell_iterator
@@ -949,14 +949,14 @@ namespace Step42
                ++face)
             {
               if (cell->face(face)->center()[2] == p2(2))
-                cell->face(face)->set_boundary_indicator(1);
+                cell->face(face)->set_boundary_id(1);
               if (cell->face(face)->center()[0] == p1(0)
                   || cell->face(face)->center()[0] == p2(0)
                   || cell->face(face)->center()[1] == p1(1)
                   || cell->face(face)->center()[1] == p2(1))
-                cell->face(face)->set_boundary_indicator(8);
+                cell->face(face)->set_boundary_id(8);
               if (cell->face(face)->center()[2] == p1(2))
-                cell->face(face)->set_boundary_indicator(6);
+                cell->face(face)->set_boundary_id(6);
             }
       }
 
@@ -1153,7 +1153,7 @@ namespace Step42
              ++face)
           if (cell->face(face)->at_boundary()
               &&
-              cell->face(face)->boundary_indicator() == 1)
+              cell->face(face)->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
               cell_matrix = 0;
@@ -1243,7 +1243,7 @@ namespace Step42
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary()
               &&
-              cell->face(face)->boundary_indicator() == 1)
+              cell->face(face)->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
               cell->face(face)->get_dof_indices(dof_indices);
@@ -1422,7 +1422,7 @@ namespace Step42
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary()
                 &&
-                cell->face(face)->boundary_indicator() == 1)
+                cell->face(face)->boundary_id() == 1)
               {
                 fe_values_face.reinit(cell, face);
 
@@ -1554,7 +1554,7 @@ namespace Step42
 
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary()
-                && cell->face(face)->boundary_indicator() == 1)
+                && cell->face(face)->boundary_id() == 1)
               {
                 fe_values_face.reinit(cell, face);
 
@@ -2103,7 +2103,7 @@ namespace Step42
         for (unsigned int face = 0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary()
               &&
-              cell->face(face)->boundary_indicator() == 1)
+              cell->face(face)->boundary_id() == 1)
             {
               fe_values_face.reinit(cell, face);
 

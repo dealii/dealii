@@ -1115,7 +1115,7 @@ namespace GridTools
    * @ref GlossFaceOrientation "standard orientation".
    *
    * Instead of defining a 'first' and 'second' boundary with the help of two
-   * boundary_indicators this function defines a 'left' boundary as all faces
+   * boundary_ids this function defines a 'left' boundary as all faces
    * with local face index <code>2*dimension</code> and boundary indicator @p
    * b_id and, similarly, a 'right' boundary consisting of all face with local
    * face index <code>2*dimension+1</code> and boundary indicator @p b_id.

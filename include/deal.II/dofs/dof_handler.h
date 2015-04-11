@@ -706,14 +706,14 @@ public:
    * function.
    */
   types::global_dof_index
-  n_boundary_dofs (const FunctionMap &boundary_indicators) const;
+  n_boundary_dofs (const FunctionMap &boundary_ids) const;
 
   /**
    * Same function, but with different data type of the argument, which is
    * here simply a list of the boundary indicators under consideration.
    */
   types::global_dof_index
-  n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const;
+  n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const;
 
   /**
    * Access to an object informing of the block structure of the dof handler.

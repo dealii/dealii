@@ -845,7 +845,7 @@ void GridOut::write_dx (const Triangulation<dim, spacedim> &tria,
           // Little trick to get -1
           // for the interior
           for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-            out << ' ' << (int)(signed char)cell->face(f)->boundary_indicator();
+            out << ' ' << (int)(signed char)cell->face(f)->boundary_id();
           out << '\n';
         }
       out << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
@@ -1355,7 +1355,7 @@ void GridOut::write_xfig (
           {
             Triangulation<dim, spacedim>::face_iterator
             face = cell->face(face_reorder[f]);
-            const types::boundary_id bi = face->boundary_indicator();
+            const types::boundary_id bi = face->boundary_id();
             if (bi != numbers::internal_face_boundary_id)
               {
                 // Code for polyline
@@ -2550,7 +2550,7 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim,spacedim> &tria)
   for (face=tria.begin_active_face(), endf=tria.end_face();
        face != endf; ++face)
     if ((face->at_boundary()) &&
-        (face->boundary_indicator() != 0))
+        (face->boundary_id() != 0))
       n_faces++;
 
   return n_faces;
@@ -2579,7 +2579,7 @@ unsigned int GridOut::n_boundary_lines (const Triangulation<dim, spacedim> &tria
     for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary()
           &&
-          (cell->line(l)->boundary_indicator() != 0)
+          (cell->line(l)->boundary_id() != 0)
           &&
           (cell->line(l)->user_flag_set() == false))
         {
@@ -2672,7 +2672,7 @@ void GridOut::write_msh_faces (const Triangulation<dim,spacedim> &tria,
   for (face=tria.begin_active_face(), endf=tria.end_face();
        face != endf; ++face)
     if (face->at_boundary() &&
-        (face->boundary_indicator() != 0))
+        (face->boundary_id() != 0))
       {
         out << index << ' ';
         switch (dim)
@@ -2686,9 +2686,9 @@ void GridOut::write_msh_faces (const Triangulation<dim,spacedim> &tria,
           default:
             Assert (false, ExcNotImplemented());
           }
-        out << static_cast<unsigned int>(face->boundary_indicator())
+        out << static_cast<unsigned int>(face->boundary_id())
             << ' '
-            << static_cast<unsigned int>(face->boundary_indicator())
+            << static_cast<unsigned int>(face->boundary_id())
             << ' ' << GeometryInfo<dim>::vertices_per_face;
         // note: vertex numbers are 1-base
         for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
@@ -2724,14 +2724,14 @@ void GridOut::write_msh_lines (const Triangulation<dim, spacedim> &tria,
     for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary()
           &&
-          (cell->line(l)->boundary_indicator() != 0)
+          (cell->line(l)->boundary_id() != 0)
           &&
           (cell->line(l)->user_flag_set() == false))
         {
           out << index << " 1 ";
-          out << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
+          out << static_cast<unsigned int>(cell->line(l)->boundary_id())
               << ' '
-              << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
+              << static_cast<unsigned int>(cell->line(l)->boundary_id())
               << " 2 ";
           // note: vertex numbers are 1-base
           for (unsigned int vertex=0; vertex<2; ++vertex)
@@ -2826,10 +2826,10 @@ void GridOut::write_ucd_faces (const Triangulation<dim, spacedim> &tria,
   for (face=tria.begin_active_face(), endf=tria.end_face();
        face != endf; ++face)
     if (face->at_boundary() &&
-        (face->boundary_indicator() != 0))
+        (face->boundary_id() != 0))
       {
         out << index << "  "
-            << static_cast<unsigned int>(face->boundary_indicator())
+            << static_cast<unsigned int>(face->boundary_id())
             << "  ";
         switch (dim)
           {
@@ -2876,12 +2876,12 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
     for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary()
           &&
-          (cell->line(l)->boundary_indicator() != 0)
+          (cell->line(l)->boundary_id() != 0)
           &&
           (cell->line(l)->user_flag_set() == false))
         {
           out << index << "  "
-              << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
+              << static_cast<unsigned int>(cell->line(l)->boundary_id())
               << "  line    ";
           // note: vertex numbers in ucd format are 1-base
           for (unsigned int vertex=0; vertex<2; ++vertex)

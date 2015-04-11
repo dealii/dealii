@@ -823,16 +823,16 @@ namespace Step18
             const Point<dim> face_center = cell->face(f)->center();
 
             if (face_center[2] == 0)
-              cell->face(f)->set_boundary_indicator (0);
+              cell->face(f)->set_boundary_id (0);
             else if (face_center[2] == 3)
-              cell->face(f)->set_boundary_indicator (1);
+              cell->face(f)->set_boundary_id (1);
             else if (std::sqrt(face_center[0]*face_center[0] +
                                face_center[1]*face_center[1])
                      <
                      (inner_radius + outer_radius) / 2)
-              cell->face(f)->set_boundary_indicator (2);
+              cell->face(f)->set_boundary_id (2);
             else
-              cell->face(f)->set_boundary_indicator (3);
+              cell->face(f)->set_boundary_id (3);
           }
 
     // In order to make sure that new vertices are placed correctly on

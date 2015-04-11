@@ -409,16 +409,16 @@ namespace internal
         // neumann boundary face. compute difference between normal derivative
         // and boundary function
         {
-          const types::boundary_id boundary_indicator = face->boundary_indicator();
+          const types::boundary_id boundary_id = face->boundary_id();
 
-          Assert (parallel_data.neumann_bc->find(boundary_indicator) !=
+          Assert (parallel_data.neumann_bc->find(boundary_id) !=
                   parallel_data.neumann_bc->end(),
                   ExcInternalError ());
           // get the values of the boundary function at the quadrature points
           if (n_components == 1)
             {
               std::vector<double> g(n_q_points);
-              parallel_data.neumann_bc->find(boundary_indicator)->second
+              parallel_data.neumann_bc->find(boundary_id)->second
               ->value_list (fe_face_values_cell.get_present_fe_values()
                             .get_quadrature_points(), g);
 
@@ -430,7 +430,7 @@ namespace internal
             {
               std::vector<dealii::Vector<double> >
               g(n_q_points, dealii::Vector<double>(n_components));
-              parallel_data.neumann_bc->find(boundary_indicator)->second
+              parallel_data.neumann_bc->find(boundary_id)->second
               ->vector_value_list (fe_face_values_cell.get_present_fe_values()
                                    .get_quadrature_points(),
                                    g);
@@ -689,7 +689,7 @@ namespace internal
           // face into the list of faces with contribution zero.
           if (face->at_boundary()
               &&
-              (parallel_data.neumann_bc->find(face->boundary_indicator()) ==
+              (parallel_data.neumann_bc->find(face->boundary_id()) ==
                parallel_data.neumann_bc->end()))
             {
               local_face_integrals[face]

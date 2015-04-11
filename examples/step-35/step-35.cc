@@ -412,7 +412,7 @@ namespace Step35
 
     EquationData::Velocity<dim>       vel_exact;
     std::map<types::global_dof_index, double>    boundary_values;
-    std::vector<types::boundary_id> boundary_indicators;
+    std::vector<types::boundary_id> boundary_ids;
 
     Triangulation<dim> triangulation;
 
@@ -709,7 +709,7 @@ namespace Step35
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl;
 
-    boundary_indicators = triangulation.get_boundary_indicators();
+    boundary_ids = triangulation.get_boundary_ids();
 
     dof_handler_velocity.distribute_dofs (fe_velocity);
     DoFRenumbering::boost::Cuthill_McKee (dof_handler_velocity);
@@ -1022,8 +1022,8 @@ namespace Step35
         vel_exact.set_component(d);
         boundary_values.clear();
         for (std::vector<types::boundary_id>::const_iterator
-             boundaries = boundary_indicators.begin();
-             boundaries != boundary_indicators.end();
+             boundaries = boundary_ids.begin();
+             boundaries != boundary_ids.end();
              ++boundaries)
           {
             switch (*boundaries)
