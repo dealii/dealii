@@ -29,23 +29,12 @@ template <int dim, int spacedim> class MappingQ;
 /*@{*/
 
 /**
- * Implementation of Hierarchical finite elements @p Qp that yield the finite
+ * Implementation of hierarchical @p Qp shape functions that yield the finite
  * element space of continuous, piecewise polynomials of degree @p p. This
  * class is realized using tensor product polynomials based on a hierarchical
- * basis @p Hierarchical on the interval <tt>[0,1]</tt> which is suitable for
- * building an @p hp tensor product finite element, if we assume that each
- * element has a single degree.
- *
- * There are not many differences between @p FE_Q_Hierarchical and @p FE_Q,
- * except that we add a function @p embedding_dofs that takes a given integer
- * @p q, between @p 1 and @p p, and returns the numbering of basis functions
- * of the element of order @p q in basis of order @p p.  This function is
- * useful if one wants to make calculations using the hierarchical nature of
- * these shape functions.
- *
- * The unit support points now are reduced to @p 0, @p 1, and <tt>0.5</tt> in
- * one dimension, and tensor products in higher dimensions. Thus, various
- * interpolation functions will only work correctly for the linear case.
+ * basis Polynomials::Hierarchical on the interval <tt>[0,1]</tt> which is
+ * suitable for building an @p hp tensor product finite element if we assume
+ * that each element has a single degree.
  *
  * The constructor of this class takes the degree @p p of this finite element.
  *
@@ -549,7 +538,7 @@ template <int dim, int spacedim> class MappingQ;
  *
  *
  *
- * @author Brian Carnes, 2002, Ralf Hartmann 2004, 2005
+ * @author Brian Carnes, 2002, Ralf Hartmann 2004, 2005, Denis Davydov, 2015
  */
 template <int dim>
 class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
