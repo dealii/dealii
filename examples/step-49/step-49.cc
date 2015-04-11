@@ -33,7 +33,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
 
@@ -190,15 +190,21 @@ void grid_3 ()
         }
     }
 
-  // In the second step we will refine the mesh twice. To do this correctly,
-  // we have to associate a geometry object with the boundary of the hole;
-  // since the boundary of the hole has boundary indicator 1 (see the
-  // documentation of the function that generates the mesh), we need to create
-  // an object that describes a circle (i.e., a hyper ball) with appropriate
-  // center and radius and assign it to the triangulation. We can then refine
-  // twice:
-  const HyperBallBoundary<2> boundary_description(Point<2>(0,0), 0.25);
-  triangulation.set_boundary (1, boundary_description);
+  // In the second step we will refine the mesh twice. To do this
+  // correctly, we have to associate a geometry object with the
+  // boundary of the hole; since the boundary of the hole has boundary
+  // indicator 1 (see the documentation of the function that generates
+  // the mesh), we need to create an object that describes a spherical
+  // manifold (i.e., a hyper ball) with appropriate center and assign
+  // it to the triangulation. Notice that the function that generates
+  // the triangulation sets the boundary indicators of the inner mesh,
+  // but leaves unchanged the manifold indicator. We copy the boundary
+  // indicator to the manifold indicators in order for the object to
+  // be refined accordingly.
+  // We can then refine twice:
+  GridTools::copy_boundary_to_manifold_id(triangulation);
+  const SphericalManifold<2> boundary_description(Point<2>(0,0));
+  triangulation.set_manifold (1, boundary_description);
   triangulation.refine_global(2);
 
   // The mesh so generated is then passed to the function that generates
@@ -207,7 +213,7 @@ void grid_3 ()
   // object is destroyed first in this function since it was declared after
   // the triangulation).
   mesh_info (triangulation, "grid-3.eps");
-  triangulation.set_boundary (1);
+  triangulation.set_manifold (1);
 }
 
 // There is one snag to doing things as shown above: If one moves the nodes on

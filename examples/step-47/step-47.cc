@@ -32,7 +32,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
@@ -1061,8 +1061,9 @@ namespace Step47
             GridGenerator::hyper_ball (triangulation);
             //GridGenerator::hyper_cube (triangulation, -1, 1);
 
-            static const HyperBallBoundary<dim> boundary;
-            triangulation.set_boundary (0, boundary);
+            static const SphericalManifold<dim> boundary;
+            triangulation.set_all_manifold_ids_on_boundary(0);
+            triangulation.set_manifold (0, boundary);
 
             triangulation.refine_global (2);
           }

@@ -36,7 +36,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -479,7 +479,9 @@ namespace Step29
     // find the faces where the transducer is to be located, which in fact is
     // just the single edge from 0.4 to 0.6 on the x-axis. This is where we
     // want the refinements to be made according to a circle shaped boundary,
-    // so we mark this edge with a different boundary indicator.
+    // so we mark this edge with a different manifold indicator. Since we will
+    // Dirichlet boundary conditions on the transducer, we also change its
+    // boundary indicator.
     GridGenerator::subdivided_hyper_cube (triangulation, 5, 0, 1);
 
     typename Triangulation<dim>::cell_iterator
@@ -490,9 +492,11 @@ namespace Step29
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         if ( cell->face(face)->at_boundary() &&
              ((cell->face(face)->center() - transducer).norm_square() < 0.01) )
+          {
 
-          cell->face(face)->set_boundary_indicator (1);
-
+            cell->face(face)->set_boundary_indicator (1);
+            cell->face(face)->set_manifold_id (1);
+          }
     // For the circle part of the transducer lens, a hyper-ball object is used
     // (which, of course, in 2D just represents a circle), with radius and
     // center as computed above. By marking this object as
@@ -500,8 +504,8 @@ namespace Step29
     // program and thereby longer than the triangulation object we will
     // associated with it. We then assign this boundary-object to the part of
     // the boundary with boundary indicator 1:
-    static const HyperBallBoundary<dim> boundary(focal_point, radius);
-    triangulation.set_boundary(1, boundary);
+    static const SphericalManifold<dim> boundary(focal_point);
+    triangulation.set_manifold(1, boundary);
 
     // Now global refinement is executed. Cells near the transducer location
     // will be automatically refined according to the circle shaped boundary

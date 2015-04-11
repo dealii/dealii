@@ -340,6 +340,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Changed: All example programs used to have calls to set_boundary() 
+  methods to deal with curved boundaries. These have been replaced with 
+  the corresponding set_manifold() equivalent. 
+  <br>
+  (Luca Heltai, 2015/04/06)
+  </li>
 
   <li> New: A new flag no_automatic_repartitioning in
   parallel::distributed::Triangulation will disable the automatic

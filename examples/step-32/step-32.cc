@@ -50,6 +50,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
@@ -3567,7 +3568,12 @@ namespace Step32
   // step-31. We use a different mesh now (a GridGenerator::hyper_shell
   // instead of a simple cube geometry), and use the
   // <code>project_temperature_field()</code> function instead of the library
-  // function <code>VectorTools::project</code>, the rest is as before.
+  // function <code>VectorTools::project</code>.
+  // In this example, however, we define both a SphericalManifold() a
+  // HyperShellBoundary() object to describe the geometry of the domain.
+  // The reason we do so here, is because we want to impose no normal flux
+  // boundary conditions, and they require knowledge of the normals to a boundary,
+  // which a SphericalManifold() alone cannot compute.
   template <int dim>
   void BoussinesqFlowProblem<dim>::run ()
   {
@@ -3577,9 +3583,12 @@ namespace Step32
                                 EquationData::R1,
                                 (dim==3) ? 96 : 12,
                                 true);
+    triangulation.set_all_manifold_ids(0);
+    triangulation.set_all_manifold_ids_on_boundary(1);
+    static SphericalManifold<dim> manifold;
     static HyperShellBoundary<dim> boundary;
-    triangulation.set_boundary (0, boundary);
-    triangulation.set_boundary (1, boundary);
+    triangulation.set_manifold (0, manifold);
+    triangulation.set_manifold (1, boundary);
 
     global_Omega_diameter = GridTools::diameter (triangulation);
 
