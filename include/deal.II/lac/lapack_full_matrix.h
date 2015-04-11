@@ -208,13 +208,16 @@ public:
    * @note The template with @tref number2 only exists for compile-time
    * compatibility with FullMatrix. Only the case @tref number2 = @tref
    * number is implemented due to limitations in the underlying LAPACK
-   * interface
+   * interface. All other variants throw an error upon invocation.
    */
   template <typename number2>
   void vmult (Vector<number2>       &w,
               const Vector<number2> &v,
               const bool             adding = false) const;
 
+  /**
+   * Specialization of above function for compatbile Vector::value_type.
+   */
   void vmult (Vector<number>       &w,
               const Vector<number> &v,
               const bool            adding = false) const;
@@ -228,6 +231,9 @@ public:
   void vmult_add (Vector<number2>       &w,
                   const Vector<number2> &v) const;
 
+  /**
+   * Specialization of above function for compatbile Vector::value_type.
+   */
   void vmult_add (Vector<number>       &w,
                   const Vector<number> &v) const;
 
@@ -248,6 +254,9 @@ public:
                const Vector<number2> &v,
                const bool             adding=false) const;
 
+  /**
+   * Specialization of above function for compatbile Vector::value_type.
+   */
   void Tvmult (Vector<number>       &w,
                const Vector<number> &v,
                const bool            adding=false) const;
@@ -262,6 +271,9 @@ public:
   void Tvmult_add (Vector<number2>       &w,
                    const Vector<number2> &v) const;
 
+  /**
+   * Specialization of above function for compatbile Vector::value_type.
+   */
   void Tvmult_add (Vector<number>       &w,
                    const Vector<number> &v) const;
 

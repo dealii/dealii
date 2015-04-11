@@ -22,6 +22,7 @@
 // file and in each case pick the more accurate data type for intermediate
 // results. currently, the choice is pretty much random. this may also allow
 // us some operations where one operand is complex and the other is not
+// -> use ProductType<T,U> type trait for the results
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/template_constraints.h>
