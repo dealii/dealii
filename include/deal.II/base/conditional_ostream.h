@@ -130,9 +130,9 @@ public:
   operator<< (std::ostream& (*p) (std::ostream &)) const;
 
   /**
-   * Reference to the stream we want to write to.
+   * Copy of the stream we want to write to.
    */
-  std::ostream  &output_stream;
+  std::ostream  output_stream;
 
 private:
   /**
