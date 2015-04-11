@@ -6880,6 +6880,98 @@ namespace VectorTools
   {
     return compute_mean_value(StaticMappingQ1<dim,spacedim>::mapping, dof, quadrature, v, component);
   }
+
+
+  template<class DH, class VECTOR>
+  void get_position_vector(const DH &dh,
+                           VECTOR &vector,
+                           const ComponentMask mask)
+  {
+    AssertDimension(vector.size(), dh.n_dofs());
+
+    const unsigned int dim=DH::dimension;
+    const unsigned int spacedim=DH::space_dimension;
+    const FiniteElement<dim, spacedim> &fe = dh.get_fe();
+
+
+    // Construct default fe_mask;
+    const ComponentMask fe_mask(mask.size() ? mask :
+                                ComponentMask(fe.get_nonzero_components(0).size(), true));
+
+    AssertDimension(fe_mask.size(), fe.get_nonzero_components(0).size());
+
+    std::vector<unsigned int> fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int);
+    unsigned int size = 0;
+    for (unsigned int i=0; i<fe_mask.size(); ++i)
+      {
+        if (fe_mask[i])
+          fe_to_real[i] = size++;
+      }
+    Assert(size == spacedim,
+           ExcMessage("The Component Mask you provided is invalid. It has to select exactly spacedim entries."));
+
+
+    if ( fe.has_support_points() )
+      {
+        typename DH::active_cell_iterator cell;
+        const Quadrature<dim> quad(fe.get_unit_support_points());
+
+        MappingQ<dim,spacedim> map_q(fe.degree);
+        FEValues<dim,spacedim> fe_v(map_q, fe, quad, update_quadrature_points);
+        std::vector<types::global_dof_index> dofs(fe.dofs_per_cell);
+
+        AssertDimension(fe.dofs_per_cell, fe.get_unit_support_points().size());
+        Assert(fe.is_primitive(), ExcMessage("FE is not Primitive! This won't work."));
+
+        for (cell = dh.begin_active(); cell != dh.end(); ++cell)
+          {
+            fe_v.reinit(cell);
+            cell->get_dof_indices(dofs);
+            const std::vector<Point<spacedim> > &points = fe_v.get_quadrature_points();
+            for (unsigned int q = 0; q < points.size(); ++q)
+              {
+                unsigned int comp = fe.system_to_component_index(q).first;
+                if (fe_mask[comp])
+                  vector(dofs[q]) = points[q][fe_to_real[comp]];
+              }
+          }
+      }
+    else
+      {
+        // Construct a FiniteElement with FE_Q^spacedim, and call this
+        // function again.
+        //
+        // Once we have this, interpolate with the given finite element
+        // to get a Mapping which is interpolatory at the support points
+        // of FE_Q(fe.degree())
+        FESystem<dim,spacedim> feq(FE_Q<dim,spacedim>(fe.degree), spacedim);
+        DH dhq(dh.get_tria());
+        dhq.distribute_dofs(feq);
+        Vector<double> eulerq(dhq.n_dofs());
+        const ComponentMask maskq(spacedim, true);
+        get_position_vector(dhq, eulerq);
+
+        FullMatrix<double> transfer(fe.dofs_per_cell, feq.dofs_per_cell);
+        const std::vector<Point<dim> > &points = feq.get_unit_support_points();
+
+        // Here construct the interpolation matrix from FE_Q^spacedim to
+        // the FiniteElement used by euler_dof_handler.
+        //
+        // The interpolation matrix is then passed to the
+        // VectorTools::interpolate() function to generate
+        for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+          {
+            unsigned int comp_i = fe.system_to_component_index(i).first;
+            if (fe_mask[comp_i])
+              for (unsigned int j=0; j<points.size(); ++j)
+                {
+                  if ( fe_to_real[comp_i] == feq.system_to_component_index(j).first)
+                    transfer(i, j) = fe.shape_value(i, points[j]);
+                }
+          }
+        interpolate(dhq, dh, transfer, eulerq, vector);
+      }
+  }
 }
 
 DEAL_II_NAMESPACE_CLOSE

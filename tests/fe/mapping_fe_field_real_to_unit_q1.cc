@@ -30,6 +30,7 @@
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/numerics/vector_tools.h>
 
 using namespace dealii;
 
@@ -80,9 +81,8 @@ void test_real_to_unit_cell()
  Vector<double> eulerq(dhq.n_dofs());
  const ComponentMask mask(spacedim, true);
 
+ VectorTools::get_position_vector(dhq, eulerq, mask);
  MappingFEField<dim,spacedim> map(eulerq, dhq, mask);
-
- map.update_euler_vector_using_triangulation(eulerq);
 
  typename Triangulation<dim, spacedim >::active_cell_iterator
  cell = triangulation.begin_active();

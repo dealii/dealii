@@ -33,6 +33,7 @@
 #include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/numerics/vector_tools.h>
 
 using namespace dealii;
 
@@ -98,10 +99,8 @@ void test_real_to_unit_cell()
  ComponentMask mask(spacedim+1, true);
  mask.set(0, false);
 
+ VectorTools::get_position_vector(dhb, eulerq, mask);
  MappingFEField<dim,spacedim> map(eulerq, dhb, mask);
-
- map.update_euler_vector_using_triangulation(eulerq);
-
 
  typename Triangulation<dim, spacedim >::active_cell_iterator
  cell = triangulation.begin_active();

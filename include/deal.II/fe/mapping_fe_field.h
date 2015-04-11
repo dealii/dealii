@@ -51,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
  * components of the FiniteElement to use for the mapping.
  *
  * Typically, the DoFHandler operates on a finite element that is
- * constructed as a system element (FESystem) from continuous FE_Q()
+ * constructed as a system element (FESystem()) from continuous FE_Q()
  * (for iso-parametric discretizations) or FE_Bernstein() (for
  * iso-geometric discretizations) objects. An example is shown below:
  *
@@ -61,9 +61,10 @@ DEAL_II_NAMESPACE_OPEN
  *    DoFHandler<dim,spacedim> dhq(triangulation);
  *    dhq.distribute_dofs(fesystem);
  *    Vector<double> eulerq(dhq.n_dofs());
+ *    // Fills the euler vector with information from the Triangulation
+ *    VectorTools::get_position_vector(dhq, eulerq);
  *    const ComponentMask mask(spacedim, true);
  *    MappingFEField<dim,spacedim> map(eulerq, dhq, mask);
- *    map.update_euler_vector_using_triangulation(eulerq);
  * @endcode
  *
  * @author Luca Heltai, Marco Tezzele 2013, 2015
@@ -89,16 +90,10 @@ public:
    * euler_vector actually represents a valid geometry (i.e., one with
    * no inverted cells, or with no zero-volume cells).
    *
-   * In order to facilitate the user, we provide an
-   * update_euler_vector_using_triangulation() method to initialize a
-   * euler_vector in a way similar to what happens in
-   * MappingQEulerian, by creating a euler_vector which interpolates
-   * the underlying Triangulation.
-   *
    * If the underlying FiniteElement is a system of FE_Q(), and
    * euler_vector is initialized using
-   * update_euler_vector_using_triangulation(), then this class is in
-   * all respects identical to MappingQ().
+   * VectorTools::get_position_vector(), then this class is in all
+   * respects identical to MappingQ().
    *
    * The optional ComponentMask argument can be used to specify what
    * components of the FiniteElement to use for the geometrical
@@ -125,24 +120,6 @@ public:
    * default copy constructor.
    */
   MappingFEField (const MappingFEField<dim,spacedim,VECTOR,DH> &mapping);
-
-  /**
-   * Helper function to fill the given euler vector with information
-   * coming from the triangulation, by interpolating the geometry of
-   * the Triangulation associated with the DoFHandler used at
-   * construction time.
-   *
-   * The resulting map is guaranteed to be interpolatory at the
-   * vertices of the Triangulation. Notice that this may or may not be
-   * meaningful, depending on the FiniteElement you have used to
-   * construct this MappingFEField.
-   *
-   * If the underlying FiniteElement is a system of FE_Q(), and
-   * euler_vector is initialized using this function, then this class
-   * is in all respects identical to MappingQ().
-   */
-  void update_euler_vector_using_triangulation(VECTOR &vector) const;
-
 
 
   /**
