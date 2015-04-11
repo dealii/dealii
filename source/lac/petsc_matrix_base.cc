@@ -629,8 +629,8 @@ namespace PETScWrappers
     MatrixBase::size_type row;
     for (row = loc_range.first; row < loc_range.second; ++row)
       {
-        int ierr;
-        ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
+        int ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
+        (void)ierr;
         AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
         for (PetscInt col = 0; col < ncols; ++col)
