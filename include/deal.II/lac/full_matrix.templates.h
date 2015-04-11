@@ -17,7 +17,12 @@
 #define __deal2__full_matrix_templates_h
 
 
-//TODO: this file has a lot of operations between matrices and matrices or matrices and vectors of different precision. we should go through the file and in each case pick the more accurate data type for intermediate results. currently, the choice is pretty much random. this may also allow us some operations where one operand is complex and the other is not
+// TODO: this file has a lot of operations between matrices and matrices or
+// matrices and vectors of different precision. we should go through the
+// file and in each case pick the more accurate data type for intermediate
+// results. currently, the choice is pretty much random. this may also allow
+// us some operations where one operand is complex and the other is not
+// -> use ProductType<T,U> type trait for the results
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/template_constraints.h>
