@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2014 by the deal.II authors
+ * Copyright (C) 2008 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -3569,11 +3569,15 @@ namespace Step32
   // instead of a simple cube geometry), and use the
   // <code>project_temperature_field()</code> function instead of the library
   // function <code>VectorTools::project</code>.
-  // In this example, however, we define both a SphericalManifold() a
+  // In this example, however, we define both a SphericalManifold() and a
   // HyperShellBoundary() object to describe the geometry of the domain.
   // The reason we do so here, is because we want to impose no normal flux
   // boundary conditions, and they require knowledge of the normals to a boundary,
-  // which a SphericalManifold() alone cannot compute.
+  // which a SphericalManifold() alone cannot compute. Consequently, we set
+  // all manifold indicators of cells and adjacent edges to zero, then overwrite
+  // the manifold indicators of all boundary objects by one. We then associate
+  // a SphericalManifold object with the former, and the HyperShellBoundary
+  // object that can also provide normal vectors with the latter.
   template <int dim>
   void BoussinesqFlowProblem<dim>::run ()
   {
