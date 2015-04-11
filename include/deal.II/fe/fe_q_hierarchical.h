@@ -590,6 +590,21 @@ public:
   virtual bool hp_constraints_are_implemented () const;
 
   /**
+   * Return the matrix interpolating from the given finite element to the present one.
+   * Interpolation only between FE_Q_Hierarchical is supported.
+   */
+  virtual void get_interpolation_matrix(const FiniteElement< dim> &source,
+                                        FullMatrix< double > &matrix) const;
+
+  /**
+   * Embedding matrix between grids.
+   * Only isotropic refinement is supported.
+   */
+  virtual const
+  FullMatrix<double> &get_prolongation_matrix  (const unsigned int child,
+                                                const RefinementCase<dim> &refinement_case = RefinementCase< dim >::isotropic_refinement) const;
+
+  /**
    * If, on a vertex, several finite elements are active, the hp code first
    * assigns the degrees of freedom of each of these FEs different global
    * indices. It then calls this function to find out which of them should get
@@ -607,6 +622,20 @@ public:
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+
+  /**
+   * Same as above but for lines.
+   */
+  virtual
+  std::vector<std::pair<unsigned int, unsigned int> >
+  hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+
+  /**
+   * Same as above but for faces.
+   */
+  virtual
+  std::vector<std::pair<unsigned int, unsigned int> >
+  hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
 
   /*@}*/
 
@@ -673,6 +702,17 @@ public:
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const;
+
+  /**
+   * A function to interpolate scalar values, computed at the
+   * support points to the FE_Q_Hierarchical.
+   *
+   * This function is not implemented and throws an exception if called.
+   */
+  virtual
+  void interpolate(std::vector<double>       &local_dofs,
+                   const std::vector<double> &values) const;
+
 
 protected:
   /**
