@@ -235,11 +235,15 @@ namespace OpenCASCADE
   Point<1>
   ArclengthProjectionLineManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const
   {
+    double t (0.0);
+#ifdef DEBUG
     ShapeAnalysis_Curve curve_analysis;
     gp_Pnt proj;
-    double t;
-    double dist = curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true);
-    Assert(dist < tolerance*length, ExcPointNotOnManifold(space_point));
+    Assert(curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true)
+           < tolerance*length, ExcPointNotOnManifold(space_point));
+#else
+    (void)space_point;
+#endif
     return Point<1>(GCPnts_AbscissaPoint::Length(curve->GetCurve(),curve->GetCurve().FirstParameter(),t));
   }
 
