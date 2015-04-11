@@ -87,9 +87,9 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
-  # Silence Clang warnings about unused parameters:
+  # Silence Clang warnings about unused parameters (mainly caused by BOOST):
   #
-  SET(DEAL_II_CXX_FLAGS "-Qunused-arguments ${DEAL_II_CXX_FLAGS}")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter")
 
   #
   # *Boy*, clang seems to be the very definition of "pedantic" in
