@@ -409,6 +409,7 @@ namespace TrilinosWrappers
             int *index_ptr, *rhs_index_ptr;
             ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,
                                                  rhs_value_ptr, rhs_index_ptr);
+            (void)ierr;
             Assert (ierr == 0, ExcTrilinosError(ierr));
 
             ierr = matrix->ExtractMyRowView (row_local, n_entries, value_ptr,
@@ -596,6 +597,7 @@ namespace TrilinosWrappers
     // check whether we got the number of columns right.
     AssertDimension (sparsity_pattern.n_cols(),static_cast<size_type>(
                        n_global_cols(*graph)));
+    (void)n_global_cols;
 
     // And now finally generate the matrix.
     matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
@@ -746,6 +748,7 @@ namespace TrilinosWrappers
           {
             Epetra_Export exporter(nonlocal_graph->RowMap(), input_row_map);
             int ierr = graph->Export(*nonlocal_graph, exporter, Add);
+            (void)ierr;
             Assert (ierr==0, ExcTrilinosError(ierr));
           }
 
@@ -1079,6 +1082,7 @@ namespace TrilinosWrappers
         int num_entries;
         const int ierr = matrix->ExtractMyRowView(local_row, num_entries,
                                                   values, col_indices);
+        (void)ierr;
 
         Assert (ierr == 0,
                 ExcTrilinosError(ierr));
@@ -1149,6 +1153,7 @@ namespace TrilinosWrappers
         // TODO Check that col_indices are int and not long long
         int ierr = matrix->ExtractMyRowView(trilinos_i, nnz_extracted,
                                             values, col_indices);
+        (void)ierr;
         Assert (ierr==0, ExcTrilinosError(ierr));
 
         Assert (nnz_present == nnz_extracted,
@@ -1221,6 +1226,7 @@ namespace TrilinosWrappers
         // an error.
         int ierr = matrix->ExtractMyRowView(trilinos_i, nnz_extracted,
                                             values, col_indices);
+        (void)ierr;
         Assert (ierr==0, ExcTrilinosError(ierr));
 
         Assert (nnz_present == nnz_extracted,
@@ -1578,6 +1584,7 @@ namespace TrilinosWrappers
         int *index_ptr, *rhs_index_ptr;
         ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,
                                              rhs_value_ptr, rhs_index_ptr);
+        (void)ierr;
         Assert (ierr == 0, ExcTrilinosError(ierr));
 
         ierr = matrix->ExtractMyRowView (row_local, n_entries, value_ptr,

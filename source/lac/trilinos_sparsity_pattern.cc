@@ -240,6 +240,7 @@ namespace TrilinosWrappers
                                  *column_space_map,
                                  0))
   {
+    (void)input_sparsity;
     Assert (input_sparsity.n_rows() == 0,
             ExcMessage ("Copy constructor only works for empty sparsity patterns."));
   }
@@ -781,6 +782,7 @@ namespace TrilinosWrappers
             int ierr = graph->ExtractGlobalRowView(
                          static_cast<TrilinosWrappers::types::int_type>(trilinos_i),
                          nnz_extracted, col_indices);
+            (void)ierr;
             Assert (ierr==0, ExcTrilinosError(ierr));
             Assert (nnz_present == nnz_extracted,
                     ExcDimensionMismatch(nnz_present, nnz_extracted));
@@ -809,6 +811,7 @@ namespace TrilinosWrappers
             // an error.
             int ierr = graph->ExtractMyRowView(trilinos_i,
                                                nnz_extracted, col_indices);
+            (void)ierr;
             Assert (ierr==0, ExcTrilinosError(ierr));
 
             Assert (nnz_present == nnz_extracted,

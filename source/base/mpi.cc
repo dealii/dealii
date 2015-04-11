@@ -192,6 +192,7 @@ namespace Utilities
                         int *len,
                         MPI_Datatype *)
       {
+        (void)len;
         const MinMaxAvg *in_lhs = static_cast<const MinMaxAvg *>(in_lhs_);
         MinMaxAvg *inout_rhs = static_cast<MinMaxAvg *>(inout_rhs_);
 
@@ -334,6 +335,7 @@ namespace Utilities
                                         const unsigned int max_num_threads)
     {
       static bool constructor_has_already_run = false;
+      (void)constructor_has_already_run;
       Assert (constructor_has_already_run == false,
               ExcMessage ("You can only create a single object of this class "
                           "in a program since it initializes the MPI system."));

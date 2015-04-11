@@ -594,6 +594,7 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
   const double length=(v1-v0).norm();
 
   double eps=1e-12;
+  (void)eps;
   double r=0;
   if (compute_radius_automatically)
     r = (p0 - center).norm();

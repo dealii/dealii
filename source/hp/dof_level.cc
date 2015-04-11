@@ -28,6 +28,7 @@ namespace internal
     void
     DoFLevel::compress_data (const dealii::hp::FECollection<dim,spacedim> &fe_collection)
     {
+      (void)fe_collection;
       return;
 
       if (dof_offsets.size() == 0 || dof_indices.size()==0)

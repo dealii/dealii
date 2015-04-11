@@ -49,6 +49,7 @@ BlockSparsityPatternBase (const BlockSparsityPatternBase &s)
   :
   Subscriptor ()
 {
+  (void)s;
   Assert(s.rows==0, ExcInvalidConstructorCall());
   Assert(s.columns==0, ExcInvalidConstructorCall());
 

@@ -820,6 +820,7 @@ namespace TrilinosWrappers
           additional_data.constant_modes[0].size() == n_rows;
         const size_type n_relevant_rows =
           constant_modes_are_global ? n_rows : additional_data.constant_modes[0].size();
+        (void)n_relevant_rows;
         const size_type my_size = domain_map.NumMyElements();
         if (constant_modes_are_global == false)
           Assert (n_relevant_rows == my_size,
@@ -828,6 +829,7 @@ namespace TrilinosWrappers
                 static_cast<size_type>(global_length(distributed_constant_modes)),
                 ExcDimensionMismatch(n_rows,
                                      global_length(distributed_constant_modes)));
+        (void)global_length;
 
         // Reshape null space as a contiguous vector of doubles so that
         // Trilinos can read from it.

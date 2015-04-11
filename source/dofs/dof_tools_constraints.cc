@@ -2226,6 +2226,7 @@ namespace DoFTools
                                 const ComponentMask            &component_mask)
   {
     static const int space_dim = DH::space_dimension;
+    (void)space_dim;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
@@ -2256,6 +2257,8 @@ namespace DoFTools
   {
     static const int dim = DH::dimension;
     static const int space_dim = DH::space_dimension;
+    (void)dim;
+    (void)space_dim;
 
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
@@ -2756,6 +2759,7 @@ namespace DoFTools
                                                fine_grid, fine_component,
                                                coarse_to_fine_grid_map,
                                                weights, weight_mapping);
+    (void)n_parameters_on_fine_grid;
 
     // global numbers of dofs
     const types::global_dof_index n_coarse_dofs = coarse_grid.n_dofs(),

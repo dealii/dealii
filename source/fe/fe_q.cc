@@ -59,6 +59,7 @@ FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
     std::vector<bool> (1, false))
 {
   const unsigned int degree = points.size()-1;
+  (void)degree;
   Assert (degree > 0,
           ExcMessage ("This element can only be used for polynomial degrees "
                       "at least zero"));

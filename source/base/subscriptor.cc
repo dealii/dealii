@@ -46,7 +46,11 @@ Subscriptor::Subscriptor ()
   :
   counter (0),
   object_info (0)
-{}
+{
+  // this has to go somewhere to avoid an extra warning.
+  (void)unknown_subscriber;
+}
+
 
 
 Subscriptor::Subscriptor (const Subscriptor &)
@@ -161,6 +165,8 @@ Subscriptor::subscribe(const char *id) const
 
   else
     it->second++;
+#  else
+  (void)id;
 #  endif
 #else
   (void)id;

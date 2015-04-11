@@ -231,6 +231,7 @@ DynamicSparsityPattern (const DynamicSparsityPattern &s)
   cols(0),
   rowset(0)
 {
+  (void)s;
   Assert (s.rows == 0, ExcInvalidConstructorCall());
   Assert (s.cols == 0, ExcInvalidConstructorCall());
 }
@@ -274,6 +275,7 @@ DynamicSparsityPattern::DynamicSparsityPattern (const size_type n)
 DynamicSparsityPattern &
 DynamicSparsityPattern::operator = (const DynamicSparsityPattern &s)
 {
+  (void)s;
   Assert (s.rows == 0, ExcInvalidConstructorCall());
   Assert (s.cols == 0, ExcInvalidConstructorCall());
 

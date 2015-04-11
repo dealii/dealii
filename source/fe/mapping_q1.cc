@@ -98,6 +98,7 @@ namespace internal
                             const std::vector<Point<1> > &unit_points,
                             typename dealii::MappingQ1<1,spacedim>::InternalData &data)
     {
+      (void)n_shape_functions;
       const unsigned int n_points=unit_points.size();
       for (unsigned int k = 0 ; k < n_points ; ++k)
         {
@@ -138,6 +139,7 @@ namespace internal
                             const std::vector<Point<2> > &unit_points,
                             typename dealii::MappingQ1<2,spacedim>::InternalData &data)
     {
+      (void)n_shape_functions;
       const unsigned int n_points=unit_points.size();
       for (unsigned int k = 0 ; k < n_points ; ++k)
         {
@@ -198,6 +200,7 @@ namespace internal
                             const std::vector<Point<3> > &unit_points,
                             typename dealii::MappingQ1<3,spacedim>::InternalData &data)
     {
+      (void)n_shape_functions;
       const unsigned int n_points=unit_points.size();
       for (unsigned int k = 0 ; k < n_points ; ++k)
         {
@@ -815,6 +818,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
                 else
                   {
                     const unsigned int codim = spacedim-dim;
+                    (void)codim;
 
                     if (update_flags & update_normal_vectors)
                       {
@@ -1457,6 +1461,7 @@ MappingQ1<dim,spacedim>::
 transform_unit_to_real_cell_internal (const InternalData &data) const
 {
   const unsigned int n_mapping_points=data.mapping_support_points.size();
+  (void)n_mapping_points;
   AssertDimension (data.shape_values.size(), n_mapping_points);
 
   // use now the InternalData to
@@ -1699,6 +1704,7 @@ transform_real_to_unit_cell_internal
  InternalData                                     &mdata) const
 {
   const unsigned int n_shapes=mdata.shape_values.size();
+  (void)n_shapes;
   Assert(n_shapes!=0, ExcInternalError());
   AssertDimension (mdata.shape_derivatives.size(), n_shapes);
 
@@ -1929,6 +1935,7 @@ transform_real_to_unit_cell_internal_codim1
 
 
   const unsigned int n_shapes=mdata.shape_values.size();
+  (void)n_shapes;
   Assert(n_shapes!=0, ExcInternalError());
   Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
   Assert(mdata.shape_second_derivatives.size()==n_shapes, ExcInternalError());

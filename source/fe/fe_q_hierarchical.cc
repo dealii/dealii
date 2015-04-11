@@ -851,6 +851,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   // we will be able to do the work
   const FE_Q_Hierarchical<dim> &source_fe
     = dynamic_cast<const FE_Q_Hierarchical<dim>&>(x_source_fe);
+  (void)source_fe;
 
   // Make sure, that the element,
   // for which the DoFs should be

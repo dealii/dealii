@@ -39,6 +39,7 @@ MappingC1<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
                                        std::vector<Point<1> > &) const
 {
   const unsigned int dim = 1;
+  (void)dim;
   Assert (dim > 1, ExcImpossibleInDim(dim));
 }
 
@@ -160,6 +161,7 @@ MappingC1<1>::add_quad_support_points (const Triangulation<1>::cell_iterator &,
                                        std::vector<Point<1> > &) const
 {
   const unsigned int dim = 1;
+  (void)dim;
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
 
@@ -171,6 +173,7 @@ MappingC1<2>::add_quad_support_points (const Triangulation<2>::cell_iterator &,
                                        std::vector<Point<2> > &) const
 {
   const unsigned int dim = 2;
+  (void)dim;
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
 

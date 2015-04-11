@@ -1130,6 +1130,7 @@ namespace
     num_vtt = std::accumulate (vertex_touch_count.begin(),
                                vertex_touch_count.end(),
                                0);
+    (void)num_vtt;
     Assert (connectivity->ctt_offset[triangulation.n_vertices()] ==
             num_vtt,
             ExcInternalError());
@@ -3295,6 +3296,7 @@ namespace parallel
       // many non-artificial cells as parallel_forest->local_num_quadrants)
       {
         const unsigned int total_local_cells = this->n_active_cells();
+        (void)total_local_cells;
 
         if (Utilities::MPI::n_mpi_processes (mpi_communicator) == 1)
           Assert (static_cast<unsigned int>(parallel_forest->local_num_quadrants) ==
@@ -3630,6 +3632,7 @@ namespace parallel
            ++it, ++buffer, ++idx)
         {
           const unsigned int num_cells = it->second.tree_index.size();
+          (void)num_cells;
           destinations.push_back(it->first);
 
           Assert(num_cells==it->second.quadrants.size(), ExcInternalError());
