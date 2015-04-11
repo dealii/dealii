@@ -793,6 +793,12 @@ inconvenience this causes.
   <br>
   (Matthias Maier, 2014/12/29)
   </li>
+
+  <li> Improved: deal.II now uses a variety of strategies to silence compiler
+  warnings about unused variables and unused parameters.
+  <br>
+  (David Wells, 2015/04/13)
+  </li>
 </ol>
 
 */
