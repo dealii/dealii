@@ -135,7 +135,7 @@ public:
   operator<< (std::ostream& (*p) (std::ostream &)) const;
 
   /**
-   * Copy of the stream we want to write to.
+   * The stream we want to write to.
    */
   std::ostream  output_stream;
 
