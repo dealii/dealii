@@ -393,7 +393,7 @@ namespace SparsityTools
                   AssertThrow(touched_nodes[*it] == numbers::invalid_dof_index,
                               ExcInternalError());
                   types::global_dof_index active_row_length = 0;
-                  for (CompressedSimpleSparsityPattern::row_iterator rowit
+                  for (DynamicSparsityPattern::row_iterator rowit
                        = connectivity.row_begin(*it);
                        rowit != connectivity.row_end(*it); ++rowit)
                     if (touched_nodes[*rowit] == numbers::invalid_dof_index)
@@ -409,7 +409,7 @@ namespace SparsityTools
                    it != current_neighbors.end(); ++it)
                 {
                   types::global_dof_index active_row_length = 0;
-                  for (CompressedSimpleSparsityPattern::row_iterator rowit
+                  for (DynamicSparsityPattern::row_iterator rowit
                        = connectivity.row_begin(*it);
                        rowit != connectivity.row_end(*it); ++rowit)
                     if (touched_nodes[*rowit] == numbers::invalid_dof_index)
@@ -427,7 +427,7 @@ namespace SparsityTools
 
               // Add all direct neighbors of the pivot cell not yet touched to
               // the current list
-              for (CompressedSimpleSparsityPattern::row_iterator it
+              for (DynamicSparsityPattern::row_iterator it
                    = connectivity.row_begin(min_neighbors.first);
                    it != connectivity.row_end(min_neighbors.first); ++it)
                 {
@@ -443,7 +443,7 @@ namespace SparsityTools
               // list from the set of possible next pivots.
               for (types::global_dof_index i=0; i<new_entries.size(); ++i)
                 {
-                  for (CompressedSimpleSparsityPattern::row_iterator it
+                  for (DynamicSparsityPattern::row_iterator it
                        = connectivity.row_begin(new_entries[i]);
                        it != connectivity.row_end(new_entries[i]); ++it)
                     if (touched_nodes[*it] == numbers::invalid_dof_index)
@@ -461,7 +461,7 @@ namespace SparsityTools
                                                    groups.size());
           for (types::global_dof_index i=0; i<groups.size(); ++i)
             for (types::global_dof_index col=0; col<groups[i].size(); ++col)
-              for (CompressedSimpleSparsityPattern::row_iterator it
+              for (DynamicSparsityPattern::row_iterator it
                    = connectivity.row_begin(groups[i][col]);
                    it != connectivity.row_end(groups[i][col]); ++it)
                 {
