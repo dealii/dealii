@@ -83,13 +83,14 @@ namespace GridGenerator
 
 
 
+    template<int spacedim>
     void
-    colorize_subdivided_hyper_rectangle (Triangulation<1> &tria,
-                                         const Point<1> &,
-                                         const Point<1> &,
+    colorize_subdivided_hyper_rectangle (Triangulation<1,spacedim> &tria,
+                                         const Point<spacedim> &,
+                                         const Point<spacedim> &,
                                          const double)
     {
-      for (Triangulation<1>::cell_iterator cell = tria.begin();
+      for (typename Triangulation<1,spacedim>::cell_iterator cell = tria.begin();
            cell != tria.end(); ++cell)
         if (cell->center()(0) > 0)
           cell->set_material_id(1);

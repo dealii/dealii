@@ -93,12 +93,12 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-//  deallog.push("1d");
-//  test<1,2>(logfile);
-//  deallog.pop();
-//  deallog.push("2d");
-//  test<1,3>(logfile);
-//  deallog.pop();
+  deallog.push("1-2");
+  test<1,2>(logfile);
+  deallog.pop();
+  deallog.push("1-3");
+  test<1,3>(logfile);
+  deallog.pop();
   deallog.push("2-3");
   test<2,3>(logfile);
   deallog.pop();
