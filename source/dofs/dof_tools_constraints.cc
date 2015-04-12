@@ -2974,7 +2974,7 @@ namespace DoFTools
   template <int dim, int spacedim, template <int,int> class DH>
   void
   make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
-                                  const types::boundary_id boundary_indicator,
+                                  const types::boundary_id boundary_id,
                                   ConstraintMatrix        &zero_boundary_constraints,
                                   const ComponentMask     &component_mask)
   {
@@ -3018,9 +3018,9 @@ namespace DoFTools
               // boundary id property
               if (face->at_boundary ()
                   &&
-                  ((boundary_indicator == numbers::invalid_boundary_id)
+                  ((boundary_id == numbers::invalid_boundary_id)
                    ||
-                   (face->boundary_indicator() == boundary_indicator)))
+                   (face->boundary_id() == boundary_id)))
                 {
                   // get indices and physical location on this face
                   face_dofs.resize (fe.dofs_per_face);

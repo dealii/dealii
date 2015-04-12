@@ -104,7 +104,7 @@ int main ()
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
-    volume_mesh.begin_active()->face(0)->set_boundary_indicator(1);
+    volume_mesh.begin_active()->face(0)->set_boundary_id(1);
     volume_mesh.refine_global (1);
 
     save_mesh(volume_mesh);
@@ -135,7 +135,7 @@ int main ()
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
-    volume_mesh.begin_active()->face(0)->set_boundary_indicator(1);
+    volume_mesh.begin_active()->face(0)->set_boundary_id(1);
     volume_mesh.refine_global (1);
 
     save_mesh(volume_mesh);
@@ -168,7 +168,7 @@ int main ()
 
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
-    volume_mesh.begin_active()->face(0)->set_boundary_indicator(1);
+    volume_mesh.begin_active()->face(0)->set_boundary_id(1);
     volume_mesh.refine_global (1);
 
     save_mesh(volume_mesh);

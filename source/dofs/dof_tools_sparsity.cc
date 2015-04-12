@@ -335,11 +335,11 @@ namespace DoFTools
       {
         // there are only 2 boundary indicators in 1d, so it is no
         // performance problem to call the other function
-        typename DH::FunctionMap boundary_indicators;
-        boundary_indicators[0] = 0;
-        boundary_indicators[1] = 0;
+        typename DH::FunctionMap boundary_ids;
+        boundary_ids[0] = 0;
+        boundary_ids[1] = 0;
         make_boundary_sparsity_pattern<DH, SparsityPattern> (dof,
-                                                             boundary_indicators,
+                                                             boundary_ids,
                                                              dof_to_boundary_mapping,
                                                              sparsity);
         return;
@@ -395,7 +395,7 @@ namespace DoFTools
   template <class DH, class SparsityPattern>
   void make_boundary_sparsity_pattern (
     const DH                                        &dof,
-    const typename FunctionMap<DH::space_dimension>::type &boundary_indicators,
+    const typename FunctionMap<DH::space_dimension>::type &boundary_ids,
     const std::vector<types::global_dof_index>                 &dof_to_boundary_mapping,
     SparsityPattern                                 &sparsity)
   {
@@ -405,8 +405,8 @@ namespace DoFTools
         for (unsigned int direction=0; direction<2; ++direction)
           {
             // if this boundary is not requested, then go on with next one
-            if (boundary_indicators.find(direction) ==
-                boundary_indicators.end())
+            if (boundary_ids.find(direction) ==
+                boundary_ids.end())
               continue;
 
             // find active cell at that boundary: first go to left/right,
@@ -436,12 +436,12 @@ namespace DoFTools
     const types::global_dof_index n_dofs = dof.n_dofs();
 
     AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
-    Assert (boundary_indicators.find(numbers::internal_face_boundary_id) == boundary_indicators.end(),
+    Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
             typename DH::ExcInvalidBoundaryIndicator());
-    Assert (sparsity.n_rows() == dof.n_boundary_dofs (boundary_indicators),
-            ExcDimensionMismatch (sparsity.n_rows(), dof.n_boundary_dofs (boundary_indicators)));
-    Assert (sparsity.n_cols() == dof.n_boundary_dofs (boundary_indicators),
-            ExcDimensionMismatch (sparsity.n_cols(), dof.n_boundary_dofs (boundary_indicators)));
+    Assert (sparsity.n_rows() == dof.n_boundary_dofs (boundary_ids),
+            ExcDimensionMismatch (sparsity.n_rows(), dof.n_boundary_dofs (boundary_ids)));
+    Assert (sparsity.n_cols() == dof.n_boundary_dofs (boundary_ids),
+            ExcDimensionMismatch (sparsity.n_cols(), dof.n_boundary_dofs (boundary_ids)));
 #ifdef DEBUG
     if (sparsity.n_rows() != 0)
       {
@@ -461,8 +461,8 @@ namespace DoFTools
                                       endc = dof.end();
     for (; cell!=endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
-        if (boundary_indicators.find(cell->face(f)->boundary_indicator()) !=
-            boundary_indicators.end())
+        if (boundary_ids.find(cell->face(f)->boundary_id()) !=
+            boundary_ids.end())
           {
             const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
             dofs_on_this_face.resize (dofs_per_face);

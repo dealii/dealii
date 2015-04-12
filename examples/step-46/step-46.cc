@@ -321,7 +321,7 @@ namespace Step46
         if (cell->face(f)->at_boundary()
             &&
             (cell->face(f)->center()[dim-1] == 1))
-          cell->face(f)->set_all_boundary_indicators(1);
+          cell->face(f)->set_all_boundary_ids(1);
 
 
     for (typename Triangulation<dim>::active_cell_iterator

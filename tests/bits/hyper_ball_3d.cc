@@ -57,7 +57,7 @@ int main ()
        face!=tria.end_face(); ++face)
     {
       deallog << face << "   "
-              << (int)face->boundary_indicator() << "  "
+              << (int)face->boundary_id() << "  "
               << face->vertex_index(0)
               << " <" << face->vertex(0) << '>'
               << std::endl

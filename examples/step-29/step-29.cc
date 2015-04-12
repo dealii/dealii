@@ -494,7 +494,7 @@ namespace Step29
              ((cell->face(face)->center() - transducer).norm_square() < 0.01) )
           {
 
-            cell->face(face)->set_boundary_indicator (1);
+            cell->face(face)->set_boundary_id (1);
             cell->face(face)->set_manifold_id (1);
           }
     // For the circle part of the transducer lens, a hyper-ball object is used
@@ -709,7 +709,7 @@ namespace Step29
         // absorbing boundary conditions:
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           if (cell->face(face)->at_boundary() &&
-              (cell->face(face)->boundary_indicator() == 0) )
+              (cell->face(face)->boundary_id() == 0) )
             {
 
 

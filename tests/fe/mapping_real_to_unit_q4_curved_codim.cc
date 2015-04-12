@@ -50,7 +50,7 @@ void test_real_to_unit_cell()
   // set the boundary indicator for
   // one face of the single cell
   triangulation.set_boundary (1, boundary);
-  triangulation.begin_active()->face(0)->set_boundary_indicator (1);
+  triangulation.begin_active()->face(0)->set_boundary_id (1);
 
   const unsigned int n_points = 5;
   std::vector< Point<dim> > unit_points(Utilities::fixed_power<dim>(n_points));

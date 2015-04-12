@@ -150,8 +150,8 @@ namespace Step45
   void LaplaceProblem::make_grid_and_dofs ()
   {
     GridGenerator::hyper_cube (triangulation);
-    triangulation.begin_active ()->face (2)->set_boundary_indicator (1);
-    triangulation.begin_active ()->face (3)->set_boundary_indicator (1);
+    triangulation.begin_active ()->face (2)->set_boundary_id (1);
+    triangulation.begin_active ()->face (3)->set_boundary_id (1);
     triangulation.refine_global (5);
 
     // The next step is to distribute the degrees of freedom and produce a

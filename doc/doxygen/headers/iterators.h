@@ -225,7 +225,7 @@ iterator are
   line->child(0);
   hex->face(3);
   cell->at_boundary();
-  face->boundary_indicator();
+  face->boundary_id();
 @endcode
 
 Since dereferencing iterators yields accessor objects, these calls are to

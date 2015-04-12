@@ -151,15 +151,15 @@ void FindBug<dim>::dirichlet_conditions ()
 
 
   std::vector<bool> fixed_dofs (dof_handler.n_dofs());
-  std::set<types::boundary_id> boundary_indicators;
-  boundary_indicators.insert (0);
+  std::set<types::boundary_id> boundary_ids;
+  boundary_ids.insert (0);
 
   // get a list of those boundary DoFs which
   // we want to be fixed:
   DoFTools::extract_boundary_dofs (dof_handler,
                                    component_mask,
                                    fixed_dofs,
-                                   boundary_indicators);
+                                   boundary_ids);
 
   // (Primitive) Check if the DoFs
   // where adjusted correctly (note

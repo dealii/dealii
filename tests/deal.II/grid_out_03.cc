@@ -41,8 +41,8 @@ void test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
-  tria.begin_active()->line(0)->set_boundary_indicator(1);
-  tria.begin_active()->face(2*dim-1)->set_boundary_indicator(2);
+  tria.begin_active()->line(0)->set_boundary_id(1);
+  tria.begin_active()->face(2*dim-1)->set_boundary_id(2);
 
   GridOut grid_out;
   GridOutFlags::Ucd flags;

@@ -65,25 +65,25 @@ void run()
 		    if ( (std::fabs(cell->face(face)->center()(0)) < 0.1)
 			 && (std::fabs(cell->face(face)->center()(dim-1)) < 1e-12) )
 		      {  
-			cell->face(face)->set_boundary_indicator (1);
+			cell->face(face)->set_boundary_id (1);
 		      }
 
 		    if ( (std::fabs(cell->face(face)->center()(0)) < 1e-12)
 			 && (std::fabs(cell->face(face)->center()(dim-1)) < 0.1) )
 		      {
-			cell->face(face)->set_boundary_indicator (1);
+			cell->face(face)->set_boundary_id (1);
 		      }
 
 		    if ( (std::fabs(1.0-cell->face(face)->center()(0)) < 0.1)
 			 && (std::fabs(1.0-cell->face(face)->center()(dim-1)) < 1e-12) )
 		      {
-			cell->face(face)->set_boundary_indicator (2);
+			cell->face(face)->set_boundary_id (2);
 		      }
 
 		    if ( (std::fabs(1.0-cell->face(face)->center()(0)) < 1e-12)
 			 && (std::fabs(1.0-cell->face(face)->center()(dim-1)) < 0.1) )
 		      {
-			cell->face(face)->set_boundary_indicator (2);
+			cell->face(face)->set_boundary_id (2);
 		      }
 
 		    // no normal flux boundary
@@ -91,25 +91,25 @@ void run()
 		    if ( (std::fabs(cell->face(face)->center()(0)) >= 0.1 && std::fabs(cell->face(face)->center()(0)) <= 1.0)
 			 && (std::fabs(cell->face(face)->center()(dim-1)) < 1e-12) )
 		      {  
-			cell->face(face)->set_boundary_indicator (3);
+			cell->face(face)->set_boundary_id (3);
 		      }
 
 		    if ( (std::fabs(cell->face(face)->center()(0)) >= 0.0 && std::fabs(cell->face(face)->center()(0)) <= 0.9)
 			 && (std::fabs(1.0-cell->face(face)->center()(dim-1)) < 1e-12) )
 		      {  
-			cell->face(face)->set_boundary_indicator (5);
+			cell->face(face)->set_boundary_id (5);
 		      }
 
 		    if ( (std::fabs(1.0-cell->face(face)->center()(0)) < 1e-12)
 			 && (std::fabs(cell->face(face)->center()(dim-1)) >= 0.0 && std::fabs(cell->face(face)->center()(dim-1)) <= 0.9) )
 		      {
-			cell->face(face)->set_boundary_indicator (4);
+			cell->face(face)->set_boundary_id (4);
 		      }
 
 		    if ( (std::fabs(cell->face(face)->center()(0)) < 1e-12)
 			 && (std::fabs(cell->face(face)->center()(dim-1)) >= 0.1 && std::fabs(cell->face(face)->center()(dim-1)) <= 1.0) )
 		      {
-			cell->face(face)->set_boundary_indicator (6);
+			cell->face(face)->set_boundary_id (6);
 		      }
 		  }
 	      }

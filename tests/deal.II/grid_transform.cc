@@ -90,7 +90,7 @@ int main ()
                       // circle.
                       new_points.insert(std::pair<types::global_dof_index, Point<dim> > (
                                           face->vertex_index(vertex_no), n_radius/inner_radius*v+n_center));
-                      face->set_boundary_indicator(1);
+                      face->set_boundary_id(1);
                     }
                   else
                     Assert(false, ExcInternalError());

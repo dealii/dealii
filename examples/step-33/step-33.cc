@@ -1490,7 +1490,7 @@ namespace Step33
                                   dof_indices,
                                   std::vector<types::global_dof_index>(),
                                   true,
-                                  cell->face(face_no)->boundary_indicator(),
+                                  cell->face(face_no)->boundary_id(),
                                   cell->face(face_no)->diameter());
             }
 

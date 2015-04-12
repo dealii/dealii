@@ -614,9 +614,9 @@ namespace Step52
         if (cell->face(f)->at_boundary())
           {
             if ((cell->face(f)->center()[0]==0.) || (cell->face(f)->center()[0]==5.))
-              cell->face(f)->set_boundary_indicator(1);
+              cell->face(f)->set_boundary_id(1);
             else
-              cell->face(f)->set_boundary_indicator(0);
+              cell->face(f)->set_boundary_id(0);
           }
 
     // Next, we set up the linear systems and fill them with content so that

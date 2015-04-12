@@ -64,7 +64,7 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
           // first get the normal vectors at the two vertices of this line
           // from the boundary description
           const Boundary<dim> &boundary
-            = line->get_triangulation().get_boundary(line->boundary_indicator());
+            = line->get_triangulation().get_boundary(line->boundary_id());
 
           Boundary<dim>::FaceVertexNormals face_vertex_normals;
           boundary.get_normals_at_vertices (line, face_vertex_normals);

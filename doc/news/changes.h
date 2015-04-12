@@ -352,6 +352,18 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Deprecated: The library uses functions such as CellAccessor::subdomain_id(),
+  TriaAccessor::manifold_id(), etc, but used the deviant spelling
+  TriaAccessor::boundary_indicator(), TriaAccessor::set_boundary_indicator(),
+  TriaAccessor::set_all_boundary_indicators(). These last three functions are now
+  deprecated and have been replaced by TriaAccessor::boundary_id(),
+  TriaAccessor::set_boundary_id(), and TriaAccessor::set_all_boundary_ids() for
+  consistency. Similar, Triangulation::get_boundary_indicators() has been
+  deprecated in favor of Triangulation::get_boundary_ids().
+  <br>
+  (Wolfgang Bangerth, 2015/04/11)
+  </li>
+
   <li> Changed: All example programs used to have calls to set_boundary() 
   methods to deal with curved boundaries. These have been replaced with 
   the corresponding set_manifold() equivalent. 

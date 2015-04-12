@@ -2810,14 +2810,14 @@ next_cell:
         for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
           {
             const typename CONTAINER::face_iterator face = cell->face(i);
-            if (face->at_boundary() && face->boundary_indicator() == b_id1)
+            if (face->at_boundary() && face->boundary_id() == b_id1)
               {
                 const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair1
                   = std::make_pair(cell, i);
                 pairs1.insert(pair1);
               }
 
-            if (face->at_boundary() && face->boundary_indicator() == b_id2)
+            if (face->at_boundary() && face->boundary_id() == b_id2)
               {
                 const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair2
                   = std::make_pair(cell, i);
@@ -2867,14 +2867,14 @@ next_cell:
         const typename CONTAINER::face_iterator face_1 = cell->face(2*direction);
         const typename CONTAINER::face_iterator face_2 = cell->face(2*direction+1);
 
-        if (face_1->at_boundary() && face_1->boundary_indicator() == b_id)
+        if (face_1->at_boundary() && face_1->boundary_id() == b_id)
           {
             const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair1
               = std::make_pair(cell, 2*direction);
             pairs1.insert(pair1);
           }
 
-        if (face_2->at_boundary() && face_2->boundary_indicator() == b_id)
+        if (face_2->at_boundary() && face_2->boundary_id() == b_id)
           {
             const std::pair<typename CONTAINER::cell_iterator, unsigned int> pair2
               = std::make_pair(cell, 2*direction+1);
@@ -2920,9 +2920,9 @@ next_cell:
         if (cell->face(f)->at_boundary())
           {
             cell->face(f)->set_manifold_id
-            (static_cast<types::manifold_id>(cell->face(f)->boundary_indicator()));
+            (static_cast<types::manifold_id>(cell->face(f)->boundary_id()));
             if (reset_boundary_ids == true)
-              cell->face(f)->set_boundary_indicator(0);
+              cell->face(f)->set_boundary_id(0);
           }
   }
 

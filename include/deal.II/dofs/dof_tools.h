@@ -558,7 +558,7 @@ namespace DoFTools
   template <class DH, class SparsityPattern>
   void
   make_boundary_sparsity_pattern (const DH &dof,
-                                  const typename FunctionMap<DH::space_dimension>::type &boundary_indicators,
+                                  const typename FunctionMap<DH::space_dimension>::type &boundary_ids,
                                   const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                   SparsityPattern    &sparsity);
 
@@ -1027,7 +1027,7 @@ namespace DoFTools
    * @ref GlossFaceOrientation "standard orientation".
    *
    * Instead of defining a 'first' and 'second' boundary with the help of two
-   * boundary_indicators this function defines a 'left' boundary as all faces
+   * boundary_ids this function defines a 'left' boundary as all faces
    * with local face index <code>2*dimension</code> and boundary indicator @p
    * b_id and, similarly, a 'right' boundary consisting of all face with local
    * face index <code>2*dimension+1</code> and boundary indicator @p b_id.
@@ -1202,7 +1202,7 @@ namespace DoFTools
    * of freedom is at the boundary and belongs to one of the selected
    * components, and @p false otherwise. The function is used in step-15.
    *
-   * By specifying the @p boundary_indicator variable, you can select which
+   * By specifying the @p boundary_id variable, you can select which
    * boundary indicators the faces have to have on which the degrees of
    * freedom are located that shall be extracted. If it is an empty list, then
    * all boundary indicators are accepted.
@@ -1236,8 +1236,8 @@ namespace DoFTools
    * contain the indices of degrees of freedom that are located on the
    * boundary (and correspond to the selected vector components and boundary
    * indicators, depending on the values of the @p component_mask and @p
-   * boundary_indicators arguments).
-   * @param boundary_indicators If empty, this function extracts the indices
+   * boundary_ids arguments).
+   * @param boundary_ids If empty, this function extracts the indices
    * of the degrees of freedom for all parts of the boundary. If it is a non-
    * empty list, then the function only considers boundary faces with the
    * boundary indicators listed in this argument.
@@ -1250,7 +1250,7 @@ namespace DoFTools
   extract_boundary_dofs (const DH                   &dof_handler,
                          const ComponentMask        &component_mask,
                          std::vector<bool>          &selected_dofs,
-                         const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
+                         const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
    * This function does the same as the previous one but it returns its result
@@ -1273,8 +1273,8 @@ namespace DoFTools
    * contain the indices of degrees of freedom that are located on the
    * boundary (and correspond to the selected vector components and boundary
    * indicators, depending on the values of the @p component_mask and @p
-   * boundary_indicators arguments).
-   * @param boundary_indicators If empty, this function extracts the indices
+   * boundary_ids arguments).
+   * @param boundary_ids If empty, this function extracts the indices
    * of the degrees of freedom for all parts of the boundary. If it is a non-
    * empty list, then the function only considers boundary faces with the
    * boundary indicators listed in this argument.
@@ -1287,7 +1287,7 @@ namespace DoFTools
   extract_boundary_dofs (const DH                   &dof_handler,
                          const ComponentMask        &component_mask,
                          IndexSet                   &selected_dofs,
-                         const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
+                         const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
    * This function is similar to the extract_boundary_dofs() function but it
@@ -1310,7 +1310,7 @@ namespace DoFTools
   extract_dofs_with_support_on_boundary (const DH               &dof_handler,
                                          const ComponentMask    &component_mask,
                                          std::vector<bool>      &selected_dofs,
-                                         const std::set<types::boundary_id> &boundary_indicators = std::set<types::boundary_id>());
+                                         const std::set<types::boundary_id> &boundary_ids = std::set<types::boundary_id>());
 
   /**
    * Extract a vector that represents the constant modes of the DoFHandler for
@@ -1906,7 +1906,7 @@ namespace DoFTools
   template <class DH>
   void
   map_dof_to_boundary_indices (const DH                      &dof_handler,
-                               const std::set<types::boundary_id> &boundary_indicators,
+                               const std::set<types::boundary_id> &boundary_ids,
                                std::vector<types::global_dof_index>     &mapping);
 
   /**
@@ -2031,7 +2031,7 @@ namespace DoFTools
    * A variant of this function with different arguments is used in step-36.
    *
    * @param dof The DoFHandler to work on.
-   * @param boundary_indicator The indicator of that part of the boundary for
+   * @param boundary_id The indicator of that part of the boundary for
    * which constraints should be computed. If this number equals
    * numbers::invalid_boundary_id then all boundaries of the domain will be
    * treated.
@@ -2064,7 +2064,7 @@ namespace DoFTools
   template <int dim, int spacedim, template <int, int> class DH>
   void
   make_zero_boundary_constraints (const DH<dim,spacedim> &dof,
-                                  const types::boundary_id boundary_indicator,
+                                  const types::boundary_id boundary_id,
                                   ConstraintMatrix       &zero_boundary_constraints,
                                   const ComponentMask    &component_mask = ComponentMask());
 

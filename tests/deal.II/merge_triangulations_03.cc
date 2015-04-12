@@ -103,7 +103,7 @@ void mesh_info(const Triangulation<dim> &tria,
 	     ++face)
 	  {
 	    if (cell->face(face)->at_boundary())
-	      boundary_count[cell->face(face)->boundary_indicator()]++;
+	      boundary_count[cell->face(face)->boundary_id()]++;
 	  }
       }
     deallog << " boundary indicators: ";

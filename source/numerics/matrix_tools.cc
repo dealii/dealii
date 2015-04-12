@@ -925,7 +925,7 @@ namespace MatrixCreator
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         // check if this face is on that part of
         // the boundary we are interested in
-        if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
+        if (boundary_functions.find(cell->face(face)->boundary_id()) !=
             boundary_functions.end())
           {
             copy_data.cell_matrix.push_back(FullMatrix<double> (copy_data.dofs_per_cell,
@@ -936,7 +936,7 @@ namespace MatrixCreator
             if (fe_is_system)
               // FE has several components
               {
-                boundary_functions.find(cell->face(face)->boundary_indicator())
+                boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->vector_value_list (fe_values.get_quadrature_points(),
                                              rhs_values_system);
 
@@ -1029,7 +1029,7 @@ namespace MatrixCreator
             else
               // FE is a scalar one
               {
-                boundary_functions.find(cell->face(face)->boundary_indicator())
+                boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 
                 if (coefficient != 0)
@@ -1106,7 +1106,7 @@ namespace MatrixCreator
         {
           // check if this face is on that part of
           // the boundary we are interested in
-          if (boundary_functions.find(copy_data.cell->face(face)->boundary_indicator()) !=
+          if (boundary_functions.find(copy_data.cell->face(face)->boundary_id()) !=
               boundary_functions.end())
             {
               for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
@@ -1283,7 +1283,7 @@ namespace MatrixCreator
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         // check if this face is on that part of
         // the boundary we are interested in
-        if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
+        if (boundary_functions.find(cell->face(face)->boundary_id()) !=
             boundary_functions.end())
           {
             x_fe_values.reinit (cell, face);
@@ -1299,7 +1299,7 @@ namespace MatrixCreator
               {
                 rhs_values_system.resize (fe_values.n_quadrature_points,
                                           Vector<double>(n_function_components));
-                boundary_functions.find(cell->face(face)->boundary_indicator())
+                boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->vector_value_list (fe_values.get_quadrature_points(),
                                              rhs_values_system);
 
@@ -1384,7 +1384,7 @@ namespace MatrixCreator
               // FE is a scalar one
               {
                 rhs_values_scalar.resize (fe_values.n_quadrature_points);
-                boundary_functions.find(cell->face(face)->boundary_indicator())
+                boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 
                 if (coefficient != 0)
@@ -1482,7 +1482,7 @@ namespace MatrixCreator
         {
           // check if this face is on that part of
           // the boundary we are interested in
-          if (boundary_functions.find(copy_data.cell->face(face)->boundary_indicator()) !=
+          if (boundary_functions.find(copy_data.cell->face(face)->boundary_id()) !=
               boundary_functions.end())
             {
 #ifdef DEBUG

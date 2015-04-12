@@ -684,11 +684,11 @@ namespace VectorTools
             // function to hold on
             // all parts of the boundary
             const std::vector<types::boundary_id>
-            used_boundary_indicators = dof.get_tria().get_boundary_indicators();
+            used_boundary_ids = dof.get_tria().get_boundary_ids();
 
             typename FunctionMap<spacedim>::type boundary_functions;
-            for (unsigned int i=0; i<used_boundary_indicators.size(); ++i)
-              boundary_functions[used_boundary_indicators[i]] = &function;
+            for (unsigned int i=0; i<used_boundary_ids.size(); ++i)
+              boundary_functions[used_boundary_ids[i]] = &function;
             project_boundary_values (mapping, dof, boundary_functions, q_boundary,
                                      boundary_values);
           }
@@ -1336,7 +1336,7 @@ namespace VectorTools
                                    const Quadrature<dim-1> &quadrature,
                                    const Function<spacedim>     &rhs_function,
                                    Vector<double>          &rhs_vector,
-                                   const std::set<types::boundary_id> &boundary_indicators)
+                                   const std::set<types::boundary_id> &boundary_ids)
   {
     const FiniteElement<dim> &fe  = dof_handler.get_fe();
     Assert (fe.n_components() == rhs_function.n_components,
@@ -1368,10 +1368,10 @@ namespace VectorTools
         for (; cell!=endc; ++cell)
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary () &&
-                (boundary_indicators.empty() ||
-                 (boundary_indicators.find (cell->face(face)->boundary_indicator())
+                (boundary_ids.empty() ||
+                 (boundary_ids.find (cell->face(face)->boundary_id())
                   !=
-                  boundary_indicators.end())))
+                  boundary_ids.end())))
               {
                 fe_values.reinit(cell, face);
 
@@ -1398,10 +1398,10 @@ namespace VectorTools
         for (; cell!=endc; ++cell)
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary () &&
-                (boundary_indicators.empty() ||
-                 (boundary_indicators.find (cell->face(face)->boundary_indicator())
+                (boundary_ids.empty() ||
+                 (boundary_ids.find (cell->face(face)->boundary_id())
                   !=
-                  boundary_indicators.end())))
+                  boundary_ids.end())))
               {
                 fe_values.reinit(cell, face);
 
@@ -1458,12 +1458,12 @@ namespace VectorTools
                                    const Quadrature<dim-1> &quadrature,
                                    const Function<spacedim>     &rhs_function,
                                    Vector<double>          &rhs_vector,
-                                   const std::set<types::boundary_id> &boundary_indicators)
+                                   const std::set<types::boundary_id> &boundary_ids)
   {
     create_boundary_right_hand_side(StaticMappingQ1<dim>::mapping, dof_handler,
                                     quadrature,
                                     rhs_function, rhs_vector,
-                                    boundary_indicators);
+                                    boundary_ids);
   }
 
 
@@ -1475,7 +1475,7 @@ namespace VectorTools
                                    const hp::QCollection<dim-1>  &quadrature,
                                    const Function<spacedim>      &rhs_function,
                                    Vector<double>                &rhs_vector,
-                                   const std::set<types::boundary_id> &boundary_indicators)
+                                   const std::set<types::boundary_id> &boundary_ids)
   {
     const hp::FECollection<dim> &fe  = dof_handler.get_fe();
     Assert (fe.n_components() == rhs_function.n_components,
@@ -1506,10 +1506,10 @@ namespace VectorTools
         for (; cell!=endc; ++cell)
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary () &&
-                (boundary_indicators.empty() ||
-                 (boundary_indicators.find (cell->face(face)->boundary_indicator())
+                (boundary_ids.empty() ||
+                 (boundary_ids.find (cell->face(face)->boundary_id())
                   !=
-                  boundary_indicators.end())))
+                  boundary_ids.end())))
               {
                 x_fe_values.reinit(cell, face);
 
@@ -1543,10 +1543,10 @@ namespace VectorTools
         for (; cell!=endc; ++cell)
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->at_boundary () &&
-                (boundary_indicators.empty() ||
-                 (boundary_indicators.find (cell->face(face)->boundary_indicator())
+                (boundary_ids.empty() ||
+                 (boundary_ids.find (cell->face(face)->boundary_id())
                   !=
-                  boundary_indicators.end())))
+                  boundary_ids.end())))
               {
                 x_fe_values.reinit(cell, face);
 
@@ -1609,12 +1609,12 @@ namespace VectorTools
                                    const hp::QCollection<dim-1>  &quadrature,
                                    const Function<spacedim>      &rhs_function,
                                    Vector<double>                &rhs_vector,
-                                   const std::set<types::boundary_id> &boundary_indicators)
+                                   const std::set<types::boundary_id> &boundary_ids)
   {
     create_boundary_right_hand_side(hp::StaticMappingQ1<dim>::mapping_collection,
                                     dof_handler, quadrature,
                                     rhs_function, rhs_vector,
-                                    boundary_indicators);
+                                    boundary_ids);
   }
 
 
@@ -1660,10 +1660,10 @@ namespace VectorTools
              direction<GeometryInfo<dim>::faces_per_cell; ++direction)
           if (cell->at_boundary(direction)
               &&
-              (function_map.find(cell->face(direction)->boundary_indicator()) != function_map.end()))
+              (function_map.find(cell->face(direction)->boundary_id()) != function_map.end()))
             {
               const Function<DH::space_dimension> &boundary_function
-                = *function_map.find(cell->face(direction)->boundary_indicator())->second;
+                = *function_map.find(cell->face(direction)->boundary_id())->second;
 
               // get the FE corresponding to this
               // cell
@@ -1848,7 +1848,7 @@ namespace VectorTools
                 }
 
               const typename DH::face_iterator face = cell->face(face_no);
-              const types::boundary_id boundary_component = face->boundary_indicator();
+              const types::boundary_id boundary_component = face->boundary_id();
 
               // see if this face is part of the boundaries for which we are
               // supposed to do something, and also see if the finite element
@@ -3451,7 +3451,7 @@ namespace VectorTools
         for (; cell != dof_handler.end (); ++cell)
           if (cell->at_boundary () && cell->is_locally_owned ())
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face (face)->boundary_indicator () == boundary_component)
+              if (cell->face (face)->boundary_id () == boundary_component)
                 {
                   // if the FE is a
                   // FE_Nothing object
@@ -3535,7 +3535,7 @@ namespace VectorTools
         for (; cell != dof_handler.end (); ++cell)
           if (cell->at_boundary () && cell->is_locally_owned ())
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face (face)->boundary_indicator () == boundary_component)
+              if (cell->face (face)->boundary_id () == boundary_component)
                 {
                   // if the FE is a
                   // FE_Nothing object
@@ -3656,7 +3656,7 @@ namespace VectorTools
         for (; cell != dof_handler.end (); ++cell)
           if (cell->at_boundary () && cell->is_locally_owned ())
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face (face)->boundary_indicator () == boundary_component)
+              if (cell->face (face)->boundary_id () == boundary_component)
                 {
                   // if the FE is a FE_Nothing object there is no work to do
                   if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
@@ -3733,7 +3733,7 @@ namespace VectorTools
         for (; cell != dof_handler.end (); ++cell)
           if (cell->at_boundary () && cell->is_locally_owned ())
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face (face)->boundary_indicator () == boundary_component)
+              if (cell->face (face)->boundary_id () == boundary_component)
                 {
                   // if the FE is a FE_Nothing object there is no work to do
                   if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
@@ -4501,7 +4501,7 @@ namespace VectorTools
                 {
                   for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
                     {
-                      if (cell->face (face)->boundary_indicator () == boundary_component)
+                      if (cell->face (face)->boundary_id () == boundary_component)
                         {
                           // If the FE is an FE_Nothing object there is no work to do
                           if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
@@ -4596,7 +4596,7 @@ namespace VectorTools
                 {
                   for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
                     {
-                      if (cell->face (face)->boundary_indicator () == boundary_component)
+                      if (cell->face (face)->boundary_id () == boundary_component)
                         {
                           // If the FE is an FE_Nothing object there is no work to do
                           if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
@@ -4946,7 +4946,7 @@ namespace VectorTools
              cell != dof_handler.end (); ++cell)
           if (cell->at_boundary ())
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face (face)->boundary_indicator () == boundary_component)
+              if (cell->face (face)->boundary_id () == boundary_component)
                 {
                   // if the FE is a
                   // FE_Nothing object
@@ -5017,7 +5017,7 @@ namespace VectorTools
              cell != dof_handler.end (); ++cell)
           if (cell->at_boundary ())
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face (face)->boundary_indicator () == boundary_component)
+              if (cell->face (face)->boundary_id () == boundary_component)
                 {
                   // This is only
                   // implemented, if the
@@ -5107,7 +5107,7 @@ namespace VectorTools
              cell != dof_handler.end (); ++cell)
           if (cell->at_boundary ())
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face (face)->boundary_indicator () == boundary_component)
+              if (cell->face (face)->boundary_id () == boundary_component)
                 {
                   // This is only
                   // implemented, if the
@@ -5154,7 +5154,7 @@ namespace VectorTools
              cell != dof_handler.end (); ++cell)
           if (cell->at_boundary ())
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
-              if (cell->face (face)->boundary_indicator () == boundary_component)
+              if (cell->face (face)->boundary_id () == boundary_component)
                 {
                   // This is only
                   // implemented, if the
@@ -5300,7 +5300,7 @@ namespace VectorTools
       if (!cell->is_artificial())
         for (unsigned int face_no=0; face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
-          if ((b_id=boundary_ids.find(cell->face(face_no)->boundary_indicator()))
+          if ((b_id=boundary_ids.find(cell->face(face_no)->boundary_id()))
               != boundary_ids.end())
             {
               const FiniteElement<dim> &fe = cell->get_fe ();
@@ -5872,7 +5872,7 @@ namespace VectorTools
       if (!cell->is_artificial())
         for (unsigned int face_no=0; face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
-          if ((b_id=boundary_ids.find(cell->face(face_no)->boundary_indicator()))
+          if ((b_id=boundary_ids.find(cell->face(face_no)->boundary_id()))
               != boundary_ids.end())
             {
               const FiniteElement<dim> &fe = cell->get_fe();

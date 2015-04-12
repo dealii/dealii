@@ -1543,7 +1543,7 @@ namespace Step44
           if (cell->face(face)->center()[0] < 0.5 * parameters.scale
               &&
               cell->face(face)->center()[1] < 0.5 * parameters.scale)
-            cell->face(face)->set_boundary_indicator(6);
+            cell->face(face)->set_boundary_id(6);
   }
 
 
@@ -2372,7 +2372,7 @@ namespace Step44
     for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
          ++face)
       if (cell->face(face)->at_boundary() == true
-          && cell->face(face)->boundary_indicator() == 6)
+          && cell->face(face)->boundary_id() == 6)
         {
           scratch.fe_face_values_ref.reinit(cell, face);
 

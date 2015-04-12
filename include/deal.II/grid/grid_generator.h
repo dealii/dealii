@@ -99,7 +99,7 @@ namespace GridGenerator
    * Create a coordinate-parallel brick from the two diagonally opposite
    * corner points @p p1 and @p p2.
    *
-   * If the @p colorize flag is set, the @p boundary_indicators of the
+   * If the @p colorize flag is set, the @p boundary_ids of the
    * surfaces are assigned, such that the lower one in @p x-direction is 0,
    * the upper one is 1. The indicators for the surfaces in @p y-direction are
    * 2 and 3, the ones for @p z are 4 and 5. Additionally, material ids are
@@ -127,7 +127,7 @@ namespace GridGenerator
    * a list of integers denoting the number of subdivisions in each coordinate
    * direction.
    *
-   * If the @p colorize flag is set, the @p boundary_indicators of the
+   * If the @p colorize flag is set, the @p boundary_ids of the
    * surfaces are assigned, such that the lower one in @p x-direction is 0,
    * the upper one is 1 (the left and the right vertical face). The indicators
    * for the surfaces in @p y-direction are 2 and 3, the ones for @p z are 4

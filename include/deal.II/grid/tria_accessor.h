@@ -866,7 +866,7 @@ public:
    */
 
   /**
-   * Boundary indicator of this object.
+   * Return the boundary indicator of this object.
    *
    * If the return value is the special value
    * numbers::internal_face_boundary_id, then this object is in the interior
@@ -875,18 +875,26 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  types::boundary_id boundary_indicator () const;
+  types::boundary_id boundary_id () const;
 
   /**
-   * Set the boundary indicator. The same applies as for the
-   * <tt>boundary_indicator()</tt> function.
+   * Return the boundary indicator of this object.
    *
-   * Note that it only sets the boundary object of the current object itself,
+   * @deprecated This spelling of the function name is deprecated. Use
+   * boundary_id() instead.
+   */
+  types::boundary_id boundary_indicator () const DEAL_II_DEPRECATED;
+
+  /**
+   * Set the boundary indicator of the current object. The same applies as for the
+   * boundary_id() function.
+   *
+   * This function only sets the boundary object of the current object itself,
    * not the indicators of the ones that bound it. For example, in 3d, if this
    * function is called on a face, then the boundary indicator of the 4 edges
    * that bound the face remain unchanged. If you want to set the boundary
    * indicators of face and edges at the same time, use the
-   * set_all_boundary_indicators() function. You can see the result of not
+   * set_all_boundary_ids() function. You can see the result of not
    * using the correct function in the results section of step-49.
    *
    * @warning You should never set the boundary indicator of an interior face
@@ -906,18 +914,26 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  void set_boundary_indicator (const types::boundary_id) const;
+  void set_boundary_id (const types::boundary_id) const;
 
   /**
-   * Do as set_boundary_indicator() but also set the boundary indicators of
+   * Set the boundary indicator of this object.
+   *
+   * @deprecated This spelling of the function name is deprecated. Use
+   * set_boundary_id() instead.
+   */
+  void set_boundary_indicator (const types::boundary_id) const DEAL_II_DEPRECATED;
+
+  /**
+   * Do as set_boundary_id() but also set the boundary indicators of
    * the objects that bound the current object. For example, in 3d, if
-   * set_boundary_indicator() is called on a face, then the boundary indicator
+   * set_boundary_id() is called on a face, then the boundary indicator
    * of the 4 edges that bound the face remain unchanged. In contrast, if you
    * call the current function, the boundary indicators of face and edges are
    * all set to the given value.
    *
    * This function is useful if you set boundary indicators of faces in 3d (in
-   * 2d, the function does the same as set_boundary_indicator()) and you do so
+   * 2d, the function does the same as set_boundary_id()) and you do so
    * because you want a curved boundary object to represent the part of the
    * boundary that corresponds to the current face. In that case, the
    * Triangulation class needs to figure out where to put new vertices upon
@@ -938,7 +954,15 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  void set_all_boundary_indicators (const types::boundary_id) const;
+  void set_all_boundary_ids (const types::boundary_id) const;
+
+  /**
+   * Set the boundary indicator of this object and all that bound it.
+   *
+   * @deprecated This spelling of the function name is deprecated. Use
+   * set_all_boundary_ids() instead.
+   */
+  void set_all_boundary_indicators (const types::boundary_id) const DEAL_II_DEPRECATED;
 
   /**
    * Return whether this object is at the boundary. Obviously, the use of this
@@ -1698,7 +1722,15 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  types::boundary_id boundary_indicator () const;
+  types::boundary_id boundary_id () const;
+
+  /**
+   * Return the boundary indicator of this object.
+   *
+   * @deprecated This spelling of the function name is deprecated. Use
+   * boundary_id() instead.
+   */
+  types::boundary_id boundary_indicator () const DEAL_II_DEPRECATED;
 
   /**
    * Return the manifold indicator of this object.
@@ -1813,7 +1845,7 @@ public:
 
   /**
    * Set the boundary indicator. The same applies as for the
-   * <tt>boundary_indicator()</tt> function.
+   * <tt>boundary_id()</tt> function.
    *
    * @warning You should never set the boundary indicator of an interior face
    * (a face not at the boundary of the domain), or set set the boundary
@@ -1833,7 +1865,15 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void
-  set_boundary_indicator (const types::boundary_id);
+  set_boundary_id (const types::boundary_id);
+
+  /**
+   * Set the boundary indicator of this object.
+   *
+   * @deprecated This spelling of the function name is deprecated. Use
+   * set_boundary_id() instead.
+   */
+  void set_boundary_indicator (const types::boundary_id) DEAL_II_DEPRECATED;
 
   /**
    * Set the manifold indicator of this vertex. This does nothing so far since
@@ -1848,7 +1888,7 @@ public:
    * Set the boundary indicator of this object and all of its lower-
    * dimensional sub-objects.  Since this object only represents a single
    * vertex, there are no lower-dimensional obejct and this function is
-   * equivalent to calling set_boundary_indicator with the same argument.
+   * equivalent to calling set_boundary_id() with the same argument.
    *
    * @ingroup boundary
    *
@@ -1856,20 +1896,27 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void
-  set_all_boundary_indicators (const types::boundary_id);
+  set_all_boundary_ids (const types::boundary_id);
+
+  /**
+   * Set the boundary indicator of this object and all that bound it.
+   *
+   * @deprecated This spelling of the function name is deprecated. Use
+   * set_all_boundary_ids() instead.
+   */
+  void set_all_boundary_indicators (const types::boundary_id) DEAL_II_DEPRECATED;
 
   /**
    * Set the manifold indicator of this object and all of its lower-
    * dimensional sub-objects.  Since this object only represents a single
    * vertex, there are no lower-dimensional obejct and this function is
-   * equivalent to calling set_manifold_indicator with the same argument.
+   * equivalent to calling set_manifold_id() with the same argument.
    *
    * @ingroup manifold
    *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-
   void
   set_all_manifold_ids (const types::manifold_id);
   /**

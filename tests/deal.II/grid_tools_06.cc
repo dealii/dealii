@@ -94,8 +94,8 @@ void generate_grid(Triangulation<2> &triangulation, int orientation)
       if (cell_2->face(j)->center()(1) < -2.9)
         face_2 = cell_2->face(j);
     }
-  face_1->set_boundary_indicator(42);
-  face_2->set_boundary_indicator(43);
+  face_1->set_boundary_id(42);
+  face_2->set_boundary_id(43);
 
   triangulation.refine_global(1);
 }
@@ -169,8 +169,8 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
       if (cell_2->face(j)->center()(2) < -2.9)
         face_2 = cell_2->face(j);
     }
-  face_1->set_boundary_indicator(42);
-  face_2->set_boundary_indicator(43);
+  face_1->set_boundary_id(42);
+  face_2->set_boundary_id(43);
 
   triangulation.refine_global(1);
 }

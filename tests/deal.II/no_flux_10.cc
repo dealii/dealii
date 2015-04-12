@@ -67,51 +67,51 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
         double radius = cell->face(f)->center().norm() - center.norm();
         if (std::fabs(cell->face(f)->center()(2) - sqrt(3.)*cell->face(f)->center()(0)) < eps ) // z = sqrt(3)x set boundary 2
           {
-            cell->face(f)->set_boundary_indicator(2);
+            cell->face(f)->set_boundary_id(2);
             for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) > eps)
-                  cell->face(f)->line(j)->set_boundary_indicator(2);
+                  cell->face(f)->line(j)->set_boundary_id(2);
           }
         else if (std::fabs(cell->face(f)->center()(2) + sqrt(3.)*cell->face(f)->center()(0)) < eps) // z = -sqrt(3)x set boundary 3
           {
-            cell->face(f)->set_boundary_indicator(3);
+            cell->face(f)->set_boundary_id(3);
             for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) > eps)
-                  cell->face(f)->line(j)->set_boundary_indicator(3);
+                  cell->face(f)->line(j)->set_boundary_id(3);
           }
         else if (std::fabs(cell->face(f)->center()(2) - sqrt(3.)*cell->face(f)->center()(1)) < eps ) // z = sqrt(3)y set boundary 4
           {
-            cell->face(f)->set_boundary_indicator(4);
+            cell->face(f)->set_boundary_id(4);
             for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) > eps)
-                  cell->face(f)->line(j)->set_boundary_indicator(4);
+                  cell->face(f)->line(j)->set_boundary_id(4);
           }
         else if (std::fabs(cell->face(f)->center()(2) + sqrt(3.)*cell->face(f)->center()(1)) < eps ) // z = -sqrt(3)y set boundary 5
           {
-            cell->face(f)->set_boundary_indicator(5);
+            cell->face(f)->set_boundary_id(5);
             for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) > eps)
-                  cell->face(f)->line(j)->set_boundary_indicator(5);
+                  cell->face(f)->line(j)->set_boundary_id(5);
           }
         else if (radius < middle) // inner radius set boundary 0
           {
-            cell->face(f)->set_boundary_indicator(0);
+            cell->face(f)->set_boundary_id(0);
             for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) < eps)
-                  cell->face(f)->line(j)->set_boundary_indicator(0);
+                  cell->face(f)->line(j)->set_boundary_id(0);
           }
         else if (radius > middle) // outer radius set boundary 1
           {
-            cell->face(f)->set_boundary_indicator(1);
+            cell->face(f)->set_boundary_id(1);
             for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) < eps)
-                  cell->face(f)->line(j)->set_boundary_indicator(1);
+                  cell->face(f)->line(j)->set_boundary_id(1);
           }
         else
           AssertThrow (false, ExcInternalError());
@@ -189,7 +189,7 @@ void run()
 
   for (unsigned int f=0; f<6; ++f)
     deallog << "Face=" << f << ", boundary_id="
-            << (int)triangulation.begin_active()->face(f)->boundary_indicator() << std::endl;
+            << (int)triangulation.begin_active()->face(f)->boundary_id() << std::endl;
 
   std::set<unsigned char> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (0);

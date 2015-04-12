@@ -992,33 +992,33 @@ types::global_dof_index DoFHandler<1>::n_boundary_dofs () const
 
 
 template <>
-types::global_dof_index DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
+types::global_dof_index DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_ids) const
 {
   // check that only boundary
   // indicators 0 and 1 are allowed
   // in 1d
-  for (FunctionMap::const_iterator i=boundary_indicators.begin();
-       i!=boundary_indicators.end(); ++i)
+  for (FunctionMap::const_iterator i=boundary_ids.begin();
+       i!=boundary_ids.end(); ++i)
     Assert ((i->first == 0) || (i->first == 1),
             ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*get_fe().dofs_per_vertex;
+  return boundary_ids.size()*get_fe().dofs_per_vertex;
 }
 
 
 
 template <>
-types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
+types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
 {
   // check that only boundary
   // indicators 0 and 1 are allowed
   // in 1d
-  for (std::set<types::boundary_id>::const_iterator i=boundary_indicators.begin();
-       i!=boundary_indicators.end(); ++i)
+  for (std::set<types::boundary_id>::const_iterator i=boundary_ids.begin();
+       i!=boundary_ids.end(); ++i)
     Assert ((*i == 0) || (*i == 1),
             ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*get_fe().dofs_per_vertex;
+  return boundary_ids.size()*get_fe().dofs_per_vertex;
 }
 
 
@@ -1031,33 +1031,33 @@ types::global_dof_index DoFHandler<1,2>::n_boundary_dofs () const
 
 
 template <>
-types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
+types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &boundary_ids) const
 {
   // check that only boundary
   // indicators 0 and 1 are allowed
   // in 1d
-  for (FunctionMap::const_iterator i=boundary_indicators.begin();
-       i!=boundary_indicators.end(); ++i)
+  for (FunctionMap::const_iterator i=boundary_ids.begin();
+       i!=boundary_ids.end(); ++i)
     Assert ((i->first == 0) || (i->first == 1),
             ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*get_fe().dofs_per_vertex;
+  return boundary_ids.size()*get_fe().dofs_per_vertex;
 }
 
 
 
 template <>
-types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
+types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
 {
   // check that only boundary
   // indicators 0 and 1 are allowed
   // in 1d
-  for (std::set<types::boundary_id>::const_iterator i=boundary_indicators.begin();
-       i!=boundary_indicators.end(); ++i)
+  for (std::set<types::boundary_id>::const_iterator i=boundary_ids.begin();
+       i!=boundary_ids.end(); ++i)
     Assert ((*i == 0) || (*i == 1),
             ExcInvalidBoundaryIndicator());
 
-  return boundary_indicators.size()*get_fe().dofs_per_vertex;
+  return boundary_ids.size()*get_fe().dofs_per_vertex;
 }
 
 
@@ -1102,9 +1102,9 @@ types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
 
 template<int dim, int spacedim>
 types::global_dof_index
-DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
+DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_ids) const
 {
-  Assert (boundary_indicators.find(numbers::internal_face_boundary_id) == boundary_indicators.end(),
+  Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
           ExcInvalidBoundaryIndicator());
 
   std::set<int> boundary_dofs;
@@ -1121,8 +1121,8 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicator
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f)
           &&
-          (boundary_indicators.find(cell->face(f)->boundary_indicator()) !=
-           boundary_indicators.end()))
+          (boundary_ids.find(cell->face(f)->boundary_id()) !=
+           boundary_ids.end()))
         {
           cell->face(f)->get_dof_indices (dofs_on_face);
           for (unsigned int i=0; i<dofs_per_face; ++i)
@@ -1136,9 +1136,9 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicator
 
 template<int dim, int spacedim>
 types::global_dof_index
-DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
+DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
 {
-  Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
+  Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
           ExcInvalidBoundaryIndicator());
 
   std::set<int> boundary_dofs;
@@ -1155,10 +1155,10 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &b
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f)
           &&
-          (std::find (boundary_indicators.begin(),
-                      boundary_indicators.end(),
-                      cell->face(f)->boundary_indicator()) !=
-           boundary_indicators.end()))
+          (std::find (boundary_ids.begin(),
+                      boundary_ids.end(),
+                      cell->face(f)->boundary_id()) !=
+           boundary_ids.end()))
         {
           cell->face(f)->get_dof_indices (dofs_on_face);
           for (unsigned int i=0; i<dofs_per_face; ++i)

@@ -305,7 +305,7 @@ namespace Advection
   void AdvectionProblem<dim>::integrate_boundary_term (MeshWorker::DoFInfo<dim> &dinfo,
                                                        MeshWorker::IntegrationInfo<dim> &info)
   {
-    const unsigned int boundary_id = dinfo.face->boundary_indicator();
+    const unsigned int boundary_id = dinfo.face->boundary_id();
 
     // We only have a non-zero boundary contribution at the
     // x=0 boundary

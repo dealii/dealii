@@ -413,7 +413,7 @@ namespace Step53
         for (Triangulation<3>::active_cell_iterator cell=triangulation.begin_active();
              cell!=triangulation.end(); ++cell)
           for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
-            if (cell->face(f)->boundary_indicator() == 5)
+            if (cell->face(f)->boundary_id() == 5)
               {
                 cell->set_refine_flag ();
                 break;

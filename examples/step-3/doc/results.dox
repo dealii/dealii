@@ -102,7 +102,7 @@ suggestions:
   of the boundary different indicators. For example, try this
   immediately after calling <code>GridGenerator::hyper_cube</code>:
   @code
-  triangulation.begin_active()->face(0)->set_boundary_indicator(1);
+  triangulation.begin_active()->face(0)->set_boundary_id(1);
   @endcode
   What this does is it first asks the triangulation to
   return an iterator that points to the first active cell. Of course,

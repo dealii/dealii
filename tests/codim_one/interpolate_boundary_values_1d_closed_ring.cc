@@ -81,7 +81,7 @@ void test()
            cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
         for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           if (cell->at_boundary(f) &&
-              (cell->face(f)->boundary_indicator() == boundary_id))
+              (cell->face(f)->boundary_id() == boundary_id))
             for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
               for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
                 {
