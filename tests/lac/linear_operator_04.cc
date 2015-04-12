@@ -15,6 +15,7 @@
 
 // Test that it is possible to instantiate a LinearOperator object for all
 // different kinds of Trilinos matrices and vectors
+// TODO: A bit more tests...
 
 #include "../tests.h"
 
