@@ -1609,6 +1609,7 @@ namespace Step33
     // After all this assembling, notify the Trilinos matrix object that the
     // matrix is done:
     system_matrix.compress(VectorOperation::add);
+    right_hand_side.compress(VectorOperation::add);
   }
 
 
