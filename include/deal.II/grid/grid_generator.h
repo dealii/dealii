@@ -108,6 +108,13 @@ namespace GridGenerator
    * adds 2<sup>i</sup>. For instance, the center point (1,-1,1) yields a
    * material id 5.
    *
+   * @note If spacedim>dim the same mesh as in the case spacedim=dim
+   * is created, but the vertices have all additional coordinates
+   * equal to the coordinates of p1, i.e., we generate a
+   * hyper_rectangle parallel to the x-axis (1d), or to the xy-axis
+   * passing through p1. The additional coordinates of the point p2
+   * are ignored by this class in this case.
+   *
    * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim, int spacedim>

@@ -430,7 +430,7 @@ inconvenience this causes.
 <ol>
   <li> New: The GridGenerator::subdivided_hyper_cube() and 
   GridGenerator::subdivided_hyper_rectangle() now work also for codimension
-  one and two Triangulation();
+  one and two Triangulation;
   <br>
   (Luca Heltai, 2015/04/12)
   </li>
