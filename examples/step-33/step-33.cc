@@ -1607,7 +1607,11 @@ namespace Step33
       }
 
     // After all this assembling, notify the Trilinos matrix and vector object
-    // that the linear system is done:
+    // that the linear system is done by invoke the function compress(). However,
+    // these two function calls here have no actual influence and you can remove
+    // them safely. The reason is this tutorial program is not designed to run in
+    // distributed parallel mode. See @ref GlossCompress "Compressing distributed objects"
+    // for more information on what is compress() designed to do.
     system_matrix.compress(VectorOperation::add);
     right_hand_side.compress(VectorOperation::add);
   }
