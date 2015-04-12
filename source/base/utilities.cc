@@ -700,13 +700,8 @@ namespace Utilities
 
     void destroy_communicator (Epetra_Comm &communicator)
     {
-      Assert (&communicator != 0, ExcInternalError());
-
-      // save the communicator, reset
-      // the map, and delete the
-      // communicator if this whole
-      // thing was created as an MPI
-      // communicator
+      // save the communicator, reset the map, and delete the communicator if
+      // this whole thing was created as an MPI communicator
 #ifdef DEAL_II_WITH_MPI
       Epetra_MpiComm
       *mpi_comm = dynamic_cast<Epetra_MpiComm *>(&communicator);
