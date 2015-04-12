@@ -428,6 +428,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The GridGenerator::subdivided_hyper_cube() and 
+  GridGenerator::subdivided_hyper_rectangle() now work also for codimension
+  one and two Triangulation();
+  <br>
+  (Luca Heltai, 2015/04/12)
+  </li>
+
   <li> Changed: The cells of coarse meshes in
   parallel::distributed::Triangulation used to be ordered in a Cuthill-McKee
   numbering, which yields very high surface-to-volume ratios of the individual

@@ -99,11 +99,11 @@ namespace GridGenerator
 
 
 
-    template <int dim>
+    template <int dim, int spacedim>
     void
-    colorize_subdivided_hyper_rectangle (Triangulation<dim> &tria,
-                                         const Point<dim>   &p1,
-                                         const Point<dim>   &p2,
+    colorize_subdivided_hyper_rectangle (Triangulation<dim,spacedim> &tria,
+                                         const Point<spacedim>   &p1,
+                                         const Point<spacedim>   &p2,
                                          const double        epsilon)
     {
 
@@ -114,13 +114,13 @@ namespace GridGenerator
       // should be smaller than the smallest cell
       // diameter.
 
-      typename Triangulation<dim>::face_iterator face = tria.begin_face(),
-                                                 endface = tria.end_face();
+      typename Triangulation<dim,spacedim>::face_iterator face = tria.begin_face(),
+                                                          endface = tria.end_face();
       for (; face!=endface; ++face)
         {
           if (face->boundary_indicator() == 0)
             {
-              const Point<dim> center (face->center());
+              const Point<spacedim> center (face->center());
               if (std::abs(center(0)-p1[0]) < epsilon)
                 face->set_boundary_indicator(0);
               else if (std::abs(center(0) - p2[0]) < epsilon)
@@ -142,7 +142,7 @@ namespace GridGenerator
 
             }
         }
-      for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
+      for (typename Triangulation<dim,spacedim>::cell_iterator cell = tria.begin();
            cell != tria.end(); ++cell)
         {
           char id = 0;
@@ -879,9 +879,9 @@ namespace GridGenerator
   }
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  subdivided_hyper_cube (Triangulation<dim> &tria,
+  subdivided_hyper_cube (Triangulation<dim,spacedim> &tria,
                          const unsigned int  repetitions,
                          const double        left,
                          const double        right)
@@ -890,115 +890,26 @@ namespace GridGenerator
     Assert (left < right,
             ExcMessage ("Invalid left-to-right bounds of hypercube"));
 
-    // first generate the necessary
-    // points
-    const double delta = (right-left)/repetitions;
-    std::vector<Point<dim> > points;
-    switch (dim)
+    Point<spacedim> p0,p1;
+    for (unsigned int i=0; i<dim; ++i)
       {
-      case 1:
-        for (unsigned int x=0; x<=repetitions; ++x)
-          points.push_back (Point<dim> (left+x*delta));
-        break;
-
-      case 2:
-        for (unsigned int y=0; y<=repetitions; ++y)
-          for (unsigned int x=0; x<=repetitions; ++x)
-            points.push_back (Point<dim> (left+x*delta,
-                                          left+y*delta));
-        break;
-
-      case 3:
-        for (unsigned int z=0; z<=repetitions; ++z)
-          for (unsigned int y=0; y<=repetitions; ++y)
-            for (unsigned int x=0; x<=repetitions; ++x)
-              points.push_back (Point<dim> (left+x*delta,
-                                            left+y*delta,
-                                            left+z*delta));
-        break;
-
-      default:
-        Assert (false, ExcNotImplemented());
+        p0[i] = left;
+        p1[i] = right;
       }
 
-    // next create the cells
-    // Prepare cell data
-    std::vector<CellData<dim> > cells;
-    // Define these as abbreviations
-    // for the step sizes below. The
-    // number of points in a single
-    // direction is repetitions+1
-    const unsigned int dy = repetitions+1;
-    const unsigned int dz = dy*dy;
-    switch (dim)
-      {
-      case 1:
-        cells.resize (repetitions);
-        for (unsigned int x=0; x<repetitions; ++x)
-          {
-            cells[x].vertices[0] = x;
-            cells[x].vertices[1] = x+1;
-            cells[x].material_id = 0;
-          }
-        break;
-
-      case 2:
-        cells.resize (repetitions*repetitions);
-        for (unsigned int y=0; y<repetitions; ++y)
-          for (unsigned int x=0; x<repetitions; ++x)
-            {
-              const unsigned int c = x  +y*repetitions;
-              cells[c].vertices[0] = x  +y*dy;
-              cells[c].vertices[1] = x+1+y*dy;
-              cells[c].vertices[2] = x  +(y+1)*dy;
-              cells[c].vertices[3] = x+1+(y+1)*dy;
-              cells[c].material_id = 0;
-            }
-        break;
-
-      case 3:
-        cells.resize (repetitions*repetitions*repetitions);
-        for (unsigned int z=0; z<repetitions; ++z)
-          for (unsigned int y=0; y<repetitions; ++y)
-            for (unsigned int x=0; x<repetitions; ++x)
-              {
-                const unsigned int c = x+y*repetitions
-                                       +z*repetitions*repetitions;
-                cells[c].vertices[0] = x  +y*dy    +z*dz;
-                cells[c].vertices[1] = x+1+y*dy    +z*dz;
-                cells[c].vertices[2] = x  +(y+1)*dy+z*dz;
-                cells[c].vertices[3] = x+1+(y+1)*dy+z*dz;
-                cells[c].vertices[4] = x  +y*dy    +(z+1)*dz;
-                cells[c].vertices[5] = x+1+y*dy    +(z+1)*dz;
-                cells[c].vertices[6] = x  +(y+1)*dy+(z+1)*dz;
-                cells[c].vertices[7] = x+1+(y+1)*dy+(z+1)*dz;
-                cells[c].material_id = 0;
-              }
-        break;
-
-      default:
-        // should be trivial to
-        // do for 3d as well, but
-        // am too tired at this
-        // point of the night to
-        // do that...
-        //
-        // contributions are welcome!
-        Assert (false, ExcNotImplemented());
-      }
-
-    tria.create_triangulation (points, cells, SubCellData());
+    std::vector<unsigned int> reps(dim, repetitions);
+    subdivided_hyper_rectangle(tria, reps, p0, p1);
   }
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
   subdivided_hyper_rectangle (
-    Triangulation<dim>              &tria,
+    Triangulation<dim, spacedim>              &tria,
     const std::vector<unsigned int> &repetitions,
-    const Point<dim>                &p_1,
-    const Point<dim>                &p_2,
+    const Point<spacedim>                &p_1,
+    const Point<spacedim>                &p_2,
     const bool                       colorize)
   {
     // contributed by Joerg R. Weimar
@@ -1008,8 +919,8 @@ namespace GridGenerator
     // First, normalize input such that
     // p1 is lower in all coordinate
     // directions.
-    Point<dim> p1(p_1);
-    Point<dim> p2(p_2);
+    Point<spacedim> p1(p_1);
+    Point<spacedim> p2(p_2);
 
     for (unsigned int i=0; i<dim; ++i)
       if (p1(i) > p2(i))
@@ -1019,39 +930,38 @@ namespace GridGenerator
     // are >= 1, and calculate deltas
     // convert repetitions from double
     // to int by taking the ceiling.
-    Point<dim> delta;
+    std::vector<Point<spacedim> > delta(dim);
 
     for (unsigned int i=0; i<dim; ++i)
       {
         Assert (repetitions[i] >= 1, ExcInvalidRepetitions(repetitions[i]));
 
-        delta[i] = (p2[i]-p1[i])/repetitions[i];
+        delta[i][i] = (p2[i]-p1[i])/repetitions[i];
       }
 
     // then generate the necessary
     // points
-    std::vector<Point<dim> > points;
+    std::vector<Point<spacedim> > points;
     switch (dim)
       {
       case 1:
         for (unsigned int x=0; x<=repetitions[0]; ++x)
-          points.push_back (Point<dim> (p1[0]+x*delta[0]));
+          points.push_back (p1+(double)x*delta[0]);
         break;
 
       case 2:
         for (unsigned int y=0; y<=repetitions[1]; ++y)
           for (unsigned int x=0; x<=repetitions[0]; ++x)
-            points.push_back (Point<dim> (p1[0]+x*delta[0],
-                                          p1[1]+y*delta[1]));
+            points.push_back (p1+(double)x*delta[0]
+                              +(double)y*delta[1]);
         break;
 
       case 3:
         for (unsigned int z=0; z<=repetitions[2]; ++z)
           for (unsigned int y=0; y<=repetitions[1]; ++y)
             for (unsigned int x=0; x<=repetitions[0]; ++x)
-              points.push_back (Point<dim> (p1[0]+x*delta[0],
-                                            p1[1]+y*delta[1],
-                                            p1[2]+z*delta[2]));
+              points.push_back (p1+(double)x*delta[0] +
+                                (double)y*delta[1] + (double)z*delta[2]);
         break;
 
       default:
@@ -1133,8 +1043,9 @@ namespace GridGenerator
         // use a large epsilon to
         // compare numbers to avoid
         // roundoff problems.
-        const double epsilon
-          = 0.01 * *std::min_element (&delta[0], &delta[0]+dim);
+        double epsilon = 10;
+        for (unsigned int i=0; i<dim; ++i)
+          epsilon = std::min(epsilon, 0.01*delta[i][i]);
         Assert (epsilon > 0,
                 ExcMessage ("The distance between corner points must be positive."))
 
