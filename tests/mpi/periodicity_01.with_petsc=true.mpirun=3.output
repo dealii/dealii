@@ -60,7 +60,7 @@ DEAL::Convergence step 7 value 0
 0.750000 0.00000 0.750000	-8.82296e-05
 
 Cycle 2:
-DEAL::Starting value 0.0249162
+DEAL::Starting value 0.0250422
 DEAL::Convergence step 7 value 0
    Solved in 7 iterations.
 0.125000 0.125000 0.00000	0.000714896
