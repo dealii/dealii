@@ -89,8 +89,8 @@ namespace GridGenerator
    *
    * @note The triangulation needs to be void upon calling this function.
    */
-  template <int dim>
-  void subdivided_hyper_cube (Triangulation<dim>  &tria,
+  template <int dim, int spacedim>
+  void subdivided_hyper_cube (Triangulation<dim,spacedim>  &tria,
                               const unsigned int   repetitions,
                               const double         left = 0.,
                               const double         right= 1.);
@@ -108,13 +108,20 @@ namespace GridGenerator
    * adds 2<sup>i</sup>. For instance, the center point (1,-1,1) yields a
    * material id 5.
    *
+   * @note If spacedim>dim the same mesh as in the case spacedim=dim
+   * is created, but the vertices have all additional coordinates
+   * equal to the coordinates of p1, i.e., we generate a
+   * hyper_rectangle parallel to the x-axis (1d), or to the xy-axis
+   * passing through p1. The additional coordinates of the point p2
+   * are ignored by this class in this case.
+   *
    * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim, int spacedim>
   void hyper_rectangle (Triangulation<dim,spacedim> &tria,
                         const Point<spacedim>       &p1,
                         const Point<spacedim>       &p2,
-                        const bool                   colorize = false);
+                        const bool                  colorize = false);
 
   /**
    * Create a coordinate-parallel parallelepiped from the two diagonally
@@ -147,13 +154,13 @@ namespace GridGenerator
    * @note For an example of the use of this function see the step-28 tutorial
    * program.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  subdivided_hyper_rectangle (Triangulation<dim>              &tria,
+  subdivided_hyper_rectangle (Triangulation<dim,spacedim>     &tria,
                               const std::vector<unsigned int> &repetitions,
-                              const Point<dim>                &p1,
-                              const Point<dim>                &p2,
-                              const bool                       colorize=false);
+                              const Point<spacedim>           &p1,
+                              const Point<spacedim>           &p2,
+                              const bool                      colorize=false);
 
   /**
    * Like the previous function. However, here the second argument does not
@@ -176,7 +183,7 @@ namespace GridGenerator
                               const std::vector<std::vector<double> > &step_sizes,
                               const Point<dim>                        &p_1,
                               const Point<dim>                        &p_2,
-                              const bool                               colorize);
+                              const bool                              colorize);
 
   /**
    * Like the previous function, but with the following twist: the @p
