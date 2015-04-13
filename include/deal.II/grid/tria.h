@@ -3026,6 +3026,14 @@ private:
   void clear_despite_subscriptions ();
 
   /**
+   * For all cells, set the active cell indices so that active cells know
+   * the how many-th active cell they are, and all other cells have an invalid
+   * value. This function is called after mesh creation, refinement, and
+   * serialization.
+   */
+  void reset_active_cell_indices ();
+
+  /**
    * Refine all cells on all levels which were previously flagged for
    * refinement.
    *
@@ -3321,18 +3329,7 @@ Triangulation<dim,spacedim>::load (Archive &ar,
   {
     for (unsigned int l=0; l<levels.size(); ++l)
       levels[l]->active_cell_indices.resize (levels[l]->refine_flags.size());
-
-    unsigned int active_cell_index = 0;
-    for (cell_iterator cell=begin(); cell!=end(); ++cell)
-      if (cell->has_children())
-        cell->set_active_cell_index (numbers::invalid_unsigned_int);
-      else
-        {
-          cell->set_active_cell_index (active_cell_index);
-          ++active_cell_index;
-        }
-
-    Assert (active_cell_index == n_active_cells(), ExcInternalError());
+    reset_active_cell_indices ();
   }
 
 
