@@ -119,9 +119,10 @@ namespace DynamicSparsityPatternIterators
     unsigned int current_row;
 
     /**
-     * The index of the element we currently point to.
+     * A pointer to the element within the current row that we
+     * currently point to.
      */
-    std::size_t index_within_row;
+    std::vector<size_type>::const_iterator current_entry;
 
     /**
      * Move the accessor to the next nonzero entry in the matrix.
@@ -148,7 +149,7 @@ namespace DynamicSparsityPatternIterators
    * SparsityPattern class for more information.
    *
    * @note This class operates directly on the internal data
-   * structures of the SparsityPattern class. As a consequence, some
+   * structures of the DynamicSparsityPattern class. As a consequence, some
    * operations are cheap and some are not. In particular, it is cheap
    * to access the column index of the sparsity pattern entry pointed
    * to. On the other hand, it is expensive to compute the distance
@@ -639,8 +640,13 @@ namespace DynamicSparsityPatternIterators
     :
     sparsity_pattern(sparsity_pattern),
     current_row (row),
-    index_within_row(index_within_row)
-  {}
+    current_entry(sparsity_pattern->lines[current_row].entries.begin()+index_within_row)
+  {
+    Assert (current_row < sparsity_pattern->n_rows(),
+            ExcIndexRange (row, 0, sparsity_pattern->n_rows()));
+    Assert (index_within_row < sparsity_pattern->lines[current_row].entries.size(),
+            ExcIndexRange (index_within_row, 0, sparsity_pattern->lines[current_row].entries.size()));
+  }
 
 
   inline
@@ -649,7 +655,7 @@ namespace DynamicSparsityPatternIterators
     :
     sparsity_pattern(sparsity_pattern),
     current_row(numbers::invalid_unsigned_int),
-    index_within_row(numbers::invalid_unsigned_int)
+    current_entry()
   {}
 
 
@@ -672,7 +678,7 @@ namespace DynamicSparsityPatternIterators
     Assert (current_row < sparsity_pattern->n_rows(),
             ExcInternalError());
 
-    return sparsity_pattern->lines[current_row].entries[index_within_row];
+    return *current_entry;
   }
 
 
@@ -683,7 +689,7 @@ namespace DynamicSparsityPatternIterators
     Assert (current_row < sparsity_pattern->n_rows(),
             ExcInternalError());
 
-    return index_within_row;
+    return current_entry - sparsity_pattern->lines[current_row].entries.begin();
   }
 
 
@@ -695,7 +701,7 @@ namespace DynamicSparsityPatternIterators
   {
     return (sparsity_pattern == other.sparsity_pattern &&
             current_row == other.current_row &&
-            index_within_row == other.index_within_row);
+            current_entry == other.current_entry);
   }
 
 
@@ -709,7 +715,7 @@ namespace DynamicSparsityPatternIterators
 
     return ((current_row < other.current_row) ||
             ((current_row == other.current_row) &&
-             (index_within_row < other.index_within_row)));
+             (current_entry < other.current_entry)));
   }
 
 
@@ -721,18 +727,18 @@ namespace DynamicSparsityPatternIterators
             ExcInternalError());
 
     // move to the next element in this row
-    ++index_within_row;
+    ++current_entry;
 
     // if this moves us beyond the end of the row, go to the next row
     // if possible, or set the iterator to an invalid state if not.
     //
     // use a while loop to ensure that we properly skip over lines
     // that are empty
-    while (index_within_row ==
-           sparsity_pattern->lines[current_row].entries.size())
+    while (current_entry ==
+           sparsity_pattern->lines[current_row].entries.end())
       {
         ++current_row;
-        index_within_row = 0;
+        current_entry = sparsity_pattern->lines[current_row].entries.begin();
 
         if (current_row == sparsity_pattern->n_rows())
           {
