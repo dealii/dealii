@@ -164,10 +164,6 @@ FE_Q_Hierarchical<dim>::get_interpolation_matrix(const FiniteElement< dim> &sour
               ExcDimensionMismatch (matrix.m(),
                                     source_fe->dofs_per_cell));
 
-      // make sure that we interpolate to a richer element.
-      Assert (this->dofs_per_cell >= source_fe->dofs_per_cell,
-              ExcMessage("Interpolation to higher polynomial degree is advised."));
-
       // Recall that DoFs are renumbered in the following order:
       // vertices, lines, quads, hexes.
       // As we deal with hierarchical FE, interpolation matrix is rather easy:
