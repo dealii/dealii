@@ -146,8 +146,14 @@ public:
   }
 
   /**
-   * Create a LinearOperator object from an object @p op for which the
-   * conversion function <code>linop</code> is defined.
+   * Default copy constructor.
+   */
+  LinearOperator (const LinearOperator<Range, Domain> &) = default;
+
+  /**
+   * Templated copy constructor that creates a LinearOperator object from
+   * an object @p op for which the conversion function <code>linop</code>
+   * is defined.
    */
   template<typename Op>
   LinearOperator (const Op &op)
@@ -156,8 +162,13 @@ public:
   }
 
   /**
-   * Copy assignment operator for an object @p op for which the conversion
-   * function <code>linop</code> is defined.
+   * Default copy assignment operator.
+   */
+  LinearOperator<Range, Domain> &operator=(const LinearOperator<Range, Domain> &) = default;
+
+  /**
+   * Templated copy assignment operator for an object @p op for which the
+   * conversion function <code>linop</code> is defined.
    */
   template <typename Op>
   LinearOperator<Range, Domain> &operator=(const Op &op)
