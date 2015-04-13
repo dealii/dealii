@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2013 - 2014 by the deal.II authors
+ * Copyright (C) 2013 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -402,14 +402,20 @@ namespace Step26
     triangulation.prepare_coarsening_and_refinement();
     solution_trans.prepare_for_coarsening_and_refinement(previous_solution);
 
-    // Now everything is ready, so do the refinement and recreate the dof
-    // structure on the new grid, and initialize the matrix structures and the
-    // new vectors in the <code>setup_system</code> function. Next, we actually
-    // perform the interpolation of the solution from old to new grid.
+    // Now everything is ready, so do the refinement and recreate the DoF
+    // structure on the new grid, and finally initialize the matrix structures
+    // and the new vectors in the <code>setup_system</code> function. Next, we
+    // actually perform the interpolation of the solution from old to new
+    // grid. The final step is to apply the hanging node constraints to the
+    // solution vector, i.e., to make sure that the values of degrees of
+    // freedom located on hanging nodes are so that the solution is
+    // continuous. This is necessary since SolutionTransfer only operates on
+    // cells locally, without regard to the neighborhoof.
     triangulation.execute_coarsening_and_refinement ();
     setup_system ();
 
     solution_trans.interpolate(previous_solution, solution);
+    constraints.distribute (solution);
   }
 
 
