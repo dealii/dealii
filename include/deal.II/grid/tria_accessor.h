@@ -2460,6 +2460,13 @@ public:
    *
    * The function throws an exception if the current cell is not
    * active.
+   *
+   * @note If the triangulation this function is called on is
+   * of type parallel::distributed::Triangulation, then active
+   * cells may be locally owned, ghost cells, or artificial
+   * (see @ref GlossLocallyOwnedCell , @ref GlossGhostCell , and
+   * @ref GlossArtificialCell). This function counts over all of
+   * them, including ghost and artificial active cells.
    */
   unsigned int active_cell_index () const;
 
