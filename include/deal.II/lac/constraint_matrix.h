@@ -181,12 +181,12 @@ public:
    * The IndexSet allows the ConstraintMatrix to save memory. Otherwise
    * internal data structures for all possible indices will be created.
    */
-  ConstraintMatrix (const IndexSet &local_constraints = IndexSet());
+  explicit ConstraintMatrix (const IndexSet &local_constraints = IndexSet());
 
   /**
    * Copy constructor
    */
-  ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
+  explicit ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
 
   /**
    * clear() the ConstraintMatrix object and supply an IndexSet with lines
@@ -1318,6 +1318,12 @@ private:
                         const Vector<double>                 &local_vector,
                         const std::vector<size_type>         &local_dof_indices,
                         const FullMatrix<double>             &local_matrix) const;
+
+  /**
+   * The assignment operator is not implemented for performance reasons. You
+   * can clear() or reinit() and merge() manually if needed.
+   */
+  ConstraintMatrix &operator= (const ConstraintMatrix &other);
 };
 
 
