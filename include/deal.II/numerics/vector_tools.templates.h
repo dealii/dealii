@@ -6885,7 +6885,7 @@ namespace VectorTools
   template<class DH, class VECTOR>
   void get_position_vector(const DH &dh,
                            VECTOR &vector,
-                           const ComponentMask mask)
+                           const ComponentMask &mask)
   {
     AssertDimension(vector.size(), dh.n_dofs());
 

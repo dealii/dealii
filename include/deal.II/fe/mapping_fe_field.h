@@ -115,9 +115,7 @@ public:
                   const ComponentMask mask=ComponentMask());
 
   /**
-   * Copy constructor. Performs a deep copy, i.e. duplicates what #tensor_pols
-   * points to instead of simply copying the #tensor_pols pointer as done by a
-   * default copy constructor.
+   * Copy constructor.
    */
   MappingFEField (const MappingFEField<dim,spacedim,VECTOR,DH> &mapping);
 
@@ -583,20 +581,23 @@ protected:
 
 
 private:
-//
   /**
    * Update internal degrees of
    * freedom. */
   void update_internal_dofs(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
+  /**
+   * It stores the local degrees of freedom of the DH for each cell
+   * (i.e. euler_vector * dof_indices, see method update_internal_dofs for more
+   * clarifications.).
    */
   mutable std::vector<double> local_dofs;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
-   * detailed information.
+  /**
+   * It stores the degrees of freedom of the DH for each cell (i.e.
+   * cell->get_dof_indices(dof_indices), see method update_internal_dofs for more
+   * clarifications.).
    */
   mutable std::vector<types::global_dof_index> dof_indices;
 
@@ -616,13 +617,13 @@ private:
   /** Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
-  UpdateFlags
+  virtual UpdateFlags
   update_once (const UpdateFlags in) const;
 
   /** Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
-  UpdateFlags
+  virtual UpdateFlags
   update_each (const UpdateFlags in) const;
 
   /** Reimplemented from Mapping. See the documentation of the base class for
