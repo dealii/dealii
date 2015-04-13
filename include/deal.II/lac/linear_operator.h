@@ -511,18 +511,19 @@ transpose_linop(const LinearOperator<Range, Domain> &op)
  * Returns a LinearOperator that is the identity of the vector space
  * @tref Range.
  *
- * The function takes an <code>std::function</code> object @ref exemplar as
- * an argument to initialize the <code>reinit_range_vector</code> and
- * <code>reinit_domain_vector</code> objects of the LinearOperator object.
+ * The function takes an <code>std::function</code> object @ref
+ * reinit_vector as an argument to initialize the
+ * <code>reinit_range_vector</code> and <code>reinit_domain_vector</code>
+ * objects of the LinearOperator object.
  */
 template <typename Range>
 LinearOperator<Range, Range>
-identity_linop(const std::function<void(Range &, bool)> &exemplar)
+identity_linop(const std::function<void(Range &, bool)> &reinit_vector)
 {
   LinearOperator<Range, Range> return_op;
 
-  return_op.reinit_range_vector = exemplar;
-  return_op.reinit_domain_vector = exemplar;
+  return_op.reinit_range_vector = reinit_vector;
+  return_op.reinit_domain_vector = reinit_vector;
 
   return_op.vmult = [](Range &v, const Range &u)
   {
