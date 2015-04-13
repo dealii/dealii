@@ -419,6 +419,11 @@ namespace Step40
                                                   system_rhs);
         }
 
+    // Notice that the assembling above is just a local operation. So, to
+    // form the "global" linear system, a synchronization between all
+    // processors is needed. This could be done by invoking the function
+    // compress(). See @ref GlossCompress  "Compressing distributed objects"
+    // for more information on what is compress() designed to do.
     system_matrix.compress (VectorOperation::add);
     system_rhs.compress (VectorOperation::add);
   }
