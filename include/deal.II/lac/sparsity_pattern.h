@@ -86,7 +86,7 @@ namespace internals
 
 
 /**
- * Iterators on sparsity patterns
+ * Iterators on objects of type SparsityPattern.
  */
 namespace SparsityPatternIterators
 {
