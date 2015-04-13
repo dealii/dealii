@@ -468,46 +468,49 @@ namespace TrilinosWrappers
 
 namespace internal
 {
-  template <typename> class ReinitRangeFactory;
-  template <typename> class ReinitDomainFactory;
-
-  /*
-   * A factory class internally used in linear_operator.h.
-   * Specialization for TrilinosWrappers::MPI::BlockVector.
-   */
-  template<>
-  class ReinitRangeFactory<TrilinosWrappers::MPI::BlockVector>
+  namespace LinearOperator
   {
-  public:
-    template <typename Matrix>
-    std::function<void(TrilinosWrappers::MPI::BlockVector &, bool)>
-    operator()(const Matrix &matrix)
-    {
-      return [&matrix](TrilinosWrappers::MPI::BlockVector &v, bool fast)
-      {
-        v.reinit(matrix.range_partitioner(), fast);
-      };
-    }
-  };
+    template <typename> class ReinitRangeFactory;
+    template <typename> class ReinitDomainFactory;
 
-  /*
-   * A factory class internally used in linear_operator.h.
-   * Specialization for TrilinosWrappers::MPI::BlockVector.
-   */
-  template<>
-  class ReinitDomainFactory<TrilinosWrappers::MPI::BlockVector>
-  {
-  public:
-    template <typename Matrix>
-    std::function<void(TrilinosWrappers::MPI::BlockVector &, bool)>
-    operator()(const Matrix &matrix)
+    /**
+     * A factory class internally used in linear_operator.h. Specialization
+     * for TrilinosWrappers::MPI::BlockVector.
+     */
+    template<>
+    class ReinitRangeFactory<TrilinosWrappers::MPI::BlockVector>
     {
-      return [&matrix](TrilinosWrappers::MPI::BlockVector &v, bool fast)
+    public:
+      template <typename Matrix>
+      std::function<void(TrilinosWrappers::MPI::BlockVector &, bool)>
+      operator()(const Matrix &matrix)
       {
-        v.reinit(matrix.domain_partitioner(), fast);
-      };
-    }
-  };
+        return [&matrix](TrilinosWrappers::MPI::BlockVector &v, bool fast)
+        {
+          v.reinit(matrix.range_partitioner(), fast);
+        };
+      }
+    };
+
+    /**
+     * A factory class internally used in linear_operator.h. Specialization
+     * for TrilinosWrappers::MPI::BlockVector.
+     */
+    template<>
+    class ReinitDomainFactory<TrilinosWrappers::MPI::BlockVector>
+    {
+    public:
+      template <typename Matrix>
+      std::function<void(TrilinosWrappers::MPI::BlockVector &, bool)>
+      operator()(const Matrix &matrix)
+      {
+        return [&matrix](TrilinosWrappers::MPI::BlockVector &v, bool fast)
+        {
+          v.reinit(matrix.domain_partitioner(), fast);
+        };
+      }
+    };
+  } /* namespace LinearOperator */
 } /* namespace internal */
 
 

@@ -454,46 +454,49 @@ namespace TrilinosWrappers
 
 namespace internal
 {
-  template <typename> class ReinitRangeFactory;
-  template <typename> class ReinitDomainFactory;
-
-  /*
-   * A factory class internally used in linear_operator.h.
-   * Specialization for TrilinosWrappers::BlockVector.
-   */
-  template<>
-  class ReinitRangeFactory<TrilinosWrappers::BlockVector>
+  namespace LinearOperator
   {
-  public:
-    template <typename Matrix>
-    std::function<void(TrilinosWrappers::BlockVector &, bool)>
-    operator()(const Matrix &matrix)
-    {
-      return [&matrix](TrilinosWrappers::BlockVector &v, bool fast)
-      {
-        v.reinit(matrix.range_partitioner(), fast);
-      };
-    }
-  };
+    template <typename> class ReinitRangeFactory;
+    template <typename> class ReinitDomainFactory;
 
-  /*
-   * A factory class internally used in linear_operator.h.
-   * Specialization for TrilinosWrappers::BlockVector.
-   */
-  template<>
-  class ReinitDomainFactory<TrilinosWrappers::BlockVector>
-  {
-  public:
-    template <typename Matrix>
-    std::function<void(TrilinosWrappers::BlockVector &, bool)>
-    operator()(const Matrix &matrix)
+    /**
+     * A factory class internally used in linear_operator.h. Specialization
+     * for TrilinosWrappers::BlockVector.
+     */
+    template<>
+    class ReinitRangeFactory<TrilinosWrappers::BlockVector>
     {
-      return [&matrix](TrilinosWrappers::BlockVector &v, bool fast)
+    public:
+      template <typename Matrix>
+      std::function<void(TrilinosWrappers::BlockVector &, bool)>
+      operator()(const Matrix &matrix)
       {
-        v.reinit(matrix.domain_partitioner(), fast);
-      };
-    }
-  };
+        return [&matrix](TrilinosWrappers::BlockVector &v, bool fast)
+        {
+          v.reinit(matrix.range_partitioner(), fast);
+        };
+      }
+    };
+
+    /**
+     * A factory class internally used in linear_operator.h. Specialization
+     * for TrilinosWrappers::BlockVector.
+     */
+    template<>
+    class ReinitDomainFactory<TrilinosWrappers::BlockVector>
+    {
+    public:
+      template <typename Matrix>
+      std::function<void(TrilinosWrappers::BlockVector &, bool)>
+      operator()(const Matrix &matrix)
+      {
+        return [&matrix](TrilinosWrappers::BlockVector &v, bool fast)
+        {
+          v.reinit(matrix.domain_partitioner(), fast);
+        };
+      }
+    };
+  } /* namespace LinearOperator */
 } /* namespace internal */
 
 DEAL_II_NAMESPACE_CLOSE

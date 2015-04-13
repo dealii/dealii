@@ -462,47 +462,50 @@ void swap (BlockVector<Number> &u,
 
 namespace internal
 {
-  template <typename> class ReinitRangeFactory;
-  template <typename> class ReinitDomainFactory;
-
-  /*
-   * A factory class internally used in linear_operator.h.
-   * Specialization for BlockVector<number>.
-   */
-  template<typename number>
-  class ReinitRangeFactory<BlockVector<number> >
+  namespace LinearOperator
   {
-  public:
-    template <typename Matrix>
-    std::function<void(BlockVector<number> &, bool)>
-    operator()(const Matrix &matrix)
-    {
-      return [&matrix](BlockVector<number> &v, bool fast)
-      {
-        v.reinit(matrix.get_row_indices(), fast);
-      };
-    }
-  };
+    template <typename> class ReinitRangeFactory;
+    template <typename> class ReinitDomainFactory;
 
-  /*
-   * A factory class internally used in linear_operator.h.
-   * Specialization for BlockVector<number>.
-   */
-  template<typename number>
-  class ReinitDomainFactory<BlockVector<number> >
-  {
-  public:
-    template <typename Matrix>
-    std::function<void(BlockVector<number> &, bool)>
-    operator()(const Matrix &matrix)
+    /**
+     * A factory class internally used in linear_operator.h.
+     * Specialization for BlockVector<number>.
+     */
+    template<typename number>
+    class ReinitRangeFactory<BlockVector<number> >
     {
-      return [&matrix](BlockVector<number> &v, bool fast)
+    public:
+      template <typename Matrix>
+      std::function<void(BlockVector<number> &, bool)>
+      operator()(const Matrix &matrix)
       {
-        v.reinit(matrix.get_column_indices(), fast);
-      };
-    }
-  };
-}
+        return [&matrix](BlockVector<number> &v, bool fast)
+        {
+          v.reinit(matrix.get_row_indices(), fast);
+        };
+      }
+    };
+
+    /**
+     * A factory class internally used in linear_operator.h.
+     * Specialization for BlockVector<number>.
+     */
+    template<typename number>
+    class ReinitDomainFactory<BlockVector<number> >
+    {
+    public:
+      template <typename Matrix>
+      std::function<void(BlockVector<number> &, bool)>
+      operator()(const Matrix &matrix)
+      {
+        return [&matrix](BlockVector<number> &v, bool fast)
+        {
+          v.reinit(matrix.get_column_indices(), fast);
+        };
+      }
+    };
+  } /* namespace LinearOperator */
+} /* namespace internal */
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -905,56 +905,59 @@ blockdiag_linop(const LinearOperator<typename Range::BlockType, typename Domain:
 
 namespace internal
 {
-  /*
-   * A factory class that is responsible for the creation of a
-   * reinit_range_vector object for a given pair of vector type Range and matrix
-   * type Matrix.
-   *
-   * The generic version of this class just calls
-   * <code>Range::reinit()</code> with the result of
-   * <code>Matrix::m()</code>. This class is specialized for more complicated
-   * data structures, such as TrilinosWrappers::MPI::Vector, etc.
-   */
-  template<typename Range>
-  class ReinitRangeFactory
+  namespace LinearOperator
   {
-  public:
-    template <typename Matrix>
-    std::function<void(Range &, bool)>
-    operator()(const Matrix &matrix)
+    /**
+     * A factory class that is responsible for the creation of a
+     * reinit_range_vector object for a given pair of vector type Range and matrix
+     * type Matrix.
+     *
+     * The generic version of this class just calls
+     * <code>Range::reinit()</code> with the result of
+     * <code>Matrix::m()</code>. This class is specialized for more complicated
+     * data structures, such as TrilinosWrappers::MPI::Vector, etc.
+     */
+    template<typename Range>
+    class ReinitRangeFactory
     {
-      return [&matrix](Range &v, bool fast)
+    public:
+      template <typename Matrix>
+      std::function<void(Range &, bool)>
+      operator()(const Matrix &matrix)
       {
-        v.reinit(matrix.m(), fast);
-      };
-    }
-  };
+        return [&matrix](Range &v, bool fast)
+        {
+          v.reinit(matrix.m(), fast);
+        };
+      }
+    };
 
 
-  /*
-   * A factory class that is responsible for the creation of a
-   * reinit_domain_vector object for a given pair of vector type Domain and
-   * matrix type Matrix.
-   *
-   * The generic version of this class just calls
-   * <code>Domain::reinit()</code> with the result of
-   * <code>Matrix::n()</code>. This class is specialized for more complicated
-   * data structures, such as TrilinosWrappers::MPI::Vector, etc.
-   */
-  template<typename Domain>
-  class ReinitDomainFactory
-  {
-  public:
-    template <typename Matrix>
-    std::function<void(Domain &, bool)>
-    operator()(const Matrix &matrix)
+    /**
+     * A factory class that is responsible for the creation of a
+     * reinit_domain_vector object for a given pair of vector type Domain and
+     * matrix type Matrix.
+     *
+     * The generic version of this class just calls
+     * <code>Domain::reinit()</code> with the result of
+     * <code>Matrix::n()</code>. This class is specialized for more complicated
+     * data structures, such as TrilinosWrappers::MPI::Vector, etc.
+     */
+    template<typename Domain>
+    class ReinitDomainFactory
     {
-      return [&matrix](Domain &v, bool fast)
+    public:
+      template <typename Matrix>
+      std::function<void(Domain &, bool)>
+      operator()(const Matrix &matrix)
       {
-        v.reinit(matrix.n(), fast);
-      };
-    }
-  };
+        return [&matrix](Domain &v, bool fast)
+        {
+          v.reinit(matrix.n(), fast);
+        };
+      }
+    };
+  } /* namespace LinearOperator */
 } /* namespace internal */
 
 
@@ -1165,10 +1168,10 @@ LinearOperator<Range, Domain> linop(const Exemplar &exemplar,
   // or an exemplar cannot usually be copied...
 
   return_op.reinit_range_vector =
-    internal::ReinitRangeFactory<Range>().operator()(exemplar);
+    internal::LinearOperator::ReinitRangeFactory<Range>().operator()(exemplar);
 
   return_op.reinit_domain_vector =
-    internal::ReinitDomainFactory<Domain>().operator()(exemplar);
+    internal::LinearOperator::ReinitDomainFactory<Domain>().operator()(exemplar);
 
   typename std::conditional<
   has_vmult_add<Range, Domain, Matrix>::type::value,
