@@ -34,6 +34,8 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include "Epetra_LocalMap.h"
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
+#  include <functional>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -940,6 +942,8 @@ namespace TrilinosWrappers
 /*@}*/
 
 
+#ifdef DEAL_II_WITH_CXX11
+
 namespace internal
 {
   namespace LinearOperator
@@ -1024,6 +1028,8 @@ namespace internal
     };
   } /* namespace LinearOperator */
 } /* namespace internal */
+
+#endif /* DEAL_II_WITH_CXX11 */
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -27,6 +27,8 @@
 #  include <deal.II/lac/block_vector_base.h>
 #  include <deal.II/lac/exceptions.h>
 
+#  include <functional>
+
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
@@ -452,6 +454,8 @@ namespace TrilinosWrappers
 /*@}*/
 
 
+#ifdef DEAL_II_WITH_CXX11
+
 namespace internal
 {
   namespace LinearOperator
@@ -498,6 +502,9 @@ namespace internal
     };
   } /* namespace LinearOperator */
 } /* namespace internal */
+
+#endif /* DEAL_II_WITH_CXX11 */
+
 
 DEAL_II_NAMESPACE_CLOSE
 

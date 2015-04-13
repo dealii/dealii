@@ -23,6 +23,7 @@
 #include <deal.II/lac/block_vector_base.h>
 
 #include <cstdio>
+#include <functional>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -460,6 +461,8 @@ void swap (BlockVector<Number> &u,
 }
 
 
+#ifdef DEAL_II_WITH_CXX11
+
 namespace internal
 {
   namespace LinearOperator
@@ -506,6 +509,8 @@ namespace internal
     };
   } /* namespace LinearOperator */
 } /* namespace internal */
+
+#endif /* DEAL_II_WITH_CXX11 */
 
 DEAL_II_NAMESPACE_CLOSE
 
