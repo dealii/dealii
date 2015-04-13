@@ -1533,7 +1533,8 @@ template <int dim, int spacedim>
 void
 CellAccessor<dim, spacedim>::set_active_cell_index (const unsigned int active_cell_index)
 {
-  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  // set the active cell index. allow setting it also for non-active (and unused)
+  // cells to allow resetting the index after refinement
   this->tria->levels[this->present_level]->active_cell_indices[this->present_index]
     = active_cell_index;
 }
