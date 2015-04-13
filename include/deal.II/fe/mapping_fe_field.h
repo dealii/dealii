@@ -60,10 +60,10 @@ DEAL_II_NAMESPACE_OPEN
  *    const FESystem<dim,spacedim> fesystem(feq, spacedim);
  *    DoFHandler<dim,spacedim> dhq(triangulation);
  *    dhq.distribute_dofs(fesystem);
+ *    const ComponentMask mask(spacedim, true);
  *    Vector<double> eulerq(dhq.n_dofs());
  *    // Fills the euler vector with information from the Triangulation
- *    VectorTools::get_position_vector(dhq, eulerq);
- *    const ComponentMask mask(spacedim, true);
+ *    VectorTools::get_position_vector(dhq, eulerq, mask);
  *    MappingFEField<dim,spacedim> map(eulerq, dhq, mask);
  * @endcode
  *
