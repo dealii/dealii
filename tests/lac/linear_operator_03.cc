@@ -173,7 +173,7 @@ int main()
   PRINTME("solve(B, v, u)", v);
 
   deallog.depth_file(0);
-  inverse_linop(solver, PreconditionIdentity(), op_b).vmult(v, u);
+  inverse_linop(op_b, solver, PreconditionIdentity()).vmult(v, u);
   deallog.depth_file(3);
   PRINTME("inverse_linop(B)u", v);
 
@@ -183,12 +183,12 @@ int main()
   PRINTME("B(inverse_linop(B)u)", w);
 
   deallog.depth_file(0);
-  (op_b * inverse_linop(solver, PreconditionIdentity(), op_b)).vmult(w, u);
+  (op_b * inverse_linop(op_b, solver, PreconditionIdentity())).vmult(w, u);
   deallog.depth_file(3);
   PRINTME("(B*inverse_linop(B))u", w);
 
   deallog.depth_file(0);
-  (inverse_linop(solver, PreconditionIdentity(), op_b) * op_b).vmult(w, u);
+  (inverse_linop(op_b, solver, PreconditionIdentity()) * op_b).vmult(w, u);
   deallog.depth_file(3);
   PRINTME("(inverse_linop(B)*B)u", w);
 
@@ -196,7 +196,7 @@ int main()
   SolverCG<BlockVector<double>> inner_solver (solver_control);
 
   deallog.depth_file(0);
-  solver.solve(inverse_linop(inner_solver, PreconditionIdentity(), op_b), v, u,
+  solver.solve(inverse_linop(op_b, inner_solver, PreconditionIdentity()), v, u,
                PreconditionIdentity());
   deallog.depth_file(3);
   PRINTME("solve(inverse_linop(B), v, u) == Bu", v);

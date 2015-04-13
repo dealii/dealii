@@ -566,9 +566,9 @@ identity_linop(const std::function<void(Range &, bool)> &exemplar)
  */
 template <typename Solver, typename Preconditioner>
 LinearOperator<typename Solver::vector_type, typename Solver::vector_type>
-inverse_linop(Solver &solver,
-              const Preconditioner &preconditioner,
-              const LinearOperator<typename Solver::vector_type, typename Solver::vector_type> &op)
+inverse_linop(const LinearOperator<typename Solver::vector_type, typename Solver::vector_type> &op,
+              Solver &solver,
+              const Preconditioner &preconditioner)
 {
   typedef typename Solver::vector_type Vector;
 
