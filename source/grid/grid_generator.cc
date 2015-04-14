@@ -611,8 +611,8 @@ namespace GridGenerator
 
   template<>
   void
-  parallelogram (Triangulation<3>  &,
-                 const Point<3>   (&/*corners*/)[3],
+  parallelogram (Triangulation<3> &,
+                 const Point<3>   ( &/*corners*/)[3],
                  const bool         /*colorize*/)
   {
     Assert (false, ExcNotImplemented());
@@ -620,8 +620,8 @@ namespace GridGenerator
 
   template<>
   void
-  parallelogram (Triangulation<1>  &,
-                 const Point<1>   (&/*corners*/)[1],
+  parallelogram (Triangulation<1> &,
+                 const Point<1>   ( &/*corners*/)[1],
                  const bool         /*colorize*/)
   {
     Assert (false, ExcNotImplemented());
