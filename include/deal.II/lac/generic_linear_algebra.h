@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,9 +23,17 @@
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/precondition.h>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
+/**
+ * A namespace in which the deal.II linear algebra classes are typedef'ed to
+ * generic names. There are similar namespaces LinearAlgebraPETSc and
+ * LinearAlgebraTrilinos for typedefs to classes that interface with the PETSc
+ * and Trilinos libraries.
+ */
 namespace LinearAlgebraDealII
 {
   typedef Vector<double> Vector;
@@ -34,7 +42,6 @@ namespace LinearAlgebraDealII
   typedef SparseMatrix<double> SparseMatrix;
 
   typedef PreconditionSSOR<SparseMatrix > PreconditionSSOR;
-
 }
 
 
@@ -54,6 +61,12 @@ DEAL_II_NAMESPACE_CLOSE
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * A namespace in which the wrappers to the PETSc linear algebra classes are
+ * typedef'ed to generic names. There are similar namespaces
+ * LinearAlgebraDealII and LinearAlgebraTrilinos for typedefs to deal.II's own
+ * classes and classes that interface with Trilinos.
+ */
 namespace LinearAlgebraPETSc
 {
   using namespace dealii;
@@ -66,9 +79,12 @@ namespace LinearAlgebraPETSc
   typedef PETScWrappers::SolverCG SolverCG;
   typedef PETScWrappers::SolverGMRES SolverGMRES;
 
+  /**
+   * A namespace with typedefs to generic names for parallel PETSc linear
+   * algebra objects.
+   */
   namespace MPI
   {
-
     /**
      * Typedef for the vector type used.
      */
@@ -138,6 +154,12 @@ DEAL_II_NAMESPACE_CLOSE
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * A namespace in which the wrappers to the Trilinos linear algebra classes are
+ * typedef'ed to generic names. There are similar namespaces
+ * LinearAlgebraDealII and LinearAlgebraPETSc for typedefs to deal.II's own
+ * classes and classes that interface with PETSc.
+ */
 namespace LinearAlgebraTrilinos
 {
   using namespace dealii;
@@ -147,9 +169,12 @@ namespace LinearAlgebraTrilinos
   typedef TrilinosWrappers::SolverCG SolverCG;
   typedef TrilinosWrappers::SolverGMRES SolverGMRES;
 
+  /**
+   * A namespace with typedefs to generic names for parallel Trilinos linear
+   * algebra objects.
+   */
   namespace MPI
   {
-
     /**
      * Typedef for the vector type used.
      */
