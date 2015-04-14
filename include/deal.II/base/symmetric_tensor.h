@@ -1184,11 +1184,14 @@ namespace internal
                 data[1] * sdata[1] +
                 2*data[2] * sdata[2]);
       default:
-        Number sum = Number();
+        // Start with the non-diagonal part to avoid some multiplications by
+        // 2.
+        Number sum = data[dim] * sdata[dim];
+        for (unsigned int d=dim+1; d<(dim*(dim+1)/2); ++d)
+          sum += data[d] * sdata[d];
+        sum *= 2.;
         for (unsigned int d=0; d<dim; ++d)
           sum += data[d] * sdata[d];
-        for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
-          sum += 2 * data[d] * sdata[d];
         return sum;
       }
   }
