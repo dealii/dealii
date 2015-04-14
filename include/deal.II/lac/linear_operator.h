@@ -222,18 +222,6 @@ public:
    */
   std::function<void(Domain &v, bool fast)> reinit_domain_vector;
 
-  /**
-   * A memory object for vectors of @tref Range space used for intermediate
-   * storage during computations in @ref vmult, etc.
-   */
-  mutable GrowingVectorMemory<Range> range_vector_memory;
-
-  /**
-   * A memory object for vectors of @tref Domain space used for intermediate
-   * storage during computations in @ref vmult, etc.
-   */
-  mutable GrowingVectorMemory<Domain> domain_vector_memory;
-
 
   /**
    * Addition with a LinearOperator @p second_op with the same @tref Domain
@@ -353,47 +341,48 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
   // ensure to have valid computation objects by catching first_op and
   // second_op by value
 
-  // Note: The range_vector_memory and domain_vector_memory objects inside
-  // the lambda exrepessions are the one belonging to the by-value captured
-  // objects first_op and second_op. Thus, they belong in essence to the
-  // std::function object vmult (vmult_add, ...) - and therefore have the
-  // same lifetime as the function object and not the LinearOperator
-  // parameters first_op and second_op.
-
   return_op.vmult = [first_op, second_op](Range &v, const Domain &u)
   {
-    Intermediate *i = second_op.range_vector_memory.alloc();
+    static GrowingVectorMemory<Intermediate> vector_memory;
+
+    Intermediate *i = vector_memory.alloc();
     second_op.reinit_range_vector(*i, /*bool fast =*/ true);
     second_op.vmult(*i, u);
     first_op.vmult(v, *i);
-    second_op.range_vector_memory.free(i);
+    vector_memory.free(i);
   };
 
   return_op.vmult_add = [first_op, second_op](Range &v, const Domain &u)
   {
-    Intermediate *i = second_op.range_vector_memory.alloc();
+    static GrowingVectorMemory<Intermediate> vector_memory;
+
+    Intermediate *i = vector_memory.alloc();
     second_op.reinit_range_vector(*i, /*bool fast =*/ true);
     second_op.vmult(*i, u);
     first_op.vmult_add(v, *i);
-    second_op.range_vector_memory.free(i);
+    vector_memory.free(i);
   };
 
   return_op.Tvmult = [first_op, second_op](Domain &v, const Range &u)
   {
-    Intermediate *i = first_op.domain_vector_memory.alloc();
+    static GrowingVectorMemory<Intermediate> vector_memory;
+
+    Intermediate *i = vector_memory.alloc();
     first_op.reinit_domain_vector(*i, /*bool fast =*/ true);
     first_op.Tvmult(*i, u);
     second_op.Tvmult(v, *i);
-    first_op.domain_vector_memory.free(i);
+    vector_memory.free(i);
   };
 
   return_op.Tvmult_add = [first_op, second_op](Domain &v, const Range &u)
   {
-    Intermediate *i = first_op.domain_vector_memory.alloc();
+    static GrowingVectorMemory<Intermediate> vector_memory;
+
+    Intermediate *i = vector_memory.alloc();
     first_op.reinit_domain_vector(*i, /*bool fast =*/ true);
     first_op.Tvmult(*i, u);
     second_op.Tvmult_add(v, *i);
-    first_op.domain_vector_memory.free(i);
+    vector_memory.free(i);
   };
 
   return return_op;
@@ -586,21 +575,16 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
     solver.solve(op, v, u, preconditioner);
   };
 
-  // Note: The range_vector_memory and domain_vector_memory objects inside
-  // the lambda exrepessions are the one belonging to the by-value captured
-  // objects first_op and second_op. Thus, they belong in essence to the
-  // std::function object vmult (vmult_add, ...) - and therefore have the
-  // same lifetime as the function object and not the LinearOperator
-  // parameter op.
-
   return_op.vmult_add =
     [op, &solver, &preconditioner](Vector &v, const Vector &u)
   {
-    Vector *v2 = op.range_vector_memory.alloc();
+    static GrowingVectorMemory<typename Solver::vector_type> vector_memory;
+
+    Vector *v2 = vector_memory.alloc();
     op.reinit_range_vector(*v2, /*bool fast =*/ true);
     solver.solve(op, *v2, u, preconditioner);
     v += *v2;
-    op.range_vector_memory.free(v2);
+    vector_memory.free(v2);
   };
 
   return_op.Tvmult = [op, &solver, &preconditioner]( Vector &v, const
@@ -612,11 +596,13 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
   return_op.Tvmult =
     [op, &solver, &preconditioner](Vector &v, const Vector &u)
   {
-    Vector *v2 = op.range_vector_memory.alloc();
+    static GrowingVectorMemory<typename Solver::vector_type> vector_memory;
+
+    Vector *v2 = vector_memory.alloc();
     op.reinit_range_vector(*v2, /*bool fast =*/ true);
     solver.solve(transpose_operator(op), *v2, u, preconditioner);
     v += *v2;
-    op.range_vector_memory.free(v2);
+    vector_memory.free(v2);
   };
 
   return return_op;
@@ -1045,14 +1031,13 @@ namespace
 
       op.vmult_add = [op](Range &v, const Domain &u)
       {
-        // Capture op by value to have a valid GrowingVectorMemory object
-        // that is bound to the lifetime of this function object
+        static GrowingVectorMemory<Range> vector_memory;
 
-        Range *i = op.range_vector_memory.alloc();
+        Range *i = vector_memory.alloc();
         op.reinit_range_vector(*i, /*bool fast =*/true);
         op.vmult(*i, u);
         v += *i;
-        op.range_vector_memory.free(i);
+        vector_memory.free(i);
       };
 
       op.Tvmult = [&matrix](Domain &v, const Range &u)
@@ -1062,14 +1047,13 @@ namespace
 
       op.Tvmult_add = [op](Domain &v, const Range &u)
       {
-        // Capture op by value to have a valid GrowingVectorMemory object
-        // that is bound to the lifetime of this function object
+        static GrowingVectorMemory<Domain> vector_memory;
 
-        Domain *i = op.domain_vector_memory.alloc();
+        Domain *i = vector_memory.alloc();
         op.reinit_domain_vector(*i, /*bool fast =*/true);
         op.Tvmult(*i, u);
         v += *i;
-        op.domain_vector_memory.free(i);
+        vector_memory.free(i);
       };
     }
   };
@@ -1164,7 +1148,8 @@ template <typename Range = Vector<double>,
           typename Matrix>
 LinearOperator<Range, Domain>
 linear_operator(const OperatorExemplar &operator_exemplar,
-                const Matrix &matrix) {
+                const Matrix &matrix)
+{
   LinearOperator<Range, Domain> return_op;
 
   // Always store a reference to matrix and operator_exemplar in the lambda
@@ -1173,12 +1158,12 @@ linear_operator(const OperatorExemplar &operator_exemplar,
   // or an operator_exemplar cannot usually be copied...
 
   return_op.reinit_range_vector =
-      internal::LinearOperator::ReinitRangeFactory<Range>().operator()(
-          operator_exemplar);
+    internal::LinearOperator::ReinitRangeFactory<Range>().operator()(
+      operator_exemplar);
 
   return_op.reinit_domain_vector =
-      internal::LinearOperator::ReinitDomainFactory<Domain>().operator()(
-          operator_exemplar);
+    internal::LinearOperator::ReinitDomainFactory<Domain>().operator()(
+      operator_exemplar);
 
   typename std::conditional<
   has_vmult_add<Range, Domain, Matrix>::type::value,
