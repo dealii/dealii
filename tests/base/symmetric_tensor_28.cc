@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// test scalar_product between tensors and symmetric tensors
+// test construction, indexing, and conversion of SymmetricTensor<2,dim>
+// from/to Tensor<2,dim> with dim > 3
 
 #include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
@@ -28,28 +29,18 @@ void test ()
 {
   deallog << "dim=" << dim << std::endl;
 
-  // initialize symmetric and non-symmetric tensors. in the former case, we
-  // only need to initialize one half
   SymmetricTensor<2,dim> s;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=i; j<dim; ++j)
-      s[i][j] = (1.+(i+1)*(j*2));
+      s[i][j] = (i+1) * (j+1);
 
-  Tensor<2,dim> t;
+  Tensor<2,dim> t = s;
+  SymmetricTensor<2,dim> u = t;
+
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
-      t[i][j] = (1.+(i+1)*(j*2));
-
-  deallog << scalar_product(s,s) << std::endl;
-  AssertThrow (scalar_product(s,s) == s*s, ExcInternalError());
-
-  deallog << scalar_product(s,t) << std::endl;
-  AssertThrow (scalar_product(s,t) == s*symmetrize(t), ExcInternalError());
-  AssertThrow (scalar_product(s,t) == symmetrize(t)*s, ExcInternalError());
-
-  deallog << scalar_product(t,s) << std::endl;
-  AssertThrow (scalar_product(t,s) == s*symmetrize(t), ExcInternalError());
-  AssertThrow (scalar_product(t,s) == symmetrize(t)*s, ExcInternalError());
+      deallog << (i+1)*(j+1) << " " << (int)s[i][j] << " "
+              << (int)t[i][j] << " " << (int)u[i][j] << std::endl;
 }
 
 
@@ -63,10 +54,8 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test<1> ();
-  test<2> ();
   test<3> ();
-  test<4> ();
+  test<5> ();
 
   deallog << "OK" << std::endl;
 }

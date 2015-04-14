@@ -958,7 +958,16 @@ SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Tensor<2,dim,Number> &t
 
       break;
     default:
-      Assert (false, ExcNotImplemented());
+      for (unsigned int d=0; d<dim; ++d)
+        for (unsigned int e=0; e<d; ++e)
+          Assert(t[d][e] == t[e][d], ExcInternalError());
+
+      for (unsigned int d=0; d<dim; ++d)
+        data[d] = t[d][d];
+
+      for (unsigned int d=0, c=0; d<dim; ++d)
+        for (unsigned int e=d+1; e<dim; ++e, ++c)
+          data[dim+c] = t[d][e];
     }
 }
 
@@ -1012,52 +1021,22 @@ SymmetricTensor<rank,dim,Number>::operator = (const Number d)
 
 
 
-// helper function to convert symmetric tensor
-// to generic tensor
-namespace internal
-{
-  template <typename Number>
-  inline
-  Tensor<2,1,Number>
-  conversion (const Tensor<1,1,Number> &data)
-  {
-    const Number t[1][1] = {{data[0]}};
-    return Tensor<2,1,Number>(t);
-  }
-
-  template <typename Number>
-  inline
-  Tensor<2,2,Number>
-  conversion (const Tensor<1,3,Number> &data)
-  {
-    const Number t[2][2] = {{data[0], data[2]},
-      {data[2], data[1]}
-    };
-    return Tensor<2,2,Number>(t);
-  }
-
-  template <typename Number>
-  inline
-  Tensor<2,3,Number>
-  conversion (const Tensor<1,6,Number> &data)
-  {
-    const Number t[3][3] = {{data[0], data[3], data[4]},
-      {data[3], data[1], data[5]},
-      {data[4], data[5], data[2]}
-    };
-    return Tensor<2,3,Number>(t);
-  }
-}
-
-
-
 template <int rank, int dim, typename Number>
 inline
 SymmetricTensor<rank,dim,Number>::
 operator Tensor<rank,dim,Number> () const
 {
   Assert (rank == 2, ExcNotImplemented());
-  return internal::conversion(data);
+  Number t[dim][dim];
+  for (unsigned int d=0; d<dim; ++d)
+    t[d][d] = data[d];
+  for (unsigned int d=0, c=0; d<dim; ++d)
+    for (unsigned int e=d+1; e<dim; ++e, ++c)
+      {
+        t[d][e] = data[dim+c];
+        t[e][d] = data[dim+c];
+      }
+  return Tensor<2,dim,Number>(t);
 }
 
 
@@ -1204,19 +1183,15 @@ namespace internal
         return (data[0] * sdata[0] +
                 data[1] * sdata[1] +
                 2*data[2] * sdata[2]);
-      case 3:
-        return (data[0] * sdata[0] +
-                data[1] * sdata[1] +
-                data[2] * sdata[2] +
-                2*data[3] * sdata[3] +
-                2*data[4] * sdata[4] +
-                2*data[5] * sdata[5]);
       default:
-        Number sum = 0;
+        // Start with the non-diagonal part to avoid some multiplications by
+        // 2.
+        Number sum = data[dim] * sdata[dim];
+        for (unsigned int d=dim+1; d<(dim*(dim+1)/2); ++d)
+          sum += data[d] * sdata[d];
+        sum *= 2.;
         for (unsigned int d=0; d<dim; ++d)
           sum += data[d] * sdata[d];
-        for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
-          sum += Number(2.) * data[d] * sdata[d];
         return sum;
       }
   }
@@ -1229,30 +1204,11 @@ namespace internal
   perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type &data,
                               const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type &sdata)
   {
-    Number tmp [SymmetricTensorAccessors::StorageType<2,dim,Number>::n_independent_components];
-    switch (dim)
-      {
-      case 1:
-        tmp[0] = data[0][0] * sdata[0];
-        break;
-      case 2:
-        for (unsigned int i=0; i<3; ++i)
-          tmp[i] = (data[i][0] * sdata[0] +
-                    data[i][1] * sdata[1] +
-                    2 * data[i][2] * sdata[2]);
-        break;
-      case 3:
-        for (unsigned int i=0; i<6; ++i)
-          tmp[i] = (data[i][0] * sdata[0] +
-                    data[i][1] * sdata[1] +
-                    data[i][2] * sdata[2] +
-                    2 * data[i][3] * sdata[3] +
-                    2 * data[i][4] * sdata[4] +
-                    2 * data[i][5] * sdata[5]);
-        break;
-      default:
-        Assert (false, ExcNotImplemented());
-      }
+    const unsigned int data_dim =
+      SymmetricTensorAccessors::StorageType<2,dim,Number>::n_independent_components;
+    Number tmp [data_dim];
+    for (unsigned int i=0; i<data_dim; ++i)
+      tmp[i] = perform_double_contraction<dim,Number>(data[i], sdata);
     return SymmetricTensor<2,dim,Number>(tmp);
   }
 
@@ -1265,28 +1221,12 @@ namespace internal
                               const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type &sdata)
   {
     typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type tmp;
-    switch (dim)
+    for (unsigned int i=0; i<tmp.dimension; ++i)
       {
-      case 1:
-        tmp[0] = data[0] * sdata[0][0];
-        break;
-      case 2:
-        for (unsigned int i=0; i<3; ++i)
-          tmp[i] = (data[0] * sdata[0][i] +
-                    data[1] * sdata[1][i] +
-                    2 * data[2] * sdata[2][i]);
-        break;
-      case 3:
-        for (unsigned int i=0; i<6; ++i)
-          tmp[i] = (data[0] * sdata[0][i] +
-                    data[1] * sdata[1][i] +
-                    data[2] * sdata[2][i] +
-                    2 * data[3] * sdata[3][i] +
-                    2 * data[4] * sdata[4][i] +
-                    2 * data[5] * sdata[5][i]);
-        break;
-      default:
-        Assert (false, ExcNotImplemented());
+        for (unsigned int d=0; d<dim; ++d)
+          tmp[i] += data[d] * sdata[d][i];
+        for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
+          tmp[i] += 2 * data[d] * sdata[d][i];
       }
     return tmp;
   }
@@ -1299,32 +1239,17 @@ namespace internal
   perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type &data,
                               const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type &sdata)
   {
+    const unsigned int data_dim =
+      SymmetricTensorAccessors::StorageType<2,dim,Number>::n_independent_components;
     typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type tmp;
-    switch (dim)
-      {
-      case 1:
-        tmp[0][0] = data[0][0] * sdata[0][0];
-        break;
-      case 2:
-        for (unsigned int i=0; i<3; ++i)
-          for (unsigned int j=0; j<3; ++j)
-            tmp[i][j] = (data[i][0] * sdata[0][j] +
-                         data[i][1] * sdata[1][j] +
-                         2*data[i][2] * sdata[2][j]);
-        break;
-      case 3:
-        for (unsigned int i=0; i<6; ++i)
-          for (unsigned int j=0; j<6; ++j)
-            tmp[i][j] = (data[i][0] * sdata[0][j] +
-                         data[i][1] * sdata[1][j] +
-                         data[i][2] * sdata[2][j] +
-                         2*data[i][3] * sdata[3][j] +
-                         2*data[i][4] * sdata[4][j] +
-                         2*data[i][5] * sdata[5][j]);
-        break;
-      default:
-        Assert (false, ExcNotImplemented());
-      }
+    for (unsigned int i=0; i<data_dim; ++i)
+      for (unsigned int j=0; j<data_dim; ++j)
+        {
+          for (unsigned int d=0; d<dim; ++d)
+            tmp[i][j] += data[i][d] * sdata[d][j];
+          for (unsigned int d=dim; d<(dim*(dim+1)/2); ++d)
+            tmp[i][j] += 2 * data[i][d] * sdata[d][j];
+        }
     return tmp;
   }
 
@@ -1375,49 +1300,37 @@ namespace internal
   symmetric_tensor_access (const TableIndices<2> &indices,
                            typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type &data)
   {
+    // 1d is very simple and done first
+    if (dim == 1)
+      return data[0];
+
+    // first treat the main diagonal elements, which are stored consecutively
+    // at the beginning
+    if (indices[0] == indices[1])
+      return data[indices[0]];
+
+    // the rest is messier and requires a few switches.
     switch (dim)
       {
-      case 1:
-        return data[0];
-
       case 2:
-        // first treat the main diagonal
-        // elements, which are stored
-        // consecutively at the beginning
-        if (indices[0] == indices[1])
-          return data[indices[0]];
-
-        // the rest is messier and requires a few
-        // switches. at least for the 2x2 case it
-        // is reasonably simple
+        // at least for the 2x2 case it is reasonably simple
         Assert (((indices[0]==1) && (indices[1]==0)) ||
                 ((indices[0]==0) && (indices[1]==1)),
                 ExcInternalError());
         return data[2];
 
-      case 3:
-        // first treat the main diagonal
-        // elements, which are stored
-        // consecutively at the beginning
-        if (indices[0] == indices[1])
-          return data[indices[0]];
+      default:
+        // to do the rest, sort our indices before comparing
+      {
+        TableIndices<2> sorted_indices (indices);
+        sorted_indices.sort ();
 
-        // the rest is messier and requires a few
-        // switches, but simpler if we just sort
-        // our indices
-        {
-          TableIndices<2> sorted_indices (indices);
-          sorted_indices.sort ();
-
-          if ((sorted_indices[0]==0) && (sorted_indices[1]==1))
-            return data[3];
-          else if ((sorted_indices[0]==0) && (sorted_indices[1]==2))
-            return data[4];
-          else if ((sorted_indices[0]==1) && (sorted_indices[1]==2))
-            return data[5];
-          else
-            Assert (false, ExcInternalError());
-        }
+        for (unsigned int d=0, c=0; d<dim; ++d)
+          for (unsigned int e=d+1; e<dim; ++e, ++c)
+            if ((sorted_indices[0]==d) && (sorted_indices[1]==e))
+              return data[dim+c];
+        Assert (false, ExcInternalError());
+      }
       }
 
     static Number dummy_but_referenceable = Number();
@@ -1432,52 +1345,40 @@ namespace internal
   symmetric_tensor_access (const TableIndices<2> &indices,
                            const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type &data)
   {
+    // 1d is very simple and done first
+    if (dim == 1)
+      return data[0];
+
+    // first treat the main diagonal elements, which are stored consecutively
+    // at the beginning
+    if (indices[0] == indices[1])
+      return data[indices[0]];
+
+    // the rest is messier and requires a few switches.
     switch (dim)
       {
-      case 1:
-        return data[0];
-
       case 2:
-        // first treat the main diagonal
-        // elements, which are stored
-        // consecutively at the beginning
-        if (indices[0] == indices[1])
-          return data[indices[0]];
-
-        // the rest is messier and requires a few
-        // switches. at least for the 2x2 case it
-        // is reasonably simple
+        // at least for the 2x2 case it is reasonably simple
         Assert (((indices[0]==1) && (indices[1]==0)) ||
                 ((indices[0]==0) && (indices[1]==1)),
                 ExcInternalError());
         return data[2];
 
-      case 3:
-        // first treat the main diagonal
-        // elements, which are stored
-        // consecutively at the beginning
-        if (indices[0] == indices[1])
-          return data[indices[0]];
+      default:
+        // to do the rest, sort our indices before comparing
+      {
+        TableIndices<2> sorted_indices (indices);
+        sorted_indices.sort ();
 
-        // the rest is messier and requires a few
-        // switches, but simpler if we just sort
-        // our indices
-        {
-          TableIndices<2> sorted_indices (indices);
-          sorted_indices.sort ();
-
-          if ((sorted_indices[0]==0) && (sorted_indices[1]==1))
-            return data[3];
-          else if ((sorted_indices[0]==0) && (sorted_indices[1]==2))
-            return data[4];
-          else if ((sorted_indices[0]==1) && (sorted_indices[1]==2))
-            return data[5];
-          else
-            Assert (false, ExcInternalError());
-        }
+        for (unsigned int d=0, c=0; d<dim; ++d)
+          for (unsigned int e=d+1; e<dim; ++e, ++c)
+            if ((sorted_indices[0]==d) && (sorted_indices[1]==e))
+              return data[dim+c];
+        Assert (false, ExcInternalError());
+      }
       }
 
-    static Number dummy_but_referenceable = 0;
+    static Number dummy_but_referenceable = Number();
     return dummy_but_referenceable;
   }
 
@@ -1806,7 +1707,7 @@ namespace internal
                                   2*data[4]*data[4] + 2*data[5]*data[5]);
         break;
       default:
-        return_value = 0;
+        return_value = Number();
         for (unsigned int d=0; d<dim; ++d)
           return_value += data[d] * data[d];
         for (unsigned int d=dim; d<(dim*dim+dim)/2; ++d)
@@ -1832,7 +1733,7 @@ namespace internal
         return_value = std::fabs (data[0][0]);
         break;
       default:
-        return_value = 0;
+        return_value = Number();
         for (unsigned int i=0; i<dim; ++i)
           for (unsigned int j=0; j<dim; ++j)
             return_value += data[i][j] * data[i][j];
@@ -1920,8 +1821,20 @@ namespace internal
           }
 
           default:
+            // for the remainder, manually figure out the numbering
+          {
+            if (indices[0] == indices[1])
+              return indices[0];
+
+            TableIndices<2> sorted_indices (indices);
+            sorted_indices.sort ();
+
+            for (unsigned int d=0, c=0; d<dim; ++d)
+              for (unsigned int e=d+1; e<dim; ++e, ++c)
+                if ((sorted_indices[0]==d) && (sorted_indices[1]==e))
+                  return dim+c;
             Assert (false, ExcNotImplemented());
-            return 0;
+          }
           }
       }
 
@@ -2012,8 +1925,13 @@ namespace internal
           }
 
           default:
-            Assert (false, ExcNotImplemented());
-            return TableIndices<2>(0,0);
+            if (i<dim)
+              return TableIndices<2> (i,i);
+
+            for (unsigned int d=0, c=0; d<dim; ++d)
+              for (unsigned int e=d+1; e<dim; ++e, ++c)
+                if (c==i)
+                  return TableIndices<2>(d,e);
           }
       }
 
@@ -2606,63 +2524,23 @@ outer_product (const SymmetricTensor<2,dim,Number> &t1,
 /**
  * Return the symmetrized version of a full rank-2 tensor, i.e.
  * (t+transpose(t))/2, as a symmetric rank-2 tensor. This is the version for
- * dim==1.
+ * general dimensions.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
-template <typename Number>
+template <int dim,typename Number>
 inline
-SymmetricTensor<2,1,Number>
-symmetrize (const Tensor<2,1,Number> &t)
+SymmetricTensor<2,dim,Number>
+symmetrize (const Tensor<2,dim,Number> &t)
 {
-  const Number array[1]
-    = { t[0][0] };
-  return SymmetricTensor<2,1,Number>(array);
-}
-
-
-
-/**
- * Return the symmetrized version of a full rank-2 tensor, i.e.
- * (t+transpose(t))/2, as a symmetric rank-2 tensor. This is the version for
- * dim==2.
- *
- * @relates SymmetricTensor
- * @author Wolfgang Bangerth, 2005
- */
-template <typename Number>
-inline
-SymmetricTensor<2,2,Number>
-symmetrize (const Tensor<2,2,Number> &t)
-{
-  const Number array[3]
-    = { t[0][0], t[1][1], (t[0][1] + t[1][0])/2 };
-  return SymmetricTensor<2,2,Number>(array);
-}
-
-
-
-/**
- * Return the symmetrized version of a full rank-2 tensor, i.e.
- * (t+transpose(t))/2, as a symmetric rank-2 tensor. This is the version for
- * dim==3.
- *
- * @relates SymmetricTensor
- * @author Wolfgang Bangerth, 2005
- */
-template <typename Number>
-inline
-SymmetricTensor<2,3,Number>
-symmetrize (const Tensor<2,3,Number> &t)
-{
-  const Number array[6]
-    = { t[0][0], t[1][1], t[2][2],
-        (t[0][1] + t[1][0])/2,
-        (t[0][2] + t[2][0])/2,
-        (t[1][2] + t[2][1])/2
-      };
-  return SymmetricTensor<2,3,Number>(array);
+  Number array[(dim*dim+dim)/2];
+  for (unsigned int d=0; d<dim; ++d)
+    array[d] = t[d][d];
+  for (unsigned int d=0, c=0; d<dim; ++d)
+    for (unsigned int e=d+1; e<dim; ++e, ++c)
+      array[dim+c] = (t[d][e]+t[e][d])*0.5;
+  return SymmetricTensor<2,dim,Number>(array);
 }
 
 
