@@ -1069,8 +1069,8 @@ namespace DoFTools
     typename DH::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-    for (unsigned int index=0; cell!=endc; ++cell, ++index)
-      active_fe_indices[index] = cell->active_fe_index();
+    for (; cell!=endc; ++cell)
+      active_fe_indices[cell->active_cell_index()] = cell->active_fe_index();
   }
 
 
