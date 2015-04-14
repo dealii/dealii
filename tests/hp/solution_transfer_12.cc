@@ -124,7 +124,7 @@ void transfer(std::ostream &out)
     quad.push_back (QTrapez<dim> ());
     hp::FEValues<dim> hp_fe_val (fe_q, quad, update_values |
                                  update_quadrature_points);
-    std::vector<unsigned int> local_dof_indices;
+    std::vector<types::global_dof_index> local_dof_indices;
     typename hp::DoFHandler<dim>::active_cell_iterator
     cell = q_dof_handler.begin_active(),
     endc = q_dof_handler.end();
