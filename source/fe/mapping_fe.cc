@@ -479,11 +479,10 @@ MappingFE<dim,spacedim,DH,VECTOR>::fill_fe_values (
                   }
                 else
                   {
-                    const unsigned int codim = spacedim-dim;
-
                     if (update_flags & update_normal_vectors)
                       {
-                        Assert( codim==1 , ExcMessage("There is no cell normal in codim 2."));
+                        Assert (spacedim - dim == 1,
+                                ExcMessage("There is no cell normal in codim 2."));
 
                         if (dim==1)
                           cross_product(normal_vectors[point], -DX_t[0]);
@@ -701,8 +700,11 @@ void MappingFE<dim,spacedim,DH,VECTOR>::transform
 (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
  VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
- const MappingType mapping_type) const
+ const MappingType) const
 {
+  (void)input;
+  (void)output;
+  (void)mapping_data;
   AssertDimension (input.size(), output.size());
 
   AssertThrow(false, ExcNotImplemented());
@@ -901,6 +903,7 @@ transform_real_to_unit_cell_internal
   }
 
   const unsigned int n_shapes=mdata.shape_values.size();
+  (void)n_shapes;
   Assert(n_shapes!=0, ExcInternalError());
   AssertDimension (mdata.shape_derivatives.size(), n_shapes);
 
@@ -1143,8 +1146,8 @@ MappingFE<dim,spacedim,DH,VECTOR>::compute_fill_face (
   std::vector<double>         &JxW_values,
   std::vector<Tensor<1,spacedim> > &boundary_forms,
   std::vector<Point<spacedim> > &normal_vectors,
-  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
+  std::vector<DerivativeForm<1,dim,spacedim> > &/*jacobians*/,
+  std::vector<DerivativeForm<1,spacedim,dim> > &/*inverse_jacobians*/) const
 {
   compute_fill (cell, n_q_points, data_set, CellSimilarity::none,
                 data, quadrature_points);

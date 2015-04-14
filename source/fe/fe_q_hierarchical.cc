@@ -125,8 +125,8 @@ FE_Q_Hierarchical<dim>::get_name () const
 template <int dim>
 void
 FE_Q_Hierarchical<dim>::interpolate(
-  std::vector<double>       &local_dofs,
-  const std::vector<double> &values) const
+  std::vector<double>       &/*local_dofs*/,
+  const std::vector<double> &/*values*/) const
 {
   // The default implementation
   // assumes that the FE has a delta property,
