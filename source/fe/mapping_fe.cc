@@ -700,7 +700,7 @@ void MappingFE<dim,spacedim,DH,VECTOR>::transform
 (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
  VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
- const MappingType mapping_type) const
+ const MappingType) const
 {
   (void)input;
   (void)output;
