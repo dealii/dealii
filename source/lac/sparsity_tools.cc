@@ -202,6 +202,9 @@ namespace SparsityTools
             ExcDimensionMismatch (sparsity.n_rows(), new_indices.size()));
     Assert (starting_indices.size() <= sparsity.n_rows(),
             ExcMessage ("You can't specify more starting indices than there are rows"));
+    Assert (sparsity.row_index_set().size() == 0 ||
+            sparsity.row_index_set().size() == sparsity.n_rows(),
+            ExcMessage("Only valid for sparsity patterns which store all rows."));
     for (SparsityPattern::size_type i=0; i<starting_indices.size(); ++i)
       Assert (starting_indices[i] < sparsity.n_rows(),
               ExcMessage ("Invalid starting index"));
@@ -359,101 +362,123 @@ namespace SparsityTools
     {
       AssertDimension (connectivity.n_rows(), connectivity.n_cols());
       AssertDimension (connectivity.n_rows(), renumbering.size());
+      Assert (connectivity.row_index_set().size() == 0 ||
+              connectivity.row_index_set().size() == connectivity.n_rows(),
+              ExcMessage("Only valid for sparsity patterns which store all rows."));
 
       std::vector<types::global_dof_index> touched_nodes(connectivity.n_rows(),
                                                          numbers::invalid_dof_index);
+      std::vector<unsigned int> row_lengths(connectivity.n_rows());
       std::set<types::global_dof_index> current_neighbors;
       std::vector<std::vector<types::global_dof_index> > groups;
+
+      // First collect the number of neighbors for each node. We use this
+      // field to find next nodes with the minimum number of non-touched
+      // neighbors in the field n_remaining_neighbors, so we will count down
+      // on this field. We also cache the row lengths because we need this
+      // data frequently and getting it from the sparsity pattern is more
+      // expensive.
+      for (types::global_dof_index row=0; row<connectivity.n_rows(); ++row)
+        {
+          row_lengths[row] = connectivity.row_length(row);
+          Assert(row_lengths[row] > 0, ExcInternalError());
+        }
+      std::vector<unsigned int> n_remaining_neighbors(row_lengths);
 
       // This outer loop is typically traversed only once, unless the global
       // graph is not connected
       while (true)
         {
-          // Find cell with the minimal number of neighbors (typically a corner
-          // node when based on FEM meshes). If no cell is left, we are done.
+          // Find cell with the minimal number of neighbors (typically a
+          // corner node when based on FEM meshes). If no cell is left, we are
+          // done. Together with the outer while loop, this loop can possibly
+          // be of quadratic complexity in the number of disconnected
+          // partitions, i.e. up to connectivity.n_rows() in the worst case,
+          // but that is not the usual use case of this loop and thus not
+          // optimized for.
           std::pair<types::global_dof_index,types::global_dof_index> min_neighbors
           (numbers::invalid_dof_index, numbers::invalid_dof_index);
           for (types::global_dof_index i=0; i<touched_nodes.size(); ++i)
             if (touched_nodes[i] == numbers::invalid_dof_index)
-              if (connectivity.row_length(i) < min_neighbors.second)
-                min_neighbors = std::make_pair(i, connectivity.row_length(i));
+              if (row_lengths[i] < min_neighbors.second)
+                {
+                  min_neighbors = std::make_pair(i, n_remaining_neighbors[i]);
+                  if (n_remaining_neighbors[i] <= 1)
+                    break;
+                }
           if (min_neighbors.first == numbers::invalid_dof_index)
             break;
+
+          Assert(min_neighbors.second > 0, ExcInternalError());
 
           current_neighbors.clear();
           current_neighbors.insert(min_neighbors.first);
           while (!current_neighbors.empty())
             {
-              // Find cell with minimum number of untouched neighbors among the
+              // Find node with minimum number of untouched neighbors among the
               // next set of possible neighbors
               min_neighbors = std::make_pair (numbers::invalid_dof_index,
                                               numbers::invalid_dof_index);
               for (std::set<types::global_dof_index>::iterator it=current_neighbors.begin();
                    it != current_neighbors.end(); ++it)
                 {
-                  AssertThrow(touched_nodes[*it] == numbers::invalid_dof_index,
-                              ExcInternalError());
-                  types::global_dof_index active_row_length = 0;
-                  for (DynamicSparsityPattern::row_iterator rowit
-                       = connectivity.row_begin(*it);
-                       rowit != connectivity.row_end(*it); ++rowit)
-                    if (touched_nodes[*rowit] == numbers::invalid_dof_index)
-                      ++active_row_length;
-                  if (active_row_length < min_neighbors.second)
-                    min_neighbors = std::make_pair(*it, active_row_length);
+                  Assert (touched_nodes[*it] == numbers::invalid_dof_index,
+                          ExcInternalError());
+                  if (n_remaining_neighbors[*it] < min_neighbors.second)
+                    min_neighbors = std::make_pair(*it, n_remaining_neighbors[*it]);
                 }
-              // Among the set of cells with the minimal number of neighbors,
+
+              // Among the set of nodes with the minimal number of neighbors,
               // choose the one with the largest number of touched neighbors,
               // i.e., the one with the largest row length
               const types::global_dof_index best_row_length = min_neighbors.second;
               for (std::set<types::global_dof_index>::iterator it=current_neighbors.begin();
                    it != current_neighbors.end(); ++it)
-                {
-                  types::global_dof_index active_row_length = 0;
-                  for (DynamicSparsityPattern::row_iterator rowit
-                       = connectivity.row_begin(*it);
-                       rowit != connectivity.row_end(*it); ++rowit)
-                    if (touched_nodes[*rowit] == numbers::invalid_dof_index)
-                      ++active_row_length;
-                  if (active_row_length == best_row_length)
-                    if (connectivity.row_length(*it) > min_neighbors.second)
-                      min_neighbors = std::make_pair(*it, connectivity.row_length(*it));
-                }
+                if (n_remaining_neighbors[*it] == best_row_length)
+                  if (row_lengths[*it] > min_neighbors.second)
+                    min_neighbors = std::make_pair(*it, row_lengths[*it]);
 
-              // Add the pivot cell to the current list
+              // Add the pivot and all direct neighbors of the pivot node not
+              // yet touched to the list of new entries.
               groups.push_back(std::vector<types::global_dof_index>());
-              std::vector<types::global_dof_index> &new_entries = groups.back();
-              new_entries.push_back(min_neighbors.first);
-              touched_nodes[min_neighbors.first] = groups.size()-1;
+              std::vector<types::global_dof_index> &next_group = groups.back();
 
-              // Add all direct neighbors of the pivot cell not yet touched to
-              // the current list
+              next_group.push_back(min_neighbors.first);
+              touched_nodes[min_neighbors.first] = groups.size()-1;
               for (DynamicSparsityPattern::row_iterator it
                    = connectivity.row_begin(min_neighbors.first);
                    it != connectivity.row_end(min_neighbors.first); ++it)
-                {
-                  if (touched_nodes[*it] == numbers::invalid_dof_index)
-                    {
-                      new_entries.push_back(*it);
-                      touched_nodes[*it] = groups.size()-1;
-                    }
-                }
+                if (touched_nodes[*it] == numbers::invalid_dof_index)
+                  {
+                    next_group.push_back(*it);
+                    touched_nodes[*it] = groups.size()-1;
+                  }
 
               // Add all neighbors of the current list not yet touched to the
-              // set of possible next pivots. Delete the entries of the current
-              // list from the set of possible next pivots.
-              for (types::global_dof_index i=0; i<new_entries.size(); ++i)
+              // set of possible next pivots. The added node is no longer a
+              // valid neighbor (here we assume symmetry of the
+              // connectivity). Delete the entries of the current list from
+              // the set of possible next pivots.
+              for (unsigned int i=0; i<next_group.size(); ++i)
                 {
                   for (DynamicSparsityPattern::row_iterator it
-                       = connectivity.row_begin(new_entries[i]);
-                       it != connectivity.row_end(new_entries[i]); ++it)
-                    if (touched_nodes[*it] == numbers::invalid_dof_index)
-                      current_neighbors.insert(*it);
-                  current_neighbors.erase(new_entries[i]);
+                       = connectivity.row_begin(next_group[i]);
+                       it != connectivity.row_end(next_group[i]); ++it)
+                    {
+                      if (touched_nodes[*it] == numbers::invalid_dof_index)
+                        current_neighbors.insert(*it);
+                      n_remaining_neighbors[*it]--;
+                    }
+                  current_neighbors.erase(next_group[i]);
                 }
             }
         }
-      // If the number of groups is smaller than the number of nodes, we can
+
+      // Sanity check: for all nodes, there should not be any neighbors left
+      for (types::global_dof_index row=0; row<connectivity.n_rows(); ++row)
+        Assert(n_remaining_neighbors[row] == 0, ExcInternalError());
+
+      // If the number of groups is smaller than the number of nodes, we
       // continue by recursively calling this method
       if (groups.size() < connectivity.n_rows())
         {
@@ -465,10 +490,7 @@ namespace SparsityTools
               for (DynamicSparsityPattern::row_iterator it
                    = connectivity.row_begin(groups[i][col]);
                    it != connectivity.row_end(groups[i][col]); ++it)
-                {
-                  if (touched_nodes[*it] != i)
-                    connectivity_next.add(i, touched_nodes[*it]);
-                }
+                connectivity_next.add(i, touched_nodes[*it]);
 
           // Recursively call the reordering
           std::vector<types::global_dof_index> renumbering_next(groups.size());
