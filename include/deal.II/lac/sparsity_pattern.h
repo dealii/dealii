@@ -86,7 +86,7 @@ namespace internals
 
 
 /**
- * Iterators on sparsity patterns
+ * Iterators on objects of type SparsityPattern.
  */
 namespace SparsityPatternIterators
 {
@@ -203,14 +203,14 @@ namespace SparsityPatternIterators
 
 
   /**
-   * STL conforming iterator walking over the elements of a sparsity pattern.
+   * An iterator class for walking over the elements of a sparsity pattern.
    *
    * The typical use for these iterators is to iterate over the elements of a
    * sparsity pattern (or, since they also serve as the basis for iterating
    * over the elements of an associated matrix, over the elements of a sparse
-   * matrix) or over the elements of individual rows. Note that there is no
+   * matrix), or over the elements of individual rows. There is no
    * guarantee that the elements of a row are actually traversed in an order
-   * in which columns monotonically increase. See the documentation of the
+   * in which column numbers monotonically increase. See the documentation of the
    * SparsityPattern class for more information.
    *
    * @note This class operates directly on the internal data structures of the

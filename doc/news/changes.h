@@ -440,6 +440,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The DynamicSparsityPattern class (formerly called
+  CompressedSparsityPattern) now has an iterator class that allows to
+  walk over the nonzero elements of a matrix represented by this class.
+  <br>
+  (Wolfgang Bangerth, 2015/04/13)
+  </li>
+
   <li> New: The GridGenerator::subdivided_hyper_cube() and 
   GridGenerator::subdivided_hyper_rectangle() now work also for codimension
   one and two Triangulation;

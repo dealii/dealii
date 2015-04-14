@@ -30,11 +30,210 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class SparseMatrix;
+class DynamicSparsityPattern;
 
 
 /*! @addtogroup Sparsity
  *@{
  */
+
+
+/**
+ * Iterators on objects of type DynamicSparsityPattern.
+ */
+namespace DynamicSparsityPatternIterators
+{
+  // forward declaration
+  class Iterator;
+
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
+   * Accessor class for iterators into objects of type
+   * DynamicSparsityPattern.
+   *
+   * Note that this class only allows read access to elements, providing their
+   * row and column number (or alternatively the index within the complete
+   * sparsity pattern). It does not allow modifying the sparsity pattern
+   * itself.
+   *
+   * @author Wolfgang Bangerth
+   * @date 2015
+   */
+  class Accessor
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    Accessor (const DynamicSparsityPattern *sparsity_pattern,
+              const unsigned int row,
+              const unsigned int index_within_row);
+
+    /**
+     * Constructor. Construct the end accessor for the given sparsity pattern.
+     */
+    Accessor (const DynamicSparsityPattern *sparsity_pattern);
+
+    /**
+     * Row number of the element represented by this object.
+     */
+    size_type row () const;
+
+    /**
+     * Index within the current row of the element represented by this object.
+     */
+    size_type index () const;
+
+    /**
+     * Column number of the element represented by this object.
+     */
+    size_type column () const;
+
+    /**
+     * Comparison. True, if both iterators point to the same matrix position.
+     */
+    bool operator == (const Accessor &) const;
+
+    /**
+     * Comparison operator. Result is true if either the first row number is
+     * smaller or if the row numbers are equal and the first index is smaller.
+     *
+     * This function is only valid if both iterators point into the same
+     * sparsity pattern.
+     */
+    bool operator < (const Accessor &) const;
+
+  protected:
+    /**
+     * The sparsity pattern we operate on accessed.
+     */
+    const DynamicSparsityPattern *sparsity_pattern;
+
+    /**
+     * The row we currently point into.
+     */
+    unsigned int current_row;
+
+    /**
+     * A pointer to the element within the current row that we
+     * currently point to.
+     */
+    std::vector<size_type>::const_iterator current_entry;
+
+    /**
+     * Move the accessor to the next nonzero entry in the matrix.
+     */
+    void advance ();
+
+    /**
+     * Grant access to iterator class.
+     */
+    friend class Iterator;
+  };
+
+
+
+  /**
+   * An iterator class for walking over the elements of a sparsity pattern.
+   *
+   * The typical use for these iterators is to iterate over the elements of a
+   * sparsity pattern (or, since they also serve as the basis for iterating
+   * over the elements of an associated matrix, over the elements of a sparse
+   * matrix), or over the elements of individual rows. There is no
+   * guarantee that the elements of a row are actually traversed in an order
+   * in which column numbers monotonically increase. See the documentation of the
+   * SparsityPattern class for more information.
+   *
+   * @note This class operates directly on the internal data
+   * structures of the DynamicSparsityPattern class. As a consequence, some
+   * operations are cheap and some are not. In particular, it is cheap
+   * to access the column index of the sparsity pattern entry pointed
+   * to. On the other hand, it is expensive to compute the distance
+   * between two iterators. As a consequence, when you design
+   * algorithms that use these iterators, it is common practice to not
+   * loop over <i>all</i> elements of a sparsity pattern at once, but
+   * to have an outer loop over all rows and within this loop iterate
+   * over the elements of this row. This way, you only ever need to
+   * dereference the iterator to obtain the column indices whereas the
+   * (expensive) lookup of the row index can be avoided by using the
+   * loop index instead.
+   */
+  class Iterator
+  {
+  public:
+    /**
+     * Constructor. Create an iterator into the sparsity pattern @p sp for the
+     * given global index (i.e., the index of the given element counting from
+     * the zeroth row).
+     */
+    Iterator (const DynamicSparsityPattern *sp,
+              const unsigned int row,
+              const unsigned int index_within_row);
+
+    /**
+     * Constructor. Create an invalid (end) iterator into the sparsity
+     * pattern @p sp.
+     */
+    Iterator (const DynamicSparsityPattern *sp);
+
+    /**
+     * Prefix increment.
+     */
+    Iterator &operator++ ();
+
+    /**
+     * Postfix increment.
+     */
+    Iterator operator++ (int);
+
+    /**
+     * Dereferencing operator.
+     */
+    const Accessor &operator* () const;
+
+    /**
+     * Dereferencing operator.
+     */
+    const Accessor *operator-> () const;
+
+    /**
+     * Comparison. True, if both iterators point to the same matrix position.
+     */
+    bool operator == (const Iterator &) const;
+
+    /**
+     * Inverse of <tt>==</tt>.
+     */
+    bool operator != (const Iterator &) const;
+
+    /**
+     * Comparison operator. Result is true if either the first row number is
+     * smaller or if the row numbers are equal and the first index is smaller.
+     *
+     * This function is only valid if both iterators point into the same
+     * matrix.
+     */
+    bool operator < (const Iterator &) const;
+
+    /**
+     * Return the distance between the current iterator and the argument. The
+     * distance is given by how many times one has to apply operator++ to the
+     * current iterator to get the argument (for a positive return value), or
+     * operator-- (for a negative return value).
+     */
+    int operator - (const Iterator &p) const;
+
+  private:
+    /**
+     * Store an object of the accessor class.
+     */
+    Accessor accessor;
+  };
+}
 
 
 /**
@@ -56,7 +255,7 @@ template <typename number> class SparseMatrix;
  * module.
  *
  * This class is an example of the "dynamic" type of
- * @ref Sparsity.
+ * @ref Sparsity. It is used in most tutorial programs in one way or another.
  *
  * <h3>Interface</h3>
  *
@@ -88,6 +287,25 @@ public:
    * Declare the type for container size.
    */
   typedef types::global_dof_index size_type;
+
+  /**
+   * Typedef an for iterator class that allows to walk over all nonzero elements
+   * of a sparsity pattern.
+   *
+   * Since the iterator does not allow to modify the sparsity pattern, this
+   * type is the same as that for @p const_iterator.
+   */
+  typedef
+  DynamicSparsityPatternIterators::Iterator
+  iterator;
+
+  /**
+   * Typedef for an iterator class that allows to walk over all nonzero elements
+   * of a sparsity pattern.
+   */
+  typedef
+  DynamicSparsityPatternIterators::Iterator
+  const_iterator;
 
   /**
    * An iterator that can be used to iterate over the elements of a single
@@ -247,6 +465,49 @@ public:
                            const size_type index) const;
 
   /**
+   * @name Iterators
+   */
+// @{
+
+  /**
+   * STL-like iterator with the first entry of the matrix. The resulting
+   * iterator can be used to walk over all nonzero entries of the sparsity
+   * pattern.
+   *
+   * Note the discussion in the general documentation of this class about the
+   * order in which elements are accessed.
+   */
+  iterator begin () const;
+
+  /**
+   * Final iterator.
+   */
+  iterator end () const;
+
+  /**
+   * STL-like iterator with the first entry of row <tt>r</tt>.
+   *
+   * Note that if the given row is empty, i.e. does not contain any nonzero
+   * entries, then the iterator returned by this function equals
+   * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
+   * that case.
+   *
+   * Note also the discussion in the general documentation of this class about
+   * the order in which elements are accessed.
+   */
+  iterator begin (const size_type r) const;
+
+  /**
+   * Final iterator of row <tt>r</tt>. It points to the first element past the
+   * end of line @p r, or past the end of the entire sparsity pattern.
+   *
+   * Note that the end iterator is not necessarily dereferencable. This is in
+   * particular the case if it is the end iterator for the last row of a
+   * matrix.
+   */
+  iterator end (const size_type r) const;
+
+  /**
    * Return an iterator that can loop over all entries in the given row.
    * Dereferencing the iterator yields a column index.
    */
@@ -256,6 +517,9 @@ public:
    * Returns the end of the current row.
    */
   row_iterator row_end (const size_type row) const;
+
+// @}
+
   /**
    * Compute the bandwidth of the matrix represented by this structure. The
    * bandwidth is the maximum of $|i-j|$ for which the index pair $(i,j)$
@@ -357,10 +621,227 @@ private:
    * Actual data: store for each row the set of nonzero entries.
    */
   std::vector<Line> lines;
+
+  // make the accessor class a friend
+  friend class DynamicSparsityPatternIterators::Accessor;
 };
 
 /*@}*/
 /*---------------------- Inline functions -----------------------------------*/
+
+
+namespace DynamicSparsityPatternIterators
+{
+  inline
+  Accessor::
+  Accessor (const DynamicSparsityPattern *sparsity_pattern,
+            const unsigned int row,
+            const unsigned int index_within_row)
+    :
+    sparsity_pattern(sparsity_pattern),
+    current_row (row),
+    current_entry(sparsity_pattern->lines[current_row].entries.begin()+index_within_row)
+  {
+    Assert (current_row < sparsity_pattern->n_rows(),
+            ExcIndexRange (row, 0, sparsity_pattern->n_rows()));
+    Assert (index_within_row < sparsity_pattern->lines[current_row].entries.size(),
+            ExcIndexRange (index_within_row, 0, sparsity_pattern->lines[current_row].entries.size()));
+  }
+
+
+  inline
+  Accessor::
+  Accessor (const DynamicSparsityPattern *sparsity_pattern)
+    :
+    sparsity_pattern(sparsity_pattern),
+    current_row(numbers::invalid_unsigned_int),
+    current_entry()
+  {}
+
+
+
+  inline
+  size_type
+  Accessor::row() const
+  {
+    Assert (current_row < sparsity_pattern->n_rows(),
+            ExcInternalError());
+
+    return current_row;
+  }
+
+
+  inline
+  size_type
+  Accessor::column() const
+  {
+    Assert (current_row < sparsity_pattern->n_rows(),
+            ExcInternalError());
+
+    return *current_entry;
+  }
+
+
+  inline
+  size_type
+  Accessor::index() const
+  {
+    Assert (current_row < sparsity_pattern->n_rows(),
+            ExcInternalError());
+
+    return current_entry - sparsity_pattern->lines[current_row].entries.begin();
+  }
+
+
+
+
+  inline
+  bool
+  Accessor::operator == (const Accessor &other) const
+  {
+    return (sparsity_pattern == other.sparsity_pattern &&
+            current_row == other.current_row &&
+            current_entry == other.current_entry);
+  }
+
+
+
+  inline
+  bool
+  Accessor::operator < (const Accessor &other) const
+  {
+    Assert (sparsity_pattern == other.sparsity_pattern,
+            ExcInternalError());
+
+    return ((current_row < other.current_row) ||
+            ((current_row == other.current_row) &&
+             (current_entry < other.current_entry)));
+  }
+
+
+  inline
+  void
+  Accessor::advance ()
+  {
+    Assert (current_row < sparsity_pattern->n_rows(),
+            ExcInternalError());
+
+    // move to the next element in this row
+    ++current_entry;
+
+    // if this moves us beyond the end of the row, go to the next row
+    // if possible, or set the iterator to an invalid state if not.
+    //
+    // use a while loop to ensure that we properly skip over lines
+    // that are empty
+    while (current_entry ==
+           sparsity_pattern->lines[current_row].entries.end())
+      {
+        ++current_row;
+        current_entry = sparsity_pattern->lines[current_row].entries.begin();
+
+        if (current_row == sparsity_pattern->n_rows())
+          {
+            *this = Accessor(sparsity_pattern);  // invalid object
+            return;
+          }
+      }
+  }
+
+
+
+  inline
+  Iterator::Iterator (const DynamicSparsityPattern *sparsity_pattern,
+                      const unsigned int row,
+                      const unsigned int index_within_row)
+    :
+    accessor(sparsity_pattern, row, index_within_row)
+  {}
+
+
+
+  inline
+  Iterator::Iterator (const DynamicSparsityPattern *sparsity_pattern)
+    :
+    accessor(sparsity_pattern)
+  {}
+
+
+
+  inline
+  Iterator &
+  Iterator::operator++ ()
+  {
+    accessor.advance ();
+    return *this;
+  }
+
+
+
+  inline
+  Iterator
+  Iterator::operator++ (int)
+  {
+    const Iterator iter = *this;
+    accessor.advance ();
+    return iter;
+  }
+
+
+
+  inline
+  const Accessor &
+  Iterator::operator* () const
+  {
+    return accessor;
+  }
+
+
+
+  inline
+  const Accessor *
+  Iterator::operator-> () const
+  {
+    return &accessor;
+  }
+
+
+  inline
+  bool
+  Iterator::operator == (const Iterator &other) const
+  {
+    return (accessor == other.accessor);
+  }
+
+
+
+  inline
+  bool
+  Iterator::operator != (const Iterator &other) const
+  {
+    return ! (*this == other);
+  }
+
+
+  inline
+  bool
+  Iterator::operator < (const Iterator &other) const
+  {
+    return accessor < other.accessor;
+  }
+
+
+  inline
+  int
+  Iterator::operator - (const Iterator &other) const
+  {
+    Assert (accessor.sparsity_pattern == other.accessor.sparsity_pattern,
+            ExcInternalError());
+    Assert (false, ExcNotImplemented());
+
+    return 0;
+  }
+}
 
 
 inline
@@ -480,6 +961,63 @@ DynamicSparsityPattern::column_number (const size_type row,
   Assert (index < lines[local_row].entries.size(),
           ExcIndexRangeType<size_type> (index, 0, lines[local_row].entries.size()));
   return lines[local_row].entries[index];
+}
+
+
+
+inline
+DynamicSparsityPattern::iterator
+DynamicSparsityPattern::begin () const
+{
+  return begin(0);
+}
+
+
+inline
+DynamicSparsityPattern::iterator
+DynamicSparsityPattern::end () const
+{
+  return iterator(this);
+}
+
+
+
+inline
+DynamicSparsityPattern::iterator
+DynamicSparsityPattern::begin (const size_type r) const
+{
+  Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
+
+  // find the first row starting at r that has entries and return the
+  // begin iterator to it
+  unsigned int row = r;
+  while ((row<n_rows()) && (row_length(row)==0))
+    ++row;
+
+  if (row == n_rows())
+    return iterator(this);
+  else
+    return iterator(this, row, 0);
+}
+
+
+
+inline
+DynamicSparsityPattern::iterator
+DynamicSparsityPattern::end (const size_type r) const
+{
+  Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
+
+  // find the first row after r that has entries and return the begin
+  // iterator to it
+  unsigned int row = r+1;
+  while ((row<n_rows()) && (row_length(row)==0))
+    ++row;
+
+  if (row == n_rows())
+    return iterator(this);
+  else
+    return iterator(this, row, 0);
 }
 
 
