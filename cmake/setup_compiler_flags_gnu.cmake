@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -86,10 +86,12 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+
   #
-  # Silence Clang warnings about unused parameters (mainly caused by BOOST):
+  # Silence Clang warnings about unused compiler parameters (works around a
+  # regression in the clang driver frontend of certain versions):
   #
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Qunused-arguments")
 
   #
   # *Boy*, clang seems to be the very definition of "pedantic" in
@@ -101,10 +103,11 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-delete-non-virtual-dtor") # not harmless but needed for boost <1.50.0
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-newline-eof")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter") # mainly caused by BOOST
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-private-field")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-variable")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
 
   # suppress warnings in boost 1.56:
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c++11-extensions")
