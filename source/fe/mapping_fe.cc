@@ -1146,8 +1146,8 @@ MappingFE<dim,spacedim,DH,VECTOR>::compute_fill_face (
   std::vector<double>         &JxW_values,
   std::vector<Tensor<1,spacedim> > &boundary_forms,
   std::vector<Point<spacedim> > &normal_vectors,
-  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
+  std::vector<DerivativeForm<1,dim,spacedim> > &/*jacobians*/,
+  std::vector<DerivativeForm<1,spacedim,dim> > &/*inverse_jacobians*/) const
 {
   compute_fill (cell, n_q_points, data_set, CellSimilarity::none,
                 data, quadrature_points);
