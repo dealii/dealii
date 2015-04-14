@@ -835,6 +835,7 @@ namespace DynamicSparsityPatternIterators
   int
   Iterator::operator - (const Iterator &other) const
   {
+    (void)other;
     Assert (accessor.sparsity_pattern == other.accessor.sparsity_pattern,
             ExcInternalError());
     Assert (false, ExcNotImplemented());

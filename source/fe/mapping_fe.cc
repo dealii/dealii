@@ -702,6 +702,9 @@ void MappingFE<dim,spacedim,DH,VECTOR>::transform
  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
  const MappingType mapping_type) const
 {
+  (void)input;
+  (void)output;
+  (void)mapping_data;
   AssertDimension (input.size(), output.size());
 
   AssertThrow(false, ExcNotImplemented());
@@ -900,6 +903,7 @@ transform_real_to_unit_cell_internal
   }
 
   const unsigned int n_shapes=mdata.shape_values.size();
+  (void)n_shapes;
   Assert(n_shapes!=0, ExcInternalError());
   AssertDimension (mdata.shape_derivatives.size(), n_shapes);
 
