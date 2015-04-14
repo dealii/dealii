@@ -151,7 +151,7 @@ namespace internal
 
     template <class Archive>
     void
-    TriaFaces<1>::serialize (Archive &ar,
+    TriaFaces<1>::serialize (Archive &,
                              const unsigned int)
     {}
 

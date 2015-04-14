@@ -84,6 +84,7 @@ namespace internal
     void
     TriaLevel<dim>::monitor_memory (const unsigned int true_dimension) const
     {
+      (void)true_dimension;
       Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
               ExcMemoryInexact (refine_flags.size(), neighbors.size()));
       Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),
@@ -168,6 +169,7 @@ namespace internal
     void
     TriaLevel<3>::monitor_memory (const unsigned int true_dimension) const
     {
+      (void)true_dimension;
       Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
               ExcMemoryInexact (refine_flags.size(), neighbors.size()));
       Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),

@@ -59,6 +59,7 @@ namespace DoFTools
                          const types::subdomain_id subdomain_id)
   {
     const types::global_dof_index n_dofs = dof.n_dofs();
+    (void)n_dofs;
 
     Assert (sparsity.n_rows() == n_dofs,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
@@ -118,6 +119,7 @@ namespace DoFTools
                          const types::subdomain_id subdomain_id)
   {
     const types::global_dof_index n_dofs = dof.n_dofs();
+    (void)n_dofs;
 
     Assert (sparsity.n_rows() == n_dofs,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
@@ -231,6 +233,8 @@ namespace DoFTools
   {
     const types::global_dof_index n_dofs_row = dof_row.n_dofs();
     const types::global_dof_index n_dofs_col = dof_col.n_dofs();
+    (void)n_dofs_row;
+    (void)n_dofs_col;
 
     Assert (sparsity.n_rows() == n_dofs_row,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs_row));
@@ -346,6 +350,7 @@ namespace DoFTools
       }
 
     const types::global_dof_index n_dofs = dof.n_dofs();
+    (void)n_dofs;
 
     AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
     AssertDimension (sparsity.n_rows(), dof.n_boundary_dofs());
@@ -434,6 +439,7 @@ namespace DoFTools
       }
 
     const types::global_dof_index n_dofs = dof.n_dofs();
+    (void)n_dofs;
 
     AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
     Assert (boundary_ids.find(numbers::internal_face_boundary_id) == boundary_ids.end(),
@@ -491,6 +497,7 @@ namespace DoFTools
 
   {
     const types::global_dof_index n_dofs = dof.n_dofs();
+    (void)n_dofs;
 
     AssertDimension (sparsity.n_rows(), n_dofs);
     AssertDimension (sparsity.n_cols(), n_dofs);
@@ -1135,7 +1142,9 @@ namespace DoFTools
     // do the error checking and frame code here, and then pass on to more
     // specialized functions in the internal namespace
     const types::global_dof_index n_dofs = dof.n_dofs();
+    (void)n_dofs;
     const unsigned int n_comp = dof.get_fe().n_components();
+    (void)n_comp;
 
     Assert (sparsity.n_rows() == n_dofs,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));

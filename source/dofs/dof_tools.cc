@@ -258,6 +258,7 @@ namespace DoFTools
     const unsigned int dim = DH::dimension;
     const unsigned int spacedim = DH::space_dimension;
     const Triangulation<dim,spacedim> &tria = dof_handler.get_tria();
+    (void)tria;
 
     AssertDimension (cell_data.size(), tria.n_active_cells());
     AssertDimension (dof_data.size(), dof_handler.n_dofs());
@@ -336,6 +337,7 @@ namespace DoFTools
                 std::vector<bool>       &selected_dofs)
   {
     const FiniteElement<dim,spacedim> &fe = dof.get_fe();
+    (void)fe;
 
     Assert(component_mask.represents_n_components(fe.n_components()),
            ExcMessage ("The given component mask is not sized correctly to represent the "
@@ -381,6 +383,7 @@ namespace DoFTools
                 std::vector<bool>       &selected_dofs)
   {
     const FiniteElement<dim,spacedim> &fe = dof.begin_active()->get_fe();
+    (void)fe;
 
     Assert(component_mask.represents_n_components(fe.n_components()),
            ExcMessage ("The given component mask is not sized correctly to represent the "

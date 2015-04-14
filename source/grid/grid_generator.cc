@@ -611,18 +611,18 @@ namespace GridGenerator
 
   template<>
   void
-  parallelogram (Triangulation<3>  &tria,
-                 const Point<3> (&corners)[3],
-                 const bool         colorize)
+  parallelogram (Triangulation<3>  &,
+                 const Point<3>   (&/*corners*/)[3],
+                 const bool         /*colorize*/)
   {
     Assert (false, ExcNotImplemented());
   }
 
   template<>
   void
-  parallelogram (Triangulation<1>  &tria,
-                 const Point<1> (&corners)[1],
-                 const bool         colorize)
+  parallelogram (Triangulation<1>  &,
+                 const Point<1>   (&/*corners*/)[1],
+                 const bool         /*colorize*/)
   {
     Assert (false, ExcNotImplemented());
   }
@@ -3027,6 +3027,7 @@ namespace GridGenerator
                     const unsigned int n,
                     const bool colorize)
   {
+    (void)colorize;
     Assert ((inner_radius > 0) && (inner_radius < outer_radius),
             ExcInvalidRadii ());
     Assert(colorize == false, ExcNotImplemented());
@@ -3726,6 +3727,7 @@ namespace GridGenerator
     const parallel::distributed::Triangulation<dim, spacedim1> *pt =
       dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim1> *>(&in_tria);
 
+    (void)pt;
     Assert (pt == NULL,
             ExcMessage("Cannot use this function on parallel::distributed::Triangulation."));
 

@@ -192,6 +192,7 @@ namespace TrilinosWrappers
       else if (fast == false)
         {
           const int ierr = vector->PutScalar(0.);
+          (void)ierr;
           Assert (ierr == 0, ExcTrilinosError(ierr));
         }
 
@@ -242,6 +243,7 @@ namespace TrilinosWrappers
               // distribution
               int ierr;
               ierr = vector->GlobalAssemble (last_action);
+              (void)ierr;
               Assert (ierr == 0, ExcTrilinosError(ierr));
 
               ierr = vector->PutScalar(0.0);
@@ -545,6 +547,7 @@ namespace TrilinosWrappers
       {
         int ierr;
         ierr = vector->GlobalAssemble(last_action);
+        (void)ierr;
         Assert (ierr == 0, ExcTrilinosError(ierr));
 
         ierr = vector->PutScalar(0.0);
@@ -571,6 +574,7 @@ namespace TrilinosWrappers
       {
         int ierr;
         ierr = vector->GlobalAssemble(last_action);
+        (void)ierr;
         Assert (ierr == 0, ExcTrilinosError(ierr));
 
         ierr = vector->PutScalar(0.0);
@@ -604,6 +608,7 @@ namespace TrilinosWrappers
       {
         int ierr;
         ierr = vector->GlobalAssemble(last_action);
+        (void)ierr;
         Assert (ierr == 0, ExcTrilinosError(ierr));
 
         ierr = vector->PutScalar(0.0);
@@ -627,6 +632,7 @@ namespace TrilinosWrappers
     // the vector, initialize our
     // map with the map in v, and
     // generate the vector.
+    (void)fast;
     if (allow_different_maps == false)
       {
         if (local_range() != v.local_range())
@@ -645,6 +651,7 @@ namespace TrilinosWrappers
                                 " seems to be the same. Check vector setup!"));
 
             ierr = vector->GlobalAssemble(last_action);
+            (void)ierr;
             Assert (ierr == 0, ExcTrilinosError(ierr));
 
             ierr = vector->PutScalar(0.0);
@@ -711,6 +718,7 @@ namespace TrilinosWrappers
 
     const int ierr = vector->Update(1.0, *v.vector, 0.0);
     Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr;
 
     return *this;
   }

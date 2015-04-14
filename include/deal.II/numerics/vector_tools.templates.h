@@ -598,6 +598,7 @@ namespace VectorTools
   {
     const DH<dim, spacedim> &dof1 = intergridmap.get_source_grid();
     const DH<dim, spacedim> &dof2 = intergridmap.get_destination_grid();
+    (void)dof2;
 
     Assert(u1.size()==dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));

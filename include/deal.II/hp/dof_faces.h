@@ -366,7 +366,7 @@ namespace internal
                    const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
-                   const unsigned int                obj_level) const
+                   const unsigned int                /*obj_level*/) const
     {
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
@@ -423,7 +423,7 @@ namespace internal
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
                    const types::global_dof_index     global_index,
-                   const unsigned int                obj_level)
+                   const unsigned int                /*obj_level*/)
     {
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
@@ -521,7 +521,7 @@ namespace internal
     types::global_dof_index
     DoFIndicesOnFacesOrEdges<structdim>::
     nth_active_fe_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
-                         const unsigned int                obj_level,
+                         const unsigned int                /*obj_level*/,
                          const unsigned int                obj_index,
                          const unsigned int                n) const
     {
@@ -579,7 +579,7 @@ namespace internal
     fe_index_is_active (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                         const unsigned int                obj_index,
                         const unsigned int                fe_index,
-                        const unsigned int                obj_level) const
+                        const unsigned int                /*obj_level*/) const
     {
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, static_cast<unsigned int>(dof_offsets.size())));

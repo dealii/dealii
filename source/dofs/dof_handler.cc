@@ -1239,9 +1239,11 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
 template<int dim, int spacedim>
 void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe)
 {
+  (void)fe;
   Assert(levels.size()>0, ExcMessage("Distribute active DoFs using distribute_dofs() before calling distribute_mg_dofs()."));
 
   const FiniteElement<dim, spacedim> *old_fe = selected_fe;
+  (void)old_fe;
   Assert(old_fe == &fe, ExcMessage("You are required to use the same FE for level and active DoFs!") );
 
   clear_mg_space();

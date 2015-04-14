@@ -483,6 +483,7 @@ namespace internal
                                  dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_neighbor)
     {
       const unsigned int dim = DH::dimension;
+      (void)dim;
 
       const typename DH::face_iterator face = cell->face(face_no);
       const unsigned int n_solution_vectors = solutions.size();
@@ -559,8 +560,10 @@ namespace internal
                                    dealii::hp::FESubfaceValues<DH::dimension, DH::space_dimension> &fe_subface_values)
     {
       const unsigned int dim = DH::dimension;
+      (void)dim;
 
       const typename DH::cell_iterator neighbor = cell->neighbor(face_no);
+      (void)neighbor;
       const unsigned int n_solution_vectors = solutions.size();
       const typename DH::face_iterator
       face=cell->face(face_no);
@@ -924,6 +927,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
 #endif
 
   const unsigned int n_components = dof_handler.get_fe().n_components();
+  (void)n_components;
 
   // sanity checks
   Assert (solutions.size() > 0,

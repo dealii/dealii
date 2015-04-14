@@ -821,6 +821,7 @@ template <int dim, int spacedim>
 const FullMatrix<double> &
 FiniteElement<dim,spacedim>::constraints (const internal::SubfaceCase<dim> &subface_case) const
 {
+  (void)subface_case;
   Assert (subface_case==internal::SubfaceCase<dim>::case_isotropic,
           ExcMessage("Constraints for this element are only implemented "
                      "for the case that faces are refined isotropically "
@@ -1447,6 +1448,7 @@ template <int dim, int spacedim>
 const FiniteElement<dim,spacedim> &
 FiniteElement<dim,spacedim>::base_element(const unsigned int index) const
 {
+  (void)index;
   Assert (index==0, ExcIndexRange(index,0,1));
   // This function should not be
   // called for a system element
