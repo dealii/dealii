@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -58,6 +58,7 @@ ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 # Setup various warnings:
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wall")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wextra")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wpointer-arith")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wwrite-strings")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsynth")
@@ -85,10 +86,12 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+
   #
-  # Silence Clang warnings about unused parameters:
+  # Silence Clang warnings about unused compiler parameters (works around a
+  # regression in the clang driver frontend of certain versions):
   #
-  SET(DEAL_II_CXX_FLAGS "-Qunused-arguments ${DEAL_II_CXX_FLAGS}")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Qunused-arguments")
 
   #
   # *Boy*, clang seems to be the very definition of "pedantic" in
@@ -100,10 +103,11 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-delete-non-virtual-dtor") # not harmless but needed for boost <1.50.0
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-newline-eof")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter") # mainly caused by BOOST
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-private-field")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-variable")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
 
   # suppress warnings in boost 1.56:
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c++11-extensions")
@@ -137,8 +141,6 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-all-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
-
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused")
 ENDIF()
 
 
@@ -181,4 +183,3 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   ENDIF()
 
 ENDIF()
-

@@ -117,6 +117,7 @@ void
 ConstantTensorFunction<rank, dim, Number>::value_list (const std::vector<Point<dim> > &points,
                                                        std::vector<typename TensorFunction<rank, dim, Number>::value_type> &values) const
 {
+  (void)points;
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
 
@@ -140,6 +141,7 @@ void
 ConstantTensorFunction<rank, dim, Number>::gradient_list (const std::vector<Point<dim> >   &points,
                                                           std::vector<typename TensorFunction<rank, dim, Number>::gradient_type> &gradients) const
 {
+  (void)points;
   Assert (gradients.size() == points.size(),
           ExcDimensionMismatch(gradients.size(), points.size()));
 

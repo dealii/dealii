@@ -1351,6 +1351,7 @@ public:
   Number &
   operator [] (const unsigned int comp)
   {
+    (void)comp;
     AssertIndexRange (comp, 1);
     return data;
   }
@@ -1361,6 +1362,7 @@ public:
   const Number &
   operator [] (const unsigned int comp) const
   {
+    (void)comp;
     AssertIndexRange (comp, 1);
     return data;
   }

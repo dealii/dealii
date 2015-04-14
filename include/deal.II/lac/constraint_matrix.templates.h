@@ -1654,6 +1654,7 @@ namespace internals
                     const size_type       column,
                     SparseMatrixIterator &matrix_values)
     {
+      (void)row;
       if (value != 0.)
         {
           while (matrix_values->column() < column)
@@ -2628,6 +2629,7 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
       actual_dof_indices.resize(n_local_dofs);
       make_sorted_row_list (local_dof_indices, actual_dof_indices);
       const size_type n_actual_dofs = actual_dof_indices.size();
+      (void)n_actual_dofs;
 
       // additional construct that also takes care of block indices.
       std::vector<size_type> &block_starts = scratch_data->block_starts;

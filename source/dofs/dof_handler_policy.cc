@@ -1529,6 +1529,7 @@ namespace internal
                ++it, ++buffer, ++idx)
             {
               const unsigned int num_cells = it->second.tree_index.size();
+              (void)num_cells;
 
               Assert(num_cells==it->second.quadrants.size(), ExcInternalError());
               Assert(num_cells>0, ExcInternalError());
@@ -1762,6 +1763,7 @@ namespace internal
                ++it, ++buffer, ++idx)
             {
               const unsigned int num_cells = it->second.tree_index.size();
+              (void)num_cells;
 
               Assert(num_cells==it->second.quadrants.size(), ExcInternalError());
               Assert(num_cells>0, ExcInternalError());

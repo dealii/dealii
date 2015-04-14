@@ -123,6 +123,7 @@ namespace FETools
                                                      endc1 = dof1.end();
     typename DH2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
                                                      endc2 = dof2.end();
+    (void)endc2;
 
     std::vector<types::global_dof_index> dofs;
     dofs.reserve (DoFTools::max_dofs_per_cell (dof2));

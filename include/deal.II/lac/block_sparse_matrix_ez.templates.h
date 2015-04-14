@@ -76,6 +76,7 @@ template <typename number>
 BlockSparseMatrixEZ<number> &
 BlockSparseMatrixEZ<number>::operator = (const double d)
 {
+  (void)d;
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
   for (unsigned int r=0; r<n_block_rows(); ++r)

@@ -342,7 +342,7 @@ namespace internal
     template <int dim>
     inline
     dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<3> > *
-    get_objects (dealii::internal::Triangulation::TriaFaces<dim> *faces,
+    get_objects (dealii::internal::Triangulation::TriaFaces<dim> *,
                  const dealii::internal::int2type<3>)
     {
       Assert (false, ExcInternalError());
@@ -2139,6 +2139,8 @@ TriaAccessor (const Triangulation<1,spacedim> *tria,
   // of the iterator which calls the accessor with argument list (0,-2,-2,0), so
   // in this particular case accept this call and create an object that corresponds
   // to the default constructed (invalid) vertex accessor
+  (void)level;
+  (void)index;
   Assert ((level == -2) && (index == -2), ExcInternalError());
 }
 
@@ -2394,7 +2396,7 @@ TriaAccessor<0, 1, spacedim>::manifold_id () const
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::face_orientation (const unsigned int face)
+bool TriaAccessor<0, 1, spacedim>::face_orientation (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2403,7 +2405,7 @@ bool TriaAccessor<0, 1, spacedim>::face_orientation (const unsigned int face)
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::face_flip (const unsigned int face)
+bool TriaAccessor<0, 1, spacedim>::face_flip (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2412,7 +2414,7 @@ bool TriaAccessor<0, 1, spacedim>::face_flip (const unsigned int face)
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::face_rotation (const unsigned int face)
+bool TriaAccessor<0, 1, spacedim>::face_rotation (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2421,7 +2423,7 @@ bool TriaAccessor<0, 1, spacedim>::face_rotation (const unsigned int face)
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::line_orientation (const unsigned int line)
+bool TriaAccessor<0, 1, spacedim>::line_orientation (const unsigned int /*line*/)
 {
   return false;
 }

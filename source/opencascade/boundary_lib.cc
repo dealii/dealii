@@ -68,6 +68,7 @@ namespace OpenCASCADE
   project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
                        const Point<spacedim> &candidate) const
   {
+    (void)surrounding_points;
 #ifdef DEBUG
     for (unsigned int i=0; i<surrounding_points.size(); ++i)
       Assert(closest_point(sh, surrounding_points[i], tolerance)
@@ -97,6 +98,7 @@ namespace OpenCASCADE
   project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
                        const Point<spacedim> &candidate) const
   {
+    (void)surrounding_points;
 #ifdef DEBUG
     for (unsigned int i=0; i<surrounding_points.size(); ++i)
       Assert(closest_point(sh, surrounding_points[i],tolerance)
@@ -117,11 +119,8 @@ namespace OpenCASCADE
     tolerance(tolerance)
   {
     Assert(spacedim == 3, ExcNotImplemented());
-
-    std_cxx11::tuple<unsigned int, unsigned int, unsigned int>
-    counts = count_elements(sh);
-
-    Assert(std_cxx11::get<0>(counts) > 0, ExcMessage("NormalToMeshProjectionBoundary needs a shape containing faces to operate."));
+    Assert(std_cxx11::get<0>(count_elements(sh)) > 0,
+           ExcMessage("NormalToMeshProjectionBoundary needs a shape containing faces to operate."));
   }
 
 
@@ -233,11 +232,15 @@ namespace OpenCASCADE
   Point<1>
   ArclengthProjectionLineManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const
   {
+    double t (0.0);
+#ifdef DEBUG
     ShapeAnalysis_Curve curve_analysis;
     gp_Pnt proj;
-    double t;
-    double dist = curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true);
-    Assert(dist < tolerance*length, ExcPointNotOnManifold(space_point));
+    Assert(curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true)
+           < tolerance*length, ExcPointNotOnManifold(space_point));
+#else
+    (void)space_point;
+#endif
     return Point<1>(GCPnts_AbscissaPoint::Length(curve->GetCurve(),curve->GetCurve().FirstParameter(),t));
   }
 

@@ -580,6 +580,7 @@ namespace MatrixCreator
                                VectorType *right_hand_side)
     {
       const unsigned int dofs_per_cell = data.dof_indices.size();
+      (void)dofs_per_cell;
 
       Assert (data.cell_matrix.m() == dofs_per_cell,
               ExcInternalError());
@@ -867,7 +868,7 @@ namespace MatrixCreator
     template <int dim, int spacedim>
     void
     create_boundary_mass_matrix_1 (typename DoFHandler<dim,spacedim>::active_cell_iterator const &cell,
-                                   MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch,
+                                   MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                    MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<dim,
                                    spacedim> > &copy_data,
                                    Mapping<dim, spacedim> const &mapping,
@@ -1135,17 +1136,16 @@ namespace MatrixCreator
 
     template <>
     void
-    create_boundary_mass_matrix_1<1,3> (DoFHandler<1,3>::active_cell_iterator const &cell,
-                                        MatrixCreator::internal::AssemblerBoundary::Scratch const
-                                        &scratch,
+    create_boundary_mass_matrix_1<1,3> (DoFHandler<1,3>::active_cell_iterator const &/*cell*/,
+                                        MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                         MatrixCreator::internal::AssemblerBoundary::CopyData<DoFHandler<1,
-                                        3> > &copy_data,
-                                        Mapping<1,3> const &mapping,
-                                        FiniteElement<1,3> const &fe,
-                                        Quadrature<0> const &q,
-                                        FunctionMap<3>::type const &boundary_functions,
-                                        Function<3> const *const coefficient,
-                                        std::vector<unsigned int> const &component_mapping)
+                                        3> > &/*copy_data*/,
+                                        Mapping<1,3> const &,
+                                        FiniteElement<1,3> const &,
+                                        Quadrature<0> const &,
+                                        FunctionMap<3>::type const &/*boundary_functions*/,
+                                        Function<3> const *const /*coefficient*/,
+                                        std::vector<unsigned int> const &/*component_mapping*/)
     {
       Assert(false,ExcNotImplemented());
     }
@@ -1231,7 +1231,7 @@ namespace MatrixCreator
     void
     create_hp_boundary_mass_matrix_1 (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator const
                                       &cell,
-                                      MatrixCreator::internal::AssemblerBoundary::Scratch const &scratch,
+                                      MatrixCreator::internal::AssemblerBoundary::Scratch const &,
                                       MatrixCreator::internal::AssemblerBoundary
                                       ::CopyData<hp::DoFHandler<dim,spacedim> > &copy_data,
                                       hp::MappingCollection<dim,spacedim> const &mapping,
@@ -1704,7 +1704,7 @@ namespace MatrixCreator
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix &)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
   }
@@ -1763,7 +1763,7 @@ namespace MatrixCreator
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix &)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
                           matrix, rhs, rhs_vector, coefficient);
@@ -1816,7 +1816,7 @@ namespace MatrixCreator
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix &)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
   }
@@ -1872,7 +1872,7 @@ namespace MatrixCreator
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
                               const Function<spacedim> *const coefficient,
-                              const ConstraintMatrix   &constraints)
+                              const ConstraintMatrix &)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
                           matrix, rhs, rhs_vector, coefficient);
@@ -2131,6 +2131,7 @@ namespace MatrixTools
     for (; dof != endd; ++dof)
       {
         Assert (dof->first < n_dofs, ExcInternalError());
+        (void)n_dofs;
 
         // get global index and index
         // in the block in which this
@@ -2324,6 +2325,7 @@ namespace MatrixTools
                              PETScVector      &right_hand_side,
                              const bool        eliminate_columns)
       {
+        (void)eliminate_columns;
         Assert (eliminate_columns == false, ExcNotImplemented());
 
         Assert (matrix.n() == right_hand_side.size(),
@@ -2538,6 +2540,7 @@ namespace MatrixTools
                              const bool           eliminate_columns)
       {
         Assert (eliminate_columns == false, ExcNotImplemented());
+        (void)eliminate_columns;
 
         Assert (matrix.n() == right_hand_side.size(),
                 ExcDimensionMismatch(matrix.n(), right_hand_side.size()));

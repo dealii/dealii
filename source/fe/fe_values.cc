@@ -2263,6 +2263,7 @@ namespace internal
 
     // Assert that we can write all components into the result vectors
     const unsigned result_components = n_components * component_multiple;
+    (void)result_components;
     if (quadrature_points_fastest)
       {
         AssertDimension(values.size(), result_components);
@@ -2395,6 +2396,7 @@ namespace internal
 
     // Assert that we can write all components into the result vectors
     const unsigned result_components = n_components * component_multiple;
+    (void)result_components;
     if (quadrature_points_fastest)
       {
         AssertDimension(derivatives.size(), result_components);
@@ -2516,6 +2518,7 @@ namespace internal
 
     // Assert that we can write all components into the result vectors
     const unsigned result_components = n_components * component_multiple;
+    (void)result_components;
     if (quadrature_points_fastest)
       {
         AssertDimension(laplacians.size(), result_components);

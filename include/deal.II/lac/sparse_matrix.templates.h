@@ -73,6 +73,7 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 {
+  (void)m;
   Assert (m.cols==0, ExcInvalidConstructorCall());
   Assert (m.val==0, ExcInvalidConstructorCall());
   Assert (m.max_len==0, ExcInvalidConstructorCall());
@@ -102,6 +103,7 @@ SparseMatrix<number>::SparseMatrix (const SparsityPattern &c,
   val(0),
   max_len(0)
 {
+  (void)id;
   Assert (c.n_rows() == id.m(), ExcDimensionMismatch (c.n_rows(), id.m()));
   Assert (c.n_cols() == id.n(), ExcDimensionMismatch (c.n_cols(), id.n()));
 
@@ -145,6 +147,7 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator = (const double d)
 {
+  (void)d;
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
   Assert (cols != 0, ExcNotInitialized());
@@ -180,6 +183,7 @@ template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator= (const IdentityMatrix  &id)
 {
+  (void)id;
   Assert (cols->n_rows() == id.m(),
           ExcDimensionMismatch (cols->n_rows(), id.m()));
   Assert (cols->n_cols() == id.n(),
@@ -384,6 +388,7 @@ SparseMatrix<number>::copy_from (const TrilinosWrappers::SparseMatrix &matrix)
           (row, matrix.row_length(row), ncols,
            &(value_cache[0]),
            reinterpret_cast<TrilinosWrappers::types::int_type *>(&(colnum_cache[0])));
+      (void)ierr;
       Assert (ierr==0, ExcTrilinosError(ierr));
 
       // resize arrays to the size actually used
@@ -1338,6 +1343,8 @@ namespace
                         "preconditioner. If it is correct that there are "
                         "zeros on the diagonal, then you will have to chose "
                         "a different preconditioner."));
+#else
+    (void)matrix;
 #endif
   }
 }

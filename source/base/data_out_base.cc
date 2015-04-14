@@ -245,6 +245,7 @@ namespace
                              (const Bytef *) &data[0],
                              data.size() * sizeof(T),
                              Z_BEST_COMPRESSION);
+        (void)err;
         Assert (err == Z_OK, ExcInternalError());
 
         // now encode the compression header
@@ -398,6 +399,7 @@ namespace DataOutBase
            patch != patches.end(); ++patch)
         {
           const unsigned int n_subdivisions = patch->n_subdivisions;
+          (void)n_subdivisions;
 
           Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
                   (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
@@ -3610,6 +3612,7 @@ namespace DataOutBase
     Assert (spacedim==2, ExcNotImplemented());
 
     const unsigned int n_data_sets = data_names.size();
+    (void)n_data_sets;
 
     // write preamble
     if (true)
@@ -3946,11 +3949,11 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_eps (const std::vector<Patch<dim,spacedim> > &patches,
+  void write_eps (const std::vector<Patch<dim,spacedim> > &/*patches*/,
                   const std::vector<std::string>          &/*data_names*/,
                   const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &,
-                  const EpsFlags                          &flags,
-                  std::ostream                            &out)
+                  const EpsFlags                          &/*flags*/,
+                  std::ostream                            &/*out*/)
   {
     // not implemented, see the documentation of the function
     AssertThrow (dim==2, ExcNotImplemented());
@@ -5802,8 +5805,8 @@ namespace DataOutBase
 
   template <int spacedim>
   void write_svg (const std::vector<Patch<2,spacedim> > &patches,
-                  const std::vector<std::string> &data_names,
-                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                  const std::vector<std::string> &/*data_names*/,
+                  const std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> > &/*vector_data_ranges*/,
                   const SvgFlags &flags,
                   std::ostream &out)
   {
@@ -7177,7 +7180,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
+void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &/*patches*/,
                                        const DataOutBase::DataOutFilter &data_filter,
                                        const bool write_mesh_file,
                                        const std::string &mesh_filename,
@@ -7188,7 +7191,6 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   // throw an exception, but first make
   // sure the compiler does not warn about
   // the now unused function arguments
-  (void)patches;
   (void)data_filter;
   (void)write_mesh_file;
   (void)mesh_filename;

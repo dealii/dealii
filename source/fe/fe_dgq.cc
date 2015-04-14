@@ -430,6 +430,7 @@ get_face_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_fe,
   // faces and the face interpolation matrix
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
+  (void)interpolation_matrix;
   typedef FiniteElement<dim,spacedim> FE;
   AssertThrow ((dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented());
@@ -457,6 +458,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_f
   // faces and the face interpolation matrix
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
+  (void)interpolation_matrix;
   typedef FiniteElement<dim, spacedim> FE;
   AssertThrow ((dynamic_cast<const FE_DGQ<dim, spacedim>*>(&x_source_fe) != 0),
                typename FE::ExcInterpolationNotImplemented());
@@ -615,7 +617,7 @@ FE_DGQ<dim, spacedim>::hp_constraints_are_implemented () const
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
-hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
+hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &/*fe_other*/) const
 {
   // this element is discontinuous, so by definition there can
   // be no identities between its dofs and those of any neighbor
@@ -630,7 +632,7 @@ hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
-hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
+hp_line_dof_identities (const FiniteElement<dim, spacedim> &/*fe_other*/) const
 {
   // this element is discontinuous, so by definition there can
   // be no identities between its dofs and those of any neighbor
@@ -645,7 +647,7 @@ hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGQ<dim, spacedim>::
-hp_quad_dof_identities (const FiniteElement<dim, spacedim>        &fe_other) const
+hp_quad_dof_identities (const FiniteElement<dim, spacedim> &/*fe_other*/) const
 {
   // this element is discontinuous, so by definition there can
   // be no identities between its dofs and those of any neighbor
@@ -659,7 +661,7 @@ hp_quad_dof_identities (const FiniteElement<dim, spacedim>        &fe_other) con
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_DGQ<dim, spacedim>::compare_for_face_domination (const FiniteElement<dim, spacedim> &fe_other) const
+FE_DGQ<dim, spacedim>::compare_for_face_domination (const FiniteElement<dim, spacedim> &/*fe_other*/) const
 {
   // this is a discontinuous element, so by definition there will
   // be no constraints wherever this element comes together with

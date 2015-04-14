@@ -736,6 +736,7 @@ namespace FETools
       // solve the least squares
       // problem.
       const double result = H.least_squares (v_fine, v_coarse);
+      (void)result;
       Assert (result < 1.e-12, ExcLeastSquaresError (result));
 
       // Copy into the result
@@ -1071,6 +1072,7 @@ namespace FETools
             // solve the least squares
             // problem.
             const double result = H.least_squares(v_fine, v_coarse);
+            (void)result;
             Assert (result < 1.e-12, ExcLeastSquaresError(result));
 
             // Copy into the result
@@ -1578,6 +1580,7 @@ namespace FETools
         if (pos2-pos1 == 2)
           {
             const char dimchar = '0' + dim;
+            (void)dimchar;
             if (name.at(pos1+1) != 'd')
               Assert (name.at(pos1+1) == dimchar,
                       ExcInvalidFEDimension(name.at(pos1+1), dim));

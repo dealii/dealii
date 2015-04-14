@@ -53,6 +53,7 @@ Function<dim, Number>::~Function ()
 template <int dim, typename Number>
 Function<dim, Number> &Function<dim, Number>::operator= (const Function &f)
 {
+  (void)f;
   AssertDimension (n_components, f.n_components);
   return *this;
 }
@@ -280,6 +281,7 @@ void ZeroFunction<dim, Number>::value_list (const std::vector<Point<dim> > &poin
                                             std::vector<Number>            &values,
                                             const unsigned int         /*component*/) const
 {
+  (void)points;
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
 
@@ -373,6 +375,7 @@ template <int dim, typename Number>
 Number ConstantFunction<dim, Number>::value (const Point<dim> &,
                                              const unsigned int component) const
 {
+  (void)component;
   Assert (component < this->n_components,
           ExcIndexRange (component, 0, this->n_components));
   return function_value;
@@ -397,6 +400,8 @@ void ConstantFunction<dim, Number>::value_list (const std::vector<Point<dim> > &
                                                 std::vector<Number>            &values,
                                                 const unsigned int              component) const
 {
+  (void)points;
+  (void)component;
   Assert (component < this->n_components,
           ExcIndexRange (component, 0, this->n_components));
   Assert (values.size() == points.size(),
@@ -533,6 +538,7 @@ Number
 ScalarFunctionFromFunctionObject<dim, Number>::value (const Point<dim> &p,
                                                       const unsigned int component) const
 {
+  (void)component;
   Assert (component == 0,
           ExcMessage ("This object represents only scalar functions"));
   return function_object (p);

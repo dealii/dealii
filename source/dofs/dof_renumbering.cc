@@ -255,6 +255,7 @@ namespace DoFRenumbering
                             const bool       reversed_numbering,
                             const bool       use_constraints)
     {
+      (void)use_constraints;
       Assert (use_constraints == false, ExcNotImplemented());
 
       // the following code is pretty

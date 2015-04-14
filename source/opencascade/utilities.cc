@@ -298,7 +298,7 @@ namespace OpenCASCADE
                                const double c_y,
                                const double c_z,
                                const double c,
-                               const double tolerance)
+                               const double /*tolerance*/)
   {
     Handle(Geom_Plane) plane = new Geom_Plane(c_x,c_y,c_z,c);
     BRepAlgo_Section section(in_shape, plane);
@@ -551,6 +551,7 @@ namespace OpenCASCADE
     // something is wrong
     std_cxx11::tuple<unsigned int, unsigned int, unsigned int> numbers =
       count_elements(out_shape);
+    (void)numbers;
 
     Assert(std_cxx11::get<0>(numbers) > 0,
            ExcMessage("Could not find normal: the shape containing the closest point has 0 faces."));
@@ -590,7 +591,7 @@ namespace OpenCASCADE
   push_forward_and_differential_forms(const TopoDS_Face &face,
                                       const double u,
                                       const double v,
-                                      const double tolerance)
+                                      const double /*tolerance*/)
   {
     Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
     GeomLProp_SLProps props(SurfToProj, u, v, 1, 1e-7);

@@ -974,6 +974,7 @@ namespace internal
     Mesh::sanity_check_node (const Cell         &c,
                              const unsigned int local_node_num) const
     {
+#ifdef DEBUG
       // check that every edge
       // coming into a node has the
       // same node value
@@ -1009,6 +1010,10 @@ namespace internal
                edge_list[ge2].nodes[or2 == forward_edge ? 0 : 1]),
               ExcMessage ("This message does not satisfy the internal "
                           "consistency check"));
+#else
+      (void)c;
+      (void)local_node_num;
+#endif
     }
 
 

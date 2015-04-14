@@ -52,6 +52,7 @@ namespace internal
     static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, const DH &)
     {
       sparsity.copy_from (dsp);
+      (void)level;
       matrix.reinit (sparsity);
     }
   };
@@ -64,7 +65,7 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
     template <class DSP, class DH>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, DH &dh)
+    static void reinit(Matrix &matrix, Sparsity &, int level, const DSP &dsp, DH &dh)
     {
       matrix.reinit(dh.locally_owned_mg_dofs(level+1),
                     dh.locally_owned_mg_dofs(level),
@@ -80,7 +81,7 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
     template <class DSP, class DH>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const DSP &dsp, DH &dh)
+    static void reinit(Matrix &, Sparsity &, int /*level*/, const DSP &, DH &)
     {
     }
   };

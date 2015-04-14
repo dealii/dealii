@@ -584,7 +584,7 @@ namespace internal
     template <class Archive>
     void
     TriaObjects<G>::BoundaryOrMaterialId::serialize(Archive &ar,
-                                                    const unsigned int version)
+                                                    const unsigned int /*version*/)
     {
       // serialize this
       // structure by

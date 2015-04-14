@@ -2847,7 +2847,7 @@ public:
    * Read or write the data of this object for serialization
    */
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version)
+  void serialize(Archive &ar, const unsigned int /*version*/)
   {
     ar &valid
     &h5_sol_filename

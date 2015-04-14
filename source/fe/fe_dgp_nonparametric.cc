@@ -140,6 +140,7 @@ FE_DGPNonparametric<dim,spacedim>::shape_value_component (const unsigned int i,
                                                           const Point<dim> &p,
                                                           const unsigned int component) const
 {
+  (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_value(i, p);
@@ -163,6 +164,7 @@ FE_DGPNonparametric<dim,spacedim>::shape_grad_component (const unsigned int i,
                                                          const Point<dim> &p,
                                                          const unsigned int component) const
 {
+  (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_grad(i, p);
@@ -187,6 +189,7 @@ FE_DGPNonparametric<dim,spacedim>::shape_grad_grad_component (const unsigned int
     const Point<dim> &p,
     const unsigned int component) const
 {
+  (void)component;
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (component == 0, ExcIndexRange (component, 0, 1));
   return polynomial_space.compute_grad_grad(i, p);
@@ -430,6 +433,7 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
   // faces and the face interpolation matrix
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
+  (void)interpolation_matrix;
   typedef              FiniteElement<dim,spacedim> FEE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPNonparametric<") == 0)
                ||
@@ -460,6 +464,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
   // faces and the face interpolation matrix
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
+  (void)interpolation_matrix;
   typedef              FiniteElement<dim,spacedim> FEE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPNonparametric<") == 0)
                ||

@@ -165,7 +165,7 @@ public:
    */
   template <class Archive>
   void serialize (Archive &ar,
-                  const unsigned int version);
+                  const unsigned int /*version*/);
 
 private:
   /**
@@ -295,7 +295,7 @@ BlockInfo::memory_consumption () const
 
 template <class Archive>
 void BlockInfo::serialize (Archive &ar,
-                           const unsigned int version)
+                           const unsigned int /*version*/)
 {
   ar &bi_global;
   ar &levels;

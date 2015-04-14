@@ -830,7 +830,7 @@ void TableHandler::add_value (const std::string &key,
 
 template <class Archive>
 void
-TableHandler::Column::save(Archive &ar, const unsigned int version) const
+TableHandler::Column::save(Archive &ar, const unsigned int /*version*/) const
 {
   ar &entries &tex_caption
   & tex_format &precision
@@ -841,7 +841,7 @@ TableHandler::Column::save(Archive &ar, const unsigned int version) const
 
 template<class Archive>
 void
-TableHandler::Column::load(Archive &ar, const unsigned int version)
+TableHandler::Column::load(Archive &ar, const unsigned int /*version*/)
 {
   ar &entries &tex_caption
   & tex_format &precision
