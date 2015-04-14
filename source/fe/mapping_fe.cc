@@ -479,11 +479,10 @@ MappingFE<dim,spacedim,DH,VECTOR>::fill_fe_values (
                   }
                 else
                   {
-                    const unsigned int codim = spacedim-dim;
-
                     if (update_flags & update_normal_vectors)
                       {
-                        Assert( codim==1 , ExcMessage("There is no cell normal in codim 2."));
+                        Assert (spacedim - dim == 1,
+                                ExcMessage("There is no cell normal in codim 2."));
 
                         if (dim==1)
                           cross_product(normal_vectors[point], -DX_t[0]);
