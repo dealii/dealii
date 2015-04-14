@@ -440,6 +440,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The class SymmetricTensor<2,dim> is now usable also for dim>3.
+  <br>
+  (Martin Kronbichler, 2015/04/14)
+  </li>
+
   <li> New: The DynamicSparsityPattern class (formerly called
   CompressedSparsityPattern) now has an iterator class that allows to
   walk over the nonzero elements of a matrix represented by this class.
