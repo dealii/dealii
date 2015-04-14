@@ -44,7 +44,7 @@ int main()
 
     SparseMatrix<double> a (sparsity_pattern);
 
-    auto op_a = linop(a);
+    auto op_a = linear_operator(a);
 
     Vector<double> u;
     op_a.reinit_domain_vector(u, false);
@@ -72,7 +72,7 @@ int main()
 
     BlockSparseMatrix<double> a (sparsity_pattern);
 
-    auto op_a = linop<BlockVector<double>>(a);
+    auto op_a = linear_operator<BlockVector<double>>(a);
 
     BlockVector<double> u;
     op_a.reinit_domain_vector(u, false);

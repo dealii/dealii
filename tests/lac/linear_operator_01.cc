@@ -200,14 +200,14 @@ int main()
 
   // operator* and transpose
 
-  auto test2 = transpose_linop(multiply2) * multiply4;
+  auto test2 = transpose_operator(multiply2) * multiply4;
   RightVector w = { 0. };
   test2.vmult(w, u);
   deallog << "(2 * 4) * " << u.value << " = " << w.value << std::endl;
 
   // identity
 
-  auto test3 = identity_linop(test2.reinit_range_vector) + test2;
+  auto test3 = identity_operator(test2.reinit_range_vector) + test2;
   test3.vmult(w, u);
   deallog << "(1 + 2 * 4) * " << u.value << " = " << w.value << std::endl;
 }

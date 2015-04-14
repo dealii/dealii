@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test linop constructor for full and reduced interface:
+// Test linear_operator constructor for full and reduced interface:
 
 #include "../tests.h"
 
@@ -207,33 +207,33 @@ int main()
   MyMatrix5 m5;
   MyMatrix6 m6;
 
-  linop(m1).vmult(v, u);
-  linop(m1).Tvmult(v, u);
-  linop(m1).vmult_add(v, u);
-  linop(m1).Tvmult_add(v, u);
+  linear_operator(m1).vmult(v, u);
+  linear_operator(m1).Tvmult(v, u);
+  linear_operator(m1).vmult_add(v, u);
+  linear_operator(m1).Tvmult_add(v, u);
 
-  linop(m2).vmult(v, u);
-  linop(m2).Tvmult(v, u);
-  linop(m2).vmult_add(v, u);
-  linop(m2).Tvmult_add(v, u);
+  linear_operator(m2).vmult(v, u);
+  linear_operator(m2).Tvmult(v, u);
+  linear_operator(m2).vmult_add(v, u);
+  linear_operator(m2).Tvmult_add(v, u);
 
-  linop(m3).vmult(v, u);
-  linop(m3).Tvmult(v, u);
-  linop(m3).vmult_add(v, u);
-  linop(m3).Tvmult_add(v, u);
+  linear_operator(m3).vmult(v, u);
+  linear_operator(m3).Tvmult(v, u);
+  linear_operator(m3).vmult_add(v, u);
+  linear_operator(m3).Tvmult_add(v, u);
 
-  linop(m4).vmult(v, u);
-  linop(m4).Tvmult(v, u);
-  linop(m4).vmult_add(v, u);
-  linop(m4).Tvmult_add(v, u);
+  linear_operator(m4).vmult(v, u);
+  linear_operator(m4).Tvmult(v, u);
+  linear_operator(m4).vmult_add(v, u);
+  linear_operator(m4).Tvmult_add(v, u);
 
-  linop(m5).vmult(v, u);
-  linop(m5).Tvmult(v, u);
-  linop(m5).vmult_add(v, u);
-  linop(m5).Tvmult_add(v, u);
+  linear_operator(m5).vmult(v, u);
+  linear_operator(m5).Tvmult(v, u);
+  linear_operator(m5).vmult_add(v, u);
+  linear_operator(m5).Tvmult_add(v, u);
 
-  linop(m6).vmult(v, u);
-  linop(m6).Tvmult(v, u);
-  linop(m6).vmult_add(v, u);
-  linop(m6).Tvmult_add(v, u);
+  linear_operator(m6).vmult(v, u);
+  linear_operator(m6).Tvmult(v, u);
+  linear_operator(m6).vmult_add(v, u);
+  linear_operator(m6).Tvmult_add(v, u);
 }

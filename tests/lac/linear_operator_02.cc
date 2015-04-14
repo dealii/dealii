@@ -70,8 +70,8 @@ int main()
 
   // Constructors and assignment:
 
-  auto op_a = linop(a);
-  auto op_b = linop(b);
+  auto op_a = linear_operator(a);
+  auto op_b = linear_operator(b);
 
   {
     LinearOperator<dealii::Vector<double>, dealii::Vector<double>> op_x (a);
@@ -153,33 +153,33 @@ int main()
   deallog << "solve(B, v, u): " << v << std::endl;
 
   deallog.depth_file(0);
-  inverse_linop(op_b, solver, PreconditionIdentity()).vmult(v, u);
+  inverse_operator(op_b, solver, PreconditionIdentity()).vmult(v, u);
   deallog.depth_file(3);
-  deallog << "inverse_linop(B)u: " << v << std::endl;
+  deallog << "inverse_operator(B)u: " << v << std::endl;
 
   deallog.depth_file(0);
   op_b.vmult(w, v);
   deallog.depth_file(3);
-  deallog << "B(inverse_linop(B)u): " << w << std::endl;
+  deallog << "B(inverse_operator(B)u): " << w << std::endl;
 
   deallog.depth_file(0);
-  (op_b * inverse_linop(op_b, solver, PreconditionIdentity())).vmult(w, u);
+  (op_b * inverse_operator(op_b, solver, PreconditionIdentity())).vmult(w, u);
   deallog.depth_file(3);
-  deallog << "(B*inverse_linop(B))u: " << w << std::endl;
+  deallog << "(B*inverse_operator(B))u: " << w << std::endl;
 
   deallog.depth_file(0);
-  (inverse_linop(op_b, solver, PreconditionIdentity()) * op_b).vmult(w, u);
+  (inverse_operator(op_b, solver, PreconditionIdentity()) * op_b).vmult(w, u);
   deallog.depth_file(3);
-  deallog << "(inverse_linop(B)*B)u: " << w << std::endl;
+  deallog << "(inverse_operator(B)*B)u: " << w << std::endl;
 
   SolverControl inner_solver_control (1000, 1e-12);
   SolverCG<> inner_solver (solver_control);
 
   deallog.depth_file(0);
-  solver.solve(inverse_linop(op_b, inner_solver, PreconditionIdentity()), v, u,
+  solver.solve(inverse_operator(op_b, inner_solver, PreconditionIdentity()), v, u,
                PreconditionIdentity());
   deallog.depth_file(3);
-  deallog << "solve(inverse_linop(B), v, u) == Bu: " << v << std::endl;
+  deallog << "solve(inverse_operator(B), v, u) == Bu: " << v << std::endl;
 
   deallog.depth_file(0);
   solver.solve(op_b + 0.005 * op_a, v, u, PreconditionIdentity());

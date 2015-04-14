@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Tests for block_linop
+// Tests for block_operator
 
 #include "../tests.h"
 
@@ -98,15 +98,15 @@ int main()
     a.block(1, 0).set(i, i, 1.);
 
 
-  auto op_a = linop<BlockVector<double>>(a);
+  auto op_a = linear_operator<BlockVector<double>>(a);
 
-  auto op_b00 = linop(a.block(0, 0));
-  auto op_b01 = linop(a.block(0, 1));
-  auto op_b10 = linop(a.block(1, 0));
-  auto op_b11 = linop(a.block(1, 1));
+  auto op_b00 = linear_operator(a.block(0, 0));
+  auto op_b01 = linear_operator(a.block(0, 1));
+  auto op_b10 = linear_operator(a.block(1, 0));
+  auto op_b11 = linear_operator(a.block(1, 1));
 
   auto op_b =
-      block_linop<2, 2, BlockVector<double>>({op_b00, op_b01, op_b10, op_b11});
+      block_operator<2, 2, BlockVector<double>>({op_b00, op_b01, op_b10, op_b11});
 
   // vmult:
 
@@ -173,7 +173,7 @@ int main()
 
   // And finally complicated block structures:
 
-  auto op_upp_x_upu = block_linop<3, 3, BlockVector<double>>(
+  auto op_upp_x_upu = block_operator<3, 3, BlockVector<double>>(
       {op_b00, op_b01, op_b00, op_b10, op_b11, op_b10, op_b10, op_b11, op_b10});
 
   op_upp_x_upu.reinit_domain_vector(u, false);
@@ -191,12 +191,12 @@ int main()
   PRINTME("v", v);
 
   auto op_upp_x_p =
-      block_linop<3, 1, BlockVector<double>>({op_b01, op_b11, op_b11});
+      block_operator<3, 1, BlockVector<double>>({op_b01, op_b11, op_b11});
 
   auto op_u_x_upu =
-      block_linop<1, 3, BlockVector<double>>({op_b00, op_b01, op_b00});
+      block_operator<1, 3, BlockVector<double>>({op_b00, op_b01, op_b00});
 
-  auto op_long = op_u_x_upu * transpose_linop(op_upp_x_upu) * op_upp_x_p;
+  auto op_long = op_u_x_upu * transpose_operator(op_upp_x_upu) * op_upp_x_p;
 
   op_long.reinit_domain_vector(u, false);
   for (unsigned int i = 0; i < u.size(); ++i) {

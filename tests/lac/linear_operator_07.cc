@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Tests for blockdiagonal_linop
+// Tests for block_diagonal_operator
 
 #include "../tests.h"
 
@@ -78,14 +78,14 @@ int main()
     a.block(2, 2).set(i, i, 3.);
 
 
-  auto op_a = linop<BlockVector<double>>(a);
+  auto op_a = linear_operator<BlockVector<double>>(a);
 
-  auto op_b0 = linop(a.block(0, 0));
-  auto op_b1 = linop(a.block(1, 1));
-  auto op_b2 = linop(a.block(2, 2));
+  auto op_b0 = linear_operator(a.block(0, 0));
+  auto op_b1 = linear_operator(a.block(1, 1));
+  auto op_b2 = linear_operator(a.block(2, 2));
 
   auto op_b =
-      blockdiag_linop<3, BlockVector<double>>({op_b0, op_b1, op_b2});
+      block_diagonal_operator<3, BlockVector<double>>({op_b0, op_b1, op_b2});
 
   // vmult:
 
@@ -150,11 +150,11 @@ int main()
   op_x.Tvmult_add(x, u);
   PRINTME("(B*B*B) Tvmult_add", x);
 
-  // And finally the other blockdiag_linop variant:
+  // And finally the other block_diagonal_operator variant:
 
-  auto op_c = blockdiag_linop<5, BlockVector<double>>({op_b0, op_b0, op_b0, op_b0, op_b0});
+  auto op_c = block_diagonal_operator<5, BlockVector<double>>({op_b0, op_b0, op_b0, op_b0, op_b0});
 
-  auto op_d = blockdiag_linop<5, BlockVector<double>>(op_b0);
+  auto op_d = block_diagonal_operator<5, BlockVector<double>>(op_b0);
 
   op_c.reinit_domain_vector(u, false);
   for (unsigned int i = 0; i < u.size(); ++i) {

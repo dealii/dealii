@@ -36,14 +36,15 @@ template <typename Range, typename Domain> class LinearOperator;
 
 template <typename Range = Vector<double>,
           typename Domain = Range,
-          typename Exemplar,
+          typename OperatorExemplar,
           typename Matrix>
-LinearOperator<Range, Domain> linop (const Exemplar &, const Matrix &);
+LinearOperator<Range, Domain> linear_operator (const OperatorExemplar &,
+                                               const Matrix &);
 
 template <typename Range = Vector<double>,
           typename Domain = Range,
           typename Matrix>
-LinearOperator<Range, Domain> linop (const Matrix &);
+LinearOperator<Range, Domain> linear_operator (const Matrix &);
 
 /**
  * A class to store the abstract concept of a linear operator.
@@ -84,9 +85,9 @@ LinearOperator<Range, Domain> linop (const Matrix &);
  *
  * // Setup and assembly of matrices
  *
- * const auto op_a = linop(A);
- * const auto op_b = linop(B);
- * const auto op_c = linop(C);
+ * const auto op_a = linear_operator(A);
+ * const auto op_b = linear_operator(B);
+ * const auto op_c = linear_operator(C);
  *
  * const auto op = (op_a + k * op_b) * op_c;
  * @endcode
@@ -152,28 +153,30 @@ public:
 
   /**
    * Templated copy constructor that creates a LinearOperator object from
-   * an object @p op for which the conversion function <code>linop</code>
+   * an object @p op for which the conversion function
+   * <code>linear_operator</code>
    * is defined.
    */
   template<typename Op>
   LinearOperator (const Op &op)
   {
-    *this = linop<Range, Domain, Op>(op);
+    *this = linear_operator<Range, Domain, Op>(op);
   }
 
   /**
    * Default copy assignment operator.
    */
-  LinearOperator<Range, Domain> &operator=(const LinearOperator<Range, Domain> &) = default;
+  LinearOperator<Range, Domain> &
+  operator=(const LinearOperator<Range, Domain> &) = default;
 
   /**
    * Templated copy assignment operator for an object @p op for which the
-   * conversion function <code>linop</code> is defined.
+   * conversion function <code>linear_operator</code> is defined.
    */
   template <typename Op>
   LinearOperator<Range, Domain> &operator=(const Op &op)
   {
-    return *this = linop<Range, Domain, Op>(op);
+    return *this = linear_operator<Range, Domain, Op>(op);
   }
 
   /**
@@ -489,7 +492,7 @@ operator*(const LinearOperator<Range, Domain> &op,
  */
 template <typename Range, typename Domain>
 LinearOperator<Domain, Range>
-transpose_linop(const LinearOperator<Range, Domain> &op)
+transpose_operator(const LinearOperator<Range, Domain> &op)
 {
   LinearOperator<Domain, Range> return_op;
 
@@ -518,7 +521,7 @@ transpose_linop(const LinearOperator<Range, Domain> &op)
  */
 template <typename Range>
 LinearOperator<Range, Range>
-identity_linop(const std::function<void(Range &, bool)> &reinit_vector)
+identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 {
   LinearOperator<Range, Range> return_op;
 
@@ -567,9 +570,9 @@ identity_linop(const std::function<void(Range &, bool)> &reinit_vector)
  */
 template <typename Solver, typename Preconditioner>
 LinearOperator<typename Solver::vector_type, typename Solver::vector_type>
-inverse_linop(const LinearOperator<typename Solver::vector_type, typename Solver::vector_type> &op,
-              Solver &solver,
-              const Preconditioner &preconditioner)
+inverse_operator(const LinearOperator<typename Solver::vector_type, typename Solver::vector_type> &op,
+                 Solver &solver,
+                 const Preconditioner &preconditioner)
 {
   typedef typename Solver::vector_type Vector;
 
@@ -603,7 +606,7 @@ inverse_linop(const LinearOperator<typename Solver::vector_type, typename Solver
   return_op.Tvmult = [op, &solver, &preconditioner]( Vector &v, const
                                                      Vector &u)
   {
-    solver.solve(transpose_linop(op), v, u, preconditioner);
+    solver.solve(transpose_operator(op), v, u, preconditioner);
   };
 
   return_op.Tvmult =
@@ -611,7 +614,7 @@ inverse_linop(const LinearOperator<typename Solver::vector_type, typename Solver
   {
     Vector *v2 = op.range_vector_memory.alloc();
     op.reinit_range_vector(*v2, /*bool fast =*/ true);
-    solver.solve(transpose_linop(op), *v2, u, preconditioner);
+    solver.solve(transpose_operator(op), *v2, u, preconditioner);
     v += *v2;
     op.range_vector_memory.free(v2);
   };
@@ -639,16 +642,16 @@ inverse_linop(const LinearOperator<typename Solver::vector_type, typename Solver
  *         |
  *  op_a10 | op_a11
  * @endcode
- * The coresponding block_linop invocation takes the form
+ * The coresponding block_operator invocation takes the form
  * @code
- * block_linop<2, 2, BlockVector<double>>({op_a00, op_a01, op_a10, op_a11});
+ * block_operator<2, 2, BlockVector<double>>({op_a00, op_a01, op_a10, op_a11});
  * @endcode
  */
 template <unsigned int m, unsigned int n,
           typename Range = BlockVector<double>,
           typename Domain = Range>
 LinearOperator<Range, Domain>
-block_linop(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, m> &ops)
+block_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, m> &ops)
 {
   static_assert(m > 0 && n > 0,
                 "a blocked LinearOperator must consist of at least one block");
@@ -739,16 +742,16 @@ block_linop(const std::array<std::array<LinearOperator<typename Range::BlockType
  * The list @p ops is best passed as an initializer list. Consider for
  * example a linear operator block (acting on Vector<double>)
  * <code>diag(op_a0, op_a1, ..., op_am)</code>. The coresponding
- * block_linop invocation takes the form
+ * block_operator invocation takes the form
  * @code
- * blockdiagonal_linop<m, BlockVector<double>>({op_00, op_a1, ..., op_am});
+ * block_diagonal_operator<m, BlockVector<double>>({op_00, op_a1, ..., op_am});
  * @endcode
  */
 template <unsigned int m,
           typename Range = BlockVector<double>,
           typename Domain = Range>
 LinearOperator<Range, Domain>
-blockdiag_linop(const std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, m> &ops)
+block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, m> &ops)
 {
   static_assert(m > 0,
                 "a blockdiagonal LinearOperator must consist of at least one block");
@@ -830,7 +833,7 @@ template <unsigned int m,
           typename Range = BlockVector<double>,
           typename Domain = Range>
 LinearOperator<Range, Domain>
-blockdiag_linop(const LinearOperator<typename Range::BlockType, typename Domain::BlockType> &op)
+block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename Domain::BlockType> &op)
 {
 
   static_assert(m > 0,
@@ -1133,20 +1136,21 @@ namespace
 template <typename Range = Vector<double>,
           typename Domain = Range,
           typename Matrix>
-LinearOperator<Range, Domain> linop(const Matrix &matrix)
+LinearOperator<Range, Domain> linear_operator(const Matrix &matrix)
 {
   // implement with the more generic variant below...
-  return linop<Range, Domain, Matrix, Matrix>(matrix, matrix);
+  return linear_operator<Range, Domain, Matrix, Matrix>(matrix, matrix);
 }
 
 
 /**
  * \relates LinearOperator
  *
- * Variant of above function that takes an Exemplar object @p exemplar as
- * an additional reference. This object is used to populate the
- * reinit_domain_vector and reinit_range_vector function objects. The
- * reference @p matrix is used to construct vmult, Tvmult, etc.
+ * Variant of above function that takes an operator object @p
+ * operator_exemplar as an additional reference. This object is used to
+ * populate the reinit_domain_vector and reinit_range_vector function
+ * objects. The reference @p matrix is used to construct vmult, Tvmult,
+ * etc.
  *
  * This variant can, for example, be used to encapsulate preconditioners
  * (that typically do not expose any information about the underlying
@@ -1156,23 +1160,25 @@ LinearOperator<Range, Domain> linop(const Matrix &matrix)
  */
 template <typename Range = Vector<double>,
           typename Domain = Range,
-          typename Exemplar,
+          typename OperatorExemplar,
           typename Matrix>
-LinearOperator<Range, Domain> linop(const Exemplar &exemplar,
-                                    const Matrix   &matrix)
-{
+LinearOperator<Range, Domain>
+linear_operator(const OperatorExemplar &operator_exemplar,
+                const Matrix &matrix) {
   LinearOperator<Range, Domain> return_op;
 
-  // Always store a reference to matrix and exemplar in the lambda
+  // Always store a reference to matrix and operator_exemplar in the lambda
   // functions. This ensures that a modification of the matrix after the
   // creation of a LinearOperator wrapper is respected - further a matrix
-  // or an exemplar cannot usually be copied...
+  // or an operator_exemplar cannot usually be copied...
 
   return_op.reinit_range_vector =
-    internal::LinearOperator::ReinitRangeFactory<Range>().operator()(exemplar);
+      internal::LinearOperator::ReinitRangeFactory<Range>().operator()(
+          operator_exemplar);
 
   return_op.reinit_domain_vector =
-    internal::LinearOperator::ReinitDomainFactory<Domain>().operator()(exemplar);
+      internal::LinearOperator::ReinitDomainFactory<Domain>().operator()(
+          operator_exemplar);
 
   typename std::conditional<
   has_vmult_add<Range, Domain, Matrix>::type::value,

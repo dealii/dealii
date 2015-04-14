@@ -35,13 +35,13 @@ int main(int argc, char *argv[])
 
   TrilinosWrappers::SparseMatrix a;
 
-  auto op_a  = linop<TrilinosWrappers::MPI::Vector>(a);
-  auto op_a2  = linop<TrilinosWrappers::Vector>(a);
+  auto op_a  = linear_operator<TrilinosWrappers::MPI::Vector>(a);
+  auto op_a2  = linear_operator<TrilinosWrappers::Vector>(a);
 
   TrilinosWrappers::BlockSparseMatrix b;
 
-  auto op_b = linop<TrilinosWrappers::MPI::BlockVector>(b);
-  auto op_b3 = linop<TrilinosWrappers::BlockVector>(b);
+  auto op_b = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
+  auto op_b3 = linear_operator<TrilinosWrappers::BlockVector>(b);
 
   deallog << "OK" << std::endl;
 

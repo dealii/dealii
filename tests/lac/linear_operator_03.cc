@@ -90,8 +90,8 @@ int main()
 
   // Constructors and assignment:
 
-  auto op_a = linop<BlockVector<double>>(a);
-  auto op_b = linop<BlockVector<double>>(b);
+  auto op_a = linear_operator<BlockVector<double>>(a);
+  auto op_b = linear_operator<BlockVector<double>>(b);
 
   {
     decltype(op_a) op_x (a);
@@ -173,33 +173,33 @@ int main()
   PRINTME("solve(B, v, u)", v);
 
   deallog.depth_file(0);
-  inverse_linop(op_b, solver, PreconditionIdentity()).vmult(v, u);
+  inverse_operator(op_b, solver, PreconditionIdentity()).vmult(v, u);
   deallog.depth_file(3);
-  PRINTME("inverse_linop(B)u", v);
+  PRINTME("inverse_operator(B)u", v);
 
   deallog.depth_file(0);
   op_b.vmult(w, v);
   deallog.depth_file(3);
-  PRINTME("B(inverse_linop(B)u)", w);
+  PRINTME("B(inverse_operator(B)u)", w);
 
   deallog.depth_file(0);
-  (op_b * inverse_linop(op_b, solver, PreconditionIdentity())).vmult(w, u);
+  (op_b * inverse_operator(op_b, solver, PreconditionIdentity())).vmult(w, u);
   deallog.depth_file(3);
-  PRINTME("(B*inverse_linop(B))u", w);
+  PRINTME("(B*inverse_operator(B))u", w);
 
   deallog.depth_file(0);
-  (inverse_linop(op_b, solver, PreconditionIdentity()) * op_b).vmult(w, u);
+  (inverse_operator(op_b, solver, PreconditionIdentity()) * op_b).vmult(w, u);
   deallog.depth_file(3);
-  PRINTME("(inverse_linop(B)*B)u", w);
+  PRINTME("(inverse_operator(B)*B)u", w);
 
   SolverControl inner_solver_control (1000, 1e-12);
   SolverCG<BlockVector<double>> inner_solver (solver_control);
 
   deallog.depth_file(0);
-  solver.solve(inverse_linop(op_b, inner_solver, PreconditionIdentity()), v, u,
+  solver.solve(inverse_operator(op_b, inner_solver, PreconditionIdentity()), v, u,
                PreconditionIdentity());
   deallog.depth_file(3);
-  PRINTME("solve(inverse_linop(B), v, u) == Bu", v);
+  PRINTME("solve(inverse_operator(B), v, u) == Bu", v);
 
   deallog.depth_file(0);
   solver.solve(op_b + 0.005 * op_a, v, u, PreconditionIdentity());
