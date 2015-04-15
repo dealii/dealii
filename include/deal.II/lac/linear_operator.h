@@ -183,26 +183,26 @@ public:
    * Application of the LinearOperator object to a vector u of the @tref
    * Domain space giving a vector v of the @tref Range space.
    */
-  std::function<const void(Range &v, const Domain &u)> vmult;
+  std::function<void(Range &v, const Domain &u)> vmult;
 
   /**
    * Application of the LinearOperator object to a vector u of the @tref
    * Domain space. The result is added to the vector v.
    */
-  std::function<const void(Range &v, const Domain &u)> vmult_add;
+  std::function<void(Range &v, const Domain &u)> vmult_add;
 
   /**
    * Application of the transpose LinearOperator object to a vector u of
    * the @tref Range space giving a vector v of the @tref Domain
    * space.
    */
-  std::function<const void(Domain &v, const Range &u)> Tvmult;
+  std::function<void(Domain &v, const Range &u)> Tvmult;
 
   /**
    * Application of the transpose LinearOperator object to a vector @p u of
    * the @tref Range space.The result is added to the vector @p v.
    */
-  std::function<const void(Domain &v, const Range &u)> Tvmult_add;
+  std::function<void(Domain &v, const Range &u)> Tvmult_add;
 
   /**
    * Initializes a vector v of the Range space to be directly usable
@@ -898,53 +898,54 @@ namespace internal
   namespace LinearOperator
   {
     /**
-     * A factory class that is responsible for the creation of a
-     * reinit_range_vector object for a given pair of vector type Range and matrix
-     * type Matrix.
+     * A helper class that is responsible for the initialization of a
+     * vector to be directly usable as the destination parameter, or source
+     * parameter in an application of vmult of a matrix.
      *
      * The generic version of this class just calls
-     * <code>Range::reinit()</code> with the result of
-     * <code>Matrix::m()</code>. This class is specialized for more complicated
-     * data structures, such as TrilinosWrappers::MPI::Vector, etc.
+     * <code>Vector::reinit()</code> with the result of
+     * <code>Matrix::m()</code> or <code>Matrix::n()</code>, respectively.
+     * This class is specialized for more complicated data structures, such
+     * as TrilinosWrappers::MPI::Vector, etc.
      */
-    template<typename Range>
-    class ReinitRangeFactory
+    template<typename Vector>
+    class ReinitHelper
     {
     public:
+      /**
+       * Initializes a vector v of the Range space to be directly usable
+       * as the destination parameter in an application of vmult. Similar to
+       * the reinit functions of the vector classes, the boolean determines
+       * whether a fast initalization is done, i.e., if it is set to false the
+       * content of the vector is set to 0.
+       *
+       * The generic version of this class just calls
+       * <code>Vector::reinit()</code> with the result of
+       * <code>Matrix::m()</code>.
+       */
       template <typename Matrix>
-      std::function<void(Range &, bool)>
-      operator()(const Matrix &matrix)
+      static
+      void reinit_range_vector (const Matrix &matrix, Vector &v, bool fast)
       {
-        return [&matrix](Range &v, bool fast)
-        {
-          v.reinit(matrix.m(), fast);
-        };
+        v.reinit(matrix.m(), fast);
       }
-    };
 
-
-    /**
-     * A factory class that is responsible for the creation of a
-     * reinit_domain_vector object for a given pair of vector type Domain and
-     * matrix type Matrix.
-     *
-     * The generic version of this class just calls
-     * <code>Domain::reinit()</code> with the result of
-     * <code>Matrix::n()</code>. This class is specialized for more complicated
-     * data structures, such as TrilinosWrappers::MPI::Vector, etc.
-     */
-    template<typename Domain>
-    class ReinitDomainFactory
-    {
-    public:
+      /**
+       * Initializes a vector of the Domain space to be directly usable as the
+       * source parameter in an application of vmult. Similar to the reinit
+       * functions of the vector classes, the boolean determines whether a fast
+       * initalization is done, i.e., if it is set to false the content of the
+       * vector is set to 0.
+       *
+       * The generic version of this class just calls
+       * <code>Vector::reinit()</code> with the result of
+       * <code>Matrix::n()</code>.
+       */
       template <typename Matrix>
-      std::function<void(Domain &, bool)>
-      operator()(const Matrix &matrix)
+      static
+      void reinit_domain_vector (const Matrix &matrix, Vector &v, bool fast)
       {
-        return [&matrix](Domain &v, bool fast)
-        {
-          v.reinit(matrix.n(), fast);
-        };
+        v.reinit(matrix.n(), fast);
       }
     };
   } /* namespace LinearOperator */
@@ -1157,13 +1158,15 @@ linear_operator(const OperatorExemplar &operator_exemplar,
   // creation of a LinearOperator wrapper is respected - further a matrix
   // or an operator_exemplar cannot usually be copied...
 
-  return_op.reinit_range_vector =
-    internal::LinearOperator::ReinitRangeFactory<Range>().operator()(
-      operator_exemplar);
+  return_op.reinit_range_vector = [&operator_exemplar](Range &v, bool fast)
+  {
+    internal::LinearOperator::ReinitHelper<Range>::reinit_range_vector(operator_exemplar, v, fast);
+  };
 
-  return_op.reinit_domain_vector =
-    internal::LinearOperator::ReinitDomainFactory<Domain>().operator()(
-      operator_exemplar);
+  return_op.reinit_domain_vector = [&operator_exemplar](Domain &v, bool fast)
+  {
+    internal::LinearOperator::ReinitHelper<Domain>::reinit_domain_vector(operator_exemplar, v, fast);
+  };
 
   typename std::conditional<
   has_vmult_add<Range, Domain, Matrix>::type::value,

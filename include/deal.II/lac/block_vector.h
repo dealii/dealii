@@ -23,7 +23,6 @@
 #include <deal.II/lac/block_vector_base.h>
 
 #include <cstdio>
-#include <functional>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -461,56 +460,41 @@ void swap (BlockVector<Number> &u,
 }
 
 
-#ifdef DEAL_II_WITH_CXX11
-
 namespace internal
 {
   namespace LinearOperator
   {
-    template <typename> class ReinitRangeFactory;
-    template <typename> class ReinitDomainFactory;
+    template <typename> class ReinitHelper;
 
     /**
-     * A factory class internally used in linear_operator.h.
+     * A helper class internally used in linear_operator.h.
      * Specialization for BlockVector<number>.
      */
     template<typename number>
-    class ReinitRangeFactory<BlockVector<number> >
+    class ReinitHelper<BlockVector<number> >
     {
     public:
       template <typename Matrix>
-      std::function<void(BlockVector<number> &, bool)>
-      operator()(const Matrix &matrix)
+      static
+      void reinit_range_vector (const Matrix &matrix,
+                                BlockVector<number> &v,
+                                bool fast)
       {
-        return [&matrix](BlockVector<number> &v, bool fast)
-        {
-          v.reinit(matrix.get_row_indices(), fast);
-        };
+        v.reinit(matrix.get_row_indices(), fast);
+      }
+
+      template <typename Matrix>
+      static
+      void reinit_domain_vector(const Matrix &matrix,
+                                BlockVector<number> &v,
+                                bool fast)
+      {
+        v.reinit(matrix.get_column_indices(), fast);
       }
     };
 
-    /**
-     * A factory class internally used in linear_operator.h.
-     * Specialization for BlockVector<number>.
-     */
-    template<typename number>
-    class ReinitDomainFactory<BlockVector<number> >
-    {
-    public:
-      template <typename Matrix>
-      std::function<void(BlockVector<number> &, bool)>
-      operator()(const Matrix &matrix)
-      {
-        return [&matrix](BlockVector<number> &v, bool fast)
-        {
-          v.reinit(matrix.get_column_indices(), fast);
-        };
-      }
-    };
   } /* namespace LinearOperator */
 } /* namespace internal */
-
-#endif /* DEAL_II_WITH_CXX11 */
 
 DEAL_II_NAMESPACE_CLOSE
 

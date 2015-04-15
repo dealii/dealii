@@ -469,56 +469,41 @@ namespace TrilinosWrappers
 /*@}*/
 
 
-#ifdef DEAL_II_WITH_CXX11
-
 namespace internal
 {
   namespace LinearOperator
   {
-    template <typename> class ReinitRangeFactory;
-    template <typename> class ReinitDomainFactory;
+    template <typename> class ReinitHelper;
 
     /**
-     * A factory class internally used in linear_operator.h. Specialization
-     * for TrilinosWrappers::MPI::BlockVector.
+     * A helper class internally used in linear_operator.h.
+     * Specialization for TrilinosWrappers::MPI::BlockVector.
      */
     template<>
-    class ReinitRangeFactory<TrilinosWrappers::MPI::BlockVector>
+    class ReinitHelper<TrilinosWrappers::MPI::BlockVector>
     {
     public:
       template <typename Matrix>
-      std::function<void(TrilinosWrappers::MPI::BlockVector &, bool)>
-      operator()(const Matrix &matrix)
+      static
+      void reinit_range_vector (const Matrix &matrix,
+                                TrilinosWrappers::MPI::BlockVector &v,
+                                bool fast)
       {
-        return [&matrix](TrilinosWrappers::MPI::BlockVector &v, bool fast)
-        {
-          v.reinit(matrix.range_partitioner(), fast);
-        };
+        v.reinit(matrix.range_partitioner(), fast);
+      }
+
+      template <typename Matrix>
+      static
+      void reinit_domain_vector(const Matrix &matrix,
+                                TrilinosWrappers::MPI::BlockVector &v,
+                                bool fast)
+      {
+        v.reinit(matrix.domain_partitioner(), fast);
       }
     };
 
-    /**
-     * A factory class internally used in linear_operator.h. Specialization
-     * for TrilinosWrappers::MPI::BlockVector.
-     */
-    template<>
-    class ReinitDomainFactory<TrilinosWrappers::MPI::BlockVector>
-    {
-    public:
-      template <typename Matrix>
-      std::function<void(TrilinosWrappers::MPI::BlockVector &, bool)>
-      operator()(const Matrix &matrix)
-      {
-        return [&matrix](TrilinosWrappers::MPI::BlockVector &v, bool fast)
-        {
-          v.reinit(matrix.domain_partitioner(), fast);
-        };
-      }
-    };
   } /* namespace LinearOperator */
 } /* namespace internal */
-
-#endif /* DEAL_II_WITH_CXX11 */
 
 
 DEAL_II_NAMESPACE_CLOSE
