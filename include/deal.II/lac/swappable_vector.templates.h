@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -183,6 +183,8 @@ void SwappableVector<number>::alert ()
 template <typename number>
 void SwappableVector<number>::reload_vector (const bool set_flag)
 {
+  (void)set_flag;
+
   Assert (filename != "", ExcInvalidFilename (filename));
   Assert (this->size() == 0, ExcSizeNonzero());
 
@@ -191,9 +193,7 @@ void SwappableVector<number>::reload_vector (const bool set_flag)
   tmp_in.close ();
 
 #ifdef DEAL_II_WITH_THREADS
-  // release the lock that was
-  // acquired by the calling
-  // functions
+  // release the lock that was acquired by the calling functions
 
   // set the flag if so required
   if (set_flag)

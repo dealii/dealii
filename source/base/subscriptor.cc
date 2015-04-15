@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+#ifdef DEBUG
 namespace
 {
 // create a lock that might be used to control subscription to and
@@ -37,6 +38,7 @@ namespace
 // <subscriptor.h> file).
   Threads::Mutex subscription_lock;
 }
+#endif
 
 
 static const char *unknown_subscriber = "unknown subscriber";
