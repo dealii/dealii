@@ -33,6 +33,10 @@
 #include <limits>
 #include <sstream>
 
+#ifndef DEAL_II_MSVC
+#  include <stdlib.h>
+#endif
+
 #ifdef DEAL_II_MSVC
 #  include <winsock2.h>
 #endif
@@ -626,6 +630,23 @@ namespace Utilities
 
       return o.str();
     }
+
+
+    void posix_memalign (void **memptr, size_t alignment, size_t size)
+    {
+#ifndef DEAL_II_MSVC
+      const int ierr = ::posix_memalign (memptr, alignment, size);
+
+      AssertThrow (ierr == 0, ExcOutOfMemory());
+      AssertThrow (*memptr != 0, ExcOutOfMemory());
+#else
+      // Windows does not appear to have posix_memalign. just use the
+      // regular malloc in that case
+      *memptr = malloc (size);
+      AssertThrow (*memptr != 0, ExcOutOfMemory());
+#endif
+    }
+
 
 
     bool job_supports_mpi ()

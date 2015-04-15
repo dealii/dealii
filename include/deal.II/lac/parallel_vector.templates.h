@@ -24,10 +24,6 @@
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-#ifndef _MSC_VER
-#  include <mm_malloc.h>
-#endif
-
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -61,14 +57,16 @@ namespace parallel
           Assert (((allocated_size > 0 && val != 0) ||
                    val == 0), ExcInternalError());
           if (val != 0)
-            _mm_free(val);
-          val = static_cast<Number *>(_mm_malloc (sizeof(Number)*new_alloc_size, 64));
+            free(val);
+
+          Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*new_alloc_size);
+
           allocated_size = new_alloc_size;
         }
       else if (new_alloc_size == 0)
         {
           if (val != 0)
-            _mm_free(val);
+            free(val);
           val = 0;
           allocated_size = 0;
         }

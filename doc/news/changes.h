@@ -352,6 +352,16 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: There were a number of places in the library where we unconditionally
+  called functions <code>_mm_malloc()/_mm_free()</code> to allocate and free
+  memory with a known alignment. This function, however, is only available on
+  systems with x86 or x64_64 compatible processors. These places have now been
+  replaced by calling <code>posix_memalign()</code> instead, a function that
+  should be more widely available.
+  <br>
+  (Wolfgang Bangerth, 2015/04/15)
+  </li>
+
   <li> Deprecated: The library uses functions such as CellAccessor::subdomain_id(),
   TriaAccessor::manifold_id(), etc, but used the deviant spelling
   TriaAccessor::boundary_indicator(), TriaAccessor::set_boundary_indicator(),
