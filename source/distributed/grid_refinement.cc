@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -158,20 +158,17 @@ namespace
     Assert (locally_owned_indicators.size() == tria.n_locally_owned_active_cells(),
             ExcInternalError());
 
-    unsigned int active_index = 0;
     unsigned int owned_index = 0;
     for (typename Triangulation<dim,spacedim>::active_cell_iterator
          cell = tria.begin_active();
-         cell != tria.end(); ++cell, ++active_index)
+         cell != tria.end(); ++cell)
       if (cell->subdomain_id() == tria.locally_owned_subdomain())
         {
           locally_owned_indicators(owned_index)
-            = criteria(active_index);
+            = criteria(cell->active_cell_index());
           ++owned_index;
         }
     Assert (owned_index == tria.n_locally_owned_active_cells(),
-            ExcInternalError());
-    Assert ((active_index == tria.Triangulation<dim,spacedim>::n_active_cells()),
             ExcInternalError());
   }
 
