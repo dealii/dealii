@@ -1407,6 +1407,7 @@ namespace DoFTools
       = *std::max_element (target_component.begin(),
                            target_component.end());
     const unsigned int n_target_components = max_component + 1;
+    (void)n_target_components; // silence possible warning about unused variable
 
     AssertDimension (dofs_per_component.size(), n_target_components);
 
@@ -1499,6 +1500,8 @@ namespace DoFTools
           = *std::max_element (target_block.begin(),
                                target_block.end());
         const unsigned int n_target_blocks = max_block + 1;
+        (void)n_target_blocks; // silence possible warning about unused variable
+
         const unsigned int n_blocks = fe.n_blocks();
 
         AssertDimension (dofs_per_block.size(), n_target_blocks);

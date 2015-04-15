@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -153,6 +153,7 @@ namespace Threads
                               const char *,
                               void *)
   {
+    (void)count;
     Assert (count == 1, ExcBarrierSizeNotUseful(count));
   }
 

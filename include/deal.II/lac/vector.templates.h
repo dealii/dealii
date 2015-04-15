@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1186,6 +1186,8 @@ namespace internal
                      ResultType        &result,
                      const int          depth = -1)
     {
+      (void)depth;
+
       if (vec_size <= 4096)
         {
           // the vector is short enough so we perform the summation. first

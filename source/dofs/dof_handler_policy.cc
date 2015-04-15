@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2401,6 +2401,9 @@ namespace internal
       renumber_dofs (const std::vector<dealii::types::global_dof_index> &new_numbers,
                      dealii::DoFHandler<dim,spacedim> &dof_handler) const
       {
+        (void)new_numbers;
+        (void)dof_handler;
+
         Assert (new_numbers.size() == dof_handler.locally_owned_dofs().n_elements(),
                 ExcInternalError());
 
