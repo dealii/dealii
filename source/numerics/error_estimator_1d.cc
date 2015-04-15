@@ -330,9 +330,9 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   // loop over all cells and do something on the cells which we're told to
   // work on. note that the error indicator is only a sum over the two
   // contributions from the two vertices of each cell.
-  typename DH::active_cell_iterator cell = dof_handler.begin_active();
-  for (unsigned int cell_index=0; cell != dof_handler.end();
-       ++cell, ++cell_index)
+  for (typename DH::active_cell_iterator cell = dof_handler.begin_active();
+       cell != dof_handler.end();
+       ++cell)
     if (((subdomain_id == numbers::invalid_subdomain_id)
          ||
          (cell->subdomain_id() == subdomain_id))
@@ -342,7 +342,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
          (cell->material_id() == material_id)))
       {
         for (unsigned int n=0; n<n_solution_vectors; ++n)
-          (*errors[n])(cell_index) = 0;
+          (*errors[n])(cell->active_cell_index()) = 0;
 
         // loop over the two points bounding this line. n==0 is left point,
         // n==1 is right point
@@ -429,12 +429,12 @@ estimate (const Mapping<1,spacedim>                    &mapping,
 
                     const double jump = ((grad_here - grad_neighbor[s](component)) *
                                          coefficient_values(component));
-                    (*errors[s])(cell_index) += jump*jump * cell->diameter();
+                    (*errors[s])(cell->active_cell_index()) += jump*jump * cell->diameter();
                   }
           }
 
         for (unsigned int s=0; s<n_solution_vectors; ++s)
-          (*errors[s])(cell_index) = std::sqrt((*errors[s])(cell_index));
+          (*errors[s])(cell->active_cell_index()) = std::sqrt((*errors[s])(cell->active_cell_index()));
       }
 }
 
