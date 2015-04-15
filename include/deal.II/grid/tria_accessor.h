@@ -2450,7 +2450,28 @@ public:
   bool direction_flag () const;
 
   /**
-   * Index of the parent of this cell within the level of the triangulation to
+   * Return the how many-th active cell the current cell is (assuming
+   * the current cell is indeed active). This is useful, for example,
+   * if you are accessing the elements of a vector with as many
+   * entries as there are active cells. Such vectors are used for
+   * estimating the error on each cell of a triangulation, for
+   * specifying refinement criteria passed to the functions in
+   * GridRefinement, and for generating cell-wise output.
+   *
+   * The function throws an exception if the current cell is not
+   * active.
+   *
+   * @note If the triangulation this function is called on is
+   * of type parallel::distributed::Triangulation, then active
+   * cells may be locally owned, ghost cells, or artificial
+   * (see @ref GlossLocallyOwnedCell , @ref GlossGhostCell , and
+   * @ref GlossArtificialCell). This function counts over all of
+   * them, including ghost and artificial active cells.
+   */
+  unsigned int active_cell_index () const;
+
+  /**
+   * Return the index of the parent of this cell within the level of the triangulation to
    * which the parent cell belongs. The level of the parent is of course one
    * lower than that of the present cell. If the parent does not exist (i.e.,
    * if the object is at the coarsest level of the mesh hierarchy), an
@@ -2655,6 +2676,11 @@ protected:
 
 
 private:
+  /**
+   * Set the active cell index of a cell. This is done at the end of refinement.
+   */
+  void set_active_cell_index (const unsigned int active_cell_index);
+
   /**
    * Set the parent of a cell.
    */

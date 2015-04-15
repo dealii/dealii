@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,6 +46,11 @@ namespace internal
           coarsen_flags.insert (coarsen_flags.end(),
                                 total_cells - coarsen_flags.size(),
                                 false);
+
+          active_cell_indices.reserve (total_cells);
+          active_cell_indices.insert (active_cell_indices.end(),
+                                      total_cells - active_cell_indices.size(),
+                                      numbers::invalid_unsigned_int);
 
           subdomain_ids.reserve (total_cells);
           subdomain_ids.insert (subdomain_ids.end(),
@@ -98,6 +103,7 @@ namespace internal
     {
       return (MemoryConsumption::memory_consumption (refine_flags) +
               MemoryConsumption::memory_consumption (coarsen_flags) +
+              MemoryConsumption::memory_consumption (active_cell_indices) +
               MemoryConsumption::memory_consumption (neighbors) +
               MemoryConsumption::memory_consumption (subdomain_ids) +
               MemoryConsumption::memory_consumption (level_subdomain_ids) +
@@ -132,6 +138,11 @@ namespace internal
           coarsen_flags.insert (coarsen_flags.end(),
                                 total_cells - coarsen_flags.size(),
                                 false);
+
+          active_cell_indices.reserve (total_cells);
+          active_cell_indices.insert (active_cell_indices.end(),
+                                      total_cells - active_cell_indices.size(),
+                                      numbers::invalid_unsigned_int);
 
           subdomain_ids.reserve (total_cells);
           subdomain_ids.insert (subdomain_ids.end(),
@@ -182,6 +193,7 @@ namespace internal
     {
       return (MemoryConsumption::memory_consumption (refine_flags) +
               MemoryConsumption::memory_consumption (coarsen_flags) +
+              MemoryConsumption::memory_consumption (active_cell_indices) +
               MemoryConsumption::memory_consumption (neighbors) +
               MemoryConsumption::memory_consumption (subdomain_ids) +
               MemoryConsumption::memory_consumption (parents) +
