@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -192,13 +192,17 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
 
+  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused-function")
+  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused-parameter")
+  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused-variable")
+
   #
   # Disable a bunch of warnings caused by Trilinos headers in older versions:
   #
   IF(TRILINOS_VERSION VERSION_LESS "11.12")
-    ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused")
     ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-extra")
     ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-overloaded-virtual")
+    ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused")
   ENDIF()
 ENDMACRO()
 

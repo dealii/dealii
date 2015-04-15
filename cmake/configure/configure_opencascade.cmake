@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,4 +16,13 @@
 #
 # Configuration for the OpenCASCADE library:
 #
+
+MACRO(FEATURE_OPENCASCADE_CONFIGURE_EXTERNAL)
+  #
+  # Disable a bunch of warnings caused by OpenCascade headers:
+  #
+  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-extra")
+ENDMACRO()
+
+
 CONFIGURE_FEATURE(OPENCASCADE)
