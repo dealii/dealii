@@ -66,14 +66,6 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsign-compare")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wswitch")
 
 #
-# Newer versions of gcc have a flag -Wunused-local-typedefs that, though in
-# principle a good idea, triggers a lot in BOOST in various places.
-# Unfortunately, this warning is included in -W/-Wall, so disable it if the
-# compiler supports it.
-#
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-local-typedefs")
-
-#
 # Disable Wlong-long that will trigger a lot of warnings when compiling
 # with disabled C++11 support:
 #
@@ -100,19 +92,12 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # easily fix them...)
   #
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-dangling-else")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-delete-non-virtual-dtor") # not harmless but needed for boost <1.50.0
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-newline-eof")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter") # mainly caused by BOOST
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-private-field")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-variable")
-
-  # suppress warnings in boost 1.56:
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c++11-extensions")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c99-extensions")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-variadic-macros")
 ENDIF()
 
 
