@@ -4161,44 +4161,12 @@ namespace VectorTools
 
           const FEValuesExtractors::Vector vec (first_vector_component);
 
-          // coordinate directions of the face.
-          const unsigned int
-          face_coordinate_direction[GeometryInfo<dim>::faces_per_cell]
-            = { 1, 1, 0, 0 };
-
-          const double tol = 0.5 * cell->face (face)->diameter () / cell->get_fe ().degree;
-          const std::vector<Point<dim> > &
-          reference_quadrature_points = fe_face_values.get_quadrature_points ();
-
           // Project the boundary function onto the shape functions for this edge
           // and set up a linear system of equations to get the values for the DoFs
           // associated with this edge.
           for (unsigned int q_point = 0;
                q_point < fe_face_values.n_quadrature_points; ++q_point)
             {
-              // Compute the tangent of the face
-              // at the quadrature point.
-              Point<dim> shifted_reference_point_1
-                = reference_quadrature_points[q_point];
-              Point<dim> shifted_reference_point_2
-                = reference_quadrature_points[q_point];
-
-              shifted_reference_point_1 (face_coordinate_direction[face])
-              += tol;
-              shifted_reference_point_2 (face_coordinate_direction[face])
-              -= tol;
-              Tensor<1,dim> tangential
-                = (fe_face_values.get_mapping ()
-                   .transform_unit_to_real_cell (cell,
-                                                 shifted_reference_point_1)
-                   -
-                   fe_face_values.get_mapping ()
-                   .transform_unit_to_real_cell (cell,
-                                                 shifted_reference_point_2))
-                  / tol;
-              tangential
-              /= tangential.norm ();
-
               // Compute the entires of the linear system
               // Note the system is symmetric so we could only compute the lower/upper triangle.
               //
@@ -4207,22 +4175,37 @@ namespace VectorTools
               //
               // The RHS entries are:
               // \int_{edge} (tangential* boundary_value) * (tangential * edge_shape_function_i) dS.
+              //
+              // In 2D, tangential*vector is equivalent to cross_product(normal, vector), so we use this instead.
+              // This avoids possible issues with the computation of the tangent.
+
+              // Store the normal at this quad point:
+              Point<dim> normal_at_q_point = fe_face_values.normal_vector(q_point);
               for (unsigned int j = 0; j < associated_edge_dofs; ++j)
                 {
                   const unsigned int j_face_idx = associated_edge_dof_to_face_dof[j];
+                  const unsigned int j_cell_idx = fe.face_to_cell_index (j_face_idx, face);
+
+                  Tensor<1,dim> phi_j = fe_face_values[vec].value (j_cell_idx, q_point);
                   for (unsigned int i = 0; i < associated_edge_dofs; ++i)
                     {
                       const unsigned int i_face_idx = associated_edge_dof_to_face_dof[i];
+                      const unsigned int i_cell_idx = fe.face_to_cell_index (i_face_idx, face);
+
+                      Tensor<1,dim> phi_i = fe_face_values[vec].value (i_cell_idx, q_point);
+
+                      // Using n cross phi
                       edge_matrix(i,j)
                       += fe_face_values.JxW (q_point)
-                         * (fe_face_values[vec].value (fe.face_to_cell_index (i_face_idx, face), q_point) * tangential)
-                         * (fe_face_values[vec].value (fe.face_to_cell_index (j_face_idx, face), q_point) * tangential);
+                         * ((phi_i[1]*normal_at_q_point(0) - phi_i[0]*normal_at_q_point(1))
+                            * (phi_j[1]*normal_at_q_point(0) - phi_j[0]*normal_at_q_point(1)));
                     }
+                  // Using n cross phi
                   edge_rhs(j)
                   += fe_face_values.JxW (q_point)
-                     * (values[q_point] (first_vector_component) * tangential [0]
-                        + values[q_point] (first_vector_component + 1) * tangential [1])
-                     * (fe_face_values[vec].value (fe.face_to_cell_index (j_face_idx, face), q_point) * tangential);
+                     * ((values[q_point] (first_vector_component+1) * normal_at_q_point (0)
+                         - values[q_point] (first_vector_component) * normal_at_q_point (1))
+                        * (phi_j[1]*normal_at_q_point(0) - phi_j[0]*normal_at_q_point(1)));
                 }
             }
 
