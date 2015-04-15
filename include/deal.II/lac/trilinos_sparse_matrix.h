@@ -3081,17 +3081,15 @@ namespace TrilinosWrappers
 
     internal::SparseMatrix::check_vector_map_equality(*matrix, src, dst);
     const size_type dst_local_size = dst.end() - dst.begin();
-    AssertDimension (dst_local_size, static_cast<size_type>(matrix->RangeMap().NumMyElements()));
-    (void)dst_local_size;
+    AssertDimension (dst_local_size, static_cast<size_type>(matrix->RangeMap().NumMyPoints()));
     const size_type src_local_size = src.end() - src.begin();
-    AssertDimension (src_local_size, static_cast<size_type>(matrix->DomainMap().NumMyElements()));
-    (void)src_local_size;
+    AssertDimension (src_local_size, static_cast<size_type>(matrix->DomainMap().NumMyPoints()));
 
     Epetra_MultiVector tril_dst (View, matrix->RangeMap(), dst.begin(),
-                                 matrix->DomainMap().NumMyPoints(), 1);
+                                 dst_local_size, 1);
     Epetra_MultiVector tril_src (View, matrix->DomainMap(),
                                  const_cast<TrilinosScalar *>(src.begin()),
-                                 matrix->DomainMap().NumMyPoints(), 1);
+                                 src_local_size, 1);
 
     const int ierr = matrix->Multiply (false, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));
@@ -3111,17 +3109,15 @@ namespace TrilinosWrappers
 
     internal::SparseMatrix::check_vector_map_equality(*matrix, dst, src);
     const size_type dst_local_size = dst.end() - dst.begin();
-    (void)dst_local_size;
-    AssertDimension (dst_local_size, static_cast<size_type>(matrix->DomainMap().NumMyElements()));
+    AssertDimension (dst_local_size, static_cast<size_type>(matrix->DomainMap().NumMyPoints()));
     const size_type src_local_size = src.end() - src.begin();
-    (void)src_local_size;
-    AssertDimension (src_local_size, static_cast<size_type>(matrix->RangeMap().NumMyElements()));
+    AssertDimension (src_local_size, static_cast<size_type>(matrix->RangeMap().NumMyPoints()));
 
     Epetra_MultiVector tril_dst (View, matrix->DomainMap(), dst.begin(),
-                                 matrix->DomainMap().NumMyPoints(), 1);
+                                 dst_local_size, 1);
     Epetra_MultiVector tril_src (View, matrix->RangeMap(),
                                  const_cast<double *>(src.begin()),
-                                 matrix->DomainMap().NumMyPoints(), 1);
+                                 src_local_size, 1);
 
     const int ierr = matrix->Multiply (true, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));
