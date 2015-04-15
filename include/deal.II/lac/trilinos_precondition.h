@@ -166,7 +166,6 @@ namespace TrilinosWrappers
                     << ". Check preconditioner and matrix setup.");
 
     friend class SolverBase;
-    friend class PreconditionStokes;
 
   protected:
     /**
