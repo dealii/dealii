@@ -718,7 +718,8 @@ namespace TrilinosWrappers
                                                       static_cast<TrilinosWrappers::types::int_type> (0));
             nonlocal_graph->InsertGlobalIndices(row, 1, &row);
           }
-        Assert(nonlocal_graph->IndicesAreGlobal() == true,
+        Assert(nonlocal_graph->RowMap().NumMyElements() == 0 ||
+               nonlocal_graph->IndicesAreGlobal() == true,
                ExcInternalError());
         nonlocal_graph->FillComplete(*column_space_map,
                                      static_cast<const Epetra_Map &>(graph->RangeMap()));
