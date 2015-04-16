@@ -8,10 +8,17 @@
 
 #include <boost/bind.hpp>
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
 #include <iostream>
 #include <set>
+
+// Selectively disable -Werror switch for GCC and compiler accepting GCC
+// dialects (such as clang). "diagnostic push" is supported since gcc-4.6
+// and clang-3.3.
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wextra"
+#endif
 
 #include <IGESControl_Controller.hxx>
 #include <IGESControl_Reader.hxx>
@@ -58,6 +65,10 @@
 
 #include <GCPnts_AbscissaPoint.hxx>
 #include <ShapeAnalysis_Surface.hxx>
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic pop
+#endif
 
 #include <vector>
 #include <algorithm>
