@@ -72,14 +72,6 @@ INSTALL(FILES ${_macros}
 STRIP_FLAG(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 
 #
-# Strip -Wno-deprecated from DEAL_II_CXX_FLAGS so that deprecation warnings
-# are actually shown for user code:
-#
-
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated")
-STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
-
-#
 # Populate a bunch of CONFIG_* variables with useful information:
 #
 

@@ -71,12 +71,6 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wswitch")
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
 
-#
-# Disable deprecation warnings
-#
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
-
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
   #
