@@ -1047,11 +1047,9 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
 
   // write cells. Enumerate cells
   // consecutively, starting with 1
-  unsigned int cell_index=1;
-  for (cell=tria.begin_active();
-       cell!=endc; ++cell, ++cell_index)
+  for (cell=tria.begin_active(); cell!=endc; ++cell)
     {
-      out << cell_index << ' ' << elm_type << ' '
+      out << cell->active_cell_index()+1 << ' ' << elm_type << ' '
           << static_cast<unsigned int>(cell->material_id()) << ' '
           << cell->subdomain_id() << ' '
           << GeometryInfo<dim>::vertices_per_cell << ' ';
@@ -1066,10 +1064,11 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
 
   // write faces and lines with
   // non-zero boundary indicator
+  unsigned int next_index = tria.n_active_cells()+1;
   if (msh_flags.write_faces)
-    write_msh_faces (tria, cell_index, out);
+    write_msh_faces (tria, next_index, out);
   if (msh_flags.write_lines)
-    write_msh_lines (tria, cell_index, out);
+    write_msh_lines (tria, next_index, out);
 
   out << "$ENDELM" << std::endl;
 
@@ -1146,11 +1145,9 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
 
   // write cells. Enumerate cells
   // consecutively, starting with 1
-  unsigned int cell_index=1;
-  for (cell=tria.begin_active();
-       cell!=endc; ++cell, ++cell_index)
+  for (cell=tria.begin_active();  cell!=endc; ++cell)
     {
-      out << cell_index << ' '
+      out << cell->active_cell_index()+1 << ' '
           << static_cast<unsigned int>(cell->material_id())
           << ' ';
       switch (dim)
@@ -1191,10 +1188,11 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
 
   // write faces and lines with
   // non-zero boundary indicator
+  unsigned int next_index = tria.n_active_cells()+1;
   if (ucd_flags.write_faces)
-    write_ucd_faces (tria, cell_index, out);
+    write_ucd_faces (tria, next_index, out);
   if (ucd_flags.write_lines)
-    write_ucd_lines (tria, cell_index, out);
+    write_ucd_lines (tria, next_index, out);
 
   // make sure everything now gets to
   // disk
@@ -2376,9 +2374,7 @@ void GridOut::write_mathgl (const Triangulation<dim, spacedim> &tria,
   endc=tria.end ();
 
   // No global indices in deal.II, so we make one up here.
-  unsigned int cell_global_index = 0;
-
-  for (; cell!=endc; ++cell, ++cell_global_index)
+  for (; cell!=endc; ++cell)
     {
       for (unsigned int i=0; i<dim; ++i)
         {
@@ -2387,7 +2383,7 @@ void GridOut::write_mathgl (const Triangulation<dim, spacedim> &tria,
           // else
           //   out << "\nfalse";
 
-          out << "\nlist " << axes[i] << cell_global_index << " ";
+          out << "\nlist " << axes[i] << cell->active_cell_index() << " ";
           for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
             out << cell->vertex(j)[i] << " ";
         }

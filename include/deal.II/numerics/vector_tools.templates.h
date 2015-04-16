@@ -6376,9 +6376,8 @@ namespace VectorTools
       IDScratchData<dim,spacedim> data(mapping, fe_collection, q, update_flags);
 
       // loop over all cells
-      typename DH::active_cell_iterator cell = dof.begin_active(),
-                                        endc = dof.end();
-      for (unsigned int index=0; cell != endc; ++cell, ++index)
+      for (typename DH::active_cell_iterator cell = dof.begin_active();
+           cell != dof.end(); ++cell)
         if (cell->is_locally_owned())
           {
             // initialize for this cell
@@ -6393,7 +6392,7 @@ namespace VectorTools
             if (update_flags & update_gradients)
               fe_values.get_function_gradients (fe_function, data.function_grads);
 
-            difference(index) =
+            difference(cell->active_cell_index()) =
               integrate_difference_inner (exact_solution, norm, weight,
                                           update_flags, exponent,
                                           n_components, data);
@@ -6401,7 +6400,7 @@ namespace VectorTools
         else
           // the cell is a ghost cell or is artificial. write a zero into the
           // corresponding value of the returned vector
-          difference(index) = 0;
+          difference(cell->active_cell_index()) = 0;
     }
 
   } // namespace internal

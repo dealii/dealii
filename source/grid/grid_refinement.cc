@@ -225,7 +225,6 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
   if (criteria.all_zero())
     return;
 
-  typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active();
   const unsigned int n_cells = criteria.size();
 
 //TODO: This is undocumented, looks fishy and seems unnecessary
@@ -244,8 +243,9 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
     }
 
   unsigned int marked=0;
-  for (unsigned int index=0; index<n_cells; ++cell, ++index)
-    if (std::fabs(criteria(index)) >= new_threshold)
+  for (typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active();
+       cell != tria.end(); ++cell)
+    if (std::fabs(criteria(cell->active_cell_index())) >= new_threshold)
       {
         if (max_to_mark!=numbers::invalid_unsigned_int && marked>=max_to_mark)
           break;
@@ -265,11 +265,9 @@ void GridRefinement::coarsen (Triangulation<dim,spacedim> &tria,
           ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
   Assert (criteria.is_non_negative (), ExcNegativeCriteria());
 
-  typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active();
-  const unsigned int n_cells = criteria.size();
-
-  for (unsigned int index=0; index<n_cells; ++cell, ++index)
-    if (std::fabs(criteria(index)) <= threshold)
+  for (typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active();
+       cell != tria.end(); ++cell)
+    if (std::fabs(criteria(cell->active_cell_index())) <= threshold)
       if (!cell->refine_flag_set())
         cell->set_coarsen_flag();
 }

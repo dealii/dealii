@@ -2993,14 +2993,13 @@ namespace GridGenerator
         // now copy the resulting level 1 cells
         // into the new triangulation,
         cells.resize(tmp.n_active_cells(), CellData<3>());
-
-        unsigned int index = 0;
         for (Triangulation<3>::active_cell_iterator cell = tmp.begin_active();
-             cell != tmp.end(); ++cell, ++index)
+             cell != tmp.end(); ++cell)
           {
+            const unsigned int cell_index = cell->active_cell_index();
             for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
-              cells[index].vertices[v] = cell->vertex_index(v);
-            cells[index].material_id = 0;
+              cells[cell_index].vertices[v] = cell->vertex_index(v);
+            cells[cell_index].material_id = 0;
           }
 
         tria.create_triangulation (tmp.get_vertices(), cells, SubCellData());

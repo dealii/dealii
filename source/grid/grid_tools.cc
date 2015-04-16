@@ -1531,11 +1531,10 @@ next_cell:
     // works, but this map can get quite big. Not sure about more efficient solutions.
     std::map< std::pair<unsigned int,unsigned int>, unsigned int >
     indexmap;
-    unsigned int index = 0;
     for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
          cell = triangulation.begin_active();
-         cell != triangulation.end(); ++cell, ++index)
-      indexmap[std::pair<unsigned int,unsigned int>(cell->level(),cell->index())] = index;
+         cell != triangulation.end(); ++cell)
+      indexmap[std::pair<unsigned int,unsigned int>(cell->level(),cell->index())] = cell->active_cell_index();
 
     // next loop over all cells and their neighbors to build the sparsity
     // pattern. note that it's a bit hard to enter all the connections when a
@@ -1544,11 +1543,11 @@ next_cell:
     // if we only do something if the neighbor has no children -- in that case
     // it is either on the same or a coarser level than we are. in return, we
     // have to add entries in both directions for both cells
-    index = 0;
     for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
          cell = triangulation.begin_active();
-         cell != triangulation.end(); ++cell, ++index)
+         cell != triangulation.end(); ++cell)
       {
+        const unsigned int index = cell->active_cell_index();
         cell_connectivity.add (index, index);
         for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           if ((cell->at_boundary(f) == false)
@@ -1583,23 +1582,21 @@ next_cell:
                                     DynamicSparsityPattern            &cell_connectivity)
   {
     std::vector<std::vector<unsigned int> > vertex_to_cell(triangulation.n_vertices());
-    unsigned int index = 0;
     for (typename Triangulation<dim,spacedim>::active_cell_iterator cell=
-           triangulation.begin_active(); cell != triangulation.end(); ++cell, ++index)
+           triangulation.begin_active(); cell != triangulation.end(); ++cell)
       {
         for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-          vertex_to_cell[cell->vertex_index(v)].push_back(index);
+          vertex_to_cell[cell->vertex_index(v)].push_back(cell->active_cell_index());
       }
 
     cell_connectivity.reinit (triangulation.n_active_cells(),
                               triangulation.n_active_cells());
-    index = 0;
     for (typename Triangulation<dim,spacedim>::active_cell_iterator cell=
-           triangulation.begin_active(); cell != triangulation.end(); ++cell, ++index)
+           triangulation.begin_active(); cell != triangulation.end(); ++cell)
       {
         for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
           for (unsigned int n=0; n<vertex_to_cell[cell->vertex_index(v)].size(); ++n)
-            cell_connectivity.add(index, vertex_to_cell[cell->vertex_index(v)][n]);
+            cell_connectivity.add(cell->active_cell_index(), vertex_to_cell[cell->vertex_index(v)][n]);
       }
   }
 
@@ -1681,11 +1678,10 @@ next_cell:
 
     // finally loop over all cells and set the
     // subdomain ids
-    unsigned int index = 0;
     for (typename dealii::internal::ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim> >::type
          cell = triangulation.begin_active();
-         cell != triangulation.end(); ++cell, ++index)
-      cell->set_subdomain_id (partition_indices[index]);
+         cell != triangulation.end(); ++cell)
+      cell->set_subdomain_id (partition_indices[cell->active_cell_index()]);
   }
 
 
@@ -1698,13 +1694,9 @@ next_cell:
     Assert (subdomain.size() == triangulation.n_active_cells(),
             ExcDimensionMismatch (subdomain.size(),
                                   triangulation.n_active_cells()));
-    unsigned int index = 0;
     for (typename Triangulation<dim, spacedim>::active_cell_iterator
-         cell = triangulation.begin_active();
-         cell!=triangulation.end(); ++cell, ++index)
-      subdomain[index] = cell->subdomain_id();
-
-    Assert (index == subdomain.size(), ExcInternalError());
+         cell = triangulation.begin_active(); cell!=triangulation.end(); ++cell)
+      subdomain[cell->active_cell_index()] = cell->subdomain_id();
   }
 
 
