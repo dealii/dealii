@@ -1830,39 +1830,39 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
 
 
 
-      // if the guess was false, then
-      // we need to loop over all faces
-      // and subfaces and find the
-      // number the hard way
+      // if the guess was false, then we need to loop over all faces and
+      // subfaces and find the number the hard way
       for (unsigned int face_no=0; face_no<GeometryInfo<3>::faces_per_cell; ++face_no)
         {
-          if (face_no!=face_no_guess)
+          if (face_no==face_no_guess)
+            continue;
+
+          const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face
+            =neighbor_cell->face(face_no);
+
+          if (!face->has_children())
+            continue;
+
+          for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
             {
-              const TriaIterator<TriaAccessor<3-1, 3, spacedim> > face
-                =neighbor_cell->face(face_no);
-              if (face->has_children())
-                for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
-                  if (face->child_index(subface_no)==this_face_index)
-                    // call a helper function, that
-                    // translates the current subface
-                    // number to a subface number for
-                    // the current FaceRefineCase
-                    return std::make_pair (face_no, translate_subface_no(face, subface_no));
-                  else if (face->child(subface_no)->has_children())
-                    for (unsigned int subsub_no=0; subsub_no<face->child(subface_no)->n_children(); ++subsub_no)
-                      if (face->child(subface_no)->child_index(subsub_no)==this_face_index)
-                        // call a helper function, that
-                        // translates the current subface
-                        // number and subsubface number to
-                        // a subface number for the current
-                        // FaceRefineCase
-                        return std::make_pair (face_no, translate_subface_no(face, subface_no, subsub_no));
+              if (face->child_index(subface_no)==this_face_index)
+                // call a helper function, that translates the current
+                // subface number to a subface number for the current
+                // FaceRefineCase
+                return std::make_pair (face_no, translate_subface_no(face, subface_no));
+
+              if (face->child(subface_no)->has_children())
+                for (unsigned int subsub_no=0; subsub_no<face->child(subface_no)->n_children(); ++subsub_no)
+                  if (face->child(subface_no)->child_index(subsub_no)==this_face_index)
+                    // call a helper function, that translates the current
+                    // subface number and subsubface number to a subface
+                    // number for the current FaceRefineCase
+                    return std::make_pair (face_no, translate_subface_no(face, subface_no, subsub_no));
             }
         }
 
-      // we should never get here,
-      // since then we did not find
-      // our way back...
+      // we should never get here, since then we did not find our way
+      // back...
       Assert (false, ExcInternalError());
       return std::make_pair (numbers::invalid_unsigned_int,
                              numbers::invalid_unsigned_int);
