@@ -17,12 +17,4 @@
 # Configuration for the OpenCASCADE library:
 #
 
-MACRO(FEATURE_OPENCASCADE_CONFIGURE_EXTERNAL)
-  #
-  # Disable a bunch of warnings caused by OpenCascade headers:
-  #
-  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-extra")
-ENDMACRO()
-
-
 CONFIGURE_FEATURE(OPENCASCADE)
