@@ -752,9 +752,12 @@ namespace DoFTools
       typename DH::active_cell_iterator cell = dof_handler.begin_active(),
                                         endc = dof_handler.end();
       for (; cell!=endc; ++cell)
-        // artificial cells can at best neighbor ghost cells, but we're not
-        // interested in these interfaces
-        if (!cell->is_artificial ())
+        {
+          // artificial cells can at best neighbor ghost cells, but we're not
+          // interested in these interfaces
+          if (cell->is_artificial ())
+            continue;
+
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->has_children())
               {
@@ -857,6 +860,7 @@ namespace DoFTools
                             ExcInternalError());
                   }
               }
+        }
     }
 
 
@@ -884,9 +888,12 @@ namespace DoFTools
       typename DH::active_cell_iterator cell = dof_handler.begin_active(),
                                         endc = dof_handler.end();
       for (; cell!=endc; ++cell)
-        // artificial cells can at best neighbor ghost cells, but we're not
-        // interested in these interfaces
-        if (!cell->is_artificial ())
+        {
+          // artificial cells can at best neighbor ghost cells, but we're not
+          // interested in these interfaces
+          if (cell->is_artificial ())
+            continue;
+
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->has_children())
               {
@@ -1073,6 +1080,7 @@ namespace DoFTools
                             ExcInternalError());
                   }
               }
+        }
     }
 
 
@@ -1137,9 +1145,12 @@ namespace DoFTools
       typename DH::active_cell_iterator cell = dof_handler.begin_active(),
                                         endc = dof_handler.end();
       for (; cell!=endc; ++cell)
-        // artificial cells can at best neighbor ghost cells, but we're not
-        // interested in these interfaces
-        if (!cell->is_artificial ())
+        {
+          // artificial cells can at best neighbor ghost cells, but we're not
+          // interested in these interfaces
+          if (cell->is_artificial ())
+            continue;
+
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face(face)->has_children())
               {
@@ -1594,6 +1605,7 @@ namespace DoFTools
                       }
                   }
               }
+        }
     }
   }
 

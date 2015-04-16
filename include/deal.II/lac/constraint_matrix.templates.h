@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -636,33 +636,37 @@ distribute_local_to_global (const Vector<double>            &local_vector,
         const ConstraintLine *position =
           lines_cache.size() <= line_index ? 0 : &lines[lines_cache[line_index]];
 
-        // Gauss elimination of the matrix columns
-        // with the inhomogeneity. Go through them one
-        // by one and again check whether they are
+        // Gauss elimination of the matrix columns with the inhomogeneity.
+        // Go through them one by one and again check whether they are
         // constrained. If so, distribute the constraint
         const double val = position->inhomogeneity;
         if (val != 0)
           for (size_type j=0; j<n_local_dofs; ++j)
-            if (is_constrained(local_dof_indices[j]) == false)
-              global_vector(local_dof_indices[j]) -= val * local_matrix(j,i);
-            else
-              {
-                const double matrix_entry = local_matrix(j,i);
-                if (matrix_entry == 0)
+            {
+              if (is_constrained(local_dof_indices[j]) == false)
+                {
+                  global_vector(local_dof_indices[j]) -= val * local_matrix(j,i);
                   continue;
+                }
 
-                const ConstraintLine &position_j =
-                  lines[lines_cache[calculate_line_index(local_dof_indices[j])]];
-                for (size_type q=0; q<position_j.entries.size(); ++q)
-                  {
-                    Assert (!(!local_lines.size()
-                              || local_lines.is_element(position_j.entries[q].first))
-                            || is_constrained(position_j.entries[q].first) == false,
-                            ExcMessage ("Tried to distribute to a fixed dof."));
-                    global_vector(position_j.entries[q].first)
-                    -= val * position_j.entries[q].second * matrix_entry;
-                  }
-              }
+              const double matrix_entry = local_matrix(j,i);
+
+              if (matrix_entry == 0)
+                continue;
+
+              const ConstraintLine &position_j =
+                lines[lines_cache[calculate_line_index(local_dof_indices[j])]];
+
+              for (size_type q=0; q<position_j.entries.size(); ++q)
+                {
+                  Assert (!(!local_lines.size()
+                            || local_lines.is_element(position_j.entries[q].first))
+                          || is_constrained(position_j.entries[q].first) == false,
+                          ExcMessage ("Tried to distribute to a fixed dof."));
+                  global_vector(position_j.entries[q].first)
+                  -= val * position_j.entries[q].second * matrix_entry;
+                }
+            }
 
         // now distribute the constraint,
         // but make sure we don't touch
