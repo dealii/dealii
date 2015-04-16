@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -180,7 +180,6 @@ MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED)
   # We have to disable a bunch of warnings:
   #
   ENABLE_IF_SUPPORTED(THREADS_CXX_FLAGS "-Wno-parentheses")
-  ENABLE_IF_SUPPORTED(THREADS_CXX_FLAGS "-Wno-long-long")
 
   #
   # Add some definitions to use the header files in debug mode:
