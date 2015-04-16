@@ -2188,7 +2188,44 @@ namespace VectorTools
                              const InVector                 &v,
                              const unsigned int              component);
   //@}
+  /**
+   * Geometrical interpolation
+   */
+  //@{
+  /**
+   * Given a DoFHandler containing at least a spacedim vector field,
+   * this function interpolates the Triangulation at the support
+   * points of a FE_Q() finite element of the same degree as
+   * dh->get_fe().degree.
+   *
+   * Curved manifold are respected, and the resulting VECTOR will be
+   * geometrically consistent.
+   *
+   * The resulting map is guaranteed to be interpolatory at the
+   * support points of a FE_Q() finite element of the same degree as
+   * dh->get_fe().degree. Notice that this may or may not be
+   * meaningful, depending on the FiniteElement you have distribed in
+   * dh.
+   *
+   * If the underlying finite element is an FE_Q(1)^spacedim, then the
+   * resulting VECTOR is a finite element field representation of the
+   * vertices of the Triangulation.
+   *
+   * The optional ComponentMask argument can be used to specify what
+   * components of the FiniteElement to use to describe the
+   * geometry. If no mask is specified at construction time, then a
+   * default one is used, i.e., the first spacedim components of the
+   * FiniteElement are assumed to represent the geometry of the
+   * problem.
+   *
+   * @author Luca Heltai, 2015
+   */
+  template<class DH, class VECTOR>
+  void get_position_vector(const DH &dh,
+                           VECTOR &vector,
+                           const ComponentMask &mask=ComponentMask());
 
+  //@}
 
   /**
    * Exception

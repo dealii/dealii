@@ -17,28 +17,20 @@
 
 // on a somewhat deformed cube, verify that if we push forward a bunch
 // of points from the reference to the real cell and then call
-// MappingFE::transform_unit_to_real_cell that we get the same point as
+// MappingFEField::transform_unit_to_real_cell that we get the same point as
 // we had in the beginning.
-
-// We use a Q5 mapping but this time we
-// actually curve one boundary of the cell which ensures that the
-// mapping is really higher order than just Q1
 
 #include "../tests.h"
 
 #include <deal.II/base/utilities.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/fe/mapping_fe.h>
+#include <deal.II/fe/mapping_fe_field.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/grid/tria_boundary_lib.h>
-
-#include <deal.II/grid/grid_out.h>
-#include <fstream>
+#include <deal.II/numerics/vector_tools.h>
 
 using namespace dealii;
 
@@ -48,22 +40,10 @@ void test_real_to_unit_cell()
 {
 	deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
-  // define a boundary that fits the
-  // the vertices of the hyper cube
-  // we're going to create below
-  HyperBallBoundary<dim,spacedim> boundary (Point<spacedim>(),
-                                            std::sqrt(1.*dim));
+ Triangulation<dim, spacedim>   triangulation;
+ GridGenerator::hyper_cube (triangulation);
 
-  Triangulation<dim, spacedim>   triangulation;
-  GridGenerator::hyper_cube (triangulation, -1, 1);
-
-  // set the boundary indicator for
-  // one face of the single cell
-  triangulation.set_boundary (1, boundary);
-  triangulation.begin_active()->face(0)->set_boundary_id (1);
-
-
- const unsigned int n_points = 5;
+ const unsigned int n_points = 4;
  std::vector< Point<dim> > unit_points(Utilities::fixed_power<dim>(n_points));
 
  switch (dim)
@@ -94,38 +74,52 @@ void test_real_to_unit_cell()
      break;
    }
 
- const FE_Q<dim,spacedim> feq(5);
- const FESystem<dim,spacedim> fesystem(feq, spacedim);
+ const FESystem<dim,spacedim> fesystem(FE_Q<dim,spacedim>(1),1, FE_Q<dim,spacedim>(2),spacedim);
+
  DoFHandler<dim,spacedim> dhq(triangulation);
  dhq.distribute_dofs(fesystem);
  Vector<double> eulerq(dhq.n_dofs());
- const ComponentMask mask(spacedim, true);
 
- MappingFE<dim,spacedim> map(eulerq, dhq, mask);
+ // Let's use only the last spacedim components
+ ComponentMask mask(spacedim+1, true);
+ mask.set(0, false);
 
- map.update_euler_vector_using_triangulation(eulerq);
- 
+ VectorTools::get_position_vector(dhq, eulerq, mask);
+ MappingFEField<dim,spacedim> map(eulerq, dhq, mask);
 
  typename Triangulation<dim, spacedim >::active_cell_iterator
  cell = triangulation.begin_active();
 
-      for (unsigned int i=0; i<unit_points.size(); ++i)
-      {
-            	  // for each of the points,
-            	  // verify that if we apply
-            	  // the forward map and then
-            	  // pull back that we get
-            	  // the same point again
+  //Move a vertex a little bit
+  const unsigned int n_dx = 5;
+  const double dx = 0.4/n_dx;
+  Point<spacedim> direction;
+  for (unsigned int j=0; j<spacedim; ++j)
+    direction[j]=dx;
 
-       const Point<spacedim> p = map.transform_unit_to_real_cell(cell,unit_points[i]);
+  // in a loop, make the cell more
+  // and more distorted
+  for (unsigned int j=0; j<n_dx; ++j)
+  {
+    deallog << "Vertex displacement: " << double(j)*direction <<  std::endl;
+    cell->vertex(0) = double(j)*direction;
 
-       const Point<dim> p_unit = map.transform_real_to_unit_cell(cell,p);
-
-       AssertThrow (unit_points[i].distance(p_unit) < 1e-10, ExcInternalError());
-     }
+    for (unsigned int i=0; i<unit_points.size(); ++i)
+    {
+	  // for each of the points,
+	  // verify that if we apply
+	  // the forward map and then
+	  // pull back that we get
+	  // the same point again
+     
+      const Point<spacedim> p = map.transform_unit_to_real_cell(cell,unit_points[i]);
+      const Point<dim> p_unit = map.transform_real_to_unit_cell(cell,p);
+     
+      Assert (unit_points[i].distance(p_unit) < 1e-10, ExcInternalError());
+    }
+  }
 
   deallog << "OK" << std::endl;
-
 }
 
 
@@ -139,12 +133,11 @@ main()
 
 	test_real_to_unit_cell<1,1>();
 	test_real_to_unit_cell<2,2>();
-  test_real_to_unit_cell<3,3>();
+	test_real_to_unit_cell<3,3>();
 
 	test_real_to_unit_cell<1,2>();
+	test_real_to_unit_cell<1,3>();
 	test_real_to_unit_cell<2,3>();
 
-
-  //test_real_to_unit_cell<1,3>();
 	return 0;
 }

@@ -459,6 +459,20 @@ inconvenience this causes.
   (Luca Heltai, 2015/04/12)
   </li>
 
+  <li> New: A new VectorTools::get_position_vector() function has been 
+  added to the library that allows one to interpolate the Geometry of 
+  a (possibly curved) triangulation to vector finite element fields 
+  of at least spacedim components.
+  <br>
+  (Luca Heltai, 2015/04/11)
+  <li>
+
+  <li> New: A new MappingFEField() class has been added to the library
+  that generalizes MappingQEulerian to allow arbitrary FiniteElements.
+  <br>
+  (Marco Tezzele, Luca Heltai, 2015/04/06)
+  <li>
+
   <li> Changed: The cells of coarse meshes in
   parallel::distributed::Triangulation used to be ordered in a Cuthill-McKee
   numbering, which yields very high surface-to-volume ratios of the individual

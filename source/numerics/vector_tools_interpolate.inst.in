@@ -40,6 +40,12 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
          const VEC&,
          VEC&);
 
+      template
+         void get_position_vector
+	 (const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
+	  VEC&,
+	  const ComponentMask&);
+
       \}
 #endif
   }
