@@ -63,8 +63,8 @@ MappingFEField<dim,spacedim,VECTOR,DH>::InternalData::memory_consumption () cons
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
-MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const VECTOR  &euler_vector,
-                                                        const DH      &euler_dof_handler,
+MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const DH      &euler_dof_handler,
+                                                        const VECTOR  &euler_vector,
                                                         const ComponentMask mask)
   :
   euler_vector(&euler_vector),

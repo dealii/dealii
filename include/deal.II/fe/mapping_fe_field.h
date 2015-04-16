@@ -64,7 +64,7 @@ DEAL_II_NAMESPACE_OPEN
  *    Vector<double> eulerq(dhq.n_dofs());
  *    // Fills the euler vector with information from the Triangulation
  *    VectorTools::get_position_vector(dhq, eulerq, mask);
- *    MappingFEField<dim,spacedim> map(eulerq, dhq, mask);
+ *    MappingFEField<dim,spacedim> map(dhq, eulerq, mask);
  * @endcode
  *
  * @author Luca Heltai, Marco Tezzele 2013, 2015
@@ -110,8 +110,8 @@ public:
    *
    * If an incompatible mask is passed, an exception is thrown.
    */
-  MappingFEField (const VECTOR  &euler_vector,
-                  const DH      &euler_dof_handler,
+  MappingFEField (const DH      &euler_dof_handler,
+                  const VECTOR  &euler_vector,
                   const ComponentMask mask=ComponentMask());
 
   /**

@@ -101,7 +101,7 @@ void test_real_to_unit_cell()
  const ComponentMask mask(spacedim, true);
 
  VectorTools::get_position_vector(dhb, eulerq, mask);
- MappingFEField<dim,spacedim> map(eulerq, dhb, mask);
+ MappingFEField<dim,spacedim> map(dhb, eulerq, mask);
  
 
  typename Triangulation<dim, spacedim >::active_cell_iterator
