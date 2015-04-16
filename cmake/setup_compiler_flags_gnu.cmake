@@ -78,7 +78,6 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-
   #
   # Silence Clang warnings about unused compiler parameters (works around a
   # regression in the clang driver frontend of certain versions):
@@ -86,18 +85,21 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Qunused-arguments")
 
   #
-  # *Boy*, clang seems to be the very definition of "pedantic" in
-  # "-pedantic" mode, so disable a bunch of harmless warnings
-  # (that are mainly triggered in third party headers so that we cannot
-  # easily fix them...)
+  # Clang verbosely warns about not supporting all our friend declarations
+  # (and consequently removing access control alltogether)
   #
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-dangling-else")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-newline-eof")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-private-field")
+
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-variable")
+
+  IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.6")
+    #
+    # Clang versions prior to 3.6 emit a lot of false positives wrt
+    # "-Wunused-function".
+    #
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
+  ENDIF()
 ENDIF()
 
 
