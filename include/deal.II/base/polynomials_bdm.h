@@ -40,14 +40,32 @@ DEAL_II_NAMESPACE_OPEN
  * these shape functions are not sufficient, additional functions are added.
  * These are the following vector valued polynomials:
  *
- * <dl> <dt> In 2D: <dd> The 2D-curl of the functions <i>x<sup>k+1</sup>y</i>
- * and <i>xy<sup>k+1</sup></i>. <dt>In 3D: <dd> For any <i>i=0,...,k</i> the
+ * <dl>
+ *   <dt> In 2D:
+ *   <dd> The 2D-curl of the functions <i>x<sup>k+1</sup>y</i>
+ *   and <i>xy<sup>k+1</sup></i>.
+ *   Note the curl of a scalar function is given by $\text{curl}(f(x,y)) =
+ *   \begin{pmatrix} f_{y}(x,y) \\ -f_{x}(x,y) \end{pmatrix}$.
+ *
+ *   More specifically, for $k=1$, this space has shape functions
+ *   @f{align*}
+ *     \phi_0 = \begin{array}{cc} 1 \\ 0 \end{array},
+ *     \phi_1 = \begin{array}{cc} -\sqrt{3}+2\sqrt{3}x \\ 0 \end{array},
+ *     \phi_2 = \begin{array}{cc} -\sqrt{3}+2\sqrt{3}y \\ 0 \end{array},
+ *     \phi_3 = \begin{array}{cc} 0 \\ 1 \end{array},
+ *     \phi_4 = \begin{array}{cc} 0 \\ -\sqrt{3}+2\sqrt{3}x \end{array},
+ *     \phi_5 = \begin{array}{cc} 0 \\ -\sqrt{3}+2\sqrt{3}y \end{array},
+ *     \phi_6 = \begin{array}{cc} x^2 \\ -2xy \end{array},
+ *     \phi_7 = \begin{array}{cc} 2xy \\ -y^2 \end{array},
+ *   @f}
+ *
+ *   <dt>In 3D:
+ *   <dd> For any <i>i=0,...,k</i> the
  * curls of <i>(0,0,xy<sup>i+1</sup>z<sup>k-i</sup>)</i>,
  * <i>(x<sup>k-i</sup>yz<sup>i+1</sup>,0,0)</i> and
- * <i>(0,x<sup>i+1</sup>y<sup>k-i</sup>z,0)</i> </dl>
+ * <i>(0,x<sup>i+1</sup>y<sup>k-i</sup>z,0)</i>
+ * </dl>
  *
- * Note the curl of a scalar function is given by $\text{curl}(f(x,y)) =
- * \begin{pmatrix} f_{y}(x,y) \\ -f_{x}(x,y) \end{pmatrix}$.
  * @todo Second derivatives in 3D are missing.
  *
  * @ingroup Polynomials
