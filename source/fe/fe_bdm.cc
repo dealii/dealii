@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -165,10 +165,9 @@ FE_BDM<dim>::interpolate(
           ExcDimensionMismatch(values.size(), this->generalized_support_points.size()));
   Assert (local_dofs.size() == this->dofs_per_cell,
           ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
-  // First do interpolation on
-  // faces. There, the component
-  // evaluated depends on the face
-  // direction and orientation.
+
+  // First do interpolation on faces. There, the component evaluated
+  // depends on the face direction and orientation.
   unsigned int fbase = 0;
   unsigned int f=0;
   for (; f<GeometryInfo<dim>::faces_per_cell;
