@@ -1141,12 +1141,12 @@ namespace VectorTools
    * Once all edge constraints, $x$, have been computed, we may compute the face constraints
    * in a similar fashion, taking into account the residuals from the edges.
    *
-   * For each face on the cell, $f$, we solve the linear system By=c where $y$ is the vector of
+   * For each face on the cell, $f$, we solve the linear system $By=c$ where $y$ is the vector of
    * constraints on degrees of freedom on the face and
    *
-   * B_{ij} = \int_{f} (\vec{n} \cross \vec{s}_{i}) \cdot (\vec{n} \cross \vec{s}_{j}) dS
+   * $B_{ij} = \int_{f} (\vec{n} \times \vec{s}_{i}) \cdot (\vec{n} \times \vec{s}_{j}) dS$
    *
-   * $c_{i} = \int_{f} (\vec{n} \cross \vec{r}) \cdot (\vec{n} \cross \vec{s}_i} dS
+   * $c_{i} = \int_{f} (\vec{n} \times \vec{r}) \cdot (\vec{n} \times \vec{s}_i) dS$
    *
    * and $\vec{r} = \vec{F} - \sum_{e \in f} \sum{i \in e} \x_{i}\vec{s}_i}$, the edge residual.
    *

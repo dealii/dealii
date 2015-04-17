@@ -955,6 +955,8 @@ namespace TrilinosWrappers
      * will increase communication and storage cost. According to the IFPACK
      * documentation, an overlap of 1 is often effective and values of more
      * than 3 are rarely needed.
+     *
+     * </ul>
      */
     struct AdditionalData
     {

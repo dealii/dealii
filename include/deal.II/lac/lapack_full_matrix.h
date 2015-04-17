@@ -205,8 +205,8 @@ public:
    *
    * @note Source and destination must not be the same vector.
    *
-   * @note The template with @tref number2 only exists for compile-time
-   * compatibility with FullMatrix. Only the case @tref number2 = @tref
+   * @note The template with @p number2 only exists for compile-time
+   * compatibility with FullMatrix. Only the case @p number2 = @p
    * number is implemented due to limitations in the underlying LAPACK
    * interface. All other variants throw an error upon invocation.
    */
