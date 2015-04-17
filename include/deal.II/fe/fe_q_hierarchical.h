@@ -693,14 +693,28 @@ public:
   get_constant_modes () const;
 
   /**
-   * A function to interpolate scalar values, computed at the
-   * support points to the FE_Q_Hierarchical.
-   *
    * This function is not implemented and throws an exception if called.
    */
   virtual
   void interpolate(std::vector<double>       &local_dofs,
                    const std::vector<double> &values) const;
+
+  /**
+   * This function is not implemented and throws an exception if called.
+   */
+  virtual
+  void
+  interpolate(std::vector<double>                &local_dofs,
+              const std::vector<Vector<double> > &values,
+              unsigned int offset = 0) const;
+
+  /**
+   * This function is not implemented and throws an exception if called.
+   */
+  virtual
+  void
+  interpolate(std::vector<double> &local_dofs,
+              const VectorSlice<const std::vector<std::vector<double> > > &values) const;
 
 
 protected:
