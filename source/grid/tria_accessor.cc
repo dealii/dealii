@@ -1791,19 +1791,12 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
       const TriaIterator<CellAccessor<3, spacedim> >
       neighbor_cell = this->neighbor(neighbor);
 
-      // usually, on regular patches of
-      // the grid, this cell is just on
-      // the opposite side of the
-      // neighbor that the neighbor is of
-      // this cell. for example in 2d, if
-      // we want to know the
-      // neighbor_of_neighbor if
-      // neighbor==1 (the right
-      // neighbor), then we will get 0
-      // (the left neighbor) in most
-      // cases. look up this relationship
-      // in the table provided by
-      // GeometryInfo and try it
+      // usually, on regular patches of the grid, this cell is just on the
+      // opposite side of the neighbor that the neighbor is of this cell.
+      // for example in 2d, if we want to know the neighbor_of_neighbor if
+      // neighbor==1 (the right neighbor), then we will get 0 (the left
+      // neighbor) in most cases. look up this relationship in the table
+      // provided by GeometryInfo and try it
       const unsigned int face_no_guess
         = GeometryInfo<3>::opposite_face[neighbor];
 
@@ -1812,23 +1805,21 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor (const unsigned int ne
 
       if (face_guess->has_children())
         for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
-          if (face_guess->child_index(subface_no)==this_face_index)
-            // call a helper function, that
-            // translates the current subface
-            // number to a subface number for
-            // the current FaceRefineCase
-            return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no));
-          else if (face_guess->child(subface_no)->has_children())
-            for (unsigned int subsub_no=0; subsub_no<face_guess->child(subface_no)->n_children(); ++subsub_no)
-              if (face_guess->child(subface_no)->child_index(subsub_no)==this_face_index)
-                // call a helper function, that
-                // translates the current subface
-                // number and subsubface number to
-                // a subface number for the current
-                // FaceRefineCase
-                return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no, subsub_no));
+          {
+            if (face_guess->child_index(subface_no)==this_face_index)
+              // call a helper function, that translates the current
+              // subface number to a subface number for the current
+              // FaceRefineCase
+              return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no));
 
-
+            if (face_guess->child(subface_no)->has_children())
+              for (unsigned int subsub_no=0; subsub_no<face_guess->child(subface_no)->n_children(); ++subsub_no)
+                if (face_guess->child(subface_no)->child_index(subsub_no)==this_face_index)
+                  // call a helper function, that translates the current
+                  // subface number and subsubface number to a subface
+                  // number for the current FaceRefineCase
+                  return std::make_pair (face_no_guess, translate_subface_no(face_guess, subface_no, subsub_no));
+          }
 
       // if the guess was false, then we need to loop over all faces and
       // subfaces and find the number the hard way
