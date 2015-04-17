@@ -118,12 +118,13 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # Trilinos has to be configured with 32bit indices if deal.II uses unsigned int.
+    # Trilinos has to be configured with 32bit indices if deal.II uses
+    # unsigned int.
     #
     IF(TRILINOS_WITH_NO_32BIT_INDICES AND NOT DEAL_II_WITH_64BIT_INDICES)
       MESSAGE(STATUS "deal.II was configured to use 32bit global indices but "
         "Trilinos was not."
-        ) 
+        )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
@@ -136,8 +137,8 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # Trilinos has to be configured with 64bit indices if deal.II uses unsigned long
-    # long int.
+    # Trilinos has to be configured with 64bit indices if deal.II uses
+    # unsigned long long int.
     #
     IF(TRILINOS_WITH_NO_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
       MESSAGE(STATUS "deal.II was configured to use 64bit global indices but "
@@ -191,19 +192,6 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
-
-  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused-function")
-  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused-parameter")
-  ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused-variable")
-
-  #
-  # Disable a bunch of warnings caused by Trilinos headers in older versions:
-  #
-  IF(TRILINOS_VERSION VERSION_LESS "11.12")
-    ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-extra")
-    ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-overloaded-virtual")
-    ENABLE_IF_SUPPORTED(TRILINOS_CXX_FLAGS "-Wno-unused")
-  ENDIF()
 ENDMACRO()
 
 

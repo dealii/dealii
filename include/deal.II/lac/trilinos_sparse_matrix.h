@@ -34,6 +34,8 @@
 #  include <memory>
 
 #  define TrilinosScalar double
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FECrsMatrix.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_CrsGraph.h>
@@ -44,6 +46,7 @@
 #  else
 #    include "Epetra_SerialComm.h"
 #  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 class Epetra_Export;
 

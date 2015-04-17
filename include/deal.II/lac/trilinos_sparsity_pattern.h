@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,6 +31,7 @@
 
 #  include <deal.II/base/std_cxx11/shared_ptr.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FECrsGraph.h>
 #  include <Epetra_Map.h>
 #  ifdef DEAL_II_WITH_MPI
@@ -39,6 +40,8 @@
 #  else
 #    include "Epetra_SerialComm.h"
 #  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 
 DEAL_II_NAMESPACE_OPEN
 
