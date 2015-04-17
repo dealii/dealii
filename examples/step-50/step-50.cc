@@ -105,12 +105,160 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 // The last step is as in all
 // previous programs:
 namespace Step50
 {
   using namespace dealii;
+
+
+
+
+
+  // send to proc 0 and compute&print checksum
+  void check(const ConstraintMatrix & cm)
+  {
+      unsigned int myid=Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+
+      std::string rank0data;
+      {
+          const IndexSet & is = cm.get_local_lines();
+          unsigned int num_lines = cm.n_constraints();
+          std::ostringstream oss;
+          {
+          boost::archive::text_oarchive oa(oss);
+          oa << num_lines;
+          for (unsigned int n=0;n<is.n_elements();++n)
+            {
+              types::global_dof_index idx = is.nth_index_in_set(n);
+              if (cm.is_constrained(idx))
+              {
+                  const std::vector<std::pair<types::global_dof_index,double> > * v
+                          = cm.get_constraint_entries(idx);
+                  oa << idx;
+                  unsigned int s = v->size();
+                  oa << s;
+                  for (unsigned int i=0;i<v->size();++i)
+                      oa << (*v)[i].first << (*v)[i].second;
+                  double inhom = cm.get_inhomogeneity(idx);
+                  oa << inhom;
+                  //std::cout << "check() idx: " << idx << " v: " << v->size() << " inhom: " << inhom << std::endl;
+              }
+            }
+          }
+//          std::cout << "check(): myid=" << myid
+//                    << " data length: " << oss.str().size()
+//                    << " lines: " << num_lines
+//                    << std::endl;
+          std::string data = oss.str();
+          char * ptr = (char*)data.c_str();
+          if (myid!=0)
+            MPI_Send(ptr,data.size()+1,MPI_CHAR, 0,7001,MPI_COMM_WORLD);
+          else
+              rank0data = data;
+      }
+
+      MPI_Barrier(MPI_COMM_WORLD);
+      if (myid==0)
+      {
+          ConstraintMatrix all;
+          unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+          std::vector<char> receive;
+          for (unsigned int p=0;p<numprocs;++p)
+          {
+              MPI_Status status;
+              status.MPI_SOURCE=0;
+              std::string instr;
+              if (p!=0)
+              {
+                  int len;
+              MPI_Probe(p, 7001, MPI_COMM_WORLD, &status);
+              MPI_Get_count(&status, MPI_BYTE, &len);
+              receive.resize(len);
+              char * ptr = &receive[0];
+              MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                  MPI_COMM_WORLD, &status);
+              instr = ptr;
+              }
+              else
+              {
+                  instr = rank0data;
+//                  std::cout << " my length is of course " << instr.length()<< std::endl;
+              }
+              std::istringstream iss(instr);
+              boost::archive::text_iarchive ia(iss);
+
+              unsigned int num_lines;
+              ia >> num_lines;
+              std::cout << "check(): got "
+                        << " lines: " << num_lines
+                        << " from " << status.MPI_SOURCE
+                        << std::endl;
+
+              for (unsigned int line=0;line<num_lines;++line)
+              {
+                  types::global_dof_index idx;
+                  std::vector<std::pair<types::global_dof_index,double> > d;
+                  double inhom;
+                  unsigned int ll;
+
+                  ia >> idx >> ll;
+                  for (unsigned int i=0;i<ll;++i)
+                  {
+                      types::global_dof_index idx;
+                      double val;
+                      ia >> idx >> val;
+                      d.push_back(std::make_pair(idx, val));
+                  }
+                  ia >> inhom;
+//                  std::cout << "check() idx: " << idx << " d: " << d.size() << " inhom: " << inhom << std::endl;
+                  if (!all.is_constrained(idx))
+                  {
+                      all.add_line(idx);
+                      all.add_entries(idx,d);
+                      all.set_inhomogeneity(idx, inhom);
+                  }
+                  else
+                  {
+                      const std::vector<std::pair<types::global_dof_index,double> > * v
+                              = all.get_constraint_entries(idx);
+                      if (v->size() != d.size())
+                          std::cout << "check(): DIFFERENT size " << idx << std::endl;
+                      else
+                      {
+                          for (unsigned int i=0;i<d.size();++i)
+                          {
+                              if (d[i]!=(*v)[i])
+                                std::cout << "check(): DIFFERENT " << idx
+                                          << " entry " << i
+                                          << " a: " << d[i].first
+                                          << " b: " << (*v)[i].first
+                                             << std::endl;
+
+                          }
+
+                      }
+
+
+
+
+                  }
+              }
+          }
+
+          all.close();
+          all.print(std::cout);
+      }
+
+      MPI_Barrier(MPI_COMM_WORLD);
+
+
+  }
+
+
 
 
   // @sect3{The <code>LaplaceProblem</code> class template}
@@ -455,17 +603,6 @@ namespace Step50
 
 
 
-    // Here we output not only the
-    // degrees of freedom on the finest
-    // level, but also in the
-    // multilevel structure
-    deallog << "Number of degrees of freedom: "
-            << mg_dof_handler.n_dofs();
-
-    for (unsigned int l=0; l<triangulation.n_global_levels(); ++l)
-      deallog << "   " << 'L' << l << ": "
-              << mg_dof_handler.n_dofs(l);
-    deallog  << std::endl;
 
     DoFTools::extract_locally_relevant_dofs (mg_dof_handler,
                                              locally_relevant_set);
@@ -509,6 +646,10 @@ namespace Step50
                                               constraints);
     constraints.close ();
     hanging_node_constraints.close ();
+
+    check(constraints);
+    check(hanging_node_constraints);
+
 
     CompressedSimpleSparsityPattern csp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (mg_dof_handler, csp, constraints);
@@ -827,9 +968,30 @@ namespace Step50
               // compute and send reply
               std::ostringstream oss;
               IndexSet reply_ref_edge = mg_constrained_dofs.refinement_edge_indices[l] & idxset;
-              IndexSet reply_ref_edge_bdry = mg_constrained_dofs.refinement_edge_boundary_indices[l] & idxset;
-              reply_ref_edge.block_write(oss);
-              reply_ref_edge_bdry.block_write(oss);
+	      IndexSet reply_bdry(idxset.size()); 
+	      {//= boundary_indices[l]
+		
+		for (unsigned int n=0;n<idxset.n_elements();++n)
+		  {
+		    types::global_dof_index idx = idxset.nth_index_in_set(n);
+		    if (mg_constrained_dofs.is_boundary_index(l, idx))
+		      reply_bdry.add_index(idx);
+		  }
+		// test
+		/*		for (unsigned int n=0;n<;++n)
+		  {
+		if (mg_constrained_dofs.is_boundary_index(l, n))
+		      reply_bdry.add_index(n);
+		      }*/
+		
+	      }
+
+	       // TH: I don't think we need this
+	       //	       IndexSet reply_ref_edge_bdry = mg_constrained_dofs.refinement_edge_boundary_indices[l] & idxset;
+	       reply_ref_edge.block_write(oss);
+	       //reply_ref_edge_bdry.block_write(oss);
+	       reply_bdry.block_write(oss);
+	       
               buffers2[index] = oss.str();
               char *ptr2 = const_cast<char*>(buffers2[index].c_str());
               MPI_Isend(ptr2, buffers2[index].length(),
@@ -858,18 +1020,33 @@ namespace Step50
 
                 std::istringstream iss(std::string(ptr,len));
                 IndexSet reply_ref_edge;
-                IndexSet reply_ref_edge_bdry;
+                //IndexSet reply_ref_edge_bdry;
                 reply_ref_edge.block_read(iss);
-                reply_ref_edge_bdry.block_read(iss);
+		IndexSet reply_bdry;
+		reply_bdry.block_read(iss);
+                //reply_ref_edge_bdry.block_read(iss);
                 unsigned int c1 = mg_constrained_dofs.refinement_edge_indices[l].n_elements();
-                unsigned int c2 = mg_constrained_dofs.refinement_edge_boundary_indices[l].n_elements();
+                //unsigned int c2 = mg_constrained_dofs.refinement_edge_boundary_indices[l].n_elements();
 
                 mg_constrained_dofs.refinement_edge_indices[l].add_indices(reply_ref_edge);
-                mg_constrained_dofs.refinement_edge_boundary_indices[l].add_indices(reply_ref_edge_bdry);
+                //mg_constrained_dofs.refinement_edge_boundary_indices[l].add_indices(reply_ref_edge_bdry);
 
-                std::cout << "new " << mg_constrained_dofs.refinement_edge_indices[l].n_elements()-c1
-                    << " and " << mg_constrained_dofs.refinement_edge_boundary_indices[l].n_elements()-c2
+		unsigned int c3 = mg_constrained_dofs.boundary_indices[l].size();
+		for (unsigned int n=0;n<reply_bdry.n_elements();++n)
+		  {
+		    types::global_dof_index idx = reply_bdry.nth_index_in_set(n);
+		    mg_constrained_dofs.boundary_indices[l].insert(idx);
+		  }
+		
+		
+                std::cout << "L=" << l
+			  << " new " << mg_constrained_dofs.refinement_edge_indices[l].n_elements()-c1
+		  //<< " and " << mg_constrained_dofs.refinement_edge_boundary_indices[l].n_elements()-c2
+			  << " and " << mg_constrained_dofs.boundary_indices[l].size()-c3
                     << std::endl;
+		if (mg_constrained_dofs.boundary_indices[l].size()>c3)
+		  std::cout << "HEY: boundary indices transfer did something!" << std::endl;
+		
               }
 
           }
@@ -903,9 +1080,13 @@ namespace Step50
     for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
       {
         // TODO: here we get missing entries!
+        IndexSet dofset;
+        DoFTools::extract_locally_relevant_mg_dofs (mg_dof_handler, dofset, level);
+        boundary_constraints[level].reinit(dofset);
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_refinement_edge_indices(level));
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
 
+        check(boundary_constraints[level]);
         boundary_constraints[level].close ();
 
 
@@ -1209,7 +1390,7 @@ namespace Step50
     static int n = 0;
     n++;
 
-    if (true)//Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1)
+    if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1)
       {
         std::ifstream f(("refine." + Utilities::int_to_string(n)).c_str());
         std::set<CellId> to_refine;
@@ -1265,20 +1446,60 @@ namespace Step50
 
     triangulation.prepare_coarsening_and_refinement ();
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    typename DoFHandler<dim>::active_cell_iterator
-        cell = mg_dof_handler.begin_active(),
-        endc = mg_dof_handler.end();
-        for (; cell!=endc; ++cell)
-          if (cell->is_locally_owned() && cell->refine_flag_set())
-            {
-            std::cout << cell->id() << std::endl;
 
-          }
-    MPI_Barrier(MPI_COMM_WORLD);
+    if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)>1)
+    {
+      // write refine.n
+
+      std::ofstream f;
+      int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+      if (myid==0)
+	f.open(("refine." + Utilities::int_to_string(n)).c_str());
+
+      {
+	// local contribution
+	std::ostringstream oss;
+	typename DoFHandler<dim>::active_cell_iterator
+	  cell = mg_dof_handler.begin_active(),
+	  endc = mg_dof_handler.end();
+	for (; cell!=endc; ++cell)
+	  {
+	    if (cell->is_locally_owned() && cell->refine_flag_set())
+	      oss << cell->id() << std::endl;
+	    
+	    cell->clear_coarsen_flag();
+	    
+	  }
+	
+	
+	if (myid!=0)
+	  {
+	    std::string s= oss.str();
+	    
+	    MPI_Send((void*)s.c_str(), s.size(), MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+	  }
+	else
+	  f << oss.str();
+      }
+
+      if (myid==0)
+	for (unsigned int i=0;i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)-1;++i)
+	{
+	  MPI_Status status;
+	  int len;
+	  MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+	  MPI_Get_count(&status, MPI_BYTE, &len);
+	  std::vector<char> receive;
+	  receive.resize(len+1);
+
+	  char *ptr = &receive[0];
+	  MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+		   MPI_COMM_WORLD, &status);
+	  f << ptr;
+	}
     }
-
-
+      }
+    
     triangulation.execute_coarsening_and_refinement ();
   }
 
@@ -1340,6 +1561,9 @@ namespace Step50
                                  ".visit");
         std::ofstream visit_master (visit_master_filename.c_str());
         data_out.write_visit_record (visit_master, filenames);
+
+	std::cout << "wrote " << pvtu_master_filename << std::endl;
+	
       }
   }
 
@@ -1357,15 +1581,16 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::run ()
   {
-    for (unsigned int cycle=0; cycle<5; ++cycle)
+    for (unsigned int cycle=0; cycle<7; ++cycle)
       {
         deallog << "Cycle " << cycle << ':' << std::endl;
+        std::cout << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
           {
             GridGenerator::hyper_cube (triangulation);
 
-            triangulation.refine_global (3);
+            triangulation.refine_global (4);
           }
         else
           refine_grid ();
@@ -1425,9 +1650,24 @@ namespace Step50
 
 
 
-        output_results (cycle);
 
         solve ();
+        output_results (cycle);
+
+	MPI_Barrier(MPI_COMM_WORLD);
+	TrilinosWrappers::MPI::Vector temp = solution;
+	system_matrix.residual(temp,solution,system_rhs);
+	constraints.set_zero(temp);
+	deallog << "residual " << temp.l2_norm() << std::endl;
+    if (temp.l2_norm()>1e-5)
+    {
+        for (unsigned int i=0;i<temp.size();++i)
+            if (temp.in_local_range(i) && temp[i]>0.06)
+                std::cout << "RESIDUAL at " << i
+                          << " is " << temp[i] << std::endl;
+
+    }
+	Assert(temp.l2_norm()<1e-5, ExcMessage("Error: residual is large for some reason!"));
 
       }
   }
@@ -1447,7 +1687,7 @@ int main (int argc, char *argv[])
       using namespace dealii;
       using namespace Step50;
 
-      LaplaceProblem<2> laplace_problem(1);
+      LaplaceProblem<2> laplace_problem(1/*degree*/);
       laplace_problem.run ();
     }
   catch (std::exception &exc)
