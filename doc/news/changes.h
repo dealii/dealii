@@ -59,7 +59,7 @@ inconvenience this causes.
 
   <li> Removed: The CMake configuration does not use the variable
   <code>DEAL_II_CMAKE_MACROS_RELDIR</code> any more. Instead, the fixed
-  location <code>${DEAL_II_SHARE_RELDIR}/macros</code> is used
+  location <code>\${DEAL_II_SHARE_RELDIR}/macros</code> is used
   unconditionally
   <br>
   (Matthias Maier, 2015/03/26)
