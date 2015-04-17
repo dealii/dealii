@@ -323,8 +323,8 @@ namespace boost {
         return *this;
       }
 #else
-      stored_edge_property(self&& x) = default;
-      self& operator=(self&& x) = default;
+      stored_edge_property(self&&) = default;
+      self& operator=(self&&) = default;
 #endif
       inline Property& get_property() { return *m_property; }
       inline const Property& get_property() const { return *m_property; }
