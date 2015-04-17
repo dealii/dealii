@@ -700,6 +700,7 @@ namespace VectorTools
      * Return whether the boundary values try to constrain a degree of freedom
      * that is already constrained to something else
      */
+    inline
     bool constraints_and_b_v_are_compatible (const ConstraintMatrix   &constraints,
                                              std::map<types::global_dof_index,double> &boundary_values)
     {
