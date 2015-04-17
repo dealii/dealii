@@ -150,8 +150,8 @@ FE_Q_Hierarchical<dim>::interpolate(
 template <int dim>
 void
 FE_Q_Hierarchical<dim>::interpolate(
-  std::vector<double> &local_dofs,
-  const VectorSlice<const std::vector<std::vector<double> > > &values) const
+  std::vector<double> &,
+  const VectorSlice<const std::vector<std::vector<double> > > &) const
 {
   Assert (false, ExcNotImplemented());
 }
