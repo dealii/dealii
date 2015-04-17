@@ -631,6 +631,12 @@ namespace VectorTools
         if (!cell1->active() && !cell2->active())
           continue;
 
+        // skip foreign cells
+        if (cell1->active() && !cell1->is_locally_owned())
+          continue;
+        if (cell2->active() && !cell2->is_locally_owned())
+          continue;
+
         Assert(cell1->get_fe().get_name() ==
                cell2->get_fe().get_name(),
                ExcMessage ("Source and destination cells need to use the same finite element"));

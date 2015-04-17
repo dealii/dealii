@@ -515,6 +515,10 @@ namespace VectorTools
    * ConstraintMatrix argument, see below, or make the field conforming
    * yourself by calling the @p ConstraintsMatrix::distribute function of your
    * hanging node constraints object.
+   *
+   * @note: This function works with parallel::distributed::Triangulation, but only
+   * if the parallel partitioning is the same for both meshes (see the
+   * no_automatic_repartitioning flag).
    */
   template <int dim, int spacedim,
             template <int,int> class DH,
