@@ -3526,6 +3526,18 @@ namespace parallel
                  number_cache.n_locally_owned_active_cells.end(),
                  0);
 
+      if (this->n_levels() == 0)
+        {
+          // Skip communication done below if we do not have any cells
+          // (meaning the Triangulation is empty on all processors). This will
+          // happen when called from the destructor of Triangulation, which
+          // can get called during exception handling causing a hang in this
+          // function.
+          number_cache.n_global_active_cells = 0;
+          number_cache.n_global_levels = 0;
+          return;
+        }
+
       if (this->n_levels() > 0)
         for (typename Triangulation<dim,spacedim>::active_cell_iterator
              cell = this->begin_active();
