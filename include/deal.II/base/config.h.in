@@ -18,15 +18,6 @@
 
 
 /***********************************************************************
- * Two macro names that we put at the top and bottom of all deal.II files
- * and that will be expanded to "namespace dealii {" and "}".
- */
-
-#define DEAL_II_NAMESPACE_OPEN namespace dealii {
-#define DEAL_II_NAMESPACE_CLOSE }
-
-
-/***********************************************************************
  * Information about deal.II:
  */
 
@@ -93,6 +84,7 @@
 #cmakedefine DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
 #cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
+#cmakedefine DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
 
 
 /***********************************************************************
@@ -184,6 +176,9 @@
 
 /***********************************************************************
  * Various macros for version number query and comparison:
+ *
+ * These macros are defined to make testing for specific versions within
+ * the deal.II main code as simple as possible.
  */
 
 /*
@@ -241,18 +236,6 @@
  *  PETSC_USE_COMPLEX
  */
 
-/*
- * These macros are defined to make testing for PETSc versions within
- * the deal.II main code as simple as possible. In brief they are used
- * like this: (i) DEAL_II_PETSC_VERSION_LT is used to advance the
- * PETScWrappers to newer versions of PETSc while preserving backward
- * compatibility; and (ii) DEAL_II_PETSC_VERSION_GTE is used to add
- * functionality to the PETScWrappers that does not exist in previous
- * versions of PETSc.  Examples of usage can be found in
- * lac/source/petsc_matrix_base.h.  Note: SLEPcWrappers do not need
- * their own analogical macros, since SLEPc and PETSc must have
- * identical version numbers anyways.
- */
 #define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
   ((PETSC_VERSION_MAJOR * 10000 + \
     PETSC_VERSION_MINOR * 100 + \
@@ -282,6 +265,44 @@
       DEAL_II_TRILINOS_VERSION_SUBMINOR) \
     >=  \
     (major)*10000 + (minor)*100 + (subminor))
+#endif
+
+
+/***********************************************************************
+ * Two macro names that we put at the top and bottom of all deal.II files
+ * and that will be expanded to "namespace dealii {" and "}".
+ */
+
+#define DEAL_II_NAMESPACE_OPEN namespace dealii {
+#define DEAL_II_NAMESPACE_CLOSE }
+
+
+/***********************************************************************
+ * Two macros to guard external header includes.
+ *
+ * Selectively disable diagnostics set by "-Wextra" (and similar flags) for
+ * GCC and compiler accepting GCC dialects (such as clang).
+ * "diagnostic push" is supported since gcc-4.6 and clang-3.3.
+ */
+
+#ifdef DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
+
+#  define DEAL_II_DISABLE_EXTRA_DIAGNOSTICS                \
+_Pragma("GCC diagnostic push")                             \
+_Pragma("GCC diagnostic ignored \"-Wextra\"")              \
+_Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"") \
+_Pragma("GCC diagnostic ignored \"-Wunused-function\"")    \
+_Pragma("GCC diagnostic ignored \"-Wunused-parameter\"")   \
+_Pragma("GCC diagnostic ignored \"-Wunused-variable\"")
+
+#  define DEAL_II_ENABLE_EXTRA_DIAGNOSTICS                 \
+_Pragma("GCC diagnostic pop")
+
+#else
+
+#  define DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#  define DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #endif
 
 

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -82,7 +82,7 @@ CHECK_CXX_COMPILER_BUG(
 
 #
 # Check for existence of the __builtin_expect facility of newer
-# gcc compilers. This can be used to hint the compiler's branch
+# GCC compilers. This can be used to hint the compiler's branch
 # prediction unit in some cases. We use it in the AssertThrow
 # macros.
 #
@@ -97,7 +97,7 @@ CHECK_CXX_SOURCE_COMPILES(
 
 
 #
-# Newer versions of gcc have a very nice feature: you can set
+# Newer versions of GCC have a very nice feature: you can set
 # a verbose terminate handler, that not only aborts a program
 # when an exception is thrown and not caught somewhere, but
 # before aborting it prints that an exception has been thrown,
@@ -204,7 +204,7 @@ CHECK_CXX_SOURCE_COMPILES(
 
 
 #
-# Gcc and some other compilers have __PRETTY_FUNCTION__, showing
+# GCC and some other compilers have __PRETTY_FUNCTION__, showing
 # an unmangled version of the function we are presently in,
 # while __FUNCTION__ (or __func__ in ISO C99) simply give the
 # function name which would not include the arguments of that
@@ -252,7 +252,7 @@ ENDIF()
 
 
 #
-# Newer versions of gcc can pass a flag to the assembler to
+# Newer versions of GCC can pass a flag to the assembler to
 # compress debug sections. At the time of writing this test,
 # this can save around 230 MB of disk space on the object
 # files we produce (810MB down to 570MB for the debug versions
@@ -281,7 +281,7 @@ ENDIF()
 
 
 #
-# Gcc and some other compilers have an attribute of the form
+# GCC and some other compilers have an attribute of the form
 # __attribute__((deprecated)) that can be used to make the
 # compiler warn whenever a deprecated function is used. See
 # if this attribute is available.
@@ -312,4 +312,24 @@ IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
 ELSE()
   SET(DEAL_II_DEPRECATED " ")
 ENDIF()
+
+
+#
+# GCC and Clang allow fine grained control of diagnostics via the "GCC
+# diagnostic" pragma. Check whether the compiler supports the "push" and
+# "pop" mechanism and the "ignored" toggle. Further, test for the
+# alternative "_Pragma(...)" variant (and that it does not emit a warning).
+#
+# - Matthias Maier, 2015
+#
+PUSH_CMAKE_REQUIRED("-Werror")
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  _Pragma(\"GCC diagnostic push\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wextra\\\\\\\"\")
+  int main() { return 0; }
+  _Pragma(\"GCC diagnostic pop\")
+  "
+  DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA)
+RESET_CMAKE_REQUIRED()
 
