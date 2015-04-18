@@ -89,14 +89,14 @@ public:
   /**
    * Constructor. There are three ways to use this constructor. First, without
    * any arguments, it generates an object with no blocks. Given one argument,
-   * it initializes <tt>num_blocks</tt> blocks, but these blocks have size
+   * it initializes <tt>n_blocks</tt> blocks, but these blocks have size
    * zero. The third variant finally initializes all blocks to the same size
    * <tt>block_size</tt>.
    *
    * Confer the other constructor further down if you intend to use blocks of
    * different sizes.
    */
-  explicit BlockVector (const unsigned int num_blocks = 0,
+  explicit BlockVector (const unsigned int n_blocks = 0,
                         const size_type block_size = 0);
 
   /**
@@ -213,8 +213,8 @@ public:
   operator= (const TrilinosWrappers::BlockVector &V);
 #endif
   /**
-   * Reinitialize the BlockVector to contain <tt>num_blocks</tt> blocks of
-   * size <tt>block_size</tt> each.
+   * Reinitialize the BlockVector to contain <tt>n_blocks</tt> blocks of size
+   * <tt>block_size</tt> each.
    *
    * If the second argument is left at its default value, then the block
    * vector allocates the specified number of blocks but leaves them at zero
@@ -224,7 +224,7 @@ public:
    *
    * If <tt>fast==false</tt>, the vector is filled with zeros.
    */
-  void reinit (const unsigned int num_blocks,
+  void reinit (const unsigned int n_blocks,
                const size_type block_size = 0,
                const bool fast = false);
 
