@@ -94,12 +94,12 @@ namespace Step17
 
   // @sect3{The <code>ElasticProblem</code> class}
 
-  // Here comes the declaration of the main class. As mentioned in the 
-  // introduction, almost all of this has been copied verbatim from step-8, 
-  // so we only comment on the few differences between the two tutorials. 
-  // There is one (cosmetic) change in that we let <code>solve</code> return 
-  // a value, namely the number of iterations it took to converge, so that 
-  // we can output this to the screen at the appropriate place. In addition, 
+  // Here comes the declaration of the main class. As mentioned in the
+  // introduction, almost all of this has been copied verbatim from step-8,
+  // so we only comment on the few differences between the two tutorials.
+  // There is one (cosmetic) change in that we let <code>solve</code> return
+  // a value, namely the number of iterations it took to converge, so that
+  // we can output this to the screen at the appropriate place. In addition,
   // we introduce a stream-like variable
   // <code>pcout</code>, explained below:
   template <int dim>
@@ -178,7 +178,7 @@ namespace Step17
 
 
   // @sec3{Right hand side values}
-  
+
   // The following is taken from step-8 without change:
   template <int dim>
   class RightHandSide :  public Function<dim>
@@ -244,7 +244,7 @@ namespace Step17
 
 
   // @sect3{The <code>ElasticProblem</code> class implementation}
-  
+
   // @sect4{ElasticProblem::ElasticProblem}
 
   // The first step in the actual implementation is the constructor
@@ -637,7 +637,7 @@ namespace Step17
 
   // @sect4{ElasticProblem::refine_grid}
 
-  // Using some kind of refinement indicator, the mesh can be refined. The problem 
+  // Using some kind of refinement indicator, the mesh can be refined. The problem
   // is basically the same as with distributing hanging node constraints: in order to
   // compute the error indicator, we need access to all elements of the
   // solution vector. We then compute the indicators for the cells that belong
