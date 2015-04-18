@@ -473,6 +473,13 @@ inconvenience this causes.
   <br>
   (Lei Qiao, 2015/04/19)
   </li>
+  
+  <li> New: The VectorTools::integrate_difference() function can now
+  also compute the $H_\text{div}$ seminorm, using the
+  VectorTools::NormType::Hdiv_seminorm argument.
+  <br>
+  (Zhen Tao, Arezou Ghesmati, Wolfgang Bangerth, 2015/04/17)
+  </li>
 
   <li> New: TrilinosWrappers::BlockSparseMatrix now has member functions
   TrilinosWrappers::BlockSparseMatrix::domain_paritioner() and
@@ -480,7 +487,6 @@ inconvenience this causes.
   vector of the underlying block Epetra_Map.
   <br>
   (Matthias Maier, 2015/04/08)
-
   </li>
 
   <li> Fixed: The class SymmetricTensor<2,dim> is now usable also for dim>3.

@@ -356,6 +356,10 @@ namespace VectorTools
      */
     H1_seminorm,
     /**
+     * #L2_norm of the divergence of a vector field
+     */
+    Hdiv_seminorm,
+    /**
      * The square of this norm is the square of the #L2_norm plus the square
      * of the #H1_seminorm.
      */
@@ -1802,7 +1806,12 @@ namespace VectorTools
    * formula only evaluates the two solutions at these particular points,
    * choosing this quadrature formula may indicate an error far smaller than
    * it actually is.
-   * @param[in] norm The norm $X$ shown above that should be computed.
+   * @param[in] norm The norm $X$ shown above that should be computed. If
+   *   the norm is NormType::Hdiv_seminorm, then the finite element on which this
+   *   function is called needs to have at least dim vector components,
+   *   and the divergence will be computed on the first div components.
+   *   This works, for example, on the finite elements used for the
+   *   mixed Laplace (step-20) and the Stokes equations (step-22).
    * @param[in] weight The additional argument @p weight allows to evaluate
    * weighted norms.  The weight function may be scalar, establishing a
    * spatially variable weight in the domain for all components equally. This
