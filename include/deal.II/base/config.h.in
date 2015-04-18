@@ -289,11 +289,13 @@
 
 #  define DEAL_II_DISABLE_EXTRA_DIAGNOSTICS                \
 _Pragma("GCC diagnostic push")                             \
+_Pragma("GCC diagnostic ignored \"-Wpragmas\"")            \
 _Pragma("GCC diagnostic ignored \"-Wextra\"")              \
 _Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"") \
 _Pragma("GCC diagnostic ignored \"-Wunused-function\"")    \
 _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"")   \
-_Pragma("GCC diagnostic ignored \"-Wunused-variable\"")
+_Pragma("GCC diagnostic ignored \"-Wunused-variable\"")    \
+_Pragma("GCC diagnostic warning \"-Wpragmas\"")
 
 #  define DEAL_II_ENABLE_EXTRA_DIAGNOSTICS                 \
 _Pragma("GCC diagnostic pop")
