@@ -53,10 +53,10 @@ LinearOperator<Range, Domain> linear_operator (const Matrix &);
  * that store the knowledge of how to apply the linear operator by
  * implementing the abstract @ref Matrix interface:
  * @code
- * std::function<const void(Range &, const Domain &)> vmult;
- * std::function<const void(Range &, const Domain &)> vmult_add;
- * std::function<const void(Domain &, const Range &)> Tvmult;
- * std::function<const void(Domain &, const Range &)> Tvmult_add;
+ *   std::function<void(Range &, const Domain &)> vmult;
+ *   std::function<void(Range &, const Domain &)> vmult_add;
+ *   std::function<void(Domain &, const Range &)> Tvmult;
+ *   std::function<void(Domain &, const Range &)> Tvmult_add;
  * @endcode
  *
  * But, in contrast to a usual matrix object, the domain and range of the
@@ -92,11 +92,13 @@ LinearOperator<Range, Domain> linear_operator (const Matrix &);
  * const auto op = (op_a + k * op_b) * op_c;
  * @endcode
  *
- * @note: This class is only available if deal.II was configured with C++11
+ * @note This class is only available if deal.II was configured with C++11
  * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during
  * cmake configure.
  *
  * @author Luca Heltai, Matthias Maier, 2015
+ *
+ * @ingroup LAOperators
  */
 template <typename Range, typename Domain> class LinearOperator
 {
@@ -264,6 +266,8 @@ public:
  *
  * Addition of two linear operators @p first_op and @p second_op given
  * by $(\text{first_op}+\text{second_op})x:=\text{first_op}(x)+\text{second_op}(x)$
+ *
+ * @ingroup LAOperators
  */
 template <typename Range, typename Domain>
 LinearOperator<Range, Domain>
@@ -311,6 +315,8 @@ operator+(const LinearOperator<Range, Domain> &first_op,
  *
  * Subtraction of two linear operators @p first_op and @p second_op given
  * by $(\text{first_op}-\text{second_op})x:=\text{first_op}(x)-\text{second_op}(x)$
+ *
+ * @ingroup LAOperators
  */
 template <typename Range, typename Domain>
 LinearOperator<Range, Domain>
@@ -327,6 +333,8 @@ operator-(const LinearOperator<Range, Domain> &first_op,
  *
  * Concatenation of two linear operators @p first_op and @p second_op given
  * by $(\text{first_op}*\text{second_op})x:=\text{first_op}(\text{second_op}(x))$
+ *
+ * @ingroup LAOperators
  */
 template <typename Range, typename Intermediate, typename Domain>
 LinearOperator<Range, Domain>
@@ -403,6 +411,8 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
  * Domain & operator *=(Domain::value_type);
  * Range & operator *=(Range::value_type);
  * @endcode
+ *
+ * @ingroup LAOperators
  */
 template <typename Range, typename Domain>
 LinearOperator<Range, Domain>
@@ -460,6 +470,8 @@ operator*(typename Range::value_type  number,
  * Domain & operator *=(Domain::value_type);
  * Range & operator *=(Range::value_type);
  * @endcode
+ *
+ * @ingroup LAOperators
  */
 template <typename Range, typename Domain>
 LinearOperator<Range, Domain>
@@ -478,6 +490,8 @@ operator*(const LinearOperator<Range, Domain> &op,
  * \relates LinearOperator
  *
  * Returns the transpose linear operations of @ref op.
+ *
+ * @ingroup LAOperators
  */
 template <typename Range, typename Domain>
 LinearOperator<Domain, Range>
@@ -507,6 +521,8 @@ transpose_operator(const LinearOperator<Range, Domain> &op)
  * reinit_vector as an argument to initialize the
  * <code>reinit_range_vector</code> and <code>reinit_domain_vector</code>
  * objects of the LinearOperator object.
+ *
+ * @ingroup LAOperators
  */
 template <typename Range>
 LinearOperator<Range, Range>
@@ -556,6 +572,8 @@ identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
  * reference for the whole lifetime of the LinearOperator object. Internal
  * data structures of the @p solver object will be modified upon
  * invocation of <code>vmult</code> or <code>Tvmult</code>.
+ *
+ * @ingroup LAOperators
  */
 template <typename Solver, typename Preconditioner>
 LinearOperator<typename Solver::vector_type, typename Solver::vector_type>
@@ -632,6 +650,8 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
  * @code
  * block_operator<2, 2, BlockVector<double>>({op_a00, op_a01, op_a10, op_a11});
  * @endcode
+ *
+ * @ingroup LAOperators
  */
 template <unsigned int m, unsigned int n,
           typename Range = BlockVector<double>,
@@ -732,6 +752,8 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
  * @code
  * block_diagonal_operator<m, BlockVector<double>>({op_00, op_a1, ..., op_am});
  * @endcode
+ *
+ * @ingroup LAOperators
  */
 template <unsigned int m,
           typename Range = BlockVector<double>,
@@ -814,6 +836,8 @@ block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockTyp
  * A variant of above function that only takes a single LinearOperator
  * argument @p op and creates a blockdiagonal linear operator with @p m
  * copies of it.
+ *
+ * @ingroup LAOperators
  */
 template <unsigned int m,
           typename Range = BlockVector<double>,
@@ -1117,6 +1141,8 @@ namespace
  * storage).
  *
  * @author Matthias Maier, 2015
+ *
+ * @ingroup LAOperators
  */
 template <typename Range = Vector<double>,
           typename Domain = Range,
@@ -1142,6 +1168,8 @@ LinearOperator<Range, Domain> linear_operator(const Matrix &matrix)
  * matrix).
  *
  * @author Matthias Maier, 2015
+ *
+ * @ingroup LAOperators
  */
 template <typename Range = Vector<double>,
           typename Domain = Range,
