@@ -31,6 +31,7 @@
 #  include <utility>
 #  include <memory>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  define TrilinosScalar double
 #  include "Epetra_ConfigDefs.h"
 #  ifdef DEAL_II_WITH_MPI // only if MPI is installed
@@ -40,6 +41,7 @@
 #    include "Epetra_SerialComm.h"
 #  endif
 #  include "Epetra_FEVector.h"
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

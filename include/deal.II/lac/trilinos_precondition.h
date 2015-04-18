@@ -27,6 +27,7 @@
 #  include <deal.II/lac/trilinos_vector_base.h>
 #  include <deal.II/lac/parallel_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  else
@@ -42,6 +43,7 @@
 #  include <MueLu.hpp>
 #  include <Teuchos_RCP.hpp>
 #  endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 // forward declarations
 class Ifpack_Preconditioner;

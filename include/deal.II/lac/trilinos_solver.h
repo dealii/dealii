@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,10 +27,13 @@
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/parallel_vector.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_LinearProblem.h>
 #  include <AztecOO.h>
 #  include <Epetra_Operator.h>
 #  include <Amesos.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 
 DEAL_II_NAMESPACE_OPEN
 
