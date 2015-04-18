@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1226,6 +1226,8 @@ namespace PETScWrappers
                    const PetscScalar  *values,
                    const bool         elide_zero_values)
   {
+    (void)elide_zero_values;
+
     prepare_action(VectorOperation::insert);
 
     const PetscInt petsc_i = row;
@@ -1234,8 +1236,7 @@ namespace PETScWrappers
     PetscScalar const *col_value_ptr;
     int n_columns;
 
-    // If we don't elide zeros, the pointers
-    // are already available...
+    // If we don't elide zeros, the pointers are already available...
 #ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
@@ -1246,8 +1247,8 @@ namespace PETScWrappers
     else
 #endif
       {
-        // Otherwise, extract nonzero values in
-        // each row and get the respective index.
+        // Otherwise, extract nonzero values in each row and get the
+        // respective index.
         if (column_indices.size() < n_cols)
           {
             column_indices.resize(n_cols);
@@ -1291,16 +1292,11 @@ namespace PETScWrappers
 
     if (value == PetscScalar())
       {
-        // we have to do checkings on Insert/Add
-        // in any case
-        // to be consistent with the MPI
-        // communication model (see the comments
-        // in the documentation of
-        // TrilinosWrappers::Vector), but we can
-        // save some work if the addend is
-        // zero. However, these actions are done
-        // in case we pass on to the other
-        // function.
+        // we have to do checkings on Insert/Add in any case to be
+        // consistent with the MPI communication model (see the comments in
+        // the documentation of TrilinosWrappers::Vector), but we can save
+        // some work if the addend is zero. However, these actions are done
+        // in case we pass on to the other function.
         prepare_action(VectorOperation::add);
 
         return;
@@ -1368,10 +1364,12 @@ namespace PETScWrappers
   MatrixBase::add (const size_type    row,
                    const size_type    n_cols,
                    const size_type   *col_indices,
-                   const PetscScalar  *values,
+                   const PetscScalar *values,
                    const bool         elide_zero_values,
                    const bool          /*col_indices_are_sorted*/)
   {
+    (void)elide_zero_values;
+
     prepare_action(VectorOperation::add);
 
     const PetscInt petsc_i = row;
@@ -1380,8 +1378,7 @@ namespace PETScWrappers
     PetscScalar const *col_value_ptr;
     int n_columns;
 
-    // If we don't elide zeros, the pointers
-    // are already available...
+    // If we don't elide zeros, the pointers are already available...
 #ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
@@ -1392,8 +1389,8 @@ namespace PETScWrappers
     else
 #endif
       {
-        // Otherwise, extract nonzero values in
-        // each row and get the respective index.
+        // Otherwise, extract nonzero values in each row and get the
+        // respective index.
         if (column_indices.size() < n_cols)
           {
             column_indices.resize(n_cols);
