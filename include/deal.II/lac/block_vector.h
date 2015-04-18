@@ -146,15 +146,16 @@ public:
   BlockVector (const BlockIndices &block_indices);
 
   /**
-   * Constructor. Set the number of blocks to <tt>n.size()</tt>. Initialize
-   * the vector with the elements pointed to by the range of iterators given
-   * as second and third argument. Apart from the first argument, this
-   * constructor is in complete analogy to the respective constructor of the
-   * <tt>std::vector</tt> class, but the first argument is needed in order to
-   * know how to subdivide the block vector into different blocks.
+   * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>.
+   * Initialize the vector with the elements pointed to by the range of
+   * iterators given as second and third argument. Apart from the first
+   * argument, this constructor is in complete analogy to the respective
+   * constructor of the <tt>std::vector</tt> class, but the first argument is
+   * needed in order to know how to subdivide the block vector into different
+   * blocks.
    */
   template <typename InputIterator>
-  BlockVector (const std::vector<size_type>    &n,
+  BlockVector (const std::vector<size_type>    &block_sizes,
                const InputIterator              first,
                const InputIterator              end);
 
@@ -243,7 +244,7 @@ public:
    * reinit() on one of the blocks, then subsequent actions on this object may
    * yield unpredictable results since they may be routed to the wrong block.
    */
-  void reinit (const std::vector<size_type> &N,
+  void reinit (const std::vector<size_type> &block_sizes,
                const bool                    fast=false);
 
   /**
@@ -353,7 +354,7 @@ public:
 
 template <typename Number>
 template <typename InputIterator>
-BlockVector<Number>::BlockVector (const std::vector<size_type>    &n,
+BlockVector<Number>::BlockVector (const std::vector<size_type>    &block_sizes,
                                   const InputIterator              first,
                                   const InputIterator              end)
 {
@@ -361,12 +362,12 @@ BlockVector<Number>::BlockVector (const std::vector<size_type>    &n,
   // don't initialize them as we will
   // copy elements soon
   (void)end;
-  reinit (n, true);
+  reinit (block_sizes, true);
   InputIterator start = first;
-  for (size_type b=0; b<n.size(); ++b)
+  for (size_type b=0; b<block_sizes.size(); ++b)
     {
       InputIterator end = start;
-      std::advance (end, static_cast<signed int>(n[b]));
+      std::advance (end, static_cast<signed int>(block_sizes[b]));
       std::copy (start, end, this->block(b).begin());
       start = end;
     };

@@ -65,9 +65,10 @@ public:
 
   /**
    * Constructor. Initialize the number of entries in each block @p i as
-   * <tt>n[i]</tt>. The number of blocks will be the size of the vector
+   * <tt>block_sizes[i]</tt>. The number of blocks will be the size of @p
+   * block_sizes.
    */
-  BlockIndices (const std::vector<size_type> &n);
+  BlockIndices (const std::vector<size_type> &block_sizes);
 
   /**
    * Specialized constructor for a structure with blocks of equal size.
@@ -83,10 +84,11 @@ public:
 
   /**
    * Reinitialize the number of indices within each block from the given
-   * argument. The number of blocks will be adjusted to the size of @p n and
-   * the size of block @p i is set to <tt>n[i]</tt>.
+   * argument. The number of blocks will be adjusted to the size of
+   * <tt>block_sizes</tt> and the size of block @p i is set to
+   * <tt>block_sizes[i]</tt>.
    */
-  void reinit (const std::vector<size_type> &n);
+  void reinit (const std::vector<size_type> &block_sizes);
 
   /**
    * Add another block of given size to the end of the block structure.
@@ -306,16 +308,16 @@ BlockIndices::reinit (const unsigned int nb,
 
 inline
 void
-BlockIndices::reinit (const std::vector<size_type> &n)
+BlockIndices::reinit (const std::vector<size_type> &block_sizes)
 {
-  if (start_indices.size() != n.size()+1)
+  if (start_indices.size() != block_sizes.size()+1)
     {
-      n_blocks = static_cast<unsigned int>(n.size());
+      n_blocks = static_cast<unsigned int>(block_sizes.size());
       start_indices.resize(n_blocks+1);
     }
   start_indices[0] = 0;
   for (size_type i=1; i<=n_blocks; ++i)
-    start_indices[i] = start_indices[i-1] + n[i-1];
+    start_indices[i] = start_indices[i-1] + block_sizes[i-1];
 }
 
 
@@ -343,12 +345,12 @@ BlockIndices::BlockIndices (
 
 
 inline
-BlockIndices::BlockIndices (const std::vector<size_type> &n)
+BlockIndices::BlockIndices (const std::vector<size_type> &block_sizes)
   :
-  n_blocks(static_cast<unsigned int>(n.size())),
-  start_indices(n.size()+1)
+  n_blocks(static_cast<unsigned int>(block_sizes.size())),
+  start_indices(block_sizes.size()+1)
 {
-  reinit (n);
+  reinit (block_sizes);
 }
 
 
