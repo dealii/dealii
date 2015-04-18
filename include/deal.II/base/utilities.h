@@ -376,6 +376,22 @@ namespace Utilities
     std::string get_time ();
 
     /**
+     * Call the system function posix_memalign, or a replacement function if not
+     * available, to allocate memory with a certain minimal alignment. The
+     * first argument will then return a pointer to this memory block that can
+     * be released later on through a standard <code>free</code> call.
+     *
+     * @param memptr The address of a pointer variable that will after this call
+     *   point to the allocated memory.
+     * @param alignment The minimal alignment of the memory block, in bytes.
+     * @param size The size of the memory block to be allocated, in bytes.
+     *
+     * @note This function checks internally for error codes, rather than
+     *   leaving this task to the calling site.
+     */
+    void posix_memalign (void **memptr, size_t alignment, size_t size);
+
+    /**
      * @deprecated Use Utilities::MPI::job_supports_mpi() instead.
      */
     bool job_supports_mpi () DEAL_II_DEPRECATED;

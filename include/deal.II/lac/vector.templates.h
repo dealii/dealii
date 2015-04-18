@@ -42,12 +42,7 @@
 #include <iostream>
 #include <iomanip>
 
-#ifndef _MSC_VER
-#  include <mm_malloc.h>
-#endif
-
 DEAL_II_NAMESPACE_OPEN
-
 
 
 namespace internal
@@ -2050,8 +2045,9 @@ Vector<Number>::allocate()
 {
   // make sure that we don't create a memory leak
   Assert (val == 0, ExcInternalError());
-  val = static_cast<Number *>(_mm_malloc (sizeof(Number)*max_vec_size, 64));
-  Assert (val != 0, ExcOutOfMemory());
+
+  // then allocate memory with the proper alignment requirements of 64 bytes
+  Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*max_vec_size);
 }
 
 
@@ -2060,7 +2056,7 @@ template <typename Number>
 void
 Vector<Number>::deallocate()
 {
-  _mm_free(val);
+  free(val);
   val = 0;
 }
 
