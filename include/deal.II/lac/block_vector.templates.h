@@ -92,11 +92,11 @@ BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const unsigned int n_bl,
-                                  const size_type    bl_sz,
+void BlockVector<Number>::reinit (const unsigned int n_blocks,
+                                  const size_type    block_size,
                                   const bool         fast)
 {
-  std::vector<size_type> block_sizes(n_bl, bl_sz);
+  std::vector<size_type> block_sizes(n_blocks, block_size);
   reinit(block_sizes, fast);
 }
 
