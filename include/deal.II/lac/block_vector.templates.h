@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,9 +35,9 @@ BlockVector<Number>::BlockVector (const unsigned int n_blocks,
 
 
 template <typename Number>
-BlockVector<Number>::BlockVector (const std::vector<size_type> &n)
+BlockVector<Number>::BlockVector (const std::vector<size_type> &block_sizes)
 {
-  reinit (n, false);
+  reinit (block_sizes, false);
 }
 
 
@@ -92,25 +92,25 @@ BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const unsigned int n_bl,
-                                  const size_type    bl_sz,
+void BlockVector<Number>::reinit (const unsigned int n_blocks,
+                                  const size_type    block_size,
                                   const bool         fast)
 {
-  std::vector<size_type> n(n_bl, bl_sz);
-  reinit(n, fast);
+  std::vector<size_type> block_sizes(n_blocks, block_size);
+  reinit(block_sizes, fast);
 }
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const std::vector<size_type> &n,
+void BlockVector<Number>::reinit (const std::vector<size_type> &block_sizes,
                                   const bool                    fast)
 {
-  this->block_indices.reinit (n);
+  this->block_indices.reinit (block_sizes);
   if (this->components.size() != this->n_blocks())
     this->components.resize(this->n_blocks());
 
   for (size_type i=0; i<this->n_blocks(); ++i)
-    this->components[i].reinit(n[i], fast);
+    this->components[i].reinit(block_sizes[i], fast);
 }
 
 

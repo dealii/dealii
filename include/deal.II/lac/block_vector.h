@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,14 +89,14 @@ public:
   /**
    * Constructor. There are three ways to use this constructor. First, without
    * any arguments, it generates an object with no blocks. Given one argument,
-   * it initializes <tt>num_blocks</tt> blocks, but these blocks have size
+   * it initializes <tt>n_blocks</tt> blocks, but these blocks have size
    * zero. The third variant finally initializes all blocks to the same size
    * <tt>block_size</tt>.
    *
    * Confer the other constructor further down if you intend to use blocks of
    * different sizes.
    */
-  explicit BlockVector (const unsigned int num_blocks = 0,
+  explicit BlockVector (const unsigned int n_blocks = 0,
                         const size_type block_size = 0);
 
   /**
@@ -146,15 +146,16 @@ public:
   BlockVector (const BlockIndices &block_indices);
 
   /**
-   * Constructor. Set the number of blocks to <tt>n.size()</tt>. Initialize
-   * the vector with the elements pointed to by the range of iterators given
-   * as second and third argument. Apart from the first argument, this
-   * constructor is in complete analogy to the respective constructor of the
-   * <tt>std::vector</tt> class, but the first argument is needed in order to
-   * know how to subdivide the block vector into different blocks.
+   * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>.
+   * Initialize the vector with the elements pointed to by the range of
+   * iterators given as second and third argument. Apart from the first
+   * argument, this constructor is in complete analogy to the respective
+   * constructor of the <tt>std::vector</tt> class, but the first argument is
+   * needed in order to know how to subdivide the block vector into different
+   * blocks.
    */
   template <typename InputIterator>
-  BlockVector (const std::vector<size_type>    &n,
+  BlockVector (const std::vector<size_type>    &block_sizes,
                const InputIterator              first,
                const InputIterator              end);
 
@@ -212,8 +213,8 @@ public:
   operator= (const TrilinosWrappers::BlockVector &V);
 #endif
   /**
-   * Reinitialize the BlockVector to contain <tt>num_blocks</tt> blocks of
-   * size <tt>block_size</tt> each.
+   * Reinitialize the BlockVector to contain <tt>n_blocks</tt> blocks of size
+   * <tt>block_size</tt> each.
    *
    * If the second argument is left at its default value, then the block
    * vector allocates the specified number of blocks but leaves them at zero
@@ -223,7 +224,7 @@ public:
    *
    * If <tt>fast==false</tt>, the vector is filled with zeros.
    */
-  void reinit (const unsigned int num_blocks,
+  void reinit (const unsigned int n_blocks,
                const size_type block_size = 0,
                const bool fast = false);
 
@@ -243,7 +244,7 @@ public:
    * reinit() on one of the blocks, then subsequent actions on this object may
    * yield unpredictable results since they may be routed to the wrong block.
    */
-  void reinit (const std::vector<size_type> &N,
+  void reinit (const std::vector<size_type> &block_sizes,
                const bool                    fast=false);
 
   /**
@@ -353,7 +354,7 @@ public:
 
 template <typename Number>
 template <typename InputIterator>
-BlockVector<Number>::BlockVector (const std::vector<size_type>    &n,
+BlockVector<Number>::BlockVector (const std::vector<size_type>    &block_sizes,
                                   const InputIterator              first,
                                   const InputIterator              end)
 {
@@ -361,12 +362,12 @@ BlockVector<Number>::BlockVector (const std::vector<size_type>    &n,
   // don't initialize them as we will
   // copy elements soon
   (void)end;
-  reinit (n, true);
+  reinit (block_sizes, true);
   InputIterator start = first;
-  for (size_type b=0; b<n.size(); ++b)
+  for (size_type b=0; b<block_sizes.size(); ++b)
     {
       InputIterator end = start;
-      std::advance (end, static_cast<signed int>(n[b]));
+      std::advance (end, static_cast<signed int>(block_sizes[b]));
       std::copy (start, end, this->block(b).begin());
       start = end;
     };
