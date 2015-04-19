@@ -16,16 +16,17 @@
 
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/thread_local_storage.h>
 
 #include <boost/math/special_functions/erf.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/random.hpp>
 
 #include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
-#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -390,41 +391,13 @@ namespace Utilities
     if (sigma == 0)
       return a;
 
-    // we want to use rand(), but that function is not reentrant in a thread
-    // context. thus, use rand_r. this does not produce reproducible results
-    // between threads either, but at least it is reentrant. if you need
-    // an exactly reproducible sequence even in multithreaded contexts,
-    // then this is probably not the function to use.
-#ifdef DEAL_II_HAVE_RAND_R
-    static unsigned int seed = 0xabcd1234;
-    const double y = 1.0*rand_r(&seed)/RAND_MAX;
-#else
-    const double y = 1.0*rand()/RAND_MAX;
-#endif
-
-    // find x such that y=erf(x). do so
-    // using a Newton method to find
-    // the zero of F(x)=erf(x)-y. start
-    // at x=0
-    double x = 0;
-    unsigned int iteration = 0;
-    while (true)
-      {
-        const double residual = 0.5+boost::math::erf(x/std::sqrt(2.)/sigma)/2-y;
-
-        if (std::fabs(residual) < 1e-7)
-          break;
-
-        const double F_prime = 1./std::sqrt(2*3.1415926536)/sigma *
-                               std::exp(-x*x/sigma/sigma/2);
-        x += -residual / F_prime;
-
-        // make sure that we don't
-        // recurse endlessly
-        ++iteration;
-        Assert (iteration < 20, ExcInternalError());
-      };
-    return x+a;
+    // we would want to use rand(), but that function is not reentrant
+    // in a thread context. one could use rand_r, but this does not
+    // produce reproducible results between threads either (though at
+    // least it is reentrant). these two approaches being
+    // non-workable, use a thread-local random number generator here
+    static Threads::ThreadLocalStorage<boost::mt19937> random_number_generator;
+    return boost::normal_distribution<>(a,sigma)(random_number_generator.get());
   }
 
 
