@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2014 by the deal.II authors
+## Copyright (C) 2012 - 2015 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -52,7 +52,9 @@ CHECK_INCLUDE_FILE_CXX("unistd.h" DEAL_II_HAVE_UNISTD_H)
 CHECK_CXX_SYMBOL_EXISTS("gethostname" "unistd.h" DEAL_II_HAVE_GETHOSTNAME)
 CHECK_CXX_SYMBOL_EXISTS("getpid" "unistd.h" DEAL_II_HAVE_GETPID)
 
-CHECK_CXX_SYMBOL_EXISTS("rand_r" "stdlib.h" DEAL_II_HAVE_RAND_R)
+IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+  CHECK_CXX_SYMBOL_EXISTS("rand_r" "stdlib.h" DEAL_II_HAVE_RAND_R)
+ENDIF()
 
 #
 # Do we have the Bessel function jn?
