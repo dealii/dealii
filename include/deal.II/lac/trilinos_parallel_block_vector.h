@@ -26,6 +26,8 @@
 #  include <deal.II/lac/block_vector_base.h>
 #  include <deal.II/lac/exceptions.h>
 
+#  include <functional>
+
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
@@ -460,11 +462,49 @@ namespace TrilinosWrappers
       u.swap (v);
     }
 
-  } /* end of namespace MPI */
+  } /* namespace MPI */
 
-}
+} /* namespace TrilinosWrappers */
 
 /*@}*/
+
+
+namespace internal
+{
+  namespace LinearOperator
+  {
+    template <typename> class ReinitHelper;
+
+    /**
+     * A helper class internally used in linear_operator.h.
+     * Specialization for TrilinosWrappers::MPI::BlockVector.
+     */
+    template<>
+    class ReinitHelper<TrilinosWrappers::MPI::BlockVector>
+    {
+    public:
+      template <typename Matrix>
+      static
+      void reinit_range_vector (const Matrix &matrix,
+                                TrilinosWrappers::MPI::BlockVector &v,
+                                bool fast)
+      {
+        v.reinit(matrix.range_partitioner(), fast);
+      }
+
+      template <typename Matrix>
+      static
+      void reinit_domain_vector(const Matrix &matrix,
+                                TrilinosWrappers::MPI::BlockVector &v,
+                                bool fast)
+      {
+        v.reinit(matrix.domain_partitioner(), fast);
+      }
+    };
+
+  } /* namespace LinearOperator */
+} /* namespace internal */
+
 
 DEAL_II_NAMESPACE_CLOSE
 

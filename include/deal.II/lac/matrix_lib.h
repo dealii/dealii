@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,6 +43,10 @@ template<typename number> class SparseMatrix;
  *
  * Here is an example multiplying two different FullMatrix objects:
  * @include product_matrix.cc
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators" for further details.
  *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
  */
@@ -142,6 +146,10 @@ private:
  * Matrix-vector products of this matrix are composed of those of the original
  * matrix with the vector and then scaling of the result by a constant factor.
  *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators" for further details.
+ *
  * @author Guido Kanschat, 2007
  */
 template<class VECTOR>
@@ -204,6 +212,10 @@ private:
  *
  * The documentation of ProductMatrix applies with exception that these
  * matrices here may be rectangular.
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators" for further details.
  *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
  */
@@ -406,6 +418,10 @@ private:
  * section on
  * @ref Instantiations
  * in the manual).
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators" for further details.
  *
  * @author Guido Kanschat, 2005
  */

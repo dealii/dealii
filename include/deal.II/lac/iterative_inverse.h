@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,6 +65,10 @@ DEAL_II_NAMESPACE_OPEN
  * iteration is the residual of the outer loop, the relative errors are far
  * from machine accuracy, even if the errors of the outer loop are in the
  * range of machine accuracy.
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators" for further details.
  *
  * @ingroup Matrix2
  * @author Guido Kanschat

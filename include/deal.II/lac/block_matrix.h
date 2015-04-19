@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,6 +37,10 @@ DEAL_II_NAMESPACE_OPEN
  *
  * One special application is a one by one block matrix, allowing to apply the
  * @p vmult of the original matrix (or preconditioner) to a block vector.
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators" for further details.
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"

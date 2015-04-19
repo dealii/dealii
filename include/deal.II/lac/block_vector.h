@@ -37,7 +37,6 @@ namespace TrilinosWrappers
 #endif
 
 
-
 /*! @addtogroup Vectors
  *@{
  */
@@ -459,6 +458,43 @@ void swap (BlockVector<Number> &u,
 {
   u.swap (v);
 }
+
+
+namespace internal
+{
+  namespace LinearOperator
+  {
+    template <typename> class ReinitHelper;
+
+    /**
+     * A helper class internally used in linear_operator.h.
+     * Specialization for BlockVector<number>.
+     */
+    template<typename number>
+    class ReinitHelper<BlockVector<number> >
+    {
+    public:
+      template <typename Matrix>
+      static
+      void reinit_range_vector (const Matrix &matrix,
+                                BlockVector<number> &v,
+                                bool fast)
+      {
+        v.reinit(matrix.get_row_indices(), fast);
+      }
+
+      template <typename Matrix>
+      static
+      void reinit_domain_vector(const Matrix &matrix,
+                                BlockVector<number> &v,
+                                bool fast)
+      {
+        v.reinit(matrix.get_column_indices(), fast);
+      }
+    };
+
+  } /* namespace LinearOperator */
+} /* namespace internal */
 
 DEAL_II_NAMESPACE_CLOSE
 

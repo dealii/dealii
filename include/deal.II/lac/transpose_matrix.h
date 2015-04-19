@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2014 by the deal.II authors
+// Copyright (C) 2002 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,6 +31,10 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note The transposed matrix is never actually assembled. Instead, only the
  * matrix vector multiplication is performed in a transposed way.
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators" for further details.
  *
  * @ingroup Matrix2
  * @author Guido Kanschat, 2006
