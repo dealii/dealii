@@ -58,9 +58,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace GridTools
 {
 
-// This anonymous namespace contains utility functions to extract the
-// triangulation from any container such as DoFHandler
-// and the like
+  // This anonymous namespace contains utility functions to extract the
+  // triangulation from any container such as DoFHandler and the like
   namespace
   {
     template<int dim, int spacedim>
@@ -113,36 +112,25 @@ namespace GridTools
   double
   diameter (const Triangulation<dim, spacedim> &tria)
   {
-    // we can't deal with distributed meshes
-    // since we don't have all vertices
-    // locally. there is one exception,
-    // however: if the mesh has never been
-    // refined. the way to test this is not to
-    // ask tria.n_levels()==1, since this is
-    // something that can happen on one
-    // processor without being true on
-    // all. however, we can ask for the global
-    // number of active cells and use that
-#ifdef DEAL_II_WITH_P4EST
+    // we can't deal with distributed meshes since we don't have all
+    // vertices locally. there is one exception, however: if the mesh has
+    // never been refined. the way to test this is not to ask
+    // tria.n_levels()==1, since this is something that can happen on one
+    // processor without being true on all. however, we can ask for the
+    // global number of active cells and use that
+#if defined(DEAL_II_WITH_P4EST) && defined(DEBUG)
     if (const parallel::distributed::Triangulation<dim,spacedim> *p_tria
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&tria))
       Assert (p_tria->n_global_active_cells() == tria.n_cells(0),
               ExcNotImplemented());
 #endif
 
-    // the algorithm used simply
-    // traverses all cells and picks
-    // out the boundary vertices. it
-    // may or may not be faster to
-    // simply get all vectors, don't
-    // mark boundary vertices, and
-    // compute the distances thereof,
-    // but at least as the mesh is
-    // refined, it seems better to
-    // first mark boundary nodes, as
-    // marking is O(N) in the number of
-    // cells/vertices, while computing
-    // the maximal distance is O(N*N)
+    // the algorithm used simply traverses all cells and picks out the
+    // boundary vertices. it may or may not be faster to simply get all
+    // vectors, don't mark boundary vertices, and compute the distances
+    // thereof, but at least as the mesh is refined, it seems better to
+    // first mark boundary nodes, as marking is O(N) in the number of
+    // cells/vertices, while computing the maximal distance is O(N*N)
     const std::vector<Point<spacedim> > &vertices = tria.get_vertices ();
     std::vector<bool> boundary_vertices (vertices.size(), false);
 
@@ -156,11 +144,8 @@ namespace GridTools
           for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
             boundary_vertices[cell->face(face)->vertex_index(i)] = true;
 
-    // now traverse the list of
-    // boundary vertices and check
-    // distances. since distances are
-    // symmetric, we only have to check
-    // one half
+    // now traverse the list of boundary vertices and check distances.
+    // since distances are symmetric, we only have to check one half
     double max_distance_sqr = 0;
     std::vector<bool>::const_iterator pi = boundary_vertices.begin();
     const unsigned int N = boundary_vertices.size();

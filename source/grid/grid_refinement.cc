@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,6 +61,7 @@ namespace
 
 
 #ifdef DEAL_II_WITH_PETSC
+    inline
     PetscScalar
     max_element (const PETScWrappers::Vector &criteria)
     {
@@ -74,6 +75,7 @@ namespace
     }
 
 
+    inline
     PetscScalar
     min_element (const PETScWrappers::Vector &criteria)
     {
@@ -89,6 +91,7 @@ namespace
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+    inline
     TrilinosScalar
     max_element (const TrilinosWrappers::Vector &criteria)
     {
@@ -98,6 +101,7 @@ namespace
     }
 
 
+    inline
     TrilinosScalar
     min_element (const TrilinosWrappers::Vector &criteria)
     {
