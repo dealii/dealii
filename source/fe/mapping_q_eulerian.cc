@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,6 +38,23 @@ MappingQEulerian<dim, EulerVectorType, spacedim>::
 MappingQEulerian (const unsigned int degree,
                   const EulerVectorType &euler_vector,
                   const DoFHandler<dim,spacedim> &euler_dof_handler)
+  :
+  MappingQ<dim,spacedim>(degree, true),
+  euler_vector(&euler_vector),
+  euler_dof_handler(&euler_dof_handler),
+  support_quadrature(degree),
+  fe_values(euler_dof_handler.get_fe(),
+            support_quadrature,
+            update_values | update_q_points)
+{ }
+
+
+
+template <int dim, class EulerVectorType, int spacedim>
+MappingQEulerian<dim, EulerVectorType, spacedim>::
+MappingQEulerian (const unsigned int degree,
+                  const DoFHandler<dim,spacedim> &euler_dof_handler,
+                  const EulerVectorType &euler_vector)
   :
   MappingQ<dim,spacedim>(degree, true),
   euler_vector(&euler_vector),
