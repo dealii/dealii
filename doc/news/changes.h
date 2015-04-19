@@ -352,6 +352,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: Utilities::generate_normal_random_number() will now
+  produce a deterministic sequence of numbers on every thread.
+  Furthermore, it will also work on systems that do not have the
+  <code>rand_r</code> library function, such as Cygwin.
+  <br>
+  (Wolfgang Bangerth, 2015/04/19)
+  </li>
+  
   <li> New: A LinearOperator class that stores the abstract concept of a
   linear operator. The class is fully compatible with the solver and
   preconditioner interfaces. The primary purpose of this class is to

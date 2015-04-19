@@ -123,7 +123,6 @@
 #cmakedefine DEAL_II_HAVE_UNISTD_H
 #cmakedefine DEAL_II_HAVE_GETHOSTNAME
 #cmakedefine DEAL_II_HAVE_GETPID
-#cmakedefine DEAL_II_HAVE_RAND_R
 #cmakedefine DEAL_II_HAVE_TIMES
 #cmakedefine DEAL_II_HAVE_JN
 

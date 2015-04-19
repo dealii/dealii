@@ -194,15 +194,17 @@ namespace Utilities
    * Generate a random number from a normalized Gaussian probability
    * distribution centered around @p a and with standard deviation @p sigma.
    *
-   * This function is reentrant, i.e., it can safely be called from multiple
-   * threads at the same time. However, if so done, then there is no guarantee
-   * that each thread will get the same sequence of numbers every time.
-   * Rather, the produced sequence of random numbers will be apportioned to
-   * the different threads in non-deterministic ways. If this is a problem,
-   * for example for exactly reproducibility, then you need to use separate
-   * random number facilities for separate threads, rather than this global
-   * function. For example, the C++11 standard offers such objects, as does
-   * BOOST.
+   * This function is reentrant, i.e., it can safely be called from
+   * multiple threads at the same time. In addition, each thread will
+   * get the same sequence of numbers every time. On the other hand,
+   * if you run Threads::Task objects via the Threading Building
+   * Blocks, then tasks will be assigned to mostly random threads, and
+   * may get a different sequence of random numbers in different runs
+   * of the program, since a previous task may already have consumed
+   * the first few random numbers generated for the thread you're
+   * on. If this is a problem, you need to create your own random
+   * number generator objects every time you want to start from a
+   * defined point.
    *
    * @note Like the system function rand(), this function produces the same
    * sequence of random numbers every time a program is started. This is an
