@@ -647,8 +647,8 @@ namespace Step50
     constraints.close ();
     hanging_node_constraints.close ();
 
-    check(constraints);
-    check(hanging_node_constraints);
+    //check(constraints);
+    //check(hanging_node_constraints);
 
 
     CompressedSimpleSparsityPattern csp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
@@ -1086,13 +1086,15 @@ namespace Step50
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_refinement_edge_indices(level));
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
 
-        check(boundary_constraints[level]);
+
         boundary_constraints[level].close ();
+        check(boundary_constraints[level]);
 
 
-       // boundary_interface_constraints[level]
-        //.add_lines (mg_constrained_dofs.get_refinement_edge_boundary_indices (level));
+        boundary_interface_constraints[level]
+        .add_lines (mg_constrained_dofs.get_refinement_edge_boundary_indices (level));
         boundary_interface_constraints[level].close ();
+        check(boundary_interface_constraints[level]);
       }
 
     // Now that we're done with most of our preliminaries, let's start
@@ -1700,8 +1702,7 @@ int main (int argc, char *argv[])
                 << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-
-      return 1;
+      throw;
     }
   catch (...)
     {
@@ -1712,7 +1713,7 @@ int main (int argc, char *argv[])
                 << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-      return 1;
+      throw;
     }
 
   return 0;
