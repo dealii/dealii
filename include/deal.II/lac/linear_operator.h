@@ -1144,9 +1144,7 @@ namespace
  *
  * @ingroup LAOperators
  */
-template <typename Range = Vector<double>,
-          typename Domain = Range,
-          typename Matrix>
+template <typename Range, typename Domain, typename Matrix>
 LinearOperator<Range, Domain> linear_operator(const Matrix &matrix)
 {
   // implement with the more generic variant below...
@@ -1171,13 +1169,12 @@ LinearOperator<Range, Domain> linear_operator(const Matrix &matrix)
  *
  * @ingroup LAOperators
  */
-template <typename Range = Vector<double>,
-          typename Domain = Range,
+template <typename Range,
+          typename Domain,
           typename OperatorExemplar,
           typename Matrix>
 LinearOperator<Range, Domain>
-linear_operator(const OperatorExemplar &operator_exemplar,
-                const Matrix &matrix)
+linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
 {
   LinearOperator<Range, Domain> return_op;
 
