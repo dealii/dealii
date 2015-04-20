@@ -172,20 +172,6 @@ namespace Step33
     // = \frac{|\rho \mathbf v|^2}{2\rho}$ (note that the independent
     // variables contain the momentum components $\rho v_i$, not the
     // velocities $v_i$).
-    //
-    // There is one slight problem: We will need to call the following
-    // functions with input arguments of type
-    // <code>std::vector@<number@></code> and
-    // <code>Vector@<number@></code>. The problem is that the former has an
-    // access operator <code>operator[]</code> whereas the latter, for
-    // historical reasons, has <code>operator()</code>. We wouldn't be able to
-    // write the function in a generic way if we were to use one or the other
-    // of these. Fortunately, we can use the following trick: instead of
-    // writing <code>v[i]</code> or <code>v(i)</code>, we can use
-    // <code>*(v.begin() + i)</code>, i.e. we generate an iterator that points
-    // to the <code>i</code>th element, and then dereference it. This works
-    // for both kinds of vectors -- not the prettiest solution, but one that
-    // works.
     template <typename InputVector>
     static
     typename InputVector::value_type
@@ -193,9 +179,9 @@ namespace Step33
     {
       typename InputVector::value_type kinetic_energy = 0;
       for (unsigned int d=0; d<dim; ++d)
-        kinetic_energy += *(W.begin()+first_momentum_component+d) *
-                          *(W.begin()+first_momentum_component+d);
-      kinetic_energy *= 1./(2 * *(W.begin() + density_component));
+        kinetic_energy += W[first_momentum_component+d] *
+                          W[first_momentum_component+d];
+      kinetic_energy *= 1./(2 * W[density_component]);
 
       return kinetic_energy;
     }
@@ -207,8 +193,7 @@ namespace Step33
     compute_pressure (const InputVector &W)
     {
       return ((gas_gamma-1.0) *
-              (*(W.begin() + energy_component) -
-               compute_kinetic_energy(W)));
+              (W[energy_component] - compute_kinetic_energy(W)));
     }
 
 
