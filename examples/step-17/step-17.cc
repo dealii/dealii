@@ -92,7 +92,7 @@ namespace Step17
 {
   using namespace dealii;
 
-  // @sect3{The <code>ElasticProblem</code> class}
+  // @sect3{The <code>ElasticProblem</code> class template}
 
   // Here comes the declaration of the main class. As mentioned in the
   // introduction, almost all of this has been copied verbatim from step-8,
@@ -177,7 +177,7 @@ namespace Step17
   };
 
 
-  // @sec3{Right hand side values}
+  // @sect3{Right hand side values}
 
   // The following is taken from step-8 without change:
   template <int dim>
