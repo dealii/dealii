@@ -20,7 +20,9 @@
 
 #include <boost/math/special_functions/erf.hpp>
 #include <boost/lexical_cast.hpp>
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <cerrno>
