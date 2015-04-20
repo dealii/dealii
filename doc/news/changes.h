@@ -481,14 +481,6 @@ inconvenience this causes.
   (Zhen Tao, Arezou Ghesmati, Wolfgang Bangerth, 2015/04/17)
   </li>
 
-  <li> New: TrilinosWrappers::BlockSparseMatrix now has member functions
-  TrilinosWrappers::BlockSparseMatrix::domain_paritioner() and
-  TrilinosWrappers::BlockSparseMatrix::range_partitioner() that return a
-  vector of the underlying block Epetra_Map.
-  <br>
-  (Matthias Maier, 2015/04/08)
-  </li>
-
   <li> Fixed: The class SymmetricTensor<2,dim> is now usable also for dim>3.
   <br>
   (Martin Kronbichler, 2015/04/14)
@@ -515,6 +507,14 @@ inconvenience this causes.
   <br>
   (Luca Heltai, 2015/04/11)
   <li>
+
+  <li> New: TrilinosWrappers::BlockSparseMatrix now has member functions
+  TrilinosWrappers::BlockSparseMatrix::domain_paritioner() and
+  TrilinosWrappers::BlockSparseMatrix::range_partitioner() that return a
+  vector of the underlying block Epetra_Map.
+  <br>
+  (Matthias Maier, 2015/04/08)
+  </li>
 
   <li> New: A new MappingFEField() class has been added to the library
   that generalizes MappingQEulerian to allow arbitrary FiniteElements.
