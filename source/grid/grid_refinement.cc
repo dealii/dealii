@@ -50,7 +50,6 @@ namespace
     }
 
 
-
     template <typename number>
     inline
     number
@@ -59,6 +58,9 @@ namespace
       return *std::min_element(criteria.begin(), criteria.end());
     }
 
+    // Silence a (bogus) warning in clang-3.6 about the following four
+    // functions being unused:
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 #ifdef DEAL_II_WITH_PETSC
     inline
@@ -110,7 +112,10 @@ namespace
       return m;
     }
 #endif
-  }
+
+    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
+  } /* namespace internal */
 
 
   template <typename Vector>
