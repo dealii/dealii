@@ -88,7 +88,7 @@ void test ()
   Vector<float> diff (tria.n_active_cells());
 
   // H1 seminorm. the function is u(x)=x, so
-  // its H1 seminorm should be equal to 1/2
+  // its H1 seminorm should be equal to 1
   {
     VectorTools::integrate_difference (dof_handler,
                                        vec,
