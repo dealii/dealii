@@ -573,7 +573,7 @@ namespace Step40
     data_out.build_patches ();
 
     // The next step is to write this data to disk. We choose file names of
-    // the form <code>solution-XX-PPPP.vtu</code> where <code>XX</code>
+    // the form <code>solution-XX.PPPP.vtu</code> where <code>XX</code>
     // indicates the refinement cycle, <code>PPPP</code> refers to the
     // processor number (enough for up to 10,000 processors, though we hope
     // that nobody ever tries to generate this much data -- you would likely
@@ -606,7 +606,9 @@ namespace Step40
                                Utilities::int_to_string (i, 4) +
                                ".vtu");
 
-        std::ofstream master_output ((filename + ".pvtu").c_str());
+        std::ofstream master_output (("solution-" +
+                                      Utilities::int_to_string (cycle, 2) +
+                                      ".pvtu").c_str());
         data_out.write_pvtu_record (master_output, filenames);
       }
   }
