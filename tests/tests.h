@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -124,7 +124,7 @@ void cat_file(const char *filename)
 void sort_file_contents (const std::string &filename)
 {
   int error = std::system ((std::string ("LC_ALL=C sort ") + filename + " -o " + filename).c_str());
-  Assert (error == 0, ExcInternalError());
+  AssertThrow (error == 0, ExcInternalError());
 }
 
 
