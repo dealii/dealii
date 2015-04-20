@@ -403,6 +403,8 @@ template <int N, typename T>
 class TableBase : public Subscriptor
 {
 public:
+  typedef T value_type;
+
   /**
    * Integer type used to count the number of elements in this container.
    */
