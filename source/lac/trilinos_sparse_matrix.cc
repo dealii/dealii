@@ -1737,12 +1737,6 @@ namespace TrilinosWrappers
                         const dealii::SparsityPattern &,
                         const bool);
 
-  template void
-  SparseMatrix::reinit (const Epetra_Map &,
-                        const Epetra_Map &,
-                        const DynamicSparsityPattern &,
-                        const bool);
-
 }
 
 DEAL_II_NAMESPACE_CLOSE
