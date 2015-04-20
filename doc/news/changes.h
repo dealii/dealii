@@ -468,6 +468,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The TimerOutput class reported abnormally large cpu time when run
+  with more than one process with MPI. Now this is fixed.
+  <br>
+  (Lei Qiao, 2015/04/19)
+  </li>
+
   <li> New: TrilinosWrappers::BlockSparseMatrix now has member functions
   TrilinosWrappers::BlockSparseMatrix::domain_paritioner() and
   TrilinosWrappers::BlockSparseMatrix::range_partitioner() that return a
@@ -476,6 +482,7 @@ inconvenience this causes.
   (Matthias Maier, 2015/04/08)
 
   </li>
+
   <li> Fixed: The class SymmetricTensor<2,dim> is now usable also for dim>3.
   <br>
   (Martin Kronbichler, 2015/04/14)
