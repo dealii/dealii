@@ -15,8 +15,9 @@
 
 
 
-// call VectorTools::integrate_difference with fe's distributed in the
-// same random way as in hp/random and on a function that is d-linear
+// like _02, but test the Hdiv seminorm. this requires a vector-valued
+// element and a function we interpolate that is vector-valued. we
+// simply extend the function from _02 by zeros
 
 
 #include "../tests.h"
@@ -34,9 +35,17 @@
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
+
+
+template <int dim>
+double f (const Point<dim> &p)
+{
+  return p[0];
+}
 
 
 
@@ -56,7 +65,7 @@ void test ()
   hp::QCollection<dim> q_collection;
   for (unsigned int i=1; i<=4; ++i)
     {
-      fe_collection.push_back(FE_Q<dim> (i));
+      fe_collection.push_back(FESystem<dim>(FE_Q<dim> (i), dim));
       q_collection.push_back (QGauss<dim> (i+2));
     }
 
@@ -73,70 +82,38 @@ void test ()
   // interpolate a linear function
   Vector<double> vec (dof_handler.n_dofs());
   VectorTools::interpolate (dof_handler,
-                            Functions::Monomial<dim>
-                            (dim == 1 ?
-                             Point<dim>(1.) :
-                             (dim == 2 ?
-                              Point<dim>(1.,0.) :
-                              Point<dim>(1.,0.,0.))),
+			    VectorFunctionFromScalarFunctionObject<dim> (&f<dim>, 0, dim),
                             vec);
 
   Vector<float> diff (tria.n_active_cells());
-
-  // L1 norm. the function is u(x)=x, so its
-  // L1 norm should be equal to 1/2
-  {
-    VectorTools::integrate_difference (dof_handler,
-                                       vec,
-                                       ZeroFunction<dim>(),
-                                       diff,
-                                       q_collection,
-                                       VectorTools::L1_norm);
-    deallog << "L1, diff=" << diff.l1_norm() << std::endl;
-  }
 
   // H1 seminorm. the function is u(x)=x, so
   // its H1 seminorm should be equal to 1
   {
     VectorTools::integrate_difference (dof_handler,
                                        vec,
-                                       ZeroFunction<dim>(),
+                                       ZeroFunction<dim>(dim),
                                        diff,
                                        q_collection,
                                        VectorTools::H1_seminorm);
     deallog << "H1 seminorm, diff=" << diff.l2_norm() << std::endl;
   }
 
-  // W1infty seminorm. the function is
+  // Hdiv seminorm. the function is
   // u(x)=x, so the norm must be equal to 1
   // on every cell
   {
     VectorTools::integrate_difference (dof_handler,
                                        vec,
-                                       ZeroFunction<dim>(),
+                                       ZeroFunction<dim>(dim),
                                        diff,
                                        q_collection,
                                        VectorTools::W1infty_seminorm);
-    deallog << "W1infty semi, diff=" << diff.linfty_norm() << std::endl;
+    deallog << "Hdiv semi, diff=" << diff.linfty_norm() << std::endl;
     // also ensure that we indeed get the
     // same value on every cell
     diff. add(-1);
     AssertThrow (diff.l2_norm() == 0, ExcInternalError());
-  }
-
-  // W1infty norm. the Linfty norm is one, so
-  // the W1infty norm must be two. but not on
-  // every cell
-  {
-    VectorTools::integrate_difference (dof_handler,
-                                       vec,
-                                       ZeroFunction<dim>(),
-                                       diff,
-                                       q_collection,
-                                       VectorTools::W1infty_norm);
-    deallog << "W1infty, diff=" << diff.linfty_norm() << std::endl;
-    diff.add(-2);
-    AssertThrow (diff.l1_norm() > 0.5, ExcInternalError());
   }
 }
 

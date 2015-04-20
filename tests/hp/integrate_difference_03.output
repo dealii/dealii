@@ -1,0 +1,11 @@
+
+DEAL::dim=1
+DEAL::H1 seminorm, diff=1.0
+DEAL::Hdiv semi, diff=1.0
+DEAL::dim=2
+DEAL::H1 seminorm, diff=1.0
+DEAL::Hdiv semi, diff=1.0
+DEAL::dim=3
+DEAL::H1 seminorm, diff=1.0
+DEAL::Hdiv semi, diff=1.0
+DEAL::OK

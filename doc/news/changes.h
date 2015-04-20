@@ -473,14 +473,12 @@ inconvenience this causes.
   <br>
   (Lei Qiao, 2015/04/19)
   </li>
-
-  <li> New: TrilinosWrappers::BlockSparseMatrix now has member functions
-  TrilinosWrappers::BlockSparseMatrix::domain_paritioner() and
-  TrilinosWrappers::BlockSparseMatrix::range_partitioner() that return a
-  vector of the underlying block Epetra_Map.
+  
+  <li> New: The VectorTools::integrate_difference() function can now
+  also compute the $H_\text{div}$ seminorm, using the
+  VectorTools::NormType::Hdiv_seminorm argument.
   <br>
-  (Matthias Maier, 2015/04/08)
-
+  (Zhen Tao, Arezou Ghesmati, Wolfgang Bangerth, 2015/04/17)
   </li>
 
   <li> Fixed: The class SymmetricTensor<2,dim> is now usable also for dim>3.
@@ -509,6 +507,14 @@ inconvenience this causes.
   <br>
   (Luca Heltai, 2015/04/11)
   <li>
+
+  <li> New: TrilinosWrappers::BlockSparseMatrix now has member functions
+  TrilinosWrappers::BlockSparseMatrix::domain_paritioner() and
+  TrilinosWrappers::BlockSparseMatrix::range_partitioner() that return a
+  vector of the underlying block Epetra_Map.
+  <br>
+  (Matthias Maier, 2015/04/08)
+  </li>
 
   <li> New: A new MappingFEField() class has been added to the library
   that generalizes MappingQEulerian to allow arbitrary FiniteElements.
