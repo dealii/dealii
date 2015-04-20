@@ -186,12 +186,12 @@ namespace Step33
     // to the <code>i</code>th element, and then dereference it. This works
     // for both kinds of vectors -- not the prettiest solution, but one that
     // works.
-    template <typename Number, typename InputVector>
+    template <typename InputVector>
     static
-    Number
+    typename InputVector::value_type
     compute_kinetic_energy (const InputVector &W)
     {
-      Number kinetic_energy = 0;
+      typename InputVector::value_type kinetic_energy = 0;
       for (unsigned int d=0; d<dim; ++d)
         kinetic_energy += *(W.begin()+first_momentum_component+d) *
                           *(W.begin()+first_momentum_component+d);
@@ -201,14 +201,14 @@ namespace Step33
     }
 
 
-    template <typename Number, typename InputVector>
+    template <typename InputVector>
     static
-    Number
+    typename InputVector::value_type
     compute_pressure (const InputVector &W)
     {
       return ((gas_gamma-1.0) *
               (*(W.begin() + energy_component) -
-               compute_kinetic_energy<Number>(W)));
+               compute_kinetic_energy(W)));
     }
 
 
@@ -228,15 +228,17 @@ namespace Step33
     // use the automatic differentiation type here.  Similarly, we will call
     // the function with different input vector data types, so we templatize
     // on it as well:
-    template <typename InputVector, typename Number>
+    template <typename InputVector>
     static
     void compute_flux_matrix (const InputVector &W,
-                              std_cxx11::array <std_cxx11::array <Number, dim>, EulerEquations<dim>::n_components > &flux)
+                              std_cxx11::array <std_cxx11::array
+                              <typename InputVector::value_type, dim>,
+                              EulerEquations<dim>::n_components > &flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
       // correspond to the momentum terms:
-      const Number pressure = compute_pressure<Number> (W);
+      const typename InputVector::value_type pressure = compute_pressure(W);
 
       for (unsigned int d=0; d<dim; ++d)
         {
@@ -267,15 +269,19 @@ namespace Step33
     // numerical flux function to enforce boundary conditions.  This routine
     // is the basic Lax-Friedrich's flux with a stabilization parameter
     // $\alpha$. It's form has also been given already in the introduction:
-    template <typename InputVector, typename Number>
+    template <typename InputVector>
     static
     void numerical_normal_flux (const Point<dim>                   &normal,
                                 const InputVector                  &Wplus,
                                 const InputVector                  &Wminus,
                                 const double                        alpha,
-                                std_cxx11::array < Number, n_components> &normal_flux)
+                                std_cxx11::array
+                                <typename InputVector::value_type, n_components>
+                                &normal_flux)
     {
-      std_cxx11::array <std_cxx11::array <Number, dim>, EulerEquations<dim>::n_components > iflux, oflux;
+      std_cxx11::array
+      <std_cxx11::array <typename InputVector::value_type, dim>,
+      EulerEquations<dim>::n_components > iflux, oflux;
 
       compute_flux_matrix (Wplus, iflux);
       compute_flux_matrix (Wminus, oflux);
@@ -300,10 +306,12 @@ namespace Step33
     // \right)^T$, shown here for the 3d case. More specifically, we will
     // consider only $\mathbf g=(0,0,-1)^T$ in 3d, or $\mathbf g=(0,-1)^T$ in
     // 2d. This naturally leads to the following function:
-    template <typename InputVector, typename Number>
+    template <typename InputVector>
     static
     void compute_forcing_vector (const InputVector &W,
-                                 std_cxx11::array < Number, n_components> &forcing)
+                                 std_cxx11::array
+                                 <typename InputVector::value_type, n_components>
+                                 &forcing)
     {
       const double gravity = -1.0;
 
@@ -642,7 +650,7 @@ namespace Step33
           computed_quantities[q](d)
             = uh[q](first_momentum_component+d) / density;
 
-        computed_quantities[q](dim) = compute_pressure<double> (uh[q]);
+        computed_quantities[q](dim) = compute_pressure (uh[q]);
 
         if (do_schlieren_plot == true)
           computed_quantities[q](dim+1) = duh[q][density_component] *
