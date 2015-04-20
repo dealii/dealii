@@ -57,6 +57,7 @@ template <typename MatrixType> class BlockMatrixBase;
 
 template <typename number> class SparseMatrix;
 class SparsityPattern;
+class DynamicSparsityPattern;
 
 
 namespace TrilinosWrappers
@@ -2944,6 +2945,14 @@ namespace TrilinosWrappers
     reinit (row_map, col_map, sparsity_pattern, exchange_data);
   }
 
+
+  // declare the existence of an explicit specialization
+  template <>
+  void
+  SparseMatrix::reinit (const Epetra_Map    &input_row_map,
+                        const Epetra_Map    &input_col_map,
+                        const DynamicSparsityPattern &sparsity_pattern,
+                        const bool           exchange_data);
 
 
   template <typename number>
