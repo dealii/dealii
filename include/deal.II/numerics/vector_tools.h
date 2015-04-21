@@ -1861,7 +1861,7 @@ namespace VectorTools
    *                                       solution, exact_solution,
    *                                       local_errors,
    *                                       QGauss<dim>(fe.degree+2),
-   *                                       NormType::L2_norm);
+   *                                       VectorTools::L2_norm);
    *    const double total_local_error = local_errors.l2_norm();
    *    const double total_global_error
    *      = std::sqrt (Utilities::MPI::sum (total_local_error * total_local_error, MPI_COMM_WORLD));
