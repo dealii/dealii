@@ -23,6 +23,7 @@
 #  include <deal.II/lac/sparsity_pattern.h>
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/sparsity_tools.h>
+#  include <deal.II/lac/parallel_vector.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Export.h>
@@ -1305,6 +1306,737 @@ namespace TrilinosWrappers
 
 
 
+  void
+  SparseMatrix::set (const std::vector<size_type>     &row_indices,
+                     const std::vector<size_type>     &col_indices,
+                     const FullMatrix<TrilinosScalar> &values,
+                     const bool                        elide_zero_values)
+  {
+    Assert (row_indices.size() == values.m(),
+            ExcDimensionMismatch(row_indices.size(), values.m()));
+    Assert (col_indices.size() == values.n(),
+            ExcDimensionMismatch(col_indices.size(), values.n()));
+
+    for (size_type i=0; i<row_indices.size(); ++i)
+      set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+           elide_zero_values);
+  }
+
+
+
+  void
+  SparseMatrix::set (const size_type                    row,
+                     const std::vector<size_type>      &col_indices,
+                     const std::vector<TrilinosScalar> &values,
+                     const bool                         elide_zero_values)
+  {
+    Assert (col_indices.size() == values.size(),
+            ExcDimensionMismatch(col_indices.size(), values.size()));
+
+    set (row, col_indices.size(), &col_indices[0], &values[0],
+         elide_zero_values);
+  }
+
+
+
+  void
+  SparseMatrix::set (const size_type       row,
+                     const size_type       n_cols,
+                     const size_type      *col_indices,
+                     const TrilinosScalar *values,
+                     const bool            elide_zero_values)
+  {
+    AssertIndexRange(row, this->m());
+
+    int ierr;
+    if (last_action == Add)
+      {
+        ierr = matrix->GlobalAssemble (*column_space_map, matrix->RowMap(),
+                                       true);
+
+        Assert (ierr == 0, ExcTrilinosError(ierr));
+      }
+
+    last_action = Insert;
+
+    TrilinosWrappers::types::int_type *col_index_ptr;
+    TrilinosScalar *col_value_ptr;
+    TrilinosWrappers::types::int_type n_columns;
+
+    TrilinosScalar short_val_array[100];
+    TrilinosWrappers::types::int_type short_index_array[100];
+    std::vector<TrilinosScalar> long_val_array;
+    std::vector<TrilinosWrappers::types::int_type> long_index_array;
+
+
+    // If we don't elide zeros, the pointers are already available... need to
+    // cast to non-const pointers as that is the format taken by Trilinos (but
+    // we will not modify const data)
+    if (elide_zero_values == false)
+      {
+        col_index_ptr = (TrilinosWrappers::types::int_type *)col_indices;
+        col_value_ptr = const_cast<TrilinosScalar *>(values);
+        n_columns = n_cols;
+      }
+    else
+      {
+        // Otherwise, extract nonzero values in each row and get the
+        // respective indices.
+        if (n_cols > 100)
+          {
+            long_val_array.resize(n_cols);
+            long_index_array.resize(n_cols);
+            col_index_ptr = &long_index_array[0];
+            col_value_ptr = &long_val_array[0];
+          }
+        else
+          {
+            col_index_ptr = &short_index_array[0];
+            col_value_ptr = &short_val_array[0];
+          }
+
+        n_columns = 0;
+        for (size_type j=0; j<n_cols; ++j)
+          {
+            const double value = values[j];
+            AssertIsFinite(value);
+            if (value != 0)
+              {
+                col_index_ptr[n_columns] = col_indices[j];
+                col_value_ptr[n_columns] = value;
+                n_columns++;
+              }
+          }
+
+        Assert(n_columns <= (TrilinosWrappers::types::int_type)n_cols, ExcInternalError());
+      }
+
+
+    // If the calling matrix owns the row to which we want to insert values,
+    // we can directly call the Epetra_CrsMatrix input function, which is much
+    // faster than the Epetra_FECrsMatrix function. We distinguish between two
+    // cases: the first one is when the matrix is not filled (i.e., it is
+    // possible to add new elements to the sparsity pattern), and the second
+    // one is when the pattern is already fixed. In the former case, we add
+    // the possibility to insert new values, and in the second we just replace
+    // data.
+    if (row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == true)
+      {
+        if (matrix->Filled() == false)
+          {
+            ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(
+                     static_cast<TrilinosWrappers::types::int_type>(row),
+                     static_cast<int>(n_columns),const_cast<double *>(col_value_ptr),
+                     col_index_ptr);
+
+            // When inserting elements, we do not want to create exceptions in
+            // the case when inserting non-local data (since that's what we
+            // want to do right now).
+            if (ierr > 0)
+              ierr = 0;
+          }
+        else
+          ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues(row, n_columns,
+                                                               col_value_ptr,
+                                                               col_index_ptr);
+      }
+    else
+      {
+        // When we're at off-processor data, we have to stick with the
+        // standard Insert/ReplaceGlobalValues function. Nevertheless, the way
+        // we call it is the fastest one (any other will lead to repeated
+        // allocation and deallocation of memory in order to call the function
+        // we already use, which is very inefficient if writing one element at
+        // a time).
+        compressed = false;
+
+        if (matrix->Filled() == false)
+          {
+            ierr = matrix->InsertGlobalValues (1,
+                                               (TrilinosWrappers::types::int_type *)&row,
+                                               n_columns, col_index_ptr,
+                                               &col_value_ptr,
+                                               Epetra_FECrsMatrix::ROW_MAJOR);
+            if (ierr > 0)
+              ierr = 0;
+          }
+        else
+          ierr = matrix->ReplaceGlobalValues (1,
+                                              (TrilinosWrappers::types::int_type *)&row,
+                                              n_columns, col_index_ptr,
+                                              &col_value_ptr,
+                                              Epetra_FECrsMatrix::ROW_MAJOR);
+        // use the FECrsMatrix facilities for set even in the case when we
+        // have explicitly set the off-processor rows because that only works
+        // properly when adding elements, not when setting them (since we want
+        // to only touch elements that have been set explicitly, and there is
+        // no way on the receiving processor to identify them otherwise)
+      }
+
+    Assert (ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
+    AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
+  }
+
+
+
+  void
+  SparseMatrix::add (const std::vector<size_type>     &indices,
+                     const FullMatrix<TrilinosScalar> &values,
+                     const bool                        elide_zero_values)
+  {
+    Assert (indices.size() == values.m(),
+            ExcDimensionMismatch(indices.size(), values.m()));
+    Assert (values.m() == values.n(), ExcNotQuadratic());
+
+    for (size_type i=0; i<indices.size(); ++i)
+      add (indices[i], indices.size(), &indices[0], &values(i,0),
+           elide_zero_values);
+  }
+
+
+
+  void
+  SparseMatrix::add (const std::vector<size_type>  &row_indices,
+                     const std::vector<size_type>  &col_indices,
+                     const FullMatrix<TrilinosScalar> &values,
+                     const bool                        elide_zero_values)
+  {
+    Assert (row_indices.size() == values.m(),
+            ExcDimensionMismatch(row_indices.size(), values.m()));
+    Assert (col_indices.size() == values.n(),
+            ExcDimensionMismatch(col_indices.size(), values.n()));
+
+    for (size_type i=0; i<row_indices.size(); ++i)
+      add (row_indices[i], col_indices.size(), &col_indices[0],
+           &values(i,0), elide_zero_values);
+  }
+
+
+
+  void
+  SparseMatrix::add (const size_type                    row,
+                     const std::vector<size_type>      &col_indices,
+                     const std::vector<TrilinosScalar> &values,
+                     const bool                         elide_zero_values)
+  {
+    Assert (col_indices.size() == values.size(),
+            ExcDimensionMismatch(col_indices.size(), values.size()));
+
+    add (row, col_indices.size(), &col_indices[0], &values[0],
+         elide_zero_values);
+  }
+
+
+
+  void
+  SparseMatrix::add (const size_type       row,
+                     const size_type       n_cols,
+                     const size_type      *col_indices,
+                     const TrilinosScalar *values,
+                     const bool            elide_zero_values,
+                     const bool            /*col_indices_are_sorted*/)
+  {
+    AssertIndexRange(row, this->m());
+    int ierr;
+    if (last_action == Insert)
+      {
+        // TODO: this could lead to a dead lock when only one processor
+        // calls GlobalAssemble.
+        ierr = matrix->GlobalAssemble(*column_space_map,
+                                      row_partitioner(), false);
+
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
+
+    last_action = Add;
+
+    TrilinosWrappers::types::int_type *col_index_ptr;
+    TrilinosScalar *col_value_ptr;
+    TrilinosWrappers::types::int_type n_columns;
+
+    double short_val_array[100];
+    TrilinosWrappers::types::int_type short_index_array[100];
+    std::vector<TrilinosScalar> long_val_array;
+    std::vector<TrilinosWrappers::types::int_type> long_index_array;
+
+    // If we don't elide zeros, the pointers are already available... need to
+    // cast to non-const pointers as that is the format taken by Trilinos (but
+    // we will not modify const data)
+    if (elide_zero_values == false)
+      {
+        col_index_ptr = (TrilinosWrappers::types::int_type *)col_indices;
+        col_value_ptr = const_cast<TrilinosScalar *>(values);
+        n_columns = n_cols;
+#ifdef DEBUG
+        for (size_type j=0; j<n_cols; ++j)
+          AssertIsFinite(values[j]);
+#endif
+      }
+    else
+      {
+        // Otherwise, extract nonzero values in each row and the corresponding
+        // index.
+        if (n_cols > 100)
+          {
+            long_val_array.resize(n_cols);
+            long_index_array.resize(n_cols);
+            col_index_ptr = &long_index_array[0];
+            col_value_ptr = &long_val_array[0];
+          }
+        else
+          {
+            col_index_ptr = &short_index_array[0];
+            col_value_ptr = &short_val_array[0];
+          }
+
+        n_columns = 0;
+        for (size_type j=0; j<n_cols; ++j)
+          {
+            const double value = values[j];
+
+            AssertIsFinite(value);
+            if (value != 0)
+              {
+                col_index_ptr[n_columns] = col_indices[j];
+                col_value_ptr[n_columns] = value;
+                n_columns++;
+              }
+          }
+
+        Assert(n_columns <= (TrilinosWrappers::types::int_type)n_cols, ExcInternalError());
+
+      }
+
+    // If the calling processor owns the row to which we want to add values, we
+    // can directly call the Epetra_CrsMatrix input function, which is much
+    // faster than the Epetra_FECrsMatrix function.
+    if (row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == true)
+      {
+        ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_columns,
+                                                             col_value_ptr,
+                                                             col_index_ptr);
+      }
+    else if (nonlocal_matrix.get() != 0)
+      {
+        compressed = false;
+        // this is the case when we have explicitly set the off-processor rows
+        // and want to create a separate matrix object for them (to retain
+        // thread-safety)
+        Assert (nonlocal_matrix->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row)) != -1,
+                ExcMessage("Attempted to write into off-processor matrix row "
+                           "that has not be specified as being writable upon "
+                           "initialization"));
+        ierr = nonlocal_matrix->SumIntoGlobalValues(row, n_columns,
+                                                    col_value_ptr,
+                                                    col_index_ptr);
+      }
+    else
+      {
+        // When we're at off-processor data, we have to stick with the
+        // standard SumIntoGlobalValues function. Nevertheless, the way we
+        // call it is the fastest one (any other will lead to repeated
+        // allocation and deallocation of memory in order to call the function
+        // we already use, which is very inefficient if writing one element at
+        // a time).
+        compressed = false;
+
+        ierr = matrix->SumIntoGlobalValues (1,
+                                            (TrilinosWrappers::types::int_type *)&row, n_columns,
+                                            col_index_ptr,
+                                            &col_value_ptr,
+                                            Epetra_FECrsMatrix::ROW_MAJOR);
+      }
+
+#ifdef DEBUG
+    if (ierr > 0)
+      {
+        std::cout << "------------------------------------------"
+                  << std::endl;
+        std::cout << "Got error " << ierr << " in row " << row
+                  << " of proc " << row_partitioner().Comm().MyPID()
+                  << " when trying to add the columns:" << std::endl;
+        for (TrilinosWrappers::types::int_type i=0; i<n_columns; ++i)
+          std::cout << col_index_ptr[i] << " ";
+        std::cout << std::endl << std::endl;
+        std::cout << "Matrix row "
+                  << (row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == false ? "(nonlocal part)" : "")
+                  << " has the following indices:" << std::endl;
+        std::vector<TrilinosWrappers::types::int_type> indices;
+        const Epetra_CrsGraph *graph =
+          (nonlocal_matrix.get() != 0 &&
+           row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == false) ?
+          &nonlocal_matrix->Graph() : &matrix->Graph();
+
+        indices.resize(graph->NumGlobalIndices(static_cast<TrilinosWrappers::types::int_type>(row)));
+        int n_indices = 0;
+        graph->ExtractGlobalRowCopy(static_cast<TrilinosWrappers::types::int_type>(row),
+                                    indices.size(), n_indices, &indices[0]);
+        AssertDimension(static_cast<unsigned int>(n_indices), indices.size());
+
+        for (TrilinosWrappers::types::int_type i=0; i<n_indices; ++i)
+          std::cout << indices[i] << " ";
+        std::cout << std::endl << std::endl;
+        Assert (ierr <= 0,
+                ExcAccessToNonPresentElement(row, col_index_ptr[0]));
+      }
+#endif
+    Assert (ierr >= 0, ExcTrilinosError(ierr));
+  }
+
+
+
+  SparseMatrix &
+  SparseMatrix::operator = (const double d)
+  {
+    Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+    compress (::dealii::VectorOperation::unknown); // TODO: why do we do this? Should we not check for is_compressed?
+
+    const int ierr = matrix->PutScalar(d);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    if (nonlocal_matrix.get() != 0)
+      nonlocal_matrix->PutScalar(d);
+
+    return *this;
+  }
+
+
+
+  void
+  SparseMatrix::add (const TrilinosScalar  factor,
+                     const SparseMatrix   &rhs)
+  {
+    AssertDimension (rhs.m(), m());
+    AssertDimension (rhs.n(), n());
+    AssertDimension (rhs.local_range().first, local_range().first);
+    AssertDimension (rhs.local_range().second, local_range().second);
+    Assert(matrix->RowMap().SameAs(rhs.matrix->RowMap()),
+           ExcMessage("Can only add matrices with same distribution of rows"));
+    Assert(matrix->Filled() && rhs.matrix->Filled(),
+           ExcMessage("Addition of matrices only allowed if matrices are "
+                      "filled, i.e., compress() has been called"));
+
+    const std::pair<size_type, size_type>
+    local_range = rhs.local_range();
+    const bool same_col_map = matrix->ColMap().SameAs(rhs.matrix->ColMap());
+
+    int ierr;
+    for (size_type row=local_range.first; row < local_range.second; ++row)
+      {
+        const int row_local =
+          matrix->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row));
+
+        // First get a view to the matrix columns of both matrices. Note that
+        // the data is in local index spaces so we need to be careful not only
+        // to compare column indices in case they are derived from the same
+        // map.
+        int n_entries, rhs_n_entries;
+        TrilinosScalar *value_ptr, *rhs_value_ptr;
+        int *index_ptr, *rhs_index_ptr;
+        ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,
+                                             rhs_value_ptr, rhs_index_ptr);
+        (void)ierr;
+        Assert (ierr == 0, ExcTrilinosError(ierr));
+
+        ierr = matrix->ExtractMyRowView (row_local, n_entries, value_ptr,
+                                         index_ptr);
+        Assert (ierr == 0, ExcTrilinosError(ierr));
+        bool expensive_checks = (n_entries != rhs_n_entries || !same_col_map);
+        if (!expensive_checks)
+          {
+            // check if the column indices are the same. If yes, can simply
+            // copy over the data.
+            expensive_checks = std::memcmp(static_cast<void *>(index_ptr),
+                                           static_cast<void *>(rhs_index_ptr),
+                                           sizeof(int)*n_entries) != 0;
+            if (!expensive_checks)
+              for (int i=0; i<n_entries; ++i)
+                value_ptr[i] += rhs_value_ptr[i] * factor;
+          }
+        // Now to the expensive case where we need to check all column indices
+        // against each other (transformed into global index space) and where
+        // we need to make sure that all entries we are about to add into the
+        // lhs matrix actually exist
+        if (expensive_checks)
+          {
+            for (int i=0; i<rhs_n_entries; ++i)
+              {
+                if (rhs_value_ptr[i] == 0.)
+                  continue;
+                const TrilinosWrappers::types::int_type rhs_global_col =
+                  global_column_index(*rhs.matrix, rhs_index_ptr[i]);
+                int local_col = matrix->ColMap().LID(rhs_global_col);
+                int *local_index = Utilities::lower_bound(index_ptr,
+                                                          index_ptr+n_entries,
+                                                          local_col);
+                Assert(local_index != index_ptr + n_entries &&
+                       *local_index == local_col,
+                       ExcMessage("Adding the entries from the other matrix "
+                                  "failed, because the sparsity pattern "
+                                  "of that matrix includes more elements than the "
+                                  "calling matrix, which is not allowed."));
+                value_ptr[local_index-index_ptr] += factor * rhs_value_ptr[i];
+              }
+          }
+      }
+  }
+
+
+
+  void
+  SparseMatrix::transpose ()
+  {
+    // This only flips a flag that tells
+    // Trilinos that any vmult operation
+    // should be done with the
+    // transpose. However, the matrix
+    // structure is not reset.
+    int ierr;
+
+    if (!matrix->UseTranspose())
+      {
+        ierr = matrix->SetUseTranspose (true);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
+    else
+      {
+        ierr = matrix->SetUseTranspose (false);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+      }
+  }
+
+
+
+  SparseMatrix &
+  SparseMatrix::operator *= (const TrilinosScalar a)
+  {
+    const int ierr = matrix->Scale (a);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
+
+    return *this;
+  }
+
+
+
+  SparseMatrix &
+  SparseMatrix::operator /= (const TrilinosScalar a)
+  {
+    Assert (a !=0, ExcDivideByZero());
+
+    const TrilinosScalar factor = 1./a;
+
+    const int ierr = matrix->Scale (factor);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
+
+    return *this;
+  }
+
+
+
+  TrilinosScalar
+  SparseMatrix::l1_norm () const
+  {
+    Assert (matrix->Filled(), ExcMatrixNotCompressed());
+    return matrix->NormOne();
+  }
+
+
+
+  TrilinosScalar
+  SparseMatrix::linfty_norm () const
+  {
+    Assert (matrix->Filled(), ExcMatrixNotCompressed());
+    return matrix->NormInf();
+  }
+
+
+
+  TrilinosScalar
+  SparseMatrix::frobenius_norm () const
+  {
+    Assert (matrix->Filled(), ExcMatrixNotCompressed());
+    return matrix->NormFrobenius();
+  }
+
+
+
+  namespace internal
+  {
+    namespace SparseMatrix
+    {
+      template <typename VectorType>
+      inline
+      void check_vector_map_equality(const Epetra_CrsMatrix &,
+                                     const VectorType &,
+                                     const VectorType &)
+      {
+      }
+
+      inline
+      void check_vector_map_equality(const Epetra_CrsMatrix              &m,
+                                     const TrilinosWrappers::MPI::Vector &in,
+                                     const TrilinosWrappers::MPI::Vector &out)
+      {
+        Assert (in.vector_partitioner().SameAs(m.DomainMap()) == true,
+                ExcMessage ("Column map of matrix does not fit with vector map!"));
+        Assert (out.vector_partitioner().SameAs(m.RangeMap()) == true,
+                ExcMessage ("Row map of matrix does not fit with vector map!"));
+        (void)m;
+        (void)in;
+        (void)out;
+      }
+    }
+  }
+
+
+  template <typename VectorType>
+  void
+  SparseMatrix::vmult (VectorType       &dst,
+                       const VectorType &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+    Assert (matrix->Filled(), ExcMatrixNotCompressed());
+    (void)src;
+    (void)dst;
+
+    internal::SparseMatrix::check_vector_map_equality(*matrix, src, dst);
+    const size_type dst_local_size = dst.end() - dst.begin();
+    AssertDimension (dst_local_size, static_cast<size_type>(matrix->RangeMap().NumMyPoints()));
+    const size_type src_local_size = src.end() - src.begin();
+    AssertDimension (src_local_size, static_cast<size_type>(matrix->DomainMap().NumMyPoints()));
+
+    Epetra_MultiVector tril_dst (View, matrix->RangeMap(), dst.begin(),
+                                 dst_local_size, 1);
+    Epetra_MultiVector tril_src (View, matrix->DomainMap(),
+                                 const_cast<TrilinosScalar *>(src.begin()),
+                                 src_local_size, 1);
+
+    const int ierr = matrix->Multiply (false, tril_src, tril_dst);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
+  }
+
+
+
+  template <typename VectorType>
+  void
+  SparseMatrix::Tvmult (VectorType       &dst,
+                        const VectorType &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+    Assert (matrix->Filled(), ExcMatrixNotCompressed());
+
+    internal::SparseMatrix::check_vector_map_equality(*matrix, dst, src);
+    const size_type dst_local_size = dst.end() - dst.begin();
+    AssertDimension (dst_local_size, static_cast<size_type>(matrix->DomainMap().NumMyPoints()));
+    const size_type src_local_size = src.end() - src.begin();
+    AssertDimension (src_local_size, static_cast<size_type>(matrix->RangeMap().NumMyPoints()));
+
+    Epetra_MultiVector tril_dst (View, matrix->DomainMap(), dst.begin(),
+                                 dst_local_size, 1);
+    Epetra_MultiVector tril_src (View, matrix->RangeMap(),
+                                 const_cast<double *>(src.begin()),
+                                 src_local_size, 1);
+
+    const int ierr = matrix->Multiply (true, tril_src, tril_dst);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
+  }
+
+
+
+  template <typename VectorType>
+  void
+  SparseMatrix::vmult_add (VectorType       &dst,
+                           const VectorType &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+
+    // Reinit a temporary vector with fast argument set, which does not
+    // overwrite the content (to save time). However, the
+    // TrilinosWrappers::Vector classes do not support this, so create a
+    // deal.II local vector that has this fast setting. It will be accepted in
+    // vmult because it only checks the local size.
+    dealii::Vector<TrilinosScalar> temp_vector;
+    temp_vector.reinit(dst.end()-dst.begin(), true);
+    dealii::VectorView<TrilinosScalar> src_view(src.end()-src.begin(), src.begin());
+    dealii::VectorView<TrilinosScalar> dst_view(dst.end()-dst.begin(), dst.begin());
+    vmult (temp_vector, static_cast<const dealii::Vector<TrilinosScalar>&>(src_view));
+    if (dst_view.size() > 0)
+      dst_view += temp_vector;
+  }
+
+
+
+  template <typename VectorType>
+  void
+  SparseMatrix::Tvmult_add (VectorType       &dst,
+                            const VectorType &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+
+    // Reinit a temporary vector with fast argument set, which does not
+    // overwrite the content (to save time). However, the
+    // TrilinosWrappers::Vector classes do not support this, so create a
+    // deal.II local vector that has this fast setting. It will be accepted in
+    // vmult because it only checks the local size.
+    dealii::Vector<TrilinosScalar> temp_vector;
+    temp_vector.reinit(dst.end()-dst.begin(), true);
+    dealii::VectorView<TrilinosScalar> src_view(src.end()-src.begin(), src.begin());
+    dealii::VectorView<TrilinosScalar> dst_view(dst.end()-dst.begin(), dst.begin());
+    Tvmult (temp_vector, static_cast<const dealii::Vector<TrilinosScalar>&>(src_view));
+    if (dst_view.size() > 0)
+      dst_view += temp_vector;
+  }
+
+
+
+  TrilinosScalar
+  SparseMatrix::matrix_norm_square (const VectorBase &v) const
+  {
+    Assert (row_partitioner().SameAs(domain_partitioner()),
+            ExcNotQuadratic());
+
+    VectorBase temp_vector;
+    temp_vector.reinit(v, true);
+
+    vmult (temp_vector, v);
+    return temp_vector*v;
+  }
+
+
+
+  TrilinosScalar
+  SparseMatrix::matrix_scalar_product (const VectorBase &u,
+                                       const VectorBase &v) const
+  {
+    Assert (row_partitioner().SameAs(domain_partitioner()),
+            ExcNotQuadratic());
+
+    VectorBase temp_vector;
+    temp_vector.reinit(v, true);
+
+    vmult (temp_vector, v);
+    return u*temp_vector;
+  }
+
+
+
+  TrilinosScalar
+  SparseMatrix::residual (VectorBase       &dst,
+                          const VectorBase &x,
+                          const VectorBase &b) const
+  {
+    vmult (dst, x);
+    dst -= b;
+    dst *= -1.;
+
+    return dst.l2_norm();
+  }
+
+
+
   namespace internals
   {
     typedef dealii::types::global_dof_index size_type;
@@ -1554,111 +2286,6 @@ namespace TrilinosWrappers
 
 
   void
-  SparseMatrix::add (const TrilinosScalar  factor,
-                     const SparseMatrix   &rhs)
-  {
-    AssertDimension (rhs.m(), m());
-    AssertDimension (rhs.n(), n());
-    AssertDimension (rhs.local_range().first, local_range().first);
-    AssertDimension (rhs.local_range().second, local_range().second);
-    Assert(matrix->RowMap().SameAs(rhs.matrix->RowMap()),
-           ExcMessage("Can only add matrices with same distribution of rows"));
-    Assert(matrix->Filled() && rhs.matrix->Filled(),
-           ExcMessage("Addition of matrices only allowed if matrices are "
-                      "filled, i.e., compress() has been called"));
-
-    const std::pair<size_type, size_type>
-    local_range = rhs.local_range();
-    const bool same_col_map = matrix->ColMap().SameAs(rhs.matrix->ColMap());
-
-    int ierr;
-    for (size_type row=local_range.first; row < local_range.second; ++row)
-      {
-        const int row_local =
-          matrix->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row));
-
-        // First get a view to the matrix columns of both matrices. Note that
-        // the data is in local index spaces so we need to be careful not only
-        // to compare column indices in case they are derived from the same
-        // map.
-        int n_entries, rhs_n_entries;
-        TrilinosScalar *value_ptr, *rhs_value_ptr;
-        int *index_ptr, *rhs_index_ptr;
-        ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,
-                                             rhs_value_ptr, rhs_index_ptr);
-        (void)ierr;
-        Assert (ierr == 0, ExcTrilinosError(ierr));
-
-        ierr = matrix->ExtractMyRowView (row_local, n_entries, value_ptr,
-                                         index_ptr);
-        Assert (ierr == 0, ExcTrilinosError(ierr));
-        bool expensive_checks = (n_entries != rhs_n_entries || !same_col_map);
-        if (!expensive_checks)
-          {
-            // check if the column indices are the same. If yes, can simply
-            // copy over the data.
-            expensive_checks = std::memcmp(static_cast<void *>(index_ptr),
-                                           static_cast<void *>(rhs_index_ptr),
-                                           sizeof(int)*n_entries) != 0;
-            if (!expensive_checks)
-              for (int i=0; i<n_entries; ++i)
-                value_ptr[i] += rhs_value_ptr[i] * factor;
-          }
-        // Now to the expensive case where we need to check all column indices
-        // against each other (transformed into global index space) and where
-        // we need to make sure that all entries we are about to add into the
-        // lhs matrix actually exist
-        if (expensive_checks)
-          {
-            for (int i=0; i<rhs_n_entries; ++i)
-              {
-                if (rhs_value_ptr[i] == 0.)
-                  continue;
-                const TrilinosWrappers::types::int_type rhs_global_col =
-                  global_column_index(*rhs.matrix, rhs_index_ptr[i]);
-                int local_col = matrix->ColMap().LID(rhs_global_col);
-                int *local_index = Utilities::lower_bound(index_ptr,
-                                                          index_ptr+n_entries,
-                                                          local_col);
-                Assert(local_index != index_ptr + n_entries &&
-                       *local_index == local_col,
-                       ExcMessage("Adding the entries from the other matrix "
-                                  "failed, because the sparsity pattern "
-                                  "of that matrix includes more elements than the "
-                                  "calling matrix, which is not allowed."));
-                value_ptr[local_index-index_ptr] += factor * rhs_value_ptr[i];
-              }
-          }
-      }
-  }
-
-
-
-  void
-  SparseMatrix::transpose ()
-  {
-    // This only flips a flag that tells
-    // Trilinos that any vmult operation
-    // should be done with the
-    // transpose. However, the matrix
-    // structure is not reset.
-    int ierr;
-
-    if (!matrix->UseTranspose())
-      {
-        ierr = matrix->SetUseTranspose (true);
-        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-      }
-    else
-      {
-        ierr = matrix->SetUseTranspose (false);
-        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-      }
-  }
-
-
-
-  void
   SparseMatrix::write_ascii ()
   {
     Assert (false, ExcNotImplemented());
@@ -1737,6 +2364,66 @@ namespace TrilinosWrappers
                         const dealii::SparsityPattern &,
                         const bool);
 
+  template void
+  SparseMatrix::vmult (VectorBase &,
+                       const VectorBase &) const;
+  template void
+  SparseMatrix::vmult (Vector &,
+                       const Vector &) const;
+  template void
+  SparseMatrix::vmult (MPI::Vector &,
+                       const MPI::Vector &) const;
+  template void
+  SparseMatrix::vmult (dealii::Vector<double> &,
+                       const dealii::Vector<double> &) const;
+  template void
+  SparseMatrix::vmult (dealii::parallel::distributed::Vector<double> &,
+                       const dealii::parallel::distributed::Vector<double> &) const;
+  template void
+  SparseMatrix::Tvmult (VectorBase &,
+                        const VectorBase &) const;
+  template void
+  SparseMatrix::Tvmult (Vector &,
+                        const Vector &) const;
+  template void
+  SparseMatrix::Tvmult (MPI::Vector &,
+                        const MPI::Vector &) const;
+  template void
+  SparseMatrix::Tvmult (dealii::Vector<double> &,
+                        const dealii::Vector<double> &) const;
+  template void
+  SparseMatrix::Tvmult (dealii::parallel::distributed::Vector<double> &,
+                        const dealii::parallel::distributed::Vector<double> &) const;
+  template void
+  SparseMatrix::vmult_add (VectorBase &,
+                           const VectorBase &) const;
+  template void
+  SparseMatrix::vmult_add (Vector &,
+                           const Vector &) const;
+  template void
+  SparseMatrix::vmult_add (MPI::Vector &,
+                           const MPI::Vector &) const;
+  template void
+  SparseMatrix::vmult_add (dealii::Vector<double> &,
+                           const dealii::Vector<double> &) const;
+  template void
+  SparseMatrix::vmult_add (dealii::parallel::distributed::Vector<double> &,
+                           const dealii::parallel::distributed::Vector<double> &) const;
+  template void
+  SparseMatrix::Tvmult_add (VectorBase &,
+                            const VectorBase &) const;
+  template void
+  SparseMatrix::Tvmult_add (Vector &,
+                            const Vector &) const;
+  template void
+  SparseMatrix::Tvmult_add (MPI::Vector &,
+                            const MPI::Vector &) const;
+  template void
+  SparseMatrix::Tvmult_add (dealii::Vector<double> &,
+                            const dealii::Vector<double> &) const;
+  template void
+  SparseMatrix::Tvmult_add (dealii::parallel::distributed::Vector<double> &,
+                            const dealii::parallel::distributed::Vector<double> &) const;
 }
 
 DEAL_II_NAMESPACE_CLOSE
