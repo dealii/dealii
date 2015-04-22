@@ -2414,31 +2414,29 @@ namespace internal
 #else
 
 
-        //calculate new IndexSet. First try
-        //to find out if the new indices are
-        //contiguous blocks. This avoids
-        //inserting each index individually
-        //into the IndexSet, which is slow.
-        //If we own no DoFs, we still need to
-        //go through this function, but we
-        //can skip this calculation.
+        // calculate new IndexSet. First try to find out if the new indices
+        // are contiguous blocks. This avoids inserting each index
+        // individually into the IndexSet, which is slow.  If we own no DoFs,
+        // we still need to go through this function, but we can skip this
+        // calculation.
 
         number_cache.locally_owned_dofs = IndexSet (dof_handler.n_dofs());
         if (dof_handler.locally_owned_dofs().n_elements()>0)
           {
-            std::vector<dealii::types::global_dof_index>::const_iterator it = new_numbers.begin();
+            std::vector<dealii::types::global_dof_index> new_numbers_sorted (new_numbers);
+            std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
+            std::vector<dealii::types::global_dof_index>::const_iterator it = new_numbers_sorted.begin();
             const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
             std::vector<std::pair<dealii::types::global_dof_index,unsigned int> > block_indices(n_blocks);
             block_indices[0].first = *it++;
             block_indices[0].second = 1;
             unsigned int current_block = 0, n_filled_blocks = 1;
-            for ( ; it != new_numbers.end(); ++it)
+            for ( ; it != new_numbers_sorted.end(); ++it)
               {
                 bool done = false;
 
-                // search from the current block onwards
-                // whether the next index is shifted by one
-                // from the previous one.
+                // search from the current block onwards whether the next
+                // index is shifted by one from the previous one.
                 for (unsigned int i=0; i<n_filled_blocks; ++i)
                   if (*it == block_indices[current_block].first
                       +block_indices[current_block].second)
@@ -2455,10 +2453,9 @@ namespace internal
                         ++current_block;
                     }
 
-                // could not find any contiguous range: need
-                // to add a new block if possible. Abort
-                // otherwise, which will add all elements
-                // individually to the IndexSet.
+                // could not find any contiguous range: need to add a new
+                // block if possible. Abort otherwise, which will add all
+                // elements individually to the IndexSet.
                 if (done == false)
                   {
                     if (n_filled_blocks < n_blocks)
@@ -2473,11 +2470,10 @@ namespace internal
                   }
               }
 
-            // check whether all indices could be assigned
-            // to blocks. If yes, we can add the block
-            // ranges to the IndexSet, otherwise we need
-            // to go through the indices once again and
-            // add each element individually
+            // check whether all indices could be assigned to blocks. If yes,
+            // we can add the block ranges to the IndexSet, otherwise we need
+            // to go through the indices once again and add each element
+            // individually
             unsigned int sum = 0;
             for (unsigned int i=0; i<n_filled_blocks; ++i)
               sum += block_indices[i].second;
@@ -2487,28 +2483,24 @@ namespace internal
                                                            block_indices[i].first+
                                                            block_indices[i].second);
             else
-              number_cache.locally_owned_dofs.add_indices(new_numbers.begin(), new_numbers.end());
+              number_cache.locally_owned_dofs.add_indices(new_numbers_sorted.begin(),
+                                                          new_numbers_sorted.end());
           }
 
 
         number_cache.locally_owned_dofs.compress();
         Assert (number_cache.locally_owned_dofs.n_elements() == new_numbers.size(),
                 ExcInternalError());
-        // also check with the number
-        // of locally owned degrees
-        // of freedom that the
-        // DoFHandler object still
-        // stores
+        // also check with the number of locally owned degrees of freedom that
+        // the DoFHandler object still stores
         Assert (number_cache.locally_owned_dofs.n_elements() ==
                 dof_handler.n_locally_owned_dofs(),
                 ExcInternalError());
 
-        // then also set this number
-        // in our own copy
+        // then also set this number in our own copy
         number_cache.n_locally_owned_dofs = dof_handler.n_locally_owned_dofs();
 
-        // mark not locally active DoFs as
-        // invalid
+        // mark not locally active DoFs as invalid
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
@@ -2528,9 +2520,7 @@ namespace internal
 
                     if (!dof_handler.locally_owned_dofs().is_element(local_dof_indices[i]))
                       {
-                        //this DoF is not owned
-                        //by us, so set it to
-                        //invalid.
+                        //this DoF is not owned by us, so set it to invalid.
                         local_dof_indices[i]
                           = DoFHandler<dim,spacedim>::invalid_dof_index;
                       }
@@ -2541,9 +2531,7 @@ namespace internal
         }
 
 
-        // renumber. Skip when there is
-        // nothing to do because we own no
-        // DoF.
+        // renumber. Skip when there is nothing to do because we own no DoF.
         if (dof_handler.locally_owned_dofs().n_elements() > 0)
           Implementation::renumber_dofs (new_numbers,
                                          dof_handler.locally_owned_dofs(),
@@ -2569,18 +2557,15 @@ namespace internal
             if (!cell->is_artificial())
               cell->set_user_flag();
 
-          // add each ghostcells'
-          // subdomain to the vertex and
-          // keep track of interesting
-          // neighbors
+          // add each ghostcells' subdomain to the vertex and keep track of
+          // interesting neighbors
           std::map<unsigned int, std::set<dealii::types::subdomain_id> >
           vertices_with_ghost_neighbors;
 
           tr->fill_vertices_with_ghost_neighbors (vertices_with_ghost_neighbors);
 
-          // Send and receive cells. After this, only
-          // the local cells are marked, that received
-          // new data. This has to be communicated in a
+          // Send and receive cells. After this, only the local cells are
+          // marked, that received new data. This has to be communicated in a
           // second communication step.
           communicate_dof_indices_on_marked_cells (dof_handler,
                                                    vertices_with_ghost_neighbors,
@@ -2593,13 +2578,11 @@ namespace internal
                                                    tr->p4est_tree_to_coarse_cell_permutation);
 
 
-          // * Create global_dof_indexsets by
-          // transferring our own owned_dofs to
-          // every other machine.
+          // * Create global_dof_indexsets by transferring our own owned_dofs
+          // to every other machine.
           const unsigned int n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
 
-          // Serialize our IndexSet and
-          // determine size.
+          // Serialize our IndexSet and determine size.
           std::ostringstream oss;
           number_cache.locally_owned_dofs.block_write(oss);
           std::string oss_str=oss.str();
@@ -2610,10 +2593,8 @@ namespace internal
           const unsigned int max_size
             = Utilities::MPI::max (my_size, tr->get_communicator());
 
-          // as we are reading past the end, we
-          // need to increase the size of the
-          // local buffer. This is filled with
-          // zeros.
+          // as we are reading past the end, we need to increase the size of
+          // the local buffer. This is filled with zeros.
           my_data.resize(max_size);
 
           std::vector<char> buffer(max_size*n_cpus);
@@ -2627,13 +2608,9 @@ namespace internal
             {
               std::stringstream strstr;
               strstr.write(&buffer[i*max_size],max_size);
-              // This does not read the whole
-              // buffer, when the size is
-              // smaller than
-              // max_size. Therefor we need to
-              // create a new stringstream in
-              // each iteration (resetting
-              // would be fine too).
+              // This does not read the whole buffer, when the size is smaller
+              // than max_size. Therefore we need to create a new stringstream
+              // in each iteration (resetting would be fine too).
               number_cache.locally_owned_dofs_per_processor[i]
               .block_read(strstr);
               number_cache.n_locally_owned_dofs_per_processor[i]
