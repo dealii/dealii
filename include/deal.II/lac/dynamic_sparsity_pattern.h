@@ -125,6 +125,15 @@ namespace DynamicSparsityPatternIterators
     std::vector<size_type>::const_iterator current_entry;
 
     /**
+     * A pointer to the end of the current row. We store this
+     * to make comparison against the end of line iterator
+     * cheaper as it otherwise needs to do the IndexSet translation
+     * from row index to the index within the 'lines' array
+     * of DynamicSparsityPattern.
+     */
+    std::vector<size_type>::const_iterator end_of_row;
+
+    /**
      * Move the accessor to the next nonzero entry in the matrix.
      */
     void advance ();
@@ -658,7 +667,12 @@ namespace DynamicSparsityPatternIterators
                    :
                    sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.begin())
                   +
-                  index_within_row)
+                  index_within_row),
+    end_of_row((sparsity_pattern->rowset.size()==0)
+               ?
+               sparsity_pattern->lines[current_row].entries.end()
+               :
+               sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.end())
   {
     Assert (current_row < sparsity_pattern->n_rows(),
             ExcIndexRange (row, 0, sparsity_pattern->n_rows()));
@@ -690,7 +704,8 @@ namespace DynamicSparsityPatternIterators
     :
     sparsity_pattern(sparsity_pattern),
     current_row(numbers::invalid_unsigned_int),
-    current_entry()
+    current_entry(),
+    end_of_row()
   {}
 
 
@@ -778,12 +793,7 @@ namespace DynamicSparsityPatternIterators
     // the sparsity pattern. consequently, rather than trying to
     // duplicate code here, just call the begin() function of the
     // sparsity pattern itself
-    if (current_entry ==
-        ((sparsity_pattern->rowset.size()==0)
-         ?
-         sparsity_pattern->lines[current_row].entries.end()
-         :
-         sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.end()))
+    if (current_entry == end_of_row)
       {
         if (current_row+1 < sparsity_pattern->n_rows())
           *this = *sparsity_pattern->begin(current_row+1);
