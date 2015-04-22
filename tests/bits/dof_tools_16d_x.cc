@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,10 +79,10 @@ check_this (const DoFHandler<dim> &dof_handler)
       block_row = sp.get_row_indices().global_to_local(line);
       for (unsigned int col=0; col<n_blocks; ++col)
         {
-          for (CompressedSetSparsityPattern::row_iterator
-               c = sp.block(block_row.first,col).row_begin(block_row.second);
-               c!=sp.block(block_row.first,col).row_end(block_row.second); ++c)
-            deallog << *c
+          for (CompressedSetSparsityPattern::iterator
+               c = sp.block(block_row.first,col).begin(block_row.second);
+               c!=sp.block(block_row.first,col).end(block_row.second); ++c)
+            deallog << c->column()
                     << " ";
           deallog << std::endl;
         }
