@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -505,12 +505,12 @@ SparsityPattern::copy_from (const DSP &dsp)
     for (size_type row = 0; row<dsp.n_rows(); ++row)
       {
         size_type *cols = &colnums[rowstart[row]] + (do_diag_optimize ? 1 : 0);
-        typename DSP::row_iterator col_num = dsp.row_begin (row),
-                                   end_row = dsp.row_end (row);
+        typename DSP::iterator col_num = dsp.begin (row),
+                               end_row = dsp.end (row);
 
         for (; col_num != end_row; ++col_num)
           {
-            const size_type col = *col_num;
+            const size_type col = col_num->column();
             if ((col!=row) || !do_diag_optimize)
               *cols++ = col;
           }
