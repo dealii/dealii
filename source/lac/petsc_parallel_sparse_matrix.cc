@@ -471,16 +471,10 @@ namespace PETScWrappers
           // from the sparsity pattern.
           {
             PetscInt *ptr = & colnums_in_window[0];
-
             for (PetscInt i=local_row_start; i<local_row_end; ++i)
-              {
-                typename SparsityType::row_iterator
-                row_start = sparsity_pattern.row_begin(i),
-                row_end = sparsity_pattern.row_end(i);
-
-                std::copy(row_start, row_end, ptr);
-                ptr += row_end - row_start;
-              }
+              for (typename SparsityType::iterator p=sparsity_pattern.begin(i);
+                   p != sparsity_pattern.end(i); ++p, ++ptr)
+                *ptr = p->column();
           }
 
 
@@ -698,16 +692,10 @@ namespace PETScWrappers
           // from the sparsity pattern.
           {
             PetscInt *ptr = & colnums_in_window[0];
-
             for (size_type i=local_row_start; i<local_row_end; ++i)
-              {
-                typename SparsityType::row_iterator
-                row_start = sparsity_pattern.row_begin(i),
-                row_end = sparsity_pattern.row_end(i);
-
-                std::copy(row_start, row_end, ptr);
-                ptr += row_end - row_start;
-              }
+              for (typename SparsityType::iterator p=sparsity_pattern.begin(i);
+                   p != sparsity_pattern.end(i); ++p, ++ptr)
+                *ptr = p->column();
           }
 
 
