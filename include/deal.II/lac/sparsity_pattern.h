@@ -340,15 +340,6 @@ public:
   const_iterator;
 
   /**
-   * Typedef an iterator class that allows to walk over the nonzero elements
-   * of a row of a sparsity pattern.
-   *
-   * @deprecated This typedef is deprecated. Use proper iterators instead.
-   */
-  typedef
-  const size_type *row_iterator;
-
-  /**
    * Typedef an iterator class that allows to walk over all nonzero elements
    * of a sparsity pattern.
    *
@@ -950,42 +941,10 @@ public:
   template <class Archive>
   void load (Archive &ar, const unsigned int version);
 
-// @}
-  /**
-   * @name Deprecated functions
-   */
-// @{
-
-
-  /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
-   *
-   * Note that if the given row is empty, i.e. does not contain any nonzero
-   * entries, then the iterator returned by this function equals
-   * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
-   * that case.
-   *
-   * @deprecated Use the iterators provided by the begin() and end() functions
-   * instead.
-   */
-  row_iterator row_begin (const size_type r) const DEAL_II_DEPRECATED;
-
-  /**
-   * Final iterator of row <tt>r</tt>. It points to the first element past the
-   * end of line @p r, or past the end of the entire sparsity pattern.
-   *
-   * Note that the end iterator is not necessarily dereferencable. This is in
-   * particular the case if it is the end iterator for the last row of a
-   * matrix.
-   *
-   * @deprecated Use the iterators provided by the begin() and end() functions
-   * instead.
-   */
-  row_iterator row_end (const size_type r) const DEAL_II_DEPRECATED;
-
-// @}
-
   BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+// @}
+
   /**
    * @addtogroup Exceptions
    * @{
@@ -1364,26 +1323,6 @@ SparsityPattern::end (const size_type r) const
   Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
 
   return iterator(this, rowstart[r+1]);
-}
-
-
-
-inline
-SparsityPattern::row_iterator
-SparsityPattern::row_begin (const size_type r) const
-{
-  Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
-  return &colnums[rowstart[r]];
-}
-
-
-
-inline
-SparsityPattern::row_iterator
-SparsityPattern::row_end (const size_type r) const
-{
-  Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
-  return &colnums[rowstart[r+1]];
 }
 
 

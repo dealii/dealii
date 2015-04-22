@@ -214,6 +214,10 @@ inconvenience this causes.
   - SparsityPattern::partition.
   - SparsityPattern::get_rowstart_indices and
     SparsityPattern::get_column_numbers.
+  - SparsityPattern::row_iterator and corresponding row_begin() and row_end()
+    functions.
+  - CompressedSparsityPattern::row_iterator and corresponding row_begin()
+    and row_end() functions.
   - The typedef CompressedBlockSparsityPattern.
   - The deprecated constructors of SparsityPattern iterator classes.
   - The deprecated variants of DoFTools::make_periodicity_constraints.

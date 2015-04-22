@@ -317,12 +317,6 @@ public:
   const_iterator;
 
   /**
-   * An iterator that can be used to iterate over the elements of a single
-   * row. The result of dereferencing such an iterator is a column index.
-   */
-  typedef std::vector<size_type>::const_iterator row_iterator;
-
-  /**
    * Initialize as an empty object. This is
    * useful if you want such objects as member variables in other classes. You
    * can make the structure usable by calling the reinit() function.
@@ -527,17 +521,6 @@ public:
    * matrix.
    */
   iterator end (const size_type r) const;
-
-  /**
-   * Return an iterator that can loop over all entries in the given row.
-   * Dereferencing the iterator yields a column index.
-   */
-  row_iterator row_begin (const size_type row) const;
-
-  /**
-   * Returns the end of the current row.
-   */
-  row_iterator row_end (const size_type row) const;
 
 // @}
 
@@ -1085,28 +1068,6 @@ DynamicSparsityPattern::end (const size_type r) const
     return iterator(this);
   else
     return iterator(this, row, 0);
-}
-
-
-
-inline
-DynamicSparsityPattern::row_iterator
-DynamicSparsityPattern::row_begin (const size_type row) const
-{
-  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
-  const size_type local_row = rowset.size() ? rowset.index_within_set(row) : row;
-  return lines[local_row].entries.begin();
-}
-
-
-
-inline
-DynamicSparsityPattern::row_iterator
-DynamicSparsityPattern::row_end (const size_type row) const
-{
-  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
-  const size_type local_row = rowset.size() ? rowset.index_within_set(row) : row;
-  return lines[local_row].entries.end();
 }
 
 
