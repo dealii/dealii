@@ -585,6 +585,24 @@ namespace VectorTools
     interpolate_to_different_mesh(intergridmap, u1, constraints, u2);
   }
 
+  namespace internal
+  {
+    /**
+     * Returns whether the cell and all of its descendants are locally owned.
+     */
+    template <typename cell_iterator>
+    bool is_locally_owned(const cell_iterator &cell)
+    {
+      if (cell->active())
+        return cell->is_locally_owned();
+
+      for (unsigned int c=0; c<cell->n_children(); ++c)
+        if (!is_locally_owned(cell->child(c)))
+          return false;
+
+      return true;
+    }
+  }
 
 
   template <int dim, int spacedim,
@@ -631,7 +649,10 @@ namespace VectorTools
         if (!cell1->active() && !cell2->active())
           continue;
 
-        // skip foreign cells
+        Assert(internal::is_locally_owned(cell1) == internal::is_locally_owned(cell2),
+               ExcMessage("The two Triangulations are required to have the same parallel partitioning."));
+
+        // Skip foreign cells.
         if (cell1->active() && !cell1->is_locally_owned())
           continue;
         if (cell2->active() && !cell2->is_locally_owned())
