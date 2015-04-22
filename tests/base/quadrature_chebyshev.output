@@ -1,0 +1,2144 @@
+DEAL::Quadrature order: 1 is exact for polynomials of degree: 0
+DEAL::Quadrature order: 1 is exact for polynomials of degree: 1
+DEAL::error: 0.392699
+DEAL::error: 0.589049
+DEAL::error: 0.662680
+DEAL::error: 0.674952
+DEAL::error: 0.659612
+DEAL::error: 0.633534
+DEAL::error: 0.604676
+DEAL::error: 0.576537
+DEAL::error: 0.550471
+DEAL::error: 0.526845
+DEAL::error: 0.505596
+DEAL::error: 0.486504
+DEAL::error: 0.469307
+DEAL::error: 0.453753
+DEAL::error: 0.439618
+DEAL::error: 0.426710
+DEAL::error: 0.414869
+DEAL::error: 0.403957
+DEAL::error: 0.393861
+DEAL::error: 0.384484
+DEAL::error: 0.375747
+DEAL::error: 0.367579
+DEAL::error: 0.359921
+DEAL::error: 0.352723
+DEAL::error: 0.345940
+DEAL::error: 0.339533
+DEAL::error: 0.333470
+DEAL::error: 0.327721
+DEAL::error: 0.322259
+DEAL::error: 0.317061
+Quadrature order: 2 is exact for polynomials of degree: 0
+Quadrature order: 2 is exact for polynomials of degree: 1
+Quadrature order: 2 is exact for polynomials of degree: 2
+Quadrature order: 2 is exact for polynomials of degree: 3
+error: 0.0245437
+error: 0.0613592
+error: 0.101243
+error: 0.139592
+error: 0.174394
+error: 0.204930
+error: 0.231116
+error: 0.253173
+error: 0.271460
+error: 0.286385
+error: 0.298359
+error: 0.307772
+error: 0.314982
+error: 0.320310
+error: 0.324042
+error: 0.326427
+error: 0.327683
+error: 0.327997
+error: 0.327531
+error: 0.326424
+error: 0.324793
+error: 0.322739
+error: 0.320347
+error: 0.317689
+error: 0.314825
+error: 0.311806
+error: 0.308674
+error: 0.305466
+Quadrature order: 3 is exact for polynomials of degree: 0
+Quadrature order: 3 is exact for polynomials of degree: 1
+Quadrature order: 3 is exact for polynomials of degree: 2
+Quadrature order: 3 is exact for polynomials of degree: 3
+Quadrature order: 3 is exact for polynomials of degree: 4
+Quadrature order: 3 is exact for polynomials of degree: 5
+error: 0.00153398
+error: 0.00536893
+error: 0.0115049
+error: 0.0195583
+error: 0.0290318
+error: 0.0394491
+error: 0.0504068
+error: 0.0615852
+error: 0.0727416
+error: 0.0836970
+error: 0.0943235
+error: 0.104533
+error: 0.114266
+error: 0.123487
+error: 0.132177
+error: 0.140329
+error: 0.147947
+error: 0.155038
+error: 0.161618
+error: 0.167703
+error: 0.173314
+error: 0.178472
+error: 0.183198
+error: 0.187514
+error: 0.191445
+error: 0.195010
+Quadrature order: 4 is exact for polynomials of degree: 0
+Quadrature order: 4 is exact for polynomials of degree: 1
+Quadrature order: 4 is exact for polynomials of degree: 2
+Quadrature order: 4 is exact for polynomials of degree: 3
+Quadrature order: 4 is exact for polynomials of degree: 4
+Quadrature order: 4 is exact for polynomials of degree: 5
+Quadrature order: 4 is exact for polynomials of degree: 6
+Quadrature order: 4 is exact for polynomials of degree: 7
+error: 9.58738e-05
+error: 0.000431432
+error: 0.00113850
+error: 0.00230696
+error: 0.00397951
+error: 0.00615877
+error: 0.00881824
+error: 0.0119128
+error: 0.0153874
+error: 0.0191830
+error: 0.0232409
+error: 0.0275055
+error: 0.0319257
+error: 0.0364556
+error: 0.0410548
+error: 0.0456881
+error: 0.0503251
+error: 0.0549402
+error: 0.0595116
+error: 0.0640213
+error: 0.0684542
+error: 0.0727982
+error: 0.0770434
+error: 0.0811819
+Quadrature order: 5 is exact for polynomials of degree: 0
+Quadrature order: 5 is exact for polynomials of degree: 1
+Quadrature order: 5 is exact for polynomials of degree: 2
+Quadrature order: 5 is exact for polynomials of degree: 3
+Quadrature order: 5 is exact for polynomials of degree: 4
+Quadrature order: 5 is exact for polynomials of degree: 5
+Quadrature order: 5 is exact for polynomials of degree: 6
+Quadrature order: 5 is exact for polynomials of degree: 7
+Quadrature order: 5 is exact for polynomials of degree: 8
+Quadrature order: 5 is exact for polynomials of degree: 9
+error: 5.99211e-06
+error: 3.29566e-05
+error: 0.000103364
+error: 0.000243430
+error: 0.000479252
+error: 0.000833898
+error: 0.00132568
+error: 0.00196748
+error: 0.00276677
+error: 0.00372614
+error: 0.00484398
+error: 0.00611534
+error: 0.00753270
+error: 0.00908665
+error: 0.0107665
+error: 0.0125609
+error: 0.0144582
+error: 0.0164464
+error: 0.0185142
+error: 0.0206503
+error: 0.0228443
+error: 0.0250860
+Quadrature order: 6 is exact for polynomials of degree: 0
+Quadrature order: 6 is exact for polynomials of degree: 1
+Quadrature order: 6 is exact for polynomials of degree: 2
+Quadrature order: 6 is exact for polynomials of degree: 3
+Quadrature order: 6 is exact for polynomials of degree: 4
+Quadrature order: 6 is exact for polynomials of degree: 5
+Quadrature order: 6 is exact for polynomials of degree: 6
+Quadrature order: 6 is exact for polynomials of degree: 7
+Quadrature order: 6 is exact for polynomials of degree: 8
+Quadrature order: 6 is exact for polynomials of degree: 9
+Quadrature order: 6 is exact for polynomials of degree: 10
+Quadrature order: 6 is exact for polynomials of degree: 11
+error: 3.74507e-07
+error: 2.43430e-06
+error: 8.84773e-06
+error: 2.37578e-05
+error: 5.26065e-05
+error: 0.000101766
+error: 0.000178091
+error: 0.000288475
+error: 0.000439474
+error: 0.000637015
+error: 0.000886200
+error: 0.00119119
+error: 0.00155517
+error: 0.00198033
+error: 0.00246797
+error: 0.00301852
+error: 0.00363165
+error: 0.00430640
+error: 0.00504122
+error: 0.00583412
+Quadrature order: 7 is exact for polynomials of degree: 0
+Quadrature order: 7 is exact for polynomials of degree: 1
+Quadrature order: 7 is exact for polynomials of degree: 2
+Quadrature order: 7 is exact for polynomials of degree: 3
+Quadrature order: 7 is exact for polynomials of degree: 4
+Quadrature order: 7 is exact for polynomials of degree: 5
+Quadrature order: 7 is exact for polynomials of degree: 6
+Quadrature order: 7 is exact for polynomials of degree: 7
+Quadrature order: 7 is exact for polynomials of degree: 8
+Quadrature order: 7 is exact for polynomials of degree: 9
+Quadrature order: 7 is exact for polynomials of degree: 10
+Quadrature order: 7 is exact for polynomials of degree: 11
+Quadrature order: 7 is exact for polynomials of degree: 12
+Quadrature order: 7 is exact for polynomials of degree: 13
+error: 2.34067e-08
+error: 1.75550e-07
+error: 7.25607e-07
+error: 2.18853e-06
+error: 5.38582e-06
+error: 1.14734e-05
+error: 2.19345e-05
+error: 3.85421e-05
+error: 6.33000e-05
+error: 9.83716e-05
+error: 0.000146004
+error: 0.000208456
+error: 0.000287930
+error: 0.000386517
+error: 0.000506154
+error: 0.000648583
+error: 0.000815335
+error: 0.00100771
+Quadrature order: 8 is exact for polynomials of degree: 0
+Quadrature order: 8 is exact for polynomials of degree: 1
+Quadrature order: 8 is exact for polynomials of degree: 2
+Quadrature order: 8 is exact for polynomials of degree: 3
+Quadrature order: 8 is exact for polynomials of degree: 4
+Quadrature order: 8 is exact for polynomials of degree: 5
+Quadrature order: 8 is exact for polynomials of degree: 6
+Quadrature order: 8 is exact for polynomials of degree: 7
+Quadrature order: 8 is exact for polynomials of degree: 8
+Quadrature order: 8 is exact for polynomials of degree: 9
+Quadrature order: 8 is exact for polynomials of degree: 10
+Quadrature order: 8 is exact for polynomials of degree: 11
+Quadrature order: 8 is exact for polynomials of degree: 12
+Quadrature order: 8 is exact for polynomials of degree: 13
+Quadrature order: 8 is exact for polynomials of degree: 14
+Quadrature order: 8 is exact for polynomials of degree: 15
+error: 1.46292e-09
+error: 1.24348e-08
+error: 5.76024e-08
+error: 1.92831e-07
+error: 5.22250e-07
+error: 1.21529e-06
+error: 2.52120e-06
+error: 4.77919e-06
+error: 8.42332e-06
+error: 1.39818e-05
+error: 2.20713e-05
+error: 3.33869e-05
+error: 4.86892e-05
+error: 6.87891e-05
+error: 9.45316e-05
+error: 0.000126780
+Quadrature order: 9 is exact for polynomials of degree: 0
+Quadrature order: 9 is exact for polynomials of degree: 1
+Quadrature order: 9 is exact for polynomials of degree: 2
+Quadrature order: 9 is exact for polynomials of degree: 3
+Quadrature order: 9 is exact for polynomials of degree: 4
+Quadrature order: 9 is exact for polynomials of degree: 5
+Quadrature order: 9 is exact for polynomials of degree: 6
+Quadrature order: 9 is exact for polynomials of degree: 7
+Quadrature order: 9 is exact for polynomials of degree: 8
+Quadrature order: 9 is exact for polynomials of degree: 9
+Quadrature order: 9 is exact for polynomials of degree: 10
+Quadrature order: 9 is exact for polynomials of degree: 11
+Quadrature order: 9 is exact for polynomials of degree: 12
+Quadrature order: 9 is exact for polynomials of degree: 13
+Quadrature order: 9 is exact for polynomials of degree: 14
+Quadrature order: 9 is exact for polynomials of degree: 15
+Quadrature order: 9 is exact for polynomials of degree: 16
+Quadrature order: 9 is exact for polynomials of degree: 17
+error: 0
+error: 8.68607e-10
+error: 4.45733e-09
+error: 1.64007e-08
+error: 4.84845e-08
+error: 1.22394e-07
+error: 2.73929e-07
+error: 5.57414e-07
+error: 1.04990e-06
+error: 1.85483e-06
+error: 3.10482e-06
+error: 4.96350e-06
+error: 7.62622e-06
+error: 1.13196e-05
+Quadrature order: 10 is exact for polynomials of degree: 0
+Quadrature order: 10 is exact for polynomials of degree: 1
+Quadrature order: 10 is exact for polynomials of degree: 2
+Quadrature order: 10 is exact for polynomials of degree: 3
+Quadrature order: 10 is exact for polynomials of degree: 4
+Quadrature order: 10 is exact for polynomials of degree: 5
+Quadrature order: 10 is exact for polynomials of degree: 6
+Quadrature order: 10 is exact for polynomials of degree: 7
+Quadrature order: 10 is exact for polynomials of degree: 8
+Quadrature order: 10 is exact for polynomials of degree: 9
+Quadrature order: 10 is exact for polynomials of degree: 10
+Quadrature order: 10 is exact for polynomials of degree: 11
+Quadrature order: 10 is exact for polynomials of degree: 12
+Quadrature order: 10 is exact for polynomials of degree: 13
+Quadrature order: 10 is exact for polynomials of degree: 14
+Quadrature order: 10 is exact for polynomials of degree: 15
+Quadrature order: 10 is exact for polynomials of degree: 16
+Quadrature order: 10 is exact for polynomials of degree: 17
+Quadrature order: 10 is exact for polynomials of degree: 18
+Quadrature order: 10 is exact for polynomials of degree: 19
+error: 0
+error: 0
+error: 3.37871e-10
+error: 1.35541e-09
+error: 4.34348e-09
+error: 1.18239e-08
+error: 2.84031e-08
+error: 6.17703e-08
+error: 1.23862e-07
+error: 2.32137e-07
+error: 4.10882e-07
+error: 6.92494e-07
+Quadrature order: 11 is exact for polynomials of degree: 0
+Quadrature order: 11 is exact for polynomials of degree: 1
+Quadrature order: 11 is exact for polynomials of degree: 2
+Quadrature order: 11 is exact for polynomials of degree: 3
+Quadrature order: 11 is exact for polynomials of degree: 4
+Quadrature order: 11 is exact for polynomials of degree: 5
+Quadrature order: 11 is exact for polynomials of degree: 6
+Quadrature order: 11 is exact for polynomials of degree: 7
+Quadrature order: 11 is exact for polynomials of degree: 8
+Quadrature order: 11 is exact for polynomials of degree: 9
+Quadrature order: 11 is exact for polynomials of degree: 10
+Quadrature order: 11 is exact for polynomials of degree: 11
+Quadrature order: 11 is exact for polynomials of degree: 12
+Quadrature order: 11 is exact for polynomials of degree: 13
+Quadrature order: 11 is exact for polynomials of degree: 14
+Quadrature order: 11 is exact for polynomials of degree: 15
+Quadrature order: 11 is exact for polynomials of degree: 16
+Quadrature order: 11 is exact for polynomials of degree: 17
+Quadrature order: 11 is exact for polynomials of degree: 18
+Quadrature order: 11 is exact for polynomials of degree: 19
+Quadrature order: 11 is exact for polynomials of degree: 20
+Quadrature order: 11 is exact for polynomials of degree: 21
+error: 0
+error: 0
+error: 0
+error: 1.09379e-10
+error: 3.77701e-10
+error: 1.10304e-09
+error: 2.83114e-09
+error: 6.55445e-09
+error: 1.39440e-08
+error: 2.76394e-08
+Quadrature order: 12 is exact for polynomials of degree: 0
+Quadrature order: 12 is exact for polynomials of degree: 1
+Quadrature order: 12 is exact for polynomials of degree: 2
+Quadrature order: 12 is exact for polynomials of degree: 3
+Quadrature order: 12 is exact for polynomials of degree: 4
+Quadrature order: 12 is exact for polynomials of degree: 5
+Quadrature order: 12 is exact for polynomials of degree: 6
+Quadrature order: 12 is exact for polynomials of degree: 7
+Quadrature order: 12 is exact for polynomials of degree: 8
+Quadrature order: 12 is exact for polynomials of degree: 9
+Quadrature order: 12 is exact for polynomials of degree: 10
+Quadrature order: 12 is exact for polynomials of degree: 11
+Quadrature order: 12 is exact for polynomials of degree: 12
+Quadrature order: 12 is exact for polynomials of degree: 13
+Quadrature order: 12 is exact for polynomials of degree: 14
+Quadrature order: 12 is exact for polynomials of degree: 15
+Quadrature order: 12 is exact for polynomials of degree: 16
+Quadrature order: 12 is exact for polynomials of degree: 17
+Quadrature order: 12 is exact for polynomials of degree: 18
+Quadrature order: 12 is exact for polynomials of degree: 19
+Quadrature order: 12 is exact for polynomials of degree: 20
+Quadrature order: 12 is exact for polynomials of degree: 21
+Quadrature order: 12 is exact for polynomials of degree: 22
+Quadrature order: 12 is exact for polynomials of degree: 23
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+error: 2.72838e-10
+error: 6.70047e-10
+Quadrature order: 13 is exact for polynomials of degree: 0
+Quadrature order: 13 is exact for polynomials of degree: 1
+Quadrature order: 13 is exact for polynomials of degree: 2
+Quadrature order: 13 is exact for polynomials of degree: 3
+Quadrature order: 13 is exact for polynomials of degree: 4
+Quadrature order: 13 is exact for polynomials of degree: 5
+Quadrature order: 13 is exact for polynomials of degree: 6
+Quadrature order: 13 is exact for polynomials of degree: 7
+Quadrature order: 13 is exact for polynomials of degree: 8
+Quadrature order: 13 is exact for polynomials of degree: 9
+Quadrature order: 13 is exact for polynomials of degree: 10
+Quadrature order: 13 is exact for polynomials of degree: 11
+Quadrature order: 13 is exact for polynomials of degree: 12
+Quadrature order: 13 is exact for polynomials of degree: 13
+Quadrature order: 13 is exact for polynomials of degree: 14
+Quadrature order: 13 is exact for polynomials of degree: 15
+Quadrature order: 13 is exact for polynomials of degree: 16
+Quadrature order: 13 is exact for polynomials of degree: 17
+Quadrature order: 13 is exact for polynomials of degree: 18
+Quadrature order: 13 is exact for polynomials of degree: 19
+Quadrature order: 13 is exact for polynomials of degree: 20
+Quadrature order: 13 is exact for polynomials of degree: 21
+Quadrature order: 13 is exact for polynomials of degree: 22
+Quadrature order: 13 is exact for polynomials of degree: 23
+Quadrature order: 13 is exact for polynomials of degree: 24
+Quadrature order: 13 is exact for polynomials of degree: 25
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+Quadrature order: 14 is exact for polynomials of degree: 0
+Quadrature order: 14 is exact for polynomials of degree: 1
+Quadrature order: 14 is exact for polynomials of degree: 2
+Quadrature order: 14 is exact for polynomials of degree: 3
+Quadrature order: 14 is exact for polynomials of degree: 4
+Quadrature order: 14 is exact for polynomials of degree: 5
+Quadrature order: 14 is exact for polynomials of degree: 6
+Quadrature order: 14 is exact for polynomials of degree: 7
+Quadrature order: 14 is exact for polynomials of degree: 8
+Quadrature order: 14 is exact for polynomials of degree: 9
+Quadrature order: 14 is exact for polynomials of degree: 10
+Quadrature order: 14 is exact for polynomials of degree: 11
+Quadrature order: 14 is exact for polynomials of degree: 12
+Quadrature order: 14 is exact for polynomials of degree: 13
+Quadrature order: 14 is exact for polynomials of degree: 14
+Quadrature order: 14 is exact for polynomials of degree: 15
+Quadrature order: 14 is exact for polynomials of degree: 16
+Quadrature order: 14 is exact for polynomials of degree: 17
+Quadrature order: 14 is exact for polynomials of degree: 18
+Quadrature order: 14 is exact for polynomials of degree: 19
+Quadrature order: 14 is exact for polynomials of degree: 20
+Quadrature order: 14 is exact for polynomials of degree: 21
+Quadrature order: 14 is exact for polynomials of degree: 22
+Quadrature order: 14 is exact for polynomials of degree: 23
+Quadrature order: 14 is exact for polynomials of degree: 24
+Quadrature order: 14 is exact for polynomials of degree: 25
+Quadrature order: 14 is exact for polynomials of degree: 26
+Quadrature order: 14 is exact for polynomials of degree: 27
+Quadrature order: 14 is exact for polynomials of degree: 28
+error: 0
+error: 0
+error: 0
+Quadrature order: 15 is exact for polynomials of degree: 0
+Quadrature order: 15 is exact for polynomials of degree: 1
+Quadrature order: 15 is exact for polynomials of degree: 2
+Quadrature order: 15 is exact for polynomials of degree: 3
+Quadrature order: 15 is exact for polynomials of degree: 4
+Quadrature order: 15 is exact for polynomials of degree: 5
+Quadrature order: 15 is exact for polynomials of degree: 6
+Quadrature order: 15 is exact for polynomials of degree: 7
+Quadrature order: 15 is exact for polynomials of degree: 8
+Quadrature order: 15 is exact for polynomials of degree: 9
+Quadrature order: 15 is exact for polynomials of degree: 10
+Quadrature order: 15 is exact for polynomials of degree: 11
+Quadrature order: 15 is exact for polynomials of degree: 12
+Quadrature order: 15 is exact for polynomials of degree: 13
+Quadrature order: 15 is exact for polynomials of degree: 14
+Quadrature order: 15 is exact for polynomials of degree: 15
+Quadrature order: 15 is exact for polynomials of degree: 16
+Quadrature order: 15 is exact for polynomials of degree: 17
+Quadrature order: 15 is exact for polynomials of degree: 18
+Quadrature order: 15 is exact for polynomials of degree: 19
+Quadrature order: 15 is exact for polynomials of degree: 20
+Quadrature order: 15 is exact for polynomials of degree: 21
+Quadrature order: 15 is exact for polynomials of degree: 22
+Quadrature order: 15 is exact for polynomials of degree: 23
+Quadrature order: 15 is exact for polynomials of degree: 24
+Quadrature order: 15 is exact for polynomials of degree: 25
+Quadrature order: 15 is exact for polynomials of degree: 26
+Quadrature order: 15 is exact for polynomials of degree: 27
+Quadrature order: 15 is exact for polynomials of degree: 28
+Quadrature order: 15 is exact for polynomials of degree: 29
+Quadrature order: 15 is exact for polynomials of degree: 30
+Quadrature order: 15 is exact for polynomials of degree: 31
+Quadrature order: 16 is exact for polynomials of degree: 0
+Quadrature order: 16 is exact for polynomials of degree: 1
+Quadrature order: 16 is exact for polynomials of degree: 2
+Quadrature order: 16 is exact for polynomials of degree: 3
+Quadrature order: 16 is exact for polynomials of degree: 4
+Quadrature order: 16 is exact for polynomials of degree: 5
+Quadrature order: 16 is exact for polynomials of degree: 6
+Quadrature order: 16 is exact for polynomials of degree: 7
+Quadrature order: 16 is exact for polynomials of degree: 8
+Quadrature order: 16 is exact for polynomials of degree: 9
+Quadrature order: 16 is exact for polynomials of degree: 10
+Quadrature order: 16 is exact for polynomials of degree: 11
+Quadrature order: 16 is exact for polynomials of degree: 12
+Quadrature order: 16 is exact for polynomials of degree: 13
+Quadrature order: 16 is exact for polynomials of degree: 14
+Quadrature order: 16 is exact for polynomials of degree: 15
+Quadrature order: 16 is exact for polynomials of degree: 16
+Quadrature order: 16 is exact for polynomials of degree: 17
+Quadrature order: 16 is exact for polynomials of degree: 18
+Quadrature order: 16 is exact for polynomials of degree: 19
+Quadrature order: 16 is exact for polynomials of degree: 20
+Quadrature order: 16 is exact for polynomials of degree: 21
+Quadrature order: 16 is exact for polynomials of degree: 22
+Quadrature order: 16 is exact for polynomials of degree: 23
+Quadrature order: 16 is exact for polynomials of degree: 24
+Quadrature order: 16 is exact for polynomials of degree: 25
+Quadrature order: 16 is exact for polynomials of degree: 26
+Quadrature order: 16 is exact for polynomials of degree: 27
+Quadrature order: 16 is exact for polynomials of degree: 28
+Quadrature order: 16 is exact for polynomials of degree: 29
+Quadrature order: 16 is exact for polynomials of degree: 30
+Quadrature order: 16 is exact for polynomials of degree: 31
+Quadrature order: 17 is exact for polynomials of degree: 0
+Quadrature order: 17 is exact for polynomials of degree: 1
+Quadrature order: 17 is exact for polynomials of degree: 2
+Quadrature order: 17 is exact for polynomials of degree: 3
+Quadrature order: 17 is exact for polynomials of degree: 4
+Quadrature order: 17 is exact for polynomials of degree: 5
+Quadrature order: 17 is exact for polynomials of degree: 6
+Quadrature order: 17 is exact for polynomials of degree: 7
+Quadrature order: 17 is exact for polynomials of degree: 8
+Quadrature order: 17 is exact for polynomials of degree: 9
+Quadrature order: 17 is exact for polynomials of degree: 10
+Quadrature order: 17 is exact for polynomials of degree: 11
+Quadrature order: 17 is exact for polynomials of degree: 12
+Quadrature order: 17 is exact for polynomials of degree: 13
+Quadrature order: 17 is exact for polynomials of degree: 14
+Quadrature order: 17 is exact for polynomials of degree: 15
+Quadrature order: 17 is exact for polynomials of degree: 16
+Quadrature order: 17 is exact for polynomials of degree: 17
+Quadrature order: 17 is exact for polynomials of degree: 18
+Quadrature order: 17 is exact for polynomials of degree: 19
+Quadrature order: 17 is exact for polynomials of degree: 20
+Quadrature order: 17 is exact for polynomials of degree: 21
+Quadrature order: 17 is exact for polynomials of degree: 22
+Quadrature order: 17 is exact for polynomials of degree: 23
+Quadrature order: 17 is exact for polynomials of degree: 24
+Quadrature order: 17 is exact for polynomials of degree: 25
+Quadrature order: 17 is exact for polynomials of degree: 26
+Quadrature order: 17 is exact for polynomials of degree: 27
+Quadrature order: 17 is exact for polynomials of degree: 28
+Quadrature order: 17 is exact for polynomials of degree: 29
+Quadrature order: 17 is exact for polynomials of degree: 30
+Quadrature order: 17 is exact for polynomials of degree: 31
+Quadrature order: 1 is exact for polynomials of degree: 0
+error: 1.57080
+error: 1.96350
+error: 2.15984
+error: 2.28256
+error: 2.36847
+error: 2.43289
+error: 2.48351
+error: 2.52464
+error: 2.55892
+error: 2.58805
+error: 2.61321
+error: 2.63523
+error: 2.65471
+error: 2.67209
+error: 2.68774
+error: 2.70193
+error: 2.71486
+error: 2.72671
+error: 2.73763
+error: 2.74773
+error: 2.75711
+error: 2.76585
+error: 2.77401
+error: 2.78167
+error: 2.78887
+error: 2.79565
+error: 2.80206
+error: 2.80812
+error: 2.81387
+error: 2.81933
+error: 2.82453
+Quadrature order: 2 is exact for polynomials of degree: 0
+Quadrature order: 2 is exact for polynomials of degree: 1
+Quadrature order: 2 is exact for polynomials of degree: 2
+error: 0.0981748
+error: 0.196350
+error: 0.276117
+error: 0.339010
+error: 0.389248
+error: 0.430282
+error: 0.464533
+error: 0.493660
+error: 0.518820
+error: 0.540835
+error: 0.560310
+error: 0.577699
+error: 0.593349
+error: 0.607532
+error: 0.620463
+error: 0.632317
+error: 0.643235
+error: 0.653334
+error: 0.662712
+error: 0.671450
+error: 0.679618
+error: 0.687276
+error: 0.694475
+error: 0.701258
+error: 0.707664
+error: 0.713727
+error: 0.719477
+error: 0.724939
+error: 0.730136
+Quadrature order: 3 is exact for polynomials of degree: 0
+Quadrature order: 3 is exact for polynomials of degree: 1
+Quadrature order: 3 is exact for polynomials of degree: 2
+Quadrature order: 3 is exact for polynomials of degree: 3
+Quadrature order: 3 is exact for polynomials of degree: 4
+error: 0.00613592
+error: 0.0184078
+error: 0.0348981
+error: 0.0536893
+error: 0.0733435
+error: 0.0929077
+error: 0.111805
+error: 0.129722
+error: 0.146514
+error: 0.162147
+error: 0.176647
+error: 0.190078
+error: 0.202517
+error: 0.214048
+error: 0.224755
+error: 0.234716
+error: 0.244004
+error: 0.252683
+error: 0.260813
+error: 0.268445
+error: 0.275627
+error: 0.282399
+error: 0.288799
+error: 0.294857
+error: 0.300603
+error: 0.306063
+error: 0.311260
+Quadrature order: 4 is exact for polynomials of degree: 0
+Quadrature order: 4 is exact for polynomials of degree: 1
+Quadrature order: 4 is exact for polynomials of degree: 2
+Quadrature order: 4 is exact for polynomials of degree: 3
+Quadrature order: 4 is exact for polynomials of degree: 4
+Quadrature order: 4 is exact for polynomials of degree: 5
+Quadrature order: 4 is exact for polynomials of degree: 6
+error: 0.000383495
+error: 0.00153398
+error: 0.00366717
+error: 0.00683101
+error: 0.0109581
+error: 0.0159180
+error: 0.0215557
+error: 0.0277145
+error: 0.0342496
+error: 0.0410338
+error: 0.0479596
+error: 0.0549384
+error: 0.0618992
+error: 0.0687861
+error: 0.0755563
+error: 0.0821780
+error: 0.0886283
+error: 0.0948915
+error: 0.100958
+error: 0.106822
+error: 0.112482
+error: 0.117940
+error: 0.123198
+error: 0.128261
+error: 0.133134
+Quadrature order: 5 is exact for polynomials of degree: 0
+Quadrature order: 5 is exact for polynomials of degree: 1
+Quadrature order: 5 is exact for polynomials of degree: 2
+Quadrature order: 5 is exact for polynomials of degree: 3
+Quadrature order: 5 is exact for polynomials of degree: 4
+Quadrature order: 5 is exact for polynomials of degree: 5
+Quadrature order: 5 is exact for polynomials of degree: 6
+Quadrature order: 5 is exact for polynomials of degree: 7
+Quadrature order: 5 is exact for polynomials of degree: 8
+error: 2.39684e-05
+error: 0.000119842
+error: 0.000346044
+error: 0.000758002
+error: 0.00139972
+error: 0.00230041
+error: 0.00347458
+error: 0.00492397
+error: 0.00664026
+error: 0.00860774
+error: 0.0108058
+error: 0.0132108
+error: 0.0157980
+error: 0.0185421
+error: 0.0214187
+error: 0.0244044
+error: 0.0274776
+error: 0.0306184
+error: 0.0338085
+error: 0.0370317
+error: 0.0402736
+error: 0.0435213
+error: 0.0467638
+Quadrature order: 6 is exact for polynomials of degree: 0
+Quadrature order: 6 is exact for polynomials of degree: 1
+Quadrature order: 6 is exact for polynomials of degree: 2
+Quadrature order: 6 is exact for polynomials of degree: 3
+Quadrature order: 6 is exact for polynomials of degree: 4
+Quadrature order: 6 is exact for polynomials of degree: 5
+Quadrature order: 6 is exact for polynomials of degree: 6
+Quadrature order: 6 is exact for polynomials of degree: 7
+Quadrature order: 6 is exact for polynomials of degree: 8
+Quadrature order: 6 is exact for polynomials of degree: 9
+Quadrature order: 6 is exact for polynomials of degree: 10
+error: 1.49803e-06
+error: 8.98817e-06
+error: 3.04287e-05
+error: 7.66803e-05
+error: 0.000160365
+error: 0.000294597
+error: 0.000491871
+error: 0.000763248
+error: 0.00111784
+error: 0.00156257
+error: 0.00210215
+error: 0.00273916
+error: 0.00347431
+error: 0.00430661
+error: 0.00523373
+error: 0.00625219
+error: 0.00735763
+error: 0.00854507
+error: 0.00980903
+error: 0.0111438
+error: 0.0125434
+Quadrature order: 7 is exact for polynomials of degree: 0
+Quadrature order: 7 is exact for polynomials of degree: 1
+Quadrature order: 7 is exact for polynomials of degree: 2
+Quadrature order: 7 is exact for polynomials of degree: 3
+Quadrature order: 7 is exact for polynomials of degree: 4
+Quadrature order: 7 is exact for polynomials of degree: 5
+Quadrature order: 7 is exact for polynomials of degree: 6
+Quadrature order: 7 is exact for polynomials of degree: 7
+Quadrature order: 7 is exact for polynomials of degree: 8
+Quadrature order: 7 is exact for polynomials of degree: 9
+Quadrature order: 7 is exact for polynomials of degree: 10
+Quadrature order: 7 is exact for polynomials of degree: 11
+Quadrature order: 7 is exact for polynomials of degree: 12
+error: 9.36268e-08
+error: 6.55387e-07
+error: 2.54548e-06
+error: 7.25607e-06
+error: 1.69611e-05
+error: 3.44693e-05
+error: 6.31039e-05
+error: 0.000106539
+error: 0.000168622
+error: 0.000253200
+error: 0.000363975
+error: 0.000504378
+error: 0.000677482
+error: 0.000885938
+error: 0.00113194
+error: 0.00141723
+error: 0.00174307
+error: 0.00211028
+error: 0.00251928
+Quadrature order: 8 is exact for polynomials of degree: 0
+Quadrature order: 8 is exact for polynomials of degree: 1
+Quadrature order: 8 is exact for polynomials of degree: 2
+Quadrature order: 8 is exact for polynomials of degree: 3
+Quadrature order: 8 is exact for polynomials of degree: 4
+Quadrature order: 8 is exact for polynomials of degree: 5
+Quadrature order: 8 is exact for polynomials of degree: 6
+Quadrature order: 8 is exact for polynomials of degree: 7
+Quadrature order: 8 is exact for polynomials of degree: 8
+Quadrature order: 8 is exact for polynomials of degree: 9
+Quadrature order: 8 is exact for polynomials of degree: 10
+Quadrature order: 8 is exact for polynomials of degree: 11
+Quadrature order: 8 is exact for polynomials of degree: 12
+Quadrature order: 8 is exact for polynomials of degree: 13
+Quadrature order: 8 is exact for polynomials of degree: 14
+error: 5.85167e-09
+error: 4.68134e-08
+error: 2.05174e-07
+error: 6.52827e-07
+error: 1.68727e-06
+error: 3.76020e-06
+error: 7.49429e-06
+error: 1.36865e-05
+error: 2.32985e-05
+error: 3.74370e-05
+error: 5.73254e-05
+error: 8.42721e-05
+error: 0.000119636
+error: 0.000164794
+error: 0.000221108
+error: 0.000289897
+error: 0.000372415
+Quadrature order: 9 is exact for polynomials of degree: 0
+Quadrature order: 9 is exact for polynomials of degree: 1
+Quadrature order: 9 is exact for polynomials of degree: 2
+Quadrature order: 9 is exact for polynomials of degree: 3
+Quadrature order: 9 is exact for polynomials of degree: 4
+Quadrature order: 9 is exact for polynomials of degree: 5
+Quadrature order: 9 is exact for polynomials of degree: 6
+Quadrature order: 9 is exact for polynomials of degree: 7
+Quadrature order: 9 is exact for polynomials of degree: 8
+Quadrature order: 9 is exact for polynomials of degree: 9
+Quadrature order: 9 is exact for polynomials of degree: 10
+Quadrature order: 9 is exact for polynomials of degree: 11
+Quadrature order: 9 is exact for polynomials of degree: 12
+Quadrature order: 9 is exact for polynomials of degree: 13
+Quadrature order: 9 is exact for polynomials of degree: 14
+Quadrature order: 9 is exact for polynomials of degree: 15
+Quadrature order: 9 is exact for polynomials of degree: 16
+error: 3.65729e-10
+error: 3.29157e-09
+error: 1.60692e-08
+error: 5.64595e-08
+error: 1.59907e-07
+error: 3.87876e-07
+error: 8.36358e-07
+error: 1.64357e-06
+error: 2.99610e-06
+error: 5.13285e-06
+error: 8.34672e-06
+error: 1.29838e-05
+error: 1.94404e-05
+error: 2.81583e-05
+error: 3.96186e-05
+Quadrature order: 10 is exact for polynomials of degree: 0
+Quadrature order: 10 is exact for polynomials of degree: 1
+Quadrature order: 10 is exact for polynomials of degree: 2
+Quadrature order: 10 is exact for polynomials of degree: 3
+Quadrature order: 10 is exact for polynomials of degree: 4
+Quadrature order: 10 is exact for polynomials of degree: 5
+Quadrature order: 10 is exact for polynomials of degree: 6
+Quadrature order: 10 is exact for polynomials of degree: 7
+Quadrature order: 10 is exact for polynomials of degree: 8
+Quadrature order: 10 is exact for polynomials of degree: 9
+Quadrature order: 10 is exact for polynomials of degree: 10
+Quadrature order: 10 is exact for polynomials of degree: 11
+Quadrature order: 10 is exact for polynomials of degree: 12
+Quadrature order: 10 is exact for polynomials of degree: 13
+Quadrature order: 10 is exact for polynomials of degree: 14
+Quadrature order: 10 is exact for polynomials of degree: 15
+Quadrature order: 10 is exact for polynomials of degree: 16
+Quadrature order: 10 is exact for polynomials of degree: 17
+Quadrature order: 10 is exact for polynomials of degree: 18
+error: 0
+error: 2.28582e-10
+error: 1.23005e-09
+error: 4.73020e-09
+error: 1.45707e-08
+error: 3.82227e-08
+error: 8.86795e-08
+error: 1.86649e-07
+error: 3.62901e-07
+error: 6.60600e-07
+error: 1.13747e-06
+error: 1.86765e-06
+error: 2.94310e-06
+Quadrature order: 11 is exact for polynomials of degree: 0
+Quadrature order: 11 is exact for polynomials of degree: 1
+Quadrature order: 11 is exact for polynomials of degree: 2
+Quadrature order: 11 is exact for polynomials of degree: 3
+Quadrature order: 11 is exact for polynomials of degree: 4
+Quadrature order: 11 is exact for polynomials of degree: 5
+Quadrature order: 11 is exact for polynomials of degree: 6
+Quadrature order: 11 is exact for polynomials of degree: 7
+Quadrature order: 11 is exact for polynomials of degree: 8
+Quadrature order: 11 is exact for polynomials of degree: 9
+Quadrature order: 11 is exact for polynomials of degree: 10
+Quadrature order: 11 is exact for polynomials of degree: 11
+Quadrature order: 11 is exact for polynomials of degree: 12
+Quadrature order: 11 is exact for polynomials of degree: 13
+Quadrature order: 11 is exact for polynomials of degree: 14
+Quadrature order: 11 is exact for polynomials of degree: 15
+Quadrature order: 11 is exact for polynomials of degree: 16
+Quadrature order: 11 is exact for polynomials of degree: 17
+Quadrature order: 11 is exact for polynomials of degree: 18
+Quadrature order: 11 is exact for polynomials of degree: 19
+Quadrature order: 11 is exact for polynomials of degree: 20
+error: 0
+error: 0
+error: 0
+error: 3.86087e-10
+error: 1.28521e-09
+error: 3.62593e-09
+error: 9.00818e-09
+error: 2.02224e-08
+error: 4.17846e-08
+error: 8.05651e-08
+error: 1.46489e-07
+Quadrature order: 12 is exact for polynomials of degree: 0
+Quadrature order: 12 is exact for polynomials of degree: 1
+Quadrature order: 12 is exact for polynomials of degree: 2
+Quadrature order: 12 is exact for polynomials of degree: 3
+Quadrature order: 12 is exact for polynomials of degree: 4
+Quadrature order: 12 is exact for polynomials of degree: 5
+Quadrature order: 12 is exact for polynomials of degree: 6
+Quadrature order: 12 is exact for polynomials of degree: 7
+Quadrature order: 12 is exact for polynomials of degree: 8
+Quadrature order: 12 is exact for polynomials of degree: 9
+Quadrature order: 12 is exact for polynomials of degree: 10
+Quadrature order: 12 is exact for polynomials of degree: 11
+Quadrature order: 12 is exact for polynomials of degree: 12
+Quadrature order: 12 is exact for polynomials of degree: 13
+Quadrature order: 12 is exact for polynomials of degree: 14
+Quadrature order: 12 is exact for polynomials of degree: 15
+Quadrature order: 12 is exact for polynomials of degree: 16
+Quadrature order: 12 is exact for polynomials of degree: 17
+Quadrature order: 12 is exact for polynomials of degree: 18
+Quadrature order: 12 is exact for polynomials of degree: 19
+Quadrature order: 12 is exact for polynomials of degree: 20
+Quadrature order: 12 is exact for polynomials of degree: 21
+Quadrature order: 12 is exact for polynomials of degree: 22
+error: 0
+error: 0
+error: 0
+error: 0
+error: 1.10304e-10
+error: 3.33076e-10
+error: 8.82330e-10
+error: 2.10475e-09
+error: 4.60657e-09
+Quadrature order: 13 is exact for polynomials of degree: 0
+Quadrature order: 13 is exact for polynomials of degree: 1
+Quadrature order: 13 is exact for polynomials of degree: 2
+Quadrature order: 13 is exact for polynomials of degree: 3
+Quadrature order: 13 is exact for polynomials of degree: 4
+Quadrature order: 13 is exact for polynomials of degree: 5
+Quadrature order: 13 is exact for polynomials of degree: 6
+Quadrature order: 13 is exact for polynomials of degree: 7
+Quadrature order: 13 is exact for polynomials of degree: 8
+Quadrature order: 13 is exact for polynomials of degree: 9
+Quadrature order: 13 is exact for polynomials of degree: 10
+Quadrature order: 13 is exact for polynomials of degree: 11
+Quadrature order: 13 is exact for polynomials of degree: 12
+Quadrature order: 13 is exact for polynomials of degree: 13
+Quadrature order: 13 is exact for polynomials of degree: 14
+Quadrature order: 13 is exact for polynomials of degree: 15
+Quadrature order: 13 is exact for polynomials of degree: 16
+Quadrature order: 13 is exact for polynomials of degree: 17
+Quadrature order: 13 is exact for polynomials of degree: 18
+Quadrature order: 13 is exact for polynomials of degree: 19
+Quadrature order: 13 is exact for polynomials of degree: 20
+Quadrature order: 13 is exact for polynomials of degree: 21
+Quadrature order: 13 is exact for polynomials of degree: 22
+Quadrature order: 13 is exact for polynomials of degree: 23
+Quadrature order: 13 is exact for polynomials of degree: 24
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+Quadrature order: 14 is exact for polynomials of degree: 0
+Quadrature order: 14 is exact for polynomials of degree: 1
+Quadrature order: 14 is exact for polynomials of degree: 2
+Quadrature order: 14 is exact for polynomials of degree: 3
+Quadrature order: 14 is exact for polynomials of degree: 4
+Quadrature order: 14 is exact for polynomials of degree: 5
+Quadrature order: 14 is exact for polynomials of degree: 6
+Quadrature order: 14 is exact for polynomials of degree: 7
+Quadrature order: 14 is exact for polynomials of degree: 8
+Quadrature order: 14 is exact for polynomials of degree: 9
+Quadrature order: 14 is exact for polynomials of degree: 10
+Quadrature order: 14 is exact for polynomials of degree: 11
+Quadrature order: 14 is exact for polynomials of degree: 12
+Quadrature order: 14 is exact for polynomials of degree: 13
+Quadrature order: 14 is exact for polynomials of degree: 14
+Quadrature order: 14 is exact for polynomials of degree: 15
+Quadrature order: 14 is exact for polynomials of degree: 16
+Quadrature order: 14 is exact for polynomials of degree: 17
+Quadrature order: 14 is exact for polynomials of degree: 18
+Quadrature order: 14 is exact for polynomials of degree: 19
+Quadrature order: 14 is exact for polynomials of degree: 20
+Quadrature order: 14 is exact for polynomials of degree: 21
+Quadrature order: 14 is exact for polynomials of degree: 22
+Quadrature order: 14 is exact for polynomials of degree: 23
+Quadrature order: 14 is exact for polynomials of degree: 24
+Quadrature order: 14 is exact for polynomials of degree: 25
+Quadrature order: 14 is exact for polynomials of degree: 26
+Quadrature order: 14 is exact for polynomials of degree: 27
+error: 0
+error: 0
+error: 0
+error: 0
+Quadrature order: 15 is exact for polynomials of degree: 0
+Quadrature order: 15 is exact for polynomials of degree: 1
+Quadrature order: 15 is exact for polynomials of degree: 2
+Quadrature order: 15 is exact for polynomials of degree: 3
+Quadrature order: 15 is exact for polynomials of degree: 4
+Quadrature order: 15 is exact for polynomials of degree: 5
+Quadrature order: 15 is exact for polynomials of degree: 6
+Quadrature order: 15 is exact for polynomials of degree: 7
+Quadrature order: 15 is exact for polynomials of degree: 8
+Quadrature order: 15 is exact for polynomials of degree: 9
+Quadrature order: 15 is exact for polynomials of degree: 10
+Quadrature order: 15 is exact for polynomials of degree: 11
+Quadrature order: 15 is exact for polynomials of degree: 12
+Quadrature order: 15 is exact for polynomials of degree: 13
+Quadrature order: 15 is exact for polynomials of degree: 14
+Quadrature order: 15 is exact for polynomials of degree: 15
+Quadrature order: 15 is exact for polynomials of degree: 16
+Quadrature order: 15 is exact for polynomials of degree: 17
+Quadrature order: 15 is exact for polynomials of degree: 18
+Quadrature order: 15 is exact for polynomials of degree: 19
+Quadrature order: 15 is exact for polynomials of degree: 20
+Quadrature order: 15 is exact for polynomials of degree: 21
+Quadrature order: 15 is exact for polynomials of degree: 22
+Quadrature order: 15 is exact for polynomials of degree: 23
+Quadrature order: 15 is exact for polynomials of degree: 24
+Quadrature order: 15 is exact for polynomials of degree: 25
+Quadrature order: 15 is exact for polynomials of degree: 26
+Quadrature order: 15 is exact for polynomials of degree: 27
+Quadrature order: 15 is exact for polynomials of degree: 28
+Quadrature order: 15 is exact for polynomials of degree: 29
+Quadrature order: 15 is exact for polynomials of degree: 30
+error: 0
+Quadrature order: 16 is exact for polynomials of degree: 0
+Quadrature order: 16 is exact for polynomials of degree: 1
+Quadrature order: 16 is exact for polynomials of degree: 2
+Quadrature order: 16 is exact for polynomials of degree: 3
+Quadrature order: 16 is exact for polynomials of degree: 4
+Quadrature order: 16 is exact for polynomials of degree: 5
+Quadrature order: 16 is exact for polynomials of degree: 6
+Quadrature order: 16 is exact for polynomials of degree: 7
+Quadrature order: 16 is exact for polynomials of degree: 8
+Quadrature order: 16 is exact for polynomials of degree: 9
+Quadrature order: 16 is exact for polynomials of degree: 10
+Quadrature order: 16 is exact for polynomials of degree: 11
+Quadrature order: 16 is exact for polynomials of degree: 12
+Quadrature order: 16 is exact for polynomials of degree: 13
+Quadrature order: 16 is exact for polynomials of degree: 14
+Quadrature order: 16 is exact for polynomials of degree: 15
+Quadrature order: 16 is exact for polynomials of degree: 16
+Quadrature order: 16 is exact for polynomials of degree: 17
+Quadrature order: 16 is exact for polynomials of degree: 18
+Quadrature order: 16 is exact for polynomials of degree: 19
+Quadrature order: 16 is exact for polynomials of degree: 20
+Quadrature order: 16 is exact for polynomials of degree: 21
+Quadrature order: 16 is exact for polynomials of degree: 22
+Quadrature order: 16 is exact for polynomials of degree: 23
+Quadrature order: 16 is exact for polynomials of degree: 24
+Quadrature order: 16 is exact for polynomials of degree: 25
+Quadrature order: 16 is exact for polynomials of degree: 26
+Quadrature order: 16 is exact for polynomials of degree: 27
+Quadrature order: 16 is exact for polynomials of degree: 28
+Quadrature order: 16 is exact for polynomials of degree: 29
+Quadrature order: 16 is exact for polynomials of degree: 30
+Quadrature order: 16 is exact for polynomials of degree: 31
+Quadrature order: 17 is exact for polynomials of degree: 0
+Quadrature order: 17 is exact for polynomials of degree: 1
+Quadrature order: 17 is exact for polynomials of degree: 2
+Quadrature order: 17 is exact for polynomials of degree: 3
+Quadrature order: 17 is exact for polynomials of degree: 4
+Quadrature order: 17 is exact for polynomials of degree: 5
+Quadrature order: 17 is exact for polynomials of degree: 6
+Quadrature order: 17 is exact for polynomials of degree: 7
+Quadrature order: 17 is exact for polynomials of degree: 8
+Quadrature order: 17 is exact for polynomials of degree: 9
+Quadrature order: 17 is exact for polynomials of degree: 10
+Quadrature order: 17 is exact for polynomials of degree: 11
+Quadrature order: 17 is exact for polynomials of degree: 12
+Quadrature order: 17 is exact for polynomials of degree: 13
+Quadrature order: 17 is exact for polynomials of degree: 14
+Quadrature order: 17 is exact for polynomials of degree: 15
+Quadrature order: 17 is exact for polynomials of degree: 16
+Quadrature order: 17 is exact for polynomials of degree: 17
+Quadrature order: 17 is exact for polynomials of degree: 18
+Quadrature order: 17 is exact for polynomials of degree: 19
+Quadrature order: 17 is exact for polynomials of degree: 20
+Quadrature order: 17 is exact for polynomials of degree: 21
+Quadrature order: 17 is exact for polynomials of degree: 22
+Quadrature order: 17 is exact for polynomials of degree: 23
+Quadrature order: 17 is exact for polynomials of degree: 24
+Quadrature order: 17 is exact for polynomials of degree: 25
+Quadrature order: 17 is exact for polynomials of degree: 26
+Quadrature order: 17 is exact for polynomials of degree: 27
+Quadrature order: 17 is exact for polynomials of degree: 28
+Quadrature order: 17 is exact for polynomials of degree: 29
+Quadrature order: 17 is exact for polynomials of degree: 30
+Quadrature order: 17 is exact for polynomials of degree: 31
+Quadrature order: 1 is exact for polynomials of degree 0
+error: 1.57080
+error: 1.17810
+error: 0.981748
+error: 0.859029
+error: 0.773126
+error: 0.708699
+error: 0.658078
+error: 0.616948
+error: 0.582673
+error: 0.553539
+error: 0.528378
+error: 0.506363
+error: 0.486887
+error: 0.469498
+error: 0.453848
+error: 0.439666
+error: 0.426734
+error: 0.414881
+error: 0.403963
+error: 0.393864
+error: 0.384486
+error: 0.375748
+error: 0.367579
+error: 0.359921
+error: 0.352723
+error: 0.345940
+error: 0.339533
+error: 0.333470
+error: 0.327721
+error: 0.322259
+error: 0.317061
+Quadrature order: 2 is exact for polynomials of degree 0
+Quadrature order: 2 is exact for polynomials of degree 1
+Quadrature order: 2 is exact for polynomials of degree 2
+error: 0.0981748
+error: 0.196350
+error: 0.276117
+error: 0.335942
+error: 0.378510
+error: 0.407272
+error: 0.425416
+error: 0.435597
+error: 0.439921
+error: 0.440020
+error: 0.437130
+error: 0.432181
+error: 0.425860
+error: 0.418674
+error: 0.410991
+error: 0.403073
+error: 0.395107
+error: 0.387222
+error: 0.379505
+error: 0.372012
+error: 0.364777
+error: 0.357820
+error: 0.351147
+error: 0.344758
+error: 0.338647
+error: 0.332805
+error: 0.327222
+error: 0.321885
+error: 0.316781
+Quadrature order: 3 is exact for polynomials of degree 0
+Quadrature order: 3 is exact for polynomials of degree 1
+Quadrature order: 3 is exact for polynomials of degree 2
+Quadrature order: 3 is exact for polynomials of degree 3
+Quadrature order: 3 is exact for polynomials of degree 4
+error: 0.00613592
+error: 0.0184078
+error: 0.0348981
+error: 0.0536893
+error: 0.0733435
+error: 0.0928957
+error: 0.111739
+error: 0.129515
+error: 0.146027
+error: 0.161188
+error: 0.174980
+error: 0.187427
+error: 0.198582
+error: 0.208515
+error: 0.217303
+error: 0.225028
+error: 0.231773
+error: 0.237618
+error: 0.242639
+error: 0.246912
+error: 0.250505
+error: 0.253483
+error: 0.255905
+error: 0.257828
+error: 0.259302
+error: 0.260373
+error: 0.261085
+Quadrature order: 4 is exact for polynomials of degree 0
+Quadrature order: 4 is exact for polynomials of degree 1
+Quadrature order: 4 is exact for polynomials of degree 2
+Quadrature order: 4 is exact for polynomials of degree 3
+Quadrature order: 4 is exact for polynomials of degree 4
+Quadrature order: 4 is exact for polynomials of degree 5
+Quadrature order: 4 is exact for polynomials of degree 6
+error: 0.000383495
+error: 0.00153398
+error: 0.00366717
+error: 0.00683101
+error: 0.0109581
+error: 0.0159180
+error: 0.0215557
+error: 0.0277144
+error: 0.0342492
+error: 0.0410324
+error: 0.0479552
+error: 0.0549277
+error: 0.0618763
+error: 0.0687422
+error: 0.0754792
+error: 0.0820514
+error: 0.0884316
+error: 0.0945995
+error: 0.100541
+error: 0.106246
+error: 0.111709
+error: 0.116927
+error: 0.121901
+error: 0.126630
+error: 0.131119
+Quadrature order: 5 is exact for polynomials of degree 0
+Quadrature order: 5 is exact for polynomials of degree 1
+Quadrature order: 5 is exact for polynomials of degree 2
+Quadrature order: 5 is exact for polynomials of degree 3
+Quadrature order: 5 is exact for polynomials of degree 4
+Quadrature order: 5 is exact for polynomials of degree 5
+Quadrature order: 5 is exact for polynomials of degree 6
+Quadrature order: 5 is exact for polynomials of degree 7
+Quadrature order: 5 is exact for polynomials of degree 8
+error: 2.39684e-05
+error: 0.000119842
+error: 0.000346044
+error: 0.000758002
+error: 0.00139972
+error: 0.00230041
+error: 0.00347458
+error: 0.00492397
+error: 0.00664026
+error: 0.00860774
+error: 0.0108058
+error: 0.0132108
+error: 0.0157980
+error: 0.0185420
+error: 0.0214184
+error: 0.0244039
+error: 0.0274765
+error: 0.0306163
+error: 0.0338048
+error: 0.0370255
+error: 0.0402636
+error: 0.0435061
+error: 0.0467412
+Quadrature order: 6 is exact for polynomials of degree 0
+Quadrature order: 6 is exact for polynomials of degree 1
+Quadrature order: 6 is exact for polynomials of degree 2
+Quadrature order: 6 is exact for polynomials of degree 3
+Quadrature order: 6 is exact for polynomials of degree 4
+Quadrature order: 6 is exact for polynomials of degree 5
+Quadrature order: 6 is exact for polynomials of degree 6
+Quadrature order: 6 is exact for polynomials of degree 7
+Quadrature order: 6 is exact for polynomials of degree 8
+Quadrature order: 6 is exact for polynomials of degree 9
+Quadrature order: 6 is exact for polynomials of degree 10
+error: 1.49803e-06
+error: 8.98817e-06
+error: 3.04287e-05
+error: 7.66803e-05
+error: 0.000160365
+error: 0.000294597
+error: 0.000491871
+error: 0.000763248
+error: 0.00111784
+error: 0.00156257
+error: 0.00210215
+error: 0.00273916
+error: 0.00347431
+error: 0.00430661
+error: 0.00523373
+error: 0.00625219
+error: 0.00735763
+error: 0.00854506
+error: 0.00980901
+error: 0.0111437
+error: 0.0125433
+Quadrature order: 7 is exact for polynomials of degree 0
+Quadrature order: 7 is exact for polynomials of degree 1
+Quadrature order: 7 is exact for polynomials of degree 2
+Quadrature order: 7 is exact for polynomials of degree 3
+Quadrature order: 7 is exact for polynomials of degree 4
+Quadrature order: 7 is exact for polynomials of degree 5
+Quadrature order: 7 is exact for polynomials of degree 6
+Quadrature order: 7 is exact for polynomials of degree 7
+Quadrature order: 7 is exact for polynomials of degree 8
+Quadrature order: 7 is exact for polynomials of degree 9
+Quadrature order: 7 is exact for polynomials of degree 10
+Quadrature order: 7 is exact for polynomials of degree 11
+Quadrature order: 7 is exact for polynomials of degree 12
+error: 9.36268e-08
+error: 6.55387e-07
+error: 2.54548e-06
+error: 7.25607e-06
+error: 1.69611e-05
+error: 3.44693e-05
+error: 6.31039e-05
+error: 0.000106539
+error: 0.000168622
+error: 0.000253200
+error: 0.000363975
+error: 0.000504378
+error: 0.000677482
+error: 0.000885938
+error: 0.00113194
+error: 0.00141723
+error: 0.00174307
+error: 0.00211028
+error: 0.00251928
+Quadrature order: 8 is exact for polynomials of degree 0
+Quadrature order: 8 is exact for polynomials of degree 1
+Quadrature order: 8 is exact for polynomials of degree 2
+Quadrature order: 8 is exact for polynomials of degree 3
+Quadrature order: 8 is exact for polynomials of degree 4
+Quadrature order: 8 is exact for polynomials of degree 5
+Quadrature order: 8 is exact for polynomials of degree 6
+Quadrature order: 8 is exact for polynomials of degree 7
+Quadrature order: 8 is exact for polynomials of degree 8
+Quadrature order: 8 is exact for polynomials of degree 9
+Quadrature order: 8 is exact for polynomials of degree 10
+Quadrature order: 8 is exact for polynomials of degree 11
+Quadrature order: 8 is exact for polynomials of degree 12
+Quadrature order: 8 is exact for polynomials of degree 13
+Quadrature order: 8 is exact for polynomials of degree 14
+error: 5.85167e-09
+error: 4.68134e-08
+error: 2.05174e-07
+error: 6.52827e-07
+error: 1.68727e-06
+error: 3.76020e-06
+error: 7.49429e-06
+error: 1.36865e-05
+error: 2.32985e-05
+error: 3.74370e-05
+error: 5.73254e-05
+error: 8.42721e-05
+error: 0.000119636
+error: 0.000164794
+error: 0.000221108
+error: 0.000289897
+error: 0.000372415
+Quadrature order: 9 is exact for polynomials of degree 0
+Quadrature order: 9 is exact for polynomials of degree 1
+Quadrature order: 9 is exact for polynomials of degree 2
+Quadrature order: 9 is exact for polynomials of degree 3
+Quadrature order: 9 is exact for polynomials of degree 4
+Quadrature order: 9 is exact for polynomials of degree 5
+Quadrature order: 9 is exact for polynomials of degree 6
+Quadrature order: 9 is exact for polynomials of degree 7
+Quadrature order: 9 is exact for polynomials of degree 8
+Quadrature order: 9 is exact for polynomials of degree 9
+Quadrature order: 9 is exact for polynomials of degree 10
+Quadrature order: 9 is exact for polynomials of degree 11
+Quadrature order: 9 is exact for polynomials of degree 12
+Quadrature order: 9 is exact for polynomials of degree 13
+Quadrature order: 9 is exact for polynomials of degree 14
+Quadrature order: 9 is exact for polynomials of degree 15
+Quadrature order: 9 is exact for polynomials of degree 16
+error: 3.65729e-10
+error: 3.29157e-09
+error: 1.60692e-08
+error: 5.64595e-08
+error: 1.59907e-07
+error: 3.87876e-07
+error: 8.36358e-07
+error: 1.64357e-06
+error: 2.99610e-06
+error: 5.13285e-06
+error: 8.34672e-06
+error: 1.29838e-05
+error: 1.94404e-05
+error: 2.81583e-05
+error: 3.96186e-05
+Quadrature order: 10 is exact for polynomials of degree 0
+Quadrature order: 10 is exact for polynomials of degree 1
+Quadrature order: 10 is exact for polynomials of degree 2
+Quadrature order: 10 is exact for polynomials of degree 3
+Quadrature order: 10 is exact for polynomials of degree 4
+Quadrature order: 10 is exact for polynomials of degree 5
+Quadrature order: 10 is exact for polynomials of degree 6
+Quadrature order: 10 is exact for polynomials of degree 7
+Quadrature order: 10 is exact for polynomials of degree 8
+Quadrature order: 10 is exact for polynomials of degree 9
+Quadrature order: 10 is exact for polynomials of degree 10
+Quadrature order: 10 is exact for polynomials of degree 11
+Quadrature order: 10 is exact for polynomials of degree 12
+Quadrature order: 10 is exact for polynomials of degree 13
+Quadrature order: 10 is exact for polynomials of degree 14
+Quadrature order: 10 is exact for polynomials of degree 15
+Quadrature order: 10 is exact for polynomials of degree 16
+Quadrature order: 10 is exact for polynomials of degree 17
+Quadrature order: 10 is exact for polynomials of degree 18
+error: 0
+error: 2.28581e-10
+error: 1.23005e-09
+error: 4.73020e-09
+error: 1.45707e-08
+error: 3.82227e-08
+error: 8.86795e-08
+error: 1.86649e-07
+error: 3.62901e-07
+error: 6.60600e-07
+error: 1.13747e-06
+error: 1.86765e-06
+error: 2.94310e-06
+Quadrature order: 11 is exact for polynomials of degree 0
+Quadrature order: 11 is exact for polynomials of degree 1
+Quadrature order: 11 is exact for polynomials of degree 2
+Quadrature order: 11 is exact for polynomials of degree 3
+Quadrature order: 11 is exact for polynomials of degree 4
+Quadrature order: 11 is exact for polynomials of degree 5
+Quadrature order: 11 is exact for polynomials of degree 6
+Quadrature order: 11 is exact for polynomials of degree 7
+Quadrature order: 11 is exact for polynomials of degree 8
+Quadrature order: 11 is exact for polynomials of degree 9
+Quadrature order: 11 is exact for polynomials of degree 10
+Quadrature order: 11 is exact for polynomials of degree 11
+Quadrature order: 11 is exact for polynomials of degree 12
+Quadrature order: 11 is exact for polynomials of degree 13
+Quadrature order: 11 is exact for polynomials of degree 14
+Quadrature order: 11 is exact for polynomials of degree 15
+Quadrature order: 11 is exact for polynomials of degree 16
+Quadrature order: 11 is exact for polynomials of degree 17
+Quadrature order: 11 is exact for polynomials of degree 18
+Quadrature order: 11 is exact for polynomials of degree 19
+Quadrature order: 11 is exact for polynomials of degree 20
+error: 0
+error: 0
+error: 0
+error: 3.86088e-10
+error: 1.28521e-09
+error: 3.62593e-09
+error: 9.00818e-09
+error: 2.02224e-08
+error: 4.17846e-08
+error: 8.05651e-08
+error: 1.46489e-07
+Quadrature order: 12 is exact for polynomials of degree 0
+Quadrature order: 12 is exact for polynomials of degree 1
+Quadrature order: 12 is exact for polynomials of degree 2
+Quadrature order: 12 is exact for polynomials of degree 3
+Quadrature order: 12 is exact for polynomials of degree 4
+Quadrature order: 12 is exact for polynomials of degree 5
+Quadrature order: 12 is exact for polynomials of degree 6
+Quadrature order: 12 is exact for polynomials of degree 7
+Quadrature order: 12 is exact for polynomials of degree 8
+Quadrature order: 12 is exact for polynomials of degree 9
+Quadrature order: 12 is exact for polynomials of degree 10
+Quadrature order: 12 is exact for polynomials of degree 11
+Quadrature order: 12 is exact for polynomials of degree 12
+Quadrature order: 12 is exact for polynomials of degree 13
+Quadrature order: 12 is exact for polynomials of degree 14
+Quadrature order: 12 is exact for polynomials of degree 15
+Quadrature order: 12 is exact for polynomials of degree 16
+Quadrature order: 12 is exact for polynomials of degree 17
+Quadrature order: 12 is exact for polynomials of degree 18
+Quadrature order: 12 is exact for polynomials of degree 19
+Quadrature order: 12 is exact for polynomials of degree 20
+Quadrature order: 12 is exact for polynomials of degree 21
+Quadrature order: 12 is exact for polynomials of degree 22
+error: 0
+error: 0
+error: 0
+error: 0
+error: 1.10305e-10
+error: 3.33076e-10
+error: 8.82330e-10
+error: 2.10475e-09
+error: 4.60657e-09
+Quadrature order: 13 is exact for polynomials of degree 0
+Quadrature order: 13 is exact for polynomials of degree 1
+Quadrature order: 13 is exact for polynomials of degree 2
+Quadrature order: 13 is exact for polynomials of degree 3
+Quadrature order: 13 is exact for polynomials of degree 4
+Quadrature order: 13 is exact for polynomials of degree 5
+Quadrature order: 13 is exact for polynomials of degree 6
+Quadrature order: 13 is exact for polynomials of degree 7
+Quadrature order: 13 is exact for polynomials of degree 8
+Quadrature order: 13 is exact for polynomials of degree 9
+Quadrature order: 13 is exact for polynomials of degree 10
+Quadrature order: 13 is exact for polynomials of degree 11
+Quadrature order: 13 is exact for polynomials of degree 12
+Quadrature order: 13 is exact for polynomials of degree 13
+Quadrature order: 13 is exact for polynomials of degree 14
+Quadrature order: 13 is exact for polynomials of degree 15
+Quadrature order: 13 is exact for polynomials of degree 16
+Quadrature order: 13 is exact for polynomials of degree 17
+Quadrature order: 13 is exact for polynomials of degree 18
+Quadrature order: 13 is exact for polynomials of degree 19
+Quadrature order: 13 is exact for polynomials of degree 20
+Quadrature order: 13 is exact for polynomials of degree 21
+Quadrature order: 13 is exact for polynomials of degree 22
+Quadrature order: 13 is exact for polynomials of degree 23
+Quadrature order: 13 is exact for polynomials of degree 24
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+Quadrature order: 14 is exact for polynomials of degree 0
+Quadrature order: 14 is exact for polynomials of degree 1
+Quadrature order: 14 is exact for polynomials of degree 2
+Quadrature order: 14 is exact for polynomials of degree 3
+Quadrature order: 14 is exact for polynomials of degree 4
+Quadrature order: 14 is exact for polynomials of degree 5
+Quadrature order: 14 is exact for polynomials of degree 6
+Quadrature order: 14 is exact for polynomials of degree 7
+Quadrature order: 14 is exact for polynomials of degree 8
+Quadrature order: 14 is exact for polynomials of degree 9
+Quadrature order: 14 is exact for polynomials of degree 10
+Quadrature order: 14 is exact for polynomials of degree 11
+Quadrature order: 14 is exact for polynomials of degree 12
+Quadrature order: 14 is exact for polynomials of degree 13
+Quadrature order: 14 is exact for polynomials of degree 14
+Quadrature order: 14 is exact for polynomials of degree 15
+Quadrature order: 14 is exact for polynomials of degree 16
+Quadrature order: 14 is exact for polynomials of degree 17
+Quadrature order: 14 is exact for polynomials of degree 18
+Quadrature order: 14 is exact for polynomials of degree 19
+Quadrature order: 14 is exact for polynomials of degree 20
+Quadrature order: 14 is exact for polynomials of degree 21
+Quadrature order: 14 is exact for polynomials of degree 22
+Quadrature order: 14 is exact for polynomials of degree 23
+Quadrature order: 14 is exact for polynomials of degree 24
+Quadrature order: 14 is exact for polynomials of degree 25
+Quadrature order: 14 is exact for polynomials of degree 26
+Quadrature order: 14 is exact for polynomials of degree 27
+error: 0
+error: 0
+error: 0
+error: 0
+Quadrature order: 15 is exact for polynomials of degree 0
+Quadrature order: 15 is exact for polynomials of degree 1
+Quadrature order: 15 is exact for polynomials of degree 2
+Quadrature order: 15 is exact for polynomials of degree 3
+Quadrature order: 15 is exact for polynomials of degree 4
+Quadrature order: 15 is exact for polynomials of degree 5
+Quadrature order: 15 is exact for polynomials of degree 6
+Quadrature order: 15 is exact for polynomials of degree 7
+Quadrature order: 15 is exact for polynomials of degree 8
+Quadrature order: 15 is exact for polynomials of degree 9
+Quadrature order: 15 is exact for polynomials of degree 10
+Quadrature order: 15 is exact for polynomials of degree 11
+Quadrature order: 15 is exact for polynomials of degree 12
+Quadrature order: 15 is exact for polynomials of degree 13
+Quadrature order: 15 is exact for polynomials of degree 14
+Quadrature order: 15 is exact for polynomials of degree 15
+Quadrature order: 15 is exact for polynomials of degree 16
+Quadrature order: 15 is exact for polynomials of degree 17
+Quadrature order: 15 is exact for polynomials of degree 18
+Quadrature order: 15 is exact for polynomials of degree 19
+Quadrature order: 15 is exact for polynomials of degree 20
+Quadrature order: 15 is exact for polynomials of degree 21
+Quadrature order: 15 is exact for polynomials of degree 22
+Quadrature order: 15 is exact for polynomials of degree 23
+Quadrature order: 15 is exact for polynomials of degree 24
+Quadrature order: 15 is exact for polynomials of degree 25
+Quadrature order: 15 is exact for polynomials of degree 26
+Quadrature order: 15 is exact for polynomials of degree 27
+Quadrature order: 15 is exact for polynomials of degree 28
+Quadrature order: 15 is exact for polynomials of degree 29
+Quadrature order: 15 is exact for polynomials of degree 30
+error: 0
+Quadrature order: 16 is exact for polynomials of degree 0
+Quadrature order: 16 is exact for polynomials of degree 1
+Quadrature order: 16 is exact for polynomials of degree 2
+Quadrature order: 16 is exact for polynomials of degree 3
+Quadrature order: 16 is exact for polynomials of degree 4
+Quadrature order: 16 is exact for polynomials of degree 5
+Quadrature order: 16 is exact for polynomials of degree 6
+Quadrature order: 16 is exact for polynomials of degree 7
+Quadrature order: 16 is exact for polynomials of degree 8
+Quadrature order: 16 is exact for polynomials of degree 9
+Quadrature order: 16 is exact for polynomials of degree 10
+Quadrature order: 16 is exact for polynomials of degree 11
+Quadrature order: 16 is exact for polynomials of degree 12
+Quadrature order: 16 is exact for polynomials of degree 13
+Quadrature order: 16 is exact for polynomials of degree 14
+Quadrature order: 16 is exact for polynomials of degree 15
+Quadrature order: 16 is exact for polynomials of degree 16
+Quadrature order: 16 is exact for polynomials of degree 17
+Quadrature order: 16 is exact for polynomials of degree 18
+Quadrature order: 16 is exact for polynomials of degree 19
+Quadrature order: 16 is exact for polynomials of degree 20
+Quadrature order: 16 is exact for polynomials of degree 21
+Quadrature order: 16 is exact for polynomials of degree 22
+Quadrature order: 16 is exact for polynomials of degree 23
+Quadrature order: 16 is exact for polynomials of degree 24
+Quadrature order: 16 is exact for polynomials of degree 25
+Quadrature order: 16 is exact for polynomials of degree 26
+Quadrature order: 16 is exact for polynomials of degree 27
+Quadrature order: 16 is exact for polynomials of degree 28
+Quadrature order: 16 is exact for polynomials of degree 29
+Quadrature order: 16 is exact for polynomials of degree 30
+Quadrature order: 16 is exact for polynomials of degree 31
+Quadrature order: 17 is exact for polynomials of degree 0
+Quadrature order: 17 is exact for polynomials of degree 1
+Quadrature order: 17 is exact for polynomials of degree 2
+Quadrature order: 17 is exact for polynomials of degree 3
+Quadrature order: 17 is exact for polynomials of degree 4
+Quadrature order: 17 is exact for polynomials of degree 5
+Quadrature order: 17 is exact for polynomials of degree 6
+Quadrature order: 17 is exact for polynomials of degree 7
+Quadrature order: 17 is exact for polynomials of degree 8
+Quadrature order: 17 is exact for polynomials of degree 9
+Quadrature order: 17 is exact for polynomials of degree 10
+Quadrature order: 17 is exact for polynomials of degree 11
+Quadrature order: 17 is exact for polynomials of degree 12
+Quadrature order: 17 is exact for polynomials of degree 13
+Quadrature order: 17 is exact for polynomials of degree 14
+Quadrature order: 17 is exact for polynomials of degree 15
+Quadrature order: 17 is exact for polynomials of degree 16
+Quadrature order: 17 is exact for polynomials of degree 17
+Quadrature order: 17 is exact for polynomials of degree 18
+Quadrature order: 17 is exact for polynomials of degree 19
+Quadrature order: 17 is exact for polynomials of degree 20
+Quadrature order: 17 is exact for polynomials of degree 21
+Quadrature order: 17 is exact for polynomials of degree 22
+Quadrature order: 17 is exact for polynomials of degree 23
+Quadrature order: 17 is exact for polynomials of degree 24
+Quadrature order: 17 is exact for polynomials of degree 25
+Quadrature order: 17 is exact for polynomials of degree 26
+Quadrature order: 17 is exact for polynomials of degree 27
+Quadrature order: 17 is exact for polynomials of degree 28
+Quadrature order: 17 is exact for polynomials of degree 29
+Quadrature order: 17 is exact for polynomials of degree 30
+Quadrature order: 17 is exact for polynomials of degree 31
+Quadrature order: 2 is exact for polynomials of degree: 0
+Quadrature order: 2 is exact for polynomials of degree: 1
+error: 0.392699
+error: 0.589049
+error: 0.711767
+error: 0.797670
+error: 0.862097
+error: 0.912719
+error: 0.953848
+error: 0.988123
+error: 1.01726
+error: 1.04242
+error: 1.06443
+error: 1.08391
+error: 1.10130
+error: 1.11695
+error: 1.13113
+error: 1.14406
+error: 1.15592
+error: 1.16683
+error: 1.17693
+error: 1.18631
+error: 1.19505
+error: 1.20322
+error: 1.21088
+error: 1.21807
+error: 1.22486
+error: 1.23126
+error: 1.23733
+error: 1.24308
+error: 1.24854
+error: 1.25374
+Quadrature order: 3 is exact for polynomials of degree: 0
+Quadrature order: 3 is exact for polynomials of degree: 1
+Quadrature order: 3 is exact for polynomials of degree: 2
+Quadrature order: 3 is exact for polynomials of degree: 3
+error: 0.0245437
+error: 0.0613592
+error: 0.101243
+error: 0.139592
+error: 0.174586
+error: 0.205793
+error: 0.233393
+error: 0.257787
+error: 0.279419
+error: 0.298703
+error: 0.315996
+error: 0.331598
+error: 0.345756
+error: 0.358676
+error: 0.370524
+error: 0.381438
+error: 0.391536
+error: 0.400913
+error: 0.409651
+error: 0.417819
+error: 0.425477
+error: 0.432675
+error: 0.439458
+error: 0.445865
+error: 0.451928
+error: 0.457677
+error: 0.463139
+error: 0.468337
+Quadrature order: 4 is exact for polynomials of degree: 0
+error: 0
+Quadrature order: 4 is exact for polynomials of degree: 2
+Quadrature order: 4 is exact for polynomials of degree: 3
+Quadrature order: 4 is exact for polynomials of degree: 4
+Quadrature order: 4 is exact for polynomials of degree: 5
+error: 0.00153398
+error: 0.00536893
+error: 0.0115049
+error: 0.0195583
+error: 0.0290318
+error: 0.0394491
+error: 0.0504075
+error: 0.0615901
+error: 0.0727593
+error: 0.0837445
+error: 0.0944287
+error: 0.104736
+error: 0.114622
+error: 0.124064
+error: 0.133056
+error: 0.141604
+error: 0.149719
+error: 0.157421
+error: 0.164728
+error: 0.171664
+error: 0.178250
+error: 0.184509
+error: 0.190461
+error: 0.196127
+error: 0.201527
+error: 0.206678
+Quadrature order: 5 is exact for polynomials of degree: 0
+Quadrature order: 5 is exact for polynomials of degree: 1
+Quadrature order: 5 is exact for polynomials of degree: 2
+Quadrature order: 5 is exact for polynomials of degree: 3
+Quadrature order: 5 is exact for polynomials of degree: 4
+Quadrature order: 5 is exact for polynomials of degree: 5
+Quadrature order: 5 is exact for polynomials of degree: 6
+Quadrature order: 5 is exact for polynomials of degree: 7
+error: 9.58738e-05
+error: 0.000431432
+error: 0.00113850
+error: 0.00230696
+error: 0.00397951
+error: 0.00615877
+error: 0.00881824
+error: 0.0119128
+error: 0.0153874
+error: 0.0191830
+error: 0.0232410
+error: 0.0275058
+error: 0.0319267
+error: 0.0364581
+error: 0.0410599
+error: 0.0456976
+error: 0.0503420
+error: 0.0549682
+error: 0.0595558
+error: 0.0640881
+error: 0.0685516
+error: 0.0729358
+error: 0.0772325
+error: 0.0814355
+Quadrature order: 6 is exact for polynomials of degree: 0
+Quadrature order: 6 is exact for polynomials of degree: 1
+Quadrature order: 6 is exact for polynomials of degree: 2
+Quadrature order: 6 is exact for polynomials of degree: 3
+Quadrature order: 6 is exact for polynomials of degree: 4
+Quadrature order: 6 is exact for polynomials of degree: 5
+Quadrature order: 6 is exact for polynomials of degree: 6
+Quadrature order: 6 is exact for polynomials of degree: 7
+Quadrature order: 6 is exact for polynomials of degree: 8
+Quadrature order: 6 is exact for polynomials of degree: 9
+error: 5.99211e-06
+error: 3.29566e-05
+error: 0.000103364
+error: 0.000243430
+error: 0.000479252
+error: 0.000833898
+error: 0.00132568
+error: 0.00196748
+error: 0.00276677
+error: 0.00372614
+error: 0.00484398
+error: 0.00611534
+error: 0.00753270
+error: 0.00908665
+error: 0.0107665
+error: 0.0125610
+error: 0.0144582
+error: 0.0164465
+error: 0.0185144
+error: 0.0206508
+error: 0.0228451
+error: 0.0250874
+Quadrature order: 7 is exact for polynomials of degree: 0
+Quadrature order: 7 is exact for polynomials of degree: 1
+Quadrature order: 7 is exact for polynomials of degree: 2
+Quadrature order: 7 is exact for polynomials of degree: 3
+Quadrature order: 7 is exact for polynomials of degree: 4
+Quadrature order: 7 is exact for polynomials of degree: 5
+Quadrature order: 7 is exact for polynomials of degree: 6
+Quadrature order: 7 is exact for polynomials of degree: 7
+Quadrature order: 7 is exact for polynomials of degree: 8
+Quadrature order: 7 is exact for polynomials of degree: 9
+Quadrature order: 7 is exact for polynomials of degree: 10
+Quadrature order: 7 is exact for polynomials of degree: 11
+error: 3.74507e-07
+error: 2.43430e-06
+error: 8.84773e-06
+error: 2.37578e-05
+error: 5.26065e-05
+error: 0.000101766
+error: 0.000178091
+error: 0.000288475
+error: 0.000439474
+error: 0.000637015
+error: 0.000886200
+error: 0.00119119
+error: 0.00155517
+error: 0.00198033
+error: 0.00246797
+error: 0.00301852
+error: 0.00363165
+error: 0.00430640
+error: 0.00504122
+error: 0.00583412
+Quadrature order: 8 is exact for polynomials of degree: 0
+Quadrature order: 8 is exact for polynomials of degree: 1
+Quadrature order: 8 is exact for polynomials of degree: 2
+Quadrature order: 8 is exact for polynomials of degree: 3
+Quadrature order: 8 is exact for polynomials of degree: 4
+Quadrature order: 8 is exact for polynomials of degree: 5
+Quadrature order: 8 is exact for polynomials of degree: 6
+Quadrature order: 8 is exact for polynomials of degree: 7
+Quadrature order: 8 is exact for polynomials of degree: 8
+Quadrature order: 8 is exact for polynomials of degree: 9
+Quadrature order: 8 is exact for polynomials of degree: 10
+Quadrature order: 8 is exact for polynomials of degree: 11
+Quadrature order: 8 is exact for polynomials of degree: 12
+Quadrature order: 8 is exact for polynomials of degree: 13
+error: 2.34067e-08
+error: 1.75550e-07
+error: 7.25607e-07
+error: 2.18853e-06
+error: 5.38582e-06
+error: 1.14734e-05
+error: 2.19345e-05
+error: 3.85421e-05
+error: 6.33000e-05
+error: 9.83716e-05
+error: 0.000146004
+error: 0.000208456
+error: 0.000287930
+error: 0.000386517
+error: 0.000506154
+error: 0.000648583
+error: 0.000815335
+error: 0.00100771
+Quadrature order: 9 is exact for polynomials of degree: 0
+Quadrature order: 9 is exact for polynomials of degree: 1
+Quadrature order: 9 is exact for polynomials of degree: 2
+Quadrature order: 9 is exact for polynomials of degree: 3
+Quadrature order: 9 is exact for polynomials of degree: 4
+Quadrature order: 9 is exact for polynomials of degree: 5
+Quadrature order: 9 is exact for polynomials of degree: 6
+Quadrature order: 9 is exact for polynomials of degree: 7
+Quadrature order: 9 is exact for polynomials of degree: 8
+Quadrature order: 9 is exact for polynomials of degree: 9
+Quadrature order: 9 is exact for polynomials of degree: 10
+Quadrature order: 9 is exact for polynomials of degree: 11
+Quadrature order: 9 is exact for polynomials of degree: 12
+Quadrature order: 9 is exact for polynomials of degree: 13
+Quadrature order: 9 is exact for polynomials of degree: 14
+Quadrature order: 9 is exact for polynomials of degree: 15
+error: 1.46292e-09
+error: 1.24348e-08
+error: 5.76024e-08
+error: 1.92831e-07
+error: 5.22250e-07
+error: 1.21529e-06
+error: 2.52120e-06
+error: 4.77919e-06
+error: 8.42332e-06
+error: 1.39818e-05
+error: 2.20713e-05
+error: 3.33869e-05
+error: 4.86892e-05
+error: 6.87891e-05
+error: 9.45316e-05
+error: 0.000126780
+Quadrature order: 10 is exact for polynomials of degree: 0
+Quadrature order: 10 is exact for polynomials of degree: 1
+Quadrature order: 10 is exact for polynomials of degree: 2
+Quadrature order: 10 is exact for polynomials of degree: 3
+Quadrature order: 10 is exact for polynomials of degree: 4
+Quadrature order: 10 is exact for polynomials of degree: 5
+Quadrature order: 10 is exact for polynomials of degree: 6
+Quadrature order: 10 is exact for polynomials of degree: 7
+Quadrature order: 10 is exact for polynomials of degree: 8
+Quadrature order: 10 is exact for polynomials of degree: 9
+Quadrature order: 10 is exact for polynomials of degree: 10
+Quadrature order: 10 is exact for polynomials of degree: 11
+Quadrature order: 10 is exact for polynomials of degree: 12
+Quadrature order: 10 is exact for polynomials of degree: 13
+Quadrature order: 10 is exact for polynomials of degree: 14
+Quadrature order: 10 is exact for polynomials of degree: 15
+Quadrature order: 10 is exact for polynomials of degree: 16
+Quadrature order: 10 is exact for polynomials of degree: 17
+error: 0
+error: 8.68607e-10
+error: 4.45733e-09
+error: 1.64007e-08
+error: 4.84845e-08
+error: 1.22394e-07
+error: 2.73929e-07
+error: 5.57414e-07
+error: 1.04990e-06
+error: 1.85483e-06
+error: 3.10482e-06
+error: 4.96350e-06
+error: 7.62622e-06
+error: 1.13196e-05
+Quadrature order: 11 is exact for polynomials of degree: 0
+Quadrature order: 11 is exact for polynomials of degree: 1
+Quadrature order: 11 is exact for polynomials of degree: 2
+Quadrature order: 11 is exact for polynomials of degree: 3
+Quadrature order: 11 is exact for polynomials of degree: 4
+Quadrature order: 11 is exact for polynomials of degree: 5
+Quadrature order: 11 is exact for polynomials of degree: 6
+Quadrature order: 11 is exact for polynomials of degree: 7
+Quadrature order: 11 is exact for polynomials of degree: 8
+Quadrature order: 11 is exact for polynomials of degree: 9
+Quadrature order: 11 is exact for polynomials of degree: 10
+Quadrature order: 11 is exact for polynomials of degree: 11
+Quadrature order: 11 is exact for polynomials of degree: 12
+Quadrature order: 11 is exact for polynomials of degree: 13
+Quadrature order: 11 is exact for polynomials of degree: 14
+Quadrature order: 11 is exact for polynomials of degree: 15
+Quadrature order: 11 is exact for polynomials of degree: 16
+Quadrature order: 11 is exact for polynomials of degree: 17
+Quadrature order: 11 is exact for polynomials of degree: 18
+Quadrature order: 11 is exact for polynomials of degree: 19
+error: 0
+error: 0
+error: 3.37871e-10
+error: 1.35541e-09
+error: 4.34348e-09
+error: 1.18239e-08
+error: 2.84031e-08
+error: 6.17703e-08
+error: 1.23862e-07
+error: 2.32137e-07
+error: 4.10882e-07
+error: 6.92494e-07
+Quadrature order: 12 is exact for polynomials of degree: 0
+Quadrature order: 12 is exact for polynomials of degree: 1
+Quadrature order: 12 is exact for polynomials of degree: 2
+Quadrature order: 12 is exact for polynomials of degree: 3
+Quadrature order: 12 is exact for polynomials of degree: 4
+Quadrature order: 12 is exact for polynomials of degree: 5
+Quadrature order: 12 is exact for polynomials of degree: 6
+Quadrature order: 12 is exact for polynomials of degree: 7
+Quadrature order: 12 is exact for polynomials of degree: 8
+Quadrature order: 12 is exact for polynomials of degree: 9
+Quadrature order: 12 is exact for polynomials of degree: 10
+Quadrature order: 12 is exact for polynomials of degree: 11
+Quadrature order: 12 is exact for polynomials of degree: 12
+Quadrature order: 12 is exact for polynomials of degree: 13
+Quadrature order: 12 is exact for polynomials of degree: 14
+Quadrature order: 12 is exact for polynomials of degree: 15
+Quadrature order: 12 is exact for polynomials of degree: 16
+Quadrature order: 12 is exact for polynomials of degree: 17
+Quadrature order: 12 is exact for polynomials of degree: 18
+Quadrature order: 12 is exact for polynomials of degree: 19
+Quadrature order: 12 is exact for polynomials of degree: 20
+Quadrature order: 12 is exact for polynomials of degree: 21
+error: 0
+error: 0
+error: 0
+error: 1.09380e-10
+error: 3.77701e-10
+error: 1.10304e-09
+error: 2.83114e-09
+error: 6.55445e-09
+error: 1.39440e-08
+error: 2.76394e-08
+Quadrature order: 13 is exact for polynomials of degree: 0
+Quadrature order: 13 is exact for polynomials of degree: 1
+Quadrature order: 13 is exact for polynomials of degree: 2
+Quadrature order: 13 is exact for polynomials of degree: 3
+Quadrature order: 13 is exact for polynomials of degree: 4
+Quadrature order: 13 is exact for polynomials of degree: 5
+Quadrature order: 13 is exact for polynomials of degree: 6
+Quadrature order: 13 is exact for polynomials of degree: 7
+Quadrature order: 13 is exact for polynomials of degree: 8
+Quadrature order: 13 is exact for polynomials of degree: 9
+Quadrature order: 13 is exact for polynomials of degree: 10
+Quadrature order: 13 is exact for polynomials of degree: 11
+Quadrature order: 13 is exact for polynomials of degree: 12
+Quadrature order: 13 is exact for polynomials of degree: 13
+Quadrature order: 13 is exact for polynomials of degree: 14
+Quadrature order: 13 is exact for polynomials of degree: 15
+Quadrature order: 13 is exact for polynomials of degree: 16
+Quadrature order: 13 is exact for polynomials of degree: 17
+Quadrature order: 13 is exact for polynomials of degree: 18
+Quadrature order: 13 is exact for polynomials of degree: 19
+Quadrature order: 13 is exact for polynomials of degree: 20
+Quadrature order: 13 is exact for polynomials of degree: 21
+Quadrature order: 13 is exact for polynomials of degree: 22
+Quadrature order: 13 is exact for polynomials of degree: 23
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+error: 2.72838e-10
+error: 6.70047e-10
+Quadrature order: 14 is exact for polynomials of degree: 0
+Quadrature order: 14 is exact for polynomials of degree: 1
+Quadrature order: 14 is exact for polynomials of degree: 2
+Quadrature order: 14 is exact for polynomials of degree: 3
+Quadrature order: 14 is exact for polynomials of degree: 4
+Quadrature order: 14 is exact for polynomials of degree: 5
+Quadrature order: 14 is exact for polynomials of degree: 6
+Quadrature order: 14 is exact for polynomials of degree: 7
+Quadrature order: 14 is exact for polynomials of degree: 8
+Quadrature order: 14 is exact for polynomials of degree: 9
+Quadrature order: 14 is exact for polynomials of degree: 10
+Quadrature order: 14 is exact for polynomials of degree: 11
+Quadrature order: 14 is exact for polynomials of degree: 12
+Quadrature order: 14 is exact for polynomials of degree: 13
+Quadrature order: 14 is exact for polynomials of degree: 14
+Quadrature order: 14 is exact for polynomials of degree: 15
+Quadrature order: 14 is exact for polynomials of degree: 16
+Quadrature order: 14 is exact for polynomials of degree: 17
+Quadrature order: 14 is exact for polynomials of degree: 18
+Quadrature order: 14 is exact for polynomials of degree: 19
+Quadrature order: 14 is exact for polynomials of degree: 20
+Quadrature order: 14 is exact for polynomials of degree: 21
+Quadrature order: 14 is exact for polynomials of degree: 22
+Quadrature order: 14 is exact for polynomials of degree: 23
+Quadrature order: 14 is exact for polynomials of degree: 24
+Quadrature order: 14 is exact for polynomials of degree: 25
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+error: 0
+Quadrature order: 15 is exact for polynomials of degree: 0
+Quadrature order: 15 is exact for polynomials of degree: 1
+Quadrature order: 15 is exact for polynomials of degree: 2
+Quadrature order: 15 is exact for polynomials of degree: 3
+Quadrature order: 15 is exact for polynomials of degree: 4
+Quadrature order: 15 is exact for polynomials of degree: 5
+Quadrature order: 15 is exact for polynomials of degree: 6
+Quadrature order: 15 is exact for polynomials of degree: 7
+Quadrature order: 15 is exact for polynomials of degree: 8
+Quadrature order: 15 is exact for polynomials of degree: 9
+Quadrature order: 15 is exact for polynomials of degree: 10
+Quadrature order: 15 is exact for polynomials of degree: 11
+Quadrature order: 15 is exact for polynomials of degree: 12
+Quadrature order: 15 is exact for polynomials of degree: 13
+Quadrature order: 15 is exact for polynomials of degree: 14
+Quadrature order: 15 is exact for polynomials of degree: 15
+Quadrature order: 15 is exact for polynomials of degree: 16
+Quadrature order: 15 is exact for polynomials of degree: 17
+Quadrature order: 15 is exact for polynomials of degree: 18
+Quadrature order: 15 is exact for polynomials of degree: 19
+Quadrature order: 15 is exact for polynomials of degree: 20
+Quadrature order: 15 is exact for polynomials of degree: 21
+Quadrature order: 15 is exact for polynomials of degree: 22
+Quadrature order: 15 is exact for polynomials of degree: 23
+Quadrature order: 15 is exact for polynomials of degree: 24
+Quadrature order: 15 is exact for polynomials of degree: 25
+Quadrature order: 15 is exact for polynomials of degree: 26
+Quadrature order: 15 is exact for polynomials of degree: 27
+Quadrature order: 15 is exact for polynomials of degree: 28
+Quadrature order: 15 is exact for polynomials of degree: 29
+error: 0
+error: 0
+Quadrature order: 16 is exact for polynomials of degree: 0
+Quadrature order: 16 is exact for polynomials of degree: 1
+Quadrature order: 16 is exact for polynomials of degree: 2
+Quadrature order: 16 is exact for polynomials of degree: 3
+Quadrature order: 16 is exact for polynomials of degree: 4
+Quadrature order: 16 is exact for polynomials of degree: 5
+Quadrature order: 16 is exact for polynomials of degree: 6
+Quadrature order: 16 is exact for polynomials of degree: 7
+Quadrature order: 16 is exact for polynomials of degree: 8
+Quadrature order: 16 is exact for polynomials of degree: 9
+Quadrature order: 16 is exact for polynomials of degree: 10
+Quadrature order: 16 is exact for polynomials of degree: 11
+Quadrature order: 16 is exact for polynomials of degree: 12
+Quadrature order: 16 is exact for polynomials of degree: 13
+Quadrature order: 16 is exact for polynomials of degree: 14
+Quadrature order: 16 is exact for polynomials of degree: 15
+Quadrature order: 16 is exact for polynomials of degree: 16
+Quadrature order: 16 is exact for polynomials of degree: 17
+Quadrature order: 16 is exact for polynomials of degree: 18
+Quadrature order: 16 is exact for polynomials of degree: 19
+Quadrature order: 16 is exact for polynomials of degree: 20
+Quadrature order: 16 is exact for polynomials of degree: 21
+Quadrature order: 16 is exact for polynomials of degree: 22
+Quadrature order: 16 is exact for polynomials of degree: 23
+Quadrature order: 16 is exact for polynomials of degree: 24
+Quadrature order: 16 is exact for polynomials of degree: 25
+Quadrature order: 16 is exact for polynomials of degree: 26
+Quadrature order: 16 is exact for polynomials of degree: 27
+Quadrature order: 16 is exact for polynomials of degree: 28
+Quadrature order: 16 is exact for polynomials of degree: 29
+Quadrature order: 16 is exact for polynomials of degree: 30
+Quadrature order: 16 is exact for polynomials of degree: 31
+error: 0
+Quadrature order: 17 is exact for polynomials of degree: 1
+Quadrature order: 17 is exact for polynomials of degree: 2
+Quadrature order: 17 is exact for polynomials of degree: 3
+Quadrature order: 17 is exact for polynomials of degree: 4
+Quadrature order: 17 is exact for polynomials of degree: 5
+Quadrature order: 17 is exact for polynomials of degree: 6
+Quadrature order: 17 is exact for polynomials of degree: 7
+Quadrature order: 17 is exact for polynomials of degree: 8
+Quadrature order: 17 is exact for polynomials of degree: 9
+Quadrature order: 17 is exact for polynomials of degree: 10
+Quadrature order: 17 is exact for polynomials of degree: 11
+Quadrature order: 17 is exact for polynomials of degree: 12
+Quadrature order: 17 is exact for polynomials of degree: 13
+Quadrature order: 17 is exact for polynomials of degree: 14
+Quadrature order: 17 is exact for polynomials of degree: 15
+Quadrature order: 17 is exact for polynomials of degree: 16
+Quadrature order: 17 is exact for polynomials of degree: 17
+Quadrature order: 17 is exact for polynomials of degree: 18
+Quadrature order: 17 is exact for polynomials of degree: 19
+Quadrature order: 17 is exact for polynomials of degree: 20
+Quadrature order: 17 is exact for polynomials of degree: 21
+Quadrature order: 17 is exact for polynomials of degree: 22
+Quadrature order: 17 is exact for polynomials of degree: 23
+Quadrature order: 17 is exact for polynomials of degree: 24
+Quadrature order: 17 is exact for polynomials of degree: 25
+Quadrature order: 17 is exact for polynomials of degree: 26
+Quadrature order: 17 is exact for polynomials of degree: 27
+Quadrature order: 17 is exact for polynomials of degree: 28
+Quadrature order: 17 is exact for polynomials of degree: 29
+Quadrature order: 17 is exact for polynomials of degree: 30
+Quadrature order: 17 is exact for polynomials of degree: 31
