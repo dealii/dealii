@@ -368,28 +368,36 @@ namespace parallel
       typedef typename dealii::Triangulation<dim,spacedim>::active_cell_iterator active_cell_iterator;
 
       /**
-       * Generic settings for distributed Triangulations. If
-       * mesh_reconstruction_after_repartitioning is set, the deal.II mesh
-       * will be reconstructed from the coarse mesh every time a repartioning
-       * in p4est happens. This can be a bit more expensive, but guarantees
-       * the same memory layout and therefore cell ordering in the deal.II
-       * mesh. As assembly is done in the deal.II cell ordering, this flag is
-       * required to get reproducible behaviour after snapshot/resume.
-       *
-       * The flag construct_multigrid_hierarchy needs to be set to use the
-       * geometric multigrid functionality. This option requires additional
-       * computation and communication. Note: geometric multigrid is still a
-       * work in progress.
-       *
-       * @p no_automatic_repartitioning will disable automatic repartioning of
-       * the cells after a refinement cycle. It can be executed manually by
-       * calling repartition().
+       * Configuration flags for distributed Triangulations to be set in the
+       * constructor. Settings can be combined using bitwise OR.
        */
       enum Settings
       {
+        /**
+         * Default settings, other options are disabled.
+         */
         default_setting = 0x0,
+        /**
+         * If set, the deal.II mesh will be reconstructed from the coarse mesh
+         * every time a repartioning in p4est happens. This can be a bit more
+         * expensive, but guarantees the same memory layout and therefore cell
+         * ordering in the deal.II mesh. As assembly is done in the deal.II
+         * cell ordering, this flag is required to get reproducible behaviour
+         * after snapshot/resume.
+         */
         mesh_reconstruction_after_repartitioning = 0x1,
+        /**
+         * This flags needs to be set to use the geometric multigrid
+         * functionality. This option requires additional computation and
+         * communication. Note: geometric multigrid is still a work in
+         * progress.
+         */
         construct_multigrid_hierarchy = 0x2,
+        /**
+         * Setting this flag will disable automatic repartioning of the cells
+         * after a refinement cycle. It can be executed manually by calling
+         * repartition().
+         */
         no_automatic_repartitioning = 0x4
       };
 
