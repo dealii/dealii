@@ -1073,18 +1073,18 @@ DynamicSparsityPattern::end (const size_type r) const
   // iterator to it. also skip rows for which we do not have
   // store anything based on the IndexSet given to the sparsity
   // pattern
+  //
+  // note: row_length(row) returns zero if the row is not locally stored
   unsigned int row = r+1;
   while ((row<n_rows())
          &&
-         ((row_length(row)==0)
-          ||
-          ((rowset.size() != 0) &&
-           (rowset.is_element(row) == false))))
+         (row_length(row)==0))
+    ++row;
 
-    if (row == n_rows())
-      return iterator(this);
-    else
-      return iterator(this, row, 0);
+  if (row == n_rows())
+    return iterator(this);
+  else
+    return iterator(this, row, 0);
 }
 
 
