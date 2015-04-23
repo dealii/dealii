@@ -125,6 +125,15 @@ namespace DynamicSparsityPatternIterators
     std::vector<size_type>::const_iterator current_entry;
 
     /**
+     * A pointer to the end of the current row. We store this
+     * to make comparison against the end of line iterator
+     * cheaper as it otherwise needs to do the IndexSet translation
+     * from row index to the index within the 'lines' array
+     * of DynamicSparsityPattern.
+     */
+    std::vector<size_type>::const_iterator end_of_row;
+
+    /**
      * Move the accessor to the next nonzero entry in the matrix.
      */
     void advance ();
@@ -476,6 +485,12 @@ public:
    *
    * Note the discussion in the general documentation of this class about the
    * order in which elements are accessed.
+   *
+   * @note If the sparsity pattern has been initialized with an IndexSet
+   * that denotes which rows to store, then iterators will simply skip
+   * over rows that are not stored. In other words, they will look like
+   * empty rows, but no exception will be generated when iterating over
+   * such rows.
    */
   iterator begin () const;
 
@@ -494,6 +509,12 @@ public:
    *
    * Note also the discussion in the general documentation of this class about
    * the order in which elements are accessed.
+   *
+   * @note If the sparsity pattern has been initialized with an IndexSet
+   * that denotes which rows to store, then iterators will simply skip
+   * over rows that are not stored. In other words, they will look like
+   * empty rows, but no exception will be generated when iterating over
+   * such rows.
    */
   iterator begin (const size_type r) const;
 
@@ -640,12 +661,40 @@ namespace DynamicSparsityPatternIterators
     :
     sparsity_pattern(sparsity_pattern),
     current_row (row),
-    current_entry(sparsity_pattern->lines[current_row].entries.begin()+index_within_row)
+    current_entry(((sparsity_pattern->rowset.size()==0)
+                   ?
+                   sparsity_pattern->lines[current_row].entries.begin()
+                   :
+                   sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.begin())
+                  +
+                  index_within_row),
+    end_of_row((sparsity_pattern->rowset.size()==0)
+               ?
+               sparsity_pattern->lines[current_row].entries.end()
+               :
+               sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.end())
   {
     Assert (current_row < sparsity_pattern->n_rows(),
             ExcIndexRange (row, 0, sparsity_pattern->n_rows()));
-    Assert (index_within_row < sparsity_pattern->lines[current_row].entries.size(),
-            ExcIndexRange (index_within_row, 0, sparsity_pattern->lines[current_row].entries.size()));
+    Assert ((sparsity_pattern->rowset.size()==0)
+            ||
+            sparsity_pattern->rowset.is_element(current_row),
+            ExcMessage ("You can't create an iterator into a "
+                        "DynamicSparsityPattern's row that is not "
+                        "actually stored by that sparsity pattern "
+                        "based on the IndexSet argument to it."));
+    Assert (index_within_row <
+            ((sparsity_pattern->rowset.size()==0)
+             ?
+             sparsity_pattern->lines[current_row].entries.size()
+             :
+             sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.size()),
+            ExcIndexRange (index_within_row, 0,
+                           ((sparsity_pattern->rowset.size()==0)
+                            ?
+                            sparsity_pattern->lines[current_row].entries.size()
+                            :
+                            sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.size())));
   }
 
 
@@ -655,7 +704,8 @@ namespace DynamicSparsityPatternIterators
     :
     sparsity_pattern(sparsity_pattern),
     current_row(numbers::invalid_unsigned_int),
-    current_entry()
+    current_entry(),
+    end_of_row()
   {}
 
 
@@ -689,7 +739,12 @@ namespace DynamicSparsityPatternIterators
     Assert (current_row < sparsity_pattern->n_rows(),
             ExcInternalError());
 
-    return current_entry - sparsity_pattern->lines[current_row].entries.begin();
+    return (current_entry -
+            ((sparsity_pattern->rowset.size()==0)
+             ?
+             sparsity_pattern->lines[current_row].entries.begin()
+             :
+             sparsity_pattern->lines[sparsity_pattern->rowset.index_within_set(current_row)].entries.begin()));
   }
 
 
@@ -732,19 +787,18 @@ namespace DynamicSparsityPatternIterators
     // if this moves us beyond the end of the row, go to the next row
     // if possible, or set the iterator to an invalid state if not.
     //
-    // use a while loop to ensure that we properly skip over lines
-    // that are empty
-    while (current_entry ==
-           sparsity_pattern->lines[current_row].entries.end())
+    // going to the next row is a bit complicated because we may have
+    // to skip over empty rows, and because we also have to avoid rows
+    // that aren't listed in a possibly passed IndexSet argument of
+    // the sparsity pattern. consequently, rather than trying to
+    // duplicate code here, just call the begin() function of the
+    // sparsity pattern itself
+    if (current_entry == end_of_row)
       {
-        ++current_row;
-        current_entry = sparsity_pattern->lines[current_row].entries.begin();
-
-        if (current_row == sparsity_pattern->n_rows())
-          {
-            *this = Accessor(sparsity_pattern);  // invalid object
-            return;
-          }
+        if (current_row+1 < sparsity_pattern->n_rows())
+          *this = *sparsity_pattern->begin(current_row+1);
+        else
+          *this = Accessor(sparsity_pattern);  // invalid object
       }
   }
 
@@ -990,9 +1044,15 @@ DynamicSparsityPattern::begin (const size_type r) const
   Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
 
   // find the first row starting at r that has entries and return the
-  // begin iterator to it
+  // begin iterator to it. also skip rows for which we do not have
+  // store anything based on the IndexSet given to the sparsity
+  // pattern
+  //
+  // note: row_length(row) returns zero if the row is not locally stored
   unsigned int row = r;
-  while ((row<n_rows()) && (row_length(row)==0))
+  while ((row<n_rows())
+         &&
+         (row_length(row)==0))
     ++row;
 
   if (row == n_rows())
@@ -1010,15 +1070,21 @@ DynamicSparsityPattern::end (const size_type r) const
   Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
 
   // find the first row after r that has entries and return the begin
-  // iterator to it
+  // iterator to it. also skip rows for which we do not have
+  // store anything based on the IndexSet given to the sparsity
+  // pattern
   unsigned int row = r+1;
-  while ((row<n_rows()) && (row_length(row)==0))
-    ++row;
+  while ((row<n_rows())
+         &&
+         ((row_length(row)==0)
+          ||
+          ((rowset.size() != 0) &&
+           (rowset.is_element(row) == false))))
 
-  if (row == n_rows())
-    return iterator(this);
-  else
-    return iterator(this, row, 0);
+    if (row == n_rows())
+      return iterator(this);
+    else
+      return iterator(this, row, 0);
 }
 
 
