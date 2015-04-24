@@ -928,9 +928,15 @@ namespace Step42
     // @endcode
     // In other words, the boundary indicators of the sides of the cube are 8.
     // The boundary indicator of the bottom is 6 and the top has indicator 1.
-    // We will make use of these indicators later when evaluating which
-    // boundary will carry Dirichlet boundary conditions or will be
-    // subject to potential contact.
+    // We set these by looping over all cells of all faces and looking at
+    // coordinate values of the cell center, and will make use of these
+    // indicators later when evaluating which boundary will carry Dirichlet
+    // boundary conditions or will be subject to potential contact.
+    // (In the current case, the mesh contains only a single cell, and all of
+    // its faces are on the boundary, so both the loop over all cells and the
+    // query whether a face is on the boundary are, strictly speaking,
+    // unnecessary; we retain them simply out of habit: this kind of code can
+    // be found in many programs in essentially this form.)
     else
       {
         const Point<dim> p1(0, 0, 0);
@@ -938,26 +944,24 @@ namespace Step42
 
         GridGenerator::hyper_rectangle(triangulation, p1, p2);
 
-        /* boundary_ids:
-
-         */
         Triangulation<3>::active_cell_iterator
         cell = triangulation.begin_active(),
         endc = triangulation.end();
         for (; cell != endc; ++cell)
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
-            {
-              if (cell->face(face)->center()[2] == p2(2))
-                cell->face(face)->set_boundary_id(1);
-              if (cell->face(face)->center()[0] == p1(0)
-                  || cell->face(face)->center()[0] == p2(0)
-                  || cell->face(face)->center()[1] == p1(1)
-                  || cell->face(face)->center()[1] == p2(1))
-                cell->face(face)->set_boundary_id(8);
-              if (cell->face(face)->center()[2] == p1(2))
-                cell->face(face)->set_boundary_id(6);
-            }
+          for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+               ++face_no)
+            if (cell->face(face_no)->at_boundary())
+              {
+                if (std::fabs(cell->face(face_no)->center()[2] - p2[2]) < 1e-12)
+                  cell->face(face_no)->set_boundary_id(1);
+                if (std::fabs(cell->face(face_no)->center()[0] - p1[0]) < 1e-12
+                    || std::fabs(cell->face(face_no)->center()[0] - p2[0]) < 1e-12
+                    || std::fabs(cell->face(face_no)->center()[1] - p1[1]) < 1e-12
+                    || std::fabs(cell->face(face_no)->center()[1] - p2[1]) < 1e-12)
+                  cell->face(face_no)->set_boundary_id(8);
+                if (std::fabs(cell->face(face_no)->center()[2] - p1[2]) < 1e-12)
+                  cell->face(face_no)->set_boundary_id(6);
+              }
       }
 
     triangulation.refine_global(n_initial_global_refinements);
