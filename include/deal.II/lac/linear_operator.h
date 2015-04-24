@@ -265,7 +265,7 @@ public:
  * \relates LinearOperator
  *
  * Addition of two linear operators @p first_op and @p second_op given
- * by $(\text{first_op}+\text{second_op})x:=\text{first_op}(x)+\text{second_op}(x)$
+ * by $(\text{first\_op}+\text{second\_op})x:=\text{first\_op}(x)+\text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -314,7 +314,7 @@ operator+(const LinearOperator<Range, Domain> &first_op,
  * \relates LinearOperator
  *
  * Subtraction of two linear operators @p first_op and @p second_op given
- * by $(\text{first_op}-\text{second_op})x:=\text{first_op}(x)-\text{second_op}(x)$
+ * by $(\text{first\_op}-\text{second\_op})x:=\text{first\_op}(x)-\text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -332,7 +332,7 @@ operator-(const LinearOperator<Range, Domain> &first_op,
  * \relates LinearOperator
  *
  * Concatenation of two linear operators @p first_op and @p second_op given
- * by $(\text{first_op}*\text{second_op})x:=\text{first_op}(\text{second_op}(x))$
+ * by $(\text{first\_op}*\text{second\_op})x:=\text{first\_op}(\text{second\_op}(x))$
  *
  * @ingroup LAOperators
  */

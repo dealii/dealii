@@ -553,7 +553,7 @@ following sums:
 @f[
   \sum_{{\bf k}, |{\bf k}|\le N}
   \longrightarrow
-  \sum_{\footnotesize \begin{matrix}{{\bf k}, |{\bf k}|\le N} \\ {|\hat U_{{\bf k}}| \ge |\hat U_{{\bf k}'}|
+  \sum_{\begin{matrix}{{\bf k}, |{\bf k}|\le N} \\ {|\hat U_{{\bf k}}| \ge |\hat U_{{\bf k}'}|
   \ \textrm{for all}\ {\bf k}'\ \textrm{with}\ |{\bf k}'|=|{\bf k}|}\end{matrix}}
 @f]
 This is the form we will implement in the program.
