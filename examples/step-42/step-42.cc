@@ -952,14 +952,14 @@ namespace Step42
                ++face_no)
             if (cell->face(face_no)->at_boundary())
               {
-                if (cell->face(face_no)->center()[2] == p2(2))
+                if (std::fabs(cell->face(face_no)->center()[2] - p2[2]) < 1e-12)
                   cell->face(face_no)->set_boundary_id(1);
-                if (cell->face(face_no)->center()[0] == p1(0)
-                    || cell->face(face_no)->center()[0] == p2(0)
-                    || cell->face(face_no)->center()[1] == p1(1)
-                    || cell->face(face_no)->center()[1] == p2(1))
+                if (std::fabs(cell->face(face_no)->center()[0] - p1[0]) < 1e-12
+                    || std::fabs(cell->face(face_no)->center()[0] - p2[0]) < 1e-12
+                    || std::fabs(cell->face(face_no)->center()[1] - p1[1]) < 1e-12
+                    || std::fabs(cell->face(face_no)->center()[1] - p2[1]) < 1e-12)
                   cell->face(face_no)->set_boundary_id(8);
-                if (cell->face(face_no)->center()[2] == p1(2))
+                if (std::fabs(cell->face(face_no)->center()[2] - p1[2]) < 1e-12)
                   cell->face(face_no)->set_boundary_id(6);
               }
       }
