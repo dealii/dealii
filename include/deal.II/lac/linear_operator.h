@@ -61,14 +61,14 @@ LinearOperator<Range, Domain> linear_operator (const Matrix &);
  *
  * But, in contrast to a usual matrix object, the domain and range of the
  * linear operator are also bound to the LinearOperator class on the type
- * level. Because of this, <code>LinearOperator <@tref Range, @tref
- * Domain></code> has two additional function objects
+ * level. Because of this, <code>LinearOperator <Range, Domain></code>
+ * has two additional function objects
  * @code
  *   std::function<void(Range &, bool)> reinit_range_vector;
  *   std::function<void(Domain &, bool)> reinit_domain_vector;
  * @endcode
  * that store the knowledge how to initialize (resize + internal data structures)
- * an arbitrary vector of the @tref Range and @tref Domain space.
+ * an arbitrary vector of the @p Range and @p Domain space.
  *
  * The primary purpose of this class is to provide syntactic sugar for
  * complex matrix-vector operations and free the user from having to
@@ -182,27 +182,27 @@ public:
   }
 
   /**
-   * Application of the LinearOperator object to a vector u of the @tref
-   * Domain space giving a vector v of the @tref Range space.
+   * Application of the LinearOperator object to a vector u of the @p
+   * Domain space giving a vector v of the @p Range space.
    */
   std::function<void(Range &v, const Domain &u)> vmult;
 
   /**
-   * Application of the LinearOperator object to a vector u of the @tref
+   * Application of the LinearOperator object to a vector u of the @p
    * Domain space. The result is added to the vector v.
    */
   std::function<void(Range &v, const Domain &u)> vmult_add;
 
   /**
    * Application of the transpose LinearOperator object to a vector u of
-   * the @tref Range space giving a vector v of the @tref Domain
+   * the @p Range space giving a vector v of the @p Domain
    * space.
    */
   std::function<void(Domain &v, const Range &u)> Tvmult;
 
   /**
    * Application of the transpose LinearOperator object to a vector @p u of
-   * the @tref Range space.The result is added to the vector @p v.
+   * the @p Range space.The result is added to the vector @p v.
    */
   std::function<void(Domain &v, const Range &u)> Tvmult_add;
 
@@ -226,8 +226,8 @@ public:
 
 
   /**
-   * Addition with a LinearOperator @p second_op with the same @tref Domain
-   * and @tref Range.
+   * Addition with a LinearOperator @p second_op with the same @p Domain
+   * and @p Range.
    */
   LinearOperator<Range, Domain> &
   operator+=(const LinearOperator<Range, Domain> &second_op)
@@ -237,8 +237,8 @@ public:
   }
 
   /**
-   * Subtraction with a LinearOperator @p second_op with the same @tref Domain
-   * and @tref Range.
+   * Subtraction with a LinearOperator @p second_op with the same @p Domain
+   * and @p Range.
    */
   LinearOperator<Range, Domain> &
   operator-=(const LinearOperator<Range, Domain> &second_op)
@@ -249,7 +249,7 @@ public:
 
   /**
    * Concatenation of the LinearOperator with an endomorphism @p second_op
-   * on the @tref Domain space.
+   * on the @p Domain space.
    */
   LinearOperator<Range, Domain> &
   operator*=(const LinearOperator<Domain, Domain> &second_op)
@@ -265,7 +265,7 @@ public:
  * \relates LinearOperator
  *
  * Addition of two linear operators @p first_op and @p second_op given
- * by $(\text{first_op}+\text{second_op})x:=\text{first_op}(x)+\text{second_op}(x)$
+ * by $(\text{first\_op}+\text{second\_op})x:=\text{first\_op}(x)+\text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -314,7 +314,7 @@ operator+(const LinearOperator<Range, Domain> &first_op,
  * \relates LinearOperator
  *
  * Subtraction of two linear operators @p first_op and @p second_op given
- * by $(\text{first_op}-\text{second_op})x:=\text{first_op}(x)-\text{second_op}(x)$
+ * by $(\text{first\_op}-\text{second\_op})x:=\text{first\_op}(x)-\text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -332,7 +332,7 @@ operator-(const LinearOperator<Range, Domain> &first_op,
  * \relates LinearOperator
  *
  * Concatenation of two linear operators @p first_op and @p second_op given
- * by $(\text{first_op}*\text{second_op})x:=\text{first_op}(\text{second_op}(x))$
+ * by $(\text{first\_op}*\text{second\_op})x:=\text{first\_op}(\text{second\_op}(x))$
  *
  * @ingroup LAOperators
  */
@@ -403,7 +403,7 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
  * Scalar multiplication of a ScalarOperator object @p op with @p
  * number from the left.
  *
- * The @tref Domain and @tref Range types must implement the following
+ * The @p Domain and @p Range types must implement the following
  * <code>operator*=</code> member functions accepting the appropriate
  * scalar Number type for rescaling:
  *
@@ -463,7 +463,7 @@ operator*(typename Range::value_type  number,
  *
  * Scalar multiplication of a ScalarOperator object from the right.
  *
- * The @tref Domain and @tref Range types must implement the following
+ * The @p Domain and @p Range types must implement the following
  * <code>operator*=</code> member functions for rescaling:
  *
  * @code
@@ -515,7 +515,7 @@ transpose_operator(const LinearOperator<Range, Domain> &op)
  * \relates LinearOperator
  *
  * Returns a LinearOperator that is the identity of the vector space
- * @tref Range.
+ * @p Range.
  *
  * The function takes an <code>std::function</code> object @ref
  * reinit_vector as an argument to initialize the
