@@ -683,9 +683,9 @@ namespace DoFRenumbering
    * number of blocks and that subsequent blocks in one element have the same
    * meaning as in another element.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  block_wise (hp::DoFHandler<dim> &dof_handler);
+  block_wise (hp::DoFHandler<dim,spacedim> &dof_handler);
 
   /**
    * Computes the renumbering vector needed by the block_wise() functions.

@@ -864,22 +864,22 @@ namespace DoFRenumbering
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  block_wise (hp::DoFHandler<dim> &dof_handler)
+  block_wise (hp::DoFHandler<dim,spacedim> &dof_handler)
   {
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(),
-                                                      hp::DoFHandler<dim>::invalid_dof_index);
+                                                      hp::DoFHandler<dim,spacedim>::invalid_dof_index);
 
-    typename hp::DoFHandler<dim>::active_cell_iterator
+    typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
     start = dof_handler.begin_active();
-    const typename hp::DoFHandler<dim>::level_cell_iterator
+    const typename hp::DoFHandler<dim,spacedim>::level_cell_iterator
     end = dof_handler.end();
 
     const types::global_dof_index result =
-      compute_block_wise<dim, dim, typename hp::DoFHandler<dim>::active_cell_iterator,
-      typename hp::DoFHandler<dim>::level_cell_iterator>(renumbering,
-                                                         start, end, false);
+      compute_block_wise<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator,
+      typename hp::DoFHandler<dim,spacedim>::level_cell_iterator>(renumbering,
+          start, end, false);
 
     if (result == 0)
       return;
@@ -1000,7 +1000,7 @@ namespace DoFRenumbering
           if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
             block_to_dof_map[block_list[fe_index][i]].
             push_back (local_dof_indices[i]);
-    }
+      }
 
     // now we've got all indices sorted
     // into buckets labeled by their
