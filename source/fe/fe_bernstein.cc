@@ -94,6 +94,6 @@ FE_Bernstein<dim, spacedim>::renumber_bases(const unsigned int deg)
 
 // explicit instantiations
 #include "fe_bernstein.inst"
-#include "../base/polynomials_bernstein.inst"
+//#include "../base/polynomials_bernstein.inst"
 
 DEAL_II_NAMESPACE_CLOSE
