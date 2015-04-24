@@ -657,6 +657,15 @@ namespace DoFRenumbering
   void
   block_wise (DoFHandler<dim,spacedim> &dof_handler);
 
+  /**
+   * Sort the degrees of freedom by vector block. It does the same thing as the
+   * above function, only that it does this for one single level of a multi-
+   * level discretization. The non-multigrid part of the the DoFHandler is not
+   * touched.
+   */
+  template <int dim, int spacedim>
+  void
+  block_wise (DoFHandler<dim,spacedim> &dof_handler, unsigned int level);
 
   /**
    * Sort the degrees of freedom by block. It does the same thing as the above
@@ -687,7 +696,8 @@ namespace DoFRenumbering
   types::global_dof_index
   compute_block_wise (std::vector<types::global_dof_index> &new_dof_indices,
                       const ITERATOR &start,
-                      const ENDITERATOR &end);
+                      const ENDITERATOR &end,
+                      bool is_level_operation);
 
   /**
    * @}
