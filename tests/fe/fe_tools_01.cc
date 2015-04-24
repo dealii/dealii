@@ -59,6 +59,7 @@ main()
   test_fe<2>("FE_Q<2>(2)");
   test_fe<2>("FE_Q<dim>(2)");
   test_fe<2>("FE_DGQ(1)");
+  test_fe<2>("FE_Bernstein(2)");
   test_fe<2>("FE_RaviartThomas(1)");
   test_fe<2>("FE_Q(QGaussLobatto(3))");
   test_fe<2>("FE_Q(QGaussLobatto(4))");

@@ -27,6 +27,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
@@ -141,6 +142,8 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
     result["FE_Q"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim> >);
+    result["FE_Bernstein"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim> >);
     result["FE_Nothing"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim> >);
   }
@@ -162,6 +165,8 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim,spacedim> >);
     result["FE_Q"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim,spacedim> >);
+    result["FE_Bernstein"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim,spacedim> >);
   }
 
   // The function filling the vector fe_name_map below. It iterates
@@ -1342,10 +1347,6 @@ namespace FETools
         // have to figure out what the
         // base elements are. this can
         // only be done recursively
-
-
-
-
         if (name_part == "FESystem")
           {
             // next we have to get at the
@@ -1492,9 +1493,9 @@ namespace FETools
             // Make sure no other thread
             // is just adding an element
             Threads::Mutex::ScopedLock lock (fe_name_map_lock);
-
             AssertThrow (fe_name_map.find(name_part) != fe_name_map.end(),
                          ExcInvalidFEName(name));
+
             // Now, just the (degree)
             // or (Quadrature<1>(degree+1))
             // part should be left.
