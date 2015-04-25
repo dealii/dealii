@@ -684,7 +684,7 @@ namespace DoFRenumbering
           {
             //we are dealing with active dofs, skip the loop if not locally
             // owned:
-            if (!cell->active() || !cell->is_locally_owned())
+            if (!cell->is_locally_owned())
               continue;
           }
         // on each cell: get dof indices
@@ -981,7 +981,7 @@ namespace DoFRenumbering
           {
             //we are dealing with active dofs, skip the loop if not locally
             // owned:
-            if (!cell->active() || !cell->is_locally_owned())
+            if (!cell->is_locally_owned())
               continue;
           }
 
