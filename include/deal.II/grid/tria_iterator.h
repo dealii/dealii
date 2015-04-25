@@ -49,13 +49,12 @@ template <typename> class TriaActiveIterator;
 
 
 /**
- * This class implements an iterator, analogous to those of the standard
- * template library (STL). It fulfills the requirements of a bidirectional
- * iterator.  See the C++ documentation for further details of iterator
- * specification and usage.
+ * This class implements an iterator, analogous to those used in the standard
+ * library. It fulfills the requirements of a bidirectional iterator. See the
+ * C++ documentation for further details of iterator specification and usage.
  *
  *
- * In addition to the STL iterators an iterator of this class provides a
+ * In addition to the standard interface, an iterator of this class provides a
  * <tt>-@></tt> operator, i.e. you can write statements like
  * @code
  * i->set_refine_flag ();
@@ -120,10 +119,10 @@ template <typename> class TriaActiveIterator;
  * more functionality.
  *
  * Furthermore, the iterators described here satisfy the requirement of input
- * and bidirectional iterators as stated by the C++ standard and the STL
- * documentation. It is therefore possible to use the functions from the
- * algorithm section of the C++ standard, e.g. <em>count_if</em> (see the
- * documentation for Triangulation for an example) and several others.
+ * and bidirectional iterators as stated by the C++ standard. It is therefore
+ * possible to use the functions from the algorithm section of the C++ standard,
+ * e.g., <em>count_if</em> (see the documentation for Triangulation for an
+ * example) and several others.
  *
  * <h3>Implementation</h3>
  *

@@ -968,7 +968,7 @@ namespace TrilinosWrappers
 //@{
 
     /**
-     * STL-like iterator with the first entry.
+     * Iterator starting at the first entry.
      */
     const_iterator begin () const;
 
@@ -978,7 +978,7 @@ namespace TrilinosWrappers
     const_iterator end () const;
 
     /**
-     * STL-like iterator with the first entry of row @p r.
+     * Iterator starting at the first entry of row @p r.
      *
      * Note that if the given row is empty, i.e. does not contain any nonzero
      * entries, then the iterator returned by this function equals

@@ -46,10 +46,10 @@ namespace PETScWrappers
   namespace MatrixIterators
   {
     /**
-     * STL conforming iterator. This class acts as an iterator walking over
-     * the elements of PETSc matrices. Since PETSc offers a uniform interface
-     * for all types of matrices, this iterator can be used to access both
-     * sparse and full matrices.
+     * This class acts as an iterator walking over the elements of PETSc
+     * matrices. Since PETSc offers a uniform interface for all types of
+     * matrices, this iterator can be used to access both sparse and full
+     * matrices.
      *
      * Note that PETSc does not give any guarantees as to the order of
      * elements within each row. Note also that accessing the elements of a
@@ -784,7 +784,7 @@ namespace PETScWrappers
                           const VectorBase &b) const;
 
     /**
-     * STL-like iterator with the first entry.
+     * Iterator starting at the first entry.
      */
     const_iterator begin () const;
 
@@ -794,7 +794,7 @@ namespace PETScWrappers
     const_iterator end () const;
 
     /**
-     * STL-like iterator with the first entry of row @p r.
+     * Iterator starting at the first entry of row @p r.
      *
      * Note that if the given row is empty, i.e. does not contain any nonzero
      * entries, then the iterator returned by this function equals

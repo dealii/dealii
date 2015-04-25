@@ -1441,8 +1441,8 @@ namespace Step14
       const unsigned int
       n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
 
-      // From this static list of vertices, we generate an STL vector of the
-      // vertices, as this is the data type the library wants to see.
+      // From this static list of vertices, we generate a <tt>std::vector</tt>
+      // of the vertices, as this is the data type the library wants to see.
       const std::vector<Point<dim> > vertices (&vertices_1[0],
                                                &vertices_1[n_vertices]);
 

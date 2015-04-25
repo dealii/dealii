@@ -252,7 +252,7 @@ public:
   };
 
   /**
-   * STL conforming iterator.
+   * Standard-conforming iterator.
    */
   class const_iterator
   {

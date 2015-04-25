@@ -167,13 +167,9 @@ namespace
 namespace
 {
   /**
-   * Sorts the vector @p ind as an
-   * index vector of @p a in
-   * increasing order.  This
-   * implementation of quicksort
-   * seems to be faster than the
-   * STL version and is needed in
-   * @p refine_and_coarsen_optimize
+   * Sorts the vector @p ind as an index vector of @p a in increasing order.
+   * This implementation of quicksort seems to be faster than the standard
+   * library version and is needed in @p refine_and_coarsen_optimize.
    */
 
   template <class Vector>

@@ -328,7 +328,7 @@ public:
    * sparsity structure to be copied is empty. This is so in order to prevent
    * involuntary copies of objects for temporaries, which can use large
    * amounts of computing time.  However, copy constructors are needed if you
-   * want to use the STL data types on classes like this, e.g. to write such
+   * want to place a DynamicSparsityPattern in a container, e.g. to write such
    * statements like <tt>v.push_back (DynamicSparsityPattern());</tt>, with
    * @p v a vector of @p DynamicSparsityPattern objects.
    */
@@ -473,7 +473,7 @@ public:
 // @{
 
   /**
-   * STL-like iterator with the first entry of the matrix. The resulting
+   * Iterator starting at the first entry of the matrix. The resulting
    * iterator can be used to walk over all nonzero entries of the sparsity
    * pattern.
    *
@@ -494,7 +494,7 @@ public:
   iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
+   * Iterator starting at the first entry of row <tt>r</tt>.
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
    * entries, then the iterator returned by this function equals

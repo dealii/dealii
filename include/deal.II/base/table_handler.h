@@ -526,7 +526,7 @@ protected:
   struct Column
   {
     /**
-     * Constructor needed by STL maps.
+     * Constructor needed by <tt>std::map</tt>.
      */
     Column ();
 

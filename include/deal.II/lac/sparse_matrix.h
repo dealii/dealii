@@ -292,7 +292,7 @@ namespace SparseMatrixIterators
 
 
   /**
-   * STL conforming iterator for constant and non-constant matrices.
+   * Iterator for constant and non-constant matrices.
    *
    * The typical use for these iterators is to iterate over the elements of a
    * sparse matrix or over the elements of individual rows. Note that there is
@@ -470,7 +470,8 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Type of matrix entries. In analogy to the STL container classes.
+   * Type of the matrix entries. This typedef is analogous to
+   * <tt>value_type</tt> in the standard library containers.
    */
   typedef number value_type;
 
@@ -486,19 +487,18 @@ public:
   typedef typename numbers::NumberTraits<number>::real_type real_type;
 
   /**
-   * Typedef of an STL conforming iterator class walking over all the nonzero
-   * entries of this matrix. This iterator cannot change the values of the
-   * matrix.
+   * Typedef of an iterator class walking over all the nonzero entries of this
+   * matrix. This iterator cannot change the values of the matrix.
    */
   typedef
   SparseMatrixIterators::Iterator<number,true>
   const_iterator;
 
   /**
-   * Typedef of an STL conforming iterator class walking over all the nonzero
-   * entries of this matrix. This iterator @em can change the values of the
-   * matrix, but of course can't change the sparsity pattern as this is fixed
-   * once a sparse matrix is attached to it.
+   * Typedef of an iterator class walking over all the nonzero entries of this
+   * matrix. This iterator @em can change the values of the matrix, but of
+   * course can't change the sparsity pattern as this is fixed once a sparse
+   * matrix is attached to it.
    */
   typedef
   SparseMatrixIterators::Iterator<number,false>

@@ -371,7 +371,7 @@ namespace internal
                  const unsigned int n1);
 
       /**
-       * Need a partial ordering for the STL
+       * Need a partial ordering for sorting algorithms
        */
       bool operator< (const CheapEdge &e2) const;
     };

@@ -35,9 +35,8 @@ template <typename T> class VectorizedArray;
 /**
  * This namespace provides functions helping to determine the amount of memory
  * used by objects. The goal is not necessarily to give the amount of memory
- * used up to the last bit (what is the memory used by an STL
- * <tt>std::map<></tt> object?), but rather to aid in the search for memory
- * bottlenecks.
+ * used up to the last bit (what is the memory used by a <tt>std::map</tt>
+ * object?), but rather to aid in the search for memory bottlenecks.
  *
  * This namespace has a single member function memory_consumption() and a lot
  * of specializations. Depending on the argument type of the function, there
@@ -228,7 +227,7 @@ namespace MemoryConsumption
   /**
    * Estimate the amount of memory (in bytes) occupied by a C-style array.
    * Since in this library we do not usually store simple data elements like
-   * <tt>double</tt>s in such arrays (but rather use STL <tt>std::vector</tt>s
+   * <tt>double</tt>s in such arrays (but rather use <tt>std::vector</tt>s
    * or deal.II <tt>Vector</tt> objects), we do not provide specializations
    * like for the <tt>std::vector</tt> arrays, but always use the loop over
    * all elements.

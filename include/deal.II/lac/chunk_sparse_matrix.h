@@ -273,7 +273,7 @@ namespace ChunkSparseMatrixIterators
 
 
   /**
-   * STL conforming iterator for constant and non-constant matrices.
+   * Iterator for constant and non-constant matrices.
    *
    * The first template argument denotes the underlying numeric type, the
    * second the constness of the matrix.
@@ -415,7 +415,8 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Type of matrix entries. In analogy to the STL container classes.
+   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt> in
+   * the standard library containers.
    */
   typedef number value_type;
 
@@ -431,19 +432,18 @@ public:
   typedef typename numbers::NumberTraits<number>::real_type real_type;
 
   /**
-   * Typedef of an STL conforming iterator class walking over all the nonzero
-   * entries of this matrix. This iterator cannot change the values of the
-   * matrix.
+   * Typedef of an iterator class walking over all the nonzero entries of this
+   * matrix. This iterator cannot change the values of the matrix.
    */
   typedef
   ChunkSparseMatrixIterators::Iterator<number,true>
   const_iterator;
 
   /**
-   * Typedef of an STL conforming iterator class walking over all the nonzero
-   * entries of this matrix. This iterator @em can change the values of the
-   * matrix, but of course can't change the sparsity pattern as this is fixed
-   * once a sparse matrix is attached to it.
+   * Typedef of an iterator class walking over all the nonzero entries of this
+   * matrix. This iterator @em can change the values of the matrix, but of
+   * course can't change the sparsity pattern as this is fixed once a sparse
+   * matrix is attached to it.
    */
   typedef
   ChunkSparseMatrixIterators::Iterator<number,false>
@@ -1095,8 +1095,8 @@ public:
 //@{
 
   /**
-   * STL-like iterator with the first entry of the matrix. This is the version
-   * for constant matrices.
+   * Iterator starting at first entry of the matrix. This is the version for
+   * constant matrices.
    *
    * Note that due to the layout in ChunkSparseMatrix, iterating over matrix
    * entries is considerably slower than for a sparse matrix, as the iterator
@@ -1116,7 +1116,7 @@ public:
   const_iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of the matrix. This is the version
+   * Iterator starting at the first entry of the matrix. This is the version
    * for non-constant matrices.
    *
    * Note that due to the layout in ChunkSparseMatrix, iterating over matrix
@@ -1137,8 +1137,8 @@ public:
   iterator end ();
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>. This is the
-   * version for constant matrices.
+   * Iterator starting at the first entry of row <tt>r</tt>. This is the version
+   * for constant matrices.
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
    * entries, then the iterator returned by this function equals
@@ -1169,8 +1169,8 @@ public:
   const_iterator end (const unsigned int r) const;
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>. This is the
-   * version for non-constant matrices.
+   * Iterator starting at the first entry of row <tt>r</tt>. This is the version
+   * for non-constant matrices.
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
    * entries, then the iterator returned by this function equals

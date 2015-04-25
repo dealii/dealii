@@ -169,7 +169,7 @@ public:
 public:
 
   /**
-   * STL conforming iterator.
+   * Standard-conforming iterator.
    */
   class const_iterator
   {
@@ -289,7 +289,8 @@ public:
   };
 
   /**
-   * Type of matrix entries. In analogy to the STL container classes.
+   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt> in
+   * the standard library containers.
    */
   typedef number value_type;
 
@@ -663,7 +664,7 @@ public:
    */
 //@{
   /**
-   * STL-like iterator with the first existing entry.
+   * Iterator starting at the first existing entry.
    */
   const_iterator begin () const;
 
@@ -673,8 +674,8 @@ public:
   const_iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of row @p r. If this row is empty,
-   * the result is <tt>end(r)</tt>, which does NOT point into row @p r..
+   * Iterator starting at the first entry of row @p r. If this row is empty, the
+   * result is <tt>end(r)</tt>, which does NOT point into row @p r.
    */
   const_iterator begin (const size_type r) const;
 
