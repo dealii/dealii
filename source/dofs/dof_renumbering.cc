@@ -677,9 +677,7 @@ namespace DoFRenumbering
         if (is_level_operation)
           {
             //we are dealing with mg dofs, skip foreign level cells:
-            if ((start->get_dof_handler().get_tria().locally_owned_subdomain() != numbers::invalid_subdomain_id)
-                &&
-                (cell->level_subdomain_id()!=start->get_dof_handler().get_tria().locally_owned_subdomain()))
+            if (!cell->is_locally_owned_on_level())
               continue;
           }
         else
@@ -928,7 +926,7 @@ namespace DoFRenumbering
   compute_block_wise (std::vector<types::global_dof_index> &new_indices,
                       const ITERATOR    &start,
                       const ENDITERATOR &end,
-                      bool is_level_operation)
+                      const bool is_level_operation)
   {
     const hp::FECollection<dim,spacedim>
     fe_collection (start->get_dof_handler().get_fe ());
@@ -976,9 +974,7 @@ namespace DoFRenumbering
         if (is_level_operation)
           {
             //we are dealing with mg dofs, skip foreign level cells:
-            if ((start->get_dof_handler().get_tria().locally_owned_subdomain() != numbers::invalid_subdomain_id)
-                && (cell->level_subdomain_id()
-                    != start->get_dof_handler().get_tria().locally_owned_subdomain()))
+            if (!cell->is_locally_owned_on_level())
               continue;
           }
         else
