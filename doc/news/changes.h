@@ -468,13 +468,19 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: There are now MPI sum functions for Tensors and SymmetricTensors
+  in the Utilities::MPI namespace.
+  <br>
+  (Ian Rose, 2015/04/24)
+  </li>
+
   <li> Fixed: project_boundary_values_curl_conforming_l2() produced incorrect
   results for non-uniform grids in 2D. Adjustment to the way 2D tangents to edges are
   computed fixes this.
   <br>
   (Ross Kynch, 2015/04/23)
   </li>
-  
+
   <li> Fixed: The TimerOutput class reported abnormally large cpu time when run
   with more than one process with MPI. Now this is fixed.
   <br>

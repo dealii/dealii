@@ -50,6 +50,10 @@ namespace MPI
 DEAL_II_NAMESPACE_OPEN
 
 
+//Forward type declarations to allow MPI sums over tensorial types
+template <int rank, int dim, typename Number> class Tensor;
+template <int rank, int dim, typename Number> class SymmetricTensor;
+
 namespace Utilities
 {
   /**
@@ -159,6 +163,28 @@ namespace Utilities
     void sum (const std::vector<T> &values,
               const MPI_Comm &mpi_communicator,
               std::vector<T> &sums);
+
+    /**
+     * Perform an MPI sum of the entries of a symmetric tensor.
+     *
+     * @relates SymmetricTensor
+     */
+    template <int rank, int dim, typename Number>
+    inline
+    SymmetricTensor<rank,dim,Number>
+    sum (const SymmetricTensor<rank,dim,Number> &local,
+         const MPI_Comm &mpi_communicator);
+
+    /**
+     * Perform an MPI sum of the entries of a tensor.
+     *
+     * @relates Tensor
+     */
+    template <int rank, int dim, typename Number>
+    inline
+    Tensor<rank,dim,Number>
+    sum (const Tensor<rank,dim,Number> &local,
+         const MPI_Comm &mpi_communicator);
 
     /**
      * Return the maximum over all processors of the value @p t. This function
@@ -468,6 +494,49 @@ namespace Utilities
         }
     }
 
+    template <int rank, int dim, typename Number>
+    inline
+    Tensor<rank,dim,Number>
+    sum (const Tensor<rank,dim,Number> &local,
+         const MPI_Comm &mpi_communicator)
+    {
+      const unsigned int n_entries = Tensor<rank,dim,Number>::n_independent_components;
+      Number entries[ Tensor<rank,dim,Number>::n_independent_components ];
+
+      for (unsigned int i=0; i< n_entries; ++i)
+        entries[i] = local[ local.unrolled_to_component_indices(i) ];
+
+      Number global_entries[ Tensor<rank,dim,Number>::n_independent_components ];
+      dealii::Utilities::MPI::sum( entries, mpi_communicator, global_entries );
+
+      Tensor<rank,dim,Number> global;
+      for (unsigned int i=0; i< n_entries; ++i)
+        global[ global.unrolled_to_component_indices(i) ] = global_entries[i];
+
+      return global;
+    }
+
+    template <int rank, int dim, typename Number>
+    inline
+    SymmetricTensor<rank,dim,Number>
+    sum (const SymmetricTensor<rank,dim,Number> &local,
+         const MPI_Comm &mpi_communicator)
+    {
+      const unsigned int n_entries = SymmetricTensor<rank,dim,Number>::n_independent_components;
+      Number entries[ SymmetricTensor<rank,dim,Number>::n_independent_components ];
+
+      for (unsigned int i=0; i< n_entries; ++i)
+        entries[i] = local[ local.unrolled_to_component_indices(i) ];
+
+      Number global_entries[ SymmetricTensor<rank,dim,Number>::n_independent_components ];
+      dealii::Utilities::MPI::sum( entries, mpi_communicator, global_entries );
+
+      SymmetricTensor<rank,dim,Number> global;
+      for (unsigned int i=0; i< n_entries; ++i)
+        global[ global.unrolled_to_component_indices(i) ] = global_entries[i];
+
+      return global;
+    }
 
     template <typename T>
     inline
