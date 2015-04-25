@@ -865,18 +865,20 @@ namespace Step32
     // happen to use the same class names for %parallel and sequential data
     // structures, i.e., all matrices will actually be considered %parallel
     // below. On the other hand, for vectors, only those from namespace
-    // TrilinosWrappers::MPI are actually distributed. In particular, we will
-    // frequently have to query velocities and temperatures at arbitrary
-    // quadrature points; consequently, rather than importing ghost
-    // information of a vector whenever we need access to degrees of freedom
-    // that are relevant locally but owned by another processor, we solve
-    // linear systems in %parallel but then immediately initialize a vector
-    // including ghost entries of the solution for further processing. The
-    // various <code>*_solution</code> vectors are therefore filled
-    // immediately after solving their respective linear system in %parallel
-    // and will always contain values for all @ref GlossLocallyRelevantDof
-    // "locally relevant degrees of freedom"; the fully distributed vectors
-    // that we obtain from the solution process and that only ever contain the
+    // TrilinosWrappers::MPI are actually distributed (be aware that
+    // TrilinosWrappers::Vector and TrilinosWrappers::BlockVector are
+    // deprecated). In particular, we will frequently have to query velocities
+    // and temperatures at arbitrary quadrature points; consequently, rather
+    // than importing ghost information of a vector whenever we need access
+    // to degrees of freedom that are relevant locally but owned by another
+    // processor, we solve linear systems in %parallel but then immediately
+    // initialize a vector including ghost entries of the solution for further
+    // processing. The various <code>*_solution</code> vectors are therefore
+    // filled immediately after solving their respective linear system in
+    // %parallel and will always contain values for all
+    // @ref GlossLocallyRelevantDof "locally relevant degrees of freedom";
+    // the fully distributed vectors that we obtain from the solution process
+    // and that only ever contain the
     // @ref GlossLocallyOwnedDof "locally owned degrees of freedom" are
     // destroyed immediately after the solution process and after we have
     // copied the relevant values into the member variable vectors.

@@ -94,15 +94,16 @@ namespace Step41
     DoFHandler<dim>      dof_handler;
     ConstraintMatrix     constraints;
     IndexSet             active_set;
+    IndexSet             solution_index_set;
 
     TrilinosWrappers::SparseMatrix system_matrix;
     TrilinosWrappers::SparseMatrix complete_system_matrix;
 
-    TrilinosWrappers::Vector       solution;
-    TrilinosWrappers::Vector       system_rhs;
-    TrilinosWrappers::Vector       complete_system_rhs;
-    TrilinosWrappers::Vector       diagonal_of_mass_matrix;
-    TrilinosWrappers::Vector       contact_force;
+    TrilinosWrappers::MPI::Vector  solution;
+    TrilinosWrappers::MPI::Vector  system_rhs;
+    TrilinosWrappers::MPI::Vector  complete_system_rhs;
+    TrilinosWrappers::MPI::Vector  diagonal_of_mass_matrix;
+    TrilinosWrappers::MPI::Vector  contact_force;
   };
 
 
@@ -255,10 +256,12 @@ namespace Step41
     system_matrix.reinit (dsp);
     complete_system_matrix.reinit (dsp);
 
-    solution.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
-    complete_system_rhs.reinit (dof_handler.n_dofs());
-    contact_force.reinit (dof_handler.n_dofs());
+    solution_index_set.set_size(dof_handler.n_dofs());
+    solution_index_set.add_range(0, dof_handler.n_dofs());
+    solution.reinit (solution_index_set);
+    system_rhs.reinit (solution_index_set);
+    complete_system_rhs.reinit (solution_index_set);
+    contact_force.reinit (solution_index_set);
 
     // The only other thing to do here is to compute the factors in the $B$
     // matrix which is used to scale the residual. As discussed in the
@@ -268,7 +271,7 @@ namespace Step41
     TrilinosWrappers::SparseMatrix mass_matrix;
     mass_matrix.reinit (dsp);
     assemble_mass_matrix_diagonal (mass_matrix);
-    diagonal_of_mass_matrix.reinit (dof_handler.n_dofs());
+    diagonal_of_mass_matrix.reinit (solution_index_set);
     for (unsigned int j=0; j<solution.size (); j++)
       diagonal_of_mass_matrix (j) = mass_matrix.diag_element (j);
   }
@@ -300,7 +303,7 @@ namespace Step41
     const unsigned int        n_q_points    = quadrature_formula.size();
 
     FullMatrix<double>        cell_matrix (dofs_per_cell, dofs_per_cell);
-    TrilinosWrappers::Vector  cell_rhs (dofs_per_cell);
+    Vector<double>            cell_rhs (dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
@@ -432,7 +435,7 @@ namespace Step41
 
     const double penalty_parameter = 100.0;
 
-    TrilinosWrappers::Vector lambda (dof_handler.n_dofs());
+    TrilinosWrappers::MPI::Vector lambda (solution_index_set);
     complete_system_matrix.residual (lambda,
                                      solution, complete_system_rhs);
     contact_force.ratio (lambda, diagonal_of_mass_matrix);
@@ -556,7 +559,7 @@ namespace Step41
     std::cout << "   Solving system..." << std::endl;
 
     ReductionControl                    reduction_control (100, 1e-12, 1e-3);
-    SolverCG<TrilinosWrappers::Vector>  solver (reduction_control);
+    SolverCG<TrilinosWrappers::MPI::Vector>  solver (reduction_control);
     TrilinosWrappers::PreconditionAMG   precondition;
     precondition.initialize (system_matrix);
 
