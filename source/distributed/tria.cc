@@ -2613,6 +2613,7 @@ namespace parallel
                           this,
                           &connectivity);
 #else
+      (void)autopartition;
       parallel_forest = dealii::internal::p4est::functions<dim>::load (
                           filename, mpi_communicator,
                           attached_size, attached_size>0,
