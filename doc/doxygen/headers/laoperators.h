@@ -67,7 +67,7 @@
  * addition and subtraction, scalar multiplication and composition (of
  * compatible linear operators) are implemented:
  * @code
- * dealii::LinearOperator op_a, op_b;
+ * dealii::LinearOperator<> op_a, op_b;
  * double k;
  *
  * // vector space addition, subtraction and scalar multiplication
