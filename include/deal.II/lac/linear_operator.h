@@ -249,6 +249,12 @@ public:
 
   /**
    * Addition with a vector @p offset of the @p Range space.
+   *
+   * The LinearOperator stores a reference to the vector @p offset. Thus,
+   * @p offset must remain a valid reference for the whole lifetime of the
+   * LinearOperator object. All changes made on @p vector after the
+   * creation of the LinearOperator object are reflected by the operator
+   * object.
    */
   LinearOperator<Range, Domain> &
   operator+=(const Range &offset)
@@ -259,6 +265,12 @@ public:
 
   /**
    * Subtraction with a vector @p offset of the @p Range space.
+   *
+   * The LinearOperator stores a reference to the vector @p offset. Thus,
+   * @p offset must remain a valid reference for the whole lifetime of the
+   * LinearOperator object. All changes made on @p vector after the
+   * creation of the LinearOperator object are reflected by the operator
+   * object.
    */
   LinearOperator<Range, Domain> &
   operator-=(const Range &offset)
@@ -268,8 +280,8 @@ public:
   }
 
   /**
-   * Concatenation of the LinearOperator with an endomorphism @p second_op
-   * on the @p Domain space.
+   * Composition of the LinearOperator with an endomorphism @p second_op
+   * of the @p Domain space.
    */
   LinearOperator<Range, Domain> &
   operator*=(const LinearOperator<Domain, Domain> &second_op)
@@ -296,8 +308,8 @@ public:
 /**
  * \relates LinearOperator
  *
- * Addition of two linear operators @p first_op and @p second_op given
- * by $(\text{first\_op}+\text{second\_op})x:=\text{first\_op}(x)+\text{second\_op}(x)$
+ * Addition of two linear operators @p first_op and @p second_op given by
+ * $(\text{first\_op}+\text{second\_op})x:=\text{first\_op}(x)+\text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -345,8 +357,8 @@ operator+(const LinearOperator<Range, Domain> &first_op,
 /**
  * \relates LinearOperator
  *
- * Subtraction of two linear operators @p first_op and @p second_op given
- * by $(\text{first\_op}-\text{second\_op})x:=\text{first\_op}(x)-\text{second\_op}(x)$
+ * Subtraction of two linear operators @p first_op and @p second_op given by
+ * $(\text{first\_op}-\text{second\_op})x:=\text{first\_op}(x)-\text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -367,8 +379,8 @@ operator-(const LinearOperator<Range, Domain> &first_op,
  * offset. This creates an affine linear operator
  * $(\text{op}+\text{offset})x:=\text{op}(x)+\text{offset}$.
  *
- * The LinearOperator that is created stores a reference to the vector @p
- * offst. Thus, @p vector must remain a valid reference for the whole
+ * The LinearOperator that is created stores a reference to the vector
+ * @p offset. Thus, @p offset must remain a valid reference for the whole
  * lifetime of the LinearOperator object. All changes made on @p vector
  * after the creation of the LinearOperator object are reflected by the
  * operator object.
@@ -438,8 +450,8 @@ operator+(const Range &offset,
  * offset. This creates an affine linear operator
  * $(\text{op}-\text{offset})x:=\text{op}(x)-\text{offset}$.
  *
- * The LinearOperator that is created stores a reference to the vector @p
- * offst. Thus, @p vector must remain a valid reference for the whole
+ * The LinearOperator that is created stores a reference to the vector
+ * @p offset. Thus, @p offset must remain a valid reference for the whole
  * lifetime of the LinearOperator object. All changes made on @p vector
  * after the creation of the LinearOperator object are reflected by the
  * operator object.
@@ -499,6 +511,7 @@ LinearOperator<Range, Domain>
 operator-(const Range &offset,
           const LinearOperator<Range, Domain> &op)
 {
+  // implement with above variant and scalar multiplication
   return -1. * (op - offset);
 }
 
@@ -507,7 +520,7 @@ operator-(const Range &offset,
 /**
  * \relates LinearOperator
  *
- * Concatenation of two linear operators @p first_op and @p second_op given
+ * Composition of two linear operators @p first_op and @p second_op given
  * by $(\text{first\_op}*\text{second\_op})x:=\text{first\_op}(\text{second\_op}(x))$
  *
  * @ingroup LAOperators

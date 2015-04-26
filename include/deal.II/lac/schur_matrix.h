@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -92,6 +92,10 @@ DEAL_II_NAMESPACE_OPEN
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2000, 2001, 2002
+ *
+ * @deprecated If deal.II was configured with C++11 support, use the
+ * LinearOperator class instead, see the module on
+ * @ref LAOperators "linear operators" for further details.
  */
 template <class MA_inverse, class MB, class MDt, class MC>
 class SchurMatrix : public Subscriptor
