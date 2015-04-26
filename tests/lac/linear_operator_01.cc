@@ -194,6 +194,11 @@ int main()
   test.vmult(v, u);
   deallog << "(4 * 4) * " << u.value << " = " << v.value << std::endl;
 
+  test = multiply4;
+  test *= 4.;
+  test.vmult(v, u);
+  deallog << "(4 * 4) * " << u.value << " = " << v.value << std::endl;
+
   test = multiply4 * 4.;
   test.vmult(v, u);
   deallog << "(4 * 4) * " << u.value << " = " << v.value << std::endl;
@@ -204,6 +209,10 @@ int main()
   RightVector w = { 0. };
   test2.vmult(w, u);
   deallog << "(2 * 4) * " << u.value << " = " << w.value << std::endl;
+
+  test2 *= identity_operator(test2.reinit_range_vector);
+  test2.vmult(w, u);
+  deallog << "(2 * 4) * 1 * " << u.value << " = " << w.value << std::endl;
 
   // identity
 

@@ -32,7 +32,8 @@ DEAL_II_NAMESPACE_OPEN
 template <typename Number> class Vector;
 template <typename Number> class BlockVector;
 
-template <typename Range, typename Domain> class LinearOperator;
+template <typename Range = Vector<double>, typename Domain = Range>
+class LinearOperator;
 
 template <typename Range = Vector<double>,
           typename Domain = Range,
@@ -248,8 +249,40 @@ public:
   }
 
   /**
-   * Concatenation of the LinearOperator with an endomorphism @p second_op
-   * on the @p Domain space.
+   * Addition with a vector @p offset of the @p Range space.
+   *
+   * The LinearOperator stores a reference to the vector @p offset. Thus,
+   * @p offset must remain a valid reference for the whole lifetime of the
+   * LinearOperator object. All changes made on @p vector after the
+   * creation of the LinearOperator object are reflected by the operator
+   * object.
+   */
+  LinearOperator<Range, Domain> &
+  operator+=(const Range &offset)
+  {
+    *this = *this + offset;
+    return *this;
+  }
+
+  /**
+   * Subtraction with a vector @p offset of the @p Range space.
+   *
+   * The LinearOperator stores a reference to the vector @p offset. Thus,
+   * @p offset must remain a valid reference for the whole lifetime of the
+   * LinearOperator object. All changes made on @p vector after the
+   * creation of the LinearOperator object are reflected by the operator
+   * object.
+   */
+  LinearOperator<Range, Domain> &
+  operator-=(const Range &offset)
+  {
+    *this = *this - offset;
+    return *this;
+  }
+
+  /**
+   * Composition of the LinearOperator with an endomorphism @p second_op
+   * of the @p Domain space.
    */
   LinearOperator<Range, Domain> &
   operator*=(const LinearOperator<Domain, Domain> &second_op)
@@ -257,6 +290,18 @@ public:
     *this = *this * second_op;
     return *this;
   }
+
+  /**
+   * Scalar multiplication of the LinearOperator with @p number from the
+   * right.
+   */
+  LinearOperator<Range, Domain>
+  operator*=(typename Domain::value_type  number)
+  {
+    *this = *this * number;
+    return *this;
+  }
+
 };
 
 
@@ -264,8 +309,8 @@ public:
 /**
  * \relates LinearOperator
  *
- * Addition of two linear operators @p first_op and @p second_op given
- * by $(\text{first\_op}+\text{second\_op})x:=\text{first\_op}(x)+\text{second\_op}(x)$
+ * Addition of two linear operators @p first_op and @p second_op given by
+ * $(\text{first\_op}+\text{second\_op})x:=\text{first\_op}(x)+\text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -313,8 +358,8 @@ operator+(const LinearOperator<Range, Domain> &first_op,
 /**
  * \relates LinearOperator
  *
- * Subtraction of two linear operators @p first_op and @p second_op given
- * by $(\text{first\_op}-\text{second\_op})x:=\text{first\_op}(x)-\text{second\_op}(x)$
+ * Subtraction of two linear operators @p first_op and @p second_op given by
+ * $(\text{first\_op}-\text{second\_op})x:=\text{first\_op}(x)-\text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -331,7 +376,152 @@ operator-(const LinearOperator<Range, Domain> &first_op,
 /**
  * \relates LinearOperator
  *
- * Concatenation of two linear operators @p first_op and @p second_op given
+ * Addition of a LinearOperator @p op with a constant @p Range vector @p
+ * offset. This creates an affine linear operator
+ * $(\text{op}+\text{offset})x:=\text{op}(x)+\text{offset}$.
+ *
+ * The LinearOperator that is created stores a reference to the vector
+ * @p offset. Thus, @p offset must remain a valid reference for the whole
+ * lifetime of the LinearOperator object. All changes made on @p vector
+ * after the creation of the LinearOperator object are reflected by the
+ * operator object.
+ *
+ * The transpose of an affine linear operator is not defined, thus
+ * <code>Tvmult</code> (and <code>Tvmult_add</code>) of the result throw an
+ * exception if called.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+operator+(const LinearOperator<Range, Domain> &op,
+          const Range &offset)
+{
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = op.reinit_range_vector;
+  return_op.reinit_domain_vector = op.reinit_domain_vector;
+
+  return_op.vmult = [op, &offset](Range &v, const Domain &u)
+  {
+    op.vmult(v, u);
+    v += offset;
+  };
+
+  return_op.vmult_add = [op, &offset](Range &v, const Domain &u)
+  {
+    op.vmult_add(v, u);
+    v += offset;
+  };
+
+  return_op.Tvmult = [](Domain &, const Range &)
+  {
+    Assert(false, ExcMessage("Tvmult of an affine linear operator called"));
+  };
+
+  return_op.Tvmult_add = [](Domain &, const Range &)
+  {
+    Assert(false, ExcMessage("Tvmult_add of an affine linear operator called"));
+  };
+
+  return return_op;
+}
+
+
+/**
+ * \relates LinearOperator
+ *
+ * Same as above with reversed arguments
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+operator+(const Range &offset,
+          const LinearOperator<Range, Domain> &op)
+{
+  return op + offset;
+}
+
+
+/**
+ * \relates LinearOperator
+ *
+ * Subtraction of a LinearOperator @p op with a constant @p Range vector @p
+ * offset. This creates an affine linear operator
+ * $(\text{op}-\text{offset})x:=\text{op}(x)-\text{offset}$.
+ *
+ * The LinearOperator that is created stores a reference to the vector
+ * @p offset. Thus, @p offset must remain a valid reference for the whole
+ * lifetime of the LinearOperator object. All changes made on @p vector
+ * after the creation of the LinearOperator object are reflected by the
+ * operator object.
+ *
+ * The transpose of an affine linear operator is not defined, thus
+ * <code>Tvmult</code> (and <code>Tvmult_add</code>) of the result throw an
+ * exception if called.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+operator-(const LinearOperator<Range, Domain> &op,
+          const Range &offset)
+{
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = op.reinit_range_vector;
+  return_op.reinit_domain_vector = op.reinit_domain_vector;
+
+  return_op.vmult = [op, &offset](Range &v, const Domain &u)
+  {
+    op.vmult(v, u);
+    v -= offset;
+  };
+
+  return_op.vmult_add = [op, &offset](Range &v, const Domain &u)
+  {
+    op.vmult_add(v, u);
+    v -= offset;
+  };
+
+  return_op.Tvmult = [](Domain &, const Range &)
+  {
+    Assert(false, ExcMessage("Tvmult of an affine linear operator called"));
+  };
+
+  return_op.Tvmult_add = [](Domain &, const Range &)
+  {
+    Assert(false, ExcMessage("Tvmult_add of an affine linear operator called"));
+  };
+
+  return return_op;
+}
+
+
+/**
+ * \relates LinearOperator
+ *
+ * Same as above with reversed arguments, i.e.,
+ * $(\text{offset}-\text{op})x:=\text{offset}-\text{op}(x)$.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+operator-(const Range &offset,
+          const LinearOperator<Range, Domain> &op)
+{
+  // implement with above variant and scalar multiplication
+  return -1. * (op - offset);
+}
+
+
+
+/**
+ * \relates LinearOperator
+ *
+ * Composition of two linear operators @p first_op and @p second_op given
  * by $(\text{first\_op}*\text{second\_op})x:=\text{first\_op}(\text{second\_op}(x))$
  *
  * @ingroup LAOperators

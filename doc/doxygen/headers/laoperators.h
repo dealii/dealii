@@ -46,8 +46,8 @@
  * applied on a vector, one can write:
  * @code
  * dealii::SparseMatrix<double> A, B, C;
+ * double k;
  * // Setup and assembly...
- * const double k = ...;
  *
  * const auto op_a = linear_operator(A);
  * const auto op_b = linear_operator(B);
@@ -65,7 +65,42 @@
  *
  * For objects of type LinearOperator, all vector space operations, i.e.,
  * addition and subtraction, scalar multiplication and composition (of
- * compatible linear operators) are implemented.
+ * compatible linear operators) are implemented:
+ * @code
+ * dealii::LinearOperator<> op_a, op_b;
+ * double k;
+ *
+ * // vector space addition, subtraction and scalar multiplication
+ * op_a + op_b;
+ * op_a - op_b;
+ * k * op_a;
+ * op_a * k;
+ *
+ * // in-place variants
+ * op_a += op_b;
+ * op_a -= op_b;
+ * op_a *= k;
+ *
+ * // operator composition
+ * op_a * op_b;
+ * op_a *= op_b; // If op_b is an endomorphism of the domain space of op_a
+ * @endcode
+ *
+ * Further, by adding (or subtracting) a vector of the range space to
+ * (from) a linear operator, an affine variant is created:
+ * @code
+ * dealii::LinearOperator<> op_a;
+ * dealii::Vector<double> offset;
+ *
+ * op_a + offset;
+ * op_a + offset;
+ * offset - op_a;
+ * offset - op_a;
+ *
+ * // in-place variants
+ * op_a += offset;
+ * op_a -= offset;
+ * @endcode
  *
  * block_operator() and block_diagonal_operator() provide further
  * encapsulation of individual linear operators into blocked linear
