@@ -32,7 +32,8 @@ DEAL_II_NAMESPACE_OPEN
 template <typename Number> class Vector;
 template <typename Number> class BlockVector;
 
-template <typename Range, typename Domain> class LinearOperator;
+template <typename Range = Vector<double>, typename Domain = Range>
+class LinearOperator;
 
 template <typename Range = Vector<double>,
           typename Domain = Range,

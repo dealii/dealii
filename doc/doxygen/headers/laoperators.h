@@ -67,7 +67,7 @@
  * addition and subtraction, scalar multiplication and composition (of
  * compatible linear operators) are implemented:
  * @code
- * dealii::LinearOperator op_a, op_b;
+ * dealii::LinearOperator<> op_a, op_b;
  * double k;
  *
  * // vector space addition, subtraction and scalar multiplication
@@ -89,7 +89,7 @@
  * Further, by adding (or subtracting) a vector of the range space to
  * (from) a linear operator, an affine variant is created:
  * @code
- * dealii::LinearOperator op_a;
+ * dealii::LinearOperator<> op_a;
  * dealii::Vector<double> offset;
  *
  * op_a + offset;
