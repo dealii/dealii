@@ -248,6 +248,26 @@ public:
   }
 
   /**
+   * Addition with a vector @p offset of the @p Range space.
+   */
+  LinearOperator<Range, Domain> &
+  operator+=(const Range &offset)
+  {
+    *this = *this + offset;
+    return *this;
+  }
+
+  /**
+   * Subtraction with a vector @p offset of the @p Range space.
+   */
+  LinearOperator<Range, Domain> &
+  operator-=(const Range &offset)
+  {
+    *this = *this - offset;
+    return *this;
+  }
+
+  /**
    * Concatenation of the LinearOperator with an endomorphism @p second_op
    * on the @p Domain space.
    */
@@ -338,6 +358,150 @@ operator-(const LinearOperator<Range, Domain> &first_op,
   // implement with addition and scalar multiplication
   return first_op + (-1. * second_op);
 }
+
+
+/**
+ * \relates LinearOperator
+ *
+ * Addition of a LinearOperator @p op with a constant @p Range vector @p
+ * offset. This creates an affine linear operator
+ * $(\text{op}+\text{offset})x:=\text{op}(x)+\text{offset}$.
+ *
+ * The LinearOperator that is created stores a reference to the vector @p
+ * offst. Thus, @p vector must remain a valid reference for the whole
+ * lifetime of the LinearOperator object. All changes made on @p vector
+ * after the creation of the LinearOperator object are reflected by the
+ * operator object.
+ *
+ * The transpose of an affine linear operator is not defined, thus
+ * <code>Tvmult</code> (and <code>Tvmult_add</code>) of the result throw an
+ * exception if called.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+operator+(const LinearOperator<Range, Domain> &op,
+          const Range &offset)
+{
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = op.reinit_range_vector;
+  return_op.reinit_domain_vector = op.reinit_domain_vector;
+
+  return_op.vmult = [op, &offset](Range &v, const Domain &u)
+  {
+    op.vmult(v, u);
+    v += offset;
+  };
+
+  return_op.vmult_add = [op, &offset](Range &v, const Domain &u)
+  {
+    op.vmult_add(v, u);
+    v += offset;
+  };
+
+  return_op.Tvmult = [](Domain &, const Range &)
+  {
+    Assert(false, ExcMessage("Tvmult of an affine linear operator called"));
+  };
+
+  return_op.Tvmult_add = [](Domain &, const Range &)
+  {
+    Assert(false, ExcMessage("Tvmult_add of an affine linear operator called"));
+  };
+
+  return return_op;
+}
+
+
+/**
+ * \relates LinearOperator
+ *
+ * Same as above with reversed arguments
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+operator+(const Range &offset,
+          const LinearOperator<Range, Domain> &op)
+{
+  return op + offset;
+}
+
+
+/**
+ * \relates LinearOperator
+ *
+ * Subtraction of a LinearOperator @p op with a constant @p Range vector @p
+ * offset. This creates an affine linear operator
+ * $(\text{op}-\text{offset})x:=\text{op}(x)-\text{offset}$.
+ *
+ * The LinearOperator that is created stores a reference to the vector @p
+ * offst. Thus, @p vector must remain a valid reference for the whole
+ * lifetime of the LinearOperator object. All changes made on @p vector
+ * after the creation of the LinearOperator object are reflected by the
+ * operator object.
+ *
+ * The transpose of an affine linear operator is not defined, thus
+ * <code>Tvmult</code> (and <code>Tvmult_add</code>) of the result throw an
+ * exception if called.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+operator-(const LinearOperator<Range, Domain> &op,
+          const Range &offset)
+{
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = op.reinit_range_vector;
+  return_op.reinit_domain_vector = op.reinit_domain_vector;
+
+  return_op.vmult = [op, &offset](Range &v, const Domain &u)
+  {
+    op.vmult(v, u);
+    v -= offset;
+  };
+
+  return_op.vmult_add = [op, &offset](Range &v, const Domain &u)
+  {
+    op.vmult_add(v, u);
+    v -= offset;
+  };
+
+  return_op.Tvmult = [](Domain &, const Range &)
+  {
+    Assert(false, ExcMessage("Tvmult of an affine linear operator called"));
+  };
+
+  return_op.Tvmult_add = [](Domain &, const Range &)
+  {
+    Assert(false, ExcMessage("Tvmult_add of an affine linear operator called"));
+  };
+
+  return return_op;
+}
+
+
+/**
+ * \relates LinearOperator
+ *
+ * Same as above with reversed arguments, i.e.,
+ * $(\text{offset}-\text{op})x:=\text{offset}-\text{op}(x)$.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+operator-(const Range &offset,
+          const LinearOperator<Range, Domain> &op)
+{
+  return -1. * (op - offset);
+}
+
 
 
 /**
