@@ -558,36 +558,6 @@ namespace TrilinosWrappers
 
 
 
-  namespace internal
-  {
-    namespace
-    {
-      typedef dealii::types::global_dof_index size_type;
-      // distinguish between compressed sparsity types that define row_begin()
-      // and SparsityPattern that uses begin() as iterator type
-      template <typename Sparsity>
-      void copy_row (const Sparsity     &dsp,
-                     const size_type     row,
-                     std::vector<TrilinosWrappers::types::int_type>   &row_indices)
-      {
-        typename Sparsity::row_iterator col_num = dsp.row_begin (row);
-        for (size_type col=0; col_num != dsp.row_end (row); ++col_num, ++col)
-          row_indices[col] = *col_num;
-      }
-
-      void copy_row (const dealii::SparsityPattern &dsp,
-                     const size_type                row,
-                     std::vector<TrilinosWrappers::types::int_type>          &row_indices)
-      {
-        dealii::SparsityPattern::iterator col_num = dsp.begin (row);
-        for (size_type col=0; col_num != dsp.end (row); ++col_num, ++col)
-          row_indices[col] = col_num->column();
-      }
-    }
-  }
-
-
-
   template <typename SparsityType>
   void
   SparsityPattern::reinit (const Epetra_Map   &input_row_map,
@@ -641,7 +611,11 @@ namespace TrilinosWrappers
             continue;
 
           row_indices.resize (row_length, -1);
-          internal::copy_row(sp, row, row_indices);
+          {
+            typename SparsityType::iterator p = sp.begin(row);
+            for (size_type col=0; p != sp.end(row); ++p, ++col)
+              row_indices[col] = p->column();
+          }
           graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
                                                        &row_indices[0]);
         }
@@ -653,7 +627,11 @@ namespace TrilinosWrappers
             continue;
 
           row_indices.resize (row_length, -1);
-          internal::copy_row(sp, row, row_indices);
+          {
+            typename SparsityType::iterator p = sp.begin(row);
+            for (size_type col=0; p != sp.end(row); ++p, ++col)
+              row_indices[col] = p->column();
+          }
           graph->InsertGlobalIndices (1,
                                       reinterpret_cast<TrilinosWrappers::types::int_type *>(&row),
                                       row_length, &row_indices[0]);

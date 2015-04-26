@@ -36,8 +36,8 @@ print_patches (const SparsityPattern &bl)
     {
       deallog << "Block " << std::setw(3) << i;
       std::vector<unsigned int> entries;
-      for (SparsityPattern::row_iterator b = bl.row_begin(i); b != bl.row_end(i); ++b)
-        entries.push_back(*b);
+      for (SparsityPattern::iterator b = bl.begin(i); b != bl.end(i); ++b)
+        entries.push_back(b->column());
 
       std::sort(entries.begin(), entries.end());
 

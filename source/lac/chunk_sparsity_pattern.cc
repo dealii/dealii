@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -203,10 +203,14 @@ ChunkSparsityPattern::copy_from (const SparsityType &dsp,
 
   for (size_type row = 0; row<dsp.n_rows(); ++row)
     {
-      typename SparsityType::row_iterator col_num = dsp.row_begin (row);
       const size_type reduced_row = row/chunk_size;
-      for (; col_num != dsp.row_end (row); ++col_num)
-        temporary_sp.add (reduced_row, *col_num/chunk_size);
+
+      // TODO: This could be made more efficient if we cached the
+      // previous column and only called add() if the previous and the
+      // current column lead to different chunk columns
+      for (typename SparsityType::iterator col_num = dsp.begin(row);
+           col_num != dsp.end(row); ++col_num)
+        temporary_sp.add (reduced_row, col_num->column()/chunk_size);
     }
 
   sparsity_pattern.copy_from (temporary_sp);

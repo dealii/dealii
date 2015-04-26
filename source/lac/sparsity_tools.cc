@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -248,9 +248,9 @@ namespace SparsityTools
 
         // find all neighbors of the dofs numbered in the last round
         for (DynamicSparsityPattern::size_type i=0; i<last_round_dofs.size(); ++i)
-          for (DynamicSparsityPattern::row_iterator j=sparsity.row_begin(last_round_dofs[i]);
-               j<sparsity.row_end(last_round_dofs[i]); ++j)
-            next_round_dofs.push_back (*j);
+          for (DynamicSparsityPattern::iterator j=sparsity.begin(last_round_dofs[i]);
+               j<sparsity.end(last_round_dofs[i]); ++j)
+            next_round_dofs.push_back (j->column());
 
         // sort dof numbers
         std::sort (next_round_dofs.begin(), next_round_dofs.end());
@@ -305,10 +305,7 @@ namespace SparsityTools
         for (std::vector<DynamicSparsityPattern::size_type>::iterator s=next_round_dofs.begin();
              s!=next_round_dofs.end(); ++s)
           {
-            DynamicSparsityPattern::size_type coordination = 0;
-            for (DynamicSparsityPattern::row_iterator j=sparsity.row_begin(*s);
-                 j<sparsity.row_end(*s); ++j)
-              ++coordination;
+            const DynamicSparsityPattern::size_type coordination = sparsity.row_length(*s);
 
             // insert this dof at its coordination number
             const std::pair<const DynamicSparsityPattern::size_type, int> new_entry (coordination, *s);
@@ -445,13 +442,13 @@ namespace SparsityTools
 
               next_group.push_back(min_neighbors.first);
               touched_nodes[min_neighbors.first] = groups.size()-1;
-              for (DynamicSparsityPattern::row_iterator it
-                   = connectivity.row_begin(min_neighbors.first);
-                   it != connectivity.row_end(min_neighbors.first); ++it)
-                if (touched_nodes[*it] == numbers::invalid_dof_index)
+              for (DynamicSparsityPattern::iterator it
+                   = connectivity.begin(min_neighbors.first);
+                   it != connectivity.end(min_neighbors.first); ++it)
+                if (touched_nodes[it->column()] == numbers::invalid_dof_index)
                   {
-                    next_group.push_back(*it);
-                    touched_nodes[*it] = groups.size()-1;
+                    next_group.push_back(it->column());
+                    touched_nodes[it->column()] = groups.size()-1;
                   }
 
               // Add all neighbors of the current list not yet touched to the
@@ -461,13 +458,13 @@ namespace SparsityTools
               // the set of possible next pivots.
               for (unsigned int i=0; i<next_group.size(); ++i)
                 {
-                  for (DynamicSparsityPattern::row_iterator it
-                       = connectivity.row_begin(next_group[i]);
-                       it != connectivity.row_end(next_group[i]); ++it)
+                  for (DynamicSparsityPattern::iterator it
+                       = connectivity.begin(next_group[i]);
+                       it != connectivity.end(next_group[i]); ++it)
                     {
-                      if (touched_nodes[*it] == numbers::invalid_dof_index)
-                        current_neighbors.insert(*it);
-                      n_remaining_neighbors[*it]--;
+                      if (touched_nodes[it->column()] == numbers::invalid_dof_index)
+                        current_neighbors.insert(it->column());
+                      n_remaining_neighbors[it->column()]--;
                     }
                   current_neighbors.erase(next_group[i]);
                 }
@@ -487,10 +484,10 @@ namespace SparsityTools
                                                    groups.size());
           for (types::global_dof_index i=0; i<groups.size(); ++i)
             for (types::global_dof_index col=0; col<groups[i].size(); ++col)
-              for (DynamicSparsityPattern::row_iterator it
-                   = connectivity.row_begin(groups[i][col]);
-                   it != connectivity.row_end(groups[i][col]); ++it)
-                connectivity_next.add(i, touched_nodes[*it]);
+              for (DynamicSparsityPattern::iterator it
+                   = connectivity.begin(groups[i][col]);
+                   it != connectivity.end(groups[i][col]); ++it)
+                connectivity_next.add(i, touched_nodes[it->column()]);
 
           // Recursively call the reordering
           std::vector<types::global_dof_index> renumbering_next(groups.size());

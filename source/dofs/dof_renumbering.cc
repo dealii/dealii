@@ -423,10 +423,10 @@ namespace DoFRenumbering
           {
             const types::global_dof_index row = locally_owned.nth_index_in_set(i);
             row_entries.resize(0);
-            for (DynamicSparsityPattern::row_iterator it =
-                   dsp.row_begin(row); it != dsp.row_end(row); ++it)
-              if (*it != row && locally_owned.is_element(*it))
-                row_entries.push_back(locally_owned.index_within_set(*it));
+            for (DynamicSparsityPattern::iterator it =
+                   dsp.begin(row); it != dsp.end(row); ++it)
+              if (it->column() != row && locally_owned.is_element(it->column()))
+                row_entries.push_back(locally_owned.index_within_set(it->column()));
             sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
                                  true);
           }

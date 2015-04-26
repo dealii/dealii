@@ -977,17 +977,17 @@ no_constraint:
                 {
                   Assert(cell_partition[neighbor_list[j]]==partition-1,
                          ExcInternalError());
-                  DynamicSparsityPattern::row_iterator neighbor =
-                    connectivity.row_begin(neighbor_list[j]),
-                    end = connectivity.row_end(neighbor_list[j]);
+                  DynamicSparsityPattern::iterator neighbor =
+                    connectivity.begin(neighbor_list[j]),
+                    end = connectivity.end(neighbor_list[j]);
                   for (; neighbor!=end ; ++neighbor)
                     {
-                      if (cell_partition[*neighbor]==size_info.n_macro_cells)
+                      if (cell_partition[neighbor->column()]==size_info.n_macro_cells)
                         {
                           partition_blocks.back()++;
-                          cell_partition[*neighbor] = partition;
-                          neighbor_neighbor_list.push_back(*neighbor);
-                          partition_list[counter++] = *neighbor;
+                          cell_partition[neighbor->column()] = partition;
+                          neighbor_neighbor_list.push_back(neighbor->column());
+                          partition_list[counter++] = neighbor->column();
                         }
                     }
                 }
@@ -1027,16 +1027,16 @@ no_constraint:
               color_finder.resize(n_neighbors+1);
               for (unsigned int j=0; j<=n_neighbors; ++j)
                 color_finder[j]=true;
-              DynamicSparsityPattern::row_iterator
-              neighbor = connectivity.row_begin(cell),
-              end      = connectivity.row_end(cell);
+              DynamicSparsityPattern::iterator
+              neighbor = connectivity.begin(cell),
+              end      = connectivity.end(cell);
               for (; neighbor!=end ; ++neighbor)
                 {
                   // Mark the color that a neighbor within the partition has
                   // as taken
-                  if (cell_partition[*neighbor] == part &&
-                      cell_color[*neighbor] <= n_neighbors)
-                    color_finder[cell_color[*neighbor]] = false;
+                  if (cell_partition[neighbor->column()] == part &&
+                      cell_color[neighbor->column()] <= n_neighbors)
+                    color_finder[cell_color[neighbor->column()]] = false;
                 }
               // Choose the smallest color that is not taken for the block
               cell_color[cell]=0;
@@ -1249,17 +1249,17 @@ no_constraint:
                 }
               index--;
               unsigned int additional = neighbor_list[index];
-              DynamicSparsityPattern::row_iterator neighbor =
-                connectivity.row_begin(additional),
-                end = connectivity.row_end(additional);
+              DynamicSparsityPattern::iterator neighbor =
+                connectivity.begin(additional),
+                end = connectivity.end(additional);
               for (; neighbor!=end ; ++neighbor)
                 {
-                  if (cell_partition[*neighbor]==size_info.n_active_cells)
+                  if (cell_partition[neighbor->column()]==size_info.n_active_cells)
                     {
                       partition_size.back()++;
-                      cell_partition[*neighbor] = partition;
-                      neighbor_list.push_back(*neighbor);
-                      partition_list[counter++] = *neighbor;
+                      cell_partition[neighbor->column()] = partition;
+                      neighbor_list.push_back(neighbor->column());
+                      partition_list[counter++] = neighbor->column();
                       remainder--;
                       if (remainder == 0)
                         break;
@@ -1277,17 +1277,17 @@ no_constraint:
                 {
                   Assert(cell_partition[neighbor_list[j]]==partition-1,
                          ExcInternalError());
-                  DynamicSparsityPattern::row_iterator neighbor =
-                    connectivity.row_begin(neighbor_list[j]),
-                    end = connectivity.row_end(neighbor_list[j]);
+                  DynamicSparsityPattern::iterator neighbor =
+                    connectivity.begin(neighbor_list[j]),
+                    end = connectivity.end(neighbor_list[j]);
                   for (; neighbor!=end ; ++neighbor)
                     {
-                      if (cell_partition[*neighbor]==size_info.n_active_cells)
+                      if (cell_partition[neighbor->column()]==size_info.n_active_cells)
                         {
                           partition_size.back()++;
-                          cell_partition[*neighbor] = partition;
-                          neighbor_neighbor_list.push_back(*neighbor);
-                          partition_list[counter++] = *neighbor;
+                          cell_partition[neighbor->column()] = partition;
+                          neighbor_neighbor_list.push_back(neighbor->column());
+                          partition_list[counter++] = neighbor->column();
                           partition_counter++;
                         }
                     }
@@ -1312,17 +1312,17 @@ no_constraint:
                     }
                   index--;
                   unsigned int additional = neighbor_neighbor_list[index];
-                  DynamicSparsityPattern::row_iterator neighbor =
-                    connectivity.row_begin(additional),
-                    end = connectivity.row_end(additional);
+                  DynamicSparsityPattern::iterator neighbor =
+                    connectivity.begin(additional),
+                    end = connectivity.end(additional);
                   for (; neighbor!=end ; ++neighbor)
                     {
-                      if (cell_partition[*neighbor]==size_info.n_active_cells)
+                      if (cell_partition[neighbor->column()]==size_info.n_active_cells)
                         {
                           partition_size.back()++;
-                          cell_partition[*neighbor] = partition;
-                          neighbor_neighbor_list.push_back(*neighbor);
-                          partition_list[counter++] = *neighbor;
+                          cell_partition[neighbor->column()] = partition;
+                          neighbor_neighbor_list.push_back(neighbor->column());
+                          partition_list[counter++] = neighbor->column();
                           remainder--;
                           if (remainder == 0)
                             break;
@@ -1412,18 +1412,18 @@ not_connect:
                                ExcInternalError());
                         Assert(cell_partition_l2[neighbor_list[j]]==partition_l2-1,
                                ExcInternalError());
-                        DynamicSparsityPattern::row_iterator neighbor =
-                          connectivity.row_begin(neighbor_list[j]),
-                          end = connectivity.row_end(neighbor_list[j]);
+                        DynamicSparsityPattern::iterator neighbor =
+                          connectivity.begin(neighbor_list[j]),
+                          end = connectivity.end(neighbor_list[j]);
                         for (; neighbor!=end ; ++neighbor)
                           {
-                            if (cell_partition[*neighbor] == part &&
-                                cell_partition_l2[*neighbor]==
+                            if (cell_partition[neighbor->column()] == part &&
+                                cell_partition_l2[neighbor->column()]==
                                 size_info.n_active_cells)
                               {
-                                cell_partition_l2[*neighbor] = partition_l2;
-                                neighbor_neighbor_list.push_back(*neighbor);
-                                partition_partition_list[counter++] = *neighbor;
+                                cell_partition_l2[neighbor->column()] = partition_l2;
+                                neighbor_neighbor_list.push_back(neighbor->column());
+                                partition_partition_list[counter++] = neighbor->column();
                                 partition_counter++;
                               }
                           }
@@ -1504,20 +1504,19 @@ not_connect:
                           // go through the neighbors of the last cell in the
                           // current partition and check if we find some to
                           // fill up with.
-                          DynamicSparsityPattern::row_iterator
-                          neighbor =
-                            connectivity.row_begin(additional),
-                            end = connectivity.row_end(additional);
+                          DynamicSparsityPattern::iterator
+                          neighbor = connectivity.begin(additional),
+                          end = connectivity.end(additional);
                           for (; neighbor!=end ; ++neighbor)
                             {
-                              if (cell_partition[*neighbor] == part &&
-                                  cell_partition_l2[*neighbor] ==
+                              if (cell_partition[neighbor->column()] == part &&
+                                  cell_partition_l2[neighbor->column()] ==
                                   size_info.n_active_cells)
                                 {
                                   unsigned int this_index = 0;
                                   if (hp_bool == true)
                                     this_index = cell_active_fe_index.empty() ? 0 :
-                                                 cell_active_fe_index[*neighbor];
+                                                 cell_active_fe_index[neighbor->column()];
 
                                   // Only add this cell if we need more macro
                                   // cells in the current block or if there is
@@ -1526,13 +1525,13 @@ not_connect:
                                   if (missing_macros > 0 ||
                                       remaining_per_macro_cell[this_index] > 0)
                                     {
-                                      cell_partition_l2[*neighbor] = partition_l2;
-                                      neighbor_neighbor_list.push_back(*neighbor);
+                                      cell_partition_l2[neighbor->column()] = partition_l2;
+                                      neighbor_neighbor_list.push_back(neighbor->column());
                                       if (hp_bool == true)
                                         renumbering_fe_index[this_index].
-                                        push_back(*neighbor);
+                                        push_back(neighbor->column());
                                       partition_partition_list[counter] =
-                                        *neighbor;
+                                        neighbor->column();
                                       counter++;
                                       partition_counter++;
                                       if (remaining_per_macro_cell[this_index]
