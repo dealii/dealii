@@ -142,6 +142,10 @@ int main()
   op_x.vmult(x, u);
   deallog << "(A*=B)u: " << x << std::endl;
 
+  op_x *= 4.;
+  op_x.vmult(x, u);
+  deallog << "(A*=B*=4.)u: " << x << std::endl;
+
   // solver interface:
 
   SolverControl solver_control (1000, 1e-12);

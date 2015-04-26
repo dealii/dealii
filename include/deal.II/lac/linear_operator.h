@@ -257,6 +257,18 @@ public:
     *this = *this * second_op;
     return *this;
   }
+
+  /**
+   * Scalar multiplication of the LinearOperator with @p number from the
+   * right.
+   */
+  LinearOperator<Range, Domain>
+  operator*=(typename Domain::value_type  number)
+  {
+    *this = *this * number;
+    return *this;
+  }
+
 };
 
 
