@@ -148,9 +148,9 @@ namespace Step17
     // parallel versions is denoted the fact that we use the classes from the
     // <code>PETScWrappers::MPI</code> namespace; sequential versions of these
     // classes are in the <code>PETScWrappers</code> namespace, i.e. without
-    // the <code>MPI</code> part). Note also that we do not use a separate
-    // sparsity pattern, since PETSc manages that as part of its matrix data
-    // structures.
+    // the <code>MPI</code> part, be aware that these classes are deprecated).
+    // Note also that we do not use a separate sparsity pattern, since PETSc
+    // manages that as part of its matrix data structures.
     PETScWrappers::MPI::SparseMatrix system_matrix;
 
     PETScWrappers::MPI::Vector       solution;
@@ -615,8 +615,8 @@ namespace Step17
     // another node in a simple way if we should need it, what we do here is
     // to get a copy of the distributed vector where we keep all elements
     // locally. This is simple, since the deal.II wrappers have a conversion
-    // constructor for the non-MPI vector class:
-    PETScWrappers::Vector localized_solution (solution);
+    // constructor for the deal.II vector class:
+    Vector<double> localized_solution (solution);
 
     // Then we distribute hanging node constraints on this local copy, i.e. we
     // compute the values of all constrained nodes:
@@ -781,7 +781,7 @@ namespace Step17
     // zero only, we need to have access to all elements of the solution
     // vector. So we need to get a local copy of the distributed vector, which
     // is in fact simple:
-    const PETScWrappers::Vector localized_solution (solution);
+    const Vector<double> localized_solution (solution);
     // The thing to notice, however, is that we do this localization operation
     // on all processes, not only the one that actually needs the data. This
     // can't be avoided, however, with the communication model of MPI: MPI
@@ -867,6 +867,111 @@ namespace Step17
 
 
   // @sect4{ElasticProblem::run}
+
+  // The sixth step is to take the solution just computed, and evaluate some
+  // kind of refinement indicator to refine the mesh. The problem is basically
+  // the same as with distributing hanging node constraints: in order to
+  // compute the error indicator, we need access to all elements of the
+  // solution vector. We then compute the indicators for the cells that belong
+  // to the present process, but then we need to distribute the refinement
+  // indicators into a distributed vector so that all processes have the
+  // values of the refinement indicator for all cells. But then, in order for
+  // each process to refine its copy of the mesh, they need to have access to
+  // all refinement indicators locally, so they have to copy the global vector
+  // back into a local one. That's a little convoluted, but thinking about it
+  // quite straightforward nevertheless. So here's how we do it:
+  template <int dim>
+  void ElasticProblem<dim>::refine_grid ()
+  {
+    // So, first part: get a local copy of the distributed solution
+    // vector. This is necessary since the error estimator needs to get at the
+    // value of neighboring cells even if they do not belong to the subdomain
+    // associated with the present MPI process:
+    const Vector<double> localized_solution (solution);
+
+    // Second part: set up a vector of error indicators for all cells and let
+    // the Kelly class compute refinement indicators for all cells belonging
+    // to the present subdomain/process. Note that the last argument of the
+    // call indicates which subdomain we are interested in. The three
+    // arguments before it are various other default arguments that one
+    // usually doesn't need (and doesn't state values for, but rather uses the
+    // defaults), but which we have to state here explicitly since we want to
+    // modify the value of a following argument (i.e. the one indicating the
+    // subdomain):
+    Vector<float> local_error_per_cell (triangulation.n_active_cells());
+    KellyErrorEstimator<dim>::estimate (dof_handler,
+                                        QGauss<dim-1>(2),
+                                        typename FunctionMap<dim>::type(),
+                                        localized_solution,
+                                        local_error_per_cell,
+                                        ComponentMask(),
+                                        0,
+                                        MultithreadInfo::n_threads(),
+                                        this_mpi_process);
+
+    // Now all processes have computed error indicators for their own cells
+    // and stored them in the respective elements of the
+    // <code>local_error_per_cell</code> vector. The elements of this vector
+    // for cells not on the present process are zero. However, since all
+    // processes have a copy of a copy of the entire triangulation and need to
+    // keep these copies in sync, they need the values of refinement
+    // indicators for all cells of the triangulation. Thus, we need to
+    // distribute our results. We do this by creating a distributed vector
+    // where each process has its share, and sets the elements it has
+    // computed. We will then later generate a local sequential copy of this
+    // distributed vector to allow each process to access all elements of this
+    // vector.
+    //
+    // So in the first step, we need to set up a %parallel vector. For
+    // simplicity, every process will own a chunk with as many elements as
+    // this process owns cells, so that the first chunk of elements is stored
+    // with process zero, the next chunk with process one, and so on. It is
+    // important to remark, however, that these elements are not necessarily
+    // the ones we will write to. This is so, since the order in which cells
+    // are arranged, i.e. the order in which the elements of the vector
+    // correspond to cells, is not ordered according to the subdomain these
+    // cells belong to. In other words, if on this process we compute
+    // indicators for cells of a certain subdomain, we may write the results
+    // to more or less random elements if the distributed vector, that do not
+    // necessarily lie within the chunk of vector we own on the present
+    // process. They will subsequently have to be copied into another
+    // process's memory space then, an operation that PETSc does for us when
+    // we call the <code>compress</code> function. This inefficiency could be
+    // avoided with some more code, but we refrain from it since it is not a
+    // major factor in the program's total runtime.
+    //
+    // So here's how we do it: count how many cells belong to this process,
+    // set up a distributed vector with that many elements to be stored
+    // locally, and copy over the elements we computed locally, then compress
+    // the result. In fact, we really only copy the elements that are nonzero,
+    // so we may miss a few that we computed to zero, but this won't hurt
+    // since the original values of the vector is zero anyway.
+    const unsigned int n_local_cells
+      = GridTools::count_cells_with_subdomain_association (triangulation,
+                                                           this_mpi_process);
+    PETScWrappers::MPI::Vector
+    distributed_all_errors (mpi_communicator,
+                            triangulation.n_active_cells(),
+                            n_local_cells);
+
+    for (unsigned int i=0; i<local_error_per_cell.size(); ++i)
+      if (local_error_per_cell(i) != 0)
+        distributed_all_errors(i) = local_error_per_cell(i);
+    distributed_all_errors.compress (VectorOperation::insert);
+
+
+    // So now we have this distributed vector out there that contains the
+    // refinement indicators for all cells. To use it, we need to obtain a
+    // local copy...
+    const Vector<float> localized_all_errors (distributed_all_errors);
+
+    // ...which we can the subsequently use to finally refine the grid:
+    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+                                                     localized_all_errors,
+                                                     0.3, 0.03);
+    triangulation.execute_coarsening_and_refinement ();
+  }
+
 
 
   // Lastly, here is the driver function. It is almost unchanged from step-8,

@@ -43,6 +43,8 @@ namespace PETScWrappers
    * interface, this class handles the actual allocation of vectors and
    * provides functions that are specific to the underlying vector type.
    *
+   * This class is deprecated use PETScWrappers::MPI::BlockVector.
+   *
    * @ingroup Vectors
    *
    * @see
@@ -85,13 +87,13 @@ namespace PETScWrappers
      * of different sizes.
      */
     explicit BlockVector (const unsigned int num_blocks = 0,
-                          const size_type    block_size = 0);
+                          const size_type    block_size = 0) DEAL_II_DEPRECATED;
 
     /**
      * Copy-Constructor. Dimension set to that of V, all components are copied
      * from V
      */
-    BlockVector (const BlockVector  &V);
+    BlockVector (const BlockVector  &V) DEAL_II_DEPRECATED;
 
     /**
      * Copy-constructor: copy the values from a PETSc wrapper parallel block
@@ -103,13 +105,13 @@ namespace PETScWrappers
      * It is not sufficient if only one processor tries to copy the elements
      * from the other processors over to its own process space.
      */
-    explicit BlockVector (const MPI::BlockVector &v);
+    explicit BlockVector (const MPI::BlockVector &v) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Set the number of blocks to <tt>n.size()</tt> and
      * initialize each block with <tt>n[i]</tt> zero elements.
      */
-    BlockVector (const std::vector<size_type> &n);
+    BlockVector (const std::vector<size_type> &n) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Set the number of blocks to <tt>n.size()</tt>. Initialize
@@ -122,7 +124,7 @@ namespace PETScWrappers
     template <typename InputIterator>
     BlockVector (const std::vector<size_type> &n,
                  const InputIterator           first,
-                 const InputIterator           end);
+                 const InputIterator           end) DEAL_II_DEPRECATED;
 
     /**
      * Destructor. Clears memory

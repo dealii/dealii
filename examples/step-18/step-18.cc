@@ -495,7 +495,7 @@ namespace Step18
 
     PETScWrappers::MPI::Vector       system_rhs;
 
-    PETScWrappers::Vector            incremental_displacement;
+    Vector<double>                   incremental_displacement;
 
     // The next block of variables is then related to the time dependent
     // nature of the problem: they denote the length of the time interval
