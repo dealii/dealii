@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -124,7 +124,7 @@ style guidelines outlined in this page.</p>
   use lowercase letters and underscores to separate words.
   The only exception are the iterator typedefs in Triangulation
   and DoFHandler (named cell_iterator, active_line_iterator, etc)
-  to make the connection to the STL classes clear.</li>
+  to make the connection to the standard library container classes clear.</li>
 
 <li> For classes with multiple template arguments, the dimension is usually
   put before the data type specifier, i.e., we use Point<dim,number> and not

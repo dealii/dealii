@@ -322,9 +322,9 @@ namespace TrilinosWrappers
     };
 
     /**
-     * STL conforming iterator. This class acts as an iterator walking over
-     * the elements of Trilinos matrices. The implementation of this class is
-     * similar to the one for PETSc matrices.
+     * This class acts as an iterator walking over the elements of Trilinos
+     * matrices. The implementation of this class is similar to the one for
+     * PETSc matrices.
      *
      * Note that Trilinos stores the elements within each row in ascending
      * order. This is opposed to the deal.II sparse matrix style where the

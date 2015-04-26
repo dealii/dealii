@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -386,7 +386,7 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * STL conforming iterator.
+   * Standard-conforming iterator.
    */
   class const_iterator
   {
@@ -561,7 +561,7 @@ public:
   void Tstep (Vector<number2> &dst, const Vector<number2> &rhs) const;
 
   /**
-   * STL-like iterator with the first entry.
+   * Iterator starting at the first entry.
    */
   const_iterator begin () const;
 
@@ -571,7 +571,7 @@ public:
   const_iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of row @p r.
+   * Iterator starting at the first entry of row @p r.
    */
   const_iterator begin (const size_type r) const;
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -371,7 +371,7 @@ namespace internal
                  const unsigned int n1);
 
       /**
-       * Need a partial ordering for the STL
+       * Need a partial ordering for sorting algorithms
        */
       bool operator< (const CheapEdge &e2) const;
     };

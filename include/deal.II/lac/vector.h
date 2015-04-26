@@ -159,8 +159,8 @@ public:
    * Copy-constructor. Sets the dimension to that of the given vector, and
    * copies all elements.
    *
-   * We would like to make this constructor explicit, but STL insists on using
-   * it implicitly.
+   * We would like to make this constructor explicit, but standard containers
+   * insist on using it implicitly.
    */
   Vector (const Vector<Number> &v);
 
@@ -273,8 +273,8 @@ public:
    * waste some memory, so keep this in mind.  However, if <tt>N==0</tt> all
    * memory is freed, i.e. if you want to resize the vector and release the
    * memory not needed, you have to first call <tt>reinit(0)</tt> and then
-   * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the STL
-   * containers.
+   * <tt>reinit(N)</tt>. This cited behaviour is analogous to that of the
+   * standard library containers.
    *
    * If @p fast is false, the vector is filled by zeros. Otherwise, the
    * elements are left an unspecified state.

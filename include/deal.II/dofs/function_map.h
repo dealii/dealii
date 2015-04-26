@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,7 @@ struct FunctionMap
   /**
    * Declare the type as discussed above. Since we can't name it FunctionMap
    * (as that would ambiguate a possible constructor of this class), name it
-   * in the fashion of the STL local typedefs.
+   * in the fashion of the standard container local typedefs.
    */
   typedef std::map<types::boundary_id, const Function<dim,Number>*> type;
 };

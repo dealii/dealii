@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2013 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,9 +30,9 @@
  *
  * In contrast to this, the MemoryConsumption namespace provides
  * functions that can be used to determine the memory consumption of
- * objects. For some simple classes, like the STL containers, it
- * directly determines how much memory they need (or at least gives an
- * estimate). For deal.II classes, it uses the
+ * objects. For some simple classes, like the standard library
+ * containers, it directly determines how much memory they need (or at
+ * least gives an estimate). For deal.II classes, it uses the
  * <code>memory_consumption</code> member function that most classes
  * have.
  *

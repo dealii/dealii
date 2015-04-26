@@ -2020,10 +2020,11 @@ make_sorted_row_list (const std::vector<size_type>   &local_dof_indices,
   // so the first step is to create a sorted list of all row values that are
   // possible. these values are either the rows from unconstrained dofs, or
   // some indices introduced by dofs constrained to a combination of some
-  // other dofs. regarding the data type, choose an STL vector of a pair of
-  // unsigned ints (for global columns) and internal data (containing local
-  // columns + possible jumps from constraints). Choosing an STL map or
-  // anything else M.K. knows of would be much more expensive here!
+  // other dofs. regarding the data type, choose a <tt>std::vector</tt> of a
+  // pair of unsigned ints (for global columns) and internal data (containing
+  // local columns + possible jumps from constraints). Choosing
+  // <tt>std::map</tt> or anything else M.K. knows of would be much more
+  // expensive here!
 
   // cache whether we have to resolve any indirect rows generated from
   // resolving constrained dofs.

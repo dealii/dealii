@@ -383,13 +383,13 @@ public:
    * Copy constructor. This constructor is only allowed to be called if the
    * matrix structure to be copied is empty. This is so in order to prevent
    * involuntary copies of objects for temporaries, which can use large
-   * amounts of computing time.  However, copy constructors are needed if yo
-   * want to use the STL data types on classes like this, e.g. to write such
+   * amounts of computing time. However, copy constructors are needed if one
+   * wants to place a SparsityPattern in a container, e.g., to write such
    * statements like <tt>v.push_back (SparsityPattern());</tt>, with
    * <tt>v</tt> a vector of SparsityPattern objects.
    *
-   * Usually, it is sufficient to use the explicit keyword to disallow
-   * unwanted temporaries, but for the STL vectors, this does not work. Since
+   * Usually, it is sufficient to use the explicit keyword to disallow unwanted
+   * temporaries, but this does not work for <tt>std::vector</tt>s. Since
    * copying a structure like this is not useful anyway because multiple
    * matrices can use the same sparsity structure, copies are only allowed for
    * empty objects, as described above.
@@ -675,7 +675,7 @@ public:
 // @{
 
   /**
-   * STL-like iterator with the first entry of the matrix. The resulting
+   * Iterator starting at the first entry of the matrix. The resulting
    * iterator can be used to walk over all nonzero entries of the sparsity
    * pattern.
    *
@@ -690,7 +690,7 @@ public:
   iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
+   * Iterator starting at the first entry of row <tt>r</tt>.
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
    * entries, then the iterator returned by this function equals

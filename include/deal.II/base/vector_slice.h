@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,22 +82,22 @@ public:
   typename VECTOR::const_reference operator[] (unsigned int i) const;
 
   /**
-   * STL conforming iterator function.
+   * Standard-conforming iterator function.
    */
   typename VECTOR::iterator begin();
 
   /**
-   * STL conforming iterator function.
+   * Standard-conforming iterator function.
    */
   typename VECTOR::const_iterator begin() const;
 
   /**
-   * STL conforming iterator function.
+   * Standard-conforming iterator function.
    */
   typename VECTOR::iterator end();
 
   /**
-   * STL conforming iterator function.
+   * Standard-conforming iterator function.
    */
   typename VECTOR::const_iterator end() const;
 

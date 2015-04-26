@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,7 +23,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * STL conforming iterator for constant and non-constant matrices.
+ * Iterator for constant and non-constant matrices.
  *
  * This iterator is abstracted from the actual matrix type and can be used for
  * any matrix having the required ACCESSOR type.

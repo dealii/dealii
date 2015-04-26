@@ -347,7 +347,8 @@ public:
   typedef MatrixType BlockType;
 
   /**
-   * Type of matrix entries. In analogy to the STL container classes.
+   * Type of matrix entries. These are analogous to typedefs in the standard
+   * library containers.
    */
   typedef typename BlockType::value_type value_type;
   typedef value_type             *pointer;
@@ -697,7 +698,7 @@ public:
               const bool    alternative_output = false) const;
 
   /**
-   * STL-like iterator with the first entry.
+   * Iterator starting at the first entry.
    */
   iterator begin ();
 
@@ -707,7 +708,7 @@ public:
   iterator end ();
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
+   * Iterator starting at the first entry of row <tt>r</tt>.
    */
   iterator begin (const size_type r);
 
@@ -716,7 +717,7 @@ public:
    */
   iterator end (const size_type r);
   /**
-   * STL-like iterator with the first entry.
+   * Iterator starting at the first entry.
    */
   const_iterator begin () const;
 
@@ -726,7 +727,7 @@ public:
   const_iterator end () const;
 
   /**
-   * STL-like iterator with the first entry of row <tt>r</tt>.
+   * Iterator starting at the first entry of row <tt>r</tt>.
    */
   const_iterator begin (const size_type r) const;
 

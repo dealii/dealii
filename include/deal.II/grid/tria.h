@@ -435,15 +435,14 @@ namespace internal
  * quite inconvenient if one attempted to operate on it directly, since data
  * is spread over quite a lot of arrays and other places. However, there are
  * ways powerful enough to work on these data structures without knowing their
- * exact relations. This is done through the concept of iterators (see the STL
- * documentation and TriaIterator). In order to make things as easy and
- * dimension independent as possible, use of class local typedefs is made, see
- * below.
+ * exact relations. deal.II uses class local typedefs (see below) to make things
+ * as easy and dimension independent as possible.
  *
- * The Triangulation class provides iterator which enable looping over all
- * cells without knowing the exact representation used to describe them. Their
- * names are typedefs imported from the Iterators class (thus making them
- * local types to this class) and are as follows:
+ * The Triangulation class provides iterators which enable looping over all
+ * cells without knowing the exact representation used to describe them. For
+ * more information see the documentation of <tt>TriaIterator</tt>. Their names
+ * are typedefs imported from the Iterators class (thus making them local types
+ * to this class) and are as follows:
  *
  * <ul>
  * <li> <tt>cell_iterator</tt>: loop over all cells used in the Triangulation
@@ -475,10 +474,11 @@ namespace internal
  * functions returning iterators. Take a look at the class doc to get an
  * overview.
  *
- * Usage of these iterators works mostly like with the STL iterators. Some
- * examples taken from the Triangulation source code follow (notice that in
- * the last two examples the template parameter @p spacedim has been omitted,
- * so it takes the default value <code>dim</code>).
+ * Usage of these iterators is similar to usage of standard container
+ * iterators. Some examples taken from the Triangulation source code follow
+ * (notice that in the last two examples the template parameter @p spacedim has
+ * been omitted, so it takes the default value <code>dim</code>).
+ *
  * <ul>
  * <li> <em>Counting the number of cells on a specific level</em>
  *    @code
@@ -492,7 +492,7 @@ namespace internal
  *        return n;
  *      };
  *    @endcode
- * Another way which uses the STL @p distance function would be to write
+ * Another way, which uses <tt>std::distance</tt>, would be to write
  *    @code
  *      template <int dim>
  *      int Triangulation<dim>::n_cells (const int level) const {
