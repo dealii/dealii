@@ -32,7 +32,8 @@ DEAL_II_NAMESPACE_OPEN
 template <typename Number> class Vector;
 template <typename Number> class BlockVector;
 
-template <typename Range, typename Domain> class LinearOperator;
+template <typename Range = Vector<double>, typename Domain = Range>
+class LinearOperator;
 
 template <typename Range = Vector<double>,
           typename Domain = Range,
@@ -248,8 +249,8 @@ public:
   }
 
   /**
-   * Concatenation of the LinearOperator with an endomorphism @p second_op
-   * on the @p Domain space.
+   * Composition of the LinearOperator with an endomorphism @p second_op
+   * of the @p Domain space.
    */
   LinearOperator<Range, Domain> &
   operator*=(const LinearOperator<Domain, Domain> &second_op)
@@ -257,6 +258,18 @@ public:
     *this = *this * second_op;
     return *this;
   }
+
+  /**
+   * Scalar multiplication of the LinearOperator with @p number from the
+   * right.
+   */
+  LinearOperator<Range, Domain>
+  operator*=(typename Domain::value_type  number)
+  {
+    *this = *this * number;
+    return *this;
+  }
+
 };
 
 
@@ -264,8 +277,8 @@ public:
 /**
  * \relates LinearOperator
  *
- * Addition of two linear operators @p first_op and @p second_op given
- * by $(\text{first\_op}+\text{second\_op})x:=\text{first\_op}(x)+\text{second\_op}(x)$
+ * Addition of two linear operators @p first_op and @p second_op given by
+ * $(\text{first\_op}+\text{second\_op})x:=\text{first\_op}(x)+\text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -313,8 +326,8 @@ operator+(const LinearOperator<Range, Domain> &first_op,
 /**
  * \relates LinearOperator
  *
- * Subtraction of two linear operators @p first_op and @p second_op given
- * by $(\text{first\_op}-\text{second\_op})x:=\text{first\_op}(x)-\text{second\_op}(x)$
+ * Subtraction of two linear operators @p first_op and @p second_op given by
+ * $(\text{first\_op}-\text{second\_op})x:=\text{first\_op}(x)-\text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -331,8 +344,8 @@ operator-(const LinearOperator<Range, Domain> &first_op,
 /**
  * \relates LinearOperator
  *
- * Concatenation of two linear operators @p first_op and @p second_op given
- * by $(\text{first\_op}*\text{second\_op})x:=\text{first\_op}(\text{second\_op}(x))$
+ * Composition of two linear operators @p first_op and @p second_op given by
+ * $(\text{first\_op}*\text{second\_op})x:=\text{first\_op}(\text{second\_op}(x))$
  *
  * @ingroup LAOperators
  */
