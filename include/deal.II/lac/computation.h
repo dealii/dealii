@@ -265,7 +265,7 @@ public:
 //@{
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Addition of two Computation objects @p first_comp and @p second_comp given by
  * vector space addition of the corresponding results.
@@ -300,7 +300,7 @@ operator+(const Computation<Range> &first_comp,
 }
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Subtraction of two Computation objects @p first_comp and @p second_comp
  * given by vector space addition of the corresponding results.
@@ -338,7 +338,7 @@ operator-(const Computation<Range> &first_comp,
 }
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Scalar multiplication of a Computation objects @p comp with a scalar @p number
  * given by a scaling Computation result with @p number.
@@ -371,7 +371,7 @@ operator*(const Computation<Range> &comp,
 }
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Scalar multiplication of a Computation objects @p comp with a scalar @p number
  * given by a scaling Computation result with @p number.
@@ -387,7 +387,7 @@ operator*(typename Range::value_type number,
 }
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Add a constant @p offset (of the @p Range space) to the result of a
  * Computation.
@@ -402,7 +402,7 @@ Computation<Range> operator+(const Computation<Range> &comp,
 }
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Add a constant @p offset (of the @p Range space) to the result of a
  * Computation.
@@ -417,7 +417,7 @@ Computation<Range> operator+(const Range &offset,
 }
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Subtract a constant @p offset (of the @p Range space) from the result of a
  * Computation.
@@ -433,7 +433,7 @@ Computation<Range> operator-(const Computation<Range> &comp,
 
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Subtract a computational result from a constant @p offset (of the @p
  * Range space). The result is a Computation object that applies this
@@ -570,7 +570,7 @@ Computation<Range> operator-(const Range &u, const Range &v)
 
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Create a Computation object from a LinearOperator and a reference to a
  * vector @p u of the Domain space. The object stores the computation
@@ -612,7 +612,7 @@ operator*(const LinearOperator<Range, Domain> &op,
 
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Create a Computation object from a LinearOperator and a reference to a
  * vector @p u of the Range space. The object stores the computation
@@ -654,7 +654,7 @@ operator*(const Range &u,
 
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Composition of a Computation object with a LinearOperator.
  * The object stores the computation $\text{op} \,comp$ (in matrix notation).
@@ -704,7 +704,7 @@ operator*(const LinearOperator<Range, Domain> &op,
 
 
 /**
- * \relates Computation
+ * @relates Computation
  *
  * Composition of a Computation object with a LinearOperator.
  * The object stores the computation $\text{op}^T \,comp$ (in matrix notation).
