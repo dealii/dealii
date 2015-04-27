@@ -44,6 +44,9 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/full_matrix.h>
 
+// IndexSet is used to set the size of PETScWrappers::Vector:
+#include <deal.II/base/index_set.h>
+
 // PETSc appears here because SLEPc depends on this library:
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -89,9 +92,9 @@ namespace Step36
     // the right hand side. We also need not just one solution function, but a
     // whole set of these for the eigenfunctions we want to compute, along
     // with the corresponding eigenvalues:
-    PETScWrappers::SparseMatrix        stiffness_matrix, mass_matrix;
-    std::vector<PETScWrappers::Vector> eigenfunctions;
-    std::vector<double>                eigenvalues;
+    PETScWrappers::SparseMatrix             stiffness_matrix, mass_matrix;
+    std::vector<PETScWrappers::MPI::Vector> eigenfunctions;
+    std::vector<double>                     eigenvalues;
 
     // And then we need an object that will store several run-time parameters
     // that we will specify in an input file:
@@ -194,11 +197,18 @@ namespace Step36
     // The next step is to take care of the eigenspectrum. In this case, the
     // outputs are eigenvalues and eigenfunctions, so we set the size of the
     // list of eigenfunctions and eigenvalues to be as large as we asked for
-    // in the input file:
+    // in the input file. When using a PETScWrappers::MPI::Vector, the Vector 
+    // is initialized using an IndexSet. IndexSet is used not only to resize the
+    // PETScWrappers::MPI::Vector but it also associates an index in the 
+    // PETScWrappers::MPI::Vector with a degree of freedom (see step-40 for a 
+    // more detailed explanation). This assocation is done by the add_range()
+    // function:
+    IndexSet eigenfunction_index_set(dof_handler.n_dofs ());
+    eigenfunction_index_set.add_range(0, dof_handler.n_dofs ());
     eigenfunctions
     .resize (parameters.get_integer ("Number of eigenvalues/eigenfunctions"));
     for (unsigned int i=0; i<eigenfunctions.size (); ++i)
-      eigenfunctions[i].reinit (dof_handler.n_dofs ());
+      eigenfunctions[i].reinit (eigenfunction_index_set, MPI_COMM_WORLD);
 
     eigenvalues.resize (eigenfunctions.size ());
   }
