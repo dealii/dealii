@@ -715,10 +715,6 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
           if (iteration_state != SolverControl::iterate)
             {
-              this->memory.free(r);
-              this->memory.free(x_);
-
-              delete gamma_;
               break;
             }
         }
