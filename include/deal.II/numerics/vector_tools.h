@@ -356,6 +356,10 @@ namespace VectorTools
      */
     H1_seminorm,
     /**
+     * #L2_norm of the divergence of a vector field.
+     */
+    Hdiv_seminorm,
+    /**
      * The square of this norm is the square of the #L2_norm plus the square
      * of the #H1_seminorm.
      */

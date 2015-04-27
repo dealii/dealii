@@ -6242,6 +6242,7 @@ namespace VectorTools
 
         case H1_seminorm:
         case W1p_seminorm:
+        case Hdiv_seminorm:
         case W1infty_seminorm:
           break;
 
@@ -6278,6 +6279,22 @@ namespace VectorTools
           diff = std::sqrt(diff);
           break;
 
+        case Hdiv_seminorm:
+          Assert (n_components >= dim,
+            ExcMessage ("You can only ask for the Hdiv norm for a finite element "
+                        "with at least 'dim' components. In that case, this function "
+                        "will take the divergence of the first 'dim' components."));
+          for (unsigned int q=0; q<n_q_points; ++q)
+            {
+              double sum = 0;
+              for (unsigned int k=0; k<dim; k++)
+                sum += (data.psi_grads[q][k][k] * data.psi_grads[q][k][k])
+                        * data.weight_vectors[q][k];
+              diff += sum * fe_values.JxW(q);
+            }
+          diff = std::sqrt(diff);
+        break;
+
         case W1infty_seminorm:
         case W1infty_norm:
         {
@@ -6292,6 +6309,7 @@ namespace VectorTools
           diff += t;
         }
         break;
+
         default:
           break;
         }
@@ -6336,6 +6354,7 @@ namespace VectorTools
         case L2_norm:
         case H1_seminorm:
         case H1_norm:
+        case Hdiv_seminorm:
           exponent = 2.;
           break;
 
@@ -6352,6 +6371,7 @@ namespace VectorTools
       switch (norm)
         {
         case H1_seminorm:
+        case Hdiv_seminorm:
         case W1p_seminorm:
         case W1infty_seminorm:
           update_flags |= UpdateFlags (update_gradients);
