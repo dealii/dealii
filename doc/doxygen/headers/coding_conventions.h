@@ -60,6 +60,10 @@ style guidelines outlined in this page.</p>
   functions which clear bits of flags should be named <code>clear_*</code>.
   Example: CellIterator::set_refine_flag().</li>
 
+<li> Traditional logical operators should be used instead of their English
+  equivalents (i.e., use <code>&&</code>, <code>||</code>, and <code>!</code>
+  instead of <code>and</code>, <code>or</code>, and <code>not</code>).
+
 <li> In the implementation files, after each function, at least three
   empty lines are expected to
   enable better readability. One empty line occurs in functions to
