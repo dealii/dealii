@@ -121,18 +121,18 @@ TriaRawIterator<Accessor>::operator = (const TriaRawIterator<Accessor> &i)
 template <typename Accessor>
 inline
 bool
-TriaRawIterator<Accessor>::operator == (const TriaRawIterator<Accessor> &i) const
+TriaRawIterator<Accessor>::operator == (const TriaRawIterator<Accessor> &other) const
 {
-  return accessor == i.accessor;
+  return accessor == other.accessor;
 }
 
 
 template <typename Accessor>
 inline
 bool
-TriaRawIterator<Accessor>::operator != (const TriaRawIterator<Accessor> &i) const
+TriaRawIterator<Accessor>::operator != (const TriaRawIterator<Accessor> &other) const
 {
-  return not (*this == i);
+  return ! (*this == other);
 }
 
 
