@@ -300,13 +300,13 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   //
   // for the neighbor gradient, we need several auxiliary fields, depending on
   // the way we get it (see below)
-  std::vector<std::vector<std::vector<Tensor<1,spacedim> > > >
+  std::vector<std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > >
   gradients_here (n_solution_vectors,
-                  std::vector<std::vector<Tensor<1,spacedim> > >(2, std::vector<Tensor<1,spacedim> >(n_components)));
-  std::vector<std::vector<std::vector<Tensor<1,spacedim> > > >
+                  std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > >(2, std::vector<Tensor<1,spacedim,typename InputVector::value_type> >(n_components)));
+  std::vector<std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > >
   gradients_neighbor (gradients_here);
-  std::vector<Vector<double> >
-  grad_neighbor (n_solution_vectors, Vector<double>(n_components));
+  std::vector<Vector<typename InputVector::value_type> >
+  grad_neighbor (n_solution_vectors, Vector<typename InputVector::value_type>(n_components));
 
   // reserve some space for coefficient values at one point.  if there is no
   // coefficient, then we fill it by unity once and for all and don't set it
