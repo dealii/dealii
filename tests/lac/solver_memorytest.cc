@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,8 +15,10 @@
 
 
 
-// test all solver with a start value that is already a solution (i.e. 0
-// iterations). This caused a memory leak in FGMRES.
+// Test all solver with a start value that is already a solution (i.e. 0
+// iterations). This caused a memory leak in FGMRES. In the same situation
+// test GMRES without using the default residual, which caused a double
+// memory freeing (see issue #886).
 
 
 #include "../tests.h"
@@ -39,12 +41,12 @@
 
 template<class SOLVER, class MATRIX, class VECTOR>
 void
-check_solve( const MATRIX &A,
-             VECTOR &u, VECTOR &f)
+check_solve( const MATRIX &A, VECTOR &u, VECTOR &f,
+             const typename SOLVER::AdditionalData &additional_data = typename SOLVER::AdditionalData() )
 {
   GrowingVectorMemory<> mem;
   SolverControl control(100, 1.e-3);
-  SOLVER solver(control, mem);
+  SOLVER solver(control, mem, additional_data);
   PreconditionIdentity prec_no;
   u = 0.;
   f = 0.;
@@ -92,6 +94,9 @@ int main()
 //      check_solve<SolverFGMRES<> >(A,u,f);
       check_solve<SolverBicgstab<> >(A,u,f);
       check_solve<SolverQMRS<> >(A,u,f);
+
+      // test use_default_residual=false case
+      check_solve<SolverGMRES<> >(A,u,f, typename SolverGMRES<>::AdditionalData(30, false, false));
 
       deallog.pop();
     }

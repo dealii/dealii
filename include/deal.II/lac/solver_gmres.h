@@ -714,13 +714,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
           iteration_state = this->iteration_status (accumulated_iterations, res, x);
 
           if (iteration_state != SolverControl::iterate)
-            {
-              this->memory.free(r);
-              this->memory.free(x_);
-
-              delete gamma_;
-              break;
-            }
+            break;
         }
 
       gamma(0) = rho;
