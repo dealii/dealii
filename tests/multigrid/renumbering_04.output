@@ -1,0 +1,48 @@
+
+DEAL::FESystem<2>[FE_Q<2>(1)-FE_DGQ<2>(0)]
+DEAL::** before:
+DEAL::* level 0
+DEAL::cell 0_0::
+DEAL::0 1 2 3 4 
+DEAL::* level 1
+DEAL::cell 0_1:0:
+DEAL::0 1 2 3 4 
+DEAL::cell 0_1:1:
+DEAL::1 5 3 6 7 
+DEAL::cell 0_1:2:
+DEAL::2 3 8 9 10 
+DEAL::cell 0_1:3:
+DEAL::3 6 9 11 12 
+DEAL::* level 2
+DEAL::cell 0_2:00:
+DEAL::0 1 2 3 4 
+DEAL::cell 0_2:01:
+DEAL::1 5 3 6 7 
+DEAL::cell 0_2:02:
+DEAL::2 3 8 9 10 
+DEAL::cell 0_2:03:
+DEAL::3 6 9 11 12 
+DEAL::
+DEAL::** after:
+DEAL::* level 0
+DEAL::cell 0_0::
+DEAL::0 1 2 3 4 
+DEAL::* level 1
+DEAL::cell 0_1:0:
+DEAL::0 1 2 3 9 
+DEAL::cell 0_1:1:
+DEAL::1 4 3 5 10 
+DEAL::cell 0_1:2:
+DEAL::2 3 6 7 11 
+DEAL::cell 0_1:3:
+DEAL::3 5 7 8 12 
+DEAL::* level 2
+DEAL::cell 0_2:00:
+DEAL::0 1 2 3 9 
+DEAL::cell 0_2:01:
+DEAL::1 4 3 5 10 
+DEAL::cell 0_2:02:
+DEAL::2 3 6 7 11 
+DEAL::cell 0_2:03:
+DEAL::3 5 7 8 12 
+DEAL::OK
