@@ -23,6 +23,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -37,11 +38,9 @@
 using namespace std;
 
 template <int dim>
-void check()
+void check(FiniteElement<dim> &fe)
 {
-  FESystem<dim> fe(FE_Q<dim>(1), 1, FE_DGQ<dim>(0), 1);
-
-  deallog << fe.get_name() << std::endl;
+  deallog << std::endl << "**** " << fe.get_name() << std::endl;
 
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -100,9 +99,26 @@ void check()
 int main()
 {
   initlog(__FILE__);
-  //check<1> ();
-  check<2> ();
-  //check<3> ();
+
+  {
+      FESystem<1> fe(FE_Q<1>(1), 1, FE_DGQ<1>(0), 1);
+      check<1> (fe);
+  }
+
+
+  {
+      FESystem<2> fe(FE_RaviartThomas<2>(0),1, FE_DGQ<2>(0), 1);
+      check<2> (fe);
+  }
+  {
+      FESystem<2> fe(FE_Q<2>(1), 1, FE_DGQ<2>(0), 1);
+      check<2> (fe);
+  }
+
+  {
+      FESystem<3> fe(FE_Q<3>(1), 1, FE_DGQ<3>(0), 1);
+      check<3> (fe);
+  }
 
   deallog << "OK" << endl;
 }
