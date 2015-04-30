@@ -448,8 +448,8 @@ namespace Step43
       a_preconditioner        (Apreconditioner)
     {
       IndexSet tmp_index_set(darcy_matrix->block(1,1).m());
-      tmp_index_set.add_range(0,darcy_matrix->block(1,1).m()); 
-      tmp.reinit(tmp_index_set);
+      tmp_index_set.add_range(0,darcy_matrix->block(1,1).m());
+      tmp.reinit(tmp_index_set, MPI_COMM_WORLD);
     }
 
 
@@ -814,28 +814,29 @@ namespace Step43
     darcy_index_set[1].set_size(n_p);
     darcy_index_set[0].add_range(0,n_u);
     darcy_index_set[1].add_range(0,n_p);
-    darcy_solution.reinit (darcy_index_set);
+    darcy_solution.reinit (darcy_index_set, MPI_COMM_WORLD);
     darcy_solution.collect_sizes ();
 
-    last_computed_darcy_solution.reinit (darcy_index_set);
+    last_computed_darcy_solution.reinit (darcy_index_set, MPI_COMM_WORLD);
     last_computed_darcy_solution.collect_sizes ();
 
-    second_last_computed_darcy_solution.reinit (darcy_index_set);
+    second_last_computed_darcy_solution.reinit (darcy_index_set, MPI_COMM_WORLD);
     second_last_computed_darcy_solution.collect_sizes ();
 
-    darcy_rhs.reinit (darcy_index_set);
+    darcy_rhs.reinit (darcy_index_set, MPI_COMM_WORLD);
     darcy_rhs.collect_sizes ();
 
     saturation_index_set.clear();
     saturation_index_set.set_size(n_s);
     saturation_index_set.add_range(0,n_s);
-    saturation_solution.reinit (saturation_index_set);
-    old_saturation_solution.reinit (saturation_index_set);
-    old_old_saturation_solution.reinit (saturation_index_set);
+    saturation_solution.reinit (saturation_index_set, MPI_COMM_WORLD);
+    old_saturation_solution.reinit (saturation_index_set, MPI_COMM_WORLD);
+    old_old_saturation_solution.reinit (saturation_index_set, MPI_COMM_WORLD);
 
-    saturation_matching_last_computed_darcy_solution.reinit (saturation_index_set);
+    saturation_matching_last_computed_darcy_solution.reinit (saturation_index_set,
+                                                             MPI_COMM_WORLD);
 
-    saturation_rhs.reinit (saturation_index_set);
+    saturation_rhs.reinit (saturation_index_set, MPI_COMM_WORLD);
   }
 
 
@@ -2259,6 +2260,12 @@ int main (int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
                                                            numbers::invalid_unsigned_int);
+
+      // This program can only be run in serial. Otherwise, throw an exception.
+      int size;
+      MPI_Comm_size(MPI_COMM_WORLD,&size);
+      AssertThrow(size==1, ExcMessage("This program can only be run in serial,"
+                                      " use mpirun -np 1 ./step-43"));
 
       TwoPhaseFlowProblem<2> two_phase_flow_problem(1);
       two_phase_flow_problem.run ();

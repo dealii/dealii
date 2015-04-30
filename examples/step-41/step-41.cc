@@ -258,10 +258,10 @@ namespace Step41
 
     solution_index_set.set_size(dof_handler.n_dofs());
     solution_index_set.add_range(0, dof_handler.n_dofs());
-    solution.reinit (solution_index_set);
-    system_rhs.reinit (solution_index_set);
-    complete_system_rhs.reinit (solution_index_set);
-    contact_force.reinit (solution_index_set);
+    solution.reinit (solution_index_set, MPI_COMM_WORLD);
+    system_rhs.reinit (solution_index_set, MPI_COMM_WORLD);
+    complete_system_rhs.reinit (solution_index_set, MPI_COMM_WORLD);
+    contact_force.reinit (solution_index_set, MPI_COMM_WORLD);
 
     // The only other thing to do here is to compute the factors in the $B$
     // matrix which is used to scale the residual. As discussed in the
@@ -673,6 +673,12 @@ int main (int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
                                                            numbers::invalid_unsigned_int);
+
+      // This program can only be run in serial. Otherwise, throw an exception.
+      int size;
+      MPI_Comm_size(MPI_COMM_WORLD,&size);
+      AssertThrow(size==1, ExcMessage("This program can only be run in serial,"
+                                      " use mpirun -np 1 ./step-41"));
 
       ObstacleProblem<2> obstacle_problem;
       obstacle_problem.run ();

@@ -197,10 +197,10 @@ namespace Step36
     // The next step is to take care of the eigenspectrum. In this case, the
     // outputs are eigenvalues and eigenfunctions, so we set the size of the
     // list of eigenfunctions and eigenvalues to be as large as we asked for
-    // in the input file. When using a PETScWrappers::MPI::Vector, the Vector 
+    // in the input file. When using a PETScWrappers::MPI::Vector, the Vector
     // is initialized using an IndexSet. IndexSet is used not only to resize the
-    // PETScWrappers::MPI::Vector but it also associates an index in the 
-    // PETScWrappers::MPI::Vector with a degree of freedom (see step-40 for a 
+    // PETScWrappers::MPI::Vector but it also associates an index in the
+    // PETScWrappers::MPI::Vector with a degree of freedom (see step-40 for a
     // more detailed explanation). This assocation is done by the add_range()
     // function:
     IndexSet eigenfunction_index_set(dof_handler.n_dofs ());
@@ -476,6 +476,13 @@ int main (int argc, char **argv)
       using namespace Step36;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+
+      // This program can only be run in serial. Otherwise, throw an exception.
+      int size;
+      MPI_Comm_size(MPI_COMM_WORLD,&size);
+      AssertThrow(size==1, ExcMessage("This program can only be run in serial,"
+                                      " use mpirun -np 1 ./step-36"));
+
       {
         deallog.depth_console (0);
 

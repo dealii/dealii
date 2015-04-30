@@ -413,7 +413,7 @@ namespace Step31
       // function.
       IndexSet tmp_index_set(stokes_matrix->block(1,1).m());
       tmp_index_set.add_range(0,stokes_matrix->block(1,1).m());
-      tmp.reinit(tmp_index_set);
+      tmp.reinit(tmp_index_set, MPI_COMM_WORLD);
     }
 
 
@@ -1056,15 +1056,15 @@ namespace Step31
     // right hand sides to their correct sizes and block structure:
     IndexSet temperature_partitioning (n_T);
     temperature_partitioning.add_range(0,n_T);
-    stokes_solution.reinit (stokes_block_sizes);
-    old_stokes_solution.reinit (stokes_block_sizes);
-    stokes_rhs.reinit (stokes_block_sizes);
+    stokes_solution.reinit (stokes_block_sizes, MPI_COMM_WORLD);
+    old_stokes_solution.reinit (stokes_block_sizes, MPI_COMM_WORLD);
+    stokes_rhs.reinit (stokes_block_sizes, MPI_COMM_WORLD);
 
-    temperature_solution.reinit (temperature_partitioning);
-    old_temperature_solution.reinit (temperature_partitioning);
-    old_old_temperature_solution.reinit (temperature_partitioning);
+    temperature_solution.reinit (temperature_partitioning, MPI_COMM_WORLD);
+    old_temperature_solution.reinit (temperature_partitioning, MPI_COMM_WORLD);
+    old_old_temperature_solution.reinit (temperature_partitioning, MPI_COMM_WORLD);
 
-    temperature_rhs.reinit (temperature_partitioning);
+    temperature_rhs.reinit (temperature_partitioning, MPI_COMM_WORLD);
   }
 
 
@@ -2217,6 +2217,12 @@ int main (int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
                                                            numbers::invalid_unsigned_int);
+
+      // This program can only be run in serial. Otherwise, throw an exception.
+      int size;
+      MPI_Comm_size(MPI_COMM_WORLD,&size);
+      AssertThrow(size==1, ExcMessage("This program can only be run in serial,"
+                                      " use mpirun -np 1 ./step-31"));
 
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();
