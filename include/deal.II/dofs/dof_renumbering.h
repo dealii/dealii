@@ -614,9 +614,8 @@ namespace DoFRenumbering
 
   /**
    * Sort the degrees of freedom by component. It does the same thing as the
-   * above function, only that it does this for one single level of a multi-
-   * level discretization. The non-multigrid part of the the DoFHandler is not
-   * touched.
+   * above function, only that it does this for one single level of a multilevel
+   * discretization. The non-multigrid part of the the DoFHandler is not touched.
    */
   template <class DH>
   void
@@ -657,6 +656,14 @@ namespace DoFRenumbering
   void
   block_wise (DoFHandler<dim,spacedim> &dof_handler);
 
+  /**
+   * Sort the degrees of freedom by vector block. It does the same thing as the
+   * above function, only that it does this for one single level of a multilevel
+   * discretization. The non-multigrid part of the the DoFHandler is not touched.
+   */
+  template <int dim, int spacedim>
+  void
+  block_wise (DoFHandler<dim,spacedim> &dof_handler, const unsigned int level);
 
   /**
    * Sort the degrees of freedom by block. It does the same thing as the above
@@ -674,9 +681,9 @@ namespace DoFRenumbering
    * number of blocks and that subsequent blocks in one element have the same
    * meaning as in another element.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  block_wise (hp::DoFHandler<dim> &dof_handler);
+  block_wise (hp::DoFHandler<dim,spacedim> &dof_handler);
 
   /**
    * Computes the renumbering vector needed by the block_wise() functions.
@@ -687,7 +694,8 @@ namespace DoFRenumbering
   types::global_dof_index
   compute_block_wise (std::vector<types::global_dof_index> &new_dof_indices,
                       const ITERATOR &start,
-                      const ENDITERATOR &end);
+                      const ENDITERATOR &end,
+                      bool is_level_operation);
 
   /**
    * @}

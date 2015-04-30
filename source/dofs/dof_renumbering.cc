@@ -677,16 +677,14 @@ namespace DoFRenumbering
         if (is_level_operation)
           {
             //we are dealing with mg dofs, skip foreign level cells:
-            if ((start->get_dof_handler().get_tria().locally_owned_subdomain() != numbers::invalid_subdomain_id)
-                &&
-                (cell->level_subdomain_id()!=start->get_dof_handler().get_tria().locally_owned_subdomain()))
+            if (!cell->is_locally_owned_on_level())
               continue;
           }
         else
           {
             //we are dealing with active dofs, skip the loop if not locally
             // owned:
-            if (!cell->active() || !cell->is_locally_owned())
+            if (!cell->is_locally_owned())
               continue;
           }
         // on each cell: get dof indices
@@ -841,7 +839,7 @@ namespace DoFRenumbering
     const types::global_dof_index result =
       compute_block_wise<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator,
       typename DoFHandler<dim,spacedim>::level_cell_iterator>
-      (renumbering, start, end);
+      (renumbering, start, end, false);
     if (result == 0)
       return;
 
@@ -864,22 +862,22 @@ namespace DoFRenumbering
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  block_wise (hp::DoFHandler<dim> &dof_handler)
+  block_wise (hp::DoFHandler<dim,spacedim> &dof_handler)
   {
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(),
-                                                      hp::DoFHandler<dim>::invalid_dof_index);
+                                                      hp::DoFHandler<dim,spacedim>::invalid_dof_index);
 
-    typename hp::DoFHandler<dim>::active_cell_iterator
+    typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
     start = dof_handler.begin_active();
-    const typename hp::DoFHandler<dim>::level_cell_iterator
+    const typename hp::DoFHandler<dim,spacedim>::level_cell_iterator
     end = dof_handler.end();
 
     const types::global_dof_index result =
-      compute_block_wise<dim, dim, typename hp::DoFHandler<dim>::active_cell_iterator,
-      typename hp::DoFHandler<dim>::level_cell_iterator>(renumbering,
-                                                         start, end);
+      compute_block_wise<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator,
+      typename hp::DoFHandler<dim,spacedim>::level_cell_iterator>(renumbering,
+          start, end, false);
 
     if (result == 0)
       return;
@@ -892,25 +890,25 @@ namespace DoFRenumbering
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  block_wise (DoFHandler<dim> &dof_handler, const unsigned int level)
+  block_wise (DoFHandler<dim,spacedim> &dof_handler, const unsigned int level)
   {
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(level),
-                                                      DoFHandler<dim>::invalid_dof_index);
+                                                      DoFHandler<dim, spacedim>::invalid_dof_index);
 
-    typename DoFHandler<dim>::level_cell_iterator
+    typename DoFHandler<dim, spacedim>::level_cell_iterator
     start =dof_handler.begin(level);
-    typename DoFHandler<dim>::level_cell_iterator
+    typename DoFHandler<dim, spacedim>::level_cell_iterator
     end = dof_handler.end(level);
 
     const types::global_dof_index result =
-      compute_block_wise<dim, dim, typename DoFHandler<dim>::level_cell_iterator,
-      typename DoFHandler<dim>::level_cell_iterator>(
-        renumbering, start, end);
+      compute_block_wise<dim, spacedim, typename DoFHandler<dim, spacedim>::level_cell_iterator,
+      typename DoFHandler<dim, spacedim>::level_cell_iterator>(
+        renumbering, start, end, true);
 
     if (result == 0) return;
 
@@ -927,7 +925,8 @@ namespace DoFRenumbering
   types::global_dof_index
   compute_block_wise (std::vector<types::global_dof_index> &new_indices,
                       const ITERATOR    &start,
-                      const ENDITERATOR &end)
+                      const ENDITERATOR &end,
+                      const bool is_level_operation)
   {
     const hp::FECollection<dim,spacedim>
     fe_collection (start->get_dof_handler().get_fe ());
@@ -971,20 +970,33 @@ namespace DoFRenumbering
     std::vector<std::vector<types::global_dof_index> >
     block_to_dof_map (fe_collection.n_blocks());
     for (ITERATOR cell=start; cell!=end; ++cell)
-      if (cell->is_locally_owned())
-        {
-          // on each cell: get dof indices
-          // and insert them into the global
-          // list using their component
-          const unsigned int fe_index = cell->active_fe_index();
-          const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
-          local_dof_indices.resize (dofs_per_cell);
-          cell->get_active_or_mg_dof_indices (local_dof_indices);
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
-              block_to_dof_map[block_list[fe_index][i]].
-              push_back (local_dof_indices[i]);
-        }
+      {
+        if (is_level_operation)
+          {
+            //we are dealing with mg dofs, skip foreign level cells:
+            if (!cell->is_locally_owned_on_level())
+              continue;
+          }
+        else
+          {
+            //we are dealing with active dofs, skip the loop if not locally
+            // owned:
+            if (!cell->is_locally_owned())
+              continue;
+          }
+
+        // on each cell: get dof indices
+        // and insert them into the global
+        // list using their component
+        const unsigned int fe_index = cell->active_fe_index();
+        const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
+        local_dof_indices.resize (dofs_per_cell);
+        cell->get_active_or_mg_dof_indices (local_dof_indices);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
+            block_to_dof_map[block_list[fe_index][i]].
+            push_back (local_dof_indices[i]);
+      }
 
     // now we've got all indices sorted
     // into buckets labeled by their

@@ -472,6 +472,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: Introduce DoFRenumbering::block_wise for multigrid computation.
+  <br>
+  (Timo Heister, Florian Sonner, 2015/04/30)
+  </li>
+  
   <li> New: There are now MPI sum functions for Tensors and SymmetricTensors
   in the Utilities::MPI namespace.
   <br>
