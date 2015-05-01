@@ -723,6 +723,34 @@ namespace internal
 namespace
 {
   // A trait class that determines whether type T provides public
+  // (templated or non-templated) vmult and Tvmult member functions
+
+  template <typename Range, typename Domain, typename T>
+  class has_vmult
+  {
+    template <typename C>
+    static std::false_type test(...);
+
+    template <typename C>
+    static std::true_type test(decltype(&C::vmult),
+                               decltype(&C::Tvmult));
+
+    template <typename C>
+    static std::true_type test(decltype(&C::template vmult<Range>),
+                               decltype(&C::template Tvmult<Range>));
+
+    template <typename C>
+    static std::true_type test(decltype(&C::template vmult<Range, Domain>),
+                               decltype(&C::template Tvmult<Domain, Range>));
+
+  public:
+    // type is std::true_type if Matrix provides vmult and Tvmult,
+    // otherwise it is std::false_type
+
+    typedef decltype(test<T>(0, 0)) type;
+  };
+
+  // A trait class that determines whether type T provides public
   // (templated or non-templated) vmult_add and Tvmult_add member functions
 
   template <typename Range, typename Domain, typename T>
@@ -944,6 +972,94 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
                 operator()(return_op, matrix);
 
   return return_op;
+}
+
+
+/**
+ * @relates LinearOperator
+ *
+ * Create a LinearOperator by multiplying two matrix objects that are
+ * compatible with Vector<double>. If other vector types are desired,
+ * explicitly wrap the matrices with linear_operator.
+ *
+ * The LinearOperator object that is created stores references to
+ * @p first_matrix and @p second_matrix. Thus, both objects must remain a valid
+ * reference for the whole lifetime of the LinearOperator object, see the
+ * documentation of linear_operator.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Matrix1,
+          typename Matrix2,
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>>, Matrix1>::value>::type,
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>>, Matrix2>::value>::type,
+          typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix1>::type::value>::type,
+          typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix2>::type::value>::type
+         >
+LinearOperator<Vector<double>, Vector<double>>
+operator*(const Matrix1 &first_matrix,
+          const Matrix2 &second_matrix)
+{
+  return linear_operator<Vector<double>>(first_matrix) *
+         linear_operator<Vector<double>>(second_matrix);
+}
+
+
+/**
+ * @relates LinearOperator
+ *
+ * Create a LinearOperator by multiplying a LinearOperator with a
+ * compatible matrix. The Domain type of the resulting LinearOperator is
+ * set to Vector<double>. If other vector types are
+ * desired, explicitly wrap the matrix with linear_operator.
+ *
+ * The LinearOperator object that is created stores references to
+ * @p matrix. Thus, both @p matrix must remain a valid reference for the whole
+ * lifetime of the LinearOperator object, see the documentation of
+ * linear_operator.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range,
+          typename Intermediate,
+          typename Matrix,
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>>, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix>::type::value>::type
+         >
+LinearOperator<Range, Vector<double>>
+operator*(const LinearOperator<Range, Intermediate> &op,
+          const Matrix &matrix)
+{
+  return op * linear_operator<Intermediate, Vector<double>>(matrix);
+}
+
+
+/**
+ * @relates LinearOperator
+ *
+ * Create a LinearOperator by multiplying a compatible matrix with a
+ * LinearOperator. The Range type of the resulting LinearOperator is set to
+ * Vector<double>. If other vector types are desired, explicitly wrap the
+ * matrix with linear_operator.
+ *
+ * The LinearOperator object that is created stores references to
+ * @p matrix. Thus, both @p matrix must remain a valid reference for the whole
+ * lifetime of the LinearOperator object, see the documentation of
+ * linear_operator.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Intermediate,
+          typename Domain,
+          typename Matrix,
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>>, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix>::type::value>::type
+         >
+LinearOperator<Vector<double>, Domain>
+operator*(const Matrix &matrix,
+          const LinearOperator<Intermediate, Domain> &op)
+{
+  return linear_operator<Vector<double>, Intermediate>(matrix) * op;
 }
 
 //@}
