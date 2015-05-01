@@ -128,7 +128,22 @@ namespace TrilinosWrappers
        * Copy-Constructor. Set all the properties of the parallel vector to
        * those of the given argument and copy the elements.
        */
-      BlockVector (const BlockVector  &V);
+      BlockVector (const BlockVector  &v);
+
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move constructor. Creates a new vector by stealing the internal data
+       * of the vector @p v.
+       *
+       * @note This constructor is only available if deal.II is configured with
+       * C++11 support.
+       */
+      BlockVector (BlockVector &&v)
+      {
+        swap(v);
+        v.reinit (0);
+      }
+#endif
 
       /**
        * Creates a block vector consisting of <tt>num_blocks</tt> components,
@@ -146,20 +161,37 @@ namespace TrilinosWrappers
        * Copy operator: fill all components of the vector that are locally
        * stored with the given scalar value.
        */
-      BlockVector &
-      operator = (const value_type s);
+      BlockVector &operator= (const value_type s);
 
       /**
        * Copy operator for arguments of the same type.
        */
-      BlockVector &
-      operator = (const BlockVector &V);
+      BlockVector &operator= (const BlockVector &v);
+
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move the given vector. This operator replaces the present vector with
+       * @p v by efficiently swapping the internal data structures. @p v is
+       * left empty.
+       *
+       * @note This operator is only available if deal.II is configured with
+       * C++11 support.
+       */
+      BlockVector &operator= (BlockVector &&v)
+      {
+        swap(v);
+        // be nice and reset v to zero
+        v.reinit (0);
+
+        return *this;
+      }
+#endif
 
       /**
        * Copy operator for arguments of the localized Trilinos vector type.
        */
       BlockVector &
-      operator = (const ::dealii::TrilinosWrappers::BlockVector &V);
+      operator= (const ::dealii::TrilinosWrappers::BlockVector &v);
 
       /**
        * Another copy function. This one takes a deal.II block vector and
@@ -172,8 +204,7 @@ namespace TrilinosWrappers
        * accept only one possible number type in the deal.II vector.
        */
       template <typename Number>
-      BlockVector &
-      operator = (const ::dealii::BlockVector<Number> &V);
+      BlockVector &operator= (const ::dealii::BlockVector<Number> &v);
 
       /**
        * Reinitialize the BlockVector to contain as many blocks as there are
@@ -400,7 +431,7 @@ namespace TrilinosWrappers
 
     template <typename Number>
     BlockVector &
-    BlockVector::operator = (const ::dealii::BlockVector<Number> &v)
+    BlockVector::operator= (const ::dealii::BlockVector<Number> &v)
     {
       if (n_blocks() != v.n_blocks())
         {

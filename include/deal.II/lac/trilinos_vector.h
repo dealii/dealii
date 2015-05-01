@@ -284,7 +284,23 @@ namespace TrilinosWrappers
       /**
        * Copy constructor using the given vector.
        */
-      Vector (const Vector &V);
+      Vector (const Vector &v);
+
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move constructor. Creates a new vector by stealing the internal data
+       * of the vector @p v.
+       *
+       * @note This constructor is only available if deal.II is configured with
+       * C++11 support.
+       */
+      Vector (Vector &&v)
+      {
+        swap(v);
+        // be nice and reset v to zero
+        v.clear();
+      }
+#endif
 
       /**
        * Destructor.
@@ -326,15 +342,33 @@ namespace TrilinosWrappers
        * function to make the example given in the discussion about making the
        * constructor explicit work.
        */
-      Vector &operator = (const TrilinosScalar s);
+      Vector &operator= (const TrilinosScalar s);
 
       /**
        * Copy the given vector. Resize the present vector if necessary. In
        * this case, also the Epetra_Map that designs the parallel partitioning
        * is taken from the input vector.
        */
-      Vector &
-      operator = (const Vector &V);
+      Vector &operator= (const Vector &v);
+
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move the given vector. This operator replaces the present vector with
+       * @p v by efficiently swapping the internal data structures. @p v is
+       * left empty.
+       *
+       * @note This operator is only available if deal.II is configured with
+       * C++11 support.
+       */
+      Vector &operator= (Vector &&v)
+      {
+        swap(v);
+        // be nice and reset v to zero
+        v.clear();
+
+        return *this;
+      }
+#endif
 
       /**
        * Copy operator from a given localized vector (present on all
@@ -343,8 +377,7 @@ namespace TrilinosWrappers
        * object) already is of the same size as the right hand side vector.
        * Otherwise, an exception will be thrown.
        */
-      Vector &
-      operator = (const ::dealii::TrilinosWrappers::Vector &V);
+      Vector &operator= (const ::dealii::TrilinosWrappers::Vector &v);
 
       /**
        * Another copy function. This one takes a deal.II vector and copies it
@@ -355,8 +388,7 @@ namespace TrilinosWrappers
        * the reinit(const Epetra_Map &input_map) function.
        */
       template <typename Number>
-      Vector &
-      operator = (const ::dealii::Vector<Number> &v);
+      Vector &operator= (const ::dealii::Vector<Number> &v);
 
       /**
        * This reinit function is meant to be used for parallel calculations
@@ -649,9 +681,9 @@ namespace TrilinosWrappers
 
     inline
     Vector &
-    Vector::operator = (const TrilinosScalar s)
+    Vector::operator= (const TrilinosScalar s)
     {
-      VectorBase::operator = (s);
+      VectorBase::operator= (s);
 
       return *this;
     }
@@ -659,7 +691,7 @@ namespace TrilinosWrappers
 
     template <typename Number>
     Vector &
-    Vector::operator = (const ::dealii::Vector<Number> &v)
+    Vector::operator= (const ::dealii::Vector<Number> &v)
     {
       if (size() != v.size())
         {
@@ -678,7 +710,7 @@ namespace TrilinosWrappers
     }
 
 
-#endif
+#endif /* DOXYGEN */
 
   } /* end of namespace MPI */
 
@@ -817,28 +849,25 @@ namespace TrilinosWrappers
      * to make the example given in the discussion about making the
      * constructor explicit work.
      */
-    Vector &operator = (const TrilinosScalar s);
+    Vector &operator= (const TrilinosScalar s);
 
     /**
      * Sets the left hand argument to the (parallel) Trilinos Vector.
      * Equivalent to the @p reinit function.
      */
-    Vector &
-    operator = (const MPI::Vector &V);
+    Vector &operator= (const MPI::Vector &v);
 
     /**
      * Sets the left hand argument to the deal.II vector.
      */
     template <typename Number>
-    Vector &
-    operator = (const ::dealii::Vector<Number> &V);
+    Vector &operator= (const ::dealii::Vector<Number> &v);
 
     /**
      * Copy operator. Copies both the dimension and the content in the right
      * hand argument.
      */
-    Vector &
-    operator = (const Vector &V);
+    Vector &operator= (const Vector &v);
 
     /**
      * This function does nothing but is there for compatibility with the @p
@@ -888,9 +917,9 @@ namespace TrilinosWrappers
 
   inline
   Vector &
-  Vector::operator = (const TrilinosScalar s)
+  Vector::operator= (const TrilinosScalar s)
   {
-    VectorBase::operator = (s);
+    VectorBase::operator= (s);
 
     return *this;
   }
@@ -899,7 +928,7 @@ namespace TrilinosWrappers
 
   template <typename Number>
   Vector &
-  Vector::operator = (const ::dealii::Vector<Number> &v)
+  Vector::operator= (const ::dealii::Vector<Number> &v)
   {
     if (size() != v.size())
       {
