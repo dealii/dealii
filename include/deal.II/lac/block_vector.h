@@ -99,10 +99,22 @@ public:
                         const size_type block_size = 0);
 
   /**
-   * Copy-Constructor. Dimension set to that of V, all components are copied
-   * from V
+   * Copy Constructor. Dimension set to that of @p v, all components are
+   * copied from @p v.
    */
   BlockVector (const BlockVector<Number> &V);
+
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor. Creates a new vector by stealing the internal data
+   * of the vector @p v.
+   *
+   * @note This constructor is only available if deal.II is configured with
+   * C++11 support.
+   */
+  BlockVector (BlockVector<Number> &&v);
+#endif
 
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
@@ -180,27 +192,39 @@ public:
    * Copy operator: fill all components of the vector with the given scalar
    * value.
    */
-  BlockVector &operator = (const value_type s);
+  BlockVector &operator= (const value_type s);
 
   /**
    * Copy operator for arguments of the same type. Resize the present vector
    * if necessary.
    */
-  BlockVector &
-  operator= (const BlockVector &V);
+  BlockVector<Number> &
+  operator= (const BlockVector<Number> &v);
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move the given vector. This operator replaces the present vector with
+   * @p v by efficiently swapping the internal data structures. @p v is
+   * left empty.
+   *
+   * @note This operator is only available if deal.II is configured with
+   * C++11 support.
+   */
+  BlockVector<Number> &operator= (BlockVector<Number> &&v);
+#endif
 
   /**
    * Copy operator for template arguments of different types. Resize the
    * present vector if necessary.
    */
   template <class Number2>
-  BlockVector &
+  BlockVector<Number> &
   operator= (const BlockVector<Number2> &V);
 
   /**
    * Copy a regular vector into a block vector.
    */
-  BlockVector &
+  BlockVector<Number> &
   operator= (const Vector<Number> &V);
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -208,9 +232,10 @@ public:
    * A copy constructor from a Trilinos block vector to a deal.II block
    * vector.
    */
-  BlockVector &
+  BlockVector<Number> &
   operator= (const TrilinosWrappers::BlockVector &V);
 #endif
+
   /**
    * Reinitialize the BlockVector to contain <tt>n_blocks</tt> blocks of size
    * <tt>block_size</tt> each.
@@ -378,12 +403,12 @@ BlockVector<Number>::BlockVector (const std::vector<size_type>    &block_sizes,
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator = (const value_type s)
+BlockVector<Number>::operator= (const value_type s)
 {
 
   AssertIsFinite(s);
 
-  BaseClass::operator = (s);
+  BaseClass::operator= (s);
   return *this;
 }
 
@@ -392,21 +417,37 @@ BlockVector<Number>::operator = (const value_type s)
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator = (const BlockVector &v)
+BlockVector<Number>::operator= (const BlockVector<Number> &v)
 {
   reinit (v, true);
-  BaseClass::operator = (v);
+  BaseClass::operator= (v);
   return *this;
 }
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+template <typename Number>
+inline
+BlockVector<Number> &
+BlockVector<Number>::operator= (BlockVector<Number> &&v)
+{
+  swap(v);
+  // be nice and reset v to zero
+  v.reinit(0, 0, false);
+
+  return *this;
+}
+#endif
 
 
 
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator = (const Vector<Number> &v)
+BlockVector<Number>::operator= (const Vector<Number> &v)
 {
-  BaseClass::operator = (v);
+  BaseClass::operator= (v);
   return *this;
 }
 
@@ -416,10 +457,10 @@ template <typename Number>
 template <typename Number2>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator = (const BlockVector<Number2> &v)
+BlockVector<Number>::operator= (const BlockVector<Number2> &v)
 {
   reinit (v, true);
-  BaseClass::operator = (v);
+  BaseClass::operator= (v);
   return *this;
 }
 

@@ -156,13 +156,24 @@ public:
   Vector ();
 
   /**
-   * Copy-constructor. Sets the dimension to that of the given vector, and
+   * Copy constructor. Sets the dimension to that of the given vector, and
    * copies all elements.
    *
    * We would like to make this constructor explicit, but standard containers
    * insist on using it implicitly.
    */
   Vector (const Vector<Number> &v);
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move constructor. Creates a new vector by stealing the internal data
+   * of the vector @p v.
+   *
+   * @note This constructor is only available if deal.II is configured with
+   * C++11 support.
+   */
+  Vector (Vector<Number> &&v);
+#endif
 
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
@@ -325,7 +336,7 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
-  Vector<Number> &operator = (const Number s);
+  Vector<Number> &operator= (const Number s);
 
   /**
    * Copy the given vector. Resize the present vector if necessary.
@@ -333,6 +344,18 @@ public:
    * @dealiiOperationIsMultithreaded
    */
   Vector<Number> &operator= (const Vector<Number> &v);
+
+#ifdef DEAL_II_WITH_CXX11
+  /**
+   * Move the given vector. This operator replaces the present vector with
+   * @p v by efficiently swapping the internal data structures. @p v is
+   * left empty.
+   *
+   * @note This operator is only available if deal.II is configured with
+   * C++11 support.
+   */
+  Vector<Number> &operator= (Vector<Number> &&v);
+#endif
 
   /**
    * Copy the given vector. Resize the present vector if necessary.
@@ -354,7 +377,7 @@ public:
    * during configuration time.
    */
   Vector<Number> &
-  operator = (const PETScWrappers::Vector &v);
+  operator= (const PETScWrappers::Vector &v);
 
   /**
    * Another copy operator: copy the values from a parallel PETSc wrapper
@@ -367,7 +390,7 @@ public:
    * the other jobs do something else.
    */
   Vector<Number> &
-  operator = (const PETScWrappers::MPI::Vector &v);
+  operator= (const PETScWrappers::MPI::Vector &v);
 #endif
 
 
@@ -384,7 +407,7 @@ public:
    * the other jobs do something else.
    */
   Vector<Number> &
-  operator = (const TrilinosWrappers::MPI::Vector &v);
+  operator= (const TrilinosWrappers::MPI::Vector &v);
 
   /**
    * Another copy operator: copy the values from a sequential Trilinos wrapper
@@ -392,7 +415,7 @@ public:
    * during configuration time.
    */
   Vector<Number> &
-  operator = (const TrilinosWrappers::Vector &v);
+  operator= (const TrilinosWrappers::Vector &v);
 #endif
 
   /**
@@ -401,7 +424,7 @@ public:
    * of different sizes makes not much sense anyway.
    */
   template <typename Number2>
-  bool operator == (const Vector<Number2> &v) const;
+  bool operator== (const Vector<Number2> &v) const;
 
   /**
    * Test for inequality. This function assumes that the present vector and
@@ -1077,7 +1100,7 @@ namespace internal
 template <typename Number>
 inline
 Vector<Number> &
-Vector<Number>::operator = (const Vector<Number> &v)
+Vector<Number>::operator= (const Vector<Number> &v)
 {
   dealii::internal::Vector::copy_vector (v, *this);
   return *this;
@@ -1085,11 +1108,27 @@ Vector<Number>::operator = (const Vector<Number> &v)
 
 
 
+#ifdef DEAL_II_WITH_CXX11
+template <typename Number>
+inline
+Vector<Number> &
+Vector<Number>::operator= (Vector<Number> &&v)
+{
+  swap(v);
+  // be nice and reset v to zero
+  v.reinit(0, false);
+
+  return *this;
+}
+#endif
+
+
+
 template <typename Number>
 template <typename Number2>
 inline
 Vector<Number> &
-Vector<Number>::operator = (const Vector<Number2> &v)
+Vector<Number>::operator= (const Vector<Number2> &v)
 {
   internal::Vector::copy_vector (v, *this);
   return *this;
@@ -1333,7 +1372,7 @@ void
 Vector<Number>::save (Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
-  ar   &static_cast<const Subscriptor &>(*this);
+  ar &static_cast<const Subscriptor &>(*this);
 
   ar &vec_size &max_vec_size ;
   ar &boost::serialization::make_array(val, max_vec_size);
