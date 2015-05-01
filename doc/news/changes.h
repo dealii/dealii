@@ -38,6 +38,11 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li>Changed: The ArpackSolver::solve() interface takes different arguments.
+  <br>
+  (Guido Kanschat, Matthias Maier, 2015/05/01)
+  </li>
+
   <li>Removed: The generic, templated vmult, Tvmult, etc. -interfaces of
   LAPACKFullMatrix - they were never implemented.
   <br>
@@ -472,6 +477,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li>Fixed: A number of issues with the ArpackSolver class have been
+  resolved. It now computes correct eigenvectors, has a compatible
+  interface with LinearOperator, and a rewritten implementation
+  <br>
+  (Guido Kanschat, Matthias Maier, 2015/05/01)
+  </li>
+
   <li> New: Introduce DoFRenumbering::block_wise for multigrid computation.
   <br>
   (Timo Heister, Florian Sonner, 2015/04/30)
