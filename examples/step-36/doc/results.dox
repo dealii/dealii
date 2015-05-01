@@ -258,19 +258,15 @@ For solving the eigenvalue problem with ARPACK, we finally need to modify
     SparseDirectUMFPACK inverse;
     inverse.initialize (stiffness_matrix);
 
-    const unsigned int num_arnoldi_vectors = 2*eigenvalues.size() + 2;
-    ArpackSolver::AdditionalData additional_data(num_arnoldi_vectors);
-
-    ArpackSolver eigensolver (solver_control, additional_data);
-    eigensolver.solve (stiffness_matrix,
-                       mass_matrix,
+    ArpackSolver eigensolver (solver_control);
+    eigensolver.solve (mass_matrix,
                        inverse,
                        eigenvalues,
-                       eigenfunctions,
-                       eigenvalues.size());
+                       eigenfunctions);
 
     for (unsigned int i=0; i<eigenfunctions.size(); ++i)
-      eigenfunctions[i] /= eigenfunctions[i].linfty_norm ();
+      if (eigenfunctions[i].linfty_norm () != 0)
+        eigenfunctions[i] /= eigenfunctions[i].linfty_norm ();
 
     return solver_control.last_step ();
   }
