@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -100,10 +100,26 @@ namespace PETScWrappers
                             const size_type     local_size);
 
       /**
-       * Copy-Constructor. Set all the properties of the parallel vector to
+       * Copy constructor. Set all the properties of the parallel vector to
        * those of the given argument and copy the elements.
        */
       BlockVector (const BlockVector  &V);
+
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move constructor. Creates a new vector by stealing the internal data
+       * of the vector @p v.
+       *
+       * @note This operator is only available if deal.II is configured with
+       * C++11 support.
+       */
+      BlockVector (BlockVector &&v)
+      {
+        swap(v);
+        // be nice and reset v to zero
+        v.reinit(0, v.get_mpi_communicator(), 0, 0, false);
+      }
+#endif
 
       /**
        * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>
@@ -141,13 +157,32 @@ namespace PETScWrappers
        * Copy operator: fill all components of the vector that are locally
        * stored with the given scalar value.
        */
-      BlockVector &operator = (const value_type s);
+      BlockVector &operator= (const value_type s);
 
       /**
        * Copy operator for arguments of the same type.
        */
       BlockVector &
       operator= (const BlockVector &V);
+
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move the given vector. This operator replaces the present vector with
+       * @p v by efficiently swapping the internal data structures. @p v is
+       * left empty.
+       *
+       * @note This operator is only available if deal.II is configured with
+       * C++11 support.
+       */
+      BlockVector &operator= (BlockVector &&v)
+      {
+        swap(v);
+        // be nice and reset v to zero
+        v.reinit(0, v.get_mpi_communicator(), 0, 0, false);
+
+        return *this;
+      }
+#endif
 
       /**
        * Copy the given sequential (non-distributed) block vector into the
@@ -166,7 +201,7 @@ namespace PETScWrappers
        * independent of what other processes do, with this function.
        */
       BlockVector &
-      operator = (const PETScWrappers::BlockVector &v);
+      operator= (const PETScWrappers::BlockVector &v);
 
       /**
        * Reinitialize the BlockVector to contain @p n_blocks of size @p
@@ -353,15 +388,15 @@ namespace PETScWrappers
 
     inline
     BlockVector &
-    BlockVector::operator = (const value_type s)
+    BlockVector::operator= (const value_type s)
     {
-      BaseClass::operator = (s);
+      BaseClass::operator= (s);
       return *this;
     }
 
     inline
     BlockVector &
-    BlockVector::operator = (const BlockVector &v)
+    BlockVector::operator= (const BlockVector &v)
     {
       // we only allow assignment to vectors with the same number of blocks
       // or to an empty BlockVector
