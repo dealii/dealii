@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2009 - 2014 by the deal.II authors
+ * Copyright (C) 2009 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -68,7 +68,7 @@ namespace Step36
   private:
     void make_grid_and_dofs ();
     void assemble_system ();
-    std::pair<unsigned int, double> solve ();
+    void solve ();
     void output_results () const;
 
     Triangulation<dim> triangulation;
@@ -114,11 +114,11 @@ namespace Step36
     stiffness_matrix.reinit (sparsity_pattern);
     mass_matrix.reinit (sparsity_pattern);
 
-    eigenfunctions.resize (8);
+    eigenfunctions.resize (16);
     for (unsigned int i=0; i<eigenfunctions.size (); ++i)
       eigenfunctions[i].reinit (dof_handler.n_dofs ());
 
-    eigenvalues.resize (eigenfunctions.size ());
+    eigenvalues.resize (8);
   }
 
 
@@ -210,27 +210,23 @@ namespace Step36
 
 
   template <int dim>
-  std::pair<unsigned int, double> EigenvalueProblem<dim>::solve ()
+  void EigenvalueProblem<dim>::solve ()
   {
     SolverControl solver_control (dof_handler.n_dofs(), 1e-9);
     SparseDirectUMFPACK inverse;
     inverse.initialize (stiffness_matrix);
     const unsigned int num_arnoldi_vectors = 2*eigenvalues.size() + 2;
-    ArpackSolver::AdditionalData additional_data(num_arnoldi_vectors,
-                                                 ArpackSolver::largest_real_part);
-    ArpackSolver eigensolver (solver_control, additional_data);
-    eigensolver.solve (stiffness_matrix,
-                       mass_matrix,
+    ArpackSolver eigensolver (solver_control);
+    eigensolver.solve (mass_matrix,
                        inverse,
                        eigenvalues,
                        eigenfunctions,
-                       eigenvalues.size());
+                       ArpackSolver::largest_real_part,
+                       20);
 
     for (unsigned int i=0; i<eigenfunctions.size(); ++i)
-      eigenfunctions[i] /= eigenfunctions[i].linfty_norm ();
-
-    return std::make_pair (solver_control.last_step (),
-                           solver_control.last_value ());
+      if (eigenfunctions[i].linfty_norm () != 0.)
+        eigenfunctions[i] /= eigenfunctions[i].linfty_norm ();
   }
 
 
@@ -276,7 +272,7 @@ namespace Step36
 
     assemble_system ();
 
-    const std::pair<unsigned int, double> res = solve ();
+    solve ();
 
     std::sort(eigenvalues.begin(), eigenvalues.end(), my_compare);
 
