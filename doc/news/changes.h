@@ -472,6 +472,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: dealii:Vector, dealii::BlockVector,
+  TrilinosWrappers::MPI::Vector, TrilinosWrappers::MPI::BlockVector,
+  PETScWrappers::MPI::Vector and PETScWrappers::MPI::BlockVector now have
+  move constructors and move assignment operators in C++11 mode.
+  <br>
+  (Matthias Maier, 2015/05/01)
+  </li>
+
   <li> New: Introduce DoFRenumbering::block_wise for multigrid computation.
   <br>
   (Timo Heister, Florian Sonner, 2015/04/30)
