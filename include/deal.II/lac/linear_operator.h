@@ -991,12 +991,11 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
  */
 template <typename Matrix1,
           typename Matrix2,
-          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>>, Matrix1>::value>::type,
-          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>>, Matrix2>::value>::type,
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double> >, Matrix1>::value>::type,
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double> >, Matrix2>::value>::type,
           typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix1>::type::value>::type,
-          typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix2>::type::value>::type
-         >
-LinearOperator<Vector<double>, Vector<double>>
+          typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix2>::type::value>::type>
+LinearOperator<Vector<double>, Vector<double> >
 operator*(const Matrix1 &first_matrix,
           const Matrix2 &second_matrix)
 {
@@ -1023,10 +1022,9 @@ operator*(const Matrix1 &first_matrix,
 template <typename Range,
           typename Intermediate,
           typename Matrix,
-          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>>, Matrix>::value>::type,
-          typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix>::type::value>::type
-         >
-LinearOperator<Range, Vector<double>>
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double> >, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix>::type::value>::type>
+LinearOperator<Range, Vector<double> >
 operator*(const LinearOperator<Range, Intermediate> &op,
           const Matrix &matrix)
 {
@@ -1052,9 +1050,8 @@ operator*(const LinearOperator<Range, Intermediate> &op,
 template <typename Intermediate,
           typename Domain,
           typename Matrix,
-          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>>, Matrix>::value>::type,
-          typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix>::type::value>::type
-         >
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double> >, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Vector<double>, Vector<double>, Matrix>::type::value>::type>
 LinearOperator<Vector<double>, Domain>
 operator*(const Matrix &matrix,
           const LinearOperator<Intermediate, Domain> &op)
