@@ -49,7 +49,7 @@
 
 // PETSc appears here because SLEPc depends on this library:
 #include <deal.II/lac/petsc_sparse_matrix.h>
-#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 
 // And then we need to actually import the interfaces for solvers that SLEPc
 // provides:
@@ -201,14 +201,15 @@ namespace Step36
     // is initialized using an IndexSet. IndexSet is used not only to resize the
     // PETScWrappers::MPI::Vector but it also associates an index in the
     // PETScWrappers::MPI::Vector with a degree of freedom (see step-40 for a
-    // more detailed explanation). This assocation is done by the add_range()
-    // function:
-    IndexSet eigenfunction_index_set(dof_handler.n_dofs ());
-    eigenfunction_index_set.add_range(0, dof_handler.n_dofs ());
+    // a more detailed explanation). The function complete_index_set() creates
+    // an IndexSet where every valid index is part of the set. Note that this
+    // program can only be run sequentially and will throw an exception if used
+    // in parallel.
+    IndexSet eigenfunction_partitioning = complete_index_set(dof_handler.n_dofs ());
     eigenfunctions
     .resize (parameters.get_integer ("Number of eigenvalues/eigenfunctions"));
     for (unsigned int i=0; i<eigenfunctions.size (); ++i)
-      eigenfunctions[i].reinit (eigenfunction_index_set, MPI_COMM_WORLD);
+      eigenfunctions[i].reinit (eigenfunction_partitioning, MPI_COMM_WORLD);
 
     eigenvalues.resize (eigenfunctions.size ());
   }
@@ -477,11 +478,10 @@ int main (int argc, char **argv)
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
+
       // This program can only be run in serial. Otherwise, throw an exception.
-      int size;
-      MPI_Comm_size(MPI_COMM_WORLD,&size);
-      AssertThrow(size==1, ExcMessage("This program can only be run in serial,"
-                                      " use mpirun -np 1 ./step-36"));
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
+                  ExcMessage("This program can only be run in serial, use mpirun -np 1 ./step-36"));
 
       {
         deallog.depth_console (0);

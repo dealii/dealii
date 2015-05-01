@@ -45,7 +45,7 @@ namespace PETScWrappers
    * virtual functions). Only the functions creating a vector of specific type
    * differ, and are implemented in this particular class.
    *
-   * This class is deprecated use PETScWrappers::MPI::Vector instead.
+   * This class is deprecated, use PETScWrappers::MPI::Vector instead.
    *
    * @ingroup Vectors
    * @author Wolfgang Bangerth, 2004
@@ -73,7 +73,7 @@ namespace PETScWrappers
     /**
      * Default constructor. Initialize the vector as empty.
      */
-    Vector () DEAL_II_DEPRECATED;
+    Vector ();
 
     /**
      * Constructor. Set dimension to @p n and initialize all elements with
@@ -85,14 +85,14 @@ namespace PETScWrappers
      * <tt>v=Vector@<number@>(0);</tt>, i.e. the vector is replaced by one of
      * length zero.
      */
-    explicit Vector (const size_type n) DEAL_II_DEPRECATED;
+    explicit Vector (const size_type n);
 
     /**
      * Copy-constructor from deal.II vectors. Sets the dimension to that of
      * the given vector, and copies all elements.
      */
     template <typename Number>
-    explicit Vector (const dealii::Vector<Number> &v) DEAL_II_DEPRECATED;
+    explicit Vector (const dealii::Vector<Number> &v);
 
     /**
      * Construct it from an existing PETSc Vector of type Vec. Note: this does
@@ -100,12 +100,12 @@ namespace PETScWrappers
      * the vector is not used twice at the same time or destroyed while in
      * use. This class does not destroy the PETSc object. Handle with care!
      */
-    explicit Vector (const Vec &v) DEAL_II_DEPRECATED;
+    explicit Vector (const Vec &v);
 
     /**
      * Copy-constructor the values from a PETSc wrapper vector class.
      */
-    Vector (const Vector &v) DEAL_II_DEPRECATED;
+    Vector (const Vector &v);
 
     /**
      * Copy-constructor: copy the values from a PETSc wrapper parallel vector
@@ -116,7 +116,7 @@ namespace PETScWrappers
      * It is not sufficient if only one processor tries to copy the elements
      * from the other processors over to its own process space.
      */
-    explicit Vector (const MPI::Vector &v) DEAL_II_DEPRECATED;
+    explicit Vector (const MPI::Vector &v);
 
     /**
      * Copy the given vector. Resize the present vector if necessary.
@@ -183,7 +183,7 @@ namespace PETScWrappers
      * vector. @p n denotes the total size of the vector to be created.
      */
     void create_vector (const size_type n);
-  };
+  } DEAL_II_DEPRECATED;
 
   /*@}*/
 

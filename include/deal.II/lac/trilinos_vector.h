@@ -710,7 +710,7 @@ namespace TrilinosWrappers
    * in order to be able to access all elements in the vector or to apply
    * certain deal.II functions.
    *
-   * This class is deprecated use TrilinosWrappers::MPI::Vector instead.
+   * This class is deprecated, use TrilinosWrappers::MPI::Vector instead.
    *
    * @ingroup TrilinosWrappers
    * @ingroup Vectors
@@ -741,12 +741,12 @@ namespace TrilinosWrappers
      * function <tt>reinit()</tt> will have to give the vector the correct
      * size.
      */
-    Vector () DEAL_II_DEPRECATED;
+    Vector ();
 
     /**
      * This constructor takes as input the number of elements in the vector.
      */
-    explicit Vector (const size_type n) DEAL_II_DEPRECATED;
+    explicit Vector (const size_type n);
 
     /**
      * This constructor takes as input the number of elements in the vector.
@@ -757,7 +757,7 @@ namespace TrilinosWrappers
      * ignored, the only thing that matters is the size of the index space
      * described by this argument.
      */
-    explicit Vector (const Epetra_Map &partitioning) DEAL_II_DEPRECATED;
+    explicit Vector (const Epetra_Map &partitioning);
 
     /**
      * This constructor takes as input the number of elements in the vector.
@@ -769,20 +769,20 @@ namespace TrilinosWrappers
      * size of the index space described by this argument.
      */
     explicit Vector (const IndexSet &partitioning,
-                     const MPI_Comm &communicator = MPI_COMM_WORLD) DEAL_II_DEPRECATED;
+                     const MPI_Comm &communicator = MPI_COMM_WORLD);
 
     /**
      * This constructor takes a (possibly parallel) Trilinos Vector and
      * generates a localized version of the whole content on each processor.
      */
-    explicit Vector (const VectorBase &V) DEAL_II_DEPRECATED;
+    explicit Vector (const VectorBase &V);
 
     /**
      * Copy-constructor from deal.II vectors. Sets the dimension to that of
      * the given vector, and copies all elements.
      */
     template <typename Number>
-    explicit Vector (const dealii::Vector<Number> &v) DEAL_II_DEPRECATED;
+    explicit Vector (const dealii::Vector<Number> &v);
 
     /**
      * Reinit function that resizes the vector to the size specified by
@@ -870,7 +870,7 @@ namespace TrilinosWrappers
      * thus an empty function.
      */
     void update_ghost_values () const;
-  };
+  } DEAL_II_DEPRECATED;
 
 
 

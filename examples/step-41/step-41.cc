@@ -94,7 +94,6 @@ namespace Step41
     DoFHandler<dim>      dof_handler;
     ConstraintMatrix     constraints;
     IndexSet             active_set;
-    IndexSet             solution_index_set;
 
     TrilinosWrappers::SparseMatrix system_matrix;
     TrilinosWrappers::SparseMatrix complete_system_matrix;
@@ -256,12 +255,11 @@ namespace Step41
     system_matrix.reinit (dsp);
     complete_system_matrix.reinit (dsp);
 
-    solution_index_set.set_size(dof_handler.n_dofs());
-    solution_index_set.add_range(0, dof_handler.n_dofs());
-    solution.reinit (solution_index_set, MPI_COMM_WORLD);
-    system_rhs.reinit (solution_index_set, MPI_COMM_WORLD);
-    complete_system_rhs.reinit (solution_index_set, MPI_COMM_WORLD);
-    contact_force.reinit (solution_index_set, MPI_COMM_WORLD);
+    IndexSet solution_partitioning = complete_index_set(dof_handler.n_dofs());
+    solution.reinit (solution_partitioning, MPI_COMM_WORLD);
+    system_rhs.reinit (solution_partitioning, MPI_COMM_WORLD);
+    complete_system_rhs.reinit (solution_partitioning, MPI_COMM_WORLD);
+    contact_force.reinit (solution_partitioning, MPI_COMM_WORLD);
 
     // The only other thing to do here is to compute the factors in the $B$
     // matrix which is used to scale the residual. As discussed in the
@@ -271,7 +269,7 @@ namespace Step41
     TrilinosWrappers::SparseMatrix mass_matrix;
     mass_matrix.reinit (dsp);
     assemble_mass_matrix_diagonal (mass_matrix);
-    diagonal_of_mass_matrix.reinit (solution_index_set);
+    diagonal_of_mass_matrix.reinit (solution_partitioning);
     for (unsigned int j=0; j<solution.size (); j++)
       diagonal_of_mass_matrix (j) = mass_matrix.diag_element (j);
   }
@@ -435,7 +433,7 @@ namespace Step41
 
     const double penalty_parameter = 100.0;
 
-    TrilinosWrappers::MPI::Vector lambda (solution_index_set);
+    TrilinosWrappers::MPI::Vector lambda (complete_index_set(dof_handler.n_dofs()));
     complete_system_matrix.residual (lambda,
                                      solution, complete_system_rhs);
     contact_force.ratio (lambda, diagonal_of_mass_matrix);
@@ -675,10 +673,8 @@ int main (int argc, char *argv[])
                                                            numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      int size;
-      MPI_Comm_size(MPI_COMM_WORLD,&size);
-      AssertThrow(size==1, ExcMessage("This program can only be run in serial,"
-                                      " use mpirun -np 1 ./step-41"));
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
+                  ExcMessage("This program can only be run in serial, use mpirun -np 1 ./step-41"));
 
       ObstacleProblem<2> obstacle_problem;
       obstacle_problem.run ();

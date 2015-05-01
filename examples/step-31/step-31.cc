@@ -393,6 +393,15 @@ namespace Step31
 
 
 
+    // When using a TrilinosWrappers::MPI::Vector or a
+    // TrilinosWrappers::MPI::BlockVector, the Vector is initialized using an
+    // IndexSet. IndexSet is used not only to resize the
+    // TrilinosWrappers::MPI::Vector but it also associates an index in the
+    // TrilinosWrappers::MPI::Vector with a degree of freedom (see step-40 for
+    // a more detailed explanation). The function complete_index_set() creates
+    // an IndexSet where every valid index is part of the set. Note that this
+    // program can only be run sequentially and will throw an exception if used
+    // in parallel.
     template <class PreconditionerA, class PreconditionerMp>
     BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
     BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
@@ -402,19 +411,9 @@ namespace Step31
       :
       stokes_matrix           (&S),
       m_inverse               (&Mpinv),
-      a_preconditioner        (Apreconditioner)
-    {
-      // When using a TrilinosWrappers::MPI::Vector or a
-      // TrilinosWrappers::MPI::BlockVector, the Vector is initialized using an
-      // IndexSet. IndexSet is used not only to resize the
-      // TrilinosWrappers::MPI::Vector but it also associates an index in the
-      // TrilinosWrappers::MPI::Vector with a degree of freedom (see step-40 for
-      // a more detailed explanation). This assocation is done by the add_range()
-      // function.
-      IndexSet tmp_index_set(stokes_matrix->block(1,1).m());
-      tmp_index_set.add_range(0,stokes_matrix->block(1,1).m());
-      tmp.reinit(tmp_index_set, MPI_COMM_WORLD);
-    }
+      a_preconditioner        (Apreconditioner),
+      tmp                     (complete_index_set(stokes_matrix->block(1,1).m()))
+    {}
 
 
     // Next is the <code>vmult</code> function. We implement the action of
@@ -513,7 +512,7 @@ namespace Step31
     DoFHandler<dim>                     stokes_dof_handler;
     ConstraintMatrix                    stokes_constraints;
 
-    std::vector<IndexSet>               stokes_block_sizes;
+    std::vector<IndexSet>               stokes_partitioning;
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
     TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
 
@@ -963,12 +962,9 @@ namespace Step31
     // Trilinos matrices store the sparsity pattern internally, there is no
     // need to keep the sparsity pattern around after the initialization of
     // the matrix.
-    stokes_block_sizes.clear();
-    stokes_block_sizes.resize (2);
-    stokes_block_sizes[0].set_size(n_u);
-    stokes_block_sizes[1].set_size(n_p);
-    stokes_block_sizes[0].add_range(0,n_u);
-    stokes_block_sizes[1].add_range(0,n_p);
+    stokes_partitioning.resize (2);
+    stokes_partitioning[0] = complete_index_set (n_u);
+    stokes_partitioning[1] = complete_index_set (n_p);
     {
       stokes_matrix.clear ();
 
@@ -1054,11 +1050,10 @@ namespace Step31
     // and $\mathbf u^{n-2}$, as well as for the temperatures $T^{n}$,
     // $T^{n-1}$ and $T^{n-2}$ (required for time stepping) and all the system
     // right hand sides to their correct sizes and block structure:
-    IndexSet temperature_partitioning (n_T);
-    temperature_partitioning.add_range(0,n_T);
-    stokes_solution.reinit (stokes_block_sizes, MPI_COMM_WORLD);
-    old_stokes_solution.reinit (stokes_block_sizes, MPI_COMM_WORLD);
-    stokes_rhs.reinit (stokes_block_sizes, MPI_COMM_WORLD);
+    IndexSet temperature_partitioning = complete_index_set (n_T);
+    stokes_solution.reinit (stokes_partitioning, MPI_COMM_WORLD);
+    old_stokes_solution.reinit (stokes_partitioning, MPI_COMM_WORLD);
+    stokes_rhs.reinit (stokes_partitioning, MPI_COMM_WORLD);
 
     temperature_solution.reinit (temperature_partitioning, MPI_COMM_WORLD);
     old_temperature_solution.reinit (temperature_partitioning, MPI_COMM_WORLD);
@@ -2219,10 +2214,8 @@ int main (int argc, char *argv[])
                                                            numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      int size;
-      MPI_Comm_size(MPI_COMM_WORLD,&size);
-      AssertThrow(size==1, ExcMessage("This program can only be run in serial,"
-                                      " use mpirun -np 1 ./step-31"));
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
+                  ExcMessage("This program can only be run in serial, use mpirun -np 1 ./step-31"));
 
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();

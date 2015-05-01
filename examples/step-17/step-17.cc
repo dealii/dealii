@@ -65,7 +65,6 @@
 // simply map to sequential, local vectors and matrices if there is only a
 // single process, i.e. if you are running on only one machine, and without
 // MPI support):
-#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 // Then we also need interfaces for solvers and preconditioners that PETSc
@@ -143,14 +142,9 @@ namespace Step17
 
     // In step-8, this would have been the place where we would have declared
     // the member variables for the sparsity pattern, the system matrix, right
-    // hand, and solution vector. We change these declarations to use
-    // parallel PETSc objects instead (note that the fact that we use the
-    // parallel versions is denoted the fact that we use the classes from the
-    // <code>PETScWrappers::MPI</code> namespace; sequential versions of these
-    // classes are in the <code>PETScWrappers</code> namespace, i.e. without
-    // the <code>MPI</code> part, be aware that these classes are deprecated).
-    // Note also that we do not use a separate sparsity pattern, since PETSc
-    // manages that as part of its matrix data structures.
+    // hand, and solution vector. We change these declarations to use parallel
+    // PETSc objects instead. Note that we do not use a separate sparsity
+    // pattern, since PETSc manages that as part of its matrix data structures.
     PETScWrappers::MPI::SparseMatrix system_matrix;
 
     PETScWrappers::MPI::Vector       solution;

@@ -445,12 +445,9 @@ namespace Step43
       :
       darcy_matrix            (&S),
       m_inverse               (&Mpinv),
-      a_preconditioner        (Apreconditioner)
-    {
-      IndexSet tmp_index_set(darcy_matrix->block(1,1).m());
-      tmp_index_set.add_range(0,darcy_matrix->block(1,1).m());
-      tmp.reinit(tmp_index_set, MPI_COMM_WORLD);
-    }
+      a_preconditioner        (Apreconditioner),
+      tmp                     (complete_index_set(darcy_matrix->block(1,1).m()))
+    {}
 
 
     template <class PreconditionerA, class PreconditionerMp>
@@ -550,7 +547,6 @@ namespace Step43
     FESystem<dim>                        darcy_fe;
     DoFHandler<dim>                      darcy_dof_handler;
     ConstraintMatrix                     darcy_constraints;
-    std::vector<IndexSet>                darcy_index_set;
 
     ConstraintMatrix                     darcy_preconditioner_constraints;
 
@@ -568,7 +564,6 @@ namespace Step43
     FE_Q<dim>                            saturation_fe;
     DoFHandler<dim>                      saturation_dof_handler;
     ConstraintMatrix                     saturation_constraints;
-    IndexSet                             saturation_index_set;
 
     TrilinosWrappers::SparseMatrix       saturation_matrix;
 
@@ -808,35 +803,30 @@ namespace Step43
       saturation_matrix.reinit (dsp);
     }
 
-    darcy_index_set.clear();
-    darcy_index_set.resize(2);
-    darcy_index_set[0].set_size(n_u);
-    darcy_index_set[1].set_size(n_p);
-    darcy_index_set[0].add_range(0,n_u);
-    darcy_index_set[1].add_range(0,n_p);
-    darcy_solution.reinit (darcy_index_set, MPI_COMM_WORLD);
+    std::vector<IndexSet> darcy_partitioning(2);
+    darcy_partitioning[0] = complete_index_set (n_u);
+    darcy_partitioning[1] = complete_index_set (n_p);
+    darcy_solution.reinit (darcy_partitioning, MPI_COMM_WORLD);
     darcy_solution.collect_sizes ();
 
-    last_computed_darcy_solution.reinit (darcy_index_set, MPI_COMM_WORLD);
+    last_computed_darcy_solution.reinit (darcy_partitioning, MPI_COMM_WORLD);
     last_computed_darcy_solution.collect_sizes ();
 
-    second_last_computed_darcy_solution.reinit (darcy_index_set, MPI_COMM_WORLD);
+    second_last_computed_darcy_solution.reinit (darcy_partitioning, MPI_COMM_WORLD);
     second_last_computed_darcy_solution.collect_sizes ();
 
-    darcy_rhs.reinit (darcy_index_set, MPI_COMM_WORLD);
+    darcy_rhs.reinit (darcy_partitioning, MPI_COMM_WORLD);
     darcy_rhs.collect_sizes ();
 
-    saturation_index_set.clear();
-    saturation_index_set.set_size(n_s);
-    saturation_index_set.add_range(0,n_s);
-    saturation_solution.reinit (saturation_index_set, MPI_COMM_WORLD);
-    old_saturation_solution.reinit (saturation_index_set, MPI_COMM_WORLD);
-    old_old_saturation_solution.reinit (saturation_index_set, MPI_COMM_WORLD);
+    IndexSet saturation_partitioning = complete_index_set(n_s);
+    saturation_solution.reinit (saturation_partitioning, MPI_COMM_WORLD);
+    old_saturation_solution.reinit (saturation_partitioning, MPI_COMM_WORLD);
+    old_old_saturation_solution.reinit (saturation_partitioning, MPI_COMM_WORLD);
 
-    saturation_matching_last_computed_darcy_solution.reinit (saturation_index_set,
+    saturation_matching_last_computed_darcy_solution.reinit (saturation_partitioning,
                                                              MPI_COMM_WORLD);
 
-    saturation_rhs.reinit (saturation_index_set, MPI_COMM_WORLD);
+    saturation_rhs.reinit (saturation_partitioning, MPI_COMM_WORLD);
   }
 
 
@@ -2262,10 +2252,8 @@ int main (int argc, char *argv[])
                                                            numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      int size;
-      MPI_Comm_size(MPI_COMM_WORLD,&size);
-      AssertThrow(size==1, ExcMessage("This program can only be run in serial,"
-                                      " use mpirun -np 1 ./step-43"));
+      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
+                  ExcMessage("This program can only be run in serial, use mpirun -np 1 ./step-43"));
 
       TwoPhaseFlowProblem<2> two_phase_flow_problem(1);
       two_phase_flow_problem.run ();
