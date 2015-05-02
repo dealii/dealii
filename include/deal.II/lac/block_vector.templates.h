@@ -64,11 +64,11 @@ BlockVector<Number>::BlockVector (const BlockVector<Number> &v)
 #ifdef DEAL_II_WITH_CXX11
 template <typename Number>
 BlockVector<Number>::BlockVector (BlockVector<Number> &&v)
-  {
-    swap(v);
-    // be nice and reset v to zero
-    v.reinit(0, 0, false);
-  }
+{
+  swap(v);
+  // be nice and reset v to zero
+  v.reinit(0, 0, false);
+}
 #endif
 
 

@@ -431,11 +431,11 @@ namespace TrilinosWrappers
 
 
 #ifdef DEAL_II_WITH_CXX11
-      Vector & Vector::operator= (Vector &&v)
-      {
-        swap(v);
-        return *this;
-      }
+    Vector &Vector::operator= (Vector &&v)
+    {
+      swap(v);
+      return *this;
+    }
 #endif
 
 

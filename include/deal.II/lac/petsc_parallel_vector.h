@@ -554,7 +554,7 @@ namespace PETScWrappers
 
 #ifdef DEAL_II_WITH_CXX11
     inline
-    Vector & Vector::operator= (Vector &&v)
+    Vector &Vector::operator= (Vector &&v)
     {
       swap(v);
       return *this;
