@@ -113,12 +113,7 @@ namespace PETScWrappers
        * @note This operator is only available if deal.II is configured with
        * C++11 support.
        */
-      BlockVector (BlockVector &&v)
-      {
-        swap(v);
-        // be nice and reset v to zero
-        v.reinit(0, v.get_mpi_communicator(), 0, 0, false);
-      }
+      BlockVector (BlockVector &&v);
 #endif
 
       /**
@@ -168,20 +163,12 @@ namespace PETScWrappers
 #ifdef DEAL_II_WITH_CXX11
       /**
        * Move the given vector. This operator replaces the present vector with
-       * @p v by efficiently swapping the internal data structures. @p v is
-       * left empty.
+       * @p v by efficiently swapping the internal data structures.
        *
        * @note This operator is only available if deal.II is configured with
        * C++11 support.
        */
-      BlockVector &operator= (BlockVector &&v)
-      {
-        swap(v);
-        // be nice and reset v to zero
-        v.reinit(0, v.get_mpi_communicator(), 0, 0, false);
-
-        return *this;
-      }
+      BlockVector &operator= (BlockVector &&v);
 #endif
 
       /**
@@ -371,6 +358,14 @@ namespace PETScWrappers
         this->components[i] = v.components[i];
     }
 
+#ifdef DEAL_II_WITH_CXX11
+    inline
+    BlockVector::BlockVector (BlockVector &&v)
+    {
+      swap(v);
+    }
+#endif
+
     inline
     BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                               const MPI_Comm              &communicator)
@@ -413,6 +408,16 @@ namespace PETScWrappers
 
       return *this;
     }
+
+#ifdef DEAL_II_WITH_CXX11
+    inline
+    BlockVector &
+    BlockVector::operator= (BlockVector &&v)
+    {
+      swap(v);
+      return *this;
+    }
+#endif
 
     inline
     BlockVector::~BlockVector ()

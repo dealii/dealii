@@ -138,11 +138,7 @@ namespace TrilinosWrappers
        * @note This constructor is only available if deal.II is configured with
        * C++11 support.
        */
-      BlockVector (BlockVector &&v)
-      {
-        swap(v);
-        v.reinit (0);
-      }
+      BlockVector (BlockVector &&v);
 #endif
 
       /**
@@ -171,20 +167,12 @@ namespace TrilinosWrappers
 #ifdef DEAL_II_WITH_CXX11
       /**
        * Move the given vector. This operator replaces the present vector with
-       * @p v by efficiently swapping the internal data structures. @p v is
-       * left empty.
+       * @p v by efficiently swapping the internal data structures.
        *
        * @note This operator is only available if deal.II is configured with
        * C++11 support.
        */
-      BlockVector &operator= (BlockVector &&v)
-      {
-        swap(v);
-        // be nice and reset v to zero
-        v.reinit (0);
-
-        return *this;
-      }
+      BlockVector &operator= (BlockVector &&v);
 #endif
 
       /**
@@ -409,6 +397,16 @@ namespace TrilinosWrappers
       for (size_type i=0; i<this->n_blocks(); ++i)
         this->components[i] = v.components[i];
     }
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+    inline
+    BlockVector::BlockVector (BlockVector &&v)
+    {
+      swap(v);
+    }
+#endif
 
 
 

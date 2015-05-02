@@ -197,12 +197,7 @@ namespace PETScWrappers
        * @note This operator is only available if deal.II is configured with
        * C++11 support.
        */
-      Vector (Vector &&v)
-      {
-        swap(v);
-        // be nice and reset v to zero
-        v.reinit(v.communicator, 0, 0, false);
-      }
+      Vector (Vector &&v);
 #endif
 
       /**
@@ -291,20 +286,12 @@ namespace PETScWrappers
 #ifdef DEAL_II_WITH_CXX11
       /**
        * Move the given vector. This operator replaces the present vector with
-       * @p v by efficiently swapping the internal data structures. @p v is
-       * left empty.
+       * @p v by efficiently swapping the internal data structures.
        *
        * @note This operator is only available if deal.II is configured with
        * C++11 support.
        */
-      Vector &operator= (Vector &&v)
-      {
-        swap(v);
-        // be nice and reset v to zero
-        v.reinit(v.communicator, 0, 0, false);
-
-        return *this;
-      }
+      Vector &operator= (Vector &&v);
 #endif
 
       /**
@@ -562,6 +549,17 @@ namespace PETScWrappers
         }
       return *this;
     }
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+    inline
+    Vector & Vector::operator= (Vector &&v)
+    {
+      swap(v);
+      return *this;
+    }
+#endif
 
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2014 by the deal.II authors
+// Copyright (C) 2008 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,6 +73,17 @@ namespace TrilinosWrappers
 
       return *this;
     }
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+    BlockVector &
+    BlockVector::operator= (BlockVector &&v)
+    {
+      swap(v);
+      return *this;
+    }
+#endif
 
 
 

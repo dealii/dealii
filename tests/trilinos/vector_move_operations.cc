@@ -56,6 +56,7 @@ int main (int argc, char **argv)
     PRINTME("copy assignemnt", v);
     PRINTME("old object", u);
 
+    v.clear();
     v = std::move(u);
     PRINTME("move assignemnt", v);
     deallog << "old object size: " << u.size() << std::endl;
@@ -83,6 +84,7 @@ int main (int argc, char **argv)
     PRINTBLOCK("copy assignemnt", v);
     PRINTBLOCK("old object", u);
 
+    v.reinit(0);
     v = std::move(u);
     PRINTBLOCK("move assignemnt", v);
     deallog << "old object size: " << u.n_blocks() << std::endl;
