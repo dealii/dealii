@@ -558,7 +558,6 @@ namespace internal
 
 
 
-
 template <typename Number>
 Vector<Number>::Vector (const Vector<Number> &v)
   :
@@ -575,8 +574,20 @@ Vector<Number>::Vector (const Vector<Number> &v)
 }
 
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
+#ifdef DEAL_II_WITH_CXX11
+template <typename Number>
+Vector<Number>::Vector (Vector<Number> &&v)
+{
+  swap(v);
+  // be nice and reset v to zero
+  v.reinit(0, false);
+}
+#endif
+
+
+
+#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 template <typename Number>
 template <typename OtherNumber>
 Vector<Number>::Vector (const Vector<OtherNumber> &v)
@@ -592,11 +603,10 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
       std::copy (v.begin(), v.end(), begin());
     }
 }
-
 #endif
 
-#ifdef DEAL_II_WITH_PETSC
 
+#ifdef DEAL_II_WITH_PETSC
 
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::Vector &v)
@@ -646,6 +656,7 @@ Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
 }
 
 #endif
+
 
 #ifdef DEAL_II_WITH_TRILINOS
 
@@ -707,6 +718,7 @@ Vector<Number>::Vector (const TrilinosWrappers::Vector &v)
 
 #endif
 
+
 template <typename Number>
 template <typename Number2>
 void Vector<Number>::reinit (const Vector<Number2> &v,
@@ -714,18 +726,6 @@ void Vector<Number>::reinit (const Vector<Number2> &v,
 {
   reinit (v.size(), fast);
 }
-
-// Moved to vector.h as an inline function by Luca Heltai on
-// 2009/04/12 to prevent strange compiling errors, after making swap
-// virtual.
-// template <typename Number>
-// void
-// Vector<Number>::swap (Vector<Number> &v)
-// {
-//   std::swap (vec_size,     v.vec_size);
-//   std::swap (max_vec_size, v.max_vec_size);
-//   std::swap (val,          v.val);
-// }
 
 
 
@@ -830,7 +830,7 @@ namespace internal
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const Number s)
+Vector<Number>::operator= (const Number s)
 {
   AssertIsFinite(s);
   if (s != Number())
@@ -852,7 +852,7 @@ Vector<Number>::operator = (const Number s)
 #ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
 template <>
 Vector<std::complex<float> > &
-Vector<std::complex<float> >::operator = (const std::complex<float> s)
+Vector<std::complex<float> >::operator= (const std::complex<float> s)
 {
   AssertIsFinite(s);
   if (s != std::complex<float>())
@@ -1769,7 +1769,7 @@ void Vector<Number>::ratio (const Vector<Number> &a,
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const BlockVector<Number> &v)
+Vector<Number>::operator= (const BlockVector<Number> &v)
 {
   if (v.size() != vec_size)
     reinit (v.size(), true);
@@ -1788,7 +1788,7 @@ Vector<Number>::operator = (const BlockVector<Number> &v)
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const PETScWrappers::Vector &v)
+Vector<Number>::operator= (const PETScWrappers::Vector &v)
 {
   if (v.size() != vec_size)
     reinit (v.size(), true);
@@ -1815,7 +1815,7 @@ Vector<Number>::operator = (const PETScWrappers::Vector &v)
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const PETScWrappers::MPI::Vector &v)
+Vector<Number>::operator= (const PETScWrappers::MPI::Vector &v)
 {
   // do this in a two-stage process:
   // first convert to a sequential petsc
@@ -1833,7 +1833,7 @@ Vector<Number>::operator = (const PETScWrappers::MPI::Vector &v)
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &v)
+Vector<Number>::operator= (const TrilinosWrappers::MPI::Vector &v)
 {
   // Generate a localized version
   // of the Trilinos vectors and
@@ -1848,7 +1848,7 @@ Vector<Number>::operator = (const TrilinosWrappers::MPI::Vector &v)
 
 template <typename Number>
 Vector<Number> &
-Vector<Number>::operator = (const TrilinosWrappers::Vector &v)
+Vector<Number>::operator= (const TrilinosWrappers::Vector &v)
 {
   if (v.size() != vec_size)
     reinit (v.size(), true);
@@ -1871,7 +1871,7 @@ Vector<Number>::operator = (const TrilinosWrappers::Vector &v)
 template <typename Number>
 template <typename Number2>
 bool
-Vector<Number>::operator == (const Vector<Number2> &v) const
+Vector<Number>::operator== (const Vector<Number2> &v) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.size(), ExcDimensionMismatch(vec_size, v.size()));

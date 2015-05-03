@@ -125,6 +125,15 @@ namespace TrilinosWrappers
 
 
 
+#ifdef DEAL_II_WITH_CXX11
+    Vector::Vector (Vector &&v)
+    {
+      swap(v);
+    }
+#endif
+
+
+
     Vector::Vector (const Epetra_Map &input_map,
                     const VectorBase &v)
       :
@@ -418,6 +427,16 @@ namespace TrilinosWrappers
 
       return *this;
     }
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+    Vector &Vector::operator= (Vector &&v)
+    {
+      swap(v);
+      return *this;
+    }
+#endif
 
 
 

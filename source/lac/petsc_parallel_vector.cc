@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,6 +40,15 @@ namespace PETScWrappers
       AssertThrow (ierr == 0, ExcPETScError(ierr));
       ghosted = false;
     }
+
+
+
+#ifdef DEAL_II_WITH_CXX11
+    Vector::Vector (Vector &&v)
+    {
+      swap(v);
+    }
+#endif
 
 
 

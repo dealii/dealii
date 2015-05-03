@@ -61,6 +61,17 @@ BlockVector<Number>::BlockVector (const BlockVector<Number> &v)
 }
 
 
+#ifdef DEAL_II_WITH_CXX11
+template <typename Number>
+BlockVector<Number>::BlockVector (BlockVector<Number> &&v)
+{
+  swap(v);
+  // be nice and reset v to zero
+  v.reinit(0, 0, false);
+}
+#endif
+
+
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
 template <typename Number>
@@ -151,9 +162,9 @@ BlockVector<Number>::~BlockVector ()
 template <typename Number>
 inline
 BlockVector<Number> &
-BlockVector<Number>::operator = (const TrilinosWrappers::BlockVector &v)
+BlockVector<Number>::operator= (const TrilinosWrappers::BlockVector &v)
 {
-  BaseClass::operator = (v);
+  BaseClass::operator= (v);
   return *this;
 }
 #endif

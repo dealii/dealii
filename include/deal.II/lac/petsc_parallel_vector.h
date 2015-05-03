@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -185,6 +185,21 @@ namespace PETScWrappers
        */
       Vector ();
 
+#ifdef DEAL_II_WITH_CXX11
+      // explicitly declare default variant, such that below move constructor
+      // does not dissallow it
+      Vector (const Vector &v) = default;
+
+      /**
+       * Move constructor. Creates a new vector by stealing the internal data
+       * of the vector @p v.
+       *
+       * @note This operator is only available if deal.II is configured with
+       * C++11 support.
+       */
+      Vector (Vector &&v);
+#endif
+
       /**
        * Constructor. Set dimension to @p n and initialize all elements with
        * zero.
@@ -266,8 +281,18 @@ namespace PETScWrappers
        * Copy the given vector. Resize the present vector if necessary. Also
        * take over the MPI communicator of @p v.
        */
-      Vector &operator = (const Vector &v);
+      Vector &operator= (const Vector &v);
 
+#ifdef DEAL_II_WITH_CXX11
+      /**
+       * Move the given vector. This operator replaces the present vector with
+       * @p v by efficiently swapping the internal data structures.
+       *
+       * @note This operator is only available if deal.II is configured with
+       * C++11 support.
+       */
+      Vector &operator= (Vector &&v);
+#endif
 
       /**
        * Copy the given sequential (non-distributed) vector into the present
@@ -284,7 +309,7 @@ namespace PETScWrappers
        * change the local part of a parallel vector on only one process,
        * independent of what other processes do, with this function.
        */
-      Vector &operator = (const PETScWrappers::Vector &v);
+      Vector &operator= (const PETScWrappers::Vector &v);
 
       /**
        * Set all components of the vector to the given number @p s. Simply
@@ -292,7 +317,7 @@ namespace PETScWrappers
        * function to make the example given in the discussion about making the
        * constructor explicit work.
        */
-      Vector &operator = (const PetscScalar s);
+      Vector &operator= (const PetscScalar s);
 
       /**
        * Copy the values of a deal.II vector (as opposed to those of the PETSc
@@ -304,7 +329,7 @@ namespace PETScWrappers
        * can't get from the source vector.
        */
       template <typename number>
-      Vector &operator = (const dealii::Vector<number> &v);
+      Vector &operator= (const dealii::Vector<number> &v);
 
       /**
        * Change the dimension of the vector to @p N. It is unspecified how
@@ -455,9 +480,9 @@ namespace PETScWrappers
 
     inline
     Vector &
-    Vector::operator = (const PetscScalar s)
+    Vector::operator= (const PetscScalar s)
     {
-      VectorBase::operator = (s);
+      VectorBase::operator= (s);
 
       return *this;
     }
@@ -466,7 +491,7 @@ namespace PETScWrappers
 
     inline
     Vector &
-    Vector::operator = (const Vector &v)
+    Vector::operator= (const Vector &v)
     {
       // make sure left- and right-hand side of the assignment are compress()'ed:
       Assert(v.last_action == VectorOperation::unknown,
@@ -527,56 +552,51 @@ namespace PETScWrappers
 
 
 
+#ifdef DEAL_II_WITH_CXX11
+    inline
+    Vector &Vector::operator= (Vector &&v)
+    {
+      swap(v);
+      return *this;
+    }
+#endif
+
+
+
     template <typename number>
     inline
     Vector &
-    Vector::operator = (const dealii::Vector<number> &v)
+    Vector::operator= (const dealii::Vector<number> &v)
     {
       Assert (size() == v.size(),
               ExcDimensionMismatch (size(), v.size()));
 
-      // the following isn't necessarily fast,
-      // but this is due to the fact that PETSc
-      // doesn't offer an inlined access
-      // operator.
+      // FIXME: the following isn't necessarily fast, but this is due to
+      // the fact that PETSc doesn't offer an inlined access operator.
       //
-      // if someone wants to contribute some
-      // code: to make this code faster, one
-      // could either first convert all values
-      // to PetscScalar, and then set them all
-      // at once using VecSetValues. This has
-      // the drawback that it could take quite
-      // some memory, if the vector is large,
-      // and it would in addition allocate
-      // memory on the heap, which is
-      // expensive. an alternative would be to
-      // split the vector into chunks of, say,
-      // 128 elements, convert a chunk at a
-      // time and set it in the output vector
-      // using VecSetValues. since 128 elements
-      // is small enough, this could easily be
-      // allocated on the stack (as a local
-      // variable) which would make the whole
-      // thing much more efficient.
+      // if someone wants to contribute some code: to make this code
+      // faster, one could either first convert all values to PetscScalar,
+      // and then set them all at once using VecSetValues. This has the
+      // drawback that it could take quite some memory, if the vector is
+      // large, and it would in addition allocate memory on the heap, which
+      // is expensive. an alternative would be to split the vector into
+      // chunks of, say, 128 elements, convert a chunk at a time and set it
+      // in the output vector using VecSetValues. since 128 elements is
+      // small enough, this could easily be allocated on the stack (as a
+      // local variable) which would make the whole thing much more
+      // efficient.
       //
-      // a second way to make things faster is
-      // for the special case that
-      // number==PetscScalar. we could then
-      // declare a specialization of this
-      // template, and omit the conversion. the
-      // problem with this is that the best we
-      // can do is to use VecSetValues, but
-      // this isn't very efficient either: it
-      // wants to see an array of indices,
-      // which in this case a) again takes up a
-      // whole lot of memory on the heap, and
-      // b) is totally dumb since its content
-      // would simply be the sequence
-      // 0,1,2,3,...,n. the best of all worlds
-      // would probably be a function in Petsc
-      // that would take a pointer to an array
-      // of PetscScalar values and simply copy
-      // n elements verbatim into the vector...
+      // a second way to make things faster is for the special case that
+      // number==PetscScalar. we could then declare a specialization of
+      // this template, and omit the conversion. the problem with this is
+      // that the best we can do is to use VecSetValues, but this isn't
+      // very efficient either: it wants to see an array of indices, which
+      // in this case a) again takes up a whole lot of memory on the heap,
+      // and b) is totally dumb since its content would simply be the
+      // sequence 0,1,2,3,...,n. the best of all worlds would probably be a
+      // function in Petsc that would take a pointer to an array of
+      // PetscScalar values and simply copy n elements verbatim into the
+      // vector...
       for (size_type i=0; i<v.size(); ++i)
         (*this)(i) = v(i);
 
