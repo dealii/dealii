@@ -1858,7 +1858,7 @@ PackagedOperation<Range> operator+(const Range &u, const Range &v)
 /**
  * @relates PackagedOperation
  *
- * Create a PackagedOperation object that stores the addition of two vectors.
+ * Create a PackagedOperation object that stores the subtraction of two vectors.
  *
  * The PackagedOperation object that is created stores a reference to @p u
  * and @p v. Thus, the vectors must remain valid references for the whole
@@ -2082,6 +2082,112 @@ operator*(const PackagedOperation<Range> &comp,
   };
 
   return return_comp;
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Create a PackagedOperation object from a reference to a matrix @p m and
+ * a reference to a vector @p u of the Domain space. The object stores the
+ * PackagedOperation $\text{m} \,u$ (in matrix notation). If a different
+ * result type than Vector<double> is desired, the matrix should be
+ * explicitly wrapper with linear_operator instead.
+ *
+ * <code>return</code> (<code>return_add</code>) are implemented with
+ * <code>vmult(__1,u)</code> (<code>vmult_add(__1,u)</code>).
+ *
+ * The PackagedOperation object that is created stores references to @p u
+ * and @p m. Thus, both must remain valid references for the whole lifetime
+ * of the PackagedOperation object. All changes made on @p u or @p m after
+ * the creation of the PackagedOperation object are reflected by the
+ * operator object.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Domain,
+          typename Matrix,
+          typename = typename std::enable_if<has_vector_interface<Domain>::type::value>::type,
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>, Domain>, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Vector<double>, Domain, Matrix>::type::value>::type>
+PackagedOperation<Vector<double> >
+operator*(const Matrix &m,
+          const Domain &u)
+{
+  return linear_operator<Vector<double>, Domain>(m) * u;
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Same as above, taking a packaged operation instead of a vector.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Domain,
+          typename Matrix,
+          typename = typename std::enable_if<has_vector_interface<Domain>::type::value>::type,
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>, Domain>, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Vector<double>, Domain, Matrix>::type::value>::type>
+PackagedOperation<Vector<double> >
+operator*(const Matrix &m,
+          const PackagedOperation<Domain> &u)
+{
+  return linear_operator<Vector<double>, Domain>(m) * u;
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Create a PackagedOperation object from a reference to a matrix @p m and
+ * a reference to a vector @p u of the Domain space. The object stores the
+ * PackagedOperation $\text{m}^T \,u$ (in matrix notation). If a different
+ * result type than Vector<double> is desired, the matrix should be
+ * explicitly wrapper with linear_operator instead.
+ *
+ * <code>return</code> (<code>return_add</code>) are implemented with
+ * <code>Tvmult(__1,u)</code> (<code>Tvmult_add(__1,u)</code>).
+ *
+ * The PackagedOperation object that is created stores references to @p u
+ * and @p m. Thus, both must remain valid references for the whole lifetime
+ * of the PackagedOperation object. All changes made on @p u or @p m after
+ * the creation of the PackagedOperation object are reflected by the
+ * operator object.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range,
+          typename Matrix,
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type,
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Range, Vector<double> >, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Range, Vector<double>, Matrix>::type::value>::type>
+PackagedOperation<Vector<double> >
+operator*(const Range &u,
+          const Matrix &m)
+{
+  return u * linear_operator<Range, Vector<double>>(m);
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Same as above, taking a packaged operation instead of a vector.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range,
+          typename Matrix,
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type,
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Range, Vector<double> >, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Range, Vector<double>, Matrix>::type::value>::type>
+PackagedOperation<Vector<double> >
+operator*(const PackagedOperation<Range> &u,
+          const Matrix &m)
+{
+  return u * linear_operator<Range, Vector<double>>(m);
 }
 
 //@}
