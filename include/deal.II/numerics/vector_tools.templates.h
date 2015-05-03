@@ -6729,28 +6729,10 @@ namespace VectorTools
     Assert(fe.n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
-    // first find the cell in which this point
-    // is, initialize a quadrature rule with
-    // it, and then a FEValues object
-    const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
-    cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
+    Vector<double> value(1);
+    point_value(mapping, dof, fe_function, point, value);
 
-    AssertThrow(cell_point.first->is_locally_owned(),
-                ExcPointNotAvailableHere());
-    Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
-           ExcInternalError());
-
-    const Quadrature<dim>
-    quadrature (GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
-    FEValues<dim> fe_values(mapping, fe, quadrature, update_values);
-    fe_values.reinit(cell_point.first);
-
-    // then use this to get at the values of
-    // the given fe_function at this point
-    std::vector<double> u_value(1);
-    fe_values.get_function_values(fe_function, u_value);
-
-    return u_value[0];
+    return value(0);
   }
 
 
@@ -6766,29 +6748,10 @@ namespace VectorTools
     Assert(fe.n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
-    // first find the cell in which this point
-    // is, initialize a quadrature rule with
-    // it, and then a FEValues object
-    const std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
-    cell_point =  GridTools::find_active_cell_around_point (mapping, dof, point);
+    Vector<double> value(1);
+    point_value(mapping, dof, fe_function, point, value);
 
-    AssertThrow(cell_point.first->is_locally_owned(),
-                ExcPointNotAvailableHere());
-    Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
-           ExcInternalError());
-
-    const Quadrature<dim>
-    quadrature (GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
-    hp::FEValues<dim, spacedim> hp_fe_values(mapping, fe, hp::QCollection<dim>(quadrature), update_values);
-    hp_fe_values.reinit(cell_point.first);
-    const FEValues<dim, spacedim> &fe_values = hp_fe_values.get_present_fe_values();
-
-    // then use this to get at the values of
-    // the given fe_function at this point
-    std::vector<double> u_value(1);
-    fe_values.get_function_values(fe_function, u_value);
-
-    return u_value[0];
+    return value(0);
   }
 
 
@@ -6941,28 +6904,10 @@ namespace VectorTools
     Assert(fe.n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
-    // first find the cell in which this point
-    // is, initialize a quadrature rule with
-    // it, and then a FEValues object
-    const std::pair<typename DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
-    cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
+    std::vector<Tensor<1, dim> > gradient(1);
+    point_gradient (mapping, dof, fe_function, point, gradient);
 
-    AssertThrow(cell_point.first->is_locally_owned(),
-                ExcPointNotAvailableHere());
-    Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
-           ExcInternalError());
-
-    const Quadrature<dim>
-    quadrature (GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
-    FEValues<dim> fe_values(mapping, fe, quadrature, update_gradients);
-    fe_values.reinit(cell_point.first);
-
-    // then use this to get the gradients of
-    // the given fe_function at this point
-    std::vector<Tensor<1, dim> > u_gradient(1);
-    fe_values.get_function_gradients(fe_function, u_gradient);
-
-    return u_gradient[0];
+    return gradient[0];
   }
 
 
@@ -6978,29 +6923,10 @@ namespace VectorTools
     Assert(fe.n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
-    // first find the cell in which this point
-    // is, initialize a quadrature rule with
-    // it, and then a FEValues object
-    const std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
-    cell_point =  GridTools::find_active_cell_around_point (mapping, dof, point);
+    std::vector<Tensor<1, dim> > gradient(1);
+    point_gradient (mapping, dof, fe_function, point, gradient);
 
-    AssertThrow(cell_point.first->is_locally_owned(),
-                ExcPointNotAvailableHere());
-    Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
-           ExcInternalError());
-
-    const Quadrature<dim>
-    quadrature (GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
-    hp::FEValues<dim, spacedim> hp_fe_values(mapping, fe, hp::QCollection<dim>(quadrature), update_gradients);
-    hp_fe_values.reinit(cell_point.first);
-    const FEValues<dim, spacedim> &fe_values = hp_fe_values.get_present_fe_values();
-
-    // then use this to get the gradients of
-    // the given fe_function at this point
-    std::vector<Tensor<1, dim > > u_gradient(1);
-    fe_values.get_function_gradients(fe_function, u_gradient);
-
-    return u_gradient[0];
+    return gradient[0];
   }
 
 

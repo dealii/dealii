@@ -2112,7 +2112,7 @@ namespace VectorTools
     * (vector) gradient of this function through the last argument.
     *
     * This is a wrapper function using a Q1-mapping for cell boundaries to call
-    * the other point_difference() function.
+    * the other point_gradient() function.
     *
     * @note If the cell in which the point is found is not locally owned, an
     * exception of type VectorTools::ExcPointNotAvailableHere is thrown.

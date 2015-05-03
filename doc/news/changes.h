@@ -472,6 +472,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: The function VectorTools::point_gradient has been added to compute
+  the gradient of a given FE function.
+  <br>
+  (Daniel Arndt, 2015/05/03)
+  </li>
+
   <li> New: dealii:Vector, dealii::BlockVector,
   TrilinosWrappers::MPI::Vector, TrilinosWrappers::MPI::BlockVector,
   PETScWrappers::MPI::Vector and PETScWrappers::MPI::BlockVector now have
