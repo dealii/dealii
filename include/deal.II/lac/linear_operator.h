@@ -781,36 +781,25 @@ namespace
   };
 
 
-  // A helper class to add the full matrix interface to a LinearOperator
+  // A helper function to apply a given vmult, or Tvmult to a vector with
+  // intermediate storage
+  template <typename Function, typename Range, typename Domain>
+  void apply_with_intermediate_storage(Function function, Range &v,
+                                       const Domain &u, bool add) {
+    static GrowingVectorMemory<Range> vector_memory;
 
-  template <typename Range, typename Domain>
-  class MatrixInterfaceWithVmultAdd
-  {
-  public:
-    template <typename Matrix>
-    void operator()(LinearOperator<Range, Domain> &op, const Matrix &matrix)
-    {
-      op.vmult = [&matrix](Range &v, const Domain &u)
-      {
-        matrix.vmult(v,u);
-      };
+    Range *i = vector_memory.alloc();
+    i->reinit(v, /*bool fast =*/true);
 
-      op.vmult_add = [&matrix](Range &v, const Domain &u)
-      {
-        matrix.vmult_add(v,u);
-      };
+    function(*i, u);
 
-      op.Tvmult = [&matrix](Domain &v, const Range &u)
-      {
-        matrix.Tvmult(v,u);
-      };
+    if (add)
+      v += *i;
+    else
+      v = *i;
 
-      op.Tvmult_add = [&matrix](Domain &v, const Range &u)
-      {
-        matrix.Tvmult_add(v,u);
-      };
-    }
-  };
+    vector_memory.free(i);
+  }
 
 
   // A helper class to add a reduced matrix interface to a LinearOperator
@@ -825,34 +814,107 @@ namespace
     {
       op.vmult = [&matrix](Range &v, const Domain &u)
       {
-        matrix.vmult(v,u);
+        if (static_cast<const void *>(&v) == static_cast<const void *>(&u))
+          {
+            // If v and u are the same memory location use intermediate storage
+            apply_with_intermediate_storage([&matrix](Range &b, const Domain &a)
+            {
+              matrix.vmult(b, a);
+            },
+            v, u, /*bool add =*/ false);
+          }
+        else
+          {
+            matrix.vmult(v,u);
+          }
       };
 
-      op.vmult_add = [op](Range &v, const Domain &u)
+      op.vmult_add = [&matrix](Range &v, const Domain &u)
       {
-        static GrowingVectorMemory<Range> vector_memory;
-
-        Range *i = vector_memory.alloc();
-        op.reinit_range_vector(*i, /*bool fast =*/true);
-        op.vmult(*i, u);
-        v += *i;
-        vector_memory.free(i);
+        // use intermediate storage to implement vmult_add with vmult
+        apply_with_intermediate_storage([&matrix](Range &b, const Domain &a)
+        {
+          matrix.vmult(b, a);
+        },
+        v, u, /*bool add =*/ true);
       };
 
       op.Tvmult = [&matrix](Domain &v, const Range &u)
       {
-        matrix.Tvmult(v,u);
+        if (static_cast<const void *>(&v) == static_cast<const void *>(&u))
+          {
+            // If v and u are the same memory location use intermediate storage
+            apply_with_intermediate_storage([&matrix](Domain &b, const Range &a)
+            {
+              matrix.Tvmult(b, a);
+            },
+            v, u, /*bool add =*/ false);
+          }
+        else
+          {
+            matrix.Tvmult(v,u);
+          }
+
       };
 
-      op.Tvmult_add = [op](Domain &v, const Range &u)
+      op.Tvmult_add = [&matrix](Domain &v, const Range &u)
       {
-        static GrowingVectorMemory<Domain> vector_memory;
+        // use intermediate storage to implement Tvmult_add with Tvmult
+        apply_with_intermediate_storage([&matrix](Domain &b, const Range &a)
+        {
+          matrix.Tvmult(b, a);
+        },
+        v, u, /*bool add =*/ true);
+      };
+    }
+  };
 
-        Domain *i = vector_memory.alloc();
-        op.reinit_domain_vector(*i, /*bool fast =*/true);
-        op.Tvmult(*i, u);
-        v += *i;
-        vector_memory.free(i);
+
+  // A helper class to add the full matrix interface to a LinearOperator
+
+  template <typename Range, typename Domain>
+  class MatrixInterfaceWithVmultAdd
+  {
+  public:
+    template <typename Matrix>
+    void operator()(LinearOperator<Range, Domain> &op, const Matrix &matrix)
+    {
+      // As above ...
+
+      MatrixInterfaceWithoutVmultAdd<Range, Domain>().operator()(op, matrix);
+
+      // ... but add native vmult_add and Tvmult_add variants:
+
+      op.vmult_add = [&matrix](Range &v, const Domain &u)
+      {
+        if (static_cast<const void *>(&v) == static_cast<const void *>(&u))
+          {
+            apply_with_intermediate_storage([&matrix](Range &b, const Domain &a)
+            {
+              matrix.vmult(b, a);
+            },
+            v, u, /*bool add =*/ false);
+          }
+        else
+          {
+            matrix.vmult_add(v,u);
+          }
+      };
+
+      op.Tvmult_add = [&matrix](Domain &v, const Range &u)
+      {
+        if (static_cast<const void *>(&v) == static_cast<const void *>(&u))
+          {
+            apply_with_intermediate_storage([&matrix](Domain &b, const Range &a)
+            {
+              matrix.Tvmult(b, a);
+            },
+            v, u, /*bool add =*/ true);
+          }
+        else
+          {
+            matrix.Tvmult_add(v,u);
+          }
       };
     }
   };
@@ -2091,11 +2153,11 @@ operator*(const PackagedOperation<Range> &comp,
  * Create a PackagedOperation object from a reference to a matrix @p m and
  * a reference to a vector @p u of the Domain space. The object stores the
  * PackagedOperation $\text{m} \,u$ (in matrix notation). If a different
- * result type than Vector<double> is desired, the matrix should be
+ * result type than Domain is desired, the matrix should be
  * explicitly wrapper with linear_operator instead.
  *
  * <code>return</code> (<code>return_add</code>) are implemented with
- * <code>vmult(__1,u)</code> (<code>vmult_add(__1,u)</code>).
+ * <code>vmult(_1,u)</code> (<code>vmult_add(_1,u)</code>).
  *
  * The PackagedOperation object that is created stores references to @p u
  * and @p m. Thus, both must remain valid references for the whole lifetime
@@ -2108,13 +2170,13 @@ operator*(const PackagedOperation<Range> &comp,
 template <typename Domain,
           typename Matrix,
           typename = typename std::enable_if<has_vector_interface<Domain>::type::value>::type,
-          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>, Domain>, Matrix>::value>::type,
-          typename = typename std::enable_if<has_vmult<Vector<double>, Domain, Matrix>::type::value>::type>
-PackagedOperation<Vector<double> >
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Domain, Domain>, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Domain, Domain, Matrix>::type::value>::type>
+PackagedOperation<Domain>
 operator*(const Matrix &m,
           const Domain &u)
 {
-  return linear_operator<Vector<double>, Domain>(m) * u;
+  return linear_operator<Domain, Domain>(m) * u;
 }
 
 
@@ -2128,13 +2190,13 @@ operator*(const Matrix &m,
 template <typename Domain,
           typename Matrix,
           typename = typename std::enable_if<has_vector_interface<Domain>::type::value>::type,
-          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Vector<double>, Domain>, Matrix>::value>::type,
-          typename = typename std::enable_if<has_vmult<Vector<double>, Domain, Matrix>::type::value>::type>
-PackagedOperation<Vector<double> >
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Domain, Domain>, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Domain, Domain, Matrix>::type::value>::type>
+PackagedOperation<Domain>
 operator*(const Matrix &m,
           const PackagedOperation<Domain> &u)
 {
-  return linear_operator<Vector<double>, Domain>(m) * u;
+  return linear_operator<Domain, Domain>(m) * u;
 }
 
 
@@ -2142,13 +2204,13 @@ operator*(const Matrix &m,
  * @relates PackagedOperation
  *
  * Create a PackagedOperation object from a reference to a matrix @p m and
- * a reference to a vector @p u of the Domain space. The object stores the
+ * a reference to a vector @p u of the Range space. The object stores the
  * PackagedOperation $\text{m}^T \,u$ (in matrix notation). If a different
- * result type than Vector<double> is desired, the matrix should be
+ * result type than Range is desired, the matrix should be
  * explicitly wrapper with linear_operator instead.
  *
  * <code>return</code> (<code>return_add</code>) are implemented with
- * <code>Tvmult(__1,u)</code> (<code>Tvmult_add(__1,u)</code>).
+ * <code>Tvmult(_1,u)</code> (<code>Tvmult_add(_1,u)</code>).
  *
  * The PackagedOperation object that is created stores references to @p u
  * and @p m. Thus, both must remain valid references for the whole lifetime
@@ -2161,13 +2223,13 @@ operator*(const Matrix &m,
 template <typename Range,
           typename Matrix,
           typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type,
-          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Range, Vector<double> >, Matrix>::value>::type,
-          typename = typename std::enable_if<has_vmult<Range, Vector<double>, Matrix>::type::value>::type>
-PackagedOperation<Vector<double> >
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Range, Range>, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Range, Range, Matrix>::type::value>::type>
+PackagedOperation<Range>
 operator*(const Range &u,
           const Matrix &m)
 {
-  return u * linear_operator<Range, Vector<double>>(m);
+  return u * linear_operator<Range, Range>(m);
 }
 
 
@@ -2181,13 +2243,13 @@ operator*(const Range &u,
 template <typename Range,
           typename Matrix,
           typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type,
-          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Range, Vector<double> >, Matrix>::value>::type,
-          typename = typename std::enable_if<has_vmult<Range, Vector<double>, Matrix>::type::value>::type>
-PackagedOperation<Vector<double> >
+          typename = typename std::enable_if<! std::is_convertible<LinearOperator<Range, Range>, Matrix>::value>::type,
+          typename = typename std::enable_if<has_vmult<Range, Range, Matrix>::type::value>::type>
+PackagedOperation<Range>
 operator*(const PackagedOperation<Range> &u,
           const Matrix &m)
 {
-  return u * linear_operator<Range, Vector<double>>(m);
+  return u * linear_operator<Range, Range>(m);
 }
 
 //@}
