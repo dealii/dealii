@@ -404,6 +404,7 @@ namespace TrilinosWrappers
     inline
     BlockVector::BlockVector (BlockVector &&v)
     {
+      reinit (0);
       swap(v);
     }
 #endif
