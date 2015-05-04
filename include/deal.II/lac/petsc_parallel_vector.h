@@ -185,21 +185,6 @@ namespace PETScWrappers
        */
       Vector ();
 
-#ifdef DEAL_II_WITH_CXX11
-      // explicitly declare default variant, such that below move constructor
-      // does not dissallow it
-      Vector (const Vector &) = default;
-
-      /**
-       * Move constructor. Creates a new vector by stealing the internal data
-       * of the vector @p v.
-       *
-       * @note This operator is only available if deal.II is configured with
-       * C++11 support.
-       */
-      Vector (Vector &&v);
-#endif
-
       /**
        * Constructor. Set dimension to @p n and initialize all elements with
        * zero.
@@ -282,17 +267,6 @@ namespace PETScWrappers
        * take over the MPI communicator of @p v.
        */
       Vector &operator= (const Vector &v);
-
-#ifdef DEAL_II_WITH_CXX11
-      /**
-       * Move the given vector. This operator replaces the present vector with
-       * @p v by efficiently swapping the internal data structures.
-       *
-       * @note This operator is only available if deal.II is configured with
-       * C++11 support.
-       */
-      Vector &operator= (Vector &&v);
-#endif
 
       /**
        * Copy the given sequential (non-distributed) vector into the present
@@ -549,17 +523,6 @@ namespace PETScWrappers
         }
       return *this;
     }
-
-
-
-#ifdef DEAL_II_WITH_CXX11
-    inline
-    Vector &Vector::operator= (Vector &&v)
-    {
-      swap(v);
-      return *this;
-    }
-#endif
 
 
 

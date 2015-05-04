@@ -105,17 +105,6 @@ namespace PETScWrappers
        */
       BlockVector (const BlockVector  &V);
 
-#ifdef DEAL_II_WITH_CXX11
-      /**
-       * Move constructor. Creates a new vector by stealing the internal data
-       * of the vector @p v.
-       *
-       * @note This operator is only available if deal.II is configured with
-       * C++11 support.
-       */
-      BlockVector (BlockVector &&v);
-#endif
-
       /**
        * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>
        * and initialize each block with <tt>block_sizes[i]</tt> zero elements.
@@ -159,17 +148,6 @@ namespace PETScWrappers
        */
       BlockVector &
       operator= (const BlockVector &V);
-
-#ifdef DEAL_II_WITH_CXX11
-      /**
-       * Move the given vector. This operator replaces the present vector with
-       * @p v by efficiently swapping the internal data structures.
-       *
-       * @note This operator is only available if deal.II is configured with
-       * C++11 support.
-       */
-      BlockVector &operator= (BlockVector &&v);
-#endif
 
       /**
        * Copy the given sequential (non-distributed) block vector into the
@@ -358,14 +336,6 @@ namespace PETScWrappers
         this->components[i] = v.components[i];
     }
 
-#ifdef DEAL_II_WITH_CXX11
-    inline
-    BlockVector::BlockVector (BlockVector &&v)
-    {
-      swap(v);
-    }
-#endif
-
     inline
     BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                               const MPI_Comm              &communicator)
@@ -408,16 +378,6 @@ namespace PETScWrappers
 
       return *this;
     }
-
-#ifdef DEAL_II_WITH_CXX11
-    inline
-    BlockVector &
-    BlockVector::operator= (BlockVector &&v)
-    {
-      swap(v);
-      return *this;
-    }
-#endif
 
     inline
     BlockVector::~BlockVector ()
