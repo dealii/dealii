@@ -496,11 +496,6 @@ inconvenience this causes.
   move constructors and move assignment operators in C++11 mode.
   <br>
   (Matthias Maier, 2015/05/01)
-  <li> Changed: TrilinosWrappers::Vector, TrilinosWrappers::BlockVector, 
-  PETScWrappers::Vector, and PETScWrappers::BlockVector are deprecated. Either 
-  use the MPI or the deal.II version of the Vector/BlockVector.
-  <br>
-  (Bruno Turcksin, 2015/05/01)
   </li>
 
   <li> New: Introduce DoFRenumbering::block_wise for multigrid computation.
