@@ -255,11 +255,11 @@ namespace Step41
     system_matrix.reinit (dsp);
     complete_system_matrix.reinit (dsp);
 
-    IndexSet solution_partitioning = complete_index_set(dof_handler.n_dofs());
-    solution.reinit (solution_partitioning, MPI_COMM_WORLD);
-    system_rhs.reinit (solution_partitioning, MPI_COMM_WORLD);
-    complete_system_rhs.reinit (solution_partitioning, MPI_COMM_WORLD);
-    contact_force.reinit (solution_partitioning, MPI_COMM_WORLD);
+    IndexSet solution_index_set = dof_handler.locally_owned_dofs();
+    solution.reinit (solution_index_set, MPI_COMM_WORLD);
+    system_rhs.reinit (solution_index_set, MPI_COMM_WORLD);
+    complete_system_rhs.reinit (solution_index_set, MPI_COMM_WORLD);
+    contact_force.reinit (solution_index_set, MPI_COMM_WORLD);
 
     // The only other thing to do here is to compute the factors in the $B$
     // matrix which is used to scale the residual. As discussed in the
@@ -269,7 +269,7 @@ namespace Step41
     TrilinosWrappers::SparseMatrix mass_matrix;
     mass_matrix.reinit (dsp);
     assemble_mass_matrix_diagonal (mass_matrix);
-    diagonal_of_mass_matrix.reinit (solution_partitioning);
+    diagonal_of_mass_matrix.reinit (solution_index_set);
     for (unsigned int j=0; j<solution.size (); j++)
       diagonal_of_mass_matrix (j) = mass_matrix.diag_element (j);
   }

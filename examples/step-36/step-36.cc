@@ -205,11 +205,11 @@ namespace Step36
     // an IndexSet where every valid index is part of the set. Note that this
     // program can only be run sequentially and will throw an exception if used
     // in parallel.
-    IndexSet eigenfunction_partitioning = complete_index_set(dof_handler.n_dofs ());
+    IndexSet eigenfunction_index_set = dof_handler.locally_owned_dofs ();
     eigenfunctions
     .resize (parameters.get_integer ("Number of eigenvalues/eigenfunctions"));
     for (unsigned int i=0; i<eigenfunctions.size (); ++i)
-      eigenfunctions[i].reinit (eigenfunction_partitioning, MPI_COMM_WORLD);
+      eigenfunctions[i].reinit (eigenfunction_index_set, MPI_COMM_WORLD);
 
     eigenvalues.resize (eigenfunctions.size ());
   }

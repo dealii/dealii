@@ -101,7 +101,7 @@ namespace TrilinosWrappers
      * entries in Input_Maps.  For this non-distributed vector, the %parallel
      * partitioning is not used, just the global size of the partitioner.
      */
-    explicit BlockVector (const std::vector<Epetra_Map> &partitioner);
+    explicit BlockVector (const std::vector<Epetra_Map> &partitioner DEAL_II_DEPRECATED);
 
     /**
      * Constructor. Generate a block vector with as many blocks as there are
@@ -109,26 +109,26 @@ namespace TrilinosWrappers
      * partitioning is not used, just the global size of the partitioner.
      */
     explicit BlockVector (const std::vector<IndexSet> &partitioner,
-                          const MPI_Comm              &communicator = MPI_COMM_WORLD);
+                          const MPI_Comm              &communicator = MPI_COMM_WORLD) DEAL_II_DEPRECATED;
 
     /**
      * Copy-Constructor. Set all the properties of the non-%parallel vector to
      * those of the given %parallel vector and import the elements.
      */
-    BlockVector (const MPI::BlockVector &V);
+    BlockVector (const MPI::BlockVector &V) DEAL_II_DEPRECATED;
 
     /**
      * Copy-Constructor. Set all the properties of the vector to those of the
      * given input vector and copy the elements.
      */
-    BlockVector (const BlockVector  &V);
+    BlockVector (const BlockVector  &V) DEAL_II_DEPRECATED;
 
     /**
      * Creates a block vector consisting of <tt>num_blocks</tt> components,
      * but there is no content in the individual components and the user has
      * to fill appropriate data using a reinit of the blocks.
      */
-    explicit BlockVector (const size_type num_blocks);
+    explicit BlockVector (const size_type num_blocks) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Set the number of blocks to <tt>n.size()</tt> and
@@ -136,7 +136,7 @@ namespace TrilinosWrappers
      *
      * References BlockVector.reinit().
      */
-    explicit BlockVector (const std::vector<size_type> &N);
+    explicit BlockVector (const std::vector<size_type> &N) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Set the number of blocks to <tt>n.size()</tt>. Initialize
@@ -149,7 +149,7 @@ namespace TrilinosWrappers
     template <typename InputIterator>
     BlockVector (const std::vector<size_type> &n,
                  const InputIterator           first,
-                 const InputIterator           end);
+                 const InputIterator           end) DEAL_II_DEPRECATED;
 
     /**
      * Destructor. Clears memory
@@ -303,7 +303,7 @@ namespace TrilinosWrappers
                     << "local_size = global_size is a necessary condition, but"
                     << arg1 << " != " << arg2 << " was given!");
 
-  } DEAL_II_DEPRECATED;
+  };
 
 
 
