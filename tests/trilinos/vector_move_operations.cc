@@ -45,11 +45,14 @@ int main (int argc, char **argv)
     IndexSet local_owned(10);
     local_owned.add_range (0,10);
 
-    TrilinosWrappers::MPI::Vector u(local_owned, MPI_COMM_WORLD);
-    for (unsigned int i = 0; i < u.size(); ++i)
-      u[i] = (double)(i+1);
+    TrilinosWrappers::MPI::Vector temp(local_owned, MPI_COMM_WORLD);
+    for (unsigned int i = 0; i < temp.size(); ++i)
+      temp[i] = (double)(i+1);
 
-    PRINTME("Vector", u);
+    PRINTME("Vector", temp);
+
+    TrilinosWrappers::MPI::Vector u(std::move(temp));
+    PRINTME("move constructor", u);
 
     TrilinosWrappers::MPI::Vector v;
     v = u;
@@ -72,12 +75,15 @@ int main (int argc, char **argv)
         index.add_range(0,2);
       }
 
-    TrilinosWrappers::MPI::BlockVector u(local_owned, MPI_COMM_WORLD);
+    TrilinosWrappers::MPI::BlockVector temp(local_owned, MPI_COMM_WORLD);
     for (unsigned int i = 0; i < 5; ++i)
       for (unsigned int j = 0; j < 2; ++j)
-        u.block(i)[j] = (double)(10 * i + j);
+        temp.block(i)[j] = (double)(10 * i + j);
 
-    PRINTBLOCK("BlockVector", u);
+    PRINTBLOCK("BlockVector", temp);
+
+    TrilinosWrappers::MPI::BlockVector u(std::move(temp));
+    PRINTME("move constructor", u);
 
     TrilinosWrappers::MPI::BlockVector v;
     v = u;
