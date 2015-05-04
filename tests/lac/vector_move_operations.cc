@@ -46,6 +46,7 @@ int main()
     deallog << "old object size: " << u.size() << std::endl;
 
     // and swap again with different sizes
+    u.reinit(0);
     u = std::move(v);
     deallog << "move assignment: " << u;
     deallog << "old object size: " << v.size() << std::endl;
