@@ -348,8 +348,7 @@ public:
 #ifdef DEAL_II_WITH_CXX11
   /**
    * Move the given vector. This operator replaces the present vector with
-   * @p v by efficiently swapping the internal data structures. @p v is
-   * left empty.
+   * @p v by efficiently swapping the internal data structures.
    *
    * @note This operator is only available if deal.II is configured with
    * C++11 support.
@@ -1115,8 +1114,6 @@ Vector<Number> &
 Vector<Number>::operator= (Vector<Number> &&v)
 {
   swap(v);
-  // be nice and reset v to zero
-  v.reinit(0, false);
 
   return *this;
 }

@@ -578,10 +578,13 @@ Vector<Number>::Vector (const Vector<Number> &v)
 #ifdef DEAL_II_WITH_CXX11
 template <typename Number>
 Vector<Number>::Vector (Vector<Number> &&v)
+  :
+  Subscriptor(),
+  vec_size(0),
+  max_vec_size(0),
+  val(0)
 {
   swap(v);
-  // be nice and reset v to zero
-  v.reinit(0, false);
 }
 #endif
 
