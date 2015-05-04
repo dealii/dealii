@@ -30,10 +30,8 @@ namespace PETScWrappers
 
     Vector::Vector ()
     {
-      // this is an invalid empty vector, so we
-      // can just as well create a sequential
-      // one to avoid all the overhead incurred
-      // by parallelism
+      // this is an invalid empty vector, so we can just as well create a
+      // sequential one to avoid all the overhead incurred by parallelism
       const int n = 0;
       const int ierr
         = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
@@ -46,6 +44,14 @@ namespace PETScWrappers
 #ifdef DEAL_II_WITH_CXX11
     Vector::Vector (Vector &&v)
     {
+      // this is an invalid empty vector, so we can just as well create a
+      // sequential one to avoid all the overhead incurred by parallelism
+      const int n = 0;
+      const int ierr
+        = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      ghosted = false;
+
       swap(v);
     }
 #endif

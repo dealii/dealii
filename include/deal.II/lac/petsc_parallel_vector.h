@@ -188,7 +188,7 @@ namespace PETScWrappers
 #ifdef DEAL_II_WITH_CXX11
       // explicitly declare default variant, such that below move constructor
       // does not dissallow it
-      Vector (const Vector &v) = default;
+      Vector (const Vector &) = default;
 
       /**
        * Move constructor. Creates a new vector by stealing the internal data
