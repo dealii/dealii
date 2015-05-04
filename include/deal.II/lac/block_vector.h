@@ -314,10 +314,6 @@ public:
    * only swaps the pointers to the data of the two vectors and therefore does
    * not need to allocate temporary storage and move data around.
    *
-   * Limitation: right now this function only works if both vectors have the
-   * same number of blocks. If needed, the numbers of blocks should be
-   * exchanged, too.
-   *
    * This function is analog to the the swap() function of all C++ standard
    * containers. Also, there is a global function swap(u,v) that simply calls
    * <tt>u.swap(v)</tt>, again in analogy to standard functions.
@@ -433,6 +429,7 @@ BlockVector<Number> &
 BlockVector<Number>::operator= (BlockVector<Number> &&v)
 {
   swap(v);
+
   // be nice and reset v to zero
   v.reinit(0, 0, false);
 

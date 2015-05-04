@@ -173,11 +173,8 @@ BlockVector<Number>::operator= (const TrilinosWrappers::BlockVector &v)
 template <typename Number>
 void BlockVector<Number>::swap (BlockVector<Number> &v)
 {
-  Assert (this->n_blocks() == v.n_blocks(),
-          ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
+  std::swap(this->components, v.components);
 
-  for (size_type i=0; i<this->n_blocks(); ++i)
-    dealii::swap (this->components[i], v.components[i]);
   dealii::swap (this->block_indices, v.block_indices);
 }
 
