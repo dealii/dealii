@@ -404,6 +404,7 @@ namespace TrilinosWrappers
     inline
     BlockVector::BlockVector (BlockVector &&v)
     {
+      // initialize a minimal, valid object and swap
       reinit (0);
       swap(v);
     }
