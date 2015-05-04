@@ -463,11 +463,8 @@ inline
 void
 BlockIndices::swap (BlockIndices &b)
 {
-  Assert (n_blocks == b.n_blocks,
-          ExcDimensionMismatch(n_blocks, b.n_blocks));
-
-  for (size_type i=0; i<=n_blocks; ++i)
-    std::swap (start_indices[i], b.start_indices[i]);
+  std::swap(n_blocks, b.n_blocks);
+  std::swap(start_indices, b.start_indices);
 }
 
 

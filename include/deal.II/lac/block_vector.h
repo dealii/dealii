@@ -204,8 +204,7 @@ public:
 #ifdef DEAL_II_WITH_CXX11
   /**
    * Move the given vector. This operator replaces the present vector with
-   * @p v by efficiently swapping the internal data structures. @p v is
-   * left empty.
+   * @p v by efficiently swapping the internal data structures.
    *
    * @note This operator is only available if deal.II is configured with
    * C++11 support.
@@ -313,10 +312,6 @@ public:
    * data elements, but this function is significantly more efficient since it
    * only swaps the pointers to the data of the two vectors and therefore does
    * not need to allocate temporary storage and move data around.
-   *
-   * Limitation: right now this function only works if both vectors have the
-   * same number of blocks. If needed, the numbers of blocks should be
-   * exchanged, too.
    *
    * This function is analog to the the swap() function of all C++ standard
    * containers. Also, there is a global function swap(u,v) that simply calls
@@ -433,8 +428,6 @@ BlockVector<Number> &
 BlockVector<Number>::operator= (BlockVector<Number> &&v)
 {
   swap(v);
-  // be nice and reset v to zero
-  v.reinit(0, 0, false);
 
   return *this;
 }

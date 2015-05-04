@@ -404,6 +404,7 @@ namespace TrilinosWrappers
     inline
     BlockVector::BlockVector (BlockVector &&v)
     {
+      reinit (0);
       swap(v);
     }
 #endif
@@ -467,11 +468,9 @@ namespace TrilinosWrappers
     void
     BlockVector::swap (BlockVector &v)
     {
-      Assert (n_blocks() == v.n_blocks(),
-              ExcDimensionMismatch(n_blocks(),v.n_blocks()));
+      std::swap(this->components, v.components);
 
-      for (unsigned int row=0; row<n_blocks(); ++row)
-        block(row).swap (v.block(row));
+      dealii::swap(this->block_indices, v.block_indices);
     }
 
 

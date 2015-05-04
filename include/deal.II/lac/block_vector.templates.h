@@ -64,10 +64,10 @@ BlockVector<Number>::BlockVector (const BlockVector<Number> &v)
 #ifdef DEAL_II_WITH_CXX11
 template <typename Number>
 BlockVector<Number>::BlockVector (BlockVector<Number> &&v)
+  :
+  BlockVectorBase<Vector<Number> > ()
 {
   swap(v);
-  // be nice and reset v to zero
-  v.reinit(0, 0, false);
 }
 #endif
 
@@ -173,11 +173,8 @@ BlockVector<Number>::operator= (const TrilinosWrappers::BlockVector &v)
 template <typename Number>
 void BlockVector<Number>::swap (BlockVector<Number> &v)
 {
-  Assert (this->n_blocks() == v.n_blocks(),
-          ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
+  std::swap(this->components, v.components);
 
-  for (size_type i=0; i<this->n_blocks(); ++i)
-    dealii::swap (this->components[i], v.components[i]);
   dealii::swap (this->block_indices, v.block_indices);
 }
 

@@ -5,46 +5,6 @@ DEAL::vector:          1.00000 2.00000 3.00000 4.00000 5.00000 6.00000 7.00000 8
 DEAL::copy assignment: 1.00000 2.00000 3.00000 4.00000 5.00000 6.00000 7.00000 8.00000 9.00000 10.0000 
 DEAL::old object:      1.00000 2.00000 3.00000 4.00000 5.00000 6.00000 7.00000 8.00000 9.00000 10.0000 
 DEAL::move assignment: 1.00000 2.00000 3.00000 4.00000 5.00000 6.00000 7.00000 8.00000 9.00000 10.0000 
-DEAL::old object size: 0
+DEAL::old object size: 10
 DEAL::move assignment: 1.00000 2.00000 3.00000 4.00000 5.00000 6.00000 7.00000 8.00000 9.00000 10.0000 
-DEAL::old object size: 0
-DEAL::
-DEAL::Block vector: move constructor:
-DEAL::[block 0 ]  0.00000 0.00000 
-DEAL::[block 1 ]  0.00000 0.00000 
-DEAL::[block 2 ]  0.00000 0.00000 
-DEAL::[block 3 ]  0.00000 0.00000 
-DEAL::[block 4 ]  0.00000 0.00000 
-DEAL::
-DEAL::Block vector: BlockVector:
-DEAL::[block 0 ]  0.00000 1.00000 
-DEAL::[block 1 ]  10.0000 11.0000 
-DEAL::[block 2 ]  20.0000 21.0000 
-DEAL::[block 3 ]  30.0000 31.0000 
-DEAL::[block 4 ]  40.0000 41.0000 
-DEAL::Block vector: copy assignemnt:
-DEAL::[block 0 ]  0.00000 1.00000 
-DEAL::[block 1 ]  10.0000 11.0000 
-DEAL::[block 2 ]  20.0000 21.0000 
-DEAL::[block 3 ]  30.0000 31.0000 
-DEAL::[block 4 ]  40.0000 41.0000 
-DEAL::Block vector: old object:
-DEAL::[block 0 ]  0.00000 1.00000 
-DEAL::[block 1 ]  10.0000 11.0000 
-DEAL::[block 2 ]  20.0000 21.0000 
-DEAL::[block 3 ]  30.0000 31.0000 
-DEAL::[block 4 ]  40.0000 41.0000 
-DEAL::Block vector: move assignemnt:
-DEAL::[block 0 ]  0.00000 1.00000 
-DEAL::[block 1 ]  10.0000 11.0000 
-DEAL::[block 2 ]  20.0000 21.0000 
-DEAL::[block 3 ]  30.0000 31.0000 
-DEAL::[block 4 ]  40.0000 41.0000 
-DEAL::old object size: 0
-DEAL::Block vector: move assignemnt:
-DEAL::[block 0 ]  0.00000 1.00000 
-DEAL::[block 1 ]  10.0000 11.0000 
-DEAL::[block 2 ]  20.0000 21.0000 
-DEAL::[block 3 ]  30.0000 31.0000 
-DEAL::[block 4 ]  40.0000 41.0000 
 DEAL::old object size: 0
