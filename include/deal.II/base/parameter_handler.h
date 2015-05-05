@@ -1558,7 +1558,35 @@ public:
     ShortText = 193
   };
 
+  /**
+   * Flags to control input file scanning behavior.
+   */
+  enum ReadInputFlags
+  {
+    /**
+     * A flag for no flag.
+     */
+    ReadInputFlag_Null = 0,
 
+    /**
+     * If this flag is set, the read_input function will automatically generate
+     * the requested file with default values if the provided file does not exist.
+     */
+    ReadInputFlag_InputFileHelp = 0x0001,
+
+    /**
+     * If this flag is set and the "Optinal" option is actived, the automatically
+     * generated file will not contain additional comments.
+     */
+    ReadInputFlag_WriteCompact = 0x0002,
+
+    /**
+     * If this flag is set, undeclared entries in input file will be ignored
+     * silently. Otherwise corresponding warning information will be wrote to
+     * standard error output.
+     */
+    ReadInputFlag_IgnoreUndeclaredEntry = 0x0004
+  };
 
   /**
    * Constructor.
@@ -1597,6 +1625,19 @@ public:
   virtual bool read_input (const std::string &filename,
                            const bool optional = false,
                            const bool write_stripped_file = false);
+  /**
+   * This is a shell function of read_input(std::string, bool, bool) with a
+   * compact argument list.
+   *
+   * This function will set arguments and flags accroding to the provided
+   * ReadInputFlags and call read_input(std::string, bool, bool). The
+   * ReadInputFlags passed to this function only has effect on this time of
+   * reading.
+   *
+   * Return what read_input(std::string, bool, bool) returned.
+   */
+  virtual bool read_input (const std::string &filename,
+                           const ReadInputFlags read_in_flags);
 
   /**
    * Read input from a string in memory. The lines in memory have to be
@@ -1605,6 +1646,11 @@ public:
    * Return whether the read was successful.
    */
   virtual bool read_input_from_string (const char *s);
+
+  /**
+   * Set private flag <tt>ignore_undeclared_entry<\tt> to the provided value.
+   */
+  void set_ignore_undeclared_entry (const bool ignore);
 
   /**
    * Read a parameter file in XML format. This could be from a file originally
@@ -1961,6 +2007,21 @@ private:
   std::vector<std_cxx11::shared_ptr<const Patterns::PatternBase> > patterns;
 
   /**
+   * A flag to determine how to react to undeclared entries when reading input
+   * file or string.
+   *
+   * By default <tt>ignore_undeclared_entry<\tt> is set to <tt>false<\tt>.
+   * In this case, the text reading functions will write warning information
+   * to standard error output and continue reading when undeclared entry is
+   * encountered. Under the same situation, the xml reading funtion will write
+   * warning information to standard error output then abort reading.
+   *
+   * If <tt>ignore_undeclared_entry<\tt> is set to <tt>true<\tt>, then any
+   * undeclared entries will be ignored silently and the reading will continue.
+   */
+  bool ignore_undeclared_entry;
+
+  /**
    * Mangle a string so that it doesn't contain any special characters or
    * spaces.
    */
@@ -2008,6 +2069,29 @@ private:
   friend class MultipleParameterLoop;
 };
 
+/**
+ * Operator for set flag
+ */
+inline
+ParameterHandler::ReadInputFlags
+operator | (ParameterHandler::ReadInputFlags f1, ParameterHandler::ReadInputFlags f2)
+{
+  return static_cast<ParameterHandler::ReadInputFlags> (
+           static_cast<unsigned int> (f1) |
+           static_cast<unsigned int> (f2));
+}
+
+/**
+ * Operator for check or unset flag
+ */
+inline
+ParameterHandler::ReadInputFlags
+operator & (ParameterHandler::ReadInputFlags f1, ParameterHandler::ReadInputFlags f2)
+{
+  return static_cast<ParameterHandler::ReadInputFlags> (
+           static_cast<unsigned int> (f1) &
+           static_cast<unsigned int> (f2));
+}
 
 
 /**

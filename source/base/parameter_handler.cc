@@ -1089,7 +1089,8 @@ namespace Patterns
 
 ParameterHandler::ParameterHandler ()
   :
-  entries (new boost::property_tree::ptree())
+  entries (new boost::property_tree::ptree()),
+  ignore_undeclared_entry(false)
 {}
 
 
@@ -1405,6 +1406,30 @@ bool ParameterHandler::read_input (const std::string &filename,
 
 
 
+bool ParameterHandler::read_input (const std::string &filename,
+                                   const ReadInputFlags read_in_flags)
+{
+  bool ignore_undeclared_entry_bak = ignore_undeclared_entry;
+  ignore_undeclared_entry = read_in_flags & ReadInputFlag_IgnoreUndeclaredEntry;
+
+  const bool return_value =
+    read_input (filename,
+                !(read_in_flags & ReadInputFlag_InputFileHelp),
+                read_in_flags & ReadInputFlag_WriteCompact);
+
+  ignore_undeclared_entry = ignore_undeclared_entry_bak;
+  return (return_value);
+}
+
+
+
+void ParameterHandler::set_ignore_undeclared_entry (const bool ignore)
+{
+  ignore_undeclared_entry = ignore;
+}
+
+
+
 bool ParameterHandler::read_input_from_string (const char *s)
 {
   // create an istringstream representation and pass it off
@@ -1418,20 +1443,24 @@ bool ParameterHandler::read_input_from_string (const char *s)
 namespace
 {
   // Recursively go through the 'source' tree
-  // and see if we can find corresponding
-  // entries in the 'destination' tree. If
-  // not, error out (i.e. we have just read
-  // an XML file that has entries that
-  // weren't declared in the ParameterHandler
-  // object); if so, copy the value of these
-  // nodes into the destination object
+  // and pickup corresponding entries values for
+  // those who have been declared in the
+  // 'destination' tree.
+  //
+  // When an undeclared entry encountered, if
+  // ignore_undeclared_entry is false then out
+  // put error message and abort the file reading
+  // with error return value,
+  // otherwise the undeclared entry will be ignored
+  // silently and the file reading will continue.
   bool
   read_xml_recursively (const boost::property_tree::ptree &source,
                         const std::string                 &current_path,
                         const char                         path_separator,
                         const std::vector<std_cxx11::shared_ptr<const Patterns::PatternBase> > &
                         patterns,
-                        boost::property_tree::ptree       &destination)
+                        boost::property_tree::ptree       &destination,
+                        const bool ignore_undeclared_entry = false)
   {
     for (boost::property_tree::ptree::const_iterator p = source.begin();
          p != source.end(); ++p)
@@ -1493,8 +1522,10 @@ namespace
                 // they match the ones in the
                 // 'destination' tree
               }
-            else
+            else if (!ignore_undeclared_entry)
               {
+                // Only report error and abort the recursive reading when
+                // ignore_undeclared_entry is not set to true.
                 std::cerr << "The entry <" << full_path
                           << "> with value <"
                           << p->second.get<std::string>("value")
@@ -1520,7 +1551,8 @@ namespace
                                        current_path + path_separator + p->first),
                                       path_separator,
                                       patterns,
-                                      destination);
+                                      destination,
+                                      ignore_undeclared_entry);
 
             // see if the recursive read
             // succeeded. if yes, continue,
@@ -1583,7 +1615,7 @@ bool ParameterHandler::read_input_from_xml (std::istream &in)
   &my_entries = single_node_tree.get_child("ParameterHandler");
 
   return read_xml_recursively (my_entries, "", path_separator, patterns,
-                               *entries);
+                               *entries, ignore_undeclared_entry);
 }
 
 
@@ -2553,16 +2585,22 @@ ParameterHandler::scan_line (std::string         line,
       // check whether subsection exists
       if (!entries->get_child_optional (get_current_full_path(subsection)))
         {
-          std::cerr << "Line <" << lineno
-                    << "> of file <" << input_filename
-                    << ">: There is no such subsection to be entered: "
-                    << demangle(get_current_full_path(subsection)) << std::endl;
-          for (unsigned int i=0; i<subsection_path.size(); ++i)
-            std::cerr << std::setw(i*2+4) << " "
-                      << "subsection " << subsection_path[i] << std::endl;
-          std::cerr << std::setw(subsection_path.size()*2+4) << " "
-                    << "subsection " << subsection << std::endl;
-          return false;
+          if (ignore_undeclared_entry)
+            // Treat undeclared entry as empty line, return nicely.
+            return true;
+          else
+            {
+              std::cerr << "Line <" << lineno
+                        << "> of file <" << input_filename
+                        << ">: There is no such subsection to be entered: "
+                        << demangle(get_current_full_path(subsection)) << std::endl;
+              for (unsigned int i=0; i<subsection_path.size(); ++i)
+                std::cerr << std::setw(i*2+4) << " "
+                          << "subsection " << subsection_path[i] << std::endl;
+              std::cerr << std::setw(subsection_path.size()*2+4) << " "
+                        << "subsection " << subsection << std::endl;
+              return false;
+            }
         }
 
       // subsection exists
@@ -2576,10 +2614,16 @@ ParameterHandler::scan_line (std::string         line,
     {
       if (subsection_path.size() == 0)
         {
-          std::cerr << "Line <" << lineno
-                    << "> of file <" << input_filename
-                    << ">: There is no subsection to leave here!" << std::endl;
-          return false;
+          if (ignore_undeclared_entry)
+            // Treat undeclared entry as empty line, return nicely.
+            return true;
+          else
+            {
+              std::cerr << "Line <" << lineno
+                        << "> of file <" << input_filename
+                        << ">: There is no subsection to leave here!" << std::endl;
+              return false;
+            }
         }
       else
         {
@@ -2658,17 +2702,23 @@ ParameterHandler::scan_line (std::string         line,
         }
       else
         {
-          std::cerr << "Line <" << lineno
-                    << "> of file <" << input_filename
-                    << ">: No such entry was declared:" << std::endl
-                    << "    " << entry_name << std::endl
-                    << "    <Present subsection:" << std::endl;
-          for (unsigned int i=0; i<subsection_path.size(); ++i)
-            std::cerr << std::setw(i*2+8) << " "
-                      << "subsection " << subsection_path[i] << std::endl;
-          std::cerr << "    >" << std::endl;
+          if (ignore_undeclared_entry)
+            // Treat undeclared entry as empty line, return nicely.
+            return true;
+          else
+            {
+              std::cerr << "Line <" << lineno
+                        << "> of file <" << input_filename
+                        << ">: No such entry was declared:" << std::endl
+                        << "    " << entry_name << std::endl
+                        << "    <Present subsection:" << std::endl;
+              for (unsigned int i=0; i<subsection_path.size(); ++i)
+                std::cerr << std::setw(i*2+8) << " "
+                          << "subsection " << subsection_path[i] << std::endl;
+              std::cerr << "    >" << std::endl;
 
-          return false;
+              return false;
+            }
         }
     }
 
