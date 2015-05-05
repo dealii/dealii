@@ -506,9 +506,9 @@ namespace GridGenerator
    * computed adaptively such that the resulting elements have the least
    * aspect ratio.
    *
-   * If colorize is set to true, the inner, outer, left, and right boundary
-   * get indicator 0, 1, 2, and 3, respectively. Otherwise all indicators are
-   * set to 0.
+   * If colorize is set to true, the inner, outer, and the part of the boundary
+   * where $x=0$, get indicator 0, 1, and 2, respectively. Otherwise all
+   * indicators are set to 0.
    *
    * @note The triangulation needs to be void upon calling this function.
    */
