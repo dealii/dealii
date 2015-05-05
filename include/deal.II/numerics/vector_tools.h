@@ -2106,6 +2106,130 @@ namespace VectorTools
                const InVector                            &fe_function,
                const Point<spacedim>                     &point);
 
+  /**
+    * Evaluate a possibly vector-valued finite element function defined by the
+    * given DoFHandler and nodal vector at the given point, and return the
+    * (vector) gradient of this function through the last argument.
+    *
+    * This is a wrapper function using a Q1-mapping for cell boundaries to call
+    * the other point_gradient() function.
+    *
+    * @note If the cell in which the point is found is not locally owned, an
+    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+    */
+  template <int dim, class InVector, int spacedim>
+  void
+  point_gradient (const DoFHandler<dim,spacedim>    &dof,
+                  const InVector                    &fe_function,
+                  const Point<spacedim>             &point,
+                  std::vector<Tensor<1, spacedim> > &value);
+
+  /**
+   * Same as above for hp.
+   *
+   * @note If the cell in which the point is found is not locally owned, an
+   * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   */
+  template <int dim, class InVector, int spacedim>
+  void
+  point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
+                  const InVector                     &fe_function,
+                  const Point<spacedim>              &point,
+                  std::vector<Tensor<1, spacedim> >  &value);
+
+  /**
+   * Evaluate a scalar finite element function defined by the given DoFHandler
+   * and nodal vector at the given point, and return the gradient of this
+   * function.
+   *
+   * Compared with the other function of the same name, this is a wrapper
+   * function using a Q1-mapping for cells.
+   *
+   * @note If the cell in which the point is found is not locally owned, an
+   * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   */
+  template <int dim, class InVector, int spacedim>
+  Tensor<1, spacedim>
+  point_gradient (const DoFHandler<dim,spacedim> &dof,
+                  const InVector                 &fe_function,
+                  const Point<spacedim>          &point);
+
+  /**
+   * Same as above for hp.
+   *
+   * @note If the cell in which the point is found is not locally owned, an
+   * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   */
+  template <int dim, class InVector, int spacedim>
+  Tensor<1, spacedim>
+  point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
+                  const InVector                     &fe_function,
+                  const Point<spacedim>              &point);
+
+  /**
+   * Evaluate a possibly vector-valued finite element function defined by the
+   * given DoFHandler and nodal vector at the given point, and return the
+   * gradients of this function through the last argument.
+   *
+   * Compared with the other function of the same name, this function uses an
+   * arbitrary mapping for evaluation.
+   *
+   * @note If the cell in which the point is found is not locally owned, an
+   * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   */
+  template <int dim, class InVector, int spacedim>
+  void
+  point_gradient (const Mapping<dim, spacedim>      &mapping,
+                  const DoFHandler<dim,spacedim>    &dof,
+                  const InVector                    &fe_function,
+                  const Point<spacedim>             &point,
+                  std::vector<Tensor<1, spacedim> > &value);
+
+  /**
+   * Same as above for hp.
+   *
+   * @note If the cell in which the point is found is not locally owned, an
+   * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   */
+  template <int dim, class InVector, int spacedim>
+  void
+  point_gradient (const hp::MappingCollection<dim, spacedim> &mapping,
+                  const hp::DoFHandler<dim,spacedim>         &dof,
+                  const InVector                             &fe_function,
+                  const Point<spacedim>                      &point,
+                  std::vector<Tensor<1, spacedim> >          &value);
+
+  /**
+   * Evaluate a scalar finite element function defined by the given DoFHandler
+   * and nodal vector at the given point, and return the gradient of this
+   * function.
+   *
+   * Compared with the other function of the same name, this function uses an
+   * arbitrary mapping for evaluation.
+   *
+   * @note If the cell in which the point is found is not locally owned, an
+   * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   */
+  template <int dim, class InVector, int spacedim>
+  Tensor<1, spacedim>
+  point_gradient (const Mapping<dim,spacedim>    &mapping,
+                  const DoFHandler<dim,spacedim> &dof,
+                  const InVector                 &fe_function,
+                  const Point<spacedim>          &point);
+
+  /**
+   * Same as above for hp.
+   *
+   * @note If the cell in which the point is found is not locally owned, an
+   * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   */
+  template <int dim, class InVector, int spacedim>
+  Tensor<1, spacedim>
+  point_gradient (const hp::MappingCollection<dim,spacedim> &mapping,
+                  const hp::DoFHandler<dim,spacedim>        &dof,
+                  const InVector                            &fe_function,
+                  const Point<spacedim>                     &point);
+
   //@}
   /**
    * Mean value operations

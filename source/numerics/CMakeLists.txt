@@ -41,6 +41,7 @@ SET(_src
   vector_tools_interpolate.cc
   vector_tools_mean_value.cc
   vector_tools_point_value.cc
+  vector_tools_point_gradient.cc
   vector_tools_project.cc
   vector_tools_rhs.cc
   )
@@ -67,6 +68,7 @@ SET(_inst
   vector_tools_interpolate.inst.in
   vector_tools_mean_value.inst.in
   vector_tools_point_value.inst.in
+  vector_tools_point_gradient.inst.in
   vector_tools_project.inst.in
   vector_tools_rhs.inst.in
   )
