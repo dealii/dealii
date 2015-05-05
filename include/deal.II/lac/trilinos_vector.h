@@ -757,7 +757,7 @@ namespace TrilinosWrappers
      * ignored, the only thing that matters is the size of the index space
      * described by this argument.
      */
-    explicit Vector (Const Epetra_Map &partitioning) DEAL_II_DEPRECATED;
+    explicit Vector (const Epetra_Map &partitioning) DEAL_II_DEPRECATED;
 
     /**
      * This constructor takes as input the number of elements in the vector.

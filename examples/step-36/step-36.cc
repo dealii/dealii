@@ -481,7 +481,7 @@ int main (int argc, char **argv)
 
       // This program can only be run in serial. Otherwise, throw an exception.
       AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
-                  ExcMessage("This program can only be run in serial, use mpirun -np 1 ./step-36"));
+                  ExcMessage("This program can only be run in serial, use ./step-36"));
 
       {
         deallog.depth_console (0);
