@@ -472,6 +472,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: GridGenerator::half_hyper_shell can now be colorized.
+  <br>
+  (Daniel Arndt, 2015/05/05)
+  </li>
+
   <li> New: The function VectorTools::point_gradient has been added to compute
   the gradient of a given FE function.
   <br>

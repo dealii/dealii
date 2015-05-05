@@ -3026,10 +3026,8 @@ namespace GridGenerator
                     const unsigned int n,
                     const bool colorize)
   {
-    (void)colorize;
     Assert ((inner_radius > 0) && (inner_radius < outer_radius),
             ExcInvalidRadii ());
-    Assert(colorize == false, ExcNotImplemented());
 
     if (n <= 5)
       {
@@ -3091,7 +3089,38 @@ namespace GridGenerator
       {
         Assert(false, ExcIndexRange(n, 0, 5));
       }
+    if (colorize)
+      {
+        // We want to use a standard boundary description where
+        // the boundary is not curved. Hence set boundary id 2 to
+        // to all faces in a first step.
+        typename Triangulation<3>::cell_iterator cell = tria.begin();
+        for (; cell!=tria.end(); ++cell)
+          for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
+            if (cell->at_boundary(i))
+              cell->face(i)->set_all_boundary_ids(2);
 
+        // Next look for the curved boundaries. If the first component is
+        // not near to zero, the boundary is curved. Then decide whether the center
+        // is nearer to the inner or outer boundary to set the correct boundary id.
+        for (cell=tria.begin(); cell!=tria.end(); ++cell)
+          for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
+            if (cell->at_boundary(i))
+              {
+                const typename Triangulation<3>::face_iterator face
+                  = cell->face(i);
+
+                const Point<3> face_center (face->center());
+                if (std::abs((face_center(0)-center(0)) > 1.e-3))
+                  {
+                    if (std::abs((face_center-center).norm()-inner_radius) <
+                        std::abs((face_center-center).norm()-outer_radius))
+                      face->set_all_boundary_ids(0);
+                    else
+                      face->set_all_boundary_ids(1);
+                  }
+              }
+      }
   }
 
 
