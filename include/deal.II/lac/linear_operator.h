@@ -815,7 +815,7 @@ namespace
     {
       op.vmult = [&matrix](Range &v, const Domain &u)
       {
-        if (static_cast<const void *>(&v) == static_cast<const void *>(&u))
+        if (PointerComparison::equal(&v, &u))
           {
             // If v and u are the same memory location use intermediate storage
             apply_with_intermediate_storage([&matrix](Range &b, const Domain &a)
@@ -842,7 +842,7 @@ namespace
 
       op.Tvmult = [&matrix](Domain &v, const Range &u)
       {
-        if (static_cast<const void *>(&v) == static_cast<const void *>(&u))
+        if (PointerComparison::equal(&v, &u))
           {
             // If v and u are the same memory location use intermediate storage
             apply_with_intermediate_storage([&matrix](Domain &b, const Range &a)
@@ -888,7 +888,7 @@ namespace
 
       op.vmult_add = [&matrix](Range &v, const Domain &u)
       {
-        if (static_cast<const void *>(&v) == static_cast<const void *>(&u))
+        if (PointerComparison::equal(&v, &u))
           {
             apply_with_intermediate_storage([&matrix](Range &b, const Domain &a)
             {
@@ -904,7 +904,7 @@ namespace
 
       op.Tvmult_add = [&matrix](Domain &v, const Range &u)
       {
-        if (static_cast<const void *>(&v) == static_cast<const void *>(&u))
+        if (PointerComparison::equal(&v, &u))
           {
             apply_with_intermediate_storage([&matrix](Domain &b, const Range &a)
             {
