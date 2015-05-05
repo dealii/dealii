@@ -785,7 +785,8 @@ namespace
   // intermediate storage
   template <typename Function, typename Range, typename Domain>
   void apply_with_intermediate_storage(Function function, Range &v,
-                                       const Domain &u, bool add) {
+                                       const Domain &u, bool add)
+  {
     static GrowingVectorMemory<Range> vector_memory;
 
     Range *i = vector_memory.alloc();
@@ -1430,8 +1431,8 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  * that store the knowledge of how to generate the result of a computation
  * and store it in a vector:
  * @code
- *   std::function<void(Range &)> result;
- *   std::function<void(Range &)> result_add;
+ *   std::function<void(Range &)> apply;
+ *   std::function<void(Range &)> apply_add;
  * @endcode
  *
  * Similar to the LinearOperator class it also has knowledge about how to
@@ -1460,13 +1461,13 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  * The expression <code>residual</code> is of type
  * <code>PackagedOperation<dealii::Vector<double>></code>. It stores
  * references to <code>A</code>, <code>b</code> and <code>x</code> and
- * defers the actual computation until <code>result</code>, or
- * <code>result_add</code> are explicitly invoked,
+ * defers the actual computation until <code>apply</code>, or
+ * <code>apply_add</code> are explicitly invoked,
  * @code
  *   dealii::Vector<double> y;
  *   residual.reinit_vector(y);
- *   residual.result(y);
- *   residual.result_add(y);
+ *   residual.apply(y);
+ *   residual.apply_add(y);
  * @endcode
  * or until the @p PackagedOperation object is implictly converted:
  * @code
@@ -1491,16 +1492,16 @@ public:
    */
   PackagedOperation ()
   {
-    result = [](Range &)
+    apply = [](Range &)
     {
       Assert(false,
-             ExcMessage("Uninitialized PackagedOperation<Range>::result called"));
+             ExcMessage("Uninitialized PackagedOperation<Range>::apply called"));
     };
 
-    result_add = [](Range &)
+    apply_add = [](Range &)
     {
       Assert(false,
-             ExcMessage("Uninitialized PackagedOperation<Range>::result_add called"));
+             ExcMessage("Uninitialized PackagedOperation<Range>::apply_add called"));
     };
 
     reinit_vector = [](Range &, bool)
@@ -1546,12 +1547,12 @@ public:
    */
   PackagedOperation<Range> &operator=(const Range &u)
   {
-    result = [&u](Range &v)
+    apply = [&u](Range &v)
     {
       v = u;
     };
 
-    result_add = [&u](Range &v)
+    apply_add = [&u](Range &v)
     {
       v += u;
     };
@@ -1568,14 +1569,14 @@ public:
    * Convert a PackagedOperation to its result.
    *
    * This conversion operator creates a vector of the Range space and calls
-   * <code>result()</code> on it.
+   * <code>apply()</code> on it.
    */
   operator Range() const
   {
     Range result_vector;
 
     reinit_vector(result_vector, /*bool fast=*/ true);
-    result(result_vector);
+    apply(result_vector);
 
     return result_vector;
   }
@@ -1632,16 +1633,16 @@ public:
    * Store the result of the PackagedOperation in a vector v of the @p Range
    * space.
    */
-  std::function<void(Range &v)> result;
+  std::function<void(Range &v)> apply;
 
   /**
    * Add the result of the PackagedOperation to a vector v of the @p Range space.
    */
-  std::function<void(Range &v)> result_add;
+  std::function<void(Range &v)> apply_add;
 
   /**
    * Initializes a vector v of the Range space to be directly usable as the
-   * destination parameter in an application of result, or result_add.
+   * destination parameter in an application of apply, or apply_add.
    * Similar to the reinit functions of the vector classes, the boolean
    * determines whether a fast initialization is done, i.e., if it is set
    * to false the content of the vector is set to 0.
@@ -1675,16 +1676,16 @@ operator+(const PackagedOperation<Range> &first_comp,
   // ensure to have valid PackagedOperation objects by catching first_comp and
   // second_comp by value
 
-  return_comp.result = [first_comp, second_comp](Range &v)
+  return_comp.apply = [first_comp, second_comp](Range &v)
   {
-    first_comp.result(v);
-    second_comp.result_add(v);
+    first_comp.apply(v);
+    second_comp.apply_add(v);
   };
 
-  return_comp.result_add = [first_comp, second_comp](Range &v)
+  return_comp.apply_add = [first_comp, second_comp](Range &v)
   {
-    first_comp.result_add(v);
-    second_comp.result_add(v);
+    first_comp.apply_add(v);
+    second_comp.apply_add(v);
   };
 
   return return_comp;
@@ -1710,18 +1711,18 @@ operator-(const PackagedOperation<Range> &first_comp,
   // ensure to have valid PackagedOperation objects by catching first_comp and
   // second_comp by value
 
-  return_comp.result = [first_comp, second_comp](Range &v)
+  return_comp.apply = [first_comp, second_comp](Range &v)
   {
-    second_comp.result(v);
+    second_comp.apply(v);
     v *= -1.;
-    first_comp.result_add(v);
+    first_comp.apply_add(v);
   };
 
-  return_comp.result_add = [first_comp, second_comp](Range &v)
+  return_comp.apply_add = [first_comp, second_comp](Range &v)
   {
-    first_comp.result_add(v);
+    first_comp.apply_add(v);
     v *= -1.;
-    second_comp.result_add(v);
+    second_comp.apply_add(v);
     v *= -1.;
   };
 
@@ -1746,16 +1747,16 @@ operator*(const PackagedOperation<Range> &comp,
 
   return_comp.reinit_vector = comp.reinit_vector;
 
-  return_comp.result = [comp, number](Range &v)
+  return_comp.apply = [comp, number](Range &v)
   {
-    comp.result(v);
+    comp.apply(v);
     v *= number;
   };
 
-  return_comp.result_add = [comp, number](Range &v)
+  return_comp.apply_add = [comp, number](Range &v)
   {
     v /= number;
-    comp.result_add(v);
+    comp.apply_add(v);
     v *= number;
   };
 
@@ -1901,13 +1902,13 @@ PackagedOperation<Range> operator+(const Range &u, const Range &v)
     x.reinit(u, fast);
   };
 
-  return_comp.result = [&u, &v](Range &x)
+  return_comp.apply = [&u, &v](Range &x)
   {
     x = u;
     x += v;
   };
 
-  return_comp.result_add = [&u, &v](Range &x)
+  return_comp.apply_add = [&u, &v](Range &x)
   {
     x += u;
     x += v;
@@ -1945,13 +1946,13 @@ PackagedOperation<Range> operator-(const Range &u, const Range &v)
     x.reinit(u, fast);
   };
 
-  return_comp.result = [&u, &v](Range &x)
+  return_comp.apply = [&u, &v](Range &x)
   {
     x = u;
     x -= v;
   };
 
-  return_comp.result_add = [&u, &v](Range &x)
+  return_comp.apply_add = [&u, &v](Range &x)
   {
     x += u;
     x -= v;
@@ -1990,12 +1991,12 @@ operator*(const LinearOperator<Range, Domain> &op,
   // ensure to have valid PackagedOperation objects by catching op by value
   // u is catched by reference
 
-  return_comp.result = [op, &u](Range &v)
+  return_comp.apply = [op, &u](Range &v)
   {
     op.vmult(v, u);
   };
 
-  return_comp.result_add = [op, &u](Range &v)
+  return_comp.apply_add = [op, &u](Range &v)
   {
     op.vmult_add(v, u);
   };
@@ -2033,12 +2034,12 @@ operator*(const Range &u,
   // ensure to have valid PackagedOperation objects by catching op by value
   // u is catched by reference
 
-  return_comp.result = [op, &u](Domain &v)
+  return_comp.apply = [op, &u](Domain &v)
   {
     op.Tvmult(v, u);
   };
 
-  return_comp.result_add = [op, &u](Domain &v)
+  return_comp.apply_add = [op, &u](Domain &v)
   {
     op.Tvmult_add(v, u);
   };
@@ -2067,27 +2068,27 @@ operator*(const LinearOperator<Range, Domain> &op,
   // ensure to have valid PackagedOperation objects by catching op by value
   // u is catched by reference
 
-  return_comp.result = [op, comp](Domain &v)
+  return_comp.apply = [op, comp](Domain &v)
   {
     static GrowingVectorMemory<Range> vector_memory;
 
     Range *i = vector_memory.alloc();
     op.reinit_domain_vector(*i, /*bool fast =*/ true);
 
-    comp.result(*i);
+    comp.apply(*i);
     op.vmult(v, *i);
 
     vector_memory.free(i);
   };
 
-  return_comp.result_add = [op, comp](Domain &v)
+  return_comp.apply_add = [op, comp](Domain &v)
   {
     static GrowingVectorMemory<Range> vector_memory;
 
     Range *i = vector_memory.alloc();
     op.reinit_range_vector(*i, /*bool fast =*/ true);
 
-    comp.result(*i);
+    comp.apply(*i);
     op.vmult_add(v, *i);
 
     vector_memory.free(i);
@@ -2117,27 +2118,27 @@ operator*(const PackagedOperation<Range> &comp,
   // ensure to have valid PackagedOperation objects by catching op by value
   // u is catched by reference
 
-  return_comp.result = [op, comp](Domain &v)
+  return_comp.apply = [op, comp](Domain &v)
   {
     static GrowingVectorMemory<Range> vector_memory;
 
     Range *i = vector_memory.alloc();
     op.reinit_range_vector(*i, /*bool fast =*/ true);
 
-    comp.result(*i);
+    comp.apply(*i);
     op.Tvmult(v, *i);
 
     vector_memory.free(i);
   };
 
-  return_comp.result_add = [op, comp](Domain &v)
+  return_comp.apply_add = [op, comp](Domain &v)
   {
     static GrowingVectorMemory<Range> vector_memory;
 
     Range *i = vector_memory.alloc();
     op.reinit_range_vector(*i, /*bool fast =*/ true);
 
-    comp.result(*i);
+    comp.apply(*i);
     op.Tvmult_add(v, *i);
 
     vector_memory.free(i);
