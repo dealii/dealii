@@ -128,6 +128,7 @@ namespace TrilinosWrappers
 #ifdef DEAL_II_WITH_CXX11
     Vector::Vector (Vector &&v)
     {
+      // initialize a minimal, valid object and swap
       last_action = Zero;
       vector.reset(new Epetra_FEVector(Epetra_Map(0,0,0,Utilities::Trilinos::comm_self())));
 
