@@ -472,6 +472,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Changed: TrilinosWrappers::Vector, TrilinosWrappers::BlockVector, 
+  PETScWrappers::Vector, and PETScWrappers::BlockVector are deprecated. Either 
+  use the MPI or the deal.II version of the Vector/BlockVector.
+  <br>
+  (Bruno Turcksin, 2015/05/04)
+  </li>
+
   <li> Fixed: GridGenerator::half_hyper_shell can now be colorized.
   <br>
   (Daniel Arndt, 2015/05/05)

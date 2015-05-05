@@ -43,6 +43,8 @@ namespace PETScWrappers
    * interface, this class handles the actual allocation of vectors and
    * provides functions that are specific to the underlying vector type.
    *
+   * This class is deprecated, use PETScWrappers::MPI::BlockVector.
+   *
    * @ingroup Vectors
    *
    * @see
@@ -242,7 +244,7 @@ namespace PETScWrappers
      */
     DeclException0 (ExcIteratorRangeDoesNotMatchVectorSize);
     ///@}
-  };
+  } DEAL_II_DEPRECATED;
 
   /*@}*/
 

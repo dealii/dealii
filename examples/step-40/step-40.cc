@@ -168,9 +168,9 @@ namespace Step40
 
     ConstraintMatrix                          constraints;
 
-    LA::MPI::SparseMatrix system_matrix;
-    LA::MPI::Vector locally_relevant_solution;
-    LA::MPI::Vector system_rhs;
+    LA::MPI::SparseMatrix                     system_matrix;
+    LA::MPI::Vector                           locally_relevant_solution;
+    LA::MPI::Vector                           system_rhs;
 
     ConditionalOStream                        pcout;
     TimerOutput                               computing_timer;

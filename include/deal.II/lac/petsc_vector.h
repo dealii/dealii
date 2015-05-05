@@ -45,6 +45,8 @@ namespace PETScWrappers
    * virtual functions). Only the functions creating a vector of specific type
    * differ, and are implemented in this particular class.
    *
+   * This class is deprecated, use PETScWrappers::MPI::Vector instead.
+   *
    * @ingroup Vectors
    * @author Wolfgang Bangerth, 2004
    */
@@ -181,7 +183,7 @@ namespace PETScWrappers
      * vector. @p n denotes the total size of the vector to be created.
      */
     void create_vector (const size_type n);
-  };
+  } DEAL_II_DEPRECATED;
 
   /*@}*/
 

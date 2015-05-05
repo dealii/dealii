@@ -65,7 +65,6 @@
 // simply map to sequential, local vectors and matrices if there is only a
 // single process, i.e. if you are running on only one machine, and without
 // MPI support):
-#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 // Then we also need interfaces for solvers and preconditioners that PETSc
@@ -143,14 +142,9 @@ namespace Step17
 
     // In step-8, this would have been the place where we would have declared
     // the member variables for the sparsity pattern, the system matrix, right
-    // hand, and solution vector. We change these declarations to use
-    // parallel PETSc objects instead (note that the fact that we use the
-    // parallel versions is denoted the fact that we use the classes from the
-    // <code>PETScWrappers::MPI</code> namespace; sequential versions of these
-    // classes are in the <code>PETScWrappers</code> namespace, i.e. without
-    // the <code>MPI</code> part). Note also that we do not use a separate
-    // sparsity pattern, since PETSc manages that as part of its matrix data
-    // structures.
+    // hand, and solution vector. We change these declarations to use parallel
+    // PETSc objects instead. Note that we do not use a separate sparsity
+    // pattern, since PETSc manages that as part of its matrix data structures.
     PETScWrappers::MPI::SparseMatrix system_matrix;
 
     PETScWrappers::MPI::Vector       solution;
@@ -615,8 +609,8 @@ namespace Step17
     // another node in a simple way if we should need it, what we do here is
     // to get a copy of the distributed vector where we keep all elements
     // locally. This is simple, since the deal.II wrappers have a conversion
-    // constructor for the non-MPI vector class:
-    PETScWrappers::Vector localized_solution (solution);
+    // constructor for the deal.II vector class:
+    Vector<double> localized_solution (solution);
 
     // Then we distribute hanging node constraints on this local copy, i.e. we
     // compute the values of all constrained nodes:
@@ -655,7 +649,7 @@ namespace Step17
     // vector. This is necessary since the error estimator needs to get at the
     // value of neighboring cells even if they do not belong to the subdomain
     // associated with the present MPI process:
-    const PETScWrappers::Vector localized_solution (solution);
+    const Vector<double> localized_solution (solution);
 
     // Second part: set up a vector of error indicators for all cells and let
     // the Kelly class compute refinement indicators for all cells belonging
@@ -781,7 +775,7 @@ namespace Step17
     // zero only, we need to have access to all elements of the solution
     // vector. So we need to get a local copy of the distributed vector, which
     // is in fact simple:
-    const PETScWrappers::Vector localized_solution (solution);
+    const Vector<double> localized_solution (solution);
     // The thing to notice, however, is that we do this localization operation
     // on all processes, not only the one that actually needs the data. This
     // can't be avoided, however, with the communication model of MPI: MPI
@@ -867,7 +861,6 @@ namespace Step17
 
 
   // @sect4{ElasticProblem::run}
-
 
   // Lastly, here is the driver function. It is almost unchanged from step-8,
   // with the exception that we replace <code>std::cout</code> by the
