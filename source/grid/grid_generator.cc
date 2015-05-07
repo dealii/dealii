@@ -2056,7 +2056,7 @@ namespace GridGenerator
               continue;
 
             // If x is zero, then this is part of the plane
-            if (cell->face(i)->center()(0) < p(0)+1.e-5)
+            if (cell->face(i)->center()(0) < p(0)+1.e-5 * radius)
               cell->face(i)->set_boundary_id(1);
           }
         ++cell;
@@ -3112,7 +3112,7 @@ namespace GridGenerator
                   = cell->face(i);
 
                 const Point<3> face_center (face->center());
-                if (std::abs(face_center(0)-center(0)) > 1.e-6)
+                if (std::abs(face_center(0)-center(0)) > 1.e-6 * face_center.norm())
                   {
                     if (std::abs((face_center-center).norm()-inner_radius) <
                         std::abs((face_center-center).norm()-outer_radius))
