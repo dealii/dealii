@@ -737,6 +737,10 @@ namespace DynamicSparsityPatternIterators
   bool
   Accessor::operator == (const Accessor &other) const
   {
+    // compare the sparsity pattern the iterator points into, the
+    // current row, and the location within this row. ignore the
+    // latter if the row is past-the-end because in that case the
+    // current_entry field may not point to a deterministic location
     return (sparsity_pattern == other.sparsity_pattern &&
             current_row == other.current_row &&
             ((current_entry == other.current_entry)
