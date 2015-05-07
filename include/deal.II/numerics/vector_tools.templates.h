@@ -6724,10 +6724,11 @@ namespace VectorTools
                const InVector        &fe_function,
                const Point<spacedim>      &point)
   {
+#ifdef DEBUG
     const FiniteElement<dim> &fe = dof.get_fe();
-
     Assert(fe.n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
+#endif
 
     Vector<double> value(1);
     point_value(mapping, dof, fe_function, point, value);
@@ -6743,10 +6744,11 @@ namespace VectorTools
                const InVector        &fe_function,
                const Point<spacedim>      &point)
   {
+#ifdef DEBUG
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe();
-
     Assert(fe.n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
+#endif
 
     Vector<double> value(1);
     point_value(mapping, dof, fe_function, point, value);
