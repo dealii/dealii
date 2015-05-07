@@ -2071,8 +2071,9 @@ private:
  *         HelperClass ();
  *
  *         virtual void create_new (const unsigned int run_no);
- *         virtual void declare_parameters (ParameterHandler &prm);
  *         virtual void run (ParameterHandler &prm);
+ *
+ *         static void declare_parameters (ParameterHandler &prm);
  *       private:
  *         Problem *p;
  *     };
@@ -2088,8 +2089,6 @@ private:
  *
  *
  *     void HelperClass::declare_parameters (ParameterHandler &prm) {
- *                                         // entries of the problem class
- *                                 // note: must be static member!
  *       Problem::declare_parameters (prm);
  *     }
  *
@@ -2101,13 +2100,13 @@ private:
  *
  *
  *
- *     void main () {
+ *     int main () {
  *       class MultipleParameterLoop prm;
  *       HelperClass h;
- *
- *       h.declare_parameters (prm);
+ *       HelperClass::declare_parameters (prm);
  *       prm.read_input ("prmtest.prm");
  *       prm.loop (h);
+ *       return 0;
  *     }
  *   @endcode
  *
@@ -2244,12 +2243,6 @@ public:
      * new one or by cleaning an old one.
      */
     virtual void create_new (const unsigned int run_no) = 0;
-
-    /**
-     * This should declare parameters and call the <tt>declare_parameters</tt>
-     * function of the problem class.
-     */
-    virtual void declare_parameters (ParameterHandler &prm) = 0;
 
     /**
      * Get the parameters and run any necessary action.
