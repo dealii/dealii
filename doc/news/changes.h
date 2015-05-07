@@ -554,7 +554,7 @@ inconvenience this causes.
   of at least spacedim components.
   <br>
   (Luca Heltai, 2015/04/11)
-  <li>
+  </li>
 
   <li> New: TrilinosWrappers::BlockSparseMatrix now has member functions
   TrilinosWrappers::BlockSparseMatrix::domain_paritioner() and
@@ -568,7 +568,7 @@ inconvenience this causes.
   that generalizes MappingQEulerian to allow arbitrary FiniteElements.
   <br>
   (Marco Tezzele, Luca Heltai, 2015/04/06)
-  <li>
+  </li>
 
   <li> Changed: The cells of coarse meshes in
   parallel::distributed::Triangulation used to be ordered in a Cuthill-McKee
@@ -608,7 +608,7 @@ inconvenience this causes.
   <code>cell-@>active_cell_index()</code>).
   <br>
   (Wolfgang Bangerth, 2015/04/10)
-  <li>
+  </li>
 
   <li> Fixed: Added missing hp-related functions to FE_Q_Hierarchical together with
   a couple of unit tests. Improved code comments.
