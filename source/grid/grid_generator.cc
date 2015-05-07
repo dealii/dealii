@@ -3100,9 +3100,10 @@ namespace GridGenerator
             if (cell->at_boundary(i))
               cell->face(i)->set_all_boundary_ids(2);
 
-        // Next look for the curved boundaries. If the first component is
-        // not near to zero, the boundary is curved. Then decide whether the center
-        // is nearer to the inner or outer boundary to set the correct boundary id.
+        // Next look for the curved boundaries. If the x value of the
+        // center of the face is not equal to center(0), we're on a curved
+        // boundary. Then decide whether the center is nearer to the inner
+        // or outer boundary to set the correct boundary id.
         for (cell=tria.begin(); cell!=tria.end(); ++cell)
           for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
             if (cell->at_boundary(i))
@@ -3111,7 +3112,7 @@ namespace GridGenerator
                   = cell->face(i);
 
                 const Point<3> face_center (face->center());
-                if (std::abs((face_center(0)-center(0)) > 1.e-3))
+                if (std::abs(face_center(0)-center(0)) > 1.e-6)
                   {
                     if (std::abs((face_center-center).norm()-inner_radius) <
                         std::abs((face_center-center).norm()-outer_radius))
