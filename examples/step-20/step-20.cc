@@ -327,18 +327,41 @@ namespace Step20
     // operation that conveniently is already implemented:
     DoFRenumbering::component_wise (dof_handler);
 
-    // The next thing is that we want to figure out the sizes of these blocks,
+    // The next thing is that we want to figure out the sizes of these blocks
     // so that we can allocate an appropriate amount of space. To this end, we
-    // call the <code>DoFTools::count_dofs_per_component</code> function that
+    // call the DoFTools::count_dofs_per_component() function that
     // counts how many shape functions are non-zero for a particular vector
-    // component. We have <code>dim+1</code> vector components, and we have to
-    // use the knowledge that for Raviart-Thomas elements all shape functions
-    // are nonzero in all components. In other words, the number of velocity
-    // shape functions equals the number of overall shape functions that are
-    // nonzero in the zeroth vector component. On the other hand, the number
+    // component. We have <code>dim+1</code> vector components, and
+    // DoFTools::count_dofs_per_component() will count how many shape functions
+    // belong to each of these components.
+    //
+    // There is one problem here. As described in the documentation of that
+    // function, it <i>wants</i> to put the number of $x$-velocity shape
+    // functions into <code>dofs_per_component[0]</code>, the number of
+    // $y$-velocity shape functions into <code>dofs_per_component[1]</code>
+    // (and similar in 3d), and the number of pressure shape functions into
+    // <code>dofs_per_component[dim]</code>. But, the Raviart-Thomas element
+    // is special in that it is non-@ref GlossPrimitive "primitive", i.e.,
+    // for Raviart-Thomas elements all velocity shape functions
+    // are nonzero in all components. In other words, the function cannot
+    // distinguish between $x$ and $y$ velocity functions because there
+    // <i>is</i> no such distinction. It therefore puts the overall number
+    // of velocity into each of <code>dofs_per_component[c]</code>,
+    // $0\le c\le \text{dim}$. On the other hand, the number
     // of pressure variables equals the number of shape functions that are
-    // nonzero in the dim-th component. Let us compute these numbers and then
-    // create some nice output with that:
+    // nonzero in the dim-th component.
+    //
+    // Using this knowledge, we can get the number of velocity shape
+    // functions from any of the first <code>dim</code> elements of
+    // <code>dofs_per_component</code>, and then use this below to initialize
+    // the vector and matrix block sizes, as well as create output.
+    //
+    // @note If you find this concept difficult to understand, you may
+    // want to consider using the function DoFTools::count_dofs_per_block()
+    // instead, as we do in the corresponding piece of code in step-22.
+    // You might also want to read up on the difference between
+    // @ref GlossBlock "blocks" and @ref GlossComponent "components"
+    // in the glossary.
     std::vector<types::global_dof_index> dofs_per_component (dim+1);
     DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
     const unsigned int n_u = dofs_per_component[0],
