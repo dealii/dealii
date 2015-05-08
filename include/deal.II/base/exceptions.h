@@ -887,17 +887,42 @@ namespace StandardExceptions
   DeclException3 (ExcIndexRange,
                   int, int, int,
                   << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
-                  << arg3 << "[.");
+                  << arg3 << ")."
+                  << (arg2==arg3 ?
+                      " In the current case, this half-open range is in fact empty, "
+                      "suggesting that you are accessing an element of an empty "
+                      "collection such as a vector that has not been set to the "
+                      "correct size."
+                      :
+                      ""));
 
   /**
-   * This generic exception will allow(enforce) the user to specify the type
-   * of indices which adds type safety to the program.
+   * This exception indicates that an index is not within the
+   * expected range. For example, it may be that you are trying to
+   * access an element of a vector which does not exist.
+   *
+   * The constructor takes three <tt>int</tt> arguments, namely
+   * <ol>
+   * <li> the violating index
+   * <li> the lower bound
+   * <li> the upper bound plus one
+   * </ol>
+   *
+   * This generic exception differs from ExcIndexRange by allowing to specify
+   * the type of indices.
    */
   template <typename T>
   DeclException3 (ExcIndexRangeType,
                   T,T,T,
                   << "Index " << arg1 << " is not in the half-open range [" << arg2 << ","
-                  << arg3 << "[.");
+                  << arg3 << ")."
+                  << (arg2==arg3 ?
+                      " In the current case, this half-open range is in fact empty, "
+                      "suggesting that you are accessing an element of an empty "
+                      "collection such as a vector that has not been set to the "
+                      "correct size."
+                      :
+                      ""));
 
   /**
    * A number is too small.
@@ -905,7 +930,7 @@ namespace StandardExceptions
   DeclException2 (ExcLowerRange,
                   int, int,
                   << "Number " << arg1 << " must be larger than or equal "
-                  << arg2 << ".");
+                  << arg2 << ").");
 
   /**
    * A generic exception definition for the ExcLowerRange above.
