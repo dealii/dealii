@@ -265,7 +265,7 @@ namespace FEValuesViews
      * selected scalar component.
      *
      * The data type stored by the output vector must be what you get
-     * when you multiply the values of shape function (i.e., @p
+     * when you multiply the values of shape functions (i.e., @p
      * value_type) times the type used to store the values of the
      * unknowns $U_j$ of your finite element vector $U$ (represented
      * by the @p fe_function argument).
@@ -287,7 +287,7 @@ namespace FEValuesViews
      * selected scalar component.
      *
      * The data type stored by the output vector must be what you get
-     * when you multiply the gradients of shape function (i.e., @p
+     * when you multiply the gradients of shape functions (i.e., @p
      * gradient_type) times the type used to store the values of the
      * unknowns $U_j$ of your finite element vector $U$ (represented
      * by the @p fe_function argument).
@@ -309,7 +309,7 @@ namespace FEValuesViews
      * selected scalar component.
      *
      * The data type stored by the output vector must be what you get
-     * when you multiply the Hessians of shape function (i.e., @p
+     * when you multiply the Hessians of shape functions (i.e., @p
      * hessian_type) times the type used to store the values of the
      * unknowns $U_j$ of your finite element vector $U$ (represented
      * by the @p fe_function argument).
@@ -332,7 +332,7 @@ namespace FEValuesViews
      * selected scalar component.
      *
      * The data type stored by the output vector must be what you get
-     * when you multiply the Laplacians of shape function (i.e., @p
+     * when you multiply the Laplacians of shape functions (i.e., @p
      * value_type) times the type used to store the values of the
      * unknowns $U_j$ of your finite element vector $U$ (represented
      * by the @p fe_function argument).
@@ -622,6 +622,12 @@ namespace FEValuesViews
      * FEValuesBase::get_function_values function but it only works on the
      * selected vector components.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the values of shape functions (i.e., @p
+     * value_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
@@ -637,6 +643,12 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_gradients function but it only works on the
      * selected vector components.
+     *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the gradients of shape functions (i.e., @p
+     * gradient_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
@@ -659,6 +671,12 @@ namespace FEValuesViews
      * but the information can be obtained from
      * FEValuesBase::get_function_gradients, of course.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the symmetric gradients of shape functions (i.e., @p
+     * symmetric_gradient_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
@@ -677,6 +695,12 @@ namespace FEValuesViews
      * information can be obtained from FEValuesBase::get_function_gradients,
      * of course.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the divergences of shape functions (i.e., @p
+     * divergence_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
@@ -694,6 +718,12 @@ namespace FEValuesViews
      * information can be obtained from FEValuesBase::get_function_gradients,
      * of course.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the curls of shape functions (i.e., @p
+     * curl_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
@@ -709,6 +739,12 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_hessians function but it only works on the
      * selected vector components.
+     *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the Hessians of shape functions (i.e., @p
+     * hessian_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
      *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
@@ -726,6 +762,12 @@ namespace FEValuesViews
      * This function is the equivalent of the
      * FEValuesBase::get_function_laplacians function but it only works on the
      * selected vector components.
+     *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the Laplacians of shape functions (i.e., @p
+     * laplacian_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
      *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
@@ -913,6 +955,12 @@ namespace FEValuesViews
      * FEValuesBase::get_function_values function but it only works on the
      * selected vector components.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the values of shape functions (i.e., @p
+     * value_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
@@ -932,6 +980,12 @@ namespace FEValuesViews
      *
      * See the general discussion of this class for a definition of the
      * divergence.
+     *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the divergences of shape functions (i.e., @p
+     * divergence_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
@@ -1107,6 +1161,12 @@ namespace FEValuesViews
      * FEValuesBase::get_function_values function but it only works on the
      * selected vector components.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the values of shape functions (i.e., @p
+     * value_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
@@ -1127,6 +1187,12 @@ namespace FEValuesViews
      *
      * See the general discussion of this class for a definition of the
      * divergence.
+     *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the divergences of shape functions (i.e., @p
+     * divergence_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
@@ -1673,6 +1739,12 @@ public:
    * @param[out] values The values of the function specified by fe_function at
    * the quadrature points of the current cell.  The object is assume to
    * already have the correct size.
+   * The data type stored by this output vector must be what you get
+   * when you multiply the values of shape function
+   * times the type used to store the values of the
+   * unknowns $U_j$ of your finite element vector $U$ (represented
+   * by the @p fe_function argument). This happens to be equal to the
+   * type of the elements of the solution vector.
    *
    * @post <code>values[q]</code> will contain the value of the field
    * described by fe_function at the $q$th quadrature point.
@@ -1816,6 +1888,11 @@ public:
    * fe_function at the quadrature points of the current cell.  The gradients
    * are computed in real space (as opposed to on the unit cell).  The object
    * is assume to already have the correct size.
+   * The data type stored by this output vector must be what you get
+   * when you multiply the gradients of shape function times the type
+   * used to store the values of the
+   * unknowns $U_j$ of your finite element vector $U$ (represented
+   * by the @p fe_function argument).
    *
    * @post <code>gradients[q]</code> will contain the gradient of the field
    * described by fe_function at the $q$th quadrature point.
@@ -1902,6 +1979,11 @@ public:
    * fe_function at the quadrature points of the current cell.  The Hessians
    * are computed in real space (as opposed to on the unit cell).  The object
    * is assume to already have the correct size.
+   * The data type stored by this output vector must be what you get
+   * when you multiply the Hessians of shape function times the type
+   * used to store the values of the
+   * unknowns $U_j$ of your finite element vector $U$ (represented
+   * by the @p fe_function argument).
    *
    * @post <code>hessians[q]</code> will contain the Hessian of the field
    * described by fe_function at the $q$th quadrature point.
@@ -1988,6 +2070,12 @@ public:
    * fe_function at the quadrature points of the current cell.  The Laplacians
    * are computed in real space (as opposed to on the unit cell).  The object
    * is assume to already have the correct size.
+   * The data type stored by this output vector must be what you get
+   * when you multiply the Laplacians of shape function times the type
+   * used to store the values of the
+   * unknowns $U_j$ of your finite element vector $U$ (represented
+   * by the @p fe_function argument). This happens to be equal to the
+   * type of the elements of the input vector.
    *
    * @post <code>laplacians[q]</code> will contain the Laplacian of the field
    * described by fe_function at the $q$th quadrature point.
