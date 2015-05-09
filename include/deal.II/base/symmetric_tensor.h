@@ -641,11 +641,11 @@ public:
    * present object and the indices of the argument, and the result is a
    * tensor of rank 2.
    *
-   * Note that the multiplication operator for symmetrict tensors is defined
+   * Note that the multiplication operator for symmetric tensors is defined
    * to be a double contraction over two indices, while it is defined as a
    * single contraction over only one index for regular <tt>Tensor</tt>
    * objects. For symmetric tensors it therefore acts in a way that is
-   * commonly denoted by a "colon multiplication" in the mathematica
+   * commonly denoted by a "colon multiplication" in the mathematical
    * literature.
    *
    * There are global functions <tt>double_contract</tt> that do the same work
