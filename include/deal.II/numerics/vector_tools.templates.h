@@ -7009,17 +7009,22 @@ namespace VectorTools
       }
   }
 
-  // move to deal.ii/base/numbers.h ?
-  namespace internal
+  namespace
   {
     template <typename Number>
-    void set_possibly_complex_number(Number &n, const double &r, const double &)
+    void set_possibly_complex_number(const double &r,
+                                     const double &,
+                                     Number &n)
     {
       n = r;
     }
 
+
+
     template <typename Type>
-    void set_possibly_complex_number(std::complex<Type> &n, const double &r, const double &i)
+    void set_possibly_complex_number(const double &r,
+                                     const double &i,
+                                     std::complex<Type> &n)
     {
       n = std::complex<Type>(r,i);
     }
@@ -7083,7 +7088,8 @@ namespace VectorTools
                        MPI_SUM,
                        p_d_triangulation->get_communicator());
 
-        internal::set_possibly_complex_number(mean,global_values[0],global_values[1]);
+        set_possibly_complex_number(global_values[0], global_values[1],
+                                    mean);
         area = global_values[2];
       }
 #endif
