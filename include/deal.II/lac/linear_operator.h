@@ -1314,6 +1314,13 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
 /**
  * A class to store a computation.
  *
+ * The PackagedOperation class allows lazy evaluation of expressions
+ * involving vectors and linear operators. This is done by storing the
+ * computational expression and only performing the computation when either
+ * the object is implicitly converted to a vector object, or
+ * <code>apply</code> (or <code>apply_add</code>) is invoked by hand. This
+ * avoids unnecessary temporary storage of intermediate results.
+ *
  * The class essentially consists of <code>std::function</code> objects
  * that store the knowledge of how to generate the result of a computation
  * and store it in a vector:
@@ -1328,9 +1335,7 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  *   std::function<void(Range &, bool)> reinit_vector;
  * @endcode
  *
- * The primary purpose of this class is to allow lazy evaluation of
- * expressions involving vectors and linear operators. As an example
- * consider the addition of multiple vectors
+ * As an example consider the addition of multiple vectors
  * @code
  *   dealii::Vector<double> a, b, c, d;
  *   // ..
@@ -1343,7 +1348,7 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  *   // ..
  *   const auto op_a = linear_operator(A);
  *
- *   const auto residual =  b - op_a * x;
+ *   dealii::Vector<double> residual =  b - op_a * x;
  * @endcode
  * The expression <code>residual</code> is of type
  * <code>PackagedOperation<dealii::Vector<double>></code>. It stores
