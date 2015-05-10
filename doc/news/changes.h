@@ -38,6 +38,27 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li>Changed: Functions such as FEValuesBase::get_function_values() that
+  extracted the values of functions at the quadrature points of a cell
+  implicitly always assumed that <code>double</code> is a reasonable
+  type to store the result in. This, however, is not true if the solution
+  vector's underlying scalar type was, for example,
+  <code>std::complex@<double@></code>. All of the functions of
+  FEValuesBase as well as of the various FEValuesViews class that extract
+  values from solution vectors have been changed so that they now return
+  their results in vectors that use the same underlying scalar type
+  (float, double, or std::complex) as was used in the solution vector.
+  <br>
+  Most user codes will be entirely unaffected by this because they simply
+  use the default vector types which all store their data as doubles.
+  You may have to adjust your code, though, if you use non-standard
+  types such as Vector@<float@> for solution vectors, or use
+  complex-valued data types. This includes compiling PETSc with
+  complex scalars.
+  <br>
+  (David Davydov, 2015/05/08)
+  </li>
+
   <li>Removed: The generic, templated vmult, Tvmult, etc. -interfaces of
   LAPACKFullMatrix - they were never implemented.
   <br>

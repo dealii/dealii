@@ -19,6 +19,21 @@ DEAL_II_NAMESPACE_OPEN
 
 #include "vector.inst"
 
+// instantiate for integers:
+template class Vector<int>;
+namespace internal
+{
+  namespace Vector
+  {
+    template void copy_vector<int,double> (const dealii::Vector<int> &,
+                                           dealii::Vector<double> &);
+  }
+}
+
+template
+void Vector<int>::reinit<double>(const Vector<double> &, const bool);
+
+
 // do a few functions that currently don't fit the scheme because they have
 // two template arguments that need to be different (the case of same
 // arguments is covered by the default copy constructor and copy operator that

@@ -264,11 +264,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_values function but it only works on the
      * selected scalar component.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the values of shape functions (i.e., @p
+     * value_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
     /**
      * Return the gradients of the selected scalar component of the finite
@@ -280,11 +286,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_gradients function but it only works on the
      * selected scalar component.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the gradients of shape functions (i.e., @p
+     * gradient_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
-                                 std::vector<gradient_type> &gradients) const;
+                                 std::vector<typename ProductType<gradient_type,typename InputVector::value_type>::type> &gradients) const;
 
     /**
      * Return the Hessians of the selected scalar component of the finite
@@ -296,11 +308,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_hessians function but it only works on the
      * selected scalar component.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the Hessians of shape functions (i.e., @p
+     * hessian_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
-                                std::vector<hessian_type> &hessians) const;
+                                std::vector<typename ProductType<hessian_type,typename InputVector::value_type>::type> &hessians) const;
 
     /**
      * Return the Laplacians of the selected scalar component of the finite
@@ -313,11 +331,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_laplacians function but it only works on the
      * selected scalar component.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the Laplacians of shape functions (i.e., @p
+     * value_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
-                                  std::vector<value_type> &laplacians) const;
+                                  std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &laplacians) const;
 
   private:
     /**
@@ -598,11 +622,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_values function but it only works on the
      * selected vector components.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the values of shape functions (i.e., @p
+     * value_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
     /**
      * Return the gradients of the selected vector components of the finite
@@ -614,11 +644,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_gradients function but it only works on the
      * selected vector components.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the gradients of shape functions (i.e., @p
+     * gradient_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
-                                 std::vector<gradient_type> &gradients) const;
+                                 std::vector<typename ProductType<gradient_type,typename InputVector::value_type>::type> &gradients) const;
 
     /**
      * Return the symmetrized gradients of the selected vector components of
@@ -635,12 +671,18 @@ namespace FEValuesViews
      * but the information can be obtained from
      * FEValuesBase::get_function_gradients, of course.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the symmetric gradients of shape functions (i.e., @p
+     * symmetric_gradient_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void
     get_function_symmetric_gradients (const InputVector &fe_function,
-                                      std::vector<symmetric_gradient_type> &symmetric_gradients) const;
+                                      std::vector<typename ProductType<symmetric_gradient_type,typename InputVector::value_type>::type> &symmetric_gradients) const;
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -653,11 +695,17 @@ namespace FEValuesViews
      * information can be obtained from FEValuesBase::get_function_gradients,
      * of course.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the divergences of shape functions (i.e., @p
+     * divergence_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<divergence_type> &divergences) const;
+                                   std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const;
 
     /**
      * Return the curl of the selected vector components of the finite element
@@ -670,11 +718,17 @@ namespace FEValuesViews
      * information can be obtained from FEValuesBase::get_function_gradients,
      * of course.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the curls of shape functions (i.e., @p
+     * curl_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_curls (const InputVector &fe_function,
-                             std::vector<curl_type> &curls) const;
+                             std::vector<typename ProductType<curl_type,typename InputVector::value_type>::type> &curls) const;
 
     /**
      * Return the Hessians of the selected vector components of the finite
@@ -686,11 +740,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_hessians function but it only works on the
      * selected vector components.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the Hessians of shape functions (i.e., @p
+     * hessian_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
-                                std::vector<hessian_type> &hessians) const;
+                                std::vector<typename ProductType<hessian_type,typename InputVector::value_type>::type> &hessians) const;
 
     /**
      * Return the Laplacians of the selected vector components of the finite
@@ -703,11 +763,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_laplacians function but it only works on the
      * selected vector components.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the Laplacians of shape functions (i.e., @p
+     * laplacian_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
     template <class InputVector>
     void get_function_laplacians (const InputVector &fe_function,
-                                  std::vector<value_type> &laplacians) const;
+                                  std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &laplacians) const;
 
   private:
     /**
@@ -889,11 +955,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_values function but it only works on the
      * selected vector components.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the values of shape functions (i.e., @p
+     * value_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -909,11 +981,17 @@ namespace FEValuesViews
      * See the general discussion of this class for a definition of the
      * divergence.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the divergences of shape functions (i.e., @p
+     * divergence_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<divergence_type> &divergences) const;
+                                   std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const;
 
   private:
     /**
@@ -1083,11 +1161,17 @@ namespace FEValuesViews
      * FEValuesBase::get_function_values function but it only works on the
      * selected vector components.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the values of shape functions (i.e., @p
+     * value_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_values}
      */
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
-                              std::vector<value_type> &values) const;
+                              std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
 
     /**
@@ -1104,11 +1188,17 @@ namespace FEValuesViews
      * See the general discussion of this class for a definition of the
      * divergence.
      *
+     * The data type stored by the output vector must be what you get
+     * when you multiply the divergences of shape functions (i.e., @p
+     * divergence_type) times the type used to store the values of the
+     * unknowns $U_j$ of your finite element vector $U$ (represented
+     * by the @p fe_function argument).
+     *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
-                                   std::vector<divergence_type> &divergences) const;
+                                   std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const;
 
   private:
     /**
@@ -1649,6 +1739,12 @@ public:
    * @param[out] values The values of the function specified by fe_function at
    * the quadrature points of the current cell.  The object is assume to
    * already have the correct size.
+   * The data type stored by this output vector must be what you get
+   * when you multiply the values of shape function
+   * times the type used to store the values of the
+   * unknowns $U_j$ of your finite element vector $U$ (represented
+   * by the @p fe_function argument). This happens to be equal to the
+   * type of the elements of the solution vector.
    *
    * @post <code>values[q]</code> will contain the value of the field
    * described by fe_function at the $q$th quadrature point.
@@ -1663,9 +1759,9 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_values (const InputVector &fe_function,
-                            std::vector<number> &values) const;
+                            std::vector<typename InputVector::value_type> &values) const;
 
   /**
    * This function does the same as the other get_function_values(), but
@@ -1680,9 +1776,9 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_values (const InputVector       &fe_function,
-                            std::vector<Vector<number> > &values) const;
+                            std::vector<Vector<typename InputVector::value_type> > &values) const;
 
   /**
    * Generate function values from an arbitrary vector.
@@ -1702,10 +1798,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_values (const InputVector &fe_function,
                             const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                            std::vector<number> &values) const;
+                            std::vector<typename InputVector::value_type> &values) const;
 
   /**
    * Generate vector function values from an arbitrary vector.
@@ -1728,10 +1824,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_values (const InputVector &fe_function,
                             const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                            std::vector<Vector<number> > &values) const;
+                            std::vector<Vector<typename InputVector::value_type> > &values) const;
 
 
   /**
@@ -1767,7 +1863,7 @@ public:
   template <class InputVector>
   void get_function_values (const InputVector &fe_function,
                             const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                            VectorSlice<std::vector<std::vector<double> > > values,
+                            VectorSlice<std::vector<std::vector<typename InputVector::value_type> > > values,
                             const bool quadrature_points_fastest) const;
 
   //@}
@@ -1792,6 +1888,11 @@ public:
    * fe_function at the quadrature points of the current cell.  The gradients
    * are computed in real space (as opposed to on the unit cell).  The object
    * is assume to already have the correct size.
+   * The data type stored by this output vector must be what you get
+   * when you multiply the gradients of shape function times the type
+   * used to store the values of the
+   * unknowns $U_j$ of your finite element vector $U$ (represented
+   * by the @p fe_function argument).
    *
    * @post <code>gradients[q]</code> will contain the gradient of the field
    * described by fe_function at the $q$th quadrature point.
@@ -1810,7 +1911,7 @@ public:
    */
   template <class InputVector>
   void get_function_gradients (const InputVector      &fe_function,
-                               std::vector<Tensor<1,spacedim> > &gradients) const;
+                               std::vector<Tensor<1,spacedim,typename InputVector::value_type> > &gradients) const;
 
   /**
    * This function does the same as the other get_function_gradients(), but
@@ -1830,7 +1931,7 @@ public:
    */
   template <class InputVector>
   void get_function_gradients (const InputVector               &fe_function,
-                               std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const;
+                               std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > &gradients) const;
 
   /**
    * Function gradient access with more flexibility. See get_function_values()
@@ -1841,7 +1942,7 @@ public:
   template <class InputVector>
   void get_function_gradients (const InputVector &fe_function,
                                const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                               std::vector<Tensor<1,spacedim> > &gradients) const;
+                               std::vector<Tensor<1,spacedim,typename InputVector::value_type> > &gradients) const;
 
   /**
    * Function gradient access with more flexibility. See get_function_values()
@@ -1852,7 +1953,7 @@ public:
   template <class InputVector>
   void get_function_gradients (const InputVector &fe_function,
                                const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-                               VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > > gradients,
+                               VectorSlice<std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > > gradients,
                                bool quadrature_points_fastest = false) const;
 
   //@}
@@ -1878,6 +1979,11 @@ public:
    * fe_function at the quadrature points of the current cell.  The Hessians
    * are computed in real space (as opposed to on the unit cell).  The object
    * is assume to already have the correct size.
+   * The data type stored by this output vector must be what you get
+   * when you multiply the Hessians of shape function times the type
+   * used to store the values of the
+   * unknowns $U_j$ of your finite element vector $U$ (represented
+   * by the @p fe_function argument).
    *
    * @post <code>hessians[q]</code> will contain the Hessian of the field
    * described by fe_function at the $q$th quadrature point.
@@ -1897,7 +2003,7 @@ public:
   template <class InputVector>
   void
   get_function_hessians (const InputVector &fe_function,
-                         std::vector<Tensor<2,spacedim> > &hessians) const;
+                         std::vector<Tensor<2,spacedim,typename InputVector::value_type> > &hessians) const;
 
   /**
    * This function does the same as the other get_function_hessians(), but
@@ -1919,7 +2025,7 @@ public:
   template <class InputVector>
   void
   get_function_hessians (const InputVector      &fe_function,
-                         std::vector<std::vector<Tensor<2,spacedim> > > &hessians,
+                         std::vector<std::vector<Tensor<2,spacedim,typename InputVector::value_type> > > &hessians,
                          bool quadrature_points_fastest = false) const;
 
   /**
@@ -1930,7 +2036,7 @@ public:
   void get_function_hessians (
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-    std::vector<Tensor<2,spacedim> > &hessians) const;
+    std::vector<Tensor<2,spacedim,typename InputVector::value_type> > &hessians) const;
 
   /**
    * Access to the second derivatives of a function with more flexibility. See
@@ -1942,7 +2048,7 @@ public:
   void get_function_hessians (
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-    VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > > hessians,
+    VectorSlice<std::vector<std::vector<Tensor<2,spacedim,typename InputVector::value_type> > > > hessians,
     bool quadrature_points_fastest = false) const;
 
   /**
@@ -1964,6 +2070,12 @@ public:
    * fe_function at the quadrature points of the current cell.  The Laplacians
    * are computed in real space (as opposed to on the unit cell).  The object
    * is assume to already have the correct size.
+   * The data type stored by this output vector must be what you get
+   * when you multiply the Laplacians of shape function times the type
+   * used to store the values of the
+   * unknowns $U_j$ of your finite element vector $U$ (represented
+   * by the @p fe_function argument). This happens to be equal to the
+   * type of the elements of the input vector.
    *
    * @post <code>laplacians[q]</code> will contain the Laplacian of the field
    * described by fe_function at the $q$th quadrature point.
@@ -1984,10 +2096,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void
   get_function_laplacians (const InputVector &fe_function,
-                           std::vector<number> &laplacians) const;
+                           std::vector<typename InputVector::value_type> &laplacians) const;
 
   /**
    * This function does the same as the other get_function_laplacians(), but
@@ -2008,10 +2120,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void
   get_function_laplacians (const InputVector      &fe_function,
-                           std::vector<Vector<number> > &laplacians) const;
+                           std::vector<Vector<typename InputVector::value_type> > &laplacians) const;
 
   /**
    * Access to the second derivatives of a function with more flexibility. See
@@ -2019,11 +2131,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_laplacians (
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-    std::vector<number> &laplacians) const;
+    std::vector<typename InputVector::value_type> &laplacians) const;
 
   /**
    * Access to the second derivatives of a function with more flexibility. See
@@ -2031,11 +2143,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_laplacians (
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-    std::vector<Vector<number> > &laplacians) const;
+    std::vector<Vector<typename InputVector::value_type> > &laplacians) const;
 
   /**
    * Access to the second derivatives of a function with more flexibility. See
@@ -2043,11 +2155,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector, typename number>
+  template <class InputVector>
   void get_function_laplacians (
     const InputVector &fe_function,
     const VectorSlice<const std::vector<types::global_dof_index> > &indices,
-    std::vector<std::vector<number> > &laplacians,
+    std::vector<std::vector<typename InputVector::value_type> > &laplacians,
     bool quadrature_points_fastest = false) const;
   //@}
 

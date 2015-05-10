@@ -24,10 +24,10 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
       const hp::DoFHandler<deal_II_dimension>&,
       const VEC&,
       const Point<deal_II_dimension>&,
-      std::vector<Tensor<1,deal_II_space_dimension> >&);
+      std::vector<Tensor<1,deal_II_space_dimension,VEC::value_type> >&);
 
   template
-    Tensor<1,deal_II_space_dimension> point_gradient (
+    Tensor<1,deal_II_space_dimension,VEC::value_type> point_gradient (
       const hp::DoFHandler<deal_II_dimension>&,
       const VEC&,
       const Point<deal_II_dimension>&);
@@ -38,10 +38,10 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
       const hp::DoFHandler<deal_II_dimension>&,
       const VEC&,
       const Point<deal_II_dimension>&,
-      std::vector<Tensor<1,deal_II_space_dimension> >&);
+      std::vector<Tensor<1,deal_II_space_dimension,VEC::value_type> >&);
 
   template
-    Tensor<1,deal_II_space_dimension> point_gradient (
+    Tensor<1,deal_II_space_dimension,VEC::value_type> point_gradient (
      const hp::MappingCollection<deal_II_dimension>&,
       const hp::DoFHandler<deal_II_dimension>&,
       const VEC&,
@@ -52,10 +52,10 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
       const DoFHandler<deal_II_dimension>&,
       const VEC&,
       const Point<deal_II_dimension>&,
-      std::vector<Tensor<1,deal_II_space_dimension> >&);
+      std::vector<Tensor<1,deal_II_space_dimension,VEC::value_type> >&);
 
   template
-    Tensor<1,deal_II_space_dimension> point_gradient (
+    Tensor<1,deal_II_space_dimension,VEC::value_type> point_gradient (
       const DoFHandler<deal_II_dimension>&,
       const VEC&,
       const Point<deal_II_dimension>&);
@@ -66,10 +66,10 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
       const DoFHandler<deal_II_dimension>&,
       const VEC&,
       const Point<deal_II_dimension>&,
-      std::vector<Tensor<1,deal_II_space_dimension> >&);
+      std::vector<Tensor<1,deal_II_space_dimension,VEC::value_type> >&);
 
   template
-    Tensor<1,deal_II_space_dimension> point_gradient (
+    Tensor<1,deal_II_space_dimension,VEC::value_type> point_gradient (
       const Mapping<deal_II_dimension>&,
       const DoFHandler<deal_II_dimension>&,
       const VEC&,

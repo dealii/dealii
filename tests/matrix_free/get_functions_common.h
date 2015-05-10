@@ -69,9 +69,9 @@ public:
   {
     FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval (data);
 
-    std::vector<double> reference_values (fe_eval.n_q_points);
-    std::vector<Tensor<1,dim> > reference_grads (fe_eval.n_q_points);
-    std::vector<Tensor<2,dim> > reference_hess (fe_eval.n_q_points);
+    std::vector<Number> reference_values (fe_eval.n_q_points);
+    std::vector<Tensor<1,dim,Number> > reference_grads (fe_eval.n_q_points);
+    std::vector<Tensor<2,dim,Number> > reference_hess (fe_eval.n_q_points);
 
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {

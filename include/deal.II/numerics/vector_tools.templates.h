@@ -6027,7 +6027,7 @@ namespace VectorTools
 
   namespace internal
   {
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     struct IDScratchData
     {
       IDScratchData (const dealii::hp::MappingCollection<dim,spacedim> &mapping,
@@ -6040,24 +6040,26 @@ namespace VectorTools
       void resize_vectors (const unsigned int n_q_points,
                            const unsigned int n_components);
 
-      std::vector<dealii::Vector<double> > function_values;
-      std::vector<std::vector<Tensor<1,spacedim> > > function_grads;
+      std::vector<dealii::Vector<Number> > function_values;
+      std::vector<std::vector<Tensor<1,spacedim,Number> > > function_grads;
       std::vector<double> weight_values;
       std::vector<dealii::Vector<double> > weight_vectors;
 
-      std::vector<dealii::Vector<double> > psi_values;
-      std::vector<std::vector<Tensor<1,spacedim> > > psi_grads;
-      std::vector<double> psi_scalar;
+      std::vector<dealii::Vector<Number> > psi_values;
+      std::vector<std::vector<Tensor<1,spacedim,Number> > > psi_grads;
+      std::vector<Number> psi_scalar;
 
       std::vector<double>         tmp_values;
+      std::vector<dealii::Vector<double> > tmp_vector_values;
       std::vector<Tensor<1,spacedim> > tmp_gradients;
+      std::vector<std::vector<Tensor<1,spacedim> > > tmp_vector_gradients;
 
       dealii::hp::FEValues<dim,spacedim> x_fe_values;
     };
 
 
-    template <int dim, int spacedim>
-    IDScratchData<dim,spacedim>
+    template <int dim, int spacedim, typename Number>
+    IDScratchData<dim,spacedim,Number>
     ::IDScratchData(const dealii::hp::MappingCollection<dim,spacedim> &mapping,
                     const dealii::hp::FECollection<dim,spacedim> &fe,
                     const dealii::hp::QCollection<dim> &q,
@@ -6066,8 +6068,8 @@ namespace VectorTools
       x_fe_values(mapping, fe, q, update_flags)
     {}
 
-    template <int dim, int spacedim>
-    IDScratchData<dim,spacedim>::IDScratchData (const IDScratchData &data)
+    template <int dim, int spacedim, typename Number>
+    IDScratchData<dim,spacedim,Number>::IDScratchData (const IDScratchData &data)
       :
       x_fe_values(data.x_fe_values.get_mapping_collection(),
                   data.x_fe_values.get_fe_collection(),
@@ -6075,35 +6077,39 @@ namespace VectorTools
                   data.x_fe_values.get_update_flags())
     {}
 
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     void
-    IDScratchData<dim,spacedim>::resize_vectors (const unsigned int n_q_points,
-                                                 const unsigned int n_components)
+    IDScratchData<dim,spacedim,Number>::resize_vectors (const unsigned int n_q_points,
+                                                        const unsigned int n_components)
     {
       function_values.resize (n_q_points,
-                              dealii::Vector<double>(n_components));
+                              dealii::Vector<Number>(n_components));
       function_grads.resize (n_q_points,
-                             std::vector<Tensor<1,spacedim> >(n_components));
+                             std::vector<Tensor<1,spacedim,Number> >(n_components));
 
       weight_values.resize (n_q_points);
       weight_vectors.resize (n_q_points,
                              dealii::Vector<double>(n_components));
 
       psi_values.resize (n_q_points,
-                         dealii::Vector<double>(n_components));
+                         dealii::Vector<Number>(n_components));
       psi_grads.resize (n_q_points,
-                        std::vector<Tensor<1,spacedim> >(n_components));
+                        std::vector<Tensor<1,spacedim,Number> >(n_components));
       psi_scalar.resize (n_q_points);
 
       tmp_values.resize (n_q_points);
+      tmp_vector_values.resize (n_q_points,
+                                dealii::Vector<double>(n_components));
       tmp_gradients.resize (n_q_points);
+      tmp_vector_gradients.resize (n_q_points,
+                                   std::vector<Tensor<1,spacedim> >(n_components));
     }
 
 
     // avoid compiling inner function for many vector types when we always
     // really do the same thing by putting the main work into this helper
     // function
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number>
     double
     integrate_difference_inner (const Function<spacedim>   &exact_solution,
                                 const NormType              &norm,
@@ -6111,7 +6117,7 @@ namespace VectorTools
                                 const UpdateFlags            update_flags,
                                 const double                 exponent,
                                 const unsigned int           n_components,
-                                IDScratchData<dim,spacedim> &data)
+                                IDScratchData<dim,spacedim,Number> &data)
     {
       const bool fe_is_system = (n_components != 1);
       const dealii::FEValues<dim, spacedim> &fe_values  = data.x_fe_values.get_present_fe_values ();
@@ -6140,12 +6146,22 @@ namespace VectorTools
       if (update_flags & update_values)
         {
           // first compute the exact solution (vectors) at the quadrature
-          // points try to do this as efficient as possible by avoiding a
+          // points. try to do this as efficient as possible by avoiding a
           // second virtual function call in case the function really has only
           // one component
+          //
+          // TODO: we have to work a bit here because the Function<dim,double>
+          //   interface of the argument denoting the exact function only
+          //   provides us with double/Tensor<1,dim> values, rather than
+          //   with the correct data type. so evaluate into a temp
+          //   object, then copy around
           if (fe_is_system)
-            exact_solution.vector_value_list (fe_values.get_quadrature_points(),
-                                              data.psi_values);
+            {
+              exact_solution.vector_value_list (fe_values.get_quadrature_points(),
+                                                data.tmp_vector_values);
+              for (unsigned int i=0; i<n_q_points; ++i)
+                data.psi_values[i] = data.tmp_vector_values[i];
+            }
           else
             {
               exact_solution.value_list (fe_values.get_quadrature_points(),
@@ -6156,7 +6172,8 @@ namespace VectorTools
 
           // then subtract finite element fe_function
           for (unsigned int q=0; q<n_q_points; ++q)
-            data.psi_values[q] -= data.function_values[q];
+            for (unsigned int i=0; i<data.psi_values[q].size(); ++i)
+              data.psi_values[q][i] -= data.function_values[q][i];
         }
 
       // Do the same for gradients, if required
@@ -6166,8 +6183,13 @@ namespace VectorTools
           // calls when calling gradient_list for functions that are really
           // scalar functions
           if (fe_is_system)
-            exact_solution.vector_gradient_list (fe_values.get_quadrature_points(),
-                                                 data.psi_grads);
+            {
+              exact_solution.vector_gradient_list (fe_values.get_quadrature_points(),
+                                                   data.tmp_vector_gradients);
+              for (unsigned int i=0; i<n_q_points; ++i)
+                for (unsigned int comp=0; comp<data.psi_grads[i].size(); ++comp)
+                  data.psi_grads[i][comp] = data.tmp_vector_gradients[i][comp];
+            }
           else
             {
               exact_solution.gradient_list (fe_values.get_quadrature_points(),
@@ -6184,14 +6206,20 @@ namespace VectorTools
           if (update_flags & update_normal_vectors)
             for (unsigned int k=0; k<n_components; ++k)
               for (unsigned int q=0; q<n_q_points; ++q)
-                data.psi_grads[q][k] -= (data.function_grads[q][k] +
-                                         (data.psi_grads[q][k] * // (f.n) n
-                                          Tensor<1,spacedim>(fe_values.normal_vector(q)))*
-                                         fe_values.normal_vector(q));
+                {
+                  // compute (f.n) n
+                  const Number f_dot_n
+                    = (data.psi_grads[q][k] * Tensor<1,spacedim,Number>(fe_values.normal_vector(q)));
+                  const Tensor<1,spacedim,Number> f_dot_n_times_n
+                    = f_dot_n * Tensor<1,spacedim,Number>(fe_values.normal_vector(q));
+
+                  data.psi_grads[q][k] -= (data.function_grads[q][k] + f_dot_n_times_n);
+                }
           else
             for (unsigned int k=0; k<n_components; ++k)
               for (unsigned int q=0; q<n_q_points; ++q)
-                data.psi_grads[q][k] -= data.function_grads[q][k];
+                for (unsigned int d=0; d<spacedim; ++d)
+                  data.psi_grads[q][k][d] -= data.function_grads[q][k][d];
         }
 
       double diff = 0;
@@ -6246,8 +6274,8 @@ namespace VectorTools
         case W1infty_norm:
           for (unsigned int q=0; q<n_q_points; ++q)
             for (unsigned int k=0; k<n_components; ++k)
-              diff = std::max (diff, std::abs(data.psi_values[q](k)*
-                                              data.weight_vectors[q](k)));
+              diff = std::max (diff, double(std::abs(data.psi_values[q](k)*
+                                                     data.weight_vectors[q](k))));
           break;
 
         case H1_seminorm:
@@ -6313,8 +6341,9 @@ namespace VectorTools
           for (unsigned int q=0; q<n_q_points; ++q)
             for (unsigned int k=0; k<n_components; ++k)
               for (unsigned int d=0; d<dim; ++d)
-                t = std::max(t, std::abs(data.psi_grads[q][k][d]) *
-                             data.weight_vectors[q](k));
+                t = std::max(t,
+                             double(std::abs(data.psi_grads[q][k][d]) *
+                                    data.weight_vectors[q](k)));
 
           // then add seminorm to norm if that had previously been computed
           diff += t;
@@ -6344,6 +6373,7 @@ namespace VectorTools
                              const Function<spacedim>   *weight,
                              const double           exponent_1)
     {
+      typedef typename InVector::value_type Number;
       // we mark the "exponent" parameter to this function "const" since it is
       // strictly incoming, but we need to set it to something different later
       // on, if necessary, so have a read-write version of it:
@@ -6404,7 +6434,7 @@ namespace VectorTools
         }
 
       dealii::hp::FECollection<dim,spacedim> fe_collection (dof.get_fe());
-      IDScratchData<dim,spacedim> data(mapping, fe_collection, q, update_flags);
+      IDScratchData<dim,spacedim,typename InVector::value_type> data(mapping, fe_collection, q, update_flags);
 
       // loop over all cells
       for (typename DH::active_cell_iterator cell = dof.begin_active();
@@ -6424,9 +6454,9 @@ namespace VectorTools
               fe_values.get_function_gradients (fe_function, data.function_grads);
 
             difference(cell->active_cell_index()) =
-              integrate_difference_inner (exact_solution, norm, weight,
-                                          update_flags, exponent,
-                                          n_components, data);
+              integrate_difference_inner<dim,spacedim,typename InVector::value_type> (exact_solution, norm, weight,
+                  update_flags, exponent,
+                  n_components, data);
           }
         else
           // the cell is a ghost cell or is artificial. write a zero into the
@@ -6545,6 +6575,7 @@ namespace VectorTools
                     Vector<double>        &difference,
                     const Point<spacedim>      &point)
   {
+    typedef typename InVector::value_type Number;
     const FiniteElement<dim> &fe = dof.get_fe();
 
     Assert(difference.size() == fe.n_components(),
@@ -6568,7 +6599,7 @@ namespace VectorTools
 
     // then use this to get at the values of
     // the given fe_function at this point
-    std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+    std::vector<Vector<Number> > u_value(1, Vector<Number> (fe.n_components()));
     fe_values.get_function_values(fe_function, u_value);
 
     if (fe.n_components() == 1)
@@ -6646,6 +6677,7 @@ namespace VectorTools
                const Point<spacedim>      &point,
                Vector<double>        &value)
   {
+    typedef typename InVector::value_type Number;
     const FiniteElement<dim> &fe = dof.get_fe();
 
     Assert(value.size() == fe.n_components(),
@@ -6671,7 +6703,7 @@ namespace VectorTools
 
     // then use this to get at the values of
     // the given fe_function at this point
-    std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+    std::vector<Vector<Number> > u_value(1, Vector<Number> (fe.n_components()));
     fe_values.get_function_values(fe_function, u_value);
 
     value = u_value[0];
@@ -6686,6 +6718,7 @@ namespace VectorTools
                const Point<spacedim>      &point,
                Vector<double>        &value)
   {
+    typedef typename InVector::value_type Number;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe();
 
     Assert(value.size() == fe.n_components(),
@@ -6710,7 +6743,7 @@ namespace VectorTools
 
     // then use this to get at the values of
     // the given fe_function at this point
-    std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+    std::vector<Vector<Number> > u_value(1, Vector<Number> (fe.n_components()));
     fe_values.get_function_values(fe_function, u_value);
 
     value = u_value[0];
@@ -6757,7 +6790,7 @@ namespace VectorTools
   point_gradient (const DoFHandler<dim,spacedim>    &dof,
                   const InVector                    &fe_function,
                   const Point<spacedim>             &point,
-                  std::vector<Tensor<1, spacedim> > &gradients)
+                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &gradients)
   {
 
     point_gradient (StaticMappingQ1<dim,spacedim>::mapping,
@@ -6773,7 +6806,7 @@ namespace VectorTools
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
                   const InVector        &fe_function,
                   const Point<spacedim>      &point,
-                  std::vector<Tensor<1, spacedim> > &gradients)
+                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &gradients)
   {
     point_gradient(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
                    dof,
@@ -6784,7 +6817,7 @@ namespace VectorTools
 
 
   template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim>
+  Tensor<1, spacedim, typename InVector::value_type>
   point_gradient (const DoFHandler<dim,spacedim> &dof,
                   const InVector        &fe_function,
                   const Point<spacedim>      &point)
@@ -6797,7 +6830,7 @@ namespace VectorTools
 
 
   template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim>
+  Tensor<1, spacedim, typename InVector::value_type>
   point_gradient (const hp::DoFHandler<dim,spacedim> &dof,
                   const InVector        &fe_function,
                   const Point<spacedim>      &point)
@@ -6815,7 +6848,7 @@ namespace VectorTools
                   const DoFHandler<dim,spacedim> &dof,
                   const InVector        &fe_function,
                   const Point<spacedim>      &point,
-                  std::vector<Tensor<1, spacedim> > &gradient)
+                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &gradient)
   {
     const FiniteElement<dim> &fe = dof.get_fe();
 
@@ -6842,7 +6875,9 @@ namespace VectorTools
 
     // then use this to get the gradients of
     // the given fe_function at this point
-    std::vector<std::vector<Tensor<1, dim> > > u_gradient(1, std::vector<Tensor<1, dim> > (fe.n_components()));
+    typedef typename InVector::value_type Number;
+    std::vector<std::vector<Tensor<1, dim, Number> > >
+    u_gradient(1, std::vector<Tensor<1, dim, Number> > (fe.n_components()));
     fe_values.get_function_gradients(fe_function, u_gradient);
 
     gradient = u_gradient[0];
@@ -6855,8 +6890,9 @@ namespace VectorTools
                   const hp::DoFHandler<dim,spacedim> &dof,
                   const InVector        &fe_function,
                   const Point<spacedim>      &point,
-                  std::vector<Tensor<1, spacedim> > &gradient)
+                  std::vector<Tensor<1, spacedim, typename InVector::value_type> > &gradient)
   {
+    typedef typename InVector::value_type Number;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe();
 
     Assert(gradient.size() == fe.n_components(),
@@ -6881,7 +6917,9 @@ namespace VectorTools
 
     // then use this to get the gradients of
     // the given fe_function at this point
-    std::vector<std::vector<Tensor<1, dim> > > u_gradient(1, std::vector<Tensor<1, dim> > (fe.n_components()));
+    typedef typename InVector::value_type Number;
+    std::vector<std::vector<Tensor<1, dim, Number> > >
+    u_gradient(1, std::vector<Tensor<1, dim, Number> > (fe.n_components()));
     fe_values.get_function_gradients(fe_function, u_gradient);
 
     gradient = u_gradient[0];
@@ -6889,7 +6927,7 @@ namespace VectorTools
 
 
   template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim>
+  Tensor<1, spacedim, typename InVector::value_type>
   point_gradient (const Mapping<dim, spacedim>    &mapping,
                   const DoFHandler<dim,spacedim> &dof,
                   const InVector        &fe_function,
@@ -6898,15 +6936,16 @@ namespace VectorTools
     Assert(dof.get_fe().n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
-    std::vector<Tensor<1, dim> > gradient(1);
+    std::vector<Tensor<1, dim, typename InVector::value_type> > gradient(1);
     point_gradient (mapping, dof, fe_function, point, gradient);
 
     return gradient[0];
   }
 
 
+
   template <int dim, class InVector, int spacedim>
-  Tensor<1, spacedim>
+  Tensor<1, spacedim, typename InVector::value_type>
   point_gradient (const hp::MappingCollection<dim, spacedim>    &mapping,
                   const hp::DoFHandler<dim,spacedim> &dof,
                   const InVector        &fe_function,
@@ -6915,7 +6954,7 @@ namespace VectorTools
     Assert(dof.get_fe().n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
-    std::vector<Tensor<1, dim> > gradient(1);
+    std::vector<Tensor<1, dim, typename InVector::value_type> > gradient(1);
     point_gradient (mapping, dof, fe_function, point, gradient);
 
     return gradient[0];
@@ -6970,6 +7009,26 @@ namespace VectorTools
       }
   }
 
+  namespace
+  {
+    template <typename Number>
+    void set_possibly_complex_number(const double &r,
+                                     const double &,
+                                     Number &n)
+    {
+      n = r;
+    }
+
+
+
+    template <typename Type>
+    void set_possibly_complex_number(const double &r,
+                                     const double &i,
+                                     std::complex<Type> &n)
+    {
+      n = std::complex<Type>(r,i);
+    }
+  }
 
 
   template <int dim, class InVector, int spacedim>
@@ -6980,6 +7039,7 @@ namespace VectorTools
                       const InVector        &v,
                       const unsigned int     component)
   {
+    typedef typename InVector::value_type Number;
     Assert (v.size() == dof.n_dofs(),
             ExcDimensionMismatch (v.size(), dof.n_dofs()));
     Assert (component < dof.get_fe().n_components(),
@@ -6990,10 +7050,10 @@ namespace VectorTools
                                           | update_values));
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell;
-    std::vector<Vector<double> > values(quadrature.size(),
-                                        Vector<double> (dof.get_fe().n_components()));
+    std::vector<Vector<Number> > values(quadrature.size(),
+                                        Vector<Number> (dof.get_fe().n_components()));
 
-    double mean = 0.;
+    Number mean = Number();
     double area = 0.;
     // Compute mean value
     for (cell = dof.begin_active(); cell != dof.end(); ++cell)
@@ -7015,15 +7075,22 @@ namespace VectorTools
         p_d_triangulation
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(&dof.get_tria()))
       {
-        double my_values[2] = { mean, area };
-        double global_values[2];
+        // The type used to store the elements of the global vector may be a
+        // real or a complex number. Do the global reduction always with real
+        // and imaginary types so that we don't have to distinguish, and to this
+        // end just copy everything into a complex number and, later, back into
+        // the original data type.
+        std::complex<double> mean_double = mean;
+        double my_values[3] = { mean_double.real(), mean_double.imag(), area };
+        double global_values[3];
 
-        MPI_Allreduce (&my_values, &global_values, 2, MPI_DOUBLE,
+        MPI_Allreduce (&my_values, &global_values, 3, MPI_DOUBLE,
                        MPI_SUM,
                        p_d_triangulation->get_communicator());
 
-        mean = global_values[0];
-        area = global_values[1];
+        set_possibly_complex_number(global_values[0], global_values[1],
+                                    mean);
+        area = global_values[2];
       }
 #endif
 
