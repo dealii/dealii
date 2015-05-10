@@ -1762,6 +1762,7 @@ namespace
   };
 }
 
+
 /**
  * @relates PackagedOperation
  *
@@ -1846,6 +1847,52 @@ PackagedOperation<Range> operator-(const Range &u, const Range &v)
   };
 
   return return_comp;
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Create a PackagedOperation object that stores the scaling of a vector
+ * with a @p number.
+ *
+ * The PackagedOperation object that is created stores a reference to @p u.
+ * Thus, the vectors must remain valid references for the whole lifetime of
+ * the PackagedOperation object. All changes made on @p u or @p v after the
+ * creation of the PackagedOperation object are reflected by the operator
+ * object.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range,
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
+PackagedOperation<Range> operator*(const Range &u,
+                                   typename Range::value_type number)
+{
+  return PackagedOperation<Range>(u) * number;
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Create a PackagedOperation object that stores the scaling of a vector
+ * with a @p number.
+ *
+ * The PackagedOperation object that is created stores a reference to @p u.
+ * Thus, the vectors must remain valid references for the whole lifetime of
+ * the PackagedOperation object. All changes made on @p u or @p v after the
+ * creation of the PackagedOperation object are reflected by the operator
+ * object.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range,
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
+PackagedOperation<Range> operator*(typename Range::value_type number,
+                                   const Range &u)
+{
+  return number * PackagedOperation<Range>(u);
 }
 
 
