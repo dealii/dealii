@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,38 +22,38 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
-  template <int dim, int spacedim>
-  VectorDataBase<dim, spacedim>::~VectorDataBase()
+  template <int dim, int spacedim, typename Number>
+  VectorDataBase<dim, spacedim, Number>::~VectorDataBase()
   {}
 
 
-  template <int dim, int spacedim>
-  VectorDataBase<dim, spacedim>::VectorDataBase(const VectorSelector &v)
+  template <int dim, int spacedim, typename Number>
+  VectorDataBase<dim, spacedim, Number>::VectorDataBase(const VectorSelector &v)
     :
     VectorSelector(v)
   {}
 
 
-  template <int dim, int spacedim>
-  VectorDataBase<dim, spacedim>::VectorDataBase()
+  template <int dim, int spacedim, typename Number>
+  VectorDataBase<dim, spacedim, Number>::VectorDataBase()
   {}
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename Number>
   void
-  VectorDataBase<dim, spacedim>::initialize(const AnyData &d)
+  VectorDataBase<dim, spacedim, Number>::initialize(const AnyData &d)
   {
     this->data = d;
     VectorSelector::initialize(d);
   }
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename Number>
   void
-  VectorDataBase<dim, spacedim>::fill(
-    std::vector<std::vector<std::vector<double> > > &,
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &,
-    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &,
+  VectorDataBase<dim, spacedim, Number>::fill(
+    std::vector<std::vector<std::vector<Number> > > &,
+    std::vector<std::vector<std::vector<Tensor<1,dim,Number> > > > &,
+    std::vector<std::vector<std::vector<Tensor<2,dim,Number> > > > &,
     const FEValuesBase<dim,spacedim> &,
     const std::vector<types::global_dof_index> &,
     const unsigned int,
@@ -65,12 +65,12 @@ namespace MeshWorker
   }
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename Number>
   void
-  VectorDataBase<dim, spacedim>::mg_fill(
-    std::vector<std::vector<std::vector<double> > > &,
-    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &,
-    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &,
+  VectorDataBase<dim, spacedim, Number>::mg_fill(
+    std::vector<std::vector<std::vector<Number> > > &,
+    std::vector<std::vector<std::vector<Tensor<1,dim,Number> > > > &,
+    std::vector<std::vector<std::vector<Tensor<2,dim,Number> > > > &,
     const FEValuesBase<dim,spacedim> &,
     const unsigned int,
     const std::vector<types::global_dof_index> &,
@@ -93,7 +93,7 @@ namespace MeshWorker
   template <class VECTOR, int dim, int spacedim>
   VectorData<VECTOR, dim, spacedim>::VectorData(const VectorSelector &s)
     :
-    VectorDataBase<dim, spacedim>(s)
+    VectorDataBase<dim, spacedim, typename VECTOR::value_type>(s)
   {}
 
 

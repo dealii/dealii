@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -172,7 +172,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009
    */
-  template <int dim, int spacedim = dim>
+  template <int dim, int spacedim = dim, typename Number=double>
   class VectorDataBase :
     public VectorSelector
   {
@@ -200,6 +200,7 @@ namespace MeshWorker
      * Virtual, but empty destructor.
      */
     virtual ~VectorDataBase();
+
     /**
      * The only function added to VectorSelector is an abstract virtual
      * function implemented in the derived class template and called by
@@ -239,9 +240,9 @@ namespace MeshWorker
      * base element.
      */
     virtual void fill(
-      std::vector<std::vector<std::vector<double> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+      std::vector<std::vector<std::vector<Number> > > &values,
+      std::vector<std::vector<std::vector<Tensor<1,dim,Number> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,dim,Number> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const std::vector<types::global_dof_index> &index,
       const unsigned int component,
@@ -256,9 +257,9 @@ namespace MeshWorker
      * the active cells.
      */
     virtual void mg_fill(
-      std::vector<std::vector<std::vector<double> > > &values,
-      std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
-      std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+      std::vector<std::vector<std::vector<Number> > > &values,
+      std::vector<std::vector<std::vector<Tensor<1,dim,Number> > > > &gradients,
+      std::vector<std::vector<std::vector<Tensor<2,dim,Number> > > > &hessians,
       const FEValuesBase<dim,spacedim> &fe,
       const unsigned int level,
       const std::vector<types::global_dof_index> &index,
@@ -286,7 +287,7 @@ namespace MeshWorker
    */
   template <class VECTOR, int dim, int spacedim = dim>
   class VectorData :
-    public VectorDataBase<dim, spacedim>
+    public VectorDataBase<dim, spacedim,typename VECTOR::value_type>
   {
   public:
     /**
@@ -359,6 +360,7 @@ namespace MeshWorker
      * Constructor.
      */
     MGVectorData();
+
     /**
      * Constructor using a prefilled VectorSelector
      */
