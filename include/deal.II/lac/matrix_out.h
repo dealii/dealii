@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,32 +56,6 @@ DEAL_II_NAMESPACE_OPEN
  * documentation of the members of the Options class for a description of
  * these flags.
  *
- *
- * <h3>Internals</h3>
- *
- * To avoid a compiler error in Sun's Forte compiler, we derive privately from
- * DataOutBase. Since the base class DataOutInterface does so as well, this
- * does no harm, but calms the compiler which is suspecting an access control
- * conflict otherwise. Testcase here:
- * @code
- *    template <typename T> class V {};
- *
- *    struct B1 {
- *        template <int dim> struct X {
- *      int i[dim];
- *        };
- *    };
- *
- *    struct B2 : private B1 {};
- *
- *    struct D : public B2, private B1 {
- *        ~D () {};
- *        typedef B1::X<2> X;
- *        V<X> x;
- *    };
- *
- *    D d;
- * @endcode
  *
  * @ingroup output
  * @author Wolfgang Bangerth, 2001
@@ -163,14 +137,8 @@ private:
   /**
    * Abbreviate the somewhat lengthy name for the dealii::DataOutBase::Patch
    * class.
-   *
-   * Note that we have to indicate the global scope in front of DataOutBase,
-   * since otherwise the C++ rules specify that this here indicates the
-   * DataOutBase base class of this class. Since that is a private base class,
-   * we cannot access its members, and so access to the local Patch type would
-   * be forbidden.
    */
-  typedef dealii::DataOutBase::Patch<2,2> Patch;
+  typedef DataOutBase::Patch<2,2> Patch;
 
   /**
    * This is a list of patches that is created each time build_patches() is
