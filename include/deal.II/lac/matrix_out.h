@@ -21,6 +21,16 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 
+#ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+#  include <deal.II/lac/petsc_sparse_matrix.h>
+#  include <deal.II/lac/petsc_block_sparse_matrix.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -120,12 +130,12 @@ public:
    * the fields of this structure for more information.
    *
    * Note that this function requires that we can extract elements of the
-   * matrix, which is done using the get_element() function declared below. By
-   * adding specializations, you can extend this class to other matrix classes
-   * which are not presently supported. Furthermore, we need to be able to
-   * extract the size of the matrix, for which we assume that the matrix type
-   * offers member functions <tt>m()</tt> and <tt>n()</tt>, which return the
-   * number of rows and columns, respectively.
+   * matrix, which is done using the get_element() function declared in an
+   * internal namespace. By adding specializations, you can extend this class
+   * to other matrix classes which are not presently supported. Furthermore,
+   * we need to be able to extract the size of the matrix, for which we assume
+   * that the matrix type offers member functions <tt>m()</tt> and
+   * <tt>n()</tt>, which return the number of rows and columns, respectively.
    */
   template <class Matrix>
   void build_patches (const Matrix      &matrix,
@@ -166,32 +176,6 @@ private:
   virtual std::vector<std::string> get_dataset_names () const;
 
   /**
-   * Return the element with given indices of a sparse matrix.
-   */
-  template <typename number>
-  static double get_element (const SparseMatrix<number> &matrix,
-                             const size_type             i,
-                             const size_type             j);
-
-  /**
-   * Return the element with given indices of a block sparse matrix.
-   */
-  template <typename number>
-  static double get_element (const BlockSparseMatrix<number> &matrix,
-                             const size_type                  i,
-                             const size_type                  j);
-
-  /**
-   * Return the element with given indices from any matrix type for which no
-   * specialization of this function was declared above. This will call
-   * <tt>operator()</tt> on the matrix.
-   */
-  template <class Matrix>
-  static double get_element (const Matrix       &matrix,
-                             const size_type     i,
-                             const size_type     j);
-
-  /**
    * Get the value of the matrix at gridpoint <tt>(i,j)</tt>. Depending on the
    * given flags, this can mean different things, for example if only absolute
    * values shall be shown then the absolute value of the matrix entry is
@@ -209,40 +193,76 @@ private:
 /* ---------------------- Template and inline functions ------------- */
 
 
-template <typename number>
-inline
-double
-MatrixOut::get_element (const SparseMatrix<number> &matrix,
-                        const size_type             i,
-                        const size_type             j)
+namespace internal
 {
-  return matrix.el(i,j);
-}
+  namespace MatrixOut
+  {
+    namespace
+    {
+      /**
+       * Return the element with given indices of a sparse matrix.
+       */
+      template <typename number>
+      double get_element (const dealii::SparseMatrix<number> &matrix,
+                          const types::global_dof_index             i,
+                          const types::global_dof_index             j)
+      {
+        return matrix.el(i,j);
+      }
 
 
 
+      /**
+       * Return the element with given indices of a block sparse matrix.
+       */
+      template <typename number>
+      double get_element (const dealii::BlockSparseMatrix<number> &matrix,
+                          const types::global_dof_index                  i,
+                          const types::global_dof_index                  j)
+      {
+        return matrix.el(i,j);
+      }
 
-template <typename number>
-inline
-double
-MatrixOut::get_element (const BlockSparseMatrix<number> &matrix,
-                        const size_type                  i,
-                        const size_type                  j)
-{
-  return matrix.el(i,j);
-}
+#ifdef DEAL_II_WITH_TRILINOS
+      /**
+       * Return the element with given indices of a sparse matrix.
+       */
+      double get_element (const TrilinosWrappers::SparseMatrix &matrix,
+                          const types::global_dof_index             i,
+                          const types::global_dof_index             j)
+      {
+        return matrix.el(i,j);
+      }
 
 
 
+      /**
+       * Return the element with given indices of a Trilinos block sparse
+       * matrix.
+       */
+      double get_element (const TrilinosWrappers::BlockSparseMatrix &matrix,
+                          const types::global_dof_index                  i,
+                          const types::global_dof_index                  j)
+      {
+        return matrix.el(i,j);
+      }
+#endif
 
-template <class Matrix>
-inline
-double
-MatrixOut::get_element (const Matrix   &matrix,
-                        const size_type i,
-                        const size_type j)
-{
-  return matrix(i,j);
+
+      /**
+       * Return the element with given indices from any matrix type for which no
+       * specialization of this function was declared above. This will call
+       * <tt>operator()</tt> on the matrix.
+       */
+      template <class Matrix>
+      double get_element (const Matrix       &matrix,
+                          const types::global_dof_index     i,
+                          const types::global_dof_index     j)
+      {
+        return matrix(i,j);
+      }
+    }
+  }
 }
 
 
@@ -261,9 +281,9 @@ MatrixOut::get_gridpoint_value (const Matrix   &matrix,
   if (options.block_size == 1)
     {
       if (options.show_absolute_values == true)
-        return std::fabs(get_element (matrix, i, j));
+        return std::fabs(internal::MatrixOut::get_element (matrix, i, j));
       else
-        return get_element (matrix, i, j);
+        return internal::MatrixOut::get_element (matrix, i, j);
     }
 
   // if blocksize greater than one,
@@ -277,9 +297,9 @@ MatrixOut::get_gridpoint_value (const Matrix   &matrix,
          col < std::min(size_type(matrix.m()),
                         size_type((j+1)*options.block_size)); ++col, ++n_elements)
       if (options.show_absolute_values == true)
-        average += std::fabs(get_element (matrix, row, col));
+        average += std::fabs(internal::MatrixOut::get_element (matrix, row, col));
       else
-        average += get_element (matrix, row, col);
+        average += internal::MatrixOut::get_element (matrix, row, col);
   average /= n_elements;
   return average;
 }
