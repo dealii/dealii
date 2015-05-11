@@ -382,11 +382,11 @@ operator*(typename Range::value_type  number,
 
 
   // the trivial case: number is zero
-  if (number == 0)
+  if (number == 0.)
     {
       return_op.vmult = [] (Range &v, const Domain &)
       {
-        v *= 0;
+        v = 0.;
       };
 
       return_op.vmult_add = [] (Range &, const Domain &)
@@ -395,7 +395,7 @@ operator*(typename Range::value_type  number,
 
       return_op.Tvmult = [](Domain &v, const Range &)
       {
-        v *= 0;
+        v = 0.;
       };
 
       return_op.Tvmult_add = [](Domain &, const Range &)
@@ -404,7 +404,6 @@ operator*(typename Range::value_type  number,
     }
   else
     {
-
       // ensure to have valid computation objects by catching number and op by
       // value
 
