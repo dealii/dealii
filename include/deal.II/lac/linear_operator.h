@@ -47,6 +47,8 @@ template <typename Range = Vector<double>,
           typename Matrix>
 LinearOperator<Range, Domain> linear_operator (const Matrix &);
 
+template <typename Range = Vector<double> > class PackagedOperation;
+
 /**
  * A class to store the abstract concept of a linear operator.
  *
@@ -225,6 +227,10 @@ public:
    */
   std::function<void(Domain &v, bool fast)> reinit_domain_vector;
 
+  /**
+   * @name In-place vector space operations
+   */
+  //@{
 
   /**
    * Addition with a LinearOperator @p second_op with the same @p Domain
@@ -270,12 +276,17 @@ public:
     return *this;
   }
 
+  //@}
 };
 
 
+/**
+ * @name Vector space operations
+ */
+//@{
 
 /**
- * \relates LinearOperator
+ * @relates LinearOperator
  *
  * Addition of two linear operators @p first_op and @p second_op given by
  * $(\text{first\_op}+\text{second\_op})x:=\text{first\_op}(x)+\text{second\_op}(x)$
@@ -324,7 +335,7 @@ operator+(const LinearOperator<Range, Domain> &first_op,
 
 
 /**
- * \relates LinearOperator
+ * @relates LinearOperator
  *
  * Subtraction of two linear operators @p first_op and @p second_op given by
  * $(\text{first\_op}-\text{second\_op})x:=\text{first\_op}(x)-\text{second\_op}(x)$
@@ -342,7 +353,103 @@ operator-(const LinearOperator<Range, Domain> &first_op,
 
 
 /**
- * \relates LinearOperator
+ * @relates LinearOperator
+ *
+ * Scalar multiplication of a ScalarOperator object @p op with @p
+ * number from the left.
+ *
+ * The @p Domain and @p Range types must implement the following
+ * <code>operator*=</code> member functions accepting the appropriate
+ * scalar Number type for rescaling:
+ *
+ * @code
+ * Domain & operator *=(Domain::value_type);
+ * Range & operator *=(Range::value_type);
+ * @endcode
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+operator*(typename Range::value_type  number,
+          const LinearOperator<Range, Domain> &op)
+{
+  static_assert(
+    std::is_convertible<typename Range::value_type, typename Domain::value_type>::value,
+    "Range and Domain must have implicitly convertible 'value_type's");
+
+  LinearOperator<Range, Domain> return_op = op;
+
+  // ensure to have valid computation objects by catching number and op by
+  // value
+
+  return_op.vmult = [number, op](Range &v, const Domain &u)
+  {
+    op.vmult(v,u);
+    v *= number;
+  };
+
+  return_op.vmult_add = [number, op](Range &v, const Domain &u)
+  {
+    v /= number;
+    op.vmult_add(v,u);
+    v *= number;
+  };
+
+  return_op.Tvmult = [number, op](Domain &v, const Range &u)
+  {
+    op.Tvmult(v,u);
+    v *= number;
+  };
+
+  return_op.Tvmult_add = [number, op](Domain &v, const Range &u)
+  {
+    v /= number;
+    op.Tvmult_add(v,u);
+    v *= number;
+  };
+
+  return return_op;
+}
+
+
+/**
+ * @relates LinearOperator
+ *
+ * Scalar multiplication of a ScalarOperator object from the right.
+ *
+ * The @p Domain and @p Range types must implement the following
+ * <code>operator*=</code> member functions for rescaling:
+ *
+ * @code
+ * Domain & operator *=(Domain::value_type);
+ * Range & operator *=(Range::value_type);
+ * @endcode
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+operator*(const LinearOperator<Range, Domain> &op,
+          typename Domain::value_type  number)
+{
+  static_assert(
+    std::is_convertible<typename Range::value_type, typename Domain::value_type>::value,
+    "Range and Domain must have implicitly convertible 'value_type's");
+
+  return number * op;
+}
+
+//@}
+
+
+/**
+ * @name Composition and manipulation of a LinearOperator
+ */
+//@{
+
+/**
+ * @relates LinearOperator
  *
  * Composition of two linear operators @p first_op and @p second_op given by
  * $(\text{first\_op}*\text{second\_op})x:=\text{first\_op}(\text{second\_op}(x))$
@@ -409,98 +516,8 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
   return return_op;
 }
 
-
 /**
- * \relates LinearOperator
- *
- * Scalar multiplication of a ScalarOperator object @p op with @p
- * number from the left.
- *
- * The @p Domain and @p Range types must implement the following
- * <code>operator*=</code> member functions accepting the appropriate
- * scalar Number type for rescaling:
- *
- * @code
- * Domain & operator *=(Domain::value_type);
- * Range & operator *=(Range::value_type);
- * @endcode
- *
- * @ingroup LAOperators
- */
-template <typename Range, typename Domain>
-LinearOperator<Range, Domain>
-operator*(typename Range::value_type  number,
-          const LinearOperator<Range, Domain> &op)
-{
-  static_assert(
-    std::is_convertible<typename Range::value_type, typename Domain::value_type>::value,
-    "Range and Domain must have implicitly convertible 'value_type's");
-
-  LinearOperator<Range, Domain> return_op = op;
-
-  // ensure to have valid computation objects by catching number and op by
-  // value
-
-  return_op.vmult = [number, op](Range &v, const Domain &u)
-  {
-    op.vmult(v,u);
-    v *= number;
-  };
-
-  return_op.vmult_add = [number, op](Range &v, const Domain &u)
-  {
-    v /= number;
-    op.vmult_add(v,u);
-    v *= number;
-  };
-
-  return_op.Tvmult = [number, op](Domain &v, const Range &u)
-  {
-    op.Tvmult(v,u);
-    v *= number;
-  };
-
-  return_op.Tvmult_add = [number, op](Domain &v, const Range &u)
-  {
-    v /= number;
-    op.Tvmult_add(v,u);
-    v *= number;
-  };
-
-  return return_op;
-}
-
-
-/**
- * \relates LinearOperator
- *
- * Scalar multiplication of a ScalarOperator object from the right.
- *
- * The @p Domain and @p Range types must implement the following
- * <code>operator*=</code> member functions for rescaling:
- *
- * @code
- * Domain & operator *=(Domain::value_type);
- * Range & operator *=(Range::value_type);
- * @endcode
- *
- * @ingroup LAOperators
- */
-template <typename Range, typename Domain>
-LinearOperator<Range, Domain>
-operator*(const LinearOperator<Range, Domain> &op,
-          typename Domain::value_type  number)
-{
-  static_assert(
-    std::is_convertible<typename Range::value_type, typename Domain::value_type>::value,
-    "Range and Domain must have implicitly convertible 'value_type's");
-
-  return number * op;
-}
-
-
-/**
- * \relates LinearOperator
+ * @relates LinearOperator
  *
  * Returns the transpose linear operations of @ref op.
  *
@@ -523,55 +540,8 @@ transpose_operator(const LinearOperator<Range, Domain> &op)
   return return_op;
 }
 
-
 /**
- * \relates LinearOperator
- *
- * Returns a LinearOperator that is the identity of the vector space
- * @p Range.
- *
- * The function takes an <code>std::function</code> object @ref
- * reinit_vector as an argument to initialize the
- * <code>reinit_range_vector</code> and <code>reinit_domain_vector</code>
- * objects of the LinearOperator object.
- *
- * @ingroup LAOperators
- */
-template <typename Range>
-LinearOperator<Range, Range>
-identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
-{
-  LinearOperator<Range, Range> return_op;
-
-  return_op.reinit_range_vector = reinit_vector;
-  return_op.reinit_domain_vector = reinit_vector;
-
-  return_op.vmult = [](Range &v, const Range &u)
-  {
-    v = u;
-  };
-
-  return_op.vmult_add = [](Range &v, const Range &u)
-  {
-    v += u;
-  };
-
-  return_op.Tvmult = [](Range &v, const Range &u)
-  {
-    v = u;
-  };
-
-  return_op.Tvmult_add = [](Range &v, const Range &u)
-  {
-    v += u;
-  };
-
-  return return_op;
-}
-
-
-/**
- * \relates LinearOperator
+ * @relates LinearOperator
  *
  * Returns an object representing the inverse of the LinearOperator @p op.
  *
@@ -639,9 +609,418 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
   return return_op;
 }
 
+//@}
+
 
 /**
- * \relates LinearOperator
+ * @name Creation of a LinearOperator
+ */
+//@{
+
+/**
+ * @relates LinearOperator
+ *
+ * Returns a LinearOperator that is the identity of the vector space
+ * @p Range.
+ *
+ * The function takes an <code>std::function</code> object @ref
+ * reinit_vector as an argument to initialize the
+ * <code>reinit_range_vector</code> and <code>reinit_domain_vector</code>
+ * objects of the LinearOperator object.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range>
+LinearOperator<Range, Range>
+identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
+{
+  LinearOperator<Range, Range> return_op;
+
+  return_op.reinit_range_vector = reinit_vector;
+  return_op.reinit_domain_vector = reinit_vector;
+
+  return_op.vmult = [](Range &v, const Range &u)
+  {
+    v = u;
+  };
+
+  return_op.vmult_add = [](Range &v, const Range &u)
+  {
+    v += u;
+  };
+
+  return_op.Tvmult = [](Range &v, const Range &u)
+  {
+    v = u;
+  };
+
+  return_op.Tvmult_add = [](Range &v, const Range &u)
+  {
+    v += u;
+  };
+
+  return return_op;
+}
+
+
+namespace internal
+{
+  namespace LinearOperator
+  {
+    /**
+     * A helper class that is responsible for the initialization of a
+     * vector to be directly usable as the destination parameter, or source
+     * parameter in an application of vmult of a matrix.
+     *
+     * The generic version of this class just calls
+     * <code>Vector::reinit()</code> with the result of
+     * <code>Matrix::m()</code> or <code>Matrix::n()</code>, respectively.
+     * This class is specialized for more complicated data structures, such
+     * as TrilinosWrappers::MPI::Vector, etc.
+     */
+    template<typename Vector>
+    class ReinitHelper
+    {
+    public:
+      /**
+       * Initializes a vector v of the Range space to be directly usable
+       * as the destination parameter in an application of vmult. Similar to
+       * the reinit functions of the vector classes, the boolean determines
+       * whether a fast initalization is done, i.e., if it is set to false the
+       * content of the vector is set to 0.
+       *
+       * The generic version of this class just calls
+       * <code>Vector::reinit()</code> with the result of
+       * <code>Matrix::m()</code>.
+       */
+      template <typename Matrix>
+      static
+      void reinit_range_vector (const Matrix &matrix, Vector &v, bool fast)
+      {
+        v.reinit(matrix.m(), fast);
+      }
+
+      /**
+       * Initializes a vector of the Domain space to be directly usable as the
+       * source parameter in an application of vmult. Similar to the reinit
+       * functions of the vector classes, the boolean determines whether a fast
+       * initalization is done, i.e., if it is set to false the content of the
+       * vector is set to 0.
+       *
+       * The generic version of this class just calls
+       * <code>Vector::reinit()</code> with the result of
+       * <code>Matrix::n()</code>.
+       */
+      template <typename Matrix>
+      static
+      void reinit_domain_vector (const Matrix &matrix, Vector &v, bool fast)
+      {
+        v.reinit(matrix.n(), fast);
+      }
+    };
+  } /* namespace LinearOperator */
+} /* namespace internal */
+
+
+namespace
+{
+  // A trait class that determines whether type T provides public
+  // (templated or non-templated) vmult_add and Tvmult_add member functions
+
+  template <typename Range, typename Domain, typename T>
+  class has_vmult_add
+  {
+    template <typename C>
+    static std::false_type test(...);
+
+    template <typename C>
+    static std::true_type test(decltype(&C::vmult_add),
+                               decltype(&C::Tvmult_add));
+
+    template <typename C>
+    static std::true_type test(decltype(&C::template vmult_add<Range>),
+                               decltype(&C::template Tvmult_add<Range>));
+
+    template <typename C>
+    static std::true_type test(decltype(&C::template vmult_add<Range, Domain>),
+                               decltype(&C::template Tvmult_add<Domain, Range>));
+
+  public:
+    // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
+    // otherwise it is std::false_type
+
+    typedef decltype(test<T>(0, 0)) type;
+  };
+
+
+  // A helper function to apply a given vmult, or Tvmult to a vector with
+  // intermediate storage
+  template <typename Function, typename Range, typename Domain>
+  void apply_with_intermediate_storage(Function function, Range &v,
+                                       const Domain &u, bool add)
+  {
+    static GrowingVectorMemory<Range> vector_memory;
+
+    Range *i = vector_memory.alloc();
+    i->reinit(v, /*bool fast =*/true);
+
+    function(*i, u);
+
+    if (add)
+      v += *i;
+    else
+      v = *i;
+
+    vector_memory.free(i);
+  }
+
+
+  // A helper class to add a reduced matrix interface to a LinearOperator
+  // (typically provided by Preconditioner classes)
+
+  template <typename Range, typename Domain>
+  class MatrixInterfaceWithoutVmultAdd
+  {
+  public:
+    template <typename Matrix>
+    void operator()(LinearOperator<Range, Domain> &op, const Matrix &matrix)
+    {
+      op.vmult = [&matrix](Range &v, const Domain &u)
+      {
+        if (PointerComparison::equal(&v, &u))
+          {
+            // If v and u are the same memory location use intermediate storage
+            apply_with_intermediate_storage([&matrix](Range &b, const Domain &a)
+            {
+              matrix.vmult(b, a);
+            },
+            v, u, /*bool add =*/ false);
+          }
+        else
+          {
+            matrix.vmult(v,u);
+          }
+      };
+
+      op.vmult_add = [&matrix](Range &v, const Domain &u)
+      {
+        // use intermediate storage to implement vmult_add with vmult
+        apply_with_intermediate_storage([&matrix](Range &b, const Domain &a)
+        {
+          matrix.vmult(b, a);
+        },
+        v, u, /*bool add =*/ true);
+      };
+
+      op.Tvmult = [&matrix](Domain &v, const Range &u)
+      {
+        if (PointerComparison::equal(&v, &u))
+          {
+            // If v and u are the same memory location use intermediate storage
+            apply_with_intermediate_storage([&matrix](Domain &b, const Range &a)
+            {
+              matrix.Tvmult(b, a);
+            },
+            v, u, /*bool add =*/ false);
+          }
+        else
+          {
+            matrix.Tvmult(v,u);
+          }
+
+      };
+
+      op.Tvmult_add = [&matrix](Domain &v, const Range &u)
+      {
+        // use intermediate storage to implement Tvmult_add with Tvmult
+        apply_with_intermediate_storage([&matrix](Domain &b, const Range &a)
+        {
+          matrix.Tvmult(b, a);
+        },
+        v, u, /*bool add =*/ true);
+      };
+    }
+  };
+
+
+  // A helper class to add the full matrix interface to a LinearOperator
+
+  template <typename Range, typename Domain>
+  class MatrixInterfaceWithVmultAdd
+  {
+  public:
+    template <typename Matrix>
+    void operator()(LinearOperator<Range, Domain> &op, const Matrix &matrix)
+    {
+      // As above ...
+
+      MatrixInterfaceWithoutVmultAdd<Range, Domain>().operator()(op, matrix);
+
+      // ... but add native vmult_add and Tvmult_add variants:
+
+      op.vmult_add = [&matrix](Range &v, const Domain &u)
+      {
+        if (PointerComparison::equal(&v, &u))
+          {
+            apply_with_intermediate_storage([&matrix](Range &b, const Domain &a)
+            {
+              matrix.vmult(b, a);
+            },
+            v, u, /*bool add =*/ false);
+          }
+        else
+          {
+            matrix.vmult_add(v,u);
+          }
+      };
+
+      op.Tvmult_add = [&matrix](Domain &v, const Range &u)
+      {
+        if (PointerComparison::equal(&v, &u))
+          {
+            apply_with_intermediate_storage([&matrix](Domain &b, const Range &a)
+            {
+              matrix.Tvmult(b, a);
+            },
+            v, u, /*bool add =*/ true);
+          }
+        else
+          {
+            matrix.Tvmult_add(v,u);
+          }
+      };
+    }
+  };
+
+} /* namespace */
+
+
+/**
+ * @relates LinearOperator
+ *
+ * A function that encapsulates generic @p matrix objects that act on a
+ * compatible Vector type into a LinearOperator. The LinearOperator object
+ * that is created stores a reference to the matrix object. Thus, @p matrix
+ * must remain a valid reference for the whole lifetime of the
+ * LinearOperator object.
+ *
+ * All changes made on @p matrix after the creation of the LinearOperator
+ * object are reflected by the operator object. For example, it is a valid
+ * procedure to first create a LinearOperator and resize, reassemble the
+ * matrix later.
+ *
+ * The Matrix class in question must provide the following minimal
+ * interface:
+ *
+ * @code
+ * class Matrix
+ * {
+ * public:
+ *   // (type specific) information how to create a Range and Domain vector
+ *   // with appropriate size and internal layout
+ *
+ *   // Application of matrix to vector src, writes the result into dst.
+ *   vmult(VECTOR &dst, const VECTOR &src);
+ *
+ *   // Application of the transpose of matrix to vector src, writes the
+ *   // result into dst. (Depending on the usage of the linear operator
+ *   // class this can be a dummy implementation throwing an error.)
+ *   Tvmult(VECTOR &dst, const VECTOR &src);
+ * };
+ * @endcode
+ *
+ * The following (optional) interface is used if available:
+ *
+ * @code
+ * class Matrix
+ * {
+ * public:
+ *   // Application of matrix to vector src, adds the result to dst.
+ *   vmult_add(VECTOR &dst, const VECTOR &src);
+ *
+ *   // Application of the transpose of matrix to vector src, adds the
+ *   // result to dst.
+ *   Tvmult_add(VECTOR &dst, const VECTOR &src);
+ * };
+ * @endcode
+ *
+ * If the Matrix does not provide <code>vmult_add</code> and
+ * <code>Tvmult_add</code>, they are implemented in terms of
+ * <code>vmult</code> and <code>Tvmult</code> (requiring intermediate
+ * storage).
+ *
+ * @author Matthias Maier, 2015
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain, typename Matrix>
+LinearOperator<Range, Domain> linear_operator(const Matrix &matrix)
+{
+  // implement with the more generic variant below...
+  return linear_operator<Range, Domain, Matrix, Matrix>(matrix, matrix);
+}
+
+
+/**
+ * @relates LinearOperator
+ *
+ * Variant of above function that takes an operator object @p
+ * operator_exemplar as an additional reference. This object is used to
+ * populate the reinit_domain_vector and reinit_range_vector function
+ * objects. The reference @p matrix is used to construct vmult, Tvmult,
+ * etc.
+ *
+ * This variant can, for example, be used to encapsulate preconditioners
+ * (that typically do not expose any information about the underlying
+ * matrix).
+ *
+ * @author Matthias Maier, 2015
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range,
+          typename Domain,
+          typename OperatorExemplar,
+          typename Matrix>
+LinearOperator<Range, Domain>
+linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
+{
+  LinearOperator<Range, Domain> return_op;
+
+  // Always store a reference to matrix and operator_exemplar in the lambda
+  // functions. This ensures that a modification of the matrix after the
+  // creation of a LinearOperator wrapper is respected - further a matrix
+  // or an operator_exemplar cannot usually be copied...
+
+  return_op.reinit_range_vector = [&operator_exemplar](Range &v, bool fast)
+  {
+    internal::LinearOperator::ReinitHelper<Range>::reinit_range_vector(operator_exemplar, v, fast);
+  };
+
+  return_op.reinit_domain_vector = [&operator_exemplar](Domain &v, bool fast)
+  {
+    internal::LinearOperator::ReinitHelper<Domain>::reinit_domain_vector(operator_exemplar, v, fast);
+  };
+
+  typename std::conditional<
+  has_vmult_add<Range, Domain, Matrix>::type::value,
+                MatrixInterfaceWithVmultAdd<Range, Domain>,
+                MatrixInterfaceWithoutVmultAdd<Range, Domain>>::type().
+                operator()(return_op, matrix);
+
+  return return_op;
+}
+
+//@}
+
+
+/**
+ * @name Creation of LinearOperator block structures
+ */
+//@{
+
+/**
+ * @relates LinearOperator
  *
  * A function that encapsulates a given collection @p ops of
  * LinearOperators into a block structure. Hereby, it is assumed that Range
@@ -752,7 +1131,7 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
 
 
 /**
- * \relates LinearOperator
+ * @relates LinearOperator
  *
  * A variant of above function that builds up a block diagonal linear
  * operator from an array @p ops of diagonal elements (off-diagonal blocks
@@ -844,7 +1223,7 @@ block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockTyp
 
 
 /**
- * \relates LinearOperator
+ * @relates LinearOperator
  *
  * A variant of above function that only takes a single LinearOperator
  * argument @p op and creates a blockdiagonal linear operator with @p m
@@ -928,293 +1307,801 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
   return return_op;
 }
 
+//@}
 
 
-namespace internal
+
+/**
+ * A class to store a computation.
+ *
+ * The PackagedOperation class allows lazy evaluation of expressions
+ * involving vectors and linear operators. This is done by storing the
+ * computational expression and only performing the computation when either
+ * the object is implicitly converted to a vector object, or
+ * <code>apply</code> (or <code>apply_add</code>) is invoked by hand. This
+ * avoids unnecessary temporary storage of intermediate results.
+ *
+ * The class essentially consists of <code>std::function</code> objects
+ * that store the knowledge of how to generate the result of a computation
+ * and store it in a vector:
+ * @code
+ *   std::function<void(Range &)> apply;
+ *   std::function<void(Range &)> apply_add;
+ * @endcode
+ *
+ * Similar to the LinearOperator class it also has knowledge about how to
+ * initialize a vector of the @p Range space:
+ * @code
+ *   std::function<void(Range &, bool)> reinit_vector;
+ * @endcode
+ *
+ * As an example consider the addition of multiple vectors
+ * @code
+ *   dealii::Vector<double> a, b, c, d;
+ *   // ..
+ *   dealii::Vector<double> result = a + b - c + d;
+ * @endcode
+ * or the computation of a residual $b-Ax$:
+ * @code
+ *   dealii::SparseMatrix<double> A;
+ *   dealii::Vector<double> b, x;
+ *   // ..
+ *   const auto op_a = linear_operator(A);
+ *
+ *   dealii::Vector<double> residual =  b - op_a * x;
+ * @endcode
+ * The expression <code>residual</code> is of type
+ * <code>PackagedOperation<dealii::Vector<double>></code>. It stores
+ * references to <code>A</code>, <code>b</code> and <code>x</code> and
+ * defers the actual computation until <code>apply</code>, or
+ * <code>apply_add</code> are explicitly invoked,
+ * @code
+ *   dealii::Vector<double> y;
+ *   residual.reinit_vector(y);
+ *   residual.apply(y);
+ *   residual.apply_add(y);
+ * @endcode
+ * or until the @p PackagedOperation object is implictly converted:
+ * @code
+ *   dealii::Vector<double> y;
+ *   y = residual;
+ *   y += residual;
+ *   y -= residual;
+ * @endcode
+ *
+ * @author Matthias Maier, 2015
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range> class PackagedOperation
 {
-  namespace LinearOperator
+public:
+
+  /**
+   * Create an empty PackagedOperation object. All <code>std::function</code>
+   * member objects are initialized with default variants that throw an
+   * exception upon invocation.
+   */
+  PackagedOperation ()
   {
-    /**
-     * A helper class that is responsible for the initialization of a
-     * vector to be directly usable as the destination parameter, or source
-     * parameter in an application of vmult of a matrix.
-     *
-     * The generic version of this class just calls
-     * <code>Vector::reinit()</code> with the result of
-     * <code>Matrix::m()</code> or <code>Matrix::n()</code>, respectively.
-     * This class is specialized for more complicated data structures, such
-     * as TrilinosWrappers::MPI::Vector, etc.
-     */
-    template<typename Vector>
-    class ReinitHelper
+    apply = [](Range &)
     {
-    public:
-      /**
-       * Initializes a vector v of the Range space to be directly usable
-       * as the destination parameter in an application of vmult. Similar to
-       * the reinit functions of the vector classes, the boolean determines
-       * whether a fast initalization is done, i.e., if it is set to false the
-       * content of the vector is set to 0.
-       *
-       * The generic version of this class just calls
-       * <code>Vector::reinit()</code> with the result of
-       * <code>Matrix::m()</code>.
-       */
-      template <typename Matrix>
-      static
-      void reinit_range_vector (const Matrix &matrix, Vector &v, bool fast)
-      {
-        v.reinit(matrix.m(), fast);
-      }
-
-      /**
-       * Initializes a vector of the Domain space to be directly usable as the
-       * source parameter in an application of vmult. Similar to the reinit
-       * functions of the vector classes, the boolean determines whether a fast
-       * initalization is done, i.e., if it is set to false the content of the
-       * vector is set to 0.
-       *
-       * The generic version of this class just calls
-       * <code>Vector::reinit()</code> with the result of
-       * <code>Matrix::n()</code>.
-       */
-      template <typename Matrix>
-      static
-      void reinit_domain_vector (const Matrix &matrix, Vector &v, bool fast)
-      {
-        v.reinit(matrix.n(), fast);
-      }
+      Assert(false,
+             ExcMessage("Uninitialized PackagedOperation<Range>::apply called"));
     };
-  } /* namespace LinearOperator */
-} /* namespace internal */
 
+    apply_add = [](Range &)
+    {
+      Assert(false,
+             ExcMessage("Uninitialized PackagedOperation<Range>::apply_add called"));
+    };
+
+    reinit_vector = [](Range &, bool)
+    {
+      Assert(false,
+             ExcMessage("Uninitialized PackagedOperation<Range>::reinit_vector "
+                        "method called"));
+    };
+  }
+
+  /**
+   * Default copy constructor.
+   */
+  PackagedOperation (const PackagedOperation<Range> &) = default;
+
+  /**
+   * Constructor that creates a PackagedOperation object from a reference vector
+   * @p u. The PackagedOperation returns @p u.
+   *
+   * The PackagedOperation object that is created stores a reference to @p
+   * u. Thus, the vector must remain a valid reference for the whole
+   * lifetime of the PackagedOperation object. All changes made on @p u
+   * after the creation of the PackagedOperation object are reflected by
+   * the operator object.
+   */
+  PackagedOperation (const Range &u)
+  {
+    *this = u;
+  }
+
+  /**
+   * Default copy assignment operator.
+   */
+  PackagedOperation<Range> &operator=(const PackagedOperation<Range> &) = default;
+
+  /** Copy assignment operator that creates a PackagedOperation object from a
+   * reference vector @p u. The PackagedOperation returns @p u.
+   *
+   * The PackagedOperation object that is created stores a reference to @p u.
+   * Thus, the vector must remain a valid reference for the whole lifetime
+   * of the PackagedOperation object. All changes made on @p u after the creation
+   * of the PackagedOperation object are reflected by the operator object.
+   */
+  PackagedOperation<Range> &operator=(const Range &u)
+  {
+    apply = [&u](Range &v)
+    {
+      v = u;
+    };
+
+    apply_add = [&u](Range &v)
+    {
+      v += u;
+    };
+
+    reinit_vector = [&u](Range &v, bool fast)
+    {
+      v.reinit(u, fast);
+    };
+
+    return *this;
+  }
+
+  /**
+   * Convert a PackagedOperation to its result.
+   *
+   * This conversion operator creates a vector of the Range space and calls
+   * <code>apply()</code> on it.
+   */
+  operator Range() const
+  {
+    Range result_vector;
+
+    reinit_vector(result_vector, /*bool fast=*/ true);
+    apply(result_vector);
+
+    return result_vector;
+  }
+
+  /**
+   * @name In-place vector space operations
+   */
+  //@{
+
+  /**
+   * Addition with a PackagedOperation @p second_comp with the same @p Range.
+   */
+  PackagedOperation<Range> &operator+=(const PackagedOperation<Range> &second_comp)
+  {
+    return *this = *this + second_comp;
+  }
+
+  /**
+   * Subtraction with a PackagedOperation @p second_comp with the same @p Range.
+   */
+  PackagedOperation<Range> &operator-=(const PackagedOperation<Range> &second_comp)
+  {
+    return *this = *this - second_comp;
+  }
+
+  /**
+   * Add a constant @p offset (of the @p Range space) to the result of a
+   * PackagedOperation.
+   */
+  PackagedOperation<Range> &operator+=(const Range &offset)
+  {
+    return *this = *this + PackagedOperation<Range>(offset);
+  }
+
+  /**
+   * Subract a constant @p offset (of the @p Range space) from the result
+   * of a PackagedOperation.
+   */
+  PackagedOperation<Range> &operator-=(const Range &offset)
+  {
+    return *this = *this - PackagedOperation<Range>(offset);
+  }
+
+  /**
+   * Scalar multiplication of the PackagedOperation with a @p number.
+   */
+  PackagedOperation<Range> &operator*=(typename Range::value_type number)
+  {
+    return *this = *this * number;
+  }
+  //@}
+
+  /**
+   * Store the result of the PackagedOperation in a vector v of the @p Range
+   * space.
+   */
+  std::function<void(Range &v)> apply;
+
+  /**
+   * Add the result of the PackagedOperation to a vector v of the @p Range space.
+   */
+  std::function<void(Range &v)> apply_add;
+
+  /**
+   * Initializes a vector v of the Range space to be directly usable as the
+   * destination parameter in an application of apply, or apply_add.
+   * Similar to the reinit functions of the vector classes, the boolean
+   * determines whether a fast initialization is done, i.e., if it is set
+   * to false the content of the vector is set to 0.
+   */
+  std::function<void(Range &v, bool fast)> reinit_vector;
+};
+
+
+/**
+ * @name Vector space operations
+ */
+//@{
+
+/**
+ * @relates PackagedOperation
+ *
+ * Addition of two PackagedOperation objects @p first_comp and
+ * @p second_comp given by vector space addition of the corresponding results.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range>
+PackagedOperation<Range>
+operator+(const PackagedOperation<Range> &first_comp,
+          const PackagedOperation<Range> &second_comp)
+{
+  PackagedOperation<Range> return_comp;
+
+  return_comp.reinit_vector = first_comp.reinit_vector;
+
+  // ensure to have valid PackagedOperation objects by catching first_comp and
+  // second_comp by value
+
+  return_comp.apply = [first_comp, second_comp](Range &v)
+  {
+    first_comp.apply(v);
+    second_comp.apply_add(v);
+  };
+
+  return_comp.apply_add = [first_comp, second_comp](Range &v)
+  {
+    first_comp.apply_add(v);
+    second_comp.apply_add(v);
+  };
+
+  return return_comp;
+}
+
+/**
+ * @relates PackagedOperation
+ *
+ * Subtraction of two PackagedOperation objects @p first_comp and @p second_comp
+ * given by vector space addition of the corresponding results.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range>
+PackagedOperation<Range>
+operator-(const PackagedOperation<Range> &first_comp,
+          const PackagedOperation<Range> &second_comp)
+{
+  PackagedOperation<Range> return_comp;
+
+  return_comp.reinit_vector = first_comp.reinit_vector;
+
+  // ensure to have valid PackagedOperation objects by catching first_comp and
+  // second_comp by value
+
+  return_comp.apply = [first_comp, second_comp](Range &v)
+  {
+    second_comp.apply(v);
+    v *= -1.;
+    first_comp.apply_add(v);
+  };
+
+  return_comp.apply_add = [first_comp, second_comp](Range &v)
+  {
+    first_comp.apply_add(v);
+    v *= -1.;
+    second_comp.apply_add(v);
+    v *= -1.;
+  };
+
+  return return_comp;
+}
+
+/**
+ * @relates PackagedOperation
+ *
+ * Scalar multiplication of a PackagedOperation objects @p comp with a
+ * scalar @p number given by a scaling PackagedOperation result with
+ * @p number.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range>
+PackagedOperation<Range>
+operator*(const PackagedOperation<Range> &comp,
+          typename Range::value_type number)
+{
+  PackagedOperation<Range> return_comp;
+
+  return_comp.reinit_vector = comp.reinit_vector;
+
+  // the trivial case: number is zero
+  if (number == 0.)
+    {
+      return_comp.apply = [](Range &v)
+      {
+        v = 0.;
+      };
+
+      return_comp.apply_add = [](Range &)
+      {
+      };
+    }
+  else
+    {
+      return_comp.apply = [comp, number](Range &v)
+      {
+        comp.apply(v);
+        v *= number;
+      };
+
+      return_comp.apply_add = [comp, number](Range &v)
+      {
+        v /= number;
+        comp.apply_add(v);
+        v *= number;
+      };
+    }
+
+  return return_comp;
+}
+
+/**
+ * @relates PackagedOperation
+ *
+ * Scalar multiplication of a PackagedOperation objects @p comp with a
+ * scalar @p number given by a scaling PackagedOperation result with
+ * @p number.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range>
+PackagedOperation<Range>
+operator*(typename Range::value_type number,
+          const PackagedOperation<Range> &comp)
+{
+  return comp * number;
+}
+
+/**
+ * @relates PackagedOperation
+ *
+ * Add a constant @p offset (of the @p Range space) to the result of a
+ * PackagedOperation.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range>
+PackagedOperation<Range> operator+(const PackagedOperation<Range> &comp,
+                                   const Range &offset)
+{
+  return comp + PackagedOperation<Range>(offset);
+}
+
+/**
+ * @relates PackagedOperation
+ *
+ * Add a constant @p offset (of the @p Range space) to the result of a
+ * PackagedOperation.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range>
+PackagedOperation<Range> operator+(const Range &offset,
+                                   const PackagedOperation<Range> &comp)
+{
+  return PackagedOperation<Range>(offset) + comp;
+}
+
+/**
+ * @relates PackagedOperation
+ *
+ * Subtract a constant @p offset (of the @p Range space) from the result of a
+ * PackagedOperation.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range>
+PackagedOperation<Range> operator-(const PackagedOperation<Range> &comp,
+                                   const Range &offset)
+{
+  return comp - PackagedOperation<Range>(offset);
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Subtract a computational result from a constant @p offset (of the @p
+ * Range space). The result is a PackagedOperation object that applies this
+ * computation.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range>
+PackagedOperation<Range> operator-(const Range &offset,
+                                   const PackagedOperation<Range> &comp)
+{
+  return PackagedOperation<Range>(offset) - comp;
+}
+
+//@}
+
+
+/**
+ * @name Creation of a PackagedOperation object
+ */
+//@{
 
 namespace
 {
-  // A trait class that determines whether type T provides public
-  // (templated or non-templated) vmult_add and Tvmult_add member functions
+  // Poor man's trait class that determines whether type T is a vector:
+  // FIXME: Implement this as a proper type trait - similar to
+  // isBlockVector
 
-  template <typename Range, typename Domain, typename T>
-  class has_vmult_add
+  template <typename T>
+  class has_vector_interface
   {
     template <typename C>
     static std::false_type test(...);
 
     template <typename C>
-    static std::true_type test(decltype(&C::vmult_add),
-                               decltype(&C::Tvmult_add));
-
-    template <typename C>
-    static std::true_type test(decltype(&C::template vmult_add<Range>),
-                               decltype(&C::template Tvmult_add<Range>));
-
-    template <typename C>
-    static std::true_type test(decltype(&C::template vmult_add<Range, Domain>),
-                               decltype(&C::template Tvmult_add<Domain, Range>));
+    static std::true_type test(decltype(&C::operator+=),
+                               decltype(&C::operator-=),
+                               decltype(&C::l2_norm));
 
   public:
     // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
     // otherwise it is std::false_type
 
-    typedef decltype(test<T>(0, 0)) type;
+    typedef decltype(test<T>(0, 0, 0)) type;
   };
-
-
-  // A helper class to add the full matrix interface to a LinearOperator
-
-  template <typename Range, typename Domain>
-  class MatrixInterfaceWithVmultAdd
-  {
-  public:
-    template <typename Matrix>
-    void operator()(LinearOperator<Range, Domain> &op, const Matrix &matrix)
-    {
-      op.vmult = [&matrix](Range &v, const Domain &u)
-      {
-        matrix.vmult(v,u);
-      };
-
-      op.vmult_add = [&matrix](Range &v, const Domain &u)
-      {
-        matrix.vmult_add(v,u);
-      };
-
-      op.Tvmult = [&matrix](Domain &v, const Range &u)
-      {
-        matrix.Tvmult(v,u);
-      };
-
-      op.Tvmult_add = [&matrix](Domain &v, const Range &u)
-      {
-        matrix.Tvmult_add(v,u);
-      };
-    }
-  };
-
-
-  // A helper class to add a reduced matrix interface to a LinearOperator
-  // (typically provided by Preconditioner classes)
-
-  template <typename Range, typename Domain>
-  class MatrixInterfaceWithoutVmultAdd
-  {
-  public:
-    template <typename Matrix>
-    void operator()(LinearOperator<Range, Domain> &op, const Matrix &matrix)
-    {
-      op.vmult = [&matrix](Range &v, const Domain &u)
-      {
-        matrix.vmult(v,u);
-      };
-
-      op.vmult_add = [op](Range &v, const Domain &u)
-      {
-        static GrowingVectorMemory<Range> vector_memory;
-
-        Range *i = vector_memory.alloc();
-        op.reinit_range_vector(*i, /*bool fast =*/true);
-        op.vmult(*i, u);
-        v += *i;
-        vector_memory.free(i);
-      };
-
-      op.Tvmult = [&matrix](Domain &v, const Range &u)
-      {
-        matrix.Tvmult(v,u);
-      };
-
-      op.Tvmult_add = [op](Domain &v, const Range &u)
-      {
-        static GrowingVectorMemory<Domain> vector_memory;
-
-        Domain *i = vector_memory.alloc();
-        op.reinit_domain_vector(*i, /*bool fast =*/true);
-        op.Tvmult(*i, u);
-        v += *i;
-        vector_memory.free(i);
-      };
-    }
-  };
-
-} /* namespace */
-
-
-/**
- * \relates LinearOperator
- *
- * A function that encapsulates generic @p matrix objects that act on a
- * compatible Vector type into a LinearOperator. The LinearOperator object
- * that is created stores a reference to the matrix object. Thus, @p matrix
- * must remain a valid reference for the whole lifetime of the
- * LinearOperator object.
- *
- * All changes made on @p matrix after the creation of the LinearOperator
- * object are reflected by the operator object. For example, it is a valid
- * procedure to first create a LinearOperator and resize, reassemble the
- * matrix later.
- *
- * The Matrix class in question must provide the following minimal
- * interface:
- *
- * @code
- * class Matrix
- * {
- * public:
- *   // (type specific) information how to create a Range and Domain vector
- *   // with appropriate size and internal layout
- *
- *   // Application of matrix to vector src, writes the result into dst.
- *   vmult(VECTOR &dst, const VECTOR &src);
- *
- *   // Application of the transpose of matrix to vector src, writes the
- *   // result into dst. (Depending on the usage of the linear operator
- *   // class this can be a dummy implementation throwing an error.)
- *   Tvmult(VECTOR &dst, const VECTOR &src);
- * };
- * @endcode
- *
- * The following (optional) interface is used if available:
- *
- * @code
- * class Matrix
- * {
- * public:
- *   // Application of matrix to vector src, adds the result to dst.
- *   vmult_add(VECTOR &dst, const VECTOR &src);
- *
- *   // Application of the transpose of matrix to vector src, adds the
- *   // result to dst.
- *   Tvmult_add(VECTOR &dst, const VECTOR &src);
- * };
- * @endcode
- *
- * If the Matrix does not provide <code>vmult_add</code> and
- * <code>Tvmult_add</code>, they are implemented in terms of
- * <code>vmult</code> and <code>Tvmult</code> (requiring intermediate
- * storage).
- *
- * @author Matthias Maier, 2015
- *
- * @ingroup LAOperators
- */
-template <typename Range, typename Domain, typename Matrix>
-LinearOperator<Range, Domain> linear_operator(const Matrix &matrix)
-{
-  // implement with the more generic variant below...
-  return linear_operator<Range, Domain, Matrix, Matrix>(matrix, matrix);
 }
 
 
 /**
- * \relates LinearOperator
+ * @relates PackagedOperation
  *
- * Variant of above function that takes an operator object @p
- * operator_exemplar as an additional reference. This object is used to
- * populate the reinit_domain_vector and reinit_range_vector function
- * objects. The reference @p matrix is used to construct vmult, Tvmult,
- * etc.
+ * Create a PackagedOperation object that stores the addition of two vectors.
  *
- * This variant can, for example, be used to encapsulate preconditioners
- * (that typically do not expose any information about the underlying
- * matrix).
+ * The PackagedOperation object that is created stores a reference to @p u and @p
+ * v. Thus, the vectors must remain valid references for the whole lifetime
+ * of the PackagedOperation object. All changes made on @p u or @p v after the
+ * creation of the PackagedOperation object are reflected by the operator object.
  *
- * @author Matthias Maier, 2015
+ * @ingroup LAOperators
+ */
+
+template <typename Range,
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
+PackagedOperation<Range> operator+(const Range &u, const Range &v)
+{
+  PackagedOperation<Range> return_comp;
+
+  // ensure to have valid PackagedOperation objects by catching op by value
+  // u is catched by reference
+
+  return_comp.reinit_vector = [&u](Range &x, bool fast)
+  {
+    x.reinit(u, fast);
+  };
+
+  return_comp.apply = [&u, &v](Range &x)
+  {
+    x = u;
+    x += v;
+  };
+
+  return_comp.apply_add = [&u, &v](Range &x)
+  {
+    x += u;
+    x += v;
+  };
+
+  return return_comp;
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Create a PackagedOperation object that stores the subtraction of two vectors.
+ *
+ * The PackagedOperation object that is created stores a reference to @p u
+ * and @p v. Thus, the vectors must remain valid references for the whole
+ * lifetime of the PackagedOperation object. All changes made on @p u or @p
+ * v after the creation of the PackagedOperation object are reflected by
+ * the operator object.
+ *
+ * @ingroup LAOperators
+ */
+
+template <typename Range,
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
+PackagedOperation<Range> operator-(const Range &u, const Range &v)
+{
+  PackagedOperation<Range> return_comp;
+
+  // ensure to have valid PackagedOperation objects by catching op by value
+  // u is catched by reference
+
+  return_comp.reinit_vector = [&u](Range &x, bool fast)
+  {
+    x.reinit(u, fast);
+  };
+
+  return_comp.apply = [&u, &v](Range &x)
+  {
+    x = u;
+    x -= v;
+  };
+
+  return_comp.apply_add = [&u, &v](Range &x)
+  {
+    x += u;
+    x -= v;
+  };
+
+  return return_comp;
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Create a PackagedOperation object that stores the scaling of a vector
+ * with a @p number.
+ *
+ * The PackagedOperation object that is created stores a reference to @p u.
+ * Thus, the vectors must remain valid references for the whole lifetime of
+ * the PackagedOperation object. All changes made on @p u or @p v after the
+ * creation of the PackagedOperation object are reflected by the operator
+ * object.
  *
  * @ingroup LAOperators
  */
 template <typename Range,
-          typename Domain,
-          typename OperatorExemplar,
-          typename Matrix>
-LinearOperator<Range, Domain>
-linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
+PackagedOperation<Range> operator*(const Range &u,
+                                   typename Range::value_type number)
 {
-  LinearOperator<Range, Domain> return_op;
-
-  // Always store a reference to matrix and operator_exemplar in the lambda
-  // functions. This ensures that a modification of the matrix after the
-  // creation of a LinearOperator wrapper is respected - further a matrix
-  // or an operator_exemplar cannot usually be copied...
-
-  return_op.reinit_range_vector = [&operator_exemplar](Range &v, bool fast)
-  {
-    internal::LinearOperator::ReinitHelper<Range>::reinit_range_vector(operator_exemplar, v, fast);
-  };
-
-  return_op.reinit_domain_vector = [&operator_exemplar](Domain &v, bool fast)
-  {
-    internal::LinearOperator::ReinitHelper<Domain>::reinit_domain_vector(operator_exemplar, v, fast);
-  };
-
-  typename std::conditional<
-  has_vmult_add<Range, Domain, Matrix>::type::value,
-                MatrixInterfaceWithVmultAdd<Range, Domain>,
-                MatrixInterfaceWithoutVmultAdd<Range, Domain>>::type().
-                operator()(return_op, matrix);
-
-  return return_op;
+  return PackagedOperation<Range>(u) * number;
 }
 
+
+/**
+ * @relates PackagedOperation
+ *
+ * Create a PackagedOperation object that stores the scaling of a vector
+ * with a @p number.
+ *
+ * The PackagedOperation object that is created stores a reference to @p u.
+ * Thus, the vectors must remain valid references for the whole lifetime of
+ * the PackagedOperation object. All changes made on @p u or @p v after the
+ * creation of the PackagedOperation object are reflected by the operator
+ * object.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range,
+          typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
+PackagedOperation<Range> operator*(typename Range::value_type number,
+                                   const Range &u)
+{
+  return number * PackagedOperation<Range>(u);
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Create a PackagedOperation object from a LinearOperator and a reference to a
+ * vector @p u of the Domain space. The object stores the PackagedOperation
+ * $\text{op} \,u$ (in matrix notation). <code>return</code>
+ * (<code>return_add</code>) are implemented with <code>vmult(__1,u)</code>
+ * (<code>vmult_add(__1,u)</code>).
+ *
+ * The PackagedOperation object that is created stores a reference to @p u.
+ * Thus, the vector must remain a valid reference for the whole lifetime of
+ * the PackagedOperation object. All changes made on @p u after the
+ * creation of the PackagedOperation object are reflected by the operator
+ * object.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+PackagedOperation<Range>
+operator*(const LinearOperator<Range, Domain> &op,
+          const Domain &u)
+{
+  PackagedOperation<Range> return_comp;
+
+  return_comp.reinit_vector = op.reinit_range_vector;
+
+  // ensure to have valid PackagedOperation objects by catching op by value
+  // u is catched by reference
+
+  return_comp.apply = [op, &u](Range &v)
+  {
+    op.vmult(v, u);
+  };
+
+  return_comp.apply_add = [op, &u](Range &v)
+  {
+    op.vmult_add(v, u);
+  };
+
+  return return_comp;
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Create a PackagedOperation object from a LinearOperator and a reference
+ * to a vector @p u of the Range space. The object stores the
+ * PackagedOperation $\text{op}^T \,u$ (in matrix notation).
+ * <code>return</code> (<code>return_add</code>) are implemented with
+ * <code>Tvmult(__1,u)</code> (<code>Tvmult_add(__1,u)</code>).
+ *
+ * The PackagedOperation object that is created stores a reference to @p u.
+ * Thus, the vector must remain a valid reference for the whole lifetime of
+ * the PackagedOperation object. All changes made on @p u after the
+ * creation of the PackagedOperation object are reflected by the operator
+ * object.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+PackagedOperation<Domain>
+operator*(const Range &u,
+          const LinearOperator<Range, Domain> &op)
+{
+  PackagedOperation<Range> return_comp;
+
+  return_comp.reinit_vector = op.reinit_domain_vector;
+
+  // ensure to have valid PackagedOperation objects by catching op by value
+  // u is catched by reference
+
+  return_comp.apply = [op, &u](Domain &v)
+  {
+    op.Tvmult(v, u);
+  };
+
+  return_comp.apply_add = [op, &u](Domain &v)
+  {
+    op.Tvmult_add(v, u);
+  };
+
+  return return_comp;
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Composition of a PackagedOperation object with a LinearOperator. The
+ * object stores the computation $\text{op} \,comp$ (in matrix notation).
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+PackagedOperation<Range>
+operator*(const LinearOperator<Range, Domain> &op,
+          const PackagedOperation<Domain> &comp)
+{
+  PackagedOperation<Range> return_comp;
+
+  return_comp.reinit_vector = op.reinit_range_vector;
+
+  // ensure to have valid PackagedOperation objects by catching op by value
+  // u is catched by reference
+
+  return_comp.apply = [op, comp](Domain &v)
+  {
+    static GrowingVectorMemory<Range> vector_memory;
+
+    Range *i = vector_memory.alloc();
+    op.reinit_domain_vector(*i, /*bool fast =*/ true);
+
+    comp.apply(*i);
+    op.vmult(v, *i);
+
+    vector_memory.free(i);
+  };
+
+  return_comp.apply_add = [op, comp](Domain &v)
+  {
+    static GrowingVectorMemory<Range> vector_memory;
+
+    Range *i = vector_memory.alloc();
+    op.reinit_range_vector(*i, /*bool fast =*/ true);
+
+    comp.apply(*i);
+    op.vmult_add(v, *i);
+
+    vector_memory.free(i);
+  };
+
+  return return_comp;
+}
+
+
+/**
+ * @relates PackagedOperation
+ *
+ * Composition of a PackagedOperation object with a LinearOperator. The
+ * object stores the computation $\text{op}^T \,comp$ (in matrix notation).
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain>
+PackagedOperation<Domain>
+operator*(const PackagedOperation<Range> &comp,
+          const LinearOperator<Range, Domain> &op)
+{
+  PackagedOperation<Range> return_comp;
+
+  return_comp.reinit_vector = op.reinit_domain_vector;
+
+  // ensure to have valid PackagedOperation objects by catching op by value
+  // u is catched by reference
+
+  return_comp.apply = [op, comp](Domain &v)
+  {
+    static GrowingVectorMemory<Range> vector_memory;
+
+    Range *i = vector_memory.alloc();
+    op.reinit_range_vector(*i, /*bool fast =*/ true);
+
+    comp.apply(*i);
+    op.Tvmult(v, *i);
+
+    vector_memory.free(i);
+  };
+
+  return_comp.apply_add = [op, comp](Domain &v)
+  {
+    static GrowingVectorMemory<Range> vector_memory;
+
+    Range *i = vector_memory.alloc();
+    op.reinit_range_vector(*i, /*bool fast =*/ true);
+
+    comp.apply(*i);
+    op.Tvmult_add(v, *i);
+
+    vector_memory.free(i);
+  };
+
+  return return_comp;
+}
+
+//@}
 
 DEAL_II_NAMESPACE_CLOSE
 

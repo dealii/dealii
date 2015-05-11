@@ -377,6 +377,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: A PackagedOperation class that stores computation expressions.
+  The primary purpose of this class is to provide syntactic sugar for vector
+  operations (vector space addition, scalar multiplication, application of a
+  linear operator) while avoiding intermediate storage.
+  <br>
+  (Matthias Maier, 2015/05/10)
+  </li>
+
   <li> Fixed: Utilities::generate_normal_random_number() will now
   produce a deterministic sequence of numbers on every thread.
   Furthermore, it will also work on systems that do not have the
