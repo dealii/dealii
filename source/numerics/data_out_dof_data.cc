@@ -608,7 +608,7 @@ namespace internal
       // least make sure we can deal with complex numbers
       std::vector<std::vector<Tensor<1,DH::space_dimension,typename VectorType::value_type> > > tmp(patch_gradients_system.size());
       for (unsigned int i = 0; i < tmp.size(); i++)
-        tmp[i].resize(patch_gradients_system.size());
+        tmp[i].resize(patch_gradients_system[i].size());
 
       fe_patch_values.get_function_gradients (*vector, tmp);
 
