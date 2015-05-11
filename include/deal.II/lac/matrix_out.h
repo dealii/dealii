@@ -26,10 +26,6 @@
 #  include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #endif
 
-#ifdef DEAL_II_WITH_PETSC
-#  include <deal.II/lac/petsc_sparse_matrix.h>
-#  include <deal.II/lac/petsc_block_sparse_matrix.h>
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -223,9 +219,10 @@ namespace internal
         return matrix.el(i,j);
       }
 
+
 #ifdef DEAL_II_WITH_TRILINOS
       /**
-       * Return the element with given indices of a sparse matrix.
+       * Return the element with given indices of a Trilinos sparse matrix.
        */
       double get_element (const TrilinosWrappers::SparseMatrix &matrix,
                           const types::global_dof_index             i,
@@ -246,6 +243,13 @@ namespace internal
       {
         return matrix.el(i,j);
       }
+#endif
+
+
+#ifdef DEAL_II_WITH_PETSC
+      // no need to do anything: PETSc matrix objects do not distinguish
+      // between operator() and el(i,j), so we can safely access elements
+      // through the generic function below
 #endif
 
 

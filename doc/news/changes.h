@@ -493,7 +493,7 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-  <li> Fixed: MatrixOut now also works with Trilinos matrices.
+  <li> Fixed: MatrixOut now also works with Trilinos and PETSc matrices.
   <br>
   (Wolfgang Bangerth, 2015/05/11)
   </li>
