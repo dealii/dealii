@@ -380,34 +380,59 @@ operator*(typename Range::value_type  number,
 
   LinearOperator<Range, Domain> return_op = op;
 
-  // ensure to have valid computation objects by catching number and op by
-  // value
 
-  return_op.vmult = [number, op](Range &v, const Domain &u)
-  {
-    op.vmult(v,u);
-    v *= number;
-  };
+  // the trivial case: number is zero
+  if (number == 0.)
+    {
+      return_op.vmult = [] (Range &v, const Domain &)
+      {
+        v = 0.;
+      };
 
-  return_op.vmult_add = [number, op](Range &v, const Domain &u)
-  {
-    v /= number;
-    op.vmult_add(v,u);
-    v *= number;
-  };
+      return_op.vmult_add = [] (Range &, const Domain &)
+      {
+      };
 
-  return_op.Tvmult = [number, op](Domain &v, const Range &u)
-  {
-    op.Tvmult(v,u);
-    v *= number;
-  };
+      return_op.Tvmult = [](Domain &v, const Range &)
+      {
+        v = 0.;
+      };
 
-  return_op.Tvmult_add = [number, op](Domain &v, const Range &u)
-  {
-    v /= number;
-    op.Tvmult_add(v,u);
-    v *= number;
-  };
+      return_op.Tvmult_add = [](Domain &, const Range &)
+      {
+      };
+    }
+  else
+    {
+      // ensure to have valid computation objects by catching number and op by
+      // value
+
+      return_op.vmult = [number, op](Range &v, const Domain &u)
+      {
+        op.vmult(v,u);
+        v *= number;
+      };
+
+      return_op.vmult_add = [number, op](Range &v, const Domain &u)
+      {
+        v /= number;
+        op.vmult_add(v,u);
+        v *= number;
+      };
+
+      return_op.Tvmult = [number, op](Domain &v, const Range &u)
+      {
+        op.Tvmult(v,u);
+        v *= number;
+      };
+
+      return_op.Tvmult_add = [number, op](Domain &v, const Range &u)
+      {
+        v /= number;
+        op.Tvmult_add(v,u);
+        v *= number;
+      };
+    }
 
   return return_op;
 }
