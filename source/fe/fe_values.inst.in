@@ -70,66 +70,66 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
     template
       void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
       ::get_function_values<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,value_type>::type>&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,value_type>::type>&) const;
     template
       void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
       ::get_function_gradients<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type>&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type>&) const;
     template
       void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
       ::get_function_hessians<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<2,deal_II_space_dimension> >::type>&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<2,deal_II_space_dimension> >::type>&) const;
     template
       void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
       ::get_function_laplacians<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,double>::type> &) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,double>::type> &) const;
 
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
       ::get_function_values<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type >&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type >&) const;
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
       ::get_function_gradients<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<2,deal_II_space_dimension> >::type >&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<2,deal_II_space_dimension> >::type >&) const;
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
       ::get_function_symmetric_gradients<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::SymmetricTensor<2,deal_II_space_dimension> >::type >&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::SymmetricTensor<2,deal_II_space_dimension> >::type >&) const;
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
       ::get_function_curls<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,curl_type>::type>&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,curl_type>::type>&) const;
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
       ::get_function_divergences<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,divergence_type>::type>&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,divergence_type>::type>&) const;
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
       ::get_function_hessians<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<3,deal_II_space_dimension> >::type >&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<3,deal_II_space_dimension> >::type >&) const;
     template
       void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
       ::get_function_laplacians<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type >&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type >&) const;
 
     template
       void FEValuesViews::SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>
       ::get_function_values<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::SymmetricTensor<2,deal_II_space_dimension> >::type>&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::SymmetricTensor<2,deal_II_space_dimension> >::type>&) const;
     template
       void FEValuesViews::SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>
       ::get_function_divergences<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type>&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type>&) const;
 
     template
       void FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>
       ::get_function_values<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<2,deal_II_space_dimension> >::type>&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<2,deal_II_space_dimension> >::type>&) const;
     template
       void FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>
       ::get_function_divergences<dealii::VEC>
-      (const dealii::VEC&, std::vector<typename ProductType<typename dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type>&) const;
+      (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type>&) const;
 #endif
 #endif
   }
@@ -143,77 +143,77 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_values<VEC>
-      (const VEC&, std::vector<typename VEC::value_type>&) const;
+      (const VEC&, std::vector<VEC::value_type>&) const;
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_values<VEC>
-      (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<typename VEC::value_type>&) const;
+      (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<VEC::value_type>&) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_values<VEC>
-      (const VEC&, std::vector<Vector<typename VEC::value_type> > &) const;
-
-    template
-      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_values<VEC>
-      (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<Vector<typename VEC::value_type> > &) const;
+      (const VEC&, std::vector<Vector<VEC::value_type> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_values<VEC>
       (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       VectorSlice<std::vector<std::vector<typename VEC::value_type> > >, bool) const;
+       std::vector<Vector<VEC::value_type> > &) const;
+
+    template
+      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_values<VEC>
+      (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&,
+       VectorSlice<std::vector<std::vector<VEC::value_type> > >, bool) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_gradients<VEC>
-      (const VEC&, std::vector<dealii::Tensor<1,deal_II_space_dimension,typename VEC::value_type> > &) const;
+      (const VEC&, std::vector<dealii::Tensor<1,deal_II_space_dimension,VEC::value_type> > &) const;
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_gradients<VEC>
       (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<dealii::Tensor<1,deal_II_space_dimension,typename VEC::value_type> > &) const;
+       std::vector<dealii::Tensor<1,deal_II_space_dimension,VEC::value_type> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_gradients<VEC>
-      (const VEC&, std::vector<std::vector<dealii::Tensor<1,deal_II_space_dimension,typename VEC::value_type> > > &) const;
+      (const VEC&, std::vector<std::vector<dealii::Tensor<1,deal_II_space_dimension,VEC::value_type> > > &) const;
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_gradients<VEC>
       (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       VectorSlice<std::vector<std::vector<dealii::Tensor<1,deal_II_space_dimension,typename VEC::value_type> > > >, bool) const;
+       VectorSlice<std::vector<std::vector<dealii::Tensor<1,deal_II_space_dimension,VEC::value_type> > > >, bool) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_hessians<VEC>
-      (const VEC&, std::vector<dealii::Tensor<2,deal_II_space_dimension,typename VEC::value_type> > &) const;
-    template
-      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_hessians<VEC>
-      (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<dealii::Tensor<2,deal_II_space_dimension,typename VEC::value_type> > &) const;
-
-    template
-      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_hessians<VEC>
-      (const VEC&, std::vector<std::vector<dealii::Tensor<2,deal_II_space_dimension,typename VEC::value_type> > > &, bool) const;
+      (const VEC&, std::vector<dealii::Tensor<2,deal_II_space_dimension,VEC::value_type> > &) const;
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_hessians<VEC>
       (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       VectorSlice<std::vector<std::vector<dealii::Tensor<2,deal_II_space_dimension,typename VEC::value_type> > > >, bool) const;
+       std::vector<dealii::Tensor<2,deal_II_space_dimension,VEC::value_type> > &) const;
 
     template
-      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_laplacians<VEC>
-      (const VEC&, std::vector<typename VEC::value_type>&) const;
+      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_hessians<VEC>
+      (const VEC&, std::vector<std::vector<dealii::Tensor<2,deal_II_space_dimension,VEC::value_type> > > &, bool) const;
     template
-      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_laplacians<VEC>
-      (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<typename VEC::value_type>&) const;
-
-    template
-      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_laplacians<VEC>
-      (const VEC&, std::vector<Vector<typename VEC::value_type> > &) const;
-
-    template
-      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_laplacians<VEC>
+      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_hessians<VEC>
       (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<Vector<typename VEC::value_type> > &) const;
+       VectorSlice<std::vector<std::vector<dealii::Tensor<2,deal_II_space_dimension,VEC::value_type> > > >, bool) const;
+
+    template
+      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_laplacians<VEC>
+      (const VEC&, std::vector<VEC::value_type>&) const;
+    template
+      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_laplacians<VEC>
+      (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&, std::vector<VEC::value_type>&) const;
+
+    template
+      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_laplacians<VEC>
+      (const VEC&, std::vector<Vector<VEC::value_type> > &) const;
 
     template
       void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_laplacians<VEC>
       (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&,
-       std::vector<std::vector<typename VEC::value_type> > &, bool) const;
+       std::vector<Vector<VEC::value_type> > &) const;
+
+    template
+      void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_laplacians<VEC>
+      (const VEC&, const VectorSlice<const std::vector<types::global_dof_index> >&,
+       std::vector<std::vector<VEC::value_type> > &, bool) const;
 
 #endif
 #endif
@@ -226,115 +226,115 @@ for (deal_II_dimension : DIMENSIONS)
   {
 #if (deal_II_dimension == DIM_A) || (deal_II_dimension == DIM_B)
     template
-	void FEValuesViews::Scalar<deal_II_dimension>::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,double>::type> &) const;
+        void FEValuesViews::Scalar<deal_II_dimension>::get_function_values<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,double>::type> &) const;
     template
-	void FEValuesViews::Scalar<deal_II_dimension>::get_function_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
+        void FEValuesViews::Scalar<deal_II_dimension>::get_function_gradients<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
     template
-	void FEValuesViews::Scalar<deal_II_dimension>::get_function_hessians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension> >::type>&) const;
+        void FEValuesViews::Scalar<deal_II_dimension>::get_function_hessians<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension> >::type>&) const;
     template
-	void FEValuesViews::Scalar<deal_II_dimension>::get_function_laplacians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,double>::type>&) const;
+        void FEValuesViews::Scalar<deal_II_dimension>::get_function_laplacians<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,double>::type>&) const;
 
     template
-	void FEValuesViews::Vector<deal_II_dimension>::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
+        void FEValuesViews::Vector<deal_II_dimension>::get_function_values<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension>::get_function_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension> >::type>&) const;
+        void FEValuesViews::Vector<deal_II_dimension>::get_function_gradients<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension> >::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension>::get_function_symmetric_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::SymmetricTensor<2,deal_II_dimension> >::type>&) const;
+        void FEValuesViews::Vector<deal_II_dimension>::get_function_symmetric_gradients<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::SymmetricTensor<2,deal_II_dimension> >::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension>::get_function_curls<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,curl_type>::type>&) const;
+        void FEValuesViews::Vector<deal_II_dimension>::get_function_curls<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,curl_type>::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension>::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,divergence_type>::type>&) const;
+        void FEValuesViews::Vector<deal_II_dimension>::get_function_divergences<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,divergence_type>::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension>::get_function_hessians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<3,deal_II_dimension> >::type>&) const;
+        void FEValuesViews::Vector<deal_II_dimension>::get_function_hessians<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<3,deal_II_dimension> >::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension>::get_function_laplacians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
+        void FEValuesViews::Vector<deal_II_dimension>::get_function_laplacians<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
 
     template
-	void FEValuesViews::SymmetricTensor<2,deal_II_dimension,deal_II_dimension>::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::SymmetricTensor<2,deal_II_dimension> >::type>&) const;
+        void FEValuesViews::SymmetricTensor<2,deal_II_dimension,deal_II_dimension>::get_function_values<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::SymmetricTensor<2,deal_II_dimension> >::type>&) const;
     template
-	void FEValuesViews::SymmetricTensor<2,deal_II_dimension,deal_II_dimension>::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
+        void FEValuesViews::SymmetricTensor<2,deal_II_dimension,deal_II_dimension>::get_function_divergences<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
 
-	template
-	void FEValuesViews::Tensor<2,deal_II_dimension,deal_II_dimension>::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension> >::type>&) const;
     template
-	void FEValuesViews::Tensor<2,deal_II_dimension,deal_II_dimension>::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
+        void FEValuesViews::Tensor<2,deal_II_dimension,deal_II_dimension>::get_function_values<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension> >::type>&) const;
+    template
+        void FEValuesViews::Tensor<2,deal_II_dimension,deal_II_dimension>::get_function_divergences<dealii::IndexSet>
+        (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension> >::type>&) const;
 
 
 #if deal_II_dimension != 3
     template
-	void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
-	::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,value_type>::type>&) const;
+    void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
+    ::get_function_values<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,value_type>::type>&) const;
     template
-	void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
-	::get_function_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
+    void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
+    ::get_function_gradients<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
     template
-	void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
-	::get_function_hessians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension+1> >::type>&) const;
+    void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
+    ::get_function_hessians<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension+1> >::type>&) const;
     template
-	void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
-	::get_function_laplacians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,double>::type>&) const;
+    void FEValuesViews::Scalar<deal_II_dimension, deal_II_dimension+1>
+    ::get_function_laplacians<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,double>::type>&) const;
 
     template
-	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
-	::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
+    void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
+    ::get_function_values<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
-	::get_function_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension+1> >::type>&) const;
+    void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
+    ::get_function_gradients<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension+1> >::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
-	::get_function_symmetric_gradients<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::SymmetricTensor<2,deal_II_dimension+1> >::type>&) const;
+    void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
+    ::get_function_symmetric_gradients<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::SymmetricTensor<2,deal_II_dimension+1> >::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
-	::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,double>::type>&) const;
+    void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
+    ::get_function_divergences<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,double>::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
-	::get_function_hessians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<3,deal_II_dimension+1> >::type>&) const;
+    void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
+    ::get_function_hessians<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<3,deal_II_dimension+1> >::type>&) const;
     template
-	void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
-	::get_function_laplacians<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
+    void FEValuesViews::Vector<deal_II_dimension, deal_II_dimension+1>
+    ::get_function_laplacians<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
 
     template
-	void FEValuesViews::SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>
+    void FEValuesViews::SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>
         ::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::SymmetricTensor<2,deal_II_dimension+1> >::type>&) const;
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::SymmetricTensor<2,deal_II_dimension+1> >::type>&) const;
     template
-	void FEValuesViews::SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>
+    void FEValuesViews::SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>
         ::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
 
     template
-	void FEValuesViews::Tensor<2, deal_II_dimension, deal_II_dimension+1>
+    void FEValuesViews::Tensor<2, deal_II_dimension, deal_II_dimension+1>
         ::get_function_values<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension+1> >::type>&) const;
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<2,deal_II_dimension+1> >::type>&) const;
     template
-	void FEValuesViews::Tensor<2, deal_II_dimension, deal_II_dimension+1>
+    void FEValuesViews::Tensor<2, deal_II_dimension, deal_II_dimension+1>
         ::get_function_divergences<dealii::IndexSet>
-	(const dealii::IndexSet&, std::vector<typename ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_dimension+1> >::type>&) const;
 
 #endif
 #endif
@@ -348,7 +348,7 @@ for (deal_II_dimension : DIMENSIONS)
   {
 #if (deal_II_dimension == DIM_A) || (deal_II_dimension == DIM_B)
     template
-	void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
+    void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
       (const IndexSet&, std::vector<IndexSet::value_type>&) const;
     template
       void FEValuesBase<deal_II_dimension>::get_function_values<IndexSet>
@@ -401,7 +401,7 @@ for (deal_II_dimension : DIMENSIONS)
        VectorSlice<std::vector<std::vector<dealii::Tensor<2,deal_II_dimension,IndexSet::value_type> > > >, bool) const;
 
     template
-	void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
+    void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
       (const IndexSet&, std::vector<IndexSet::value_type>&) const;
     template
       void FEValuesBase<deal_II_dimension>::get_function_laplacians<IndexSet>
@@ -425,7 +425,7 @@ for (deal_II_dimension : DIMENSIONS)
 #if deal_II_dimension != 3
 
     template
-	void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
+    void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
       (const IndexSet&, std::vector<IndexSet::value_type>&) const;
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_values<IndexSet>
@@ -478,7 +478,7 @@ for (deal_II_dimension : DIMENSIONS)
        VectorSlice<std::vector<std::vector<dealii::Tensor<2,deal_II_dimension+1,IndexSet::value_type> > > >, bool) const;
 
     template
-	void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_laplacians<IndexSet>
+      void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_laplacians<IndexSet>
       (const IndexSet&, std::vector<IndexSet::value_type>&) const;
     template
       void FEValuesBase<deal_II_dimension,deal_II_dimension+1>::get_function_laplacians<IndexSet>
