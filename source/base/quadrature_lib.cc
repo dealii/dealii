@@ -1132,7 +1132,7 @@ QTelles<1>::QTelles (
 
 template <>
 std::vector<double>
-QGaussChebyshev<1>::set_quadrature_points(const unsigned int n) const
+QGaussChebyshev<1>::get_quadrature_points(const unsigned int n)
 {
 
   std::vector<double> points(n);
@@ -1149,7 +1149,7 @@ QGaussChebyshev<1>::set_quadrature_points(const unsigned int n) const
 
 template <>
 std::vector<double>
-QGaussChebyshev<1>::set_quadrature_weights(const unsigned int n) const
+QGaussChebyshev<1>::get_quadrature_weights(const unsigned int n)
 {
 
   std::vector<double> weights(n);
@@ -1172,8 +1172,8 @@ QGaussChebyshev<1>::QGaussChebyshev(const unsigned int n)
 {
 
   Assert(n>0,ExcMessage("Need at least one point for the quadrature rule"));
-  std::vector<double> p=set_quadrature_points(n);
-  std::vector<double> w=set_quadrature_weights(n);
+  std::vector<double> p=get_quadrature_points(n);
+  std::vector<double> w=get_quadrature_weights(n);
 
   for (unsigned int i=0; i<this->size(); ++i)
     {
@@ -1196,7 +1196,8 @@ QGaussChebyshev<dim>::QGaussChebyshev (const unsigned int n)
 
 template <>
 std::vector<double>
-QGaussRadauChebyshev<1>::set_quadrature_points(const unsigned int n) const
+QGaussRadauChebyshev<1>::get_quadrature_points(const unsigned int n,
+                                               QGaussRadauChebyshev::EndPoint ep)
 {
 
   std::vector<double> points(n);
@@ -1219,7 +1220,8 @@ QGaussRadauChebyshev<1>::set_quadrature_points(const unsigned int n) const
 
 template <>
 std::vector<double>
-QGaussRadauChebyshev<1>::set_quadrature_weights(const unsigned int n) const
+QGaussRadauChebyshev<1>::get_quadrature_weights(const unsigned int n,
+                                                QGaussRadauChebyshev::EndPoint ep)
 {
 
   std::vector<double> weights(n);
@@ -1248,8 +1250,8 @@ QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n,
 {
 
   Assert(n>0,ExcMessage("Need at least one point for quadrature rules"));
-  std::vector<double> p=set_quadrature_points(n);
-  std::vector<double> w=set_quadrature_weights(n);
+  std::vector<double> p=get_quadrature_points(n,ep);
+  std::vector<double> w=get_quadrature_weights(n,ep);
 
   for (unsigned int i=0; i<this->size(); ++i)
     {
@@ -1264,7 +1266,8 @@ QGaussRadauChebyshev<2>::QGaussRadauChebyshev (const unsigned int n,
                                                QGaussRadauChebyshev::EndPoint ep)
   :
   Quadrature<2> (QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep)),
-                 QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep)))
+                 QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
+  ep (ep)
 {}
 
 
@@ -1273,13 +1276,14 @@ QGaussRadauChebyshev<dim>::QGaussRadauChebyshev (const unsigned int n,
                                                  QGaussRadauChebyshev::EndPoint ep)
   :
   Quadrature<dim> (QGaussRadauChebyshev<dim-1>(n,static_cast<typename QGaussRadauChebyshev<dim-1>::EndPoint>(ep)),
-                   QGaussRadauChebyshev<1>(n,static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep)))
+                   QGaussRadauChebyshev<1>(n,static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
+  ep (ep)
 {}
 
 
 template <>
 std::vector<double>
-QGaussLobattoChebyshev<1>::set_quadrature_points(const unsigned int n) const
+QGaussLobattoChebyshev<1>::get_quadrature_points(const unsigned int n)
 {
 
   std::vector<double> points(n);
@@ -1296,7 +1300,7 @@ QGaussLobattoChebyshev<1>::set_quadrature_points(const unsigned int n) const
 
 template <>
 std::vector<double>
-QGaussLobattoChebyshev<1>::set_quadrature_weights(const unsigned int n) const
+QGaussLobattoChebyshev<1>::get_quadrature_weights(const unsigned int n)
 {
 
   std::vector<double> weights(n);
@@ -1321,8 +1325,8 @@ QGaussLobattoChebyshev<1>::QGaussLobattoChebyshev(const unsigned int n)
 {
 
   Assert(n>1,ExcMessage("Need at least two points for Gauss-Lobatto quadrature rule"));
-  std::vector<double> p=set_quadrature_points(n);
-  std::vector<double> w=set_quadrature_weights(n);
+  std::vector<double> p=get_quadrature_points(n);
+  std::vector<double> w=get_quadrature_weights(n);
 
   for (unsigned int i=0; i<this->size(); ++i)
     {

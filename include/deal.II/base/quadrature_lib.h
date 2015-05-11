@@ -517,9 +517,9 @@ public:
 * $w(x) = 1/\sqrt{1-x^2}$. The nodes and weights are known analytically,
 * and are exact for monomials up to the order $2n-1$, where $n$ is the number
 * of quadrature points.
-* Here we rescale the quadrature formula so that it is defined on t
-* he interval [0,1] instead of [-1,1]. So the quadrature formulas inte
-* grate exactly the integral $\int_0^1 f(x) w(x) dx$ with the weight:
+* Here we rescale the quadrature formula so that it is defined on
+* the interval $[0,1]$ instead of $[-1,1]$. So the quadrature formulas
+* integrate exactly the integral $\int_0^1 f(x) w(x) dx$ with the weight:
 * $w(x) = 1/sqrt{x(1-x)}$.
 * For details see:
 * M. Abramowitz & I.A. Stegun: Handbook of Mathematical Functions, par. 25.4.38
@@ -530,17 +530,17 @@ template <int dim>
 class QGaussChebyshev : public Quadrature<dim>
 {
 public:
-  //Generate a formula with <tt>n</tt> quadrature points
+  /// Generate a formula with <tt>n</tt> quadrature points
   QGaussChebyshev(const unsigned int n);
 
-protected:
-  // Sets the points of the quadrature formula.
-  std::vector<double>
-  set_quadrature_points(const unsigned int n) const;
+private:
+  /// Sets the points of the quadrature formula.
+  static std::vector<double>
+  get_quadrature_points(const unsigned int n);
 
-  // Sets the weights of the quadrature formula.
-  std::vector<double>
-  set_quadrature_weights(const unsigned int n) const;
+  /// Sets the weights of the quadrature formula.
+  static std::vector<double>
+  get_quadrature_weights(const unsigned int n);
 
 };
 
@@ -552,10 +552,9 @@ protected:
 * lies at one of the two extrema of the interval.
 * The nodes and weights are known analytically,
 * and are exact for monomials up to the order $2n-2$, where $n$ is the number
-* of quadrature points.
-* Here we rescale the quadrature formula so that it is defined on t
-* he interval [0,1] instead of [-1,1]. So the quadrature formulas inte
-* grate exactly the integral $\int_0^1 f(x) w(x) dx$ with the weight:
+* of quadrature points. Here we rescale the quadrature formula so that it is defined on
+* the interval $[0,1]$ instead of $[-1,1]$. So the quadrature formulas
+* integrate exactly the integral $\int_0^1 f(x) w(x) dx$ with the weight:
 * $w(x) = 1/sqrt{x(1-x)}$. By default the quadrature is constructed with the
 * left endpoint as quadrature node, but the quadrature node can be imposed at the
 * right endpoint through the variable ep that can assume the values left or right.
@@ -566,32 +565,37 @@ template <int dim>
 class QGaussRadauChebyshev : public Quadrature<dim>
 {
 public:
+  /* EndPoint is used to specify which of the two endpoints of the unit interval
+   * is used also as quadrature point
+   */
   enum EndPoint { left,right };
-  EndPoint ep;
-  //Generate a formula with <tt>n</tt> quadrature points
+  /// Generate a formula with <tt>n</tt> quadrature points
   QGaussRadauChebyshev(const unsigned int n,
                        QGaussRadauChebyshev::EndPoint ep=QGaussRadauChebyshev::left);
 
-protected:
-  // Sets the points of the quadrature formula.
-  std::vector<double>
-  set_quadrature_points(const unsigned int n) const;
+private:
+  const EndPoint ep;
+  /// Sets the points of the quadrature formula.
+  static std::vector<double>
+  get_quadrature_points(const unsigned int n, EndPoint ep);
 
-  // Sets the weights of the quadrature formula.
-  std::vector<double>
-  set_quadrature_weights(const unsigned int n) const;
+  /// Sets the weights of the quadrature formula.
+  static std::vector<double>
+  get_quadrature_weights(const unsigned int n, EndPoint ep);
 
 };
 
 /**
 * Gauss-Lobatto-Chebyshev quadrature rules integrate the weighted product
 * $\int_{-1}^1 f(x) w(x) dx$ with weight given by:
-* $w(x) = 1/\sqrt{1-x^2}$. The nodes and weights are known analytically,
-* and are exact for monomials up to the order $2n-1$, where $n$ is the number
+* $w(x) = 1/\sqrt{1-x^2}$, with the additional constraint that two of the quadrature
+* points are located at the endpoints of the quadrature interval.
+* The nodes and weights are known analytically,
+* and are exact for monomials up to the order $2n-3$, where $n$ is the number
 * of quadrature points.
-* Here we rescale the quadrature formula so that it is defined on t
-* he interval [0,1] instead of [-1,1]. So the quadrature formulas inte
-* grate exactly the integral $\int_0^1 f(x) w(x) dx$ with the weight:
+* Here we rescale the quadrature formula so that it is defined on
+* the interval $[0,1]$ instead of $[-1,1]$. So the quadrature formulas
+* integrate exactly the integral $\int_0^1 f(x) w(x) dx$ with the weight:
 * $w(x) = 1/sqrt{x(1-x)}$.
 * For details see:
 * M. Abramowitz & I.A. Stegun: Handbook of Mathematical Functions, par. 25.4.40
@@ -602,17 +606,17 @@ template <int dim>
 class QGaussLobattoChebyshev : public Quadrature<dim>
 {
 public:
-  //Generate a formula with <tt>n</tt> quadrature points
+  /// Generate a formula with <tt>n</tt> quadrature points
   QGaussLobattoChebyshev(const unsigned int n);
 
-protected:
-  // Sets the points of the quadrature formula.
-  std::vector<double>
-  set_quadrature_points(const unsigned int n) const;
+private:
+  /// Sets the points of the quadrature formula.
+  static std::vector<double>
+  get_quadrature_points(const unsigned int n);
 
-  // Sets the weights of the quadrature formula.
-  std::vector<double>
-  set_quadrature_weights(const unsigned int n) const;
+  /// Sets the weights of the quadrature formula.
+  static std::vector<double>
+  get_quadrature_weights(const unsigned int n);
 
 };
 
