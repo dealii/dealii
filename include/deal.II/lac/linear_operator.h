@@ -1639,18 +1639,33 @@ operator*(const PackagedOperation<Range> &comp,
 
   return_comp.reinit_vector = comp.reinit_vector;
 
-  return_comp.apply = [comp, number](Range &v)
-  {
-    comp.apply(v);
-    v *= number;
-  };
+  // the trivial case: number is zero
+  if (number == 0.)
+    {
+      return_comp.apply = [](Range &v)
+      {
+        v = 0.;
+      };
 
-  return_comp.apply_add = [comp, number](Range &v)
-  {
-    v /= number;
-    comp.apply_add(v);
-    v *= number;
-  };
+      return_comp.apply_add = [](Range &)
+      {
+      };
+    }
+  else
+    {
+      return_comp.apply = [comp, number](Range &v)
+      {
+        comp.apply(v);
+        v *= number;
+      };
+
+      return_comp.apply_add = [comp, number](Range &v)
+      {
+        v /= number;
+        comp.apply_add(v);
+        v *= number;
+      };
+    }
 
   return return_comp;
 }
