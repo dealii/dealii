@@ -1745,7 +1745,7 @@ PackagedOperation<Range> operator-(const Range &offset,
 namespace
 {
   // Poor man's trait class that determines whether type T is a vector:
-  // FIXME: Implement this as a proprer type trait - similar to
+  // FIXME: Implement this as a proper type trait - similar to
   // isBlockVector
 
   template <typename T>

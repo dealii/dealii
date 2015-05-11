@@ -107,8 +107,9 @@
  * involving vectors and linear operators. This is done by storing the
  * computational expression and only performing the computation when either
  * the object is implicitly converted to a vector object, or
- * <code>apply</code> (or <code>apply_add</code>) is invoked by hand. This
- * avoids unnecessary temporary storage of intermediate results.
+ * PackagedOperation::apply() (or PackagedOperation::apply_add()) is
+ * invoked by hand. This avoids unnecessary temporary storage of
+ * intermediate results.
  *
  * As an example consider the addition of multiple vectors:
  * @code
@@ -137,6 +138,12 @@
  *
  *   dealii::Vector<double> residual =  b - op_a * x;
  * @endcode
+ * Here, the expression <code>b - op_a * x</code> results again in an
+ * object of type PackagedOperation that stores the <i>sequence of
+ * operations</i> that should be performed using the two vectors and the
+ * linear operator. Converting the expression to a vector (as happens here
+ * with the assignment to the vector <code>residual</code>) executes the
+ * computation (see the following note).
  *
  * @note
  * Lazy evaluation of a computational expression necessarily involves
