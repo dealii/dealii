@@ -377,6 +377,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: Utilities::MPI::min() functions.
+  <br>
+  (Timo Heister, 2015/05/12)
+  </li>
+
   <li> New: A PackagedOperation class that stores computation expressions.
   The primary purpose of this class is to provide syntactic sugar for vector
   operations (vector space addition, scalar multiplication, application of a
