@@ -31,6 +31,11 @@ struct LeftVector
   typedef double value_type;
   double value;
 
+  LeftVector & operator = (double new_value)
+  {
+    value = new_value;
+    return *this;
+  }
   LeftVector & operator *= (double scale)
   {
     value *= scale;
@@ -61,6 +66,11 @@ struct RightVector
   typedef double value_type;
   double value;
 
+  RightVector & operator = (double new_value)
+  {
+    value = new_value;
+    return *this;
+  }
   RightVector & operator *= (double scale)
   {
     value *= scale;
