@@ -467,6 +467,85 @@ namespace Utilities
         return MPI_LONG_DOUBLE;
       }
 #endif
+
+      template <typename T>
+      inline
+      T op (const MPI_Op &mpi_op,
+            const T &t,
+            const MPI_Comm &mpi_communicator)
+      {
+#ifdef DEAL_II_WITH_MPI
+        if (job_supports_mpi())
+          {
+            T output;
+            MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
+                           &output, 1, internal::mpi_type_id(&t), mpi_op,
+                           mpi_communicator);
+            return output;
+          }
+        else
+#endif
+          {
+            (void)mpi_communicator;
+            return t;
+          }
+      }
+
+      template <typename T, unsigned int N>
+      inline
+      void op (const MPI_Op &mpi_op,
+               const T (&values)[N],
+               const MPI_Comm &mpi_communicator,
+               T (&output)[N])
+      {
+#ifdef DEAL_II_WITH_MPI
+        if (job_supports_mpi())
+          {
+            MPI_Allreduce ((&values[0] != &output[0]
+                            ?
+                            const_cast<void *>(static_cast<const void *>(&values[0]))
+                            :
+                            MPI_IN_PLACE),
+                           &output[0], N, internal::mpi_type_id(values), mpi_op,
+                           mpi_communicator);
+          }
+        else
+#endif
+          {
+            (void)mpi_communicator;
+            for (unsigned int i=0; i<N; ++i)
+              output[i] = values[i];
+          }
+      }
+
+      template <typename T>
+      inline
+      void op (const MPI_Op &mpi_op,
+               const std::vector<T> &values,
+               const MPI_Comm       &mpi_communicator,
+               std::vector<T>       &output)
+      {
+#ifdef DEAL_II_WITH_MPI
+        if (job_supports_mpi())
+          {
+            output.resize (values.size());
+            MPI_Allreduce ((&values[0] != &output[0]
+                            ?
+                            const_cast<void *>(static_cast<const void *>(&values[0]))
+                            :
+                            MPI_IN_PLACE),
+                           &output[0], values.size(), internal::mpi_type_id((T *)0), mpi_op,
+                           mpi_communicator);
+          }
+        else
+#endif
+          {
+            (void)mpi_communicator;
+            output = values;
+          }
+      }
+
+
     }
 
 
@@ -475,21 +554,7 @@ namespace Utilities
     T sum (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          T sum;
-          MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
-                         &sum, 1, internal::mpi_type_id(&t), MPI_SUM,
-                         mpi_communicator);
-          return sum;
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          return t;
-        }
+      return internal::op(MPI_SUM, t, mpi_communicator);
     }
 
 
@@ -499,24 +564,7 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&sums)[N])
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          MPI_Allreduce ((&values[0] != &sums[0]
-                          ?
-                          const_cast<void *>(static_cast<const void *>(&values[0]))
-                          :
-                          MPI_IN_PLACE),
-                         &sums[0], N, internal::mpi_type_id(values), MPI_SUM,
-                         mpi_communicator);
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          for (unsigned int i=0; i<N; ++i)
-            sums[i] = values[i];
-        }
+      internal::op(MPI_SUM, values, mpi_communicator, sums);
     }
 
 
@@ -526,24 +574,7 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &sums)
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          sums.resize (values.size());
-          MPI_Allreduce ((&values[0] != &sums[0]
-                          ?
-                          const_cast<void *>(static_cast<const void *>(&values[0]))
-                          :
-                          MPI_IN_PLACE),
-                         &sums[0], values.size(), internal::mpi_type_id((T *)0), MPI_SUM,
-                         mpi_communicator);
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          sums = values;
-        }
+      internal::op(MPI_SUM, values, mpi_communicator, sums);
     }
 
     template <int rank, int dim, typename Number>
@@ -595,21 +626,7 @@ namespace Utilities
     T max (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          T sum;
-          MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
-                         &sum, 1, internal::mpi_type_id(&t), MPI_MAX,
-                         mpi_communicator);
-          return sum;
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          return t;
-        }
+      return internal::op(MPI_MAX, t, mpi_communicator);
     }
 
 
@@ -619,24 +636,7 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&maxima)[N])
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          MPI_Allreduce ((&values[0] != &maxima[0]
-                          ?
-                          const_cast<void *>(static_cast<const void *>(&values[0]))
-                          :
-                          MPI_IN_PLACE),
-                         &maxima[0], N, internal::mpi_type_id(values), MPI_MAX,
-                         mpi_communicator);
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          for (unsigned int i=0; i<N; ++i)
-            maxima[i] = values[i];
-        }
+      internal::op(MPI_MAX, values, mpi_communicator, maxima);
     }
 
 
@@ -646,24 +646,7 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &maxima)
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          maxima.resize (values.size());
-          MPI_Allreduce ((&values[0] != &maxima[0]
-                          ?
-                          const_cast<void *>(static_cast<const void *>(&values[0]))
-                          :
-                          MPI_IN_PLACE),
-                         &maxima[0], values.size(), internal::mpi_type_id((T *)0), MPI_MAX,
-                         mpi_communicator);
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          maxima = values;
-        }
+      internal::op(MPI_MAX, values, mpi_communicator, maxima);
     }
 
 
@@ -672,21 +655,7 @@ namespace Utilities
     T min (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          T sum;
-          MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
-                         &sum, 1, internal::mpi_type_id(&t), MPI_MIN,
-                         mpi_communicator);
-          return sum;
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          return t;
-        }
+      return internal::op(MPI_MIN, t, mpi_communicator);
     }
 
 
@@ -696,24 +665,7 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&minima)[N])
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          MPI_Allreduce ((&values[0] != &minima[0]
-                          ?
-                          const_cast<void *>(static_cast<const void *>(&values[0]))
-                          :
-                          MPI_IN_PLACE),
-                         &minima[0], N, internal::mpi_type_id(values), MPI_MIN,
-                         mpi_communicator);
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          for (unsigned int i=0; i<N; ++i)
-            minima[i] = values[i];
-        }
+      internal::op(MPI_MIN, values, mpi_communicator, minima);
     }
 
 
@@ -723,24 +675,7 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &minima)
     {
-#ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi())
-        {
-          minima.resize (values.size());
-          MPI_Allreduce ((&values[0] != &minima[0]
-                          ?
-                          const_cast<void *>(static_cast<const void *>(&values[0]))
-                          :
-                          MPI_IN_PLACE),
-                         &minima[0], values.size(), internal::mpi_type_id((T *)0), MPI_MIN,
-                         mpi_communicator);
-        }
-      else
-#endif
-        {
-          (void)mpi_communicator;
-          minima = values;
-        }
+      internal::op(MPI_MIN, values, mpi_communicator, minima);
     }
 
 
