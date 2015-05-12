@@ -238,6 +238,58 @@ namespace Utilities
               std::vector<T> &maxima);
 
     /**
+     * Return the minimum over all processors of the value @p t. This function
+     * is collective over all processors given in the communicator. If deal.II
+     * is not configured for use of MPI, this function simply returns the
+     * value of @p t. This function corresponds to the
+     * <code>MPI_Allreduce</code> function, i.e. all processors receive the
+     * result of this operation.
+     *
+     * @note Sometimes, not all processors need a results and in that case one
+     * would call the <code>MPI_Reduce</code> function instead of the
+     * <code>MPI_Allreduce</code> function. The latter is at most twice as
+     * expensive, so if you are concerned about performance, it may be
+     * worthwhile investigating whether your algorithm indeed needs the result
+     * everywhere or whether you could get away with calling the current
+     * function and getting the result everywhere.
+     *
+     * @note This function is only implemented for certain template arguments
+     * <code>T</code>, namely <code>float, double, int, unsigned int</code>.
+     */
+    template <typename T>
+    T min (const T &t,
+           const MPI_Comm &mpi_communicator);
+
+    /**
+     * Like the previous function, but take the minima over the elements of an
+     * array of length N. In other words, the i-th element of the results
+     * array is the minimum of the i-th entries of the input arrays from each
+     * processor.
+     *
+     * Input and output arrays may be the same.
+     */
+    template <typename T, unsigned int N>
+    inline
+    void min (const T (&values)[N],
+              const MPI_Comm &mpi_communicator,
+              T (&minima)[N]);
+
+    /**
+     * Like the previous function, but take the minimum over the elements of a
+     * std::vector. In other words, the i-th element of the results array is
+     * the minimum over the i-th entries of the input arrays from each
+     * processor.
+     *
+     * Input and output vectors may be the same.
+     */
+    template <typename T>
+    inline
+    void min (const std::vector<T> &values,
+              const MPI_Comm &mpi_communicator,
+              std::vector<T> &minima);
+
+
+    /**
      * Data structure to store the result of min_max_avg().
      */
     struct MinMaxAvg
@@ -611,6 +663,83 @@ namespace Utilities
         {
           (void)mpi_communicator;
           maxima = values;
+        }
+    }
+
+
+    template <typename T>
+    inline
+    T min (const T &t,
+           const MPI_Comm &mpi_communicator)
+    {
+#ifdef DEAL_II_WITH_MPI
+      if (job_supports_mpi())
+        {
+          T sum;
+          MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
+                         &sum, 1, internal::mpi_type_id(&t), MPI_MIN,
+                         mpi_communicator);
+          return sum;
+        }
+      else
+#endif
+        {
+          (void)mpi_communicator;
+          return t;
+        }
+    }
+
+
+    template <typename T, unsigned int N>
+    inline
+    void min (const T (&values)[N],
+              const MPI_Comm &mpi_communicator,
+              T (&minima)[N])
+    {
+#ifdef DEAL_II_WITH_MPI
+      if (job_supports_mpi())
+        {
+          MPI_Allreduce ((&values[0] != &minima[0]
+                          ?
+                          const_cast<void *>(static_cast<const void *>(&values[0]))
+                          :
+                          MPI_IN_PLACE),
+                         &minima[0], N, internal::mpi_type_id(values), MPI_MIN,
+                         mpi_communicator);
+        }
+      else
+#endif
+        {
+          (void)mpi_communicator;
+          for (unsigned int i=0; i<N; ++i)
+            minima[i] = values[i];
+        }
+    }
+
+
+    template <typename T>
+    inline
+    void min (const std::vector<T> &values,
+              const MPI_Comm       &mpi_communicator,
+              std::vector<T>       &minima)
+    {
+#ifdef DEAL_II_WITH_MPI
+      if (job_supports_mpi())
+        {
+          minima.resize (values.size());
+          MPI_Allreduce ((&values[0] != &minima[0]
+                          ?
+                          const_cast<void *>(static_cast<const void *>(&values[0]))
+                          :
+                          MPI_IN_PLACE),
+                         &minima[0], values.size(), internal::mpi_type_id((T *)0), MPI_MIN,
+                         mpi_communicator);
+        }
+      else
+#endif
+        {
+          (void)mpi_communicator;
+          minima = values;
         }
     }
 
