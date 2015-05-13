@@ -3094,7 +3094,7 @@ namespace GridGenerator
         // We want to use a standard boundary description where
         // the boundary is not curved. Hence set boundary id 2 to
         // to all faces in a first step.
-        typename Triangulation<3>::cell_iterator cell = tria.begin();
+        Triangulation<3>::cell_iterator cell = tria.begin();
         for (; cell!=tria.end(); ++cell)
           for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
             if (cell->at_boundary(i))
@@ -3108,7 +3108,7 @@ namespace GridGenerator
           for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
             if (cell->at_boundary(i))
               {
-                const typename Triangulation<3>::face_iterator face
+                const Triangulation<3>::face_iterator face
                   = cell->face(i);
 
                 const Point<3> face_center (face->center());
