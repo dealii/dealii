@@ -27,13 +27,13 @@ void test()
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
-  unsigned int values_[2] = { 1, 2 };
+  unsigned int values_[2] = { myid, numprocs+myid };
   std::vector<unsigned int> inout(&values_[0], &values_[2]);
   Utilities::MPI::min (inout,
                        MPI_COMM_WORLD,
                        inout);
-  Assert (inout[0] == 1, ExcInternalError());
-  Assert (inout[1] == 2, ExcInternalError());
+  Assert (inout[0] == 0, ExcInternalError());
+  Assert (inout[1] == numprocs, ExcInternalError());
 
   if (myid==0)
     deallog << inout[0] << ' ' << inout[1] << std::endl;

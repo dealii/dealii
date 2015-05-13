@@ -27,14 +27,14 @@ void test()
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
-  unsigned int values_[2] = { 1, 2 };
+  unsigned int values_[2] = { 1+myid, numprocs+myid };
   std::vector<unsigned int> values(&values_[0], &values_[2]);
   std::vector<unsigned int> maxima(2);
   Utilities::MPI::max (values,
                        MPI_COMM_WORLD,
                        maxima);
-  Assert (maxima[0] == 1, ExcInternalError());
-  Assert (maxima[1] == 2, ExcInternalError());
+  Assert (maxima[0] == numprocs, ExcInternalError());
+  Assert (maxima[1] == 2*numprocs-1, ExcInternalError());
 
   if (myid==0)
     deallog << maxima[0] << ' ' << maxima[1] << std::endl;

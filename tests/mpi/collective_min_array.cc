@@ -27,13 +27,13 @@ void test()
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
-  unsigned int values[2] = { 1, 2 };
+  unsigned int values[2] = { 1+myid, numprocs+myid };
   unsigned int minima[2];
   Utilities::MPI::min (values,
                        MPI_COMM_WORLD,
                        minima);
   Assert (minima[0] == 1, ExcInternalError());
-  Assert (minima[1] == 2, ExcInternalError());
+  Assert (minima[1] == numprocs, ExcInternalError());
 
   if (myid==0)
     deallog << minima[0] << ' ' << minima[1] << std::endl;
