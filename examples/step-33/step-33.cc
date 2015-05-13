@@ -69,8 +69,13 @@
 
 // Sacado is the automatic differentiation package within Trilinos, which is
 // used to find the Jacobian for a fully implicit Newton iteration:
+// Trilinos::Sacado (at least until version 11.10.2) package will trigger
+// warnings when compiling this file. Since we are not responsible for this,
+// we just suppress the warning by wrapping the <code>#include</code>
+// directive into a pair of macros that simply suppress these warnings:
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <Sacado.hpp>
-
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 // And this again is C++:
 #include <iostream>
