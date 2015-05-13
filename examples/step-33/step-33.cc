@@ -58,11 +58,10 @@
 // linear solvers as well as for automatic differentiation. These are in the
 // following include files.
 //
-// Since deal.II provides interfaces to the basic Trilinos matrices, vectors,
+// Since deal.II provides interfaces to the basic Trilinos matrices,
 // preconditioners and solvers, we include them similarly as deal.II linear
 // algebra structures.
 #include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_solver.h>
 
