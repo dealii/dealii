@@ -694,7 +694,7 @@ namespace TrilinosWrappers
 
         row_indices.resize (row_length, -1);
         {
-          typename dealii::DynamicSparsityPattern::iterator p = sparsity_pattern.begin(global_row);
+          dealii::DynamicSparsityPattern::iterator p = sparsity_pattern.begin(global_row);
           for (size_type col=0; p != sparsity_pattern.end(global_row); ++p, ++col)
             row_indices[col] = p->column();
         }
