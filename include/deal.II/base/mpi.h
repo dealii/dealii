@@ -45,6 +45,9 @@ namespace MPI
   static const unsigned int MIN = 0;
   static const unsigned int SUM = 0;
 }
+static const int MPI_MIN = 0;
+static const int MPI_MAX = 0;
+static const int MPI_SUM = 0;
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -486,6 +489,7 @@ namespace Utilities
         else
 #endif
           {
+            (void)mpi_op;
             (void)mpi_communicator;
             return t;
           }
@@ -512,6 +516,7 @@ namespace Utilities
         else
 #endif
           {
+            (void)mpi_op;
             (void)mpi_communicator;
             for (unsigned int i=0; i<N; ++i)
               output[i] = values[i];
@@ -540,6 +545,7 @@ namespace Utilities
         else
 #endif
           {
+            (void)mpi_op;
             (void)mpi_communicator;
             output = values;
           }
