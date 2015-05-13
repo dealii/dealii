@@ -517,7 +517,7 @@ inconvenience this causes.
   <br>
   (Wolfgang Bangerth, 2015/05/11)
   </li>
-  
+
   <li> Changed: TrilinosWrappers::Vector, TrilinosWrappers::BlockVector, 
   PETScWrappers::Vector, and PETScWrappers::BlockVector are deprecated. Either 
   use the MPI or the deal.II version of the Vector/BlockVector.
