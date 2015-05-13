@@ -15,7 +15,7 @@
 
 
 
-// check Utilities::MPI::max() for vectors
+// check Utilities::MPI::min() for arrays
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -27,17 +27,16 @@ void test()
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
-  unsigned int values_[2] = { 1, 2 };
-  std::vector<unsigned int> values(&values_[0], &values_[2]);
-  std::vector<unsigned int> maxima(2);
-  Utilities::MPI::max (values,
+  unsigned int values[2] = { 1+myid, numprocs+myid };
+  unsigned int minima[2];
+  Utilities::MPI::min (values,
                        MPI_COMM_WORLD,
-                       maxima);
-  Assert (maxima[0] == 1, ExcInternalError());
-  Assert (maxima[1] == 2, ExcInternalError());
+                       minima);
+  Assert (minima[0] == 1, ExcInternalError());
+  Assert (minima[1] == numprocs, ExcInternalError());
 
   if (myid==0)
-    deallog << maxima[0] << ' ' << maxima[1] << std::endl;
+    deallog << minima[0] << ' ' << minima[1] << std::endl;
 }
 
 

@@ -15,7 +15,7 @@
 
 
 
-// check Utilities::MPI::max() for vectors, but with input=output
+// check Utilities::MPI::min()
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -27,16 +27,30 @@ void test()
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
-  unsigned int values_[2] = { 1, 2 };
-  std::vector<unsigned int> maxima(&values_[0], &values_[2]);
-  Utilities::MPI::max (maxima,
-                       MPI_COMM_WORLD,
-                       maxima);
-  Assert (maxima[0] == 1, ExcInternalError());
-  Assert (maxima[1] == 2, ExcInternalError());
+  int int_sum;
+  unsigned int uint_sum;
+  double double_sum;
+  float float_sum;
+
+  int_sum
+    =
+      Utilities::MPI::min<int>(numprocs+myid,
+                               MPI_COMM_WORLD);
+  uint_sum
+    =
+      Utilities::MPI::min<unsigned int>(numprocs+myid,
+                                        MPI_COMM_WORLD);
+  float_sum
+    =
+      Utilities::MPI::min<float>(numprocs+myid,
+                                 MPI_COMM_WORLD);
+  double_sum
+    =
+      Utilities::MPI::min<double>(numprocs+myid,
+                                  MPI_COMM_WORLD);
 
   if (myid==0)
-    deallog << maxima[0] << ' ' << maxima[1] << std::endl;
+    deallog << int_sum << ' ' << uint_sum << ' ' << double_sum << ' ' << float_sum << std::endl;
 }
 
 
