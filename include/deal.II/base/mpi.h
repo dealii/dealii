@@ -125,13 +125,12 @@ namespace Utilities
      * of @p t. This function corresponds to the <code>MPI_Allreduce</code>
      * function, i.e. all processors receive the result of this operation.
      *
-     * @note Sometimes, not all processors need a results and in that case one
+     * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
      * expensive, so if you are concerned about performance, it may be
      * worthwhile investigating whether your algorithm indeed needs the result
-     * everywhere or whether you could get away with calling the current
-     * function and getting the result everywhere.
+     * everywhere.
      *
      * @note This function is only implemented for certain template arguments
      * <code>T</code>, namely <code>float, double, int, unsigned int</code>.
@@ -197,13 +196,12 @@ namespace Utilities
      * <code>MPI_Allreduce</code> function, i.e. all processors receive the
      * result of this operation.
      *
-     * @note Sometimes, not all processors need a results and in that case one
+     * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
      * expensive, so if you are concerned about performance, it may be
      * worthwhile investigating whether your algorithm indeed needs the result
-     * everywhere or whether you could get away with calling the current
-     * function and getting the result everywhere.
+     * everywhere.
      *
      * @note This function is only implemented for certain template arguments
      * <code>T</code>, namely <code>float, double, int, unsigned int</code>.
@@ -248,13 +246,12 @@ namespace Utilities
      * <code>MPI_Allreduce</code> function, i.e. all processors receive the
      * result of this operation.
      *
-     * @note Sometimes, not all processors need a results and in that case one
+     * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
      * expensive, so if you are concerned about performance, it may be
      * worthwhile investigating whether your algorithm indeed needs the result
-     * everywhere or whether you could get away with calling the current
-     * function and getting the result everywhere.
+     * everywhere.
      *
      * @note This function is only implemented for certain template arguments
      * <code>T</code>, namely <code>float, double, int, unsigned int</code>.
@@ -313,13 +310,12 @@ namespace Utilities
      * mpi_communicator . Each processor's value is given in @p my_value and
      * the result will be returned. The result is available on all machines.
      *
-     * @note Sometimes, not all processors need a results and in that case one
+     * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
      * expensive, so if you are concerned about performance, it may be
      * worthwhile investigating whether your algorithm indeed needs the result
-     * everywhere or whether you could get away with calling the current
-     * function and getting the result everywhere.
+     * everywhere.
      */
     MinMaxAvg
     min_max_avg (const double my_value,
@@ -473,9 +469,9 @@ namespace Utilities
 
       template <typename T>
       inline
-      T op (const MPI_Op &mpi_op,
-            const T &t,
-            const MPI_Comm &mpi_communicator)
+      T all_reduce (const MPI_Op &mpi_op,
+                    const T &t,
+                    const MPI_Comm &mpi_communicator)
       {
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
@@ -497,10 +493,10 @@ namespace Utilities
 
       template <typename T, unsigned int N>
       inline
-      void op (const MPI_Op &mpi_op,
-               const T (&values)[N],
-               const MPI_Comm &mpi_communicator,
-               T (&output)[N])
+      void all_reduce (const MPI_Op &mpi_op,
+                       const T (&values)[N],
+                       const MPI_Comm &mpi_communicator,
+                       T (&output)[N])
       {
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
@@ -525,10 +521,10 @@ namespace Utilities
 
       template <typename T>
       inline
-      void op (const MPI_Op &mpi_op,
-               const std::vector<T> &values,
-               const MPI_Comm       &mpi_communicator,
-               std::vector<T>       &output)
+      void all_reduce (const MPI_Op &mpi_op,
+                       const std::vector<T> &values,
+                       const MPI_Comm       &mpi_communicator,
+                       std::vector<T>       &output)
       {
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
@@ -560,7 +556,7 @@ namespace Utilities
     T sum (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-      return internal::op(MPI_SUM, t, mpi_communicator);
+      return internal::all_reduce(MPI_SUM, t, mpi_communicator);
     }
 
 
@@ -570,7 +566,7 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&sums)[N])
     {
-      internal::op(MPI_SUM, values, mpi_communicator, sums);
+      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
 
 
@@ -580,7 +576,7 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &sums)
     {
-      internal::op(MPI_SUM, values, mpi_communicator, sums);
+      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
 
     template <int rank, int dim, typename Number>
@@ -632,7 +628,7 @@ namespace Utilities
     T max (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-      return internal::op(MPI_MAX, t, mpi_communicator);
+      return internal::all_reduce(MPI_MAX, t, mpi_communicator);
     }
 
 
@@ -642,7 +638,7 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&maxima)[N])
     {
-      internal::op(MPI_MAX, values, mpi_communicator, maxima);
+      internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
     }
 
 
@@ -652,7 +648,7 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &maxima)
     {
-      internal::op(MPI_MAX, values, mpi_communicator, maxima);
+      internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
     }
 
 
@@ -661,7 +657,7 @@ namespace Utilities
     T min (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-      return internal::op(MPI_MIN, t, mpi_communicator);
+      return internal::all_reduce(MPI_MIN, t, mpi_communicator);
     }
 
 
@@ -671,7 +667,7 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&minima)[N])
     {
-      internal::op(MPI_MIN, values, mpi_communicator, minima);
+      internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
     }
 
 
@@ -681,7 +677,7 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &minima)
     {
-      internal::op(MPI_MIN, values, mpi_communicator, minima);
+      internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
     }
 
 
