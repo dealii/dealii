@@ -25,13 +25,15 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Ifpack.h>
 #  include <Ifpack_Chebyshev.h>
 #  include <Teuchos_ParameterList.hpp>
+#  include <Teuchos_RCP.hpp>
 #  include <Epetra_MultiVector.h>
 #  include <ml_include.h>
 #  include <ml_MultiLevelPreconditioner.h>
 
 #if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
-#include <MueLu_EpetraOperator.hpp>
-#include <MueLu_MLParameterListInterpreter.hpp>
+#  include <MueLu.hpp>
+#  include <MueLu_EpetraOperator.hpp>
+#  include <MueLu_MLParameterListInterpreter.hpp>
 #endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 

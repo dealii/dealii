@@ -38,11 +38,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Teuchos_ParameterList.hpp>
 #  include <Epetra_RowMatrix.h>
 #  include <Epetra_Vector.h>
-
-#  if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
-#  include <MueLu.hpp>
-#  include <Teuchos_RCP.hpp>
-#  endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 // forward declarations
