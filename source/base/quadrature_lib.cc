@@ -16,6 +16,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/geometry_info.h>
 
+
 #include <cmath>
 #include <limits>
 #include <algorithm>
@@ -1127,6 +1128,221 @@ QTelles<1>::QTelles (
     }
 }
 
+
+
+template <>
+std::vector<double>
+QGaussChebyshev<1>::get_quadrature_points(const unsigned int n)
+{
+
+  std::vector<double> points(n);
+  // n point quadrature: index from 0 to n-1
+  for (unsigned short i=0; i<n; ++i)
+    // would be cos((2i+1)Pi/(2N+2))
+    // put + Pi so we start from the smallest point
+    // then map from [-1,1] to [0,1]
+    points[i] = 1./2.*(1.+std::cos(numbers::PI*(1.+double(2*i+1)/double(2*(n-1)+2))));
+
+  return points;
+}
+
+
+template <>
+std::vector<double>
+QGaussChebyshev<1>::get_quadrature_weights(const unsigned int n)
+{
+
+  std::vector<double> weights(n);
+
+  for (unsigned short i=0; i<n; ++i)
+    {
+      // same weights as on [-1,1]
+      weights[i] = numbers::PI/double(n);
+    }
+
+  return weights;
+
+}
+
+
+template <>
+QGaussChebyshev<1>::QGaussChebyshev(const unsigned int n)
+  :
+  Quadrature<1> (n)
+{
+
+  Assert(n>0,ExcMessage("Need at least one point for the quadrature rule"));
+  std::vector<double> p=get_quadrature_points(n);
+  std::vector<double> w=get_quadrature_weights(n);
+
+  for (unsigned int i=0; i<this->size(); ++i)
+    {
+      this->quadrature_points[i] = Point<1>(p[i]);
+      this->weights[i]           = w[i];
+    }
+
+}
+
+
+template <int dim>
+QGaussChebyshev<dim>::QGaussChebyshev (const unsigned int n)
+  :
+  Quadrature<dim> (QGaussChebyshev<dim-1>(n), QGaussChebyshev<1>(n))
+{}
+
+
+
+
+
+template <>
+std::vector<double>
+QGaussRadauChebyshev<1>::get_quadrature_points(const unsigned int n,
+                                               QGaussRadauChebyshev::EndPoint ep)
+{
+
+  std::vector<double> points(n);
+  // n point quadrature: index from 0 to n-1
+  for (unsigned short i=0; i<n; ++i)
+    // would be -cos(2i Pi/(2N+1))
+    // put + Pi so we start from the smallest point
+    // then map from [-1,1] to [0,1]
+    if (ep == QGaussRadauChebyshev::left)
+      points[i] = 1./2.*(1.-std::cos(numbers::PI*(1+2*double(i)/(2*double(n-1)+1.))));
+    else
+      {
+        Assert(ep==QGaussRadauChebyshev::right,ExcInvalidConstructorCall());
+        points[i] = 1./2.*(1.-std::cos(numbers::PI*(2*double(n-1-i)/(2*double(n-1)+1.))));
+      }
+
+  return points;
+}
+
+
+template <>
+std::vector<double>
+QGaussRadauChebyshev<1>::get_quadrature_weights(const unsigned int n,
+                                                QGaussRadauChebyshev::EndPoint ep)
+{
+
+  std::vector<double> weights(n);
+
+  for (unsigned short i=0; i<n; ++i)
+    {
+      // same weights as on [-1,1]
+      weights[i] = 2.*numbers::PI/double(2*(n-1)+1.);
+      if (ep==left && i==0)
+        weights[i] /= 2.;
+      else if (ep==right && i==(n-1))
+        weights[i] /= 2.;
+    }
+
+  return weights;
+
+}
+
+
+template <>
+QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n,
+                                              QGaussRadauChebyshev<1>::EndPoint ep)
+  :
+  Quadrature<1> (n),
+  ep (ep)
+{
+
+  Assert(n>0,ExcMessage("Need at least one point for quadrature rules"));
+  std::vector<double> p=get_quadrature_points(n,ep);
+  std::vector<double> w=get_quadrature_weights(n,ep);
+
+  for (unsigned int i=0; i<this->size(); ++i)
+    {
+      this->quadrature_points[i] = Point<1>(p[i]);
+      this->weights[i]           = w[i];
+    }
+}
+
+
+template <>
+QGaussRadauChebyshev<2>::QGaussRadauChebyshev (const unsigned int n,
+                                               QGaussRadauChebyshev::EndPoint ep)
+  :
+  Quadrature<2> (QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep)),
+                 QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
+  ep (ep)
+{}
+
+
+template <int dim>
+QGaussRadauChebyshev<dim>::QGaussRadauChebyshev (const unsigned int n,
+                                                 QGaussRadauChebyshev::EndPoint ep)
+  :
+  Quadrature<dim> (QGaussRadauChebyshev<dim-1>(n,static_cast<typename QGaussRadauChebyshev<dim-1>::EndPoint>(ep)),
+                   QGaussRadauChebyshev<1>(n,static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
+  ep (ep)
+{}
+
+
+template <>
+std::vector<double>
+QGaussLobattoChebyshev<1>::get_quadrature_points(const unsigned int n)
+{
+
+  std::vector<double> points(n);
+  // n point quadrature: index from 0 to n-1
+  for (unsigned short i=0; i<n; ++i)
+    // would be cos(i Pi/N)
+    // put + Pi so we start from the smallest point
+    // then map from [-1,1] to [0,1]
+    points[i] = 1./2.*(1.+std::cos(numbers::PI*(1+double(i)/double(n-1))));
+
+  return points;
+}
+
+
+template <>
+std::vector<double>
+QGaussLobattoChebyshev<1>::get_quadrature_weights(const unsigned int n)
+{
+
+  std::vector<double> weights(n);
+
+  for (unsigned short i=0; i<n; ++i)
+    {
+      // same weights as on [-1,1]
+      weights[i] = numbers::PI/double((n-1));
+      if (i==0 || i==(n-1))
+        weights[i] /= 2.;
+    }
+
+  return weights;
+
+}
+
+
+template <>
+QGaussLobattoChebyshev<1>::QGaussLobattoChebyshev(const unsigned int n)
+  :
+  Quadrature<1> (n)
+{
+
+  Assert(n>1,ExcMessage("Need at least two points for Gauss-Lobatto quadrature rule"));
+  std::vector<double> p=get_quadrature_points(n);
+  std::vector<double> w=get_quadrature_weights(n);
+
+  for (unsigned int i=0; i<this->size(); ++i)
+    {
+      this->quadrature_points[i] = Point<1>(p[i]);
+      this->weights[i]           = w[i];
+    }
+
+}
+
+
+template <int dim>
+QGaussLobattoChebyshev<dim>::QGaussLobattoChebyshev (const unsigned int n)
+  :
+  Quadrature<dim> (QGaussLobattoChebyshev<dim-1>(n), QGaussLobattoChebyshev<1>(n))
+{}
+
 // explicit specialization
 // note that 1d formulae are specialized by implementation above
 template class QGauss<2>;
@@ -1152,5 +1368,17 @@ template class QSorted<3>;
 template class QTelles<1> ;
 template class QTelles<2> ;
 template class QTelles<3> ;
+
+template class QGaussChebyshev<1>;
+template class QGaussChebyshev<2>;
+template class QGaussChebyshev<3>;
+
+template class QGaussRadauChebyshev<1>;
+template class QGaussRadauChebyshev<2>;
+template class QGaussRadauChebyshev<3>;
+
+template class QGaussLobattoChebyshev<1>;
+template class QGaussLobattoChebyshev<2>;
+template class QGaussLobattoChebyshev<3>;
 
 DEAL_II_NAMESPACE_CLOSE

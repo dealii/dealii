@@ -506,6 +506,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: Three new quadrature formulas in quadrature_lib, based on
+  Chebyshev quadrature rules. See functions QGaussChebyshev,
+  QGaussRadauChebyshev and QGaussLobattoChebyshev.
+  <br>
+  (Giuseppe Pitton, Luca Heltai 2015/05/11)
+  </li>
+
   <li> Fixed: MatrixOut now also works with Trilinos and PETSc matrices.
   <br>
   (Wolfgang Bangerth, 2015/05/11)
