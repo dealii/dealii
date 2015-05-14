@@ -51,10 +51,7 @@ DEAL_II_NAMESPACE_CLOSE
 #ifdef DEAL_II_WITH_PETSC
 
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/petsc_vector.h>
-#include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/lac/petsc_solver.h>
@@ -70,11 +67,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace LinearAlgebraPETSc
 {
   using namespace dealii;
-
-  typedef PETScWrappers::Vector Vector;
-  typedef PETScWrappers::BlockVector BlockVector;
-
-  typedef PETScWrappers::SparseMatrix SparseMatrix;
 
   typedef PETScWrappers::SolverCG SolverCG;
   typedef PETScWrappers::SolverGMRES SolverGMRES;
@@ -144,8 +136,6 @@ DEAL_II_NAMESPACE_CLOSE
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_precondition.h>
@@ -163,8 +153,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace LinearAlgebraTrilinos
 {
   using namespace dealii;
-
-  typedef TrilinosWrappers::Vector Vector;
 
   typedef TrilinosWrappers::SolverCG SolverCG;
   typedef TrilinosWrappers::SolverGMRES SolverGMRES;
