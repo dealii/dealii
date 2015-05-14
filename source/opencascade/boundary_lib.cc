@@ -44,7 +44,7 @@ namespace OpenCASCADE
 
 
 
-    // Helper internal functions.
+// Helper internal functions.
     double shape_length(const TopoDS_Shape &sh)
     {
       Handle_Adaptor3d_HCurve adapt = curve_adaptor(sh);
@@ -233,14 +233,11 @@ namespace OpenCASCADE
   ArclengthProjectionLineManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const
   {
     double t (0.0);
-#ifdef DEBUG
     ShapeAnalysis_Curve curve_analysis;
     gp_Pnt proj;
-    Assert(curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true)
-           < tolerance*length, ExcPointNotOnManifold(space_point));
-#else
-    (void)space_point;
-#endif
+    const double dist = curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true);
+    Assert(dist < tolerance*length, ExcPointNotOnManifold(space_point));
+    (void)dist; // Silence compiler warning in Release mode.
     return Point<1>(GCPnts_AbscissaPoint::Length(curve->GetCurve(),curve->GetCurve().FirstParameter(),t));
   }
 
@@ -256,7 +253,7 @@ namespace OpenCASCADE
   }
 
 
-  // Explicit instantiations
+// Explicit instantiations
 #include "boundary_lib.inst"
 
 } // end namespace OpenCASCADE
