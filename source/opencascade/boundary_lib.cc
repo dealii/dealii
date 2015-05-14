@@ -237,7 +237,7 @@ namespace OpenCASCADE
     gp_Pnt proj;
     double dist = curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true);
     Assert(dist < tolerance*length, ExcPointNotOnManifold(space_point));
-    dist *= 2; // Silence compiler warning in Release mode.
+    (void)dist; // Silence compiler warning in Release mode.
     return Point<1>(GCPnts_AbscissaPoint::Length(curve->GetCurve(),curve->GetCurve().FirstParameter(),t));
   }
 
