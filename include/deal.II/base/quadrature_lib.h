@@ -534,11 +534,11 @@ public:
   QGaussChebyshev(const unsigned int n);
 
 private:
-  /// Sets the points of the quadrature formula.
+  /// Computes the points of the quadrature formula.
   static std::vector<double>
   get_quadrature_points(const unsigned int n);
 
-  /// Sets the weights of the quadrature formula.
+  /// Computes the weights of the quadrature formula.
   static std::vector<double>
   get_quadrature_weights(const unsigned int n);
 
@@ -575,11 +575,11 @@ public:
 
 private:
   const EndPoint ep;
-  /// Sets the points of the quadrature formula.
+  /// Computes the points of the quadrature formula.
   static std::vector<double>
   get_quadrature_points(const unsigned int n, EndPoint ep);
 
-  /// Sets the weights of the quadrature formula.
+  /// Computes the weights of the quadrature formula.
   static std::vector<double>
   get_quadrature_weights(const unsigned int n, EndPoint ep);
 
@@ -610,11 +610,11 @@ public:
   QGaussLobattoChebyshev(const unsigned int n);
 
 private:
-  /// Sets the points of the quadrature formula.
+  /// Computes the points of the quadrature formula.
   static std::vector<double>
   get_quadrature_points(const unsigned int n);
 
-  /// Sets the weights of the quadrature formula.
+  /// Computes the weights of the quadrature formula.
   static std::vector<double>
   get_quadrature_weights(const unsigned int n);
 
