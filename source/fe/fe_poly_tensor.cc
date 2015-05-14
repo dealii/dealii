@@ -1035,7 +1035,9 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
         out |= update_values | update_piola;
 
       if (flags & update_gradients)
-        out |= update_gradients | update_piola | update_covariant_transformation;
+        // out |= update_gradients | update_piola | update_covariant_transformation;
+        out |= update_gradients | update_piola |
+                update_covariant_transformation | update_jacobian_grads;
 
       if (flags & update_hessians)
         out |= update_hessians | update_piola | update_covariant_transformation;
@@ -1050,7 +1052,10 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
         out |= update_values | update_piola;
 
       if (flags & update_gradients)
-        out |= update_gradients | update_piola | update_covariant_transformation;
+        // out |= update_gradients | update_piola | update_covariant_transformation;
+        out |= update_gradients | update_piola |
+                update_covariant_transformation | update_jacobian_grads;
+
 
       if (flags & update_hessians)
         out |= update_hessians | update_piola | update_covariant_transformation;
