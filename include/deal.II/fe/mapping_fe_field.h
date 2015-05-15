@@ -587,30 +587,18 @@ private:
   void update_internal_dofs(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
-   * Typedef holding the local cell_dofs.
-   */
-  typedef
-  Threads::ThreadLocalStorage <std::vector<double> > local_dofs_t;
-
-  /**
-  * Typedef holding the local dof indices.
-  */
-  typedef
-  Threads::ThreadLocalStorage <std::vector<types::global_dof_index> > local_dof_indices_t;
-
-  /**
    * It stores the local degrees of freedom of the DH for each cell
    * (i.e. euler_vector * dof_indices, see method update_internal_dofs for more
    * clarifications.).
    */
-  mutable local_dofs_t local_dofs;
+  mutable Threads::ThreadLocalStorage <std::vector<double> >  local_dof_values;
 
   /**
    * Store the degrees of freedom of the DH for each cell (i.e.
    * cell->get_dof_indices(dof_indices), see method update_internal_dofs for more
    * clarifications.). Thread safe.
    */
-  mutable  local_dof_indices_t dof_indices;
+  mutable  Threads::ThreadLocalStorage <std::vector<types::global_dof_index> > local_dof_indices;
 
   /** Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
