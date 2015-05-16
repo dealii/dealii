@@ -58,19 +58,23 @@
 // linear solvers as well as for automatic differentiation. These are in the
 // following include files.
 //
-// Since deal.II provides interfaces to the basic Trilinos matrices, vectors,
+// Since deal.II provides interfaces to the basic Trilinos matrices,
 // preconditioners and solvers, we include them similarly as deal.II linear
 // algebra structures.
 #include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_solver.h>
 
 
 // Sacado is the automatic differentiation package within Trilinos, which is
 // used to find the Jacobian for a fully implicit Newton iteration:
+// Trilinos::Sacado (at least until version 11.10.2) package will trigger
+// warnings when compiling this file. Since we are not responsible for this,
+// we just suppress the warning by wrapping the <code>#include</code>
+// directive into a pair of macros that simply suppress these warnings:
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <Sacado.hpp>
-
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 // And this again is C++:
 #include <iostream>
