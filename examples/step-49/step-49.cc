@@ -57,9 +57,9 @@ using namespace dealii;
 //
 // Finally, the function outputs the mesh in encapsulated postscript (EPS)
 // format that can easily be visualized in the same way as was done in step-1.
-template<int dim>
-void mesh_info(const Triangulation<dim> &tria,
-               const std::string        &filename)
+template <int dim>
+void print_mesh_info(const Triangulation<dim> &tria,
+                     const std::string        &filename)
 {
   std::cout << "Mesh info:" << std::endl
             << " dimension: " << dim << std::endl
@@ -121,8 +121,7 @@ void grid_1 ()
   std::ifstream f("untitled.msh");
   gridin.read_msh(f);
 
-  mesh_info(triangulation, "grid-1.eps");
-
+  print_mesh_info(triangulation, "grid-1.eps");
 }
 
 
@@ -147,7 +146,7 @@ void grid_2 ()
   Triangulation<2> triangulation;
   GridGenerator::merge_triangulations (tria1, tria2, triangulation);
 
-  mesh_info(triangulation, "grid-2.eps");
+  print_mesh_info(triangulation, "grid-2.eps");
 }
 
 
@@ -212,7 +211,7 @@ void grid_3 ()
   // no longer in use by the triangulation when it is destroyed (the boundary
   // object is destroyed first in this function since it was declared after
   // the triangulation).
-  mesh_info (triangulation, "grid-3.eps");
+  print_mesh_info (triangulation, "grid-3.eps");
   triangulation.set_manifold (1);
 }
 
@@ -242,8 +241,7 @@ void grid_4()
   GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
 
   GridGenerator::extrude_triangulation (triangulation, 3, 2.0, out);
-  mesh_info(out, "grid-4.eps");
-
+  print_mesh_info(out, "grid-4.eps");
 }
 
 
@@ -278,7 +276,7 @@ void grid_5()
                                              Point<2>(10.0,1.0));
 
   GridTools::transform(&grid_5_transform, tria);
-  mesh_info(tria, "grid-5.eps");
+  print_mesh_info(tria, "grid-5.eps");
 }
 
 
@@ -318,7 +316,7 @@ void grid_6()
                                              Point<2>(1.0,1.0));
 
   GridTools::transform(Grid6Func(), tria);
-  mesh_info(tria, "grid-6.eps");
+  print_mesh_info(tria, "grid-6.eps");
 }
 
 
@@ -340,7 +338,7 @@ void grid_7()
                                              Point<2>(1.0,1.0));
 
   GridTools::distort_random (0.3, tria, true);
-  mesh_info(tria, "grid-7.eps");
+  print_mesh_info(tria, "grid-7.eps");
 }
 
 
