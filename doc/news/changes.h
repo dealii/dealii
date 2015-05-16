@@ -377,6 +377,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: DerivativeForm() now takes an additional optional
+  template argument specifying the type, similarly to Tensor() classes.
+  <br>
+  (Luca Heltai, 2015/05/16)
+  </li>
+
   <li> New: Utilities::MPI::min() functions.
   <br>
   (Timo Heister, 2015/05/12)
