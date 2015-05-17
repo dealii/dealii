@@ -224,6 +224,7 @@ namespace internal
       /**
        * Return the element with given indices of a Trilinos sparse matrix.
        */
+      inline
       double get_element (const TrilinosWrappers::SparseMatrix &matrix,
                           const types::global_dof_index             i,
                           const types::global_dof_index             j)
@@ -237,6 +238,7 @@ namespace internal
        * Return the element with given indices of a Trilinos block sparse
        * matrix.
        */
+      inline
       double get_element (const TrilinosWrappers::BlockSparseMatrix &matrix,
                           const types::global_dof_index                  i,
                           const types::global_dof_index                  j)
