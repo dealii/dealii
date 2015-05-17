@@ -70,8 +70,8 @@ MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const DH      &euler_dof
   euler_vector(&euler_vector),
   fe(&euler_dof_handler.get_fe()),
   euler_dof_handler(&euler_dof_handler),
-  local_dofs(fe->dofs_per_cell),
-  dof_indices(fe->dofs_per_cell),
+  local_dof_values(std::vector<double>(fe->dofs_per_cell)),
+  local_dof_indices(std::vector<types::global_dof_index>(fe->dofs_per_cell)),
   fe_mask(mask.size() ? mask :
           ComponentMask(fe->get_nonzero_components(0).size(), true)),
   fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
@@ -92,8 +92,8 @@ MappingFEField<dim,spacedim,VECTOR,DH>::MappingFEField (const MappingFEField<dim
   euler_vector(mapping.euler_vector),
   fe(mapping.fe),
   euler_dof_handler(mapping.euler_dof_handler),
-  local_dofs(mapping.local_dofs),
-  dof_indices(mapping.dof_indices),
+  local_dof_values(std::vector<double>(fe->dofs_per_cell)),
+  local_dof_indices(std::vector<types::global_dof_index>(fe->dofs_per_cell)),
   fe_mask(mapping.fe_mask),
   fe_to_real(mapping.fe_to_real)
 {}
@@ -386,8 +386,8 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
   std::vector<Point<spacedim> >                             &normal_vectors,
   CellSimilarity::Similarity                                &cell_similarity) const
 {
-  AssertDimension(fe->dofs_per_cell, local_dofs.size());
-  Assert(local_dofs.size()>0, ExcMessage("Cannot do anything with zero degrees of freedom"));
+  AssertDimension(fe->dofs_per_cell, local_dof_values.get().size());
+  Assert(local_dof_values.get().size()>0, ExcMessage("Cannot do anything with zero degrees of freedom"));
 
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -520,7 +520,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
                     for (unsigned int j=0; j<dim; ++j)
                       for (unsigned int l=0; l<dim; ++l)
                         result[fe_to_real[comp_k]][j][l] += (second[k][j][l]
-                                                             * local_dofs[k]);
+                                                             * local_dof_values.get()[k]);
                 }
 
               // never touch any data for j=dim in case dim<spacedim, so it
@@ -778,9 +778,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 {
 //  Use the get_data function to create an InternalData with data vectors of
 //  the right size and transformation shape values already computed at point
-//  p. Make sure only one processor at a time performs this operations.
-
-  Threads::Mutex::ScopedLock lock(mutex);
+//  p.
   update_internal_dofs(cell);
 
   const Quadrature<dim> point_quadrature(p);
@@ -803,7 +801,7 @@ transform_unit_to_real_cell_internal (const InternalData &data) const
     {
       unsigned int comp_i = fe->system_to_component_index(i).first;
       if (fe_mask[comp_i])
-        p_real[fe_to_real[comp_i]] += local_dofs[i] * data.shape(0,i);
+        p_real[fe_to_real[comp_i]] += local_dof_values.get()[i] * data.shape(0,i);
     }
 
   return p_real;
@@ -817,7 +815,6 @@ MappingFEField<dim,spacedim,VECTOR,DH>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<spacedim>                            &p) const
 {
-  Threads::Mutex::ScopedLock lock(mutex);
   update_internal_dofs(cell);
 
   // first a Newton iteration based on the real mapping. It uses the center
@@ -899,7 +896,7 @@ transform_real_to_unit_cell_internal
           unsigned int comp_k = fe->system_to_component_index(k).first;
           if (fe_mask[comp_k])
             for (unsigned int j=0; j<dim; ++j)
-              DF[j][fe_to_real[comp_k]] += local_dofs[k] * grad_k[j];
+              DF[j][fe_to_real[comp_k]] += local_dof_values.get()[k] * grad_k[j];
         }
       for (unsigned int j=0; j<dim; ++j)
         {
@@ -976,7 +973,6 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_fill (
 {
   const UpdateFlags update_flags(data.current_update_flags());
   {
-    Threads::Mutex::ScopedLock lock(mutex);
     update_internal_dofs(cell);
   }
 
@@ -994,7 +990,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_fill (
             {
               unsigned int comp_k = fe->system_to_component_index(k).first;
               if (fe_mask[comp_k])
-                result[fe_to_real[comp_k]] += local_dofs[k] * shape[k];
+                result[fe_to_real[comp_k]] += local_dof_values.get()[k] * shape[k];
             }
 
           quadrature_points[point] = result;
@@ -1028,7 +1024,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_fill (
                 {
                   unsigned int comp_k = fe->system_to_component_index(k).first;
                   if (fe_mask[comp_k])
-                    result[fe_to_real[comp_k]] += local_dofs[k] * data_derv[k];
+                    result[fe_to_real[comp_k]] += local_dof_values.get()[k] * data_derv[k];
                 }
 
               // write result into contravariant data. for
@@ -1235,10 +1231,10 @@ MappingFEField<dim,spacedim,VECTOR,DH>::update_internal_dofs (
   typename DH::cell_iterator dof_cell(*cell, euler_dof_handler);
   Assert (dof_cell->active() == true, ExcInactiveCell());
 
-  dof_cell->get_dof_indices(dof_indices);
+  dof_cell->get_dof_indices(local_dof_indices.get());
 
-  for (unsigned int i=0; i<local_dofs.size(); ++i)
-    local_dofs[i] = (*euler_vector)(dof_indices[i]);
+  for (unsigned int i=0; i<local_dof_values.get().size(); ++i)
+    local_dof_values.get()[i] = (*euler_vector)(local_dof_indices.get()[i]);
 }
 
 // explicit instantiations
