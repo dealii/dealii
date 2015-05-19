@@ -731,7 +731,8 @@ element at a time; however, its data structures are poorly adapted for the
 large numbers of nonzero entries per row created by our discretization in
 3d, leading to a quadratic behavior. Replacing the internal algorithms in
 deal.II to set many elements at a time, and using a
-BlockCompressedSimpleSparsityPattern as a better adapted data structure,
+BlockCompressedSimpleSparsityPattern (which has, as of early 2015, been in turn
+replaced by BlockDynamicSparsityPattern) as a better adapted data structure,
 removed this bottleneck at the price of a slightly higher memory
 consumption. Likewise, the implementation of the decomposition step in the
 SparseILU class was very inefficient and has been replaced by one that is
