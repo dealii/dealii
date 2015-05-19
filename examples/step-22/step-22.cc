@@ -645,7 +645,7 @@ namespace Step22
               {
                 for (unsigned int j=0; j<=i; ++j)
                   {
-                    local_matrix(i,j) += (symgrad_phi_u[i] * symgrad_phi_u[j]
+                    local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
                                           - div_phi_u[i] * phi_p[j]
                                           - phi_p[i] * div_phi_u[j]
                                           + phi_p[i] * phi_p[j])
