@@ -2329,6 +2329,38 @@ upper_triangular_operator(BlockMatrix &a)
   return return_op;
 }
 
+
+template <typename Range = BlockVector<double>,
+          typename Domain = Range,
+          typename BlockMatrix>
+LinearOperator<Range, Domain>
+inverse_operator( BlockMatrix &a,
+                  const LinearOperator<Range, Domain> &inverse_diagonal,
+                  bool lower = true)
+{
+
+  LinearOperator<Domain, Range> op_a;
+
+  if(lower)
+  {
+    op_a = lower_triangular_operator(a);
+  }
+  else
+  {
+    op_a = upper_triangular_operator(a);
+  }
+
+  auto id     = identity_operator(op_a.reinit_range_vector);
+  auto result = identity_operator(op_a.reinit_range_vector);
+
+
+  for(unsigned int i = 0; i < a.n_block_cols() - 1; ++i)
+    result = id - inverse_diagonal * op_a * result;
+
+  return result * inverse_diagonal;
+}
+
+
 //@}
 
 DEAL_II_NAMESPACE_CLOSE
