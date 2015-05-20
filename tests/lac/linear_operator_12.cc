@@ -49,17 +49,17 @@ int main()
     sparsity_pattern.copy_from(dsp);
     sparsity_pattern.compress();
 
-    //  | 2 1 0 |     | 0 0 0 |
-    //  | 3 2 1 | ->  | 3 0 0 |
-    //  | 4 3 2 |     | 4 3 0 |
+    //  | 2 3 4 |
+    //  | 1 2 3 |
+    //  | 0 1 2 |
     BlockSparseMatrix<double> a (sparsity_pattern);
     for (unsigned int i = 0; i < 3; ++i)
       for (unsigned int j = 0; j < 3; ++j)
-        a.block(i,j).set(0, 0, 2 + i - j);
+        a.block(i,j).set(0, 0, 2 + j - i);
 
     auto op_a = linear_operator<BlockVector<double>>(a);
 
-    auto triangular_block_op = lower_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
+    auto triangular_block_op = upper_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
 
     BlockVector<double> u;
     op_a.reinit_domain_vector(u, false);

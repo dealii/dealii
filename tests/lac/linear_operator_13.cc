@@ -49,57 +49,87 @@ int main()
     sparsity_pattern.copy_from(dsp);
     sparsity_pattern.compress();
 
-    //  | 2 1 0 |     | 0 0 0 |
-    //  | 3 2 1 | ->  | 3 0 0 |
-    //  | 4 3 2 |     | 4 3 0 |
     BlockSparseMatrix<double> a (sparsity_pattern);
     for (unsigned int i = 0; i < 3; ++i)
       for (unsigned int j = 0; j < 3; ++j)
-        a.block(i,j).set(0, 0, 2 + i - j);
+        a.block(i,j).set(0, 0, 2 + j + i);
 
     auto op_a = linear_operator<BlockVector<double>>(a);
 
-    auto triangular_block_op = lower_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
-
-    BlockVector<double> u;
-    op_a.reinit_domain_vector(u, false);
-    BlockVector<double> v;
-    op_a.reinit_range_vector(v, false);
+    auto lower_triangular_block_op = lower_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
+    auto upper_triangular_block_op = upper_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
 
 
-    // vmult:
+    BlockVector<double> u1;
+    op_a.reinit_domain_vector(u1, false);
+    BlockVector<double> v1;
+    op_a.reinit_range_vector(v1, false);
+    BlockVector<double> u2;
+    op_a.reinit_domain_vector(u2, false);
+    BlockVector<double> v2;
+    op_a.reinit_range_vector(v2, false);
+
+
+    // check 1
     for(unsigned int i = 0; i<3; ++i)
     {
-      u.block(i)[0] = i+1;
-      v.block(i)[0] = 1;
+      u1.block(i)[0] = i+1;
+      u2.block(i)[0] = i+1;
+      v1.block(i)[0] = 1;
+      v2.block(i)[0] = 1;
     }
 
-    triangular_block_op.vmult(v, u);
-    deallog << " -- vmult --" << std::endl;
-    PRINTME("v", v);
+    lower_triangular_block_op.vmult(v1, u1);
+    upper_triangular_block_op.Tvmult(v2, u2);
 
-    // vmult_add:
+    PRINTME("v1", v1);
+    PRINTME("v2", v2);
+
+
+    // check 2
     for(unsigned int i = 0; i<3; ++i)
-      v.block(i)[0] = 1;
+    {
+      u1.block(i)[0] = i+1;
+      u2.block(i)[0] = i+1;
+      v1.block(i)[0] = 1;
+      v2.block(i)[0] = 1;
+    }
 
-    triangular_block_op.vmult_add(v, u);
-    deallog << " -- vmult_add --" << std::endl;
-    PRINTME("v", v);
+    lower_triangular_block_op.Tvmult(v1, u1);
+    upper_triangular_block_op.vmult(v2, u2);
 
-    // Tvmult
+    PRINTME("v1", v1);
+    PRINTME("v2", v2);
+
+    // check 3
     for(unsigned int i = 0; i<3; ++i)
-      v.block(i)[0] = i+1;
+    {
+      u1.block(i)[0] = i+1;
+      u2.block(i)[0] = i+1;
+      v1.block(i)[0] = 1;
+      v2.block(i)[0] = 1;
+    }
 
-    triangular_block_op.Tvmult(u, v);
-    deallog << " -- Tvmult --" << std::endl;
-    PRINTME("u", u);
+    lower_triangular_block_op.vmult_add(v1, u1);
+    upper_triangular_block_op.Tvmult_add(v2, u2);
 
-    // Tvmult_add
+    PRINTME("v1", v1);
+    PRINTME("v2", v2);
+
+
+    // check 4
     for(unsigned int i = 0; i<3; ++i)
-      u.block(i)[0] = 1;
+    {
+      u1.block(i)[0] = i+1;
+      u2.block(i)[0] = i+1;
+      v1.block(i)[0] = 1;
+      v2.block(i)[0] = 1;
+    }
 
-    triangular_block_op.Tvmult_add(u, v);
-    deallog << " -- Tvmult_add --" << std::endl;
-    PRINTME("u", u);
+    lower_triangular_block_op.Tvmult_add(v1, u1);
+    upper_triangular_block_op.vmult_add(v2, u2);
+
+    PRINTME("v1", v1);
+    PRINTME("v2", v2);
   }
 }
