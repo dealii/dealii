@@ -2126,6 +2126,109 @@ operator*(const PackagedOperation<Range> &comp,
   return return_comp;
 }
 
+
+
+template <typename Range = BlockVector<double>,
+          typename Domain = Range,
+          typename BlockMatrix>
+LinearOperator<Range, Domain>
+lower_triangular_operator(BlockMatrix &a)
+{
+  Assert( a.n_block_rows() == a.n_block_cols(),
+          ExcDimensionMismatch(a.n_block_rows(),a.n_block_cols()) );
+
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = [&a](Range &v, bool fast)
+  {
+    // Reinitialize the block vector to have the number of blocks
+    // equal to the number of row blocks of the matrix a.
+    v.reinit(a.n_block_rows());
+
+    // And reinitialize every individual block with reinit_range_vectors:
+    for (unsigned int i = 0; i < a.n_block_rows(); ++i)
+      linear_operator(a.block(i,0)).reinit_range_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.reinit_domain_vector = [&a](Domain &v, bool fast)
+  {
+    // Reinitialize the block vector to have the number of blocks
+    // equal to the number of coloumn blocks of the matrix a.
+    v.reinit(a.n_block_cols());
+
+    // And reinitialize every individual block with reinit_domain_vectors:
+    for (unsigned int i = 0; i < a.n_block_cols(); ++i)
+      linear_operator(a.block(0,i)).reinit_domain_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.vmult = [&a](Range &v, const Domain &u)
+  {
+    Assert( v.n_blocks() == a.n_block_rows(),
+            ExcDimensionMismatch(v.n_blocks(), a.n_block_rows()));
+    Assert( u.n_blocks() == a.n_block_cols(),
+            ExcDimensionMismatch(u.n_blocks(), a.n_block_cols()));
+
+    v.block(0) *= 0;
+    for (unsigned int i = 1; i < a.n_block_rows(); ++i)
+      {
+        a.block(i,0).vmult(v.block(i), u.block(0));
+        for (unsigned int j = 1; j < i; ++j)
+          a.block(i,j).vmult_add(v.block(i), u.block(j));
+      }
+  };
+
+  return_op.vmult_add = [&a](Range &v, const Domain &u)
+  {
+    Assert( v.n_blocks() == a.n_block_rows(),
+            ExcDimensionMismatch(v.n_blocks(), a.n_block_rows()));
+    Assert( u.n_blocks() == a.n_block_cols(),
+            ExcDimensionMismatch(u.n_blocks(), a.n_block_cols()));
+
+    for (unsigned int i = 1; i < a.n_block_rows(); ++i)
+      {
+        a.block(i,0).vmult_add(v.block(i), u.block(0));
+        for (unsigned int j = 1; j < i; ++j)
+          a.block(i,j).vmult_add(v.block(i), u.block(j));
+      }
+  };
+
+
+  return_op.Tvmult = [&a](Domain &v, const Range &u)
+  {
+    Assert( v.n_blocks() == a.n_block_cols(),
+            ExcDimensionMismatch(v.n_blocks(), a.n_block_cols()));
+    Assert( u.n_blocks() == a.n_block_rows(),
+            ExcDimensionMismatch(u.n_blocks(), a.n_block_rows()));
+
+
+    for (unsigned int i = 0; i < a.n_block_cols(); ++i)
+      {
+        v.block(i) *= 0;
+        for (unsigned int j = i + 1; j < a.n_block_rows(); ++j)
+          a.block(j,i).Tvmult_add(v.block(i), u.block(j));
+      }
+  };
+
+  return_op.Tvmult_add = [&a](Domain &v, const Range &u)
+  {
+    Assert( v.n_blocks() == a.n_block_cols(),
+            ExcDimensionMismatch(v.n_blocks(), a.n_block_cols()));
+    Assert( u.n_blocks() == a.n_block_rows(),
+            ExcDimensionMismatch(u.n_blocks(), a.n_block_rows()));
+
+    for (unsigned int i = 0; i < a.n_block_cols(); ++i)
+      for (unsigned int j = i + 1; j < a.n_block_rows(); ++j)
+        a.block(j,i).Tvmult_add(v.block(i), u.block(j));
+  };
+
+  return return_op;
+}
+
+
 //@}
 
 DEAL_II_NAMESPACE_CLOSE
