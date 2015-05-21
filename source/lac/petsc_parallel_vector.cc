@@ -80,6 +80,7 @@ namespace PETScWrappers
     }
 
 
+
     Vector::Vector (const IndexSet   &local,
                     const MPI_Comm     &communicator)
       :
@@ -88,6 +89,23 @@ namespace PETScWrappers
       Assert(local.is_contiguous(), ExcNotImplemented());
       Vector::create_vector(local.size(), local.n_elements());
     }
+
+
+
+    void
+    Vector::clear ()
+    {
+      // destroy the PETSc Vec and create an invalid empty vector,
+      // so we can just as well create a sequential one to avoid
+      // all the overhead incurred by parallelism
+      attained_ownership = true;
+      VectorBase::clear ();
+
+      const int n = 0;
+      int ierr = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+    }
+
 
 
     void

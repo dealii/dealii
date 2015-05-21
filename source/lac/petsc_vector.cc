@@ -62,6 +62,15 @@ namespace PETScWrappers
 
 
   void
+  Vector::clear ()
+  {
+    VectorBase::clear ();
+    Vector::create_vector (0);
+  }
+
+
+
+  void
   Vector::reinit (const size_type n,
                   const bool      fast)
   {

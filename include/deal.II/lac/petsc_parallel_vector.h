@@ -263,6 +263,12 @@ namespace PETScWrappers
                        const MPI_Comm &communicator);
 
       /**
+       * Release all memory and return to a state just like after having called
+       * the default constructor.
+       */
+      void clear ();
+
+      /**
        * Copy the given vector. Resize the present vector if necessary. Also
        * take over the MPI communicator of @p v.
        */
