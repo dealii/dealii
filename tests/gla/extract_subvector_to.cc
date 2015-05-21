@@ -19,6 +19,8 @@
 
 #include "../tests.h"
 #include <deal.II/lac/generic_linear_algebra.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <fstream>
@@ -76,7 +78,7 @@ int main (int argc, char **argv)
 
     {
       deallog.push("PETSc");
-      PETScWrappers::Vector v(17);
+      PETScWrappers::MPI::Vector v(MPI_COMM_SELF, 17, 17);
       test (v);
       deallog.pop();
     }
@@ -102,11 +104,11 @@ int main (int argc, char **argv)
 
     {
       deallog.push("PETSc");
-      PETScWrappers::BlockVector v(3);
-      v.block(0).reinit(7);
-      v.block(1).reinit(5);
-      v.block(2).reinit(3);
-      v.collect_sizes();
+      std::vector<PETScWrappers::MPI::BlockVector::size_type> sizes(3);
+      sizes[0] = 7;
+      sizes[1] = 5;
+      sizes[2] = 3;
+      PETScWrappers::MPI::BlockVector v(sizes, MPI_COMM_SELF, sizes);
       test (v);
       deallog.pop();
     }
