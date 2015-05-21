@@ -2127,234 +2127,286 @@ operator*(const PackagedOperation<Range> &comp,
 }
 
 
-
+/**
+ * @relates LinearOperator
+ *
+ * A function that takes a block matrix @p a and returns its associated
+ * lower triangular matrix operator (diagonal is not included).
+ *
+ * @code
+ *  a00 | a01 | a02                 |     |
+ *  ---------------             ---------------
+ *  a10 | a11 | a12     ->      a10 |     |
+ *  ---------------             ---------------
+ *  a20 | a21 | a22             a20 | a21 |
+ * @endcode
+ *
+ * @ingroup LAOperators
+ */
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
           typename BlockMatrix>
 LinearOperator<Range, Domain>
-lower_triangular_operator(BlockMatrix &a)
+lower_triangular_operator(const BlockMatrix &block_matrix)
 {
-  Assert( a.n_block_rows() == a.n_block_cols(),
-          ExcDimensionMismatch(a.n_block_rows(),a.n_block_cols()) );
+  Assert( block_matrix.n_block_rows() == block_matrix.n_block_cols(),
+          ExcDimensionMismatch(block_matrix.n_block_rows(),block_matrix.n_block_cols()) );
 
   LinearOperator<Range, Domain> return_op;
 
-  return_op.reinit_range_vector = [&a](Range &v, bool fast)
+  return_op.reinit_range_vector = [&block_matrix](Range &v, bool fast)
   {
     // Reinitialize the block vector to have the number of blocks
-    // equal to the number of row blocks of the matrix a.
-    v.reinit(a.n_block_rows());
+    // equal to the number of row blocks of the matrix block_matrix.
+    v.reinit(block_matrix.n_block_rows());
 
     // And reinitialize every individual block with reinit_range_vectors:
-    for (unsigned int i = 0; i < a.n_block_rows(); ++i)
-      linear_operator(a.block(i,0)).reinit_range_vector(v.block(i), fast);
+    for (unsigned int i = 0; i < block_matrix.n_block_rows(); ++i)
+      linear_operator(block_matrix.block(i,0)).reinit_range_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
 
-  return_op.reinit_domain_vector = [&a](Domain &v, bool fast)
+  return_op.reinit_domain_vector = [&block_matrix](Domain &v, bool fast)
   {
     // Reinitialize the block vector to have the number of blocks
-    // equal to the number of coloumn blocks of the matrix a.
-    v.reinit(a.n_block_cols());
+    // equal to the number of coloumn blocks of the matrix block_matrix.
+    v.reinit(block_matrix.n_block_cols());
 
     // And reinitialize every individual block with reinit_domain_vectors:
-    for (unsigned int i = 0; i < a.n_block_cols(); ++i)
-      linear_operator(a.block(0,i)).reinit_domain_vector(v.block(i), fast);
+    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
+      linear_operator(block_matrix.block(0,i)).reinit_domain_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
 
-  return_op.vmult = [&a](Range &v, const Domain &u)
+  return_op.vmult = [&block_matrix](Range &v, const Domain &u)
   {
-    Assert( v.n_blocks() == a.n_block_rows(),
-            ExcDimensionMismatch(v.n_blocks(), a.n_block_rows()));
-    Assert( u.n_blocks() == a.n_block_cols(),
-            ExcDimensionMismatch(u.n_blocks(), a.n_block_cols()));
+    Assert( v.n_blocks() == block_matrix.n_block_rows(),
+            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_rows()));
+    Assert( u.n_blocks() == block_matrix.n_block_cols(),
+            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_cols()));
 
     v.block(0) *= 0;
-    for (unsigned int i = 1; i < a.n_block_rows(); ++i)
+    for (unsigned int i = 1; i < block_matrix.n_block_rows(); ++i)
       {
-        a.block(i,0).vmult(v.block(i), u.block(0));
+        block_matrix.block(i,0).vmult(v.block(i), u.block(0));
         for (unsigned int j = 1; j < i; ++j)
-          a.block(i,j).vmult_add(v.block(i), u.block(j));
+          block_matrix.block(i,j).vmult_add(v.block(i), u.block(j));
       }
   };
 
-  return_op.vmult_add = [&a](Range &v, const Domain &u)
+  return_op.vmult_add = [&block_matrix](Range &v, const Domain &u)
   {
-    Assert( v.n_blocks() == a.n_block_rows(),
-            ExcDimensionMismatch(v.n_blocks(), a.n_block_rows()));
-    Assert( u.n_blocks() == a.n_block_cols(),
-            ExcDimensionMismatch(u.n_blocks(), a.n_block_cols()));
+    Assert( v.n_blocks() == block_matrix.n_block_rows(),
+            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_rows()));
+    Assert( u.n_blocks() == block_matrix.n_block_cols(),
+            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_cols()));
 
-    for (unsigned int i = 1; i < a.n_block_rows(); ++i)
+    for (unsigned int i = 1; i < block_matrix.n_block_rows(); ++i)
       {
-        a.block(i,0).vmult_add(v.block(i), u.block(0));
+        block_matrix.block(i,0).vmult_add(v.block(i), u.block(0));
         for (unsigned int j = 1; j < i; ++j)
-          a.block(i,j).vmult_add(v.block(i), u.block(j));
+          block_matrix.block(i,j).vmult_add(v.block(i), u.block(j));
       }
   };
 
-
-  return_op.Tvmult = [&a](Domain &v, const Range &u)
+  return_op.Tvmult = [&block_matrix](Domain &v, const Range &u)
   {
-    Assert( v.n_blocks() == a.n_block_cols(),
-            ExcDimensionMismatch(v.n_blocks(), a.n_block_cols()));
-    Assert( u.n_blocks() == a.n_block_rows(),
-            ExcDimensionMismatch(u.n_blocks(), a.n_block_rows()));
+    Assert( v.n_blocks() == block_matrix.n_block_cols(),
+            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_cols()));
+    Assert( u.n_blocks() == block_matrix.n_block_rows(),
+            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_rows()));
 
-
-    for (unsigned int i = 0; i < a.n_block_cols(); ++i)
+    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
       {
         v.block(i) *= 0;
-        for (unsigned int j = i + 1; j < a.n_block_rows(); ++j)
-          a.block(j,i).Tvmult_add(v.block(i), u.block(j));
+        for (unsigned int j = i + 1; j < block_matrix.n_block_rows(); ++j)
+          block_matrix.block(j,i).Tvmult_add(v.block(i), u.block(j));
       }
   };
 
-  return_op.Tvmult_add = [&a](Domain &v, const Range &u)
+  return_op.Tvmult_add = [&block_matrix](Domain &v, const Range &u)
   {
-    Assert( v.n_blocks() == a.n_block_cols(),
-            ExcDimensionMismatch(v.n_blocks(), a.n_block_cols()));
-    Assert( u.n_blocks() == a.n_block_rows(),
-            ExcDimensionMismatch(u.n_blocks(), a.n_block_rows()));
+    Assert( v.n_blocks() == block_matrix.n_block_cols(),
+            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_cols()));
+    Assert( u.n_blocks() == block_matrix.n_block_rows(),
+            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_rows()));
 
-    for (unsigned int i = 0; i < a.n_block_cols(); ++i)
-      for (unsigned int j = i + 1; j < a.n_block_rows(); ++j)
-        a.block(j,i).Tvmult_add(v.block(i), u.block(j));
+    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
+      for (unsigned int j = i + 1; j < block_matrix.n_block_rows(); ++j)
+        block_matrix.block(j,i).Tvmult_add(v.block(i), u.block(j));
   };
 
   return return_op;
 }
 
 
+/**
+ * @relates LinearOperator
+ *
+ * A function that takes a block matrix @p a and returns its associated
+ * upper triangular matrix operator (diagonal is not included).
+ *
+ * @code
+ *  a00 | a01 | a02                 | a01 | a02
+ *  ---------------             ---------------
+ *  a10 | a11 | a12     ->          |     | a12
+ *  ---------------             ---------------
+ *  a20 | a21 | a22                 |     |
+ * @endcode
+ *
+ * @ingroup LAOperators
+ */
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
           typename BlockMatrix>
 LinearOperator<Range, Domain>
-upper_triangular_operator(BlockMatrix &a)
+upper_triangular_operator(const BlockMatrix &block_matrix)
 {
-  Assert( a.n_block_rows() == a.n_block_cols(),
-          ExcDimensionMismatch(a.n_block_rows(),a.n_block_cols()) );
+  Assert( block_matrix.n_block_rows() == block_matrix.n_block_cols(),
+          ExcDimensionMismatch(block_matrix.n_block_rows(),block_matrix.n_block_cols()) );
 
   LinearOperator<Range, Domain> return_op;
 
-  return_op.reinit_range_vector = [&a](Range &v, bool fast)
+  return_op.reinit_range_vector = [&block_matrix](Range &v, bool fast)
   {
     // Reinitialize the block vector to have the number of blocks
-    // equal to the number of row blocks of the matrix a.
-    v.reinit(a.n_block_rows());
+    // equal to the number of row blocks of the matrix block_matrix.
+    v.reinit(block_matrix.n_block_rows());
 
     // And reinitialize every individual block with reinit_range_vectors:
-    for (unsigned int i = 0; i < a.n_block_rows(); ++i)
-      linear_operator(a.block(i,0)).reinit_range_vector(v.block(i), fast);
+    for (unsigned int i = 0; i < block_matrix.n_block_rows(); ++i)
+      linear_operator(block_matrix.block(i,0)).reinit_range_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
 
-  return_op.reinit_domain_vector = [&a](Domain &v, bool fast)
+  return_op.reinit_domain_vector = [&block_matrix](Domain &v, bool fast)
   {
     // Reinitialize the block vector to have the number of blocks
-    // equal to the number of coloumn blocks of the matrix a.
-    v.reinit(a.n_block_cols());
+    // equal to the number of coloumn blocks of the matrix block_matrix.
+    v.reinit(block_matrix.n_block_cols());
 
     // And reinitialize every individual block with reinit_domain_vectors:
-    for (unsigned int i = 0; i < a.n_block_cols(); ++i)
-      linear_operator(a.block(0,i)).reinit_domain_vector(v.block(i), fast);
+    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
+      linear_operator(block_matrix.block(0,i)).reinit_domain_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
 
-  return_op.vmult = [&a](Range &v, const Domain &u)
+  return_op.vmult = [&block_matrix](Range &v, const Domain &u)
   {
-    Assert( v.n_blocks() == a.n_block_rows(),
-            ExcDimensionMismatch(v.n_blocks(), a.n_block_rows()));
-    Assert( u.n_blocks() == a.n_block_cols(),
-            ExcDimensionMismatch(u.n_blocks(), a.n_block_cols()));
+    Assert( v.n_blocks() == block_matrix.n_block_rows(),
+            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_rows()));
+    Assert( u.n_blocks() == block_matrix.n_block_cols(),
+            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_cols()));
 
-    for (unsigned int i = 0; i < a.n_block_rows(); ++i)
+    for (unsigned int i = 0; i < block_matrix.n_block_rows(); ++i)
       {
         v.block(i) *= 0;
-        for (unsigned int j = i + 1; j < a.n_block_cols(); ++j)
-          a.block(i,j).Tvmult_add(v.block(i), u.block(j));
+        for (unsigned int j = i + 1; j < block_matrix.n_block_cols(); ++j)
+          block_matrix.block(i,j).Tvmult_add(v.block(i), u.block(j));
       }
 
   };
 
-  return_op.vmult_add = [&a](Range &v, const Domain &u)
+  return_op.vmult_add = [&block_matrix](Range &v, const Domain &u)
   {
-    Assert( v.n_blocks() == a.n_block_rows(),
-            ExcDimensionMismatch(v.n_blocks(), a.n_block_rows()));
-    Assert( u.n_blocks() == a.n_block_cols(),
-            ExcDimensionMismatch(u.n_blocks(), a.n_block_cols()));
+    Assert( v.n_blocks() == block_matrix.n_block_rows(),
+            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_rows()));
+    Assert( u.n_blocks() == block_matrix.n_block_cols(),
+            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_cols()));
 
-            for (unsigned int i = 0; i < a.n_block_cols(); ++i)
-              for (unsigned int j = i + 1; j < a.n_block_rows(); ++j)
-                a.block(i,j).Tvmult_add(v.block(i), u.block(j));
+    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
+      for (unsigned int j = i + 1; j < block_matrix.n_block_rows(); ++j)
+        block_matrix.block(i,j).Tvmult_add(v.block(i), u.block(j));
   };
 
-
-
-    return_op.Tvmult = [&a](Domain &v, const Range &u)
-    {
-      Assert( v.n_blocks() == a.n_block_cols(),
-              ExcDimensionMismatch(v.n_blocks(), a.n_block_cols()));
-      Assert( u.n_blocks() == a.n_block_rows(),
-              ExcDimensionMismatch(u.n_blocks(), a.n_block_rows()));
-
-
-
-              for (unsigned int i = 0; i < a.n_block_cols(); ++i)
-                {
-                  v.block(i) *= 0;
-                  for (unsigned int j = 0; j < i; ++j)
-                    a.block(j,i).vmult_add(v.block(i), u.block(j));
-                }
-    };
-
-
-  return_op.Tvmult_add = [&a](Domain &v, const Range &u)
+  return_op.Tvmult = [&block_matrix](Domain &v, const Range &u)
   {
-    Assert( v.n_blocks() == a.n_block_cols(),
-            ExcDimensionMismatch(v.n_blocks(), a.n_block_cols()));
-    Assert( u.n_blocks() == a.n_block_rows(),
-            ExcDimensionMismatch(u.n_blocks(), a.n_block_rows()));
+    Assert( v.n_blocks() == block_matrix.n_block_cols(),
+            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_cols()));
+    Assert( u.n_blocks() == block_matrix.n_block_rows(),
+            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_rows()));
 
-            for (unsigned int i = 0; i < a.n_block_cols(); ++i)
-                for (unsigned int j = 0; j < i; ++j)
-                  a.block(j,i).vmult_add(v.block(i), u.block(j));
+    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
+      {
+        v.block(i) *= 0;
+        for (unsigned int j = 0; j < i; ++j)
+          block_matrix.block(j,i).vmult_add(v.block(i), u.block(j));
+      }
+  };
+
+  return_op.Tvmult_add = [&block_matrix](Domain &v, const Range &u)
+  {
+    Assert( v.n_blocks() == block_matrix.n_block_cols(),
+            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_cols()));
+    Assert( u.n_blocks() == block_matrix.n_block_rows(),
+            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_rows()));
+
+    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
+      for (unsigned int j = 0; j < i; ++j)
+        block_matrix.block(j,i).vmult_add(v.block(i), u.block(j));
   };
 
   return return_op;
 }
 
 
+/**
+ * @relates LinearOperator
+ *
+ * Let M be a block matrix of the form Id + T made of nxn blocks
+ * and where T is a lower / upper triangular (without diagonal).
+ * Then, its inverse is of the form:
+ * @code
+ *  Id + sum_{i=1}^{n-1} (-1)^i T^i
+ * @endcode
+ * This formula can be used to invert all triangular matrices
+ * (diagonal included of course).
+ *
+ * This function takes a block matrix @p block_matrix (possibly full) and
+ * a linear block operator  @p inverse_diagonal made of the inverse
+ * of the diagonal blocks inverses.
+ * The output is the inverse of the matrix in the case of a triangular matrix and
+ * as inverse_diagonal its diagonal blocks inverses.
+ * Otherwise, the result is a preconditioner.
+ *
+ * The parameter @p lower is a bool that allows to specify if we want
+ * to use lower triangular part of @p block_matrix (true, this is the default value) or
+ * to use upper triangular part of @p block_matrix (false).
+ * @ingroup LAOperators
+ */
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
           typename BlockMatrix>
 LinearOperator<Range, Domain>
-inverse_operator( BlockMatrix &a,
-                  const LinearOperator<Range, Domain> &inverse_diagonal,
-                  bool lower = true)
+block_triangular_inverse( const BlockMatrix &block_matrix,
+                          const LinearOperator<Range, Domain> &inverse_diagonal,
+                          bool lower = true)
 {
+  Assert( block_matrix.n_block_rows() == block_matrix.n_block_cols(),
+          ExcDimensionMismatch(block_matrix.n_block_rows(),block_matrix.n_block_cols()) );
 
   LinearOperator<Domain, Range> op_a;
 
-  if(lower)
-  {
-    op_a = lower_triangular_operator(a);
-  }
+  if (lower)
+    {
+      op_a = lower_triangular_operator(block_matrix);
+    }
   else
-  {
-    op_a = upper_triangular_operator(a);
-  }
+    {
+      op_a = upper_triangular_operator(block_matrix);
+    }
 
   auto id     = identity_operator(op_a.reinit_range_vector);
   auto result = identity_operator(op_a.reinit_range_vector);
 
-
-  for(unsigned int i = 0; i < a.n_block_cols() - 1; ++i)
+  // Notice that the following formula is recursive.
+  //  we are evaluating:
+  //  Id - T + T^2 - T^3 ... (- T)^block_matrix.n_block_cols()
+  for (unsigned int i = 0; i < block_matrix.n_block_cols() - 1; ++i)
     result = id - inverse_diagonal * op_a * result;
 
   return result * inverse_diagonal;

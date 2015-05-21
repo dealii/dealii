@@ -13,7 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-// Test non symmetric variants:
+// Test upper_triangular_block_op and lower_triangular_operator
+// simultaneously:
 
 #include "../tests.h"
 

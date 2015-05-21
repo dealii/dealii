@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test non symmetric variants:
+// Test preconditioner_from_diagonal_inverse:
 
 #include "../tests.h"
 
@@ -60,13 +60,11 @@ int main()
     BlockSparseMatrix<double> d(sparsity_pattern);
     for (unsigned int i = 0; i < 3; ++i)
         d.set(i,i, 1.0 / (i+i +1) );
-    // std::array<decltype(a.block(0,0)), 3> diag {{a.block(0,0), a.block(1,1),a.block(2,2)}};
-
 
     auto op_a         = linear_operator< BlockVector<double> >(a);
     auto diagonal_inv = linear_operator< BlockVector<double> >(d);
     // auto diagonal_inv = block_diagonal_operator(diag);
-    auto inverse_op_a = inverse_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a, diagonal_inv);
+    auto inverse_op_a = block_triangular_inverse< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a, diagonal_inv);
 
     auto identity = inverse_op_a * op_a;
 
@@ -78,7 +76,6 @@ int main()
     op_a.reinit_range_vector(v, false);
     for(unsigned int j = 0; j<3; ++j)
     {
-      // check 1
       for(unsigned int i = 0; i<3; ++i)
       {
         u.block(i)[0] = 0;;
@@ -86,9 +83,7 @@ int main()
       }
       u.block(j)[0] = 1;;
 
-
       op_a.vmult(v, u);
-      // identity.Tvmult(v2, u2);
 
       PRINTME("v", v);
     }
@@ -98,17 +93,14 @@ int main()
     inverse_op_a.reinit_range_vector(v, false);
     for(unsigned int j = 0; j<3; ++j)
     {
-      // check 1
       for(unsigned int i = 0; i<3; ++i)
       {
-        u.block(i)[0] = 0;;
+        u.block(i)[0] = 0;
         v.block(i)[0] = 0;
       }
       u.block(j)[0] = 1;;
 
-
       inverse_op_a.vmult(v, u);
-      // identity.Tvmult(v2, u2);
 
       PRINTME("v", v);
     }
@@ -118,7 +110,6 @@ int main()
     identity.reinit_range_vector(v, false);
     for(unsigned int j = 0; j<3; ++j)
     {
-      // check 1
       for(unsigned int i = 0; i<3; ++i)
       {
         u.block(i)[0] = 0;;
@@ -126,21 +117,9 @@ int main()
       }
       u.block(j)[0] = 1;;
 
-
       identity.vmult(v, u);
-      // identity.Tvmult(v2, u2);
 
       PRINTME("v", v);
     }
-
-    // op_a.vmult(v, u);
-    // // identity.Tvmult(v2, u2);
-    //
-    // PRINTME("v", v);
-    //
-    // inverse_op_a.vmult(v, u);
-    // // identity.Tvmult(v2, u2);
-    //
-    // PRINTME("v", v);
   }
 }

@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test non symmetric variants:
+// Test lower_triangular_operator:
 
 #include "../tests.h"
 
@@ -24,7 +24,8 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#define PRINTME(name, var) \
+#define PRINTME(title, name, var) \
+  deallog << title << std::endl; \
   deallog << "Block vector: " name << ":" << std::endl; \
   for (unsigned int i = 0; i < var.n_blocks(); ++i) \
     deallog << "[block " << i << " ]  " << var.block(i);
@@ -58,7 +59,6 @@ int main()
         a.block(i,j).set(0, 0, 2 + i - j);
 
     auto op_a = linear_operator<BlockVector<double>>(a);
-
     auto triangular_block_op = lower_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
 
     BlockVector<double> u;
@@ -75,31 +75,27 @@ int main()
     }
 
     triangular_block_op.vmult(v, u);
-    deallog << " -- vmult --" << std::endl;
-    PRINTME("v", v);
+    PRINTME(" -- vmult --", "v", v);
 
     // vmult_add:
     for(unsigned int i = 0; i<3; ++i)
       v.block(i)[0] = 1;
 
     triangular_block_op.vmult_add(v, u);
-    deallog << " -- vmult_add --" << std::endl;
-    PRINTME("v", v);
+    PRINTME(" -- vmult_add --", "v", v);
 
     // Tvmult
     for(unsigned int i = 0; i<3; ++i)
       v.block(i)[0] = i+1;
 
     triangular_block_op.Tvmult(u, v);
-    deallog << " -- Tvmult --" << std::endl;
-    PRINTME("u", u);
+    PRINTME(" -- Tvmult --", "u", u);
 
     // Tvmult_add
     for(unsigned int i = 0; i<3; ++i)
       u.block(i)[0] = 1;
 
     triangular_block_op.Tvmult_add(u, v);
-    deallog << " -- Tvmult_add --" << std::endl;
-    PRINTME("u", u);
+    PRINTME(" -- Tvmult_add --", "u", u);
   }
 }
