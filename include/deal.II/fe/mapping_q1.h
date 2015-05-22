@@ -107,6 +107,14 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
+   virtual
+   void
+   transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input_grads,
+     const VectorSlice<const std::vector<Tensor<1,dim> > > input_values,
+     VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+     const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+     const MappingType type) const;
+
 
 protected:
   /**
@@ -129,6 +137,16 @@ protected:
                       VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
                       const typename Mapping<dim,spacedim>::InternalDataBase &internal,
                       const MappingType type) const;
+
+  template < int rank >
+  void
+  transform_gradients(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input_grads,
+                      const VectorSlice<const std::vector<Tensor<rank-1,dim> > > input_values,
+                      VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
+                      const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+                      const MappingType type) const;
+
+
   /**
    * see doc in transform_fields
    */
