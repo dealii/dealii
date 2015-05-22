@@ -24,6 +24,17 @@ if test ! -f contrib/utilities/astyle.rc ; then
   exit
 fi
 
+if test -z "`which astyle`" ; then
+  echo "*** No astyle program found."
+  exit
+fi
+
+if test "`astyle --version 2>&1`" != "Artistic Style Version 2.04" ; then
+  echo "*** Found a version of astyle different than the required version 2.04."
+  exit
+fi
+
+
 
 # loop over all directories in which we may have source files;
 # collect a list of files and then spawn a parallel process to
