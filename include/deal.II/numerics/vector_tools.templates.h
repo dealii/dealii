@@ -6372,7 +6372,6 @@ namespace VectorTools
       switch (norm)
         {
         case H1_seminorm:
-        case Hdiv_seminorm:
         case W1p_seminorm:
         case W1infty_seminorm:
           update_flags |= UpdateFlags (update_gradients);
@@ -6382,6 +6381,7 @@ namespace VectorTools
           break;
 
         case H1_norm:
+        case Hdiv_seminorm:
         case W1p_norm:
         case W1infty_norm:
           update_flags |= UpdateFlags (update_gradients);
