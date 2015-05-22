@@ -399,7 +399,28 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF,
   return dest;
 }
 
-
+/**
+ * Similar to previous apply_transformation. It computes $T_k DF_{ijk}$
+ * (in Einstein summation) and the DerivativeForm<2,dim,spacedim> usually
+ * comes from the gradient of Jacobian: $ DF_{ijk} = dJ_{jk}/d\hat x_i$.
+ * Require: @dim==@spacedim
+ *
+ * @relates DerivativeForm
+ * @author Zhen Tao, 2014
+ */
+ template <int spacedim, int dim>
+ inline
+ Tensor<2, spacedim>
+ apply_transformation (const DerivativeForm<2,dim,spacedim> &DF,
+                       const Tensor<1,dim>               &T)
+ {
+   Assert (spacedim==dim, ExcMessage("Tensor not square"));
+   Tensor<2, spacedim> dest;
+   for (unsigned int i=0; i<spacedim; ++i)
+      for (unsigned int j=0; j<spacedim; ++j)
+        dest[i][j] = DF[i][j] * T;
+   return dest;
+ }
 
 /**
  * Similar to previous apply_transformation. It computes $T*DF^{t}$.
