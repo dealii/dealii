@@ -537,12 +537,12 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
             case mapping_piola_gradient:
             {
 
-
-              std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
+              // Zhen Tao, May. 20, 2014
+              std::vector <Tensor<2,spacedim> > input_grads(fe_data.shape_grads[i].size());
               for (unsigned int k=0; k<input.size(); ++k)
-                input[k] = fe_data.shape_grads[i][k];
+                input_grads[k] = fe_data.shape_grads[i][k];
 
-              mapping.transform(input, shape_grads1,
+              mapping.transform(input_grads, fe_data.shape_values[i], shape_grads1,
                                 mapping_data, mapping_piola_gradient);
 
               for (unsigned int k=0; k<n_q_points; ++k)
