@@ -285,7 +285,8 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tr
                                                  const Vector       &criteria,
                                                  const double        top_fraction,
                                                  const double        bottom_fraction,
-                                                 const unsigned int  max_n_cells)
+                                                 const unsigned int  max_n_cells,
+                                                 const double        refine_priority)
 {
   // correct number of cells is
   // checked in @p{refine}
@@ -293,71 +294,110 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tr
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
   Assert (criteria.is_non_negative (), ExcNegativeCriteria());
+  Assert(refine_priority >= 0.0, ExcInvalidParameterValue());
+  Assert(refine_priority <= 1.0, ExcInvalidParameterValue());
 
-  int refine_cells  = static_cast<int>(top_fraction*criteria.size());
-  int coarsen_cells = static_cast<int>(bottom_fraction*criteria.size());
+  // Convert variables to double to avoid annoying type casting and round error.
+  const double current_cell_number = static_cast<double>(criteria.size());
+  const double max_cell_number = static_cast<double>(max_n_cells);
 
-  // first we have to see whether we
-  // currently already exceed the target
-  // number of cells
-  if (tria.n_active_cells() >= max_n_cells)
+  // as we have no information on cells being refined isotropically or
+  // anisotropically, assume isotropic refinement here, though that may
+  // result in a worse approximation
+  const double cell_increase_on_refine  = GeometryInfo<dim>::max_children_per_cell - 1.0;
+  const double cell_decrease_on_coarsen = 1.0 - 1.0/GeometryInfo<dim>::max_children_per_cell;
+
+  // first we estimate the cell number after refinement and coarsening along the
+  // the requested fractions.
+  const double refine_cells_requested  = top_fraction * current_cell_number;
+  const double coarsen_cells_requested = bottom_fraction * current_cell_number;
+  const double n_cell_after_adaptation = current_cell_number +
+                                         refine_cells_requested * cell_increase_on_refine -
+                                         coarsen_cells_requested * cell_decrease_on_coarsen;
+
+  int refine_cells  = static_cast<int> (refine_cells_requested);
+  int coarsen_cells = static_cast<int> (coarsen_cells_requested);
+
+  if (n_cell_after_adaptation > max_cell_number)
     {
-      // if yes, then we need to stop
-      // refining cells and instead try to
-      // only coarsen as many as it would
-      // take to get to the target
+      // Let's clarify the simple math behind this situation.
+      // Define symbols:
+      // N     : @var current_cell_number
+      // N_n   : @var n_cell_after_adaptation
+      // N_l   : @var max_cell_number
+      // N_r   : number of cell to refine
+      // N_c   : number of cell to coarsen
+      // N_r_r : @var refine_cells_requested
+      // N_c_r : @var coarsen_cells_requested
+      // C_r   : @var cell_increase_on_refine
+      // C_c   : @var cell_decrease_on_coarsen
+      //
+      // Now, the problem is:
+      //       N_n = N + N_r_r*C_r - N_c_r*C_c > N_l   ...(0)
+      // And we want to bring the number of cell after adaptation down to its
+      // upper limit:
+      //       N_n = N + N_r*C_r - N_c*C_c = N_l       ...(1)
+      //
+      // It is easy to see that generally solution to equation (1) is not unique,
+      // so there is a feasible region for N_r and N_c.
+      // Note that equation (1) is linear on both N_r and N_c and larger N_r
+      // corresponds to larger N_c. So we just have to find out the two
+      // extreme points of the feasible region, and interpolate between them
+      // using parameter @refine_priority to get the final decision.
+      //
+      // In order to find out the extreme values, let's check the constraints
+      // that N_r and N_c shoud subject to:
+      // 1) if we don't want to break both of the input frations, we need
+      //         N_r <= N_r_r,
+      //       N_c_r <= N_c,
+      // 2) naturally
+      //                 0 <= N_r,
+      //               N_c <= N
+      //         N_r + N_c <= N.
+      // Thus finally
+      //          0 <= N_r <= N_r_r,
+      //      N_c_r <= N_c <= N - N_r.
 
-      // as we have no information on cells
-      // being refined isotropically or
-      // anisotropically, assume isotropic
-      // refinement here, though that may
-      // result in a worse approximation
-      refine_cells  = 0;
-      coarsen_cells = (tria.n_active_cells() - max_n_cells) *
-                      GeometryInfo<dim>::max_children_per_cell /
-                      (GeometryInfo<dim>::max_children_per_cell - 1);
-    }
-  // otherwise, see if we would exceed the
-  // maximum desired number of cells with the
-  // number of cells that are likely going to
-  // result from refinement. here, each cell
-  // to be refined is replaced by
-  // C=GeometryInfo<dim>::max_children_per_cell
-  // new cells, i.e. there will be C-1 more
-  // cells than before. similarly, C cells
-  // will be replaced by 1
+      // Try lower extreme of N_r at minimum N_c, and limit the result from below
+      // with its lower constraint. Limiting the result from above is not necessary
+      // at this point since we are already inside the if block.
+      const double refine_cells_min = std::max(
+                                        (max_cell_number - current_cell_number + coarsen_cells_requested*
+                                         cell_decrease_on_coarsen)/cell_increase_on_refine
+                                        ,
+                                        0.0);
+      // Lower extreme of N_c is explicit.
+      const double coarsen_cells_min = coarsen_cells_requested;
 
-  // again, this is true for isotropically
-  // refined cells. we take this as an
-  // approximation of a mixed refinement.
-  else if (static_cast<unsigned int>
-           (tria.n_active_cells()
-            + refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1)
-            - (coarsen_cells *
-               (GeometryInfo<dim>::max_children_per_cell - 1) /
-               GeometryInfo<dim>::max_children_per_cell))
-           >
-           max_n_cells)
-    {
-      // we have to adjust the
-      // fractions. assume we want
-      // alpha*refine_fraction and
-      // alpha*coarsen_fraction as new
-      // fractions and the resulting number
-      // of cells to be equal to
-      // max_n_cells. this leads to the
-      // following equation for lambda
-      const double alpha
-        =
-          1. *
-          (max_n_cells - tria.n_active_cells())
-          /
-          (refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1)
-           - (coarsen_cells *
-              (GeometryInfo<dim>::max_children_per_cell - 1) /
-              GeometryInfo<dim>::max_children_per_cell));
-      refine_cells  = static_cast<int> (refine_cells * alpha);
-      coarsen_cells = static_cast<int> (coarsen_cells * alpha);
+
+      // Try upper extreme of N_r at maximum N_c = N - N_r, and limit the result
+      // from both above and below.
+      const double refine_cells_max = std::max (
+                                        std::min(
+                                          (max_cell_number - (1.0-cell_decrease_on_coarsen) *
+                                           current_cell_number)/(cell_increase_on_refine+cell_decrease_on_coarsen)
+                                          ,
+                                          refine_cells_requested)
+                                        ,
+                                        0.0);
+      // Solve equation (1) with N_r = max(N_r) for upper extreme of N_c, and limit the result
+      // from above.
+      const double coarsen_cells_max = std::min(
+                                         (current_cell_number + refine_cells_max * cell_increase_on_refine -
+                                          max_cell_number)/cell_decrease_on_coarsen
+                                         ,
+                                         current_cell_number - refine_cells_max);
+
+      // Interpolate between the two extremes
+      const double refine_cells_actual =
+        (1.0 - refine_priority) * refine_cells_min
+        +      refine_priority  * refine_cells_max;
+      const double coarsen_cells_actual =
+        (1.0 - refine_priority) * coarsen_cells_min
+        +      refine_priority  * coarsen_cells_max;
+
+      refine_cells  = static_cast<int> (refine_cells_actual);
+      coarsen_cells = static_cast<int> (coarsen_cells_actual);
     }
 
   if (refine_cells || coarsen_cells)

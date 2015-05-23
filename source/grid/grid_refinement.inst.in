@@ -43,7 +43,8 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
           const dealii::Vector<S> &,
           const double,
           const double,
-          const unsigned int);
+          const unsigned int,
+          const double);
 
   template
   void
@@ -89,7 +90,8 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
           const dealii::Vector<S> &,
           const double,
           const double,
-          const unsigned int);
+          const unsigned int,
+          const double);
 
   template
   void

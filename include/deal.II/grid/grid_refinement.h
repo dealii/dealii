@@ -116,7 +116,8 @@ namespace GridRefinement
     const Vector                &criteria,
     const double                top_fraction_of_cells,
     const double                bottom_fraction_of_cells,
-    const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
+    const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max(),
+    const double                refine_priority = 1.0);
 
   /**
    * This function provides a refinement strategy controlling the reduction of
@@ -169,6 +170,24 @@ namespace GridRefinement
    * refinement due to Triangulation::MeshSmoothing, this number is only an
    * indicator. The default value of this argument is to impose no limit on
    * the number of cells.
+   *
+   * @arg @p refine_priority should be a real number in interval $[0,1]$.
+   * The larger the @p refine_priority, the more grid refinement this function
+   * will try to do. More specifically,
+   *
+   * If @p refine_priority = 0.0, this function will only coarsen @p bottom_fraction
+   * of cells and then refine as more as possible fraction of cells without exceeding
+   * @p max_n_cells.
+   *
+   * If @p refine_priority = 1.0, this function will refine as many as possible but no
+   * more than requested fraction of cells, and coarsen necessary fraction of cells
+   * to avoid breaking the maximum cell number limit.
+   *
+   * A @p refine_priority valur in between 0.0 and 1.0 will lead to a linear
+   * interpolation of the two fore mentioned extreme conditions.
+   *
+   * @note How grid refinement and coarsening will affect the number of cells is
+   * estimated under isotropic refinement assumption.
    */
   template <int dim, class Vector, int spacedim>
   void
