@@ -512,6 +512,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> New: Add a clear function to the PETSc::Vector
+  and PETSc::MPI::Vector classes similar to the Trilinos vector classes.
+  <br>
+  (Martin Steigemann 2015/05/22)
+  </li>
+
   <li> New: Three new quadrature formulas in quadrature_lib, based on
   Chebyshev quadrature rules. See functions QGaussChebyshev,
   QGaussRadauChebyshev and QGaussLobattoChebyshev.

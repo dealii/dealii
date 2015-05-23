@@ -261,6 +261,12 @@ namespace PETScWrappers
     virtual ~VectorBase ();
 
     /**
+     * Release all memory and return to a state just like after having called
+     * the default constructor.
+     */
+    virtual void clear ();
+
+    /**
      * Compress the underlying representation of the PETSc object, i.e. flush
      * the buffers of the vector object if it has any. This function is
      * necessary after writing into a vector element-by-element and before

@@ -210,6 +210,27 @@ namespace PETScWrappers
 
 
 
+  void
+  VectorBase::clear ()
+  {
+    if (attained_ownership)
+      {
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+        const int ierr = VecDestroy (vector);
+#else
+        const int ierr = VecDestroy (&vector);
+#endif
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
+
+    ghosted = false;
+    ghost_indices.clear ();
+    last_action = ::dealii::VectorOperation::unknown;
+    attained_ownership = true;
+  }
+
+
+
   VectorBase &
   VectorBase::operator = (const PetscScalar s)
   {
