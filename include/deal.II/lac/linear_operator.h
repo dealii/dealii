@@ -2162,7 +2162,7 @@ lower_triangular_operator(const BlockMatrix &block_matrix)
 
     // And reinitialize every individual block with reinit_range_vectors:
     for (unsigned int i = 0; i < block_matrix.n_block_rows(); ++i)
-      linear_operator(block_matrix.block(i,0)).reinit_range_vector(v.block(i), fast);
+      linear_operator<typename Range::BlockType, typename Domain::BlockType,  typename BlockMatrix::BlockType>(block_matrix.block(i,0)).reinit_range_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
@@ -2175,7 +2175,7 @@ lower_triangular_operator(const BlockMatrix &block_matrix)
 
     // And reinitialize every individual block with reinit_domain_vectors:
     for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
-      linear_operator(block_matrix.block(0,i)).reinit_domain_vector(v.block(i), fast);
+      linear_operator<typename Range::BlockType, typename Domain::BlockType,  typename BlockMatrix::BlockType>(block_matrix.block(0,i)).reinit_domain_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
@@ -2277,7 +2277,7 @@ upper_triangular_operator(const BlockMatrix &block_matrix)
 
     // And reinitialize every individual block with reinit_range_vectors:
     for (unsigned int i = 0; i < block_matrix.n_block_rows(); ++i)
-      linear_operator(block_matrix.block(i,0)).reinit_range_vector(v.block(i), fast);
+      linear_operator<typename Range::BlockType, typename Domain::BlockType, typename BlockMatrix::BlockType>(block_matrix.block(i,0)).reinit_range_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
@@ -2290,7 +2290,7 @@ upper_triangular_operator(const BlockMatrix &block_matrix)
 
     // And reinitialize every individual block with reinit_domain_vectors:
     for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
-      linear_operator(block_matrix.block(0,i)).reinit_domain_vector(v.block(i), fast);
+      linear_operator<typename Range::BlockType, typename Domain::BlockType,  typename BlockMatrix::BlockType>(block_matrix.block(0,i)).reinit_domain_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
@@ -2393,11 +2393,11 @@ block_triangular_inverse( const BlockMatrix &block_matrix,
 
   if (lower)
     {
-      op_a = lower_triangular_operator(block_matrix);
+      op_a = lower_triangular_operator<Range, Domain, BlockMatrix>(block_matrix);
     }
   else
     {
-      op_a = upper_triangular_operator(block_matrix);
+      op_a = upper_triangular_operator<Range, Domain, BlockMatrix>(block_matrix);
     }
 
   auto id     = identity_operator(op_a.reinit_range_vector);
