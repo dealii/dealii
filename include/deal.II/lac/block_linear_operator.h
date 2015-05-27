@@ -339,8 +339,12 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  * @ingroup LAOperators
  */
 
-// workaround for a bug in <=gcc-4.7 that does not like partial template
-// default values in combination with local lambda expressions [1]
+// This is a workaround for a bug in <=gcc-4.7 that does not like partial
+// template default values in function definitions in combination with
+// local lambda expressions [1] in the function body. As a workaround
+// declare the function with all default types and parameters first such
+// that the function definition is without default types and parameters.
+//
 // [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
@@ -467,8 +471,12 @@ lower_triangular_operator(const BlockMatrix &block_matrix)
  * @ingroup LAOperators
  */
 
-// workaround for a bug in <=gcc-4.7 that does not like partial template
-// default values in combination with local lambda expressions [1]
+// This is a workaround for a bug in <=gcc-4.7 that does not like partial
+// template default values in function definitions in combination with
+// local lambda expressions [1] in the function body. As a workaround
+// declare the function with all default types and parameters first such
+// that the function definition is without default types and parameters.
+//
 // [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
