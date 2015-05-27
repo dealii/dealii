@@ -2143,9 +2143,18 @@ operator*(const PackagedOperation<Range> &comp,
  *
  * @ingroup LAOperators
  */
+
+// workaround for a bug in <=gcc-4.7 that does not like partial template
+// default values in combination with local lambda expressions [1]
+// [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
           typename BlockMatrix>
+LinearOperator<Range, Domain>
+lower_triangular_operator(const BlockMatrix &);
+
+
+template <typename Range, typename Domain, typename BlockMatrix>
 LinearOperator<Range, Domain>
 lower_triangular_operator(const BlockMatrix &block_matrix)
 {
@@ -2258,9 +2267,18 @@ lower_triangular_operator(const BlockMatrix &block_matrix)
  *
  * @ingroup LAOperators
  */
+
+// workaround for a bug in <=gcc-4.7 that does not like partial template
+// default values in combination with local lambda expressions [1]
+// [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
           typename BlockMatrix>
+LinearOperator<Range, Domain>
+upper_triangular_operator(const BlockMatrix &);
+
+
+template <typename Range, typename Domain, typename BlockMatrix>
 LinearOperator<Range, Domain>
 upper_triangular_operator(const BlockMatrix &block_matrix)
 {
@@ -2378,13 +2396,24 @@ upper_triangular_operator(const BlockMatrix &block_matrix)
  * to use upper triangular part of @p block_matrix (false).
  * @ingroup LAOperators
  */
+
+// workaround for a bug in <=gcc-4.7 that does not like partial template
+// default values in combination with local lambda expressions [1]
+// [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
           typename BlockMatrix>
 LinearOperator<Range, Domain>
-block_triangular_inverse( const BlockMatrix &block_matrix,
-                          const LinearOperator<Range, Domain> &inverse_diagonal,
-                          bool lower = true)
+block_triangular_inverse(const BlockMatrix &,
+                         const LinearOperator<Range, Domain> &,
+                         bool lower = true);
+
+
+template <typename Range, typename Domain, typename BlockMatrix>
+LinearOperator<Range, Domain>
+block_triangular_inverse(const BlockMatrix &block_matrix,
+                         const LinearOperator<Range, Domain> &inverse_diagonal,
+                         bool lower)
 {
   Assert( block_matrix.n_block_rows() == block_matrix.n_block_cols(),
           ExcDimensionMismatch(block_matrix.n_block_rows(),block_matrix.n_block_cols()) );
