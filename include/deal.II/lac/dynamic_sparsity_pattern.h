@@ -757,16 +757,19 @@ namespace DynamicSparsityPatternIterators
     Assert (sparsity_pattern == other.sparsity_pattern,
             ExcInternalError());
 
-    // compare the sparsity pattern the iterator points into, properly
-    // taking into account the one-past-the-end iterator state
-    if ((current_row < sparsity_pattern->n_rows())
-        &&
-        (other.current_row == numbers::invalid_unsigned_int))
-      return true;
-    if ((other.current_row < other.sparsity_pattern->n_rows())
-        &&
-        (current_row == numbers::invalid_unsigned_int))
-      return false;
+    // if *this is past-the-end, then it is less than no one
+    if (current_row == numbers::invalid_unsigned_int)
+      return (false);
+    // now *this should be an valid value
+    Assert (current_row < sparsity_pattern->n_rows(),
+            ExcInternalError());
+
+    // if other is past-the-end
+    if (other.current_row == numbers::invalid_unsigned_int)
+      return (true);
+    // now other should be an valid value
+    Assert (other.current_row < sparsity_pattern->n_rows(),
+            ExcInternalError());
 
     // both iterators are not one-past-the-end
     return ((current_row < other.current_row) ||
