@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__operator_h
-#define __deal2__operator_h
+#ifndef dealii__operator_h
+#define dealii__operator_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/algorithms/any_data.h>

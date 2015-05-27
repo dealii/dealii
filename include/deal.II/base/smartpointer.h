@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__smartpointer_h
-#define __deal2__smartpointer_h
+#ifndef dealii__smartpointer_h
+#define dealii__smartpointer_h
 
 
 #include <deal.II/base/config.h>

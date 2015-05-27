@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__sparse_matrix_templates_h
-#define __deal2__sparse_matrix_templates_h
+#ifndef dealii__sparse_matrix_templates_h
+#define dealii__sparse_matrix_templates_h
 
 
 #include <deal.II/base/config.h>

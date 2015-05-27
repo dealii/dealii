@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tensor_product_polynomials_h
-#define __deal2__tensor_product_polynomials_h
+#ifndef dealii__tensor_product_polynomials_h
+#define dealii__tensor_product_polynomials_h
 
 
 #include <deal.II/base/config.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__function_lib_h
-#define __deal2__function_lib_h
+#ifndef dealii__function_lib_h
+#define dealii__function_lib_h
 
 
 #include <deal.II/base/config.h>

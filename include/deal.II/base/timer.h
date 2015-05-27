@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__timer_h
-#define __deal2__timer_h
+#ifndef dealii__timer_h
+#define dealii__timer_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/conditional_ostream.h>

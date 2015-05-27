@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__iterator_range_h
-#define __deal2__iterator_range_h
+#ifndef dealii__iterator_range_h
+#define dealii__iterator_range_h
 
 
 #include <deal.II/base/config.h>

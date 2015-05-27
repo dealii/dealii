@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_vector_base_h
-#define __deal2__block_vector_base_h
+#ifndef dealii__block_vector_base_h
+#define dealii__block_vector_base_h
 
 
 #include <deal.II/base/config.h>

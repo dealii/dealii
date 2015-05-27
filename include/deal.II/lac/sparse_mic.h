@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_mic_h
-#define __deal2__sparse_mic_h
+#ifndef dealii__sparse_mic_h
+#define dealii__sparse_mic_h
 
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_decomposition.h>
@@ -164,4 +164,4 @@ private:
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif  // __deal2__
+#endif  // dealii__

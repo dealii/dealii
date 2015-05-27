@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__arpack_solver_h
-#define __deal2__arpack_solver_h
+#ifndef dealii__arpack_solver_h
+#define dealii__arpack_solver_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>

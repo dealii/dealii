@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__multithread_info_h
-#define __deal2__multithread_info_h
+#ifndef dealii__multithread_info_h
+#define dealii__multithread_info_h
 //---------------------------------------------------------------------------
 
 
@@ -148,6 +148,6 @@ extern MultithreadInfo multithread_info DEAL_II_DEPRECATED;
 
 //---------------------------------------------------------------------------
 DEAL_II_NAMESPACE_CLOSE
-// end of #ifndef __deal2__multithread_info_h
+// end of #ifndef dealii__multithread_info_h
 #endif
 //---------------------------------------------------------------------------

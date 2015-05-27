@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_sparse_matrix_h
-#define __deal2__block_sparse_matrix_h
+#ifndef dealii__block_sparse_matrix_h
+#define dealii__block_sparse_matrix_h
 
 
 #include <deal.II/base/config.h>
@@ -529,4 +529,4 @@ precondition_Jacobi (Vector<number2>       &dst,
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif    // __deal2__block_sparse_matrix_h
+#endif    // dealii__block_sparse_matrix_h

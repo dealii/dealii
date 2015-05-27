@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__template_constraints_h
-#define __deal2__template_constraints_h
+#ifndef dealii__template_constraints_h
+#define dealii__template_constraints_h
 
 
 #include <deal.II/base/config.h>

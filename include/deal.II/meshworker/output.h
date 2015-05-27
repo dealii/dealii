@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mesh_worker_output_h
-#define __deal2__mesh_worker_output_h
+#ifndef dealii__mesh_worker_output_h
+#define dealii__mesh_worker_output_h
 
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/base/smartpointer.h>

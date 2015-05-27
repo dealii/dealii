@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_iterator_h
-#define __deal2__tria_iterator_h
+#ifndef dealii__tria_iterator_h
+#define dealii__tria_iterator_h
 
 
 /*----------------------------   tria-iterator.h     ---------------------------*/

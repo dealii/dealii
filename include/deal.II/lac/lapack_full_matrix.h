@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__lapack_full_matrix_h
-#define __deal2__lapack_full_matrix_h
+#ifndef dealii__lapack_full_matrix_h
+#define dealii__lapack_full_matrix_h
 
 
 #include <deal.II/base/config.h>

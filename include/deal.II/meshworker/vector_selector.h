@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mesh_worker_vector_selector_h
-#define __deal2__mesh_worker_vector_selector_h
+#ifndef dealii__mesh_worker_vector_selector_h
+#define dealii__mesh_worker_vector_selector_h
 
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/algorithms/named_selection.h>

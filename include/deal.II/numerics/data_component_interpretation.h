@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__data_component_interpretation_h
-#define __deal2__data_component_interpretation_h
+#ifndef dealii__data_component_interpretation_h
+#define dealii__data_component_interpretation_h
 
 
 

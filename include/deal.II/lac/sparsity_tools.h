@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparsity_tools_h
-#define __deal2__sparsity_tools_h
+#ifndef dealii__sparsity_tools_h
+#define dealii__sparsity_tools_h
 
 
 #include <deal.II/base/config.h>

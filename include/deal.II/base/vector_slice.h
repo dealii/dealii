@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__vector_slice_h
-#define __deal2__vector_slice_h
+#ifndef dealii__vector_slice_h
+#define dealii__vector_slice_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

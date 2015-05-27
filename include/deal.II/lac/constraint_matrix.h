@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__constraint_matrix_h
-#define __deal2__constraint_matrix_h
+#ifndef dealii__constraint_matrix_h
+#define dealii__constraint_matrix_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

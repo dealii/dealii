@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_block_smoother_h
-#define __deal2__mg_block_smoother_h
+#ifndef dealii__mg_block_smoother_h
+#define dealii__mg_block_smoother_h
 
 
 #include <deal.II/base/config.h>

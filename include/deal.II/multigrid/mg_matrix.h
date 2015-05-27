@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_matrix_h
-#define __deal2__mg_matrix_h
+#ifndef dealii__mg_matrix_h
+#define dealii__mg_matrix_h
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/pointer_matrix.h>

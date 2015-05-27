@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__generic_linear_algebra_h
-#define __deal2__generic_linear_algebra_h
+#ifndef dealii__generic_linear_algebra_h
+#define dealii__generic_linear_algebra_h
 
 #include <deal.II/base/config.h>
 

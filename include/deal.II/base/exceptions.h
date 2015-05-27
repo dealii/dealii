@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__exceptions_h
-#define __deal2__exceptions_h
+#ifndef dealii__exceptions_h
+#define dealii__exceptions_h
 
 #include <deal.II/base/config.h>
 

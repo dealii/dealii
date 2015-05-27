@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__dof_levels_h
-#define __deal2__dof_levels_h
+#ifndef dealii__dof_levels_h
+#define dealii__dof_levels_h
 
 
 #include <deal.II/base/config.h>

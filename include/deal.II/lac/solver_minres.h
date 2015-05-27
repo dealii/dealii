@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solver_minres_h
-#define __deal2__solver_minres_h
+#ifndef dealii__solver_minres_h
+#define dealii__solver_minres_h
 
 
 #include <deal.II/base/config.h>

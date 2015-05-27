@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__lac_exceptions_h
-#define __deal2__lac_exceptions_h
+#ifndef dealii__lac_exceptions_h
+#define dealii__lac_exceptions_h
 
 #include <deal.II/base/exceptions.h>
 

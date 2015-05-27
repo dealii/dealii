@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_dgp_monomial_h
-#define __deal2__fe_dgp_monomial_h
+#ifndef dealii__fe_dgp_monomial_h
+#define dealii__fe_dgp_monomial_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/polynomials_p.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mapping_h
-#define __deal2__mapping_h
+#ifndef dealii__mapping_h
+#define dealii__mapping_h
 
 
 #include <deal.II/base/config.h>

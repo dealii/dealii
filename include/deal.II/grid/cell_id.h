@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__cell_id_h
-#define __deal2__cell_id_h
+#ifndef dealii__cell_id_h
+#define dealii__cell_id_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__time_dependent_h
-#define __deal2__time_dependent_h
+#ifndef dealii__time_dependent_h
+#define dealii__time_dependent_h
 
 
 /*----------------------------   time-dependent.h     ---------------------------*/

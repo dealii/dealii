@@ -2,8 +2,8 @@
 #include <fstream>
 #include <iostream>
 
-#ifndef __deal2_polynomials_bernstein_h
-#define __deal2_polynomials_bernstein_h
+#ifndef dealii__polynomials_bernstein_h
+#define dealii__polynomials_bernstein_h
 
 
 DEAL_II_NAMESPACE_OPEN

@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__parsed_function_h
-#define __deal2__parsed_function_h
+#ifndef dealii__parsed_function_h
+#define dealii__parsed_function_h
 
 #include <deal.II/base/auto_derivative_function.h>
 #include <deal.II/base/function_parser.h>

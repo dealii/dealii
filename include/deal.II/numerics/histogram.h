@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__histogram_h
-#define __deal2__histogram_h
+#ifndef dealii__histogram_h
+#define dealii__histogram_h
 
 
 #include <deal.II/base/config.h>

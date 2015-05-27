@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solver_gmres_h
-#define __deal2__solver_gmres_h
+#ifndef dealii__solver_gmres_h
+#define dealii__solver_gmres_h
 
 
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__distributed_solution_transfer_h
-#define __deal2__distributed_solution_transfer_h
+#ifndef dealii__distributed_solution_transfer_h
+#define dealii__distributed_solution_transfer_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/distributed/tria.h>

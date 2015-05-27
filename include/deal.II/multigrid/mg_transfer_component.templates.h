@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mg_transfer_component_templates_h
-#define __deal2__mg_transfer_component_templates_h
+#ifndef dealii__mg_transfer_component_templates_h
+#define dealii__mg_transfer_component_templates_h
 
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/grid/tria_iterator.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_mic_templates_h
-#define __deal2__sparse_mic_templates_h
+#ifndef dealii__sparse_mic_templates_h
+#define dealii__sparse_mic_templates_h
 
 
 #include <deal.II/base/memory_consumption.h>
@@ -202,4 +202,4 @@ SparseMIC<number>::memory_consumption () const
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // __deal2__sparse_mic_templates_h
+#endif // dealii__sparse_mic_templates_h

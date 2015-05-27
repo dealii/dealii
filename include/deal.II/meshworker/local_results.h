@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mesh_worker_local_results_h
-#define __deal2__mesh_worker_local_results_h
+#ifndef dealii__mesh_worker_local_results_h
+#define dealii__mesh_worker_local_results_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/std_cxx11/function.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_matrix_base_h
-#define __deal2__block_matrix_base_h
+#ifndef dealii__block_matrix_base_h
+#define dealii__block_matrix_base_h
 
 
 #include <deal.II/base/config.h>
@@ -2667,4 +2667,4 @@ BlockMatrixBase<MatrixType>::prepare_set_operation ()
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif    // __deal2__block_matrix_base_h
+#endif    // dealii__block_matrix_base_h

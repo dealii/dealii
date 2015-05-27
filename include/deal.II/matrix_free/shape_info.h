@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__matrix_free_shape_info_h
-#define __deal2__matrix_free_shape_info_h
+#ifndef dealii__matrix_free_shape_info_h
+#define dealii__matrix_free_shape_info_h
 
 
 #include <deal.II/base/exceptions.h>

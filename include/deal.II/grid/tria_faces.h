@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_faces_h
-#define __deal2__tria_faces_h
+#ifndef dealii__tria_faces_h
+#define dealii__tria_faces_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/grid/tria_object.h>

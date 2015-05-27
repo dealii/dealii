@@ -14,8 +14,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__graph_coloring_h
-#define __deal2__graph_coloring_h
+#ifndef dealii__graph_coloring_h
+#define dealii__graph_coloring_h
 
 
 #include <deal.II/base/config.h>
@@ -548,6 +548,6 @@ DEAL_II_NAMESPACE_CLOSE
 
 
 //----------------------------   graph_coloring.h     ---------------------------
-// end of #ifndef __deal2__graph_coloring_h
+// end of #ifndef dealii__graph_coloring_h
 #endif
 //----------------------------   graph_coloring.h     ---------------------------

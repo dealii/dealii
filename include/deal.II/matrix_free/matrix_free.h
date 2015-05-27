@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__matrix_free_h
-#define __deal2__matrix_free_h
+#ifndef dealii__matrix_free_h
+#define dealii__matrix_free_h
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/parallel.h>

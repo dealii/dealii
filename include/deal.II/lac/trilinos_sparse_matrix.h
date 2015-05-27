@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__trilinos_sparse_matrix_h
-#define __deal2__trilinos_sparse_matrix_h
+#ifndef dealii__trilinos_sparse_matrix_h
+#define dealii__trilinos_sparse_matrix_h
 
 
 #include <deal.II/base/config.h>

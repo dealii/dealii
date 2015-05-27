@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__relaxation_block_templates_h
-#define __deal2__relaxation_block_templates_h
+#ifndef dealii__relaxation_block_templates_h
+#define dealii__relaxation_block_templates_h
 
 #include <deal.II/lac/relaxation_block.h>
 #include <deal.II/lac/full_matrix.h>

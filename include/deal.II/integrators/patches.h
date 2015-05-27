@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__integrators_patches_h
-#define __deal2__integrators_patches_h
+#ifndef dealii__integrators_patches_h
+#define dealii__integrators_patches_h
 
 
 #include <deal.II/base/config.h>

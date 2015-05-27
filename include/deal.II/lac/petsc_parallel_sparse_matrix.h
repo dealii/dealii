@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__petsc_parallel_sparse_matrix_h
-#define __deal2__petsc_parallel_sparse_matrix_h
+#ifndef dealii__petsc_parallel_sparse_matrix_h
+#define dealii__petsc_parallel_sparse_matrix_h
 
 #include <deal.II/base/config.h>
 

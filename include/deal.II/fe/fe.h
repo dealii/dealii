@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_h
-#define __deal2__fe_h
+#ifndef dealii__fe_h
+#define dealii__fe_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/geometry_info.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__swappable_vector_h
-#define __deal2__swappable_vector_h
+#ifndef dealii__swappable_vector_h
+#define dealii__swappable_vector_h
 
 
 #include <deal.II/base/config.h>
@@ -211,7 +211,7 @@ private:
 
 /*@}*/
 /*----------------------------   swappable_vector.h     ---------------------------*/
-/* end of #ifndef __deal2__swappable_vector_h */
+/* end of #ifndef dealii__swappable_vector_h */
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

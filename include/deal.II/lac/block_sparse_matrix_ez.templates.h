@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_sparse_matrix_ez_templates_h
-#define __deal2__block_sparse_matrix_ez_templates_h
+#ifndef dealii__block_sparse_matrix_ez_templates_h
+#define dealii__block_sparse_matrix_ez_templates_h
 
 
 #include <deal.II/base/config.h>

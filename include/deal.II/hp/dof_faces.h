@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__hp_dof_faces_h
-#define __deal2__hp_dof_faces_h
+#ifndef dealii__hp_dof_faces_h
+#define dealii__hp_dof_faces_h
 
 
 #include <deal.II/base/config.h>

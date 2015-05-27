@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_update_flags_h
-#define __deal2__fe_update_flags_h
+#ifndef dealii__fe_update_flags_h
+#define dealii__fe_update_flags_h
 
 
 #include <deal.II/base/config.h>

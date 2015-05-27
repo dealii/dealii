@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__transpose_matrix_h
-#define __deal2__transpose_matrix_h
+#ifndef dealii__transpose_matrix_h
+#define dealii__transpose_matrix_h
 
 
 #include <deal.II/base/subscriptor.h>

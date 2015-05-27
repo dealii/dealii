@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__multigrid_h
-#define __deal2__multigrid_h
+#ifndef dealii__multigrid_h
+#define dealii__multigrid_h
 
 
 #include <deal.II/base/config.h>

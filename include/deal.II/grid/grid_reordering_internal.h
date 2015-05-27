@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__grid_reordering_internal_h
-#define __deal2__grid_reordering_internal_h
+#ifndef dealii__grid_reordering_internal_h
+#define dealii__grid_reordering_internal_h
 
 
 #include <deal.II/base/config.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__dof_renumbering_h
-#define __deal2__dof_renumbering_h
+#ifndef dealii__dof_renumbering_h
+#define dealii__dof_renumbering_h
 
 
 #include <deal.II/base/config.h>

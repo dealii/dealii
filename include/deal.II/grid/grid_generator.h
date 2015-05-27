@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__grid_generator_h
-#define __deal2__grid_generator_h
+#ifndef dealii__grid_generator_h
+#define dealii__grid_generator_h
 
 
 #include <deal.II/base/config.h>

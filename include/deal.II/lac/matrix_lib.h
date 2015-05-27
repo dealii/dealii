@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__matrix_lib_h
-#define __deal2__matrix_lib_h
+#ifndef dealii__matrix_lib_h
+#define dealii__matrix_lib_h
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/lac/vector_memory.h>

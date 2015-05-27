@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__subscriptor_h
-#define __deal2__subscriptor_h
+#ifndef dealii__subscriptor_h
+#define dealii__subscriptor_h
 
 
 #include <deal.II/base/config.h>

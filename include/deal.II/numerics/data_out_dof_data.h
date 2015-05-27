@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__data_out_dof_data_h
-#define __deal2__data_out_dof_data_h
+#ifndef dealii__data_out_dof_data_h
+#define dealii__data_out_dof_data_h
 
 
 
