@@ -204,7 +204,8 @@ public:
    */
   PackagedOperation<Range> &operator+=(const PackagedOperation<Range> &second_comp)
   {
-    return *this = *this + second_comp;
+    *this = *this + second_comp;
+    return *this;
   }
 
   /**
@@ -212,7 +213,8 @@ public:
    */
   PackagedOperation<Range> &operator-=(const PackagedOperation<Range> &second_comp)
   {
-    return *this = *this - second_comp;
+    *this = *this - second_comp;
+    return *this;
   }
 
   /**
@@ -221,7 +223,8 @@ public:
    */
   PackagedOperation<Range> &operator+=(const Range &offset)
   {
-    return *this = *this + PackagedOperation<Range>(offset);
+    *this = *this + PackagedOperation<Range>(offset);
+    return *this;
   }
 
   /**
@@ -230,7 +233,8 @@ public:
    */
   PackagedOperation<Range> &operator-=(const Range &offset)
   {
-    return *this = *this - PackagedOperation<Range>(offset);
+    *this = *this - PackagedOperation<Range>(offset);
+    return *this;
   }
 
   /**
@@ -238,7 +242,8 @@ public:
    */
   PackagedOperation<Range> &operator*=(typename Range::value_type number)
   {
-    return *this = *this * number;
+    *this = *this * number;
+    return *this;
   }
   //@}
 

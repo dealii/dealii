@@ -179,7 +179,8 @@ public:
   template <typename Op>
   LinearOperator<Range, Domain> &operator=(const Op &op)
   {
-    return *this = linear_operator<Range, Domain, Op>(op);
+    *this = linear_operator<Range, Domain, Op>(op);
+    return *this;
   }
 
   /**
@@ -237,7 +238,8 @@ public:
   LinearOperator<Range, Domain> &
   operator+=(const LinearOperator<Range, Domain> &second_op)
   {
-    return *this = *this + second_op;
+    *this = *this + second_op;
+    return *this;
   }
 
   /**
@@ -247,7 +249,8 @@ public:
   LinearOperator<Range, Domain> &
   operator-=(const LinearOperator<Range, Domain> &second_op)
   {
-    return *this = *this - second_op;
+    *this = *this - second_op;
+    return *this;
   }
 
   /**
@@ -257,7 +260,8 @@ public:
   LinearOperator<Range, Domain> &
   operator*=(const LinearOperator<Domain, Domain> &second_op)
   {
-    return *this = *this * second_op;
+    *this = *this * second_op;
+    return *this;
   }
 
   /**
@@ -267,7 +271,8 @@ public:
   LinearOperator<Range, Domain>
   operator*=(typename Domain::value_type  number)
   {
-    return *this = *this * number;
+    *this = *this * number;
+    return *this;
   }
 
   //@}
