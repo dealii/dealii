@@ -196,22 +196,28 @@ FE_Bernstein<dim,spacedim>::hp_vertex_dof_identities (const FiniteElement<dim,sp
 
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_Bernstein<dim,spacedim>::hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
+FE_Bernstein<dim,spacedim>::hp_line_dof_identities (const FiniteElement<dim,spacedim> &) const
 {
   // Since this fe is not interpolatory but on the vertices, we can
   // not identify dofs on lines and on quads even if there are dofs
   // on lines and on quads.
+  //
+  // we also have nothing to say about interpolation to other finite
+  // elements. consequently, we never have anything to say at all
   return std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
 
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_Bernstein<dim,spacedim>::hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
+FE_Bernstein<dim,spacedim>::hp_quad_dof_identities (const FiniteElement<dim,spacedim> &) const
 {
   // Since this fe is not interpolatory but on the vertices, we can
   // not identify dofs on lines and on quads even if there are dofs
   // on lines and on quads.
+  //
+  // we also have nothing to say about interpolation to other finite
+  // elements. consequently, we never have anything to say at all
   return std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
