@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__matrix_lib_templates_h
-#define __deal2__matrix_lib_templates_h
+#ifndef dealii__matrix_lib_templates_h
+#define dealii__matrix_lib_templates_h
 
 #include <deal.II/lac/matrix_lib.h>
 #include <deal.II/lac/vector.h>

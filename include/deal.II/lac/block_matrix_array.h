@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_matrix_array_h
-#define __deal2__block_matrix_array_h
+#ifndef dealii__block_matrix_array_h
+#define dealii__block_matrix_array_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__table_h
-#define __deal2__table_h
+#ifndef dealii__table_h
+#define dealii__table_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

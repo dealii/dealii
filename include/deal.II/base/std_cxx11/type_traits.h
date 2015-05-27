@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__std_cxx11_type_traits_h
-#define __deal2__std_cxx11_type_traits_h
+#ifndef dealii__std_cxx11_type_traits_h
+#define dealii__std_cxx11_type_traits_h
 
 
 #include <deal.II/base/config.h>

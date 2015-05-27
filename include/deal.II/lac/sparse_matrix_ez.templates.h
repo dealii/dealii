@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_matrix_ez_templates_h
-#define __deal2__sparse_matrix_ez_templates_h
+#ifndef dealii__sparse_matrix_ez_templates_h
+#define dealii__sparse_matrix_ez_templates_h
 
 
 #include <deal.II/lac/sparse_matrix_ez.h>
@@ -630,4 +630,4 @@ SparseMatrixEZ<number>::block_read (std::istream &in)
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // __deal2__sparse_matrix_ez_templates_h
+#endif // dealii__sparse_matrix_ez_templates_h

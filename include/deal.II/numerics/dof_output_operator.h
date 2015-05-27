@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__dof_output_operator_h
-#define __deal2__dof_output_operator_h
+#ifndef dealii__dof_output_operator_h
+#define dealii__dof_output_operator_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/parameter_handler.h>

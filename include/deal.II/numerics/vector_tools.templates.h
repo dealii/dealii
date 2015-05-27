@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef _deal2__vector_tools_templates_h
-#define _deal2__vector_tools_templates_h
+#ifndef dealii__vector_tools_templates_h
+#define dealii__vector_tools_templates_h
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/function.h>

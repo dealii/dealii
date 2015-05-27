@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__eigen_h
-#define __deal2__eigen_h
+#ifndef dealii__eigen_h
+#define dealii__eigen_h
 
 
 #include <deal.II/base/config.h>

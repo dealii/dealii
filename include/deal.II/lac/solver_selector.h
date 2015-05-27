@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solver_selector_h
-#define __deal2__solver_selector_h
+#ifndef dealii__solver_selector_h
+#define dealii__solver_selector_h
 
 
 #include <deal.II/base/config.h>

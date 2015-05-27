@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__petsc_parallel_block_sparse_matrix_h
-#define __deal2__petsc_parallel_block_sparse_matrix_h
+#ifndef dealii__petsc_parallel_block_sparse_matrix_h
+#define dealii__petsc_parallel_block_sparse_matrix_h
 
 
 #include <deal.II/base/config.h>
@@ -355,4 +355,4 @@ DEAL_II_NAMESPACE_CLOSE
 
 #endif    // DEAL_II_WITH_PETSC
 
-#endif    // __deal2__petsc_parallel_block_sparse_matrix_h
+#endif    // dealii__petsc_parallel_block_sparse_matrix_h

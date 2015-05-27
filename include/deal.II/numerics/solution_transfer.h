@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__solution_transfer_h
-#define __deal2__solution_transfer_h
+#ifndef dealii__solution_transfer_h
+#define dealii__solution_transfer_h
 
 
 /*----------------------------   solutiontransfer.h     ----------------------*/

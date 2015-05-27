@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__mesh_worker_simple_h
-#define __deal2__mesh_worker_simple_h
+#ifndef dealii__mesh_worker_simple_h
+#define dealii__mesh_worker_simple_h
 
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/base/smartpointer.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__hp_dof_handler_h
-#define __deal2__hp_dof_handler_h
+#ifndef dealii__hp_dof_handler_h
+#define dealii__hp_dof_handler_h
 
 
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__q_collection_h
-#define __deal2__q_collection_h
+#ifndef dealii__q_collection_h
+#define dealii__q_collection_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>

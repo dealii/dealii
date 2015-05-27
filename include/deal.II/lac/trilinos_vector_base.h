@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__trilinos_vector_base_h
-#define __deal2__trilinos_vector_base_h
+#ifndef dealii__trilinos_vector_base_h
+#define dealii__trilinos_vector_base_h
 
 
 #include <deal.II/base/config.h>

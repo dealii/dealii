@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tensor_base_h
-#define __deal2__tensor_base_h
+#ifndef dealii__tensor_base_h
+#define dealii__tensor_base_h
 
 
 // single this file out from tensor.h, since we want to derive

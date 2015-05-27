@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__function_time_h
-#define __deal2__function_time_h
+#ifndef dealii__function_time_h
+#define dealii__function_time_h
 
 
 #include <deal.II/base/config.h>

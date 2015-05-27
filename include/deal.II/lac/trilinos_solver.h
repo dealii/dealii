@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__trilinos_solver_h
-#define __deal2__trilinos_solver_h
+#ifndef dealii__trilinos_solver_h
+#define dealii__trilinos_solver_h
 
 
 #include <deal.II/base/config.h>

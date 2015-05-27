@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__linear_operator_h
-#define __deal2__linear_operator_h
+#ifndef dealii__linear_operator_h
+#define dealii__linear_operator_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

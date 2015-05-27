@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__grid_in_h
-#define __deal2__grid_in_h
+#ifndef dealii__grid_in_h
+#define dealii__grid_in_h
 
 
 #include <deal.II/base/config.h>

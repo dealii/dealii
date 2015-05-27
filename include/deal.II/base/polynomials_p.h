@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__polynomials_P_h
-#define __deal2__polynomials_P_h
+#ifndef dealii__polynomials_P_h
+#define dealii__polynomials_P_h
 
 
 #include <deal.II/base/config.h>

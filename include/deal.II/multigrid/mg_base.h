@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_base_h
-#define __deal2__mg_base_h
+#ifndef dealii__mg_base_h
+#define dealii__mg_base_h
 
 /*
  * This file contains MGLevelObject and some abstract base classes

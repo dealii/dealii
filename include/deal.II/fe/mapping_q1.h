@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mapping_q1_h
-#define __deal2__mapping_q1_h
+#ifndef dealii__mapping_q1_h
+#define dealii__mapping_q1_h
 
 
 #include <deal.II/base/derivative_form.h>

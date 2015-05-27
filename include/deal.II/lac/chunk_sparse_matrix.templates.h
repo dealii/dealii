@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__chunk_sparse_matrix_templates_h
-#define __deal2__chunk_sparse_matrix_templates_h
+#ifndef dealii__chunk_sparse_matrix_templates_h
+#define dealii__chunk_sparse_matrix_templates_h
 
 
 #include <deal.II/base/template_constraints.h>

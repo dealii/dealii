@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_nothing_h
-#define __deal2__fe_nothing_h
+#ifndef dealii__fe_nothing_h
+#define dealii__fe_nothing_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/fe/fe.h>

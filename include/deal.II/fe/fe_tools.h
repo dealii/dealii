@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_tools_H
-#define __deal2__fe_tools_H
+#ifndef dealii__fe_tools_H
+#define dealii__fe_tools_H
 
 
 
@@ -1047,6 +1047,6 @@ namespace FETools
 DEAL_II_NAMESPACE_CLOSE
 
 /*----------------------------   fe_tools.h     ---------------------------*/
-/* end of #ifndef __deal2__fe_tools_H */
+/* end of #ifndef dealii__fe_tools_H */
 #endif
 /*----------------------------   fe_tools.h     ---------------------------*/

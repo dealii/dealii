@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__derivative_approximation_h
-#define __deal2__derivative_approximation_h
+#ifndef dealii__derivative_approximation_h
+#define dealii__derivative_approximation_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

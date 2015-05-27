@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__matrix_out_h
-#define __deal2__matrix_out_h
+#ifndef dealii__matrix_out_h
+#define dealii__matrix_out_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/data_out_base.h>

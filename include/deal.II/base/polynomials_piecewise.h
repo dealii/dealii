@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__polynomials_piecewise_h
-#define __deal2__polynomials_piecewise_h
+#ifndef dealii__polynomials_piecewise_h
+#define dealii__polynomials_piecewise_h
 
 
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_function_h
-#define __deal2__fe_function_h
+#ifndef dealii__fe_function_h
+#define dealii__fe_function_h
 
 #include <deal.II/base/function.h>
 #include <deal.II/dofs/dof_handler.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__flow_function_h
-#define __deal2__flow_function_h
+#ifndef dealii__flow_function_h
+#define dealii__flow_function_h
 
 
 #include <deal.II/base/config.h>

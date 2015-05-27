@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__time_stepping_templates_h
-#define __deal2__time_stepping_templates_h
+#ifndef dealii__time_stepping_templates_h
+#define dealii__time_stepping_templates_h
 
 #include <deal.II/base/std_cxx11/bind.h>
 #include <deal.II/base/exceptions.h>

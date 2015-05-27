@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__function_map_h
-#define __deal2__function_map_h
+#ifndef dealii__function_map_h
+#define dealii__function_map_h
 
 #include <deal.II/base/config.h>
 #include <map>

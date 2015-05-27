@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__numbers_h
-#define __deal2__numbers_h
+#ifndef dealii__numbers_h
+#define dealii__numbers_h
 
 
 #include <deal.II/base/config.h>

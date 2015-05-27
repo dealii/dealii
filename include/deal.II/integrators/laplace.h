@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__integrators_laplace_h
-#define __deal2__integrators_laplace_h
+#ifndef dealii__integrators_laplace_h
+#define dealii__integrators_laplace_h
 
 
 #include <deal.II/base/config.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mpi_h
-#define __deal2__mpi_h
+#ifndef dealii__mpi_h
+#define dealii__mpi_h
 
 #include <deal.II/base/config.h>
 #include <vector>

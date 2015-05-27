@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__matrix_free_mapping_data_on_the_fly_h
-#define __deal2__matrix_free_mapping_data_on_the_fly_h
+#ifndef dealii__matrix_free_mapping_data_on_the_fly_h
+#define dealii__matrix_free_mapping_data_on_the_fly_h
 
 
 #include <deal.II/base/config.h>

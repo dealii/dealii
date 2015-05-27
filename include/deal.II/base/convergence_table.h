@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__convergence_table_h
-#define __deal2__convergence_table_h
+#ifndef dealii__convergence_table_h
+#define dealii__convergence_table_h
 
 
 #include <deal.II/base/config.h>

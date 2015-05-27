@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__logstream_h
-#define __deal2__logstream_h
+#ifndef dealii__logstream_h
+#define dealii__logstream_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

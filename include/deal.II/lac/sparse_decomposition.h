@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_decomposition_h
-#define __deal2__sparse_decomposition_h
+#ifndef dealii__sparse_decomposition_h
+#define dealii__sparse_decomposition_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -337,4 +337,4 @@ SparseLUDecomposition<number>::AdditionalData::AdditionalData (
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // __deal2__sparse_decomposition_h
+#endif // dealii__sparse_decomposition_h

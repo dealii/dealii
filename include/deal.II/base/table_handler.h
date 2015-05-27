@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__table_handler_h
-#define __deal2__table_handler_h
+#ifndef dealii__table_handler_h
+#define dealii__table_handler_h
 
 
 #include <deal.II/base/config.h>

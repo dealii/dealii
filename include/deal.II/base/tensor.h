@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tensor_h
-#define __deal2__tensor_h
+#ifndef dealii__tensor_h
+#define dealii__tensor_h
 
 
 #include <deal.II/base/config.h>

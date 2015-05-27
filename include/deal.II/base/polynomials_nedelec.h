@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__polynomials_nedelec_h
-#define __deal2__polynomials_nedelec_h
+#ifndef dealii__polynomials_nedelec_h
+#define dealii__polynomials_nedelec_h
 
 
 #include <deal.II/base/config.h>

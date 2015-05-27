@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__multigrid_templates_h
-#define __deal2__multigrid_templates_h
+#ifndef dealii__multigrid_templates_h
+#define dealii__multigrid_templates_h
 #include <deal.II/multigrid/multigrid.h>
 
 #include <deal.II/base/logstream.h>

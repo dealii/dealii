@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__integrators_divergence_h
-#define __deal2__integrators_divergence_h
+#ifndef dealii__integrators_divergence_h
+#define dealii__integrators_divergence_h
 
 
 #include <deal.II/base/config.h>

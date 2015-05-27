@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__revision_h
-#define __deal2__revision_h
+#ifndef dealii___revision_h
+#define dealii___revision_h
 
 /**
  * Name of the local git branch of the source directory.

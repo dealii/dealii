@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__tria_objects_h
-#define __deal2__tria_objects_h
+#ifndef dealii__tria_objects_h
+#define dealii__tria_objects_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__named_selection_h
-#define __deal2__named_selection_h
+#ifndef dealii__named_selection_h
+#define dealii__named_selection_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/algorithms/any_data.h>

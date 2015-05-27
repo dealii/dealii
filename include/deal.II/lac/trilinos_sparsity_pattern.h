@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__trilinos_sparsity_pattern_h
-#define __deal2__trilinos_sparsity_pattern_h
+#ifndef dealii__trilinos_sparsity_pattern_h
+#define dealii__trilinos_sparsity_pattern_h
 
 
 #include <deal.II/base/config.h>

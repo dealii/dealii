@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_poly_tensor_h
-#define __deal2__fe_poly_tensor_h
+#ifndef dealii__fe_poly_tensor_h
+#define dealii__fe_poly_tensor_h
 
 
 #include <deal.II/lac/full_matrix.h>

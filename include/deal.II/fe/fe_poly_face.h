@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_poly_face_h
-#define __deal2__fe_poly_face_h
+#ifndef dealii__fe_poly_face_h
+#define dealii__fe_poly_face_h
 
 
 #include <deal.II/fe/fe.h>

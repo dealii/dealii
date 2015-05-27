@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__mg_constraints_h
-#define __deal2__mg_constraints_h
+#ifndef dealii__mg_constraints_h
+#define dealii__mg_constraints_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>

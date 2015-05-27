@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__aligned_vector_h
-#define __deal2__aligned_vector_h
+#ifndef dealii__aligned_vector_h
+#define dealii__aligned_vector_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/std_cxx11/type_traits.h>

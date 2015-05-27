@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__index_set_h
-#define __deal2__index_set_h
+#ifndef dealii__index_set_h
+#define dealii__index_set_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/utilities.h>

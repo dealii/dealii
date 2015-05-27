@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_ilu_templates_h
-#define __deal2__sparse_ilu_templates_h
+#ifndef dealii__sparse_ilu_templates_h
+#define dealii__sparse_ilu_templates_h
 
 
 

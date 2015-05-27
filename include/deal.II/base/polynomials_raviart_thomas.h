@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__polynomials_raviart_thomas_h
-#define __deal2__polynomials_raviart_thomas_h
+#ifndef dealii__polynomials_raviart_thomas_h
+#define dealii__polynomials_raviart_thomas_h
 
 
 #include <deal.II/base/config.h>

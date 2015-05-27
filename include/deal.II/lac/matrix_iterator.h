@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__matrix_iterator_h
-#define __deal2__matrix_iterator_h
+#ifndef dealii__matrix_iterator_h
+#define dealii__matrix_iterator_h
 
 
 #include <deal.II/base/config.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__block_info_h
-#define __deal2__block_info_h
+#ifndef dealii__block_info_h
+#define dealii__block_info_h
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/memory_consumption.h>

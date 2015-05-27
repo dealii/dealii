@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__sparse_vanka_templates_h
-#define __deal2__sparse_vanka_templates_h
+#ifndef dealii__sparse_vanka_templates_h
+#define dealii__sparse_vanka_templates_h
 
 
 #include <deal.II/base/memory_consumption.h>

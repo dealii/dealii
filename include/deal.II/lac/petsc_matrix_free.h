@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__petsc_matrix_free_h
-#define __deal2__petsc_matrix_free_h
+#ifndef dealii__petsc_matrix_free_h
+#define dealii__petsc_matrix_free_h
 
 
 #include <deal.II/base/config.h>

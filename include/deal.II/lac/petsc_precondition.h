@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__petsc_precondition_h
-#define __deal2__petsc_precondition_h
+#ifndef dealii__petsc_precondition_h
+#define dealii__petsc_precondition_h
 
 
 #include <deal.II/base/config.h>

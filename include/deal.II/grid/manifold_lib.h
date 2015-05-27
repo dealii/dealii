@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__manifold_lib_h
-#define __deal2__manifold_lib_h
+#ifndef dealii__manifold_lib_h
+#define dealii__manifold_lib_h
 
 
 #include <deal.II/base/config.h>

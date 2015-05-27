@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__intergrid_map_h
-#define __deal2__intergrid_map_h
+#ifndef dealii__intergrid_map_h
+#define dealii__intergrid_map_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>

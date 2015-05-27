@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__iterative_inverse_h
-#define __deal2__iterative_inverse_h
+#ifndef dealii__iterative_inverse_h
+#define dealii__iterative_inverse_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>

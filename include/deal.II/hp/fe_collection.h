@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__fe_collection_h
-#define __deal2__fe_collection_h
+#ifndef dealii__fe_collection_h
+#define dealii__fe_collection_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
