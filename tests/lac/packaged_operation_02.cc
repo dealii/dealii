@@ -14,11 +14,13 @@
 // ---------------------------------------------------------------------
 
 // Test PackagedOperation for
-//   dealii::Vector<double>
-//   dealii::SparseMatrix<double>
+//   dealii::SparseMatrix<double> with LinearOperator
 
 #include "../tests.h"
 
+#include <deal.II/lac/packaged_operation.h>
+
+// and a _lot_ of stuff to create a linera oprator
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -99,34 +101,6 @@ int main()
 
   deallog << "u: " << u << std::endl;
 
-  // creation via operator+, operator-, operator*
-
-  test_applies("u + u", u + u);
-  test_applies("u - u", u - u);
-  test_applies("3. * u", 3. * u);
-  test_applies("u * 3.", u * 3.);
-
-  // creation via mixed operator+, operator-
-
-  auto expr = 2. * u;
-
-  test_applies("2. * u + u", expr + u);
-  test_applies("2. * u - u", expr - u);
-
-  test_applies("u + 2. * u", u + expr);
-  test_applies("u - 2. * u", u - expr);
-
-  // operator+, operator-, operator*
-
-  PackagedOperation<Vector<double> > expr2 = u;
-
-  test_applies("2. * u + u", expr + expr2);
-  test_applies("2. * u - u", expr - expr2);
-  test_applies("3. * u", 3. * expr2);
-  test_applies("u * 3.", expr2 * 3.);
-
-  // creation with LinearOperator object
-
   deallog.depth_file(0);
   Vector<double> b = MInv * u;
   deallog.depth_file(3);
@@ -135,7 +109,7 @@ int main()
   test_applies("M * b", M * b);
   test_applies("b * M", b * M);
 
-  expr = b;
+  auto expr = b;
   test_applies("M * b", M * expr);
   test_applies("b * M", expr * M);
 }
