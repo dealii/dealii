@@ -13,182 +13,22 @@
 //
 // ---------------------------------------------------------------------
 
-// Test linear_operator constructor for full and reduced interface:
+// Test non symmetric variants:
 
 #include "../tests.h"
 
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/linear_operator.h>
-#include <deal.II/lac/vector_memory.templates.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-class MyMatrix1
-{
-public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
+#define PRINTME(name, var) \
+  deallog << "Block vector: " name << ":" << std::endl; \
+  for (unsigned int i = 0; i < var.n_blocks(); ++i) \
+    deallog << "[block " << i << " ]  " << var.block(i);
 
-  void vmult(Vector<double> &, const Vector<double> &) const
-  {
-    deallog << "MyMatrix1::vmult" << std::endl;
-  }
-
-  void Tvmult(Vector<double> &, const Vector<double> &) const
-  {
-    deallog << "MyMatrix1::Tvmult" << std::endl;
-  }
-
-};
-
-class MyMatrix2
-{
-public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
-
-  void vmult(Vector<double> &, const Vector<double> &) const
-  {
-    deallog << "MyMatrix2::vmult" << std::endl;
-  }
-
-  void Tvmult(Vector<double> &, const Vector<double> &) const
-  {
-    deallog << "MyMatrix2::Tvmult" << std::endl;
-  }
-
-  void vmult_add(Vector<double> &, const Vector<double> &) const
-  {
-    deallog << "MyMatrix2::vmult_add" << std::endl;
-  }
-
-  void Tvmult_add(Vector<double> &, const Vector<double> &) const
-  {
-    deallog << "MyMatrix2::Tvmult_add" << std::endl;
-  }
-};
-
-class MyMatrix3
-{
-public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
-
-  template<typename OutVector, typename InVector>
-  void vmult(OutVector &, const InVector &) const
-  {
-    deallog << "MyMatrix3::vmult" << std::endl;
-  }
-
-  template<typename OutVector, typename InVector>
-  void Tvmult(OutVector &, const InVector &) const
-  {
-    deallog << "MyMatrix3::Tvmult" << std::endl;
-  }
-
-  template<typename OutVector, typename InVector>
-  void vmult_add(OutVector &, const InVector &) const
-  {
-    deallog << "MyMatrix3::vmult_add" << std::endl;
-  }
-
-  template<typename OutVector, typename InVector>
-  void Tvmult_add(OutVector &, const InVector &) const
-  {
-    deallog << "MyMatrix3::Tvmult_add" << std::endl;
-  }
-};
-
-class MyMatrix4
-{
-public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
-
-  template<typename OutVector, typename InVector>
-  void vmult(OutVector &, const InVector &, bool = true) const
-  {
-    deallog << "MyMatrix4::vmult" << std::endl;
-  }
-
-  template<typename OutVector, typename InVector>
-  void Tvmult(OutVector &, const InVector &, bool = true) const
-  {
-    deallog << "MyMatrix4::Tvmult" << std::endl;
-  }
-
-  template<typename OutVector, typename InVector>
-  void vmult_add(OutVector &, const InVector &, bool = true) const
-  {
-    deallog << "MyMatrix4::vmult_add" << std::endl;
-  }
-
-  template<typename OutVector, typename InVector>
-  void Tvmult_add(OutVector &, const InVector &, bool = true) const
-  {
-    deallog << "MyMatrix4::Tvmult_add" << std::endl;
-  }
-};
-
-class MyMatrix5
-{
-public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
-
-  template<typename number>
-  void vmult(Vector<number> &, const Vector<number> &, bool = true) const
-  {
-    deallog << "MyMatrix5::vmult" << std::endl;
-  }
-
-  template<typename number>
-  void Tvmult(Vector<number> &, const Vector<number> &, bool = true) const
-  {
-    deallog << "MyMatrix5::Tvmult" << std::endl;
-  }
-
-  template<typename number>
-  void vmult_add(Vector<number> &, const Vector<number> &, bool = true) const
-  {
-    deallog << "MyMatrix5::vmult_add" << std::endl;
-  }
-
-  template<typename number>
-  void Tvmult_add(Vector<number> &, const Vector<number> &, bool = true) const
-  {
-    deallog << "MyMatrix5::Tvmult_add" << std::endl;
-  }
-};
-
-class MyMatrix6
-{
-public:
-  size_t m() const { return 1; };
-  size_t n() const { return 1; };
-
-  template<typename number, typename number2>
-  void vmult(Vector<number> &, const Vector<number2> &, bool = true) const
-  {
-    deallog << "MyMatrix6::vmult" << std::endl;
-  }
-
-  template<typename number, typename number2>
-  void Tvmult(Vector<number> &, const Vector<number2> &, bool = true) const
-  {
-    deallog << "MyMatrix6::Tvmult" << std::endl;
-  }
-
-  template<typename number, typename number2>
-  void vmult_add(Vector<number> &, const Vector<number2> &, bool = true) const
-  {
-    deallog << "MyMatrix6::vmult_add" << std::endl;
-  }
-
-  template<typename number, typename number2>
-  void Tvmult_add(Vector<number> &, const Vector<number2> &, bool = true) const
-  {
-    deallog << "MyMatrix6::Tvmult_add" << std::endl;
-  }
-};
 
 using namespace dealii;
 
@@ -197,43 +37,52 @@ int main()
   initlog();
   deallog << std::setprecision(10);
 
-  Vector<double> u (1);
-  Vector<double> v (1);
+  // SparseMatrix:
+  {
+    SparsityPattern sparsity_pattern (10, 5, 0);
+    sparsity_pattern.compress();
 
-  MyMatrix1 m1;
-  MyMatrix2 m2;
-  MyMatrix3 m3;
-  MyMatrix4 m4;
-  MyMatrix5 m5;
-  MyMatrix6 m6;
+    SparseMatrix<double> a (sparsity_pattern);
 
-  linear_operator(m1).vmult(v, u);
-  linear_operator(m1).Tvmult(v, u);
-  linear_operator(m1).vmult_add(v, u);
-  linear_operator(m1).Tvmult_add(v, u);
+    auto op_a = linear_operator(a);
 
-  linear_operator(m2).vmult(v, u);
-  linear_operator(m2).Tvmult(v, u);
-  linear_operator(m2).vmult_add(v, u);
-  linear_operator(m2).Tvmult_add(v, u);
+    Vector<double> u;
+    op_a.reinit_domain_vector(u, false);
+    Vector<double> v;
+    op_a.reinit_range_vector(v, false);
+    op_a.vmult(v, u);
+    op_a.vmult_add(v, u);
+    op_a.Tvmult(u, v);
+    op_a.Tvmult_add(u, v);
 
-  linear_operator(m3).vmult(v, u);
-  linear_operator(m3).Tvmult(v, u);
-  linear_operator(m3).vmult_add(v, u);
-  linear_operator(m3).Tvmult_add(v, u);
+    deallog << "OK" << std::endl;
+  }
 
-  linear_operator(m4).vmult(v, u);
-  linear_operator(m4).Tvmult(v, u);
-  linear_operator(m4).vmult_add(v, u);
-  linear_operator(m4).Tvmult_add(v, u);
+  // BlockSparseMatrix:
+  {
+    BlockDynamicSparsityPattern dsp(5, 3);
+    for (unsigned int i = 0; i < 5; ++i)
+      for (unsigned int j = 0; j < 3; ++j)
+        dsp.block(i, j).reinit (10, 5);
+    dsp.collect_sizes ();
 
-  linear_operator(m5).vmult(v, u);
-  linear_operator(m5).Tvmult(v, u);
-  linear_operator(m5).vmult_add(v, u);
-  linear_operator(m5).Tvmult_add(v, u);
+    BlockSparsityPattern sparsity_pattern;
+    sparsity_pattern.copy_from(dsp);
+    sparsity_pattern.compress();
 
-  linear_operator(m6).vmult(v, u);
-  linear_operator(m6).Tvmult(v, u);
-  linear_operator(m6).vmult_add(v, u);
-  linear_operator(m6).Tvmult_add(v, u);
+    BlockSparseMatrix<double> a (sparsity_pattern);
+
+    auto op_a = linear_operator<BlockVector<double>>(a);
+
+    BlockVector<double> u;
+    op_a.reinit_domain_vector(u, false);
+    BlockVector<double> v;
+    op_a.reinit_range_vector(v, false);
+    op_a.vmult(v, u);
+    op_a.vmult_add(v, u);
+    op_a.Tvmult(u, v);
+    op_a.Tvmult_add(u, v);
+    deallog << "OK" << std::endl;
+  }
 }
+

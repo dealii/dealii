@@ -13,20 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-// Tests for block_diagonal_operator
+// Test scaling with a number which might be 0
 
 #include "../tests.h"
 
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/linear_operator.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #define PRINTME(name, var) \
   deallog << "Block vector: " name << ":" << std::endl; \
@@ -41,147 +37,25 @@ int main()
   initlog();
   deallog << std::setprecision(10);
 
-  static const int dim = 2;
+  // SparseMatrix:
+  {
+    SparsityPattern sparsity_pattern (10, 5, 0);
+    sparsity_pattern.compress();
 
-  Triangulation<dim> triangulation;
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global(2);
+    SparseMatrix<double> a (sparsity_pattern);
 
-  MappingQ1<dim> mapping_q1;
-  FESystem<dim> fe(FE_Q<dim>(2), 1, FE_Q<dim>(1), 1, FE_Q<dim>(3), 1);
-  DoFHandler<dim> dof_handler(triangulation);
+    auto op_a = 0*linear_operator(a);
 
-  dof_handler.distribute_dofs(fe);
+    Vector<double> u;
+    op_a.reinit_domain_vector(u, false);
+    Vector<double> v;
+    op_a.reinit_range_vector(v, false);
+    op_a.vmult(v, u);
+    op_a.vmult_add(v, u);
+    op_a.Tvmult(u, v);
+    op_a.Tvmult_add(u, v);
 
-  std::vector<types::global_dof_index> dpc (3);
-  DoFTools::count_dofs_per_component (dof_handler, dpc);
-
-  BlockDynamicSparsityPattern dsp(3, 3);
-  for (unsigned int i = 0; i < 3; ++i)
-    for (unsigned int j = 0; j < 3; ++j)
-      dsp.block(i, j).reinit (dpc[i], dpc[j]);
-  dsp.collect_sizes ();
-
-  BlockSparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from(dsp);
-  sparsity_pattern.compress();
-
-  BlockSparseMatrix<double> a (sparsity_pattern);
-
-  // Come up with a simple structure:
-
-  for(unsigned int i = 0; i < a.block(0, 0).m(); ++i)
-    a.block(0, 0).set(i, i, 10.);
-  for(unsigned int i = 0; i < a.block(1, 1).m(); ++i)
-    a.block(1, 1).set(i, i, 5.);
-  for(unsigned int i = 0; i < a.block(2, 2).m(); ++i)
-    a.block(2, 2).set(i, i, 3.);
-
-
-  auto op_a = linear_operator<BlockVector<double>>(a);
-
-  auto op_b0 = linear_operator(a.block(0, 0));
-  auto op_b1 = linear_operator(a.block(1, 1));
-  auto op_b2 = linear_operator(a.block(2, 2));
-
-
-  std::array<decltype(op_b0), 3> temp{op_b0, op_b1, op_b2};
-  auto op_b = block_diagonal_operator<3, BlockVector<double>>(temp);
-
-  // vmult:
-
-  BlockVector<double> u;
-  op_a.reinit_domain_vector(u, false);
-  for (unsigned int i = 0; i < u.size(); ++i) {
-    u[i] = (double)(i+1);
+    deallog << "OK" << std::endl;
   }
-
-  PRINTME("u", u);
-
-  BlockVector<double> v;
-  op_a.reinit_domain_vector(v, false);
-  BlockVector<double> w;
-  op_a.reinit_domain_vector(w, false);
-  BlockVector<double> x;
-  op_a.reinit_domain_vector(x, false);
-
-  op_a.vmult(v, u);
-  PRINTME("Au", v);
-
-  op_b.vmult(w, u);
-  PRINTME("Bu", w);
-
-  x = v;
-  x -= w;
-  PRINTME("Au-Bu", x);
-
-  // Test that both objects give the same results:
-
-  auto op_x = op_a - op_b;
-
-  op_x.vmult(x, u);
-  PRINTME("(A-B).vmult", x);
-
-  x = 0.;
-  op_x.vmult_add(x, u);
-  PRINTME("(A-B).vmult_add", x);
-
-  op_x.Tvmult(x, u);
-  PRINTME("(A-B).Tvmult", x);
-
-  x = 0.;
-  op_x.Tvmult_add(x, u);
-  PRINTME("(A-B).Tvmult_add", x);
-
-
-  // Test vector reinitalization:
-
-  op_x = op_b * op_b * op_b;
-  op_x.vmult(x, u);
-  PRINTME("(B*B*B) vmult", x);
-
-  x = 0.;
-  op_x.vmult_add(x, u);
-  PRINTME("(B*B*B) vmult_add", x);
-
-  op_x.Tvmult(x, u);
-  PRINTME("(B*B*B) Tvmult", x);
-
-  x = 0.;
-  op_x.Tvmult_add(x, u);
-  PRINTME("(B*B*B) Tvmult_add", x);
-
-  // And finally the other block_diagonal_operator variant:
-
-  std::array<decltype(op_b0), 5> temp2{op_b0, op_b0, op_b0, op_b0, op_b0};
-  auto op_c = block_diagonal_operator<5, BlockVector<double>>(temp2);
-
-  auto op_d = block_diagonal_operator<5, BlockVector<double>>(op_b0);
-
-  op_c.reinit_domain_vector(u, false);
-  for (unsigned int i = 0; i < u.size(); ++i) {
-    u[i] = (double)(i+1);
-  }
-  PRINTME("u", u);
-  op_c.reinit_domain_vector(x, false);
-
-  op_x = op_c - op_d;
-
-  op_x.vmult(x, u);
-  PRINTME("(C-D) vmult", x);
-
-  x = 0.;
-  op_x.vmult_add(x, u);
-  PRINTME("(C-D) vmult_add", x);
-
-  op_x.Tvmult(x, u);
-  PRINTME("(C-D) Tvmult", x);
-
-  x = 0.;
-  op_x.Tvmult_add(x, u);
-  PRINTME("(C-D) Tvmult_add", x);
-
 }
-
-
 
