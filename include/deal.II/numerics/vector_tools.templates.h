@@ -7176,7 +7176,7 @@ namespace VectorTools
         dhq.distribute_dofs(feq);
         Vector<double> eulerq(dhq.n_dofs());
         const ComponentMask maskq(spacedim, true);
-        get_position_vector(dhq, eulerq);
+        get_position_vector(dhq, eulerq, maskq);
 
         FullMatrix<double> transfer(fe.dofs_per_cell, feq.dofs_per_cell);
         const std::vector<Point<dim> > &points = feq.get_unit_support_points();
@@ -7186,6 +7186,7 @@ namespace VectorTools
         //
         // The interpolation matrix is then passed to the
         // VectorTools::interpolate() function to generate
+        // the interpolated position vector.
         for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
           {
             unsigned int comp_i = fe.system_to_component_index(i).first;
@@ -7193,9 +7194,10 @@ namespace VectorTools
               for (unsigned int j=0; j<points.size(); ++j)
                 {
                   if ( fe_to_real[comp_i] == feq.system_to_component_index(j).first)
-                    transfer(i, j) = fe.shape_value(i, points[j]);
+                    transfer(j, i) = fe.shape_value(i, points[j]);
                 }
           }
+
         interpolate(dhq, dh, transfer, eulerq, vector);
       }
   }
