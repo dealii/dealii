@@ -79,6 +79,7 @@ void
 RelaxationBlock<MATRIX,inverse_type>::clear ()
 {
   A = 0;
+  additional_data = 0;
   PreconditionBlockBase<inverse_type>::clear ();
 }
 
