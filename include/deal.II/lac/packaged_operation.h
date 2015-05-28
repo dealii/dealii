@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __deal2__packaged_operation_h
-#define __deal2__packaged_operation_h
+#ifndef dealii__packaged_operation_h
+#define dealii__packaged_operation_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
