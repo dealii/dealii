@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2014 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,7 +76,7 @@ void test()
 
   eval("abs(-2.3)",Point<2>(0,0), 2.3);
   eval("acos(0.5)",Point<2>(0,0), acos(0.5));
-  eval("acosh(0.5)",Point<2>(0,0), acosh(0.5));
+  eval("acosh(1.5)",Point<2>(0,0), acosh(1.5));
   eval("asin(0.5)",Point<2>(0,0), asin(0.5));
   eval("asinh(0.5)",Point<2>(0,0), asinh(0.5));
   eval("atan(0.5)",Point<2>(0,0), atan(0.5));
