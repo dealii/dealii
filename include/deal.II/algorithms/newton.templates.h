@@ -122,7 +122,7 @@ namespace Algorithms
     // fill res with (f(u), v)
     (*residual)(out1, src1);
     double resnorm = res->l2_norm();
-    double old_residual = resnorm / assemble_threshold + 1;
+    double old_residual = 0.;
 
     if (debug_vectors)
       {
@@ -140,7 +140,7 @@ namespace Algorithms
     while (control.check(step++, resnorm) == SolverControl::iterate)
       {
         // assemble (Df(u), v)
-        if (resnorm/old_residual >= assemble_threshold)
+        if ((step > 1) && (resnorm/old_residual >= assemble_threshold))
           inverse_derivative->notify (Events::bad_derivative);
 
         Du->reinit(u);
