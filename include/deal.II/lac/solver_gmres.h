@@ -754,7 +754,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
           //s=0 is a lucky breakdown, the solver will reach convergence,
           //but we must not divide by zero here.
-          if (numbers::is_finite(1./s))
+          if (s != 0)
             vv *= 1./s;
 
           // for eigenvalues, get the resulting coefficients from the
