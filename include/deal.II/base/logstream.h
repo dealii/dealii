@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -594,11 +594,10 @@ LogStream::operator<< (const double t)
 {
   std::ostringstream &stream = get_stream();
 
+  // drop small numbers or skew them away from zero.
   // we have to make sure that we don't catch NaN's and +-Inf's with the
   // test, because for these denormals all comparisons are always false.
-  // thus, for a NaN, both t<=0 and t>=0 are false at the same time, which
-  // can't be said for any other number
-  if (! (t<=0) && !(t>=0))
+  if (! numbers::is_finite(t))
     stream << t;
   else if (std::fabs(t) < double_threshold)
     stream << '0';
