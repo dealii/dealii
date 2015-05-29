@@ -1687,6 +1687,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
     }
 }
 
+
 template<int dim, int spacedim>
 Point<dim>
 MappingQ1<dim,spacedim>::
@@ -1705,169 +1706,157 @@ transform_real_to_unit_cell_internal
 
   /*
   Newton iteration to solve
-  
-      p(x) = p 
-      
-  or, equivalently, 
-  
-      p(x) - p = 0    
-      
-  where we are looking for 'x' and p(x) is the mapping 
-  
-  (1)   x -> p(x)  
-     
-  i.e., the mapping 'transform_unit_to_real_cell'.  We find the (approximate) 
+
+      p(x) = p
+
+  or, equivalently,
+
+      p(x) - p = 0
+
+  where we are looking for 'x' and p(x) is the mapping
+
+  (1)   x -> p(x)
+
+  i.e., the mapping 'transform_unit_to_real_cell'.  We find the (approximate)
   solution using Newton's method:
-  
+
      x_{n+1} = x_n - J(x_n)^{-1} * [p(x_n) - p]
-     
+
   where J(x_n) is the Jacobian of the mapping x -> p(x) in (1) evaluated at the
   point x_n in the unit cell.
-   
+
   To compute the initial guess, the cell is approximated by a rectangle or,
   equivalently, the mapping (1) is approximated by an affine mapping
-  
+
     (2) x -> Ax + b
-  
-  The initial guess x_0 = initial_p_unit is then easily found: 
-  
-  (3) A*x_0 + b = p => x_0 = A^{-1}(p - b). 
-  
+
+  The initial guess x_0 = initial_p_unit is then easily found:
+
+  (3) A*x_0 + b = p => x_0 = A^{-1}(p - b).
+
   (cf. the documentation for transform_real_to_unit_cell_initial_guess function
   for further description of the algorithm for computing A and b).
    */
- 
- const double eps = 1.e-11;
- const unsigned int newton_iteration_limit = 20;
-  
- Point<dim> x_unit_n;
- Point<spacedim> p_real_n; 
- 
- Tensor<1,spacedim> delta_x_unit;
+
+  const double eps = 1.e-11;
+  const unsigned int newton_iteration_limit = 20;
+
+  Point<dim> x_unit_n;
+  Point<spacedim> p_real_n;
+
+  Tensor<1,spacedim> delta_x_unit;
 
   x_unit_n = initial_p_unit;
-  
-/*
-  We need to compare the position of the computed p(x_n) against the given
-  point 'p'. We will terminate the computation after the n-th iteration and 
-  return 'x_n' if they are less than eps apart. The question is: in which 
-  norm do we want 'p' and 'p(x)' to be eps apart.
-  
-  This question is non-trivial since we may have to deal with very elongated
-  cells where we may achieve eps for the distance of these two points in the
-  'long' direction, but achieving this tolerance in the 'short' direction of
-  the cell may not be possible.
-  
-  In other words, the algorithm must take into account the metric anisotropy 
-  of the cell. This means that the error in a measurement depends on the
-  direction in which the measurement is taken. For example, if a cell is very 
-  thin and elongated, a measurement of its length along the "long" direction 
-  has smaller relative error than along the "short" direction, given that the
-  absolute errors in both cases are equal. The converse is also true: if the 
-  relative errors are equal, then the absolute error in the "long" direction 
-  is greater than in the "short" direction.
-  
-  In addition, there is dimensional inconsistency: the real (physical) cell has
-  dimensions of length, whereas the unit (index) cell is dimensionless.
-       
-  Since the Euclidean norm (|| ||_2-norm) does not take anisotropy and 
-  dimensionality into account, we must use another norm: the 'A_norm'.
-  
-  NOTE: The matrix A in the A_norm is not the same matrix A as in the equations (2) and (3)!
-  
-  Thus, the computation must terminate after n-th iteration if 
-    
-    ||p(x_n) - p||_A < eps, where 
-  
-  || ||_A is the A-norm, which is defined as 
-    
-    ||p||_A = sqrt(<A p,p>), 
-	
-  where <,> is the standard inner product in Euclidean space.
-    
-  Thus, if 
-  
-    A = B^T * B,
-	
-  then 
-  
-    <A p,p> = (A p)^T (p) = (B^T B p)^T p = p^T B^T B p = (B p)^T (B p) = <B p, B p>
-    
-  In other words,
 
-    ||p||_A = || p ||_(B^T B) = ||B p||_2
-    
-  Hence,
-  
-    ||p(x_n) - p||_A = ||p(x_n) - p||_(B^T * B) = ||B (p(x_n) - p) ||_2 
-  
-  It is natural to suggest that B should be equal to J(x_n)^(-1). In this case,
-  the distance between p and p(x) is measured in the unit cell, which takes care
-  of both the anisotropy and dimensionality.
-  
-  Thus,
-  
-    B = J(x_n)^(-1) => A
-	
-	  = J(x_n)^(-T) * J(x_n)^(-1), 
-	  
-  and
-        ||p(x_n) - p||_A = ||J(x_n)^(-1) * (p(x_n) - p)||_2 
-    
-  However, recall from the definition of Newton's method that 
-    
-    x_{n+1} = x_n - J(x_n)^{-1} * [p(x_n) - p].
-    
-  Hence,
-    
-    ||x_{n+1} - x_n||_2 = ||J(x_n)^{-1} (p - p(x_n))||_2
-	
-	                    = ||p(x_n) - p||_A
-    
-  Therefore, a condition that is equivalent to 
-  
-    ||p(x_n) - p||_A < eps 
-	
-  for terminating the computation after the n-th iteration is
+  /*
+    We need to compare the position of the computed p(x_n) against the given
+    point 'p'. We will terminate the computation after the n-th iteration and
+    return 'x_n' if they are less than eps apart. The question is: in which
+    norm do we want 'p' and 'p(x)' to be eps apart.
 
-    ||x_{n+1} - x_n||_2 < eps 
-    
-  Thus, if we let
-  
-    delta_x_unit := x_{n+1} - x_n, 
+    This question is non-trivial since we may have to deal with very elongated
+    cells where we may achieve eps for the distance of these two points in the
+    'long' direction, but achieving this tolerance in the 'short' direction of
+    the cell may not be possible.
 
-  then the condition implemented in the following algorithm is 
-      
-      ||delta_x_unit||_2 < eps
-    
-  */
+    In other words, the algorithm must take into account the metric anisotropy
+    of the cell. This means that the error in a measurement depends on the
+    direction in which the measurement is taken. For example, if a cell is very
+    thin and elongated, a measurement of its length along the "long" direction
+    has smaller relative error than along the "short" direction, given that the
+    absolute errors in both cases are equal. The converse is also true: if the
+    relative errors are equal, then the absolute error in the "long" direction
+    is greater than in the "short" direction.
 
-  for(unsigned int newton_iteration = 0; newton_iteration < newton_iteration_limit; newton_iteration++) 
+    In addition, there is dimensional inconsistency: the real (physical) cell has
+    dimensions of length, whereas the unit (index) cell is dimensionless.
+
+    Since the Euclidean norm (|| ||_2-norm) does not take anisotropy and
+    dimensionality into account, we must use another norm: the 'A_norm'.
+
+    NOTE: The matrix A in the A_norm is not the same matrix A as in the equations (2) and (3)!
+
+    Thus, the computation must terminate after n-th iteration if
+
+      ||p(x_n) - p||_A < eps, where
+
+    || ||_A is the A-norm, which is defined as
+
+      ||p||_A = sqrt(<A p,p>),
+
+    where <,> is the standard inner product in Euclidean space.
+
+    Thus, if
+
+      A = B^T * B,
+
+    then
+
+      <A p,p> = (A p)^T (p) = (B^T B p)^T p = p^T B^T B p = (B p)^T (B p) = <B p, B p>
+
+    In other words,
+
+      ||p||_A = || p ||_(B^T B) = ||B p||_2
+
+    Hence,
+
+      ||p(x_n) - p||_A = ||p(x_n) - p||_(B^T * B) = ||B (p(x_n) - p) ||_2
+
+    It is natural to suggest that B should be equal to J(x_n)^(-1). In this case,
+    the distance between p and p(x) is measured in the unit cell, which takes care
+    of both the anisotropy and dimensionality.
+
+    Thus,
+
+      B = J(x_n)^(-1) => A
+
+      = J(x_n)^(-T) * J(x_n)^(-1),
+
+    and
+          ||p(x_n) - p||_A = ||J(x_n)^(-1) * (p(x_n) - p)||_2
+
+    However, recall from the definition of Newton's method that
+
+      x_{n+1} = x_n - J(x_n)^{-1} * [p(x_n) - p].
+
+    Hence,
+
+      ||x_{n+1} - x_n||_2 = ||J(x_n)^{-1} (p - p(x_n))||_2
+
+                        = ||p(x_n) - p||_A
+
+    Therefore, a condition that is equivalent to
+
+      ||p(x_n) - p||_A < eps
+
+    for terminating the computation after the n-th iteration is
+
+      ||x_{n+1} - x_n||_2 < eps
+
+    Thus, if we let
+
+      delta_x_unit := x_{n+1} - x_n,
+
+    then the condition implemented in the following algorithm is
+
+        ||delta_x_unit||_2 < eps
+
+    */
+
+  for (unsigned int newton_iteration = 0; newton_iteration < newton_iteration_limit; newton_iteration++)
     {
-  
-  // shape values and derivatives at x_unit_n
-  compute_shapes(std::vector<Point<dim> > (1, x_unit_n), mdata);
-  
-  // p(x_unit_n)    
-  p_real_n= transform_unit_to_real_cell_internal(mdata);
-      
-      // Initialize the Jacobian
-      Tensor<2, spacedim> J;
-      
-/*     
-  TODO: Would this be more efficient/cheaper?
-  
-   for (unsigned int i=0; i<spacedim; ++i)
-            for (unsigned int j=0; j<dim; ++j)
-              J[i][j]=0;
-	    
-	    or, perhaps
-	    
-    J.clear();
 
-*/
+      // shape values and derivatives at x_unit_n
+      compute_shapes(std::vector<Point<dim> > (1, x_unit_n), mdata);
+
+      // p(x_unit_n)
+      p_real_n= transform_unit_to_real_cell_internal(mdata);
+
+      // Initialize the Jacobian with a null matrix
+      Tensor<2, spacedim> J;
+
       // Now compute the Jacobian, J(x_unit_n)
-      
+
       for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
         {
           const Tensor<1,dim> &grad_transform=mdata.derivative(0,k);
@@ -1877,54 +1866,53 @@ transform_real_to_unit_cell_internal
             for (unsigned int j=0; j<dim; ++j)
               J[i][j]+=point[i]*grad_transform[j];
         }
-    
-    /*
-      Compute the correction for x_unit_n: 
-	 	delta_x_unit = x_{n+1} - x_n = - J(x_unit_n)^(-1) * (p(x_unit_n) - p)
+
+      /*
+        Compute the correction for x_unit_n:
+      delta_x_unit = x_{n+1} - x_n = - J(x_unit_n)^(-1) * (p(x_unit_n) - p)
+
       Equivalently, avoiding the minus sign for clarity,
-	 	delta_x_unit = x_{n+1} - x_n = J(x_unit_n)^(-1) * (p - p(x_unit_n))
-	 	*/
+      delta_x_unit = x_{n+1} - x_n = J(x_unit_n)^(-1) * (p - p(x_unit_n))
+      */
 
       contract (delta_x_unit, invert(J), static_cast<const Tensor<1,spacedim>&>(p-p_real_n));
 
       /*
       Return x_unit_n if the norm of the correction is less than eps,
-      i.e. if further correction of x_unit_n is smaller than the tolerance value. 
+      i.e. if further correction of x_unit_n is smaller than the tolerance value.
       */
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-  std::cout << "Iteration = " << newton_iteration << std::endl
-            << "\tNorm: ||p_real_n - p|| = " << (p_real_n-p).norm() << std::endl 
-            << "\tNorm of the correction: ||delta_x_unit|| = ||x_" << newton_iteration + 1 << " - x_" << newton_iteration << "|| = " << delta_x_unit.norm() << std::endl
-	    << "\t||delta|| / eps = " << delta_x_unit.norm()/eps << ", where eps = " << eps << std::endl;     
-#endif 
-      
-      if (delta_x_unit.norm() < eps) 
-      return x_unit_n; 
-      
-/*      
-    Otherwise, correct x_unit_n with delta_x_unit and do another iteration.
-	  The spacedim-th component of transformed point is simply ignored 
-	  in the codimension one case. When this component is not zero, then we 
-	  are projecting the point to the surface or curve identified by the cell.*/
+      std::cout << "Iteration = " << newton_iteration << std::endl
+                << "\tNorm: ||p_real_n - p|| = " << (p_real_n-p).norm() << std::endl
+                << "\tNorm of the correction: ||delta_x_unit|| = ||x_" << newton_iteration + 1 << " - x_" << newton_iteration << "|| = " << delta_x_unit.norm() << std::endl
+                << "\t||delta|| / eps = " << delta_x_unit.norm()/eps << ", where eps = " << eps << std::endl;
+#endif
 
-	  for (unsigned int i=0; i<dim; ++i)
-		x_unit_n[i] += delta_x_unit[i];
-	  
+      if (delta_x_unit.norm() < eps)
+        return x_unit_n;
+
+      /*
+          Otherwise, correct x_unit_n with delta_x_unit and do another iteration.
+          The spacedim-th component of transformed point is simply ignored
+          in the codimension one case. When this component is not zero, then we
+          are projecting the point to the surface or curve identified by the cell.*/
+
+      x_unit_n += delta_x_unit;
+
     }
-    
- /* 
- Throw an exception if the number of iterations exceedes newton_iteration_limit,
- i.e., indicate that the numerical process failed to converge within the given constraints.
- */   
-    
- AssertThrow (false, 
-	      (typename Mapping<dim,spacedim>::ExcTransformationFailed())); 
- 
- return x_unit_n;
-  
-}
 
+  /*
+  Throw an exception if the number of iterations exceedes newton_iteration_limit,
+  i.e., indicate that the numerical process failed to converge within the given constraints.
+  */
+
+  AssertThrow (false,
+               (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+
+  return x_unit_n;
+
+}
 
 /*
   This function becomes a little tricky in dimension <2,3>.
