@@ -61,22 +61,28 @@ namespace LocalIntegrators
       for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
         {
           const double dx = fe.JxW(k) * factor;
-
           for (unsigned int i=0; i<n_dofs; ++i)
-            for (unsigned int d=0; d<n_components; ++d)
-              {
-                M(i,i) += dx
-                          * fe.shape_value_component(i,k,d)
-                          * fe.shape_value_component(i,k,d);
-                for (unsigned int j=i+1; j<n_dofs; ++j)
-                  {
-                    const double Mij =  dx
-                                        * fe.shape_value_component(j,k,d)
-                                        * fe.shape_value_component(i,k,d);
-                    M(i,j) += Mij;
-                    M(j,i) += Mij;
-                  }
-              }
+            {
+              double Mii = 0.0;
+              for (unsigned int d=0; d<n_components; ++d)
+                Mii += dx
+                       * fe.shape_value_component(i,k,d)
+                       * fe.shape_value_component(i,k,d);
+
+              M(i,i) += Mii;
+
+              for (unsigned int j=i+1; j<n_dofs; ++j)
+                {
+                  double Mij = 0.0;
+                  for (unsigned int d=0; d<n_components; ++d)
+                    Mij += dx
+                           * fe.shape_value_component(j,k,d)
+                           * fe.shape_value_component(i,k,d);
+
+                  M(i,j) += Mij;
+                  M(j,i) += Mij;
+                }
+            }
         }
     }
 
@@ -110,23 +116,28 @@ namespace LocalIntegrators
       for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
         {
           const double dx = fe.JxW(k) * weights[k];
-
           for (unsigned int i=0; i<n_dofs; ++i)
-            for (unsigned int d=0; d<n_components; ++d)
-              {
-                M(i,i) += dx
-                          * fe.shape_value_component(i,k,d)
-                          * fe.shape_value_component(i,k,d);
+            {
+              double Mii = 0.0;
+              for (unsigned int d=0; d<n_components; ++d)
+                Mii += dx
+                       * fe.shape_value_component(i,k,d)
+                       * fe.shape_value_component(i,k,d);
 
-                for (unsigned int j=i+1; j<n_dofs; ++j)
-                  {
-                    const double Mij = dx
-                                       * fe.shape_value_component(j,k,d)
-                                       * fe.shape_value_component(i,k,d);
-                    M(i,j) += Mij;
-                    M(j,i) += Mij;
-                  }
-              }
+              M(i,i) += Mii;
+
+              for (unsigned int j=i+1; j<n_dofs; ++j)
+                {
+                  double Mij = 0.0;
+                  for (unsigned int d=0; d<n_components; ++d)
+                    Mij += dx
+                           * fe.shape_value_component(j,k,d)
+                           * fe.shape_value_component(i,k,d);
+
+                  M(i,j) += Mij;
+                  M(j,i) += Mij;
+                }
+            }
         }
     }
 
