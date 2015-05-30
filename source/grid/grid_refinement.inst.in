@@ -110,3 +110,16 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
    const unsigned int);
 #endif
 }
+
+for (deal_II_dimension : DIMENSIONS)
+{
+  template
+  std::pair<double, double>
+  GridRefinement::
+  adjust_refine_and_coarsen_number_fraction <deal_II_dimension>
+                                            (const unsigned int,
+                                             const unsigned int,
+                                             const double,
+                                             const double);
+}
+

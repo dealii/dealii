@@ -48,6 +48,41 @@ template <class T> class Vector;
 namespace GridRefinement
 {
   /**
+   * Return a pair of double values of which the first is adjusted refinement
+   * fraction of cells and the second is adjusted coarsening fraction of cells.
+   *
+   *
+   * @arg @p current_n_cells is current cell number.
+   *
+   * @arg @p max_n_cells is the maximal number of cells. If current cell number
+   * @p current_n_cells is already exceeded maximal cell number @p max_n_cells,
+   * refinement fraction of cells will be set to zero and coarsening fraction
+   * of cells will be adjusted to reduce cell number to @ max_n_cells.
+   * If cell number is going to be exceeded only upon refinement, then refinement
+   * and coarsening fractions are going to be adjusted with a same ratio in
+   * an attempt to reach the maximum number of cells.
+   * Be aware though that through proliferation of refinement due to
+   * Triangulation::MeshSmoothing, this number is only an indicator.
+   * The default value of this argument is to impose no limit on the number
+   * of cells.
+   *
+   * @arg @p top_fraction is the requested fraction of cells to be refined.
+   *
+   * @arg @p bottom_fraction is the requested fraction of cells to be coarsened.
+   *
+   * @note Usually you do not need to call this function explicitly. Pass
+   * @p max_n_cells to function refine_and_coarsen_fixed_number() or function
+   * refine_and_coarsen_fixed_fraction() and they will call this function if
+   * necessary.
+   */
+  template <int dim>
+  std::pair<double, double>
+  adjust_refine_and_coarsen_number_fraction (const unsigned int  current_n_cells,
+                                             const unsigned int  max_n_cells,
+                                             const double        top_fraction_of_cells,
+                                             const double        bottom_fraction_of_cells);
+
+  /**
    * This function provides a refinement strategy with predictable growth of
    * the mesh.
    *
