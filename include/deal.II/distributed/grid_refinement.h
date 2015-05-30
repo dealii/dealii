@@ -70,8 +70,9 @@ namespace parallel
       refine_and_coarsen_fixed_number (
         parallel::distributed::Triangulation<dim,spacedim> &tria,
         const Vector                &criteria,
-        const double                top_fraction_of_cells,
-        const double                bottom_fraction_of_cells);
+        const double                 top_fraction_of_cells,
+        const double                 bottom_fraction_of_cells,
+        const unsigned int           max_n_cells = std::numeric_limits<unsigned int>::max());
 
       /**
        * Like dealii::GridRefinement::refine_and_coarsen_fixed_fraction, but

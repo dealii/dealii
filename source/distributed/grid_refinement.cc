@@ -543,8 +543,9 @@ namespace parallel
       refine_and_coarsen_fixed_number (
         parallel::distributed::Triangulation<dim,spacedim> &tria,
         const Vector                &criteria,
-        const double                top_fraction_of_cells,
-        const double                bottom_fraction_of_cells)
+        const double                 top_fraction_of_cells,
+        const double                 bottom_fraction_of_cells,
+        const unsigned int           max_n_cells)
       {
         Assert ((top_fraction_of_cells>=0) && (top_fraction_of_cells<=1),
                 dealii::GridRefinement::ExcInvalidParameterValue());
@@ -554,6 +555,13 @@ namespace parallel
                 dealii::GridRefinement::ExcInvalidParameterValue());
         Assert (criteria.is_non_negative (),
                 dealii::GridRefinement::ExcNegativeCriteria());
+
+        const std::pair<double, double> adjusted_fractions =
+          dealii::GridRefinement::adjust_refine_and_coarsen_number_fraction<dim> (
+            tria.n_global_active_cells(),
+            max_n_cells,
+            top_fraction_of_cells,
+            bottom_fraction_of_cells);
 
         // first extract from the
         // vector of indicators the
@@ -590,7 +598,7 @@ namespace parallel
                 master_compute_threshold (locally_owned_indicators,
                                           global_min_and_max,
                                           static_cast<unsigned int>
-                                          (top_fraction_of_cells *
+                                          (adjusted_fractions.first *
                                            tria.n_global_active_cells()),
                                           mpi_communicator);
 
@@ -600,14 +608,14 @@ namespace parallel
             // use a threshold lower
             // than the smallest
             // value we have locally
-            if (bottom_fraction_of_cells > 0)
+            if (adjusted_fractions.second > 0)
               bottom_threshold
                 =
                   RefineAndCoarsenFixedNumber::
                   master_compute_threshold (locally_owned_indicators,
                                             global_min_and_max,
                                             static_cast<unsigned int>
-                                            ((1-bottom_fraction_of_cells) *
+                                            ((1-adjusted_fractions.second) *
                                              tria.n_global_active_cells()),
                                             mpi_communicator);
             else
@@ -629,7 +637,7 @@ namespace parallel
             // compute bottom
             // threshold only if
             // necessary
-            if (bottom_fraction_of_cells > 0)
+            if (adjusted_fractions.second > 0)
               bottom_threshold
                 =
                   RefineAndCoarsenFixedNumber::
