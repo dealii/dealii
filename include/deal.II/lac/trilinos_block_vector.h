@@ -101,7 +101,7 @@ namespace TrilinosWrappers
      * entries in Input_Maps.  For this non-distributed vector, the %parallel
      * partitioning is not used, just the global size of the partitioner.
      */
-    explicit BlockVector (const std::vector<Epetra_Map> &partitioner DEAL_II_DEPRECATED);
+    explicit BlockVector (const std::vector<Epetra_Map> &partitioner) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Generate a block vector with as many blocks as there are
