@@ -349,12 +349,70 @@ namespace DataOutBase
     //@}
   };
 
+
+  /**
+   * Base class describing common functionality between different output flags.
+   *
+   * This is implemented with the "Curiously Recurring Template Pattern";
+   * derived classes use their own type to fill in the typename so that
+   * <tt>memory_consumption</tt> works correctly. See the Wikipedia page on the
+   * pattern for more information.
+   *
+   * @ingroup output
+   */
+  template<typename FlagsType>
+  struct OutputFlagsBase
+  {
+    /**
+     * Declare all flags with name and type as offered by this class, for use
+     * in input files.
+     *
+     * This method does nothing, but child classes may override this method to
+     * add fields to <tt>prm</tt>.
+     */
+    static void declare_parameters (ParameterHandler &prm);
+
+    /**
+     * Read the parameters declared in declare_parameters() and set the flags
+     * for this output format accordingly.
+     *
+     * This method does nothing, but child classes may override this method to
+     * add fields to <tt>prm</tt>.
+     */
+    void parse_parameters (const ParameterHandler &prm);
+
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this
+     * object. This is not exact (but will usually be close) because calculating
+     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+     */
+    std::size_t memory_consumption () const;
+  };
+
+
+  template<typename FlagsType>
+  void OutputFlagsBase<FlagsType>::declare_parameters (ParameterHandler &)
+  {}
+
+
+  template<typename FlagsType>
+  void OutputFlagsBase<FlagsType>::parse_parameters (const ParameterHandler &)
+  {}
+
+
+  template<typename FlagsType>
+  std::size_t OutputFlagsBase<FlagsType>::memory_consumption () const
+  {
+    return sizeof(FlagsType);
+  }
+
+
   /**
    * Flags controlling the details of output in OpenDX format.
    *
    * @ingroup output
    */
-  struct DXFlags
+  struct DXFlags : public OutputFlagsBase<DXFlags>
   {
     /**
      * Write neighbor information. This information is necessary for instance,
@@ -416,7 +474,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct UcdFlags
+  struct UcdFlags : public OutputFlagsBase<UcdFlags>
   {
     /**
      * Write a comment at the beginning of the file stating the date of
@@ -462,7 +520,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct GnuplotFlags
+  struct GnuplotFlags : public OutputFlagsBase<GnuplotFlags>
   {
   private:
     /**
@@ -506,7 +564,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct PovrayFlags
+  struct PovrayFlags : public OutputFlagsBase<PovrayFlags>
   {
     /**
      * Normal vector interpolation, if set to true
@@ -566,7 +624,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct EpsFlags
+  struct EpsFlags : public OutputFlagsBase<EpsFlags>
   {
     /**
      * This denotes the number of the data vector which shall be used for
@@ -810,7 +868,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct GmvFlags
+  struct GmvFlags : public OutputFlagsBase<GmvFlags>
   {
   private:
     /**
@@ -853,7 +911,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct TecplotFlags
+  struct TecplotFlags : public OutputFlagsBase<TecplotFlags>
   {
 
   public:
@@ -904,7 +962,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct VtkFlags
+  struct VtkFlags : public OutputFlagsBase<VtkFlags>
   {
   public:
     /**
@@ -980,7 +1038,7 @@ namespace DataOutBase
   /**
    * Flags for SVG output.
    */
-  struct SvgFlags
+  struct SvgFlags : public OutputFlagsBase<SvgFlags>
   {
   public:
     /**
@@ -1044,7 +1102,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct Deal_II_IntermediateFlags
+  struct Deal_II_IntermediateFlags : public OutputFlagsBase<Deal_II_IntermediateFlags>
   {
     /**
      * An indicator of the currect file format version used to write
