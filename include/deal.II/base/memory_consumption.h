@@ -171,6 +171,14 @@ namespace MemoryConsumption
   std::size_t memory_consumption (const long double);
 
   /**
+   * Determine the amount of memory consumed by a C-style string. The returned
+   * value does not include the size of the pointer. This function only measures
+   * up to (and including) the NUL byte; the underlying buffer may be larger.
+   */
+  inline
+  std::size_t memory_consumption (const char *string);
+
+  /**
    * Determine the amount of memory in bytes consumed by a
    * <tt>std::complex</tt> variable.
    */
@@ -437,6 +445,21 @@ namespace MemoryConsumption
   std::size_t memory_consumption (const long double)
   {
     return sizeof(long double);
+  }
+
+
+
+  inline
+  std::size_t memory_consumption (const char *string)
+  {
+    if (string == NULL)
+      {
+        return 0;
+      }
+    else
+      {
+        return /*Don't forget about the NUL! :]*/ sizeof(char) + strlen(string);
+      }
   }
 
 

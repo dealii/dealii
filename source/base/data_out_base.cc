@@ -2306,9 +2306,9 @@ namespace DataOutBase
   std::size_t
   TecplotFlags::memory_consumption () const
   {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
+    return sizeof(*this)
+           + MemoryConsumption::memory_consumption(tecplot_binary_file_name)
+           + MemoryConsumption::memory_consumption(zone_name);
   }
 
 
