@@ -833,9 +833,6 @@ namespace DataOutBase
    */
   struct TecplotFlags : public OutputFlagsBase<TecplotFlags>
   {
-
-  public:
-
     /**
      * This variable is needed to hold the output file name when using the
      * Tecplot API to write binary files.  If the user doesn't set the file
@@ -869,7 +866,6 @@ namespace DataOutBase
    */
   struct VtkFlags : public OutputFlagsBase<VtkFlags>
   {
-  public:
     /**
      * The time of the time step if this file is part of a time dependent
      * simulation.
@@ -916,7 +912,6 @@ namespace DataOutBase
    */
   struct SvgFlags : public OutputFlagsBase<SvgFlags>
   {
-  public:
     /**
      * Height of the image in SVG units. Default value is 4000.
      */
