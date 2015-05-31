@@ -847,7 +847,7 @@ namespace DataOutBase
     const char *zone_name;
 
     /**
-     * Constructor
+     * Constructor.
      */
     TecplotFlags (const char *tecplot_binary_file_name = NULL,
                   const char *zone_name = NULL);
@@ -899,7 +899,7 @@ namespace DataOutBase
     bool print_date_and_time;
 
     /**
-     * Default constructor.
+     * Constructor.
      */
     VtkFlags (const double       time   = std::numeric_limits<double>::min(),
               const unsigned int cycle  = std::numeric_limits<unsigned int>::min(),
