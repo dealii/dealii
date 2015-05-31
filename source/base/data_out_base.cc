@@ -1907,16 +1907,6 @@ namespace DataOutBase
 
 
 
-  std::size_t
-  DataOutFilterFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
   DXFlags::DXFlags (const bool write_neighbors,
                     const bool int_binary,
                     const bool coordinates_binary,
@@ -1964,17 +1954,6 @@ namespace DataOutBase
 
 
 
-  std::size_t
-  DXFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
-
   void UcdFlags::declare_parameters (ParameterHandler &prm)
   {
     prm.declare_entry ("Write preamble", "true",
@@ -1991,16 +1970,6 @@ namespace DataOutBase
   {
     write_preamble = prm.get_bool ("Write preamble");
   }
-
-
-  std::size_t
-  UcdFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
 
 
   GnuplotFlags::GnuplotFlags ()
@@ -2020,15 +1989,6 @@ namespace DataOutBase
 
 
 
-  size_t
-  GnuplotFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
   SvgFlags::SvgFlags (const unsigned int height_vector,
                       const int azimuth_angle,
                       const int polar_angle,
@@ -2045,16 +2005,6 @@ namespace DataOutBase
     margin(margin),
     draw_colorbar(draw_colorbar)
   {}
-
-
-  std::size_t
-  SvgFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
 
 
 
@@ -2081,16 +2031,6 @@ namespace DataOutBase
     smooth        = prm.get_bool ("Use smooth triangles");
     bicubic_patch = prm.get_bool ("Use bicubic patches");
     external_data = prm.get_bool ("Include external file");
-  }
-
-
-
-  std::size_t
-  PovrayFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
   }
 
 
@@ -2330,17 +2270,6 @@ namespace DataOutBase
   }
 
 
-
-  std::size_t
-  EpsFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
   GmvFlags::GmvFlags ()
   {}
 
@@ -2353,16 +2282,6 @@ namespace DataOutBase
 
   void GmvFlags::parse_parameters (const ParameterHandler &/*prm*/) const
   {}
-
-
-  std::size_t
-  GmvFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
 
 
   TecplotFlags::
@@ -2415,15 +2334,6 @@ namespace DataOutBase
 
 
 
-  std::size_t
-  VtkFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
   Deal_II_IntermediateFlags::Deal_II_IntermediateFlags ()
     :
     dummy (0)
@@ -2438,16 +2348,6 @@ namespace DataOutBase
 
   void Deal_II_IntermediateFlags::parse_parameters (const ParameterHandler &/*prm*/) const
   {}
-
-
-  std::size_t
-  Deal_II_IntermediateFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
 
 
   OutputFormat

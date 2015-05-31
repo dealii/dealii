@@ -461,12 +461,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm);
-
-    /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -505,13 +499,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm);
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -549,13 +536,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm) const;
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -608,13 +588,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm);
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
 
@@ -853,13 +826,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm);
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -897,13 +863,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm) const;
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -1025,13 +984,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm) const;
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
 
@@ -1086,13 +1038,6 @@ namespace DataOutBase
              const unsigned int line_thickness = 1,
              const bool margin = true,
              const bool draw_colorbar = true);
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
 
@@ -1139,13 +1084,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm) const;
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
