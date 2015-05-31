@@ -41,7 +41,7 @@ namespace GridGenerator
      const std::vector<unsigned int>&,
      const Point<deal_II_space_dimension>&,
      const Point<deal_II_space_dimension>&,
-     bool);
+     const bool);
 
     template
       void
