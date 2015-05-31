@@ -909,6 +909,8 @@ namespace DataOutBase
 
   /**
    * Flags for SVG output.
+   *
+   * @ingroup output
    */
   struct SvgFlags : public OutputFlagsBase<SvgFlags>
   {
