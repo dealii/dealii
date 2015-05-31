@@ -517,12 +517,6 @@ namespace DataOutBase
      * structure (and remove the <tt>private</tt> as well).
      */
     int dummy;
-
-  public:
-    /**
-     * Constructor.
-     */
-    GnuplotFlags ();
   };
 
   /**
@@ -830,12 +824,6 @@ namespace DataOutBase
      * structure (and remove the <tt>private</tt> as well).
      */
     int dummy;
-
-  public:
-    /**
-     * Default constructor.
-     */
-    GmvFlags ();
   };
 
   /**
@@ -1000,12 +988,6 @@ namespace DataOutBase
      * structure (and remove the <tt>private</tt> as well).
      */
     int dummy;
-
-  public:
-    /**
-     * Constructor.
-     */
-    Deal_II_IntermediateFlags ();
   };
 
   /**

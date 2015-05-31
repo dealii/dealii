@@ -1972,10 +1972,7 @@ namespace DataOutBase
   }
 
 
-  GnuplotFlags::GnuplotFlags ()
-    :
-    dummy (0)
-  {}
+
   SvgFlags::SvgFlags (const unsigned int height_vector,
                       const int azimuth_angle,
                       const int polar_angle,
@@ -2257,8 +2254,7 @@ namespace DataOutBase
   }
 
 
-  GmvFlags::GmvFlags ()
-  {}
+
   TecplotFlags::
   TecplotFlags (const char *tecplot_binary_file_name,
                 const char *zone_name)
@@ -2286,12 +2282,6 @@ namespace DataOutBase
     time (time),
     cycle (cycle),
     print_date_and_time (print_date_and_time)
-  {}
-
-
-  Deal_II_IntermediateFlags::Deal_II_IntermediateFlags ()
-    :
-    dummy (0)
   {}
 
 
