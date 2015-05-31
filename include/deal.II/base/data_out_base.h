@@ -522,20 +522,6 @@ namespace DataOutBase
      * Constructor.
      */
     GnuplotFlags ();
-
-    /**
-     * Declare all flags with name and type as offered by this class, for use
-     * in input files.
-     */
-    static void declare_parameters (ParameterHandler &prm);
-
-    /**
-     * Read the parameters declared in declare_parameters() and set the flags
-     * for this output format accordingly.
-     *
-     * The flags thus obtained overwrite all previous contents of this object.
-     */
-    void parse_parameters (const ParameterHandler &prm) const;
   };
 
   /**
@@ -849,20 +835,6 @@ namespace DataOutBase
      * Default constructor.
      */
     GmvFlags ();
-
-    /**
-     * Declare all flags with name and type as offered by this class, for use
-     * in input files.
-     */
-    static void declare_parameters (ParameterHandler &prm);
-
-    /**
-     * Read the parameters declared in declare_parameters() and set the flags
-     * for this output format accordingly.
-     *
-     * The flags thus obtained overwrite all previous contents of this object.
-     */
-    void parse_parameters (const ParameterHandler &prm) const;
   };
 
   /**
@@ -893,20 +865,6 @@ namespace DataOutBase
      */
     TecplotFlags (const char *tecplot_binary_file_name = NULL,
                   const char *zone_name = NULL);
-
-    /**
-     * Declare all flags with name and type as offered by this class, for use
-     * in input files.
-     */
-    static void declare_parameters (ParameterHandler &prm);
-
-    /**
-     * Read the parameters declared in declare_parameters() and set the flags
-     * for this output format accordingly.
-     *
-     * The flags thus obtained overwrite all previous contents of this object.
-     */
-    void parse_parameters (const ParameterHandler &prm) const;
 
     /**
      * Return an estimate for the memory consumption, in bytes, of this
@@ -961,28 +919,6 @@ namespace DataOutBase
     VtkFlags (const double       time   = std::numeric_limits<double>::min(),
               const unsigned int cycle  = std::numeric_limits<unsigned int>::min(),
               const bool print_date_and_time = true);
-
-    /**
-     * Declare the flags with name and type as offered by this class, for use
-     * in input files.
-     *
-     * Unlike the flags in many of the other classes similar to this one, we
-     * do not actually declare parameters for the #cycle and #time member
-     * variables of this class. The reason is that there wouldn't appear to be
-     * a case where one would want to declare these parameters in an input
-     * file. Rather, these are typically values that change during the course
-     * of a simulation and can only reasonably be set as part of the execution
-     * of a program, rather than a priori by a user who runs this program.
-     */
-    static void declare_parameters (ParameterHandler &prm);
-
-    /**
-     * Read the parameters declared in declare_parameters() and set the flags
-     * for this output format accordingly.
-     *
-     * The flags thus obtained overwrite all previous contents of this object.
-     */
-    void parse_parameters (const ParameterHandler &prm) const;
   };
 
 
@@ -1069,20 +1005,6 @@ namespace DataOutBase
      * Constructor.
      */
     Deal_II_IntermediateFlags ();
-
-    /**
-     * Declare all flags with name and type as offered by this class, for use
-     * in input files.
-     */
-    static void declare_parameters (ParameterHandler &prm);
-
-    /**
-     * Read the parameters declared in declare_parameters() and set the flags
-     * for this output format accordingly.
-     *
-     * The flags thus obtained overwrite all previous contents of this object.
-     */
-    void parse_parameters (const ParameterHandler &prm) const;
   };
 
   /**

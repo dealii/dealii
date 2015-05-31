@@ -1976,19 +1976,6 @@ namespace DataOutBase
     :
     dummy (0)
   {}
-
-
-
-  void GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void GnuplotFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
-
   SvgFlags::SvgFlags (const unsigned int height_vector,
                       const int azimuth_angle,
                       const int polar_angle,
@@ -2272,18 +2259,6 @@ namespace DataOutBase
 
   GmvFlags::GmvFlags ()
   {}
-
-
-
-  void GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void GmvFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
   TecplotFlags::
   TecplotFlags (const char *tecplot_binary_file_name,
                 const char *zone_name)
@@ -2292,15 +2267,6 @@ namespace DataOutBase
     zone_name(zone_name)
   {}
 
-
-
-  void TecplotFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void TecplotFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
 
 
   std::size_t
@@ -2323,31 +2289,11 @@ namespace DataOutBase
   {}
 
 
-
-  void VtkFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void VtkFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
-
   Deal_II_IntermediateFlags::Deal_II_IntermediateFlags ()
     :
     dummy (0)
   {}
 
-
-
-  void Deal_II_IntermediateFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void Deal_II_IntermediateFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
 
 
   OutputFormat
