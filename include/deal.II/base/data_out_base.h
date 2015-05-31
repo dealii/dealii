@@ -26,6 +26,7 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include <typeinfo>
 
 #include <deal.II/base/mpi.h>
 
@@ -2316,55 +2317,14 @@ public:
    */
   void set_default_format (const DataOutBase::OutputFormat default_format);
 
-  /**
-   * Set the flags to be used for output in OpenDX format.
-   */
-  void set_flags (const DataOutBase::DXFlags &dx_flags);
 
   /**
-   * Set the flags to be used for output in UCD format.
+   * Set the flags to be used for output. This method expects <tt>flags</tt> to
+   * be a member of one of the child classes of <tt>OutputFlagsBase</tt>.
    */
-  void set_flags (const DataOutBase::UcdFlags &ucd_flags);
+  template<typename FlagType>
+  void set_flags (const FlagType &flags);
 
-  /**
-   * Set the flags to be used for output in GNUPLOT format.
-   */
-  void set_flags (const DataOutBase::GnuplotFlags &gnuplot_flags);
-
-  /**
-   * Set the flags to be used for output in POVRAY format.
-   */
-  void set_flags (const DataOutBase::PovrayFlags &povray_flags);
-
-  /**
-   * Set the flags to be used for output in EPS output.
-   */
-  void set_flags (const DataOutBase::EpsFlags &eps_flags);
-
-  /**
-   * Set the flags to be used for output in GMV format.
-   */
-  void set_flags (const DataOutBase::GmvFlags &gmv_flags);
-
-  /**
-   * Set the flags to be used for output in Tecplot format.
-   */
-  void set_flags (const DataOutBase::TecplotFlags &tecplot_flags);
-
-  /**
-   * Set the flags to be used for output in VTK format.
-   */
-  void set_flags (const DataOutBase::VtkFlags &vtk_flags);
-
-  /**
-   * Set the flags to be used for output in SVG format.
-   */
-  void set_flags (const DataOutBase::SvgFlags &svg_flags);
-
-  /**
-   * Set the flags to be used for output in deal.II intermediate format.
-   */
-  void set_flags (const DataOutBase::Deal_II_IntermediateFlags &deal_II_intermediate_flags);
 
   /**
    * A function that returns the same string as the respective function in the

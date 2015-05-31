@@ -19,7 +19,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #if deal_II_dimension <= deal_II_space_dimension
   template class DataOutInterface<deal_II_dimension, deal_II_space_dimension>;
   template class DataOutReader<deal_II_dimension, deal_II_space_dimension>;
-  
+
   namespace DataOutBase
   \{
   template struct Patch<deal_II_dimension, deal_II_space_dimension>;
@@ -132,4 +132,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
                         std::ostream                            &out);
   \}
 #endif
+}
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; flag_type : OUTPUT_FLAG_TYPES)
+{
+  template
+  void
+  DataOutInterface<deal_II_dimension, deal_II_space_dimension>::set_flags (const DataOutBase::flag_type &flags);
 }

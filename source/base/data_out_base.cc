@@ -7380,94 +7380,33 @@ DataOutInterface<dim,spacedim>::set_default_format(const DataOutBase::OutputForm
   default_fmt = fmt;
 }
 
-
-
 template <int dim, int spacedim>
+template <typename FlagType>
 void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::DXFlags &flags)
+DataOutInterface<dim, spacedim>::set_flags (const FlagType &flags)
 {
-  dx_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::UcdFlags &flags)
-{
-  ucd_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::GnuplotFlags &flags)
-{
-  gnuplot_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::PovrayFlags &flags)
-{
-  povray_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::EpsFlags &flags)
-{
-  eps_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::GmvFlags &flags)
-{
-  gmv_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::TecplotFlags &flags)
-{
-  tecplot_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::VtkFlags &flags)
-{
-  vtk_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::SvgFlags &flags)
-{
-  svg_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::Deal_II_IntermediateFlags &flags)
-{
-  deal_II_intermediate_flags = flags;
+  // The price for not writing ten duplicates of this function is some loss in
+  // type safety.
+  if (typeid(flags) == typeid(dx_flags))
+    dx_flags = *reinterpret_cast<const DataOutBase::DXFlags *>(&flags);
+  else if (typeid(flags) == typeid(ucd_flags))
+    ucd_flags = *reinterpret_cast<const DataOutBase::UcdFlags *>(&flags);
+  else if (typeid(flags) == typeid(povray_flags))
+    povray_flags = *reinterpret_cast<const DataOutBase::PovrayFlags *>(&flags);
+  else if (typeid(flags) == typeid(eps_flags))
+    eps_flags = *reinterpret_cast<const DataOutBase::EpsFlags *>(&flags);
+  else if (typeid(flags) == typeid(gmv_flags))
+    gmv_flags = *reinterpret_cast<const DataOutBase::GmvFlags *>(&flags);
+  else if (typeid(flags) == typeid(tecplot_flags))
+    tecplot_flags = *reinterpret_cast<const DataOutBase::TecplotFlags *>(&flags);
+  else if (typeid(flags) == typeid(vtk_flags))
+    vtk_flags = *reinterpret_cast<const DataOutBase::VtkFlags *>(&flags);
+  else if (typeid(flags) == typeid(svg_flags))
+    svg_flags = *reinterpret_cast<const DataOutBase::SvgFlags *>(&flags);
+  else if (typeid(flags) == typeid(deal_II_intermediate_flags))
+    deal_II_intermediate_flags = *reinterpret_cast<const DataOutBase::Deal_II_IntermediateFlags *>(&flags);
+  else
+    Assert(false, ExcNotImplemented());
 }
 
 
