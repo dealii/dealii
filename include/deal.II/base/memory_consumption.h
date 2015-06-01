@@ -24,6 +24,7 @@
 #include <complex>
 #include <vector>
 #include <cstddef>
+#include <cstring>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -458,7 +459,7 @@ namespace MemoryConsumption
       }
     else
       {
-        return /*Don't forget about the NUL! :]*/ sizeof(char) + strlen(string);
+        return sizeof(char)*(strlen(string) /*Remember the NUL*/ + 1);
       }
   }
 
