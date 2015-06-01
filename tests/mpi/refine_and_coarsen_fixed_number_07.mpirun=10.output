@@ -1,0 +1,18 @@
+
+DEAL:0::total active cells = 200
+DEAL:0::n_refined = 10
+DEAL:0::n_coarsened = 20
+DEAL:0::total active cells = 230
+DEAL:0::cell number upper limit = 220
+
+DEAL:0::total active cells = 200
+DEAL:0::n_refined = 0
+DEAL:0::n_coarsened = 50
+DEAL:0::total active cells = 170
+DEAL:0::cell number upper limit = 160
+
+DEAL:0::total active cells = 200
+DEAL:0::n_refined = 40
+DEAL:0::n_coarsened = 40
+DEAL:0::total active cells = 317
+DEAL:0::cell number upper limit = 20000
