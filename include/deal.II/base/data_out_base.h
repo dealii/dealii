@@ -26,6 +26,7 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include <typeinfo>
 
 #include <deal.II/base/mpi.h>
 
@@ -349,12 +350,70 @@ namespace DataOutBase
     //@}
   };
 
+
+  /**
+   * Base class describing common functionality between different output flags.
+   *
+   * This is implemented with the "Curiously Recurring Template Pattern";
+   * derived classes use their own type to fill in the typename so that
+   * <tt>memory_consumption</tt> works correctly. See the Wikipedia page on the
+   * pattern for more information.
+   *
+   * @ingroup output
+   */
+  template<typename FlagsType>
+  struct OutputFlagsBase
+  {
+    /**
+     * Declare all flags with name and type as offered by this class, for use
+     * in input files.
+     *
+     * This method does nothing, but child classes may override this method to
+     * add fields to <tt>prm</tt>.
+     */
+    static void declare_parameters (ParameterHandler &prm);
+
+    /**
+     * Read the parameters declared in declare_parameters() and set the flags
+     * for this output format accordingly.
+     *
+     * This method does nothing, but child classes may override this method to
+     * add fields to <tt>prm</tt>.
+     */
+    void parse_parameters (const ParameterHandler &prm);
+
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this
+     * object. This is not exact (but will usually be close) because calculating
+     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+     */
+    std::size_t memory_consumption () const;
+  };
+
+
+  template<typename FlagsType>
+  void OutputFlagsBase<FlagsType>::declare_parameters (ParameterHandler &)
+  {}
+
+
+  template<typename FlagsType>
+  void OutputFlagsBase<FlagsType>::parse_parameters (const ParameterHandler &)
+  {}
+
+
+  template<typename FlagsType>
+  std::size_t OutputFlagsBase<FlagsType>::memory_consumption () const
+  {
+    return sizeof(FlagsType);
+  }
+
+
   /**
    * Flags controlling the details of output in OpenDX format.
    *
    * @ingroup output
    */
-  struct DXFlags
+  struct DXFlags : public OutputFlagsBase<DXFlags>
   {
     /**
      * Write neighbor information. This information is necessary for instance,
@@ -403,12 +462,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm);
-
-    /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -416,7 +469,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct UcdFlags
+  struct UcdFlags : public OutputFlagsBase<UcdFlags>
   {
     /**
      * Write a comment at the beginning of the file stating the date of
@@ -447,13 +500,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm);
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -462,7 +508,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct GnuplotFlags
+  struct GnuplotFlags : public OutputFlagsBase<GnuplotFlags>
   {
   private:
     /**
@@ -471,33 +517,6 @@ namespace DataOutBase
      * structure (and remove the <tt>private</tt> as well).
      */
     int dummy;
-
-  public:
-    /**
-     * Constructor.
-     */
-    GnuplotFlags ();
-
-    /**
-     * Declare all flags with name and type as offered by this class, for use
-     * in input files.
-     */
-    static void declare_parameters (ParameterHandler &prm);
-
-    /**
-     * Read the parameters declared in declare_parameters() and set the flags
-     * for this output format accordingly.
-     *
-     * The flags thus obtained overwrite all previous contents of this object.
-     */
-    void parse_parameters (const ParameterHandler &prm) const;
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -506,7 +525,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct PovrayFlags
+  struct PovrayFlags : public OutputFlagsBase<PovrayFlags>
   {
     /**
      * Normal vector interpolation, if set to true
@@ -550,13 +569,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm);
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
 
@@ -566,7 +578,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct EpsFlags
+  struct EpsFlags : public OutputFlagsBase<EpsFlags>
   {
     /**
      * This denotes the number of the data vector which shall be used for
@@ -795,13 +807,6 @@ namespace DataOutBase
      * The flags thus obtained overwrite all previous contents of this object.
      */
     void parse_parameters (const ParameterHandler &prm);
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -810,7 +815,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct GmvFlags
+  struct GmvFlags : public OutputFlagsBase<GmvFlags>
   {
   private:
     /**
@@ -819,33 +824,6 @@ namespace DataOutBase
      * structure (and remove the <tt>private</tt> as well).
      */
     int dummy;
-
-  public:
-    /**
-     * Default constructor.
-     */
-    GmvFlags ();
-
-    /**
-     * Declare all flags with name and type as offered by this class, for use
-     * in input files.
-     */
-    static void declare_parameters (ParameterHandler &prm);
-
-    /**
-     * Read the parameters declared in declare_parameters() and set the flags
-     * for this output format accordingly.
-     *
-     * The flags thus obtained overwrite all previous contents of this object.
-     */
-    void parse_parameters (const ParameterHandler &prm) const;
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -853,11 +831,8 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct TecplotFlags
+  struct TecplotFlags : public OutputFlagsBase<TecplotFlags>
   {
-
-  public:
-
     /**
      * This variable is needed to hold the output file name when using the
      * Tecplot API to write binary files.  If the user doesn't set the file
@@ -872,29 +847,14 @@ namespace DataOutBase
     const char *zone_name;
 
     /**
-     * Constructor
+     * Constructor.
      */
     TecplotFlags (const char *tecplot_binary_file_name = NULL,
                   const char *zone_name = NULL);
 
     /**
-     * Declare all flags with name and type as offered by this class, for use
-     * in input files.
-     */
-    static void declare_parameters (ParameterHandler &prm);
-
-    /**
-     * Read the parameters declared in declare_parameters() and set the flags
-     * for this output format accordingly.
-     *
-     * The flags thus obtained overwrite all previous contents of this object.
-     */
-    void parse_parameters (const ParameterHandler &prm) const;
-
-    /**
      * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+     * object.
      */
     std::size_t memory_consumption () const;
   };
@@ -904,9 +864,8 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct VtkFlags
+  struct VtkFlags : public OutputFlagsBase<VtkFlags>
   {
-  public:
     /**
      * The time of the time step if this file is part of a time dependent
      * simulation.
@@ -940,49 +899,21 @@ namespace DataOutBase
     bool print_date_and_time;
 
     /**
-     * Default constructor.
+     * Constructor.
      */
     VtkFlags (const double       time   = std::numeric_limits<double>::min(),
               const unsigned int cycle  = std::numeric_limits<unsigned int>::min(),
               const bool print_date_and_time = true);
-
-    /**
-     * Declare the flags with name and type as offered by this class, for use
-     * in input files.
-     *
-     * Unlike the flags in many of the other classes similar to this one, we
-     * do not actually declare parameters for the #cycle and #time member
-     * variables of this class. The reason is that there wouldn't appear to be
-     * a case where one would want to declare these parameters in an input
-     * file. Rather, these are typically values that change during the course
-     * of a simulation and can only reasonably be set as part of the execution
-     * of a program, rather than a priori by a user who runs this program.
-     */
-    static void declare_parameters (ParameterHandler &prm);
-
-    /**
-     * Read the parameters declared in declare_parameters() and set the flags
-     * for this output format accordingly.
-     *
-     * The flags thus obtained overwrite all previous contents of this object.
-     */
-    void parse_parameters (const ParameterHandler &prm) const;
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
 
   /**
    * Flags for SVG output.
+   *
+   * @ingroup output
    */
-  struct SvgFlags
+  struct SvgFlags : public OutputFlagsBase<SvgFlags>
   {
-  public:
     /**
      * Height of the image in SVG units. Default value is 4000.
      */
@@ -1028,13 +959,6 @@ namespace DataOutBase
              const unsigned int line_thickness = 1,
              const bool margin = true,
              const bool draw_colorbar = true);
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
 
@@ -1044,7 +968,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  struct Deal_II_IntermediateFlags
+  struct Deal_II_IntermediateFlags : public OutputFlagsBase<Deal_II_IntermediateFlags>
   {
     /**
      * An indicator of the currect file format version used to write
@@ -1061,33 +985,6 @@ namespace DataOutBase
      * structure (and remove the <tt>private</tt> as well).
      */
     int dummy;
-
-  public:
-    /**
-     * Constructor.
-     */
-    Deal_II_IntermediateFlags ();
-
-    /**
-     * Declare all flags with name and type as offered by this class, for use
-     * in input files.
-     */
-    static void declare_parameters (ParameterHandler &prm);
-
-    /**
-     * Read the parameters declared in declare_parameters() and set the flags
-     * for this output format accordingly.
-     *
-     * The flags thus obtained overwrite all previous contents of this object.
-     */
-    void parse_parameters (const ParameterHandler &prm) const;
-
-    /**
-     * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
-     */
-    std::size_t memory_consumption () const;
   };
 
   /**
@@ -2399,55 +2296,14 @@ public:
    */
   void set_default_format (const DataOutBase::OutputFormat default_format);
 
-  /**
-   * Set the flags to be used for output in OpenDX format.
-   */
-  void set_flags (const DataOutBase::DXFlags &dx_flags);
 
   /**
-   * Set the flags to be used for output in UCD format.
+   * Set the flags to be used for output. This method expects <tt>flags</tt> to
+   * be a member of one of the child classes of <tt>OutputFlagsBase</tt>.
    */
-  void set_flags (const DataOutBase::UcdFlags &ucd_flags);
+  template<typename FlagType>
+  void set_flags (const FlagType &flags);
 
-  /**
-   * Set the flags to be used for output in GNUPLOT format.
-   */
-  void set_flags (const DataOutBase::GnuplotFlags &gnuplot_flags);
-
-  /**
-   * Set the flags to be used for output in POVRAY format.
-   */
-  void set_flags (const DataOutBase::PovrayFlags &povray_flags);
-
-  /**
-   * Set the flags to be used for output in EPS output.
-   */
-  void set_flags (const DataOutBase::EpsFlags &eps_flags);
-
-  /**
-   * Set the flags to be used for output in GMV format.
-   */
-  void set_flags (const DataOutBase::GmvFlags &gmv_flags);
-
-  /**
-   * Set the flags to be used for output in Tecplot format.
-   */
-  void set_flags (const DataOutBase::TecplotFlags &tecplot_flags);
-
-  /**
-   * Set the flags to be used for output in VTK format.
-   */
-  void set_flags (const DataOutBase::VtkFlags &vtk_flags);
-
-  /**
-   * Set the flags to be used for output in SVG format.
-   */
-  void set_flags (const DataOutBase::SvgFlags &svg_flags);
-
-  /**
-   * Set the flags to be used for output in deal.II intermediate format.
-   */
-  void set_flags (const DataOutBase::Deal_II_IntermediateFlags &deal_II_intermediate_flags);
 
   /**
    * A function that returns the same string as the respective function in the

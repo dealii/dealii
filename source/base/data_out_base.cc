@@ -1907,16 +1907,6 @@ namespace DataOutBase
 
 
 
-  std::size_t
-  DataOutFilterFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
   DXFlags::DXFlags (const bool write_neighbors,
                     const bool int_binary,
                     const bool coordinates_binary,
@@ -1964,17 +1954,6 @@ namespace DataOutBase
 
 
 
-  std::size_t
-  DXFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
-
   void UcdFlags::declare_parameters (ParameterHandler &prm)
   {
     prm.declare_entry ("Write preamble", "true",
@@ -1993,41 +1972,6 @@ namespace DataOutBase
   }
 
 
-  std::size_t
-  UcdFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
-  GnuplotFlags::GnuplotFlags ()
-    :
-    dummy (0)
-  {}
-
-
-
-  void GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void GnuplotFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
-
-  size_t
-  GnuplotFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
 
   SvgFlags::SvgFlags (const unsigned int height_vector,
                       const int azimuth_angle,
@@ -2045,16 +1989,6 @@ namespace DataOutBase
     margin(margin),
     draw_colorbar(draw_colorbar)
   {}
-
-
-  std::size_t
-  SvgFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
 
 
 
@@ -2081,16 +2015,6 @@ namespace DataOutBase
     smooth        = prm.get_bool ("Use smooth triangles");
     bicubic_patch = prm.get_bool ("Use bicubic patches");
     external_data = prm.get_bool ("Include external file");
-  }
-
-
-
-  std::size_t
-  PovrayFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
   }
 
 
@@ -2331,40 +2255,6 @@ namespace DataOutBase
 
 
 
-  std::size_t
-  EpsFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
-  GmvFlags::GmvFlags ()
-  {}
-
-
-
-  void GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void GmvFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
-  std::size_t
-  GmvFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-
   TecplotFlags::
   TecplotFlags (const char *tecplot_binary_file_name,
                 const char *zone_name)
@@ -2375,21 +2265,12 @@ namespace DataOutBase
 
 
 
-  void TecplotFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void TecplotFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
   std::size_t
   TecplotFlags::memory_consumption () const
   {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
+    return sizeof(*this)
+           + MemoryConsumption::memory_consumption(tecplot_binary_file_name)
+           + MemoryConsumption::memory_consumption(zone_name);
   }
 
 
@@ -2402,51 +2283,6 @@ namespace DataOutBase
     cycle (cycle),
     print_date_and_time (print_date_and_time)
   {}
-
-
-
-  void VtkFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void VtkFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
-
-  std::size_t
-  VtkFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
-
-
-  Deal_II_IntermediateFlags::Deal_II_IntermediateFlags ()
-    :
-    dummy (0)
-  {}
-
-
-
-  void Deal_II_IntermediateFlags::declare_parameters (ParameterHandler &/*prm*/)
-  {}
-
-
-
-  void Deal_II_IntermediateFlags::parse_parameters (const ParameterHandler &/*prm*/) const
-  {}
-
-
-  std::size_t
-  Deal_II_IntermediateFlags::memory_consumption () const
-  {
-    // only simple data elements, so
-    // use sizeof operator
-    return sizeof (*this);
-  }
 
 
 
@@ -7534,94 +7370,33 @@ DataOutInterface<dim,spacedim>::set_default_format(const DataOutBase::OutputForm
   default_fmt = fmt;
 }
 
-
-
 template <int dim, int spacedim>
+template <typename FlagType>
 void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::DXFlags &flags)
+DataOutInterface<dim, spacedim>::set_flags (const FlagType &flags)
 {
-  dx_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::UcdFlags &flags)
-{
-  ucd_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::GnuplotFlags &flags)
-{
-  gnuplot_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::PovrayFlags &flags)
-{
-  povray_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::EpsFlags &flags)
-{
-  eps_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::GmvFlags &flags)
-{
-  gmv_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::TecplotFlags &flags)
-{
-  tecplot_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::VtkFlags &flags)
-{
-  vtk_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::SvgFlags &flags)
-{
-  svg_flags = flags;
-}
-
-
-
-template <int dim, int spacedim>
-void
-DataOutInterface<dim,spacedim>::set_flags (const DataOutBase::Deal_II_IntermediateFlags &flags)
-{
-  deal_II_intermediate_flags = flags;
+  // The price for not writing ten duplicates of this function is some loss in
+  // type safety.
+  if (typeid(flags) == typeid(dx_flags))
+    dx_flags = *reinterpret_cast<const DataOutBase::DXFlags *>(&flags);
+  else if (typeid(flags) == typeid(ucd_flags))
+    ucd_flags = *reinterpret_cast<const DataOutBase::UcdFlags *>(&flags);
+  else if (typeid(flags) == typeid(povray_flags))
+    povray_flags = *reinterpret_cast<const DataOutBase::PovrayFlags *>(&flags);
+  else if (typeid(flags) == typeid(eps_flags))
+    eps_flags = *reinterpret_cast<const DataOutBase::EpsFlags *>(&flags);
+  else if (typeid(flags) == typeid(gmv_flags))
+    gmv_flags = *reinterpret_cast<const DataOutBase::GmvFlags *>(&flags);
+  else if (typeid(flags) == typeid(tecplot_flags))
+    tecplot_flags = *reinterpret_cast<const DataOutBase::TecplotFlags *>(&flags);
+  else if (typeid(flags) == typeid(vtk_flags))
+    vtk_flags = *reinterpret_cast<const DataOutBase::VtkFlags *>(&flags);
+  else if (typeid(flags) == typeid(svg_flags))
+    svg_flags = *reinterpret_cast<const DataOutBase::SvgFlags *>(&flags);
+  else if (typeid(flags) == typeid(deal_II_intermediate_flags))
+    deal_II_intermediate_flags = *reinterpret_cast<const DataOutBase::Deal_II_IntermediateFlags *>(&flags);
+  else
+    Assert(false, ExcNotImplemented());
 }
 
 
