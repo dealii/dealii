@@ -509,15 +509,7 @@ namespace DataOutBase
    * @ingroup output
    */
   struct GnuplotFlags : public OutputFlagsBase<GnuplotFlags>
-  {
-  private:
-    /**
-     * Dummy entry to suppress compiler warnings when copying an empty
-     * structure. Remove this member when adding the first flag to this
-     * structure (and remove the <tt>private</tt> as well).
-     */
-    int dummy;
-  };
+  {};
 
   /**
    * Flags controlling the details of output in Povray format. Several flags
@@ -816,15 +808,7 @@ namespace DataOutBase
    * @ingroup output
    */
   struct GmvFlags : public OutputFlagsBase<GmvFlags>
-  {
-  private:
-    /**
-     * Dummy entry to suppress compiler warnings when copying an empty
-     * structure. Remove this member when adding the first flag to this
-     * structure (and remove the <tt>private</tt> as well).
-     */
-    int dummy;
-  };
+  {};
 
   /**
    * Flags controlling the details of output in Tecplot format.
@@ -977,14 +961,6 @@ namespace DataOutBase
      * what the current readers and writers understand.
      */
     static const unsigned int format_version = 3;
-
-  private:
-    /**
-     * Dummy entry to suppress compiler warnings when copying an empty
-     * structure. Remove this member when adding the first flag to this
-     * structure (and remove the <tt>private</tt> as well).
-     */
-    int dummy;
   };
 
   /**
