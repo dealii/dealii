@@ -110,7 +110,12 @@ private:
 
       virtual std::string do_grouping() const 
       { 
-        return std::string(1, m_nGroup); 
+        // fix for issue 4: https://code.google.com/p/muparser/issues/detail?id=4
+        // courtesy of Jens Bartsch
+        // original code:
+        //        return std::string(1, (char)m_nGroup); 
+        // new code:
+        return std::string(1, (char)(m_cThousandsSep > 0 ? m_nGroup : CHAR_MAX));
       }
 
     private:
@@ -124,7 +129,7 @@ public:
     ParserInt();
 
     virtual void InitFun();
-	  virtual void InitOprt();
+    virtual void InitOprt();
     virtual void InitConst();
     virtual void InitCharSets();
 };

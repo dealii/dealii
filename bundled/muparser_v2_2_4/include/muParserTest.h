@@ -66,11 +66,11 @@ namespace mu
         static value_type f3of4(value_type  , value_type,   value_type v, value_type  ) {return v;}
         static value_type f4of4(value_type  , value_type,   value_type  , value_type v) {return v;}
 
-	      static value_type f1of5(value_type v, value_type,   value_type  , value_type  , value_type  ) { return v; }
-	      static value_type f2of5(value_type  , value_type v, value_type  , value_type  , value_type  ) { return v; }
-	      static value_type f3of5(value_type  , value_type,   value_type v, value_type  , value_type  ) { return v; }
-	      static value_type f4of5(value_type  , value_type,   value_type  , value_type v, value_type  ) { return v; }
-	      static value_type f5of5(value_type  , value_type,   value_type  , value_type  , value_type v) { return v; }
+        static value_type f1of5(value_type v, value_type,   value_type  , value_type  , value_type  ) { return v; }
+        static value_type f2of5(value_type  , value_type v, value_type  , value_type  , value_type  ) { return v; }
+        static value_type f3of5(value_type  , value_type,   value_type v, value_type  , value_type  ) { return v; }
+        static value_type f4of5(value_type  , value_type,   value_type  , value_type v, value_type  ) { return v; }
+        static value_type f5of5(value_type  , value_type,   value_type  , value_type  , value_type v) { return v; }
 
         static value_type Min(value_type a_fVal1, value_type a_fVal2) { return (a_fVal1<a_fVal2) ? a_fVal1 : a_fVal2; }
   	    static value_type Max(value_type a_fVal1, value_type a_fVal2) { return (a_fVal1>a_fVal2) ? a_fVal1 : a_fVal2; }
@@ -166,17 +166,18 @@ namespace mu
         static int IsHexVal(const char_type *a_szExpr, int *a_iPos, value_type *a_fVal);
 
         int TestNames();
-	      int TestSyntax();
-	      int TestMultiArg();
-	      int TestPostFix();
-	      int TestExpression();
-	      int TestInfixOprt();
-	      int TestBinOprt();
-	      int TestVarConst();
-	      int TestInterface();
-	      int TestException();
+        int TestSyntax();
+        int TestMultiArg();
+        int TestPostFix();
+        int TestExpression();
+        int TestInfixOprt();
+        int TestBinOprt();
+        int TestVarConst();
+        int TestInterface();
+        int TestException();
         int TestStrArg();
         int TestIfThenElse();
+        int TestBulkMode();
 
         void Abort() const;
 
@@ -201,6 +202,9 @@ namespace mu
 
         // Test Int Parser
         int EqnTestInt(const string_type& a_str, double a_fRes, bool a_fPass);
+
+        // Test Bulkmode
+        int EqnTestBulk(const string_type& a_str, double a_fRes[4], bool a_fPass);
     };
   } // namespace Test
 } // namespace mu

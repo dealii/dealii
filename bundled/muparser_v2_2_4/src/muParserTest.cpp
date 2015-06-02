@@ -61,6 +61,7 @@ namespace mu
       AddTest(&ParserTester::TestBinOprt);
       AddTest(&ParserTester::TestException);
       AddTest(&ParserTester::TestStrArg);
+      AddTest(&ParserTester::TestBulkMode);
 
       ParserTester::c_iCount = 0;
     }
@@ -145,6 +146,8 @@ namespace mu
       iStat += EqnTest(_T("strfun1(\"100\")"), 100, true);
       iStat += EqnTest(_T("strfun2(\"100\",1)"), 101, true);
       iStat += EqnTest(_T("strfun3(\"99\",1,2)"), 102, true);
+      // string constants
+      iStat += EqnTest(_T("atof(str1)+atof(str2)"), 3.33, true);
 
       if (iStat==0)
         mu::console() << _T("passed") << endl;
@@ -155,6 +158,40 @@ namespace mu
     }
 
     //---------------------------------------------------------------------------------------------
+    int ParserTester::TestBulkMode()
+    {
+        int iStat = 0;
+        mu::console() << _T("testing bulkmode...");
+
+#define EQN_TEST_BULK(EXPR, R1, R2, R3, R4, PASS) \
+        { \
+          double res[] = { R1, R2, R3, R4 }; \
+          iStat += EqnTestBulk(_T(EXPR), res, (PASS)); \
+        }
+
+        // Bulk Variables for the test:
+        // a: 1,2,3,4
+        // b: 2,2,2,2
+        // c: 3,3,3,3
+        // d: 5,4,3,2
+        EQN_TEST_BULK("a",   1, 1, 1, 1, false)
+        EQN_TEST_BULK("a",   1, 2, 3, 4, true)
+        EQN_TEST_BULK("b=a", 1, 2, 3, 4, true)
+        EQN_TEST_BULK("b=a, b*10", 10, 20, 30, 40, true)
+        EQN_TEST_BULK("b=a, b*10, a", 1, 2, 3, 4, true)
+        EQN_TEST_BULK("a+b", 3, 4, 5, 6, true)
+        EQN_TEST_BULK("c*(a+b)", 9, 12, 15, 18, true)
+#undef EQN_TEST_BULK
+
+        if (iStat == 0)
+            mu::console() << _T("passed") << endl;
+        else
+            mu::console() << _T("\n  failed with ") << iStat << _T(" errors") << endl;
+
+        return iStat;
+    }
+
+    //---------------------------------------------------------------------------------------------
     int ParserTester::TestBinOprt()
     {
       int iStat = 0;
@@ -162,16 +199,7 @@ namespace mu
    
       // built in operators
       // xor operator
-      //iStat += EqnTest(_T("1 xor 2"), 3, true); 
-      //iStat += EqnTest(_T("a xor b"), 3, true);            // with a=1 and b=2
-      //iStat += EqnTest(_T("1 xor 2 xor 3"), 0, true); 
-      //iStat += EqnTest(_T("a xor b xor 3"), 0, true);      // with a=1 and b=2
-      //iStat += EqnTest(_T("a xor b xor c"), 0, true);      // with a=1 and b=2
-      //iStat += EqnTest(_T("(1 xor 2) xor 3"), 0, true); 
-      //iStat += EqnTest(_T("(a xor b) xor c"), 0, true);    // with a=1 and b=2
-      //iStat += EqnTest(_T("(a) xor (b) xor c"), 0, true);  // with a=1 and b=2
-      //iStat += EqnTest(_T("1 or 2"), 3, true); 
-      //iStat += EqnTest(_T("a or b"), 3, true);             // with a=1 and b=2
+
       iStat += EqnTest(_T("a++b"), 3, true);
       iStat += EqnTest(_T("a ++ b"), 3, true);
       iStat += EqnTest(_T("1++2"), 3, true);
@@ -210,6 +238,7 @@ namespace mu
       iStat += EqnTest(_T("2*(a=b)"), 4, true);
       iStat += EqnTest(_T("2*(a=b+1)"), 6, true);
       iStat += EqnTest(_T("(a=b+1)*2"), 6, true);
+      iStat += EqnTest(_T("a=c, a*10"), 30, true);
 
       iStat += EqnTest(_T("2^2^3"), 256, true); 
       iStat += EqnTest(_T("1/2/3"), 1.0/6.0, true); 
@@ -666,6 +695,13 @@ namespace mu
       int iStat(0);
       mu::console() << "testing infix operators...";
 
+      iStat += EqnTest( _T("+1"),    +1, true);
+      iStat += EqnTest( _T("-(+1)"), -1, true);
+      iStat += EqnTest( _T("-(+1)*2"),  -2, true);
+      iStat += EqnTest( _T("-(+2)*sqrt(4)"),  -4, true);
+      iStat += EqnTest( _T("3-+a"), 2, true);
+      iStat += EqnTest( _T("+1*3"),  3, true);
+
       iStat += EqnTest( _T("-1"),    -1, true);
       iStat += EqnTest( _T("-(-1)"),  1, true);
       iStat += EqnTest( _T("-(-1)*2"),  2, true);
@@ -820,7 +856,7 @@ namespace mu
       iStat += EqnTest( _T("(e^(ln(7)))"), 7, true);
       iStat += EqnTest( _T("1-(e^(ln(7)))"), -6, true);
       iStat += EqnTest( _T("2*(e^(ln(7)))"), 14, true);
-      iStat += EqnTest( _T("10^log(5)"), 5, true);
+      iStat += EqnTest( _T("10^log(5)"), pow(10.0, log(5.0)), true);
       iStat += EqnTest( _T("10^log10(5)"), 5, true);
       iStat += EqnTest( _T("2^log2(4)"), 4, true);
       iStat += EqnTest( _T("-(sin(0)+1)"), -1, true);
@@ -982,7 +1018,7 @@ namespace mu
       iStat += ThrowTest(_T("sin(3)cos(3)"), ecUNEXPECTED_FUN);
       iStat += ThrowTest(_T("a+b+c=10"),     ecUNEXPECTED_OPERATOR);
       iStat += ThrowTest(_T("a=b=3"),        ecUNEXPECTED_OPERATOR);
-
+      
 #if defined(MUP_MATH_EXCEPTIONS)
       // divide by zero whilst constant folding
       iStat += ThrowTest(_T("1/0"),          ecDIV_BY_ZERO);
@@ -1166,14 +1202,15 @@ namespace mu
                                            double a_fRes2)
     {
       ParserTester::c_iCount++;
-      value_type fVal[2] = {-999, -999 }; // should be equalinitially
 
       try
       {
+        value_type fVal[2] = {-999, -999 }; // should be equalinitially
+	  
         Parser  p;
+        value_type var = 0;
 
         // variable
-        value_type var = 0;
         p.DefineVar( _T("a"), &var);
         p.SetExpr(a_str);
 
@@ -1235,6 +1272,9 @@ namespace mu
         p1->DefineConst( _T("const"), 1);
         p1->DefineConst( _T("const1"), 2);
         p1->DefineConst( _T("const2"), 3);
+        // string constants
+        p1->DefineStrConst( _T("str1"), _T("1.11"));
+        p1->DefineStrConst( _T("str2"), _T("2.22"));
         // variables
         value_type vVarVal[] = { 1, 2, 3, -2};
         p1->DefineVar( _T("a"), &vVarVal[0]);
@@ -1344,9 +1384,14 @@ namespace mu
           // The tests equations never result in infinity, if they do thats a bug.
           // reference:
           // http://sourceforge.net/projects/muparser/forums/forum/462843/topic/5037825
-          if (numeric_limits<value_type>::has_infinity)
+          #pragma warning(push)
+          #pragma warning(disable:4127)
+		  if (std::numeric_limits<value_type>::has_infinity)
+          #pragma warning(pop)
+		  {
             bCloseEnough &= (fabs(fVal[i]) != numeric_limits<value_type>::infinity());
-        }
+		  }
+		}
 
         iRet = ((bCloseEnough && a_fPass) || (!bCloseEnough && !a_fPass)) ? 0 : 1;
         
@@ -1393,11 +1438,11 @@ namespace mu
       ParserTester::c_iCount++;
 
       value_type vVarVal[] = {1, 2, 3};   // variable values
-      value_type fVal[2] = {-99, -999};   // results: initially should be different
       int iRet(0);
 
       try
       {
+        value_type fVal[2] = {-99, -999};   // results: initially should be different
         ParserInt p;
         p.DefineConst( _T("const1"), 1);
         p.DefineConst( _T("const2"), 2);
@@ -1436,6 +1481,63 @@ namespace mu
       }
 
       return iRet;
+    }
+
+    //---------------------------------------------------------------------------
+    /** \brief Test an expression in Bulk Mode. */
+    int ParserTester::EqnTestBulk(const string_type &a_str, double a_fRes[4], bool a_fPass)
+    {
+        ParserTester::c_iCount++;
+
+        // Define Bulk Variables
+        int nBulkSize = 4;
+        value_type vVariableA[] = { 1, 2, 3, 4 };   // variable values
+        value_type vVariableB[] = { 2, 2, 2, 2 };   // variable values
+        value_type vVariableC[] = { 3, 3, 3, 3 };   // variable values
+        value_type vResults[] = { 0, 0, 0, 0 };   // variable values
+        int iRet(0);
+
+        try
+        {
+            Parser p;
+            p.DefineConst(_T("const1"), 1);
+            p.DefineConst(_T("const2"), 2);
+            p.DefineVar(_T("a"), vVariableA);
+            p.DefineVar(_T("b"), vVariableB);
+            p.DefineVar(_T("c"), vVariableC);
+
+            p.SetExpr(a_str);
+            p.Eval(vResults, nBulkSize);
+
+            bool bCloseEnough(true);
+            for (int i = 0; i < nBulkSize; ++i)
+            {
+                bCloseEnough &= (fabs(a_fRes[i] - vResults[i]) <= fabs(a_fRes[i] * 0.00001));
+            }
+
+            iRet = ((bCloseEnough && a_fPass) || (!bCloseEnough && !a_fPass)) ? 0 : 1;
+            if (iRet == 1)
+            {
+                mu::console() << _T("\n  fail: ") << a_str.c_str()
+                    << _T(" (incorrect result; expected: {") << a_fRes[0] << _T(",") << a_fRes[1] << _T(",") << a_fRes[2] << _T(",") << a_fRes[3] << _T("}")
+                    << _T(" ;calculated: ") << vResults[0] << _T(",") << vResults[1] << _T(",") << vResults[2] << _T(",") << vResults[3] << _T("}");
+            }
+        }
+        catch (Parser::exception_type &e)
+        {
+            if (a_fPass)
+            {
+                mu::console() << _T("\n  fail: ") << e.GetExpr() << _T(" : ") << e.GetMsg();
+                iRet = 1;
+            }
+        }
+        catch (...)
+        {
+            mu::console() << _T("\n  fail: ") << a_str.c_str() << _T(" (unexpected exception)");
+            iRet = 1;  // exceptions other than ParserException are not allowed
+        }
+
+        return iRet;
     }
 
     //---------------------------------------------------------------------------
