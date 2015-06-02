@@ -111,7 +111,7 @@ namespace VectorTools
     for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
       {
         unit_support_points[fe_index] = fe[fe_index].get_unit_support_points();
-        Assert (unit_support_points[fe_index].size() != 0,
+        Assert ((unit_support_points[fe_index].size() != 0)||(fe[fe_index].dofs_per_cell == 0),
                 ExcNonInterpolatingFE());
       }
 
@@ -207,64 +207,66 @@ namespace VectorTools
       if (cell->is_locally_owned())
         {
           const unsigned int fe_index = cell->active_fe_index();
+	  if (fe[fe_index].degree != 0)
+	    {
+		  // for each cell:
+		  // get location of finite element
+		  // support_points
+		  fe_values.reinit(cell);
+		  const std::vector<Point<spacedim> > &support_points =
+		    fe_values.get_present_fe_values().get_quadrature_points();
 
-          // for each cell:
-          // get location of finite element
-          // support_points
-          fe_values.reinit(cell);
-          const std::vector<Point<spacedim> > &support_points =
-            fe_values.get_present_fe_values().get_quadrature_points();
+		  // pick out the representative
+		  // support points
+		  rep_points.resize (dofs_of_rep_points[fe_index].size());
+		  for (unsigned int j=0; j<dofs_of_rep_points[fe_index].size(); ++j)
+		    rep_points[j] = support_points[dofs_of_rep_points[fe_index][j]];
 
-          // pick out the representative
-          // support points
-          rep_points.resize (dofs_of_rep_points[fe_index].size());
-          for (unsigned int j=0; j<dofs_of_rep_points[fe_index].size(); ++j)
-            rep_points[j] = support_points[dofs_of_rep_points[fe_index][j]];
-
-          // get indices of the dofs on this cell
-          dofs_on_cell.resize (fe[fe_index].dofs_per_cell);
-          cell->get_dof_indices (dofs_on_cell);
+		  // get indices of the dofs on this cell
+		  dofs_on_cell.resize (fe[fe_index].dofs_per_cell);
+		  cell->get_dof_indices (dofs_on_cell);
 
 
-          if (fe_is_system)
-            {
-              // get function values at
-              // these points. Here: get
-              // all components
-              function_values_system[fe_index]
-              .resize (n_rep_points[fe_index],
-                       Vector<double> (fe[fe_index].n_components()));
-              function.vector_value_list (rep_points,
-                                          function_values_system[fe_index]);
-              // distribute the function
-              // values to the global
-              // vector
-              for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
-                {
-                  const unsigned int component
-                    = fe[fe_index].system_to_component_index(i).first;
-                  const unsigned int rep_dof=dof_to_rep_index_table[fe_index][i];
-                  vec(dofs_on_cell[i])
-                    = function_values_system[fe_index][rep_dof](component);
-                }
-            }
-          else
-            {
-              // get first component only,
-              // which is the only component
-              // in the function anyway
-              function_values_scalar[fe_index].resize (n_rep_points[fe_index]);
-              function.value_list (rep_points,
-                                   function_values_scalar[fe_index],
-                                   0);
-              // distribute the function
-              // values to the global
-              // vector
-              for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
-                vec(dofs_on_cell[i])
-                  = function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]];
-            }
-        }
+		  if (fe_is_system)
+		    {
+		      // get function values at
+		      // these points. Here: get
+		      // all components
+		      function_values_system[fe_index]
+		      .resize (n_rep_points[fe_index],
+		               Vector<double> (fe[fe_index].n_components()));
+		      function.vector_value_list (rep_points,
+		                                  function_values_system[fe_index]);
+		      // distribute the function
+		      // values to the global
+		      // vector
+		      for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
+		        {
+		          const unsigned int component
+		            = fe[fe_index].system_to_component_index(i).first;
+		          const unsigned int rep_dof=dof_to_rep_index_table[fe_index][i];
+		          vec(dofs_on_cell[i])
+		            = function_values_system[fe_index][rep_dof](component);
+		        }
+		    }
+		  else
+		    {
+		      // get first component only,
+		      // which is the only component
+		      // in the function anyway
+		      function_values_scalar[fe_index].resize (n_rep_points[fe_index]);
+		      function.value_list (rep_points,
+		                           function_values_scalar[fe_index],
+		                           0);
+		      // distribute the function
+		      // values to the global
+		      // vector
+		      for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
+		        vec(dofs_on_cell[i])
+		          = function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]];
+		    }
+	    }
+	}
     vec.compress(VectorOperation::insert);
   }
 
