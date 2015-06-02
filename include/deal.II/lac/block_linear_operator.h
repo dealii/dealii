@@ -531,13 +531,13 @@ upper_triangular_operator(const BlockMatrix &block_matrix)
     Assert( u.n_blocks() == block_matrix.n_block_cols(),
             ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_cols()));
 
-    for (unsigned int i = 0; i < block_matrix.n_block_rows(); ++i)
+    for (unsigned int i = 0; i < block_matrix.n_block_rows() - 1; ++i)
       {
-        v.block(i) *= 0;
-        for (unsigned int j = i + 1; j < block_matrix.n_block_cols(); ++j)
-          block_matrix.block(i,j).Tvmult_add(v.block(i), u.block(j));
+        block_matrix.block(i,block_matrix.n_block_rows() - 1).vmult(v.block(i), u.block(block_matrix.n_block_rows() - 1));
+        for (unsigned int j = block_matrix.n_block_rows() - 2; j > i; --j)
+          block_matrix.block(i,j).vmult_add(v.block(i), u.block(j));
       }
-
+    v.block(block_matrix.n_block_rows() - 1) = 0;
   };
 
   return_op.vmult_add = [&block_matrix](Range &v, const Domain &u)
