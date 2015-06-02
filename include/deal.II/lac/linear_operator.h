@@ -682,6 +682,48 @@ identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 }
 
 
+/**
+ * @relates LinearOperator
+ *
+ * Returns a LinearOperator that is the null operator of the vector space
+ * @p Range.
+ *
+ * The function takes an <code>std::function</code> object @ref
+ * reinit_vector as an argument to initialize the
+ * <code>reinit_range_vector</code> and <code>reinit_domain_vector</code>
+ * objects of the LinearOperator object.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range>
+LinearOperator<Range, Range>
+null_operator(const std::function<void(Range &, bool)> &reinit_vector)
+{
+  LinearOperator<Range, Range> return_op;
+
+  return_op.reinit_range_vector = reinit_vector;
+  return_op.reinit_domain_vector = reinit_vector;
+
+  return_op.vmult = [](Range &v, const Range &u)
+  {
+    v = 0;
+  };
+
+  return_op.vmult_add = [](Range &v, const Range &u)
+  {};
+
+  return_op.Tvmult = [](Range &v, const Range &u)
+  {
+    v = 0;
+  };
+
+  return_op.Tvmult_add = [](Range &v, const Range &u)
+  {};
+
+  return return_op;
+}
+
+
 namespace internal
 {
   namespace LinearOperator

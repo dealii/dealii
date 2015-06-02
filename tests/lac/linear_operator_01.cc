@@ -229,4 +229,11 @@ int main()
   auto test3 = identity_operator(test2.reinit_range_vector) + test2;
   test3.vmult(w, u);
   deallog << "(1 + 2 * 4) * " << u.value << " = " << w.value << std::endl;
+
+  // null operator
+
+  auto test4 = null_operator(test2.reinit_range_vector);
+  test4.vmult(w, u);
+  deallog << " 0 * " << u.value << " = " << w.value << std::endl;
+
 }
