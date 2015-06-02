@@ -46,16 +46,16 @@ namespace mu
     ECmdCode Cmd;
     int StackPos;
 
-      union u
+    union
     {
-      struct sVal
+      struct //SValData
       {
         value_type *ptr;
         value_type  data;
         value_type  data2;
       } Val;
 
-      struct sFun
+      struct //SFunData
       {
         // Note: generic_fun_type is merely a placeholder. The real type could be 
         //       anything between gun_type1 and fun_type9. I can't use a void
@@ -66,12 +66,12 @@ namespace mu
         int   idx;
       } Fun;
 
-      struct sOprt
+      struct //SOprtData
       {
         value_type *ptr;
         int offset;
       } Oprt;
-    } u;
+    };
   };
   
   

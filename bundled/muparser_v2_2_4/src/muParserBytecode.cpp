@@ -25,12 +25,12 @@
 
 #include "muParserBytecode.h"
 
+#include <algorithm>
 #include <cassert>
 #include <string>
 #include <stack>
 #include <vector>
 #include <iostream>
-#include <algorithm>
 
 #include "muParserDef.h"
 #include "muParserError.h"
@@ -92,6 +92,7 @@ namespace mu
     m_iStackPos = a_ByteCode.m_iStackPos;
     m_vRPN = a_ByteCode.m_vRPN;
     m_iMaxStackSize = a_ByteCode.m_iMaxStackSize;
+	m_bEnableOptimizer = a_ByteCode.m_bEnableOptimizer;
   }
 
   //---------------------------------------------------------------------------
@@ -107,9 +108,9 @@ namespace mu
     // optimization does not apply
     SToken tok;
     tok.Cmd       = cmVAR;
-    tok.u.Val.ptr   = a_pVar;
-    tok.u.Val.data  = 1;
-    tok.u.Val.data2 = 0;
+    tok.Val.ptr   = a_pVar;
+    tok.Val.data  = 1;
+    tok.Val.data2 = 0;
     m_vRPN.push_back(tok);
   }
 
@@ -134,9 +135,9 @@ namespace mu
     // If optimization does not apply
     SToken tok;
     tok.Cmd = cmVAL;
-    tok.u.Val.ptr   = NULL;
-    tok.u.Val.data  = 0;
-    tok.u.Val.data2 = a_fVal;
+    tok.Val.ptr   = NULL;
+    tok.Val.data  = 0;
+    tok.Val.data2 = a_fVal;
     m_vRPN.push_back(tok);
   }
 
@@ -144,8 +145,8 @@ namespace mu
   void ParserByteCode::ConstantFolding(ECmdCode a_Oprt)
   {
     std::size_t sz = m_vRPN.size();
-    value_type &x = m_vRPN[sz-2].u.Val.data2,
-               &y = m_vRPN[sz-1].u.Val.data2;
+    value_type &x = m_vRPN[sz-2].Val.data2,
+               &y = m_vRPN[sz-1].Val.data2;
     switch (a_Oprt)
     {
     case cmLAND: x = (int)x && (int)y; m_vRPN.pop_back(); break;
@@ -215,11 +216,11 @@ namespace mu
               // Optimization for ploynomials of low order
               if (m_vRPN[sz-2].Cmd == cmVAR && m_vRPN[sz-1].Cmd == cmVAL)
               {
-                if (m_vRPN[sz-1].u.Val.data2==2)
+                if (m_vRPN[sz-1].Val.data2==2)
                   m_vRPN[sz-2].Cmd = cmVARPOW2;
-                else if (m_vRPN[sz-1].u.Val.data2==3)
+                else if (m_vRPN[sz-1].Val.data2==3)
                   m_vRPN[sz-2].Cmd = cmVARPOW3;
-                else if (m_vRPN[sz-1].u.Val.data2==4)
+                else if (m_vRPN[sz-1].Val.data2==4)
                   m_vRPN[sz-2].Cmd = cmVARPOW4;
                 else
                   break;
@@ -237,19 +238,19 @@ namespace mu
                    (m_vRPN[sz-1].Cmd == cmVAL    && m_vRPN[sz-2].Cmd == cmVAR)    || 
                    (m_vRPN[sz-1].Cmd == cmVAL    && m_vRPN[sz-2].Cmd == cmVARMUL) ||
                    (m_vRPN[sz-1].Cmd == cmVARMUL && m_vRPN[sz-2].Cmd == cmVAL)    ||
-                   (m_vRPN[sz-1].Cmd == cmVAR    && m_vRPN[sz-2].Cmd == cmVAR    && m_vRPN[sz-2].u.Val.ptr == m_vRPN[sz-1].u.Val.ptr) ||
-                   (m_vRPN[sz-1].Cmd == cmVAR    && m_vRPN[sz-2].Cmd == cmVARMUL && m_vRPN[sz-2].u.Val.ptr == m_vRPN[sz-1].u.Val.ptr) ||
-                   (m_vRPN[sz-1].Cmd == cmVARMUL && m_vRPN[sz-2].Cmd == cmVAR    && m_vRPN[sz-2].u.Val.ptr == m_vRPN[sz-1].u.Val.ptr) ||
-                   (m_vRPN[sz-1].Cmd == cmVARMUL && m_vRPN[sz-2].Cmd == cmVARMUL && m_vRPN[sz-2].u.Val.ptr == m_vRPN[sz-1].u.Val.ptr) )
+                   (m_vRPN[sz-1].Cmd == cmVAR    && m_vRPN[sz-2].Cmd == cmVAR    && m_vRPN[sz-2].Val.ptr == m_vRPN[sz-1].Val.ptr) ||
+                   (m_vRPN[sz-1].Cmd == cmVAR    && m_vRPN[sz-2].Cmd == cmVARMUL && m_vRPN[sz-2].Val.ptr == m_vRPN[sz-1].Val.ptr) ||
+                   (m_vRPN[sz-1].Cmd == cmVARMUL && m_vRPN[sz-2].Cmd == cmVAR    && m_vRPN[sz-2].Val.ptr == m_vRPN[sz-1].Val.ptr) ||
+                   (m_vRPN[sz-1].Cmd == cmVARMUL && m_vRPN[sz-2].Cmd == cmVARMUL && m_vRPN[sz-2].Val.ptr == m_vRPN[sz-1].Val.ptr) )
               {
-                assert( (m_vRPN[sz-2].u.Val.ptr==NULL && m_vRPN[sz-1].u.Val.ptr!=NULL) ||
-                        (m_vRPN[sz-2].u.Val.ptr!=NULL && m_vRPN[sz-1].u.Val.ptr==NULL) || 
-                        (m_vRPN[sz-2].u.Val.ptr == m_vRPN[sz-1].u.Val.ptr) );
+                assert( (m_vRPN[sz-2].Val.ptr==NULL && m_vRPN[sz-1].Val.ptr!=NULL) ||
+                        (m_vRPN[sz-2].Val.ptr!=NULL && m_vRPN[sz-1].Val.ptr==NULL) || 
+                        (m_vRPN[sz-2].Val.ptr == m_vRPN[sz-1].Val.ptr) );
 
                 m_vRPN[sz-2].Cmd = cmVARMUL;
-                m_vRPN[sz-2].u.Val.ptr    = (value_type*)((long long)(m_vRPN[sz-2].u.Val.ptr) | (long long)(m_vRPN[sz-1].u.Val.ptr));    // variable
-                m_vRPN[sz-2].u.Val.data2 += ((a_Oprt==cmSUB) ? -1 : 1) * m_vRPN[sz-1].u.Val.data2;  // offset
-                m_vRPN[sz-2].u.Val.data  += ((a_Oprt==cmSUB) ? -1 : 1) * m_vRPN[sz-1].u.Val.data;   // multiplikatior
+                m_vRPN[sz-2].Val.ptr    = (value_type*)((long long)(m_vRPN[sz-2].Val.ptr) | (long long)(m_vRPN[sz-1].Val.ptr));    // variable
+                m_vRPN[sz-2].Val.data2 += ((a_Oprt==cmSUB) ? -1 : 1) * m_vRPN[sz-1].Val.data2;  // offset
+                m_vRPN[sz-2].Val.data  += ((a_Oprt==cmSUB) ? -1 : 1) * m_vRPN[sz-1].Val.data;   // multiplikatior
                 m_vRPN.pop_back();
                 bOptimized = true;
               } 
@@ -260,9 +261,9 @@ namespace mu
                    (m_vRPN[sz-1].Cmd == cmVAL && m_vRPN[sz-2].Cmd == cmVAR) ) 
               {
                 m_vRPN[sz-2].Cmd        = cmVARMUL;
-                m_vRPN[sz-2].u.Val.ptr    = (value_type*)((long long)(m_vRPN[sz-2].u.Val.ptr) | (long long)(m_vRPN[sz-1].u.Val.ptr));
-                m_vRPN[sz-2].u.Val.data   = m_vRPN[sz-2].u.Val.data2 + m_vRPN[sz-1].u.Val.data2;
-                m_vRPN[sz-2].u.Val.data2  = 0;
+                m_vRPN[sz-2].Val.ptr    = (value_type*)((long long)(m_vRPN[sz-2].Val.ptr) | (long long)(m_vRPN[sz-1].Val.ptr));
+                m_vRPN[sz-2].Val.data   = m_vRPN[sz-2].Val.data2 + m_vRPN[sz-1].Val.data2;
+                m_vRPN[sz-2].Val.data2  = 0;
                 m_vRPN.pop_back();
                 bOptimized = true;
               } 
@@ -271,22 +272,22 @@ namespace mu
               {
                 // Optimization: 2*(3*b+1) or (3*b+1)*2 -> 6*b+2
                 m_vRPN[sz-2].Cmd     = cmVARMUL;
-                m_vRPN[sz-2].u.Val.ptr = (value_type*)((long long)(m_vRPN[sz-2].u.Val.ptr) | (long long)(m_vRPN[sz-1].u.Val.ptr));
+                m_vRPN[sz-2].Val.ptr = (value_type*)((long long)(m_vRPN[sz-2].Val.ptr) | (long long)(m_vRPN[sz-1].Val.ptr));
                 if (m_vRPN[sz-1].Cmd == cmVAL)
                 {
-                  m_vRPN[sz-2].u.Val.data  *= m_vRPN[sz-1].u.Val.data2;
-                  m_vRPN[sz-2].u.Val.data2 *= m_vRPN[sz-1].u.Val.data2;
+                  m_vRPN[sz-2].Val.data  *= m_vRPN[sz-1].Val.data2;
+                  m_vRPN[sz-2].Val.data2 *= m_vRPN[sz-1].Val.data2;
                 }
                 else
                 {
-                  m_vRPN[sz-2].u.Val.data  = m_vRPN[sz-1].u.Val.data  * m_vRPN[sz-2].u.Val.data2;
-                  m_vRPN[sz-2].u.Val.data2 = m_vRPN[sz-1].u.Val.data2 * m_vRPN[sz-2].u.Val.data2;
+                  m_vRPN[sz-2].Val.data  = m_vRPN[sz-1].Val.data  * m_vRPN[sz-2].Val.data2;
+                  m_vRPN[sz-2].Val.data2 = m_vRPN[sz-1].Val.data2 * m_vRPN[sz-2].Val.data2;
                 }
                 m_vRPN.pop_back();
                 bOptimized = true;
               }
               else if (m_vRPN[sz-1].Cmd == cmVAR && m_vRPN[sz-2].Cmd == cmVAR &&
-                       m_vRPN[sz-1].u.Val.ptr == m_vRPN[sz-2].u.Val.ptr)
+                       m_vRPN[sz-1].Val.ptr == m_vRPN[sz-2].Val.ptr)
               {
                 // Optimization: a*a -> a^2
                 m_vRPN[sz-2].Cmd = cmVARPOW2;
@@ -296,11 +297,11 @@ namespace mu
               break;
 
         case cmDIV:
-              if (m_vRPN[sz-1].Cmd == cmVAL && m_vRPN[sz-2].Cmd == cmVARMUL && m_vRPN[sz-1].u.Val.data2!=0)
+              if (m_vRPN[sz-1].Cmd == cmVAL && m_vRPN[sz-2].Cmd == cmVARMUL && m_vRPN[sz-1].Val.data2!=0)
               {
                 // Optimization: 4*a/2 -> 2*a
-                m_vRPN[sz-2].u.Val.data  /= m_vRPN[sz-1].u.Val.data2;
-                m_vRPN[sz-2].u.Val.data2 /= m_vRPN[sz-1].u.Val.data2;
+                m_vRPN[sz-2].Val.data  /= m_vRPN[sz-1].Val.data2;
+                m_vRPN[sz-2].Val.data2 /= m_vRPN[sz-1].Val.data2;
                 m_vRPN.pop_back();
                 bOptimized = true;
               }
@@ -345,7 +346,7 @@ namespace mu
 
     SToken tok;
     tok.Cmd = cmASSIGN;
-    tok.u.Val.ptr = a_pVar;
+    tok.Oprt.ptr = a_pVar;
     m_vRPN.push_back(tok);
   }
 
@@ -370,8 +371,8 @@ namespace mu
 
     SToken tok;
     tok.Cmd = cmFUNC;
-    tok.u.Fun.argc = a_iArgc;
-    tok.u.Fun.ptr = a_pFun;
+    tok.Fun.argc = a_iArgc;
+    tok.Fun.ptr = a_pFun;
     m_vRPN.push_back(tok);
   }
 
@@ -388,8 +389,8 @@ namespace mu
 
     SToken tok;
     tok.Cmd = cmFUNC_BULK;
-    tok.u.Fun.argc = a_iArgc;
-    tok.u.Fun.ptr = a_pFun;
+    tok.Fun.argc = a_iArgc;
+    tok.Fun.ptr = a_pFun;
     m_vRPN.push_back(tok);
   }
 
@@ -407,9 +408,9 @@ namespace mu
 
     SToken tok;
     tok.Cmd = cmFUNC_STR;
-    tok.u.Fun.argc = a_iArgc;
-    tok.u.Fun.idx = a_iIdx;
-    tok.u.Fun.ptr = a_pFun;
+    tok.Fun.argc = a_iArgc;
+    tok.Fun.idx = a_iIdx;
+    tok.Fun.ptr = a_pFun;
     m_vRPN.push_back(tok);
 
     m_iMaxStackSize = std::max(m_iMaxStackSize, (size_t)m_iStackPos);
@@ -441,12 +442,12 @@ namespace mu
       case  cmELSE:
             stElse.push(i);
             idx = stIf.pop();
-            m_vRPN[idx].u.Oprt.offset = i - idx;
+            m_vRPN[idx].Oprt.offset = i - idx;
             break;
       
       case cmENDIF:
             idx = stElse.pop();
-            m_vRPN[idx].u.Oprt.offset = i - idx;
+            m_vRPN[idx].Oprt.offset = i - idx;
             break;
 
       default:
@@ -510,42 +511,42 @@ namespace mu
       switch (m_vRPN[i].Cmd)
       {
       case cmVAL:   mu::console() << _T("VAL \t");
-                    mu::console() << _T("[") << m_vRPN[i].u.Val.data2 << _T("]\n");
+                    mu::console() << _T("[") << m_vRPN[i].Val.data2 << _T("]\n");
                     break;
 
       case cmVAR:   mu::console() << _T("VAR \t");
-	                  mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Val.ptr << _T("]\n"); 
+	                  mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Val.ptr << _T("]\n"); 
                     break;
 
       case cmVARPOW2: mu::console() << _T("VARPOW2 \t");
-	                    mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Val.ptr << _T("]\n"); 
+	                    mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Val.ptr << _T("]\n"); 
                       break;
 
       case cmVARPOW3: mu::console() << _T("VARPOW3 \t");
-	                    mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Val.ptr << _T("]\n"); 
+	                    mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Val.ptr << _T("]\n"); 
                       break;
 
       case cmVARPOW4: mu::console() << _T("VARPOW4 \t");
-	                    mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Val.ptr << _T("]\n"); 
+	                    mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Val.ptr << _T("]\n"); 
                       break;
 
       case cmVARMUL:  mu::console() << _T("VARMUL \t");
-	                    mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Val.ptr << _T("]"); 
-                      mu::console() << _T(" * [") << m_vRPN[i].u.Val.data << _T("]");
-                      mu::console() << _T(" + [") << m_vRPN[i].u.Val.data2 << _T("]\n");
+	                    mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Val.ptr << _T("]"); 
+                      mu::console() << _T(" * [") << m_vRPN[i].Val.data << _T("]");
+                      mu::console() << _T(" + [") << m_vRPN[i].Val.data2 << _T("]\n");
                       break;
 
       case cmFUNC:  mu::console() << _T("CALL\t");
-                    mu::console() << _T("[ARG:") << std::dec << m_vRPN[i].u.Fun.argc << _T("]"); 
-                    mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].u.Fun.ptr << _T("]"); 
+                    mu::console() << _T("[ARG:") << std::dec << m_vRPN[i].Fun.argc << _T("]"); 
+                    mu::console() << _T("[ADDR: 0x") << std::hex << m_vRPN[i].Fun.ptr << _T("]"); 
                     mu::console() << _T("\n");
                     break;
 
       case cmFUNC_STR:
                     mu::console() << _T("CALL STRFUNC\t");
-                    mu::console() << _T("[ARG:") << std::dec << m_vRPN[i].u.Fun.argc << _T("]");
-                    mu::console() << _T("[IDX:") << std::dec << m_vRPN[i].u.Fun.idx << _T("]");
-                    mu::console() << _T("[ADDR: 0x") << m_vRPN[i].u.Fun.ptr << _T("]\n"); 
+                    mu::console() << _T("[ARG:") << std::dec << m_vRPN[i].Fun.argc << _T("]");
+                    mu::console() << _T("[IDX:") << std::dec << m_vRPN[i].Fun.idx << _T("]");
+                    mu::console() << _T("[ADDR: 0x") << m_vRPN[i].Fun.ptr << _T("]\n"); 
                     break;
 
       case cmLT:    mu::console() << _T("LT\n");  break;
@@ -563,18 +564,18 @@ namespace mu
       case cmPOW:   mu::console() << _T("POW\n"); break;
 
       case cmIF:    mu::console() << _T("IF\t");
-                    mu::console() << _T("[OFFSET:") << std::dec << m_vRPN[i].u.Oprt.offset << _T("]\n");
+                    mu::console() << _T("[OFFSET:") << std::dec << m_vRPN[i].Oprt.offset << _T("]\n");
                     break;
 
       case cmELSE:  mu::console() << _T("ELSE\t");
-                    mu::console() << _T("[OFFSET:") << std::dec << m_vRPN[i].u.Oprt.offset << _T("]\n");
+                    mu::console() << _T("[OFFSET:") << std::dec << m_vRPN[i].Oprt.offset << _T("]\n");
                     break;
 
       case cmENDIF: mu::console() << _T("ENDIF\n"); break;
 
       case cmASSIGN: 
                     mu::console() << _T("ASSIGN\t");
-                    mu::console() << _T("[ADDR: 0x") << m_vRPN[i].u.Oprt.ptr << _T("]\n"); 
+                    mu::console() << _T("[ADDR: 0x") << m_vRPN[i].Oprt.ptr << _T("]\n"); 
                     break; 
 
       default:      mu::console() << _T("(unknown code: ") << m_vRPN[i].Cmd << _T(")\n"); 
