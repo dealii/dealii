@@ -854,7 +854,9 @@ namespace
     /**
      * The flags controlling the output
      */
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
     const DataOutBase::GmvFlags flags;
+    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
   };
 
   /**
