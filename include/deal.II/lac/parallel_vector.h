@@ -360,9 +360,11 @@ namespace parallel
       /**
        * This method copies the local range from another vector with the same
        * local range, but possibly different layout of ghost indices.
+       *
+       * This function is deprecated.
        */
       void copy_from (const Vector<Number> &in_vector,
-                      const bool            call_update_ghost_values = false);
+                      const bool            call_update_ghost_values = false) DEAL_II_DEPRECATED;
 
       /**
        * Sets all elements of the vector to the scalar @p s. If the scalar is
@@ -636,22 +638,28 @@ namespace parallel
 
       /**
        * Returns the number of ghost elements present on the vector.
+       *
+       * This function is deprecated.
        */
-      size_type n_ghost_entries () const;
+      size_type n_ghost_entries () const DEAL_II_DEPRECATED;
 
       /**
        * Return an index set that describes which elements of this vector are
        * not owned by the current processor but can be written into or read
        * from locally (ghost elements).
+       *
+       * This function is deprecated.
        */
-      const IndexSet &ghost_elements() const;
+      const IndexSet &ghost_elements() const DEAL_II_DEPRECATED;
 
       /**
        * Returns whether the given global index is a ghost index on the
        * present processor. Returns false for indices that are owned locally
        * and for indices not present at all.
+       *
+       * This function is deprecated.
        */
-      bool is_ghost_entry (const types::global_dof_index global_index) const;
+      bool is_ghost_entry (const types::global_dof_index global_index) const DEAL_II_DEPRECATED;
 
       /**
        * Make the @p Vector class a bit like the <tt>vector<></tt> class of
@@ -817,8 +825,10 @@ namespace parallel
 
       /**
        * Simple vector addition, equal to the <tt>operator +=</tt>.
+       *
+       * This function is deprecated use the <tt>operator +=</tt> instead.
        */
-      void add (const Vector<Number> &V);
+      void add (const Vector<Number> &V) DEAL_II_DEPRECATED;
 
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this +=

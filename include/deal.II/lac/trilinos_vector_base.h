@@ -287,8 +287,10 @@ namespace TrilinosWrappers
     /**
      * Returns the state of the vector, i.e., whether compress() has already
      * been called after an operation requiring data exchange.
+     *
+     * This function is deprecated.
      */
-    bool is_compressed () const;
+    bool is_compressed () const DEAL_II_DEPRECATED;
 
     /**
      * Set all components of the vector to the given number @p s. Simply pass
@@ -431,8 +433,20 @@ namespace TrilinosWrappers
 
     /**
      * Compute the minimal value of the elements of this vector.
+     *
+     * This function is deprecated use min() instead.
      */
-    TrilinosScalar minimal_value () const;
+    TrilinosScalar minimal_value () const DEAL_II_DEPRECATED;
+
+    /**
+     * Compute the minimal value of the elements of this vector.
+     */
+    TrilinosScalar min () const;
+
+    /**
+     * Compute the maximal value of the elements of this vector.
+     */
+    TrilinosScalar max () const;
 
     /**
      * $l_1$-norm of the vector.  The sum of the absolute values.
@@ -561,8 +575,10 @@ namespace TrilinosWrappers
      * returns 0 which might or might not be appropriate in a given situation.
      * If you rely on consistent results, use the access functions () or []
      * that throw an assertion in case a non-local element is used.
+     *
+     * This function is deprecated.
      */
-    TrilinosScalar el (const size_type index) const;
+    TrilinosScalar el (const size_type index) const DEAL_II_DEPRECATED;
 
     /**
      * Make the Vector class a bit like the <tt>vector<></tt> class of the C++
@@ -802,8 +818,10 @@ namespace TrilinosWrappers
     /**
      * Output of vector in user-defined format in analogy to the
      * dealii::Vector class.
+     *
+     * This function is deprecated.
      */
-    void print (const char *format = 0) const;
+    void print (const char *format = 0) const DEAL_II_DEPRECATED;
 
     /**
      * Print to a stream. @p precision denotes the desired precision with
@@ -1466,11 +1484,33 @@ namespace TrilinosWrappers
   TrilinosScalar
   VectorBase::minimal_value () const
   {
+    return min();
+  }
+
+
+
+  inline
+  TrilinosScalar
+  VectorBase::min () const
+  {
     TrilinosScalar min_value;
     const int ierr = vector->MinValue (&min_value);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
     return min_value;
+  }
+
+
+
+  inline
+  TrilinosScalar
+  VectorBase::max () const
+  {
+    TrilinosScalar max_value;
+    const int ierr = vector->MaxValue (&max_value);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    return max_value;
   }
 
 

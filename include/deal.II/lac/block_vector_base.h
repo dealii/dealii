@@ -897,8 +897,10 @@ public:
 
   /**
    * U+=V. Simple vector addition, equal to the <tt>operator +=</tt>.
+   *
+   * This function is deprecated use the <tt>operator +=</tt> instead.
    */
-  void add (const BlockVectorBase &V);
+  void add (const BlockVectorBase &V) DEAL_II_DEPRECATED;
 
   /**
    * U+=a*V. Simple addition of a scaled vector.
@@ -1866,7 +1868,14 @@ template <class VectorType>
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator += (const BlockVectorBase<VectorType> &v)
 {
-  add (v);
+  Assert (n_blocks() == v.n_blocks(),
+          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+
+  for (size_type i=0; i<n_blocks(); ++i)
+    {
+      components[i] += v.components[i];
+    }
+
   return *this;
 }
 
@@ -1948,13 +1957,7 @@ void BlockVectorBase<VectorType>::add (const value_type a)
 template <class VectorType>
 void BlockVectorBase<VectorType>::add (const BlockVectorBase<VectorType> &v)
 {
-  Assert (n_blocks() == v.n_blocks(),
-          ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-
-  for (size_type i=0; i<n_blocks(); ++i)
-    {
-      components[i].add(v.components[i]);
-    }
+  *this += v;
 }
 
 

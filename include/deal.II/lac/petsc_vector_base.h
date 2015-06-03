@@ -383,8 +383,7 @@ namespace PETScWrappers
     operator [] (const size_type index);
 
     /**
-     * Provide read-only access to an element. This is equivalent to the
-     * <code>el()</code> command.
+     * Provide read-only access to an element.
      *
      * Exactly the same as operator().
      */
@@ -502,8 +501,10 @@ namespace PETScWrappers
     /**
      * Normalize vector by dividing by the $l_2$-norm of the vector. Return
      * the vector norm before normalization.
+     *
+     * This function is deprecated.
      */
-    real_type normalize () const;
+    real_type normalize () const DEAL_II_DEPRECATED;
 
     /**
      * Return the value of the vector element with the largest negative value.
@@ -517,33 +518,43 @@ namespace PETScWrappers
 
     /**
      * Replace every element in a vector with its absolute value.
+     *
+     * This function is deprecated.
      */
-    VectorBase &abs ();
+    VectorBase &abs () DEAL_II_DEPRECATED;
 
     /**
      * Conjugate a vector.
+     *
+     * This function is deprecated.
      */
-    VectorBase &conjugate ();
+    VectorBase &conjugate () DEAL_II_DEPRECATED;
 
     /**
      * A collective piecewise multiply operation on <code>this</code> vector
      * with itself. TODO: The model for this function should be similer to add
      * ().
+     *
+     * This function is deprecated.
      */
-    VectorBase &mult ();
+    VectorBase &mult () DEAL_II_DEPRECATED;
 
     /**
      * Same as above, but a collective piecewise multiply operation of
      * <code>this</code> vector with <b>v</b>.
+     *
+     * This function is deprecated.
      */
-    VectorBase &mult (const VectorBase &v);
+    VectorBase &mult (const VectorBase &v) DEAL_II_DEPRECATED;
 
     /**
      * Same as above, but a collective piecewise multiply operation of
      * <b>u</b> with <b>v</b>.
+     *
+     * This function is deprecated.
      */
     VectorBase &mult (const VectorBase &u,
-                      const VectorBase &v);
+                      const VectorBase &v) DEAL_II_DEPRECATED;
 
     /**
      * Return whether the vector contains only elements with value zero. This
@@ -587,8 +598,10 @@ namespace PETScWrappers
 
     /**
      * Simple vector addition, equal to the <tt>operator +=</tt>.
+     *
+     * This function is deprecated use += instead.
      */
-    void add (const VectorBase &V);
+    void add (const VectorBase &V) DEAL_II_DEPRECATED;
 
     /**
      * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.

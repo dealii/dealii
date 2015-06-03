@@ -413,10 +413,12 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * This function is deprecated.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      explicit Vector (const Epetra_Map &parallel_partitioning);
+      explicit Vector (const Epetra_Map &parallel_partitioning)  DEAL_II_DEPRECATED;
 
       /**
        * Copy constructor from the TrilinosWrappers vector class. Since a
@@ -429,11 +431,13 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * This function is deprecated.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       Vector (const Epetra_Map &parallel_partitioning,
-              const VectorBase &v);
+              const VectorBase &v) DEAL_II_DEPRECATED;
 
       /**
        * Reinitialize from a deal.II vector. The Epetra_Map specifies the
@@ -444,12 +448,14 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * This function is deprecated.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       template <typename number>
       void reinit (const Epetra_Map             &parallel_partitioner,
-                   const dealii::Vector<number> &v);
+                   const dealii::Vector<number> &v) DEAL_II_DEPRECATED;
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -460,11 +466,13 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * This function is deprecated.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void reinit (const Epetra_Map &parallel_partitioning,
-                   const bool        fast = false);
+                   const bool        fast = false) DEAL_II_DEPRECATED;
 
       /**
        * Copy-constructor from deal.II vectors. Sets the dimension to that of
@@ -475,12 +483,14 @@ namespace TrilinosWrappers
        * or may not have ghost elements. See the general documentation of this
        * class for more information.
        *
+       * This function is deprecated.
+       *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       template <typename Number>
       Vector (const Epetra_Map             &parallel_partitioning,
-              const dealii::Vector<Number> &v);
+              const dealii::Vector<Number> &v) DEAL_II_DEPRECATED;
 //@}
       /**
        * @name Initialization with an IndexSet

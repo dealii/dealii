@@ -63,6 +63,7 @@ SET(_src
   tridiagonal_matrix.cc
   trilinos_block_sparse_matrix.cc
   trilinos_block_vector.cc
+  trilinos_parallel_block_vector.cc
   trilinos_precondition.cc
   trilinos_solver.cc
   trilinos_sparse_matrix.cc
