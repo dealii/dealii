@@ -544,8 +544,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim,
-           template <int,int> class DH,
-           class Vector>
+            template <int,int> class DH,
+            class Vector>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
                                  const Vector            &u1,
@@ -568,8 +568,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim,
-           template <int,int> class DH,
-           class Vector>
+            template <int,int> class DH,
+            class Vector>
   void
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
                                  const Vector            &u1,
@@ -608,8 +608,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim,
-           template <int,int> class DH,
-           class Vector>
+            template <int,int> class DH,
+            class Vector>
   void
   interpolate_to_different_mesh (const InterGridMap<DH<dim, spacedim> > &intergridmap,
                                  const Vector                           &u1,
@@ -683,9 +683,9 @@ namespace VectorTools
      * Compute the boundary values to be used in the project() functions.
      */
     template <int dim, int spacedim,
-             template <int,int> class DH,
-             template <int,int> class M_or_MC,
-             template <int> class Q_or_QC>
+              template <int,int> class DH,
+              template <int,int> class M_or_MC,
+              template <int> class Q_or_QC>
     void project_compute_b_v (const M_or_MC<dim, spacedim>   &mapping,
                               const DH<dim,spacedim> &dof,
                               const Function<spacedim> &function,
@@ -750,10 +750,10 @@ namespace VectorTools
      * Generic implementation of the project() function
      */
     template <int dim, int spacedim,
-             class Vector,
-             template <int,int> class DH,
-             template <int,int> class M_or_MC,
-             template <int> class Q_or_QC>
+              class Vector,
+              template <int,int> class DH,
+              template <int,int> class M_or_MC,
+              template <int> class Q_or_QC>
     void do_project (const M_or_MC<dim, spacedim>   &mapping,
                      const DH<dim,spacedim> &dof,
                      const ConstraintMatrix   &constraints,
@@ -1662,7 +1662,7 @@ namespace VectorTools
     // easier to simply work on
     // individual vertices
     template <class DH,
-             template <int,int> class M_or_MC>
+              template <int,int> class M_or_MC>
     static inline
     void do_interpolate_boundary_values (const M_or_MC<DH::dimension, DH::space_dimension> &,
                                          const DH                 &dof,
@@ -1745,8 +1745,8 @@ namespace VectorTools
     // whenever possible (i.e., if dim==1), the function template above
     // will be used
     template <class DH,
-             template <int,int> class M_or_MC,
-             int dim_>
+              template <int,int> class M_or_MC,
+              int dim_>
     static inline
     void
     do_interpolate_boundary_values (const M_or_MC<DH::dimension, DH::space_dimension> &mapping,
@@ -1934,17 +1934,17 @@ namespace VectorTools
                                    :
                                    (dim == 2 ?
                                     (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
+                                    :
+                                    (dim == 3 ?
+                                     (i<4*fe.dofs_per_vertex ?
+                                      i
                                       :
-                                      (dim == 3 ?
-                                       (i<4*fe.dofs_per_vertex ?
-                                        i
-                                        :
-                                        (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
-                                         i+4*fe.dofs_per_vertex
-                                         :
-                                         i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                                      (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
+                                       i+4*fe.dofs_per_vertex
                                        :
-                                       numbers::invalid_unsigned_int)));
+                                       i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
+                                     :
+                                     numbers::invalid_unsigned_int)));
                               Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
 
                               // make sure that if this is not a primitive
@@ -1970,7 +1970,7 @@ namespace VectorTools
                     }
                   else
                     // fe has only one component, so save some computations
-                  {
+                    {
                       // get only the one component that this function has
                       dof_values_scalar.resize (fe.dofs_per_face);
                       function_map.find(boundary_component)->second
@@ -2154,9 +2154,9 @@ namespace VectorTools
   namespace
   {
     template <int dim, int spacedim,
-             template <int,int> class DH,
-             template <int,int> class M_or_MC,
-             template <int> class Q_or_QC>
+              template <int,int> class DH,
+              template <int,int> class M_or_MC,
+              template <int> class Q_or_QC>
     void
     do_project_boundary_values (const M_or_MC<dim, spacedim>   &mapping,
                                 const DH<dim, spacedim> &dof,
@@ -5535,17 +5535,17 @@ namespace VectorTools
 
         switch (max_n_contributions_per_cell)
           {
-            // first deal with the case that a number of cells all have
-            // registered that they have a normal vector defined at the
-            // location of a given vector dof, and that each of them have
-            // encountered this vector dof exactly once while looping over all
-            // their faces. as stated in the documentation, this is the case
-            // where we want to simply average over all normal vectors
-            //
-            // the typical case is in 2d where multiple cells meet at one
-            // vertex sitting on the boundary. same in 3d for a vertex that
-            // is associated with only one of the boundary indicators passed
-            // to this function
+          // first deal with the case that a number of cells all have
+          // registered that they have a normal vector defined at the
+          // location of a given vector dof, and that each of them have
+          // encountered this vector dof exactly once while looping over all
+          // their faces. as stated in the documentation, this is the case
+          // where we want to simply average over all normal vectors
+          //
+          // the typical case is in 2d where multiple cells meet at one
+          // vertex sitting on the boundary. same in 3d for a vertex that
+          // is associated with only one of the boundary indicators passed
+          // to this function
           case 1:
           {
             // compute the average normal vector from all the ones that have
@@ -6428,7 +6428,7 @@ namespace VectorTools
           update_flags |= UpdateFlags (update_gradients);
           if (spacedim == dim+1)
             update_flags |= UpdateFlags (update_normal_vectors);
-          // no break!
+        // no break!
 
         default:
           update_flags |= UpdateFlags (update_values);
