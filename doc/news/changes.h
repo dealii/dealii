@@ -512,6 +512,17 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: VectorTools::interpolate now works with FE_Nothing.
+  <br>
+  (Angel Rodriguez, 2015/06/03)
+  </li>
+
+  <li> Improved: deal.II now uses a variety of strategies to silence compiler
+  warnings about unused variables and unused parameters.
+  <br>
+  (David Wells, 2015/04/13)
+  </li>
+
   <li> New: Add a clear function to the PETSc::Vector
   and PETSc::MPI::Vector classes similar to the Trilinos vector classes.
   <br>
@@ -973,12 +984,6 @@ inconvenience this causes.
   DEAL_II_WITH_* variables to certain places in the documentation.
   <br>
   (Matthias Maier, 2014/12/29)
-  </li>
-
-  <li> Improved: deal.II now uses a variety of strategies to silence compiler
-  warnings about unused variables and unused parameters.
-  <br>
-  (David Wells, 2015/04/13)
   </li>
 </ol>
 
