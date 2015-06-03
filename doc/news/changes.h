@@ -980,6 +980,11 @@ inconvenience this causes.
   <br>
   (David Wells, 2015/04/13)
   </li>
+
+  <li> Improved: VectorTools::interpolate now works with FE_Nothing.
+  <br>
+  (Angel Rodriguez, 2015/06/03)
+  </li>
 </ol>
 
 */
