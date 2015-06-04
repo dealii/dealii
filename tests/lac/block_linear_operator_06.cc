@@ -62,9 +62,9 @@ int main()
         d.set(i,i, 1.0 / (i+i +1) );
 
     auto op_a         = linear_operator< BlockVector<double> >(a);
-    auto diagonal_inv = linear_operator< BlockVector<double> >(d);
+    auto diagonal_inv = linear_operator< BlockVector<double>, BlockVector<double> >(d);
     // auto diagonal_inv = block_diagonal_operator(diag);
-    auto inverse_op_a = block_triangular_inverse< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a, diagonal_inv);
+    auto inverse_op_a = block_triangular_inverse<3, BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a, diagonal_inv);
 
     auto identity = inverse_op_a * op_a;
 
@@ -81,7 +81,7 @@ int main()
         u.block(i)[0] = 0;;
         v.block(i)[0] = 0;
       }
-      u.block(j)[0] = 1;;
+      u.block(j)[0] = 1;
 
       op_a.vmult(v, u);
 
@@ -90,7 +90,7 @@ int main()
 
     deallog << " -- Inverse -- " << std::endl;
     inverse_op_a.reinit_domain_vector(u, false);
-    inverse_op_a.reinit_range_vector(v, false);
+    inverse_op_a.reinit_range_vector(v, true);
     for(unsigned int j = 0; j<3; ++j)
     {
       for(unsigned int i = 0; i<3; ++i)

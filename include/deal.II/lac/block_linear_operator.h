@@ -325,8 +325,9 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
 /**
  * @relates LinearOperator
  *
- * A function that takes a block matrix @p a and returns its associated
- * lower triangular matrix operator (diagonal is not included).
+ * A function that takes an array of arrays of LinearOperators @p block_matrix
+ * and returns its associated lower triangular matrix operator
+ * (diagonal is not included).
  *
  * @code
  *  a00 | a01 | a02                 |     |
@@ -346,122 +347,6 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
 // that the function definition is without default types and parameters.
 //
 // [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
-template <typename Range = BlockVector<double>,
-          typename Domain = Range,
-          typename BlockMatrix>
-LinearOperator<Range, Domain>
-lower_triangular_operator(const BlockMatrix &);
-
-
-template <typename Range, typename Domain, typename BlockMatrix>
-LinearOperator<Range, Domain>
-lower_triangular_operator(const BlockMatrix &block_matrix)
-{
-  Assert(block_matrix.n_block_rows() == block_matrix.n_block_cols(),
-         ExcDimensionMismatch(block_matrix.n_block_rows(),block_matrix.n_block_cols()) );
-
-  LinearOperator<Range, Domain> return_op;
-
-  return_op.reinit_range_vector = [&block_matrix](Range &v, bool fast)
-  {
-    // Reinitialize the block vector to have the number of blocks
-    // equal to the number of row blocks of the matrix block_matrix.
-    v.reinit(block_matrix.n_block_rows());
-
-    // And reinitialize every individual block with reinit_range_vectors:
-    for (unsigned int i = 0; i < block_matrix.n_block_rows(); ++i)
-      linear_operator<typename Range::BlockType, typename Domain::BlockType,
-                      typename BlockMatrix::BlockType>(block_matrix.block(i, 0))
-                      .reinit_range_vector(v.block(i), fast);
-
-    v.collect_sizes();
-  };
-
-  return_op.reinit_domain_vector = [&block_matrix](Domain &v, bool fast)
-  {
-    // Reinitialize the block vector to have the number of blocks
-    // equal to the number of coloumn blocks of the matrix block_matrix.
-    v.reinit(block_matrix.n_block_cols());
-
-    // And reinitialize every individual block with reinit_domain_vectors:
-    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
-      linear_operator<typename Range::BlockType, typename Domain::BlockType,
-                      typename BlockMatrix::BlockType>(block_matrix.block(0, i))
-                      .reinit_domain_vector(v.block(i), fast);
-
-    v.collect_sizes();
-  };
-
-  return_op.vmult = [&block_matrix](Range &v, const Domain &u)
-  {
-    Assert(v.n_blocks() == block_matrix.n_block_rows(),
-           ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_rows()));
-    Assert(u.n_blocks() == block_matrix.n_block_cols(),
-           ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_cols()));
-
-    v.block(0) = 0;
-    for (unsigned int i = 1; i < block_matrix.n_block_rows(); ++i)
-      {
-        block_matrix.block(i,0).vmult(v.block(i), u.block(0));
-        for (unsigned int j = 1; j < i; ++j)
-          block_matrix.block(i,j).vmult_add(v.block(i), u.block(j));
-      }
-  };
-
-  return_op.vmult_add = [&block_matrix](Range &v, const Domain &u)
-  {
-    Assert(v.n_blocks() == block_matrix.n_block_rows(),
-           ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_rows()));
-    Assert(u.n_blocks() == block_matrix.n_block_cols(),
-           ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_cols()));
-
-    for (unsigned int i = 1; i < block_matrix.n_block_rows(); ++i)
-      {
-        block_matrix.block(i,0).vmult_add(v.block(i), u.block(0));
-        for (unsigned int j = 1; j < i; ++j)
-          block_matrix.block(i,j).vmult_add(v.block(i), u.block(j));
-      }
-  };
-
-  return_op.Tvmult = [&block_matrix](Domain &v, const Range &u)
-  {
-    Assert(v.n_blocks() == block_matrix.n_block_cols(),
-           ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_cols()));
-    Assert(u.n_blocks() == block_matrix.n_block_rows(),
-           ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_rows()));
-
-    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
-      {
-        v.block(i) = 0;
-        for (unsigned int j = i + 1; j < block_matrix.n_block_rows(); ++j)
-          block_matrix.block(j,i).Tvmult_add(v.block(i), u.block(j));
-      }
-  };
-
-  return_op.Tvmult_add = [&block_matrix](Domain &v, const Range &u)
-  {
-    Assert(v.n_blocks() == block_matrix.n_block_cols(),
-           ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_cols()));
-    Assert(u.n_blocks() == block_matrix.n_block_rows(),
-           ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_rows()));
-
-    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
-      for (unsigned int j = i + 1; j < block_matrix.n_block_rows(); ++j)
-        block_matrix.block(j,i).Tvmult_add(v.block(i), u.block(j));
-  };
-
-  return return_op;
-}
-
-
-/**
- * @relates LinearOperator
- *
- * This function is a specification of the above function that
- * allows to work with std::array of std::array of LinearOperator
- *
- * @ingroup LAOperators
- */
 
 template <unsigned int n,
           typename Range = BlockVector<double>,
@@ -481,7 +366,7 @@ lower_triangular_operator(const std::array<std::array<LinearOperator<typename Ra
     v.reinit(n);
 
     for (unsigned int i = 0; i < n; ++i)
-      block_matrix[i][0].reinit_range_vector(v.block(i), fast);
+      block_matrix[i][i].reinit_range_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
@@ -491,7 +376,7 @@ lower_triangular_operator(const std::array<std::array<LinearOperator<typename Ra
     v.reinit(n);
 
     for (unsigned int i = 0; i < n; ++i)
-      block_matrix[0][i].reinit_domain_vector(v.block(i), fast);
+      block_matrix[i][i].reinit_domain_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
@@ -537,12 +422,46 @@ lower_triangular_operator(const std::array<std::array<LinearOperator<typename Ra
   return return_op;
 }
 
+/**
+ * @relates LinearOperator
+ *
+ * This function is a specification of the above function that
+ * allows to work with block matrices @p block_matrix .
+ *
+ * @ingroup LAOperators
+ */
+
+template <unsigned int n,
+          typename Range = BlockVector<double>,
+          typename Domain = Range,
+          typename BlockMatrix>
+LinearOperator<Range, Domain>
+lower_triangular_operator(const BlockMatrix &);
+
+
+template <unsigned int n, typename Range, typename Domain, typename BlockMatrix>
+LinearOperator<Range, Domain>
+lower_triangular_operator(const BlockMatrix &block_matrix)
+{
+  Assert(block_matrix.n_block_rows() == block_matrix.n_block_cols(),
+         ExcDimensionMismatch(block_matrix.n_block_rows(),block_matrix.n_block_cols()) );
+
+  std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> M;
+  for (unsigned int i = 0; i<n; ++i)
+    {
+      for (unsigned int j = 0; j<i; ++j)
+        M[i][j] = linear_operator<typename Range::BlockType, typename Domain::BlockType>(block_matrix.block(i,j));
+      M[i][i] = null_operator(linear_operator<typename Range::BlockType, typename Domain::BlockType>(block_matrix.block(i,i)).reinit_range_vector);
+    }
+  return lower_triangular_operator<n, Range, Domain>(M);
+}
 
 /**
  * @relates LinearOperator
  *
- * A function that takes a block matrix @p a and returns its associated
- * upper triangular matrix operator (diagonal is not included).
+ * A function that takes an array of arrays of LinearOperators @p block_matrix
+ * and returns its associated upper triangular matrix operator
+ * (diagonal is not included).
  *
  * @code
  *  a00 | a01 | a02                 | a01 | a02
@@ -562,119 +481,6 @@ lower_triangular_operator(const std::array<std::array<LinearOperator<typename Ra
 // that the function definition is without default types and parameters.
 //
 // [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
-template <typename Range = BlockVector<double>,
-          typename Domain = Range,
-          typename BlockMatrix>
-LinearOperator<Range, Domain>
-upper_triangular_operator(const BlockMatrix &);
-
-
-template <typename Range, typename Domain, typename BlockMatrix>
-LinearOperator<Range, Domain>
-upper_triangular_operator(const BlockMatrix &block_matrix)
-{
-  Assert( block_matrix.n_block_rows() == block_matrix.n_block_cols(),
-          ExcDimensionMismatch(block_matrix.n_block_rows(),block_matrix.n_block_cols()) );
-
-  LinearOperator<Range, Domain> return_op;
-
-  return_op.reinit_range_vector = [&block_matrix](Range &v, bool fast)
-  {
-    // Reinitialize the block vector to have the number of blocks
-    // equal to the number of row blocks of the matrix block_matrix.
-    v.reinit(block_matrix.n_block_rows());
-
-    // And reinitialize every individual block with reinit_range_vectors:
-    for (unsigned int i = 0; i < block_matrix.n_block_rows(); ++i)
-      linear_operator<typename Range::BlockType, typename Domain::BlockType,
-                      typename BlockMatrix::BlockType>(block_matrix.block(i, 0))
-                      .reinit_range_vector(v.block(i), fast);
-
-    v.collect_sizes();
-  };
-
-  return_op.reinit_domain_vector = [&block_matrix](Domain &v, bool fast)
-  {
-    // Reinitialize the block vector to have the number of blocks
-    // equal to the number of coloumn blocks of the matrix block_matrix.
-    v.reinit(block_matrix.n_block_cols());
-
-    // And reinitialize every individual block with reinit_domain_vectors:
-    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
-      linear_operator<typename Range::BlockType, typename Domain::BlockType,
-                      typename BlockMatrix::BlockType>(block_matrix.block(0, i))
-                      .reinit_domain_vector(v.block(i), fast);
-
-    v.collect_sizes();
-  };
-
-  return_op.vmult = [&block_matrix](Range &v, const Domain &u)
-  {
-    Assert( v.n_blocks() == block_matrix.n_block_rows(),
-            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_rows()));
-    Assert( u.n_blocks() == block_matrix.n_block_cols(),
-            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_cols()));
-
-    for (unsigned int i = 0; i < block_matrix.n_block_rows() - 1; ++i)
-      {
-        block_matrix.block(i,block_matrix.n_block_rows() - 1).vmult(v.block(i), u.block(block_matrix.n_block_rows() - 1));
-        for (unsigned int j = block_matrix.n_block_rows() - 2; j > i; --j)
-          block_matrix.block(i,j).vmult_add(v.block(i), u.block(j));
-      }
-    v.block(block_matrix.n_block_rows() - 1) = 0;
-  };
-
-  return_op.vmult_add = [&block_matrix](Range &v, const Domain &u)
-  {
-    Assert( v.n_blocks() == block_matrix.n_block_rows(),
-            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_rows()));
-    Assert( u.n_blocks() == block_matrix.n_block_cols(),
-            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_cols()));
-
-    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
-      for (unsigned int j = i + 1; j < block_matrix.n_block_rows(); ++j)
-        block_matrix.block(i,j).Tvmult_add(v.block(i), u.block(j));
-  };
-
-  return_op.Tvmult = [&block_matrix](Domain &v, const Range &u)
-  {
-    Assert( v.n_blocks() == block_matrix.n_block_cols(),
-            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_cols()));
-    Assert( u.n_blocks() == block_matrix.n_block_rows(),
-            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_rows()));
-
-    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
-      {
-        v.block(i) = 0;
-        for (unsigned int j = 0; j < i; ++j)
-          block_matrix.block(j,i).vmult_add(v.block(i), u.block(j));
-      }
-  };
-
-  return_op.Tvmult_add = [&block_matrix](Domain &v, const Range &u)
-  {
-    Assert( v.n_blocks() == block_matrix.n_block_cols(),
-            ExcDimensionMismatch(v.n_blocks(), block_matrix.n_block_cols()));
-    Assert( u.n_blocks() == block_matrix.n_block_rows(),
-            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_rows()));
-
-    for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
-      for (unsigned int j = 0; j < i; ++j)
-        block_matrix.block(j,i).vmult_add(v.block(i), u.block(j));
-  };
-
-  return return_op;
-}
-
-
-/**
- * @relates LinearOperator
- *
- * This function is a specification of the above function that
- * allows to work with std::array of std::array of LinearOperator
- *
- * @ingroup LAOperators
- */
 
 template <unsigned int n,
           typename Range = BlockVector<double>,
@@ -694,7 +500,7 @@ upper_triangular_operator(const std::array<std::array<LinearOperator<typename Ra
     v.reinit(n);
 
     for (unsigned int i = 0; i < n; ++i)
-      block_matrix[i][0].reinit_range_vector(v.block(i), fast);
+      block_matrix[i][i].reinit_range_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
@@ -704,7 +510,7 @@ upper_triangular_operator(const std::array<std::array<LinearOperator<typename Ra
     v.reinit(n);
 
     for (unsigned int i = 0; i < n; ++i)
-      block_matrix[0][i].reinit_domain_vector(v.block(i), fast);
+      block_matrix[i][i].reinit_domain_vector(v.block(i), fast);
 
     v.collect_sizes();
   };
@@ -751,6 +557,42 @@ upper_triangular_operator(const std::array<std::array<LinearOperator<typename Ra
 /**
  * @relates LinearOperator
  *
+ * This function is a specification of the above function that
+ * allows to work with block matrices @p block_matrix .
+ *
+ * @ingroup LAOperators
+ */
+
+template <unsigned int n,
+          typename Range = BlockVector<double>,
+          typename Domain = Range,
+          typename BlockMatrix>
+LinearOperator<Range, Domain>
+upper_triangular_operator(const BlockMatrix &);
+
+
+template <unsigned int n, typename Range, typename Domain, typename BlockMatrix>
+LinearOperator<Range, Domain>
+upper_triangular_operator(const BlockMatrix &block_matrix)
+{
+  Assert(block_matrix.n_block_rows() == block_matrix.n_block_cols(),
+         ExcDimensionMismatch(block_matrix.n_block_rows(),block_matrix.n_block_cols()) );
+
+  std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> M;
+  for (unsigned int i = 0; i<n; ++i)
+    {
+      M[i][i] = null_operator(linear_operator<typename Range::BlockType, typename Domain::BlockType>(block_matrix.block(i,i)).reinit_range_vector);
+
+      for (unsigned int j = i+1; j<n; ++j)
+        M[i][j] = linear_operator<typename Range::BlockType, typename Domain::BlockType>(block_matrix.block(i,j));
+    }
+  return upper_triangular_operator<n, Range, Domain>(M);
+}
+
+
+/**
+ * @relates LinearOperator
+ *
  * Let M be a block matrix of the form Id + T made of nxn blocks and where
  * T is a lower / upper triangular (without diagonal). Then, its inverse is
  * of the form:
@@ -776,7 +618,8 @@ upper_triangular_operator(const std::array<std::array<LinearOperator<typename Ra
 // workaround for a bug in <=gcc-4.7 that does not like partial template
 // default values in combination with local lambda expressions [1]
 // [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
-template <typename Range = BlockVector<double>,
+template <unsigned int n,
+          typename Range = BlockVector<double>,
           typename Domain = Range,
           typename BlockMatrix>
 LinearOperator<Range, Domain>
@@ -785,33 +628,35 @@ block_triangular_inverse(const BlockMatrix &,
                          bool lower = true);
 
 
-template <typename Range, typename Domain, typename BlockMatrix>
+template <unsigned int n, typename Range, typename Domain, typename BlockMatrix>
 LinearOperator<Range, Domain>
 block_triangular_inverse(const BlockMatrix &block_matrix,
                          const LinearOperator<Range, Domain> &inverse_diagonal,
                          bool lower)
 {
+  Assert(block_matrix.n_block_rows() == n,
+         ExcDimensionMismatch(block_matrix.n_block_rows(), n));
   Assert(block_matrix.n_block_rows() == block_matrix.n_block_cols(),
          ExcDimensionMismatch(block_matrix.n_block_rows(),
                               block_matrix.n_block_cols()));
 
-  LinearOperator<Domain, Range> op_a;
+  LinearOperator<Range, Domain> op_a;
 
   if (lower)
     {
-      op_a = lower_triangular_operator<Range, Domain, BlockMatrix>(block_matrix);
+      op_a = lower_triangular_operator<n, Range, Domain, BlockMatrix>(block_matrix);
     }
   else
     {
-      op_a = upper_triangular_operator<Range, Domain, BlockMatrix>(block_matrix);
+      op_a = upper_triangular_operator<n, Range, Domain, BlockMatrix>(block_matrix);
     }
 
   auto id     = identity_operator(op_a.reinit_range_vector);
   auto result = identity_operator(op_a.reinit_range_vector);
 
   // Notice that the following formula is recursive. We are evaluating:
-  // Id - T + T^2 - T^3 ... (- T)^block_matrix.n_block_cols()
-  for (unsigned int i = 0; i < block_matrix.n_block_cols() - 1; ++i)
+  // Id - T + T^2 - T^3 ... (- T)^n
+  for (unsigned int i = 0; i < n - 1; ++i)
     result = id - inverse_diagonal * op_a * result;
 
   return result * inverse_diagonal;

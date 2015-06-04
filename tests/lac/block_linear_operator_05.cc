@@ -57,8 +57,8 @@ int main()
 
     auto op_a = linear_operator<BlockVector<double>>(a);
 
-    auto lower_triangular_block_op = lower_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
-    auto upper_triangular_block_op = upper_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
+    auto lower_triangular_block_op = lower_triangular_operator<3, BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
+    auto upper_triangular_block_op = upper_triangular_operator<3, BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
 
 
     BlockVector<double> u1;

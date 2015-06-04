@@ -75,8 +75,8 @@ int main()
 
     auto op_a = linear_operator<BlockVector<double>>(a);
 
-    auto lower_triangular_block_op = lower_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
-    auto upper_triangular_block_op = upper_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
+    auto lower_triangular_block_op = lower_triangular_operator<2, BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double>>(a);
+    auto upper_triangular_block_op = upper_triangular_operator<2, BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
 
 
     BlockVector<double> u1;
@@ -95,7 +95,6 @@ int main()
     PRINTME("u2", u2);
     PRINTME("v1", v1);
     PRINTME("v2", v2);
-
 
     lower_triangular_block_op.vmult(v1, u1);
     upper_triangular_block_op.Tvmult(v2, u2);
