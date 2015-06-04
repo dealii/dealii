@@ -399,7 +399,7 @@ lower_triangular_operator(const BlockMatrix &block_matrix)
     Assert(u.n_blocks() == block_matrix.n_block_cols(),
            ExcDimensionMismatch(u.n_blocks(), block_matrix.n_block_cols()));
 
-    v.block(0) *= 0;
+    v.block(0) = 0;
     for (unsigned int i = 1; i < block_matrix.n_block_rows(); ++i)
       {
         block_matrix.block(i,0).vmult(v.block(i), u.block(0));
@@ -432,7 +432,7 @@ lower_triangular_operator(const BlockMatrix &block_matrix)
 
     for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
       {
-        v.block(i) *= 0;
+        v.block(i) = 0;
         for (unsigned int j = i + 1; j < block_matrix.n_block_rows(); ++j)
           block_matrix.block(j,i).Tvmult_add(v.block(i), u.block(j));
       }
@@ -448,6 +448,90 @@ lower_triangular_operator(const BlockMatrix &block_matrix)
     for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
       for (unsigned int j = i + 1; j < block_matrix.n_block_rows(); ++j)
         block_matrix.block(j,i).Tvmult_add(v.block(i), u.block(j));
+  };
+
+  return return_op;
+}
+
+
+/**
+ * @relates LinearOperator
+ *
+ * This function is a specification of the above function that
+ * allows to work with std::array of std::array of LinearOperator
+ *
+ * @ingroup LAOperators
+ */
+
+template <unsigned int n,
+          typename Range = BlockVector<double>,
+          typename Domain = Range>
+LinearOperator<Range, Domain>
+lower_triangular_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> &);
+
+
+template <unsigned int n, typename Range, typename Domain>
+LinearOperator<Range, Domain>
+lower_triangular_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> &block_matrix)
+{
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = [block_matrix](Range &v, bool fast)
+  {
+    v.reinit(n);
+
+    for (unsigned int i = 0; i < n; ++i)
+      block_matrix[i][0].reinit_range_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.reinit_domain_vector = [block_matrix](Domain &v, bool fast)
+  {
+    v.reinit(n);
+
+    for (unsigned int i = 0; i < n; ++i)
+      block_matrix[0][i].reinit_domain_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.vmult = [block_matrix](Range &v, const Domain &u)
+  {
+    v.block(0) = 0;
+    for (unsigned int i = 1; i < n; ++i)
+      {
+        block_matrix[i][0].vmult(v.block(i), u.block(0));
+        for (unsigned int j = 1; j < i; ++j)
+          block_matrix[i][j].vmult_add(v.block(i), u.block(j));
+      }
+  };
+
+  return_op.vmult_add = [block_matrix](Range &v, const Domain &u)
+  {
+    for (unsigned int i = 1; i < n; ++i)
+      {
+        block_matrix[i][0].vmult_add(v.block(i), u.block(0));
+        for (unsigned int j = 1; j < i; ++j)
+          block_matrix[i][j].vmult_add(v.block(i), u.block(j));
+      }
+  };
+
+  return_op.Tvmult = [block_matrix](Domain &v, const Range &u)
+  {
+    for (unsigned int i = 0; i < n; ++i)
+      {
+        v.block(i) = 0;
+        for (unsigned int j = i+1; j < n; ++j)
+          block_matrix[j][i].Tvmult_add(v.block(i), u.block(j));
+      }
+  };
+
+  return_op.Tvmult_add = [block_matrix](Domain &v, const Range &u)
+  {
+    for (unsigned int i = 0; i < n; ++i)
+      for (unsigned int j = i+1; j < n; ++j)
+        block_matrix[j][i].Tvmult_add(v.block(i), u.block(j));
   };
 
   return return_op;
@@ -561,7 +645,7 @@ upper_triangular_operator(const BlockMatrix &block_matrix)
 
     for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
       {
-        v.block(i) *= 0;
+        v.block(i) = 0;
         for (unsigned int j = 0; j < i; ++j)
           block_matrix.block(j,i).vmult_add(v.block(i), u.block(j));
       }
@@ -577,6 +661,87 @@ upper_triangular_operator(const BlockMatrix &block_matrix)
     for (unsigned int i = 0; i < block_matrix.n_block_cols(); ++i)
       for (unsigned int j = 0; j < i; ++j)
         block_matrix.block(j,i).vmult_add(v.block(i), u.block(j));
+  };
+
+  return return_op;
+}
+
+
+/**
+ * @relates LinearOperator
+ *
+ * This function is a specification of the above function that
+ * allows to work with std::array of std::array of LinearOperator
+ *
+ * @ingroup LAOperators
+ */
+
+template <unsigned int n,
+          typename Range = BlockVector<double>,
+          typename Domain = Range>
+LinearOperator<Range, Domain>
+upper_triangular_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> &);
+
+
+template <unsigned int n, typename Range, typename Domain>
+LinearOperator<Range, Domain>
+upper_triangular_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> &block_matrix)
+{
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = [block_matrix](Range &v, bool fast)
+  {
+    v.reinit(n);
+
+    for (unsigned int i = 0; i < n; ++i)
+      block_matrix[i][0].reinit_range_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.reinit_domain_vector = [block_matrix](Domain &v, bool fast)
+  {
+    v.reinit(n);
+
+    for (unsigned int i = 0; i < n; ++i)
+      block_matrix[0][i].reinit_domain_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.vmult = [block_matrix](Range &v, const Domain &u)
+  {
+    for (unsigned int i = 0; i < n - 1; ++i)
+      {
+        block_matrix[i][n - 1].vmult(v.block(i), u.block(n - 1));
+        for (unsigned int j = n - 2; j > i; --j)
+          block_matrix[i][j].vmult_add(v.block(i), u.block(j));
+      }
+    v.block(n - 1) = 0;
+  };
+
+  return_op.vmult_add = [block_matrix](Range &v, const Domain &u)
+  {
+    for (unsigned int i = 0; i < n; ++i)
+      for (unsigned int j = i + 1; j < n; ++j)
+        block_matrix[i][j].vmult_add(v.block(i), u.block(j));
+  };
+
+  return_op.Tvmult = [block_matrix](Domain &v, const Range &u)
+  {
+    for (unsigned int i = 0; i < n; ++i)
+      {
+        v.block(i) = 0;
+        for (unsigned int j = 0; j < i; ++j)
+          block_matrix[j][i].Tvmult_add(v.block(i), u.block(j));
+      }
+  };
+
+  return_op.Tvmult_add = [block_matrix](Domain &v, const Range &u)
+  {
+    for (unsigned int i = 0; i < n; ++i)
+      for (unsigned int j = 0; j < i; ++j)
+        block_matrix[j][i].Tvmult_add(v.block(i), u.block(j));
   };
 
   return return_op;

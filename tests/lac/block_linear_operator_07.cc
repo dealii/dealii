@@ -90,16 +90,6 @@ int main()
 
 
     // check 1
-    // for(unsigned int i = 0; i<2; ++i)
-    // {
-    //   for(unsigned int j = 0; j<2; ++j)
-    //   {
-    //   u1.block(i)[j] = i+1;
-    //   u2.block(i)[j] = i+1;
-    //   v1.block(i)[j] = 1;
-    //   v2.block(i)[j] = 1;
-    // }
-    // }
     reinit_vec(u1,u2,v1,v2);
     PRINTME("u1", u1);
     PRINTME("u2", u2);
