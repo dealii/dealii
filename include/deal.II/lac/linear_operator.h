@@ -46,6 +46,16 @@ template <typename Range = Vector<double>,
           typename Matrix>
 LinearOperator<Range, Domain> linear_operator (const Matrix &);
 
+template <typename Domain = Vector<double>,
+          typename Range = Domain>
+LinearOperator<Domain, Range>
+null_operator(const std::function<void(Domain &, bool)> &,
+              const std::function<void(Range &,  bool)> &);
+
+template <typename Range = Vector<double>>
+LinearOperator<Range, Range>
+null_operator(const std::function<void(Range &, bool)> &);
+
 
 /**
  * A class to store the abstract concept of a linear operator.
@@ -110,8 +120,11 @@ public:
    * member objects are initialized with default variants that throw an
    * exception upon invocation.
    */
-  LinearOperator ()
+  LinearOperator (bool is_null_operator=false)
+    :
+    is_null_operator(is_null_operator)
   {
+
     vmult = [](Range &, const Domain &)
     {
       Assert(false, ExcMessage("Uninitialized LinearOperator<Range, "
@@ -275,6 +288,13 @@ public:
     return *this;
   }
 
+  /**
+  * This bool is used to determine whether a linear operator is a
+  * null operator. In this case the class is able to optimize some
+  * operations like multiplication or addition.
+  */
+  bool is_null_operator;
+
   //@}
 };
 
@@ -297,39 +317,50 @@ LinearOperator<Range, Domain>
 operator+(const LinearOperator<Range, Domain> &first_op,
           const LinearOperator<Range, Domain> &second_op)
 {
-  LinearOperator<Range, Domain> return_op;
+  if (first_op.is_null_operator)
+    {
+      return second_op;
+    }
+  else if (second_op.is_null_operator)
+    {
+      return first_op;
+    }
+  else
+    {
+      LinearOperator<Range, Domain> return_op;
 
-  return_op.reinit_range_vector = first_op.reinit_range_vector;
-  return_op.reinit_domain_vector = first_op.reinit_domain_vector;
+      return_op.reinit_range_vector = first_op.reinit_range_vector;
+      return_op.reinit_domain_vector = first_op.reinit_domain_vector;
 
-  // ensure to have valid computation objects by catching first_op and
-  // second_op by value
+      // ensure to have valid computation objects by catching first_op and
+      // second_op by value
 
-  return_op.vmult = [first_op, second_op](Range &v, const Domain &u)
-  {
-    first_op.vmult(v, u);
-    second_op.vmult_add(v, u);
-  };
+      return_op.vmult = [first_op, second_op](Range &v, const Domain &u)
+      {
+        first_op.vmult(v, u);
+        second_op.vmult_add(v, u);
+      };
 
-  return_op.vmult_add = [first_op, second_op](Range &v, const Domain &u)
-  {
-    first_op.vmult_add(v, u);
-    second_op.vmult_add(v, u);
-  };
+      return_op.vmult_add = [first_op, second_op](Range &v, const Domain &u)
+      {
+        first_op.vmult_add(v, u);
+        second_op.vmult_add(v, u);
+      };
 
-  return_op.Tvmult = [first_op, second_op](Domain &v, const Range &u)
-  {
-    second_op.Tvmult(v, u);
-    first_op.Tvmult_add(v, u);
-  };
+      return_op.Tvmult = [first_op, second_op](Domain &v, const Range &u)
+      {
+        second_op.Tvmult(v, u);
+        first_op.Tvmult_add(v, u);
+      };
 
-  return_op.Tvmult_add = [first_op, second_op](Domain &v, const Range &u)
-  {
-    second_op.Tvmult_add(v, u);
-    first_op.Tvmult_add(v, u);
-  };
+      return_op.Tvmult_add = [first_op, second_op](Domain &v, const Range &u)
+      {
+        second_op.Tvmult_add(v, u);
+        first_op.Tvmult_add(v, u);
+      };
 
-  return return_op;
+      return return_op;
+    }
 }
 
 
@@ -346,8 +377,19 @@ LinearOperator<Range, Domain>
 operator-(const LinearOperator<Range, Domain> &first_op,
           const LinearOperator<Range, Domain> &second_op)
 {
-  // implement with addition and scalar multiplication
-  return first_op + (-1. * second_op);
+  if (first_op.is_null_operator)
+    {
+      return -1 * second_op;
+    }
+  else if (second_op.is_null_operator)
+    {
+      return first_op;
+    }
+  else
+    {
+      // implement with addition and scalar multiplication
+      return first_op + (-1. * second_op);
+    }
 }
 
 
@@ -377,58 +419,51 @@ operator*(typename Range::value_type  number,
     std::is_convertible<typename Range::value_type, typename Domain::value_type>::value,
     "Range and Domain must have implicitly convertible 'value_type's");
 
-  LinearOperator<Range, Domain> return_op = op;
+  if (op.is_null_operator)
+    {
+      return op;
+    }
+  else if (number == 0.)
+    {
+      LinearOperator<Range, Domain> return_op = op;
+      return_op.is_null_operator = true;
+      return return_op;
+    }
+  else
+    {
+      LinearOperator<Range, Domain> return_op = op;
 
-  // ensure to have valid computation objects by catching number and op by
-  // value
+      // ensure to have valid computation objects by catching number and op by
+      // value
 
-  return_op.vmult = [number, op](Range &v, const Domain &u)
-  {
-    if (number == 0.)
-      {
-        v = 0.;
-      }
-    else
+      return_op.vmult = [number, op](Range &v, const Domain &u)
       {
         op.vmult(v,u);
         v *= number;
-      }
-  };
+      };
 
-  return_op.vmult_add = [number, op](Range &v, const Domain &u)
-  {
-    if (number != 0.)
+      return_op.vmult_add = [number, op](Range &v, const Domain &u)
       {
         v /= number;
         op.vmult_add(v,u);
         v *= number;
-      }
-  };
+      };
 
-  return_op.Tvmult = [number, op](Domain &v, const Range &u)
-  {
-    if (number == 0.)
-      {
-        v = 0.;
-      }
-    else
+      return_op.Tvmult = [number, op](Domain &v, const Range &u)
       {
         op.Tvmult(v,u);
         v *= number;
-      }
-  };
+      };
 
-  return_op.Tvmult_add = [number, op](Domain &v, const Range &u)
-  {
-    if (number != 0.)
+      return_op.Tvmult_add = [number, op](Domain &v, const Range &u)
       {
         v /= number;
         op.Tvmult_add(v,u);
         v *= number;
-      }
-  };
+      };
 
-  return return_op;
+      return return_op;
+    }
 }
 
 
@@ -480,59 +515,66 @@ LinearOperator<Range, Domain>
 operator*(const LinearOperator<Range, Intermediate> &first_op,
           const LinearOperator<Intermediate, Domain> &second_op)
 {
-  LinearOperator<Range, Domain> return_op;
+  if (first_op.is_null_operator || second_op.is_null_operator)
+    {
+      return null_operator(second_op.reinit_domain_vector, first_op.reinit_range_vector);
+    }
+  else
+    {
+      LinearOperator<Range, Domain> return_op;
 
-  return_op.reinit_domain_vector = second_op.reinit_domain_vector;
-  return_op.reinit_range_vector = first_op.reinit_range_vector;
+      return_op.reinit_domain_vector = second_op.reinit_domain_vector;
+      return_op.reinit_range_vector  = first_op.reinit_range_vector;
 
-  // ensure to have valid computation objects by catching first_op and
-  // second_op by value
+      // ensure to have valid computation objects by catching first_op and
+      // second_op by value
 
-  return_op.vmult = [first_op, second_op](Range &v, const Domain &u)
-  {
-    static GrowingVectorMemory<Intermediate> vector_memory;
+      return_op.vmult = [first_op, second_op](Range &v, const Domain &u)
+      {
+        static GrowingVectorMemory<Intermediate> vector_memory;
 
-    Intermediate *i = vector_memory.alloc();
-    second_op.reinit_range_vector(*i, /*bool fast =*/ true);
-    second_op.vmult(*i, u);
-    first_op.vmult(v, *i);
-    vector_memory.free(i);
-  };
+        Intermediate *i = vector_memory.alloc();
+        second_op.reinit_range_vector(*i, /*bool fast =*/ true);
+        second_op.vmult(*i, u);
+        first_op.vmult(v, *i);
+        vector_memory.free(i);
+      };
 
-  return_op.vmult_add = [first_op, second_op](Range &v, const Domain &u)
-  {
-    static GrowingVectorMemory<Intermediate> vector_memory;
+      return_op.vmult_add = [first_op, second_op](Range &v, const Domain &u)
+      {
+        static GrowingVectorMemory<Intermediate> vector_memory;
 
-    Intermediate *i = vector_memory.alloc();
-    second_op.reinit_range_vector(*i, /*bool fast =*/ true);
-    second_op.vmult(*i, u);
-    first_op.vmult_add(v, *i);
-    vector_memory.free(i);
-  };
+        Intermediate *i = vector_memory.alloc();
+        second_op.reinit_range_vector(*i, /*bool fast =*/ true);
+        second_op.vmult(*i, u);
+        first_op.vmult_add(v, *i);
+        vector_memory.free(i);
+      };
 
-  return_op.Tvmult = [first_op, second_op](Domain &v, const Range &u)
-  {
-    static GrowingVectorMemory<Intermediate> vector_memory;
+      return_op.Tvmult = [first_op, second_op](Domain &v, const Range &u)
+      {
+        static GrowingVectorMemory<Intermediate> vector_memory;
 
-    Intermediate *i = vector_memory.alloc();
-    first_op.reinit_domain_vector(*i, /*bool fast =*/ true);
-    first_op.Tvmult(*i, u);
-    second_op.Tvmult(v, *i);
-    vector_memory.free(i);
-  };
+        Intermediate *i = vector_memory.alloc();
+        first_op.reinit_domain_vector(*i, /*bool fast =*/ true);
+        first_op.Tvmult(*i, u);
+        second_op.Tvmult(v, *i);
+        vector_memory.free(i);
+      };
 
-  return_op.Tvmult_add = [first_op, second_op](Domain &v, const Range &u)
-  {
-    static GrowingVectorMemory<Intermediate> vector_memory;
+      return_op.Tvmult_add = [first_op, second_op](Domain &v, const Range &u)
+      {
+        static GrowingVectorMemory<Intermediate> vector_memory;
 
-    Intermediate *i = vector_memory.alloc();
-    first_op.reinit_domain_vector(*i, /*bool fast =*/ true);
-    first_op.Tvmult(*i, u);
-    second_op.Tvmult_add(v, *i);
-    vector_memory.free(i);
-  };
+        Intermediate *i = vector_memory.alloc();
+        first_op.reinit_domain_vector(*i, /*bool fast =*/ true);
+        first_op.Tvmult(*i, u);
+        second_op.Tvmult_add(v, *i);
+        vector_memory.free(i);
+      };
 
-  return return_op;
+      return return_op;
+    }
 }
 
 /**
@@ -685,8 +727,53 @@ identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 /**
  * @relates LinearOperator
  *
- * Returns a LinearOperator that is the null operator of the vector space
- * @p Range.
+ * Returns a LinearOperator that is the null operator
+ * from the vector space @p Domain to the vector space @p Range.
+ *
+ * The function takes two <code>std::function</code> objects @ref
+ * reinit_range_vector and reinit_domain_vector as arguments to initialize the
+ * <code>reinit_range_vector</code> and <code>reinit_domain_vector</code>
+ * objects of the LinearOperator object.
+ *
+ * @ingroup LAOperators
+ */
+
+template <typename Domain,
+          typename Range>
+LinearOperator<Domain, Range>
+null_operator(const std::function<void(Domain &, bool)> &reinit_domain_vector,
+              const std::function<void(Range &,  bool)> &reinit_range_vector)
+{
+  LinearOperator<Domain, Range> return_op(/*is_null_operator = */true);
+
+  return_op.reinit_range_vector  = reinit_range_vector;
+  return_op.reinit_domain_vector = reinit_domain_vector;
+
+  return_op.vmult = [](Range &v, const Domain &u)
+  {
+    v = 0;
+  };
+
+  return_op.vmult_add = [](Range &v, const Domain &u)
+  {};
+
+  return_op.Tvmult = [](Range &v, const Domain &u)
+  {
+    v = 0;
+  };
+
+  return_op.Tvmult_add = [](Range &v, const Domain &u)
+  {};
+
+  return return_op;
+}
+
+/**
+ * @relates LinearOperator
+ *
+ * Returns a LinearOperator that is the null operator
+ * of the vector space @p Range. (It is a specification of the previous
+ * function in the case of square matrices)
  *
  * The function takes an <code>std::function</code> object @ref
  * reinit_vector as an argument to initialize the
@@ -699,28 +786,7 @@ template <typename Range>
 LinearOperator<Range, Range>
 null_operator(const std::function<void(Range &, bool)> &reinit_vector)
 {
-  LinearOperator<Range, Range> return_op;
-
-  return_op.reinit_range_vector = reinit_vector;
-  return_op.reinit_domain_vector = reinit_vector;
-
-  return_op.vmult = [](Range &v, const Range &u)
-  {
-    v = 0;
-  };
-
-  return_op.vmult_add = [](Range &v, const Range &u)
-  {};
-
-  return_op.Tvmult = [](Range &v, const Range &u)
-  {
-    v = 0;
-  };
-
-  return_op.Tvmult_add = [](Range &v, const Range &u)
-  {};
-
-  return return_op;
+  return null_operator(reinit_vector, reinit_vector);
 }
 
 
