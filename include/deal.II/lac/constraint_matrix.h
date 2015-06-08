@@ -32,8 +32,6 @@
 #include <utility>
 #include <complex>
 
-#include <boost/scoped_ptr.hpp>
-
 
 DEAL_II_NAMESPACE_OPEN
 
