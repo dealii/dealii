@@ -16,6 +16,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/parallel_vector.h>
@@ -3427,14 +3428,14 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
 namespace
 {
-  // Reset a std::auto_ptr. If we can, do not de-allocate the previously
+  // Reset a unique_ptr. If we can, do not de-allocate the previously
   // held memory but re-use it for the next item to avoid the repeated
   // memory allocation. We do this because FEValues objects are heavily
   // used in multithreaded contexts where memory allocations are evil.
   template <typename Type, typename Pointer, typename Iterator>
   void
   reset_pointer_in_place_if_possible
-  (std::auto_ptr<Pointer> &present_cell,
+  (std_cxx11::unique_ptr<Pointer> &present_cell,
    const Iterator         &new_cell)
   {
     // see if the existing pointer is non-null and if the type of

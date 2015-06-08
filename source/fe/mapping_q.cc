@@ -19,6 +19,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary.h>
@@ -28,7 +29,6 @@
 #include <deal.II/fe/fe_q.h>
 
 #include <numeric>
-#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1036,7 +1036,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
   // the right size and transformation shape values already computed at point
   // p.
   const Quadrature<dim> point_quadrature(p);
-  std::auto_ptr<InternalData>
+  std_cxx11::unique_ptr<InternalData>
   mdata (dynamic_cast<InternalData *> (
            get_data(update_transformation_values, point_quadrature)));
 
@@ -1122,7 +1122,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       UpdateFlags update_flags = update_transformation_values|update_transformation_gradients;
       if (spacedim>dim)
         update_flags |= update_jacobian_grads;
-      std::auto_ptr<InternalData>
+      std_cxx11::unique_ptr<InternalData>
       mdata (dynamic_cast<InternalData *> (
                get_data(update_flags,point_quadrature)));
 

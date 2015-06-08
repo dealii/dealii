@@ -18,6 +18,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
@@ -37,7 +38,6 @@
 #include <iomanip>
 #include <iomanip>
 #include <string>
-#include <memory>
 
 
 // forward declaration of the function that must be provided in the

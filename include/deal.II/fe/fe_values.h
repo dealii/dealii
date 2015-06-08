@@ -26,6 +26,7 @@
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -37,7 +38,6 @@
 #include <deal.II/fe/mapping.h>
 
 #include <algorithm>
-#include <memory>
 
 // dummy include in order to have the
 // definition of PetscScalar available
@@ -2469,7 +2469,7 @@ protected:
    * is necessary for the <tt>get_function_*</tt> functions as well as the
    * functions of same name in the extractor classes.
    */
-  std::auto_ptr<const CellIteratorBase> present_cell;
+  std_cxx11::unique_ptr<const CellIteratorBase> present_cell;
 
   /**
    * A signal connection we use to ensure we get informed whenever the

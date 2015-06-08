@@ -45,9 +45,9 @@ check_this (const FiniteElement<dim> &fe1,
   if (!fe2.constraints_are_implemented())
     return;
 
-  std::auto_ptr<Triangulation<dim> > tria(make_tria<dim>());
-  std::auto_ptr<DoFHandler<dim> >    dof1(make_dof_handler (*tria, fe1));
-  std::auto_ptr<DoFHandler<dim> >    dof2(make_dof_handler (*tria, fe2));
+  std_cxx11::unique_ptr<Triangulation<dim> > tria(make_tria<dim>());
+  std_cxx11::unique_ptr<DoFHandler<dim> >    dof1(make_dof_handler (*tria, fe1));
+  std_cxx11::unique_ptr<DoFHandler<dim> >    dof2(make_dof_handler (*tria, fe2));
   ConstraintMatrix cm;
   DoFTools::make_hanging_node_constraints (*dof2, cm);
   cm.close ();
