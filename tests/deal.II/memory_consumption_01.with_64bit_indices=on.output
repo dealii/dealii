@@ -44,7 +44,7 @@ DEAL::Memory consumption -- Sparsity:      1752
 DEAL::Memory consumption -- Matrix:        1400
 DEAL::Memory consumption -- Solution:      424
 DEAL::Memory consumption -- Rhs:           424
-DEAL::Memory consumption -- DataOut:       3329
+DEAL::Memory consumption -- DataOut:       3320
 DEAL::2d
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       20
@@ -90,7 +90,7 @@ DEAL::Memory consumption -- Sparsity:      128216
 DEAL::Memory consumption -- Matrix:        120824
 DEAL::Memory consumption -- Solution:      7464
 DEAL::Memory consumption -- Rhs:           7464
-DEAL::Memory consumption -- DataOut:       42789
+DEAL::Memory consumption -- DataOut:       42780
 DEAL::3d
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       56
@@ -136,4 +136,4 @@ DEAL::Memory consumption -- Sparsity:      16643416
 DEAL::Memory consumption -- Matrix:        16383928
 DEAL::Memory consumption -- Solution:      259560
 DEAL::Memory consumption -- Rhs:           259560
-DEAL::Memory consumption -- DataOut:       1159725
+DEAL::Memory consumption -- DataOut:       1159716
