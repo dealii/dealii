@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 // Test upper_triangular_block_op and lower_triangular_operator
+// (in the case of array of array of LinearOperator as argument)
 // simultaneously:
 
 #include "../tests.h"
@@ -73,20 +74,36 @@ int main()
           for (unsigned int k = 0; k < 2; ++k)
             a.block(i,j).set(h, k, j + i + h + k);
 
-    auto op_a = linear_operator<BlockVector<double>>(a);
+    auto op00 = linear_operator<Vector<double>,Vector<double>>(a.block(0,0));
+    auto op01 = linear_operator<Vector<double>,Vector<double>>(a.block(0,1));
+    auto op10 = linear_operator<Vector<double>,Vector<double>>(a.block(1,0));
+    auto op11 = linear_operator<Vector<double>,Vector<double>>(a.block(1,1));
 
-    auto lower_triangular_block_op = lower_triangular_operator<2, BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double>>(a);
-    auto upper_triangular_block_op = upper_triangular_operator<2, BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
-
+    auto lower_triangular_block_op =
+          lower_triangular_operator<  2,
+                                      BlockVector<double>,
+                                      BlockVector<double>>({{
+      {{ op00, op01 }} ,
+      {{ op10, op11 }}
+    }
+  });
+    auto upper_triangular_block_op =
+          upper_triangular_operator<  2,
+                                      BlockVector<double>,
+                                      BlockVector<double>>({{
+      {{ op00, op01 }} ,
+      {{ op10, op11 }}
+    }
+  });
 
     BlockVector<double> u1;
-    op_a.reinit_domain_vector(u1, false);
+    lower_triangular_block_op.reinit_domain_vector(u1, false);
     BlockVector<double> v1;
-    op_a.reinit_range_vector(v1, false);
+    lower_triangular_block_op.reinit_range_vector(v1, false);
     BlockVector<double> u2;
-    op_a.reinit_domain_vector(u2, false);
+    upper_triangular_block_op.reinit_domain_vector(u2, false);
     BlockVector<double> v2;
-    op_a.reinit_range_vector(v2, false);
+    upper_triangular_block_op.reinit_range_vector(v2, false);
 
 
     // check 1

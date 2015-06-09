@@ -59,7 +59,7 @@ int main()
 
     auto op_a = linear_operator<BlockVector<double>>(a);
 
-    auto triangular_block_op = upper_triangular_operator< BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
+    auto triangular_block_op = upper_triangular_operator<3, BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a);
 
     BlockVector<double> u;
     op_a.reinit_domain_vector(u, false);
