@@ -277,7 +277,87 @@ void GridRefinement::coarsen (Triangulation<dim,spacedim> &tria,
         cell->set_coarsen_flag();
 }
 
+template <int dim>
+std::pair<double, double>
+GridRefinement::adjust_refine_and_coarsen_number_fraction (const unsigned int  current_n_cells,
+                                                           const unsigned int  max_n_cells,
+                                                           const double        top_fraction,
+                                                           const double        bottom_fraction)
+{
+  Assert (top_fraction>=0, ExcInvalidParameterValue());
+  Assert (top_fraction<=1, ExcInvalidParameterValue());
+  Assert (bottom_fraction>=0, ExcInvalidParameterValue());
+  Assert (bottom_fraction<=1, ExcInvalidParameterValue());
+  Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
 
+  double refine_cells  = current_n_cells * top_fraction;
+  double coarsen_cells = current_n_cells * bottom_fraction;
+
+  const double cell_increase_on_refine  = GeometryInfo<dim>::max_children_per_cell - 1.0;
+  const double cell_decrease_on_coarsen = 1.0 - 1.0/GeometryInfo<dim>::max_children_per_cell;
+
+  std::pair<double, double> adjusted_fractions(top_fraction, bottom_fraction);
+  // first we have to see whether we
+  // currently already exceed the target
+  // number of cells
+  if (current_n_cells >= max_n_cells)
+    {
+      // if yes, then we need to stop
+      // refining cells and instead try to
+      // only coarsen as many as it would
+      // take to get to the target
+
+      // as we have no information on cells
+      // being refined isotropically or
+      // anisotropically, assume isotropic
+      // refinement here, though that may
+      // result in a worse approximation
+      adjusted_fractions.first  = 0;
+      coarsen_cells          = (current_n_cells - max_n_cells) /
+                               cell_decrease_on_coarsen;
+      adjusted_fractions.second = std::min(coarsen_cells/current_n_cells, 1.0);
+    }
+  // otherwise, see if we would exceed the
+  // maximum desired number of cells with the
+  // number of cells that are likely going to
+  // result from refinement. here, each cell
+  // to be refined is replaced by
+  // C=GeometryInfo<dim>::max_children_per_cell
+  // new cells, i.e. there will be C-1 more
+  // cells than before. similarly, C cells
+  // will be replaced by 1
+
+  // again, this is true for isotropically
+  // refined cells. we take this as an
+  // approximation of a mixed refinement.
+  else if (static_cast<unsigned int>
+           (current_n_cells
+            + refine_cells * cell_increase_on_refine
+            - coarsen_cells / cell_decrease_on_coarsen)
+           >
+           max_n_cells)
+    {
+      // we have to adjust the
+      // fractions. assume we want
+      // alpha*refine_fraction and
+      // alpha*coarsen_fraction as new
+      // fractions and the resulting number
+      // of cells to be equal to
+      // max_n_cells. this leads to the
+      // following equation for alpha
+      const double alpha
+        =
+          1. *
+          (max_n_cells - current_n_cells)
+          /
+          (refine_cells * cell_increase_on_refine
+           - coarsen_cells / cell_decrease_on_coarsen);
+
+      adjusted_fractions.first  = alpha * top_fraction;
+      adjusted_fractions.second = alpha * bottom_fraction;
+    }
+  return (adjusted_fractions);
+}
 
 template <int dim, class Vector, int spacedim>
 void
@@ -294,71 +374,14 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tr
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
   Assert (criteria.is_non_negative (), ExcNegativeCriteria());
 
-  int refine_cells  = static_cast<int>(top_fraction*criteria.size());
-  int coarsen_cells = static_cast<int>(bottom_fraction*criteria.size());
+  const std::pair<double, double> adjusted_fractions =
+    adjust_refine_and_coarsen_number_fraction<dim> (criteria.size(),
+                                                    max_n_cells,
+                                                    top_fraction,
+                                                    bottom_fraction);
 
-  // first we have to see whether we
-  // currently already exceed the target
-  // number of cells
-  if (tria.n_active_cells() >= max_n_cells)
-    {
-      // if yes, then we need to stop
-      // refining cells and instead try to
-      // only coarsen as many as it would
-      // take to get to the target
-
-      // as we have no information on cells
-      // being refined isotropically or
-      // anisotropically, assume isotropic
-      // refinement here, though that may
-      // result in a worse approximation
-      refine_cells  = 0;
-      coarsen_cells = (tria.n_active_cells() - max_n_cells) *
-                      GeometryInfo<dim>::max_children_per_cell /
-                      (GeometryInfo<dim>::max_children_per_cell - 1);
-    }
-  // otherwise, see if we would exceed the
-  // maximum desired number of cells with the
-  // number of cells that are likely going to
-  // result from refinement. here, each cell
-  // to be refined is replaced by
-  // C=GeometryInfo<dim>::max_children_per_cell
-  // new cells, i.e. there will be C-1 more
-  // cells than before. similarly, C cells
-  // will be replaced by 1
-
-  // again, this is true for isotropically
-  // refined cells. we take this as an
-  // approximation of a mixed refinement.
-  else if (static_cast<unsigned int>
-           (tria.n_active_cells()
-            + refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1)
-            - (coarsen_cells *
-               (GeometryInfo<dim>::max_children_per_cell - 1) /
-               GeometryInfo<dim>::max_children_per_cell))
-           >
-           max_n_cells)
-    {
-      // we have to adjust the
-      // fractions. assume we want
-      // alpha*refine_fraction and
-      // alpha*coarsen_fraction as new
-      // fractions and the resulting number
-      // of cells to be equal to
-      // max_n_cells. this leads to the
-      // following equation for lambda
-      const double alpha
-        =
-          1. *
-          (max_n_cells - tria.n_active_cells())
-          /
-          (refine_cells * (GeometryInfo<dim>::max_children_per_cell - 1)
-           - (coarsen_cells *
-              (GeometryInfo<dim>::max_children_per_cell - 1) /
-              GeometryInfo<dim>::max_children_per_cell));
-      refine_cells  = static_cast<int> (refine_cells * alpha);
-      coarsen_cells = static_cast<int> (coarsen_cells * alpha);
-    }
+  const int refine_cells  = static_cast<int>(adjusted_fractions.first  * criteria.size());
+  const int coarsen_cells = static_cast<int>(adjusted_fractions.second * criteria.size());
 
   if (refine_cells || coarsen_cells)
     {
