@@ -297,6 +297,7 @@ _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")          \
 _Pragma("GCC diagnostic ignored \"-Wunused-but-set-parameter\"") \
 _Pragma("GCC diagnostic ignored \"-Wnested-anon-types\"")        \
 _Pragma("GCC diagnostic ignored \"-Wunused-private-field\"")     \
+_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")  \
 _Pragma("GCC diagnostic warning \"-Wpragmas\"")
 
 #  define DEAL_II_ENABLE_EXTRA_DIAGNOSTICS                       \

@@ -18,6 +18,7 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -28,7 +29,6 @@
 
 #include <cmath>
 #include <algorithm>
-#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -1433,7 +1433,7 @@ MappingQ1<dim,spacedim>::transform_unit_to_real_cell (
   // already computed at point p.
   const Quadrature<dim> point_quadrature(p);
 
-  std::auto_ptr<InternalData>
+  std_cxx11::unique_ptr<InternalData>
   mdata (dynamic_cast<InternalData *> (
            get_data(update_transformation_values, point_quadrature)));
 
@@ -1669,7 +1669,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       if (spacedim>dim)
         update_flags |= update_jacobian_grads;
 
-      std::auto_ptr<InternalData>
+      std_cxx11::unique_ptr<InternalData>
       mdata(dynamic_cast<InternalData *> (
               MappingQ1<dim,spacedim>::get_data(update_flags, point_quadrature)));
 

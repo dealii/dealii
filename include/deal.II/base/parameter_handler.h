@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/std_cxx11/shared_ptr.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -28,7 +29,6 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1952,7 +1952,7 @@ private:
    * than having to include all of the property_tree stuff from boost. This
    * works around a problem with gcc 4.5.
    */
-  std::auto_ptr<boost::property_tree::ptree> entries;
+  std_cxx11::unique_ptr<boost::property_tree::ptree> entries;
 
   /**
    * A list of patterns that are used to describe the parameters of this

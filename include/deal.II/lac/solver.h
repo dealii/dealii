@@ -21,7 +21,10 @@
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/solver_control.h>
 
+// Ignore deprecation warnings for auto_ptr.
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/signals2.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

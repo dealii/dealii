@@ -16,6 +16,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/parallel_vector.h>
@@ -3427,14 +3428,14 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
 namespace
 {
-  // Reset a std::auto_ptr. If we can, do not de-allocate the previously
+  // Reset a unique_ptr. If we can, do not de-allocate the previously
   // held memory but re-use it for the next item to avoid the repeated
   // memory allocation. We do this because FEValues objects are heavily
   // used in multithreaded contexts where memory allocations are evil.
   template <typename Type, typename Pointer, typename Iterator>
   void
   reset_pointer_in_place_if_possible
-  (std::auto_ptr<Pointer> &present_cell,
+  (std_cxx11::unique_ptr<Pointer> &present_cell,
    const Iterator         &new_cell)
   {
     // see if the existing pointer is non-null and if the type of
@@ -3465,11 +3466,6 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
   this->maybe_invalidate_previous_present_cell (cell);
   this->check_cell_similarity(cell);
 
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of the current object
   reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::TriaCellIterator>
   (this->present_cell, cell);
 
@@ -3500,11 +3496,6 @@ FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > &c
   this->maybe_invalidate_previous_present_cell (cell);
   this->check_cell_similarity(cell);
 
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of the current object
   reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > >
   (this->present_cell, cell);
 
@@ -3677,11 +3668,6 @@ FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> 
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
 
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of the current object
   this->maybe_invalidate_previous_present_cell (cell);
   reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > >
   (this->present_cell, cell);
@@ -3703,11 +3689,6 @@ void FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spaced
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
 
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of the current object
   this->maybe_invalidate_previous_present_cell (cell);
   reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::TriaCellIterator>
   (this->present_cell, cell);
@@ -3854,11 +3835,6 @@ void FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<D
                       "already refined. Iterate over their children "
                       "instead in these cases."));
 
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of the current object
   this->maybe_invalidate_previous_present_cell (cell);
   reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::template CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > >
   (this->present_cell, cell);
@@ -3882,11 +3858,6 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spa
   Assert (subface_no < cell->face(face_no)->n_children(),
           ExcIndexRange (subface_no, 0, cell->face(face_no)->n_children()));
 
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of the current object
   this->maybe_invalidate_previous_present_cell (cell);
   reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::TriaCellIterator>
   (this->present_cell, cell);
