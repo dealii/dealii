@@ -583,6 +583,10 @@ public:
    * pattern of the calling matrix does not contain all the elements in the
    * sparsity pattern of the input matrix, this function will throw an
    * exception.
+   *
+   * Depending on MatrixType, however, additional restrictions might
+   * arise. Some sparse matrix formats require <tt>matrix</tt> to be based on
+   * the same sparsity pattern as the calling matrix.
    */
   void add (const value_type                   factor,
             const BlockMatrixBase<MatrixType> &matrix);
