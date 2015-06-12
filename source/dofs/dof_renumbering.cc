@@ -398,12 +398,12 @@ namespace DoFRenumbering
       DoFTools::make_hanging_node_constraints (dof_handler, constraints);
     constraints.close ();
 
-    IndexSet locally_owned = dof_handler.locally_owned_dofs();
+    const IndexSet locally_owned = dof_handler.locally_owned_dofs();
 
     // otherwise compute the Cuthill-McKee permutation
     DynamicSparsityPattern dsp (dof_handler.n_dofs(),
                                 dof_handler.n_dofs(),
-                                dof_handler.locally_owned_dofs());
+                                locally_owned);
     DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
 
     // constraints are not needed anymore
@@ -411,8 +411,8 @@ namespace DoFRenumbering
 
     // If the index set is not complete, need to get indices in local index
     // space.
-    if (dof_handler.locally_owned_dofs().n_elements() !=
-        dof_handler.locally_owned_dofs().size())
+    if (locally_owned.n_elements() !=
+        locally_owned.size())
       {
         // Create sparsity pattern from dsp by transferring its indices to
         // processor-local index space and doing Cuthill-McKee there
