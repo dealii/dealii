@@ -398,12 +398,12 @@ namespace DoFRenumbering
       DoFTools::make_hanging_node_constraints (dof_handler, constraints);
     constraints.close ();
 
-    IndexSet locally_owned = dof_handler.locally_owned_dofs();
+    const IndexSet locally_owned = dof_handler.locally_owned_dofs();
 
     // otherwise compute the Cuthill-McKee permutation
     DynamicSparsityPattern dsp (dof_handler.n_dofs(),
                                 dof_handler.n_dofs(),
-                                dof_handler.locally_owned_dofs());
+                                locally_owned);
     DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
 
     // constraints are not needed anymore
@@ -411,8 +411,8 @@ namespace DoFRenumbering
 
     // If the index set is not complete, need to get indices in local index
     // space.
-    if (dof_handler.locally_owned_dofs().n_elements() !=
-        dof_handler.locally_owned_dofs().size())
+    if (locally_owned.n_elements() !=
+        locally_owned.size())
       {
         // Create sparsity pattern from dsp by transferring its indices to
         // processor-local index space and doing Cuthill-McKee there
@@ -422,7 +422,7 @@ namespace DoFRenumbering
         for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
           {
             const types::global_dof_index row = locally_owned.nth_index_in_set(i);
-            row_entries.resize(0);
+            row_entries.clear();
             for (DynamicSparsityPattern::iterator it =
                    dsp.begin(row); it != dsp.end(row); ++it)
               if (it->column() != row && locally_owned.is_element(it->column()))
@@ -431,23 +431,37 @@ namespace DoFRenumbering
                                  true);
           }
 
-        AssertDimension(new_indices.size(), sparsity.n_rows());
+        // translate starting indices from global to local indices
+        std::vector<types::global_dof_index> local_starting_indices (starting_indices.size());
+        for (unsigned int i=0; i<starting_indices.size(); ++i)
+          {
+            Assert (locally_owned.is_element (starting_indices[i]),
+                    ExcMessage ("You specified global degree of freedom "
+                                + Utilities::int_to_string(starting_indices[i]) +
+                                " as a starting index, but this index is not among the "
+                                "locally owned ones on this processor."));
+            local_starting_indices[i] = locally_owned.index_within_set(starting_indices[i]);
+          }
+
+        // then do the renumbering on the locally owned portion
+        AssertDimension(new_indices.size(), locally_owned.n_elements());
         SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
-                                              starting_indices);
+                                              local_starting_indices);
+        if (reversed_numbering)
+          new_indices = Utilities::reverse_permutation (new_indices);
+
+        // convert indices back to global index space
+        for (std::size_t i=0; i<new_indices.size(); ++i)
+          new_indices[i] = locally_owned.nth_index_in_set(new_indices[i]);
       }
     else
       {
         AssertDimension(new_indices.size(), dsp.n_rows());
         SparsityTools::reorder_Cuthill_McKee (dsp, new_indices,
                                               starting_indices);
+        if (reversed_numbering)
+          new_indices = Utilities::reverse_permutation (new_indices);
       }
-
-    if (reversed_numbering)
-      new_indices = Utilities::reverse_permutation (new_indices);
-
-    // convert indices back to global index space
-    for (std::size_t i=0; i<new_indices.size(); ++i)
-      new_indices[i] = locally_owned.nth_index_in_set(new_indices[i]);
   }
 
 

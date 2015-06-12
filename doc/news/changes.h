@@ -512,6 +512,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: DoFRenumbering::Cuthill_McKee() can now also
+  use starting indices for parallel triangulations.
+  <br>
+  (Wolfgang Bangerth, 2015/06/11)
+  </li>
+
   <li> Improved: VectorTools::interpolate now works with FE_Nothing.
   <br>
   (Angel Rodriguez, 2015/06/03)
