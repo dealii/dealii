@@ -58,10 +58,10 @@ The classical formulation of the problem possesses the following form:
   \varepsilon^p:(\tau - \sigma) &\geq 0\quad\forall\tau\text{ with
   }\mathcal{F}(\tau)\leq 0 & &\quad\text{in } \Omega,\\
   \mathbf u &= 0 & &\quad\text{on }\Gamma_D,\\
-  \sigma \cdot \mathbf n - [\mathbf n \cdot(\sigma \cdot \mathbf n)]\mathbf n &= 0,
-  \quad \mathbf n \cdot (\sigma \cdot
+  \sigma \mathbf n - [\mathbf n \cdot(\sigma \mathbf n)]\mathbf n &= 0,
+  \quad \mathbf n \cdot (\sigma
   \mathbf n) \leq 0 & &\quad\text{on }\Gamma_C,\\
-  (\mathbf n \cdot (\sigma \cdot
+  (\mathbf n \cdot (\sigma
   \mathbf n))(\mathbf n \cdot \mathbf u - g) &= 0,\quad \mathbf n
   \cdot \mathbf u - g \leq 0 & &\quad\text{on } \Gamma_C.
 @f}
@@ -92,10 +92,10 @@ and $|\cdot|$ denotes the Frobenius norm.
 Further equations describe a
 fixed, zero displacement on $\Gamma_D$ and
 that on the surface $\Gamma_C=\partial\Omega\backslash\Gamma_D$ where contact may appear, the normal
-force $\sigma_n=\mathbf n \cdot (\sigma(\mathbf u) \cdot
+force $\sigma_n=\mathbf n \cdot (\sigma(\mathbf u)
   \mathbf n)$ exerted by the obstacle is inward (no "pull" by the obstacle on our
-body) and with zero tangential component $\mathbf \sigma_t= \sigma \cdot \mathbf n - \mathbf \sigma_n \mathbf n
-= \sigma \cdot \mathbf n - [\mathbf n \cdot(\sigma \cdot \mathbf n)]\mathbf n$.
+body) and with zero tangential component $\mathbf \sigma_t= \sigma \mathbf n - \mathbf \sigma_n \mathbf n
+= \sigma \mathbf n - [\mathbf n \cdot(\sigma \mathbf n)]\mathbf n$.
 The last condition is again a complementarity condition that
 implies that on $\Gamma_C$, the normal
 force can only be nonzero if the body is in contact with the obstacle; the
