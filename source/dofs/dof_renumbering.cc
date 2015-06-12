@@ -422,7 +422,7 @@ namespace DoFRenumbering
         for (unsigned int i=0; i<locally_owned.n_elements(); ++i)
           {
             const types::global_dof_index row = locally_owned.nth_index_in_set(i);
-            row_entries.resize(0);
+            row_entries.clear();
             for (DynamicSparsityPattern::iterator it =
                    dsp.begin(row); it != dsp.end(row); ++it)
               if (it->column() != row && locally_owned.is_element(it->column()))
@@ -431,23 +431,24 @@ namespace DoFRenumbering
                                  true);
           }
 
-        AssertDimension(new_indices.size(), sparsity.n_rows());
+        AssertDimension(new_indices.size(), locally_owned.n_elements());
         SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
                                               starting_indices);
+        if (reversed_numbering)
+          new_indices = Utilities::reverse_permutation (new_indices);
+
+        // convert indices back to global index space
+        for (std::size_t i=0; i<new_indices.size(); ++i)
+          new_indices[i] = locally_owned.nth_index_in_set(new_indices[i]);
       }
     else
       {
         AssertDimension(new_indices.size(), dsp.n_rows());
         SparsityTools::reorder_Cuthill_McKee (dsp, new_indices,
                                               starting_indices);
+        if (reversed_numbering)
+          new_indices = Utilities::reverse_permutation (new_indices);
       }
-
-    if (reversed_numbering)
-      new_indices = Utilities::reverse_permutation (new_indices);
-
-    // convert indices back to global index space
-    for (std::size_t i=0; i<new_indices.size(); ++i)
-      new_indices[i] = locally_owned.nth_index_in_set(new_indices[i]);
   }
 
 
