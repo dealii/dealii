@@ -150,42 +150,40 @@ namespace SparsityTools
     find_unnumbered_starting_index (const DynamicSparsityPattern &sparsity,
                                     const std::vector<DynamicSparsityPattern::size_type> &new_indices)
     {
-      {
-        DynamicSparsityPattern::size_type starting_point   = numbers::invalid_size_type;
-        DynamicSparsityPattern::size_type min_coordination = sparsity.n_rows();
-        for (DynamicSparsityPattern::size_type row=0; row<sparsity.n_rows(); ++row)
-          // look over all as-yet unnumbered indices
-          if (new_indices[row] == numbers::invalid_size_type)
-            {
-              if (sparsity.row_length(row) < min_coordination)
-                {
-                  min_coordination = sparsity.row_length(row);
-                  starting_point   = row;
-                }
-            }
-
-        // now we still have to care for the case that no unnumbered dof has a
-        // coordination number less than sparsity.n_rows(). this rather exotic
-        // case only happens if we only have one cell, as far as I can see,
-        // but there may be others as well.
-        //
-        // if that should be the case, we can chose an arbitrary dof as
-        // starting point, e.g. the first unnumbered one
-        if (starting_point == numbers::invalid_size_type)
+      DynamicSparsityPattern::size_type starting_point   = numbers::invalid_size_type;
+      DynamicSparsityPattern::size_type min_coordination = sparsity.n_rows();
+      for (DynamicSparsityPattern::size_type row=0; row<sparsity.n_rows(); ++row)
+        // look over all as-yet unnumbered indices
+        if (new_indices[row] == numbers::invalid_size_type)
           {
-            for (DynamicSparsityPattern::size_type i=0; i<new_indices.size(); ++i)
-              if (new_indices[i] == numbers::invalid_size_type)
-                {
-                  starting_point = i;
-                  break;
-                }
-
-            Assert (starting_point != numbers::invalid_size_type,
-                    ExcInternalError());
+            if (sparsity.row_length(row) < min_coordination)
+              {
+                min_coordination = sparsity.row_length(row);
+                starting_point   = row;
+              }
           }
 
-        return starting_point;
-      }
+      // now we still have to care for the case that no unnumbered dof has a
+      // coordination number less than sparsity.n_rows(). this rather exotic
+      // case only happens if we only have one cell, as far as I can see,
+      // but there may be others as well.
+      //
+      // if that should be the case, we can chose an arbitrary dof as
+      // starting point, e.g. the first unnumbered one
+      if (starting_point == numbers::invalid_size_type)
+        {
+          for (DynamicSparsityPattern::size_type i=0; i<new_indices.size(); ++i)
+            if (new_indices[i] == numbers::invalid_size_type)
+              {
+                starting_point = i;
+                break;
+              }
+
+          Assert (starting_point != numbers::invalid_size_type,
+                  ExcInternalError());
+        }
+
+      return starting_point;
     }
   }
 
