@@ -608,6 +608,9 @@ namespace MatrixCreator
  * There are two ways to incorporate fixed degrees of freedom such as boundary
  * nodes into a linear system, as discussed below.
  *
+ * @dealiiVideoLecture{21.6,21.65}
+ *
+ *
  *
  * <h3>Global elimination</h3>
  *
@@ -981,6 +984,8 @@ namespace MatrixTools
    * matrices, or for PETSc or trilinos matrices). However, it doesn't work as
    * expected if there are also hanging nodes to be considered. More caveats
    * are listed in the general documentation of this class.
+   *
+   * @dealiiVideoLecture{21.6,21.65}
    */
   void
   local_apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
