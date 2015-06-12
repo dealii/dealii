@@ -431,9 +431,22 @@ namespace DoFRenumbering
                                  true);
           }
 
+        // translate starting indices from global to local indices
+        std::vector<types::global_dof_index> local_starting_indices (starting_indices.size());
+        for (unsigned int i=0; i<starting_indices.size(); ++i)
+          {
+            Assert (locally_owned.is_element (starting_indices[i]),
+                    ExcMessage ("You specified global degree of freedom "
+                                + Utilities::int_to_string(starting_indices[i]) +
+                                " as a starting index, but this index is not among the "
+                                "locally owned ones on this processor."));
+            local_starting_indices[i] = locally_owned.index_within_set(starting_indices[i]);
+          }
+
+        // then do the renumbering on the locally owned portion
         AssertDimension(new_indices.size(), locally_owned.n_elements());
         SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
-                                              starting_indices);
+                                              local_starting_indices);
         if (reversed_numbering)
           new_indices = Utilities::reverse_permutation (new_indices);
 
