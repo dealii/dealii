@@ -665,9 +665,11 @@ public:
   /**
    * Simple vector addition, equal to the <tt>operator +=</tt>.
    *
+   * This function is deprecated use the <tt>operator +=</tt> instead.
+   *
    * @dealiiOperationIsMultithreaded
    */
-  void add (const Vector<Number> &V);
+  void add (const Vector<Number> &V) DEAL_II_DEPRECATED;
 
 
   /**
@@ -825,8 +827,10 @@ public:
   /**
    * Output of vector in user-defined format. For complex-valued vectors, the
    * format should include specifiers for both the real and imaginary parts.
+   *
+   * This funcion is deprecated.
    */
-  void print (const char *format = 0) const;
+  void print (const char *format = 0) const DEAL_II_DEPRECATED;
 
   /**
    * Print to a stream. @p precision denotes the desired precision with which

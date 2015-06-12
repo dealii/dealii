@@ -321,8 +321,10 @@ public:
 
   /**
    * Output of vector in user-defined format.
+   *
+   * This function is deprecated.
    */
-  void print (const char *format = 0) const;
+  void print (const char *format = 0) const DEAL_II_DEPRECATED;
 
   /**
    * Print to a stream.

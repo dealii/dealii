@@ -1709,9 +1709,12 @@ namespace Step32
 
     std::vector<double> rhs_values(n_q_points);
 
-    TrilinosWrappers::MPI::Vector
-    rhs (temperature_mass_matrix.row_partitioner()),
-        solution (temperature_mass_matrix.row_partitioner());
+    IndexSet row_temp_matrix_partitioning(temperature_mass_matrix.n());
+    row_temp_matrix_partitioning.add_range(temperature_mass_matrix.local_range().first,
+                                           temperature_mass_matrix.local_range().second);
+    TrilinosWrappers::MPI::Vector rhs (row_temp_matrix_partitioning),
+                     solution (row_temp_matrix_partitioning);
+
 
     const EquationData::TemperatureInitialValues<dim> initial_temperature;
 
@@ -3391,7 +3394,7 @@ namespace Step32
     locally_relevant_joint_solution = joint_solution;
 
     Postprocessor postprocessor (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
-                                 stokes_solution.block(1).minimal_value());
+                                 stokes_solution.block(1).min());
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler (joint_dof_handler);

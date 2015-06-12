@@ -102,8 +102,10 @@ namespace TrilinosWrappers
        * Constructor. Generate a block vector with as many blocks as there are
        * entries in @p partitioning. Each Epetra_Map contains the layout of
        * the distribution of data among the MPI processes.
+       *
+       * This function is deprecated.
        */
-      explicit BlockVector (const std::vector<Epetra_Map> &parallel_partitioning);
+      explicit BlockVector (const std::vector<Epetra_Map> &parallel_partitioning) DEAL_II_DEPRECATED;
 
       /**
        * Constructor. Generate a block vector with as many blocks as there are
@@ -200,9 +202,11 @@ namespace TrilinosWrappers
        * distribution of the individual components described in the maps.
        *
        * If <tt>fast==false</tt>, the vector is filled with zeros.
+       *
+       * This function is deprecated.
        */
       void reinit (const std::vector<Epetra_Map> &parallel_partitioning,
-                   const bool                     fast = false);
+                   const bool                     fast = false) DEAL_II_DEPRECATED;
 
       /**
        * Reinitialize the BlockVector to contain as many blocks as there are
@@ -289,8 +293,10 @@ namespace TrilinosWrappers
        * non-true values when used in <tt>debug</tt> mode, since it is quite
        * expensive to keep track of all operations that lead to the need for
        * compress().
+       *
+       * This function is deprecated.
        */
-      bool is_compressed () const;
+      bool is_compressed () const DEAL_II_DEPRECATED;
 
       /**
        * Returns if this Vector contains ghost elements.
@@ -350,14 +356,6 @@ namespace TrilinosWrappers
 
 
     inline
-    BlockVector::BlockVector (const std::vector<Epetra_Map> &parallel_partitioning)
-    {
-      reinit (parallel_partitioning, false);
-    }
-
-
-
-    inline
     BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                               const MPI_Comm              &communicator)
     {
@@ -409,23 +407,6 @@ namespace TrilinosWrappers
       swap(v);
     }
 #endif
-
-
-
-    inline
-    bool
-    BlockVector::is_compressed () const
-    {
-      bool compressed = true;
-      for (unsigned int row=0; row<n_blocks(); ++row)
-        if (block(row).is_compressed() == false)
-          {
-            compressed = false;
-            break;
-          }
-
-      return compressed;
-    }
 
 
 
