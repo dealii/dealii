@@ -186,7 +186,7 @@ are worthwhile browsing through before you start any large-scale programming:
 As a general recommendation: If you expect to spend more than a few days
 writing software in the future, do yourself the favor of learning tools that
 can make your life more productive, in particular debuggers and integrated
-development environments. (@dealiiVideoLectureSeeAlso{7,8,25})
+development environments. (@dealiiVideoLectureSeeAlso{7,8,8.01,25})
 You will find that you will get the time spent
 learning these tools back severalfold soon by being more productive!
 Several of the video lectures referenced above show how to use tools

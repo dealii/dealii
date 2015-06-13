@@ -29,6 +29,9 @@ locally be constructed as a graph but not globally.
 Because the equation is non-linear, we can't solve it directly. Rather, we
 have to use Newton's method to compute the solution iteratively.
 
+@dealiiVideoLecture{31.5,31.55,31.6}
+(@dealiiVideoLectureSeeAlso{31.65,31.7})
+
 
 
 <h3>Classical formulation</h3>

@@ -141,6 +141,7 @@ form, and consequently a symmetric (if indefinite) system matrix.
 <h3>%Boundary conditions</h3>
 
 @dealiiVideoLecture{21.5}
+(@dealiiVideoLectureSeeAlso{21.55,21.6,21.65})
 
 The weak form just derived immediately presents us with different
 possibilities for imposing boundary conditions:

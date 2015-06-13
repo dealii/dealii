@@ -2,6 +2,7 @@
 <h1>Introduction</h1>
 
 @dealiiVideoLecture{29,30}
+(@dealiiVideoLectureSeeAlso{31.7})
 
 
 This program implements the heat equation
