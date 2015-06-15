@@ -918,13 +918,13 @@ namespace Step42
     // Alternatively, create a hypercube mesh. After creating it,
     // assign boundary indicators as follows:
     // @code
-    //    _______
-    //   /  1    /|
-    //  /______ / |
-    // |       | 8|
-    // |   8   | /
-    // |_______|/
-    //     6
+    // >     _______
+    // >    /  1    /|
+    // >   /______ / |
+    // >  |       | 8|
+    // >  |   8   | /
+    // >  |_______|/
+    // >      6
     // @endcode
     // In other words, the boundary indicators of the sides of the cube are 8.
     // The boundary indicator of the bottom is 6 and the top has indicator 1.
