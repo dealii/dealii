@@ -107,9 +107,9 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
-   virtual
-   void
-   transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input_grads,
+  virtual
+  void
+  transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input_grads,
      const VectorSlice<const std::vector<Tensor<1,dim> > > input_values,
      VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
      const typename Mapping<dim,spacedim>::InternalDataBase &internal,
@@ -264,6 +264,12 @@ public:
      * Computed on each cell.
      */
     std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
+
+    /**
+     * Zhen Tao
+     * Computed on each cell.
+     */
+    std::vector< DerivativeForm<2,dim,spacedim> > contravariant_derivatives;
 
     /**
      * Unit tangential vectors. Used for the computation of boundary forms and

@@ -728,6 +728,17 @@ MappingCartesian<dim,spacedim>::transform (
 
 }
 
+template <int dim, int spacedim>
+void
+MappingCartesian<dim,spacedim>::transform (
+   const VectorSlice<const std::vector<Tensor<2, dim> > >     input_grads,
+   const VectorSlice<const std::vector<Tensor<1,dim> > > input_values,
+   VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+   const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+   const MappingType type) const
+   {
+     Assert(false, ExcNotImplemented());
+   }
 
 template <int dim, int spacedim>
 Point<spacedim>

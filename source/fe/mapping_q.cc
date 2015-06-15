@@ -1025,6 +1025,17 @@ void MappingQ<dim,spacedim>::transform
   MappingQ1<dim,spacedim>::transform(input, output, *q1_data, mapping_type);
 }
 
+template<int dim, int spacedim>
+void MappingQ<dim,spacedim>::transform (
+  const VectorSlice<const std::vector<Tensor<2, dim> > >    input_grads,
+  const VectorSlice<const std::vector<Tensor<1, dim> > >    input_values,
+  VectorSlice<std::vector<Tensor<2, spacedim> > >     output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
 
 template<int dim, int spacedim>
 Point<spacedim>

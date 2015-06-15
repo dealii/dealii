@@ -673,6 +673,17 @@ void MappingFEField<dim,spacedim,VECTOR,DH>::transform
   AssertThrow(false, ExcNotImplemented());
 }
 
+template<int dim, int spacedim, class VECTOR, class DH>
+void MappingFEField<dim,spacedim,VECTOR,DH>::transform (
+  const VectorSlice<const std::vector<Tensor<2, dim> > >    input_grads,
+  const VectorSlice<const std::vector<Tensor<1, dim> > >    input_values,
+  VectorSlice<std::vector<Tensor<2, spacedim> > >     output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
 
 template<int dim, int spacedim, class VECTOR, class DH>
 template < int rank >

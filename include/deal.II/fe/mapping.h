@@ -492,6 +492,15 @@ public:
              const InternalDataBase &internal,
              const MappingType type) const = 0;
 
+// Zhen Tao add
+   virtual
+   void
+   transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input_grads,
+     const VectorSlice<const std::vector<Tensor<1,dim> > > input_values,
+     VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+     const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+     const MappingType type) const = 0;
+
   /**
    * The transformed (generalized) support point.
    */

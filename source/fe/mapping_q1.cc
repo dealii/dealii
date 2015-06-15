@@ -483,7 +483,10 @@ MappingQ1<dim,spacedim>::compute_data (const UpdateFlags      update_flags,
     data.volume_elements.resize(n_original_q_points);
 
   if (flags & update_jacobian_grads)
+  {
     data.shape_second_derivatives.resize(data.n_shape_functions * n_q_points);
+    data.contravariant_derivatives.resize(n_original_q_points);
+  }
 
   compute_shapes (q.get_points(), data);
 }
@@ -711,6 +714,49 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
       for (unsigned int point=0; point<n_q_points; ++point)
         data.volume_elements[point] = data.contravariant[point].determinant();
 
+  // Zhen Tao
+  if (update_flags & update_jacobian_grads)
+  {
+    AssertDimension (data.contravariant_derivatives.size(), n_q_points);
+
+    if (cell_similarity != CellSimilarity::translation)
+    {
+      std::fill(data.contravariant_derivatives.begin(),
+                data.contravariant_derivatives.end(),
+                DerivativeForm<2,dim,spacedim>());
+
+      Assert (data.n_shape_functions > 0, ExcInternalError());
+
+      const Tensor<1,spacedim> *supp_pts =
+                  &data.mapping_support_points[0];
+
+      for (unsigned int point=0; point<n_q_points; ++point)
+        {
+          const Tensor<2,dim> *second =
+            &data.second_derivative(point+data_set, 0);
+          double result [spacedim][dim][dim];
+          for (unsigned int i=0; i<spacedim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int l=0; l<dim; ++l)
+                result[i][j][l] = (second[0][j][l] * supp_pts[0][i]);
+          for (unsigned int k=1; k<data.n_shape_functions; ++k)
+            for (unsigned int i=0; i<spacedim; ++i)
+              for (unsigned int j=0; j<dim; ++j)
+                for (unsigned int l=0; l<dim; ++l)
+                  result[i][j][l]
+                  += (second[k][j][l]
+                      *
+                      supp_pts[k][i]);
+
+          // never touch any data for j=dim in case dim<spacedim, so it
+          // will always be zero as it was initialized
+          for (unsigned int i=0; i<spacedim; ++i)
+            for (unsigned int j=0; j<dim; ++j)
+              for (unsigned int l=0; l<dim; ++l)
+                data.contravariant_derivatives[point][i][j][l] = result[i][j][l];
+        }
+    }
+  }
 
 }
 
@@ -1229,6 +1275,25 @@ MappingQ1<dim,spacedim>::transform (
     }
 }
 
+template<int dim, int spacedim>
+void
+MappingQ1<dim,spacedim>::transform (
+  const VectorSlice<const std::vector<Tensor<2, dim> > >    input_grads,
+  const VectorSlice<const std::vector<Tensor<1, dim> > >    input_values,
+  VectorSlice<std::vector<Tensor<2, spacedim> > >     output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+{
+  switch (mapping_type)
+  {
+    case mapping_piola_gradient:
+      transform_gradients(input_grads, input_values,
+        output, mapping_data, mapping_type);
+      return;
+    default:
+      Assert(false, ExcNotImplemented());
+  }
+}
 
 
 template<int dim, int spacedim>
@@ -1359,6 +1424,8 @@ void MappingQ1<dim,spacedim>::transform_gradients(
               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
       Assert (data.update_flags & update_volume_elements,
               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+      // Assert (data.update_flags & update_jacobian_grads,
+      //         typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_jacobian_grads"));
       Assert (rank==2, ExcMessage("Only for rank 2"));
 
       for (unsigned int i=0; i<output.size(); ++i)
@@ -1380,6 +1447,79 @@ void MappingQ1<dim,spacedim>::transform_gradients(
     }
 }
 
+template<int dim, int spacedim>
+template < int rank >
+void MappingQ1<dim,spacedim>::transform_gradients(
+  const VectorSlice<const std::vector<Tensor<rank,dim> > > input_grads,
+  const VectorSlice<const std::vector<Tensor<rank-1,dim> > > input_values,
+  VectorSlice<std::vector<Tensor<rank,spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+{
+  AssertDimension (input_grads.size(), output.size());
+  AssertDimension (input_values.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+          ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
+
+  switch (mapping_type)
+  {
+    case mapping_piola_gradient:
+    {
+      Assert (data.update_flags & update_covariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+      Assert (data.update_flags & update_contravariant_transformation,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+      Assert (data.update_flags & update_volume_elements,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+      Assert (data.update_flags & update_jacobian_grads,
+              typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_jacobian_grads"));
+      Assert (rank==2, ExcMessage("Only for rank 2"));
+
+      for (unsigned int i=0; i<output.size(); ++i)
+        {
+          DerivativeForm<1,spacedim,dim> A =
+            apply_transformation(data.covariant[i], input_grads[i] );
+          Tensor<2,spacedim> T1 =
+            apply_transformation(data.contravariant[i], A.transpose() );
+
+          output[i] = transpose(T1);
+
+          DerivativeForm<1,dim,spacedim> G =
+            apply_transformation(data.contravariant_derivatives[i],
+                                input_values[i] );
+          Tensor<2,spacedim> T2 =
+            apply_transformation(data.covariant[i] ,G );
+
+          output[i] += T2;
+
+          Tensor<1,spacedim> v1 =
+            apply_transformation(data.contravariant[i], input_values[i] );
+
+          Tensor<1,dim> v2 =
+            trace_apply_transformation(data.contravariant_derivatives[i],
+                                 data.covariant[i] );
+
+          Tensor<1,spacedim> v3 =
+            apply_transformation(data.covariant[i], v2 );
+
+          Tensor<2,spacedim> T3;
+
+          dealii::outer_product(T3,v1,v3);
+
+          output[i] += T3;
+
+          output[i] /= data.volume_elements[i];
+        }
+
+      return;
+    }
+
+    default:
+      Assert(false, ExcNotImplemented());
+  }
+
+}
 
 
 
