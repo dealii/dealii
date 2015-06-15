@@ -984,6 +984,8 @@ namespace parallel
        &vertices_with_ghost_neighbors);
 
       template <int, int> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
+
+      template <int,int> friend class dealii::FETools::internal::ExtrapolateImplementation;
     };
 
 
