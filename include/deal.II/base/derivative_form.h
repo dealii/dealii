@@ -410,17 +410,35 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF,
  */
  template <int spacedim, int dim>
  inline
- Tensor<2, spacedim>
+ DerivativeForm<1, dim, spacedim>
  apply_transformation (const DerivativeForm<2,dim,spacedim> &DF,
                        const Tensor<1,dim>               &T)
  {
-   Assert (spacedim==dim, ExcMessage("Tensor not square"));
-   Tensor<2, spacedim> dest;
+  //  Assert (spacedim==dim, ExcMessage("Tensor not square"));
+   DerivativeForm<1, dim, spacedim> dest;
    for (unsigned int i=0; i<spacedim; ++i)
-      for (unsigned int j=0; j<spacedim; ++j)
+      for (unsigned int j=0; j<dim; ++j)
         dest[i][j] = DF[i][j] * T;
    return dest;
  }
+
+ template <int spacedim, int dim>
+ inline
+ Tensor<1, dim>
+ trace_apply_transformation (const DerivativeForm<2,dim,spacedim> &DF2,
+                             const DerivativeForm<1,dim,spacedim> &DF1)
+ {
+  //  Assert (spacedim==dim, ExcMessage("Tensor not square"));
+   Tensor<1,dim> dest;
+   for(unsigned int k=0; k<dim; ++k)
+     for(unsigned int i=0; i<spacedim; ++i)
+       for(unsigned int j=0; j<dim; ++j)
+       {
+         dest[k] += DF2[i][j][k] * DF1[i][j];
+       }
+   return dest;
+ }
+
 
 /**
  * Similar to previous apply_transformation. It computes $T*DF^{t}$.
