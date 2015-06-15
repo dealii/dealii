@@ -826,7 +826,7 @@ namespace parallel
       /**
        * Simple vector addition, equal to the <tt>operator +=</tt>.
        *
-       * This function is deprecated use the <tt>operator +=</tt> instead.
+       * @deprecated Use the <tt>operator +=</tt> instead.
        */
       void add (const Vector<Number> &V) DEAL_II_DEPRECATED;
 
@@ -868,6 +868,8 @@ namespace parallel
       /**
        * Scaling and multiple addition.  <tt>*this = s*(*this)+a*V + b*W +
        * c*X</tt>.
+       *
+       * This function is deprecated.
        */
       void sadd (const Number          s,
                  const Number          a,
@@ -875,7 +877,7 @@ namespace parallel
                  const Number          b,
                  const Vector<Number> &W,
                  const Number          c,
-                 const Vector<Number> &X);
+                 const Vector<Number> &X) DEAL_II_DEPRECATED;
 
       /**
        * Scale each element of the vector by a constant value.
@@ -921,10 +923,12 @@ namespace parallel
 
       /**
        * Assignment <tt>*this = a*u + b*v + b*w</tt>.
+       *
+       * This function is deprecated.
        */
       void equ (const Number a, const Vector<Number> &u,
                 const Number b, const Vector<Number> &v,
-                const Number c, const Vector<Number> &w);
+                const Number c, const Vector<Number> &w) DEAL_II_DEPRECATED;
 
       /**
        * Compute the elementwise ratio of the two given vectors, that is let
