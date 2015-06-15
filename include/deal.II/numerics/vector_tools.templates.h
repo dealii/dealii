@@ -207,7 +207,7 @@ namespace VectorTools
       if (cell->is_locally_owned())
         {
           const unsigned int fe_index = cell->active_fe_index();
-          if (fe[fe_index].degree != 0)
+          if (fe[fe_index].dofs_per_cell != 0)
             {
               // for each cell:
               // get location of finite element
