@@ -666,43 +666,119 @@ namespace
   }
 
   /**
+   * Class describing common functionality between different output streams.
+   *
+   * @ingroup output
+   */
+  template<typename FlagsType>
+  class StreamBase
+  {
+  public:
+    /*
+     * Constructor. Stores a reference to the output stream for immediate use.
+     */
+    StreamBase (std::ostream &stream,
+                const FlagsType &flags)
+      :
+      selected_component (numbers::invalid_unsigned_int),
+      stream (stream),
+      flags (flags)
+    {}
+
+    /**
+     * Output operator for points. All inheriting classes should implement this
+     * function.
+     */
+    template <int dim>
+    void write_point (const unsigned int,
+                      const Point<dim> &)
+    {
+      Assert (false, ExcMessage ("The derived class you are using needs to "
+                                 "reimplement this function if you want to call "
+                                 "it."));
+    }
+
+    /**
+     * Do whatever is necessary to terminate the list of points. The default
+     * implementation does nothing; derived classes that do not require any
+     * action do not need to reimplement this.
+     */
+    void flush_points () {}
+
+    /**
+     * Write dim-dimensional cell with first vertex at number start and further
+     * vertices offset by the specified values. Values not needed are
+     * ignored. All inheriting classes should implement this function.
+     */
+    template <int dim>
+    void write_cell (const unsigned int /*index*/,
+                     const unsigned int /*start*/,
+                     const unsigned int /*x_offset*/,
+                     const unsigned int /*y_offset*/,
+                     const unsigned int /*z_offset*/)
+    {
+      Assert (false, ExcMessage ("The derived class you are using needs to "
+                                 "reimplement this function if you want to call "
+                                 "it."));
+    }
+
+    /**
+     * Do whatever is necessary to terminate the list of cells. This function is
+     * usually only reimplemented if deal.II is compiled with zlib. The default
+     * implementation does nothing; derived classes that do not require any
+     * action do not need to reimplement this.
+     */
+    void flush_cells () {}
+
+    /**
+     * Forwarding of an output stream. This function is usually only
+     * reimplemented if inheriting classes use zlib.
+     */
+    template <typename T>
+    std::ostream &operator<< (const T &t)
+    {
+      stream << t;
+      return stream;
+    }
+
+    /**
+     * Since the GMV and Tecplot formats read the x, y and z coordinates in
+     * separate fields, we enable write() to output only a single selected
+     * component at once and do this dim times for the whole set of nodes. This
+     * integer can be used to select the component written.
+     */
+    unsigned int selected_component;
+
+  protected:
+    /**
+     * The ostream to use. Since the life span of these objects is small, we use
+     * a very simple storage technique.
+     */
+    std::ostream &stream;
+
+    /**
+     * The flags controlling the output.
+     */
+    const FlagsType flags;
+  };
+
+  /**
    * Class for writing basic
    * entities in @ref
    * SoftwareOpenDX format,
    * depending on the flags.
    */
-  class DXStream
+  class DXStream : public StreamBase<DataOutBase::DXFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
     DXStream (std::ostream &stream,
-              const DataOutBase::DXFlags flags);
+              const DataOutBase::DXFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
-    void flush_points ();
-
-    /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The order of vertices for
      * these cells in different
      * dimensions is
@@ -720,12 +796,6 @@ namespace
                      const unsigned int z_offset);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
-    void flush_cells ();
-
-    /**
      * Write a complete set of
      * data for a single node.
      *
@@ -738,27 +808,6 @@ namespace
     template<typename data>
     void write_dataset (const unsigned int       index,
                         const std::vector<data> &values);
-
-    /**
-     * Forwarding of output stream
-     */
-    template <typename T>
-    std::ostream &operator<< (const T &);
-
-  private:
-    /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::DXFlags flags;
   };
 
   /**
@@ -767,38 +816,17 @@ namespace
    * format, depending on the
    * flags.
    */
-  class GmvStream
+  class GmvStream : public StreamBase<DataOutBase::GmvFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
     GmvStream (std::ostream &stream,
-               const DataOutBase::GmvFlags flags);
+               const DataOutBase::GmvFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
-    void flush_points ();
-
-    /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The order of vertices for
      * these cells in different
      * dimensions is
@@ -809,54 +837,11 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell(const unsigned int index,
-                    const unsigned int start,
-                    const unsigned int x_offset,
-                    const unsigned int y_offset,
-                    const unsigned int z_offset);
-
-    /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
-    void flush_cells ();
-
-    /**
-     * Forwarding of output stream
-     */
-    template <typename T>
-    std::ostream &operator<< (const T &);
-
-    /**
-     * Since GMV reads the x, y
-     * and z coordinates in
-     * separate fields, we enable
-     * write() to output only a
-     * single selected component
-     * at once and do this dim
-     * times for the whole set of
-     * nodes. This integer can be
-     * used to select the
-     * component written.
-     */
-    unsigned int selected_component;
-
-  private:
-    /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-    const DataOutBase::GmvFlags flags;
-    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+    void write_cell (const unsigned int index,
+                     const unsigned int start,
+                     const unsigned int x_offset,
+                     const unsigned int y_offset,
+                     const unsigned int z_offset);
   };
 
   /**
@@ -865,37 +850,17 @@ namespace
    * SoftwareTecplot format,
    * depending on the flags.
    */
-  class TecplotStream
+  class TecplotStream : public StreamBase<DataOutBase::TecplotFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
-    TecplotStream (std::ostream &stream, const DataOutBase::TecplotFlags flags);
+    TecplotStream (std::ostream &stream,
+                   const DataOutBase::TecplotFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
-    void flush_points ();
-
-    /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The order of vertices for
      * these cells in different
      * dimensions is
@@ -906,52 +871,11 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell(const unsigned int index,
-                    const unsigned int start,
-                    const unsigned int x_offset,
-                    const unsigned int y_offset,
-                    const unsigned int z_offset);
-
-    /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
-    void flush_cells ();
-
-    /**
-     * Forwarding of output stream
-     */
-    template <typename T>
-    std::ostream &operator<< (const T &);
-
-    /**
-     * Since TECPLOT reads the x, y
-     * and z coordinates in
-     * separate fields, we enable
-     * write() to output only a
-     * single selected component
-     * at once and do this dim
-     * times for the whole set of
-     * nodes. This integer can be
-     * used to select the
-     * component written.
-     */
-    unsigned int selected_component;
-
-  private:
-    /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::TecplotFlags flags;
+    void write_cell (const unsigned int index,
+                     const unsigned int start,
+                     const unsigned int x_offset,
+                     const unsigned int y_offset,
+                     const unsigned int z_offset);
   };
 
   /**
@@ -960,38 +884,17 @@ namespace
    * @ref SoftwareAVS, depending on
    * the flags.
    */
-  class UcdStream
+  class UcdStream : public StreamBase<DataOutBase::UcdFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
     UcdStream (std::ostream &stream,
-               const DataOutBase::UcdFlags flags);
+               const DataOutBase::UcdFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
-    void flush_points ();
-
-    /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The additional offset 1 is
      * added inside this
      * function.
@@ -1006,17 +909,11 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell(const unsigned int index,
-                    const unsigned int start,
-                    const unsigned int x_offset,
-                    const unsigned int y_offset,
-                    const unsigned int z_offset);
-
-    /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
-    void flush_cells ();
+    void write_cell (const unsigned int index,
+                     const unsigned int start,
+                     const unsigned int x_offset,
+                     const unsigned int y_offset,
+                     const unsigned int z_offset);
 
     /**
      * Write a complete set of
@@ -1031,26 +928,6 @@ namespace
     template<typename data>
     void write_dataset (const unsigned int       index,
                         const std::vector<data> &values);
-
-    /**
-     * Forwarding of output stream
-     */
-    template <typename T>
-    std::ostream &operator<< (const T &);
-  private:
-    /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::UcdFlags flags;
   };
 
   /**
@@ -1059,38 +936,17 @@ namespace
    * format, depending on the
    * flags.
    */
-  class VtkStream
+  class VtkStream : public StreamBase<DataOutBase::VtkFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
     VtkStream (std::ostream &stream,
-               const DataOutBase::VtkFlags flags);
+               const DataOutBase::VtkFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
     /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
-    void flush_points ();
-
-    /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The order of vertices for
      * these cells in different
      * dimensions is
@@ -1101,73 +957,27 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell(const unsigned int index,
-                    const unsigned int start,
-                    const unsigned int x_offset,
-                    const unsigned int y_offset,
-                    const unsigned int z_offset);
-
-    /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
-    void flush_cells ();
-
-    /**
-     * Forwarding of output stream
-     */
-    template <typename T>
-    std::ostream &operator<< (const T &);
-
-  private:
-    /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::VtkFlags flags;
+    void write_cell (const unsigned int index,
+                     const unsigned int start,
+                     const unsigned int x_offset,
+                     const unsigned int y_offset,
+                     const unsigned int z_offset);
   };
 
 
-  class VtuStream
+  class VtuStream : public StreamBase<DataOutBase::VtkFlags>
   {
   public:
-    /**
-     * Constructor, storing
-     * persistent values for
-     * later use.
-     */
     VtuStream (std::ostream &stream,
-               const DataOutBase::VtkFlags flags);
+               const DataOutBase::VtkFlags &flags);
 
-    /**
-     * Output operator for points.
-     */
     template <int dim>
     void write_point (const unsigned int index,
                       const Point<dim> &);
 
-    /**
-     * Do whatever is necessary to
-     * terminate the list of points.
-     */
     void flush_points ();
 
     /**
-     * Write dim-dimensional cell
-     * with first vertex at
-     * number start and further
-     * vertices offset by the
-     * specified values. Values
-     * not needed are ignored.
-     *
      * The order of vertices for
      * these cells in different
      * dimensions is
@@ -1178,21 +988,14 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell(const unsigned int index,
-                    const unsigned int start,
-                    const unsigned int x_offset,
-                    const unsigned int y_offset,
-                    const unsigned int z_offset);
+    void write_cell (const unsigned int index,
+                     const unsigned int start,
+                     const unsigned int x_offset,
+                     const unsigned int y_offset,
+                     const unsigned int z_offset);
 
-    /**
-     * Do whatever is necessary to
-     * terminate the list of cells.
-     */
     void flush_cells ();
 
-    /**
-     * Forwarding of output stream
-     */
     template <typename T>
     std::ostream &operator<< (const T &);
 
@@ -1212,20 +1015,6 @@ namespace
 
   private:
     /**
-     * The ostream to use. Since
-     * the life span of these
-     * objects is small, we use a
-     * very simple storage
-     * technique.
-     */
-    std::ostream &stream;
-
-    /**
-     * The flags controlling the output
-     */
-    const DataOutBase::VtkFlags flags;
-
-    /**
      * A list of vertices and
      * cells, to be used in case we
      * want to compress the data.
@@ -1244,10 +1033,10 @@ namespace
 
 //----------------------------------------------------------------------//
 
-  DXStream::DXStream(std::ostream &out,
-                     const DataOutBase::DXFlags f)
+  DXStream::DXStream (std::ostream &out,
+                      const DataOutBase::DXFlags &f)
     :
-    stream(out), flags(f)
+    StreamBase (out, f)
   {}
 
 
@@ -1273,19 +1062,14 @@ namespace
   }
 
 
-  void
-  DXStream::flush_points ()
-  {}
-
 
   template<int dim>
   void
-  DXStream::write_cell(
-    unsigned int,
-    unsigned int start,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  DXStream::write_cell (unsigned int,
+                        unsigned int start,
+                        unsigned int d1,
+                        unsigned int d2,
+                        unsigned int d3)
   {
     int nodes[1<<dim];
     nodes[GeometryInfo<dim>::dx_to_deal[0]] = start;
@@ -1318,16 +1102,12 @@ namespace
   }
 
 
-  void
-  DXStream::flush_cells ()
-  {}
-
 
   template<typename data>
   inline
   void
-  DXStream::write_dataset(const unsigned int     /*index*/,
-                          const std::vector<data> &values)
+  DXStream::write_dataset (const unsigned int,
+                           const std::vector<data> &values)
   {
     if (flags.data_binary)
       {
@@ -1347,10 +1127,9 @@ namespace
 //----------------------------------------------------------------------//
 
   GmvStream::GmvStream (std::ostream &out,
-                        const DataOutBase::GmvFlags f)
+                        const DataOutBase::GmvFlags &f)
     :
-    selected_component(numbers::invalid_unsigned_int),
-    stream(out), flags(f)
+    StreamBase (out, f)
   {}
 
 
@@ -1365,19 +1144,14 @@ namespace
   }
 
 
-  void
-  GmvStream::flush_points ()
-  {}
-
 
   template<int dim>
   void
-  GmvStream::write_cell(
-    unsigned int,
-    unsigned int s,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  GmvStream::write_cell (unsigned int,
+                         unsigned int s,
+                         unsigned int d1,
+                         unsigned int d2,
+                         unsigned int d3)
   {
     // Vertices are numbered starting
     // with one.
@@ -1403,17 +1177,10 @@ namespace
 
 
 
-  void
-  GmvStream::flush_cells ()
-  {}
-
-
-//----------------------------------------------------------------------//
-
-  TecplotStream::TecplotStream(std::ostream &out, const DataOutBase::TecplotFlags f)
+  TecplotStream::TecplotStream (std::ostream &out,
+                                const DataOutBase::TecplotFlags &f)
     :
-    selected_component(numbers::invalid_unsigned_int),
-    stream(out), flags(f)
+    StreamBase (out, f)
   {}
 
 
@@ -1428,19 +1195,14 @@ namespace
   }
 
 
-  void
-  TecplotStream::flush_points ()
-  {}
-
 
   template<int dim>
   void
-  TecplotStream::write_cell(
-    unsigned int,
-    unsigned int s,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  TecplotStream::write_cell (unsigned int,
+                             unsigned int s,
+                             unsigned int d1,
+                             unsigned int d2,
+                             unsigned int d3)
   {
     const unsigned int start = s+1;
 
@@ -1463,17 +1225,10 @@ namespace
 
 
 
-  void
-  TecplotStream::flush_cells ()
-  {}
-
-
-
-//----------------------------------------------------------------------//
-
-  UcdStream::UcdStream(std::ostream &out, const DataOutBase::UcdFlags f)
+  UcdStream::UcdStream (std::ostream &out,
+                        const DataOutBase::UcdFlags &f)
     :
-    stream(out), flags(f)
+    StreamBase (out, f)
   {}
 
 
@@ -1495,19 +1250,13 @@ namespace
 
 
 
-  void
-  UcdStream::flush_points ()
-  {}
-
-
   template<int dim>
   void
-  UcdStream::write_cell(
-    unsigned int index,
-    unsigned int start,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  UcdStream::write_cell (unsigned int index,
+                         unsigned int start,
+                         unsigned int d1,
+                         unsigned int d2,
+                         unsigned int d3)
   {
     int nodes[1<<dim];
     nodes[GeometryInfo<dim>::ucd_to_deal[0]] = start;
@@ -1539,16 +1288,11 @@ namespace
 
 
 
-  void
-  UcdStream::flush_cells ()
-  {}
-
-
   template<typename data>
   inline
   void
-  UcdStream::write_dataset(const unsigned int       index,
-                           const std::vector<data> &values)
+  UcdStream::write_dataset (const unsigned int index,
+                            const std::vector<data> &values)
   {
     stream << index+1;
     for (unsigned int i=0; i<values.size(); ++i)
@@ -1560,9 +1304,10 @@ namespace
 
 //----------------------------------------------------------------------//
 
-  VtkStream::VtkStream(std::ostream &out, const DataOutBase::VtkFlags f)
+  VtkStream::VtkStream (std::ostream &out,
+                        const DataOutBase::VtkFlags &f)
     :
-    stream(out), flags(f)
+    StreamBase (out, f)
   {}
 
 
@@ -1581,19 +1326,13 @@ namespace
 
 
 
-  void
-  VtkStream::flush_points ()
-  {}
-
-
   template<int dim>
   void
-  VtkStream::write_cell(
-    unsigned int,
-    unsigned int start,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  VtkStream::write_cell (unsigned int,
+                         unsigned int start,
+                         unsigned int d1,
+                         unsigned int d2,
+                         unsigned int d3)
   {
     stream << GeometryInfo<dim>::vertices_per_cell << '\t'
            << start << '\t'
@@ -1614,15 +1353,11 @@ namespace
   }
 
 
-  void
-  VtkStream::flush_cells ()
-  {}
 
-
-
-  VtuStream::VtuStream(std::ostream &out, const DataOutBase::VtkFlags f)
+  VtuStream::VtuStream (std::ostream &out,
+                        const DataOutBase::VtkFlags &f)
     :
-    stream(out), flags(f)
+    StreamBase (out, f)
   {}
 
 
@@ -1665,12 +1400,11 @@ namespace
 
   template<int dim>
   void
-  VtuStream::write_cell(
-    unsigned int,
-    unsigned int start,
-    unsigned int d1,
-    unsigned int d2,
-    unsigned int d3)
+  VtuStream::write_cell (unsigned int,
+                         unsigned int start,
+                         unsigned int d1,
+                         unsigned int d2,
+                         unsigned int d3)
   {
 #if !defined(DEAL_II_WITH_ZLIB)
     stream << start << '\t'
@@ -1737,45 +1471,9 @@ namespace
 
     return stream;
   }
-
-  template <typename T>
-  std::ostream &
-  DXStream::operator<< (const T &t)
-  {
-    stream << t;
-    return stream;
-  }
-
-
-  template <typename T>
-  std::ostream &
-  GmvStream::operator<< (const T &t)
-  {
-    stream << t;
-    return stream;
-  }
-
-
-  template <typename T>
-  std::ostream &
-  UcdStream::operator<< (const T &t)
-  {
-    stream << t;
-    return stream;
-  }
-
-
-  template <typename T>
-  std::ostream &
-  VtkStream::operator<< (const T &t)
-  {
-    stream << t;
-    return stream;
-  }
 }
 
 
-//----------------------------------------------------------------------//
 
 namespace DataOutBase
 {
