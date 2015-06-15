@@ -599,7 +599,7 @@ namespace PETScWrappers
     /**
      * Simple vector addition, equal to the <tt>operator +=</tt>.
      *
-     * This function is deprecated use += instead.
+     * @deprecated Use the <tt>operator +=</tt> instead.
      */
     void add (const VectorBase &V) DEAL_II_DEPRECATED;
 
@@ -639,6 +639,8 @@ namespace PETScWrappers
     /**
      * Scaling and multiple addition. <tt>*this = s*(*this)+a*V + b*W +
      * c*X</tt>.
+     *
+     * This function is deprecated.
      */
     void sadd (const PetscScalar s,
                const PetscScalar a,
@@ -646,7 +648,7 @@ namespace PETScWrappers
                const PetscScalar b,
                const VectorBase     &W,
                const PetscScalar c,
-               const VectorBase     &X);
+               const VectorBase     &X) DEAL_II_DEPRECATED;
 
     /**
      * Scale each element of this vector by the corresponding element in the

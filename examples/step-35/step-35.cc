@@ -1003,7 +1003,8 @@ namespace Step35
   void
   NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
   {
-    pres_tmp.equ (-1., pres_n, -4./3., phi_n, 1./3., phi_n_minus_1);
+    pres_tmp = pres_n;
+    pres_tmp.sadd(-1., -4./3., phi_n, 1./3., phi_n_minus_1);
 
     assemble_advection_term();
 

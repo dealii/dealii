@@ -665,7 +665,7 @@ public:
   /**
    * Simple vector addition, equal to the <tt>operator +=</tt>.
    *
-   * This function is deprecated use the <tt>operator +=</tt> instead.
+   * @deprecate Use the <tt>operator +=</tt> instead.
    *
    * @dealiiOperationIsMultithreaded
    */
@@ -719,6 +719,8 @@ public:
    * Scaling and multiple addition.  <tt>*this = s*(*this)+a*V + b*W +
    * c*X</tt>.
    *
+   * This function is deprecated.
+   *
    * @dealiiOperationIsMultithreaded
    */
   void sadd (const Number          s,
@@ -727,7 +729,7 @@ public:
              const Number          b,
              const Vector<Number> &W,
              const Number          c,
-             const Vector<Number> &X);
+             const Vector<Number> &X) DEAL_II_DEPRECATED;
 
   /**
    * Scale each element of the vector by a constant value.
@@ -784,11 +786,13 @@ public:
   /**
    * Assignment <tt>*this = a*u + b*v + b*w</tt>.
    *
+   * This function is deprecated.
+   *
    * @dealiiOperationIsMultithreaded
    */
   void equ (const Number a, const Vector<Number> &u,
             const Number b, const Vector<Number> &v,
-            const Number c, const Vector<Number> &w);
+            const Number c, const Vector<Number> &w) DEAL_II_DEPRECATED;
 
   /**
    * Compute the elementwise ratio of the two given vectors, that is let
@@ -848,10 +852,12 @@ public:
    * manipulator, if printing across.  If @p across is @p true then the vector
    * is printed in a line, while if @p false then the elements are printed on
    * a separate line each.
+   *
+   * This function is deprecated.
    */
   void print (LogStream &out,
               const unsigned int width = 6,
-              const bool across = true) const;
+              const bool across = true) const DEAL_II_DEPRECATED;
 
   /**
    * Write the vector en bloc to a file. This is done in a binary mode, so the

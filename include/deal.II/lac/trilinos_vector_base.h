@@ -747,6 +747,8 @@ namespace TrilinosWrappers
     /**
      * Scaling and multiple addition.  <tt>*this = s*(*this) + a*V + b*W +
      * c*X</tt>.
+     *
+     * This function is deprecated.
      */
     void sadd (const TrilinosScalar  s,
                const TrilinosScalar  a,
@@ -754,7 +756,7 @@ namespace TrilinosWrappers
                const TrilinosScalar  b,
                const VectorBase     &W,
                const TrilinosScalar  c,
-               const VectorBase     &X);
+               const VectorBase     &X) DEAL_II_DEPRECATED;
 
     /**
      * Scale each element of this vector by the corresponding element in the
