@@ -1,0 +1,121 @@
+
+DEAL::2d cell 0.0 has the following face orientations:
+DEAL::    true
+DEAL::    true
+DEAL::    true
+DEAL::    true
+DEAL::2d cell 0.1 has the following face orientations:
+DEAL::    true
+DEAL::    true
+DEAL::    true
+DEAL::    true
+DEAL::2d cell 0.2 has the following face orientations:
+DEAL::    true
+DEAL::    true
+DEAL::    true
+DEAL::    true
+DEAL::2d cell 0.3 has the following face orientations:
+DEAL::    true
+DEAL::    true
+DEAL::    true
+DEAL::    true
+DEAL::2d cell 0.4 has the following face orientations:
+DEAL::    true
+DEAL::    true
+DEAL::    true
+DEAL::    true
+DEAL::3d cell 0.0 has the following face orientation/flips and edge orientations:
+DEAL::    face=0 -> true/false
+DEAL::    face=1 -> true/false
+DEAL::    face=2 -> true/false
+DEAL::    face=3 -> true/false
+DEAL::    face=4 -> true/false
+DEAL::    face=5 -> true/false
+DEAL::    edge=0 -> true
+DEAL::    edge=1 -> true
+DEAL::    edge=2 -> true
+DEAL::    edge=3 -> true
+DEAL::    edge=4 -> true
+DEAL::    edge=5 -> true
+DEAL::    edge=6 -> true
+DEAL::    edge=7 -> true
+DEAL::    edge=8 -> true
+DEAL::    edge=9 -> true
+DEAL::    edge=10 -> true
+DEAL::    edge=11 -> true
+DEAL::3d cell 0.1 has the following face orientation/flips and edge orientations:
+DEAL::    face=0 -> true/false
+DEAL::    face=1 -> true/false
+DEAL::    face=2 -> false/false
+DEAL::    face=3 -> true/false
+DEAL::    face=4 -> true/false
+DEAL::    face=5 -> true/false
+DEAL::    edge=0 -> true
+DEAL::    edge=1 -> true
+DEAL::    edge=2 -> true
+DEAL::    edge=3 -> true
+DEAL::    edge=4 -> true
+DEAL::    edge=5 -> true
+DEAL::    edge=6 -> true
+DEAL::    edge=7 -> true
+DEAL::    edge=8 -> true
+DEAL::    edge=9 -> true
+DEAL::    edge=10 -> true
+DEAL::    edge=11 -> true
+DEAL::3d cell 0.2 has the following face orientation/flips and edge orientations:
+DEAL::    face=0 -> true/false
+DEAL::    face=1 -> true/false
+DEAL::    face=2 -> true/false
+DEAL::    face=3 -> true/false
+DEAL::    face=4 -> true/false
+DEAL::    face=5 -> true/false
+DEAL::    edge=0 -> true
+DEAL::    edge=1 -> true
+DEAL::    edge=2 -> true
+DEAL::    edge=3 -> true
+DEAL::    edge=4 -> true
+DEAL::    edge=5 -> true
+DEAL::    edge=6 -> true
+DEAL::    edge=7 -> true
+DEAL::    edge=8 -> true
+DEAL::    edge=9 -> true
+DEAL::    edge=10 -> true
+DEAL::    edge=11 -> true
+DEAL::3d cell 0.3 has the following face orientation/flips and edge orientations:
+DEAL::    face=0 -> true/false
+DEAL::    face=1 -> true/false
+DEAL::    face=2 -> true/false
+DEAL::    face=3 -> false/false
+DEAL::    face=4 -> true/false
+DEAL::    face=5 -> true/false
+DEAL::    edge=0 -> true
+DEAL::    edge=1 -> true
+DEAL::    edge=2 -> true
+DEAL::    edge=3 -> true
+DEAL::    edge=4 -> true
+DEAL::    edge=5 -> true
+DEAL::    edge=6 -> true
+DEAL::    edge=7 -> true
+DEAL::    edge=8 -> true
+DEAL::    edge=9 -> true
+DEAL::    edge=10 -> true
+DEAL::    edge=11 -> true
+DEAL::3d cell 0.4 has the following face orientation/flips and edge orientations:
+DEAL::    face=0 -> true/false
+DEAL::    face=1 -> false/false
+DEAL::    face=2 -> true/false
+DEAL::    face=3 -> false/false
+DEAL::    face=4 -> true/false
+DEAL::    face=5 -> true/false
+DEAL::    edge=0 -> true
+DEAL::    edge=1 -> true
+DEAL::    edge=2 -> true
+DEAL::    edge=3 -> true
+DEAL::    edge=4 -> true
+DEAL::    edge=5 -> true
+DEAL::    edge=6 -> true
+DEAL::    edge=7 -> true
+DEAL::    edge=8 -> true
+DEAL::    edge=9 -> true
+DEAL::    edge=10 -> true
+DEAL::    edge=11 -> true
