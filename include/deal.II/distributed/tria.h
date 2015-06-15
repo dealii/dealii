@@ -967,6 +967,8 @@ namespace parallel
       mark_locally_active_vertices_on_level(const int level) const;
 
       template <int, int> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
+
+      template <int,int> friend class dealii::FETools::internal::ExtrapolateImplementation;
     };
 
 
