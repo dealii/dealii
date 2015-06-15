@@ -662,6 +662,177 @@ block_triangular_inverse(const BlockMatrix &block_matrix,
   return result * inverse_diagonal;
 }
 
+/**
+ * @relates LinearOperator
+ *
+ * This function implement a gauss elimination argument to invert a lower
+ * block triangular matrix.
+ * It takes as argement a block matrix @p block_matrix and an array of LinearOperators
+ * @p inverse_diagonal representing inverses of digonal blocks of @p block_matrix.
+ *
+ * Caveat: Tvmult and Tvmult_add have not been implemented, yet. This may lead to mistakes.
+ * @ingroup LAOperators
+ */
+
+template <unsigned int n, typename Range, typename Domain, typename BlockMatrix>
+LinearOperator<Range, Domain>
+gauss_lower_block_inverse(const BlockMatrix &block_matrix,
+                          const std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n> &inverse_diagonal)
+{
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = [inverse_diagonal](Range &v, bool fast)
+  {
+    // Reinitialize the block vector to m blocks:
+    v.reinit(n);
+
+    // And reinitialize every individual block with reinit_range_vectors:
+    for (unsigned int i = 0; i < n; ++i)
+      inverse_diagonal[i].reinit_range_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.reinit_domain_vector = [inverse_diagonal](Domain &v, bool fast)
+  {
+    // Reinitialize the block vector to m blocks:
+    v.reinit(n);
+
+    // And reinitialize every individual block with reinit_domain_vectors:
+    for (unsigned int i = 0; i < n; ++i)
+      inverse_diagonal[i].reinit_domain_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.vmult = [&block_matrix, inverse_diagonal](Range &v, const Domain &u)
+  {
+    static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
+    typename  Range::BlockType *tmp = vector_memory.alloc();
+
+    inverse_diagonal[0].vmult(v.block(0), u.block(0));
+    for (unsigned int i=1; i<n; ++i)
+      {
+        inverse_diagonal[i].reinit_range_vector(*tmp, /*bool fast=*/ true);
+        *tmp = u.block(i);
+        *tmp *= -1.;
+        for (unsigned int j=0; j<i; ++j)
+          block_matrix.block(i,j).vmult_add(*tmp, v.block(j));
+        *tmp *= -1.;
+        inverse_diagonal[i].vmult(v.block(i),*tmp);
+      }
+
+    vector_memory.free(tmp);
+  };
+
+  return_op.vmult_add = [&block_matrix, inverse_diagonal](Range &v, const Domain &u)
+  {
+    static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
+    typename  Range::BlockType *tmp = vector_memory.alloc();
+
+    inverse_diagonal[0].vmult_add(v.block(0), u.block(0));
+    for (unsigned int i=1; i<n; ++i)
+      {
+        inverse_diagonal[i].reinit_range_vector(*tmp, /*bool fast=*/ true);
+        *tmp = u.block(i);
+        *tmp *= -1.;
+        for (unsigned int j=0; j<i; ++j)
+          block_matrix.block(i,j).vmult_add(*tmp, v.block(j));
+        *tmp *= -1.;
+        inverse_diagonal[i].vmult_add(v.block(i),*tmp);
+      }
+
+    vector_memory.free(tmp);
+  };
+
+  return return_op;
+}
+
+/**
+ * @relates LinearOperator
+ *
+ * This function implement a gauss elimination argument to invert an upper
+ * block triangular matrix.
+ * It takes as argement a block matrix @p block_matrix and an array of LinearOperators
+ * @p inverse_diagonal representing inverses of digonal blocks of @p block_matrix.
+ *
+ * Caveat: Tvmult and Tvmult_add have not been implemented, yet. This may lead to mistakes.
+ * @ingroup LAOperators
+ */
+
+template <unsigned int n, typename Range, typename Domain, typename BlockMatrix>
+LinearOperator<Range, Domain>
+gauss_upper_block_inverse(const BlockMatrix &block_matrix,
+                          const std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n> &inverse_diagonal)
+{
+  LinearOperator<Range, Domain> return_op;
+
+  return_op.reinit_range_vector = [inverse_diagonal](Range &v, bool fast)
+  {
+    // Reinitialize the block vector to m blocks:
+    v.reinit(n);
+
+    // And reinitialize every individual block with reinit_range_vectors:
+    for (unsigned int i = 0; i < n; ++i)
+      inverse_diagonal[i].reinit_range_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.reinit_domain_vector = [inverse_diagonal](Domain &v, bool fast)
+  {
+    // Reinitialize the block vector to m blocks:
+    v.reinit(n);
+
+    // And reinitialize every individual block with reinit_domain_vectors:
+    for (unsigned int i = 0; i < n; ++i)
+      inverse_diagonal[i].reinit_domain_vector(v.block(i), fast);
+
+    v.collect_sizes();
+  };
+
+  return_op.vmult = [&block_matrix, inverse_diagonal](Range &v, const Domain &u)
+  {
+    static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
+    typename  Range::BlockType *tmp = vector_memory.alloc();
+
+    inverse_diagonal[n-1].vmult(v.block(n-1),u.block(n-1));
+    for (int i=n-2; i>=0; --i)
+      {
+        inverse_diagonal[i].reinit_range_vector(*tmp, /*bool fast=*/ true);
+        *tmp = u.block(i);
+        *tmp *= -1.;
+        for (int j=i+1; j<n; ++j)
+          block_matrix.block(i,j).vmult_add(*tmp,v.block(j));
+        *tmp *= -1.;
+        inverse_diagonal[i].vmult(v.block(i),*tmp);
+      }
+
+    vector_memory.free(tmp);
+  };
+
+  return_op.vmult_add = [&block_matrix, inverse_diagonal](Range &v, const Domain &u)
+  {
+    static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
+    typename  Range::BlockType *tmp = vector_memory.alloc();
+
+    inverse_diagonal[n-1].vmult_add(v.block(n-1),u.block(n-1));
+    for (int i=n-2; i>=0; --i)
+      {
+        inverse_diagonal[i].reinit_range_vector(*tmp, /*bool fast=*/ true);
+        *tmp = u.block(i);
+        *tmp *= -1.;
+        for (int j=i+1; j<n; ++j)
+          block_matrix.block(i,j).vmult_add(*tmp,v.block(j));
+        *tmp *= -1.;
+        inverse_diagonal[i].vmult_add(v.block(i),*tmp);
+      }
+
+    vector_memory.free(tmp);
+  };
+
+  return return_op;
+}
 
 //@}
 
