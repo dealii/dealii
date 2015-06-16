@@ -665,21 +665,36 @@ block_triangular_inverse(const BlockMatrix &block_matrix,
 /**
  * @relates LinearOperator
  *
- * This function implement a gauss elimination argument to invert a lower
+ * This function implement a forward substitution argument to invert a lower
  * block triangular matrix.
  * It takes as argement a block matrix @p block_matrix and an array of LinearOperators
  * @p inverse_diagonal representing inverses of digonal blocks of @p block_matrix.
+ *
+ * Let us assume we have a linear system where each coefficient of the system is a
+ * matrix:
+ * A00 x0 + ...                   = y0
+ * A01 x0 + A11 x1 + ...          = y1
+ * ...        ...
+ * A0n x0 + A1n x1 + ... + Ann xn = yn
+ *
+ * First of all, x0 = A00^-1 y0
+ * Then, we can use x0 to recover x1:
+ *    x1 = A11^-1 ( y1 - A01 x0 )
+ * and therefore:
+ *    xn = Ann^-1 ( yn - A0n x0 - ... - A(n-1)n x(n-1) )
  *
  * Caveat: Tvmult and Tvmult_add have not been implemented, yet. This may lead to mistakes.
  * @ingroup LAOperators
  */
 
-template <unsigned int n, typename Range, typename Domain, typename BlockMatrix>
-LinearOperator<Range, Domain>
-gauss_lower_block_inverse(const BlockMatrix &block_matrix,
-                          const std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n> &inverse_diagonal)
+template <typename BlockMatrix,
+          unsigned int n  = BlockMatrix::n ,
+          typename Range  = typename BlockMatrix::BlockType>
+LinearOperator<Range, Range>
+block_forward_substitution(const BlockMatrix &block_matrix,
+                           const std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n> &inverse_diagonal)
 {
-  LinearOperator<Range, Domain> return_op;
+  LinearOperator<Range, Range> return_op;
 
   return_op.reinit_range_vector = [inverse_diagonal](Range &v, bool fast)
   {
@@ -693,7 +708,7 @@ gauss_lower_block_inverse(const BlockMatrix &block_matrix,
     v.collect_sizes();
   };
 
-  return_op.reinit_domain_vector = [inverse_diagonal](Domain &v, bool fast)
+  return_op.reinit_domain_vector = [inverse_diagonal](Range &v, bool fast)
   {
     // Reinitialize the block vector to m blocks:
     v.reinit(n);
@@ -705,7 +720,7 @@ gauss_lower_block_inverse(const BlockMatrix &block_matrix,
     v.collect_sizes();
   };
 
-  return_op.vmult = [&block_matrix, inverse_diagonal](Range &v, const Domain &u)
+  return_op.vmult = [&block_matrix, inverse_diagonal](Range &v, const Range &u)
   {
     static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
     typename  Range::BlockType *tmp = vector_memory.alloc();
@@ -725,7 +740,7 @@ gauss_lower_block_inverse(const BlockMatrix &block_matrix,
     vector_memory.free(tmp);
   };
 
-  return_op.vmult_add = [&block_matrix, inverse_diagonal](Range &v, const Domain &u)
+  return_op.vmult_add = [&block_matrix, inverse_diagonal](Range &v, const Range &u)
   {
     static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
     typename  Range::BlockType *tmp = vector_memory.alloc();
@@ -751,21 +766,37 @@ gauss_lower_block_inverse(const BlockMatrix &block_matrix,
 /**
  * @relates LinearOperator
  *
- * This function implement a gauss elimination argument to invert an upper
+ * This function implement a back substitution argument to invert an upper
  * block triangular matrix.
  * It takes as argement a block matrix @p block_matrix and an array of LinearOperators
  * @p inverse_diagonal representing inverses of digonal blocks of @p block_matrix.
+ *
+ * Let us assume we have a linear system where each coefficient of the system is a
+ * matrix:
+
+ * A00 x0 + A01 x1 + ... + A0n xn = yn
+ *          A11 x1 + ...          = y1
+ *                          ...     ..
+ *                         Ann xn = yn
+ *
+ * First of all, xn = Ann^-1 yn
+ * Then, we can use xn to recover x(n-1):
+ *    x(n-1) = A(n-1)(n-1)^-1 ( y(n-1) - A(n-1)n x(n-1) )
+ * and therefore:
+ *    x0 = A00^-1 ( y0 - A0n xn - ... - A01 x1 )
  *
  * Caveat: Tvmult and Tvmult_add have not been implemented, yet. This may lead to mistakes.
  * @ingroup LAOperators
  */
 
-template <unsigned int n, typename Range, typename Domain, typename BlockMatrix>
-LinearOperator<Range, Domain>
-gauss_upper_block_inverse(const BlockMatrix &block_matrix,
-                          const std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n> &inverse_diagonal)
+template <typename BlockMatrix,
+          unsigned int n  = BlockMatrix::n ,
+          typename Range  = typename BlockMatrix::BlockType>
+LinearOperator<Range, Range>
+block_back_substitution(const BlockMatrix &block_matrix,
+                        const std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n> &inverse_diagonal)
 {
-  LinearOperator<Range, Domain> return_op;
+  LinearOperator<Range, Range> return_op;
 
   return_op.reinit_range_vector = [inverse_diagonal](Range &v, bool fast)
   {
@@ -779,7 +810,7 @@ gauss_upper_block_inverse(const BlockMatrix &block_matrix,
     v.collect_sizes();
   };
 
-  return_op.reinit_domain_vector = [inverse_diagonal](Domain &v, bool fast)
+  return_op.reinit_domain_vector = [inverse_diagonal](Range &v, bool fast)
   {
     // Reinitialize the block vector to m blocks:
     v.reinit(n);
@@ -791,7 +822,7 @@ gauss_upper_block_inverse(const BlockMatrix &block_matrix,
     v.collect_sizes();
   };
 
-  return_op.vmult = [&block_matrix, inverse_diagonal](Range &v, const Domain &u)
+  return_op.vmult = [&block_matrix, inverse_diagonal](Range &v, const Range &u)
   {
     static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
     typename  Range::BlockType *tmp = vector_memory.alloc();
@@ -811,7 +842,7 @@ gauss_upper_block_inverse(const BlockMatrix &block_matrix,
     vector_memory.free(tmp);
   };
 
-  return_op.vmult_add = [&block_matrix, inverse_diagonal](Range &v, const Domain &u)
+  return_op.vmult_add = [&block_matrix, inverse_diagonal](Range &v, const Range &u)
   {
     static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
     typename  Range::BlockType *tmp = vector_memory.alloc();

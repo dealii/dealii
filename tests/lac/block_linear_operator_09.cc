@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test gauss_upper_block_inverse and gauss_lower_block_inverse:
+// Test block_back_substitution and block_forward_substitution:
 
 #include "../tests.h"
 
@@ -65,9 +65,8 @@ int main()
     auto d00 = linear_operator< Vector<double>, Vector<double> >(d.block(0,0));
     auto d11 = linear_operator< Vector<double>, Vector<double> >(d.block(1,1));
     auto d22 = linear_operator< Vector<double>, Vector<double> >(d.block(2,2));
-    // auto diagonal_inv = block_diagonal_operator(diag);
-    auto inverse_op_a = gauss_lower_block_inverse<3, BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a, {{d00, d11, d22}});
-    //
+
+    auto inverse_op_a = block_forward_substitution< BlockSparseMatrix<double> >(a, {{d00, d11, d22}});
     auto identity = inverse_op_a * op_a;
 
     BlockVector<double> u;
@@ -153,9 +152,8 @@ int main()
     auto d00 = linear_operator< Vector<double>, Vector<double> >(d.block(0,0));
     auto d11 = linear_operator< Vector<double>, Vector<double> >(d.block(1,1));
     auto d22 = linear_operator< Vector<double>, Vector<double> >(d.block(2,2));
-    // auto diagonal_inv = block_diagonal_operator(diag);
-    auto inverse_op_a = gauss_upper_block_inverse<3, BlockVector<double>, BlockVector<double>, BlockSparseMatrix<double> >(a, {{d00, d11, d22}});
-    //
+
+    auto inverse_op_a = block_back_substitution< BlockSparseMatrix<double> >(a, {{d00, d11, d22}});
     auto identity = inverse_op_a * op_a;
 
     BlockVector<double> u;
