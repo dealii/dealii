@@ -137,6 +137,19 @@ namespace PETScWrappers
       const VectorReference &operator /= (const PetscScalar &s) const;
 
       /**
+       * Return the real part of the value of the referenced element.
+       */
+      PetscReal real () const;
+
+      /**
+       * Return the imaginary part of the value of the referenced element.
+       *
+       * @note This operation is not defined for real numbers and an
+       * exception is thrown.
+       */
+      PetscReal imag () const;
+
+      /**
        * Convert the reference to an actual value, i.e. return the value of
        * the referenced element of the vector.
        */
@@ -444,6 +457,8 @@ namespace PETScWrappers
     /**
      * Return the scalar product of two vectors. The vectors must have the
      * same size.
+     *
+     * For complex valued vector, this gives$\left(v^\ast,vec\right)$.
      */
     PetscScalar operator * (const VectorBase &vec) const;
 
@@ -1003,9 +1018,34 @@ namespace PETScWrappers
 
       return *this;
     }
-  }
 
 
+
+    inline
+    PetscReal
+    VectorReference::real () const
+    {
+#ifndef PETSC_USE_COMPLEX
+      return static_cast<PetscScalar>(*this);
+#else
+      return PetscRealPart (static_cast<PetscScalar>(*this));
+#endif
+    }
+
+
+
+    inline
+    PetscReal
+    VectorReference::imag () const
+    {
+#ifndef PETSC_USE_COMPLEX
+      return PetscReal (0);
+#else
+      return PetscImaginaryPart (static_cast<PetscScalar>(*this));
+#endif
+    }
+
+  } // namespace internal
 
   inline
   bool
