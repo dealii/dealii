@@ -982,7 +982,10 @@ namespace Step35
   NavierStokesProjection<dim>::interpolate_velocity()
   {
     for (unsigned int d=0; d<dim; ++d)
-      u_star[d].equ (2., u_n[d], -1, u_n_minus_1[d]);
+      {
+        u_star[d].equ (2., u_n[d]);
+        u_star[d].add (-1, u_n_minus_1[d]);
+      }
   }
 
 
@@ -1003,15 +1006,16 @@ namespace Step35
   void
   NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
   {
-    pres_tmp = pres_n;
-    pres_tmp.sadd(-1., -4./3., phi_n, 1./3., phi_n_minus_1);
+    pres_tmp.equ (-1., pres_n);
+    pres_tmp.add (-4./3., phi_n, 1./3., phi_n_minus_1);
 
     assemble_advection_term();
 
     for (unsigned int d=0; d<dim; ++d)
       {
         force[d] = 0.;
-        v_tmp.equ (2./dt,u_n[d],-.5/dt,u_n_minus_1[d]);
+        v_tmp.equ (2./dt,u_n[d]);
+        v_tmp.add (-.5/dt,u_n_minus_1[d]);
         vel_Mass.vmult_add (force[d], v_tmp);
 
         pres_Diff[d].vmult_add (force[d], pres_tmp);
@@ -1239,7 +1243,8 @@ namespace Step35
           prec_mass.initialize (pres_Mass);
         pres_n = pres_tmp;
         prec_mass.solve (pres_n);
-        pres_n.sadd(1./Re, 1., pres_n_minus_1, 1., phi_n);
+        pres_n.sadd(1./Re, 1., pres_n_minus_1);
+        pres_n += phi_n;
         break;
       default:
         Assert (false, ExcNotImplemented());

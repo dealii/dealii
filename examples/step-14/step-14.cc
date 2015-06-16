@@ -2577,7 +2577,7 @@ namespace Step14
                           FaceIntegrals                                     &face_integrals) const
     {
       // Because of WorkStream, estimate_on_one_cell requires a CopyData object
-      // even if it is no used. The next line silence a warning about this unused
+      // even if it is no used. The next line silences a warning about this unused
       // variable.
       (void) copy_data;
 

@@ -376,7 +376,10 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
           startup = false;
         }
       else
-        p.sadd(beta, 1., r, -beta*omega, v);
+        {
+          p.sadd(beta, 1., r);
+          p.add(-beta*omega, v);
+        }
 
       precondition.vmult(y,p);
       A.vmult(v,y);

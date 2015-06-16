@@ -629,12 +629,14 @@ namespace PETScWrappers
 
     /**
      * Scaling and multiple addition.
+     *
+     * This function is deprecated.
      */
     void sadd (const PetscScalar s,
                const PetscScalar a,
                const VectorBase     &V,
                const PetscScalar b,
-               const VectorBase     &W);
+               const VectorBase     &W) DEAL_II_DEPRECATED;
 
     /**
      * Scaling and multiple addition. <tt>*this = s*(*this)+a*V + b*W +
@@ -664,9 +666,11 @@ namespace PETScWrappers
 
     /**
      * Assignment <tt>*this = a*V + b*W</tt>.
+     *
+     * This function is deprecated.
      */
     void equ (const PetscScalar a, const VectorBase &V,
-              const PetscScalar b, const VectorBase &W);
+              const PetscScalar b, const VectorBase &W) DEAL_II_DEPRECATED;
 
     /**
      * Compute the elementwise ratio of the two given vectors, that is let

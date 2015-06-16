@@ -351,6 +351,7 @@ namespace Step52
                                                     const double tau,
                                                     const Vector<double> &y)
   {
+    (void) time;
     SparseDirectUMFPACK inverse_mass_minus_tau_Jacobian;
 
     mass_minus_tau_Jacobian.copy_from(mass_matrix);
