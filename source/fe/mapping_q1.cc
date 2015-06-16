@@ -1476,6 +1476,8 @@ void MappingQ1<dim,spacedim>::transform_gradients(
               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_jacobian_grads"));
       Assert (rank==2, ExcMessage("Only for rank 2"));
 
+      Assert (rank==3, ExcMessage("stop here anyway"));
+
       for (unsigned int i=0; i<output.size(); ++i)
         {
           DerivativeForm<1,spacedim,dim> A =
@@ -1491,7 +1493,7 @@ void MappingQ1<dim,spacedim>::transform_gradients(
           Tensor<2,spacedim> T2 =
             apply_transformation(data.covariant[i] ,G );
 
-          output[i] += T2;
+          // output[i] += T2;
 
           Tensor<1,spacedim> v1 =
             apply_transformation(data.contravariant[i], input_values[i] );
@@ -1507,7 +1509,7 @@ void MappingQ1<dim,spacedim>::transform_gradients(
 
           dealii::outer_product(T3,v1,v3);
 
-          output[i] += T3;
+          // output[i] += T3;
 
           output[i] /= data.volume_elements[i];
         }
