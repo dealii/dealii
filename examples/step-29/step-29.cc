@@ -454,22 +454,17 @@ namespace Step29
 
     // Next, two points are defined for position and focal point of the
     // transducer lens, which is the center of the circle whose segment will
-    // form the transducer part of the boundary. We compute the radius of this
-    // circle in such a way that the segment fits in the interval [0.4,0.6] on
-    // the x-axis.  Notice that this is the only point in the program where
-    // things are slightly different in 2D and 3D.  Even though this tutorial
-    // only deals with the 2D case, the necessary additions to make this
-    // program functional in 3D are so minimal that we opt for including them:
+    // form the transducer part of the boundary. Notice that this is the only
+    // point in the program where things are slightly different in 2D and 3D.
+    // Even though this tutorial only deals with the 2D case, the necessary
+    // additions to make this program functional in 3D are so minimal that we
+    // opt for including them:
     const Point<dim>    transducer = (dim == 2) ?
                                      Point<dim> (0.5, 0.0) :
-                                     Point<dim> (0.5, 0.5, 0.0),
-                                     focal_point = (dim == 2) ?
-                                                   Point<dim> (0.5, focal_distance) :
-                                                   Point<dim> (0.5, 0.5, focal_distance);
-
-    const double radius = std::sqrt( (focal_point.distance(transducer) *
-                                      focal_point.distance(transducer)) +
-                                     ((dim==2) ? 0.01 : 0.02));
+                                     Point<dim> (0.5, 0.5, 0.0);
+    const Point<dim>   focal_point = (dim == 2) ?
+                                     Point<dim> (0.5, focal_distance) :
+                                     Point<dim> (0.5, 0.5, focal_distance);
 
 
     // As initial coarse grid we take a simple unit square with 5 subdivisions
@@ -497,13 +492,12 @@ namespace Step29
             cell->face(face)->set_boundary_id (1);
             cell->face(face)->set_manifold_id (1);
           }
-    // For the circle part of the transducer lens, a hyper-ball object is used
-    // (which, of course, in 2D just represents a circle), with radius and
-    // center as computed above. By marking this object as
-    // <code>static</code>, we ensure that it lives until the end of the
-    // program and thereby longer than the triangulation object we will
-    // associated with it. We then assign this boundary-object to the part of
-    // the boundary with boundary indicator 1:
+    // For the circle part of the transducer lens, a SphericalManifold object
+    // is used (which, of course, in 2D just represents a circle), with center
+    // computed as above. By marking this object as <code>static</code>, we
+    // ensure that it lives until the end of the program and thereby longer
+    // than the triangulation object we will associate with it. We then assign
+    // this boundary-object to the part of the boundary with boundary indicator 1:
     static const SphericalManifold<dim> boundary(focal_point);
     triangulation.set_manifold(1, boundary);
 
