@@ -2576,8 +2576,8 @@ namespace Step14
                           WeightedResidualCopyData                          &copy_data,
                           FaceIntegrals                                     &face_integrals) const
     {
-      // Because of WorkStream, estimate_on_one_cell requires a CopyData object 
-      // even if it is no used. The next line silence a warning about this unused 
+      // Because of WorkStream, estimate_on_one_cell requires a CopyData object
+      // even if it is no used. The next line silence a warning about this unused
       // variable.
       (void) copy_data;
 
