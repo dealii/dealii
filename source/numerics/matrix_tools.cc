@@ -2351,9 +2351,9 @@ namespace MatrixTools
             // find such an entry, take one
             PetscScalar average_nonzero_diagonal_entry = 1;
             for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
-              if (matrix.diag_element(i) != 0)
+              if (matrix.diag_element(i) != PetscScalar ())
                 {
-                  average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
+                  average_nonzero_diagonal_entry = std::abs(matrix.diag_element(i));
                   break;
                 }
 
