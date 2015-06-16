@@ -5797,7 +5797,6 @@ namespace internal
         for (unsigned int c=0; c<n_components; c++)
           {
             VectorizedArray<Number> temp1[temp_size];
-            VectorizedArray<Number> temp2[temp_size];
 
             // grad x
             if (evaluate_grad == true)

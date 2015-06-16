@@ -1377,7 +1377,7 @@ namespace Step51
 
 
 
-int main (int argc, char **argv)
+int main ()
 {
   const unsigned int dim = 2;
 
