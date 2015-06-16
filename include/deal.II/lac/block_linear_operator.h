@@ -325,349 +325,10 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
 /**
  * @relates LinearOperator
  *
- * A function that takes an array of arrays of LinearOperators @p block_matrix
- * and returns its associated lower triangular matrix operator
- * (diagonal is not included).
- *
- * @code
- *  a00 | a01 | a02                 |     |
- *  ---------------             ---------------
- *  a10 | a11 | a12     ->      a10 |     |
- *  ---------------             ---------------
- *  a20 | a21 | a22             a20 | a21 |
- * @endcode
- *
- * @ingroup LAOperators
- */
-
-// This is a workaround for a bug in <=gcc-4.7 that does not like partial
-// template default values in function definitions in combination with
-// local lambda expressions [1] in the function body. As a workaround
-// declare the function with all default types and parameters first such
-// that the function definition is without default types and parameters.
-//
-// [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
-
-template <unsigned int n,
-          typename Range = BlockVector<double>,
-          typename Domain = Range>
-LinearOperator<Range, Domain>
-lower_triangular_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> &);
-
-
-template <unsigned int n, typename Range, typename Domain>
-LinearOperator<Range, Domain>
-lower_triangular_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> &block_matrix)
-{
-  LinearOperator<Range, Domain> return_op;
-
-  return_op.reinit_range_vector = [block_matrix](Range &v, bool fast)
-  {
-    v.reinit(n);
-
-    for (unsigned int i = 0; i < n; ++i)
-      block_matrix[i][i].reinit_range_vector(v.block(i), fast);
-
-    v.collect_sizes();
-  };
-
-  return_op.reinit_domain_vector = [block_matrix](Domain &v, bool fast)
-  {
-    v.reinit(n);
-
-    for (unsigned int i = 0; i < n; ++i)
-      block_matrix[i][i].reinit_domain_vector(v.block(i), fast);
-
-    v.collect_sizes();
-  };
-
-  return_op.vmult = [block_matrix](Range &v, const Domain &u)
-  {
-    v.block(0) = 0;
-    for (unsigned int i = 1; i < n; ++i)
-      {
-        block_matrix[i][0].vmult(v.block(i), u.block(0));
-        for (unsigned int j = 1; j < i; ++j)
-          block_matrix[i][j].vmult_add(v.block(i), u.block(j));
-      }
-  };
-
-  return_op.vmult_add = [block_matrix](Range &v, const Domain &u)
-  {
-    for (unsigned int i = 1; i < n; ++i)
-      {
-        block_matrix[i][0].vmult_add(v.block(i), u.block(0));
-        for (unsigned int j = 1; j < i; ++j)
-          block_matrix[i][j].vmult_add(v.block(i), u.block(j));
-      }
-  };
-
-  return_op.Tvmult = [block_matrix](Domain &v, const Range &u)
-  {
-    for (unsigned int i = 0; i < n; ++i)
-      {
-        v.block(i) = 0;
-        for (unsigned int j = i+1; j < n; ++j)
-          block_matrix[j][i].Tvmult_add(v.block(i), u.block(j));
-      }
-  };
-
-  return_op.Tvmult_add = [block_matrix](Domain &v, const Range &u)
-  {
-    for (unsigned int i = 0; i < n; ++i)
-      for (unsigned int j = i+1; j < n; ++j)
-        block_matrix[j][i].Tvmult_add(v.block(i), u.block(j));
-  };
-
-  return return_op;
-}
-
-/**
- * @relates LinearOperator
- *
- * This function is a specification of the above function that
- * allows to work with block matrices @p block_matrix .
- *
- * @ingroup LAOperators
- */
-
-template <unsigned int n,
-          typename Range = BlockVector<double>,
-          typename Domain = Range,
-          typename BlockMatrix>
-LinearOperator<Range, Domain>
-lower_triangular_operator(const BlockMatrix &);
-
-
-template <unsigned int n, typename Range, typename Domain, typename BlockMatrix>
-LinearOperator<Range, Domain>
-lower_triangular_operator(const BlockMatrix &block_matrix)
-{
-  Assert(block_matrix.n_block_rows() == block_matrix.n_block_cols(),
-         ExcDimensionMismatch(block_matrix.n_block_rows(),block_matrix.n_block_cols()) );
-
-  std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> M;
-  for (unsigned int i = 0; i<n; ++i)
-    {
-      for (unsigned int j = 0; j<i; ++j)
-        M[i][j] = linear_operator<typename Range::BlockType, typename Domain::BlockType>(block_matrix.block(i,j));
-      M[i][i] = null_operator(linear_operator<typename Range::BlockType, typename Domain::BlockType>(block_matrix.block(i,i)).reinit_range_vector);
-    }
-  return lower_triangular_operator<n, Range, Domain>(M);
-}
-
-/**
- * @relates LinearOperator
- *
- * A function that takes an array of arrays of LinearOperators @p block_matrix
- * and returns its associated upper triangular matrix operator
- * (diagonal is not included).
- *
- * @code
- *  a00 | a01 | a02                 | a01 | a02
- *  ---------------             ---------------
- *  a10 | a11 | a12     ->          |     | a12
- *  ---------------             ---------------
- *  a20 | a21 | a22                 |     |
- * @endcode
- *
- * @ingroup LAOperators
- */
-
-// This is a workaround for a bug in <=gcc-4.7 that does not like partial
-// template default values in function definitions in combination with
-// local lambda expressions [1] in the function body. As a workaround
-// declare the function with all default types and parameters first such
-// that the function definition is without default types and parameters.
-//
-// [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
-
-template <unsigned int n,
-          typename Range = BlockVector<double>,
-          typename Domain = Range>
-LinearOperator<Range, Domain>
-upper_triangular_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> &);
-
-
-template <unsigned int n, typename Range, typename Domain>
-LinearOperator<Range, Domain>
-upper_triangular_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> &block_matrix)
-{
-  LinearOperator<Range, Domain> return_op;
-
-  return_op.reinit_range_vector = [block_matrix](Range &v, bool fast)
-  {
-    v.reinit(n);
-
-    for (unsigned int i = 0; i < n; ++i)
-      block_matrix[i][i].reinit_range_vector(v.block(i), fast);
-
-    v.collect_sizes();
-  };
-
-  return_op.reinit_domain_vector = [block_matrix](Domain &v, bool fast)
-  {
-    v.reinit(n);
-
-    for (unsigned int i = 0; i < n; ++i)
-      block_matrix[i][i].reinit_domain_vector(v.block(i), fast);
-
-    v.collect_sizes();
-  };
-
-  return_op.vmult = [block_matrix](Range &v, const Domain &u)
-  {
-    for (unsigned int i = 0; i < n - 1; ++i)
-      {
-        block_matrix[i][n - 1].vmult(v.block(i), u.block(n - 1));
-        for (unsigned int j = n - 2; j > i; --j)
-          block_matrix[i][j].vmult_add(v.block(i), u.block(j));
-      }
-    v.block(n - 1) = 0;
-  };
-
-  return_op.vmult_add = [block_matrix](Range &v, const Domain &u)
-  {
-    for (unsigned int i = 0; i < n; ++i)
-      for (unsigned int j = i + 1; j < n; ++j)
-        block_matrix[i][j].vmult_add(v.block(i), u.block(j));
-  };
-
-  return_op.Tvmult = [block_matrix](Domain &v, const Range &u)
-  {
-    for (unsigned int i = 0; i < n; ++i)
-      {
-        v.block(i) = 0;
-        for (unsigned int j = 0; j < i; ++j)
-          block_matrix[j][i].Tvmult_add(v.block(i), u.block(j));
-      }
-  };
-
-  return_op.Tvmult_add = [block_matrix](Domain &v, const Range &u)
-  {
-    for (unsigned int i = 0; i < n; ++i)
-      for (unsigned int j = 0; j < i; ++j)
-        block_matrix[j][i].Tvmult_add(v.block(i), u.block(j));
-  };
-
-  return return_op;
-}
-
-
-/**
- * @relates LinearOperator
- *
- * This function is a specification of the above function that
- * allows to work with block matrices @p block_matrix .
- *
- * @ingroup LAOperators
- */
-
-template <unsigned int n,
-          typename Range = BlockVector<double>,
-          typename Domain = Range,
-          typename BlockMatrix>
-LinearOperator<Range, Domain>
-upper_triangular_operator(const BlockMatrix &);
-
-
-template <unsigned int n, typename Range, typename Domain, typename BlockMatrix>
-LinearOperator<Range, Domain>
-upper_triangular_operator(const BlockMatrix &block_matrix)
-{
-  Assert(block_matrix.n_block_rows() == block_matrix.n_block_cols(),
-         ExcDimensionMismatch(block_matrix.n_block_rows(),block_matrix.n_block_cols()) );
-
-  std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType>, n>, n> M;
-  for (unsigned int i = 0; i<n; ++i)
-    {
-      M[i][i] = null_operator(linear_operator<typename Range::BlockType, typename Domain::BlockType>(block_matrix.block(i,i)).reinit_range_vector);
-
-      for (unsigned int j = i+1; j<n; ++j)
-        M[i][j] = linear_operator<typename Range::BlockType, typename Domain::BlockType>(block_matrix.block(i,j));
-    }
-  return upper_triangular_operator<n, Range, Domain>(M);
-}
-
-
-/**
- * @relates LinearOperator
- *
- * Let M be a block matrix of the form Id + T made of nxn blocks and where
- * T is a lower / upper triangular (without diagonal). Then, its inverse is
- * of the form:
- * @code
- *  Id + sum_{i=1}^{n-1} (-1)^i T^i
- * @endcode
- * This formula can be used to invert all triangular matrices (diagonal
- * included of course).
- *
- * This function takes a block matrix @p block_matrix (possibly full) and a
- * linear block operator  @p inverse_diagonal made of the inverse of the
- * diagonal blocks inverses. The output is the inverse of the matrix in the
- * case of a triangular matrix and as inverse_diagonal its diagonal blocks
- * inverses. Otherwise, the result is a preconditioner.
- *
- * The parameter @p lower is a bool that allows to specify if we want to
- * use lower triangular part of @p block_matrix (true, this is the default
- * value) or to use upper triangular part of @p block_matrix (false).
- *
- * @ingroup LAOperators
- */
-
-// workaround for a bug in <=gcc-4.7 that does not like partial template
-// default values in combination with local lambda expressions [1]
-// [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
-template <unsigned int n,
-          typename Range = BlockVector<double>,
-          typename Domain = Range,
-          typename BlockMatrix>
-LinearOperator<Range, Domain>
-block_triangular_inverse(const BlockMatrix &,
-                         const LinearOperator<Range, Domain> &,
-                         bool lower = true);
-
-
-template <unsigned int n, typename Range, typename Domain, typename BlockMatrix>
-LinearOperator<Range, Domain>
-block_triangular_inverse(const BlockMatrix &block_matrix,
-                         const LinearOperator<Range, Domain> &inverse_diagonal,
-                         bool lower)
-{
-  Assert(block_matrix.n_block_rows() == n,
-         ExcDimensionMismatch(block_matrix.n_block_rows(), n));
-  Assert(block_matrix.n_block_rows() == block_matrix.n_block_cols(),
-         ExcDimensionMismatch(block_matrix.n_block_rows(),
-                              block_matrix.n_block_cols()));
-
-  LinearOperator<Range, Domain> op_a;
-
-  if (lower)
-    {
-      op_a = lower_triangular_operator<n, Range, Domain, BlockMatrix>(block_matrix);
-    }
-  else
-    {
-      op_a = upper_triangular_operator<n, Range, Domain, BlockMatrix>(block_matrix);
-    }
-
-  auto id     = identity_operator(op_a.reinit_range_vector);
-  auto result = identity_operator(op_a.reinit_range_vector);
-
-  // Notice that the following formula is recursive. We are evaluating:
-  // Id - T + T^2 - T^3 ... (- T)^n
-  for (unsigned int i = 0; i < n - 1; ++i)
-    result = id - inverse_diagonal * op_a * result;
-
-  return result * inverse_diagonal;
-}
-
-/**
- * @relates LinearOperator
- *
  * This function implement a forward substitution argument to invert a lower
  * block triangular matrix.
- * It takes as argement a block matrix @p block_matrix and an array of LinearOperators
+ * It takes as argement an array of array of LinearOperators @p block_matrix
+ * representing a block matrix and an array of LinearOperators
  * @p inverse_diagonal representing inverses of digonal blocks of @p block_matrix.
  *
  * Let us assume we have a linear system where each coefficient of the system is a
@@ -686,12 +347,16 @@ block_triangular_inverse(const BlockMatrix &block_matrix,
  * Caveat: Tvmult and Tvmult_add have not been implemented, yet. This may lead to mistakes.
  * @ingroup LAOperators
  */
-
-template <typename BlockMatrix,
-          unsigned int n  = BlockMatrix::n ,
-          typename Range  = typename BlockMatrix::BlockType>
+template < unsigned int n,
+           typename Range = BlockVector<double>>
 LinearOperator<Range, Range>
-block_forward_substitution(const BlockMatrix &block_matrix,
+block_forward_substitution(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n>, n> &,
+                           const std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n> &);
+
+template < unsigned int n,
+           typename Range>
+LinearOperator<Range, Range>
+block_forward_substitution(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n>, n> &block_matrix,
                            const std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n> &inverse_diagonal)
 {
   LinearOperator<Range, Range> return_op;
@@ -720,7 +385,7 @@ block_forward_substitution(const BlockMatrix &block_matrix,
     v.collect_sizes();
   };
 
-  return_op.vmult = [&block_matrix, inverse_diagonal](Range &v, const Range &u)
+  return_op.vmult = [block_matrix, inverse_diagonal](Range &v, const Range &u)
   {
     static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
     typename  Range::BlockType *tmp = vector_memory.alloc();
@@ -732,7 +397,7 @@ block_forward_substitution(const BlockMatrix &block_matrix,
         *tmp = u.block(i);
         *tmp *= -1.;
         for (unsigned int j=0; j<i; ++j)
-          block_matrix.block(i,j).vmult_add(*tmp, v.block(j));
+          block_matrix[i][j].vmult_add(*tmp, v.block(j));
         *tmp *= -1.;
         inverse_diagonal[i].vmult(v.block(i),*tmp);
       }
@@ -740,7 +405,7 @@ block_forward_substitution(const BlockMatrix &block_matrix,
     vector_memory.free(tmp);
   };
 
-  return_op.vmult_add = [&block_matrix, inverse_diagonal](Range &v, const Range &u)
+  return_op.vmult_add = [block_matrix, inverse_diagonal](Range &v, const Range &u)
   {
     static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
     typename  Range::BlockType *tmp = vector_memory.alloc();
@@ -752,7 +417,7 @@ block_forward_substitution(const BlockMatrix &block_matrix,
         *tmp = u.block(i);
         *tmp *= -1.;
         for (unsigned int j=0; j<i; ++j)
-          block_matrix.block(i,j).vmult_add(*tmp, v.block(j));
+          block_matrix[i][j].vmult_add(*tmp, v.block(j));
         *tmp *= -1.;
         inverse_diagonal[i].vmult_add(v.block(i),*tmp);
       }
@@ -768,7 +433,8 @@ block_forward_substitution(const BlockMatrix &block_matrix,
  *
  * This function implement a back substitution argument to invert an upper
  * block triangular matrix.
- * It takes as argement a block matrix @p block_matrix and an array of LinearOperators
+ * It takes as argement an array of array of LinearOperators @p block_matrix
+ * representing a block matrix and an array of LinearOperators
  * @p inverse_diagonal representing inverses of digonal blocks of @p block_matrix.
  *
  * Let us assume we have a linear system where each coefficient of the system is a
@@ -788,12 +454,16 @@ block_forward_substitution(const BlockMatrix &block_matrix,
  * Caveat: Tvmult and Tvmult_add have not been implemented, yet. This may lead to mistakes.
  * @ingroup LAOperators
  */
-
-template <typename BlockMatrix,
-          unsigned int n  = BlockMatrix::n ,
-          typename Range  = typename BlockMatrix::BlockType>
+template < unsigned int n,
+           typename Range = BlockVector<double>>
 LinearOperator<Range, Range>
-block_back_substitution(const BlockMatrix &block_matrix,
+block_back_substitution(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n>, n> &,
+                        const std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n> &);
+
+template < unsigned int n,
+           typename Range>
+LinearOperator<Range, Range>
+block_back_substitution(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n>, n> &block_matrix,
                         const std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n> &inverse_diagonal)
 {
   LinearOperator<Range, Range> return_op;
@@ -822,7 +492,7 @@ block_back_substitution(const BlockMatrix &block_matrix,
     v.collect_sizes();
   };
 
-  return_op.vmult = [&block_matrix, inverse_diagonal](Range &v, const Range &u)
+  return_op.vmult = [block_matrix, inverse_diagonal](Range &v, const Range &u)
   {
     static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
     typename  Range::BlockType *tmp = vector_memory.alloc();
@@ -834,7 +504,7 @@ block_back_substitution(const BlockMatrix &block_matrix,
         *tmp = u.block(i);
         *tmp *= -1.;
         for (int j=i+1; j<n; ++j)
-          block_matrix.block(i,j).vmult_add(*tmp,v.block(j));
+          block_matrix[i][j].vmult_add(*tmp,v.block(j));
         *tmp *= -1.;
         inverse_diagonal[i].vmult(v.block(i),*tmp);
       }
@@ -854,7 +524,7 @@ block_back_substitution(const BlockMatrix &block_matrix,
         *tmp = u.block(i);
         *tmp *= -1.;
         for (int j=i+1; j<n; ++j)
-          block_matrix.block(i,j).vmult_add(*tmp,v.block(j));
+          block_matrix[i][j].vmult_add(*tmp,v.block(j));
         *tmp *= -1.;
         inverse_diagonal[i].vmult_add(v.block(i),*tmp);
       }
@@ -863,6 +533,55 @@ block_back_substitution(const BlockMatrix &block_matrix,
   };
 
   return return_op;
+}
+
+/**
+ * @relates LinearOperator
+ *
+ * This function uses above functions block_back_substitution and block_forward_substitution
+ * to invert triangular matrices.
+ * It takes as input a triangular block matrix @p block_matrix, an array of LinearOperators
+ * @p inverse_diagonal representing inverses of block_matrix, and an optional bool @p lower
+ * used to specify if block_matrix should be conidered as lower triangular matrix (true) or
+ * as upper triangular matrix (false). @p lower is equal to true by default.
+ *
+ */
+
+// workaround for a bug in <=gcc-4.7 that does not like partial template
+// default values in combination with local lambda expressions [1]
+// [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53624
+
+template <unsigned int n,
+          typename BlockMatrix,
+          typename Range = BlockVector<double>>
+LinearOperator<Range, Range>
+block_triangular_inverse(const BlockMatrix &,
+                         const std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n> &,
+                         bool lower = true);
+
+template <unsigned int n,
+          typename BlockMatrix,
+          typename Range>
+LinearOperator<Range, Range>
+block_triangular_inverse(const BlockMatrix &block_matrix,
+                         const std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n> &inverse_diagonal,
+                         bool lower)
+{
+  Assert(block_matrix.n_block_rows() == n,
+         ExcDimensionMismatch(block_matrix.n_block_rows(), n));
+  Assert(block_matrix.n_block_rows() == block_matrix.n_block_cols(),
+         ExcDimensionMismatch(block_matrix.n_block_rows(),
+                              block_matrix.n_block_cols()));
+
+  std::array<std::array<LinearOperator<typename Range::BlockType, typename Range::BlockType>, n>, n> M;
+  for (unsigned int i = 0; i<n; ++i)
+    for (unsigned int j = 0; j<n; ++j)
+      M[i][j] = linear_operator<typename Range::BlockType, typename Range::BlockType>(block_matrix.block(i,j));
+
+  if (lower)
+    return block_forward_substitution<n, Range>(M, inverse_diagonal);
+  else
+    return block_back_substitution<n, Range>(M, inverse_diagonal);
 }
 
 //@}

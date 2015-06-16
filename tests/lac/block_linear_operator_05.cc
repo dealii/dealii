@@ -62,11 +62,29 @@ int main()
         d.block(i,i).set(0,0, 1.0 / (i+i +1) );
 
     auto op_a         = linear_operator< BlockVector<double> >(a);
+
+    auto a00 = linear_operator< Vector<double>, Vector<double> >(a.block(0,0));
+    auto a01 = linear_operator< Vector<double>, Vector<double> >(a.block(0,1));
+    auto a02 = linear_operator< Vector<double>, Vector<double> >(a.block(0,2));
+    auto a10 = linear_operator< Vector<double>, Vector<double> >(a.block(1,0));
+    auto a11 = linear_operator< Vector<double>, Vector<double> >(a.block(1,1));
+    auto a12 = linear_operator< Vector<double>, Vector<double> >(a.block(1,2));
+    auto a20 = linear_operator< Vector<double>, Vector<double> >(a.block(2,0));
+    auto a21 = linear_operator< Vector<double>, Vector<double> >(a.block(2,1));
+    auto a22 = linear_operator< Vector<double>, Vector<double> >(a.block(2,2));
+
     auto d00 = linear_operator< Vector<double>, Vector<double> >(d.block(0,0));
     auto d11 = linear_operator< Vector<double>, Vector<double> >(d.block(1,1));
     auto d22 = linear_operator< Vector<double>, Vector<double> >(d.block(2,2));
 
-    auto inverse_op_a = block_forward_substitution< BlockSparseMatrix<double> >(a, {{d00, d11, d22}});
+    auto inverse_op_a = block_forward_substitution< 3, BlockVector<double> >(
+      {{
+        {{a00, a01, a02}},
+        {{a10, a11, a12}},
+        {{a20, a21, a22}}
+      }},
+      { {d00, d11, d22}});
+
     auto identity = inverse_op_a * op_a;
 
     BlockVector<double> u;
@@ -148,13 +166,31 @@ int main()
     for (unsigned int i = 0; i < 3; ++i)
         d.block(i,i).set(0,0, 1.0 / (i+i +1) );
 
-    auto op_a         = linear_operator< BlockVector<double> >(a);
-    auto d00 = linear_operator< Vector<double>, Vector<double> >(d.block(0,0));
-    auto d11 = linear_operator< Vector<double>, Vector<double> >(d.block(1,1));
-    auto d22 = linear_operator< Vector<double>, Vector<double> >(d.block(2,2));
+        auto op_a         = linear_operator< BlockVector<double> >(a);
 
-    auto inverse_op_a = block_back_substitution< BlockSparseMatrix<double> >(a, {{d00, d11, d22}});
-    auto identity = inverse_op_a * op_a;
+        auto a00 = linear_operator< Vector<double>, Vector<double> >(a.block(0,0));
+        auto a01 = linear_operator< Vector<double>, Vector<double> >(a.block(0,1));
+        auto a02 = linear_operator< Vector<double>, Vector<double> >(a.block(0,2));
+        auto a10 = linear_operator< Vector<double>, Vector<double> >(a.block(1,0));
+        auto a11 = linear_operator< Vector<double>, Vector<double> >(a.block(1,1));
+        auto a12 = linear_operator< Vector<double>, Vector<double> >(a.block(1,2));
+        auto a20 = linear_operator< Vector<double>, Vector<double> >(a.block(2,0));
+        auto a21 = linear_operator< Vector<double>, Vector<double> >(a.block(2,1));
+        auto a22 = linear_operator< Vector<double>, Vector<double> >(a.block(2,2));
+
+        auto d00 = linear_operator< Vector<double>, Vector<double> >(d.block(0,0));
+        auto d11 = linear_operator< Vector<double>, Vector<double> >(d.block(1,1));
+        auto d22 = linear_operator< Vector<double>, Vector<double> >(d.block(2,2));
+
+        auto inverse_op_a = block_back_substitution< 3, BlockVector<double> >(
+          {{
+            {{a00, a01, a02}},
+            {{a10, a11, a12}},
+            {{a20, a21, a22}}
+          }},
+          { {d00, d11, d22}});
+
+        auto identity = inverse_op_a * op_a;
 
     BlockVector<double> u;
     BlockVector<double> v;
