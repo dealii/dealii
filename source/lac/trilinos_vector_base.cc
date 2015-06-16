@@ -414,6 +414,44 @@ namespace TrilinosWrappers
 
 
 
+  void
+  VectorBase::equ (const TrilinosScalar  a,
+                   const VectorBase     &v,
+                   const TrilinosScalar  b,
+                   const VectorBase     &w)
+  {
+    // if we have ghost values, do not allow
+    // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
+    Assert (v.local_size() == w.local_size(),
+            ExcDimensionMismatch (v.local_size(), w.local_size()));
+
+    AssertIsFinite(a);
+    AssertIsFinite(b);
+
+    // If we don't have the same map, copy.
+    if (vector->Map().SameAs(v.vector->Map())==false)
+      {
+        sadd(0., a, v, b, w);
+      }
+    else
+      {
+        // Otherwise, just update. verify
+        // that *this does not only have
+        // the same map as v (the
+        // if-condition above) but also as
+        // w
+        Assert (vector->Map().SameAs(w.vector->Map()),
+                ExcDifferentParallelPartitioning());
+        int ierr = vector->Update(a, *v.vector, b, *w.vector, 0.0);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+        last_action = Zero;
+      }
+  }
+
+
+
   // TODO: up to now only local
   // data printed out! Find a
   // way to neatly output

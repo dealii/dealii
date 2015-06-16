@@ -858,12 +858,14 @@ namespace parallel
 
       /**
        * Scaling and multiple addition.
+       *
+       * This function is deprecated.
        */
       void sadd (const Number          s,
                  const Number          a,
                  const Vector<Number> &V,
                  const Number          b,
-                 const Vector<Number> &W);
+                 const Vector<Number> &W) DEAL_II_DEPRECATED;
 
       /**
        * Scaling and multiple addition.  <tt>*this = s*(*this)+a*V + b*W +
@@ -917,9 +919,11 @@ namespace parallel
 
       /**
        * Assignment <tt>*this = a*u + b*v</tt>.
+       *
+       * This function is deprecated.
        */
       void equ (const Number a, const Vector<Number> &u,
-                const Number b, const Vector<Number> &v);
+                const Number b, const Vector<Number> &v) DEAL_II_DEPRECATED;
 
       /**
        * Assignment <tt>*this = a*u + b*v + b*w</tt>.
