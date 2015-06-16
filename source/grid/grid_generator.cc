@@ -3451,18 +3451,21 @@ namespace GridGenerator
     std::vector<CellData<3> > cells;
     cells.reserve((n_slices-1)*input.n_active_cells());
 
+    // copy the array of points as many times as there will be slices,
+    // one slice at a time
     for (unsigned int slice=0; slice<n_slices; ++slice)
       {
         for (unsigned int i=0; i<input.n_vertices(); ++i)
-
           {
             const Point<2> &v = input.get_vertices()[i];
-            points[i+slice*input.n_vertices()](0) = v(0);
-            points[i+slice*input.n_vertices()](1) = v(1);
-            points[i+slice*input.n_vertices()](2) = height * slice / (n_slices-1);
+            points[slice*input.n_vertices()+i](0) = v(0);
+            points[slice*input.n_vertices()+i](1) = v(1);
+            points[slice*input.n_vertices()+i](2) = height * slice / (n_slices-1);
           }
       }
 
+    // then create the cells of each of the slices, one stack at a
+    // time
     for (Triangulation<2,2>::cell_iterator
          cell = input.begin(); cell != input.end(); ++cell)
       {
@@ -3482,18 +3485,24 @@ namespace GridGenerator
           }
       }
 
+    // next, create face data for all of the outer faces for which the
+    // boundary indicator will not be equal to zero (where we would
+    // explicitly set it to something that is already the default --
+    // no need to do that)
     SubCellData s;
-    types::boundary_id bid=0;
+    types::boundary_id max_boundary_id=0;
     s.boundary_quads.reserve(input.n_active_lines()*(n_slices-1) + input.n_active_cells()*2);
     for (Triangulation<2,2>::cell_iterator
          cell = input.begin(); cell != input.end(); ++cell)
       {
         CellData<2> quad;
         for (unsigned int f=0; f<4; ++f)
-          if (cell->at_boundary(f))
+          if (cell->at_boundary(f)
+              &&
+              (cell->face(f)->boundary_indicator() != 0))
             {
               quad.boundary_id = cell->face(f)->boundary_id();
-              bid = std::max(bid, quad.boundary_id);
+              max_boundary_id = std::max(max_boundary_id, quad.boundary_id);
               for (unsigned int slice=0; slice<n_slices-1; ++slice)
                 {
                   quad.vertices[0] = cell->face(f)->vertex_index(0)+slice*input.n_vertices();
@@ -3505,23 +3514,35 @@ namespace GridGenerator
             }
       }
 
+    // then mark the bottom and top boundaries of the extruded mesh
+    // with max_boundary_id+1 and max_boundary_id+2. check that this
+    // remains valid
+    Assert ((max_boundary_id != numbers::invalid_boundary_id) &&
+            (max_boundary_id+1 != numbers::invalid_boundary_id) &&
+            (max_boundary_id+2 != numbers::invalid_boundary_id),
+            ExcMessage ("The input triangulation to this function is using boundary "
+                        "indicators in a range that do not allow using "
+                        "max_boundary_id+1 and max_boundary_id+2 as boundary "
+                        "indicators for the bottom and top faces of the "
+                        "extruded triangulation."));
     for (Triangulation<2,2>::cell_iterator
          cell = input.begin(); cell != input.end(); ++cell)
       {
         CellData<2> quad;
-        quad.boundary_id = bid + 1;
+        quad.boundary_id = max_boundary_id + 1;
         quad.vertices[0] = cell->vertex_index(0);
         quad.vertices[1] = cell->vertex_index(1);
         quad.vertices[2] = cell->vertex_index(2);
         quad.vertices[3] = cell->vertex_index(3);
         s.boundary_quads.push_back(quad);
 
-        quad.boundary_id = bid + 2;
+        quad.boundary_id = max_boundary_id + 2;
         for (int i=0; i<4; ++i)
           quad.vertices[i] += (n_slices-1)*input.n_vertices();
         s.boundary_quads.push_back(quad);
       }
 
+    // use all of this to finally create the extruded 3d triangulation
     result.create_triangulation (points,
                                  cells,
                                  s);
