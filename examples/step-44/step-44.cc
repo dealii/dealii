@@ -2663,8 +2663,8 @@ namespace Step44
       //      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
       //      \mathsf{\mathbf{F}}_{\widetilde{p}}
       //      $
-      A.block(J_dof).equ(1.0, system_rhs.block(J_dof));
-      A.block(J_dof).add(-1.0, B.block(J_dof));
+      A.block(J_dof) = system_rhs.block(J_dof);
+      A.block(J_dof) -= B.block(J_dof);
       //      $
       //      \mathsf{\mathbf{A}}_{\widetilde{J}}
       //      =

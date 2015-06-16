@@ -984,7 +984,7 @@ namespace Step35
     for (unsigned int d=0; d<dim; ++d)
       {
         u_star[d].equ (2., u_n[d]);
-        u_star[d].add (-1, u_n_minus_1[d]);
+        u_star[d] -=  u_n_minus_1[d];
       }
   }
 
