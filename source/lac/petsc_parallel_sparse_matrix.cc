@@ -858,7 +858,8 @@ namespace PETScWrappers
     {
       Vector tmp (v);
       vmult (tmp, v);
-      return tmp*v;
+      // note, that v*tmp returns  sum_i conjugate(v)_i * tmp_i
+      return v*tmp;
     }
 
     PetscScalar
@@ -867,6 +868,7 @@ namespace PETScWrappers
     {
       Vector tmp (v);
       vmult (tmp, v);
+      // note, that v*tmp returns  sum_i conjugate(v)_i * tmp_i
       return u*tmp;
     }
 
