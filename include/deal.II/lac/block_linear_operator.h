@@ -328,7 +328,7 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  * This function implement a forward substitution argument to invert a lower
  * block triangular matrix.
  * It takes as argement an array of array of LinearOperators @p block_matrix
- * representing a block matrix and an array of LinearOperators
+ * representing a lower block triangular matrix and an array of LinearOperators
  * @p inverse_diagonal representing inverses of digonal blocks of @p block_matrix.
  *
  * Let us assume we have a linear system where each coefficient of the system is a
@@ -343,6 +343,9 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  *    x1 = A11^-1 ( y1 - A01 x0 )
  * and therefore:
  *    xn = Ann^-1 ( yn - A0n x0 - ... - A(n-1)n x(n-1) )
+ *
+ * Notice that we are not using the whole matrix: just the lower triangular block
+ * matrix obtained from @p block_matrix it is used.
  *
  * Caveat: Tvmult and Tvmult_add have not been implemented, yet. This may lead to mistakes.
  * @ingroup LAOperators
@@ -434,12 +437,12 @@ block_forward_substitution(const std::array<std::array<LinearOperator<typename R
  * This function implement a back substitution argument to invert an upper
  * block triangular matrix.
  * It takes as argement an array of array of LinearOperators @p block_matrix
- * representing a block matrix and an array of LinearOperators
+ * representing an upper block triangular matrix and an array of LinearOperators
  * @p inverse_diagonal representing inverses of digonal blocks of @p block_matrix.
  *
  * Let us assume we have a linear system where each coefficient of the system is a
  * matrix:
-
+ *
  * A00 x0 + A01 x1 + ... + A0n xn = yn
  *          A11 x1 + ...          = y1
  *                          ...     ..
@@ -450,6 +453,9 @@ block_forward_substitution(const std::array<std::array<LinearOperator<typename R
  *    x(n-1) = A(n-1)(n-1)^-1 ( y(n-1) - A(n-1)n x(n-1) )
  * and therefore:
  *    x0 = A00^-1 ( y0 - A0n xn - ... - A01 x1 )
+ *
+ * Notice that we are not using the whole matrix: just the upper triangular block
+ * matrix obtained from @p block_matrix it is used.
  *
  * Caveat: Tvmult and Tvmult_add have not been implemented, yet. This may lead to mistakes.
  * @ingroup LAOperators
