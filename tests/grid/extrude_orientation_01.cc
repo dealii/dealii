@@ -18,7 +18,8 @@
 // Test GridGenerator::extrude. 2d meshes are always correctly
 // edge-oriented, and so if we stack them one on top of the other, we
 // should also get a 3d mesh for which both edge and face orientations
-// are correct
+// are correct -- or so I thought, but this turns out to not be true,
+// see https://github.com/dealii/dealii/issues/1013
 //
 // test this for a square extruded to a cube
 
