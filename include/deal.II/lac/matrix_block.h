@@ -111,6 +111,11 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
+   * Declare a type for matrix entries.
+   */
+  typedef typename MATRIX::value_type value_type;
+
+  /**
    * Constructor rendering an uninitialized object.
    */
   MatrixBlock();
