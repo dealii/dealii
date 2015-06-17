@@ -353,7 +353,7 @@ namespace PETScWrappers
 
       /**
        * Return the square of the norm of the vector $v$ with respect to the
-       * norm induced by this matrix, i.e. $\left(v,Mv\right)$. This is
+       * norm induced by this matrix, i.e. $\left(v^\ast,Mv\right)$. This is
        * useful, e.g. in the finite element context, where the $L_2$ norm of a
        * function equals the matrix norm with respect to the mass matrix of
        * the vector representing the nodal values of the finite element
@@ -369,7 +369,7 @@ namespace PETScWrappers
       PetscScalar matrix_norm_square (const Vector &v) const;
 
       /**
-       * Compute the matrix scalar product $\left(u,Mv\right)$.
+       * Compute the matrix scalar product $\left(u^\ast,Mv\right)$.
        *
        * The implementation of this function is not as efficient as the one in
        * the @p MatrixBase class used in deal.II (i.e. the original one, not

@@ -505,7 +505,7 @@ namespace Step37
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     const Coefficient<dim>    coefficient;
     std::vector<double>       coefficient_values (n_q_points);
-    FullMatrix<double>        local_matrix (dofs_per_cell, dofs_per_cell);
+    FullMatrix<float>         local_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>            local_diagonal (dofs_per_cell);
 
     const unsigned int n_levels = triangulation.n_levels();

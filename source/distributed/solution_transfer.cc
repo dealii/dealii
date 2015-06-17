@@ -216,18 +216,19 @@ namespace parallel
                   const typename Triangulation<dim,dim>::CellStatus /*status*/,
                   void *data)
     {
-      double *data_store = reinterpret_cast<double *>(data);
+      typename VECTOR::value_type *data_store = reinterpret_cast<typename VECTOR::value_type *>(data);
 
       typename DH::cell_iterator cell(*cell_, dof_handler);
 
       const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
-      ::dealii::Vector<double> dofvalues(dofs_per_cell);
+      ::dealii::Vector<typename VECTOR::value_type> dofvalues(dofs_per_cell);
       for (typename std::vector<const VECTOR *>::iterator it=input_vectors.begin();
            it !=input_vectors.end();
            ++it)
         {
           cell->get_interpolated_dof_values(*(*it), dofvalues);
-          std::memcpy(data_store, &dofvalues(0), sizeof(double)*dofs_per_cell);
+          Assert (typeid(typename VECTOR::value_type) == typeid(double), ExcNotImplemented());
+          std::memcpy(data_store, &dofvalues(0), sizeof(typename VECTOR::value_type)*dofs_per_cell);
           data_store += dofs_per_cell;
         }
     }
@@ -245,14 +246,15 @@ namespace parallel
       cell(*cell_, dof_handler);
 
       const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
-      ::dealii::Vector<double> dofvalues(dofs_per_cell);
-      const double *data_store = reinterpret_cast<const double *>(data);
+      ::dealii::Vector<typename VECTOR::value_type> dofvalues(dofs_per_cell);
+      const typename VECTOR::value_type *data_store = reinterpret_cast<const typename VECTOR::value_type *>(data);
 
       for (typename std::vector<VECTOR *>::iterator it = all_out.begin();
            it != all_out.end();
            ++it)
         {
-          std::memcpy(&dofvalues(0), data_store, sizeof(double)*dofs_per_cell);
+          Assert (typeid(typename VECTOR::value_type) == typeid(double), ExcNotImplemented());
+          std::memcpy(&dofvalues(0), data_store, sizeof(typename VECTOR::value_type)*dofs_per_cell);
           cell->set_dof_values_by_interpolation(dofvalues, *(*it));
           data_store += dofs_per_cell;
         }

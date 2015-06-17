@@ -273,7 +273,7 @@ namespace MatrixCreator
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim> &rhs,
-                           Vector<double>           &rhs_vector,
+                           Vector<number>           &rhs_vector,
                            const Function<spacedim> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
@@ -286,7 +286,7 @@ namespace MatrixCreator
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim> &rhs,
-                           Vector<double>           &rhs_vector,
+                           Vector<number>           &rhs_vector,
                            const Function<spacedim> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
@@ -320,7 +320,7 @@ namespace MatrixCreator
                            const hp::QCollection<dim> &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim> &rhs,
-                           Vector<double>           &rhs_vector,
+                           Vector<number>           &rhs_vector,
                            const Function<spacedim> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
@@ -332,7 +332,7 @@ namespace MatrixCreator
                            const hp::QCollection<dim> &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim> &rhs,
-                           Vector<double>           &rhs_vector,
+                           Vector<number>           &rhs_vector,
                            const Function<spacedim> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
@@ -360,7 +360,6 @@ namespace MatrixCreator
    * shape functions.
    */
   template <int dim, int spacedim>
-
   void create_boundary_mass_matrix (const Mapping<dim, spacedim>       &mapping,
                                     const DoFHandler<dim,spacedim>    &dof,
                                     const Quadrature<dim-1>  &q,
@@ -400,7 +399,6 @@ namespace MatrixCreator
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
    */
   template <int dim, int spacedim>
-
   void create_boundary_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                                     const Quadrature<dim-1>  &q,
                                     SparseMatrix<double>     &matrix,
@@ -414,7 +412,6 @@ namespace MatrixCreator
    * Same function as above, but for hp objects.
    */
   template <int dim, int spacedim>
-
   void create_boundary_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
                                     const hp::DoFHandler<dim,spacedim>    &dof,
                                     const hp::QCollection<dim-1>  &q,
@@ -442,7 +439,6 @@ namespace MatrixCreator
    * Same function as above, but for hp objects.
    */
   template <int dim, int spacedim>
-
   void create_boundary_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                                     const hp::QCollection<dim-1>  &q,
                                     SparseMatrix<double>     &matrix,
