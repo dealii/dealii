@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -222,8 +222,8 @@ namespace FETools
     for (types::global_dof_index i=0; i<dof2.n_dofs(); ++i)
       if (locally_owned_dofs.is_element(i))
         {
-          const typename OutVector::value_type touch_i = touch_count(i);
-          Assert( touch_i != typename OutVector::value_type(), ExcInternalError());
+          Assert(touch_count(i) != typename OutVector::value_type(),
+		 ExcInternalError());
           u2(i) /= touch_count(i);
         }
 
