@@ -464,6 +464,90 @@ namespace internal
       return face_integral;
     }
 
+    /**
+     * A factor to scale the integral for the face at the boundary.
+     * Used for Neumann BC.
+     */
+    template <class DH>
+    double boundary_face_factor(const typename DH::active_cell_iterator &cell,
+                                const unsigned int                       face_no,
+                                const dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_cell,
+                                const typename KellyErrorEstimator<DH::dimension,DH::space_dimension>::Strategy strategy)
+    {
+      switch (strategy)
+        {
+        case KellyErrorEstimator<DH::dimension,DH::space_dimension>::cell_diameter_over_24 :
+          return 1.0;
+        case KellyErrorEstimator<DH::dimension,DH::space_dimension>::face_diameter_over_twice_max_degree :
+          const double cell_degree = fe_face_values_cell.get_fe_collection()[cell->active_fe_index()].degree;
+          return cell->face(face_no)->diameter() / cell_degree;
+        }
+    }
+
+
+    /**
+     *  A factor to scale the integral for the regular face.
+     */
+    template <class DH>
+    double regular_face_factor(const typename DH::active_cell_iterator &cell,
+                               const unsigned int                       face_no,
+                               const dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_cell,
+                               const dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_neighbor,
+                               const typename KellyErrorEstimator<DH::dimension,DH::space_dimension>::Strategy strategy)
+    {
+      switch (strategy)
+        {
+        case KellyErrorEstimator<DH::dimension,DH::space_dimension>::cell_diameter_over_24 :
+          return 1.0;
+        case KellyErrorEstimator<DH::dimension,DH::space_dimension>::face_diameter_over_twice_max_degree :
+          const double cell_degree     = fe_face_values_cell.get_fe_collection()[cell->active_fe_index()].degree;
+          const double neighbor_degree = fe_face_values_neighbor.get_fe_collection()[cell->neighbor(face_no)->active_fe_index()].degree;
+          return cell->face(face_no)->diameter() / std::max(cell_degree,neighbor_degree) / 2.0;
+        }
+    }
+
+    /**
+     * A factor to scale the integral for the irregular face.
+     */
+    template <class DH>
+    double irregular_face_factor(const typename DH::active_cell_iterator &cell,
+                                 const typename DH::active_cell_iterator &neighbor_child,
+                                 const unsigned int                       face_no,
+                                 const unsigned int                       subface_no,
+                                 const dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values,
+                                 dealii::hp::FESubfaceValues<DH::dimension, DH::space_dimension>    &fe_subface_values,
+                                 const typename KellyErrorEstimator<DH::dimension,DH::space_dimension>::Strategy strategy)
+    {
+      switch (strategy)
+        {
+        case KellyErrorEstimator<DH::dimension,DH::space_dimension>::cell_diameter_over_24 :
+          return 1.0;
+        case KellyErrorEstimator<DH::dimension,DH::space_dimension>::face_diameter_over_twice_max_degree :
+          const double cell_degree = fe_face_values.get_fe_collection()[cell->active_fe_index()].degree;
+          const double neighbor_child_degree = fe_subface_values.get_fe_collection()[neighbor_child->active_fe_index()].degree;
+          return cell->face(face_no)->child(subface_no)->diameter()/std::max(neighbor_child_degree,cell_degree)/2.0;
+        }
+    }
+
+    /**
+     * A factor used when summing up all the contribution
+     * from different faces of each cell.
+     */
+    template <class DH>
+    double cell_factor(const typename DH::active_cell_iterator &cell,
+                       const unsigned int                       face_no,
+                       const DH                                &dof_handler,
+                       const typename KellyErrorEstimator<DH::dimension,DH::space_dimension>::Strategy strategy)
+    {
+      switch (strategy)
+        {
+        case KellyErrorEstimator<DH::dimension,DH::space_dimension>::cell_diameter_over_24 :
+          return cell->diameter()/24;
+        case KellyErrorEstimator<DH::dimension,DH::space_dimension>::face_diameter_over_twice_max_degree :
+          return 1.0;
+        }
+    }
+
 
 
     /**
@@ -480,7 +564,8 @@ namespace internal
                                  const typename DH::active_cell_iterator &cell,
                                  const unsigned int                       face_no,
                                  dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_cell,
-                                 dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_neighbor)
+                                 dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_neighbor,
+                                 const typename KellyErrorEstimator<DH::dimension,DH::space_dimension>::Strategy strategy)
     {
       const unsigned int dim = DH::dimension;
       (void)dim;
@@ -500,6 +585,7 @@ namespace internal
         fe_face_values_cell.get_present_fe_values()
         .get_function_gradients (*solutions[n], parallel_data.psi[n]);
 
+      double factor;
       // now compute over the other side of the face
       if (face->at_boundary() == false)
         // internal face; integrate jump of gradient across this face
@@ -522,6 +608,10 @@ namespace internal
           fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor,
                                           cell->active_fe_index());
 
+          factor = regular_face_factor<DH>(cell,face_no,
+                                           fe_face_values_cell,fe_face_values_neighbor,
+                                           strategy);
+
           // get gradients on neighbor cell
           for (unsigned int n=0; n<n_solution_vectors; ++n)
             {
@@ -530,10 +620,18 @@ namespace internal
                                        parallel_data.neighbor_psi[n]);
             }
         }
+      else
+        {
+          factor = boundary_face_factor<DH>(cell,face_no,
+                                            fe_face_values_cell,
+                                            strategy);
+        }
 
       // now go to the generic function that does all the other things
       local_face_integrals[face] =
         integrate_over_face (parallel_data, face, fe_face_values_cell);
+      for (unsigned int i = 0; i < local_face_integrals[face].size(); i++)
+        local_face_integrals[face][i] *= factor;
     }
 
 
@@ -557,7 +655,8 @@ namespace internal
                                    const typename DH::active_cell_iterator    &cell,
                                    const unsigned int                          face_no,
                                    dealii::hp::FEFaceValues<DH::dimension,DH::space_dimension>    &fe_face_values,
-                                   dealii::hp::FESubfaceValues<DH::dimension, DH::space_dimension> &fe_subface_values)
+                                   dealii::hp::FESubfaceValues<DH::dimension, DH::space_dimension> &fe_subface_values,
+                                   const typename KellyErrorEstimator<DH::dimension,DH::space_dimension>::Strategy strategy)
     {
       const unsigned int dim = DH::dimension;
       (void)dim;
@@ -603,6 +702,14 @@ namespace internal
           fe_face_values.reinit (neighbor_child, neighbor_neighbor,
                                  cell->active_fe_index());
 
+          const double factor = irregular_face_factor<DH>(cell,
+                                                          neighbor_child,
+                                                          face_no,
+                                                          subface_no,
+                                                          fe_face_values,
+                                                          fe_subface_values,
+                                                          strategy);
+
           // store the gradient of the solution in psi
           for (unsigned int n=0; n<n_solution_vectors; ++n)
             fe_subface_values.get_present_fe_values()
@@ -616,6 +723,8 @@ namespace internal
           // call generic evaluate function
           local_face_integrals[neighbor_child->face(neighbor_neighbor)] =
             integrate_over_face (parallel_data, face, fe_face_values);
+          for (unsigned int i = 0; i < local_face_integrals[neighbor_child->face(neighbor_neighbor)].size(); i++)
+            local_face_integrals[neighbor_child->face(neighbor_neighbor)][i] *= factor;
         }
 
       // finally loop over all subfaces to collect the contributions of the
@@ -648,7 +757,8 @@ namespace internal
     estimate_one_cell (const typename DH::active_cell_iterator &cell,
                        ParallelData<DH, typename InputVector::value_type> &parallel_data,
                        std::map<typename DH::face_iterator,std::vector<double> > &local_face_integrals,
-                       const std::vector<const InputVector *> &solutions)
+                       const std::vector<const InputVector *> &solutions,
+                       const typename KellyErrorEstimator<DH::dimension,DH::space_dimension>::Strategy strategy)
     {
       const unsigned int dim = DH::dimension;
       const unsigned int n_solution_vectors = solutions.size();
@@ -769,7 +879,8 @@ namespace internal
                                          local_face_integrals,
                                          cell, face_no,
                                          parallel_data.fe_face_values_cell,
-                                         parallel_data.fe_face_values_neighbor);
+                                         parallel_data.fe_face_values_neighbor,
+                                         strategy);
 
           else
             // otherwise we need to do some special computations which do not
@@ -779,7 +890,8 @@ namespace internal
                                            local_face_integrals,
                                            cell, face_no,
                                            parallel_data.fe_face_values_cell,
-                                           parallel_data.fe_subface_values);
+                                           parallel_data.fe_subface_values,
+                                           strategy);
         }
     }
   }
@@ -805,13 +917,14 @@ estimate (const Mapping<dim, spacedim>      &mapping,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
-          const types::material_id       material_id)
+          const types::material_id       material_id,
+          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
 {
   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
   std::vector<Vector<float>*>              errors (1, &error);
   estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
-            component_mask, coefficients, n_threads, subdomain_id, material_id);
+            component_mask, coefficients, n_threads, subdomain_id, material_id, strategy);
 }
 
 
@@ -828,11 +941,12 @@ estimate (const DH                &dof_handler,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
-          const types::material_id       material_id)
+          const types::material_id       material_id,
+          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
 {
   estimate(StaticMappingQ1<dim,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
            error, component_mask, coefficients, n_threads,
-           subdomain_id, material_id);
+           subdomain_id, material_id, strategy);
 }
 
 
@@ -850,13 +964,14 @@ estimate (const Mapping<dim, spacedim>      &mapping,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
-          const types::material_id       material_id)
+          const types::material_id       material_id,
+          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
 {
   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
   std::vector<Vector<float>*>              errors (1, &error);
   estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
-            component_mask, coefficients, n_threads, subdomain_id, material_id);
+            component_mask, coefficients, n_threads, subdomain_id, material_id, strategy);
 }
 
 
@@ -873,11 +988,12 @@ estimate (const DH                &dof_handler,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id subdomain_id,
-          const types::material_id       material_id)
+          const types::material_id       material_id,
+          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
 {
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
            error, component_mask, coefficients, n_threads,
-           subdomain_id, material_id);
+           subdomain_id, material_id, strategy);
 }
 
 
@@ -897,7 +1013,8 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const Function<spacedim>                 *coefficients,
           const unsigned int                   ,
           const types::subdomain_id          subdomain_id_,
-          const types::material_id                   material_id)
+          const types::material_id                   material_id,
+          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
 {
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
@@ -985,7 +1102,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   WorkStream::run (dof_handler.begin_active(),
                    static_cast<typename DH::active_cell_iterator>(dof_handler.end()),
                    std_cxx11::bind (&internal::estimate_one_cell<InputVector,DH>,
-                                    std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::ref(solutions)),
+                                    std_cxx11::_1, std_cxx11::_2, std_cxx11::_3, std_cxx11::ref(solutions),strategy),
                    std_cxx11::bind (&internal::copy_local_to_global<DH>,
                                     std_cxx11::_1, std_cxx11::ref(face_integrals)),
                    parallel_data,
@@ -1022,7 +1139,10 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
             Assert(face_integrals.find(cell->face(face_no))
                    != face_integrals.end(),
                    ExcInternalError());
-            const double factor = cell->diameter() / 24;
+            const double factor = internal::cell_factor<DH>(cell,
+                                                            face_no,
+                                                            dof_handler,
+                                                            strategy);
 
             for (unsigned int n=0; n<n_solution_vectors; ++n)
               {
@@ -1057,14 +1177,15 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const Function<spacedim>                 *coefficients,
           const unsigned int                   n_threads,
           const types::subdomain_id          subdomain_id,
-          const types::material_id                   material_id)
+          const types::material_id                   material_id,
+          const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
 {
   // forward to the function with the QCollection
   estimate (mapping, dof_handler,
             hp::QCollection<dim-1>(quadrature),
             neumann_bc, solutions,
             errors, component_mask, coefficients,
-            n_threads, subdomain_id, material_id);
+            n_threads, subdomain_id, material_id, strategy);
 }
 
 
@@ -1079,11 +1200,12 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
                                                    const Function<spacedim>                 *coefficients,
                                                    const unsigned int                   n_threads,
                                                    const types::subdomain_id subdomain_id,
-                                                   const types::material_id       material_id)
+                                                   const types::material_id       material_id,
+                                                   const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
 {
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
            errors, component_mask, coefficients, n_threads,
-           subdomain_id, material_id);
+           subdomain_id, material_id, strategy);
 }
 
 
@@ -1099,11 +1221,12 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
                                                    const Function<spacedim>                 *coefficients,
                                                    const unsigned int                   n_threads,
                                                    const types::subdomain_id subdomain_id,
-                                                   const types::material_id       material_id)
+                                                   const types::material_id       material_id,
+                                                   const typename KellyErrorEstimator<dim,spacedim>::Strategy strategy)
 {
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
            errors, component_mask, coefficients, n_threads,
-           subdomain_id, material_id);
+           subdomain_id, material_id, strategy);
 }
 
 

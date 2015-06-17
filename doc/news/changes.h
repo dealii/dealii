@@ -43,7 +43,7 @@ inconvenience this causes.
   but the scalar type of the vector was always <code>double</code>. This
   has been changed so that the two always need to match.
   <br>
-  (David Davydov, Wolfgang Bangerth, 2015/06/17)
+  (Denis Davydov, Wolfgang Bangerth, 2015/06/17)
   </li>
 
   <li>Changed: Functions such as FEValuesBase::get_function_values() that
@@ -64,7 +64,7 @@ inconvenience this causes.
   complex-valued data types. This includes compiling PETSc with
   complex scalars.
   <br>
-  (David Davydov, 2015/05/08)
+  (Denis Davydov, 2015/05/08)
   </li>
 
   <li>Removed: The generic, templated vmult, Tvmult, etc. -interfaces of
@@ -385,6 +385,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: Implement a modified version of the Kelly error estimator, which
+  effectively provides the boundary residual term for the hp-FEM error estimators.
+  <br>
+  (Denis Davydov, 2015/06/17)
+  </li>
+
   <li> New: DerivativeForm() now takes an additional optional
   template argument specifying the type, similarly to Tensor() classes.
   <br>
