@@ -38,6 +38,14 @@ inconvenience this causes.
 </p>
 
 <ol>
+  <li>Changed: MatrixCreator::create_mass_matrix() took matrix and vector
+  objects where the scalar type of the matrix was a template argument
+  but the scalar type of the vector was always <code>double</code>. This
+  has been changed so that the two always need to match.
+  <br>
+  (David Davydov, Wolfgang Bangerth, 2015/06/17)
+  </li>
+
   <li>Changed: Functions such as FEValuesBase::get_function_values() that
   extracted the values of functions at the quadrature points of a cell
   implicitly always assumed that <code>double</code> is a reasonable

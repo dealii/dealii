@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2014 by the deal.II authors
+// Copyright (C) 2010 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,6 +101,42 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
        const Function<deal_II_space_dimension> * const,
        std::vector<unsigned int>);
 
+// same for float
+    template
+      void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_space_dimension>
+      (const Mapping<deal_II_dimension,deal_II_space_dimension>       &mapping,
+       const DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const Quadrature<deal_II_dimension>    &q,
+       SparseMatrix<float>     &matrix,
+       const Function<deal_II_space_dimension> * const coefficient,
+       const ConstraintMatrix   &constraints);
+    template
+      void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_space_dimension>
+      (const DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const Quadrature<deal_II_dimension>    &q,
+       SparseMatrix<float>     &matrix,
+       const Function<deal_II_space_dimension> * const coefficient,
+       const ConstraintMatrix   &constraints);
+    template
+      void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_space_dimension>
+      (const Mapping<deal_II_dimension,deal_II_space_dimension>       &mapping,
+       const DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const Quadrature<deal_II_dimension>    &q,
+       SparseMatrix<float>     &matrix,
+       const Function<deal_II_space_dimension>      &rhs,
+       Vector<float>           &rhs_vector,
+       const Function<deal_II_space_dimension> * const coefficient,
+       const ConstraintMatrix   &constraints);
+    template
+      void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_space_dimension>
+      (const DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const Quadrature<deal_II_dimension>    &q,
+       SparseMatrix<float>     &matrix,
+       const Function<deal_II_space_dimension>      &rhs,
+       Vector<float>           &rhs_vector,
+       const Function<deal_II_space_dimension> * const coefficient,
+       const ConstraintMatrix   &constraints);
+
 #endif
   }
 
@@ -109,8 +145,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 // where applicable and move to codimension cases above also when applicable
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
-#if deal_II_dimension <= deal_II_space_dimension
 // hp versions of functions
+#if deal_II_dimension <= deal_II_space_dimension
     template
       void MatrixCreator::create_mass_matrix<deal_II_dimension,double,deal_II_space_dimension>
       (const hp::MappingCollection<deal_II_dimension,deal_II_space_dimension>       &mapping,
@@ -227,8 +263,56 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
        const Function<deal_II_dimension> * const coefficient,
        const ConstraintMatrix   &constraints);
 
+#endif
+
+// same for float
+#if deal_II_dimension <= deal_II_space_dimension
+
+    template
+      void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_space_dimension>
+      (const hp::MappingCollection<deal_II_dimension,deal_II_space_dimension>       &mapping,
+       const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const hp::QCollection<deal_II_dimension>    &q,
+       SparseMatrix<float>     &matrix,
+       const Function<deal_II_space_dimension> * const coefficient,
+       const ConstraintMatrix   &constraints);
+
+    template
+      void MatrixCreator::create_mass_matrix<deal_II_dimension,float,deal_II_space_dimension>
+      (const hp::MappingCollection<deal_II_dimension,deal_II_space_dimension>       &mapping,
+       const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const hp::QCollection<deal_II_dimension>    &q,
+       SparseMatrix<float>     &matrix,
+       const Function<deal_II_space_dimension>      &rhs,
+       Vector<float>           &rhs_vector,
+       const Function<deal_II_space_dimension> * const coefficient,
+       const ConstraintMatrix   &constraints);
 
 
 #endif
+
+#if deal_II_dimension == deal_II_space_dimension
+
+       
+    template
+      void MatrixCreator::create_mass_matrix<deal_II_dimension>
+      (const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const hp::QCollection<deal_II_dimension>    &q,
+       SparseMatrix<float>     &matrix,
+       const Function<deal_II_space_dimension> * const coefficient,
+       const ConstraintMatrix   &constraints);
+
+    template
+      void MatrixCreator::create_mass_matrix<deal_II_dimension>
+      (const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>    &dof,
+       const hp::QCollection<deal_II_dimension>    &q,
+       SparseMatrix<float>     &matrix,
+       const Function<deal_II_space_dimension>      &rhs,
+       Vector<float>           &rhs_vector,
+       const Function<deal_II_space_dimension> * const coefficient,
+       const ConstraintMatrix   &constraints);
+
+#endif
+
   }
 
