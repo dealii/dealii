@@ -223,7 +223,7 @@ namespace FETools
       if (locally_owned_dofs.is_element(i))
         {
           Assert(touch_count(i) != typename OutVector::value_type(),
-		 ExcInternalError());
+                 ExcInternalError());
           u2(i) /= touch_count(i);
         }
 
