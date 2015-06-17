@@ -7180,7 +7180,7 @@ namespace VectorTools
         const ComponentMask maskq(spacedim, true);
         get_position_vector(dhq, eulerq);
 
-        FullMatrix<double> transfer(fe.dofs_per_cell, feq.dofs_per_cell);
+        FullMatrix<double> transfer(fe.dofs_per_cell);
         const std::vector<Point<dim> > &points = feq.get_unit_support_points();
 
         // Here construct the interpolation matrix from FE_Q^spacedim to
