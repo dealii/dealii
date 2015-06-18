@@ -1476,8 +1476,6 @@ void MappingQ1<dim,spacedim>::transform_gradients(
               typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_jacobian_grads"));
       Assert (rank==2, ExcMessage("Only for rank 2"));
 
-      Assert (rank==3, ExcMessage("stop here anyway"));
-
       for (unsigned int i=0; i<output.size(); ++i)
         {
           DerivativeForm<1,spacedim,dim> A =
