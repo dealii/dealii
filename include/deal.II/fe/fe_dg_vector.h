@@ -21,6 +21,7 @@
 #include <deal.II/base/polynomials_raviart_thomas.h>
 #include <deal.II/base/polynomials_nedelec.h>
 #include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/polynomials_abf.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/geometry_info.h>
@@ -233,6 +234,30 @@ public:
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_DGBDM<dim>(degree)</tt>, with @p dim and @p degree
+   * replaced by appropriate values.
+   */
+  virtual std::string get_name () const;
+};
+
+/**
+ * A vector-valued DG element based on the polynomials space of FE_ABF.
+ *
+ * @ingroup fe
+ * @author Zhen Tao
+ * @date 2015
+ */
+template <int dim, int spacedim=dim>
+class FE_DGABF : public FE_DGVector<PolynomialsABF<dim>, dim, spacedim>
+{
+public:
+  /**
+   * Constructor for the discontinuous ABF element of degree @p p.
+   */
+  FE_DGABF (const unsigned int p);
+
+  /**
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_DGABF<dim>(degree)</tt>, with @p dim and @p degree
    * replaced by appropriate values.
    */
   virtual std::string get_name () const;
