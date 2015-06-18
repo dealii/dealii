@@ -99,8 +99,34 @@ FE_DGBDM<dim, spacedim>::get_name () const
   return namebuf.str();
 }
 
+// added by Zhen Tao
+
+template <int dim, int spacedim>
+FE_DGABF<dim, spacedim>::FE_DGABF (const unsigned int p)
+  : FE_DGVector<PolynomialsABF<dim>, dim, spacedim>(p, mapping_raviart_thomas)
+{}
+
+
+template <int dim, int spacedim>
+std::string
+FE_DGABF<dim, spacedim>::get_name () const
+{
+  // note that the
+  // FETools::get_fe_from_name
+  // function depends on the
+  // particular format of the string
+  // this function returns, so they
+  // have to be kept in synch
+
+  std::ostringstream namebuf;
+  namebuf << "FE_DGABF<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << this->degree-1 << ")";
+
+  return namebuf.str();
+}
+
 
 #include "fe_dg_vector.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-
