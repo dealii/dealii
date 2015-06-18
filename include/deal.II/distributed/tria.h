@@ -63,6 +63,13 @@ namespace internal
   }
 }
 
+namespace FETools
+{
+  namespace internal
+  {
+    template <int, int> class ExtrapolateImplementation;
+  }
+}
 
 namespace internal
 {
