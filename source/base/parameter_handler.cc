@@ -2574,6 +2574,18 @@ ParameterHandler::scan_line (std::string         line,
   if ((line.find ("END") == 0) ||
       (line.find ("end") == 0))
     {
+      line.erase (0, 3);
+      while ((line.size() > 0) && (line[0] == ' '))
+        line.erase (0, 1);
+
+      if (line.size()>0)
+        {
+          std::cerr << "Line <" << lineno
+                    << "> of file <" << input_filename
+                    << ">: invalid content after 'end'!" << std::endl;
+          return false;
+        }
+
       if (subsection_path.size() == 0)
         {
           std::cerr << "Line <" << lineno
