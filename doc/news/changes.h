@@ -385,6 +385,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: deal.II now supports compilation in C++14 mode, which may be
+  enabled with the CMake option <code>DEAL_II_WITH_CXX14</code>.
+  <br>
+  (David Wells, 2015/06/21)
+  </li>
+
   <li> New: Implement a modified version of the Kelly error estimator, which
   effectively provides the boundary residual term for the hp-FEM error estimators.
   <br>
