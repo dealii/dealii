@@ -455,8 +455,8 @@ namespace Step47
   template <int dim>
   std::pair<unsigned int, Quadrature<dim> >
   LaplaceProblem<dim>::compute_quadrature (const Quadrature<dim> &plain_quadrature,
-                                           const typename hp::DoFHandler<dim>::active_cell_iterator &cell,
-                                           const std::vector<double> &level_set_values                    )
+                                           const typename hp::DoFHandler<dim>::active_cell_iterator &/*cell*/,
+                                           const std::vector<double> &level_set_values)
   {
 
     unsigned int type = 0;
@@ -476,9 +476,14 @@ namespace Step47
     // ++++, ---- type 2: -+++, +-++, ++-+, +++-, +---, -+--, --+-, ---+ type
     // 3: +--+, ++--, +-+-, -++-, --++, -+-+
 
-    if ( sign_ls[0]==sign_ls[1] & sign_ls[0]==sign_ls[2] & sign_ls[0]==sign_ls[3] ) type =1;
-    else if ( sign_ls[0]*sign_ls[1]*sign_ls[2]*sign_ls[3] < 0 ) type = 2;
-    else type = 3;
+    if ( sign_ls[0]==sign_ls[1] &&
+         sign_ls[0]==sign_ls[2] &&
+         sign_ls[0]==sign_ls[3] )
+      type = 1;
+    else if ( sign_ls[0]*sign_ls[1]*sign_ls[2]*sign_ls[3] < 0 )
+      type = 2;
+    else
+      type = 3;
 
     unsigned int Pos = 100;
 

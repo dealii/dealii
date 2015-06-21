@@ -127,7 +127,7 @@ namespace Step41
   };
 
   template <int dim>
-  double RightHandSide<dim>::value (const Point<dim> &p,
+  double RightHandSide<dim>::value (const Point<dim> &,
                                     const unsigned int component) const
   {
     Assert (component == 0, ExcNotImplemented());
@@ -148,7 +148,7 @@ namespace Step41
   };
 
   template <int dim>
-  double BoundaryValues<dim>::value (const Point<dim> &p,
+  double BoundaryValues<dim>::value (const Point<dim> &,
                                      const unsigned int component) const
   {
     Assert (component == 0, ExcNotImplemented());
