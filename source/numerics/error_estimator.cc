@@ -477,10 +477,19 @@ namespace internal
       switch (strategy)
         {
         case KellyErrorEstimator<DH::dimension,DH::space_dimension>::cell_diameter_over_24 :
+        {
           return 1.0;
+        }
         case KellyErrorEstimator<DH::dimension,DH::space_dimension>::face_diameter_over_twice_max_degree :
+        {
           const double cell_degree = fe_face_values_cell.get_fe_collection()[cell->active_fe_index()].degree;
           return cell->face(face_no)->diameter() / cell_degree;
+        }
+        default:
+        {
+          Assert (false, ExcNotImplemented());
+          return -std::numeric_limits<double>::max();
+        }
         }
     }
 
@@ -498,11 +507,20 @@ namespace internal
       switch (strategy)
         {
         case KellyErrorEstimator<DH::dimension,DH::space_dimension>::cell_diameter_over_24 :
+        {
           return 1.0;
+        }
         case KellyErrorEstimator<DH::dimension,DH::space_dimension>::face_diameter_over_twice_max_degree :
+        {
           const double cell_degree     = fe_face_values_cell.get_fe_collection()[cell->active_fe_index()].degree;
           const double neighbor_degree = fe_face_values_neighbor.get_fe_collection()[cell->neighbor(face_no)->active_fe_index()].degree;
           return cell->face(face_no)->diameter() / std::max(cell_degree,neighbor_degree) / 2.0;
+        }
+        default:
+        {
+          Assert (false, ExcNotImplemented());
+          return -std::numeric_limits<double>::max();
+        }
         }
     }
 
@@ -521,11 +539,20 @@ namespace internal
       switch (strategy)
         {
         case KellyErrorEstimator<DH::dimension,DH::space_dimension>::cell_diameter_over_24 :
+        {
           return 1.0;
+        }
         case KellyErrorEstimator<DH::dimension,DH::space_dimension>::face_diameter_over_twice_max_degree :
+        {
           const double cell_degree = fe_face_values.get_fe_collection()[cell->active_fe_index()].degree;
           const double neighbor_child_degree = fe_subface_values.get_fe_collection()[neighbor_child->active_fe_index()].degree;
           return cell->face(face_no)->child(subface_no)->diameter()/std::max(neighbor_child_degree,cell_degree)/2.0;
+        }
+        default:
+        {
+          Assert (false, ExcNotImplemented());
+          return -std::numeric_limits<double>::max();
+        }
         }
     }
 
@@ -535,16 +562,25 @@ namespace internal
      */
     template <class DH>
     double cell_factor(const typename DH::active_cell_iterator &cell,
-                       const unsigned int                       face_no,
-                       const DH                                &dof_handler,
+                       const unsigned int                       /*face_no*/,
+                       const DH                                &/*dof_handler*/,
                        const typename KellyErrorEstimator<DH::dimension,DH::space_dimension>::Strategy strategy)
     {
       switch (strategy)
         {
         case KellyErrorEstimator<DH::dimension,DH::space_dimension>::cell_diameter_over_24 :
+        {
           return cell->diameter()/24;
+        }
         case KellyErrorEstimator<DH::dimension,DH::space_dimension>::face_diameter_over_twice_max_degree :
+        {
           return 1.0;
+        }
+        default:
+        {
+          Assert (false, ExcNotImplemented());
+          return -std::numeric_limits<double>::max();
+        }
         }
     }
 
