@@ -526,6 +526,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: FE_DGQArbitraryNodes::get_name() now also detects if
+  the quadrature rule was Gauss points.
+  <br>
+  (Guido Kanschat, 2015/06/22)
+  </li>
+  
   <li> Improved: DoFRenumbering::Cuthill_McKee() can now also
   use starting indices for parallel triangulations.
   <br>

@@ -811,25 +811,45 @@ FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
       }
 
   if (equidistant == true)
-    namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
-  else
     {
-
-      // Check whether the support points come from QGaussLobatto.
-      const QGaussLobatto<1> points_gl(this->degree+1);
-      bool gauss_lobatto = true;
-      for (unsigned int j=0; j<=this->degree; j++)
-        if (points[j] != points_gl.point(j)(0))
-          {
-            gauss_lobatto = false;
-            break;
-          }
-      if (gauss_lobatto == true)
-        namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
-      else
-        namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QUnknownNodes(" << this->degree << "))";
+      namebuf << "FE_DGQ<" << dim << ">(" << this->degree << ")";
+      return namebuf.str();
     }
 
+  // Check whether the support points come from QGaussLobatto.
+  const QGaussLobatto<1> points_gl(this->degree+1);
+  bool gauss_lobatto = true;
+  for (unsigned int j=0; j<=this->degree; j++)
+    if (points[j] != points_gl.point(j)(0))
+      {
+        gauss_lobatto = false;
+        break;
+      }
+
+  if (gauss_lobatto == true)
+    {
+      namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGaussLobatto(" << this->degree+1 << "))";
+      return namebuf.str();
+    }
+
+  // Check whether the support points come from QGauss.
+  const QGauss<1> points_g(this->degree+1);
+  bool gauss = true;
+  for (unsigned int j=0; j<=this->degree; j++)
+    if (points[j] != points_g.point(j)(0))
+      {
+        gauss = false;
+        break;
+      }
+
+  if (gauss == true)
+    {
+      namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGauss(" << this->degree+1 << "))";
+      return namebuf.str();
+    }
+
+  // All guesses exhausted
+  namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QUnknownNodes(" << this->degree+1 << "))";
   return namebuf.str();
 }
 
