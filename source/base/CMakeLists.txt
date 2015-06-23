@@ -61,6 +61,7 @@ SET(_src
   table_handler.cc
   tensor_function.cc
   tensor_product_polynomials.cc
+  abf_scalar_polynomials.cc
   tensor_product_polynomials_const.cc
   thread_management.cc
   timer.cc
