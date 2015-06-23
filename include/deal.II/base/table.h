@@ -866,6 +866,8 @@ public:
                const unsigned int size2,
                const bool         fast = false);
 
+  using TableBase<2,T>::reinit;
+
   /**
    * Access operator. Generate an object that accesses the requested row of
    * this two-dimensional table. Range checks are performed.
