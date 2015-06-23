@@ -29,11 +29,13 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_dgabf_scalar.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgp_monomial.h>
 #include <deal.II/fe/fe_dgp_nonparametric.h>
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_dg_vector.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
