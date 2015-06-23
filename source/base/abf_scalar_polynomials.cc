@@ -375,7 +375,7 @@ get_n_tensor_pols (const std::vector<POLY>  &pols)
 
   unsigned int x = 1;
   for (unsigned int d=0; d<dim-1; ++d)
-    x *=pols.size() - 1;
+    x *= pols.size() - 1;
 
   y += dim*x;
 

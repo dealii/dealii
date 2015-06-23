@@ -134,8 +134,8 @@ namespace
 template <int dim, int spacedim>
 FE_DGABF_Scalar<dim, spacedim>::FE_DGABF_Scalar (const unsigned int degree)
   :
-  FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
-    TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
+  FE_Poly<ABFScalarPolynomials<dim>, dim, spacedim> (
+    ABFScalarPolynomials<dim>(Polynomials::Legendre::generate_complete_basis(degree+1)),
     FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
     std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
     std::vector<ComponentMask>(FiniteElementData<dim>(
@@ -226,6 +226,13 @@ FE_DGABF_Scalar<dim, spacedim>::get_dpo_vector (const unsigned int deg)
   dpo[dim] = deg+1;
   for (unsigned int i=1; i<dim; ++i)
     dpo[dim] *= deg+1;
+
+  unsigned int x = 1;
+  for(unsigned int i=0; i<dim-1; ++i)
+    x *= deg+1;
+
+  dpo[dim] += dim*x;
+
   return dpo;
 }
 
