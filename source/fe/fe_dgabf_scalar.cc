@@ -141,42 +141,7 @@ FE_DGABF_Scalar<dim, spacedim>::FE_DGABF_Scalar (const unsigned int degree)
     std::vector<ComponentMask>(FiniteElementData<dim>(
                                  get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
-  // fill in support points
-  if (degree == 0)
-    {
-      // constant elements, take
-      // midpoint
-      this->unit_support_points.resize(1);
-      for (unsigned int i=0; i<dim; ++i)
-        this->unit_support_points[0](i) = 0.5;
-    }
-  else
-    {
-      // number of points: (degree+1)^dim
-      unsigned int n = degree+1;
-      for (unsigned int i=1; i<dim; ++i)
-        n *= degree+1;
-
-      this->unit_support_points.resize(n);
-
-      const double step = 1./degree;
-      Point<dim> p;
-
-      unsigned int k=0;
-      for (unsigned int iz=0; iz <= ((dim>2) ? degree : 0) ; ++iz)
-        for (unsigned int iy=0; iy <= ((dim>1) ? degree : 0) ; ++iy)
-          for (unsigned int ix=0; ix<=degree; ++ix)
-            {
-              p(0) = ix * step;
-              if (dim>1)
-                p(1) = iy * step;
-              if (dim>2)
-                p(2) = iz * step;
-
-              this->unit_support_points[k++] = p;
-            };
-    };
-
+  
   // do not initialize embedding and restriction here. these matrices are
   // initialized on demand in get_restriction_matrix and
   // get_prolongation_matrix
@@ -243,74 +208,7 @@ void
 FE_DGABF_Scalar<dim, spacedim>::rotate_indices (std::vector<unsigned int> &numbers,
                                        const char                 direction) const
 {
-  const unsigned int n = this->degree+1;
-  unsigned int s = n;
-  for (unsigned int i=1; i<dim; ++i)
-    s *= n;
-  numbers.resize (s);
-
-  unsigned int l = 0;
-
-  if (dim==1)
-    {
-      // Mirror around midpoint
-      for (unsigned int i=n; i>0;)
-        numbers[l++]=--i;
-    }
-  else
-    {
-      switch (direction)
-        {
-        // Rotate xy-plane
-        // counter-clockwise
-        case 'z':
-          for (unsigned int iz=0; iz<((dim>2) ? n:1); ++iz)
-            for (unsigned int j=0; j<n; ++j)
-              for (unsigned int i=0; i<n; ++i)
-                {
-                  unsigned int k = n*i-j+n-1 + n*n*iz;
-                  numbers[l++] = k;
-                }
-          break;
-        // Rotate xy-plane
-        // clockwise
-        case 'Z':
-          for (unsigned int iz=0; iz<((dim>2) ? n:1); ++iz)
-            for (unsigned int iy=0; iy<n; ++iy)
-              for (unsigned int ix=0; ix<n; ++ix)
-                {
-                  unsigned int k = n*ix-iy+n-1 + n*n*iz;
-                  numbers[k] = l++;
-                }
-          break;
-        // Rotate yz-plane
-        // counter-clockwise
-        case 'x':
-          Assert (dim>2, ExcDimensionMismatch (dim,3));
-          for (unsigned int iz=0; iz<n; ++iz)
-            for (unsigned int iy=0; iy<n; ++iy)
-              for (unsigned int ix=0; ix<n; ++ix)
-                {
-                  unsigned int k = n*(n*iy-iz+n-1) + ix;
-                  numbers[l++] = k;
-                }
-          break;
-        // Rotate yz-plane
-        // clockwise
-        case 'X':
-          Assert (dim>2, ExcDimensionMismatch (dim,3));
-          for (unsigned int iz=0; iz<n; ++iz)
-            for (unsigned int iy=0; iy<n; ++iy)
-              for (unsigned int ix=0; ix<n; ++ix)
-                {
-                  unsigned int k = n*(n*iy-iz+n-1) + ix;
-                  numbers[k] = l++;
-                }
-          break;
-        default:
-          Assert (false, ExcNotImplemented ());
-        }
-    }
+  Assert (false, ExcNotImplemented ());
 }
 
 
@@ -662,78 +560,7 @@ FE_DGABF_Scalar<dim, spacedim>::has_support_on_face (const unsigned int shape_in
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
-  unsigned int n = this->degree+1;
-
-  // for DGQ(0) elements or arbitrary node DGQ with support points not located
-  // at the element boundary, the single shape functions is constant and
-  // therefore lives on the boundary
-  bool support_points_on_boundary = true;
-  for (unsigned int d=0; d<dim; ++d)
-    if (std::abs(this->unit_support_points[0][d]) > 1e-13)
-      support_points_on_boundary = false;
-  for (unsigned int d=0; d<dim; ++d)
-    if (std::abs(this->unit_support_points.back()[d]-1.) > 1e-13)
-      support_points_on_boundary = false;
-  if (support_points_on_boundary == false)
-    return true;
-
-  unsigned int n2 = n*n;
-
-  switch (dim)
-    {
-    case 1:
-    {
-      // in 1d, things are simple. since
-      // there is only one degree of
-      // freedom per vertex in this
-      // class, the first is on vertex 0
-      // (==face 0 in some sense), the
-      // second on face 1:
-      return (((shape_index == 0) && (face_index == 0)) ||
-              ((shape_index == this->degree) && (face_index == 1)));
-    };
-
-    case 2:
-    {
-      if (face_index==0 && (shape_index % n) == 0)
-        return true;
-      if (face_index==1 && (shape_index % n) == this->degree)
-        return true;
-      if (face_index==2 && shape_index < n)
-        return true;
-      if (face_index==3 && shape_index >= this->dofs_per_cell-n)
-        return true;
-      return false;
-    };
-
-    case 3:
-    {
-      const unsigned int in2 = shape_index % n2;
-
-      // x=0
-      if (face_index==0 && (shape_index % n) == 0)
-        return true;
-      // x=1
-      if (face_index==1 && (shape_index % n) == n-1)
-        return true;
-      // y=0
-      if (face_index==2 && in2 < n )
-        return true;
-      // y=1
-      if (face_index==3 && in2 >= n2-n)
-        return true;
-      // z=0
-      if (face_index==4 && shape_index < n2)
-        return true;
-      // z=1
-      if (face_index==5 && shape_index >= this->dofs_per_cell - n2)
-        return true;
-      return false;
-    };
-
-    default:
-      Assert (false, ExcNotImplemented());
-    }
+  // Legendre polynomials
   return true;
 }
 
@@ -743,6 +570,7 @@ template <int dim, int spacedim>
 std::pair<Table<2,bool>, std::vector<unsigned int> >
 FE_DGABF_Scalar<dim,spacedim>::get_constant_modes () const
 {
+  Assert (false, ExcMessage ("get_constant_modes is called by FE_DGABF_Scalar"));
   Table<2,bool> constant_modes(1, this->dofs_per_cell);
   constant_modes.fill(true);
   return std::pair<Table<2,bool>, std::vector<unsigned int> >
