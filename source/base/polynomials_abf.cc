@@ -16,6 +16,7 @@
 
 #include <deal.II/base/polynomials_abf.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/thread_management.h>
 #include <iostream>
 #include <iomanip>
 
@@ -27,24 +28,25 @@ template <int dim>
 PolynomialsABF<dim>::PolynomialsABF (const unsigned int k)
   :
   my_degree(k),
+  polynomial_space (create_polynomials (k)),
   n_pols(compute_n_pols(k))
 {
+}
+
+template <int dim>
+std::vector<std::vector< Polynomials::Polynomial< double > > >
+PolynomialsABF<dim>::create_polynomials (const unsigned int k)
+{
   std::vector<std::vector< Polynomials::Polynomial< double > > > pols(dim);
-  pols[0] = Polynomials::LagrangeEquidistant::generate_complete_basis(k+2);
+  pols[0] = Polynomials::Legendre::generate_complete_basis(k+2);
   if (k == 0)
     for (unsigned int d=1; d<dim; ++d)
       pols[d] = Polynomials::Legendre::generate_complete_basis(0);
   else
     for (unsigned int d=1; d<dim; ++d)
-      pols[d] = Polynomials::LagrangeEquidistant::generate_complete_basis(k);
-  polynomial_space = new AnisotropicPolynomials<dim>(pols);
-}
+      pols[d] = Polynomials::Legendre::generate_complete_basis(k);
 
-
-template <int dim>
-PolynomialsABF<dim>::~PolynomialsABF ()
-{
-  delete polynomial_space;
+  return pols;
 }
 
 
@@ -62,14 +64,18 @@ PolynomialsABF<dim>::compute (const Point<dim>            &unit_point,
   Assert(grad_grads.size()==n_pols|| grad_grads.size()==0,
          ExcDimensionMismatch(grad_grads.size(), n_pols));
 
-  const unsigned int n_sub = polynomial_space->n();
   // guard access to the scratch
   // arrays in the following block
   // using a mutex to make sure they
   // are not used by multiple threads
-  // at once
+  static Threads::Mutex mutex;
   Threads::Mutex::ScopedLock lock(mutex);
 
+  static std::vector<double> p_values;
+  static std::vector<Tensor<1,dim> > p_grads;
+  static std::vector<Tensor<2,dim> > p_grad_grads;
+
+  const unsigned int n_sub = polynomial_space.n();
   p_values.resize((values.size() == 0) ? 0 : n_sub);
   p_grads.resize((grads.size() == 0) ? 0 : n_sub);
   p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
@@ -113,11 +119,10 @@ template <int dim>
 unsigned int
 PolynomialsABF<dim>::compute_n_pols(unsigned int k)
 {
-  if (dim == 1) return k+1;
+  if (dim == 1) return k+3;
   if (dim == 2) return 2*(k+1)*(k+3);
   //TODO:Check what are the correct numbers ...
-  if (dim == 3) return 3*(k+1)*(k+1)*(k+2);
-
+  if (dim == 3) return 3*(k+1)*(k+1)*(k+3);
   Assert(false, ExcNotImplemented());
   return 0;
 }

@@ -25,7 +25,6 @@
 #include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/table.h>
-#include <deal.II/base/thread_management.h>
 
 #include <vector>
 
@@ -62,12 +61,6 @@ public:
    * contained.
    */
   PolynomialsABF (const unsigned int k);
-
-  /**
-   * Destructor deleting the polynomials.
-   */
-  ~PolynomialsABF ();
-
   /**
    * Computes the value and the first and second derivatives of each Raviart-
    * Thomas polynomial at @p unit_point.
@@ -118,32 +111,20 @@ private:
    * An object representing the polynomial space for a single component. We
    * can re-use it by rotating the coordinates of the evaluation point.
    */
-  AnisotropicPolynomials<dim> *polynomial_space;
+  const AnisotropicPolynomials<dim> polynomial_space;
 
   /**
    * Number of Raviart-Thomas polynomials.
    */
-  unsigned int n_pols;
+  const unsigned int n_pols;
 
   /**
-   * A mutex that guards the following scratch arrays.
+   * A static member function that creates the polynomial space we use to
+   * initialize the #polynomial_space member variable.
    */
-  mutable Threads::Mutex mutex;
-
-  /**
-   * Auxiliary memory.
-   */
-  mutable std::vector<double> p_values;
-
-  /**
-   * Auxiliary memory.
-   */
-  mutable std::vector<Tensor<1,dim> > p_grads;
-
-  /**
-   * Auxiliary memory.
-   */
-  mutable std::vector<Tensor<2,dim> > p_grad_grads;
+  static
+  std::vector<std::vector< Polynomials::Polynomial< double > > >
+  create_polynomials (const unsigned int k);
 };
 
 
