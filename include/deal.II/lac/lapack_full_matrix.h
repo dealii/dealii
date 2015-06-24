@@ -216,7 +216,7 @@ public:
               const bool             adding = false) const;
 
   /**
-   * Specialization of above function for compatbile Vector::value_type.
+   * Specialization of above function for compatible Vector::value_type.
    */
   void vmult (Vector<number>       &w,
               const Vector<number> &v,
@@ -232,7 +232,7 @@ public:
                   const Vector<number2> &v) const;
 
   /**
-   * Specialization of above function for compatbile Vector::value_type.
+   * Specialization of above function for compatible Vector::value_type.
    */
   void vmult_add (Vector<number>       &w,
                   const Vector<number> &v) const;
@@ -255,7 +255,7 @@ public:
                const bool             adding=false) const;
 
   /**
-   * Specialization of above function for compatbile Vector::value_type.
+   * Specialization of above function for compatible Vector::value_type.
    */
   void Tvmult (Vector<number>       &w,
                const Vector<number> &v,
@@ -272,7 +272,7 @@ public:
                    const Vector<number2> &v) const;
 
   /**
-   * Specialization of above function for compatbile Vector::value_type.
+   * Specialization of above function for compatible Vector::value_type.
    */
   void Tvmult_add (Vector<number>       &w,
                    const Vector<number> &v) const;
@@ -582,7 +582,7 @@ public:
    * this are considered zero.
    */
   void print_formatted (std::ostream       &out,
-                        const unsigned int  presicion=3,
+                        const unsigned int  precision   = 3,
                         const bool          scientific  = true,
                         const unsigned int  width       = 0,
                         const char         *zero_string = " ",
