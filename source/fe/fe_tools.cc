@@ -776,7 +776,7 @@ namespace FETools
 
       MappingQ1<dim,spacedim> mapping;
       const unsigned int degree = fe.degree;
-      QGauss<dim> q_fine (degree+1);
+      QGauss<dim> q_fine (degree+2);
       const unsigned int nq = q_fine.size();
 
       FEValues<dim,spacedim> fine (mapping, fe, q_fine,
@@ -1137,7 +1137,7 @@ namespace FETools
     // prepare FEValues, quadrature etc on
     // coarse cell
     MappingQ1<dim,spacedim> mapping;
-    QGauss<dim> q_fine(degree+1);
+    QGauss<dim> q_fine(degree+2);
     const unsigned int nq = q_fine.size();
 
     // create mass matrix on coarse cell.
