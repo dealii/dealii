@@ -97,7 +97,7 @@ PolynomialsABF<dim>::compute (const Point<dim>            &unit_point,
       for (unsigned int c=0; c<dim; ++c)
         p(c) = unit_point((c+d)%dim);
 
-      polynomial_space->compute (p, p_values, p_grads, p_grad_grads);
+      polynomial_space.compute (p, p_values, p_grads, p_grad_grads);
 
       for (unsigned int i=0; i<p_values.size(); ++i)
         values[i+d*n_sub][d] = p_values[i];
