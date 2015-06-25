@@ -34,7 +34,7 @@
 ########################################################################
 
 #
-# backwards compatability with the old DEAL_II_CXX11_FLAG option
+# backwards compatibility with the old DEAL_II_CXX11_FLAG option
 #
 
 IF(DEFINED DEAL_II_CXX11_FLAG AND NOT DEFINED DEAL_II_CXX_VERSION_FLAG)
