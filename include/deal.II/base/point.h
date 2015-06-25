@@ -430,10 +430,10 @@ inline
 Number
 Point<dim,Number>::distance (const Point<dim,Number> &p) const
 {
-  Number sum=0;
+  Number sum = Number();
   for (unsigned int i=0; i<dim; ++i)
     {
-      const double diff=this->values[i]-p(i);
+      const Number diff=this->values[i]-p(i);
       sum += diff*diff;
     }
 
