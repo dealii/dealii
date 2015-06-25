@@ -38,7 +38,7 @@ namespace internal
   {
 
     /**
-     * Check whether a given arrangement of cells is already consisten. If
+     * Check whether a given arrangement of cells is already consistent. If
      * this is the case, then we skip the reordering pass.
      *
      * This function works by looping over all cells, checking whether one of
