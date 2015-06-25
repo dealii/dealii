@@ -21,8 +21,9 @@
  * <h3>Linear Operator</h3>
  *
  * If deal.II is configured with C++11 support (i.e.,
- * <code>DEAL_II_WITH_CXX11=on</code> during configuration) a versatile
- * mechanism for storing the concept of a linear operator is available.
+ * <code>DEAL_II_WITH_CXX11=ON</code> or <code>DEAL_II_WITH_CXX14=ON</code>
+ * during configuration) a versatile mechanism for storing the concept of a
+ * linear operator is available.
  *
  * This is done with a LinearOperator class that, similarly to the abstract
  * MATRIX interface, defines a minimal interface for <i>applying</i> a

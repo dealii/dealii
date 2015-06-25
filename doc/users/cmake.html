@@ -426,13 +426,24 @@ parameter_gui  - builds and installs the 'parameter_gui' component
     <h3>Feature configuration</h3>
 
     <p>
-      <acronym>deal.II</acronym> provides (optional) interfaces to quite
-      a number of external libraries. All of these are represented by
-      <code>cmake</code> variables that are set to <code>ON</code> if
-      an external package is found or to <code>OFF</code> otherwise. By
-      explicitly setting it to off either on the command line or using
-      <code>ccmake</code>, you can prevent <acronym>deal.II</acronym>
-      from using this external package, even if it is found.
+      <acronym>deal.II</acronym> provides (optional) interfaces to quite a
+      number of external libraries as well as multiple versions
+      of <code>C++</code>. All of these options are represented
+      by <code>cmake</code> variables that may be set to either <code>ON</code>
+      or <code>OFF</code>.
+
+      By default, <acronym>deal.II</acronym> does not provide the compiler with
+      any <code>C++</code> version flag. If
+      either <code>DEAL_II_WITH_CXX11</code> or <code>DEAL_II_WITH_CXX14</code>
+      is set to <code>ON</code>, then <code>cmake</code> will attempt to
+      determine both the level of compliance and the correct compiler flag for
+      the requested language standard.
+
+      The remaining flags are set to <code>ON</code> if an external package is
+      found or to <code>OFF</code> otherwise. By explicitly setting it to off
+      either on the command line or using <code>ccmake</code>, you can
+      prevent <acronym>deal.II</acronym> from using an external package, even if
+      it is found.
     </p>
 
     <p>
@@ -444,6 +455,7 @@ DEAL_II_WITH_ARPACK
 DEAL_II_WITH_BOOST
 DEAL_II_WITH_BZIP2
 DEAL_II_WITH_CXX11
+DEAL_II_WITH_CXX14
 DEAL_II_WITH_HDF5
 DEAL_II_WITH_LAPACK
 DEAL_II_WITH_METIS
@@ -475,6 +487,15 @@ DEAL_II_WITH_ZLIB
       more dependencies to external or 'bundled' (i.e. bundled with
       <acronym>deal.II</acronym> and residing under <code>bundled/</code>)
       libraries.
+    </p>
+
+    <p>
+      Additionally, the variable
+<pre class="cmake">
+DEAL_II_CXX_VERSION_FLAG
+</pre>
+      may be set to specify the <code>C++</code> language version flag passed to
+      the compiler.
     </p>
 
     <p>

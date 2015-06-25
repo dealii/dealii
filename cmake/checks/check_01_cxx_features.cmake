@@ -19,6 +19,7 @@
 # This file sets up
 #
 #   DEAL_II_WITH_CXX11
+#   DEAL_II_WITH_CXX14
 #
 #   DEAL_II_HAVE_ISNAN
 #   DEAL_II_HAVE_UNDERSCORE_ISNAN
@@ -28,29 +29,71 @@
 
 ########################################################################
 #                                                                      #
-#                             C++11 Support:                           #
+#                         C++ Version Support:                         #
 #                                                                      #
 ########################################################################
 
+#
+# backwards compatability with the old DEAL_II_CXX11_FLAG option
+#
+
+IF(DEFINED DEAL_II_CXX11_FLAG AND NOT DEFINED DEAL_II_CXX_VERSION_FLAG)
+  SET(DEAL_II_CXX_VERSION_FLAG ${DEAL_II_CXX11_FLAG})
+ENDIF()
+
+IF(DEAL_II_WITH_CXX11 AND DEAL_II_WITH_CXX14)
+  MESSAGE(STATUS
+          "Since DEAL_II_WITH_CXX11 and DEAL_II_WITH_CXX14 were both specified,\n"
+          "DEAL_II_WITH_CXX14 is chosen as the standard.")
+ENDIF()
+
+IF(DEAL_II_WITH_CXX14 AND DEFINED DEAL_II_WITH_CXX11 AND NOT DEAL_II_WITH_CXX11)
+  MESSAGE(FATAL_ERROR
+    "Compiling deal.II with C++14 support (i.e., DEAL_II_WITH_CXX14=ON) requires"
+    " that C++11 support not be explicitly disabled (i.e., DEAL_II_WITH_CXX11 may"
+    " not be set to a logically false value).")
+ENDIF()
 
 #
-# Only run these tests if C++11 support should actually be set up:
+# Only run these tests if C++11 support (or newer) should actually be set up:
 #
-IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
 
-  IF("${DEAL_II_CXX11_FLAG}" STREQUAL "")
-    CHECK_CXX_COMPILER_FLAG("-std=c++0x" DEAL_II_HAVE_FLAG_stdcxx0x)
-    CHECK_CXX_COMPILER_FLAG("-std=c++11" DEAL_II_HAVE_FLAG_stdcxx11)
-    IF(DEAL_II_HAVE_FLAG_stdcxx11)
-      SET(DEAL_II_CXX11_FLAG "-std=c++11")
-    ELSEIF(DEAL_II_HAVE_FLAG_stdcxx0x)
-      SET(DEAL_II_CXX11_FLAG "-std=c++0x")
+IF(DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX14)
+  IF(NOT DEAL_II_CXX_VERSION_FLAG)
+    IF(DEAL_II_WITH_CXX14)
+      CHECK_CXX_COMPILER_FLAG("-std=c++14" DEAL_II_HAVE_FLAG_stdcxx14)
+      IF(DEAL_II_HAVE_FLAG_stdcxx14)
+        SET(DEAL_II_CXX_VERSION_FLAG "-std=c++14")
+      ELSE()
+        MESSAGE(FATAL_ERROR
+          "CMake was not able to find a valid C++14 flag. Try manually"
+          " specifying\nDEAL_II_CXX_VERSION_FLAG\nand reruning CMake.")
+      ENDIF()
+    ELSEIF(DEAL_II_WITH_CXX11)
+      CHECK_CXX_COMPILER_FLAG("-std=c++0x" DEAL_II_HAVE_FLAG_stdcxx0x)
+      CHECK_CXX_COMPILER_FLAG("-std=c++11" DEAL_II_HAVE_FLAG_stdcxx11)
+      IF(DEAL_II_HAVE_FLAG_stdcxx11)
+        SET(DEAL_II_CXX_VERSION_FLAG "-std=c++11")
+      ELSEIF(DEAL_II_HAVE_FLAG_stdcxx0x)
+        SET(DEAL_II_CXX_VERSION_FLAG "-std=c++0x")
+      ELSE()
+        MESSAGE(FATAL_ERROR
+          "CMake was not able to find a valid C++11 flag. Try manually"
+          " specifying\nDEAL_II_CXX_VERSION_FLAG and reruning CMake.")
+      ENDIF()
+    ENDIF()
+  ELSE()
+    CHECK_CXX_COMPILER_FLAG(${DEAL_II_CXX_VERSION_FLAG} DEAL_II_CXX_VERSION_FLAG_VALID)
+    IF(NOT DEAL_II_CXX_VERSION_FLAG_VALID)
+      MESSAGE(FATAL_ERROR
+        "The supplied flag \"${DEAL_II_CXX_VERSION_FLAG}\" was not recognized "
+        "by the detected compiler.")
     ENDIF()
   ENDIF()
 
   # Set CMAKE_REQUIRED_FLAGS for the unit tests
-  MESSAGE(STATUS "Using C++11 flag \"${DEAL_II_CXX11_FLAG}\"")
-  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
+  MESSAGE(STATUS "Using C++ version flag \"${DEAL_II_CXX_VERSION_FLAG}\"")
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -111,7 +154,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       "
       DEAL_II_HAVE_CXX11_THREAD)
     RESET_CMAKE_REQUIRED()
-    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
+    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
   ELSE()
     # Just export it ;-)
     SET(DEAL_II_HAVE_CXX11_THREAD TRUE CACHE BOOL "")
@@ -228,7 +271,30 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       SET(DEAL_II_HAVE_CXX11 TRUE)
   ENDIF()
 
+  #
+  # This test does not guarantee full C++14 support, but virtually every
+  # compiler with some C++14 support implements this.
+  #
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <memory>
+    int main()
+    {
+        auto ptr = std::make_unique<int>(42);
+        return 0;
+    }
+    "
+    DEAL_II_HAVE_CXX14_MAKE_UNIQUE)
+  IF( DEAL_II_HAVE_CXX11 AND
+      DEAL_II_HAVE_CXX14_MAKE_UNIQUE AND
+      DEAL_II_WITH_CXX14)
+    SET(DEAL_II_HAVE_CXX14 TRUE)
+  ENDIF()
+
   RESET_CMAKE_REQUIRED()
+ELSE()
+  SET(DEAL_II_WITH_CXX11 FALSE)
+  SET(DEAL_II_WITH_CXX14 FALSE)
 ENDIF()
 
 #
@@ -238,6 +304,15 @@ ENDIF()
 OPTION(DEAL_II_WITH_CXX11
   "Compile deal.II using C++11 language standard."
   ${DEAL_II_HAVE_CXX11}
+  )
+
+#
+# Set up a configuration option for C++14 support:
+#
+
+OPTION(DEAL_II_WITH_CXX14
+  "Compile deal.II using C++14 language standard."
+  ${DEAL_II_HAVE_CXX14}
   )
 
 #
@@ -254,19 +329,39 @@ IF(DEAL_II_WITH_CXX11 AND NOT DEAL_II_HAVE_CXX11)
     "or use a different compiler, instead. (If the compiler flag for C++11 "
     "support differs from \"-std=c++0x\" or \"-std=c++11\", a suitable "
     "compiler flag has to be specified manually via\n"
-    "    -DDEAL_II_CXX11_FLAG=\"...\"\n\n"
+    "    -DDEAL_II_CXX_VERSION_FLAG=\"...\"\n\n"
     )
 ENDIF()
 
 #
-# Set up C++11 support:
+# similar for C++14
 #
 
-IF(DEAL_II_WITH_CXX11)
-  ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
+IF(DEAL_II_WITH_CXX14 AND NOT DEAL_II_HAVE_CXX14)
+  MESSAGE(FATAL_ERROR "\n"
+    "C++14 support was requested (DEAL_II_WITH_CXX14=${DEAL_II_WITH_CXX14}) "
+    "but is not supported by the current compiler and flag combination.\n"
+    "Please disable C++14 support, i.e. configure with\n"
+    "    -DDEAL_II_WITH_CXX14=FALSE,\n"
+    "or use a different compiler, instead. (If the compiler flag for C++14 "
+    "support differs from \"-std=c++14\", a suitable "
+    "compiler flag has to be specified manually via\n"
+    "    -DDEAL_II_CXX_VERSION_FLAG=\"...\"\n\n"
+    )
+ENDIF()
+
+#
+# Set up support for newer versions of C++:
+#
+
+IF (DEAL_II_WITH_CXX14)
+  ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+  MESSAGE(STATUS "DEAL_II_WITH_CXX14 successfully set up")
+ELSEIF(DEAL_II_WITH_CXX11)
+  ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
   MESSAGE(STATUS "DEAL_II_WITH_CXX11 successfully set up")
 
-  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX11_FLAG}")
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <type_traits>
@@ -275,7 +370,7 @@ IF(DEAL_II_WITH_CXX11)
     DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
   RESET_CMAKE_REQUIRED()
 ELSE()
-  MESSAGE(STATUS "DEAL_II_WITH_CXX11 disabled")
+  MESSAGE(STATUS "DEAL_II_WITH_CXX14 and DEAL_II_WITH_CXX11 are both disabled")
 ENDIF()
 
 
