@@ -532,12 +532,18 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: The SparseMatrix class can now also use <code>std::complex</code>
+  scalars for its elements.
+  <br>
+  (Wolfgang Bangerth, 2015/06/26)
+  </li>
+
   <li> Improved: FE_DGQArbitraryNodes::get_name() now also detects if
   the quadrature rule was Gauss points.
   <br>
   (Guido Kanschat, 2015/06/22)
-  </li>
-  
+  </li>  
+
   <li> Improved: DoFRenumbering::Cuthill_McKee() can now also
   use starting indices for parallel triangulations.
   <br>

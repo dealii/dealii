@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,4 +19,13 @@ for (VECTOR : SERIAL_VECTORS)
   {
     template class VectorMemory<VECTOR>;
     template class GrowingVectorMemory<VECTOR>;
+  }
+
+ for (SCALAR : COMPLEX_SCALARS)
+  {
+    template class VectorMemory<Vector<SCALAR> >;
+    template class GrowingVectorMemory<Vector<SCALAR> >;
+
+    template class VectorMemory<BlockVector<SCALAR> >;
+    template class GrowingVectorMemory<BlockVector<SCALAR> >;
   }

@@ -1633,7 +1633,7 @@ SparseMatrix<number>::set (const size_type i,
   if (index == SparsityPattern::invalid_entry)
     {
       Assert ((index != SparsityPattern::invalid_entry) ||
-              (value == 0.),
+              (value == number()),
               ExcInvalidIndex(i, j));
       return;
     }
@@ -1710,7 +1710,7 @@ SparseMatrix<number>::add (const size_type i,
 {
   AssertIsFinite(value);
 
-  if (value == 0)
+  if (value == number())
     return;
 
   const size_type index = cols->operator()(i, j);
@@ -1720,7 +1720,7 @@ SparseMatrix<number>::add (const size_type i,
   if (index == SparsityPattern::invalid_entry)
     {
       Assert ((index != SparsityPattern::invalid_entry) ||
-              (value == 0.),
+              (value == number()),
               ExcInvalidIndex(i, j));
       return;
     }
@@ -1814,9 +1814,9 @@ SparseMatrix<number>::operator /= (const number factor)
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (factor !=0, ExcDivideByZero());
+  Assert (factor != number(), ExcDivideByZero());
 
-  const number factor_inv = 1. / factor;
+  const number factor_inv = number(1.) / factor;
 
   number             *val_ptr    = &val[0];
   const number *const end_ptr    = &val[cols->n_nonzero_elements()];
