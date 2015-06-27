@@ -89,7 +89,13 @@ public:
    * constraints.
    */
   const std::vector<std::set<types::global_dof_index> > &
-  get_boundary_indices () const;
+  get_boundary_indices () const DEAL_II_DEPRECATED;
+
+  /**
+   * Return the indices of dofs for each level that are subject to boundary constraints.
+   */
+  const IndexSet &
+  get_boundary_indices (const unsigned int level) const;
 
   /**
    * @deprecated Use at_refinement_edge() if possible, else
@@ -133,7 +139,12 @@ public:
   /**
    * The indices of boundary dofs for each level.
    */
-  std::vector<std::set<types::global_dof_index> > boundary_indices;
+  std::vector<IndexSet> boundary_indices;
+
+  /**
+   * old data structure only filled on demand
+   */
+  mutable std::vector<std::set<types::global_dof_index> > boundary_indices_old;
 
   /**
    * The degrees of freedom on the refinement edge between a level and coarser
@@ -216,7 +227,7 @@ MGConstrainedDoFs::is_boundary_index (const unsigned int level,
     return false;
 
   AssertIndexRange(level, boundary_indices.size());
-  return (boundary_indices[level].find(index) != boundary_indices[level].end());
+  return boundary_indices[level].is_element(index);
 }
 
 inline
@@ -234,8 +245,28 @@ inline
 const std::vector<std::set<types::global_dof_index> > &
 MGConstrainedDoFs::get_boundary_indices () const
 {
-  return boundary_indices;
+  if (boundary_indices_old.size()!=boundary_indices.size())
+  {
+    boundary_indices_old.resize(boundary_indices.size());
+    for (unsigned int l=0;l<boundary_indices.size(); ++l)
+      {
+        std::vector<types::global_dof_index> tmp;
+        boundary_indices[l].fill_index_vector(tmp);
+        boundary_indices_old[l].insert(tmp.begin(), tmp.end());
+      }
+  }
+  return boundary_indices_old;
 }
+
+
+inline
+const IndexSet &
+MGConstrainedDoFs::get_boundary_indices (const unsigned int level) const
+{
+  AssertIndexRange(level, boundary_indices.size());
+  return boundary_indices[level];
+}
+
 
 inline
 const std::vector<std::vector<bool> > &
