@@ -98,7 +98,7 @@ BlockMatrixArray<number,BLOCK_VECTOR>::clear ()
 template <typename number, typename BLOCK_VECTOR>
 void
 BlockMatrixArray<number,BLOCK_VECTOR>::vmult_add (BLOCK_VECTOR &dst,
-                                     const BLOCK_VECTOR &src) const
+                                                  const BLOCK_VECTOR &src) const
 {
   GrowingVectorMemory<typename BLOCK_VECTOR::BlockType > mem;
   Assert (dst.n_blocks() == block_rows,
@@ -129,7 +129,7 @@ BlockMatrixArray<number,BLOCK_VECTOR>::vmult_add (BLOCK_VECTOR &dst,
 template <typename number, typename BLOCK_VECTOR>
 void
 BlockMatrixArray<number,BLOCK_VECTOR>::vmult (BLOCK_VECTOR &dst,
-                                 const BLOCK_VECTOR &src) const
+                                              const BLOCK_VECTOR &src) const
 {
   dst = 0.;
   vmult_add (dst, src);
@@ -141,7 +141,7 @@ BlockMatrixArray<number,BLOCK_VECTOR>::vmult (BLOCK_VECTOR &dst,
 template <typename number, typename BLOCK_VECTOR>
 void
 BlockMatrixArray<number,BLOCK_VECTOR>::Tvmult_add (BLOCK_VECTOR &dst,
-                                      const BLOCK_VECTOR &src) const
+                                                   const BLOCK_VECTOR &src) const
 {
   GrowingVectorMemory<typename BLOCK_VECTOR::BlockType > mem;
   Assert (dst.n_blocks() == block_cols,
@@ -171,7 +171,7 @@ BlockMatrixArray<number,BLOCK_VECTOR>::Tvmult_add (BLOCK_VECTOR &dst,
 template <typename number, typename BLOCK_VECTOR>
 void
 BlockMatrixArray<number,BLOCK_VECTOR>::Tvmult (BLOCK_VECTOR &dst,
-                                  const BLOCK_VECTOR &src) const
+                                               const BLOCK_VECTOR &src) const
 {
   dst = 0.;
   Tvmult_add (dst, src);
@@ -426,7 +426,18 @@ template class BlockMatrixArray<double>;
 template class BlockTrianglePrecondition<float>;
 template class BlockTrianglePrecondition<double>;
 
-template class BlockMatrixArray<double, TrilinosWrappers::MPI::BlockVector>;
+#ifdef DEAL_II_WITH_TRILINOS
 template class BlockMatrixArray<float, TrilinosWrappers::MPI::BlockVector>;
+template class BlockMatrixArray<double, TrilinosWrappers::MPI::BlockVector>;
+template class BlockTrianglePrecondition<float, TrilinosWrappers::MPI::BlockVector>;
+template class BlockTrianglePrecondition<double, TrilinosWrappers::MPI::BlockVector>;
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+template class BlockMatrixArray<float, PETScWrappers::MPI::BlockVector>;
+template class BlockMatrixArray<double, PETScWrappers::MPI::BlockVector>;
+template class BlockTrianglePrecondition<float, PETScWrappers::MPI::BlockVector>;
+template class BlockTrianglePrecondition<double, PETScWrappers::MPI::BlockVector>;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

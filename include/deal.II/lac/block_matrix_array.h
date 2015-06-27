@@ -189,8 +189,8 @@ public:
   /**
    * Matrix-vector multiplication adding to <tt>dst</tt>.
    */
-	void vmult_add(BLOCK_VECTOR &dst,
-                  const BLOCK_VECTOR &src) const;
+  void vmult_add(BLOCK_VECTOR &dst,
+                 const BLOCK_VECTOR &src) const;
 
   /**
    * Transposed matrix-vector multiplication.
@@ -461,20 +461,20 @@ public:
   /**
    * Make function of base class available.
    */
-  using BlockMatrixArray<number>::print_latex;
+  using BlockMatrixArray<number,BLOCK_VECTOR>::print_latex;
 
   /**
    * Make function of base class available.
    */
-  using BlockMatrixArray<number>::n_block_rows;
+  using BlockMatrixArray<number,BLOCK_VECTOR>::n_block_rows;
 
   /**
    * Make function of base class available.
    */
-  using BlockMatrixArray<number>::n_block_cols;
-  using BlockMatrixArray<number>::clear;
-  using BlockMatrixArray<number>::Subscriptor::subscribe;
-  using BlockMatrixArray<number>::Subscriptor::unsubscribe;
+  using BlockMatrixArray<number,BLOCK_VECTOR>::n_block_cols;
+  using BlockMatrixArray<number,BLOCK_VECTOR>::clear;
+  using BlockMatrixArray<number,BLOCK_VECTOR>::Subscriptor::subscribe;
+  using BlockMatrixArray<number,BLOCK_VECTOR>::Subscriptor::unsubscribe;
 
   /**
    * @addtogroup Exceptions
@@ -620,8 +620,8 @@ template <class MATRIX>
 inline
 void
 BlockTrianglePrecondition<number, BLOCK_VECTOR>::enter (const MATRIX &matrix,
-                                          size_type row, size_type col,
-                                          number prefix, bool transpose)
+                                                        size_type row, size_type col,
+                                                        number prefix, bool transpose)
 {
   BlockMatrixArray<number, BLOCK_VECTOR>::enter(matrix, row, col, prefix, transpose);
 }
