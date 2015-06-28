@@ -73,7 +73,7 @@ class FunctionTime
 {
 public:
   /**
-   * Constructor. May take an initial vakue for the time variable, which
+   * Constructor. May take an initial value for the time variable, which
    * defaults to zero.
    */
   FunctionTime (const Number initial_time = Number(0.0));
@@ -84,7 +84,7 @@ public:
   virtual ~FunctionTime();
 
   /**
-   * Return the value of the time variable/
+   * Return the value of the time variable.
    */
   Number get_time () const;
 
