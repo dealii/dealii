@@ -32,9 +32,8 @@ template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 template <typename number> class SparseMatrixEZ;
 template <typename number> class BlockSparseMatrixEZ;
-template <typename number> class BlockMatrixArray;
 template <typename number> class TridiagonalMatrix;
-
+template <typename number, typename BlockVectorType> class BlockMatrixArray;
 
 /*! @addtogroup Matrix2
  *@{
@@ -549,11 +548,11 @@ new_pointer_matrix_base(const BlockSparseMatrixEZ<numberm> &matrix, const VECTOR
  *
  * @relates PointerMatrixBase @relates PointerMatrix
  */
-template <typename numberv, typename numberm>
-PointerMatrixBase<BlockVector<numberv> > *
-new_pointer_matrix_base(const BlockMatrixArray<numberm> &matrix, const BlockVector<numberv> &, const char *name = "PointerMatrix")
+template <typename numberv, typename numberm, typename BLOCK_VECTOR=BlockVector<numberv> >
+PointerMatrixBase<BLOCK_VECTOR> *
+new_pointer_matrix_base(const BlockMatrixArray<numberm,BLOCK_VECTOR> &matrix, const BLOCK_VECTOR &, const char *name = "PointerMatrix")
 {
-  return new PointerMatrix<BlockMatrixArray<numberm>, BlockVector<numberv> >(&matrix, name);
+  return new PointerMatrix<BlockMatrixArray<numberm,BLOCK_VECTOR>, BlockVector<numberv> >(&matrix, name);
 }
 
 
