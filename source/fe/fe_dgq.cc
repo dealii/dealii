@@ -848,6 +848,22 @@ FE_DGQArbitraryNodes<dim,spacedim>::get_name () const
       return namebuf.str();
     }
 
+  // Check whether the support points come from QGauss.
+  const QGaussLog<1> points_glog(this->degree+1);
+  bool gauss_log = true;
+  for (unsigned int j=0; j<=this->degree; j++)
+    if (points[j] != points_glog.point(j)(0))
+      {
+        gauss_log = false;
+        break;
+      }
+
+  if (gauss_log == true)
+    {
+      namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QGaussLog(" << this->degree+1 << "))";
+      return namebuf.str();
+    }
+
   // All guesses exhausted
   namebuf << "FE_DGQArbitraryNodes<" << dim << ">(QUnknownNodes(" << this->degree+1 << "))";
   return namebuf.str();
