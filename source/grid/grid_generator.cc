@@ -419,6 +419,117 @@ namespace GridGenerator
     hyper_rectangle (tria, p1, p2, colorize);
   }
 
+  template <int dim>
+  void
+  simplex(Triangulation<dim> &tria,
+          const std::vector<Point<dim> > &vertices)
+  {
+    AssertDimension(vertices.size(), dim+1);
+    Assert(dim>1, ExcNotImplemented());
+    Assert(dim<4, ExcNotImplemented());
+
+#ifdef DEBUG
+    Tensor<2,dim> vector_matrix;
+    for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int c=1; c<=dim; ++c)
+        vector_matrix[c-1][d] = vertices[c](d) - vertices[0](d);
+    Assert(determinant(vector_matrix) > 0., ExcMessage("Vertices of simplex must form a right handed system"));
+#endif
+
+    // Set up the vertices by first copying into points.
+    std::vector<Point<dim> > points = vertices;
+    Point<dim> center;
+    // Compute the edge midpoints and add up everything to compute the
+    // center point.
+    for (unsigned int i=0; i<=dim; ++i)
+      {
+        points.push_back(0.5*(points[i]+points[(i+1)%(dim+1)]));
+        center += points[i];
+      }
+    if (dim>2)
+      {
+        // In 3D, we have some more edges to deal with
+        for (unsigned int i=0; i<dim-1; ++i)
+          points.push_back(0.5*(points[i]+points[i+2]));
+        // And we need face midpoints
+        for (unsigned int i=0; i<=dim; ++i)
+          points.push_back(1./3.*
+                           (points[i]+
+                            points[(i+1)%(dim+1)]+
+                            points[(i+2)%(dim+1)]));
+      }
+    points.push_back((1./(dim+1))*center);
+
+    std::vector<CellData<dim> > cells(dim+1);
+    switch (dim)
+      {
+      case 2:
+        AssertDimension(points.size(), 7);
+        cells[0].vertices[0] = 0;
+        cells[0].vertices[1] = 3;
+        cells[0].vertices[2] = 5;
+        cells[0].vertices[3] = 6;
+        cells[0].material_id = 0;
+
+        cells[1].vertices[0] = 3;
+        cells[1].vertices[1] = 1;
+        cells[1].vertices[2] = 6;
+        cells[1].vertices[3] = 4;
+        cells[1].material_id = 0;
+
+        cells[2].vertices[0] = 5;
+        cells[2].vertices[1] = 6;
+        cells[2].vertices[2] = 2;
+        cells[2].vertices[3] = 4;
+        cells[2].material_id = 0;
+        break;
+      case 3:
+        AssertDimension(points.size(), 15);
+        cells[0].vertices[0] = 0;
+        cells[0].vertices[1] = 4;
+        cells[0].vertices[2] = 8;
+        cells[0].vertices[3] = 10;
+        cells[0].vertices[4] = 7;
+        cells[0].vertices[5] = 13;
+        cells[0].vertices[6] = 12;
+        cells[0].vertices[7] = 14;
+        cells[0].material_id = 0;
+
+        cells[1].vertices[0] = 4;
+        cells[1].vertices[1] = 1;
+        cells[1].vertices[2] = 10;
+        cells[1].vertices[3] = 5;
+        cells[1].vertices[4] = 13;
+        cells[1].vertices[5] = 9;
+        cells[1].vertices[6] = 14;
+        cells[1].vertices[7] = 11;
+        cells[1].material_id = 0;
+
+        cells[2].vertices[0] = 8;
+        cells[2].vertices[1] = 10;
+        cells[2].vertices[2] = 2;
+        cells[2].vertices[3] = 5;
+        cells[2].vertices[4] = 12;
+        cells[2].vertices[5] = 14;
+        cells[2].vertices[6] = 6;
+        cells[2].vertices[7] = 11;
+        cells[2].material_id = 0;
+
+        cells[3].vertices[0] = 7;
+        cells[3].vertices[1] = 13;
+        cells[3].vertices[2] = 12;
+        cells[3].vertices[3] = 14;
+        cells[3].vertices[4] = 3;
+        cells[3].vertices[5] = 9;
+        cells[3].vertices[6] = 6;
+        cells[3].vertices[7] = 11;
+        cells[3].material_id = 0;
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
+      }
+    tria.create_triangulation (points, cells, SubCellData());
+  }
 
 
   void
@@ -1552,6 +1663,188 @@ namespace GridGenerator
       }
   }
 
+  template <int dim, int spacedim>
+  void
+  cheese (
+    Triangulation<dim, spacedim> &tria,
+    const std::vector<unsigned int> &holes)
+  {
+    AssertDimension(holes.size(), dim);
+    // The corner points of the first cell. If there is a desire at
+    // some point to change the geometry of the cells, they can be
+    // made an argument to the function.
+
+    Point<spacedim> p1;
+    Point<spacedim> p2;
+    for (unsigned int d=0; d<dim; ++d)
+      p2(d) = 1.;
+
+    // then check that all repetitions
+    // are >= 1, and calculate deltas
+    // convert repetitions from double
+    // to int by taking the ceiling.
+    std::vector<Point<spacedim> > delta(dim);
+    unsigned int repetitions[dim];
+    for (unsigned int i=0; i<dim; ++i)
+      {
+        Assert (holes[i] >= 1, ExcMessage("At least one hole needed in each direction"));
+        repetitions[i] = 2*holes[i]+1;
+        delta[i][i] = (p2[i]-p1[i]);
+      }
+
+    // then generate the necessary
+    // points
+    std::vector<Point<spacedim> > points;
+    switch (dim)
+      {
+      case 1:
+        for (unsigned int x=0; x<=repetitions[0]; ++x)
+          points.push_back (p1+(double)x*delta[0]);
+        break;
+
+      case 2:
+        for (unsigned int y=0; y<=repetitions[1]; ++y)
+          for (unsigned int x=0; x<=repetitions[0]; ++x)
+            points.push_back (p1+(double)x*delta[0]
+                              +(double)y*delta[1]);
+        break;
+
+      case 3:
+        for (unsigned int z=0; z<=repetitions[2]; ++z)
+          for (unsigned int y=0; y<=repetitions[1]; ++y)
+            for (unsigned int x=0; x<=repetitions[0]; ++x)
+              points.push_back (p1+(double)x*delta[0] +
+                                (double)y*delta[1] + (double)z*delta[2]);
+        break;
+
+      default:
+        Assert (false, ExcNotImplemented());
+      }
+
+    // next create the cells
+    // Prepare cell data
+    std::vector<CellData<dim> > cells;
+    switch (dim)
+      {
+      case 2:
+      {
+        cells.resize (repetitions[1]*repetitions[0]-holes[1]*holes[0]);
+        unsigned int c=0;
+        for (unsigned int y=0; y<repetitions[1]; ++y)
+          for (unsigned int x=0; x<repetitions[0]; ++x)
+            {
+              if ((x%2 == 1) && (y%2 ==1)) continue;
+              Assert(c<cells.size(), ExcInternalError());
+              cells[c].vertices[0] = y*(repetitions[0]+1)+x;
+              cells[c].vertices[1] = y*(repetitions[0]+1)+x+1;
+              cells[c].vertices[2] = (y+1)*(repetitions[0]+1)+x;
+              cells[c].vertices[3] = (y+1)*(repetitions[0]+1)+x+1;
+              cells[c].material_id = 0;
+              ++c;
+            }
+        break;
+      }
+
+      case 3:
+      {
+        const unsigned int n_x  = (repetitions[0]+1);
+        const unsigned int n_xy = (repetitions[0]+1)*(repetitions[1]+1);
+
+        cells.resize (repetitions[2]*repetitions[1]*repetitions[0]);
+
+        unsigned int c=0;
+        for (unsigned int z=0; z<repetitions[2]; ++z)
+          for (unsigned int y=0; y<repetitions[1]; ++y)
+            for (unsigned int x=0; x<repetitions[0]; ++x)
+              {
+                Assert(c<cells.size(),ExcInternalError());
+                cells[c].vertices[0] = z*n_xy + y*n_x + x;
+                cells[c].vertices[1] = z*n_xy + y*n_x + x+1;
+                cells[c].vertices[2] = z*n_xy + (y+1)*n_x + x;
+                cells[c].vertices[3] = z*n_xy + (y+1)*n_x + x+1;
+                cells[c].vertices[4] = (z+1)*n_xy + y*n_x + x;
+                cells[c].vertices[5] = (z+1)*n_xy + y*n_x + x+1;
+                cells[c].vertices[6] = (z+1)*n_xy + (y+1)*n_x + x;
+                cells[c].vertices[7] = (z+1)*n_xy + (y+1)*n_x + x+1;
+                cells[c].material_id = 0;
+                ++c;
+              }
+        break;
+
+      }
+
+      default:
+        Assert (false, ExcNotImplemented());
+      }
+
+    tria.create_triangulation (points, cells, SubCellData());
+  }
+
+  template <int dim, int spacedim>
+  void hyper_cross(Triangulation<dim, spacedim> &tria,
+                   const std::vector<unsigned int> &sizes,
+                   const bool colorize)
+  {
+    AssertDimension(sizes.size(), GeometryInfo<dim>::faces_per_cell);
+    Assert(dim>1, ExcNotImplemented());
+    Assert(dim<4, ExcNotImplemented());
+
+    // If there is a desire at some point to change the geometry of
+    // the cells, this tensor can be made an argument to the function.
+    Tensor<1,dim> dimensions;
+    for (unsigned int d=0; d<dim; ++d)
+      dimensions[d] = 1.;
+
+    std::vector<Point<spacedim> > points;
+    unsigned int n_cells = 1;
+    for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+      n_cells += sizes[i];
+
+    std::vector<CellData<dim> > cells(n_cells);
+    // Vertices of the center cell
+    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      {
+        Point<spacedim> p;
+        for (unsigned int d=0; d<dim; ++d)
+          p(d) = 0.5 * dimensions[d] *
+                 GeometryInfo<dim>::unit_normal_orientation[GeometryInfo<dim>::vertex_to_face[i][d]];
+        points.push_back(p);
+        cells[0].vertices[i] = i;
+      }
+    cells[0].material_id = 0;
+
+    // The index of the first cell of the leg.
+    unsigned int cell_index = 1;
+    // The legs of the cross
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      {
+        const unsigned int oface = GeometryInfo<dim>::opposite_face[face];
+        const unsigned int dir = GeometryInfo<dim>::unit_normal_direction[face];
+
+        // We are moving in the direction of face
+        for (unsigned int j=0; j<sizes[face]; ++j,++cell_index)
+          {
+            const unsigned int last_cell = (j==0) ? 0U : (cell_index-1);
+
+            for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+              {
+                const unsigned int cellv = GeometryInfo<dim>::face_to_cell_vertices(face, v);
+                const unsigned int ocellv = GeometryInfo<dim>::face_to_cell_vertices(oface, v);
+                // First the vertices which already exist
+                cells[cell_index].vertices[ocellv] = cells[last_cell].vertices[cellv];
+
+                // Now the new vertices
+                cells[cell_index].vertices[cellv] = points.size();
+
+                Point<spacedim> p = points[cells[cell_index].vertices[ocellv]];
+                p(dir) += GeometryInfo<dim>::unit_normal_orientation[face] * dimensions[dir];
+                points.push_back(p);
+              }
+            cells[cell_index].material_id = (colorize) ? (face+1U) : 0U;
+          }
+      }
+    tria.create_triangulation (points, cells, SubCellData());
+  }
 
 
   template <>
