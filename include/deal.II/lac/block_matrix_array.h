@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,6 +22,7 @@
 
 #include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/block_vector.h>
 
 #include <vector>
 #include <map>

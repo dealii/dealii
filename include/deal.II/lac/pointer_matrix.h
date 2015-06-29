@@ -548,7 +548,7 @@ new_pointer_matrix_base(const BlockSparseMatrixEZ<numberm> &matrix, const VECTOR
  *
  * @relates PointerMatrixBase @relates PointerMatrix
  */
-template <typename numberv, typename numberm, typename BLOCK_VECTOR=BlockVector<numberv> >
+template <typename numberv, typename numberm, typename BLOCK_VECTOR>
 PointerMatrixBase<BLOCK_VECTOR> *
 new_pointer_matrix_base(const BlockMatrixArray<numberm,BLOCK_VECTOR> &matrix, const BLOCK_VECTOR &, const char *name = "PointerMatrix")
 {
