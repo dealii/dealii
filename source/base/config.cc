@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,7 +25,7 @@ namespace numbers
   bool is_finite (const double x)
   {
 #ifdef DEAL_II_HAVE_ISFINITE
-    return std::isfinite (x);
+    return !isnan(x) && std::isfinite (x);
 #else
     // Check against infinities. Note
     // that if x is a NaN, then both
