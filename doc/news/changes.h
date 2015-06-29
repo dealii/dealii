@@ -538,6 +538,14 @@ inconvenience this causes.
   <br>
   (Angel Rodriguez,  2015/06/29)
   </li>
+  
+  <li> Fixed: The function numbers::is_finite() produced incorrect results when
+  called with a NaN number (specifically, it produces an uncatchable floating
+  point exception when called with a signalling NaN). This was clearly not
+  intended since such values are definitely not finite.
+  <br>
+  (Wolfgang Bangerth, 2015/06/29)
+  </li>
 
   <li> Improved: The SparseMatrix class can now also use <code>std::complex</code>
   scalars for its elements.
