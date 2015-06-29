@@ -432,12 +432,20 @@ parameter_gui  - builds and installs the 'parameter_gui' component
       by <code>cmake</code> variables that may be set to either <code>ON</code>
       or <code>OFF</code>.
 
-      By default, <acronym>deal.II</acronym> does not provide the compiler with
-      any <code>C++</code> version flag. If
-      either <code>DEAL_II_WITH_CXX11</code> or <code>DEAL_II_WITH_CXX14</code>
-      is set to <code>ON</code>, then <code>cmake</code> will attempt to
-      determine both the level of compliance and the correct compiler flag for
-      the requested language standard.
+      By default, <acronym>deal.II</acronym>'s <code>CMake</code> build scripts
+      will attempt to find the newest <code>C++</code> version available by
+      checking which language version flags work with the detected compiler. For
+      example: if <code>CMake</code> detects <code>GCC 5.1</code> or <code>Clang
+      3.6</code>, <acronym>deal.II</acronym> will be compiled
+      in <code>C++14</code> mode unless either <code>C++14</code>
+      or <code>C++11</code> is explicitly disabled. Another example:
+      if <code>DEAL_II_WITH_CXX11=ON</code> is passed to <code>CMake</code>,
+      then <acronym>deal.II</acronym> will check if the compiler supports enough
+      parts of the <code>C++11</code> <em>and</em>
+      <code>C++14</code> language standards. <code>CMake</code> will not fail in
+      this example just because the compiler does not support
+      <code>C++14</code>, but <code>CMake</code> <em>will</em> fail if the
+      compiler does not support enough of <code>C++11</code>.
 
       The remaining flags are set to <code>ON</code> if an external package is
       found or to <code>OFF</code> otherwise. By explicitly setting it to off

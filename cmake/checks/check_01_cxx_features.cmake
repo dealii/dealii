@@ -55,32 +55,61 @@ IF(DEAL_II_WITH_CXX14 AND DEFINED DEAL_II_WITH_CXX11 AND NOT DEAL_II_WITH_CXX11)
 ENDIF()
 
 #
-# Only run these tests if C++11 support (or newer) should actually be set up:
+# Test for C++11 flag support if the compiler supports a C++11 flag and C++11
+# support is not explicitly disabled.
 #
 
-IF(DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX14)
-  IF(NOT DEAL_II_CXX_VERSION_FLAG)
-    IF(DEAL_II_WITH_CXX14)
-      CHECK_CXX_COMPILER_FLAG("-std=c++14" DEAL_II_HAVE_FLAG_stdcxx14)
-      IF(DEAL_II_HAVE_FLAG_stdcxx14)
-        SET(DEAL_II_CXX_VERSION_FLAG "-std=c++14")
-      ELSE()
+IF((NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
+    AND NOT DEFINED DEAL_II_CXX_VERSION_FLAG)
+  CHECK_CXX_COMPILER_FLAG("-std=c++0x" DEAL_II_HAVE_FLAG_stdcxx0x)
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" DEAL_II_HAVE_FLAG_stdcxx11)
+  IF(DEAL_II_HAVE_FLAG_stdcxx11)
+    SET(DEAL_II_CXX11_FLAG "-std=c++11")
+  ELSEIF(DEAL_II_HAVE_FLAG_stdcxx0x)
+    SET(DEAL_II_CXX11_FLAG "-std=c++0x")
+  ELSE()
+    IF(DEAL_II_WITH_CXX11)
+      MESSAGE(FATAL_ERROR
+        "C++11 support was requested but CMake was not able to find a valid C++11"
+        " flag. Try manually specifying DEAL_II_CXX_VERSION_FLAG and reruning CMake.")
+    ENDIF()
+  ENDIF()
+
+  #
+  # C++11 support must not be explicitly disabled for C++14 support to be
+  # enabled.
+  #
+
+  IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
+    CHECK_CXX_COMPILER_FLAG("-std=c++1y" DEAL_II_HAVE_FLAG_stdcxx1y)
+    CHECK_CXX_COMPILER_FLAG("-std=c++14" DEAL_II_HAVE_FLAG_stdcxx14)
+    IF(DEAL_II_HAVE_FLAG_stdcxx14)
+      SET(DEAL_II_CXX14_FLAG "-std=c++14")
+    ELSEIF(DEAL_II_HAVE_FLAG_stdcxx1y)
+      SET(DEAL_II_CXX14_FLAG "-std=c++1y")
+    ELSE()
+      IF(DEAL_II_WITH_CXX14)
         MESSAGE(FATAL_ERROR
-          "CMake was not able to find a valid C++14 flag. Try manually"
-          " specifying\nDEAL_II_CXX_VERSION_FLAG\nand reruning CMake.")
+          "C++14 support was requested but CMake was not able to find a valid C++14"
+          " flag. Try manually specifying DEAL_II_CXX_VERSION_FLAG and reruning CMake.")
       ENDIF()
-    ELSEIF(DEAL_II_WITH_CXX11)
-      CHECK_CXX_COMPILER_FLAG("-std=c++0x" DEAL_II_HAVE_FLAG_stdcxx0x)
-      CHECK_CXX_COMPILER_FLAG("-std=c++11" DEAL_II_HAVE_FLAG_stdcxx11)
-      IF(DEAL_II_HAVE_FLAG_stdcxx11)
-        SET(DEAL_II_CXX_VERSION_FLAG "-std=c++11")
-      ELSEIF(DEAL_II_HAVE_FLAG_stdcxx0x)
-        SET(DEAL_II_CXX_VERSION_FLAG "-std=c++0x")
-      ELSE()
-        MESSAGE(FATAL_ERROR
-          "CMake was not able to find a valid C++11 flag. Try manually"
-          " specifying\nDEAL_II_CXX_VERSION_FLAG and reruning CMake.")
-      ENDIF()
+    ENDIF()
+  ENDIF()
+ENDIF()
+
+#
+# Only run these tests if CMake should attempt to set up C++11 (or newer)
+# support.
+#
+IF(DEFINED DEAL_II_CXX11_FLAG OR DEFINED DEAL_II_CXX14_FLAG
+    OR DEFINED DEAL_II_CXX_VERSION_FLAG)
+  IF(NOT DEFINED DEAL_II_CXX_VERSION_FLAG)
+    IF(DEFINED DEAL_II_CXX14_FLAG)
+      SET(DEAL_II_CXX_VERSION_FLAG ${DEAL_II_CXX14_FLAG})
+    ELSEIF(DEFINED DEAL_II_CXX11_FLAG)
+      SET(DEAL_II_CXX_VERSION_FLAG ${DEAL_II_CXX11_FLAG})
+    ELSE()
+      SET(DEAL_II_CXX_VERSION_FLAG " ")
     ENDIF()
   ELSE()
     CHECK_CXX_COMPILER_FLAG(${DEAL_II_CXX_VERSION_FLAG} DEAL_II_CXX_VERSION_FLAG_VALID)
@@ -286,15 +315,14 @@ IF(DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX14)
     "
     DEAL_II_HAVE_CXX14_MAKE_UNIQUE)
   IF( DEAL_II_HAVE_CXX11 AND
-      DEAL_II_HAVE_CXX14_MAKE_UNIQUE AND
-      DEAL_II_WITH_CXX14)
+      DEAL_II_HAVE_CXX14_MAKE_UNIQUE)
     SET(DEAL_II_HAVE_CXX14 TRUE)
   ENDIF()
 
   RESET_CMAKE_REQUIRED()
 ELSE()
-  SET(DEAL_II_WITH_CXX11 FALSE)
-  SET(DEAL_II_WITH_CXX14 FALSE)
+  SET(DEAL_II_HAVE_CXX11 FALSE)
+  SET(DEAL_II_HAVE_CXX14 FALSE)
 ENDIF()
 
 #
@@ -344,7 +372,7 @@ IF(DEAL_II_WITH_CXX14 AND NOT DEAL_II_HAVE_CXX14)
     "Please disable C++14 support, i.e. configure with\n"
     "    -DDEAL_II_WITH_CXX14=FALSE,\n"
     "or use a different compiler, instead. (If the compiler flag for C++14 "
-    "support differs from \"-std=c++14\", a suitable "
+    "support differs from \"-std=c++14\" or \"-std=c++1y\", a suitable "
     "compiler flag has to be specified manually via\n"
     "    -DDEAL_II_CXX_VERSION_FLAG=\"...\"\n\n"
     )
@@ -356,6 +384,7 @@ ENDIF()
 
 IF (DEAL_II_WITH_CXX14)
   ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+  MESSAGE(STATUS "DEAL_II_WITH_CXX11 successfully set up")
   MESSAGE(STATUS "DEAL_II_WITH_CXX14 successfully set up")
 ELSEIF(DEAL_II_WITH_CXX11)
   ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
