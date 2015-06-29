@@ -165,7 +165,7 @@ LaplaceKernelIntegration<dim>::term_S (const Tensor<1,3> &r,
     *(
       - ra1*n/a1.norm() * asinh( r*a1/ra1.norm() )
       + ra2*n/a2.norm() * asinh( r*a2/ra2.norm() )
-      + rn_c * atan( ra1*ra2 / (r.norm()* (r*(a12))))
+      + rn_c * atan2( ra1*ra2, r.norm()* (r*a12) )
     );
 
   return integral;
@@ -185,7 +185,7 @@ LaplaceKernelIntegration<dim>::term_D (const Tensor<1,3> &r,
   cross_product(a12,a1,a2);
 
   double integral = 1./2./numbers::PI
-                    *atan( ra1*ra2 / (r.norm()* (r*(a12))));
+                    *atan2( ra1*ra2, (r.norm()* (r*a12)));
 
   return integral;
 
