@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,7 @@ namespace PETScWrappers
 
     MPI_Comm comm;
     int ierr;
-    // this ugly cast is necessay because the
+    // this ugly cast is necessary because the
     // type Mat and PETScObject are
     // unrelated.
     ierr = PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);

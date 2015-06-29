@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,7 @@ namespace mg
 {
   /**
    * Multilevel matrix. This matrix stores an MGLevelObject of
-   * PointerMatrixBase objects. It implementes the interface defined in
+   * PointerMatrixBase objects. It implements the interface defined in
    * MGMatrixBase, so that it can be used as a matrix in Multigrid.
    *
    * @author Guido Kanschat

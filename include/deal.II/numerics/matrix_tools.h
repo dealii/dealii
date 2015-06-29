@@ -973,7 +973,7 @@ namespace MatrixTools
    * structures of sparse matrices, it is relatively cheap. It may therefore
    * be a win if you have many fixed degrees of freedom (e.g. boundary nodes),
    * or if access to the sparse matrix is expensive (e.g. for block sparse
-   * matrices, or for PETSc or trilinos matrices). However, it doesn't work as
+   * matrices, or for PETSc or Trilinos matrices). However, it doesn't work as
    * expected if there are also hanging nodes to be considered. More caveats
    * are listed in the general documentation of this class.
    *

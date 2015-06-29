@@ -24,7 +24,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * The transpose of a given matrix.  This auxiliary class swaps the effect ov
+ * The transpose of a given matrix.  This auxiliary class swaps the effect of
  * vmult() and Tvmult() as well as vmult_add() and Tvmult_add().
  *
  * The implementation is analogous to the class PointerMatrix.

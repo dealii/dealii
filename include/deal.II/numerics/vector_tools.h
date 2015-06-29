@@ -2355,7 +2355,7 @@ namespace VectorTools
    * The resulting map is guaranteed to be interpolatory at the support points
    * of a FE_Q() finite element of the same degree as dh->get_fe().degree.
    * Notice that this may or may not be meaningful, depending on the
-   * FiniteElement you have distribed in dh.
+   * FiniteElement you have distributed in dh.
    *
    * If the underlying finite element is an FE_Q(1)^spacedim, then the
    * resulting VECTOR is a finite element field representation of the vertices

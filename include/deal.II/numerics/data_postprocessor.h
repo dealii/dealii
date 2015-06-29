@@ -38,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * For the (graphical) output of a FE solution one frequently wants to include
  * derived quantities, which are calculated from the values of the solution
- * and possibly the first and second derivates of the solution. Examples are
+ * and possibly the first and second derivatives of the solution. Examples are
  * the calculation of Mach numbers from velocity and density in supersonic
  * flow computations, or the computation of the magnitude of a complex-valued
  * solution as demonstrated in step-29. Other uses are shown in step-32 and

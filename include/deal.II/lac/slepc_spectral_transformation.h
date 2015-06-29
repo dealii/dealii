@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,7 +55,7 @@ namespace SLEPcWrappers
    *  eigensolver.solve (A, B, lambda, x, size_of_spectrum);
    * @endcode
    *
-   * @note These options can also be set at the commandline.
+   * @note These options can also be set at the command line.
    *
    * @ingroup SLEPcWrappers
    * @author Toby D. Young 2009, 2013

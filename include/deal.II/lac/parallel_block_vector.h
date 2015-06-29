@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,10 +44,10 @@ namespace parallel
 
 
     /**
-     * An implementation of block vectors based on distribued deal.II vectors.
-     * While the base class provides for most of the interface, this class
-     * handles the actual allocation of vectors and provides functions that
-     * are specific to the underlying vector type.
+     * An implementation of block vectors based on distributed deal.II
+     * vectors. While the base class provides for most of the interface, this
+     * class handles the actual allocation of vectors and provides functions
+     * that are specific to the underlying vector type.
      *
      * @note Instantiations for this template are provided for <tt>@<float@>
      * and @<double@></tt>; others can be generated in application programs

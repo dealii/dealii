@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -151,7 +151,7 @@ namespace internal
  * <h3>Generic loops and the third template argument</h3>
  *
  * Many loops look very similar, whether they operate on the active dofs of
- * the active cells of the Triangulation or on the level dodfs of a single
+ * the active cells of the Triangulation or on the level dofs of a single
  * level or the whole grid hierarchy. In order to use polymorphism in such
  * loops, they access degrees of freedom through the function
  * get_active_or_mg_dof_indices(), which changes behavior according to the

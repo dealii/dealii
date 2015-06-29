@@ -64,7 +64,7 @@ namespace internal
     /**
      * @internal Have a class which declares some nested typedefs, depending
      * on its template parameters. The general template declares nothing, but
-     * there are more useful specializations regaring the last parameter
+     * there are more useful specializations regarding the last parameter
      * indicating constness of the table for which accessor objects are to be
      * generated in this namespace.
      */

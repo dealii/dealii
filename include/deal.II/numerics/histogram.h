@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,13 +44,13 @@ DEAL_II_NAMESPACE_OPEN
  * <ul>
  * <li> Linear spacing: The intervals are distributed in constant steps
  * between the minimum and maximum values of the data.
- * <li> Logaritmic spacing: The intervals are distributed in constant steps
+ * <li> Logarithmic spacing: The intervals are distributed in constant steps
  * between the minimum and maximum values of the logs of the values. This
  * scheme is only useful if the data has only positive values. Negative and
  * zero values are sorted into the leftmost interval.
  * </ul>
  *
- * To keep programs extendible, you can use the two functions @p
+ * To keep programs extensible, you can use the two functions @p
  * get_interval_spacing_names and @p parse_interval_spacing, which always give
  * you a complete list of spacing formats presently supported and are able to
  * generate the respective value of the @p enum. If you use them, you can
@@ -206,7 +206,7 @@ private:
    *
    * Return @p true, if (<tt>n1<n2</tt>, and (<tt>n1>0</tt> or
    * <tt>n2<0</tt>)), or (n2<n1 and n1>0 and n2<=0). This in effect sorts all
-   * negativ numbers to be larger than the largest positive number.
+   * negative numbers to be larger than the largest positive number.
    */
   template <typename number>
   static bool logarithmic_less (const number n1,

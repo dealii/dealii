@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
  * operator of the <tt>VECTOR</tt> and adds an offset to every index.
  *
  * Some precautions have to be taken if it is used for a constant vector: the
- * VectorSlice object has to be constant, too. The appropriate initalization
+ * VectorSlice object has to be constant, too. The appropriate initialization
  * sequence is like this:
  *
  * @code

@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
  * <a href="http://www.cise.ufl.edu/research/sparse/umfpack">this link</a>).
  * UMFPACK is a set of routines for solving non-symmetric sparse linear
  * systems, Ax=b, using the Unsymmetric-pattern MultiFrontal method and direct
- * sparse LU factorization. Matrices may have symmetric or unsymmetrix
+ * sparse LU factorization. Matrices may have symmetric or unsymmetric
  * sparsity patterns, and may have unsymmetric entries. The use of this class
  * is explained in the
  * @ref step_22 "step-22"

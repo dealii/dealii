@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
  * function is a linear map from ${\mathbb R}^{\text{dim}}$  to ${\mathbb
  * R}^{\text{spacedim}}$, the second derivative a bilinear map from  ${\mathbb
  * R}^{\text{dim}} \times  {\mathbb R}^{\text{dim}}$ to ${\mathbb
- * R}^{\text{spacedim}}$ and so on.  In deal.II we represent these derivaties
+ * R}^{\text{spacedim}}$ and so on.  In deal.II we represent these derivatives
  * using objects of type DerivativeForm<1,dim,spacedim,Number>,
  * DerivativeForm<2,dim,spacedim,Number> and so on.
  * @author Sebastian Pauletti, 2011, Luca Heltai, 2015

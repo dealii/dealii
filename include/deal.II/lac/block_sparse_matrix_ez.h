@@ -63,7 +63,7 @@ public:
   BlockSparseMatrixEZ ();
 
   /**
-   * Constructor setting up an object with given unmber of block rows and
+   * Constructor setting up an object with given number of block rows and
    * columns. The blocks themselves still have zero dimension.
    */
   BlockSparseMatrixEZ (const unsigned int block_rows,

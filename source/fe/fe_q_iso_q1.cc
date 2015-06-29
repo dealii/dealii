@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,7 @@ FE_Q_iso_Q1<dim,spacedim>::get_name () const
 {
   // note that the FETools::get_fe_from_name function depends on the
   // particular format of the string this function returns, so they have to be
-  // kept in synch
+  // kept in sync
 
   std::ostringstream namebuf;
   namebuf << "FE_Q_iso_Q1<"

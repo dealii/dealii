@@ -63,7 +63,7 @@ namespace DerivativeApproximation
      * The following class is used to describe the data needed to compute the
      * finite difference approximation to the gradient on a cell. See the
      * general documentation of this class for more information on
-     * implementational details.
+     * implementation details.
      *
      * @author Wolfgang Bangerth, 2000
      */

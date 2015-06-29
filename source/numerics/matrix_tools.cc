@@ -71,7 +71,7 @@ namespace MatrixCreator
      * just like a
      * <tt>std::pair<iterator,iterator></tt>
      * but is templatized on the
-     * dof handler that shouls be used.
+     * dof handler that should be used.
      */
     template <typename DH>
     struct IteratorRange
