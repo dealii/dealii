@@ -280,7 +280,7 @@ SparseMatrix<number>::n_actually_nonzero_elements (const double threshold) const
   size_type nnz = 0;
   const size_type nnz_alloc = n_nonzero_elements();
   for (size_type i=0; i<nnz_alloc; ++i)
-    if (std::fabs(val[i]) > threshold)
+    if (std::abs(val[i]) > threshold)
       ++nnz;
   return nnz;
 }
@@ -1919,7 +1919,7 @@ void SparseMatrix<number>::print_pattern (std::ostream &out,
       for (size_type j=0; j<n(); ++j)
         if ((*cols)(i,j) == SparsityPattern::invalid_entry)
           out << '.';
-        else if (std::fabs(val[cols->operator()(i,j)]) > threshold)
+        else if (std::abs(val[cols->operator()(i,j)]) > threshold)
           out << '*';
         else
           out << ':';
