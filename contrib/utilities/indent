@@ -26,6 +26,10 @@ fi
 
 if test -z "`which astyle`" ; then
   echo "*** No astyle program found."
+  echo "***"
+  echo "*** You can download astyle from http://astyle.sourceforge.net/"
+  echo "*** Note that you will need exactly version 2.04 (no newer or"
+  echo "*** older version will yield the correct indentation)."
   exit
 fi
 
