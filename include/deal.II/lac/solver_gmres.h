@@ -977,7 +977,7 @@ SolverFGMRES<VECTOR>::solve (
 
       for (unsigned int j=0; j<basis_size; ++j)
         {
-          if (numbers::is_finite(1./a)) // treat lucky breakdown
+          if (a != 0) // treat lucky breakdown
             v(j,x).equ(1./a, *aux);
           else
             v(j,x) = 0.;
