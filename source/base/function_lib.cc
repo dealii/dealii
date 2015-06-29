@@ -2112,8 +2112,13 @@ namespace Functions
 
     double prod = 1;
     for (unsigned int s=0; s<dim; ++s)
-      prod *= std::pow(p[s], exponents[s]);
-
+      {
+        if (p[s] < 0)
+          Assert(std::floor(exponents[s]) == exponents[s],
+                 ExcMessage("Exponentiation of a negative base number with "
+                            "a real exponent can't be performed."));
+        prod *= std::pow(p[s], exponents[s]);
+      }
     return prod;
   }
 
@@ -2154,6 +2159,10 @@ namespace Functions
               }
             else
               {
+                if (p[s] < 0)
+                  Assert(std::floor(exponents[s]) == exponents[s],
+                         ExcMessage("Exponentiation of a negative base number with "
+                                    "a real exponent can't be performed."));
                 prod *= (s==d
                          ?
                          exponents[s] * std::pow(p[s], exponents[s]-1)

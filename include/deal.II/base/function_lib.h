@@ -1031,7 +1031,8 @@ namespace Functions
    * described by a $dim$-tuple of exponents. Consequently, the class's
    * constructor takes a Tensor<1,dim> to describe the set of exponents. Most
    * of the time these exponents will of course be integers, but real
-   * exponents are of course equally valid.
+   * exponents are of course equally valid. Exponents can't be real when
+   * the bases are negative numbers.
    *
    * @author Wolfgang Bangerth, 2006
    */
