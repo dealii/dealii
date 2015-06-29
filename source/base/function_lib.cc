@@ -2146,12 +2146,21 @@ namespace Functions
       {
         double prod = 1;
         for (unsigned int s=0; s<dim; ++s)
-          prod *= (s==d
-                   ?
-                   exponents[s] * std::pow(p[s], exponents[s]-1)
-                   :
-                   std::pow(p[s], exponents[s]));
-
+          {
+            if ((s==d) && (exponents[s] == 0) && (p[s] == 0))
+              {
+                prod = 0;
+                break;
+              }
+            else
+              {
+                prod *= (s==d
+                         ?
+                         exponents[s] * std::pow(p[s], exponents[s]-1)
+                         :
+                         std::pow(p[s], exponents[s]));
+              }
+          }
         r[d] = prod;
       }
 
