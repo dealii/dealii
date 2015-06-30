@@ -93,7 +93,7 @@ inconvenience this causes.
   <br>
   (Matthias Maier, 2015/03/26)
   </li>
-  
+
   <li> Changed: The TrilinosWrappers::SparseMatrix::clear_row() function used
   to call TrilinosWrappers::SparseMatrix::compress() before doing its work,
   but this is neither efficient nor safe. You will now have to do this
@@ -423,7 +423,7 @@ inconvenience this causes.
   <br>
   (Wolfgang Bangerth, 2015/04/19)
   </li>
-  
+
   <li> New: A LinearOperator class that stores the abstract concept of a
   linear operator. The class is fully compatible with the solver and
   preconditioner interfaces. The primary purpose of this class is to
@@ -456,9 +456,9 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/04/11)
   </li>
 
-  <li> Changed: All example programs used to have calls to set_boundary() 
-  methods to deal with curved boundaries. These have been replaced with 
-  the corresponding set_manifold() equivalent. 
+  <li> Changed: All example programs used to have calls to set_boundary()
+  methods to deal with curved boundaries. These have been replaced with
+  the corresponding set_manifold() equivalent.
   <br>
   (Luca Heltai, 2015/04/06)
   </li>
@@ -532,6 +532,13 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Improved: Functions::Monomial::gradient function now works when both base and exponent
+  are equal to zero for one or more components of the monomial.
+  Also, an assertion is added to avoid exponentiation of negative base numbers with real exponents.
+  <br>
+  (Angel Rodriguez,  2015/06/29)
+  </li>
+
   <li> Improved: The SparseMatrix class can now also use <code>std::complex</code>
   scalars for its elements.
   <br>
@@ -542,7 +549,7 @@ inconvenience this causes.
   the quadrature rule was Gauss points.
   <br>
   (Guido Kanschat, 2015/06/22)
-  </li>  
+  </li>
 
   <li> Improved: DoFRenumbering::Cuthill_McKee() can now also
   use starting indices for parallel triangulations.
@@ -579,8 +586,8 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/05/11)
   </li>
 
-  <li> Changed: TrilinosWrappers::Vector, TrilinosWrappers::BlockVector, 
-  PETScWrappers::Vector, and PETScWrappers::BlockVector are deprecated. Either 
+  <li> Changed: TrilinosWrappers::Vector, TrilinosWrappers::BlockVector,
+  PETScWrappers::Vector, and PETScWrappers::BlockVector are deprecated. Either
   use the MPI or the deal.II version of the Vector/BlockVector.
   <br>
   (Bruno Turcksin, 2015/05/04)
@@ -609,7 +616,7 @@ inconvenience this causes.
   <br>
   (Timo Heister, Florian Sonner, 2015/04/30)
   </li>
-  
+
   <li> New: There are now MPI sum functions for Tensors and SymmetricTensors
   in the Utilities::MPI namespace.
   <br>
@@ -628,7 +635,7 @@ inconvenience this causes.
   <br>
   (Lei Qiao, 2015/04/19)
   </li>
-  
+
   <li> New: The VectorTools::integrate_difference() function can now
   also compute the $H_\text{div}$ seminorm, using the
   VectorTools::NormType::Hdiv_seminorm argument.
@@ -648,16 +655,16 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/04/13)
   </li>
 
-  <li> New: The GridGenerator::subdivided_hyper_cube() and 
+  <li> New: The GridGenerator::subdivided_hyper_cube() and
   GridGenerator::subdivided_hyper_rectangle() now work also for codimension
   one and two Triangulation;
   <br>
   (Luca Heltai, 2015/04/12)
   </li>
 
-  <li> New: A new VectorTools::get_position_vector() function has been 
-  added to the library that allows one to interpolate the Geometry of 
-  a (possibly curved) triangulation to vector finite element fields 
+  <li> New: A new VectorTools::get_position_vector() function has been
+  added to the library that allows one to interpolate the Geometry of
+  a (possibly curved) triangulation to vector finite element fields
   of at least spacedim components.
   <br>
   (Luca Heltai, 2015/04/11)
