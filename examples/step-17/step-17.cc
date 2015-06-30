@@ -857,7 +857,7 @@ namespace Step17
   template <int dim>
   void ElasticProblem<dim>::run ()
   {
-    for (unsigned int cycle=0; cycle<10; ++cycle)
+    for (unsigned int cycle=0; cycle<7; ++cycle)
       {
         pcout << "Cycle " << cycle << ':' << std::endl;
 
@@ -922,7 +922,7 @@ int main (int argc, char **argv)
       {
         deallog.depth_console (0);
 
-        ElasticProblem<2> elastic_problem;
+        ElasticProblem<3> elastic_problem;
         elastic_problem.run ();
       }
     }
