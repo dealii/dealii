@@ -197,12 +197,12 @@ MACRO(CONFIGURE_FEATURE _feature)
         IF(DEAL_II_WITH_${_feature})
           MESSAGE(FATAL_ERROR "\n"
             "DEAL_II_WITH_${_feature} has unmet configuration requirements: "
-            "${_dependency} has to be set to \"ON\".\n\n"
+            "DEAL_II_WITH_${_dependency} has to be set to \"ON\".\n\n"
             )
         ELSE()
           MESSAGE(STATUS
             "DEAL_II_WITH_${_feature} has unmet configuration requirements: "
-            "${_dependency} has to be set to \"ON\"."
+            "DEAL_II_WITH_${_dependency} has to be set to \"ON\"."
             )
           PURGE_FEATURE(${_feature})
           SET_CACHED_OPTION(${_feature} OFF)
