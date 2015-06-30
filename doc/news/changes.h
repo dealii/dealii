@@ -93,6 +93,12 @@ inconvenience this causes.
   (Jason Sheldon, Wolfgang Bangerth, 2015/08/13)
   </li>
 
+  <li> New: FE_RannacherTurek describes a discontinuous FiniteElement
+  with vanishing mean values of jumps across faces.
+  <br>
+  (Patrick Esser, 2015/08/17)
+  </li>
+
   <li> New: FE_Q_Bubbles describes a FiniteElement based on FE_Q 
   enriched by bubble functions.
   <br>

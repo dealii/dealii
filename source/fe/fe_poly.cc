@@ -20,6 +20,7 @@
 #include <deal.II/base/tensor_product_polynomials_bubbles.h>
 #include <deal.II/base/polynomials_p.h>
 #include <deal.II/base/polynomials_piecewise.h>
+#include <deal.II/base/polynomials_rannacher_turek.h>
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_poly.templates.h>
