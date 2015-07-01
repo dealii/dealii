@@ -1,18 +1,18 @@
 
-DEAL:0::total active cells = 20
-DEAL:0::n_refined = 1
-DEAL:0::n_coarsened = 2
-DEAL:0::total active cells = 23
-DEAL:0::cell number upper limit = 22
+DEAL:0::total active cells = 320
+DEAL:0::n_refined = 14
+DEAL:0::n_coarsened = 15
+DEAL:0::total active cells = 353
+DEAL:0::cell number upper limit = 352
 
-DEAL:0::total active cells = 20
+DEAL:0::total active cells = 320
 DEAL:0::n_refined = 0
-DEAL:0::n_coarsened = 6
-DEAL:0::total active cells = 17
-DEAL:0::cell number upper limit = 16
+DEAL:0::n_coarsened = 86
+DEAL:0::total active cells = 257
+DEAL:0::cell number upper limit = 256
 
-DEAL:0::total active cells = 20
-DEAL:0::n_refined = 4
-DEAL:0::n_coarsened = 4
-DEAL:0::total active cells = 29
-DEAL:0::cell number upper limit = 2000
+DEAL:0::total active cells = 320
+DEAL:0::n_refined = 64
+DEAL:0::n_coarsened = 64
+DEAL:0::total active cells = 464
+DEAL:0::cell number upper limit = 32000

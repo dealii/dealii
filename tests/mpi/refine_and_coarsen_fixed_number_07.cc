@@ -15,7 +15,7 @@
 
 
 
-// derived from _02, but with maximal cell number limit
+// derived from _01, but with maximal cell number limit
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -34,7 +34,7 @@
 #include <fstream>
 
 
-void test(const unsigned int max_n_cell)
+void test(const double max_n_cell_ratio)
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -45,7 +45,7 @@ void test(const unsigned int max_n_cell)
   sub[1] = 1;
   GridGenerator::subdivided_hyper_rectangle(static_cast<Triangulation<2>&>(tr),
                                             sub, Point<2>(0,0), Point<2>(1,1));
-  tr.refine_global (1);
+  tr.refine_global (3);
 
   Vector<float> indicators (tr.dealii::Triangulation<2>::n_active_cells());
   {
@@ -56,9 +56,11 @@ void test(const unsigned int max_n_cell)
       if (cell->subdomain_id() == myid)
         {
           ++my_cell_index;
-          indicators(cell_index) = std::pow (10, (float)my_cell_index);
+          indicators(cell_index) = my_cell_index;
         }
   }
+
+  const unsigned int max_n_cell = max_n_cell_ratio * tr.n_global_active_cells();
 
   parallel::distributed::GridRefinement
   ::refine_and_coarsen_fixed_number (tr, indicators, 0.2, 0.2, max_n_cell);
@@ -116,12 +118,8 @@ int main(int argc, char *argv[])
 
 // test effective maximal cell number limit
   {
-    const unsigned int max_n_cell = static_cast<unsigned int>
-                                    (1.1
-                                     * 4 // corresponds to tr.refine_global (1) in 2d
-                                     * 5*Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD) // corresponds to definition in function test
-                                     + 0.5 // avoid truncation
-                                    );
+    const double max_n_cell_ratio = 1.1;
+
     if (myid == 0)
       {
         std::ofstream logfile("output");
@@ -129,18 +127,17 @@ int main(int argc, char *argv[])
         deallog.depth_console(0);
         deallog.threshold_double(1.e-10);
 
-        test(max_n_cell);
+        test(max_n_cell_ratio);
       }
     else
-      test(max_n_cell);
+      test(max_n_cell_ratio);
   }
   MPI_Barrier(MPI_COMM_WORLD);
 
 
 // cell number already exceeded maximal cell number limit
   {
-    const unsigned int max_n_cell = static_cast<unsigned int>
-                                    (0.8 * 4 * 5*Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD));
+    const double max_n_cell_ratio = 0.8;
     if (myid == 0)
       {
         std::ofstream logfile("output", std::ofstream::app);
@@ -148,18 +145,17 @@ int main(int argc, char *argv[])
         deallog.depth_console(0);
         deallog.threshold_double(1.e-10);
 
-        test(max_n_cell);
+        test(max_n_cell_ratio);
       }
     else
-      test(max_n_cell);
+      test(max_n_cell_ratio);
   }
   MPI_Barrier(MPI_COMM_WORLD);
 
 
 // test non-effective maximal cell number limit
   {
-    const unsigned int max_n_cell = static_cast<unsigned int>
-                                    (100.0 * 4 * 5*Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD));
+    const double max_n_cell_ratio = 100;
     if (myid == 0)
       {
         std::ofstream logfile("output", std::ofstream::app);
@@ -167,10 +163,10 @@ int main(int argc, char *argv[])
         deallog.depth_console(0);
         deallog.threshold_double(1.e-10);
 
-        test(max_n_cell);
+        test(max_n_cell_ratio);
       }
     else
-      test(max_n_cell);
+      test(max_n_cell_ratio);
   }
 
   return (0);
