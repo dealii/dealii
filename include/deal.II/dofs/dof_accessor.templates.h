@@ -2325,6 +2325,18 @@ DoFAccessor<0,DH<1,spacedim>, level_dof_access>::operator != (const DoFAccessor<
 
 
 
+template <template <int, int> class DH, int spacedim, bool level_dof_access>
+inline
+TriaIterator<DoFAccessor<0,DH<1,spacedim>, level_dof_access > >
+DoFAccessor<0,DH<1,spacedim>, level_dof_access>::child (const unsigned int i) const
+{
+  return TriaIterator<DoFAccessor<0,DH<1,spacedim>, level_dof_access > >();
+}
+
+
+
+
+
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
 
 
