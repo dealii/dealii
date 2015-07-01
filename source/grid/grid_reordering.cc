@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2015 by the deal.II authors
+// Copyright (C) 2000 - 2016 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,6 +27,621 @@
 #include <functional>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+namespace internal
+{
+  namespace GridReordering2d
+  {
+    /**
+     * A simple data structure denoting an edge, i.e., the ordered pair
+     * of its vertex indices. This is only used in the is_consistent()
+     * function.
+     */
+    struct CheapEdge
+    {
+      /**
+       * Construct an edge from the global indices of its two vertices.
+       */
+      CheapEdge (const unsigned int v0,
+                 const unsigned int v1)
+        :
+        v0(v0), v1(v1)
+      {}
+
+      /**
+       * Comparison operator for edges. It compares based on the
+       * lexicographic ordering of the two vertex indices.
+       */
+      bool operator < (const CheapEdge &e) const
+      {
+        return ((v0 < e.v0) || ((v0 == e.v0) && (v1 < e.v1)));
+      }
+
+    private:
+      /**
+       * The global indices of the vertices that define the edge.
+       */
+      const unsigned int v0, v1;
+    };
+
+
+    /**
+     * A function that determines whether the edges in a mesh are
+     * already consistently oriented. It does so by adding all edges
+     * of all cells into a set (which automatically eliminates
+     * duplicates) but before that checks whether the reverse edge is
+     * already in the set -- which would imply that a neighboring cell
+     * is inconsistently oriented.
+     */
+    template <int dim>
+    bool
+    is_consistent  (const std::vector<CellData<dim> > &cells)
+    {
+      std::set<CheapEdge> edges;
+
+      for (typename std::vector<CellData<dim> >::const_iterator c = cells.begin();
+           c != cells.end(); ++c)
+        {
+          // construct the edges in reverse order. for each of them,
+          // ensure that the reverse edge is not yet in the list of
+          // edges (return false if the reverse edge already *is* in
+          // the list) and then add the actual edge to it; std::set
+          // eliminates duplicates automatically
+          for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+            {
+              const CheapEdge reverse_edge (c->vertices[GeometryInfo<dim>::line_to_cell_vertices(l, 1)],
+                                            c->vertices[GeometryInfo<dim>::line_to_cell_vertices(l, 0)]);
+              if (edges.find (reverse_edge) != edges.end())
+                return false;
+
+
+              // ok, not. insert edge in correct order
+              const CheapEdge correct_edge (c->vertices[GeometryInfo<dim>::line_to_cell_vertices(l, 0)],
+                                            c->vertices[GeometryInfo<dim>::line_to_cell_vertices(l, 1)]);
+              edges.insert (correct_edge);
+            }
+        }
+
+      // no conflicts found, so return true
+      return true;
+    }
+
+
+    /**
+     * A structure that describes some properties of parallel edges
+     * such as what starter edges are (i.e., representative elements
+     * of the sets of parallel edges within a cell) and what the set
+     * of parallel edges to each edge is.
+     */
+    template <int dim>
+    struct ParallelEdges
+    {
+      static const unsigned int starter_edges[dim];
+      static const unsigned int parallel_edges[GeometryInfo<dim>::lines_per_cell][(1<<(dim-1)) - 1];
+    };
+
+    template <>
+    const unsigned int ParallelEdges<2>::starter_edges[2] = { 0, 2 };
+
+    template <>
+    const unsigned int ParallelEdges<2>::parallel_edges[4][1] = { {1}, {0}, {3}, {2} };
+
+    template <>
+    const unsigned int ParallelEdges<3>::starter_edges[3] = { 0, 2, 8 };
+
+    template <>
+    const unsigned int ParallelEdges<3>::parallel_edges[12][3] = { {1, 4, 5},    // line 0
+      {0, 4, 5},    // line 1
+      {3, 6, 7},    // line 2
+      {2, 6, 7},    // line 3
+      {0, 1, 5},    // line 4
+      {0, 1, 4},    // line 5
+      {2, 3, 7},    // line 6
+      {2, 3, 6},    // line 7
+      {9, 10, 11},  // line 8
+      {8, 10, 11},  // line 9
+      {8, 9, 11},   // line 10
+      {8, 9, 10}   // line 11
+    };
+
+
+    template <int dim>
+    struct Edge;
+
+    /**
+     * A class that describes all of the relevant properties of an
+     * edge. For the purpose of what we do here, that includes the
+     * indices of the two vertices, and the indices of the adjacent
+     * cells (together with a description *where* in each of the
+     * adjacent cells the edge is located). It also includes the
+     * (global) direction of the edge: either from the first vertex to
+     * the second, the other way around, or so far undetermined.
+     */
+    template <>
+    struct Edge<2>
+    {
+      static const unsigned int dim = 2;
+
+      /**
+       * Default constructor. Creates an invalid edge.
+       */
+      Edge ()
+        :
+        orientation_status (not_oriented)
+      {
+        for (unsigned int i=0; i<2; ++i)
+          vertex_indices[i] = numbers::invalid_unsigned_int;
+
+        for (unsigned int i=0; i<2; ++i)
+          {
+            static const AdjacentCell invalid_cell = { numbers::invalid_unsigned_int,
+                                                       numbers::invalid_unsigned_int
+                                                     };
+            adjacent_cells[i] = invalid_cell;
+          }
+      }
+
+      /**
+       * Constructor. Create the edge based on the information given
+       * in @p cell, and selecting the edge with number @p edge_number
+       * within this cell. Initialize the edge as unoriented.
+       */
+      Edge (const CellData<dim> &cell,
+            const unsigned int   edge_number)
+        :
+        orientation_status (not_oriented)
+      {
+        Assert (edge_number < GeometryInfo<dim>::lines_per_cell, ExcInternalError());
+
+        // copy vertices for this particular line
+        vertex_indices[0] = cell.vertices[GeometryInfo<dim>::line_to_cell_vertices(edge_number, 0)];
+        vertex_indices[1] = cell.vertices[GeometryInfo<dim>::line_to_cell_vertices(edge_number, 1)];
+
+        // bring them into standard orientation
+        if (vertex_indices[0] > vertex_indices[1])
+          std::swap (vertex_indices[0], vertex_indices[1]);
+
+        for (unsigned int i=0; i<2; ++i)
+          {
+            static const AdjacentCell invalid_cell = { numbers::invalid_unsigned_int,
+                                                       numbers::invalid_unsigned_int
+                                                     };
+            adjacent_cells[i] = invalid_cell;
+          }
+      }
+
+      /**
+       * Comparison operator for edges. It compares based on the
+       * lexicographic ordering of the two vertex indices.
+       */
+      bool operator< (const Edge<dim> &e) const
+      {
+        return ((vertex_indices[0] < e.vertex_indices[0])
+                ||
+                ((vertex_indices[0] == e.vertex_indices[0]) && (vertex_indices[1] < e.vertex_indices[1])));
+      }
+
+      /**
+       * Compare two edges for equality based on their vertex indices.
+       */
+      bool operator== (const Edge<dim> &e) const
+      {
+        return ((vertex_indices[0] == e.vertex_indices[0])
+                &&
+                (vertex_indices[1] == e.vertex_indices[1]));
+      }
+
+      /**
+       * Store the given cell index as one of the cells as adjacent to
+       * the current edge. Also store that the current edge has index
+       * @p edge_within_cell within the given cell.
+       */
+      void add_adjacent_cell (const unsigned int cell_index,
+                              const unsigned int edge_within_cell)
+      {
+        const AdjacentCell adjacent_cell = { cell_index, edge_within_cell };
+        if (adjacent_cells[0].cell_index == numbers::invalid_unsigned_int)
+          adjacent_cells[0] = adjacent_cell;
+        else
+          {
+            Assert (adjacent_cells[1].cell_index == numbers::invalid_unsigned_int,
+                    ExcInternalError());
+            adjacent_cells[1] = adjacent_cell;
+          }
+      }
+
+      /**
+       * The global indices of the two vertices that bound this edge. These
+       * will be ordered so that the first index is less than the second.
+       */
+      unsigned int vertex_indices[2];
+
+      /**
+       * An enum that indicates the direction of this edge with
+       * regard to the two vertices that bound it.
+       */
+      enum OrientationStatus
+      {
+        not_oriented,
+        forward,
+        backward
+      };
+
+      OrientationStatus orientation_status;
+
+      /**
+       * A structure that stores how this edge relates to the at most
+       * two cells that are next to it.
+       */
+      struct AdjacentCell
+      {
+        unsigned int cell_index;
+        unsigned int edge_within_cell;
+      };
+
+      AdjacentCell adjacent_cells[2];
+    };
+
+
+
+    /**
+     * A data structure that represents a cell with all of its vertices
+     * and edges.
+     */
+    template <int dim>
+    struct Cell
+    {
+      /**
+       * Default construct a cell.
+       */
+      Cell ()
+      {
+        for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+          vertex_indices[i] = numbers::invalid_unsigned_int;
+        for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i)
+          edge_indices[i] = numbers::invalid_unsigned_int;
+      }
+
+      /**
+       * Construct a Cell object from a CellData object. Also take a (sorted)
+       * list of edges and to point into from the current object.
+       * @param c
+       * @param edge_list
+       */
+      Cell (const CellData<dim>           &c,
+            const std::vector<Edge<dim> > &edge_list)
+      {
+        for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+          vertex_indices[i] = c.vertices[i];
+
+        // now for each of the edges of this cell, find the location inside the
+        // given edge_list array and store than index
+        for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+          {
+            const Edge<dim> e (c, l);
+            edge_indices[l] = (std::lower_bound (edge_list.begin(), edge_list.end(), e)
+                               -
+                               edge_list.begin());
+            Assert (edge_indices[l] < edge_list.size(), ExcInternalError());
+            Assert (edge_list[edge_indices[l]] == e, ExcInternalError())
+          }
+      }
+
+      /**
+       * A list of global indices for the vertices that bound this cell.
+       */
+      unsigned int vertex_indices[GeometryInfo<dim>::vertices_per_cell];
+
+      /**
+       * A list of indices into the 'edge_list' array passed to the constructor
+       * for the edges of the current cell.
+       */
+      unsigned int edge_indices[GeometryInfo<dim>::lines_per_cell];
+    };
+
+
+
+
+    /**
+     * From a list of cells, build a sorted vector that contains all of the edges
+     * that exist in the mesh.
+     */
+    template <int dim>
+    std::vector<Edge<dim> >
+    build_edges (const std::vector<CellData<dim> > &cells)
+    {
+      // build the edge list for all cells. because each cell has
+      // GeometryInfo<dim>::lines_per_cell edges, the total number
+      // of edges is this many times the number of cells. of course
+      // some of them will be duplicates, and we throw them out below
+      std::vector<Edge<dim> > edge_list;
+      edge_list.reserve(cells.size()*GeometryInfo<dim>::lines_per_cell);
+      for (unsigned int i=0; i<cells.size(); ++i)
+        for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+          edge_list.push_back (Edge<dim>(cells[i], l));
+
+      // next sort the edge list and then remove duplicates
+      std::sort (edge_list.begin(), edge_list.end());
+      edge_list.erase(std::unique(edge_list.begin(),edge_list.end()),
+                      edge_list.end());
+
+      return edge_list;
+    }
+
+    /**
+     * Build the cell list. Update the edge array to let edges know
+     * which cells are adjacent to them.
+     */
+    template <int dim>
+    std::vector<Cell<dim> >
+    build_cells_and_connect_edges (const std::vector<CellData<dim> > &cells,
+                                   std::vector<Edge<dim> > &edges)
+    {
+      std::vector<Cell<dim> > cell_list;
+      cell_list.reserve(cells.size());
+      for (unsigned int i=0; i<cells.size(); ++i)
+        {
+          // create our own data structure for the cells and let it
+          // connect to the edges array
+          cell_list.push_back (Cell<dim>(cells[i], edges));
+
+          // then also inform the edges that they are adjacent
+          // to the current cell, and where within this cell
+          for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+            edges[cell_list.back().edge_indices[l]].add_adjacent_cell (i, l);
+        }
+      Assert (cell_list.size() == cells.size(), ExcInternalError());
+
+      return cell_list;
+    }
+
+
+    /**
+     * Return the index within 'cells' of the first cell that has at least one
+     * edge that is not yet oriented.
+     */
+    template <int dim>
+    unsigned int
+    get_next_unoriented_quad(const std::vector<Cell<dim> > &cells,
+                             const std::vector<Edge<dim> > &edges)
+    {
+      for (unsigned int c=0; c<cells.size(); ++c)
+        for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+          if (edges[cells[c].edge_indices[l]].orientation_status == Edge<dim>::not_oriented)
+            return c;
+
+      return numbers::invalid_unsigned_int;
+    }
+
+
+    /**
+     * Given a set of cells and edges, orient all edges that are
+     * (globall) parallel to the one identified by the @p cell and
+     * within it the one with index @p local_edge.
+     */
+    void
+    orient_one_set_of_parallel_edges (const std::vector<Cell<2> > &cells,
+                                      std::vector<Edge<2> >       &edges,
+                                      const unsigned int           cell,
+                                      const unsigned int           local_edge)
+    {
+      const unsigned int dim = 2;
+
+      // choose the direction of the first edge by chance
+      edges[cells[cell].edge_indices[local_edge]].orientation_status = Edge<dim>::forward;
+
+      // walk outward from the given edge as described in
+      // the algorithm in the paper that documents all of
+      // this
+      //
+      // note that in 2d, each of the Deltas can at most
+      // contain two elements. we indicate non-used elements
+      // of these sets by invalid unsigned ints; if the set has
+      // only one element, then we use the first
+      unsigned int Delta_k[2] = { numbers::invalid_unsigned_int,
+                                  numbers::invalid_unsigned_int
+                                };
+      unsigned int Delta_k_minus_1[2] = { cells[cell].edge_indices[local_edge],
+                                          numbers::invalid_unsigned_int
+                                        };
+      while (Delta_k_minus_1[0] != numbers::invalid_unsigned_int)   // while set is not empty
+        {
+          Delta_k[0] = Delta_k[1] = numbers::invalid_unsigned_int;
+
+          for (unsigned int delta_element=0; delta_element<2; ++delta_element)
+            if (Delta_k_minus_1[delta_element] != numbers::invalid_unsigned_int)
+              {
+                // get the edge we are currently looking at. it must already
+                // have been oriented
+                const unsigned int delta = Delta_k_minus_1[delta_element];
+                Assert (edges[delta].orientation_status != Edge<dim>::not_oriented,
+                        ExcInternalError());
+
+                // now go through the cells adjacent to this edge
+                for (unsigned int K_element=0; K_element<2; ++K_element)
+                  if (edges[delta].adjacent_cells[K_element].cell_index != numbers::invalid_unsigned_int)
+                    {
+                      const unsigned int K = edges[delta].adjacent_cells[K_element].cell_index;
+                      const unsigned int delta_is_edge_in_K = edges[delta].adjacent_cells[K_element].edge_within_cell;
+
+                      // figure out the direction of delta with respect to the cell K
+                      // (in the orientation in which the user has given it to us)
+                      const unsigned int first_edge_vertex
+                        = (edges[delta].orientation_status == Edge<dim>::forward
+                           ?
+                           edges[delta].vertex_indices[0]
+                           :
+                           edges[delta].vertex_indices[1]);
+                      const unsigned int first_edge_vertex_in_K = cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(delta_is_edge_in_K, 0)];
+                      Assert (first_edge_vertex == first_edge_vertex_in_K
+                              ||
+                              first_edge_vertex == cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(delta_is_edge_in_K, 1)],
+                              ExcInternalError());
+
+                      // now figure out which direction the opposite edge needs to be into.
+                      const unsigned int opposite_edge
+                        = cells[K].edge_indices[ParallelEdges<2>::parallel_edges[delta_is_edge_in_K][0]];
+                      const unsigned int first_opposite_edge_vertex
+                        =  cells[K].vertex_indices[GeometryInfo<dim>::face_to_cell_vertices(
+                                                     ParallelEdges<dim>::parallel_edges[delta_is_edge_in_K][0],
+                                                     (first_edge_vertex == first_edge_vertex_in_K
+                                                      ?
+                                                      0
+                                                      :
+                                                      1))];
+
+                      const Edge<dim>::OrientationStatus opposite_edge_orientation
+                        = (edges[opposite_edge].vertex_indices[0]
+                           ==
+                           first_opposite_edge_vertex
+                           ?
+                           Edge<dim>::forward
+                           :
+                           Edge<dim>::backward);
+
+                      // see if the opposite edge (there is only one in 2d) has already been
+                      // oriented.
+                      if (edges[opposite_edge].orientation_status == Edge<dim>::not_oriented)
+                        {
+                          // the opposite edge is not yet oriented. do orient it and add it to
+                          // Delta_k;
+                          edges[opposite_edge].orientation_status = opposite_edge_orientation;
+                          if (Delta_k[0] == numbers::invalid_unsigned_int)
+                            Delta_k[0] = opposite_edge;
+                          else
+                            {
+                              Assert (Delta_k[1] == numbers::invalid_unsigned_int, ExcInternalError());
+                              Delta_k[1] = opposite_edge;
+                            }
+                        }
+                      else
+                        {
+                          // the opposite edge has already been oriented. assert that it is
+                          // consistent with the current one
+                          Assert (edges[opposite_edge].orientation_status == opposite_edge_orientation,
+                                  ExcInternalError());
+                        }
+                    }
+              }
+
+          // finally copy the new set to the previous one
+          // (corresponding to increasing 'k' by one in the
+          // algorithm)
+          Delta_k_minus_1[0] = Delta_k[0];
+          Delta_k_minus_1[1] = Delta_k[1];
+        }
+    }
+
+
+    /**
+     * Given data structures @p cell_list and @p edge_list, where
+     * all edges are already oriented, rotate the cell with
+     * index @p cell_index in such a way that its local coordinate
+     * system matches the ones of the adjacent edges. Store the
+     * rotated order of vertices in <code>raw_cells[cell_index]</code>.
+     */
+    void
+    rotate_cell (const std::vector<Cell<2> > &cell_list,
+                 const std::vector<Edge<2> > &edge_list,
+                 const unsigned int           cell_index,
+                 std::vector<CellData<2> >   &raw_cells)
+    {
+      // find the first vertex of the cell. this is the
+      // vertex where two edges originate, so for
+      // each of the four edges record which the
+      // starting vertex is
+      unsigned int starting_vertex_of_edge[4];
+      for (unsigned int e=0; e<4; ++e)
+        {
+          Assert (edge_list[cell_list[cell_index].edge_indices[e]].orientation_status
+                  != Edge<2>::not_oriented,
+                  ExcInternalError());
+          if (edge_list[cell_list[cell_index].edge_indices[e]].orientation_status == Edge<2>::forward)
+            starting_vertex_of_edge[e] = edge_list[cell_list[cell_index].edge_indices[e]].vertex_indices[0];
+          else
+            starting_vertex_of_edge[e] = edge_list[cell_list[cell_index].edge_indices[e]].vertex_indices[1];
+        }
+
+      // find the vertex number that appears twice. this must either be
+      // the first, second, or third vertex in the list. because edges
+      // zero and one don't share any vertices, and the same for edges
+      // two and three, the possibilities can easily be enumerated
+      unsigned int starting_vertex_of_cell = numbers::invalid_unsigned_int;
+      if ((starting_vertex_of_edge[0] == starting_vertex_of_edge[2])
+          ||
+          (starting_vertex_of_edge[0] == starting_vertex_of_edge[3]))
+        starting_vertex_of_cell = starting_vertex_of_edge[0];
+      else if ((starting_vertex_of_edge[1] == starting_vertex_of_edge[2])
+               ||
+               (starting_vertex_of_edge[1] == starting_vertex_of_edge[3]))
+        starting_vertex_of_cell = starting_vertex_of_edge[1];
+      else
+        Assert (false, ExcInternalError());
+
+      // now rotate raw_cells[cell_index] until the starting indices match.
+      // take into account the ordering of vertices (not in clockwise
+      // or counter-clockwise sense)
+      while (raw_cells[cell_index].vertices[0] != starting_vertex_of_cell)
+        {
+          const unsigned int tmp = raw_cells[cell_index].vertices[0];
+          raw_cells[cell_index].vertices[0] = raw_cells[cell_index].vertices[1];
+          raw_cells[cell_index].vertices[1] = raw_cells[cell_index].vertices[3];
+          raw_cells[cell_index].vertices[3] = raw_cells[cell_index].vertices[2];
+          raw_cells[cell_index].vertices[2] = tmp;
+        }
+    }
+
+
+    /**
+     * Given a set of cells, find globally unique edge orientations
+     * and then rotate cells so that the coordinate system of the cell
+     * coincides with the coordinate systems of the adjacent edges.
+     */
+    template <int dim>
+    void reorient (std::vector<CellData<dim> > &cells)
+    {
+      // first build the arrays that connect cells to edges and the other
+      // way around
+      std::vector<Edge<dim> > edge_list = build_edges(cells);
+      std::vector<Cell<dim> > cell_list = build_cells_and_connect_edges(cells, edge_list);
+
+      // then loop over all cells and start orienting parallel edge sets
+      // of cells that still have non-oriented edges
+      unsigned int next_cell_with_unoriented_edge;
+      while ((next_cell_with_unoriented_edge = get_next_unoriented_quad(cell_list, edge_list)) !=
+             numbers::invalid_unsigned_int)
+        {
+          // see which edge sets are still not oriented
+          //
+          // we do not need to look at each edge because if we orient edge
+          // 0, we will end up with edge 1 also oriented. there are only
+          // dim independent sets of edges
+          for (unsigned int l=0; l<dim; ++l)
+            if (edge_list[cell_list[next_cell_with_unoriented_edge].edge_indices[ParallelEdges<dim>::starter_edges[l]]].orientation_status
+                == Edge<dim>::not_oriented)
+              orient_one_set_of_parallel_edges (cell_list,
+                                                edge_list,
+                                                next_cell_with_unoriented_edge,
+                                                ParallelEdges<dim>::starter_edges[l]);
+
+          // ensure that we have really oriented all edges now, not just
+          // the starter edges
+          for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+            Assert (edge_list[cell_list[next_cell_with_unoriented_edge].edge_indices[l]].orientation_status
+                    != Edge<dim>::not_oriented,
+                    ExcInternalError());
+        }
+
+      // now that we have oriented all edges, we need to rotate cells
+      // so that the edges point in the right direction with the now
+      // rotated coordinate system
+      for (unsigned int c=0; c<cells.size(); ++c)
+        rotate_cell (cell_list, edge_list, c, cells);
+    }
+
+  }
+}
 
 
 template<>
@@ -83,531 +698,6 @@ GridReordering<1,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3
 {
   // nothing to be done in 1d
 }
-
-
-namespace internal
-{
-  namespace GridReordering2d
-  {
-// -- Definition of connectivity information --
-    const int ConnectGlobals::EdgeToNode[4][2] =
-    { {0,1},{1,2},{2,3},{3,0} };
-
-    const int ConnectGlobals::NodeToEdge[4][2] =
-    { {3,0},{0,1},{1,2},{2,3} };
-
-    const int ConnectGlobals::DefaultOrientation[4][2] =
-    {{0,1},{1,2},{3,2},{0,3}};
-
-
-    /**
-     * Simple data structure denoting
-     * an edge, i.e. the ordered pair
-     * of its vertices. This is only
-     * used in the is_consistent
-     * function.
-     */
-    struct Edge
-    {
-      Edge (const unsigned int v0,
-            const unsigned int v1)
-        :
-        v0(v0), v1(v1)
-      {}
-
-      const unsigned int v0, v1;
-      bool operator < (const Edge &e) const
-      {
-        return ((v0 < e.v0) || ((v0 == e.v0) && (v1 < e.v1)));
-      }
-    };
-
-
-    bool
-    is_consistent  (const std::vector<CellData<2> > &cells)
-    {
-      std::set<Edge> edges;
-
-      std::vector<CellData<2> >::const_iterator c = cells.begin();
-      for (; c != cells.end(); ++c)
-        {
-          // construct the four edges
-          // in reverse order
-          const Edge reverse_edges[4] = { Edge (c->vertices[1],
-                                                c->vertices[0]),
-                                          Edge (c->vertices[2],
-                                                c->vertices[1]),
-                                          Edge (c->vertices[2],
-                                                c->vertices[3]),
-                                          Edge (c->vertices[3],
-                                                c->vertices[0])
-                                        };
-          // for each of them, check
-          // whether they are already
-          // in the set
-          if ((edges.find (reverse_edges[0]) != edges.end()) ||
-              (edges.find (reverse_edges[1]) != edges.end()) ||
-              (edges.find (reverse_edges[2]) != edges.end()) ||
-              (edges.find (reverse_edges[3]) != edges.end()))
-            return false;
-          // ok, not. insert them
-          // in the order in which
-          // we want them
-          // (std::set eliminates
-          // duplicated by itself)
-          for (unsigned int i = 0; i<4; ++i)
-            {
-              const Edge e(reverse_edges[i].v1, reverse_edges[i].v0);
-              edges.insert (e);
-            }
-          // then go on with next
-          // cell
-        }
-      // no conflicts found, so
-      // return true
-      return true;
-    }
-
-
-
-    /**
-     * Returns an MSide corresponding to the
-     * specified side of a deal.II CellData<2> object.
-     */
-    MSide quadside(const CellData<2> &q, unsigned int i)
-    {
-      Assert (i<4, ExcInternalError());
-      return MSide(q.vertices[ConnectGlobals::EdgeToNode[i][0]],
-                   q.vertices[ConnectGlobals::EdgeToNode[i][1]]);
-    }
-
-
-    /**
-     * Wrapper class for the quadside() function
-     */
-    struct QuadSide
-    {
-      typedef CellData<2> first_argument_type;
-      typedef int second_argument_type;
-      typedef MSide result_type;
-
-      MSide operator()(const CellData<2> &q, int i) const
-      {
-        return quadside(q,i);
-      }
-    };
-
-
-
-    MQuad::MQuad (const unsigned int v0,
-                  const unsigned int v1,
-                  const unsigned int v2,
-                  const unsigned int v3,
-                  const unsigned int s0,
-                  const unsigned int s1,
-                  const unsigned int s2,
-                  const unsigned int s3,
-                  const CellData<2>  &cd)
-      :
-      original_cell_data (cd)
-    {
-      v[0] = v0;
-      v[1] = v1;
-      v[2] = v2;
-      v[3] = v3;
-      side[0] = s0;
-      side[1] = s1;
-      side[2] = s2;
-      side[3] = s3;
-    }
-
-
-    MSide::MSide (const unsigned int initv0,
-                  const unsigned int initv1)
-      :
-      v0(initv0), v1(initv1),
-      Q0(numbers::invalid_unsigned_int),
-      Q1(numbers::invalid_unsigned_int),
-      lsn0(numbers::invalid_unsigned_int),
-      lsn1(numbers::invalid_unsigned_int),
-      Oriented(false)
-    {}
-
-
-
-    bool
-    MSide::operator == (const MSide &s2) const
-    {
-      if ((v0 == s2.v0)&&(v1 == s2.v1))
-        {
-          return true;
-        }
-      if ((v0 == s2.v1)&&(v1 == s2.v0))
-        {
-          return true;
-        }
-      return false;
-    }
-
-
-    bool
-    MSide::operator != (const MSide &s2) const
-    {
-      return !(*this == s2);
-    }
-
-
-    namespace
-    {
-      void side_rectify (MSide &s)
-      {
-        if (s.v0>s.v1)
-          std::swap (s.v0, s.v1);
-      }
-
-      bool side_sort_less(const MSide &s1, const MSide &s2)
-      {
-        int s1vmin,s1vmax;
-        int s2vmin,s2vmax;
-        if (s1.v0<s1.v1)
-          {
-            s1vmin = s1.v0;
-            s1vmax = s1.v1;
-          }
-        else
-          {
-            s1vmin = s1.v1;
-            s1vmax = s1.v0;
-          }
-        if (s2.v0<s2.v1)
-          {
-            s2vmin = s2.v0;
-            s2vmax = s2.v1;
-          }
-        else
-          {
-            s2vmin = s2.v1;
-            s2vmax = s2.v0;
-          }
-
-        if (s1vmin<s2vmin)
-          return true;
-        if (s1vmin>s2vmin)
-          return false;
-        return s1vmax<s2vmax;
-      }
-
-      /**
-       * Create an MQuad object from the
-       * indices of the four vertices by
-       * looking up the indices of the four
-       * sides.
-       */
-      MQuad build_quad_from_vertices(const CellData<2> &q,
-                                     const std::vector<MSide> &elist)
-      {
-        // compute the indices of the four
-        // sides that bound this quad. note
-        // that the incoming list elist is
-        // sorted with regard to the
-        // side_sort_less criterion
-        unsigned int edges[4] = { numbers::invalid_unsigned_int,
-                                  numbers::invalid_unsigned_int,
-                                  numbers::invalid_unsigned_int,
-                                  numbers::invalid_unsigned_int
-                                };
-
-        for (unsigned int i=0; i<4; ++i)
-          edges[i] = (Utilities::lower_bound (elist.begin(),
-                                              elist.end(),
-                                              quadside(q,i),
-                                              side_sort_less)
-                      -
-                      elist.begin());
-
-        return MQuad(q.vertices[0],q.vertices[1], q.vertices[2], q.vertices[3],
-                     edges[0], edges[1], edges[2], edges[3],
-                     q);
-      }
-    }
-
-
-
-    void
-    GridReordering::reorient(std::vector<CellData<2> > &quads)
-    {
-      build_graph(quads);
-      orient();
-      get_quads(quads);
-    }
-
-
-    void
-    GridReordering::build_graph (const std::vector<CellData<2> > &inquads)
-    {
-      //Reserve some space
-      sides.reserve(4*inquads.size());
-
-      //Insert all the sides into the side vector
-      for (int i = 0; i<4; ++i)
-        {
-          std::transform(inquads.begin(),inquads.end(),
-                         std::back_inserter(sides), std_cxx11::bind(QuadSide(),std_cxx11::_1,i));
-        }
-
-      //Change each edge so that v0<v1
-      std::for_each(sides.begin(),sides.end(), side_rectify);
-
-      //Sort them by Sidevertices.
-      std::sort(sides.begin(),sides.end(), side_sort_less);
-
-      //Remove duplicates
-      sides.erase(std::unique(sides.begin(),sides.end()),
-                  sides.end());
-
-      // Swap trick to shrink the
-      // side vector
-      std::vector<MSide>(sides).swap(sides);
-
-      // Now assign the correct sides to
-      // each quads
-      mquads.reserve(inquads.size());
-      std::transform(inquads.begin(),
-                     inquads.end(),
-                     std::back_inserter(mquads),
-                     std_cxx11::bind(build_quad_from_vertices,
-                                     std_cxx11::_1,
-                                     std_cxx11::cref(sides)) );
-
-      // Assign the quads to their sides also.
-      int qctr = 0;
-      for (std::vector<MQuad>::iterator it = mquads.begin(); it != mquads.end(); ++it)
-        {
-          for (unsigned int i = 0; i<4; ++i)
-            {
-              MSide &ss = sides[(*it).side[i]];
-              if (ss.Q0 == numbers::invalid_unsigned_int)
-                {
-                  ss.Q0 = qctr;
-                  ss.lsn0 = i;
-                }
-              else if (ss.Q1 == numbers::invalid_unsigned_int)
-                {
-                  ss.Q1 = qctr;
-                  ss.lsn1 = i;
-                }
-              else
-                AssertThrow (false, ExcInternalError());
-            }
-          qctr++;
-        }
-    }
-
-
-    void GridReordering::orient()
-    {
-      // do what the comment in the
-      // class declaration says
-      unsigned int qnum = 0;
-      while (get_unoriented_quad(qnum))
-        {
-          unsigned int lsn = 0;
-          while (get_unoriented_side(qnum,lsn))
-            {
-              orient_side(qnum,lsn);
-              unsigned int qqnum = qnum;
-              while (side_hop(qqnum,lsn))
-                {
-                  // switch this face
-                  lsn = (lsn+2)%4;
-                  if (!is_oriented_side(qqnum,lsn))
-                    orient_side(qqnum,lsn);
-                  else
-                    //We've found a
-                    //cycle.. and
-                    //oriented all
-                    //quads in it.
-                    break;
-                }
-            }
-        }
-    }
-
-
-    void
-    GridReordering::orient_side(const unsigned int quadnum,
-                                const unsigned int localsidenum)
-    {
-      MQuad &quad = mquads[quadnum];
-      int op_side_l = (localsidenum+2)%4;
-      MSide &side = sides[mquads[quadnum].side[localsidenum]];
-      const MSide &op_side = sides[mquads[quadnum].side[op_side_l]];
-
-      //is the opposite side oriented?
-      if (op_side.Oriented)
-        {
-          //YES - Make the orientations match
-          //Is op side in default orientation?
-          if (op_side.v0 == quad.v[ConnectGlobals::DefaultOrientation[op_side_l][0]])
-            {
-              //YES
-              side.v0 = quad.v[ConnectGlobals::DefaultOrientation[localsidenum][0]];
-              side.v1 = quad.v[ConnectGlobals::DefaultOrientation[localsidenum][1]];
-            }
-          else
-            {
-              //NO, its reversed
-              side.v0 = quad.v[ConnectGlobals::DefaultOrientation[localsidenum][1]];
-              side.v1 = quad.v[ConnectGlobals::DefaultOrientation[localsidenum][0]];
-            }
-        }
-      else
-        {
-          //NO
-          //Just use the default orientation
-          side.v0 = quad.v[ConnectGlobals::DefaultOrientation[localsidenum][0]];
-          side.v1 = quad.v[ConnectGlobals::DefaultOrientation[localsidenum][1]];
-        }
-      side.Oriented = true;
-    }
-
-
-
-    bool
-    GridReordering::is_fully_oriented_quad(const unsigned int quadnum) const
-    {
-      return (
-               (sides[mquads[quadnum].side[0]].Oriented)&&
-               (sides[mquads[quadnum].side[1]].Oriented)&&
-               (sides[mquads[quadnum].side[2]].Oriented)&&
-               (sides[mquads[quadnum].side[3]].Oriented)
-             );
-    }
-
-
-
-    bool
-    GridReordering::is_oriented_side(const unsigned int quadnum,
-                                     const unsigned int lsn) const
-    {
-      return (sides[mquads[quadnum].side[lsn]].Oriented);
-    }
-
-
-
-
-    bool
-    GridReordering::get_unoriented_quad(unsigned int &UnOrQLoc) const
-    {
-      while ( (UnOrQLoc<mquads.size()) &&
-              is_fully_oriented_quad(UnOrQLoc) )
-        UnOrQLoc++;
-      return (UnOrQLoc != mquads.size());
-    }
-
-
-
-    bool
-    GridReordering::get_unoriented_side (const unsigned int quadnum,
-                                         unsigned int &lsn) const
-    {
-      const MQuad &mq = mquads[quadnum];
-      if (!sides[mq.side[0]].Oriented)
-        {
-          lsn = 0;
-          return true;
-        }
-      if (!sides[mq.side[1]].Oriented)
-        {
-          lsn = 1;
-          return true;
-        }
-      if (!sides[mq.side[2]].Oriented)
-        {
-          lsn = 2;
-          return true;
-        }
-      if (!sides[mq.side[3]].Oriented)
-        {
-          lsn = 3;
-          return true;
-        }
-      return false;
-    }
-
-
-    bool
-    GridReordering::side_hop (unsigned int &qnum, unsigned int &lsn) const
-    {
-      const MQuad &mq = mquads[qnum];
-      const MSide &s = sides[mq.side[lsn]];
-      unsigned int opquad = 0;
-      if (s.Q0 == qnum)
-        {
-          opquad = s.Q1;
-          lsn = s.lsn1;
-        }
-      else
-        {
-          opquad = s.Q0;
-          lsn = s.lsn0;
-        }
-
-      if (opquad != numbers::invalid_unsigned_int)
-        {
-          qnum = opquad;
-          return true;
-        }
-
-      return false;
-    }
-
-
-    void
-    GridReordering::get_quads (std::vector<CellData<2> > &outquads) const
-    {
-      outquads.clear();
-      outquads.reserve(mquads.size());
-      for (unsigned int qn = 0; qn<mquads.size(); ++qn)
-        {
-          // initialize CellData object with
-          // previous contents, and the
-          // overwrite all the fields that
-          // might have changed in the
-          // process of rotating things
-          CellData<2> q = mquads[qn].original_cell_data;
-
-          // Are the sides oriented?
-          Assert (is_fully_oriented_quad(qn), ExcInternalError());
-          bool s[4]; //whether side 1 ,2, 3, 4 are in the default orientation
-          for (int sn = 0; sn<4; sn++)
-            {
-              s[sn] = is_side_default_oriented(qn,sn);
-            }
-          // Are they oriented in the "deal way"?
-          Assert (s[0] == s[2], ExcInternalError());
-          Assert (s[1] == s[3], ExcInternalError());
-          // How much we rotate them by.
-          int rotn = 2*(s[0]?1:0)+ ((s[0]^s[1])?1:0);
-
-          for (int i = 0; i<4; ++i)
-            {
-              q.vertices[(i+rotn)%4] = mquads[qn].v[i];
-            }
-          outquads.push_back(q);
-        }
-
-    }
-
-    bool
-    GridReordering::is_side_default_oriented (const unsigned int qnum,
-                                              const unsigned int lsn) const
-    {
-      return (sides[mquads[qnum].side[lsn]].v0 ==
-              mquads[qnum].v[ConnectGlobals::DefaultOrientation[lsn][0]]);
-    }
-  } // namespace GridReordering2d
-} // namespace internal
 
 
 // anonymous namespace for internal helper functions
@@ -676,21 +766,21 @@ void
 GridReordering<2>::reorder_cells (std::vector<CellData<2> > &cells,
                                   const bool use_new_style_ordering)
 {
-  // if necessary, convert to old-style format
-  if (use_new_style_ordering)
-    reorder_new_to_old_style(cells);
+  // if necessary, convert to old (compatibility) to new-style format
+  if (!use_new_style_ordering)
+    reorder_old_to_new_style(cells);
 
   // check if grids are already
   // consistent. if so, do
   // nothing. if not, then do the
   // reordering
   if (!internal::GridReordering2d::is_consistent (cells))
-    internal::GridReordering2d::GridReordering().reorient(cells);
+    internal::GridReordering2d::reorient(cells);
 
 
   // and convert back if necessary
-  if (use_new_style_ordering)
-    reorder_old_to_new_style(cells);
+  if (!use_new_style_ordering)
+    reorder_new_to_old_style(cells);
 }
 
 
