@@ -333,7 +333,7 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction (const unsigned int  c
   else if (static_cast<unsigned int>
            (current_n_cells
             + refine_cells * cell_increase_on_refine
-            - coarsen_cells / cell_decrease_on_coarsen)
+            - coarsen_cells * cell_decrease_on_coarsen)
            >
            max_n_cells)
     {
@@ -351,7 +351,7 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction (const unsigned int  c
           (max_n_cells - current_n_cells)
           /
           (refine_cells * cell_increase_on_refine
-           - coarsen_cells / cell_decrease_on_coarsen);
+           - coarsen_cells * cell_decrease_on_coarsen);
 
       adjusted_fractions.first  = alpha * top_fraction;
       adjusted_fractions.second = alpha * bottom_fraction;
