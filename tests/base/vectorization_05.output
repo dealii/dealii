@@ -1,0 +1,22 @@
+
+DEAL:double::load_and_transpose at          n=1: #errors: 0
+DEAL:double::transpose_and_store (  add) at n=1: #errors: 0
+DEAL:double::transpose_and_store (noadd) at n=1: #errors: 0
+DEAL:double::load_and_transpose at          n=9: #errors: 0
+DEAL:double::transpose_and_store (  add) at n=9: #errors: 0
+DEAL:double::transpose_and_store (noadd) at n=9: #errors: 0
+DEAL:double::load_and_transpose at          n=32: #errors: 0
+DEAL:double::transpose_and_store (  add) at n=32: #errors: 0
+DEAL:double::transpose_and_store (noadd) at n=32: #errors: 0
+DEAL:float::load_and_transpose at          n=1: #errors: 0
+DEAL:float::transpose_and_store (  add) at n=1: #errors: 0
+DEAL:float::transpose_and_store (noadd) at n=1: #errors: 0
+DEAL:float::load_and_transpose at          n=9: #errors: 0
+DEAL:float::transpose_and_store (  add) at n=9: #errors: 0
+DEAL:float::transpose_and_store (noadd) at n=9: #errors: 0
+DEAL:float::load_and_transpose at          n=32: #errors: 0
+DEAL:float::transpose_and_store (  add) at n=32: #errors: 0
+DEAL:float::transpose_and_store (noadd) at n=32: #errors: 0
+DEAL:long double::load_and_transpose at          n=4: #errors: 0
+DEAL:long double::transpose_and_store (  add) at n=4: #errors: 0
+DEAL:long double::transpose_and_store (noadd) at n=4: #errors: 0
