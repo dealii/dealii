@@ -12,7 +12,7 @@ set Potential                            = 0
 @endcode
 
 Here, the potential is zero inside the domain, and we know that the
-eigenvalues are given by $\lambda_{(mn)}=\frac{\pi}{4}(m^2+n^2)$ where
+eigenvalues are given by $\lambda_{(mn)}=\frac{\pi^2}{4}(m^2+n^2)$ where
 $m,n\in{\mathbb N^+}$. Eigenfunctions are sines and cosines with $m$ and $n$
 periods in $x$ and $y$ directions. This matches the output our program
 generates:
