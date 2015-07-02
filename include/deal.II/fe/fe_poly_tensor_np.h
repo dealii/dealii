@@ -240,7 +240,7 @@ protected:
    */
   POLY poly_space;
 
-  int piola_boundary;
+  unsigned int piola_boundary;
 
   /**
    * The inverse of the matrix <i>a<sub>ij</sub></i> of node values
