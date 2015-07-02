@@ -25,7 +25,7 @@ namespace numbers
   bool is_finite (const double x)
   {
 #ifdef DEAL_II_HAVE_ISFINITE
-    return !isnan(x) && std::isfinite (x);
+    return !std::isnan(x) && std::isfinite (x);
 #else
     // Check against infinities. Note
     // that if x is a NaN, then both
