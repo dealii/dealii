@@ -532,6 +532,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+  <li> Fixed: The specialization of DoFAccessor for zero-dimensional objects,
+  i.e., for vertices as created by accessing the faces of one-dimensional
+  cells, had a member function DoFAccessor::child() that was declared but not
+  implemented. This is now fixed.
+  <br>
+  (Wolfgang Bangerth,  2015/07/01)
+  </li>
+
   <li> Improved: Functions::Monomial::gradient function now works when both base and exponent
   are equal to zero for one or more components of the monomial.
   Also, an assertion is added to avoid exponentiation of negative base numbers with real exponents.
