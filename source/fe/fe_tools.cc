@@ -565,7 +565,7 @@ namespace FETools
     Assert (degree != numbers::invalid_unsigned_int,
             ExcNotImplemented());
 
-    QGauss<dim> quadrature(degree+1);
+    QGauss<dim> quadrature(degree+2);
     // Set up FEValues.
     const UpdateFlags flags = update_values | update_quadrature_points | update_JxW_values;
     FEValues<dim> val1 (fe1, quadrature, update_values);
@@ -991,7 +991,7 @@ namespace FETools
     // refinement cases. Guido stops
     // disliking and instead starts
     // hating the anisotropic implementation
-    QGauss<dim-1> q_gauss(degree+1);
+    QGauss<dim-1> q_gauss(degree+2);
     const Quadrature<dim> q_fine = QProjector<dim>::project_to_face(q_gauss, face_fine);
     const unsigned int nq = q_fine.size();
 
