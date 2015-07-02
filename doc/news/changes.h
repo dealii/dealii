@@ -80,7 +80,7 @@ inconvenience this causes.
   </li>
 
   <li>Removed: The class NamedData has been removed after it had been
-  superceded by AnyData a while ago. This affects the use of classes
+  superseded by AnyData a while ago. This affects the use of classes
   in Algorithms and MeshWorker
   <br>
   (Guido Kanschat, 2015/04/02)
@@ -143,7 +143,7 @@ inconvenience this causes.
   (Matthias Maier, 2015/01/13)
   </li>
 
-  <li> Removed: The Component compat_files was removed entirely. deal.II
+  <li> Removed: The Component <code>compat_files</code> was removed entirely. deal.II
   now always configures and installs with a somewhat FSHS compliant
   directory structure. Further, the ancient make_dependencies binary was
   removed. Either migrate your project to CMake, or port your build system
@@ -531,7 +531,17 @@ inconvenience this causes.
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
+
+
 <ol>
+
+  <li>New: GridGenerator::cheese() for a mesh with many holes;
+  GridGenerator::simplex() for simplices in 2 and 3 dimensions;
+  GridGenerator::hyper_cross() for crosses in 2 and 3 dimensions.
+  <br>
+  (Guido Kanschat, 2015/07/02)
+  </li>
+
   <li> Fixed: The specialization of DoFAccessor for zero-dimensional objects,
   i.e., for vertices as created by accessing the faces of one-dimensional
   cells, had a member function DoFAccessor::child() that was declared but not
@@ -549,7 +559,7 @@ inconvenience this causes.
   
   <li> Fixed: The function numbers::is_finite() produced incorrect results when
   called with a NaN number (specifically, it produces an uncatchable floating
-  point exception when called with a signalling NaN). This was clearly not
+  point exception when called with a signaling NaN). This was clearly not
   intended since such values are definitely not finite.
   <br>
   (Wolfgang Bangerth, 2015/06/29)
