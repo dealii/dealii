@@ -152,7 +152,7 @@ MACRO(FEATURE_THREADS_CONFIGURE_EXTERNAL)
 
   #
   # Workaround for an issue with C++11 mode, non gcc-compilers and missing
-  # template<typename T> std::ist_trivially_copyable<T>
+  # template<typename T> std::is_trivially_copyable<T>
   #
   IF( DEAL_II_WITH_CXX11 AND
       NOT DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE AND
@@ -191,7 +191,7 @@ MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED)
 
   #
   # Workaround for an issue with C++11 mode, non gcc-compilers and missing
-  # template<typename T> std::ist_trivially_copyable<T>
+  # template<typename T> std::is_trivially_copyable<T>
   #
   IF( DEAL_II_WITH_CXX11 AND
       NOT DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE AND

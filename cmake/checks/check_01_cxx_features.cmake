@@ -300,6 +300,20 @@ IF(DEFINED DEAL_II_CXX11_FLAG OR DEFINED DEAL_II_CXX14_FLAG
       SET(DEAL_II_HAVE_CXX11 TRUE)
   ENDIF()
 
+  IF(DEAL_II_HAVE_CXX11)
+    #
+    # Some compilers (such as Intel 15.3 and GCC 4.9.2) support the flags
+    # "-std=c++11" and "-std=c++14" but do not support
+    # 'std::is_trivially_copyable', so check for support in C++11 or newer.
+    #
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+    #include <type_traits>
+    int main(){ std::is_trivially_copyable<int> bob; }
+    "
+      DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
+  ENDIF()
+
   #
   # This test does not guarantee full C++14 support, but virtually every
   # compiler with some C++14 support implements this.
@@ -389,15 +403,6 @@ IF (DEAL_II_WITH_CXX14)
 ELSEIF(DEAL_II_WITH_CXX11)
   ADD_FLAGS(DEAL_II_CXX_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
   MESSAGE(STATUS "DEAL_II_WITH_CXX11 successfully set up")
-
-  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <type_traits>
-    int main(){ std::is_trivially_copyable<int> bob; }
-    "
-    DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
-  RESET_CMAKE_REQUIRED()
 ELSE()
   MESSAGE(STATUS "DEAL_II_WITH_CXX14 and DEAL_II_WITH_CXX11 are both disabled")
 ENDIF()
