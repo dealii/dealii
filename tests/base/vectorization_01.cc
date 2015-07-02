@@ -86,8 +86,8 @@ void test ()
   d = std::sqrt(c);
   for (unsigned int i=0; i<n_vectors; ++i)
     AssertThrow (std::fabs(d[i]-std::sqrt(Number(i)))<
-            std::numeric_limits<Number>::epsilon(),
-            ExcInternalError());
+                 std::numeric_limits<Number>::epsilon(),
+                 ExcInternalError());
 
   deallog << "OK" << std::endl
           << "Absolute value: ";

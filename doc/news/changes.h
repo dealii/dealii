@@ -385,10 +385,10 @@ inconvenience this causes.
 
 
 <ol>
-  <li> New: Added the class Functions::Polynomial for representation of polynomials. 
+  <li> New: Added the class Functions::Polynomial for representation of polynomials.
   The new class is derived from the Function class.
   <br>
-  (Angel Rodriguez, 2015/07/01) 
+  (Angel Rodriguez, 2015/07/01)
   </li>
 
   <li> New: deal.II now supports compilation in C++14 mode, which may be
@@ -540,7 +540,6 @@ inconvenience this causes.
 
 
 <ol>
-
   <li>New: Utilities::replace_in_string().
   <br>
   (Timo Heister, 2015/07/05)
@@ -559,7 +558,15 @@ inconvenience this causes.
   <br>
   (Guido Kanschat, 2015/07/04)
   </li>
-  
+
+  <li> New: VectorizedArray now provides two methods
+  vectorized_load_and_transpose() and vectorized_transpose_and_store() that
+  perform vectorized reads or writes and convert from array-of-struct into
+  struct-of-array or the other way around.
+  <br>
+  (Martin Kronbichler, 2015/07/02)
+  </li>
+
   <li>New: GridGenerator::cheese() for a mesh with many holes;
   GridGenerator::simplex() for simplices in 2 and 3 dimensions;
   GridGenerator::hyper_cross() for crosses in 2 and 3 dimensions.
@@ -581,7 +588,7 @@ inconvenience this causes.
   <br>
   (Angel Rodriguez,  2015/06/29)
   </li>
-  
+
   <li> Fixed: The function numbers::is_finite() produced incorrect results when
   called with a NaN number (specifically, it produces an uncatchable floating
   point exception when called with a signaling NaN). This was clearly not
