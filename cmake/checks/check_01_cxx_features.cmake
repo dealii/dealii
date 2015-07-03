@@ -396,6 +396,14 @@ ENDIF()
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <cmath>
+  int main(){ double d=0; std::isnan (d); return 0; }
+  "
+  DEAL_II_HAVE_STD_ISNAN)
+
+
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <cmath>
   int main(){ double d=0; isnan (d); return 0; }
   "
   DEAL_II_HAVE_ISNAN)
