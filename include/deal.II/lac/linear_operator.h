@@ -49,12 +49,7 @@ LinearOperator<Range, Domain> linear_operator (const Matrix &);
 template <typename Domain = Vector<double>,
           typename Range = Domain>
 LinearOperator<Domain, Range>
-null_operator(const std::function<void(Domain &, bool)> &,
-              const std::function<void(Range &,  bool)> &);
-
-template <typename Range = Vector<double>>
-LinearOperator<Range, Range>
-null_operator(const std::function<void(Range &, bool)> &);
+null_operator(const LinearOperator<Domain, Range> &);
 
 
 /**
@@ -120,9 +115,9 @@ public:
    * member objects are initialized with default variants that throw an
    * exception upon invocation.
    */
-  LinearOperator (bool is_null_operator=false)
+  LinearOperator()
     :
-    is_null_operator(is_null_operator)
+    is_null_operator(false)
   {
 
     vmult = [](Range &, const Domain &)
@@ -425,9 +420,7 @@ operator*(typename Range::value_type  number,
     }
   else if (number == 0.)
     {
-      LinearOperator<Range, Domain> return_op = op;
-      return_op.is_null_operator = true;
-      return return_op;
+      return null_operator(op);
     }
   else
     {
@@ -517,7 +510,10 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
 {
   if (first_op.is_null_operator || second_op.is_null_operator)
     {
-      return null_operator(second_op.reinit_domain_vector, first_op.reinit_range_vector);
+      LinearOperator<Range, Domain> return_op;
+      return_op.reinit_domain_vector = second_op.reinit_domain_vector;
+      return_op.reinit_range_vector  = first_op.reinit_range_vector;
+      return null_operator(return_op);
     }
   else
     {
@@ -727,66 +723,37 @@ identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 /**
  * @relates LinearOperator
  *
- * Returns a LinearOperator that is the null operator
- * from the vector space @p Domain to the vector space @p Range.
- *
- * The function takes two <code>std::function</code> objects @ref
- * reinit_range_vector and reinit_domain_vector as arguments to initialize the
- * <code>reinit_range_vector</code> and <code>reinit_domain_vector</code>
- * objects of the LinearOperator object.
+ * Returns a nulled variant of the LinearOperator @p op, i.e. with
+ * optimized LinearOperator::vmult, LinearOperator::vmult_add, etc.
+ * functions and with LinearOperator::is_null_operator set to true.
  *
  * @ingroup LAOperators
  */
-
-template <typename Domain,
-          typename Range>
-LinearOperator<Domain, Range>
-null_operator(const std::function<void(Domain &, bool)> &reinit_domain_vector,
-              const std::function<void(Range &,  bool)> &reinit_range_vector)
+template <typename Range, typename Domain>
+LinearOperator<Range, Domain>
+null_operator(const LinearOperator<Range, Domain> &op)
 {
-  LinearOperator<Domain, Range> return_op(/*is_null_operator = */true);
+  auto return_op = op;
 
-  return_op.reinit_range_vector  = reinit_range_vector;
-  return_op.reinit_domain_vector = reinit_domain_vector;
+  return_op.is_null_operator = true;
 
-  return_op.vmult = [](Range &v, const Domain &u)
+  return_op.vmult = [](Range &v, const Domain &)
   {
-    v = 0;
+    v = 0.;
   };
 
-  return_op.vmult_add = [](Range &v, const Domain &u)
+  return_op.vmult_add = [](Range &, const Domain &)
   {};
 
-  return_op.Tvmult = [](Range &v, const Domain &u)
+  return_op.Tvmult = [](Domain &v, const Range &)
   {
-    v = 0;
+    v = 0.;
   };
 
-  return_op.Tvmult_add = [](Range &v, const Domain &u)
+  return_op.Tvmult_add = [](Domain &, const Range &)
   {};
 
   return return_op;
-}
-
-/**
- * @relates LinearOperator
- *
- * Returns a LinearOperator that is the null operator
- * of the vector space @p Range. (It is a specification of the previous
- * function in the case of square matrices)
- *
- * The function takes an <code>std::function</code> object @ref
- * reinit_vector as an argument to initialize the
- * <code>reinit_range_vector</code> and <code>reinit_domain_vector</code>
- * objects of the LinearOperator object.
- *
- * @ingroup LAOperators
- */
-template <typename Range>
-LinearOperator<Range, Range>
-null_operator(const std::function<void(Range &, bool)> &reinit_vector)
-{
-  return null_operator(reinit_vector, reinit_vector);
 }
 
 
