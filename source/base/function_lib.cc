@@ -2483,6 +2483,113 @@ namespace Functions
     return interpolate (data_values, ix, p_unit);
   }
 
+  /* ---------------------- Polynomial ----------------------- */
+
+
+
+  template <int dim>
+  Polynomial<dim>::
+  Polynomial(const Table<2,double> &exponents,
+             const Vector<double>   &coefficients)
+    :
+    Function<dim> (1),
+    exponents (exponents),
+    coefficients(coefficients)
+  {
+    Assert(exponents.n_rows() == coefficients.size(),
+           ExcDimensionMismatch(exponents.n_rows(), coefficients.size()));
+    Assert(exponents.n_cols() == dim,
+           ExcDimensionMismatch(exponents.n_cols(), dim));
+  }
+
+
+
+  template <int dim>
+  double
+  Polynomial<dim>::value (const Point<dim> &p,
+                          const unsigned int component) const
+  {
+    (void)component;
+    Assert (component==0, ExcIndexRange(component,0,1));
+
+    double prod;
+    double sum = 0;
+    for (unsigned int monom = 0; monom < exponents.n_rows(); ++monom)
+      {
+        prod = 1;
+        for (unsigned int s=0; s< dim; ++s)
+          {
+            if (p[s] < 0)
+              Assert(std::floor(exponents[monom][s]) == exponents[monom][s],
+                     ExcMessage("Exponentiation of a negative base number with "
+                                "a real exponent can't be performed."));
+            prod *= std::pow(p[s], exponents[monom][s]);
+          }
+        sum += coefficients[monom]*prod;
+      }
+    return sum;
+  }
+
+
+
+  template <int dim>
+  void
+  Polynomial<dim>::value_list (const std::vector<Point<dim> > &points,
+                               std::vector<double>    &values,
+                               const unsigned int     component) const
+  {
+    Assert (values.size() == points.size(),
+            ExcDimensionMismatch(values.size(), points.size()));
+
+    for (unsigned int i=0; i<points.size(); ++i)
+      values[i] = Polynomial<dim>::value (points[i], component);
+  }
+
+
+
+  template <int dim>
+  Tensor<1,dim>
+  Polynomial<dim>::gradient (const Point<dim> &p,
+                             const unsigned int component) const
+  {
+    (void)component;
+    Assert (component==0, ExcIndexRange(component,0,1));
+
+    Tensor<1,dim> r;
+
+    for (unsigned int d=0; d<dim; ++d)
+      {
+        double sum = 0;
+
+        for (unsigned int monom = 0; monom < exponents.n_rows(); ++monom)
+          {
+            double prod = 1;
+            for (unsigned int s=0; s < dim; ++s)
+              {
+                if ((s==d)&&(exponents[monom][s] == 0)&&(p[s] == 0))
+                  {
+                    prod = 0;
+                    break;
+                  }
+                else
+                  {
+                    if (p[s] < 0)
+                      Assert(std::floor(exponents[monom][s]) == exponents[monom][s],
+                             ExcMessage("Exponentiation of a negative base number with "
+                                        "a real exponent can't be performed."));
+                    prod *= (s==d
+                             ?
+                             exponents[monom][s] * std::pow(p[s], exponents[monom][s]-1)
+                             :
+                             std::pow(p[s], exponents[monom][s]));
+                  }
+              }
+            sum += coefficients[monom]*prod;
+          }
+        r[d] = sum;
+      }
+    return r;
+  }
 
 
 // explicit instantiations
@@ -2532,6 +2639,9 @@ namespace Functions
   template class InterpolatedUniformGridData<1>;
   template class InterpolatedUniformGridData<2>;
   template class InterpolatedUniformGridData<3>;
+  template class Polynomial<1>;
+  template class Polynomial<2>;
+  template class Polynomial<3>;
 }
 
 DEAL_II_NAMESPACE_CLOSE

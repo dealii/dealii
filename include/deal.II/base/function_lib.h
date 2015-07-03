@@ -1254,6 +1254,70 @@ namespace Functions
      */
     const Table<dim,double>                     data_values;
   };
+
+
+  /**
+   * A class that represents a function object for a polynomial. A polynomial
+   * is composed by the summation of multiple monomials. If the polynomial has
+   * n monomials and the dimension is equal to dim, the polynomial can be written as
+   * $\sum_{i=1}^{n} a_{i}(\prod_{d=1}^{dim} x_{d}^{\alpha_{i,d}})$, where
+   * $a_{i}$ are the coefficients of the monomials and $\alpha_{i,d}$ are their exponents.
+   * The class's constructor takes a Table<2,double> to describe the set of
+   * exponents and a Vector<double> to describe the set of coefficients.
+   *
+   *  @author Ángel Rodríguez, 2015
+   */
+  template <int dim>
+  class Polynomial : public Function<dim>
+  {
+  public:
+    /**
+     * Constructor. The coefficients and the exponents of the polynomial are
+     * passed as arguments. The Table<2, double> exponents has a number of rows
+     * equal to the number of monomials of the polynomial and a number of columns
+     * equal to dim. The i-th row of the exponents table contains the
+     * ${\alpha_{i,d}}$ exponents of the i-th monomial
+     * $a_{i}\prod_{d=1}^{dim} x_{d}^{\alpha_{i,d}}$. The i-th element of the coefficients
+     * vector contains the coefficient $a_{i}$ for the i-th monomial.
+     */
+    Polynomial (const Table<2,double> &exponents,
+                const Vector<double>   &coefficients);
+
+    /**
+     * Function value at one point.
+     */
+    virtual double value (const Point<dim> &p,
+                          const unsigned int component = 0) const;
+
+
+    /**
+     * Function values at multiple points.
+     */
+    virtual void value_list (const std::vector<Point<dim> > &points,
+                             std::vector<double>      &values,
+                             const unsigned int       component = 0) const;
+
+    /**
+     * Function gradient at one point.
+     */
+    virtual Tensor<1,dim> gradient (const Point<dim> &p,
+                                    const unsigned int component = 0) const;
+
+  private:
+
+    /**
+     * The set of exponents.
+     */
+    const Table<2,double> exponents;
+
+    /**
+     * The set of coefficients.
+     */
+    const Vector<double> coefficients;
+  };
+
+
+
 }
 DEAL_II_NAMESPACE_CLOSE
 

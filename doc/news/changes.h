@@ -385,6 +385,12 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: Added the class Functions::Polynomial for representation of polynomials. 
+  The new class is derived from the Function class.
+  <br>
+  (Angel Rodriguez, 2015/07/01) 
+  </li>
+
   <li> New: deal.II now supports compilation in C++14 mode, which may be
   enabled with the CMake option <code>DEAL_II_WITH_CXX14</code>.
   <br>
