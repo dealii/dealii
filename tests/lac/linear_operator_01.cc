@@ -232,7 +232,7 @@ int main()
 
   // null operator
 
-  auto test4 = null_operator(test2.reinit_range_vector);
+  auto test4 = null_operator(test2);
   test4.vmult(w, u);
   deallog << " 0 * " << u.value << " = " << w.value << std::endl;
 
