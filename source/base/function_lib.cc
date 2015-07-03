@@ -2489,8 +2489,8 @@ namespace Functions
 
   template <int dim>
   Polynomial<dim>::
-  Polynomial(const Table<2,double> &exponents,
-             const Vector<double>   &coefficients)
+  Polynomial(const Table<2,double>     &exponents,
+             const std::vector<double> &coefficients)
     :
     Function<dim> (1),
     exponents (exponents),
