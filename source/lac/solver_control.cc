@@ -92,15 +92,7 @@ SolverControl::check (const unsigned int step,
     }
 
   if ((step >= maxsteps) ||
-#ifdef DEAL_II_HAVE_ISNAN
-      isnan(check_value) ||
-#else
-#  ifdef DEAL_II_HAVE_UNDERSCORE_ISNAN
-      // on Microsoft Windows, the
-      // function is called _isnan
-      _isnan(check_value) ||
-#  endif
-#endif
+      numbers::is_nan(check_value) ||
       (check_failure && (check_value > failure_residual))
      )
     {

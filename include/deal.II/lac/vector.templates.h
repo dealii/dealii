@@ -1473,6 +1473,16 @@ Vector<Number>::lp_norm (const real_type p) const
 
 
 
+template <>
+typename Vector<int>::real_type
+Vector<int>::lp_norm (const real_type) const
+{
+  Assert(false, ExcMessage("No lp norm for integer vectors"));
+  return -1;
+}
+
+
+
 template <typename Number>
 typename Vector<Number>::real_type
 Vector<Number>::linfty_norm () const
