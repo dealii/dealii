@@ -1280,8 +1280,8 @@ namespace Functions
      * $a_{i}\prod_{d=1}^{dim} x_{d}^{\alpha_{i,d}}$. The i-th element of the coefficients
      * vector contains the coefficient $a_{i}$ for the i-th monomial.
      */
-    Polynomial (const Table<2,double> &exponents,
-                const Vector<double>   &coefficients);
+    Polynomial (const Table<2,double>     &exponents,
+                const std::vector<double> &coefficients);
 
     /**
      * Function value at one point.
@@ -1313,7 +1313,7 @@ namespace Functions
     /**
      * The set of coefficients.
      */
-    const Vector<double> coefficients;
+    const std::vector<double> coefficients;
   };
 
 

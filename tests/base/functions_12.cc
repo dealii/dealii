@@ -30,12 +30,11 @@ void check()
     for (unsigned int d = 0; d < dim; ++d)
       exponents[i][d] = i + d;
 
-  Vector<double> coeffs(n_mon);
+  std::vector<double> coeffs(n_mon);
   for (unsigned int i = 0; i < n_mon; ++i)
     coeffs[i] = std::pow(-1,i)*(i+1);
 
-
-  CustomFunctions::Polynomial<dim> poly(exponents,coeffs);
+  Functions::Polynomial<dim> poly(exponents, coeffs);
 
   Point<dim> p;
   for (unsigned int d=0; d<dim; ++d)
