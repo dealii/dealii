@@ -6246,8 +6246,9 @@ namespace VectorTools
             {
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
-                sum += std::pow(data.psi_values[q](k)*data.psi_values[q](k),
-                                exponent/2.) * data.weight_vectors[q](k);
+                sum += std::pow(
+                         static_cast<double>(data.psi_values[q](k)*data.psi_values[q](k)),
+                         exponent/2.) * data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
 
@@ -6298,8 +6299,9 @@ namespace VectorTools
             {
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
-                sum += std::pow(data.psi_grads[q][k]*data.psi_grads[q][k],
-                                exponent/2.) * data.weight_vectors[q](k);
+                sum += std::pow(
+                         static_cast<double>(data.psi_grads[q][k]*data.psi_grads[q][k]),
+                         exponent/2.) * data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
           diff = std::pow(diff, 1./exponent);
