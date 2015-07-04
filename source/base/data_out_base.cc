@@ -4656,17 +4656,15 @@ namespace DataOutBase
 
     const unsigned int n_data_sets = data_names.size();
     // check against # of data sets in
-    // first patch. checks against all
-    // other patches are made in
-    // write_gmv_reorder_data_vectors
-    Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
-            (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
-            ExcDimensionMismatch (patches[0].points_are_available
-                                  ?
-                                  (n_data_sets + spacedim)
-                                  :
-                                  n_data_sets,
-                                  patches[0].data.n_rows()));
+    // first patch.
+    if (patches[0].points_are_available)
+      {
+        AssertDimension(n_data_sets + spacedim, patches[0].data.n_rows())
+      }
+    else
+      {
+        AssertDimension(n_data_sets, patches[0].data.n_rows())
+      }
 
     ///////////////////////
     // preamble
@@ -5081,15 +5079,14 @@ namespace DataOutBase
     // first patch. checks against all
     // other patches are made in
     // write_gmv_reorder_data_vectors
-    Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
-            (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
-            ExcDimensionMismatch (patches[0].points_are_available
-                                  ?
-                                  (n_data_sets + spacedim)
-                                  :
-                                  n_data_sets,
-                                  patches[0].data.n_rows()));
-
+    if (patches[0].points_are_available)
+      {
+        AssertDimension(n_data_sets + spacedim, patches[0].data.n_rows())
+      }
+    else
+      {
+        AssertDimension(n_data_sets, patches[0].data.n_rows())
+      }
 
 #ifdef DEAL_II_WITH_ZLIB
     const char *ascii_or_binary = "binary";
