@@ -42,7 +42,7 @@ void check (TRIA &tr)
 
   for (; cell!=endc; ++cell)
     {
-      deallog << cell->level() << " " << cell->index() << " " << cell->id() << std::endl;
+      deallog << cell->level() << " " << cell->index() << " " << cell->id() << " " << cell->id().to_string() << std::endl;
     }
 
   deallog << "OK" << std::endl;

@@ -540,6 +540,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li>New: CellId::to_string() returns a string representation.
+  <br>
+  (Timo Heister, 2015/07/05)
+  </li>
+
   <li>New: Utilities::replace_in_string().
   <br>
   (Timo Heister, 2015/07/05)

@@ -20,6 +20,7 @@
 #include <deal.II/base/exceptions.h>
 
 #include <vector>
+#include <sstream>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -67,6 +68,11 @@ public:
   CellId()
     : coarse_cell_id(-1)
   {}
+
+  /**
+   * Return a string representation of this CellId.
+   */
+  std::string to_string() const;
 
   /**
    * compare two CellIds
@@ -128,6 +134,14 @@ inline std::istream &operator>> (std::istream &is, CellId &cid)
       cid.id.push_back(value-'0');
     }
   return is;
+}
+
+inline std::string
+CellId::to_string() const
+{
+  std::ostringstream ss;
+  ss << *this;
+  return ss.str();
 }
 
 inline bool
