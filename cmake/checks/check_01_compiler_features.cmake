@@ -327,6 +327,17 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   _Pragma(\"GCC diagnostic push\")
   _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wextra\\\\\\\"\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wpragmas\\\\\\\"\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wextra\\\\\\\"\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Woverloaded-virtual\\\\\\\"\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wunused-function\\\\\\\"\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wunused-parameter\\\\\\\"\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wunused-variable\\\\\\\"\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wunused-but-set-parameter\\\\\\\"\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wnested-anon-types\\\\\\\"\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wunused-private-field\\\\\\\"\")
+  _Pragma(\"GCC diagnostic ignored \\\\\\\"-Wdeprecated-declarations\\\\\\\"\")
+  _Pragma(\"GCC diagnostic warning \\\\\\\"-Wpragmas\\\\\\\"\")
   int main() { return 0; }
   _Pragma(\"GCC diagnostic pop\")
   "
