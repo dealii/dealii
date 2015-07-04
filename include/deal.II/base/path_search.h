@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * This piece of code will first traverse all paths in the list set up for
- * file class <TT>MESH</tt>. If it manages to open a file, it returns the
+ * file class <tt>MESH</tt>. If it manages to open a file, it returns the
  * <tt>istream</tt> object. If not, it will try to append the first suffix of
  * the suffix list and do the same. And so on. If no file is found in the end,
  * an exception is thrown.

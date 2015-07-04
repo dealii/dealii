@@ -120,7 +120,7 @@ public:
   std::string name () const;
 
   /**
-   * Return the number of polynomials in the space <TT>BDM(degree)</tt>
+   * Return the number of polynomials in the space <tt>BDM(degree)</tt>
    * without requiring to build an object of PolynomialsBDM. This is required
    * by the FiniteElement classes.
    */

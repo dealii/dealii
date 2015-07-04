@@ -92,7 +92,7 @@ public:
   std::string name () const;
 
   /**
-   * Return the number of polynomials in the space <TT>N(degree)</tt> without
+   * Return the number of polynomials in the space <tt>N(degree)</tt> without
    * requiring to build an object of PolynomialsNedelec. This is required by
    * the FiniteElement classes.
    */
