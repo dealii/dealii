@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __dealii__point_value_history_h
-#define __dealii__point_value_history_h
+#ifndef dealii__point_value_history_h
+#define dealii__point_value_history_h
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/smartpointer.h>
@@ -658,4 +658,4 @@ private:
 
 
 DEAL_II_NAMESPACE_CLOSE
-#endif /* __dealii__point_value_history_h */
+#endif /* dealii__point_value_history_h */
