@@ -541,6 +541,11 @@ inconvenience this causes.
 
 <ol>
 
+  <li>New: Utilities::replace_in_string().
+  <br>
+  (Timo Heister, 2015/07/05)
+  </li>
+
   <li>Improved: GridOut::write_vtk() and GridOut::write_vtu() now
   output material id, level and subdomain ids of the cells.
   <br>
