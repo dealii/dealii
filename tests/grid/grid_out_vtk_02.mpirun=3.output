@@ -1,0 +1,29 @@
+
+DEAL:0:2d::hyper_cube
+DEAL:0:2d::ID = 0
+DEAL:0:2d::0
+DEAL:0:2d::0123
+DEAL:0:2d::00001-1-22--3---
+DEAL:0:2d::
+DEAL:0:2d::my levels: 3<= global levels:3
+
+DEAL:1:2d::ID = 1
+DEAL:1:2d::0
+DEAL:1:2d::0123
+DEAL:1:2d::-0-01111-2--33--
+DEAL:1:2d::
+
+
+DEAL:2:2d::ID = 2
+DEAL:2:2d::0
+DEAL:2:2d::0123
+DEAL:2:2d::--00--1-22223-3-
+DEAL:2:2d::
+
+
+DEAL:3:2d::ID = 3
+DEAL:3:2d::0
+DEAL:3:2d::0123
+DEAL:3:2d::---0--11-2-23333
+DEAL:3:2d::
+

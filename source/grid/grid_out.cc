@@ -2442,10 +2442,10 @@ namespace
             patch.data(0, v) = cell->level();
             patch.data(1, v) = cell->material_id();
             if (!cell->has_children())
-              patch.data(2, v) = cell->subdomain_id();
+              patch.data(2, v) = static_cast<int>(cell->subdomain_id());
             else
               patch.data(2, v) = -1;
-            patch.data(3, v) = cell->level_subdomain_id();
+            patch.data(3, v) = static_cast<int>(cell->level_subdomain_id());
           }
         patches.push_back (patch);
       }
