@@ -449,8 +449,8 @@ namespace GridGenerator
     if (dim>2)
       {
         // In 3D, we have some more edges to deal with
-        for (unsigned int i=0; i<dim-1; ++i)
-          points.push_back(0.5*(points[i]+points[i+2]));
+        for (unsigned int i=1; i<dim; ++i)
+          points.push_back(0.5*(points[i-1]+points[i+1]));
         // And we need face midpoints
         for (unsigned int i=0; i<=dim; ++i)
           points.push_back(1./3.*
