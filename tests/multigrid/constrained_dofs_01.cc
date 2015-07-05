@@ -64,10 +64,26 @@ void setup_tria(parallel::distributed::Triangulation<dim> &tr)
   tr.execute_coarsening_and_refinement();
 }
 
-
 template <int dim>
-void reorder(DoFHandler<dim> &dofh, FiniteElement<dim> &fe)
+void check_fe(FiniteElement<dim> &fe)
 {
+  deallog << fe.get_name() << std::endl;
+
+  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
+                                               Triangulation<dim>::none,
+                                               parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+  setup_tria(tr);
+
+  ZeroFunction<dim> zero;
+  typename FunctionMap<dim>::type fmap;
+  fmap.insert(std::make_pair(0, &zero));
+
+  DoFHandler<dim> dofh(tr);
+  dofh.distribute_dofs(fe);
+  dofh.distribute_mg_dofs(fe);
+
+  MGConstrainedDoFs                    mg_constrained_dofs_ref;
+  { // reorder
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_SELF,
                                                Triangulation<dim>::none,
                                                parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
@@ -101,32 +117,11 @@ void reorder(DoFHandler<dim> &dofh, FiniteElement<dim> &fe)
       cell->set_mg_dof_indices(renumbered);
       cell->update_cell_dof_indices_cache();
     }
-
   
-}
-
-template <int dim>
-void check_fe(FiniteElement<dim> &fe)
-{
-  deallog << fe.get_name() << std::endl;
-
-    parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-                                               Triangulation<dim>::none,
-                                               parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
-  setup_tria(tr);
-
-  ZeroFunction<dim> zero;
-  typename FunctionMap<dim>::type fmap;
-  fmap.insert(std::make_pair(0, &zero));
-
-  DoFHandler<dim> dofh(tr);
-  dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs(fe);
-
-  { // reorder
-    unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
-    if (numprocs > 1)
-      reorder(dofh, fe);
+  typename FunctionMap<dim>::type      dirichlet_boundary;
+  ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
+  dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
+  mg_constrained_dofs_ref.initialize(dofhref, dirichlet_boundary);
   }
   
   
@@ -156,6 +151,16 @@ void check_fe(FiniteElement<dim> &fe)
                 relevant, level);
       deallog << "relevant:" << std::endl;
       relevant.print(deallog);
+
+      // the indexsets should be the same when run in parallel (on the
+      // relevant subset):
+      deallog << ((rei == (relevant & mg_constrained_dofs_ref.get_refinement_edge_indices(level)))
+		  ?"ok ":"FAIL ")
+	      << ((bi == (relevant & mg_constrained_dofs_ref.get_boundary_indices(level)))
+		  ?"ok ":"FAIL ")
+	      << std::endl;
+      
+
     }
 }
 
