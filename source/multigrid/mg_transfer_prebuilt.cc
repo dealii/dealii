@@ -76,8 +76,8 @@ void MGTransferPrebuilt<VECTOR>::clear ()
   prolongation_matrices.resize(0);
   prolongation_sparsities.resize(0);
   copy_indices.resize(0);
-  copy_indices_to_me.resize(0);
-  copy_indices_from_me.resize(0);
+  copy_indices_global_mine.resize(0);
+  copy_indices_level_mine.resize(0);
   component_to_block_map.resize(0);
   interface_dofs.resize(0);
   constraints = 0;
@@ -256,7 +256,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       prolongation_matrices[level]->compress(VectorOperation::insert);
     }
 
-  // Now we are filling the variables copy_indices*, which are essentially
+  // * Now we are filling the variables copy_indices*, which are essentially
   // maps from global to mgdof for each level stored as a std::vector of
   // pairs. We need to split this map on each level depending on the ownership
   // of the global and mgdof, so that we later not access non-local elements
@@ -264,11 +264,29 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // We keep track in the bitfield dof_touched which global dof has
   // been processed already (on the current level). This is the same as
   // the multigrid running in serial.
-  // Only entering on the finest level gives wrong results (why?)
+  
+  struct dof_pair
+  {
+    unsigned int level;
+    unsigned int global_dof_index;
+    unsigned int level_dof_index;
 
+    dof_pair(unsigned int level, unsigned int global_dof_index, unsigned int level_dof_index)
+      :
+        level(level), global_dof_index(global_dof_index), level_dof_index(level_dof_index)
+    {}
+
+    dof_pair()
+    {}
+  };
+
+  // map cpu_index -> vector of data
+  // that will be copied into copy_indices_level_mine
+  std::vector<dof_pair> send_data_temp;
+  
   copy_indices.resize(n_levels);
-  copy_indices_from_me.resize(n_levels);
-  copy_indices_to_me.resize(n_levels);
+  copy_indices_global_mine.resize(n_levels);
+  copy_indices_level_mine.resize(n_levels);
   IndexSet globally_relevant;
   DoFTools::extract_locally_relevant_dofs(mg_dof, globally_relevant);
 
@@ -279,8 +297,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
     {
       std::vector<bool> dof_touched(globally_relevant.n_elements(), false);
       copy_indices[level].clear();
-      copy_indices_from_me[level].clear();
-      copy_indices_to_me[level].clear();
+      copy_indices_level_mine[level].clear();
+      copy_indices_global_mine[level].clear();
 
       typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);
@@ -313,20 +331,123 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
               bool global_mine = mg_dof.locally_owned_dofs().is_element(global_dof_indices[i]);
               bool level_mine = mg_dof.locally_owned_mg_dofs(level).is_element(level_dof_indices[i]);
 
+
               if (global_mine && level_mine)
-                copy_indices[level].push_back(
-                  std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
-              else if (level_mine)
-                copy_indices_from_me[level].push_back(
-                  std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
-              else if (global_mine)
-                copy_indices_to_me[level].push_back(
-                  std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
-//              else
-//                continue;
+                {
+                  copy_indices[level].push_back(
+                      std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+                }
+              else if(global_mine)
+                {
+                  copy_indices_global_mine[level].push_back(
+                      std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+
+                  //send this to the owner of the level_dof:
+                  send_data_temp.push_back(dof_pair(level, global_dof_indices[i], level_dof_indices[i]));
+                }
+              else
+                {
+                  // somebody will send those to me
+                }
 
               dof_touched[global_idx] = true;
             }
+        }
+    }
+  
+  const dealii::parallel::distributed::Triangulation<dim,spacedim> *tria =
+    (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+     (&mg_dof.get_tria()));
+  AssertThrow(send_data_temp.size()==0 || tria!=NULL, ExcMessage("parallel Multigrid only works with a distributed Triangulation!"));
+
+  if (tria)
+    {
+      // TODO: This is a gigantic hack. We don't have a list of all our ghost
+      // neighbors, so we communicate with every other process. Searching the
+      // owner for every single DoF becomes quite inefficient. Please fix
+      // this, Timo.
+      std::vector<unsigned int> neighbors;
+      std::map<int, std::vector<dof_pair> > send_data;
+
+      {
+        // TODO: replace this with the minimum ghost neighbor list that should
+        // come from Triangulation
+        int n_proc = Utilities::MPI::n_mpi_processes(tria->get_communicator());
+        int myid = tria->locally_owned_subdomain();
+        for (unsigned int i=0;i<n_proc;++i)
+          if (i!=myid)
+            neighbors.push_back(i);
+      }
+
+      // * find owners of the level dofs and insert into send_data accordingly
+      for(typename std::vector<dof_pair>::iterator dofpair=send_data_temp.begin(); dofpair != send_data_temp.end(); ++dofpair)
+        {
+          for (std::vector<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
+            {
+              if (mg_dof.locally_owned_mg_dofs_per_processor(dofpair->level)[*it].is_element(dofpair->level_dof_index))
+                {
+                  send_data[*it].push_back(*dofpair);
+                  break;
+                }
+            }
+        }
+
+      // * send
+      std::vector<MPI_Request> requests;
+      {
+        for (std::vector<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
+          {
+            requests.push_back(MPI_Request());
+            unsigned int dest = *it;
+            std::vector<dof_pair> & data = send_data[dest];
+            if (data.size())
+              MPI_Isend(&data[0], data.size()*sizeof(data[0]), MPI_BYTE, dest, 71, tria->get_communicator(), &*requests.rbegin());
+            else
+              MPI_Isend(NULL, 0, MPI_BYTE, dest, 71, tria->get_communicator(), &*requests.rbegin());
+          }
+      }
+
+      // * receive
+      {
+        typename std::vector<dof_pair> receive;
+        for (std::vector<unsigned int>::iterator it = neighbors.begin(); it != neighbors.end(); ++it)
+          {
+            MPI_Status status;
+            int len;
+            MPI_Probe(MPI_ANY_SOURCE, 71, tria->get_communicator(), &status);
+            MPI_Get_count(&status, MPI_BYTE, &len);
+
+            if (len==0)
+              {
+                int err = MPI_Recv(NULL, 0, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                                       tria->get_communicator(), &status);
+                Assert(err==MPI_SUCCESS, ExcInternalError());
+                continue;
+              }
+
+            int count = len / sizeof(dof_pair);
+            Assert(count * sizeof(dof_pair) == len, ExcInternalError());
+            receive.resize(count);
+
+            void *ptr = &receive[0];
+            int err = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
+                                   tria->get_communicator(), &status);
+            Assert(err==MPI_SUCCESS, ExcInternalError());
+
+            for (unsigned int i=0; i<receive.size(); ++i)
+              {
+                copy_indices_level_mine[receive[i].level].push_back(
+                      std::pair<unsigned int, unsigned int> (receive[i].global_dof_index, receive[i].level_dof_index)
+                      );
+              }
+          }
+      }
+
+      // * wait
+      if (requests.size() > 0)
+        {
+          MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+          requests.clear();
         }
     }
 
@@ -336,10 +457,10 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   std::less<std::pair<types::global_dof_index, unsigned int> > compare;
   for (unsigned int level=0; level<copy_indices.size(); ++level)
     std::sort(copy_indices[level].begin(), copy_indices[level].end(), compare);
-  for (unsigned int level=0; level<copy_indices_from_me.size(); ++level)
-    std::sort(copy_indices_from_me[level].begin(), copy_indices_from_me[level].end(), compare);
-  for (unsigned int level=0; level<copy_indices_to_me.size(); ++level)
-    std::sort(copy_indices_to_me[level].begin(), copy_indices_to_me[level].end(), compare);
+  for (unsigned int level=0; level<copy_indices_level_mine.size(); ++level)
+    std::sort(copy_indices_level_mine[level].begin(), copy_indices_level_mine[level].end(), compare);
+  for (unsigned int level=0; level<copy_indices_global_mine.size(); ++level)
+    std::sort(copy_indices_global_mine[level].begin(), copy_indices_global_mine[level].end(), compare);
 #endif
 }
 
@@ -367,17 +488,17 @@ MGTransferPrebuilt<VECTOR>::print_indices (std::ostream &os) const
            << "]\t" << copy_indices[level][i].first << '\t' << copy_indices[level][i].second << std::endl;
     }
 
-  for (unsigned int level = 0; level<copy_indices_from_me.size(); ++level)
+  for (unsigned int level = 0; level<copy_indices_level_mine.size(); ++level)
     {
-      for (unsigned int i=0; i<copy_indices_from_me[level].size(); ++i)
+      for (unsigned int i=0; i<copy_indices_level_mine[level].size(); ++i)
         os << "copy_ifrom  [" << level
-           << "]\t" << copy_indices_from_me[level][i].first << '\t' << copy_indices_from_me[level][i].second << std::endl;
+           << "]\t" << copy_indices_level_mine[level][i].first << '\t' << copy_indices_level_mine[level][i].second << std::endl;
     }
-  for (unsigned int level = 0; level<copy_indices_to_me.size(); ++level)
+  for (unsigned int level = 0; level<copy_indices_global_mine.size(); ++level)
     {
-      for (unsigned int i=0; i<copy_indices_to_me[level].size(); ++i)
+      for (unsigned int i=0; i<copy_indices_global_mine[level].size(); ++i)
         os << "copy_ito    [" << level
-           << "]\t" << copy_indices_to_me[level][i].first << '\t' << copy_indices_to_me[level][i].second << std::endl;
+           << "]\t" << copy_indices_global_mine[level][i].first << '\t' << copy_indices_global_mine[level][i].second << std::endl;
     }
 }
 

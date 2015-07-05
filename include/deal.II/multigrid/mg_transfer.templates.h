@@ -28,6 +28,9 @@
 
 #include <algorithm>
 
+// Here you can turn on some cout statements and MPI Barriers for debugging:
+//#define DEBUG_OUTPUT
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -142,46 +145,42 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 {
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
   bool first = true;
+#ifdef DEBUG_OUTPUT
   std::cout << "copy_to_mg src " << src.l2_norm() << std::endl;
   MPI_Barrier(MPI_COMM_WORLD);
+#endif
   for (unsigned int level=mg_dof_handler.get_tria().n_global_levels(); level != 0;)
     {
       --level;
       VECTOR &dst_level = dst[level];
-      
+
+#ifdef DEBUG_OUTPUT
       MPI_Barrier(MPI_COMM_WORLD);
       int myid=-1;
       MPI_Comm_rank (MPI_COMM_WORLD, &myid);
+#endif
 
       typedef std::vector<std::pair<types::global_dof_index, unsigned int> >::const_iterator IT;
       for (IT i= copy_indices[level].begin();
            i != copy_indices[level].end(); ++i)
-        {
-          dst_level(i->second) = src(i->first);
-          if (i->first == 41)
-          std::cout << "L" << level << " " << i->first << " -> " << i->second << ": " << src(i->first) << " iam=" << myid << std::endl;
+        dst_level(i->second) = src(i->first);
 
-        }
-
-       for (IT i= copy_indices_to_me[level].begin();
-            i != copy_indices_to_me[level].end(); ++i)
-         {
-           dst_level(i->second) = src(i->first);
-           //if (i->first == 446)
-           if (i->first == 41)
-          std::cout << "L" << level << " " << i->first << " --> " << i->second << ": " << src(i->first)<< " iam=" << myid << std::endl;
-         }
+       for (IT i= copy_indices_global_mine[level].begin();
+            i != copy_indices_global_mine[level].end(); ++i)
+         dst_level(i->second) = src(i->first);
 
       dst_level.compress(VectorOperation::insert);
+#ifdef DEBUG_OUTPUT
       MPI_Barrier(MPI_COMM_WORLD);
       std::cout << "copy_to_mg dst " << level << " " << dst_level.l2_norm() << std::endl;
-
+#endif
       if (!first)
         {
           //if (level<2)
           restrict_and_add (level+1, dst[level], dst[level+1]);
+#ifdef DEBUG_OUTPUT
           std::cout << "copy_to_mg restr&add " << level << " " << dst_level.l2_norm() << std::endl;
-
+#endif
         }
 
       first = false;
@@ -198,6 +197,10 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   OutVector                     &dst,
   const MGLevelObject<VECTOR> &src) const
 {
+#ifdef DEBUG_OUTPUT
+  int myid=-1;
+  MPI_Comm_rank (MPI_COMM_WORLD, &myid);
+#endif
   // For non-DG: degrees of
   // freedom in the refinement
   // face may need special
@@ -209,48 +212,36 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   for (unsigned int level=0; level<mg_dof_handler.get_tria().n_global_levels(); ++level)
     {
       typedef std::vector<std::pair<types::global_dof_index, unsigned int> >::const_iterator IT;
-
+#ifdef DEBUG_OUTPUT
       MPI_Barrier(MPI_COMM_WORLD);
-      int myid=-1;
-      MPI_Comm_rank (MPI_COMM_WORLD, &myid);
       std::cout << "copy_from_mg src " << level << " " << src[level].l2_norm() << std::endl;
       MPI_Barrier(MPI_COMM_WORLD);
-
+#endif
 
       // First copy all indices local to this process
-      if (constraints==0)
-        for (IT i= copy_indices[level].begin();
-             i != copy_indices[level].end(); ++i)
-          dst(i->first) = src[level](i->second);
-      else
-        for (IT i= copy_indices[level].begin();
-             i != copy_indices[level].end(); ++i)
-             {
-               std::cout << "L" << level << " " << i->first << " <- " << i->second << ": " << src[level](i->second) << " iam=" << myid << std::endl;
-               
-          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
-             }
+      for (IT i= copy_indices[level].begin();
+           i != copy_indices[level].end(); ++i)
+        dst(i->first) = src[level](i->second);
 
       // Do the same for the indices where the level index is local,
       // but the global index is not
-      if (constraints==0)
-        for (IT i= copy_indices_from_me[level].begin();
-             i != copy_indices_from_me[level].end(); ++i)
-          dst(i->first) = src[level](i->second);
-      else
-        for (IT i= copy_indices_from_me[level].begin();
-             i != copy_indices_from_me[level].end(); ++i)
-             {
-               std::cout << "L" << level << " " << i->first << " <- " << i->second << ": " << src[level](i->second) << " iam=" << myid << " from-me"<< std::endl;
-          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
-             }
+      for (IT i= copy_indices_level_mine[level].begin();
+           i != copy_indices_level_mine[level].end(); ++i)
+        dst(i->first) = src[level](i->second);
+
+#ifdef DEBUG_OUTPUT
+      {
+        dst.compress(VectorOperation::insert);
+        MPI_Barrier(MPI_COMM_WORLD);
+        std::cout << "copy_from_mg level=" << level << " " << dst.l2_norm() << std::endl;
+      }
+#endif
     }
-  if (constraints == 0)
-    dst.compress(VectorOperation::insert);
-  else
-    dst.compress(VectorOperation::add);
+  dst.compress(VectorOperation::insert);
+#ifdef DEBUG_OUTPUT
   MPI_Barrier(MPI_COMM_WORLD);
   std::cout << "copy_from_mg " << dst.l2_norm() << std::endl;
+#endif
 }
 
 
@@ -273,25 +264,15 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
   for (unsigned int level=0; level<mg_dof_handler.get_tria().n_global_levels(); ++level)
     {
       typedef std::vector<std::pair<types::global_dof_index, unsigned int> >::const_iterator IT;
-      if (constraints==0)
-        for (IT i= copy_indices[level].begin();
-             i != copy_indices[level].end(); ++i)
-          dst(i->first) += src[level](i->second);
-      else
-        for (IT i= copy_indices[level].begin();
-             i != copy_indices[level].end(); ++i)
-          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
+      for (IT i= copy_indices[level].begin();
+           i != copy_indices[level].end(); ++i)
+        dst(i->first) += src[level](i->second);
 
       // Do the same for the indices where the level index is local,
       // but the global index is not
-      if (constraints==0)
-        for (IT i= copy_indices_from_me[level].begin();
-             i != copy_indices_from_me[level].end(); ++i)
-          dst(i->first) += src[level](i->second);
-      else
-        for (IT i= copy_indices_from_me[level].begin();
-             i != copy_indices_from_me[level].end(); ++i)
-          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
+      for (IT i= copy_indices_level_mine[level].begin();
+           i != copy_indices_level_mine[level].end(); ++i)
+        dst(i->first) += src[level](i->second);
     }
   dst.compress(VectorOperation::add);
 }

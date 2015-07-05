@@ -266,7 +266,7 @@ private:
    * Organization of the data is like for @p copy_indices_mine.
    */
   std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
-  copy_indices_to_me;
+  copy_indices_global_mine;
 
   /**
    * Additional degrees of freedom for the copy_from_mg() function. These are
@@ -276,7 +276,7 @@ private:
    * Organization of the data is like for @p copy_indices_mine.
    */
   std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
-  copy_indices_from_me;
+  copy_indices_level_mine;
 
 
   /**
