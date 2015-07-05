@@ -57,33 +57,6 @@ DEAL:0::cell=0_4:0320 level_subdomain_id=0
 DEAL:0::cell=0_4:0321 level_subdomain_id=0
 DEAL:0::cell=0_4:0322 level_subdomain_id=0
 DEAL:0::cell=0_4:0323 level_subdomain_id=0
-copy_indices[2]	10	4
-copy_indices[2]	13	5
-copy_indices[3]	0	1
-copy_indices[3]	1	4
-copy_indices[3]	2	3
-copy_indices[3]	3	5
-copy_indices[3]	4	2
-copy_indices[3]	5	6
-copy_indices[3]	6	7
-copy_indices[3]	7	8
-copy_indices[3]	8	9
-copy_indices[3]	9	10
-copy_indices[3]	12	13
-copy_indices[3]	14	15
-copy_indices[3]	15	16
-copy_indices[3]	16	17
-copy_indices[3]	17	20
-copy_indices[3]	18	21
-copy_indices[3]	19	22
-copy_indices[3]	20	23
-copy_indices[3]	21	18
-copy_indices[3]	33	19
-copy_indices[4]	22	0
-copy_indices[4]	23	1
-copy_indices[4]	24	2
-copy_indices[4]	25	3
-copy_indices[4]	30	12
 DEAL:0::ok
 
 DEAL:1::FE_Q<2>(1)
@@ -136,27 +109,5 @@ DEAL:1::cell=0_4:0320 level_subdomain_id=4294967294
 DEAL:1::cell=0_4:0321 level_subdomain_id=4294967294
 DEAL:1::cell=0_4:0322 level_subdomain_id=4294967294
 DEAL:1::cell=0_4:0323 level_subdomain_id=4294967294
-copy_indices[2]	34	9
-copy_indices[2]	35	10
-copy_indices[2]	36	11
-copy_indices[2]	37	12
-copy_indices[2]	38	13
-copy_indices[2]	39	14
-copy_indices[2]	40	15
-copy_indices[2]	41	16
-copy_indices[2]	42	18
-copy_indices[2]	43	19
-copy_indices[2]	44	17
-copy_indices[2]	45	20
-copy_indices[2]	47	21
-copy_indices[2]	48	22
-copy_indices[2]	49	23
-copy_indices[2]	50	24
-copy_indices[3]	52	26
-copy_indices[3]	55	31
-copy_indices[3]	56	32
-copy_indices[3]	57	33
-copy_indices[3]	59	37
-copy_ito    [2]	46	8
 DEAL:1::ok
 

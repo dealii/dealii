@@ -143,7 +143,7 @@ void check_fe(FiniteElement<dim> &fe)
 
   MGTransferPrebuilt<vector_t> transfer(hanging_node_constraints, mg_constrained_dofs);
   transfer.build_matrices(dofh);
-  transfer.print_indices(deallog.get_file_stream());
+  //transfer.print_indices(deallog.get_file_stream());
 
   MGLevelObject<vector_t> u(0, tr.n_global_levels()-1);
   for (unsigned int level=u.min_level(); level<=u.max_level(); ++level)
@@ -161,6 +161,7 @@ void check_fe(FiniteElement<dim> &fe)
   v.reinit(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   v = 0.;
   transfer.copy_from_mg(dofh, v, u);
+  hanging_node_constraints.distribute(v);
 
   {
     for (unsigned int i=0;i<dofh.locally_owned_dofs().n_elements();++i)
