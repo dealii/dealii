@@ -221,13 +221,7 @@ void check_simple(const FiniteElement<dim> &fe)
   DoFTools::make_hanging_node_constraints (
     mgdof,
     hnc);
-
-  DoFTools::make_hanging_node_constraints (
-    mgdof_renumbered,
-    hnc_renumbered);
   hnc.close ();
-  hnc_renumbered.close ();
-
 
   std::vector<unsigned int> block_component (4,0);
   block_component[2] = 1;
@@ -237,6 +231,10 @@ void check_simple(const FiniteElement<dim> &fe)
   for (unsigned int level=0; level<tr.n_levels(); ++level)
     DoFRenumbering::component_wise (mgdof_renumbered, level, block_component);
 
+  DoFTools::make_hanging_node_constraints (
+    mgdof_renumbered,
+    hnc_renumbered);
+  hnc_renumbered.close ();
 
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(mgdof, dirichlet_boundary_functions);
@@ -249,16 +247,20 @@ void check_simple(const FiniteElement<dim> &fe)
 
   MGTransferPrebuilt<Vector<double> > transfer_renumbered(hnc_renumbered, mg_constrained_dofs_renumbered);
   transfer_renumbered.build_matrices(mgdof_renumbered);
-
+  
+  // Fill vector u with some cell based numbering
   Vector<double> u(mgdof.n_dofs());
   initialize(mgdof,u);
 
   MGLevelObject<Vector<double> > v(0, tr.n_levels()-1);
   reinit_vector(mgdof, v);
-
+  
+  // Copy u to a multigrid vector and print
   transfer.copy_to_mg(mgdof, v, u);
   print(mgdof, v);
-
+  
+  // Forget everything so far and fill v with a cell based
+  // numbering. Prolongate from coarse grid up and transfer to u.
   u=0;
   initialize(mgdof, v);
   for (unsigned int l=0; l<tr.n_levels()-1; ++l)
@@ -266,13 +268,16 @@ void check_simple(const FiniteElement<dim> &fe)
 
   transfer.copy_from_mg(mgdof, u, v);
   Vector<double> diff = u;
-
+  
+  // Do the same for the renumbered mesh
   initialize(mgdof_renumbered,u);
   reinit_vector(mgdof_renumbered, v);
   transfer_renumbered.copy_to_mg(mgdof_renumbered, v, u);
   deallog << "copy_to_mg" << std::endl;
   print(mgdof_renumbered, v);
-
+  
+  // Prolongate up from coarse mesh and make sure the result does not
+  // depend on numbering
   u=0;
   initialize(mgdof_renumbered, v);
   for (unsigned int l=0; l<tr.n_levels()-1; ++l)

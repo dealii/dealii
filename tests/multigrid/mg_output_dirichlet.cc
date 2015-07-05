@@ -223,13 +223,7 @@ void check_simple(const FiniteElement<dim> &fe)
   DoFTools::make_hanging_node_constraints (
     mgdof,
     hnc);
-
-  DoFTools::make_hanging_node_constraints (
-    mgdof_renumbered,
-    hnc_renumbered);
   hnc.close ();
-  hnc_renumbered.close ();
-
 
   std::vector<unsigned int> block_component (4,0);
   block_component[2] = 1;
@@ -239,6 +233,10 @@ void check_simple(const FiniteElement<dim> &fe)
   for (unsigned int level=0; level<tr.n_levels(); ++level)
     DoFRenumbering::component_wise (mgdof_renumbered, level, block_component);
 
+  DoFTools::make_hanging_node_constraints (
+    mgdof_renumbered,
+    hnc_renumbered);
+  hnc_renumbered.close ();
 
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(mgdof, dirichlet_boundary_functions);
