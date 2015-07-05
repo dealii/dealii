@@ -2434,18 +2434,19 @@ namespace
       {
         DataOutBase::Patch<dim,spacedim> patch;
         patch.n_subdivisions = 1;
-        patch.data.reinit (4,GeometryInfo<dim>::vertices_per_cell);
+        patch.data.reinit (5,GeometryInfo<dim>::vertices_per_cell);
 
         for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
           {
             patch.vertices[v] = cell->vertex(v);
-            patch.data(0, v) = cell->level();
-            patch.data(1, v) = cell->material_id();
+            patch.data(0,v) = cell->level();
+	    patch.data(1,v) = static_cast<int>(cell->manifold_id());
+            patch.data(2,v) = cell->material_id();
             if (!cell->has_children())
-              patch.data(2, v) = static_cast<int>(cell->subdomain_id());
+              patch.data(3,v) = static_cast<int>(cell->subdomain_id());
             else
-              patch.data(2, v) = -1;
-            patch.data(3, v) = static_cast<int>(cell->level_subdomain_id());
+              patch.data(3,v) = -1;
+            patch.data(4,v) = static_cast<int>(cell->level_subdomain_id());
           }
         patches.push_back (patch);
       }
@@ -2453,11 +2454,12 @@ namespace
 
   std::vector<std::string> triangulation_patch_data_names ()
   {
-    std::vector<std::string> v(4);
+    std::vector<std::string> v(5);
     v[0] = "level";
-    v[1] = "material";
-    v[2] = "leaf_subdomain";
-    v[3] = "level_subdomain";
+    v[1] = "manifold";
+    v[2] = "material";
+    v[3] = "subdomain";
+    v[4] = "level_subdomain";
     return v;
   }
 }

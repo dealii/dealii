@@ -15,7 +15,7 @@
 
 
 
-// check level_subdomain_id for distributed Triangulation
+// check GriOut::write_vtk() with subdomain ids
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -59,13 +59,13 @@ void test()
   tr.refine_global(2);
   DoFHandler<dim> dofh(tr);
 
-  const std::string
-    filename = ("mesh" + Utilities::int_to_string(dim)
-		+ "d." +
-		Utilities::int_to_string(tr.locally_owned_subdomain(), 4) +
-		".vtk");
-  std::ofstream stream(filename.c_str());
-  output(tr, stream);
+  // const std::string
+  //   filename = ("mesh" + Utilities::int_to_string(dim)
+  // 		+ "d." +
+  // 		Utilities::int_to_string(tr.locally_owned_subdomain(), 4) +
+  // 		".vtk");
+  // std::ofstream stream(filename.c_str());
+  output(tr, deallog.get_file_stream());
 
   //tr.begin_active()->set_level_subdomain_id(1+myid);
 
