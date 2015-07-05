@@ -2440,7 +2440,7 @@ namespace
           {
             patch.vertices[v] = cell->vertex(v);
             patch.data(0,v) = cell->level();
-	    patch.data(1,v) = static_cast<int>(cell->manifold_id());
+            patch.data(1,v) = static_cast<int>(cell->manifold_id());
             patch.data(2,v) = cell->material_id();
             if (!cell->has_children())
               patch.data(3,v) = static_cast<int>(cell->subdomain_id());
