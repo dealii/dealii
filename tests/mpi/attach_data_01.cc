@@ -32,13 +32,6 @@
 
 #include <fstream>
 
-std::string id_to_string(const CellId &id)
-{
-  std::ostringstream ss;
-  ss << id;
-  return ss.str();
-}
-
 template<int dim>
 void pack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
 		    const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
@@ -116,13 +109,13 @@ void test()
            cell != tr.end();
            ++cell)
         {
-	  if (id_to_string(cell->id())=="0_1:0")
-	    {	      
+	  if (cell->id().to_string()=="0_1:0")
+	    {
 	      cell->set_refine_flag();
 	    }
-	  else if (id_to_string(cell->parent()->id())=="3_0:")
+	  else if (cell->parent()->id().to_string()=="3_0:")
 	    cell->set_coarsen_flag();
-	  
+
 	  if (cell->is_locally_owned())
 	    {
 	      deallog << "myid=" << myid << " cellid=" << cell->id();
