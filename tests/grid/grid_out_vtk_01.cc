@@ -32,15 +32,17 @@
 #include <iomanip>
 
 
-std::ofstream logfile("output");
-
-
 template <int dim, int spacedim>
-void test ()
+void test (std::ostream& logfile)
 {
   Triangulation<dim,spacedim> tria;
-  GridGenerator::hyper_cube (tria);
-  tria.refine_global (1);
+  std::vector<unsigned int> legs(2*dim, 1);
+  if (dim > 1)
+    GridGenerator::hyper_cross (tria, legs, true);
+  else
+    GridGenerator::subdivided_hyper_cube(tria, 2);
+  tria.begin_active()->set_refine_flag();
+  tria.execute_coarsening_and_refinement();
 
   GridOut grid_out;
   grid_out.write_vtk (tria, logfile);
@@ -49,16 +51,11 @@ void test ()
 
 int main ()
 {
-  deallog << std::setprecision (2);
-  logfile << std::setprecision (2);
-  deallog.attach(logfile);
-  deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
-
-  test<1,1> ();
-  test<1,2> ();
-  test<2,2> ();
-  test<2,3> ();
-  test<3,3> ();
+  initlog("output");
+  test<1,1> (deallog.get_file_stream());
+  test<1,2> (deallog.get_file_stream());
+  test<2,2> (deallog.get_file_stream());
+  test<2,3> (deallog.get_file_stream());
+  test<3,3> (deallog.get_file_stream());
 }
 

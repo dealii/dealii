@@ -541,6 +541,12 @@ inconvenience this causes.
 
 <ol>
 
+  <li>Improved: GridOut::write_vtk() and GridOut::write_vtu() now
+  output material id, level and subdomain ids of the cells.
+  <br>
+  (Guido Kanschat, 2015/07/05)
+  </li>
+
   <li>New: GridGenerator::cheese() for a mesh with many holes;
   GridGenerator::simplex() for simplices in 2 and 3 dimensions;
   GridGenerator::hyper_cross() for crosses in 2 and 3 dimensions.

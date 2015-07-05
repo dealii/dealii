@@ -2422,32 +2422,45 @@ namespace
    * A function that is able to convert each cell of a triangulation into
    * a patch that can then be output by the functions in DataOutBase.
    * This is made particularly simple because the patch only needs to
-   * contain geometry info -- we attach no data at all
+   * contain geometry info and additional properties of cells
    */
-  template <int dim, int spacedim>
-  std::vector<DataOutBase::Patch<dim,spacedim> >
-  triangulation_to_patches (const Triangulation<dim,spacedim> &triangulation)
+  template <int dim, int spacedim, typename ITERATOR, typename END>
+  void
+  generate_triangulation_patches (std::vector<DataOutBase::Patch<dim,spacedim> > &patches,
+                                  ITERATOR cell, END end)
   {
-    std::vector<DataOutBase::Patch<dim,spacedim> > patches;
-    patches.reserve (triangulation.n_active_cells());
-
     // convert each of the active cells into a patch
-    for (typename Triangulation<dim,spacedim>::active_cell_iterator cell = triangulation.begin_active();
-         cell != triangulation.end(); ++cell)
+    for (; cell != end; ++cell)
       {
         DataOutBase::Patch<dim,spacedim> patch;
         patch.n_subdivisions = 1;
+        patch.data.reinit (5,GeometryInfo<dim>::vertices_per_cell);
 
         for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-          patch.vertices[v] = cell->vertex(v);
-
-        // no data
-        patch.data.reinit (0,0);
-
+          {
+            patch.vertices[v] = cell->vertex(v);
+            patch.data(0,v) = cell->level();
+            patch.data(1,v) = static_cast<int>(cell->manifold_id());
+            patch.data(2,v) = cell->material_id();
+            if (!cell->has_children())
+              patch.data(3,v) = static_cast<int>(cell->subdomain_id());
+            else
+              patch.data(3,v) = -1;
+            patch.data(4,v) = static_cast<int>(cell->level_subdomain_id());
+          }
         patches.push_back (patch);
       }
+  }
 
-    return patches;
+  std::vector<std::string> triangulation_patch_data_names ()
+  {
+    std::vector<std::string> v(5);
+    v[0] = "level";
+    v[1] = "manifold";
+    v[2] = "material";
+    v[3] = "subdomain";
+    v[4] = "level_subdomain";
+    return v;
   }
 }
 
@@ -2463,8 +2476,11 @@ void GridOut::write_vtk (const Triangulation<dim,spacedim> &tria,
   // and then have them output. since there is no data attached to
   // the geometry, we also do not have to provide any names, identifying
   // information, etc.
-  DataOutBase::write_vtk (triangulation_to_patches(tria),
-                          std::vector<std::string>(),
+  std::vector<DataOutBase::Patch<dim,spacedim> > patches;
+  patches.reserve (tria.n_active_cells());
+  generate_triangulation_patches(patches, tria.begin_active(), tria.end());
+  DataOutBase::write_vtk (patches,
+                          triangulation_patch_data_names(),
                           std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >(),
                           vtk_flags,
                           out);
@@ -2484,8 +2500,11 @@ void GridOut::write_vtu (const Triangulation<dim,spacedim> &tria,
   // and then have them output. since there is no data attached to
   // the geometry, we also do not have to provide any names, identifying
   // information, etc.
-  DataOutBase::write_vtu (triangulation_to_patches(tria),
-                          std::vector<std::string>(),
+  std::vector<DataOutBase::Patch<dim,spacedim> > patches;
+  patches.reserve (tria.n_active_cells());
+  generate_triangulation_patches(patches, tria.begin_active(), tria.end());
+  DataOutBase::write_vtu (patches,
+                          triangulation_patch_data_names(),
                           std::vector<std_cxx11::tuple<unsigned int, unsigned int, std::string> >(),
                           vtu_flags,
                           out);

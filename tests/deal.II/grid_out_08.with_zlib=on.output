@@ -25,6 +25,14 @@ AQAAABgAAAAYAAAACwAAAA==eNpjZsYOAAOcAEk=
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAAIABAACAAQAAEgAAAA==eNpjYACBD/YMo/SA0AAihjjR    </DataArray>
+    <DataArray type="Float64" Name="material" format="binary">
+AQAAAIABAACAAQAADQAAAA==eNpjYBgFAwkAAYAAAQ==    </DataArray>
+    <DataArray type="Float64" Name="leaf_subdomain" format="binary">
+AQAAAIABAACAAQAADQAAAA==eNpjYBgFAwkAAYAAAQ==    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAAIABAACAAQAADQAAAA==eNpjYBgFAwkAAYAAAQ==    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>

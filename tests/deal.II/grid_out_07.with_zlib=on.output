@@ -6,25 +6,33 @@
 -->
 <VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
 <UnstructuredGrid>
-<Piece NumberOfPoints="4" NumberOfCells="2" >
+<Piece NumberOfPoints="6" NumberOfCells="3" >
   <Points>
     <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAGAAAABgAAAAEwAAAA==eNpjYMAHHtiTJv4BQxwAjgUDbg==
+AQAAAJAAAACQAAAAHAAAAA==eNpjYACBB/YMWMEHHOK4wAV70sQx7QUAp4oFjA==
     </DataArray>
   </Points>
 
   <Cells>
     <DataArray type="Int32" Name="connectivity" format="binary">
-AQAAABAAAAAQAAAAEwAAAA==eNpjYGBgYARiJiBmBmIAADgABw==
+AQAAABgAAAAYAAAAGAAAAA==eNpjYGBgYARiJiBmBmIWIGYFYgAApAAQ
     </DataArray>
     <DataArray type="Int32" Name="offsets" format="binary">
-AQAAAAgAAAAIAAAADgAAAA==eNpjYmBgYAFiAAAoAAc=
+AQAAAAwAAAAMAAAAEQAAAA==eNpjYmBgYAFiNiAGAABcAA0=
     </DataArray>
     <DataArray type="UInt8" Name="types" format="binary">
-AQAAAAIAAAACAAAACgAAAA==eNpjZgYAAAsABw==
+AQAAAAMAAAADAAAACwAAAA==eNpjZmYGAAAVAAo=
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAADAAAAAwAAAADwAAAA==eNpjYMAGPtjjogFBfAS9    </DataArray>
+    <DataArray type="Float64" Name="material" format="binary">
+AQAAADAAAAAwAAAADAAAAA==eNpjYCANAAAAMAAB    </DataArray>
+    <DataArray type="Float64" Name="leaf_subdomain" format="binary">
+AQAAADAAAAAwAAAADAAAAA==eNpjYCANAAAAMAAB    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAADAAAAAwAAAADAAAAA==eNpjYCANAAAAMAAB    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>
@@ -36,25 +44,33 @@ AQAAAAIAAAACAAAACgAAAA==eNpjZgYAAAsABw==
 -->
 <VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
 <UnstructuredGrid>
-<Piece NumberOfPoints="4" NumberOfCells="2" >
+<Piece NumberOfPoints="6" NumberOfCells="3" >
   <Points>
     <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAGAAAABgAAAAEwAAAA==eNpjYMAHHtiTJv4BQxwAjgUDbg==
+AQAAAJAAAACQAAAAHAAAAA==eNpjYACBB/YMWMEHHOK4wAV70sQx7QUAp4oFjA==
     </DataArray>
   </Points>
 
   <Cells>
     <DataArray type="Int32" Name="connectivity" format="binary">
-AQAAABAAAAAQAAAAEwAAAA==eNpjYGBgYARiJiBmBmIAADgABw==
+AQAAABgAAAAYAAAAGAAAAA==eNpjYGBgYARiJiBmBmIWIGYFYgAApAAQ
     </DataArray>
     <DataArray type="Int32" Name="offsets" format="binary">
-AQAAAAgAAAAIAAAADgAAAA==eNpjYmBgYAFiAAAoAAc=
+AQAAAAwAAAAMAAAAEQAAAA==eNpjYmBgYAFiNiAGAABcAA0=
     </DataArray>
     <DataArray type="UInt8" Name="types" format="binary">
-AQAAAAIAAAACAAAACgAAAA==eNpjZgYAAAsABw==
+AQAAAAMAAAADAAAACwAAAA==eNpjZmYGAAAVAAo=
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAADAAAAAwAAAADwAAAA==eNpjYMAGPtjjogFBfAS9    </DataArray>
+    <DataArray type="Float64" Name="material" format="binary">
+AQAAADAAAAAwAAAADAAAAA==eNpjYCANAAAAMAAB    </DataArray>
+    <DataArray type="Float64" Name="leaf_subdomain" format="binary">
+AQAAADAAAAAwAAAADAAAAA==eNpjYCANAAAAMAAB    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAADAAAAAwAAAADAAAAA==eNpjYCANAAAAMAAB    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>
@@ -66,25 +82,33 @@ AQAAAAIAAAACAAAACgAAAA==eNpjZgYAAAsABw==
 -->
 <VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
 <UnstructuredGrid>
-<Piece NumberOfPoints="16" NumberOfCells="4" >
+<Piece NumberOfPoints="32" NumberOfCells="8" >
   <Points>
     <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAIABAACAAQAAMwAAAA==eNpjYMAHHtgzkCQP4+MSRwcf7PGbi67vgz1+84h1Dy77Yeo+2FPmHlzmfMAQBwBtNxtp
+AQAAAAADAAAAAwAAWQAAAA==eNqlkcEJACAMA7tZRncVx+hTFPWhHAbMp5jGmGBER5Yxos65UIHfeoH+5AU+wG+9QA/vJvik2YtyPntRHtCnvDznns4u3L54X56vmwP99JeH9vd/NcNJQpE=
     </DataArray>
   </Points>
 
   <Cells>
     <DataArray type="Int32" Name="connectivity" format="binary">
-AQAAAEAAAABAAAAAKAAAAA==eNoNwwkSwBAQALB1VIvi/7+VzCQiIlnMVh9fm5/d6fB3edxeCvAAeQ==
+AQAAAIAAAACAAAAAPAAAAA==eNoNwwUOg0AAALCD4Q7DZfv/L2mThhBC5MfYxNTczMLS2srG1t7OwdGvk7OLm6u7h5ent49/f75V4AHx
     </DataArray>
     <DataArray type="Int32" Name="offsets" format="binary">
-AQAAABAAAAAQAAAAEwAAAA==eNpjYWBg4ABiHiAWAGIAAVAAKQ==
+AQAAACAAAAAgAAAAHQAAAA==eNpjYWBg4ABiHiAWAGIRIJYAYhkgVgBiAAegAJE=
     </DataArray>
     <DataArray type="UInt8" Name="types" format="binary">
-AQAAAAQAAAAEAAAADAAAAA==eNrj5OTkBAAAXgAl
+AQAAAAgAAAAIAAAACwAAAA==eNrj5IQAAAFMAEk=
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAAAABAAAAAQAAEAAAAA==eNpjYBgM4IP9QNEAk2wS8Q==    </DataArray>
+    <DataArray type="Float64" Name="material" format="binary">
+AQAAAAABAAAAAQAAHAAAAA==eNpjYACBD/YMeGkGB/w0BwFagAA9cAAAp2YIHQ==    </DataArray>
+    <DataArray type="Float64" Name="leaf_subdomain" format="binary">
+AQAAAAABAAAAAQAADAAAAA==eNpjYBjZAAABAAAB    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAAAABAAAAAQAADAAAAA==eNpjYBjZAAABAAAB    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>
@@ -96,25 +120,33 @@ AQAAAAQAAAAEAAAADAAAAA==eNrj5OTkBAAAXgAl
 -->
 <VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
 <UnstructuredGrid>
-<Piece NumberOfPoints="16" NumberOfCells="4" >
+<Piece NumberOfPoints="32" NumberOfCells="8" >
   <Points>
     <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAIABAACAAQAAMwAAAA==eNpjYMAHHtgzkCQP4+MSRwcf7PGbi67vgz1+84h1Dy77Yeo+2FPmHlzmfMAQBwBtNxtp
+AQAAAAADAAAAAwAAWQAAAA==eNqlkcEJACAMA7tZRncVx+hTFPWhHAbMp5jGmGBER5Yxos65UIHfeoH+5AU+wG+9QA/vJvik2YtyPntRHtCnvDznns4u3L54X56vmwP99JeH9vd/NcNJQpE=
     </DataArray>
   </Points>
 
   <Cells>
     <DataArray type="Int32" Name="connectivity" format="binary">
-AQAAAEAAAABAAAAAKAAAAA==eNoNwwkSwBAQALB1VIvi/7+VzCQiIlnMVh9fm5/d6fB3edxeCvAAeQ==
+AQAAAIAAAACAAAAAPAAAAA==eNoNwwUOg0AAALCD4Q7DZfv/L2mThhBC5MfYxNTczMLS2srG1t7OwdGvk7OLm6u7h5ent49/f75V4AHx
     </DataArray>
     <DataArray type="Int32" Name="offsets" format="binary">
-AQAAABAAAAAQAAAAEwAAAA==eNpjYWBg4ABiHiAWAGIAAVAAKQ==
+AQAAACAAAAAgAAAAHQAAAA==eNpjYWBg4ABiHiAWAGIRIJYAYhkgVgBiAAegAJE=
     </DataArray>
     <DataArray type="UInt8" Name="types" format="binary">
-AQAAAAQAAAAEAAAADAAAAA==eNrj5OTkBAAAXgAl
+AQAAAAgAAAAIAAAACwAAAA==eNrj5IQAAAFMAEk=
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAAAABAAAAAQAAEAAAAA==eNpjYBgM4IP9QNEAk2wS8Q==    </DataArray>
+    <DataArray type="Float64" Name="material" format="binary">
+AQAAAAABAAAAAQAAHAAAAA==eNpjYACBD/YMeGkGB/w0BwFagAA9cAAAp2YIHQ==    </DataArray>
+    <DataArray type="Float64" Name="leaf_subdomain" format="binary">
+AQAAAAABAAAAAQAADAAAAA==eNpjYBjZAAABAAAB    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAAAABAAAAAQAADAAAAA==eNpjYBjZAAABAAAB    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>
@@ -126,25 +158,33 @@ AQAAAAQAAAAEAAAADAAAAA==eNrj5OTkBAAAXgAl
 -->
 <VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
 <UnstructuredGrid>
-<Piece NumberOfPoints="64" NumberOfCells="8" >
+<Piece NumberOfPoints="112" NumberOfCells="14" >
   <Points>
     <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAAAGAAAABgAAeAAAAA==eNq1ksENwDAIA9PJ2H8LRvAIffXT9CBWRT4oAoR9sFb1MpaVf/6nfdRPdRnXK9bzFN58mbqEer91Kv757/yRLpcn8eh8uDwF9bsvjyflFbWuqfukvREv4tT5m7rPPNxTp5P2MX2fLk/yyX5m79PlSXV7vAFGfKSB
+AQAAAIAKAACACgAAyAAAAA==eNq1U8ENw0AMusEisUo3zSodw8+qVdKHIw5Ie/74EUww+MZ4V+2fNp5m/+JBcCB4c+7CDzKPOV8pfSB4CL0g/Jj3ErpL+aE6wtwQ5mn6Iuf2uX92bgjzhMhZ3HeF91o/5pX6eTsv3HxXCPOEmfPRz3K/91JzbJ7hej028T9k/z/xrq7Or3R2/nR/tR/TlfrJ/Oj8rGw/zfeV+sl0dn7m67/vk+XG/GI+yf0W3SfViexeaB6L7zP1k+2p9ll1n6mfDHftL/BMUEA=
     </DataArray>
   </Points>
 
   <Cells>
     <DataArray type="Int32" Name="connectivity" format="binary">
-AQAAAAABAAAAAQAAaQAAAA==eNoNwwVSAkAAAMADpaQ7pEGluyT//yt2ZzaEECJ+GPXTmAnjJk2Z9suMWfPmLFi0bMmKVevWbNj025ZtO/bs2nfgyKFjf/zz14lT585cuHTtyo1b9+48ePTsyYv/3rx69+HLp2+r3gfh
+AQAAAMABAADAAQAAsQAAAA==eNoNw1VSQgEAAMBntwJ2oSJiYHcLtmJ3dxf3/3N3ZoMgCHLMM9d8Cyyy0GJLLLPUciusstKQYauNWGOt9dbZYKPNNtliq21GbbfDTmPG7bLbhD32mrTPfgccctBhRxxz1HEnnHLSaWecc9Z5F1xy0ZRpV1x21TU3XHfTLTNuu+Ou++554KHHHnniqeeeeeGl115546333vngo88++eKr77754afffvnjr1n//AdNYhhJ
     </DataArray>
     <DataArray type="Int32" Name="offsets" format="binary">
-AQAAACAAAAAgAAAAHQAAAA==eNrjYGBgEABiCSBWAGINIDYAYgsgdgBiAA8gASE=
+AQAAADgAAAA4AAAALAAAAA==eNrjYGBgEABiCSBWAGINIDYAYgsgdgBiDyAOAOIIIE4A4gwgLgBiAEY4A0k=
     </DataArray>
     <DataArray type="UInt8" Name="types" format="binary">
-AQAAAAgAAAAIAAAACwAAAA==eNrj4YEAAAG4AGE=
+AQAAAA4AAAAOAAAACwAAAA==eNrj4UEGAAT6AKk=
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="level" format="binary">
+AQAAAIADAACAAwAAFAAAAA==eNpjYBgFAw8+2I/SI5MGACClS8E=    </DataArray>
+    <DataArray type="Float64" Name="material" format="binary">
+AQAAAIADAACAAwAAJAAAAA==eNpjYACBD/YMFNEMDpTRHBTSAhTSIhTSEhTSo2CkAgAhCRWZ    </DataArray>
+    <DataArray type="Float64" Name="leaf_subdomain" format="binary">
+AQAAAIADAACAAwAAEQAAAA==eNpjYBgFo2AUDBQAAAOAAAE=    </DataArray>
+    <DataArray type="Float64" Name="level_subdomain" format="binary">
+AQAAAIADAACAAwAAEQAAAA==eNpjYBgFo2AUDBQAAAOAAAE=    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>

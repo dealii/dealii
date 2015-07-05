@@ -167,6 +167,11 @@ MACRO(DEAL_II_PICKUP_TESTS)
       ENDIF()
     ENDFOREACH()
 
+    # Disable tests using mpirun if MPI is not enabled
+    STRING(REGEX MATCH "mpirun=" _matches ${_test})
+    IF (_matches AND NOT DEAL_II_WITH_MPI)
+      SET(_define_test FALSE)
+    ENDIF()
     #
     # Query configuration and check whether we support it. Otherwise
     # set _define_test to FALSE:
