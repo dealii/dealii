@@ -215,6 +215,7 @@ MGConstrainedDoFs::clear()
 
   refinement_edge_indices_old.clear();
   refinement_edge_boundary_indices_old.clear();
+  boundary_indices_old.clear();
 }
 
 
