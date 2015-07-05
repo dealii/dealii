@@ -18,7 +18,6 @@
 // check level_subdomain_id for distributed Triangulation
 
 #include "../tests.h"
-#include "coarse_grid_common.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
