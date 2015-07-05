@@ -191,6 +191,14 @@ namespace Utilities
                            const unsigned int position);
 
   /**
+   * Return a string with all occurrences of @p from in @p input replaced by
+   * @p to.
+   */
+  std::string replace_in_string(const std::string &input,
+                                const std::string &from,
+                                const std::string &to);
+
+  /**
    * Generate a random number from a normalized Gaussian probability
    * distribution centered around @p a and with standard deviation @p sigma.
    *

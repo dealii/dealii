@@ -94,6 +94,26 @@ namespace Utilities
 
 
   std::string
+  replace_in_string(const std::string &input,
+                    const std::string &from,
+                    const std::string &to)
+  {
+    if (from.empty())
+      return input;
+
+    std::string out = input;
+    std::string::size_type pos = out.find(from);
+
+    while (pos != std::string::npos)
+      {
+        out.replace(pos, from.size(), to);
+        pos = out.find(from, pos + to.size());
+      }
+    return out;
+  }
+
+
+  std::string
   dim_string(const int dim, const int spacedim)
   {
     if (dim == spacedim)

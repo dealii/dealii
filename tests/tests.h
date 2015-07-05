@@ -133,28 +133,6 @@ void sort_file_contents (const std::string &filename)
 }
 
 
-/**
- * Replace all occurrences of @p from in @p input by @p to and return the new
- * string.
- * TODO: move this to Utilities.
- */
-std::string replace(const std::string& input,
-		    const std::string& from,
-		    const std::string& to)
-{
-  if (from.empty())
-    return input;
-
-  std::string out = input;
-  std::string::size_type pos = out.find(from);
-  
-  while (pos != std::string::npos)
-    {
-      out.replace(pos, from.size(), to);
-      pos = out.find(from, pos + to.size());
-    }
-  return out;
-}
 
 
 /*
@@ -167,10 +145,10 @@ std::string replace(const std::string& input,
 std::string unify_pretty_function (const std::string &text)
 {
   std::string t=text;
-  t=replace(t, " &", "& ");
-  t=replace(t, " & ,", "&,");
-  t=replace(t, " & ", "& ");
-  t=replace(t, "virtual ", "");
+  t=Utilities::replace_in_string(t, " &", "& ");
+  t=Utilities::replace_in_string(t, " & ,", "&,");
+  t=Utilities::replace_in_string(t, " & ", "& ");
+  t=Utilities::replace_in_string(t, "virtual ", "");
   return t;
 }
 
