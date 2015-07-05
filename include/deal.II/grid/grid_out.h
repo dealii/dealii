@@ -664,17 +664,18 @@ namespace GridOutFlags
     /// The factor determining the vertical distance between levels (default = 0.3)
     float level_height_factor;
 
-    /**
-     * Cell labeling (fixed order).
-     *
-     * The following booleans determine which properties of the cell shall be
-     * displayed as text in the middle of each cell.
-     */
-    bool label_level_number;    // default: true
-    bool label_cell_index;      // default: true
-    bool label_material_id;     // default: false
-    bool label_subdomain_id;    // default: false
-    bool label_level_subdomain_id;  // default: false
+    /// Scaling of the font for cell annotations. Defaults to 1.
+    float cell_font_scaling;
+    /// Write level number into each cell. Defaults to true
+    bool label_level_number;
+    /// Write cell index into each cell. Defaults to true
+    bool label_cell_index;
+    /// Write material id of each cell. Defaults to false
+    bool label_material_id;
+    /// Write subdomain id of each cell. Defaults to false
+    bool label_subdomain_id;
+    /// Write level subdomain id of each cell. Defaults to false
+    bool label_level_subdomain_id;
 
     /// Draw a colorbar next to the plotted grid with respect to the chosen coloring of the cells
     bool draw_colorbar;

@@ -547,6 +547,14 @@ inconvenience this causes.
   (Guido Kanschat, 2015/07/05)
   </li>
 
+  <li>Improved: The font scaling in GridOut::write_svg() was broken,
+  since the units were missing. It has been fixed and an additional
+  parameter GridOutFlags::Svg::cell_font_scaling has been introduced
+  for tuning.
+  <br>
+  (Guido Kanschat, 2015/07/04)
+  </li>
+  
   <li>New: GridGenerator::cheese() for a mesh with many holes;
   GridGenerator::simplex() for simplices in 2 and 3 dimensions;
   GridGenerator::hyper_cross() for crosses in 2 and 3 dimensions.
