@@ -145,8 +145,9 @@ void sort_file_contents (const std::string &filename)
 std::string unify_pretty_function (const std::string &text)
 {
   std::string t=text;
-  t=Utilities::replace_in_string(t, " &", "& ");
+  t=Utilities::replace_in_string(t, " &", " & ");
   t=Utilities::replace_in_string(t, " & ,", "&,");
+  t=Utilities::replace_in_string(t, " & )", "&)");
   t=Utilities::replace_in_string(t, " & ", "& ");
   t=Utilities::replace_in_string(t, "virtual ", "");
   return t;
