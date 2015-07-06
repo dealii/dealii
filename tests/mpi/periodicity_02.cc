@@ -325,10 +325,9 @@ namespace Step22
       DoFTools::extract_locally_relevant_dofs (dof_handler, locally_relevant_dofs);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(n_u, n_u+n_p));
-    }
-
-    {
+    
       constraints.clear ();
+      constraints.reinit(locally_relevant_dofs);
 
       FEValuesExtractors::Vector velocities(0);
       FEValuesExtractors::Scalar pressure(dim);
