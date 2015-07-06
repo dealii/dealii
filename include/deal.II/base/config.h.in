@@ -290,6 +290,7 @@
 
 #  define DEAL_II_DISABLE_EXTRA_DIAGNOSTICS                      \
 _Pragma("GCC diagnostic push")                                   \
+_Pragma("GCC diagnostic ignored \"-Wunknown-pragmas\"")          \
 _Pragma("GCC diagnostic ignored \"-Wpragmas\"")                  \
 _Pragma("GCC diagnostic ignored \"-Wextra\"")                    \
 _Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"")       \
