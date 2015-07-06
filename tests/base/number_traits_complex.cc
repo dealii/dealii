@@ -23,11 +23,21 @@
 #include <limits>
 #include <typeinfo>
 
+// replace type names found on MAC OS
+std::string cleanup_type(std::string &in)
+{
+  std::string ret = in;
+  ret = Utilities::replace_in_string(ret, "NSt3__17complexIfEE", "St7complexIfE");
+  ret = Utilities::replace_in_string(ret, "NSt3__17complexIdEE", "St7complexIdE");
+  return ret;
+}
+
 
 template <typename number>
 void check (const number &x)
 {
-  deallog << "typeid(x).name() = " << typeid(x).name()
+  deallog << "typeid(x).name() = "
+          << cleanup_type(typeid(x).name())
           << std::endl;
 
   deallog << "typeid(NumberTraits<number>::real_type).name() = "
