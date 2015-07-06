@@ -1048,7 +1048,7 @@ namespace
                 {
                   /*
                    * The values for tree_to_face are in 0..23 where ttf % 6
-                   * gives the face number and ttf / 6 the face orientation
+                   * gives the face number and ttf / 4 the face orientation
                    * code.  The orientation is determined as follows.  Let
                    * my_face and other_face be the two face numbers of the
                    * connecting trees in 0..5.  Then the first face vertex of
@@ -4195,11 +4195,71 @@ namespace parallel
             = coarse_cell_to_p4est_tree_permutation[std::distance(this->begin(),
                                                                   second_cell)];
 
-          //TODO Add support for non default orientation.
-          Assert(it->orientation == 1,
-                 ExcMessage("Found a face match with non standard orientation. "
-                            "This function is only suitable for meshes with "
-                            "cells in default orientation"));
+          // p4est wants to know which corner the first corner on
+          // the face with the lower id is mapped to on the face with
+          // with the higher id. For d==2 there are only two possibilities
+          // that are determined by it->orientation[1].
+          // For d==3 we have to use GridTools::OrientationLookupTable.
+          // The result is given below.
+
+          unsigned int p4est_orientation = 0;
+          if (dim==2)
+            p4est_orientation = it->orientation[1];
+          else
+            {
+              const unsigned int face_idx_list[] = {face_left, face_right};
+              const cell_iterator cell_list[] = {first_cell, second_cell};
+              unsigned int lower_idx, higher_idx;
+              if (face_left<=face_right)
+                {
+                  higher_idx = 1;
+                  lower_idx = 0;
+                }
+              else
+                {
+                  higher_idx = 0;
+                  lower_idx = 1;
+                }
+
+              // get the cell index of the first index on the face with the lower id
+              unsigned int first_p4est_idx_on_cell = p8est_face_corners[face_idx_list[lower_idx]][0];
+              unsigned int first_dealii_idx_on_face = numbers::invalid_unsigned_int;
+              for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
+                {
+                  const unsigned int first_dealii_idx_on_cell
+                    =  GeometryInfo<dim>::face_to_cell_vertices
+                       (face_idx_list[lower_idx], i,
+                        cell_list[lower_idx]->face_orientation(face_idx_list[lower_idx]),
+                        cell_list[lower_idx]->face_flip(face_idx_list[lower_idx]),
+                        cell_list[lower_idx]->face_rotation(face_idx_list[lower_idx]));
+                  if (first_p4est_idx_on_cell == first_dealii_idx_on_cell)
+                    {
+                      first_dealii_idx_on_face = i;
+                      break;
+                    }
+                }
+              Assert( first_dealii_idx_on_face != numbers::invalid_unsigned_int, ExcInternalError());
+              // Now map dealii_idx_on_face according to the orientation
+              const unsigned int left_to_right [8][4] = {{0,2,1,3},{0,1,2,3},{3,1,2,0},{3,2,1,0},
+                {2,3,0,1},{1,3,0,2},{1,0,3,2},{2,0,3,1}
+              };
+              const unsigned int right_to_left [8][4] = {{0,2,1,3},{0,1,2,3},{3,1,2,0},{3,2,1,0},
+                {2,3,0,1},{2,0,3,1},{1,0,3,2},{1,3,0,2}
+              };
+              const unsigned int second_dealii_idx_on_face
+                = lower_idx==0?left_to_right[it->orientation.to_ulong()][first_dealii_idx_on_face]:
+                  right_to_left[it->orientation.to_ulong()][first_dealii_idx_on_face];
+              const unsigned int second_dealii_idx_on_cell
+                = GeometryInfo<dim>::face_to_cell_vertices
+                  (face_idx_list[higher_idx], second_dealii_idx_on_face,
+                   cell_list[higher_idx]->face_orientation(face_idx_list[higher_idx]),
+                   cell_list[higher_idx]->face_flip(face_idx_list[higher_idx]),
+                   cell_list[higher_idx]->face_rotation(face_idx_list[higher_idx]));
+              //map back to p4est
+              const unsigned int second_p4est_idx_on_face
+                = p8est_corner_face_corners[second_dealii_idx_on_cell][face_idx_list[higher_idx]];
+              p4est_orientation = second_p4est_idx_on_face;
+            }
 
           dealii::internal::p4est::functions<dim>::
           connectivity_join_faces (connectivity,
@@ -4207,18 +4267,7 @@ namespace parallel
                                    tree_right,
                                    face_left,
                                    face_right,
-                                   /* orientation */ 0);
-
-          /* The orientation parameter above describes the difference between
-           * the cell on the left and the cell on the right would number of the
-           * corners of the face.  In the periodic domains most users will want,
-           * this orientation will be 0, i.e. the two cells would number the
-           * corners the same way.  More exotic periodicity, like moebius strips
-           * or converting an unstructured quad/hex mesh into a periodic domain,
-           * are not supported right now, and undefined behavior will occur if
-           * users try to make them periodic.  This may be addressed at a later
-           * date.
-           */
+                                   p4est_orientation);
         }
 
 
