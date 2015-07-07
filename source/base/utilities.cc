@@ -627,6 +627,22 @@ namespace Utilities
     }
 
 
+
+    std::string get_date ()
+    {
+      std::time_t  time1= std::time (0);
+      std::tm     *time = std::localtime(&time1);
+
+      std::ostringstream o;
+      o << time->tm_year + 1900 << "/"
+        << time->tm_mon + 1 << "/"
+        << time->tm_mday;
+
+      return o.str();
+    }
+
+
+
     void posix_memalign (void **memptr, size_t alignment, size_t size)
     {
 #ifndef DEAL_II_MSVC
