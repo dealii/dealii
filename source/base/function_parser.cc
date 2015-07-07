@@ -20,7 +20,9 @@
 
 
 #ifdef DEAL_II_WITH_MUPARSER
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <muParser.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #else
 
 namespace fparser
