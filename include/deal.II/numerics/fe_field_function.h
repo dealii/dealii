@@ -19,6 +19,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_vector.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
@@ -48,6 +49,11 @@ namespace Functions
    * construct a quadrature object for the point (or set of points) where you
    * want to evaluate your finite element function. In order to do so, it
    * needs to find out where the points lie.
+   *
+   * @note This function is not intended for assembling a vector or a
+   * matrix on a cell-by-cell basis. Tailored access through FEValues
+   * or similar is recommended then. In such a case, the base class
+   * DoFVector may be helpful.
    *
    * If you know in advance in which cell your points lie, you can accelerate
    * things a bit, by calling set_active_cell before asking for values or
@@ -162,7 +168,7 @@ namespace Functions
   template <int dim,
             typename DH=DoFHandler<dim>,
             typename VECTOR=Vector<double> >
-  class FEFieldFunction :  public Function<dim>
+  class FEFieldFunction :  public Function<dim>, private DoFVector<DH, VECTOR>
   {
   public:
     /**
@@ -425,16 +431,6 @@ namespace Functions
     typedef
     Threads::ThreadLocalStorage <typename DH::active_cell_iterator >
     cell_hint_t;
-
-    /**
-     * Pointer to the dof handler.
-     */
-    SmartPointer<const DH,FEFieldFunction<dim, DH, VECTOR> > dh;
-
-    /**
-     * A reference to the actual data vector.
-     */
-    const VECTOR &data_vector;
 
     /**
      * A reference to the mapping being used.

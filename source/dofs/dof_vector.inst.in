@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2015 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,22 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-
-
-for (VECTOR : SERIAL_VECTORS)
+for (VEC : SERIAL_VECTORS ; DH : DOFHANDLER_TEMPLATES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
-    template class VectorMemory<VECTOR>;
-    template class GrowingVectorMemory<VECTOR>;
+#if deal_II_dimension <= deal_II_space_dimension
+    template
+    void DoFVector< DH<deal_II_dimension,deal_II_space_dimension>, VEC>::sync ();
 
-    template class VectorMemory<MGLevelObject<VECTOR> >;
-    template class GrowingVectorMemory<MGLevelObject<VECTOR> >;
-  }
-
- for (SCALAR : COMPLEX_SCALARS)
-  {
-    template class VectorMemory<Vector<SCALAR> >;
-    template class GrowingVectorMemory<Vector<SCALAR> >;
-
-    template class VectorMemory<BlockVector<SCALAR> >;
-    template class GrowingVectorMemory<BlockVector<SCALAR> >;
+    template
+    void DoFVector< DH<deal_II_dimension,deal_II_space_dimension>,
+      MGLevelObject<VEC> >::sync ();
+#endif
   }

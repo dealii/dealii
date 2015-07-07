@@ -28,6 +28,7 @@ SET(_src
   dof_tools.cc
   dof_tools_constraints.cc
   dof_tools_sparsity.cc
+  dof_vector.cc
   number_cache.cc
   )
 
@@ -43,6 +44,7 @@ SET(_inst
   dof_tools_constraints.inst.in
   dof_tools.inst.in
   dof_tools_sparsity.inst.in
+  dof_vector.inst.in
   )
 
 FILE(GLOB _header
