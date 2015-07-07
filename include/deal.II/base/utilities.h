@@ -378,6 +378,12 @@ namespace Utilities
     std::string get_time ();
 
     /**
+     * Return the present date as YYYY/MM/DD. MM and DD may be either one or two
+     * digits.
+     */
+    std::string get_date ();
+
+    /**
      * Call the system function posix_memalign, or a replacement function if not
      * available, to allocate memory with a certain minimal alignment. The
      * first argument will then return a pointer to this memory block that can
