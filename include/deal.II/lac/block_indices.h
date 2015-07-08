@@ -21,6 +21,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
 #include <cstddef>
 #include <vector>
 
@@ -115,6 +116,13 @@ public:
    * The size of the @p ith block.
    */
   size_type block_size (const unsigned int i) const;
+
+  /**
+   * String representation of the block sizes. The output is of the
+   * form `[nb->b1,b2,b3|s]`, where `nb` is n_blocks(), `s`
+   * is total_size() and `b1` etc. are the values of block_size().
+   */
+  std::string to_string () const;
 
   //@}
 
@@ -418,6 +426,23 @@ BlockIndices::block_size (const unsigned int block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   return start_indices[block+1]-start_indices[block];
+}
+
+
+
+inline
+std::string
+BlockIndices::to_string () const
+{
+  std::string result = "[" + Utilities::int_to_string(n_blocks) + "->";
+  for (unsigned int i=0; i<n_blocks; ++i)
+    {
+      if (i>0)
+        result += ',';
+      result += Utilities::int_to_string(block_size(i));
+    }
+  result += "|" + Utilities::int_to_string(total_size()) + ']';
+  return result;
 }
 
 
