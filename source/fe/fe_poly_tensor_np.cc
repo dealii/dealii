@@ -403,6 +403,16 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_values (
   FEValuesData<dim,spacedim>                       &data,
   CellSimilarity::Similarity                  &cell_similarity) const
 {
+
+
+
+// for(unsigned int k=0; k<data.quadrature_points.size(); ++k)
+// {
+//        std::cout << data.quadrature_points[k] << "   JxW: "
+//       << data.JxW_values[k]
+//       <<std::endl; 
+// }
+
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
@@ -412,6 +422,8 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_values (
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
+  // const UpdateFlags flags(fe_data.update_each | fe_data.update_once);
+
   Assert (flags & update_quadrature_points, ExcInternalError());
 
   const unsigned int n_q_points = data.quadrature_points.size();
@@ -455,6 +467,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_values (
   if(flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
     {
+
       poly_space.compute(data.quadrature_points[k],
         values, grads, grad_grads);
 
@@ -599,13 +612,13 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_face_values (
   std::vector<Tensor<3,dim> > grad_grads(0);
 
   if (flags & update_values)
-      values.resize (this->dofs_per_face);
+      values.resize (this->dofs_per_cell);
 
   if (flags & update_gradients)
-      grads.resize (this->dofs_per_face);
+      grads.resize (this->dofs_per_cell);
 
 
-  if (flags & (upsate_values | update_gradients))
+  if (flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
     {
       poly_space.compute(data.quadrature_points[k],
@@ -615,7 +628,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_face_values (
       {
         const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
                                                                     this->get_nonzero_components(i).first_selected_component()];
-        if (flags & update_vlues)
+        if (flags & update_values)
         {
           for (unsigned int d=0; d<dim; ++d)
             data.shape_values(first+d,k) = sign_change[i] * values[i][d];
@@ -911,7 +924,6 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
     }
     }
 
-    if (flags & (upsate_values | update_gradients))
       out |= update_quadrature_points;
 
   return out;
