@@ -1186,7 +1186,11 @@ FESystem<dim,spacedim>::compute_fill (
           // Piola transformation, which is applied to correctly map the RT
           // space from the reference element to the global coordinate system.
           if (cell_similarity != CellSimilarity::translation)
+          {
             base_data.JxW_values = data.JxW_values;
+            // added by Zhen Tao
+            base_data.quadrature_points = data.quadrature_points;
+          }
 
 
           // Make sure that in the case of fill_fe_values the data is only
