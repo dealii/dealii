@@ -92,6 +92,11 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-variable")
 
+  # without c++11 enabled, clang produces a ton of warnings in boost:
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c99-extensions")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-variadic-macros")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-c++11-extensions")
+
   IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.6")
     #
     # Clang versions prior to 3.6 emit a lot of false positives wrt
