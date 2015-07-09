@@ -1157,7 +1157,7 @@ namespace VectorTools
    *
    * $c_{i} = \int_{f} (\vec{n} \times \vec{r}) \cdot (\vec{n} \times \vec{s}_i) dS$
    *
-   * and $\vec{r} = \vec{F} - \sum_{e \in f} \sum{i \in e} \x_{i}\vec{s}_i}$, the edge residual.
+   * and $\vec{r} = \vec{F} - \sum_{e \in f} \sum{i \in e} x_{i}\vec{s}_i$, the edge residual.
    *
    * The resulting constraints are then given in the solutions $x$ and $y$.
    *

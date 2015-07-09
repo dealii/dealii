@@ -665,7 +665,7 @@ public:
   /**
    * Simple vector addition, equal to the <tt>operator +=</tt>.
    *
-   * @deprecate Use the <tt>operator +=</tt> instead.
+   * @deprecated Use the <tt>operator +=</tt> instead.
    *
    * @dealiiOperationIsMultithreaded
    */

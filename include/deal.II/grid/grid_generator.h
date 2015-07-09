@@ -79,16 +79,16 @@ namespace GridGenerator
   /**
    * \brief Mesh of a d-simplex with (d+1) vertices and mesh cells, resp.
    *
-   * The <code>vertices<code> argument contains a vector with all d+1
-   * vertices of the simplex. They must be given in an order such that
+   * The @p vertices argument contains a vector with all d+1 vertices
+   * of the simplex. They must be given in an order such that
    * the vectors from the first vertex to each of the others form a
    * right-handed system. And I am not happy about the discrimination
    * involved here.
    *
    * The meshes generated in two and three dimensions are
    *
-   * @image simplex_2d.png
-   * @image simplex_3d.png
+   * @image html simplex_2d.png
+   * @image html simplex_3d.png
    *
    * @author Guido Kanschat
    * @date 2015
@@ -237,7 +237,7 @@ namespace GridGenerator
    *
    * An example with two by three holes is
    *
-   * @image cheese_2d.png
+   * @image html cheese_2d.png
    *
    * @author Guido Kanschat
    * @date 2015
@@ -458,8 +458,8 @@ namespace GridGenerator
   *
   * Examples in two and three dimensions are
   *
-  * @image hyper_cross_2d.png
-  * @image hyper_cross_3d.png
+  * @image html hyper_cross_2d.png
+  * @image html hyper_cross_3d.png
   *
   * @author Guido Kanschat
   * @date 2015
