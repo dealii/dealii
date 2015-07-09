@@ -120,9 +120,9 @@ template <typename> class TriaActiveIterator;
  *
  * Furthermore, the iterators described here satisfy the requirement of input
  * and bidirectional iterators as stated by the C++ standard. It is therefore
- * possible to use the functions from the algorithm section of the C++ standard,
- * e.g., <em>count_if</em> (see the documentation for Triangulation for an
- * example) and several others.
+ * possible to use the functions from the algorithm section of the C++
+ * standard, e.g., <em>count_if</em> (see the documentation for Triangulation
+ * for an example) and several others.
  *
  * <h3>Implementation</h3>
  *

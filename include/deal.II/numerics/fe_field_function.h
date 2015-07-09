@@ -121,9 +121,9 @@ namespace Functions
    * @ref GlossGhostCell).
    * If the cell is artificial, we have no access to the solution there and
    * functions that evaluate the solution at such a point will trigger an
-   * exception of type VectorTools::ExcPointNotAvailableHere. The same
-   * kind of exception will also be produced if the cell is a ghost cell: On
-   * such cells, one could in principle evaluate the solution, but it becomes
+   * exception of type VectorTools::ExcPointNotAvailableHere. The same kind of
+   * exception will also be produced if the cell is a ghost cell: On such
+   * cells, one could in principle evaluate the solution, but it becomes
    * easier if we do not allow to do so because then there is exactly one
    * processor in a parallel distributed computation that can indeed evaluate
    * the solution. Consequently, it is clear which processor is responsible

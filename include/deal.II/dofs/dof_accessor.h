@@ -799,8 +799,8 @@ public:
 
   /**
    * Return an invalid iterator of a type that represents pointing to a child
-   * of the current object. The object is invalid because points (as represented
-   * by the current class) do not have children.
+   * of the current object. The object is invalid because points (as
+   * represented by the current class) do not have children.
    */
   TriaIterator<DoFAccessor<0,DH<1,spacedim>, level_dof_access > >
   child (const unsigned int c) const;

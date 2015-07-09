@@ -208,9 +208,9 @@ namespace SparsityPatternIterators
    * The typical use for these iterators is to iterate over the elements of a
    * sparsity pattern (or, since they also serve as the basis for iterating
    * over the elements of an associated matrix, over the elements of a sparse
-   * matrix), or over the elements of individual rows. There is no
-   * guarantee that the elements of a row are actually traversed in an order
-   * in which column numbers monotonically increase. See the documentation of the
+   * matrix), or over the elements of individual rows. There is no guarantee
+   * that the elements of a row are actually traversed in an order in which
+   * column numbers monotonically increase. See the documentation of the
    * SparsityPattern class for more information.
    *
    * @note This class operates directly on the internal data structures of the
@@ -388,9 +388,9 @@ public:
    * statements like <tt>v.push_back (SparsityPattern());</tt>, with
    * <tt>v</tt> a vector of SparsityPattern objects.
    *
-   * Usually, it is sufficient to use the explicit keyword to disallow unwanted
-   * temporaries, but this does not work for <tt>std::vector</tt>s. Since
-   * copying a structure like this is not useful anyway because multiple
+   * Usually, it is sufficient to use the explicit keyword to disallow
+   * unwanted temporaries, but this does not work for <tt>std::vector</tt>s.
+   * Since copying a structure like this is not useful anyway because multiple
    * matrices can use the same sparsity structure, copies are only allowed for
    * empty objects, as described above.
    */
@@ -614,11 +614,11 @@ public:
                   const ForwardIterator end);
 
   /**
-   * Copy data from an object of type DynamicSparsityPattern. Although
-   * not a compressed sparsity pattern, this function is also instantiated if
-   * the argument is of type SparsityPattern (i.e., the current class).
-   * Previous content of this object is lost, and the sparsity pattern is in
-   * compressed mode afterwards.
+   * Copy data from an object of type DynamicSparsityPattern. Although not a
+   * compressed sparsity pattern, this function is also instantiated if the
+   * argument is of type SparsityPattern (i.e., the current class). Previous
+   * content of this object is lost, and the sparsity pattern is in compressed
+   * mode afterwards.
    */
   template <typename CompressedSparsityType>
   void copy_from (const CompressedSparsityType &dsp);

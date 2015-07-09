@@ -297,10 +297,10 @@ namespace GridTools
                           const Function<dim,double> *coefficient = 0);
 
   /**
-  * Returns a std::map with all vertices of faces located in the boundary
-  *
-  * @param[in] tria The Triangulation object.
-  */
+   * Returns a std::map with all vertices of faces located in the boundary
+   *
+   * @param[in] tria The Triangulation object.
+   */
   template <int dim, int spacedim>
   std::map<unsigned int,Point<spacedim> >
   get_all_vertices_at_boundary (const Triangulation<dim, spacedim> &tria);
@@ -1115,10 +1115,10 @@ namespace GridTools
    * @ref GlossFaceOrientation "standard orientation".
    *
    * Instead of defining a 'first' and 'second' boundary with the help of two
-   * boundary_ids this function defines a 'left' boundary as all faces
-   * with local face index <code>2*dimension</code> and boundary indicator @p
-   * b_id and, similarly, a 'right' boundary consisting of all face with local
-   * face index <code>2*dimension+1</code> and boundary indicator @p b_id.
+   * boundary_ids this function defines a 'left' boundary as all faces with
+   * local face index <code>2*dimension</code> and boundary indicator @p b_id
+   * and, similarly, a 'right' boundary consisting of all face with local face
+   * index <code>2*dimension+1</code> and boundary indicator @p b_id.
    *
    * This function will collect periodic face pairs on the coarsest mesh level
    * and add them to @p matched_pairs leaving the original contents intact.

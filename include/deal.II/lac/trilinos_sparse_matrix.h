@@ -464,9 +464,8 @@ namespace TrilinosWrappers
    * <ul>
    * <li> The matrix uses only one MPI process.
    * <li> The matrix has been initialized with the reinit() method with a
-   * DynamicSparsityPattern (that includes the set of locally
-   * relevant rows, i.e., the rows that an assembly routine will possibly
-   * write into).
+   * DynamicSparsityPattern (that includes the set of locally relevant rows,
+   * i.e., the rows that an assembly routine will possibly write into).
    * <li> The matrix has been initialized from a
    * TrilinosWrappers::SparsityPattern object that in turn has been
    * initialized with the reinit function specifying three index sets, one for
@@ -726,13 +725,13 @@ namespace TrilinosWrappers
      * optional argument @p exchange_data can be used for reinitialization
      * with a sparsity pattern that is not fully constructed. This feature is
      * only implemented for input sparsity patterns of type
-     * DynamicSparsityPattern. If the flag is not set, each processor
-     * just sets the elements in the sparsity pattern that belong to its rows.
+     * DynamicSparsityPattern. If the flag is not set, each processor just
+     * sets the elements in the sparsity pattern that belong to its rows.
      *
      * If the sparsity pattern given to this function is of type
-     * DynamicSparsity pattern, then a matrix will be created that
-     * allows several threads to write into different rows of the matrix at
-     * the same also with MPI, as opposed to most other reinit() methods.
+     * DynamicSparsity pattern, then a matrix will be created that allows
+     * several threads to write into different rows of the matrix at the same
+     * also with MPI, as opposed to most other reinit() methods.
      *
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
@@ -886,9 +885,9 @@ namespace TrilinosWrappers
      * to the deal.II own object. The optional argument @p exchange_data can
      * be used for reinitialization with a sparsity pattern that is not fully
      * constructed. This feature is only implemented for input sparsity
-     * patterns of type DynamicSparsityPattern. If the flag is not
-     * set, each processor just sets the elements in the sparsity pattern that
-     * belong to its rows.
+     * patterns of type DynamicSparsityPattern. If the flag is not set, each
+     * processor just sets the elements in the sparsity pattern that belong to
+     * its rows.
      *
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
@@ -1303,18 +1302,17 @@ namespace TrilinosWrappers
      * The second parameter can be used to set the diagonal entry of this row
      * to a value different from zero. The default is to set it to zero.
      *
-     * @note If the matrix is stored in parallel across multiple
-     * processors using MPI, this function only touches rows that are
-     * locally stored and simply ignores all other row
-     * indices. Further, in the context of parallel computations, you
-     * will get into trouble if you clear a row while other processors
-     * still have pending writes or additions into the same row. In
-     * other words, if another processor still wants to add something
-     * to an element of a row and you call this function to zero out
-     * the row, then the next time you call compress() may add the
-     * remote value to the zero you just created. Consequently, you
-     * will want to call compress() after you made the last
-     * modifications to a matrix and before starting to clear rows.
+     * @note If the matrix is stored in parallel across multiple processors
+     * using MPI, this function only touches rows that are locally stored and
+     * simply ignores all other row indices. Further, in the context of
+     * parallel computations, you will get into trouble if you clear a row
+     * while other processors still have pending writes or additions into the
+     * same row. In other words, if another processor still wants to add
+     * something to an element of a row and you call this function to zero out
+     * the row, then the next time you call compress() may add the remote
+     * value to the zero you just created. Consequently, you will want to call
+     * compress() after you made the last modifications to a matrix and before
+     * starting to clear rows.
      */
     void clear_row (const size_type      row,
                     const TrilinosScalar new_diag_value = 0);
@@ -1327,18 +1325,17 @@ namespace TrilinosWrappers
      * diagonal entries get the same value -- if you want different values for
      * the diagonal entries, you have to set them by hand.
      *
-     * @note If the matrix is stored in parallel across multiple
-     * processors using MPI, this function only touches rows that are
-     * locally stored and simply ignores all other row
-     * indices. Further, in the context of parallel computations, you
-     * will get into trouble if you clear a row while other processors
-     * still have pending writes or additions into the same row. In
-     * other words, if another processor still wants to add something
-     * to an element of a row and you call this function to zero out
-     * the row, then the next time you call compress() may add the
-     * remote value to the zero you just created. Consequently, you
-     * will want to call compress() after you made the last
-     * modifications to a matrix and before starting to clear rows.
+     * @note If the matrix is stored in parallel across multiple processors
+     * using MPI, this function only touches rows that are locally stored and
+     * simply ignores all other row indices. Further, in the context of
+     * parallel computations, you will get into trouble if you clear a row
+     * while other processors still have pending writes or additions into the
+     * same row. In other words, if another processor still wants to add
+     * something to an element of a row and you call this function to zero out
+     * the row, then the next time you call compress() may add the remote
+     * value to the zero you just created. Consequently, you will want to call
+     * compress() after you made the last modifications to a matrix and before
+     * starting to clear rows.
      */
     void clear_rows (const std::vector<size_type> &rows,
                      const TrilinosScalar          new_diag_value = 0);
@@ -1700,22 +1697,20 @@ namespace TrilinosWrappers
     /**
      * Return an iterator pointing to the first element of the matrix.
      *
-     * The elements accessed by iterators within each row are ordered
-     * in the way in which Trilinos stores them, though the
-     * implementation guarantees that all elements of one row are
-     * accessed before the elements of the next row. If your algorithm
-     * relies on visiting elements within one row, you will need to
-     * consult with the Trilinos documentation on the order in which
-     * it stores data. It is, however, generally not a good and
-     * long-term stable idea to rely on the order in which receive
-     * elements if you iterate over them.
+     * The elements accessed by iterators within each row are ordered in the
+     * way in which Trilinos stores them, though the implementation guarantees
+     * that all elements of one row are accessed before the elements of the
+     * next row. If your algorithm relies on visiting elements within one row,
+     * you will need to consult with the Trilinos documentation on the order
+     * in which it stores data. It is, however, generally not a good and long-
+     * term stable idea to rely on the order in which receive elements if you
+     * iterate over them.
      *
-     * When you iterate over the elements of a parallel matrix, you
-     * will only be able to access the locally owned rows. (You can
-     * access the other rows as well, but they will look empty.) In
-     * that case, you probably want to call the begin() function that
-     * takes the row as an argument to limit the range of elements to
-     * loop over.
+     * When you iterate over the elements of a parallel matrix, you will only
+     * be able to access the locally owned rows. (You can access the other
+     * rows as well, but they will look empty.) In that case, you probably
+     * want to call the begin() function that takes the row as an argument to
+     * limit the range of elements to loop over.
      */
     const_iterator begin () const;
 
@@ -1725,8 +1720,8 @@ namespace TrilinosWrappers
     iterator begin ();
 
     /**
-     * Return an iterator pointing the element past the last one of
-     * this matrix.
+     * Return an iterator pointing the element past the last one of this
+     * matrix.
      */
     const_iterator end () const;
 
@@ -1738,32 +1733,30 @@ namespace TrilinosWrappers
     /**
      * Return an iterator pointing to the first element of row @p r.
      *
-     * Note that if the given row is empty, i.e. does not contain any
-     * nonzero entries, then the iterator returned by this function
-     * equals <tt>end(r)</tt>. The returned iterator may not be
-     * dereferencable in that case if neither row @p r nor any of the
-     * following rows contain any nonzero entries.
+     * Note that if the given row is empty, i.e. does not contain any nonzero
+     * entries, then the iterator returned by this function equals
+     * <tt>end(r)</tt>. The returned iterator may not be dereferencable in
+     * that case if neither row @p r nor any of the following rows contain any
+     * nonzero entries.
      *
-     * The elements accessed by iterators within each row are ordered
-     * in the way in which Trilinos stores them, though the
-     * implementation guarantees that all elements of one row are
-     * accessed before the elements of the next row. If your algorithm
-     * relies on visiting elements within one row, you will need to
-     * consult with the Trilinos documentation on the order in which
-     * it stores data. It is, however, generally not a good and
-     * long-term stable idea to rely on the order in which receive
-     * elements if you iterate over them.
+     * The elements accessed by iterators within each row are ordered in the
+     * way in which Trilinos stores them, though the implementation guarantees
+     * that all elements of one row are accessed before the elements of the
+     * next row. If your algorithm relies on visiting elements within one row,
+     * you will need to consult with the Trilinos documentation on the order
+     * in which it stores data. It is, however, generally not a good and long-
+     * term stable idea to rely on the order in which receive elements if you
+     * iterate over them.
      *
-     * @note When you access the elements of a parallel matrix, you
-     * can only access the elements of rows that are actually stored
-     * locally. (You can access the other rows as well, but they will
-     * look empty.) Even then, if another processor has since written
-     * into, or added to, an element of the matrix that is stored on
-     * the current processor, then you will still see the old value of
-     * this entry unless you have called compress() between modifying
-     * the matrix element on the remote processor and accessing it on
-     * the current processor. See the documentation of the compress()
-     * function for more information.
+     * @note When you access the elements of a parallel matrix, you can only
+     * access the elements of rows that are actually stored locally. (You can
+     * access the other rows as well, but they will look empty.) Even then, if
+     * another processor has since written into, or added to, an element of
+     * the matrix that is stored on the current processor, then you will still
+     * see the old value of this entry unless you have called compress()
+     * between modifying the matrix element on the remote processor and
+     * accessing it on the current processor. See the documentation of the
+     * compress() function for more information.
      */
     const_iterator begin (const size_type r) const;
 
@@ -1773,9 +1766,9 @@ namespace TrilinosWrappers
     iterator begin (const size_type r);
 
     /**
-     * Return an iterator pointing the element past the last one of
-     * row @p r , or past the end of the entire sparsity pattern if
-     * none of the rows after @p r contain any entries at all.
+     * Return an iterator pointing the element past the last one of row @p r ,
+     * or past the end of the entire sparsity pattern if none of the rows
+     * after @p r contain any entries at all.
      *
      * Note that the end iterator is not necessarily dereferencable. This is
      * in particular the case if it is the end iterator for the last row of a

@@ -133,8 +133,8 @@ namespace Algorithms
   };
 
   /**
-   * An unary operator base class, intended to output the vectors in
-   * AnyData in each step of an iteration.
+   * An unary operator base class, intended to output the vectors in AnyData
+   * in each step of an iteration.
    *
    * @author Guido Kanschat, 2010
    */

@@ -88,8 +88,8 @@ public:
   /**
    * Constructor. There are three ways to use this constructor. First, without
    * any arguments, it generates an object with no blocks. Given one argument,
-   * it initializes <tt>n_blocks</tt> blocks, but these blocks have size
-   * zero. The third variant finally initializes all blocks to the same size
+   * it initializes <tt>n_blocks</tt> blocks, but these blocks have size zero.
+   * The third variant finally initializes all blocks to the same size
    * <tt>block_size</tt>.
    *
    * Confer the other constructor further down if you intend to use blocks of
@@ -107,8 +107,8 @@ public:
 
 #ifdef DEAL_II_WITH_CXX11
   /**
-   * Move constructor. Creates a new vector by stealing the internal data
-   * of the vector @p v.
+   * Move constructor. Creates a new vector by stealing the internal data of
+   * the vector @p v.
    *
    * @note This constructor is only available if deal.II is configured with
    * C++11 support.
@@ -203,11 +203,11 @@ public:
 
 #ifdef DEAL_II_WITH_CXX11
   /**
-   * Move the given vector. This operator replaces the present vector with
-   * @p v by efficiently swapping the internal data structures.
+   * Move the given vector. This operator replaces the present vector with @p
+   * v by efficiently swapping the internal data structures.
    *
-   * @note This operator is only available if deal.II is configured with
-   * C++11 support.
+   * @note This operator is only available if deal.II is configured with C++11
+   * support.
    */
   BlockVector<Number> &operator= (BlockVector<Number> &&v);
 #endif
@@ -503,8 +503,8 @@ namespace internal
     template <typename> class ReinitHelper;
 
     /**
-     * A helper class internally used in linear_operator.h.
-     * Specialization for BlockVector<number>.
+     * A helper class internally used in linear_operator.h. Specialization for
+     * BlockVector<number>.
      */
     template<typename number>
     class ReinitHelper<BlockVector<number> >

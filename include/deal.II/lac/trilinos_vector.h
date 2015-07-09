@@ -291,8 +291,8 @@ namespace TrilinosWrappers
        * Move constructor. Creates a new vector by stealing the internal data
        * of the vector @p v.
        *
-       * @note This constructor is only available if deal.II is configured with
-       * C++11 support.
+       * @note This constructor is only available if deal.II is configured
+       * with C++11 support.
        */
       Vector (Vector &&v);
 #endif
@@ -975,8 +975,8 @@ namespace internal
     template <typename> class ReinitHelper;
 
     /**
-     * A helper class internally used in linear_operator.h.
-     * Specialization for TrilinosWrappers::MPI::Vector.
+     * A helper class internally used in linear_operator.h. Specialization for
+     * TrilinosWrappers::MPI::Vector.
      */
     template<>
     class ReinitHelper<TrilinosWrappers::MPI::Vector>
@@ -1002,8 +1002,8 @@ namespace internal
     };
 
     /**
-     * A helper class internally used in linear_operator.h.
-     * Specialization for TrilinosWrappers::Vector.
+     * A helper class internally used in linear_operator.h. Specialization for
+     * TrilinosWrappers::Vector.
      */
     template<>
     class ReinitHelper<TrilinosWrappers::Vector>

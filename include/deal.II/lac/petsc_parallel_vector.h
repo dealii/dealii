@@ -263,8 +263,8 @@ namespace PETScWrappers
                        const MPI_Comm &communicator);
 
       /**
-       * Release all memory and return to a state just like after having called
-       * the default constructor.
+       * Release all memory and return to a state just like after having
+       * called the default constructor.
        */
       void clear ();
 

@@ -111,8 +111,8 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * Multiple calls to the function <code>interpolate (const Vector<number> &in,
- * Vector<number> &out)</code> are NOT allowed. Interpolating several functions
- * can be performed in one step by using <tt>void interpolate (const
+ * Vector<number> &out)</code> are NOT allowed. Interpolating several
+ * functions can be performed in one step by using <tt>void interpolate (const
  * vector<Vector<number> >&all_in, vector<Vector<number> >&all_out)
  * const</tt>, and using the respective @p
  * prepare_for_coarsening_and_refinement function taking several vectors as

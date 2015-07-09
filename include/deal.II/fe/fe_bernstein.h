@@ -27,35 +27,34 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Implementation of a scalar Bernstein finite element @p that we call FE_Bernstein
- * in analogy with FE_Q that yields the
- * finite element space of continuous, piecewise Bernstein polynomials of degree @p p in
- * each coordinate direction. This class is realized using tensor product
+ * Implementation of a scalar Bernstein finite element @p that we call
+ * FE_Bernstein in analogy with FE_Q that yields the finite element space of
+ * continuous, piecewise Bernstein polynomials of degree @p p in each
+ * coordinate direction. This class is realized using tensor product
  * polynomials of Bernstein basis polynomials.
  *
  *
  * The standard constructor of this class takes the degree @p p of this finite
  * element.
  *
- * For more information about the <tt>spacedim</tt> template parameter
- * check the documentation of FiniteElement or the one of
- * Triangulation.
+ * For more information about the <tt>spacedim</tt> template parameter check
+ * the documentation of FiniteElement or the one of Triangulation.
  *
  * <h3>Implementation</h3>
  *
  * The constructor creates a TensorProductPolynomials object that includes the
- * tensor product of @p Bernstein polynomials of degree @p p. This
- * @p TensorProductPolynomials object provides all values and derivatives of
- * the shape functions.
+ * tensor product of @p Bernstein polynomials of degree @p p. This @p
+ * TensorProductPolynomials object provides all values and derivatives of the
+ * shape functions.
  *
  * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
  * The original ordering of the shape functions represented by the
- * TensorProductPolynomials is a tensor product
- * numbering. However, the shape functions on a cell are renumbered
- * beginning with the shape functions whose support points are at the
- * vertices, then on the line, on the quads, and finally (for 3d) on
- * the hexes. See the documentation of FE_Q for more details.
+ * TensorProductPolynomials is a tensor product numbering. However, the shape
+ * functions on a cell are renumbered beginning with the shape functions whose
+ * support points are at the vertices, then on the line, on the quads, and
+ * finally (for 3d) on the hexes. See the documentation of FE_Q for more
+ * details.
  *
  *
  * @author Marco Tezzele, Luca Heltai
@@ -72,26 +71,26 @@ public:
   FE_Bernstein (const unsigned int p);
 
   /**
-  * Return the matrix interpolating from a face of one element to the face
-  * of the neighboring element.  The size of the matrix is then
-  * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. The
-  * FE_Bernstein element family only provides interpolation matrices for elements of
-  * the same type and FE_Nothing. For all other elements, an exception of
-  * type FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is
-  * thrown.
-  */
+   * Return the matrix interpolating from a face of one element to the face of
+   * the neighboring element.  The size of the matrix is then
+   * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. The
+   * FE_Bernstein element family only provides interpolation matrices for
+   * elements of the same type and FE_Nothing. For all other elements, an
+   * exception of type
+   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
+   */
   virtual void
   get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
                                  FullMatrix<double>       &matrix) const;
 
   /**
-   * Return the matrix interpolating from a face of one element to the face
-   * of the neighboring element.  The size of the matrix is then
+   * Return the matrix interpolating from a face of one element to the face of
+   * the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. The
-   * FE_Bernstein element family only provides interpolation matrices for elements of
-   * the same type and FE_Nothing. For all other elements, an exception of
-   * type FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is
-   * thrown.
+   * FE_Bernstein element family only provides interpolation matrices for
+   * elements of the same type and FE_Nothing. For all other elements, an
+   * exception of type
+   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
    */
   virtual void
   get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
@@ -155,8 +154,8 @@ public:
 
   /**
    * Return a string that uniquely identifies a finite element. This class
-   * returns <tt>FE_Bernstein<dim>(degree)</tt>, with @p dim and @p degree replaced by
-   * appropriate values.
+   * returns <tt>FE_Bernstein<dim>(degree)</tt>, with @p dim and @p degree
+   * replaced by appropriate values.
    */
   virtual std::string get_name () const;
 

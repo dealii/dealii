@@ -921,8 +921,8 @@ namespace PETScWrappers
 
     /**
      * Internal function that checks that there are no pending insert/add
-     * operations. Throws an exception otherwise. Useful before calling
-     * any PETSc internal functions modifying the matrix.
+     * operations. Throws an exception otherwise. Useful before calling any
+     * PETSc internal functions modifying the matrix.
      */
     void assert_is_compressed();
 

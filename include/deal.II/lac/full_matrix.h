@@ -73,8 +73,8 @@ public:
   typedef unsigned int size_type;
 
   /**
-   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt> in
-   * the standard library containers.
+   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt>
+   * in the standard library containers.
    */
   typedef number value_type;
 

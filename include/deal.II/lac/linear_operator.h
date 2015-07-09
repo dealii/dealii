@@ -55,9 +55,9 @@ null_operator(const LinearOperator<Domain, Range> &);
 /**
  * A class to store the abstract concept of a linear operator.
  *
- * The class essentially consists of <code>std::function</code> objects
- * that store the knowledge of how to apply the linear operator by
- * implementing the abstract @ref Matrix interface:
+ * The class essentially consists of <code>std::function</code> objects that
+ * store the knowledge of how to apply the linear operator by implementing the
+ * abstract @p Matrix interface:
  * @code
  *   std::function<void(Range &, const Domain &)> vmult;
  *   std::function<void(Range &, const Domain &)> vmult_add;
@@ -67,23 +67,23 @@ null_operator(const LinearOperator<Domain, Range> &);
  *
  * But, in contrast to a usual matrix object, the domain and range of the
  * linear operator are also bound to the LinearOperator class on the type
- * level. Because of this, <code>LinearOperator <Range, Domain></code>
- * has two additional function objects
+ * level. Because of this, <code>LinearOperator <Range, Domain></code> has two
+ * additional function objects
  * @code
  *   std::function<void(Range &, bool)> reinit_range_vector;
  *   std::function<void(Domain &, bool)> reinit_domain_vector;
  * @endcode
- * that store the knowledge how to initialize (resize + internal data structures)
- * an arbitrary vector of the @p Range and @p Domain space.
+ * that store the knowledge how to initialize (resize + internal data
+ * structures) an arbitrary vector of the @p Range and @p Domain space.
  *
- * The primary purpose of this class is to provide syntactic sugar for
- * complex matrix-vector operations and free the user from having to
- * create, set up and handle intermediate storage locations by hand.
+ * The primary purpose of this class is to provide syntactic sugar for complex
+ * matrix-vector operations and free the user from having to create, set up
+ * and handle intermediate storage locations by hand.
  *
- * As an example consider the operation $(A+k\,B)\,C$, where $A$, $B$ and
- * $C$ denote (possible different) matrices. In order to construct a
- * LinearOperator <code>op</code> that stores the knowledge of this
- * operation, one can write:
+ * As an example consider the operation $(A+k\,B)\,C$, where $A$, $B$ and $C$
+ * denote (possible different) matrices. In order to construct a
+ * LinearOperator <code>op</code> that stores the knowledge of this operation,
+ * one can write:
  *
  * @code
  * dealii::SparseMatrix<double> A, B, C;
@@ -99,8 +99,8 @@ null_operator(const LinearOperator<Domain, Range> &);
  * @endcode
  *
  * @note This class is only available if deal.II was configured with C++11
- * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during
- * cmake configure.
+ * support, i.e., if <code>DEAL_II_WITH_CXX11</code> is enabled during cmake
+ * configure.
  *
  * @author Luca Heltai, Matthias Maier, 2015
  *
@@ -163,10 +163,9 @@ public:
   LinearOperator (const LinearOperator<Range, Domain> &) = default;
 
   /**
-   * Templated copy constructor that creates a LinearOperator object from
-   * an object @p op for which the conversion function
-   * <code>linear_operator</code>
-   * is defined.
+   * Templated copy constructor that creates a LinearOperator object from an
+   * object @p op for which the conversion function
+   * <code>linear_operator</code> is defined.
    */
   template<typename Op>
   LinearOperator (const Op &op)
@@ -192,21 +191,20 @@ public:
   }
 
   /**
-   * Application of the LinearOperator object to a vector u of the @p
-   * Domain space giving a vector v of the @p Range space.
+   * Application of the LinearOperator object to a vector u of the @p Domain
+   * space giving a vector v of the @p Range space.
    */
   std::function<void(Range &v, const Domain &u)> vmult;
 
   /**
-   * Application of the LinearOperator object to a vector u of the @p
-   * Domain space. The result is added to the vector v.
+   * Application of the LinearOperator object to a vector u of the @p Domain
+   * space. The result is added to the vector v.
    */
   std::function<void(Range &v, const Domain &u)> vmult_add;
 
   /**
-   * Application of the transpose LinearOperator object to a vector u of
-   * the @p Range space giving a vector v of the @p Domain
-   * space.
+   * Application of the transpose LinearOperator object to a vector u of the
+   * @p Range space giving a vector v of the @p Domain space.
    */
   std::function<void(Domain &v, const Range &u)> Tvmult;
 
@@ -217,11 +215,11 @@ public:
   std::function<void(Domain &v, const Range &u)> Tvmult_add;
 
   /**
-   * Initializes a vector v of the Range space to be directly usable
-   * as the destination parameter in an application of vmult. Similar to
-   * the reinit functions of the vector classes, the boolean determines
-   * whether a fast initalization is done, i.e., if it is set to false the
-   * content of the vector is set to 0.
+   * Initializes a vector v of the Range space to be directly usable as the
+   * destination parameter in an application of vmult. Similar to the reinit
+   * functions of the vector classes, the boolean determines whether a fast
+   * initalization is done, i.e., if it is set to false the content of the
+   * vector is set to 0.
    */
   std::function<void(Range &v, bool fast)> reinit_range_vector;
 
@@ -240,8 +238,8 @@ public:
   //@{
 
   /**
-   * Addition with a LinearOperator @p second_op with the same @p Domain
-   * and @p Range.
+   * Addition with a LinearOperator @p second_op with the same @p Domain and
+   * @p Range.
    */
   LinearOperator<Range, Domain> &
   operator+=(const LinearOperator<Range, Domain> &second_op)
@@ -262,8 +260,8 @@ public:
   }
 
   /**
-   * Composition of the LinearOperator with an endomorphism @p second_op
-   * of the @p Domain space.
+   * Composition of the LinearOperator with an endomorphism @p second_op of
+   * the @p Domain space.
    */
   LinearOperator<Range, Domain> &
   operator*=(const LinearOperator<Domain, Domain> &second_op)
@@ -284,10 +282,10 @@ public:
   }
 
   /**
-  * This bool is used to determine whether a linear operator is a
-  * null operator. In this case the class is able to optimize some
-  * operations like multiplication or addition.
-  */
+   * This bool is used to determine whether a linear operator is a null
+   * operator. In this case the class is able to optimize some operations like
+   * multiplication or addition.
+   */
   bool is_null_operator;
 
   //@}
@@ -303,7 +301,8 @@ public:
  * @relates LinearOperator
  *
  * Addition of two linear operators @p first_op and @p second_op given by
- * $(\text{first\_op}+\text{second\_op})x:=\text{first\_op}(x)+\text{second\_op}(x)$
+ * $(\text{first\_op}+\text{second\_op})x := \text{first\_op}(x) +
+ * \text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -363,7 +362,8 @@ operator+(const LinearOperator<Range, Domain> &first_op,
  * @relates LinearOperator
  *
  * Subtraction of two linear operators @p first_op and @p second_op given by
- * $(\text{first\_op}-\text{second\_op})x:=\text{first\_op}(x)-\text{second\_op}(x)$
+ * $(\text{first\_op}-\text{second\_op})x := \text{first\_op}(x) -
+ * \text{second\_op}(x)$
  *
  * @ingroup LAOperators
  */
@@ -391,12 +391,12 @@ operator-(const LinearOperator<Range, Domain> &first_op,
 /**
  * @relates LinearOperator
  *
- * Scalar multiplication of a ScalarOperator object @p op with @p number
- * from the left.
+ * Scalar multiplication of a ScalarOperator object @p op with @p number from
+ * the left.
  *
  * The @p Domain and @p Range types must implement the following
- * <code>operator*=</code> member functions accepting the appropriate
- * scalar Number type for rescaling:
+ * <code>operator*=</code> member functions accepting the appropriate scalar
+ * Number type for rescaling:
  *
  * @code
  * Domain & operator *=(Domain::value_type);
@@ -499,7 +499,8 @@ operator*(const LinearOperator<Range, Domain> &op,
  * @relates LinearOperator
  *
  * Composition of two linear operators @p first_op and @p second_op given by
- * $(\text{first\_op}*\text{second\_op})x:=\text{first\_op}(\text{second\_op}(x))$
+ * $(\text{first\_op}*\text{second\_op})x :=
+ * \text{first\_op}(\text{second\_op}(x))$
  *
  * @ingroup LAOperators
  */
@@ -576,7 +577,8 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
 /**
  * @relates LinearOperator
  *
- * Returns the transpose linear operations of @ref op.
+ * Returns the transpose linear operations of
+ * @ref op.
  *
  * @ingroup LAOperators
  */
@@ -607,11 +609,11 @@ transpose_operator(const LinearOperator<Range, Domain> &op)
  * <code>vmult</code> and <code>Tvmult</code> implementations of the
  * LinearOperator object.
  *
- * The LinearOperator object that is created stores a reference to @p
- * solver and @p preconditioner. Thus, both objects must remain a valid
- * reference for the whole lifetime of the LinearOperator object. Internal
- * data structures of the @p solver object will be modified upon
- * invocation of <code>vmult</code> or <code>Tvmult</code>.
+ * The LinearOperator object that is created stores a reference to @p solver
+ * and @p preconditioner. Thus, both objects must remain a valid reference for
+ * the whole lifetime of the LinearOperator object. Internal data structures
+ * of the @p solver object will be modified upon invocation of
+ * <code>vmult</code> or <code>Tvmult</code>.
  *
  * @ingroup LAOperators
  */
@@ -677,13 +679,12 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
 /**
  * @relates LinearOperator
  *
- * Returns a LinearOperator that is the identity of the vector space
- * @p Range.
+ * Returns a LinearOperator that is the identity of the vector space @p Range.
  *
- * The function takes an <code>std::function</code> object @ref
- * reinit_vector as an argument to initialize the
- * <code>reinit_range_vector</code> and <code>reinit_domain_vector</code>
- * objects of the LinearOperator object.
+ * The function takes an <code>std::function</code> object
+ * @ref reinit_vector
+ * as an argument to initialize the <code>reinit_range_vector</code> and
+ * <code>reinit_domain_vector</code> objects of the LinearOperator object.
  *
  * @ingroup LAOperators
  */
@@ -723,9 +724,9 @@ identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 /**
  * @relates LinearOperator
  *
- * Returns a nulled variant of the LinearOperator @p op, i.e. with
- * optimized LinearOperator::vmult, LinearOperator::vmult_add, etc.
- * functions and with LinearOperator::is_null_operator set to true.
+ * Returns a nulled variant of the LinearOperator @p op, i.e. with optimized
+ * LinearOperator::vmult, LinearOperator::vmult_add, etc. functions and with
+ * LinearOperator::is_null_operator set to true.
  *
  * @ingroup LAOperators
  */
@@ -762,24 +763,24 @@ namespace internal
   namespace LinearOperator
   {
     /**
-     * A helper class that is responsible for the initialization of a
-     * vector to be directly usable as the destination parameter, or source
-     * parameter in an application of vmult of a matrix.
+     * A helper class that is responsible for the initialization of a vector
+     * to be directly usable as the destination parameter, or source parameter
+     * in an application of vmult of a matrix.
      *
      * The generic version of this class just calls
      * <code>Vector::reinit()</code> with the result of
      * <code>Matrix::m()</code> or <code>Matrix::n()</code>, respectively.
-     * This class is specialized for more complicated data structures, such
-     * as TrilinosWrappers::MPI::Vector, etc.
+     * This class is specialized for more complicated data structures, such as
+     * TrilinosWrappers::MPI::Vector, etc.
      */
     template<typename Vector>
     class ReinitHelper
     {
     public:
       /**
-       * Initializes a vector v of the Range space to be directly usable
-       * as the destination parameter in an application of vmult. Similar to
-       * the reinit functions of the vector classes, the boolean determines
+       * Initializes a vector v of the Range space to be directly usable as
+       * the destination parameter in an application of vmult. Similar to the
+       * reinit functions of the vector classes, the boolean determines
        * whether a fast initalization is done, i.e., if it is set to false the
        * content of the vector is set to 0.
        *
@@ -797,9 +798,9 @@ namespace internal
       /**
        * Initializes a vector of the Domain space to be directly usable as the
        * source parameter in an application of vmult. Similar to the reinit
-       * functions of the vector classes, the boolean determines whether a fast
-       * initalization is done, i.e., if it is set to false the content of the
-       * vector is set to 0.
+       * functions of the vector classes, the boolean determines whether a
+       * fast initalization is done, i.e., if it is set to false the content
+       * of the vector is set to 0.
        *
        * The generic version of this class just calls
        * <code>Vector::reinit()</code> with the result of
@@ -992,16 +993,15 @@ namespace
  * A function that encapsulates generic @p matrix objects that act on a
  * compatible Vector type into a LinearOperator. The LinearOperator object
  * that is created stores a reference to the matrix object. Thus, @p matrix
- * must remain a valid reference for the whole lifetime of the
- * LinearOperator object.
+ * must remain a valid reference for the whole lifetime of the LinearOperator
+ * object.
  *
  * All changes made on @p matrix after the creation of the LinearOperator
  * object are reflected by the operator object. For example, it is a valid
  * procedure to first create a LinearOperator and resize, reassemble the
  * matrix later.
  *
- * The Matrix class in question must provide the following minimal
- * interface:
+ * The Matrix class in question must provide the following minimal interface:
  *
  * @code
  * class Matrix
@@ -1057,13 +1057,11 @@ LinearOperator<Range, Domain> linear_operator(const Matrix &matrix)
  *
  * Variant of above function that takes an operator object @p
  * operator_exemplar as an additional reference. This object is used to
- * populate the reinit_domain_vector and reinit_range_vector function
- * objects. The reference @p matrix is used to construct vmult, Tvmult,
- * etc.
+ * populate the reinit_domain_vector and reinit_range_vector function objects.
+ * The reference @p matrix is used to construct vmult, Tvmult, etc.
  *
- * This variant can, for example, be used to encapsulate preconditioners
- * (that typically do not expose any information about the underlying
- * matrix).
+ * This variant can, for example, be used to encapsulate preconditioners (that
+ * typically do not expose any information about the underlying matrix).
  *
  * @author Matthias Maier, 2015
  *

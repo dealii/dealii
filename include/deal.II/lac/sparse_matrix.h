@@ -641,8 +641,8 @@ public:
   bool empty () const;
 
   /**
-   * Return the dimension of the codomain (or range) space. To remember:
-   * the matrix is of dimension $m \times n$.
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
@@ -1368,8 +1368,7 @@ public:
   iterator begin ();
 
   /**
-   * Return an iterator pointing the element past the last one of
-   * this matrix.
+   * Return an iterator pointing the element past the last one of this matrix.
    */
   const_iterator end () const;
 
@@ -1381,11 +1380,11 @@ public:
   /**
    * Return an iterator pointing to the first element of row @p r.
    *
-   * Note that if the given row is empty, i.e. does not contain any
-   * nonzero entries, then the iterator returned by this function
-   * equals <tt>end(r)</tt>. The returned iterator may not be
-   * dereferencable in that case if neither row @p r nor any of the
-   * following rows contain any nonzero entries.
+   * Note that if the given row is empty, i.e. does not contain any nonzero
+   * entries, then the iterator returned by this function equals
+   * <tt>end(r)</tt>. The returned iterator may not be dereferencable in that
+   * case if neither row @p r nor any of the following rows contain any
+   * nonzero entries.
    */
   const_iterator begin (const size_type r) const;
 
@@ -1395,12 +1394,12 @@ public:
   iterator begin (const size_type r);
 
   /**
-   * Return an iterator pointing the element past the last one of
-   * row @p r , or past the end of the entire sparsity pattern if
-   * none of the rows after @p r contain any entries at all.
+   * Return an iterator pointing the element past the last one of row @p r ,
+   * or past the end of the entire sparsity pattern if none of the rows after
+   * @p r contain any entries at all.
    *
-   * Note that the end iterator is not necessarily dereferencable. This is
-   * in particular the case if it is the end iterator for the last row of a
+   * Note that the end iterator is not necessarily dereferencable. This is in
+   * particular the case if it is the end iterator for the last row of a
    * matrix.
    */
   const_iterator end (const size_type r) const;

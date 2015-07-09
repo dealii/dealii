@@ -93,12 +93,12 @@ namespace numbers
   /**
    * Check whether a value is not a number.
    *
-   * This function uses either <code>std::isnan</code>,
-   * <code>isnan</code>, or <code>_isnan</code>, whichever is
-   * available on the system and returns the result.
+   * This function uses either <code>std::isnan</code>, <code>isnan</code>, or
+   * <code>_isnan</code>, whichever is available on the system and returns the
+   * result.
    *
-   * If none of the functions detecting NaN is available, this
-   * function returns false.
+   * If none of the functions detecting NaN is available, this function
+   * returns false.
    */
   bool is_nan (const double x);
 

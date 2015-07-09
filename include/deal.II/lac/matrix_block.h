@@ -341,9 +341,8 @@ public:
   typedef MatrixBlock<MATRIX> value_type;
 
   /**
-   * The pointer type used for storing the objects. We use a shard
-   * pointer, such that they get deleted automatically when not used
-   * anymore.
+   * The pointer type used for storing the objects. We use a shard pointer,
+   * such that they get deleted automatically when not used anymore.
    */
   typedef std_cxx11::shared_ptr<value_type> ptr_type;
 

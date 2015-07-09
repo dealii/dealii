@@ -277,9 +277,9 @@ public:
    * statements like <tt>v.push_back (ChunkSparsityPattern());</tt>, with
    * <tt>v</tt> a vector of ChunkSparsityPattern objects.
    *
-   * Usually, it is sufficient to use the explicit keyword to disallow unwanted
-   * temporaries, but this does not work for <tt>std::vector</tt>. Since
-   * copying a structure like this is not useful anyway because multiple
+   * Usually, it is sufficient to use the explicit keyword to disallow
+   * unwanted temporaries, but this does not work for <tt>std::vector</tt>.
+   * Since copying a structure like this is not useful anyway because multiple
    * matrices can use the same sparsity structure, copies are only allowed for
    * empty objects, as described above.
    */
@@ -481,9 +481,9 @@ public:
                   const size_type chunk_size);
 
   /**
-   * Copy data from an object of type DynamicSparsityPattern. Previous
-   * content of this object is lost, and the sparsity pattern is in compressed
-   * mode afterwards.
+   * Copy data from an object of type DynamicSparsityPattern. Previous content
+   * of this object is lost, and the sparsity pattern is in compressed mode
+   * afterwards.
    */
   template <typename SparsityType>
   void copy_from (const SparsityType &dsp,
@@ -621,8 +621,9 @@ public:
   bool stores_only_added_elements () const;
 
   /**
-   * Iterator starting at the first entry of the matrix. The resulting iterator
-   * can be used to walk over all nonzero entries of the sparsity pattern.
+   * Iterator starting at the first entry of the matrix. The resulting
+   * iterator can be used to walk over all nonzero entries of the sparsity
+   * pattern.
    */
   iterator begin () const;
 

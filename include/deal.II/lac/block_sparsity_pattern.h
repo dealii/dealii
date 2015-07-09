@@ -57,10 +57,10 @@ namespace TrilinosWrappers
  * patterns.
  *
  * The largest difference between the SparsityPattern and
- * DynamicSparsityPattern classes and this class is that mostly, the
- * matrices have different properties and you will want to work on the blocks
- * making up the matrix rather than the whole matrix. You can access the
- * different blocks using the <tt>block(row,col)</tt> function.
+ * DynamicSparsityPattern classes and this class is that mostly, the matrices
+ * have different properties and you will want to work on the blocks making up
+ * the matrix rather than the whole matrix. You can access the different
+ * blocks using the <tt>block(row,col)</tt> function.
  *
  * Attention: this object is not automatically notified if the size of one of
  * its subobjects' size is changed. After you initialize the sizes of the
@@ -441,10 +441,9 @@ public:
   std::size_t memory_consumption () const;
 
   /**
-   * Copy data from an object of type BlockDynamicSparsityPattern, i.e.
-   * resize this object to the size of the given argument, and copy over the
-   * contents of each of the subobjects. Previous content of this object is
-   * lost.
+   * Copy data from an object of type BlockDynamicSparsityPattern, i.e. resize
+   * this object to the size of the given argument, and copy over the contents
+   * of each of the subobjects. Previous content of this object is lost.
    */
   void copy_from (const BlockDynamicSparsityPattern &dsp);
 };

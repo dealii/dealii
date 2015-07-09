@@ -258,8 +258,8 @@ namespace TrilinosWrappers
    * with the difference that this class can work fully in %parallel according
    * to a partitioning of the sparsity pattern rows.
    *
-   * This class has many similarities to the  DynamicSparsityPattern, since
-   * it can dynamically add elements to the pattern without any memory being
+   * This class has many similarities to the  DynamicSparsityPattern, since it
+   * can dynamically add elements to the pattern without any memory being
    * previously reserved for it. However, it also has a method
    * SparsityPattern::compress(), that finalizes the pattern and enables its
    * use with Trilinos sparse matrices.
@@ -340,8 +340,8 @@ namespace TrilinosWrappers
      * The number of columns entries per row is specified as the maximum
      * number of entries argument.  This does not need to be an accurate
      * number since the entries are allocated dynamically in a similar manner
-     * as for the deal.II DynamicSparsityPattern classes, but a good
-     * estimate will reduce the setup time of the sparsity pattern.
+     * as for the deal.II DynamicSparsityPattern classes, but a good estimate
+     * will reduce the setup time of the sparsity pattern.
      */
     void
     reinit (const size_type  m,

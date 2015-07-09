@@ -310,9 +310,9 @@ public:
                                       std::vector<Vector<Number> >   &values) const;
 
   /**
-   * Return an estimate for the memory consumption, in bytes, of this
-   * object. This is not exact (but will usually be close) because calculating
-   * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+   * Return an estimate for the memory consumption, in bytes, of this object.
+   * This is not exact (but will usually be close) because calculating the
+   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
   std::size_t memory_consumption () const;
 };
@@ -498,9 +498,9 @@ public:
                                   std::vector<Vector<Number> >   &values) const;
 
   /**
-   * Return an estimate for the memory consumption, in bytes, of this
-   * object. This is not exact (but will usually be close) because calculating
-   * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+   * Return an estimate for the memory consumption, in bytes, of this object.
+   * This is not exact (but will usually be close) because calculating the
+   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
   std::size_t memory_consumption () const;
 

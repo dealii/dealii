@@ -69,10 +69,10 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Parameters for block relaxation methods. In addition to typical
-   * control parameters like #relaxation, this object also contains
-   * the block structure in #block_list and an optional ordering of
-   * the blocks in #order.
+   * Parameters for block relaxation methods. In addition to typical control
+   * parameters like #relaxation, this object also contains the block
+   * structure in #block_list and an optional ordering of the blocks in
+   * #order.
    */
   class AdditionalData : public Subscriptor
   {
@@ -85,9 +85,8 @@ public:
                     const bool same_diagonal = false);
 
     /**
-     * The mapping from indices to blocks. Each row of this pattern
-     * enumerates the indices constituting a diagonal block to be
-     * inverted.
+     * The mapping from indices to blocks. Each row of this pattern enumerates
+     * the indices constituting a diagonal block to be inverted.
      */
     SparsityPattern block_list;
 
@@ -97,18 +96,17 @@ public:
     double relaxation;
 
     /**
-     * Invert diagonal during initialization. Alternatively, diagonal
-     * blocks are inverted on the fly, whenever they are used. While
-     * inverting blocks in advance requires more memory, it usually
-     * saves a lot of computation. See #same_diagonal on how you can
-     * avoid memory overhead.
+     * Invert diagonal during initialization. Alternatively, diagonal blocks
+     * are inverted on the fly, whenever they are used. While inverting blocks
+     * in advance requires more memory, it usually saves a lot of computation.
+     * See #same_diagonal on how you can avoid memory overhead.
      */
     bool invert_diagonal;
 
     /**
-     * Assume all diagonal blocks are equal to save memory. If this
-     * flag is true, then only the first diagonal block of the matrix
-     * is inverted and stored. It is then used for all other blocks.
+     * Assume all diagonal blocks are equal to save memory. If this flag is
+     * true, then only the first diagonal block of the matrix is inverted and
+     * stored. It is then used for all other blocks.
      *
      * \note Avoid setting this true if your blocks are not equal, in
      * particularr if their sizes differ.
@@ -120,10 +118,10 @@ public:
     typename PreconditionBlockBase<inverse_type>::Inversion inversion;
 
     /**
-     * If #inversion is SVD, we can compute the Penrose-Moore inverse
-     * of the blocks. In order to do so, we can specify here the
-     * threshold below which a singular value will be considered zero
-     * and thus not inverted. This parameter is used in the call to
+     * If #inversion is SVD, we can compute the Penrose-Moore inverse of the
+     * blocks. In order to do so, we can specify here the threshold below
+     * which a singular value will be considered zero and thus not inverted.
+     * This parameter is used in the call to
      * LAPACKFullMatrix::compute_inverse_svd().
      */
     double threshold;
@@ -156,14 +154,13 @@ public:
   };
 
   /**
-   * Initialize matrix and additional information. In a second step,
-   * the inverses of the diagonal blocks may be computed.
+   * Initialize matrix and additional information. In a second step, the
+   * inverses of the diagonal blocks may be computed.
    *
-   * Note that AdditionalData, different from other preconditioners,
-   * defines quite large objects, and that therefore the object is not
-   * copied, but rather a pointer is stored. Thus, the lifetime of
-   * <code>additional_data</code> hast to exceed the lifetime of this
-   * object.
+   * Note that AdditionalData, different from other preconditioners, defines
+   * quite large objects, and that therefore the object is not copied, but
+   * rather a pointer is stored. Thus, the lifetime of
+   * <code>additional_data</code> hast to exceed the lifetime of this object.
    */
   void initialize (const MATRIX &A,
                    const AdditionalData &parameters);

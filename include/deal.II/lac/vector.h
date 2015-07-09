@@ -166,8 +166,8 @@ public:
 
 #ifdef DEAL_II_WITH_CXX11
   /**
-   * Move constructor. Creates a new vector by stealing the internal data
-   * of the vector @p v.
+   * Move constructor. Creates a new vector by stealing the internal data of
+   * the vector @p v.
    *
    * @note This constructor is only available if deal.II is configured with
    * C++11 support.
@@ -347,11 +347,11 @@ public:
 
 #ifdef DEAL_II_WITH_CXX11
   /**
-   * Move the given vector. This operator replaces the present vector with
-   * @p v by efficiently swapping the internal data structures.
+   * Move the given vector. This operator replaces the present vector with @p
+   * v by efficiently swapping the internal data structures.
    *
-   * @note This operator is only available if deal.II is configured with
-   * C++11 support.
+   * @note This operator is only available if deal.II is configured with C++11
+   * support.
    */
   Vector<Number> &operator= (Vector<Number> &&v);
 #endif
@@ -665,7 +665,7 @@ public:
   /**
    * Simple vector addition, equal to the <tt>operator +=</tt>.
    *
-   * @deprecate Use the <tt>operator +=</tt> instead.
+   * @deprecated Use the <tt>operator +=</tt> instead.
    *
    * @dealiiOperationIsMultithreaded
    */
@@ -1001,8 +1001,8 @@ protected:
 private:
 
   /**
-   * Allocate and align @p val along 64-byte boundaries. The size
-   * of the allocated memory is determined by @p max_vec_size .
+   * Allocate and align @p val along 64-byte boundaries. The size of the
+   * allocated memory is determined by @p max_vec_size .
    */
   void allocate();
 

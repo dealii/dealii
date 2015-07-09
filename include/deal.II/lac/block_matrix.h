@@ -40,7 +40,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @deprecated If deal.II was configured with C++11 support, use the
  * LinearOperator class instead, see the module on
- * @ref LAOperators "linear operators" for further details.
+ * @ref LAOperators "linear operators"
+ * for further details.
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"

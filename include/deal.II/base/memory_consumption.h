@@ -173,8 +173,9 @@ namespace MemoryConsumption
 
   /**
    * Determine the amount of memory consumed by a C-style string. The returned
-   * value does not include the size of the pointer. This function only measures
-   * up to (and including) the NUL byte; the underlying buffer may be larger.
+   * value does not include the size of the pointer. This function only
+   * measures up to (and including) the NUL byte; the underlying buffer may be
+   * larger.
    */
   inline
   std::size_t memory_consumption (const char *string);
@@ -236,10 +237,10 @@ namespace MemoryConsumption
   /**
    * Estimate the amount of memory (in bytes) occupied by a C-style array.
    * Since in this library we do not usually store simple data elements like
-   * <tt>double</tt>s in such arrays (but rather use <tt>std::vector</tt>s
-   * or deal.II <tt>Vector</tt> objects), we do not provide specializations
-   * like for the <tt>std::vector</tt> arrays, but always use the loop over
-   * all elements.
+   * <tt>double</tt>s in such arrays (but rather use <tt>std::vector</tt>s or
+   * deal.II <tt>Vector</tt> objects), we do not provide specializations like
+   * for the <tt>std::vector</tt> arrays, but always use the loop over all
+   * elements.
    */
   template <typename T, int N>
   inline

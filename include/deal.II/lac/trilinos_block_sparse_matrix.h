@@ -234,8 +234,8 @@ namespace TrilinosWrappers
     /**
      * Return a vector of the underlying Trilinos Epetra_Map that sets the
      * partitioning of the range space of this block matrix, i.e., the
-     * partitioning of the individual block vectors that are the result
-     * from matrix-vector products.
+     * partitioning of the individual block vectors that are the result from
+     * matrix-vector products.
      */
     std::vector<Epetra_Map> range_partitioner () const;
 

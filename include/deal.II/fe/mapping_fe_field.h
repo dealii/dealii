@@ -32,28 +32,27 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * The MappingFEField is a generalization of the MappingQEulerian
- * class, for arbitrary vector finite elements. The two main
- * differences are that this class uses a vector of absolute positions
- * instead of a vector of displacements, and it allows for arbitrary
- * FiniteElement types, instead of only FE_Q.
+ * The MappingFEField is a generalization of the MappingQEulerian class, for
+ * arbitrary vector finite elements. The two main differences are that this
+ * class uses a vector of absolute positions instead of a vector of
+ * displacements, and it allows for arbitrary FiniteElement types, instead of
+ * only FE_Q.
  *
  * This class effectively decouples the topology from the geometry, by
  * relegating all geometrical information to some components of a
- * FiniteElement vector field. The components that are used for the
- * geometry can be arbitrarily selected at construction time.
+ * FiniteElement vector field. The components that are used for the geometry
+ * can be arbitrarily selected at construction time.
  *
- * The idea is to consider the Triangulation as a parameter
- * configuration space, on which we  construct an arbitrary
- * geometrical mapping, using the instruments of the deal.II library:
- * a vector of degrees of freedom, a DoFHandler associated to the
- * geometry of the problem and a ComponentMask that tells us which
- * components of the FiniteElement to use for the mapping.
+ * The idea is to consider the Triangulation as a parameter configuration
+ * space, on which we  construct an arbitrary geometrical mapping, using the
+ * instruments of the deal.II library: a vector of degrees of freedom, a
+ * DoFHandler associated to the geometry of the problem and a ComponentMask
+ * that tells us which components of the FiniteElement to use for the mapping.
  *
- * Typically, the DoFHandler operates on a finite element that is
- * constructed as a system element (FESystem()) from continuous FE_Q()
- * (for iso-parametric discretizations) or FE_Bernstein() (for
- * iso-geometric discretizations) objects. An example is shown below:
+ * Typically, the DoFHandler operates on a finite element that is constructed
+ * as a system element (FESystem()) from continuous FE_Q() (for iso-parametric
+ * discretizations) or FE_Bernstein() (for iso-geometric discretizations)
+ * objects. An example is shown below:
  *
  * @code
  *    const FE_Q<dim,spacedim> feq(1);
@@ -80,33 +79,30 @@ public:
    * transformation of the domain from the reference to the current
    * configuration.
    *
-   * In general this class decouples geometry from topology, allowing
-   * users to define geometries which are only topologically
-   * equivalent to the underlying Triangulation, but which may
-   * otherwise be arbitrary. Differently from what happens in
-   * MappingQEulerian, the FiniteElement field which is passed to the
-   * constructor is interpreted as an absolute geometrical
-   * configuration, therefore one has to make sure that the
-   * euler_vector actually represents a valid geometry (i.e., one with
-   * no inverted cells, or with no zero-volume cells).
+   * In general this class decouples geometry from topology, allowing users to
+   * define geometries which are only topologically equivalent to the
+   * underlying Triangulation, but which may otherwise be arbitrary.
+   * Differently from what happens in MappingQEulerian, the FiniteElement
+   * field which is passed to the constructor is interpreted as an absolute
+   * geometrical configuration, therefore one has to make sure that the
+   * euler_vector actually represents a valid geometry (i.e., one with no
+   * inverted cells, or with no zero-volume cells).
    *
-   * If the underlying FiniteElement is a system of FE_Q(), and
-   * euler_vector is initialized using
-   * VectorTools::get_position_vector(), then this class is in all
-   * respects identical to MappingQ().
+   * If the underlying FiniteElement is a system of FE_Q(), and euler_vector
+   * is initialized using VectorTools::get_position_vector(), then this class
+   * is in all respects identical to MappingQ().
    *
    * The optional ComponentMask argument can be used to specify what
    * components of the FiniteElement to use for the geometrical
-   * transformation. If no mask is specified at construction time,
-   * then a default one is used, which makes this class works in the
-   * same way of MappingQEulerian(), i.e., the first spacedim
-   * components of the FiniteElement are assumed to represent the
-   * geometry of the problem.
+   * transformation. If no mask is specified at construction time, then a
+   * default one is used, which makes this class works in the same way of
+   * MappingQEulerian(), i.e., the first spacedim components of the
+   * FiniteElement are assumed to represent the geometry of the problem.
    *
    * Notice that if a mask is specified, it has to match in size the
-   * underlying FiniteElement, and it has to have exactly spacedim
-   * non-zero elements, indicating the components (in order) of the
-   * FiniteElement which will be used for the geometry.
+   * underlying FiniteElement, and it has to have exactly spacedim non-zero
+   * elements, indicating the components (in order) of the FiniteElement which
+   * will be used for the geometry.
    *
    * If an incompatible mask is passed, an exception is thrown.
    */
@@ -143,7 +139,8 @@ public:
     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     const Point<spacedim>                            &p) const;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   virtual void
@@ -152,7 +149,8 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   virtual void
@@ -161,7 +159,8 @@ public:
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
              const MappingType type) const;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   virtual
@@ -194,8 +193,7 @@ public:
 
 
   /**
-   * Storage for internal data of
-   * d-linear transformation.
+   * Storage for internal data of d-linear transformation.
    */
   class InternalData : public Mapping<dim,spacedim>::InternalDataBase
   {
@@ -207,118 +205,83 @@ public:
                  const ComponentMask mask);
 
     /**
-     * Shape function at quadrature
-     * point. Shape functions are
-     * in tensor product order, so
-     * vertices must be reordered
-     * to obtain transformation.
+     * Shape function at quadrature point. Shape functions are in tensor
+     * product order, so vertices must be reordered to obtain transformation.
      */
     double shape (const unsigned int qpoint,
                   const unsigned int shape_nr) const;
 
     /**
-     * Shape function at quadrature
-     * point. See above.
+     * Shape function at quadrature point. See above.
      */
     double &shape (const unsigned int qpoint,
                    const unsigned int shape_nr);
 
     /**
-     * Gradient of shape function
-     * in quadrature point. See
-     * above.
+     * Gradient of shape function in quadrature point. See above.
      */
     Tensor<1,dim> derivative (const unsigned int qpoint,
                               const unsigned int shape_nr) const;
 
     /**
-     * Gradient of shape function
-     * in quadrature point. See
-     * above.
+     * Gradient of shape function in quadrature point. See above.
      */
     Tensor<1,dim> &derivative (const unsigned int qpoint,
                                const unsigned int shape_nr);
 
     /**
-     * Second derivative of shape
-     * function in quadrature
-     * point. See above.
+     * Second derivative of shape function in quadrature point. See above.
      */
     Tensor<2,dim> second_derivative (const unsigned int qpoint,
                                      const unsigned int shape_nr) const;
 
     /**
-     * Second derivative of shape
-     * function in quadrature
-     * point. See above.
+     * Second derivative of shape function in quadrature point. See above.
      */
     Tensor<2,dim> &second_derivative (const unsigned int qpoint,
                                       const unsigned int shape_nr);
 
     /**
-     * Return an estimate (in
-     * bytes) or the memory
-     * consumption of this
-     * object.
+     * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual std::size_t memory_consumption () const;
 
     /**
-     * Values of shape
-     * functions. Access by
-     * function @p shape.
+     * Values of shape functions. Access by function @p shape.
      *
      * Computed once.
      */
     std::vector<double> shape_values;
 
     /**
-     * Values of shape function
-     * derivatives. Access by
-     * function @p derivative.
+     * Values of shape function derivatives. Access by function @p derivative.
      *
      * Computed once.
      */
     std::vector<Tensor<1,dim> > shape_derivatives;
 
     /**
-     * Values of shape function
-     * second derivatives. Access
-     * by function
-     * @p second_derivative.
+     * Values of shape function second derivatives. Access by function @p
+     * second_derivative.
      *
      * Computed once.
      */
     std::vector<Tensor<2,dim> > shape_second_derivatives;
 
     /**
-     * Tensors of covariant
-     * transformation at each of
-     * the quadrature points. The
-     * matrix stored is the
-     * Jacobian * G^{-1},
-     * where G = Jacobian^{t} * Jacobian,
-     * is the first fundamental
-     * form of the map;
-     * if dim=spacedim then
-     * it reduces to the transpose of the
-     * inverse of the Jacobian
-     * matrix, which itself is
-     * stored in the
-     * @p contravariant field of
-     * this structure.
+     * Tensors of covariant transformation at each of the quadrature points.
+     * The matrix stored is the Jacobian * G^{-1}, where G = Jacobian^{t} *
+     * Jacobian, is the first fundamental form of the map; if dim=spacedim
+     * then it reduces to the transpose of the inverse of the Jacobian matrix,
+     * which itself is stored in the @p contravariant field of this structure.
      *
      * Computed on each cell.
      */
     std::vector<DerivativeForm<1,dim, spacedim > >  covariant;
 
     /**
-     * Tensors of contravariant
-     * transformation at each of
-     * the quadrature points. The
-     * contravariant matrix is
-     * the Jacobian of the
-     * transformation,
+     * Tensors of contravariant transformation at each of the quadrature
+     * points. The contravariant matrix is the Jacobian of the transformation,
      * i.e. $J_{ij}=dx_i/d\hat x_j$.
      *
      * Computed on each cell.
@@ -326,24 +289,15 @@ public:
     std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
 
     /**
-     * Unit tangential vectors. Used
-     * for the computation of
-     * boundary forms and normal
-     * vectors.
+     * Unit tangential vectors. Used for the computation of boundary forms and
+     * normal vectors.
      *
-     * This vector has
-     * (dim-1)GeometryInfo::faces_per_cell
-     * entries. The first
-     * GeometryInfo::faces_per_cell
-     * contain the vectors in the first
-     * tangential direction for each
-     * face; the second set of
-     * GeometryInfo::faces_per_cell
-     * entries contain the vectors in the
-     * second tangential direction (only
-     * in 3d, since there we have 2
-     * tangential directions per face),
-     * etc.
+     * This vector has (dim-1)GeometryInfo::faces_per_cell entries. The first
+     * GeometryInfo::faces_per_cell contain the vectors in the first
+     * tangential direction for each face; the second set of
+     * GeometryInfo::faces_per_cell entries contain the vectors in the second
+     * tangential direction (only in 3d, since there we have 2 tangential
+     * directions per face), etc.
      *
      * Filled once.
      */
@@ -355,54 +309,42 @@ public:
     std::vector<std::vector<Tensor<1,spacedim> > > aux;
 
     /**
-     * Number of shape functions. If this is a Q1 mapping, then it is
-     * simply the number of vertices per cell. However, since also
-     * derived classes use this class (e.g. the Mapping_Q() class),
-     * the number of shape functions may also be different.
+     * Number of shape functions. If this is a Q1 mapping, then it is simply
+     * the number of vertices per cell. However, since also derived classes
+     * use this class (e.g. the Mapping_Q() class), the number of shape
+     * functions may also be different.
      */
     unsigned int n_shape_functions;
 
     /**
-     * Stores the mask given at construction time. If no mask was
-     * specified at construction time, then a default one is used,
-     * which makes this class works in the same way of
-     * MappingQEulerian(), i.e., the first spacedim components of the
-     * FiniteElement are used for the euler_vector and the euler_dh.
+     * Stores the mask given at construction time. If no mask was specified at
+     * construction time, then a default one is used, which makes this class
+     * works in the same way of MappingQEulerian(), i.e., the first spacedim
+     * components of the FiniteElement are used for the euler_vector and the
+     * euler_dh.
      *
      * If a mask is specified, then it has to match the underlying
-     * FiniteElement, and it has to have exactly spacedim non-zero
-     * elements, indicating the components (in order) of the
-     * FiniteElement which will be used for the euler vector and the
-     * euler dof handler.
+     * FiniteElement, and it has to have exactly spacedim non-zero elements,
+     * indicating the components (in order) of the FiniteElement which will be
+     * used for the euler vector and the euler dof handler.
      */
     ComponentMask mask;
   };
 
 
   /**
-   * Transforms a point @p p on
-   * the unit cell to the point
-   * @p p_real on the real cell
-   * @p cell and returns @p p_real.
+   * Transforms a point @p p on the unit cell to the point @p p_real on the
+   * real cell @p cell and returns @p p_real.
    *
-   * This function is called by
-   * @p transform_unit_to_real_cell
-   * and multiple times (through the
-   * Newton iteration) by
-   * @p transform_real_to_unit_cell_internal.
+   * This function is called by @p transform_unit_to_real_cell and multiple
+   * times (through the Newton iteration) by @p
+   * transform_real_to_unit_cell_internal.
    *
-   * Takes a reference to an
-   * @p InternalData that must
-   * already include the shape
-   * values at point @p p and the
-   * mapping support points of the
-   * cell.
+   * Takes a reference to an @p InternalData that must already include the
+   * shape values at point @p p and the mapping support points of the cell.
    *
-   * This @p InternalData argument
-   * avoids multiple computations
-   * of the shape values at point
-   * @p p and especially multiple
-   * computations of the mapping
+   * This @p InternalData argument avoids multiple computations of the shape
+   * values at point @p p and especially multiple computations of the mapping
    * support points.
    */
   Point<spacedim>
@@ -410,34 +352,18 @@ public:
 
 
   /**
-   * Transforms the point @p p on
-   * the real cell to the corresponding
-   * point on the unit cell
-   * @p cell by a Newton
-   * iteration.
+   * Transforms the point @p p on the real cell to the corresponding point on
+   * the unit cell @p cell by a Newton iteration.
    *
-   * Takes a reference to an
-   * @p InternalData that is
-   * assumed to be previously
-   * created by the @p get_data
-   * function with @p UpdateFlags
-   * including
-   * @p update_transformation_values
-   * and
-   * @p update_transformation_gradients
-   * and a one point Quadrature
-   * that includes the given
-   * initial guess for the
-   * transformation
-   * @p initial_p_unit.  Hence this
-   * function assumes that
-   * @p mdata already includes the
-   * transformation shape values
-   * and gradients computed at
-   * @p initial_p_unit.
+   * Takes a reference to an @p InternalData that is assumed to be previously
+   * created by the @p get_data function with @p UpdateFlags including @p
+   * update_transformation_values and @p update_transformation_gradients and a
+   * one point Quadrature that includes the given initial guess for the
+   * transformation @p initial_p_unit.  Hence this function assumes that @p
+   * mdata already includes the transformation shape values and gradients
+   * computed at @p initial_p_unit.
    *
-   * @p mdata will be changed by
-   * this function.
+   * @p mdata will be changed by this function.
    */
   Point<dim>
   transform_real_to_unit_cell_internal (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -446,8 +372,7 @@ public:
                                         InternalData &mdata) const;
 
   /**
-   * Do the computation for the
-   * <tt>fill_*</tt> functions.
+   * Do the computation for the <tt>fill_*</tt> functions.
    */
   void compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                      const unsigned int      npts,
@@ -458,8 +383,7 @@ public:
 
 
   /**
-   * Do the computation for the
-   * <tt>fill_*</tt> functions.
+   * Do the computation for the <tt>fill_*</tt> functions.
    */
   void compute_fill_face (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                           const unsigned int      face_no,
@@ -533,10 +457,10 @@ protected:
 
 
   /**
-     This function and the next allow to generate the transform require by
-     the virtual transform() in mapping, but unfortunately in C++ one cannot
-     declare a virtual template function.
-  */
+   * This function and the next allow to generate the transform require by the
+   * virtual transform() in mapping, but unfortunately in C++ one cannot
+   * declare a virtual template function.
+   */
   template < int rank >
   void
   transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input,
@@ -546,7 +470,7 @@ protected:
 
 
   /**
-       see doc in transform_fields
+   * see doc in transform_fields
    */
   template < int rank >
   void
@@ -559,16 +483,16 @@ protected:
 
 protected:
   /**
-  * Reference to the vector of shifts.
-  */
+   * Reference to the vector of shifts.
+   */
 
   SmartPointer<const VECTOR, MappingFEField<dim,spacedim,DH,VECTOR> >euler_vector;
   /**
-   * A FiniteElement object which is only needed in 3D, since it knows how to reorder
-   * shape functions/DoFs on non-standard faces. This is used to reorder
-   * support points in the same way. We could make this a pointer to prevent
-   * construction in 1D and 2D, but since memory and time requirements are not
-   * particularly high this seems unnecessary at the moment.
+   * A FiniteElement object which is only needed in 3D, since it knows how to
+   * reorder shape functions/DoFs on non-standard faces. This is used to
+   * reorder support points in the same way. We could make this a pointer to
+   * prevent construction in 1D and 2D, but since memory and time requirements
+   * are not particularly high this seems unnecessary at the moment.
    */
   SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,DH,VECTOR> > fe;
 
@@ -587,39 +511,43 @@ private:
   void update_internal_dofs(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
-   * It stores the local degrees of freedom of the DH for each cell
-   * (i.e. euler_vector * dof_indices, see method update_internal_dofs for more
+   * It stores the local degrees of freedom of the DH for each cell (i.e.
+   * euler_vector * dof_indices, see method update_internal_dofs for more
    * clarifications.).
    */
   mutable Threads::ThreadLocalStorage <std::vector<double> >  local_dof_values;
 
   /**
    * Store the degrees of freedom of the DH for each cell (i.e.
-   * cell->get_dof_indices(dof_indices), see method update_internal_dofs for more
-   * clarifications.). Thread safe.
+   * cell->get_dof_indices(dof_indices), see method update_internal_dofs for
+   * more clarifications.). Thread safe.
    */
   mutable  Threads::ThreadLocalStorage <std::vector<types::global_dof_index> > local_dof_indices;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   virtual void
   compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
                           typename MappingFEField<dim, spacedim>::InternalData &data) const;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   virtual UpdateFlags
   update_once (const UpdateFlags in) const;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   virtual UpdateFlags
   update_each (const UpdateFlags in) const;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   void
@@ -628,7 +556,8 @@ private:
                 const unsigned int     n_original_q_points,
                 InternalData           &data) const;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   void
@@ -637,7 +566,8 @@ private:
                      const unsigned int     n_original_q_points,
                      InternalData           &data) const;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   virtual
@@ -645,7 +575,8 @@ private:
   get_data (const UpdateFlags,
             const Quadrature<dim> &quadrature) const;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   virtual
@@ -653,7 +584,8 @@ private:
   get_face_data (const UpdateFlags flags,
                  const Quadrature<dim-1>& quadrature) const;
 
-  /** Reimplemented from Mapping. See the documentation of the base class for
+  /**
+   * Reimplemented from Mapping. See the documentation of the base class for
    * detailed information.
    */
   virtual
@@ -669,12 +601,13 @@ private:
 
 
   /**
-   * Mapping between indices in the FE space and the real space. This vector contains one
-   * index for each component of the finite element space. If the index is one for which
-   * the ComponentMask which is used to construct this element is false, then
-   * numbers::invalid_unsigned_int is returned, otherwise the component in real space is
-   * returned. For example, if we construct the mapping using ComponentMask(spacedim, true),
-   * then this vector contains {0,1,2} in spacedim = 3.
+   * Mapping between indices in the FE space and the real space. This vector
+   * contains one index for each component of the finite element space. If the
+   * index is one for which the ComponentMask which is used to construct this
+   * element is false, then numbers::invalid_unsigned_int is returned,
+   * otherwise the component in real space is returned. For example, if we
+   * construct the mapping using ComponentMask(spacedim, true), then this
+   * vector contains {0,1,2} in spacedim = 3.
    */
   std::vector<unsigned int> fe_to_real;
 

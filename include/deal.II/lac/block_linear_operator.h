@@ -36,15 +36,16 @@ template <typename Number> class BlockVector;
 /**
  * @relates LinearOperator
  *
- * A function that encapsulates a given collection @p ops of
- * LinearOperators into a block structure. Hereby, it is assumed that Range
- * and Domain are blockvectors, i.e., derived from @ref BlockVectorBase.
+ * A function that encapsulates a given collection @p ops of LinearOperators
+ * into a block structure. Hereby, it is assumed that Range and Domain are
+ * blockvectors, i.e., derived from
+ * @ref BlockVectorBase.
  * The individual linear operators in @p ops must act on a the underlying
  * vector type of the block vectors, i.e., on Domain::BlockType yielding a
  * result in Range::BlockType.
  *
- * The list @p ops is best passed as an initializer list. Consider for
- * example a linear operator block (acting on Vector<double>)
+ * The list @p ops is best passed as an initializer list. Consider for example
+ * a linear operator block (acting on Vector<double>)
  * @code
  *  op_a00 | op_a01
  *         |
@@ -147,14 +148,14 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
 /**
  * @relates LinearOperator
  *
- * A variant of above function that builds up a block diagonal linear
- * operator from an array @p ops of diagonal elements (off-diagonal blocks
- * are assumed to be 0).
+ * A variant of above function that builds up a block diagonal linear operator
+ * from an array @p ops of diagonal elements (off-diagonal blocks are assumed
+ * to be 0).
  *
- * The list @p ops is best passed as an initializer list. Consider for
- * example a linear operator block (acting on Vector<double>)
- * <code>diag(op_a0, op_a1, ..., op_am)</code>. The coresponding
- * block_operator invocation takes the form
+ * The list @p ops is best passed as an initializer list. Consider for example
+ * a linear operator block (acting on Vector<double>) <code>diag(op_a0, op_a1,
+ * ..., op_am)</code>. The coresponding block_operator invocation takes the
+ * form
  * @code
  * block_diagonal_operator<m, BlockVector<double>>({op_00, op_a1, ..., op_am});
  * @endcode
@@ -240,8 +241,8 @@ block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockTyp
  * @relates LinearOperator
  *
  * A variant of above function that only takes a single LinearOperator
- * argument @p op and creates a blockdiagonal linear operator with @p m
- * copies of it.
+ * argument @p op and creates a blockdiagonal linear operator with @p m copies
+ * of it.
  *
  * @ingroup LAOperators
  */
@@ -543,12 +544,13 @@ block_back_substitution(const std::array<std::array<LinearOperator<typename Rang
 /**
  * @relates LinearOperator
  *
- * This function uses above functions block_back_substitution and block_forward_substitution
- * to invert triangular matrices.
- * It takes as input a triangular block matrix @p block_matrix, an array of LinearOperators
- * @p inverse_diagonal representing inverses of block_matrix, and an optional bool @p lower
- * used to specify if block_matrix should be conidered as lower triangular matrix (true) or
- * as upper triangular matrix (false). @p lower is equal to true by default.
+ * This function uses above functions block_back_substitution and
+ * block_forward_substitution to invert triangular matrices. It takes as input
+ * a triangular block matrix @p block_matrix, an array of LinearOperators @p
+ * inverse_diagonal representing inverses of block_matrix, and an optional
+ * bool @p lower used to specify if block_matrix should be conidered as lower
+ * triangular matrix (true) or as upper triangular matrix (false). @p lower is
+ * equal to true by default.
  *
  */
 

@@ -415,8 +415,8 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt> in
-   * the standard library containers.
+   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt>
+   * in the standard library containers.
    */
   typedef number value_type;
 
@@ -584,14 +584,14 @@ public:
   bool empty () const;
 
   /**
-   * Return the dimension of the codomain (or range) space. To remember:
-   * the matrix is of dimension $m \times n$.
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the domain space. To remember: the matrix is
-   * of dimension $m \times n$.
+   * Return the dimension of the domain space. To remember: the matrix is of
+   * dimension $m \times n$.
    */
   size_type n () const;
 
@@ -1137,8 +1137,8 @@ public:
   iterator end ();
 
   /**
-   * Iterator starting at the first entry of row <tt>r</tt>. This is the version
-   * for constant matrices.
+   * Iterator starting at the first entry of row <tt>r</tt>. This is the
+   * version for constant matrices.
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
    * entries, then the iterator returned by this function equals
@@ -1169,8 +1169,8 @@ public:
   const_iterator end (const unsigned int r) const;
 
   /**
-   * Iterator starting at the first entry of row <tt>r</tt>. This is the version
-   * for non-constant matrices.
+   * Iterator starting at the first entry of row <tt>r</tt>. This is the
+   * version for non-constant matrices.
    *
    * Note that if the given row is empty, i.e. does not contain any nonzero
    * entries, then the iterator returned by this function equals

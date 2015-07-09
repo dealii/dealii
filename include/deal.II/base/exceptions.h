@@ -377,10 +377,10 @@ namespace deal_II_exceptions
 
 
 /**
- * Declare an exception class derived from ExceptionBase that can take
- * one runtime argument, but if none is given in the place where you
- * want to throw the exception, it simply reverts to the default text
- * provided when declaring the exception class through this macro.
+ * Declare an exception class derived from ExceptionBase that can take one
+ * runtime argument, but if none is given in the place where you want to throw
+ * the exception, it simply reverts to the default text provided when
+ * declaring the exception class through this macro.
  *
  * @ingroup Exceptions
  */
@@ -521,10 +521,10 @@ namespace deal_II_exceptions
   static dealii::ExceptionBase& Exception0 ()
 
 /**
- * Declare an exception class derived from ExceptionBase that can take
- * one runtime argument, but if none is given in the place where you
- * want to throw the exception, it simply reverts to the default text
- * provided when declaring the exception class through this macro.
+ * Declare an exception class derived from ExceptionBase that can take one
+ * runtime argument, but if none is given in the place where you want to throw
+ * the exception, it simply reverts to the default text provided when
+ * declaring the exception class through this macro.
  *
  * @ingroup Exceptions
  */
@@ -615,8 +615,8 @@ namespace StandardExceptions
    * of arithmetic operations that do not result from a division by zero (use
    * ExcDivideByZero for those).
    *
-   * The exception uses std::complex as its argument to ensure that we can
-   * use it for all scalar arguments (real or complex-valued).
+   * The exception uses std::complex as its argument to ensure that we can use
+   * it for all scalar arguments (real or complex-valued).
    */
   DeclException1 (ExcNumberNotFinite,
                   std::complex<double>,
@@ -873,9 +873,9 @@ namespace StandardExceptions
                   << " nor to " << arg3);
 
   /**
-   * This exception indicates that an index is not within the
-   * expected range. For example, it may be that you are trying to
-   * access an element of a vector which does not exist.
+   * This exception indicates that an index is not within the expected range.
+   * For example, it may be that you are trying to access an element of a
+   * vector which does not exist.
    *
    * The constructor takes three <tt>int</tt> arguments, namely
    * <ol>
@@ -897,9 +897,9 @@ namespace StandardExceptions
                       ""));
 
   /**
-   * This exception indicates that an index is not within the
-   * expected range. For example, it may be that you are trying to
-   * access an element of a vector which does not exist.
+   * This exception indicates that an index is not within the expected range.
+   * For example, it may be that you are trying to access an element of a
+   * vector which does not exist.
    *
    * The constructor takes three <tt>int</tt> arguments, namely
    * <ol>
@@ -1079,11 +1079,10 @@ namespace StandardExceptions
                                                    ExcIndexRange<types::global_dof_index>((index),0,(range)))
 
 /**
- * An assertion that checks whether a number is finite or not.
- * We explicitly cast the number to std::complex to match
- * the signature of the exception (see there for an explanation
- * of why we use std::complex at all) and to satisfy the
- * fact that std::complex has no implicit conversions.
+ * An assertion that checks whether a number is finite or not. We explicitly
+ * cast the number to std::complex to match the signature of the exception
+ * (see there for an explanation of why we use std::complex at all) and to
+ * satisfy the fact that std::complex has no implicit conversions.
  *
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 2015

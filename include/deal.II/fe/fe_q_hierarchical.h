@@ -579,15 +579,14 @@ public:
   virtual bool hp_constraints_are_implemented () const;
 
   /**
-   * Return the matrix interpolating from the given finite element to the present one.
-   * Interpolation only between FE_Q_Hierarchical is supported.
+   * Return the matrix interpolating from the given finite element to the
+   * present one. Interpolation only between FE_Q_Hierarchical is supported.
    */
   virtual void get_interpolation_matrix(const FiniteElement< dim> &source,
                                         FullMatrix< double > &matrix) const;
 
   /**
-   * Embedding matrix between grids.
-   * Only isotropic refinement is supported.
+   * Embedding matrix between grids. Only isotropic refinement is supported.
    */
   virtual const
   FullMatrix<double> &get_prolongation_matrix  (const unsigned int child,

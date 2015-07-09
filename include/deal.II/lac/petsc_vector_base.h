@@ -144,8 +144,8 @@ namespace PETScWrappers
       /**
        * Return the imaginary part of the value of the referenced element.
        *
-       * @note This operation is not defined for real numbers and an
-       * exception is thrown.
+       * @note This operation is not defined for real numbers and an exception
+       * is thrown.
        */
       PetscReal imag () const;
 

@@ -1568,8 +1568,8 @@ namespace TrilinosWrappers
 
     /**
      * A data structure that is used to control details of how the algebraic
-     * multigrid is set up. The flags detailed in here are then passed to
-     * the Trilinos MueLu implementation. A structure of the current type are
+     * multigrid is set up. The flags detailed in here are then passed to the
+     * Trilinos MueLu implementation. A structure of the current type are
      * passed to the constructor of PreconditionAMGMueLu.
      */
     struct AdditionalData
@@ -1592,8 +1592,8 @@ namespace TrilinosWrappers
       /**
        * Determines whether the AMG preconditioner should be optimized for
        * elliptic problems (MueLu option smoothed aggregation SA, using a
-       * Chebyshev smoother) or for non-elliptic problems (MueLu option
-       * non-symmetric smoothed aggregation NSSA, smoother is SSOR with
+       * Chebyshev smoother) or for non-elliptic problems (MueLu option non-
+       * symmetric smoothed aggregation NSSA, smoother is SSOR with
        * underrelaxation).
        */
       bool elliptic;
@@ -1655,37 +1655,37 @@ namespace TrilinosWrappers
       bool output_details;
 
       /**
-       * Determines which smoother to use for the AMG cycle. Possibilities
-       * for smoother_type are the following:
+       * Determines which smoother to use for the AMG cycle. Possibilities for
+       * smoother_type are the following:
        * <ul>
-       *   <li>  "Aztec" </li>
-       *   <li>  "IFPACK" </li>
-       *   <li>  "Jacobi" </li>
-       *   <li>  "ML symmetric Gauss-Seidel" </li>
-       *   <li>  "symmetric Gauss-Seidel" </li>
-       *   <li>  "ML Gauss-Seidel" </li>
-       *   <li>  "Gauss-Seidel" </li>
-       *   <li>  "block Gauss-Seidel" </li>
-       *   <li>  "symmetric block Gauss-Seidel" </li>
-       *   <li>  "Chebyshev" </li>
-       *   <li>  "MLS" </li>
-       *   <li>  "Hiptmair" </li>
-       *   <li>  "Amesos-KLU" </li>
-       *   <li>  "Amesos-Superlu" </li>
-       *   <li>  "Amesos-UMFPACK" </li>
-       *   <li>  "Amesos-Superludist" </li>
-       *   <li>  "Amesos-MUMPS" </li>
-       *   <li>  "user-defined" </li>
-       *   <li>  "SuperLU" </li>
-       *   <li>  "IFPACK-Chebyshev" </li>
-       *   <li>  "self" </li>
-       *   <li>  "do-nothing" </li>
-       *   <li>  "IC" </li>
-       *   <li>  "ICT" </li>
-       *   <li>  "ILU" </li>
-       *   <li>  "ILUT" </li>
-       *   <li>  "Block Chebyshev" </li>
-       *   <li>  "IFPACK-Block Chebyshev" </li>
+       * <li>  "Aztec" </li>
+       * <li>  "IFPACK" </li>
+       * <li>  "Jacobi" </li>
+       * <li>  "ML symmetric Gauss-Seidel" </li>
+       * <li>  "symmetric Gauss-Seidel" </li>
+       * <li>  "ML Gauss-Seidel" </li>
+       * <li>  "Gauss-Seidel" </li>
+       * <li>  "block Gauss-Seidel" </li>
+       * <li>  "symmetric block Gauss-Seidel" </li>
+       * <li>  "Chebyshev" </li>
+       * <li>  "MLS" </li>
+       * <li>  "Hiptmair" </li>
+       * <li>  "Amesos-KLU" </li>
+       * <li>  "Amesos-Superlu" </li>
+       * <li>  "Amesos-UMFPACK" </li>
+       * <li>  "Amesos-Superludist" </li>
+       * <li>  "Amesos-MUMPS" </li>
+       * <li>  "user-defined" </li>
+       * <li>  "SuperLU" </li>
+       * <li>  "IFPACK-Chebyshev" </li>
+       * <li>  "self" </li>
+       * <li>  "do-nothing" </li>
+       * <li>  "IC" </li>
+       * <li>  "ICT" </li>
+       * <li>  "ILU" </li>
+       * <li>  "ILUT" </li>
+       * <li>  "Block Chebyshev" </li>
+       * <li>  "IFPACK-Block Chebyshev" </li>
        * </ul>
        */
       const char *smoother_type;
@@ -1713,7 +1713,8 @@ namespace TrilinosWrappers
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
      * linear system with the given matrix. As opposed to the other initialize
-     * function above, this function uses an object of type Epetra_CrsMatrixCrs.
+     * function above, this function uses an object of type
+     * Epetra_CrsMatrixCrs.
      */
     void initialize (const Epetra_CrsMatrix &matrix,
                      const AdditionalData   &additional_data = AdditionalData());
@@ -1724,8 +1725,8 @@ namespace TrilinosWrappers
      * format specified in TrilinosWrappers::SparseMatrix.
      *
      * This function is similar to the one above, but allows the user to set
-     * most of the options of the Trilinos ML preconditioner. In order to find out
-     * about all the options for ML, we refer to the <a
+     * most of the options of the Trilinos ML preconditioner. In order to find
+     * out about all the options for ML, we refer to the <a
      * href=http://trilinos.sandia.gov/packages/ml/mlguide5.pdf>ML user's
      * guide</a>. Not all ML options have a corresponding MueLu option.
      */
