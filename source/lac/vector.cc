@@ -27,6 +27,9 @@ namespace internal
   {
     template void copy_vector<int,double> (const dealii::Vector<int> &,
                                            dealii::Vector<double> &);
+
+    template void copy_vector<int,int> (const dealii::Vector<int> &,
+                                        dealii::Vector<int> &);
   }
 }
 
