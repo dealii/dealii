@@ -662,9 +662,9 @@ namespace VectorTools
    *
    * The parameter @p function_map provides a list of boundary indicators to
    * be handled by this function and corresponding boundary value functions.
-   * The keys of this map correspond to the number @p boundary_id of
-   * the face.  numbers::internal_face_boundary_id is an illegal value for
-   * this key since it is reserved for interior faces.
+   * The keys of this map correspond to the number @p boundary_id of the face.
+   * numbers::internal_face_boundary_id is an illegal value for this key since
+   * it is reserved for interior faces.
    *
    * The flags in the last parameter, @p component_mask denote which
    * components of the finite element space shall be interpolated. If it is
@@ -1072,8 +1072,8 @@ namespace VectorTools
    * $z$-component.
    *
    * The parameter @p boundary_component corresponds to the number @p
-   * boundary_id of the face. numbers::internal_face_boundary_id is an
-   * illegal value, since it is reserved for interior faces.
+   * boundary_id of the face. numbers::internal_face_boundary_id is an illegal
+   * value, since it is reserved for interior faces.
    *
    * The last argument is denoted to compute the normal vector $\vec{n}$ at
    * the boundary points.
@@ -1120,44 +1120,53 @@ namespace VectorTools
                                                 const hp::MappingCollection<dim, dim> &mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
 
   /**
-   * This function is an updated version of the project_boundary_values_curl_conforming
-   * function. The intention is to fix a problem when using the previous function in
-   * conjunction with non-rectangular geometries (i.e. elements with non-rectangular faces).
-   * The L2-projection method used has been taken from the paper "Electromagnetic scattering
-   * simulation using an H (curl) conforming hp finite element method in three dimensions"
-   * by PD Ledger, K Morgan and O Hassan ( Int. J.  Num. Meth. Fluids, Volume 53, Issue 8, pages 1267–1296).
+   * This function is an updated version of the
+   * project_boundary_values_curl_conforming function. The intention is to fix
+   * a problem when using the previous function in conjunction with non-
+   * rectangular geometries (i.e. elements with non-rectangular faces). The
+   * L2-projection method used has been taken from the paper "Electromagnetic
+   * scattering simulation using an H (curl) conforming hp finite element
+   * method in three dimensions" by PD Ledger, K Morgan and O Hassan ( Int. J.
+   * Num. Meth. Fluids, Volume 53, Issue 8, pages 1267–1296).
    *
-   * This function will compute constraints that correspond to Dirichlet boundary conditions of the form
-   * $\vec{n}\times\vec{E}=\vec{n}\times\vec{F}$
-   * i.e. the tangential components of $\vec{E}$ and $f$ shall coincide.
+   * This function will compute constraints that correspond to Dirichlet
+   * boundary conditions of the form
+   * $\vec{n}\times\vec{E}=\vec{n}\times\vec{F}$ i.e. the tangential
+   * components of $\vec{E}$ and $f$ shall coincide.
    *
    * <h4>Computing constraints</h4>
    *
-   * To compute the constraints we use a projection method based upon the paper mentioned
-   * above. In 2D this is done in a single stage for the edge-based shape functions, regardless
-   * of the order of the finite element. In 3D this is done in two stages, edges first and then
-   * faces.
+   * To compute the constraints we use a projection method based upon the
+   * paper mentioned above. In 2D this is done in a single stage for the edge-
+   * based shape functions, regardless of the order of the finite element. In
+   * 3D this is done in two stages, edges first and then faces.
    *
-   * For each cell, each edge, $e$, is projected by solving the linear system $Ax=b$ where $x$
-   * is the vector of contraints on degrees of freedom on the edge and
+   * For each cell, each edge, $e$, is projected by solving the linear system
+   * $Ax=b$ where $x$ is the vector of contraints on degrees of freedom on the
+   * edge and
    *
    * $A_{ij} = \int_{e} (\vec{s}_{i}\cdot\vec{t})(\vec{s}_{j}\cdot\vec{t}) dS$
    *
    * $b_{i} = \int_{e} (\vec{s}_{i}\cdot\vec{t})(\vec{F}\cdot\vec{t}) dS$
    *
-   * with $\vec{s}_{i}$ the $i^{th}$ shape function and $\vec{t}$ the tangent vector.
+   * with $\vec{s}_{i}$ the $i^{th}$ shape function and $\vec{t}$ the tangent
+   * vector.
    *
-   * Once all edge constraints, $x$, have been computed, we may compute the face constraints
-   * in a similar fashion, taking into account the residuals from the edges.
+   * Once all edge constraints, $x$, have been computed, we may compute the
+   * face constraints in a similar fashion, taking into account the residuals
+   * from the edges.
    *
-   * For each face on the cell, $f$, we solve the linear system $By=c$ where $y$ is the vector of
-   * constraints on degrees of freedom on the face and
+   * For each face on the cell, $f$, we solve the linear system $By=c$ where
+   * $y$ is the vector of constraints on degrees of freedom on the face and
    *
-   * $B_{ij} = \int_{f} (\vec{n} \times \vec{s}_{i}) \cdot (\vec{n} \times \vec{s}_{j}) dS$
+   * $B_{ij} = \int_{f} (\vec{n} \times \vec{s}_{i}) \cdot (\vec{n} \times
+   * \vec{s}_{j}) dS$
    *
-   * $c_{i} = \int_{f} (\vec{n} \times \vec{r}) \cdot (\vec{n} \times \vec{s}_i) dS$
+   * $c_{i} = \int_{f} (\vec{n} \times \vec{r}) \cdot (\vec{n} \times
+   * \vec{s}_i) dS$
    *
-   * and $\vec{r} = \vec{F} - \sum_{e \in f} \sum{i \in e} x_{i}\vec{s}_i$, the edge residual.
+   * and $\vec{r} = \vec{F} - \sum_{e \in f} \sum{i \in e} x_{i}\vec{s}_i$,
+   * the edge residual.
    *
    * The resulting constraints are then given in the solutions $x$ and $y$.
    *
@@ -1165,37 +1174,39 @@ namespace VectorTools
    * constraints before, the new ones are added or the old ones overwritten,
    * if a node of the boundary part to be used was already in the list of
    * constraints. This is handled by using inhomogeneous constraints. Please
-   * note that when combining adaptive meshes and this kind of constraints, the
-   * Dirichlet conditions should be set first, and then completed by hanging
-   * node constraints, in order to make sure that the discretization remains
-   * consistent. See the discussion on conflicting constraints in the
+   * note that when combining adaptive meshes and this kind of constraints,
+   * the Dirichlet conditions should be set first, and then completed by
+   * hanging node constraints, in order to make sure that the discretization
+   * remains consistent. See the discussion on conflicting constraints in the
    * module on
    * @ref constraints.
    *
    * <h4>Arguments to this function></h4>
    *
-   * This function is explicitly for use with FE_Nedelec elements, or with FESystem
-   * elements which contain FE_Nedelec elements. It will throw an exception if called
-   * with any other finite element. The user must ensure that FESystem elements are
-   * correctly setup when using this function as this check not possible in this case.
+   * This function is explicitly for use with FE_Nedelec elements, or with
+   * FESystem elements which contain FE_Nedelec elements. It will throw an
+   * exception if called with any other finite element. The user must ensure
+   * that FESystem elements are correctly setup when using this function as
+   * this check not possible in this case.
    *
-   * The second argument of this function denotes the first vector component of the
-   * finite element which corresponds to the vector function that you wish to constrain.
-   * For example, if we are solving Maxwell's equations in 3D and have components
-   * $(E_x,E_y,E_z,B_x,B_y,B_z)$ and we want the boundary conditions
-   * $\vec{n}\times\vec{B}=\vec{n}\times\vec{f}$, then @p first_vector_component would
-   * be 3. The @p boundary_function must return 6 components in this example, with the first 3
-   * corresponding to $\vec{E}$ and the second 3 corresponding to $\vec{B}$.
-   * Vectors are implicitly assumed to have exactly <code>dim</code> components
-   * that are ordered in the same way as we usually order the coordinate directions,
-   * i.e. $x$-, $y$-, and finally $z$-component.
+   * The second argument of this function denotes the first vector component
+   * of the finite element which corresponds to the vector function that you
+   * wish to constrain. For example, if we are solving Maxwell's equations in
+   * 3D and have components $(E_x,E_y,E_z,B_x,B_y,B_z)$ and we want the
+   * boundary conditions $\vec{n}\times\vec{B}=\vec{n}\times\vec{f}$, then @p
+   * first_vector_component would be 3. The @p boundary_function must return 6
+   * components in this example, with the first 3 corresponding to $\vec{E}$
+   * and the second 3 corresponding to $\vec{B}$. Vectors are implicitly
+   * assumed to have exactly <code>dim</code> components that are ordered in
+   * the same way as we usually order the coordinate directions, i.e. $x$-,
+   * $y$-, and finally $z$-component.
    *
-   * The parameter @p boundary_component corresponds to the number @p boundary_id
-   * of the face. numbers::internal_face_boundary_id is an illegal value, since it is
-   * reserved for interior faces.
+   * The parameter @p boundary_component corresponds to the number @p
+   * boundary_id of the face. numbers::internal_face_boundary_id is an illegal
+   * value, since it is reserved for interior faces.
    *
-   * The last argument is denoted to compute the normal vector $\vec{n}$ at the
-   * boundary points.
+   * The last argument is denoted to compute the normal vector $\vec{n}$ at
+   * the boundary points.
    *
    *
    * @ingroup constraints
@@ -1213,7 +1224,8 @@ namespace VectorTools
 
 
   /**
-   * hp-namespace version of project_boundary_values_curl_conforming_l2 (above).
+   * hp-namespace version of project_boundary_values_curl_conforming_l2
+   * (above).
    *
    * @ingroup constraints
    */
@@ -1255,11 +1267,11 @@ namespace VectorTools
    * we usually order the coordinate directions, i.e., $x$-, $y$-, and finally
    * $z$-component.
    *
-   * The parameter @p boundary_component corresponds to the @p
-   * boundary_id of the faces where the boundary conditions are
-   * applied. numbers::internal_face_boundary_id is an illegal value, since it
-   * is reserved for interior faces. The @p mapping is used to compute the
-   * normal vector $\vec{n}$ at the boundary points.
+   * The parameter @p boundary_component corresponds to the @p boundary_id of
+   * the faces where the boundary conditions are applied.
+   * numbers::internal_face_boundary_id is an illegal value, since it is
+   * reserved for interior faces. The @p mapping is used to compute the normal
+   * vector $\vec{n}$ at the boundary points.
    *
    * <h4>Computing constraints</h4>
    *
@@ -1813,12 +1825,12 @@ namespace VectorTools
    * formula only evaluates the two solutions at these particular points,
    * choosing this quadrature formula may indicate an error far smaller than
    * it actually is.
-   * @param[in] norm The norm $X$ shown above that should be computed. If
-   *   the norm is NormType::Hdiv_seminorm, then the finite element on which this
-   *   function is called needs to have at least dim vector components,
-   *   and the divergence will be computed on the first div components.
-   *   This works, for example, on the finite elements used for the
-   *   mixed Laplace (step-20) and the Stokes equations (step-22).
+   * @param[in] norm The norm $X$ shown above that should be computed. If the
+   * norm is NormType::Hdiv_seminorm, then the finite element on which this
+   * function is called needs to have at least dim vector components, and the
+   * divergence will be computed on the first div components. This works, for
+   * example, on the finite elements used for the mixed Laplace (step-20) and
+   * the Stokes equations (step-22).
    * @param[in] weight The additional argument @p weight allows to evaluate
    * weighted norms.  The weight function may be scalar, establishing a
    * spatially variable weight in the domain for all components equally. This
@@ -2109,16 +2121,16 @@ namespace VectorTools
                const Point<spacedim>                     &point);
 
   /**
-    * Evaluate a possibly vector-valued finite element function defined by the
-    * given DoFHandler and nodal vector at the given point, and return the
-    * (vector) gradient of this function through the last argument.
-    *
-    * This is a wrapper function using a Q1-mapping for cell boundaries to call
-    * the other point_gradient() function.
-    *
-    * @note If the cell in which the point is found is not locally owned, an
-    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
-    */
+   * Evaluate a possibly vector-valued finite element function defined by the
+   * given DoFHandler and nodal vector at the given point, and return the
+   * (vector) gradient of this function through the last argument.
+   *
+   * This is a wrapper function using a Q1-mapping for cell boundaries to call
+   * the other point_gradient() function.
+   *
+   * @note If the cell in which the point is found is not locally owned, an
+   * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   */
   template <int dim, class InVector, int spacedim>
   void
   point_gradient (const DoFHandler<dim,spacedim>    &dof,
@@ -2333,30 +2345,27 @@ namespace VectorTools
    */
   //@{
   /**
-   * Given a DoFHandler containing at least a spacedim vector field,
-   * this function interpolates the Triangulation at the support
-   * points of a FE_Q() finite element of the same degree as
-   * dh->get_fe().degree.
+   * Given a DoFHandler containing at least a spacedim vector field, this
+   * function interpolates the Triangulation at the support points of a FE_Q()
+   * finite element of the same degree as dh->get_fe().degree.
    *
    * Curved manifold are respected, and the resulting VECTOR will be
    * geometrically consistent.
    *
-   * The resulting map is guaranteed to be interpolatory at the
-   * support points of a FE_Q() finite element of the same degree as
-   * dh->get_fe().degree. Notice that this may or may not be
-   * meaningful, depending on the FiniteElement you have distribed in
-   * dh.
+   * The resulting map is guaranteed to be interpolatory at the support points
+   * of a FE_Q() finite element of the same degree as dh->get_fe().degree.
+   * Notice that this may or may not be meaningful, depending on the
+   * FiniteElement you have distribed in dh.
    *
    * If the underlying finite element is an FE_Q(1)^spacedim, then the
-   * resulting VECTOR is a finite element field representation of the
-   * vertices of the Triangulation.
+   * resulting VECTOR is a finite element field representation of the vertices
+   * of the Triangulation.
    *
    * The optional ComponentMask argument can be used to specify what
-   * components of the FiniteElement to use to describe the
-   * geometry. If no mask is specified at construction time, then a
-   * default one is used, i.e., the first spacedim components of the
-   * FiniteElement are assumed to represent the geometry of the
-   * problem.
+   * components of the FiniteElement to use to describe the geometry. If no
+   * mask is specified at construction time, then a default one is used, i.e.,
+   * the first spacedim components of the FiniteElement are assumed to
+   * represent the geometry of the problem.
    *
    * @author Luca Heltai, 2015
    */

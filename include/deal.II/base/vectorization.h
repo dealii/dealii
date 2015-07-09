@@ -317,10 +317,10 @@ make_vectorized_array (const Number &u)
  * given array @p in. The offsets to the input array are given by the array @p
  * offsets. From each stream, n_entries are read. The data is then transposed
  * and stored it into an array of VectorizedArray type. The output array @p
- * out is expected to be an array of size @p n_entries. This method
- * operates on plain arrays, so no checks for valid data access are made. It is
- * the user's responsibility to ensure that the given arrays are valid
- * according to the access layout below.
+ * out is expected to be an array of size @p n_entries. This method operates
+ * on plain arrays, so no checks for valid data access are made. It is the
+ * user's responsibility to ensure that the given arrays are valid according
+ * to the access layout below.
  *
  * This operation corresponds to a transformation of an array-of-struct
  * (input) into a struct-of-array (output) according to the following formula:
@@ -355,10 +355,10 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
 /**
  * This method stores the vectorized arrays in transposed form into the given
  * output array @p out with the given offsets @p offsets. This operation
- * corresponds to a transformation of a struct-of-array (input) into an
- * array-of-struct (output). This method operates on plain array, so no checks
- * for valid data access are made. It is the user's responsibility to ensure
- * that the given arrays are valid according to the access layout below.
+ * corresponds to a transformation of a struct-of-array (input) into an array-
+ * of-struct (output). This method operates on plain array, so no checks for
+ * valid data access are made. It is the user's responsibility to ensure that
+ * the given arrays are valid according to the access layout below.
  *
  * This method assumes that the specified offsets do not overlap. Otherwise,
  * the behavior is undefined in the vectorized case. It is the user's
@@ -376,7 +376,8 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
  *     out[offsets[v]+i] = in[i][v];
  * @endcode
  *
- * For <code>add_into == true</code>, the code implements the following action:
+ * For <code>add_into == true</code>, the code implements the following
+ * action:
  * @code
  * for (unsigned int i=0; i<n_entries; ++i)
  *   for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)

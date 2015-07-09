@@ -579,8 +579,9 @@ namespace Functions
 
     /**
      * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+     * object. This is not exact (but will usually be close) because
+     * calculating the memory usage of trees (e.g., <tt>std::map</tt>) is
+     * difficult.
      */
     std::size_t memory_consumption () const;
 
@@ -1031,8 +1032,8 @@ namespace Functions
    * described by a $dim$-tuple of exponents. Consequently, the class's
    * constructor takes a Tensor<1,dim> to describe the set of exponents. Most
    * of the time these exponents will of course be integers, but real
-   * exponents are of course equally valid. Exponents can't be real when
-   * the bases are negative numbers.
+   * exponents are of course equally valid. Exponents can't be real when the
+   * bases are negative numbers.
    *
    * @author Wolfgang Bangerth, 2006
    */
@@ -1259,13 +1260,14 @@ namespace Functions
   /**
    * A class that represents a function object for a polynomial. A polynomial
    * is composed by the summation of multiple monomials. If the polynomial has
-   * n monomials and the dimension is equal to dim, the polynomial can be written as
-   * $\sum_{i=1}^{n} a_{i}(\prod_{d=1}^{dim} x_{d}^{\alpha_{i,d}})$, where
-   * $a_{i}$ are the coefficients of the monomials and $\alpha_{i,d}$ are their exponents.
-   * The class's constructor takes a Table<2,double> to describe the set of
-   * exponents and a Vector<double> to describe the set of coefficients.
+   * n monomials and the dimension is equal to dim, the polynomial can be
+   * written as $\sum_{i=1}^{n} a_{i}(\prod_{d=1}^{dim}
+   * x_{d}^{\alpha_{i,d}})$, where $a_{i}$ are the coefficients of the
+   * monomials and $\alpha_{i,d}$ are their exponents. The class's constructor
+   * takes a Table<2,double> to describe the set of exponents and a
+   * Vector<double> to describe the set of coefficients.
    *
-   *  @author Ángel Rodríguez, 2015
+   * @author Ángel Rodríguez, 2015
    */
   template <int dim>
   class Polynomial : public Function<dim>
@@ -1273,12 +1275,12 @@ namespace Functions
   public:
     /**
      * Constructor. The coefficients and the exponents of the polynomial are
-     * passed as arguments. The Table<2, double> exponents has a number of rows
-     * equal to the number of monomials of the polynomial and a number of columns
-     * equal to dim. The i-th row of the exponents table contains the
-     * ${\alpha_{i,d}}$ exponents of the i-th monomial
-     * $a_{i}\prod_{d=1}^{dim} x_{d}^{\alpha_{i,d}}$. The i-th element of the coefficients
-     * vector contains the coefficient $a_{i}$ for the i-th monomial.
+     * passed as arguments. The Table<2, double> exponents has a number of
+     * rows equal to the number of monomials of the polynomial and a number of
+     * columns equal to dim. The i-th row of the exponents table contains the
+     * ${\alpha_{i,d}}$ exponents of the i-th monomial $a_{i}\prod_{d=1}^{dim}
+     * x_{d}^{\alpha_{i,d}}$. The i-th element of the coefficients vector
+     * contains the coefficient $a_{i}$ for the i-th monomial.
      */
     Polynomial (const Table<2,double>     &exponents,
                 const std::vector<double> &coefficients);

@@ -206,9 +206,9 @@ public:
    * @note Source and destination must not be the same vector.
    *
    * @note The template with @p number2 only exists for compile-time
-   * compatibility with FullMatrix. Only the case @p number2 = @p
-   * number is implemented due to limitations in the underlying LAPACK
-   * interface. All other variants throw an error upon invocation.
+   * compatibility with FullMatrix. Only the case @p number2 = @p number is
+   * implemented due to limitations in the underlying LAPACK interface. All
+   * other variants throw an error upon invocation.
    */
   template <typename number2>
   void vmult (Vector<number2>       &w,
@@ -262,8 +262,8 @@ public:
                const bool            adding=false) const;
 
   /**
-   * Adding transpose matrix-vector-multiplication.
-   * <i>w += A<sup>T</sup>*v</i>
+   * Adding transpose matrix-vector-multiplication. <i>w +=
+   * A<sup>T</sup>*v</i>
    *
    * See the documentation of vmult() for details on the implementation.
    */

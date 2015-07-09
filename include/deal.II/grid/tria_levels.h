@@ -72,9 +72,9 @@ namespace internal
 
 
       /**
-       * An integer that, for every active cell, stores the how
-       * many-th active cell this is. For non-active cells, this value
-       * is unused and set to an invalid value.
+       * An integer that, for every active cell, stores the how many-th active
+       * cell this is. For non-active cells, this value is unused and set to
+       * an invalid value.
        */
       std::vector<unsigned int> active_cell_indices;
 
@@ -208,9 +208,9 @@ namespace internal
 //TODO: Replace TriaObjectsHex to avoid this specialization
 
     /**
-     * Specialization of TriaLevels for 3D. Since we need
-     * TriaObjectsHex instead of TriaObjects. Refer to the
-     * documentation of the general class template for details.
+     * Specialization of TriaLevels for 3D. Since we need TriaObjectsHex
+     * instead of TriaObjects. Refer to the documentation of the general class
+     * template for details.
      */
     template<>
     class TriaLevel<3>

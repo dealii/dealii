@@ -35,16 +35,16 @@ template <typename Range = Vector<double> > class PackagedOperation;
 /**
  * A class to store a computation.
  *
- * The PackagedOperation class allows lazy evaluation of expressions
- * involving vectors and linear operators. This is done by storing the
- * computational expression and only performing the computation when either
- * the object is implicitly converted to a vector object, or
- * <code>apply</code> (or <code>apply_add</code>) is invoked by hand. This
- * avoids unnecessary temporary storage of intermediate results.
+ * The PackagedOperation class allows lazy evaluation of expressions involving
+ * vectors and linear operators. This is done by storing the computational
+ * expression and only performing the computation when either the object is
+ * implicitly converted to a vector object, or <code>apply</code> (or
+ * <code>apply_add</code>) is invoked by hand. This avoids unnecessary
+ * temporary storage of intermediate results.
  *
- * The class essentially consists of <code>std::function</code> objects
- * that store the knowledge of how to generate the result of a computation
- * and store it in a vector:
+ * The class essentially consists of <code>std::function</code> objects that
+ * store the knowledge of how to generate the result of a computation and
+ * store it in a vector:
  * @code
  *   std::function<void(Range &)> apply;
  *   std::function<void(Range &)> apply_add;
@@ -73,9 +73,9 @@ template <typename Range = Vector<double> > class PackagedOperation;
  * @endcode
  * The expression <code>residual</code> is of type
  * <code>PackagedOperation<dealii::Vector<double>></code>. It stores
- * references to <code>A</code>, <code>b</code> and <code>x</code> and
- * defers the actual computation until <code>apply</code>, or
- * <code>apply_add</code> are explicitly invoked,
+ * references to <code>A</code>, <code>b</code> and <code>x</code> and defers
+ * the actual computation until <code>apply</code>, or <code>apply_add</code>
+ * are explicitly invoked,
  * @code
  *   dealii::Vector<double> y;
  *   residual.reinit_vector(y);
@@ -131,14 +131,13 @@ public:
   PackagedOperation (const PackagedOperation<Range> &) = default;
 
   /**
-   * Constructor that creates a PackagedOperation object from a reference vector
-   * @p u. The PackagedOperation returns @p u.
+   * Constructor that creates a PackagedOperation object from a reference
+   * vector @p u. The PackagedOperation returns @p u.
    *
-   * The PackagedOperation object that is created stores a reference to @p
-   * u. Thus, the vector must remain a valid reference for the whole
-   * lifetime of the PackagedOperation object. All changes made on @p u
-   * after the creation of the PackagedOperation object are reflected by
-   * the operator object.
+   * The PackagedOperation object that is created stores a reference to @p u.
+   * Thus, the vector must remain a valid reference for the whole lifetime of
+   * the PackagedOperation object. All changes made on @p u after the creation
+   * of the PackagedOperation object are reflected by the operator object.
    */
   PackagedOperation (const Range &u)
   {
@@ -150,12 +149,13 @@ public:
    */
   PackagedOperation<Range> &operator=(const PackagedOperation<Range> &) = default;
 
-  /** Copy assignment operator that creates a PackagedOperation object from a
+  /**
+   * Copy assignment operator that creates a PackagedOperation object from a
    * reference vector @p u. The PackagedOperation returns @p u.
    *
    * The PackagedOperation object that is created stores a reference to @p u.
-   * Thus, the vector must remain a valid reference for the whole lifetime
-   * of the PackagedOperation object. All changes made on @p u after the creation
+   * Thus, the vector must remain a valid reference for the whole lifetime of
+   * the PackagedOperation object. All changes made on @p u after the creation
    * of the PackagedOperation object are reflected by the operator object.
    */
   PackagedOperation<Range> &operator=(const Range &u)
@@ -209,7 +209,8 @@ public:
   }
 
   /**
-   * Subtraction with a PackagedOperation @p second_comp with the same @p Range.
+   * Subtraction with a PackagedOperation @p second_comp with the same @p
+   * Range.
    */
   PackagedOperation<Range> &operator-=(const PackagedOperation<Range> &second_comp)
   {
@@ -228,8 +229,8 @@ public:
   }
 
   /**
-   * Subract a constant @p offset (of the @p Range space) from the result
-   * of a PackagedOperation.
+   * Subract a constant @p offset (of the @p Range space) from the result of a
+   * PackagedOperation.
    */
   PackagedOperation<Range> &operator-=(const Range &offset)
   {
@@ -254,16 +255,17 @@ public:
   std::function<void(Range &v)> apply;
 
   /**
-   * Add the result of the PackagedOperation to a vector v of the @p Range space.
+   * Add the result of the PackagedOperation to a vector v of the @p Range
+   * space.
    */
   std::function<void(Range &v)> apply_add;
 
   /**
    * Initializes a vector v of the Range space to be directly usable as the
-   * destination parameter in an application of apply, or apply_add.
-   * Similar to the reinit functions of the vector classes, the boolean
-   * determines whether a fast initialization is done, i.e., if it is set
-   * to false the content of the vector is set to 0.
+   * destination parameter in an application of apply, or apply_add. Similar
+   * to the reinit functions of the vector classes, the boolean determines
+   * whether a fast initialization is done, i.e., if it is set to false the
+   * content of the vector is set to 0.
    */
   std::function<void(Range &v, bool fast)> reinit_vector;
 };
@@ -277,8 +279,8 @@ public:
 /**
  * @relates PackagedOperation
  *
- * Addition of two PackagedOperation objects @p first_comp and
- * @p second_comp given by vector space addition of the corresponding results.
+ * Addition of two PackagedOperation objects @p first_comp and @p second_comp
+ * given by vector space addition of the corresponding results.
  *
  * @ingroup LAOperators
  */
@@ -312,8 +314,8 @@ operator+(const PackagedOperation<Range> &first_comp,
 /**
  * @relates PackagedOperation
  *
- * Subtraction of two PackagedOperation objects @p first_comp and @p second_comp
- * given by vector space addition of the corresponding results.
+ * Subtraction of two PackagedOperation objects @p first_comp and @p
+ * second_comp given by vector space addition of the corresponding results.
  *
  * @ingroup LAOperators
  */
@@ -350,9 +352,8 @@ operator-(const PackagedOperation<Range> &first_comp,
 /**
  * @relates PackagedOperation
  *
- * Scalar multiplication of a PackagedOperation objects @p comp with a
- * scalar @p number given by a scaling PackagedOperation result with
- * @p number.
+ * Scalar multiplication of a PackagedOperation objects @p comp with a scalar
+ * @p number given by a scaling PackagedOperation result with @p number.
  *
  * @ingroup LAOperators
  */
@@ -399,9 +400,8 @@ operator*(const PackagedOperation<Range> &comp,
 /**
  * @relates PackagedOperation
  *
- * Scalar multiplication of a PackagedOperation objects @p comp with a
- * scalar @p number given by a scaling PackagedOperation result with
- * @p number.
+ * Scalar multiplication of a PackagedOperation objects @p comp with a scalar
+ * @p number given by a scaling PackagedOperation result with @p number.
  *
  * @ingroup LAOperators
  */
@@ -462,8 +462,8 @@ PackagedOperation<Range> operator-(const PackagedOperation<Range> &comp,
 /**
  * @relates PackagedOperation
  *
- * Subtract a computational result from a constant @p offset (of the @p
- * Range space). The result is a PackagedOperation object that applies this
+ * Subtract a computational result from a constant @p offset (of the @p Range
+ * space). The result is a PackagedOperation object that applies this
  * computation.
  *
  * @ingroup LAOperators
@@ -514,10 +514,11 @@ namespace
  *
  * Create a PackagedOperation object that stores the addition of two vectors.
  *
- * The PackagedOperation object that is created stores a reference to @p u and @p
- * v. Thus, the vectors must remain valid references for the whole lifetime
+ * The PackagedOperation object that is created stores a reference to @p u and
+ * @p v. Thus, the vectors must remain valid references for the whole lifetime
  * of the PackagedOperation object. All changes made on @p u or @p v after the
- * creation of the PackagedOperation object are reflected by the operator object.
+ * creation of the PackagedOperation object are reflected by the operator
+ * object.
  *
  * @ingroup LAOperators
  */
@@ -555,13 +556,14 @@ PackagedOperation<Range> operator+(const Range &u, const Range &v)
 /**
  * @relates PackagedOperation
  *
- * Create a PackagedOperation object that stores the subtraction of two vectors.
+ * Create a PackagedOperation object that stores the subtraction of two
+ * vectors.
  *
- * The PackagedOperation object that is created stores a reference to @p u
- * and @p v. Thus, the vectors must remain valid references for the whole
- * lifetime of the PackagedOperation object. All changes made on @p u or @p
- * v after the creation of the PackagedOperation object are reflected by
- * the operator object.
+ * The PackagedOperation object that is created stores a reference to @p u and
+ * @p v. Thus, the vectors must remain valid references for the whole lifetime
+ * of the PackagedOperation object. All changes made on @p u or @p v after the
+ * creation of the PackagedOperation object are reflected by the operator
+ * object.
  *
  * @ingroup LAOperators
  */
@@ -599,8 +601,8 @@ PackagedOperation<Range> operator-(const Range &u, const Range &v)
 /**
  * @relates PackagedOperation
  *
- * Create a PackagedOperation object that stores the scaling of a vector
- * with a @p number.
+ * Create a PackagedOperation object that stores the scaling of a vector with
+ * a @p number.
  *
  * The PackagedOperation object that is created stores a reference to @p u.
  * Thus, the vectors must remain valid references for the whole lifetime of
@@ -622,8 +624,8 @@ PackagedOperation<Range> operator*(const Range &u,
 /**
  * @relates PackagedOperation
  *
- * Create a PackagedOperation object that stores the scaling of a vector
- * with a @p number.
+ * Create a PackagedOperation object that stores the scaling of a vector with
+ * a @p number.
  *
  * The PackagedOperation object that is created stores a reference to @p u.
  * Thus, the vectors must remain valid references for the whole lifetime of
@@ -645,17 +647,16 @@ PackagedOperation<Range> operator*(typename Range::value_type number,
 /**
  * @relates PackagedOperation
  *
- * Create a PackagedOperation object from a LinearOperator and a reference to a
- * vector @p u of the Domain space. The object stores the PackagedOperation
+ * Create a PackagedOperation object from a LinearOperator and a reference to
+ * a vector @p u of the Domain space. The object stores the PackagedOperation
  * $\text{op} \,u$ (in matrix notation). <code>return</code>
  * (<code>return_add</code>) are implemented with <code>vmult(__1,u)</code>
  * (<code>vmult_add(__1,u)</code>).
  *
  * The PackagedOperation object that is created stores a reference to @p u.
  * Thus, the vector must remain a valid reference for the whole lifetime of
- * the PackagedOperation object. All changes made on @p u after the
- * creation of the PackagedOperation object are reflected by the operator
- * object.
+ * the PackagedOperation object. All changes made on @p u after the creation
+ * of the PackagedOperation object are reflected by the operator object.
  *
  * @ingroup LAOperators
  */
@@ -688,17 +689,16 @@ operator*(const LinearOperator<Range, Domain> &op,
 /**
  * @relates PackagedOperation
  *
- * Create a PackagedOperation object from a LinearOperator and a reference
- * to a vector @p u of the Range space. The object stores the
- * PackagedOperation $\text{op}^T \,u$ (in matrix notation).
- * <code>return</code> (<code>return_add</code>) are implemented with
- * <code>Tvmult(__1,u)</code> (<code>Tvmult_add(__1,u)</code>).
+ * Create a PackagedOperation object from a LinearOperator and a reference to
+ * a vector @p u of the Range space. The object stores the PackagedOperation
+ * $\text{op}^T \,u$ (in matrix notation). <code>return</code>
+ * (<code>return_add</code>) are implemented with <code>Tvmult(__1,u)</code>
+ * (<code>Tvmult_add(__1,u)</code>).
  *
  * The PackagedOperation object that is created stores a reference to @p u.
  * Thus, the vector must remain a valid reference for the whole lifetime of
- * the PackagedOperation object. All changes made on @p u after the
- * creation of the PackagedOperation object are reflected by the operator
- * object.
+ * the PackagedOperation object. All changes made on @p u after the creation
+ * of the PackagedOperation object are reflected by the operator object.
  *
  * @ingroup LAOperators
  */
@@ -731,8 +731,8 @@ operator*(const Range &u,
 /**
  * @relates PackagedOperation
  *
- * Composition of a PackagedOperation object with a LinearOperator. The
- * object stores the computation $\text{op} \,comp$ (in matrix notation).
+ * Composition of a PackagedOperation object with a LinearOperator. The object
+ * stores the computation $\text{op} \,comp$ (in matrix notation).
  *
  * @ingroup LAOperators
  */
@@ -781,8 +781,8 @@ operator*(const LinearOperator<Range, Domain> &op,
 /**
  * @relates PackagedOperation
  *
- * Composition of a PackagedOperation object with a LinearOperator. The
- * object stores the computation $\text{op}^T \,comp$ (in matrix notation).
+ * Composition of a PackagedOperation object with a LinearOperator. The object
+ * stores the computation $\text{op}^T \,comp$ (in matrix notation).
  *
  * @ingroup LAOperators
  */

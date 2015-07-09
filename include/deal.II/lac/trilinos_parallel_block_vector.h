@@ -137,8 +137,8 @@ namespace TrilinosWrappers
        * Move constructor. Creates a new vector by stealing the internal data
        * of the vector @p v.
        *
-       * @note This constructor is only available if deal.II is configured with
-       * C++11 support.
+       * @note This constructor is only available if deal.II is configured
+       * with C++11 support.
        */
       BlockVector (BlockVector &&v);
 #endif
@@ -486,8 +486,8 @@ namespace internal
     template <typename> class ReinitHelper;
 
     /**
-     * A helper class internally used in linear_operator.h.
-     * Specialization for TrilinosWrappers::MPI::BlockVector.
+     * A helper class internally used in linear_operator.h. Specialization for
+     * TrilinosWrappers::MPI::BlockVector.
      */
     template<>
     class ReinitHelper<TrilinosWrappers::MPI::BlockVector>

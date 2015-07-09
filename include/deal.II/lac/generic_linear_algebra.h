@@ -145,8 +145,8 @@ DEAL_II_NAMESPACE_CLOSE
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A namespace in which the wrappers to the Trilinos linear algebra classes are
- * typedef'ed to generic names. There are similar namespaces
+ * A namespace in which the wrappers to the Trilinos linear algebra classes
+ * are typedef'ed to generic names. There are similar namespaces
  * LinearAlgebraDealII and LinearAlgebraPETSc for typedefs to deal.II's own
  * classes and classes that interface with PETSc.
  */

@@ -438,14 +438,14 @@ namespace internal
  * quite inconvenient if one attempted to operate on it directly, since data
  * is spread over quite a lot of arrays and other places. However, there are
  * ways powerful enough to work on these data structures without knowing their
- * exact relations. deal.II uses class local typedefs (see below) to make things
- * as easy and dimension independent as possible.
+ * exact relations. deal.II uses class local typedefs (see below) to make
+ * things as easy and dimension independent as possible.
  *
  * The Triangulation class provides iterators which enable looping over all
  * cells without knowing the exact representation used to describe them. For
- * more information see the documentation of <tt>TriaIterator</tt>. Their names
- * are typedefs imported from the Iterators class (thus making them local types
- * to this class) and are as follows:
+ * more information see the documentation of <tt>TriaIterator</tt>. Their
+ * names are typedefs imported from the Iterators class (thus making them
+ * local types to this class) and are as follows:
  *
  * <ul>
  * <li> <tt>cell_iterator</tt>: loop over all cells used in the Triangulation
@@ -479,8 +479,8 @@ namespace internal
  *
  * Usage of these iterators is similar to usage of standard container
  * iterators. Some examples taken from the Triangulation source code follow
- * (notice that in the last two examples the template parameter @p spacedim has
- * been omitted, so it takes the default value <code>dim</code>).
+ * (notice that in the last two examples the template parameter @p spacedim
+ * has been omitted, so it takes the default value <code>dim</code>).
  *
  * <ul>
  * <li> <em>Counting the number of cells on a specific level</em>
@@ -3029,8 +3029,8 @@ private:
   void clear_despite_subscriptions ();
 
   /**
-   * For all cells, set the active cell indices so that active cells know
-   * the how many-th active cell they are, and all other cells have an invalid
+   * For all cells, set the active cell indices so that active cells know the
+   * how many-th active cell they are, and all other cells have an invalid
    * value. This function is called after mesh creation, refinement, and
    * serialization.
    */
@@ -3130,8 +3130,8 @@ private:
    * fields of this class that can be modified by the TriaAccessor hierarchy
    * are pointers, and so these accessor classes store a const pointer to the
    * triangulation. We could no longer do so for TriaAccessor<0,1,spacedim> if
-   * this field (that can be modified by TriaAccessor::set_boundary_id)
-   * were not a pointer.
+   * this field (that can be modified by TriaAccessor::set_boundary_id) were
+   * not a pointer.
    */
   std::map<unsigned int, types::boundary_id> *vertex_to_boundary_id_map_1d;
 
@@ -3152,8 +3152,8 @@ private:
    * fields of this class that can be modified by the TriaAccessor hierarchy
    * are pointers, and so these accessor classes store a const pointer to the
    * triangulation. We could no longer do so for TriaAccessor<0,1,spacedim> if
-   * this field (that can be modified by TriaAccessor::set_boundary_id)
-   * were not a pointer.
+   * this field (that can be modified by TriaAccessor::set_boundary_id) were
+   * not a pointer.
    */
   std::map<unsigned int, types::manifold_id> *vertex_to_manifold_id_map_1d;
 

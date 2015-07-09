@@ -45,8 +45,8 @@ namespace parallel
   namespace internal
   {
     /**
-     * Helper struct to tell us if we can use SIMD instructions for the given @p
-     * Number type.
+     * Helper struct to tell us if we can use SIMD instructions for the given
+     * @p Number type.
      */
     template <typename Number>
     struct EnableOpenMPSimdFor

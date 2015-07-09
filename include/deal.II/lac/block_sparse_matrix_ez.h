@@ -150,8 +150,8 @@ public:
   bool empty () const;
 
   /**
-   * Return number of rows of this matrix, which equals the dimension of
-   * the codomain (or range) space. It is the sum of the number of rows over the
+   * Return number of rows of this matrix, which equals the dimension of the
+   * codomain (or range) space. It is the sum of the number of rows over the
    * sub-matrix blocks of this matrix.
    *
    * @deprecated Use m() instead.
@@ -160,16 +160,16 @@ public:
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
-   * the domain space. It is the sum of the number of columns over the
-   * sub-matrix blocks of this matrix.
+   * the domain space. It is the sum of the number of columns over the sub-
+   * matrix blocks of this matrix.
    *
    * @deprecated Use n() instead.
    */
   size_type n_cols () const DEAL_II_DEPRECATED;
 
   /**
-   * Return number of rows of this matrix, which equals the dimension of
-   * the codomain (or range) space. It is the sum of the number of rows over the
+   * Return number of rows of this matrix, which equals the dimension of the
+   * codomain (or range) space. It is the sum of the number of rows over the
    * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
    * times n().
    */
@@ -177,9 +177,9 @@ public:
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
-   * the domain space. It is the sum of the number of columns over the
-   * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
-   * times n().
+   * the domain space. It is the sum of the number of columns over the sub-
+   * matrix blocks of this matrix. Recall that the matrix is of size m() times
+   * n().
    */
   size_type n () const;
 

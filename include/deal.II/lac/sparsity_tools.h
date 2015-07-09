@@ -154,12 +154,12 @@ namespace SparsityTools
    * and puts that node and its direct neighbors into one chunk. Next, it
    * selects one of the neighbors of the already selected nodes, adds the node
    * and its direct neighbors that are not part of one of the previous chunks,
-   * into the next. After this sweep, neighboring nodes are grouped
-   * together. To ensure a similar grouping on a more global level, this
-   * grouping is called recursively on the groups so formed. The recursion
-   * stops when no further grouping is possible. Eventually, the ordering
-   * obtained by this method passes through the indices represented in the
-   * sparsity pattern in a z-like way.
+   * into the next. After this sweep, neighboring nodes are grouped together.
+   * To ensure a similar grouping on a more global level, this grouping is
+   * called recursively on the groups so formed. The recursion stops when no
+   * further grouping is possible. Eventually, the ordering obtained by this
+   * method passes through the indices represented in the sparsity pattern in
+   * a z-like way.
    *
    * If the graph has two or more unconnected components, the algorithm will
    * number each component consecutively, starting with the components with
@@ -186,11 +186,11 @@ namespace SparsityTools
    * processors that all participate in this operation.
    *
    * @param myrange indicates the range of elements stored locally and should
-   * be the one used in the constructor of the
-   * DynamicSparsityPattern.  This should be the locally relevant
-   * set.  Only rows contained in myrange are checked in dsp for transfer.
-   * This function needs to be used with PETScWrappers::MPI::SparseMatrix for
-   * it to work correctly in a parallel computation.
+   * be the one used in the constructor of the DynamicSparsityPattern.  This
+   * should be the locally relevant set.  Only rows contained in myrange are
+   * checked in dsp for transfer. This function needs to be used with
+   * PETScWrappers::MPI::SparseMatrix for it to work correctly in a parallel
+   * computation.
    */
   template <class DSP_t>
   void distribute_sparsity_pattern(DSP_t &dsp,

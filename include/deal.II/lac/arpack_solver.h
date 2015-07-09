@@ -76,13 +76,12 @@ extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
  * <code>dnaupd</code> work and also how to set the parameters appropriately
  * please take a look into the ARPACK manual.
  *
- * @note Whenever you eliminate degrees of freedom using
- * ConstraintMatrix, you generate spurious eigenvalues and
- * eigenvectors. If you make sure that the diagonals of eliminated
- * matrix rows are all equal to one, you get a single additional
- * eigenvalue. But beware that some functions in deal.II set these
- * diagonals to rather arbitrary (from the point of view of
- * eigenvalue problems) values. See also
+ * @note Whenever you eliminate degrees of freedom using ConstraintMatrix, you
+ * generate spurious eigenvalues and eigenvectors. If you make sure that the
+ * diagonals of eliminated matrix rows are all equal to one, you get a single
+ * additional eigenvalue. But beware that some functions in deal.II set these
+ * diagonals to rather arbitrary (from the point of view of eigenvalue
+ * problems) values. See also
  * @ref step_36 "step-36"
  * for an example.
  *
@@ -140,40 +139,38 @@ public:
 
   /**
    * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
-   * the <code>dneupd</code> and <code>dnaupd</code> functions of
-   * ARPACK.
+   * the <code>dneupd</code> and <code>dnaupd</code> functions of ARPACK.
    *
-   * The function returns a vector of eigenvalues of length <i>n</i>
-   * and a vector of eigenvectors, where the latter should be twice
-   * the size of the eigenvalue vector. The first <i>n</i> vectors in
-   * <code>eigenvectors</code> will be the real parts of the
-   * eigenvectors, the second <i>n</i> the imaginary parts.
+   * The function returns a vector of eigenvalues of length <i>n</i> and a
+   * vector of eigenvectors, where the latter should be twice the size of the
+   * eigenvalue vector. The first <i>n</i> vectors in
+   * <code>eigenvectors</code> will be the real parts of the eigenvectors, the
+   * second <i>n</i> the imaginary parts.
    *
-   * @param A The operator for which we want to compute
-   * eigenvalues. Actually, this parameter is entirely unused.
+   * @param A The operator for which we want to compute eigenvalues. Actually,
+   * this parameter is entirely unused.
    *
-   * @param B The inner product of the underlying space, typically the
-   * mass matrix. For constrained problems, it can be a partial mass
-   * matrix, like for instance the velocity mass matrix of a Stokes
-   * problem. Only its function <code>vmult()</code> is used.
+   * @param B The inner product of the underlying space, typically the mass
+   * matrix. For constrained problems, it can be a partial mass matrix, like
+   * for instance the velocity mass matrix of a Stokes problem. Only its
+   * function <code>vmult()</code> is used.
    *
-   * @param inverse This is the possibly shifted inverse that is
-   * actually used instead of <code>A</code>. Only its function
-   * <code>vmult()</code> is used.
+   * @param inverse This is the possibly shifted inverse that is actually used
+   * instead of <code>A</code>. Only its function <code>vmult()</code> is
+   * used.
    *
    * @param eigenvalues is a vector of complex numbers in which the
    * eigenvalues are returned.
    *
-   * @param eigenvectors is a <b>real</b> vector of eigenvectors,
-   * containing alternatingly the real parts and the imaginary parts of the
-   * eigenvectors. Therefore, its length should be twice the number of
-   * eigenvalues. The vectors have to be initialized to match the
-   * matrices.
+   * @param eigenvectors is a <b>real</b> vector of eigenvectors, containing
+   * alternatingly the real parts and the imaginary parts of the eigenvectors.
+   * Therefore, its length should be twice the number of eigenvalues. The
+   * vectors have to be initialized to match the matrices.
    *
-   * @param n_eigenvalues The purpose of this parameter is not clear,
-   * but it is safe to set it to the size of <code>eigenvalues</code>
-   * or greater. Leave it at its default zero, which will be reset to the size
-   * of <code>eigenvalues</code> internally.
+   * @param n_eigenvalues The purpose of this parameter is not clear, but it
+   * is safe to set it to the size of <code>eigenvalues</code> or greater.
+   * Leave it at its default zero, which will be reset to the size of
+   * <code>eigenvalues</code> internally.
    */
   template <typename VECTOR, typename MATRIX1,
             typename MATRIX2, typename INVERSE>

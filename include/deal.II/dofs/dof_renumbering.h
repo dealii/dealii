@@ -527,21 +527,20 @@ namespace DoFRenumbering
    *
    * @param dof_handler The DoFHandler or hp::DoFHandler object to work on.
    * @param reversed_numbering Whether to use the original Cuthill-McKee
-   *   algorithm, or to reverse the ordering.
-   * @param use_constraints Whether or not to use hanging node constraints
-   *   in determining the reordering of degrees of freedom.
-   * @param starting_indices A set of degrees of freedom that form the
-   *   first level of renumbered degrees of freedom. If the set is empty,
-   *   then a single starting entry is chosen automatically among those
-   *   that have the smallest number of others that couple with it.
-   *   If the DoFHandler is built on a parallel triangulation, then on every
-   *   processor, these starting indices need to be a (possibly empty)
-   *   subset of the
-   *   @ref GlossLocallyOwnedDof "locally owned degrees of freedom".
-   *   These will then be used as starting indices for the local renumbering
-   *   on the current processor. (In other words, this argument will in
-   *   fact be different on every processor unless you pass an
-   *   empty list as is the default.)
+   * algorithm, or to reverse the ordering.
+   * @param use_constraints Whether or not to use hanging node constraints in
+   * determining the reordering of degrees of freedom.
+   * @param starting_indices A set of degrees of freedom that form the first
+   * level of renumbered degrees of freedom. If the set is empty, then a
+   * single starting entry is chosen automatically among those that have the
+   * smallest number of others that couple with it. If the DoFHandler is built
+   * on a parallel triangulation, then on every processor, these starting
+   * indices need to be a (possibly empty) subset of the
+   * @ref GlossLocallyOwnedDof "locally owned degrees of freedom".
+   * These will then be used as starting indices for the local renumbering on
+   * the current processor. (In other words, this argument will in fact be
+   * different on every processor unless you pass an empty list as is the
+   * default.)
    */
   template <class DH>
   void
@@ -632,8 +631,9 @@ namespace DoFRenumbering
 
   /**
    * Sort the degrees of freedom by component. It does the same thing as the
-   * above function, only that it does this for one single level of a multilevel
-   * discretization. The non-multigrid part of the the DoFHandler is not touched.
+   * above function, only that it does this for one single level of a
+   * multilevel discretization. The non-multigrid part of the the DoFHandler
+   * is not touched.
    */
   template <class DH>
   void
@@ -675,9 +675,10 @@ namespace DoFRenumbering
   block_wise (DoFHandler<dim,spacedim> &dof_handler);
 
   /**
-   * Sort the degrees of freedom by vector block. It does the same thing as the
-   * above function, only that it does this for one single level of a multilevel
-   * discretization. The non-multigrid part of the the DoFHandler is not touched.
+   * Sort the degrees of freedom by vector block. It does the same thing as
+   * the above function, only that it does this for one single level of a
+   * multilevel discretization. The non-multigrid part of the the DoFHandler
+   * is not touched.
    */
   template <int dim, int spacedim>
   void

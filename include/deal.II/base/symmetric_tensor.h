@@ -641,12 +641,11 @@ public:
    * present object and the indices of the argument, and the result is a
    * tensor of rank 2.
    *
-   * Note that the multiplication operator for symmetric tensors is defined
-   * to be a double contraction over two indices, while it is defined as a
-   * single contraction over only one index for regular <tt>Tensor</tt>
-   * objects. For symmetric tensors it therefore acts in a way that is
-   * commonly denoted by a "colon multiplication" in the mathematical
-   * literature.
+   * Note that the multiplication operator for symmetric tensors is defined to
+   * be a double contraction over two indices, while it is defined as a single
+   * contraction over only one index for regular <tt>Tensor</tt> objects. For
+   * symmetric tensors it therefore acts in a way that is commonly denoted by
+   * a "colon multiplication" in the mathematical literature.
    *
    * There are global functions <tt>double_contract</tt> that do the same work
    * as this operator, but rather than returning the result as a return value,
@@ -752,14 +751,14 @@ public:
   /**
    * Reset all values to zero.
    *
-   * Note that this is partly inconsistent with the semantics of the @p clear()
-   * member functions of the standard library containers and of several other
-   * classes within deal.II, which not only reset the values of stored elements
-   * to zero, but release all memory and return the object into a virginial
-   * state. However, since the size of objects of the present type is determined
-   * by its template parameters, resizing is not an option, and indeed the state
-   * where all elements have a zero value is the state right after construction
-   * of such an object.
+   * Note that this is partly inconsistent with the semantics of the @p
+   * clear() member functions of the standard library containers and of
+   * several other classes within deal.II, which not only reset the values of
+   * stored elements to zero, but release all memory and return the object
+   * into a virginial state. However, since the size of objects of the present
+   * type is determined by its template parameters, resizing is not an option,
+   * and indeed the state where all elements have a zero value is the state
+   * right after construction of such an object.
    */
   void clear ();
 

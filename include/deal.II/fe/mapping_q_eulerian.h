@@ -94,26 +94,23 @@ public:
   /**
    * Constructor.
    *
-   * @param[in] degree The polynomical degree of the desired
-   *   $Q_p$ mapping.
-   * @param[in] euler_dof_handler A DoFHandler object that defines a
-   *   finite element space. This space needs to have at least dim
-   *   components and the first dim components of the space will
-   *   be considered displacements relative to the original positions
-   *   of the cells of the triangulation.
-   * @param[in] euler_vector A finite element function in the
-   *   space defined by the second argument. The first dim components
-   *   of this function will be interpreted as the displacement we
-   *   use in definining the mapping, relative to the location of cells
-   *   of the underlying triangulation.
+   * @param[in] degree The polynomical degree of the desired $Q_p$ mapping.
+   * @param[in] euler_dof_handler A DoFHandler object that defines a finite
+   * element space. This space needs to have at least dim components and the
+   * first dim components of the space will be considered displacements
+   * relative to the original positions of the cells of the triangulation.
+   * @param[in] euler_vector A finite element function in the space defined by
+   * the second argument. The first dim components of this function will be
+   * interpreted as the displacement we use in definining the mapping,
+   * relative to the location of cells of the underlying triangulation.
    */
   MappingQEulerian (const unsigned int              degree,
                     const DoFHandler<dim,spacedim> &euler_dof_handler,
                     const VECTOR                   &euler_vector);
 
   /**
-   * @deprecated Use the constructor with the reverse order of
-   * second and third argument.
+   * @deprecated Use the constructor with the reverse order of second and
+   * third argument.
    */
   MappingQEulerian (const unsigned int              degree,
                     const VECTOR                   &euler_vector,

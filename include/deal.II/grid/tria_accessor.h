@@ -886,16 +886,16 @@ public:
   types::boundary_id boundary_indicator () const DEAL_II_DEPRECATED;
 
   /**
-   * Set the boundary indicator of the current object. The same applies as for the
-   * boundary_id() function.
+   * Set the boundary indicator of the current object. The same applies as for
+   * the boundary_id() function.
    *
    * This function only sets the boundary object of the current object itself,
    * not the indicators of the ones that bound it. For example, in 3d, if this
    * function is called on a face, then the boundary indicator of the 4 edges
    * that bound the face remain unchanged. If you want to set the boundary
    * indicators of face and edges at the same time, use the
-   * set_all_boundary_ids() function. You can see the result of not
-   * using the correct function in the results section of step-49.
+   * set_all_boundary_ids() function. You can see the result of not using the
+   * correct function in the results section of step-49.
    *
    * @warning You should never set the boundary indicator of an interior face
    * (a face not at the boundary of the domain), or set set the boundary
@@ -925,12 +925,12 @@ public:
   void set_boundary_indicator (const types::boundary_id) const DEAL_II_DEPRECATED;
 
   /**
-   * Do as set_boundary_id() but also set the boundary indicators of
-   * the objects that bound the current object. For example, in 3d, if
-   * set_boundary_id() is called on a face, then the boundary indicator
-   * of the 4 edges that bound the face remain unchanged. In contrast, if you
-   * call the current function, the boundary indicators of face and edges are
-   * all set to the given value.
+   * Do as set_boundary_id() but also set the boundary indicators of the
+   * objects that bound the current object. For example, in 3d, if
+   * set_boundary_id() is called on a face, then the boundary indicator of the
+   * 4 edges that bound the face remain unchanged. In contrast, if you call
+   * the current function, the boundary indicators of face and edges are all
+   * set to the given value.
    *
    * This function is useful if you set boundary indicators of faces in 3d (in
    * 2d, the function does the same as set_boundary_id()) and you do so
@@ -2450,35 +2450,33 @@ public:
   bool direction_flag () const;
 
   /**
-   * Return the how many-th active cell the current cell is (assuming
-   * the current cell is indeed active). This is useful, for example,
-   * if you are accessing the elements of a vector with as many
-   * entries as there are active cells. Such vectors are used for
-   * estimating the error on each cell of a triangulation, for
-   * specifying refinement criteria passed to the functions in
-   * GridRefinement, and for generating cell-wise output.
+   * Return the how many-th active cell the current cell is (assuming the
+   * current cell is indeed active). This is useful, for example, if you are
+   * accessing the elements of a vector with as many entries as there are
+   * active cells. Such vectors are used for estimating the error on each cell
+   * of a triangulation, for specifying refinement criteria passed to the
+   * functions in GridRefinement, and for generating cell-wise output.
    *
-   * The function throws an exception if the current cell is not
-   * active.
+   * The function throws an exception if the current cell is not active.
    *
-   * @note If the triangulation this function is called on is
-   * of type parallel::distributed::Triangulation, then active
-   * cells may be locally owned, ghost cells, or artificial
-   * (see
+   * @note If the triangulation this function is called on is of type
+   * parallel::distributed::Triangulation, then active cells may be locally
+   * owned, ghost cells, or artificial (see
    * @ref GlossLocallyOwnedCell,
-   * @ref GlossGhostCell, and
+   * @ref GlossGhostCell,
+   * and
    * @ref GlossArtificialCell).
-   * This function counts over all of
-   * them, including ghost and artificial active cells.
+   * This function counts over all of them, including ghost and artificial
+   * active cells.
    */
   unsigned int active_cell_index () const;
 
   /**
-   * Return the index of the parent of this cell within the level of the triangulation to
-   * which the parent cell belongs. The level of the parent is of course one
-   * lower than that of the present cell. If the parent does not exist (i.e.,
-   * if the object is at the coarsest level of the mesh hierarchy), an
-   * exception is generated.
+   * Return the index of the parent of this cell within the level of the
+   * triangulation to which the parent cell belongs. The level of the parent
+   * is of course one lower than that of the present cell. If the parent does
+   * not exist (i.e., if the object is at the coarsest level of the mesh
+   * hierarchy), an exception is generated.
    */
   int parent_index () const;
 
@@ -2680,7 +2678,8 @@ protected:
 
 private:
   /**
-   * Set the active cell index of a cell. This is done at the end of refinement.
+   * Set the active cell index of a cell. This is done at the end of
+   * refinement.
    */
   void set_active_cell_index (const unsigned int active_cell_index);
 

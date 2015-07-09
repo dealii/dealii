@@ -289,8 +289,8 @@ public:
   };
 
   /**
-   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt> in
-   * the standard library containers.
+   * Type of matrix entries. This typedef is analogous to <tt>value_type</tt>
+   * in the standard library containers.
    */
   typedef number value_type;
 
@@ -374,14 +374,14 @@ public:
   bool empty () const;
 
   /**
-   * Return the dimension of the codomain (or range) space. To remember:
-   * the matrix is of dimension $m \times n$.
+   * Return the dimension of the codomain (or range) space. To remember: the
+   * matrix is of dimension $m \times n$.
    */
   size_type m () const;
 
   /**
-   * Return the dimension of the domain space. To remember: the matrix is
-   * of dimension $m \times n$.
+   * Return the dimension of the domain space. To remember: the matrix is of
+   * dimension $m \times n$.
    */
   size_type n () const;
 
@@ -674,8 +674,8 @@ public:
   const_iterator end () const;
 
   /**
-   * Iterator starting at the first entry of row @p r. If this row is empty, the
-   * result is <tt>end(r)</tt>, which does NOT point into row @p r.
+   * Iterator starting at the first entry of row @p r. If this row is empty,
+   * the result is <tt>end(r)</tt>, which does NOT point into row @p r.
    */
   const_iterator begin (const size_type r) const;
 

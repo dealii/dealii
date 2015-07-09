@@ -52,8 +52,7 @@ namespace DynamicSparsityPatternIterators
   typedef types::global_dof_index size_type;
 
   /**
-   * Accessor class for iterators into objects of type
-   * DynamicSparsityPattern.
+   * Accessor class for iterators into objects of type DynamicSparsityPattern.
    *
    * Note that this class only allows read access to elements, providing their
    * row and column number (or alternatively the index within the complete
@@ -119,17 +118,16 @@ namespace DynamicSparsityPatternIterators
     unsigned int current_row;
 
     /**
-     * A pointer to the element within the current row that we
-     * currently point to.
+     * A pointer to the element within the current row that we currently point
+     * to.
      */
     std::vector<size_type>::const_iterator current_entry;
 
     /**
-     * A pointer to the end of the current row. We store this
-     * to make comparison against the end of line iterator
-     * cheaper as it otherwise needs to do the IndexSet translation
-     * from row index to the index within the 'lines' array
-     * of DynamicSparsityPattern.
+     * A pointer to the end of the current row. We store this to make
+     * comparison against the end of line iterator cheaper as it otherwise
+     * needs to do the IndexSet translation from row index to the index within
+     * the 'lines' array of DynamicSparsityPattern.
      */
     std::vector<size_type>::const_iterator end_of_row;
 
@@ -152,24 +150,23 @@ namespace DynamicSparsityPatternIterators
    * The typical use for these iterators is to iterate over the elements of a
    * sparsity pattern (or, since they also serve as the basis for iterating
    * over the elements of an associated matrix, over the elements of a sparse
-   * matrix), or over the elements of individual rows. There is no
-   * guarantee that the elements of a row are actually traversed in an order
-   * in which column numbers monotonically increase. See the documentation of the
+   * matrix), or over the elements of individual rows. There is no guarantee
+   * that the elements of a row are actually traversed in an order in which
+   * column numbers monotonically increase. See the documentation of the
    * SparsityPattern class for more information.
    *
-   * @note This class operates directly on the internal data
-   * structures of the DynamicSparsityPattern class. As a consequence, some
-   * operations are cheap and some are not. In particular, it is cheap
-   * to access the column index of the sparsity pattern entry pointed
-   * to. On the other hand, it is expensive to compute the distance
-   * between two iterators. As a consequence, when you design
-   * algorithms that use these iterators, it is common practice to not
-   * loop over <i>all</i> elements of a sparsity pattern at once, but
-   * to have an outer loop over all rows and within this loop iterate
-   * over the elements of this row. This way, you only ever need to
-   * dereference the iterator to obtain the column indices whereas the
-   * (expensive) lookup of the row index can be avoided by using the
-   * loop index instead.
+   * @note This class operates directly on the internal data structures of the
+   * DynamicSparsityPattern class. As a consequence, some operations are cheap
+   * and some are not. In particular, it is cheap to access the column index
+   * of the sparsity pattern entry pointed to. On the other hand, it is
+   * expensive to compute the distance between two iterators. As a
+   * consequence, when you design algorithms that use these iterators, it is
+   * common practice to not loop over <i>all</i> elements of a sparsity
+   * pattern at once, but to have an outer loop over all rows and within this
+   * loop iterate over the elements of this row. This way, you only ever need
+   * to dereference the iterator to obtain the column indices whereas the
+   * (expensive) lookup of the row index can be avoided by using the loop
+   * index instead.
    */
   class Iterator
   {
@@ -184,8 +181,8 @@ namespace DynamicSparsityPatternIterators
               const unsigned int index_within_row);
 
     /**
-     * Constructor. Create an invalid (end) iterator into the sparsity
-     * pattern @p sp.
+     * Constructor. Create an invalid (end) iterator into the sparsity pattern
+     * @p sp.
      */
     Iterator (const DynamicSparsityPattern *sp);
 
@@ -264,7 +261,8 @@ namespace DynamicSparsityPatternIterators
  * module.
  *
  * This class is an example of the "dynamic" type of
- * @ref Sparsity. It is used in most tutorial programs in one way or another.
+ * @ref Sparsity.
+ * It is used in most tutorial programs in one way or another.
  *
  * <h3>Interface</h3>
  *
@@ -298,8 +296,8 @@ public:
   typedef types::global_dof_index size_type;
 
   /**
-   * Typedef an for iterator class that allows to walk over all nonzero elements
-   * of a sparsity pattern.
+   * Typedef an for iterator class that allows to walk over all nonzero
+   * elements of a sparsity pattern.
    *
    * Since the iterator does not allow to modify the sparsity pattern, this
    * type is the same as that for @p const_iterator.
@@ -309,17 +307,17 @@ public:
   iterator;
 
   /**
-   * Typedef for an iterator class that allows to walk over all nonzero elements
-   * of a sparsity pattern.
+   * Typedef for an iterator class that allows to walk over all nonzero
+   * elements of a sparsity pattern.
    */
   typedef
   DynamicSparsityPatternIterators::Iterator
   const_iterator;
 
   /**
-   * Initialize as an empty object. This is
-   * useful if you want such objects as member variables in other classes. You
-   * can make the structure usable by calling the reinit() function.
+   * Initialize as an empty object. This is useful if you want such objects as
+   * member variables in other classes. You can make the structure usable by
+   * calling the reinit() function.
    */
   DynamicSparsityPattern ();
 
@@ -329,16 +327,16 @@ public:
    * involuntary copies of objects for temporaries, which can use large
    * amounts of computing time.  However, copy constructors are needed if you
    * want to place a DynamicSparsityPattern in a container, e.g. to write such
-   * statements like <tt>v.push_back (DynamicSparsityPattern());</tt>, with
-   * @p v a vector of @p DynamicSparsityPattern objects.
+   * statements like <tt>v.push_back (DynamicSparsityPattern());</tt>, with @p
+   * v a vector of @p DynamicSparsityPattern objects.
    */
   DynamicSparsityPattern (const DynamicSparsityPattern &);
 
   /**
-   * Initialize a rectangular sparsity pattern with @p m rows and @p n columns. The @p
-   * rowset restricts the storage to elements in rows of this set.  Adding
-   * elements outside of this set has no effect. The default argument keeps
-   * all entries.
+   * Initialize a rectangular sparsity pattern with @p m rows and @p n
+   * columns. The @p rowset restricts the storage to elements in rows of this
+   * set.  Adding elements outside of this set has no effect. The default
+   * argument keeps all entries.
    */
   DynamicSparsityPattern (const size_type m,
                           const size_type n,
@@ -362,10 +360,10 @@ public:
   DynamicSparsityPattern &operator = (const DynamicSparsityPattern &);
 
   /**
-   * Reallocate memory and set up data structures for a new sparsity pattern with @p m
-   * rows and @p n columns. The @p rowset restricts the storage to elements in rows of this
-   * set.  Adding elements outside of this set has no effect. The default
-   * argument keeps all entries.
+   * Reallocate memory and set up data structures for a new sparsity pattern
+   * with @p m rows and @p n columns. The @p rowset restricts the storage to
+   * elements in rows of this set.  Adding elements outside of this set has no
+   * effect. The default argument keeps all entries.
    */
   void reinit (const size_type m,
                const size_type n,
@@ -397,7 +395,8 @@ public:
             const size_type j);
 
   /**
-   * Add several nonzero entries to the specified row. Already existing entries are ignored.
+   * Add several nonzero entries to the specified row. Already existing
+   * entries are ignored.
    */
   template <typename ForwardIterator>
   void add_entries (const size_type row,
@@ -421,21 +420,21 @@ public:
   void symmetrize ();
 
   /**
-   * Print the sparsity pattern. The output consists of one line per row
-   * of the format <tt>[i,j1,j2,j3,...]</tt>. <i>i</i> is the row number and
+   * Print the sparsity pattern. The output consists of one line per row of
+   * the format <tt>[i,j1,j2,j3,...]</tt>. <i>i</i> is the row number and
    * <i>jn</i> are the allocated columns in this row.
    */
   void print (std::ostream &out) const;
 
   /**
-   * Print the sparsity pattern in a format that @p gnuplot understands
-   * and which can be used to plot the sparsity pattern in a graphical way.
-   * The format consists of pairs <tt>i j</tt> of nonzero elements, each
-   * representing one entry, one per line of the output file.
-   * Indices are counted from zero on, as usual. Since sparsity patterns are
-   * printed in the same way as matrices are displayed, we print the negative
-   * of the column index, which means that the <tt>(0,0)</tt> element is in
-   * the top left rather than in the bottom left corner.
+   * Print the sparsity pattern in a format that @p gnuplot understands and
+   * which can be used to plot the sparsity pattern in a graphical way. The
+   * format consists of pairs <tt>i j</tt> of nonzero elements, each
+   * representing one entry, one per line of the output file. Indices are
+   * counted from zero on, as usual. Since sparsity patterns are printed in
+   * the same way as matrices are displayed, we print the negative of the
+   * column index, which means that the <tt>(0,0)</tt> element is in the top
+   * left rather than in the bottom left corner.
    *
    * Print the sparsity pattern in gnuplot by setting the data style to dots
    * or points and use the @p plot command.
@@ -443,14 +442,13 @@ public:
   void print_gnuplot (std::ostream &out) const;
 
   /**
-   * Return the number of rows, which equals the dimension of the
-   * image space.
+   * Return the number of rows, which equals the dimension of the image space.
    */
   size_type n_rows () const;
 
   /**
-   * Return the number of columns, which equals the dimension of
-   * the range space.
+   * Return the number of columns, which equals the dimension of the range
+   * space.
    */
   size_type n_cols () const;
 
@@ -480,11 +478,10 @@ public:
    * Note the discussion in the general documentation of this class about the
    * order in which elements are accessed.
    *
-   * @note If the sparsity pattern has been initialized with an IndexSet
-   * that denotes which rows to store, then iterators will simply skip
-   * over rows that are not stored. In other words, they will look like
-   * empty rows, but no exception will be generated when iterating over
-   * such rows.
+   * @note If the sparsity pattern has been initialized with an IndexSet that
+   * denotes which rows to store, then iterators will simply skip over rows
+   * that are not stored. In other words, they will look like empty rows, but
+   * no exception will be generated when iterating over such rows.
    */
   iterator begin () const;
 
@@ -504,11 +501,10 @@ public:
    * Note also the discussion in the general documentation of this class about
    * the order in which elements are accessed.
    *
-   * @note If the sparsity pattern has been initialized with an IndexSet
-   * that denotes which rows to store, then iterators will simply skip
-   * over rows that are not stored. In other words, they will look like
-   * empty rows, but no exception will be generated when iterating over
-   * such rows.
+   * @note If the sparsity pattern has been initialized with an IndexSet that
+   * denotes which rows to store, then iterators will simply skip over rows
+   * that are not stored. In other words, they will look like empty rows, but
+   * no exception will be generated when iterating over such rows.
    */
   iterator begin (const size_type r) const;
 

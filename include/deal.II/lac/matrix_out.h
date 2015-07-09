@@ -256,8 +256,8 @@ namespace internal
 
 
       /**
-       * Return the element with given indices from any matrix type for which no
-       * specialization of this function was declared above. This will call
+       * Return the element with given indices from any matrix type for which
+       * no specialization of this function was declared above. This will call
        * <tt>operator()</tt> on the matrix.
        */
       template <class Matrix>

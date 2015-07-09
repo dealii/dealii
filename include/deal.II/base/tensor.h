@@ -274,14 +274,14 @@ public:
   /**
    * Reset all values to zero.
    *
-   * Note that this is partly inconsistent with the semantics of the @p clear()
-   * member functions of the standard library containers and of several other
-   * classes within deal.II, which not only reset the values of stored elements
-   * to zero, but release all memory and return the object into a virginial
-   * state. However, since the size of objects of the present type is determined
-   * by its template parameters, resizing is not an option, and indeed the state
-   * where all elements have a zero value is the state right after construction
-   * of such an object.
+   * Note that this is partly inconsistent with the semantics of the @p
+   * clear() member functions of the standard library containers and of
+   * several other classes within deal.II, which not only reset the values of
+   * stored elements to zero, but release all memory and return the object
+   * into a virginial state. However, since the size of objects of the present
+   * type is determined by its template parameters, resizing is not an option,
+   * and indeed the state where all elements have a zero value is the state
+   * right after construction of such an object.
    */
   void clear ();
 

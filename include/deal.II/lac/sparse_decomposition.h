@@ -50,9 +50,9 @@ DEAL_II_NAMESPACE_OPEN
  * sparsity pattern of the decomposition is a superset of the sparsity pattern
  * in the original matrix.
  *
- * Such fill-in can be accomplished by various ways, one of which is the
- * copy-constructor of the SparsityPattern class that allows the addition of
- * side-diagonals to a given sparsity structure.
+ * Such fill-in can be accomplished by various ways, one of which is the copy-
+ * constructor of the SparsityPattern class that allows the addition of side-
+ * diagonals to a given sparsity structure.
  *
  *
  * <h3>Unified use of preconditioners</h3>
@@ -72,9 +72,9 @@ DEAL_II_NAMESPACE_OPEN
  * parameters of the LU decomposition.
  *
  * 1/ The matrix diagonal can be strengthened by adding
- * <code>strengthen_diagonal</code> times the sum of the absolute row entries of
- * each row to the respective diagonal entries. By default no strengthening is
- * performed.
+ * <code>strengthen_diagonal</code> times the sum of the absolute row entries
+ * of each row to the respective diagonal entries. By default no strengthening
+ * is performed.
  *
  * 2/ By default, each initialize() function call creates its own sparsity.
  * For that, it copies the sparsity of <code>matrix</code> and adds a specific
@@ -150,22 +150,22 @@ public:
                     const SparsityPattern *use_this_sparsity=0);
 
     /**
-     * <code>strengthen_diag</code> times the sum of absolute row entries is added
-     * to the diagonal entries.
+     * <code>strengthen_diag</code> times the sum of absolute row entries is
+     * added to the diagonal entries.
      *
      * Per default, this value is zero, i.e. the diagonal is not strengthened.
      */
     double strengthen_diagonal;
 
     /**
-     * By default, the <code>initialize(matrix, data)</code> function creates its
-     * own sparsity. This sparsity has the same SparsityPattern as
-     * <code>matrix</code> with some extra off diagonals the number of which is
-     * specified by <code>extra_off_diagonals</code>.
+     * By default, the <code>initialize(matrix, data)</code> function creates
+     * its own sparsity. This sparsity has the same SparsityPattern as
+     * <code>matrix</code> with some extra off diagonals the number of which
+     * is specified by <code>extra_off_diagonals</code>.
      *
-     * The user can give a SparsityPattern to <code>use_this_sparsity</code>. Then
-     * this sparsity is used and the <code>extra_off_diagonals</code> argument is
-     * ignored.
+     * The user can give a SparsityPattern to <code>use_this_sparsity</code>.
+     * Then this sparsity is used and the <code>extra_off_diagonals</code>
+     * argument is ignored.
      */
     unsigned int extra_off_diagonals;
 
@@ -184,9 +184,10 @@ public:
      * function calls <code>reinit(*use_this_sparsity)</code> causing this
      * sparsity to be used.
      *
-     * Note that the sparsity structures of <code>*use_this_sparsity</code> and
-     * the matrix passed to the initialize function need not be equal. Fill-in
-     * is allowed, as well as filtering out some elements in the matrix.
+     * Note that the sparsity structures of <code>*use_this_sparsity</code>
+     * and the matrix passed to the initialize function need not be equal.
+     * Fill-in is allowed, as well as filtering out some elements in the
+     * matrix.
      */
     const SparsityPattern *use_this_sparsity;
   };
@@ -200,8 +201,8 @@ public:
    *
    * According to the <code>parameters</code>, this function creates a new
    * SparsityPattern or keeps the previous sparsity or takes the sparsity
-   * given by the user to <code>data</code>. Then, this function performs the LU
-   * decomposition.
+   * given by the user to <code>data</code>. Then, this function performs the
+   * LU decomposition.
    *
    * After this function is called the preconditioner is ready to be used
    * (using the <code>vmult</code> function of derived classes).

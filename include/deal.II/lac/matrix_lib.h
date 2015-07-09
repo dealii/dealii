@@ -46,7 +46,8 @@ template<typename number> class SparseMatrix;
  *
  * @deprecated If deal.II was configured with C++11 support, use the
  * LinearOperator class instead, see the module on
- * @ref LAOperators "linear operators" for further details.
+ * @ref LAOperators "linear operators"
+ * for further details.
  *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
  */
@@ -148,7 +149,8 @@ private:
  *
  * @deprecated If deal.II was configured with C++11 support, use the
  * LinearOperator class instead, see the module on
- * @ref LAOperators "linear operators" for further details.
+ * @ref LAOperators "linear operators"
+ * for further details.
  *
  * @author Guido Kanschat, 2007
  */
@@ -215,7 +217,8 @@ private:
  *
  * @deprecated If deal.II was configured with C++11 support, use the
  * LinearOperator class instead, see the module on
- * @ref LAOperators "linear operators" for further details.
+ * @ref LAOperators "linear operators"
+ * for further details.
  *
  * @author Guido Kanschat, 2000, 2001, 2002, 2005
  */
@@ -421,7 +424,8 @@ private:
  *
  * @deprecated If deal.II was configured with C++11 support, use the
  * LinearOperator class instead, see the module on
- * @ref LAOperators "linear operators" for further details.
+ * @ref LAOperators "linear operators"
+ * for further details.
  *
  * @author Guido Kanschat, 2005
  */

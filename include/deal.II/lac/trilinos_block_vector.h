@@ -461,8 +461,8 @@ namespace internal
     template <typename> class ReinitHelper;
 
     /**
-     * A helper class internally used in linear_operator.h.
-     * Specialization for TrilinosWrappers::BlockVector.
+     * A helper class internally used in linear_operator.h. Specialization for
+     * TrilinosWrappers::BlockVector.
      */
     template<>
     class ReinitHelper<TrilinosWrappers::BlockVector>

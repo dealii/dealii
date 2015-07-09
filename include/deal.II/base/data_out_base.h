@@ -325,8 +325,9 @@ namespace DataOutBase
 
     /**
      * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+     * object. This is not exact (but will usually be close) because
+     * calculating the memory usage of trees (e.g., <tt>std::map</tt>) is
+     * difficult.
      */
     std::size_t memory_consumption () const;
 
@@ -352,12 +353,13 @@ namespace DataOutBase
 
 
   /**
-   * Base class describing common functionality between different output flags.
+   * Base class describing common functionality between different output
+   * flags.
    *
    * This is implemented with the "Curiously Recurring Template Pattern";
    * derived classes use their own type to fill in the typename so that
-   * <tt>memory_consumption</tt> works correctly. See the Wikipedia page on the
-   * pattern for more information.
+   * <tt>memory_consumption</tt> works correctly. See the Wikipedia page on
+   * the pattern for more information.
    *
    * @ingroup output
    */
@@ -384,8 +386,9 @@ namespace DataOutBase
 
     /**
      * Return an estimate for the memory consumption, in bytes, of this
-     * object. This is not exact (but will usually be close) because calculating
-     * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+     * object. This is not exact (but will usually be close) because
+     * calculating the memory usage of trees (e.g., <tt>std::map</tt>) is
+     * difficult.
      */
     std::size_t memory_consumption () const;
   };
@@ -2274,8 +2277,8 @@ public:
 
 
   /**
-   * Set the flags to be used for output. This method expects <tt>flags</tt> to
-   * be a member of one of the child classes of <tt>OutputFlagsBase</tt>.
+   * Set the flags to be used for output. This method expects <tt>flags</tt>
+   * to be a member of one of the child classes of <tt>OutputFlagsBase</tt>.
    */
   template<typename FlagType>
   void set_flags (const FlagType &flags);
@@ -2317,9 +2320,9 @@ public:
   void parse_parameters (ParameterHandler &prm);
 
   /**
-   * Return an estimate for the memory consumption, in bytes, of this
-   * object. This is not exact (but will usually be close) because calculating
-   * the memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
+   * Return an estimate for the memory consumption, in bytes, of this object.
+   * This is not exact (but will usually be close) because calculating the
+   * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
   std::size_t memory_consumption () const;
 
