@@ -1169,7 +1169,8 @@ namespace VectorTools
    * Dirichlet conditions should be set first, and then completed by hanging
    * node constraints, in order to make sure that the discretization remains
    * consistent. See the discussion on conflicting constraints in the
-   * module on @ref constraints
+   * module on
+   * @ref constraints.
    *
    * <h4>Arguments to this function></h4>
    *
@@ -1199,7 +1200,8 @@ namespace VectorTools
    *
    * @ingroup constraints
    *
-   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   * @see
+   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim>
   void project_boundary_values_curl_conforming_l2 (const DoFHandler<dim> &dof_handler,

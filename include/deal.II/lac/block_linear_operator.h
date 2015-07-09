@@ -38,7 +38,8 @@ template <typename Number> class BlockVector;
  *
  * A function that encapsulates a given collection @p ops of
  * LinearOperators into a block structure. Hereby, it is assumed that Range
- * and Domain are blockvectors, i.e., derived from @ref BlockVectorBase.
+ * and Domain are blockvectors, i.e., derived from
+ * @ref BlockVectorBase.
  * The individual linear operators in @p ops must act on a the underlying
  * vector type of the block vectors, i.e., on Domain::BlockType yielding a
  * result in Range::BlockType.

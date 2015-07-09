@@ -57,7 +57,7 @@ null_operator(const LinearOperator<Domain, Range> &);
  *
  * The class essentially consists of <code>std::function</code> objects
  * that store the knowledge of how to apply the linear operator by
- * implementing the abstract @ref Matrix interface:
+ * implementing the abstract @p Matrix interface:
  * @code
  *   std::function<void(Range &, const Domain &)> vmult;
  *   std::function<void(Range &, const Domain &)> vmult_add;
@@ -576,7 +576,8 @@ operator*(const LinearOperator<Range, Intermediate> &first_op,
 /**
  * @relates LinearOperator
  *
- * Returns the transpose linear operations of @ref op.
+ * Returns the transpose linear operations of
+ * @ref op.
  *
  * @ingroup LAOperators
  */
@@ -680,8 +681,9 @@ inverse_operator(const LinearOperator<typename Solver::vector_type, typename Sol
  * Returns a LinearOperator that is the identity of the vector space
  * @p Range.
  *
- * The function takes an <code>std::function</code> object @ref
- * reinit_vector as an argument to initialize the
+ * The function takes an <code>std::function</code> object
+ * @ref reinit_vector
+ * as an argument to initialize the
  * <code>reinit_range_vector</code> and <code>reinit_domain_vector</code>
  * objects of the LinearOperator object.
  *

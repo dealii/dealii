@@ -536,7 +536,8 @@ namespace DoFRenumbering
    *   that have the smallest number of others that couple with it.
    *   If the DoFHandler is built on a parallel triangulation, then on every
    *   processor, these starting indices need to be a (possibly empty)
-   *   subset of the @ref GlossLocallyOwnedDof "locally owned degrees of freedom".
+   *   subset of the
+   *   @ref GlossLocallyOwnedDof "locally owned degrees of freedom".
    *   These will then be used as starting indices for the local renumbering
    *   on the current processor. (In other words, this argument will in
    *   fact be different on every processor unless you pass an
