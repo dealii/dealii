@@ -57,6 +57,10 @@ DEAL_II_NAMESPACE_OPEN
 template <int rank, int dim, typename Number> class Tensor;
 template <int rank, int dim, typename Number> class SymmetricTensor;
 
+//Forward type declaration to allow MPI sums over Vector<number> type
+template <typename Number> class Vector;
+
+
 namespace Utilities
 {
   /**
@@ -165,6 +169,19 @@ namespace Utilities
     void sum (const std::vector<T> &values,
               const MPI_Comm &mpi_communicator,
               std::vector<T> &sums);
+
+    /**
+     * Like the previous function, but take the sums over the elements of a
+     * Vector<T>.
+     *
+     * Input and output vectors may be the same.
+     */
+    template <typename T>
+    inline
+    void sum (const Vector<T> &values,
+              const MPI_Comm &mpi_communicator,
+              Vector<T> &sums);
+
 
     /**
      * Perform an MPI sum of the entries of a symmetric tensor.
@@ -547,6 +564,37 @@ namespace Utilities
           }
       }
 
+      template <typename T>
+      inline
+      void all_reduce (const MPI_Op    &mpi_op,
+                       const Vector<T> &values,
+                       const MPI_Comm  &mpi_communicator,
+                       Vector<T>  &output)
+      {
+#ifdef DEAL_II_WITH_MPI
+        if (job_supports_mpi())
+          {
+            if (values.begin() != output.begin())
+              output.reinit (values.size());
+
+            MPI_Allreduce ((values.begin() != output.begin()
+                            ?
+                            const_cast<void *>(static_cast<const void *>(values.begin()))
+                            :
+                            MPI_IN_PLACE),
+                           output.begin(), values.size(), internal::mpi_type_id((T *)0), mpi_op,
+                           mpi_communicator);
+          }
+        else
+#endif
+          {
+            (void)mpi_op;
+            (void)mpi_communicator;
+            output = values;
+          }
+      }
+
+
 
     }
 
@@ -578,6 +626,16 @@ namespace Utilities
     {
       internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
+
+    template <typename T>
+    inline
+    void sum (const Vector<T> &values,
+              const MPI_Comm &mpi_communicator,
+              Vector<T> &sums)
+    {
+      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
+    }
+
 
     template <int rank, int dim, typename Number>
     inline
