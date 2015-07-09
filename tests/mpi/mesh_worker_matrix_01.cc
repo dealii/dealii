@@ -170,13 +170,6 @@ test_simple(DoFHandler<dim> &dofs, bool faces)
   matrix.print(deallog.get_file_stream());
 }
 
-std::string id_to_string(const CellId &id)
-{
-  std::ostringstream ss;
-  ss << id;
-  return ss.str();
-}
-
 
 template<int dim>
 void
@@ -218,7 +211,7 @@ test(const FiniteElement<dim> &fe)
           f >> id;
           if (f.eof())
             break;
-          std::vector<types::global_dof_index> &d = dofmap[id_to_string(id)];
+          std::vector<types::global_dof_index> &d = dofmap[id.to_string()];
           d.reserve(fe.dofs_per_cell);
           for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
             {
@@ -234,7 +227,7 @@ test(const FiniteElement<dim> &fe)
           if (!cell->is_locally_owned())
             continue;
 
-          std::vector<types::global_dof_index>   &renumbered = dofmap[id_to_string(cell->id())];
+          std::vector<types::global_dof_index>   &renumbered = dofmap[cell->id().to_string()];
           cell->set_dof_indices(renumbered);
           cell->update_cell_dof_indices_cache();
 

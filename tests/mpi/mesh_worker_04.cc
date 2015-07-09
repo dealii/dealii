@@ -129,13 +129,6 @@ test_simple(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 //     lctrl);
 }
 
-std::string id_to_string(const CellId &id)
-{
-  std::ostringstream ss;
-  ss << id;
-  return ss.str();
-}
-
 template<int dim>
 void test_loop(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 {

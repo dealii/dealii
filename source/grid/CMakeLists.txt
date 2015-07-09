@@ -16,6 +16,7 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
+  cell_id.cc
   grid_generator.cc
   grid_in.cc
   grid_out.cc

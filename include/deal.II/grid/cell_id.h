@@ -20,6 +20,7 @@
 #include <deal.II/base/exceptions.h>
 
 #include <vector>
+#include <iostream>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -67,6 +68,11 @@ public:
   CellId()
     : coarse_cell_id(-1)
   {}
+
+  /**
+   * Return a string representation of this CellId.
+   */
+  std::string to_string() const;
 
   /**
    * compare two CellIds
