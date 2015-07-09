@@ -24,7 +24,7 @@
 #include <typeinfo>
 
 // replace type names found on MAC OS
-std::string cleanup_type(std::string &in)
+std::string cleanup_type(const std::string &in)
 {
   std::string ret = in;
   ret = Utilities::replace_in_string(ret, "NSt3__17complexIfEE", "St7complexIfE");

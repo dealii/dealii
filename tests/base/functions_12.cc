@@ -32,7 +32,7 @@ void check()
 
   std::vector<double> coeffs(n_mon);
   for (unsigned int i = 0; i < n_mon; ++i)
-    coeffs[i] = std::pow(-1.0,i)*(i+1);
+    coeffs[i] = std::pow(-1.0,static_cast<double>(i))*(i+1);
 
   Functions::Polynomial<dim> poly(exponents, coeffs);
 
