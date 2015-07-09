@@ -1544,7 +1544,7 @@ namespace TrilinosWrappers
 
 
 
-#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
+#if defined(DOXYGEN) || DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
   /**
    * This class implements an algebraic multigrid (AMG) preconditioner based
    * on the Trilinos MueLu implementation, which is a black-box preconditioner
