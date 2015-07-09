@@ -20,7 +20,7 @@
 #include <deal.II/base/exceptions.h>
 
 #include <vector>
-#include <sstream>
+#include <iostream>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -134,14 +134,6 @@ inline std::istream &operator>> (std::istream &is, CellId &cid)
       cid.id.push_back(value-'0');
     }
   return is;
-}
-
-inline std::string
-CellId::to_string() const
-{
-  std::ostringstream ss;
-  ss << *this;
-  return ss.str();
 }
 
 inline bool
