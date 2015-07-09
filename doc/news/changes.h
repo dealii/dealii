@@ -38,6 +38,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+
+  <li>Changed: GridTools::distort_random is now deterministic (gives the same
+  distorted mesh when called with the same input Triangulation).
+  <br>
+  (Timo Heister, 2015/07/09)
+  </li>
+
   <li>Changed: MatrixCreator::create_mass_matrix() took matrix and vector
   objects where the scalar type of the matrix was a template argument
   but the scalar type of the vector was always <code>double</code>. This
