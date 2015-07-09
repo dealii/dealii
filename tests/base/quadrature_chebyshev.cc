@@ -113,7 +113,7 @@ void check_quadrature(double *exact_monomials)
 
      for (unsigned int i=0; i<32; ++i)
      {
-       double quadrature_int=0;
+       long double quadrature_int=0;
        double err = 0;
 
        // Check the integral
@@ -121,8 +121,8 @@ void check_quadrature(double *exact_monomials)
        long double f=1.;
        for (unsigned int x=0; x<quadrature.size(); ++x)
        {
-            f = std::pow((long double) points[x](0), i*1.0L);
-            quadrature_int+=f*weights[x];
+	 f = std::pow(static_cast<long double>(points[x](0)), i*1.0L);
+	 quadrature_int+=f*static_cast<long double>(weights[x]);
        }
        err = std::fabs(quadrature_int-exact_monomials[i]);
        if (err < 1.e-15)
