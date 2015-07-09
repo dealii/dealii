@@ -856,19 +856,19 @@ namespace GridTools
             }
         }
 
+    // create a random number generator for the interval [-1,1]. we use
+    // this to make sure the distribution we get is repeatable, i.e.,
+    // if you call the function twice on the same mesh, then you will
+    // get the same mesh. this would not be the case if you used
+    // the rand() function, which carries around some internal state
+    boost::random::mt19937 rng;
+    boost::random::uniform_real_distribution<> uniform_distribution(-1,1);
+
     // If the triangulation is distributed, we need to
     // exchange the moved vertices across mpi processes
     if (parallel::distributed::Triangulation< dim, spacedim > *distributed_triangulation
         = dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*> (&triangulation))
       {
-        // create a random number generator for the interval [-1,1]. we use
-        // this to make sure the distribution we get is repeatable, i.e.,
-        // if you call the function twice on the same mesh, then you will
-        // get the same mesh. this would not be the case if you used
-        // the rand() function, which carries around some internal state
-        boost::random::mt19937 rng;
-        boost::random::uniform_real_distribution<> uniform_distribution(-1,1);
-
         const std::vector<bool> locally_owned_vertices = get_locally_owned_vertices(triangulation);
         std::vector<bool>       vertex_moved (triangulation.n_vertices(), false);
 
@@ -935,7 +935,7 @@ namespace GridTools
                 // compute a random shift vector
                 Point<spacedim> shift_vector;
                 for (unsigned int d=0; d<spacedim; ++d)
-                  shift_vector(d) = std::rand()*2.0/RAND_MAX-1;
+                  shift_vector(d) = uniform_distribution(rng);
 
                 shift_vector *= factor * minimal_length[vertex] /
                                 std::sqrt(shift_vector.square());
