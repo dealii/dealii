@@ -13,13 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/polynomials_bdm.h>
 #include <deal.II/fe/fe_poly_tensor_np.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_cartesian.h>
+#include <deal.II/grid/tria_accessor.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -464,11 +464,15 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_values (
   if (flags & update_gradients)
       grads.resize (this->dofs_per_cell);
 
+  const Point<dim> center(cell->center());
+  const double measure = cell->measure();
+  const double h = std::sqrt(measure);
+
   if(flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
     {
 
-      poly_space.compute(data.quadrature_points[k],
+      poly_space.compute(Point<dim>(data.quadrature_points[k] - center)/h,
         values, grads, grad_grads);
 
       for (unsigned int i=0; i<this->dofs_per_cell-piola_boundary; ++i)
@@ -484,7 +488,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_values (
         if (flags & update_gradients)
         {
           for (unsigned int d=0; d<dim; ++d)
-            data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d];
+            data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d]/h;
         }
       }
     }
@@ -617,11 +621,14 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_face_values (
   if (flags & update_gradients)
       grads.resize (this->dofs_per_cell);
 
+  const Point<dim> center(cell->center());
+  const double measure = cell->measure();
+  const double h = std::sqrt(measure);
 
   if (flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
     {
-      poly_space.compute(data.quadrature_points[k],
+      poly_space.compute(Point<dim>(data.quadrature_points[k]-center)/h,
         values, grads, grad_grads);
 
       for (unsigned int i=0; i<this->dofs_per_cell-piola_boundary; ++i)
@@ -637,7 +644,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_face_values (
         if (flags & update_gradients)
         {
           for (unsigned int d=0; d<dim; ++d)
-              data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d];
+              data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d]/h;
         }
       }
     }
@@ -768,10 +775,14 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_subface_values (
   if (flags & update_gradients)
       grads.resize (this->dofs_per_cell);
 
+  const Point<dim> center(cell->center());
+  const double measure = cell->measure();
+  const double h = std::sqrt(measure);
+
   if(flags & (update_values | update_gradients))
     for (unsigned int k=0; k<n_q_points; ++k)
     {
-      poly_space.compute(data.quadrature_points[k],
+      poly_space.compute(Point<dim>(data.quadrature_points[k]-center)/h,
         values, grads, grad_grads);
 
       for (unsigned int i=0; i<this->dofs_per_cell-piola_boundary; ++i)
@@ -787,7 +798,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::fill_fe_subface_values (
         if (flags & update_gradients)
         {
           for (unsigned int d=0; d<dim; ++d)
-            data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d];
+            data.shape_gradients[first+d][k] = sign_change[i] * grads[i][d]/h;
         }
       }
     }

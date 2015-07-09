@@ -295,7 +295,7 @@ template <int dim, int spacedim>
 void
 FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
   const Mapping<dim,spacedim> &,
-  const typename Triangulation<dim,spacedim>::cell_iterator &,
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim> &,
   typename Mapping<dim,spacedim>::InternalDataBase &,
   typename Mapping<dim,spacedim>::InternalDataBase &fedata,
@@ -315,19 +315,23 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
 
   const unsigned int n_q_points = data.quadrature_points.size();
 
+  const Point<dim> center(cell->center());
+  const double measure = cell->measure();
+  const double h = std::sqrt(measure);
+
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
-        polynomial_space.compute(data.quadrature_points[i],
+        polynomial_space.compute(Point<dim>(data.quadrature_points[i] - center)/h,
                                  fe_data.values, fe_data.grads, fe_data.grad_grads);
         for (unsigned int k=0; k<this->dofs_per_cell; ++k)
           {
             if (flags & update_values)
               data.shape_values[k][i] = fe_data.values[k];
             if (flags & update_gradients)
-              data.shape_gradients[k][i] = fe_data.grads[k];
+              data.shape_gradients[k][i] = fe_data.grads[k]/h;
             if (flags & update_hessians)
-              data.shape_hessians[k][i] = fe_data.grad_grads[k];
+              data.shape_hessians[k][i] = fe_data.grad_grads[k]/measure;
           }
       }
 }
@@ -338,7 +342,7 @@ template <int dim, int spacedim>
 void
 FE_DGPNonparametric<dim,spacedim>::fill_fe_face_values (
   const Mapping<dim,spacedim> &,
-  const typename Triangulation<dim,spacedim>::cell_iterator &,
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int,
   const Quadrature<dim-1>&,
   typename Mapping<dim,spacedim>::InternalDataBase &,
@@ -358,19 +362,23 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_face_values (
 
   const unsigned int n_q_points = data.quadrature_points.size();
 
+  const Point<dim> center(cell->center());
+  const double measure = cell->measure();
+  const double h = std::sqrt(measure);  
+
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
-        polynomial_space.compute(data.quadrature_points[i],
+        polynomial_space.compute(Point<dim>(data.quadrature_points[i]-center)/h,
                                  fe_data.values, fe_data.grads, fe_data.grad_grads);
         for (unsigned int k=0; k<this->dofs_per_cell; ++k)
           {
             if (flags & update_values)
               data.shape_values[k][i] = fe_data.values[k];
             if (flags & update_gradients)
-              data.shape_gradients[k][i] = fe_data.grads[k];
+              data.shape_gradients[k][i] = fe_data.grads[k]/h;
             if (flags & update_hessians)
-              data.shape_hessians[k][i] = fe_data.grad_grads[k];
+              data.shape_hessians[k][i] = fe_data.grad_grads[k]/measure;
           }
       }
 }
@@ -381,7 +389,7 @@ template <int dim, int spacedim>
 void
 FE_DGPNonparametric<dim,spacedim>::fill_fe_subface_values (
   const Mapping<dim,spacedim> &,
-  const typename Triangulation<dim,spacedim>::cell_iterator &,
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int,
   const unsigned int,
   const Quadrature<dim-1>&,
@@ -402,19 +410,23 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_subface_values (
 
   const unsigned int n_q_points = data.quadrature_points.size();
 
+  const Point<dim> center(cell->center());  
+  const double measure = cell->measure();
+  const double h = std::sqrt(measure);
+
   if (flags & (update_values | update_gradients))
     for (unsigned int i=0; i<n_q_points; ++i)
       {
-        polynomial_space.compute(data.quadrature_points[i],
+        polynomial_space.compute(Point<dim>(data.quadrature_points[i] - center)/h,
                                  fe_data.values, fe_data.grads, fe_data.grad_grads);
         for (unsigned int k=0; k<this->dofs_per_cell; ++k)
           {
             if (flags & update_values)
               data.shape_values[k][i] = fe_data.values[k];
             if (flags & update_gradients)
-              data.shape_gradients[k][i] = fe_data.grads[k];
+              data.shape_gradients[k][i] = fe_data.grads[k]/h;
             if (flags & update_hessians)
-              data.shape_hessians[k][i] = fe_data.grad_grads[k];
+              data.shape_hessians[k][i] = fe_data.grad_grads[k]/measure;
           }
       }
 }
