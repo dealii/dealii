@@ -18,6 +18,7 @@ def wrap_block(lines, startwith):
     longline = " ".join(lines)
     wrapper.initial_indent = startwith
     wrapper.subsequent_indent = startwith
+    wrapper.break_long_words = False
     wrapper.width = 78
     return wrapper.wrap(longline)
 
@@ -412,6 +413,16 @@ lineI = [" /**", \
          "  */"]
 assert(format_block(lineI)==lineI)
 
+# do not break $very_long_formula_without_spacing$:
+longtext = "blabla"*20
+lineI = [" /**", \
+         "  * a $" + longtext + "$", \
+         "  */"]
+lineO = [" /**", \
+         "  * a", \
+         "  * $" + longtext + "$", \
+         "  */"]
+assert(format_block(lineI)==lineO)
 
 
 
