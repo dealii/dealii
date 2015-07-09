@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 by the deal.II authors
+// Copyright (C) 2014, 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -99,4 +99,17 @@
  * There are variants of these functions that provide iterator ranges
  * for all cells (not just the active ones) and for cells on individual
  * levels.
+ *
+ *
+ * <h3>Things that are only enabled if your compiler supports C++11</h3>
+ *
+ * There is a small number of places inside deal.II where we allow ourselves
+ * the use of C++11 because it makes things so much simpler. These features
+ * are simply not available if your compiler does not support C++11, but this
+ * does not affect the usability of the remainder of deal.II.
+ *
+ * Specifically, these places are:
+ * - The LinearOperator class and all associated functions such as
+ *   linear_operator(), null_operator(), and everything else that is part of
+ *   the LAOperators documentation module.
  */
