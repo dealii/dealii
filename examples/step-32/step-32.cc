@@ -327,13 +327,12 @@ namespace Step32
   // distinguish between <code>struct</code>s and <code>class</code>es).
   //
   // Regarding the Scratch objects, each struct is equipped with a constructor
-  // that creates an FEValues object for a @ref FiniteElement "finite
-  // element", a @ref Quadrature "quadrature formula", the @ref Mapping
-  // "mapping" that describes the interpolation of curved boundaries, and some
-  // @ref UpdateFlags "update flags".  Moreover, we manually implement a copy
-  // constructor (since the FEValues class is not copyable by itself), and
-  // provide some additional vector fields that are used to hold intermediate
-  // data during the computation of local contributions.
+  // that creates an @ref FEValues object using the @ref FiniteElement,
+  // Quadrature, @ref Mapping (which describes the interpolation of curved
+  // boundaries), and @ref UpdateFlags instances. Moreover, we manually
+  // implement a copy constructor (since the FEValues class is not copyable by
+  // itself), and provide some additional vector fields that are used to hold
+  // intermediate data during the computation of local contributions.
   //
   // Let us start with the scratch arrays and, specifically, the one used for
   // assembly of the Stokes preconditioner:
