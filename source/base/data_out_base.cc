@@ -1036,7 +1036,7 @@ namespace
   DXStream::DXStream (std::ostream &out,
                       const DataOutBase::DXFlags &f)
     :
-    StreamBase (out, f)
+    StreamBase<DataOutBase::DXFlags> (out, f)
   {}
 
 
@@ -1129,7 +1129,7 @@ namespace
   GmvStream::GmvStream (std::ostream &out,
                         const DataOutBase::GmvFlags &f)
     :
-    StreamBase (out, f)
+    StreamBase<DataOutBase::GmvFlags> (out, f)
   {}
 
 
@@ -1180,7 +1180,7 @@ namespace
   TecplotStream::TecplotStream (std::ostream &out,
                                 const DataOutBase::TecplotFlags &f)
     :
-    StreamBase (out, f)
+    StreamBase<DataOutBase::TecplotFlags> (out, f)
   {}
 
 
@@ -1228,7 +1228,7 @@ namespace
   UcdStream::UcdStream (std::ostream &out,
                         const DataOutBase::UcdFlags &f)
     :
-    StreamBase (out, f)
+    StreamBase<DataOutBase::UcdFlags> (out, f)
   {}
 
 
@@ -1307,7 +1307,7 @@ namespace
   VtkStream::VtkStream (std::ostream &out,
                         const DataOutBase::VtkFlags &f)
     :
-    StreamBase (out, f)
+    StreamBase<DataOutBase::VtkFlags> (out, f)
   {}
 
 
@@ -1357,7 +1357,7 @@ namespace
   VtuStream::VtuStream (std::ostream &out,
                         const DataOutBase::VtkFlags &f)
     :
-    StreamBase (out, f)
+    StreamBase<DataOutBase::VtkFlags> (out, f)
   {}
 
 
