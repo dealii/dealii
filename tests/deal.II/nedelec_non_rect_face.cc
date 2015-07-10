@@ -411,8 +411,7 @@ namespace Maxwell
   template <int dim>
   void MaxwellProblem<dim>::run ()
   {
-
-    unsigned int numcycles=3;
+    unsigned int numcycles=(p_order>1)?2:3;
 
     for (unsigned int cycle=0; cycle<numcycles; ++cycle)
       {
