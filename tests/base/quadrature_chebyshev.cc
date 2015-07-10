@@ -81,20 +81,16 @@ int main()
   deallog.threshold_double(1.e-10);
   deallog << std::setprecision(8);
   
-  deallog.push("1d Gauss-Chebyshev\n");
-  deallog.pop();
+  deallog << "* 1d Gauss-Chebyshev" << std::endl;
   check_quadrature<QGaussChebyshev<1>,1>(&exact_monomials[0]);
 
-  deallog.push("1d Gauss-Radau-Chebyshev, left endpoint\n");
-  deallog.pop();
+  deallog << "* 1d Gauss-Radau-Chebyshev, left endpoint" << std::endl;
   check_quadrature<QGaussRadauChebyshev<1>,1>(&exact_monomials[0]);
 
-  deallog.push("1d Gauss-Radau-Chebyshev, right endpoint\n");
-  deallog.pop();
+  deallog << "* 1d Gauss-Radau-Chebyshev, right endpoint" << std::endl;
   check_GRC_right(&exact_monomials[0]);
 
-  deallog.push("1d Gauss-Lobatto-Chebyshev\n");
-  deallog.pop();
+  deallog << "1d Gauss-Lobatto-Chebyshev" << std::endl;
   check_quadrature<QGaussLobattoChebyshev<1>,2>(&exact_monomials[0]);
 
   return 0;
@@ -126,12 +122,13 @@ void check_quadrature(double *exact_monomials)
 	 quadrature_int+=f*static_cast<long double>(weights[x]);
        }
        err = std::fabs(quadrature_int-exact_monomials[i]);
+       deallog << "Quadrature order " << n << ", polynomial of degree " << i << ": ";
+       
        if (err < 1.e-15)
-         deallog << "Quadrature order: " << n << " is exact for polynomials of degree: " << i << std::endl;
+	 deallog << "exact." << std::endl;       
        else
-         deallog << "error: " << err << std::endl;
+	 deallog << "error " << err << std::endl;
      }
-  deallog.pop();
 
     }
 }
@@ -149,7 +146,7 @@ void check_GRC_right (double *exact_monomials)
 
      for (unsigned int i=0; i<32; ++i)
      {
-       double quadrature_int=0;
+       long double quadrature_int=0;
        double err = 0;
 
           // Check the integral
@@ -157,19 +154,18 @@ void check_GRC_right (double *exact_monomials)
        long double f=1.;
        for (unsigned int x=0; x<quadrature.size(); ++x)
        {
-            f = std::pow((long double) points[x](0), i*1.0L);
-            quadrature_int+=f*weights[x];
+	 f = std::pow(static_cast<long double>(points[x](0)), i*1.0L);
+	 quadrature_int+=f*static_cast<long double>(weights[x]);
        }
        err = std::fabs(quadrature_int-exact_monomials[i]);
-       //std::cout << "monomial order: " << i-1 << "quadrature order: " << n << std::endl;
-       //deallog << "error: " << err << std::endl;
+       deallog << "Quadrature order " << n << ", polynomial of degree " << i << ": ";
+       
        if (err < 1.e-15)
-         deallog << "Quadrature order: " << n << " is exact for polynomials of degree " << i << std::endl;
+	 deallog << "exact." << std::endl;       
        else
-         deallog << "error: " << err << std::endl;
+	 deallog << "error " << err << std::endl;
      }
 
-  deallog.pop();
     }
 }
 
