@@ -29,6 +29,7 @@ std::string cleanup_type(const std::string &in)
   std::string ret = in;
   ret = Utilities::replace_in_string(ret, "NSt3__17complexIfEE", "St7complexIfE");
   ret = Utilities::replace_in_string(ret, "NSt3__17complexIdEE", "St7complexIdE");
+  ret = Utilities::replace_in_string(ret, "NSt3__17complexIeEE", "St7complexIeE");
   return ret;
 }
 
