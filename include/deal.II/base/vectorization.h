@@ -1360,12 +1360,14 @@ vectorized_load_and_transpose(const unsigned int      n_entries,
       __m128 u5 = _mm_loadu_ps(in+4*i+offsets[5]);
       __m128 u6 = _mm_loadu_ps(in+4*i+offsets[6]);
       __m128 u7 = _mm_loadu_ps(in+4*i+offsets[7]);
-      __m256 t0 = __m256(), t1 = __m256(), t2 = __m256(), t3 = __m256();
-      t0 = _mm256_insertf128_ps (t0, u0, 0);
+      // To avoid warnings about uninitialized variables, need to initialize
+      // one variable with zero before using it.
+      __m256 t0, t1, t2, t3 = _mm256_set1_ps(0.F);
+      t0 = _mm256_insertf128_ps (t3, u0, 0);
       t0 = _mm256_insertf128_ps (t0, u4, 1);
-      t1 = _mm256_insertf128_ps (t1, u1, 0);
+      t1 = _mm256_insertf128_ps (t3, u1, 0);
       t1 = _mm256_insertf128_ps (t1, u5, 1);
-      t2 = _mm256_insertf128_ps (t2, u2, 0);
+      t2 = _mm256_insertf128_ps (t3, u2, 0);
       t2 = _mm256_insertf128_ps (t2, u6, 1);
       t3 = _mm256_insertf128_ps (t3, u3, 0);
       t3 = _mm256_insertf128_ps (t3, u7, 1);
@@ -1391,12 +1393,12 @@ vectorized_load_and_transpose(const unsigned int      n_entries,
       __m128 u5 = _mm_loadu_ps(in+final_pos+offsets[5]);
       __m128 u6 = _mm_loadu_ps(in+final_pos+offsets[6]);
       __m128 u7 = _mm_loadu_ps(in+final_pos+offsets[7]);
-      __m256 t0 = __m256(), t1 = __m256(), t2 = __m256(), t3 = __m256();
-      t0 = _mm256_insertf128_ps (t0, u0, 0);
+      __m256 t0, t1, t2, t3 = _mm256_set1_ps(0.F);
+      t0 = _mm256_insertf128_ps (t3, u0, 0);
       t0 = _mm256_insertf128_ps (t0, u4, 1);
-      t1 = _mm256_insertf128_ps (t1, u1, 0);
+      t1 = _mm256_insertf128_ps (t3, u1, 0);
       t1 = _mm256_insertf128_ps (t1, u5, 1);
-      t2 = _mm256_insertf128_ps (t2, u2, 0);
+      t2 = _mm256_insertf128_ps (t3, u2, 0);
       t2 = _mm256_insertf128_ps (t2, u6, 1);
       t3 = _mm256_insertf128_ps (t3, u3, 0);
       t3 = _mm256_insertf128_ps (t3, u7, 1);
@@ -1843,6 +1845,7 @@ public:
 #endif
     return *this;
   }
+
   /**
    * Multiplication.
    */
