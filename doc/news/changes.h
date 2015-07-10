@@ -547,7 +547,14 @@ inconvenience this causes.
 
 
 <ol>
-  <li>New: CellId::to_string() returns a string representation.
+  <li>Changed: The IsBlockMatrix class is now declared in
+  <code>constraint_matrix.h</code> instead of its former home in
+  <code>block_indices.h</code>.
+  <br>
+  (Wolfgang Bangerth, 2015/07/10)
+  </li>
+
+  <li>New: CellId::to_string() returns a string representation of a CellId object.
   <br>
   (Timo Heister, 2015/07/05)
   </li>

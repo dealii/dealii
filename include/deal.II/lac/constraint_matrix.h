@@ -44,7 +44,7 @@ class BlockDynamicSparsityPattern;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockSparseMatrix;
 class BlockIndices;
-template <typename MatrixType> struct IsBlockMatrix;
+
 
 namespace internals
 {
@@ -1633,6 +1633,86 @@ void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
     }
 }
 
+
+template <typename MatrixType> class BlockMatrixBase;
+template <typename SparsityType> class BlockSparsityPatternBase;
+template <typename number>     class BlockSparseMatrixEZ;
+
+/**
+ * A class that can be used to determine whether a given type is a block
+ * matrix type or not. For example,
+ * @code
+ *   IsBlockMatrix<SparseMatrix<double> >::value
+ * @endcode
+ * has the value false, whereas
+ * @code
+ *   IsBlockMatrix<BlockSparseMatrix<double> >::value
+ * @endcode
+ * is true. This is sometimes useful in template contexts where we may want to
+ * do things differently depending on whether a template type denotes a
+ * regular or a block matrix type.
+ *
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
+ * @author Wolfgang Bangerth, 2009
+ */
+template <typename MatrixType>
+struct IsBlockMatrix
+{
+private:
+  struct yes_type
+  {
+    char c[1];
+  };
+  struct no_type
+  {
+    char c[2];
+  };
+
+  /**
+   * Overload returning true if the class is derived from BlockMatrixBase,
+   * which is what block matrices do (with the exception of
+   * BlockSparseMatrixEZ).
+   */
+  template <typename T>
+  static yes_type check_for_block_matrix (const BlockMatrixBase<T> *);
+
+  /**
+   * Overload returning true if the class is derived from
+   * BlockSparsityPatternBase, which is what block sparsity patterns do.
+   */
+  template <typename T>
+  static yes_type check_for_block_matrix (const BlockSparsityPatternBase<T> *);
+
+  /**
+   * Overload for BlockSparseMatrixEZ, which is the only block matrix not
+   * derived from BlockMatrixBase at the time of writing this class.
+   */
+  template <typename T>
+  static yes_type check_for_block_matrix (const BlockSparseMatrixEZ<T> *);
+
+  /**
+   * Catch all for all other potential matrix types that are not block
+   * matrices.
+   */
+  static no_type check_for_block_matrix (...);
+
+public:
+  /**
+   * A statically computable value that indicates whether the template
+   * argument to this class is a block matrix (in fact whether the type is
+   * derived from BlockMatrixBase<T>).
+   */
+  static const bool value = (sizeof(check_for_block_matrix
+                                    ((MatrixType *)0))
+                             ==
+                             sizeof(yes_type));
+};
+
+
+// instantiation of the static member
+template <typename MatrixType>
+const bool IsBlockMatrix<MatrixType>::value;
 
 
 template <typename MatrixType>
