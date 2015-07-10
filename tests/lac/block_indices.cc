@@ -31,7 +31,7 @@ void test (const BlockIndices &idx)
   for (unsigned i=0; i<n; ++i)
     deallog << ' ' << idx.block_start(i);
 
-  deallog << std::endl;
+  deallog << std::endl << "string: " << idx.to_string() << std::endl;
 
   for (unsigned int i=0; i<idx.total_size(); ++i)
     {
