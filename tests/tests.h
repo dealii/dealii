@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef __tests_tests_h
-#define __tests_tests_h
+#ifndef dealii__tests_h
+#define dealii__tests_h
 
 // common definitions used in all the tests
 
@@ -462,4 +462,4 @@ struct SetGrainSizes
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // __tests_tests_h
+#endif // dealii__tests_h
