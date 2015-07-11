@@ -9,5 +9,5 @@ DEAL::defaults='' defined='bla|bla 2|1' input='set v=bla,bla,bla' result='bla,bl
 DEAL::defaults='default,alsodefault' defined='default|nodefault|alsodefault' input='' result='default,alsodefault'
 DEAL::defaults='default,alsodefault' defined='default|nodefault|alsodefault' input='set v=nodefault' result='nodefault'
 DEAL::defaults='  input 2  ,  have spaces  ' defined='have spaces|input 2' input='' result='  input 2  ,  have spaces  '
-DEAL::defaults='input 2' defined='have spaces|input 2' input='set v=   input 2  ,   have spaces  ' result='input 2 , have spaces'
-DEAL::defaults='' defined='double  spaces|input 2' input='set v = double  spaces  ,  double  spaces' result=''
+DEAL::defaults='input 2' defined='have spaces|input 2' input='set v=   input 2  ,   have spaces  ' result='input 2  ,   have spaces'
+DEAL::defaults='' defined='double  spaces|input 2' input='set v = double  spaces  ,  double  spaces' result='double  spaces  ,  double  spaces'
