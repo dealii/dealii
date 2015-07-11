@@ -199,6 +199,11 @@ namespace Utilities
                                 const std::string &to);
 
   /**
+   * Return a string with all spaces at the beginning and end of @p input removed.
+   */
+  std::string trim(const std::string &input);
+
+  /**
    * Generate a random number from a normalized Gaussian probability
    * distribution centered around @p a and with standard deviation @p sigma.
    *
