@@ -714,12 +714,12 @@ SolverGMRES<VECTOR>::compute_eigs_and_cond(
           std::vector<std::complex<double> > eigenvalues(dim);
           for (unsigned int i=0; i<mat_eig.n(); ++i)
             eigenvalues[i] = mat_eig.eigenvalue(i);
+          //Sort eigenvalues for nicer output.
+          std::sort(eigenvalues.begin(), eigenvalues.end(),
+                    internal::SolverGMRES::complex_less_pred);
           eigenvalues_signal(eigenvalues);
           if (log_eigenvalues)
             {
-              //Sort eigenvalues for nicer output.
-              std::sort(eigenvalues.begin(), eigenvalues.end(),
-                        internal::SolverGMRES::complex_less_pred);
               deallog << "Eigenvalue estimate: ";
               for (unsigned int i=0; i<mat_eig.n(); ++i)
                 deallog << ' ' << eigenvalues[i];
