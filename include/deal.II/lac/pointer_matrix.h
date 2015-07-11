@@ -439,7 +439,7 @@ private:
  * should overload the function in order to save memory and time.
  *
  * The result is a PointerMatrixBase* pointing to <tt>matrix</tt>. The
- * <TT>VECTOR</tt> argument is a dummy just used to determine the template
+ * <tt>VECTOR</tt> argument is a dummy just used to determine the template
  * arguments.
  *
  * @relates PointerMatrixBase @relates PointerMatrixAux

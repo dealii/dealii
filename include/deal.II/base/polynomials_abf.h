@@ -102,7 +102,7 @@ public:
   std::string name () const;
 
   /**
-   * Return the number of polynomials in the space <TT>RT(degree)</tt> without
+   * Return the number of polynomials in the space <tt>RT(degree)</tt> without
    * requiring to build an object of PolynomialsABF. This is required by the
    * FiniteElement classes.
    */
