@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2014 by the deal.II authors
+// Copyright (C) 2009 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,7 @@
 #include <deal.II/lac/compressed_set_sparsity_pattern.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_sparse_matrix_ez.h>
+#include <deal.II/lac/constraint_matrix.h>
 
 #include <fstream>
 #include <iomanip>
