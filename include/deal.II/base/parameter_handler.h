@@ -595,20 +595,19 @@ namespace Patterns
   /**
    * This class is much like the Selection class, but it allows the input to
    * be a comma-separated list of values which each have to be given in the
-   * constructor argument. Alternatively, it could be viewed as a
-   * specialization of the List class. For example, if the string to the
-   * constructor was <tt>"ucd|gmv|eps"</tt>, then the following would be legal
-   * input: <tt>eps</tt>, <tt>gmv</tt>. You may give an arbitrarily long list
-   * of values, where there may be as many spaces around commas as you like.
-   * However, commas are not allowed inside the values given to the
-   * constructor.
+   * constructor argument. The input is allowed to be empty or contain values
+   * more than once and have an arbitrary number of spaces around commas. Of
+   * course commas are not allowed inside the values given to the constructor.
+   *
+   * For example, if the string to the constructor was <tt>"ucd|gmv|eps"</tt>,
+   * then the following would be legal inputs: "eps", "gmv, eps",
+   * or "".
    */
   class MultipleSelection : public PatternBase
   {
   public:
     /**
-     * Constructor. Take the given parameter as the specification of valid
-     * strings.
+     * Constructor. @p seq is a list of valid options separated by "|".
      */
     MultipleSelection (const std::string &seq);
 
