@@ -66,9 +66,8 @@ class PreconditionIdentity;
  * are equal. But, even for small numbers of iteration steps, the condition
  * number of @p T is a good estimate for the one of @p PA.
  *
- * With the coefficients @p alpha and @p beta written to the log file if
- * <tt>AdditionalData::log_coefficients = true</tt>, the matrix @p T_m after
- * @p m steps is the tri-diagonal matrix with diagonal elements
+ * After @p m steps the matrix T_m can be written in terms of the coefficients
+ * @p alpha and @p beta as the tri-diagonal matrix with diagonal elements
  * <tt>1/alpha_0</tt>, <tt>1/alpha_1 + beta_0/alpha_0</tt>, ...,
  * <tt>1/alpha_{m-1</tt>+beta_{m-2}/alpha_{m-2}} and off-diagonal elements
  * <tt>sqrt(beta_0)/alpha_0</tt>, ..., <tt>sqrt(beta_{m-2</tt>)/alpha_{m-2}}.
@@ -77,6 +76,15 @@ class PreconditionIdentity;
  * @see Y. Saad: "Iterative methods for Sparse Linear Systems", section 6.7.3
  * for details.
  *
+ * The coefficients, eigenvalues and condition number (computed as the ratio of
+ * the largest over smallest eigenvalue) can be obtained by connecting a
+ * function as a slot to the solver using one of the functions
+ * @p connect_coefficients_slot, @p connect_eigenvalues_slot and
+ * @p connect_condition_number_slot. These slots will then be called from the
+ * solver with the estimates as argument.
+ *
+ * @deprecated Alternatively these estimates can be written to deallog by
+ * setting flags in @p AdditionalData.
  *
  * <h3>Observing the progress of linear solver iterations</h3>
  *
@@ -130,11 +138,18 @@ public:
 
     /**
      * Constructor. Initialize data fields.  Confer the description of those.
+     * @deprecated Instead use: connect_coefficients_slot,
+     * connect_condition_number_slot, and connect_eigenvalues_slot.
      */
-    AdditionalData (const bool log_coefficients = false,
+    AdditionalData (const bool log_coefficients,
                     const bool compute_condition_number = false,
                     const bool compute_all_condition_numbers = false,
-                    const bool compute_eigenvalues = false);
+                    const bool compute_eigenvalues = false) DEAL_II_DEPRECATED;
+
+    /**
+     * Constructor. Initializes all data fields to false.
+     */
+    AdditionalData();
   };
 
   /**
@@ -166,6 +181,38 @@ public:
          const VECTOR         &b,
          const PRECONDITIONER &precondition);
 
+  /**
+   * Connect a slot to retrieve the CG coefficients. The slot will be called
+   * with alpha as the first argument and with beta as the second argument,
+   * where alpha and beta follow the notation in
+   * Y. Saad: "Iterative methods for Sparse Linear Systems", section 6.7.
+   * Called once per iteration
+   */
+  boost::signals2::connection
+  connect_coefficients_slot(
+    const std_cxx11::function<void (double,double)> &slot);
+
+  /**
+   * Connect a slot to retrieve the estimated condition number.
+   * Called on each iteration if every_iteration=true, otherwise called once
+   * when iterations are ended (i.e., either because convergence has been
+   * achieved, or because divergence has been detected).
+   */
+  boost::signals2::connection
+  connect_condition_number_slot(const std_cxx11::function<void (double)> &slot,
+                                const bool every_iteration=false);
+
+  /**
+   * Connect a slot to retrieve the estimated eigenvalues.
+   * Called on each iteration if every_iteration=true, otherwise called once
+   * when iterations are ended (i.e., either because convergence has been
+   * achieved, or because divergence has been detected).
+   */
+  boost::signals2::connection
+  connect_eigenvalues_slot(
+    const std_cxx11::function<void (const std::vector<double> &)> &slot,
+    const bool every_iteration=false);
+
 protected:
   /**
    * Implementation of the computation of the norm of the residual. This can
@@ -182,6 +229,22 @@ protected:
                              const VECTOR &x,
                              const VECTOR &r,
                              const VECTOR &d) const;
+
+  /**
+   * Estimates the eigenvalues from diagonal and offdiagonal. Uses
+   * these estimate to compute the condition number. Calls the signals
+   * eigenvalues_signal and cond_signal with these estimates as arguments.
+   * Outputs the eigenvalues/condition-number to deallog if
+   * log_eigenvalues/log_cond is true.
+   */
+  static void
+  compute_eigs_and_cond(
+    const std::vector<double> &diagonal,
+    const std::vector<double> &offdiagonal,
+    const boost::signals2::signal<void (const std::vector<double> &)> &eigenvalues_signal,
+    const boost::signals2::signal<void (double)> &cond_signal,
+    const bool log_eigenvalues,
+    const bool log_cond);
 
   /**
    * Temporary vectors, allocated through the @p VectorMemory object at the
@@ -203,6 +266,36 @@ protected:
    * Additional parameters.
    */
   AdditionalData additional_data;
+
+  /**
+   * Signal used to retrieve the CG coefficients.
+   * Called on each iteration.
+   */
+  boost::signals2::signal<void (double,double)> coefficients_signal;
+
+  /**
+   * Signal used to retrieve the estimated condition number.
+   * Called once when all iterations are ended.
+   */
+  boost::signals2::signal<void (double)> condition_number_signal;
+
+  /**
+   * Signal used to retrieve the estimated condition numbers.
+   * Called on each iteration.
+   */
+  boost::signals2::signal<void (double)> all_condition_numbers_signal;
+
+  /**
+   * Signal used to retrieve the estimated eigenvalues.
+   * Called once when all iterations are ended.
+   */
+  boost::signals2::signal<void (const std::vector<double> &)> eigenvalues_signal;
+
+  /**
+   * Signal used to retrieve the estimated eigenvalues.
+   * Called on each iteration.
+   */
+  boost::signals2::signal<void (const std::vector<double> &)> all_eigenvalues_signal;
 
 private:
   void cleanup();
@@ -226,6 +319,19 @@ AdditionalData (const bool log_coefficients,
   compute_condition_number(compute_condition_number),
   compute_all_condition_numbers(compute_all_condition_numbers),
   compute_eigenvalues(compute_eigenvalues)
+{}
+
+
+
+template <class VECTOR>
+inline
+SolverCG<VECTOR>::AdditionalData::
+AdditionalData ()
+  :
+  log_coefficients (false),
+  compute_condition_number(false),
+  compute_all_condition_numbers(false),
+  compute_eigenvalues(false)
 {}
 
 
@@ -289,6 +395,63 @@ SolverCG<VECTOR>::print_vectors(const unsigned int,
 
 
 template <class VECTOR>
+inline void
+SolverCG<VECTOR>::compute_eigs_and_cond(
+  const std::vector<double> &diagonal,
+  const std::vector<double> &offdiagonal,
+  const boost::signals2::signal<void (const std::vector<double> &)> &eigenvalues_signal,
+  const boost::signals2::signal<void (double)> &cond_signal,
+  const bool log_eigenvalues,
+  const bool log_cond)
+{
+  //Avoid computing eigenvalues unless they are needed.
+  if (!cond_signal.empty()|| !eigenvalues_signal.empty()  || log_cond ||
+      log_eigenvalues)
+    {
+      TridiagonalMatrix<double> T(diagonal.size(), true);
+      for (size_type i=0; i<diagonal.size(); ++i)
+        {
+          T(i,i) = diagonal[i];
+          if (i< diagonal.size()-1)
+            T(i,i+1) = offdiagonal[i];
+        }
+      T.compute_eigenvalues();
+      //Need two eigenvalues to estimate the condition number.
+      if (diagonal.size()>1)
+        {
+          double condition_number=T.eigenvalue(T.n()-1)/T.eigenvalue(0);
+          cond_signal(condition_number);
+          //Send to deallog
+          if (log_cond)
+            {
+              deallog << "Condition number estimate: " <<
+                      condition_number << std::endl;
+            }
+        }
+      //Avoid copying the eigenvalues of T to a vector unless a signal is
+      //connected.
+      if (!eigenvalues_signal.empty())
+        {
+          std::vector<double> eigenvalues(T.n());
+          for (unsigned int j = 0; j < T.n(); ++j)
+            {
+              eigenvalues.at(j)=T.eigenvalue(j);
+            }
+          eigenvalues_signal(eigenvalues);
+        }
+      if (log_eigenvalues)
+        {
+          for (size_type i=0; i<T.n(); ++i)
+            deallog << ' ' << T.eigenvalue(i);
+          deallog << std::endl;
+        }
+    }
+
+}
+
+
+
+template <class VECTOR>
 template <class MATRIX, class PRECONDITIONER>
 void
 SolverCG<VECTOR>::solve (const MATRIX         &A,
@@ -306,9 +469,13 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   Vp = this->memory.alloc();
   // Should we build the matrix for
   // eigenvalue computations?
-  bool do_eigenvalues = additional_data.compute_condition_number
-                        | additional_data.compute_all_condition_numbers
-                        | additional_data.compute_eigenvalues;
+  const bool do_eigenvalues = !condition_number_signal.empty()
+                              |!all_condition_numbers_signal.empty()
+                              |!eigenvalues_signal.empty()
+                              |!all_eigenvalues_signal.empty()
+                              | additional_data.compute_condition_number
+                              | additional_data.compute_all_condition_numbers
+                              | additional_data.compute_eigenvalues;
   double eigen_beta_alpha = 0;
 
   // vectors used for eigenvalue
@@ -404,6 +571,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
               d.sadd(beta,-1.,g);
             }
 
+          this->coefficients_signal(alpha,beta);
           if (additional_data.log_coefficients)
             deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
           // set up the vectors
@@ -416,20 +584,9 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
               eigen_beta_alpha = beta/alpha;
               offdiagonal.push_back(std::sqrt(beta)/alpha);
             }
-
-          if (additional_data.compute_all_condition_numbers && (diagonal.size()>1))
-            {
-              TridiagonalMatrix<double> T(diagonal.size(), true);
-              for (size_type i=0; i<diagonal.size(); ++i)
-                {
-                  T(i,i) = diagonal[i];
-                  if (i< diagonal.size()-1)
-                    T(i,i+1) = offdiagonal[i];
-                }
-              T.compute_eigenvalues();
-              deallog << "Condition number estimate: " <<
-                      T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
-            }
+          compute_eigs_and_cond(diagonal,offdiagonal,all_eigenvalues_signal,
+                                all_condition_numbers_signal,false,
+                                additional_data.compute_all_condition_numbers);
         }
     }
   catch (...)
@@ -437,30 +594,11 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
       cleanup();
       throw;
     }
-
-  // Write eigenvalues or condition number
-  if (do_eigenvalues)
-    {
-      TridiagonalMatrix<double> T(diagonal.size(), true);
-      for (size_type i=0; i<diagonal.size(); ++i)
-        {
-          T(i,i) = diagonal[i];
-          if (i< diagonal.size()-1)
-            T(i,i+1) = offdiagonal[i];
-        }
-      T.compute_eigenvalues();
-      if (additional_data.compute_condition_number
-          && ! additional_data.compute_all_condition_numbers
-          && (diagonal.size() > 1))
-        deallog << "Condition number estimate: " <<
-                T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
-      if (additional_data.compute_eigenvalues)
-        {
-          for (size_type i=0; i<T.n(); ++i)
-            deallog << ' ' << T.eigenvalue(i);
-          deallog << std::endl;
-        }
-    }
+  compute_eigs_and_cond(diagonal,offdiagonal,eigenvalues_signal,
+                        condition_number_signal,
+                        additional_data.compute_eigenvalues,
+                        (additional_data.compute_condition_number &&
+                         !additional_data.compute_all_condition_numbers));
 
   // Deallocate Memory
   cleanup();
@@ -469,6 +607,54 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
     AssertThrow(false, SolverControl::NoConvergence (it, res));
   // otherwise exit as normal
 }
+
+
+
+template<class VECTOR>
+boost::signals2::connection
+SolverCG<VECTOR>::connect_coefficients_slot(
+  const std_cxx11::function<void(double,double)> &slot)
+{
+  return coefficients_signal.connect(slot);
+}
+
+
+
+template<class VECTOR>
+boost::signals2::connection
+SolverCG<VECTOR>::connect_condition_number_slot(
+  const std_cxx11::function<void(double)> &slot,
+  const bool every_iteration)
+{
+  if (every_iteration)
+    {
+      return all_condition_numbers_signal.connect(slot);
+    }
+  else
+    {
+      return condition_number_signal.connect(slot);
+    }
+}
+
+
+
+template<class VECTOR>
+boost::signals2::connection
+SolverCG<VECTOR>::connect_eigenvalues_slot(
+  const std_cxx11::function<void (const std::vector<double> &)> &slot,
+  const bool every_iteration)
+{
+  if (every_iteration)
+    {
+      return all_eigenvalues_signal.connect(slot);
+    }
+  else
+    {
+      return eigenvalues_signal.connect(slot);
+    }
+}
+
+
 
 #endif // DOXYGEN
 
