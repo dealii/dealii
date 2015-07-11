@@ -228,9 +228,9 @@ namespace parallel
      * dealii::Triangulation::execute_coarsening_and_refinement multiple times
      * and this function needs to know about boundaries. In other words, it is
      * <i>not</i> enough to just set boundary indicators on newly created
-     * faces only <i>after</i> calling distributed::parallel::Triangulation::e
-     * xecute_coarsening_and_refinement: it actually has to happen while that
-     * function is still running.
+     * faces only <i>after</i> calling
+     * <tt>distributed::parallel::Triangulation::execute_coarsening_and_refinement</tt>:
+     * it actually has to happen while that function is still running.
      *
      * The way to do this is by writing a function that sets boundary
      * indicators and that will be called by the dealii::Triangulation class.
