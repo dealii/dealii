@@ -52,7 +52,7 @@ namespace MeshWorker
      * arguments are the name of the vector and indicators, which information
      * is to be extracted from the vector. The name refers to an entry in a
      * AnyData object, which will be identified by initialize().  The three
-     * bool parameters indicate, whether values, greadients and Hessians of
+     * bool parameters indicate, whether values, gradients and Hessians of
      * the finite element function are to be computed on each cell or face.
      */
     void add(const std::string &name,

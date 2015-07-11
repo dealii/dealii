@@ -50,7 +50,7 @@ namespace MeshWorker
    * This class supports two local integration models, corresponding to the
    * data models in the documentation of the Assembler namespace. One is the
    * standard model suggested by the use of FESystem. Namely, there is one
-   * FEValuseBase object in this class, containing all shape functions of the
+   * FEValuesBase object in this class, containing all shape functions of the
    * whole system, and having as many components as the system. Using this
    * model involves loops over all system shape functions. It requires to
    * identify the system components for each shape function and to select the

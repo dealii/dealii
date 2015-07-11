@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2014 by the deal.II authors
+// Copyright (C) 1998 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
  * The coefficients of these quadrature rules are computed by the function
  * described in <a
  * href="http://en.wikipedia.org/wiki/Numerical_Recipes">Numerical
- * Recipies</a>.
+ * Recipes</a>.
  *
  * @author Guido Kanschat, 2001
  */

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,12 +39,12 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 1D case only. See the
+     * These are the declarations for the 1D case only. See the
      * @ref Iterators
      * module for more information.
      *
-     * A @p line_iterator is typdef'd to an iterator operating on the @p lines
-     * member variable of a <tt>Triangulation<1></tt> object. An @p
+     * A @p line_iterator is typedef'd to an iterator operating on the @p
+     * lines member variable of a <tt>Triangulation<1></tt> object. An @p
      * active_line_iterator only operates on the active lines. @p
      * raw_line_iterator objects operate on all lines, used or not.
      *
@@ -89,12 +89,12 @@ namespace internal
 
     /**
      * This class implements some types which differ between the dimensions.
-     * These are the declararions for the 2D case only. See the
+     * These are the declarations for the 2D case only. See the
      * @ref Iterators
      * module for more information.
      *
-     * A @p line_iterator is typdef'd to an iterator operating on the @p lines
-     * member variable of a <tt>Triangulation<2></tt> object. An @p
+     * A @p line_iterator is typedef'd to an iterator operating on the @p
+     * lines member variable of a <tt>Triangulation<2></tt> object. An @p
      * active_line_iterator only operates on the active lines. @p
      * raw_line_iterator objects operate on all lines, used or not. Using @p
      * active_line_iterators may not be particularly in 2D useful since it

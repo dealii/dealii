@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2014 by the deal.II authors
+// Copyright (C) 2004 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,7 +68,7 @@ namespace PETScWrappers
     int ierr;
 
     /*
-      TODO: PETSc dublicates communicators, so this does not work (you put MPI_COMM_SELF in, but get something other out when you ask PETSc for the communicator. This mainly fails due to the MatrixFree classes, that can not ask PETSc for a communicator. //Timo Heister
+      TODO: PETSc duplicates communicators, so this does not work (you put MPI_COMM_SELF in, but get something other out when you ask PETSc for the communicator. This mainly fails due to the MatrixFree classes, that can not ask PETSc for a communicator. //Timo Heister
     Assert(A.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc Solver and Matrix need to use the same MPI_Comm."));
     Assert(x.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc Solver and Vector need to use the same MPI_Comm."));
     Assert(b.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc Solver and Vector need to use the same MPI_Comm."));

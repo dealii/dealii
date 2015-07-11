@@ -70,7 +70,7 @@ public:
   void set_symmetric (const bool);
 
   /**
-   * Switch on/off transposed smoothing. The effect is overriden by
+   * Switch on/off transposed smoothing. The effect is overridden by
    * set_symmetric().
    */
   void set_transpose (const bool);

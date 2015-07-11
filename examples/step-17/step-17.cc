@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2014 by the deal.II authors
+ * Copyright (C) 2000 - 2015 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -271,7 +271,7 @@ namespace Step17
 
   // @sect4{ElasticProblem::~ElasticProblem}
 
-  // The destuctor is exactly as in step-8.
+  // The destructor is exactly as in step-8.
   template <int dim>
   ElasticProblem<dim>::~ElasticProblem ()
   {

@@ -192,7 +192,7 @@ namespace Algorithms
   public:
     /**
      * Constructor, receiving the two operators stored in #op_explicit and
-     * #op_implicit. For their meening, see the description of those
+     * #op_implicit. For their meaning, see the description of those
      * variables.
      */
     ThetaTimestepping (Operator<VECTOR> &op_explicit,

@@ -54,7 +54,7 @@ template <int spacedim, typename Number> class Function;
  *
  * It seems odd at first to declare this typedef inside a class, rather than
  * declaring a typedef at global scope. The reason is that C++ does not allow
- * to define templated typedefs, where here in fact we want a typdef that
+ * to define templated typedefs, where here in fact we want a typedef that
  * depends on the space dimension. (Defining templated typedefs is something
  * that is possible starting with the C++11 standard, but that wasn't possible
  * within the C++98 standard in place when this programming pattern was

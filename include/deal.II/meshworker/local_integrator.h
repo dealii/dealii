@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,7 +38,7 @@ namespace MeshWorker
    *
    * Additionally, since we cannot have a virtual null function, we provide
    * flags, which allow us to indicate, whether we want to integrate on
-   * boundary and interior faces. Thes flags are true by default, but can be
+   * boundary and interior faces. These flags are true by default, but can be
    * modified by applications to speed up the loop.
    *
    * If a function is not overloaded in a derived class, but its usage flag is

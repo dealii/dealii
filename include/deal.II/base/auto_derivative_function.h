@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2014 by the deal.II authors
+// Copyright (C) 2001 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
  * The following example of an user defined function overloads and implements
  * only the value() function but not the gradient() function. If the
  * gradient() function is invoked then the gradient function implemented by
- * the AutoDerivativeFunction is called, where the latter function imployes
+ * the AutoDerivativeFunction is called, where the latter function employs
  * numerical difference quotients.
  *
  * @code
