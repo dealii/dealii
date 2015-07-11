@@ -28,18 +28,19 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+
 void
-IndexSet::add_range (const types::global_dof_index begin,
-                     const types::global_dof_index end)
+IndexSet::add_range (const size_type begin,
+                     const size_type end)
 {
   Assert ((begin < index_space_size)
           ||
           ((begin == index_space_size) && (end == index_space_size)),
-          ExcIndexRangeType<types::global_dof_index> (begin, 0, index_space_size));
+          ExcIndexRangeType<size_type> (begin, 0, index_space_size));
   Assert (end <= index_space_size,
-          ExcIndexRangeType<types::global_dof_index> (end, 0, index_space_size+1));
+          ExcIndexRangeType<size_type> (end, 0, index_space_size+1));
   Assert (begin <= end,
-          ExcIndexRangeType<types::global_dof_index> (begin, 0, end));
+          ExcIndexRangeType<size_type> (begin, 0, end));
 
   if (begin != end)
     {
@@ -75,8 +76,8 @@ IndexSet::do_compress () const
       next = i;
       ++next;
 
-      types::global_dof_index first_index = i->begin;
-      types::global_dof_index last_index  = i->end;
+      size_type first_index = i->begin;
+      size_type last_index  = i->end;
 
       // see if we can merge any of the following ranges
       while (next != ranges.end() &&
@@ -99,7 +100,7 @@ IndexSet::do_compress () const
     }
 
   // now compute indices within set and the range with most elements
-  types::global_dof_index next_index = 0, largest_range_size = 0;
+  size_type next_index = 0, largest_range_size = 0;
   for (std::vector<Range>::iterator i = ranges.begin();  i != ranges.end();
        ++i)
     {
@@ -178,8 +179,8 @@ IndexSet::operator & (const IndexSet &is) const
 
 
 IndexSet
-IndexSet::get_view (const types::global_dof_index begin,
-                    const types::global_dof_index end) const
+IndexSet::get_view (const size_type begin,
+                    const size_type end) const
 {
   Assert (begin <= end,
           ExcMessage ("End index needs to be larger or equal to begin index!"));
@@ -354,7 +355,7 @@ IndexSet::write(std::ostream &out) const
 void
 IndexSet::read(std::istream &in)
 {
-  types::global_dof_index s;
+  size_type s;
   unsigned int numranges;
 
   in >> s >> numranges;
@@ -362,7 +363,7 @@ IndexSet::read(std::istream &in)
   set_size(s);
   for (unsigned int i=0; i<numranges; ++i)
     {
-      types::global_dof_index b, e;
+      size_type b, e;
       in >> b >> e;
       add_range(b,e);
     }
@@ -387,7 +388,7 @@ IndexSet::block_write(std::ostream &out) const
 void
 IndexSet::block_read(std::istream &in)
 {
-  types::global_dof_index size;
+  size_type size;
   size_t n_ranges;
   in.read(reinterpret_cast<char *>(&size), sizeof(size));
   in.read(reinterpret_cast<char *>(&n_ranges), sizeof(n_ranges));
@@ -404,7 +405,7 @@ IndexSet::block_read(std::istream &in)
 
 
 
-void IndexSet::fill_index_vector(std::vector<types::global_dof_index> &indices) const
+void IndexSet::fill_index_vector(std::vector<size_type> &indices) const
 {
   compress();
 
@@ -414,7 +415,7 @@ void IndexSet::fill_index_vector(std::vector<types::global_dof_index> &indices) 
   for (std::vector<Range>::iterator it = ranges.begin();
        it != ranges.end();
        ++it)
-    for (types::global_dof_index i=it->begin; i<it->end; ++i)
+    for (size_type i=it->begin; i<it->end; ++i)
       indices.push_back (i);
 
   Assert (indices.size() == n_elements(), ExcInternalError());
@@ -467,7 +468,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 #endif
   else
     {
-      std::vector<types::global_dof_index> indices;
+      std::vector<size_type> indices;
       fill_index_vector(indices);
 
       return Epetra_Map (TrilinosWrappers::types::int_type(-1),
