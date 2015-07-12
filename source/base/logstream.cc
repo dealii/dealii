@@ -527,6 +527,10 @@ LogStream::timestamp ()
 #else
   const double time = 0.;
   const unsigned int tick = 100;
+  current_tms.tms_utime = 0;
+  current_tms.tms_stime = 0;
+  current_tms.tms_cutime = 0;
+  current_tms.tms_cstime = 0;
 #endif
   (*this) << "Wall: " << time - reference_time_val
           << " User: " << 1./tick * (current_tms.tms_utime - reference_tms.tms_utime)
