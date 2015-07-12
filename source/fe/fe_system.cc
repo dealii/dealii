@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2014 by the deal.II authors
+// Copyright (C) 1999 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1180,11 +1180,12 @@ FESystem<dim,spacedim>::compute_fill (
           FEValuesData<dim,spacedim> &
           base_data    = fe_data.get_fe_values_data(base_no);
 
-          //TODO: Think about a smarter alternative Copy quadrature
-          // points. These are required for computing the determinant in the
-          // FEPolyTensor class. The determinant is one ingredient of the
-          // Piola transformation, which is applied to correctly map the RT
-          // space from the reference element to the global coordinate system.
+          // Copy quadrature points. These are required for computing
+          // the determinant in the FEPolyTensor class. The
+          // determinant is one ingredient of the Piola
+          // transformation, which is applied to correctly map the RT
+          // space from the reference element to the global coordinate
+          // system.
           if (cell_similarity != CellSimilarity::translation)
             base_data.JxW_values = data.JxW_values;
 
