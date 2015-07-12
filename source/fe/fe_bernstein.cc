@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: fe_q.cc 30037 2013-07-18 16:55:40Z maier $
 //
-// Copyright (C) 2000 - 2013 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
