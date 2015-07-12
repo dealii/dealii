@@ -314,6 +314,16 @@ _Pragma("GCC diagnostic pop")
 #endif
 
 
+/**
+ * BOOST can falsely detect cxx11 support and will try to use
+ * variadic templates even when we disable cxx11. This would create
+ * a ton of warnings, so we tell boost to not use them in this case.
+ */
+#ifndef DEAL_II_WITH_CXX11
+#define BOOST_NO_CXX11_VARIADIC_TEMPLATES
+#endif
+
+
 /***********************************************************************
  * Final inclusions:
  */
