@@ -1086,6 +1086,19 @@ public:
    *
    * @ingroup Exceptions
    */
+  DeclException2 (ExcColumnNotStoredHere,
+                  size_type,
+                  size_type,
+                  << "The index set given to this constraint matrix indicates "
+                  << "constraints using degree of freedom " << arg2
+                  << " should not be stored by this object, but a constraint "
+                  << "for degree of freedom " << arg1 <<" uses it.");
+
+  /**
+   * Exception
+   *
+   * @ingroup Exceptions
+   */
   DeclException2 (ExcIncorrectConstraint,
                   int, int,
                   << "While distributing the constraint for DoF "
@@ -1404,6 +1417,8 @@ ConstraintMatrix::add_entry (const size_type line,
   // exists, since we don't want to enter it twice
   Assert (lines_cache[calculate_line_index(line)] != numbers::invalid_size_type,
           ExcInternalError());
+  Assert (!local_lines.size() || local_lines.is_element(column),
+          ExcColumnNotStoredHere(line, column));
   ConstraintLine *line_ptr = &lines[lines_cache[calculate_line_index(line)]];
   Assert (line_ptr->line == line, ExcInternalError());
   for (ConstraintLine::Entries::const_iterator
