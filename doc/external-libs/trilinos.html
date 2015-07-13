@@ -13,7 +13,7 @@
     <h1>Interfacing <acronym>deal.II</acronym> to Trilinos</h1>
 
     <p>
-      <a href="http://trilinos.sandia.gov" target="_top">Trilinos</a> is a
+      <a href="https://trilinos.org/" target="_top">Trilinos</a> is a
       software package that provides lots of functionality for linear
       algebra, among other things. For example, it includes implementations of a variety of
       linear solvers, as well as various different sparse and dense matrix and
@@ -50,21 +50,23 @@
 
     <p style="color: red">
       Note: The current version of deal.II requires at least Trilinos 11.2.
-      Deal.II is known to work with Trilinos 11.12.1. Others versions of
+      Deal.II is known to work with Trilinos up to 11.14 and 12.0. Others versions of
       Trilinos should work too but we do not do regression tests with them. 
     </p>
 
     <p>
       Trilinos uses <a href="http://cmake.org/">cmake</a> to configure and
       build. The following slightly longish set of commands will set up a
-      reasonable configuration:
+      reasonable configuration (we require MueLu starting from 12.0):
       <pre>
 
-	cd trilinos-11.12.1
+	cd trilinos-12.0.1
 	mkdir build
 	cd build
 
-	cmake -D Trilinos_ENABLE_Sacado=ON \
+	cmake \
+	-D Trilinos_ENABLE_Sacado=ON \
+	-D Trilinos_ENABLE_MueLu:BOOL=ON \
 	-D Trilinos_ENABLE_Stratimikos=ON \
 	-D CMAKE_BUILD_TYPE=RELEASE \
 	-D CMAKE_CXX_FLAGS="-g -O3" \

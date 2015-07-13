@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------
 // $Id: integrate_one_over_r.cc 30338 2013-08-18 22:02:27Z heltai $
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
