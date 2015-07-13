@@ -2522,24 +2522,17 @@ ParameterHandler::scan_line (std::string         line,
   // if there is a comment, delete it
   if (line.find('#') != std::string::npos)
     line.erase (line.find("#"), std::string::npos);
-  // replace every whitespace sequence
-  // by " "
+
+  // replace \t by space:
   while (line.find('\t') != std::string::npos)
     line.replace (line.find('\t'), 1, " ");
-  while (line.find("  ") != std::string::npos)
-    line.erase (line.find("  "), 1);
-  // now every existing whitespace
-  // should be exactly one ' ';
-  // if at beginning: delete
-  if ((line.length() != 0) && (std::isspace (line[0])))
-    line.erase (0, 1);
+
+  //trim start and end:
+  line = Utilities::trim(line);
+
   // if line is now empty: leave
   if (line.length() == 0)
     return true;
-
-  // also delete spaces at the end
-  if (std::isspace (line[line.length()-1]))
-    line.erase (line.size()-1, 1);
 
   // enter subsection
   if ((line.find ("SUBSECTION ") == 0) ||
@@ -2548,7 +2541,7 @@ ParameterHandler::scan_line (std::string         line,
       // delete this prefix
       line.erase (0, std::string("subsection").length()+1);
 
-      const std::string subsection = line;
+      const std::string subsection = Utilities::trim(line);
 
       // check whether subsection exists
       if (!entries->get_child_optional (get_current_full_path(subsection)))
@@ -2575,7 +2568,7 @@ ParameterHandler::scan_line (std::string         line,
       (line.find ("end") == 0))
     {
       line.erase (0, 3);
-      while ((line.size() > 0) && (line[0] == ' '))
+      while ((line.size() > 0) && (std::isspace(line[0])))
         line.erase (0, 1);
 
       if (line.size()>0)
@@ -2605,17 +2598,21 @@ ParameterHandler::scan_line (std::string         line,
   if ((line.find ("SET ") == 0) ||
       (line.find ("set ") == 0))
     {
-      // erase "set" statement and eliminate
-      // spaces around the '='
+      // erase "set" statement
       line.erase (0, 4);
-      if (line.find(" =") != std::string::npos)
-        line.replace (line.find(" ="), 2, "=");
-      if (line.find("= ") != std::string::npos)
-        line.replace (line.find("= "), 2, "=");
 
-      // extract entry name and value
-      std::string entry_name  (line, 0, line.find('='));
-      std::string entry_value (line, line.find('=')+1, std::string::npos);
+      std::string::size_type pos = line.find("=");
+      if (pos == std::string::npos)
+        {
+          std::cerr << "Line <" << lineno
+                    << "> of file <" << input_filename
+                    << ">: invalid format of set expression!" << std::endl;
+          return false;
+        }
+
+      // extract entry name and value and trim
+      std::string entry_name = Utilities::trim(std::string(line, 0, pos));
+      std::string entry_value = Utilities::trim(std::string(line, pos+1, std::string::npos));
 
       // resolve aliases before we look up the entry. if necessary, print
       // a warning that the alias is deprecated
@@ -2688,8 +2685,7 @@ ParameterHandler::scan_line (std::string         line,
   if ((line.find ("INCLUDE ") == 0) ||
       (line.find ("include ") == 0))
     {
-      // erase "set" statement and eliminate
-      // spaces around the '='
+      // erase "include " statement and eliminate spaces
       line.erase (0, 7);
       while ((line.size() > 0) && (line[0] == ' '))
         line.erase (0, 1);

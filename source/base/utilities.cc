@@ -112,6 +112,16 @@ namespace Utilities
     return out;
   }
 
+  std::string
+  trim(const std::string &input)
+  {
+    std::string::size_type start_idx = input.find_first_not_of(" ");
+    if (start_idx == std::string::npos)
+      return "";
+
+    std::string::size_type end_idx = input.find_last_not_of(" ");
+    return std::string( input, start_idx, end_idx+1-start_idx);
+  }
 
   std::string
   dim_string(const int dim, const int spacedim)

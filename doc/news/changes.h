@@ -547,6 +547,12 @@ inconvenience this causes.
 
 
 <ol>
+
+  <li> New: Utilities::trim() function removes trailing and leading spaces.
+  <br>
+  (Timo Heister, 2015/07/11)
+  </li>
+
   <li>Changed: The IsBlockMatrix class is now declared in
   <code>constraint_matrix.h</code> instead of its former home in
   <code>block_indices.h</code>.
