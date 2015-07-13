@@ -1652,8 +1652,7 @@ namespace
   public:
     RefineAndCoarsenList (const Triangulation<dim,spacedim> &triangulation,
                           const std::vector<types::global_dof_index> &p4est_tree_to_coarse_cell_permutation,
-                          const types::subdomain_id                   my_subdomain,
-                          typename internal::p4est::types<dim>::forest &forest);
+                          const types::subdomain_id                   my_subdomain);
 
     /**
      * A callback function that we pass to the p4est data structures when a
@@ -1688,8 +1687,6 @@ namespace
     std::vector<typename internal::p4est::types<dim>::quadrant> coarsen_list;
     typename std::vector<typename internal::p4est::types<dim>::quadrant>::const_iterator current_coarsen_pointer;
 
-    typename internal::p4est::types<dim>::forest forest;
-
     void build_lists (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                       const typename internal::p4est::types<dim>::quadrant &p4est_cell,
                       const unsigned int myid);
@@ -1713,10 +1710,7 @@ namespace
   RefineAndCoarsenList<dim,spacedim>::
   RefineAndCoarsenList (const Triangulation<dim,spacedim>            &triangulation,
                         const std::vector<types::global_dof_index>   &p4est_tree_to_coarse_cell_permutation,
-                        const types::subdomain_id                    my_subdomain,
-                        typename internal::p4est::types<dim>::forest &forest)
-    :
-    forest(forest)
+                        const types::subdomain_id                    my_subdomain)
   {
     // count how many flags are set and allocate that much memory
     unsigned int n_refine_flags  = 0,
@@ -3384,8 +3378,7 @@ namespace parallel
       RefineAndCoarsenList<dim,spacedim>
       refine_and_coarsen_list (*this,
                                p4est_tree_to_coarse_cell_permutation,
-                               my_subdomain,
-                               *parallel_forest);
+                               my_subdomain);
 
       // copy refine and coarsen flags into p4est and execute the refinement
       // and coarsening. this uses the refine_and_coarsen_list just built,
