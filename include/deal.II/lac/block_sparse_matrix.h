@@ -73,7 +73,7 @@ public:
   typedef typename BaseClass::const_iterator  const_iterator;
 
   /**
-   * @name Constructors and initalization
+   * @name Constructors and initialization
    */
 //@{
   /**

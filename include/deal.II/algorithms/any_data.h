@@ -149,7 +149,7 @@ public:
   /**
    * @brief Find index of a named object
    *
-   * Try to find the objecty and return its index in the list. Throw an
+   * Try to find the object and return its index in the list. Throw an
    * exception if the object has not been found.
    */
   unsigned int find(const std::string &name) const;
@@ -157,7 +157,7 @@ public:
   /**
    * @brief Try to find index of a named object
    *
-   * Try to find the objecty and return its index in the list. returns
+   * Try to find the object and return its index in the list. returns
    * numbers::invalid_unsigned_int if the name was not found.
    */
   unsigned int try_find(const std::string &name) const;

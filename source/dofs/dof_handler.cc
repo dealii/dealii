@@ -49,7 +49,7 @@ template <int dim, int spacedim>
 const unsigned int DoFHandler<dim,spacedim>::default_fe_index;
 
 
-// reference the invalid_dof_index variable explicitely to work around
+// reference the invalid_dof_index variable explicitly to work around
 // a bug in the icc8 compiler
 namespace internal
 {

@@ -112,7 +112,7 @@ namespace internal
  * for dofs are given to the largest cells as well as their bounding lines and
  * vertices, with the dofs of more refined cells getting higher numbers.
  *
- * This numbering implies very large bandwiths of the resulting matrices and
+ * This numbering implies very large bandwidths of the resulting matrices and
  * is thus vastly suboptimal for some solution algorithms. For this reason,
  * the DoFRenumbering class offers several algorithms to reorder the dof
  * numbering according. See there for a discussion of the implemented
@@ -136,7 +136,7 @@ namespace internal
  * <h3>User defined renumbering schemes</h3>
  *
  * The DoFRenumbering class offers a number of renumbering schemes like the
- * Cuthill-McKey scheme. Basically, the function sets up an array in which for
+ * Cuthill-McKee scheme. Basically, the function sets up an array in which for
  * each degree of freedom we store the new index this DoF should have after
  * renumbering. Using this array, the renumber_dofs() function of the present
  * class is called, which actually performs the change from old DoF indices to

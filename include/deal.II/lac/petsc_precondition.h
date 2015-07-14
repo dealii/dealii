@@ -647,9 +647,9 @@ namespace PETScWrappers
 
       /**
        * Set this flag to true if you have a symmetric system matrix and you
-       * want to use a solver which asumes a symmetric preconditioner like CG.
-       * The relaxation is done with SSOR/Jacobi when set to true and with
-       * SOR/Jacobi otherwise.
+       * want to use a solver which assumes a symmetric preconditioner like
+       * CG. The relaxation is done with SSOR/Jacobi when set to true and
+       * with SOR/Jacobi otherwise.
        */
       bool symmetric_operator;
 

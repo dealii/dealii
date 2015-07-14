@@ -104,7 +104,7 @@ protected:
   /**
    * For each block of the whole block vector, list to what block of the
    * multigrid vector it is mapped. Since depending on #selected, there may be
-   * fewer mutlilevel blocks than original blocks, some of the entries may be
+   * fewer multilevel blocks than original blocks, some of the entries may be
    * illegal unsigned integers.
    */
 //TODO: rename this to mg_block_mask, in the same way as has already been done in MGTransferComponent, and give it type BlockMask

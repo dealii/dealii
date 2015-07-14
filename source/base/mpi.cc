@@ -355,7 +355,7 @@ namespace Utilities
                    ExcMessage ("MPI error. You can only start MPI once!"));
 
       int mpi_err, provided;
-      // this works likempi_err = MPI_Init (&argc, &argv); but tells MPI that
+      // this works like mpi_err = MPI_Init (&argc, &argv); but tells MPI that
       // we might use several threads but never call two MPI functions at the
       // same time. For an explanation see on why we do this see
       // http://www.open-mpi.org/community/lists/users/2010/03/12244.php

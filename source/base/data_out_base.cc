@@ -566,7 +566,7 @@ namespace
   };
 #endif
 
-  // NOTE: The dimension of the array is choosen to 5 to allow the choice
+  // NOTE: The dimension of the array is chosen to 5 to allow the choice
   // DataOutBase<deal_II_dimension,deal_II_dimension+1> in general
   // Wolfgang supposed that we don't need it in general, but however this
   // choice avoids a -Warray-bounds check warning

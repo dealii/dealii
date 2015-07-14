@@ -250,7 +250,7 @@ namespace PETScWrappers
    *
    * The interface of this class is modeled after the existing SparseMatrix
    * class in deal.II. It has almost the same member functions, and is often
-   * exchangable. However, since PETSc only supports a single scalar type
+   * exchangeable. However, since PETSc only supports a single scalar type
    * (either double, float, or a complex data type), it is not templated, and
    * only works with whatever your PETSc installation has defined the data
    * type PetscScalar to.
@@ -1292,7 +1292,7 @@ namespace PETScWrappers
 
     if (value == PetscScalar())
       {
-        // we have to do checkings on Insert/Add in any case to be
+        // we have to check after using Insert/Add in any case to be
         // consistent with the MPI communication model (see the comments in
         // the documentation of TrilinosWrappers::Vector), but we can save
         // some work if the addend is zero. However, these actions are done

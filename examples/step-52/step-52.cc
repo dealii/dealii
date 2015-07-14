@@ -532,7 +532,7 @@ namespace Step52
 
 
   // @sect4{<code>Diffusion::embedded_explicit_method</code>}
-  // This function is the driver for the embedded explict methods. It requires
+  // This function is the driver for the embedded explicit methods. It requires
   // more parameters:
   //   - coarsen_param: factor multiplying the current time step when the error
   //   is below the threshold.

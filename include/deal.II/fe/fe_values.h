@@ -1248,6 +1248,23 @@ namespace internal
  * A class that contains all data vectors for FEValues, FEFaceValues, and
  * FESubfaceValues.
  *
+ * This class has been extracted from FEValuesBase to encapsulate in one
+ * place all of the data, independent of the functions that later
+ * access this data in the public interfaces of the FEValues and related
+ * classes. Consequently, this base class is protected in FEValuesBase.
+ *
+ * The second reason is because in FEValuesBase::reinit, we first need to
+ * call Mapping::fill_fe_values() to compute mapping related data, and later
+ * call FiniteElement::fill_fe_values() to compute shape function related
+ * data. In the first step, Mapping::fill_fe_values() gets a pointer to
+ * its own internal data structure and a pointer to the FEValuesData base
+ * object of FEValuesBase, and the mapping then places the computed data
+ * into the data fields that pertain to the mapping below. In the second
+ * step, the finite element receives a pointer to its own internal object,
+ * and to the current object, and from both of these computes the shape
+ * function related information and, again, places it into the current
+ * FEValuesData object.
+ *
  * More information can be found on the page on
  * @ref UpdateFlagsEssay.
  *
@@ -1750,7 +1767,7 @@ public:
    * @note The actual data type of the input vector may be either a
    * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the sequential PETSc or
    * Trilinos vector wrapper classes. It represents a global vector of DoF
-   * values associated with the DofHandler object with which this FEValues
+   * values associated with the DoFHandler object with which this FEValues
    * object was last initialized. Alternatively, if the vector argument is of
    * type IndexSet, then the function is represented as one that is either
    * zero or one, depending on whether a DoF index is in the set or not.

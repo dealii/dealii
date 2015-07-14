@@ -41,8 +41,8 @@ template <typename number> class SparseBlockVanka;
 /**
  * Point-wise Vanka preconditioning. This class does Vanka preconditioning  on
  * a point-wise base. Vanka preconditioners are used for saddle point problems
- * like Stoke's problem or problems arising in optimization where Lagrange
- * multiplier occur and let Netwon's matrix have a zero block. With these
+ * like Stokes' problem or problems arising in optimization where Lagrange
+ * multipliers occur and the Newton method matrix has a zero block. With these
  * matrices the application of Jacobi or Gauss-Seidel methods is impossible,
  * because some diagonal elements are zero in the rows of the Lagrange
  * multiplier. The approach of Vanka is to solve a small (usually indefinite)
@@ -418,7 +418,7 @@ class SparseBlockVanka : public SparseVanka<number>
 {
 public:
   /**
-   * Declate type for container size.
+   * Declare type for container size.
    */
   typedef types::global_dof_index size_type;
 

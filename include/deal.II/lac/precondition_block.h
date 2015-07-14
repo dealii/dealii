@@ -172,7 +172,7 @@ public:
 protected:
   /**
    * Initialize matrix and block size for permuted preconditioning.
-   * Additionally to the parameters of the other initalize() function, we hand
+   * Additionally to the parameters of the other initialize() function, we hand
    * over two index vectors with the permutation and its inverse. For the
    * meaning of these vectors see PreconditionBlockSOR.
    *
@@ -259,7 +259,7 @@ public:
    * Perform one block relaxation step in forward numbering.
    *
    * Depending on the arguments @p dst and @p pref, this performs an SOR step
-   * (both reference the same vector) of a Jacobi step (botha different
+   * (both reference the same vector) of a Jacobi step (both different
    * vectors). For the Jacobi step, the calling function must copy @p dst to
    * @p pref after this.
    *
@@ -277,7 +277,7 @@ public:
    * Perform one block relaxation step in backward numbering.
    *
    * Depending on the arguments @p dst and @p pref, this performs an SOR step
-   * (both reference the same vector) of a Jacobi step (botha different
+   * (both reference the same vector) of a Jacobi step (both different
    * vectors). For the Jacobi step, the calling function must copy @p dst to
    * @p pref after this.
    *
@@ -915,7 +915,7 @@ Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
   a_block = row / bs;
 
   // This is the end accessor, which
-  // does not hava a valid block.
+  // does not have a valid block.
   if (a_block == matrix->size())
     return;
 

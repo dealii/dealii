@@ -26,7 +26,7 @@ these cases:
   case of ships, the domain is the water surrounding the ship with its rudders
   and propellers.
 - The other of the two big applications of the finite element method is
-  structural engineering in which the domains are bridges, airplane necelles
+  structural engineering in which the domains are bridges, airplane nacelles
   and wings, and other solid bodies of often complicated shapes.
 - Finite element modeling is also often used to describe the generation and
   propagation of earthquake waves. In these cases, one needs to accurately

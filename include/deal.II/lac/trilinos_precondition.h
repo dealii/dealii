@@ -926,7 +926,7 @@ namespace TrilinosWrappers
      * <li> @p ilu_fill: This specifies the amount of additional fill-in
      * elements besides the original sparse matrix structure. If $k$ is @p
      * fill, the sparsity pattern of $A^{k+1}$ is used for the storage of the
-     * result of the Gaussian elemination. This is known as ILU($k$) in the
+     * result of the Gaussian elimination. This is known as ILU($k$) in the
      * literature.  When @p fill is large, the preconditioner comes closer to
      * a (direct) sparse LU decomposition. Note, however, that this will
      * drastically increase the memory requirement, especially when the
@@ -1007,7 +1007,7 @@ namespace TrilinosWrappers
    * serial and in parallel, depending on the matrix it is based on. In
    * general, an incomplete factorization does not take all fill-in elements
    * that would appear in a full factorization (that is the basis for a direct
-   * solve). For the ILU-T precondtioner, the parameter <tt>ilut_drop</tt>
+   * solve). For the ILU-T preconditioner, the parameter <tt>ilut_drop</tt>
    * lets the user specify which elements should be dropped (i.e., should not
    * be part of the incomplete decomposition). Trilinos calculates first the
    * complete factorization for one row, and then skips those elements that
@@ -1517,7 +1517,7 @@ namespace TrilinosWrappers
      * remained the same. What this function does is taking the already
      * generated coarsening structure, computing the AMG prolongation and
      * restriction according to a smoothed aggregation strategy and then
-     * building the whole multilevel hiearchy. This function can be
+     * building the whole multilevel hierarchy. This function can be
      * considerably faster than the initialize function, since the coarsening
      * pattern is usually the most difficult thing to do when setting up the
      * AMG ML preconditioner.

@@ -1121,7 +1121,7 @@ namespace Step42
   // for the finite element are located. We achieve this by using a
   // QGaussLobatto quadrature formula here, along with initializing the finite
   // element with a set of interpolation points derived from the same quadrature
-  // formula. The remainder of the function is relatively straightfoward: we
+  // formula. The remainder of the function is relatively straightforward: we
   // put the resulting matrix into the given argument; because we know the
   // matrix is diagonal, it is sufficient to have a loop over only $i$ not
   // not over $j$. Strictly speaking, we could even avoid multiplying the
@@ -2069,7 +2069,7 @@ namespace Step42
   // residual (newton_rhs_uncondensed) and corresponding diagonal entry
   // of the mass matrix (diag_mass_matrix_vector). Because it is
   // not unlikely that hanging nodes show up in the contact area
-  // it is important to apply contraints_hanging_nodes.distribute
+  // it is important to apply constraints_hanging_nodes.distribute
   // to the distributed_lambda vector.
   template <int dim>
   void

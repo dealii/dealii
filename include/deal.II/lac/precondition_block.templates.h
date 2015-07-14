@@ -168,7 +168,7 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
       // numbering of the unknowns in the
       // blocks.
       // row, column are the global numbering
-      // of the unkowns.
+      // of the unknowns.
       M_cell = 0;
 
       for (unsigned int cell=0; cell<this->size(); ++cell)
@@ -248,7 +248,7 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
   // numbering of the unknowns in the
   // blocks.
   // row, column are the global numbering
-  // of the unkowns.
+  // of the unknowns.
   size_type row, row_cell;
   number2 b_cell_row;
   // The diagonal block if the
@@ -346,7 +346,7 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
   // numbering of the unknowns in the
   // blocks.
   // row, column are the global numbering
-  // of the unkowns.
+  // of the unknowns.
   size_type row, row_cell;
   number2 b_cell_row;
 
@@ -573,7 +573,7 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
   // numbering of the unknowns in the
   // blocks.
   // row, column are the global numbering
-  // of the unkowns.
+  // of the unknowns.
   size_type row, row_cell, begin_diag_block=0;
 
   if (!this->inverses_ready())
@@ -741,7 +741,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::forward (
   // numbering of the unknowns in the
   // blocks.
   // row, column are the global numbering
-  // of the unkowns.
+  // of the unknowns.
   size_type row, row_cell, block_start=0;
   number2 b_cell_row;
   // The diagonal block if the
@@ -831,7 +831,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::backward (
   // numbering of the unknowns in the
   // blocks.
   // row, column are the global numbering
-  // of the unkowns.
+  // of the unknowns.
   size_type row, row_cell;
   size_type block_end=this->blocksize * this->size();
   number2 b_cell_row;

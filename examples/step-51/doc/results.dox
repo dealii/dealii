@@ -277,7 +277,7 @@ are linear. Put in other words, DG methods are often most efficient when used
 at relatively high order, despite their focus on a discontinuous (and hence,
 seemingly low accurate) representation of solutions.
 
-<h4>Resuls for 3D</h4>
+<h4>Results for 3D</h4>
 
 We now show the same figures in 3D: The first row shows the number of degrees
 of freedom and computing time versus the $L_2$ error in the scalar variable

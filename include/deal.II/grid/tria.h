@@ -124,7 +124,7 @@ struct CellData
   };
 
   /**
-   * Manifold identificator of this object. This identificator should be used
+   * Manifold identifier of this object. This identifier should be used
    * to identify the manifold to which this object belongs, and from which
    * this object will collect information on how to add points upon
    * refinement.
@@ -160,7 +160,7 @@ struct CellData
  * a common number describing the boundary condition to hold on this part of
  * the boundary. The triangulation creation function gives lines not in this
  * list either the boundary indicator zero (if on the boundary) or
- * numbers::internal_face_boundary_id (if in the interior). Explicitely giving
+ * numbers::internal_face_boundary_id (if in the interior). Explicitly giving
  * a line the indicator numbers::internal_face_boundary_id will result in an
  * error, as well as giving an interior line a boundary indicator.
  *
@@ -1048,7 +1048,7 @@ namespace internal
  * For technical reasons, writing and restoring a Triangulation object is not-
  * trivial. The primary reason is that unlike many other objects,
  * triangulations rely on many other objects to which they store pointers or
- * with which they interace; for example, triangulations store pointers to
+ * with which they interface; for example, triangulations store pointers to
  * objects describing boundaries and manifolds, and they have signals that
  * store pointers to other objects so they can be notified of changes in the
  * triangulation (see the section on signals in this introduction). As objects
@@ -1286,12 +1286,12 @@ public:
      * before calling execute_coarsening_and_refinement the first time. The
      * easiest way to achieve this is by calling global_refine(1) straight
      * after creation of the triangulation. It follows that active cells on
-     * level 1 may not be coarsenend.
+     * level 1 may not be coarsened.
      *
      * The main use of this flag is to ensure that each cell has at least one
      * neighbor in each coordinate direction (i.e. each cell has at least a
      * left or right, and at least an upper or lower neighbor in 2d). This is
-     * a necessary precondition for some algorihms that compute finite
+     * a necessary precondition for some algorithms that compute finite
      * differences between cells. The DerivativeApproximation class is one of
      * these algorithms that require that a triangulation is coarsest_level_1
      * unless all cells already have at least one neighbor in each coordinate
@@ -1385,7 +1385,7 @@ public:
     /**
      * This flag includes all the above ones and therefore combines all
      * smoothing algorithms implemented with the exception of anisotropic
-     * smoothening.
+     * smoothing.
      */
     maximum_smoothing                  = 0xffff ^ allow_anisotropic_smoothing
   };
@@ -1593,7 +1593,7 @@ public:
 
   /**
    * Assign a manifold object to a certain part of the the triangulation. If
-   * an object with manfifold number @p number is refined, this object is used
+   * an object with manifold number @p number is refined, this object is used
    * to find the location of new vertices (see the results section of step-49
    * for a more in-depth discussion of this, with examples).  It is also used
    * for non-linear (i.e.: non-Q1) transformations of cells to the unit cell

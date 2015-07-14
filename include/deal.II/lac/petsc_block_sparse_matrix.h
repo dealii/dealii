@@ -127,7 +127,7 @@ namespace PETScWrappers
 
     /**
      * Resize the matrix, by setting the number of block rows and columns.
-     * This deletes all blocks and replaces them by unitialized ones, i.e.
+     * This deletes all blocks and replaces them by uninitialized ones, i.e.
      * ones for which also the sizes are not yet set. You have to do that by
      * calling the @p reinit functions of the blocks themselves. Do not forget
      * to call collect_sizes() after that on this object.

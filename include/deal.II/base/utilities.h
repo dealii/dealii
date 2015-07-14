@@ -84,7 +84,7 @@ namespace Utilities
    * deal.II classes, by default spacedim is equal to dimension, the above
    * string is usually contracted to "<dim>", instead of "<dim,spacedim>".
    * This function returns a string containing "dim" if dim is equal to
-   * spacedim, otherwhise it returns "dim,spacedim".
+   * spacedim, otherwise it returns "dim,spacedim".
    */
   std::string dim_string(const int dim, const int spacedim);
 
@@ -180,7 +180,7 @@ namespace Utilities
 
   /**
    * Read a (signed) integer starting at the position in @p name indicated by
-   * the second argument, and retun this integer as a pair together with how
+   * the second argument, and return this integer as a pair together with how
    * many characters it takes up in the string.
    *
    * If no integer can be read at the indicated position, return
@@ -651,7 +651,7 @@ namespace Utilities
                 // did len
                 // become==0
                 // somehow? that
-                // shouln't have
+                // shouldn't have
                 // happened
                 Assert (false, ExcInternalError());
               }

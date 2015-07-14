@@ -400,7 +400,7 @@ FE_Q_Hierarchical<dim>::build_dofs_cell (std::vector<FullMatrix<double> > &dofs_
 
   // TODO: The dofs_subcell shall differ by a factor 2^p due to shape functions
   // defined on [0,1] instead of [-1,1]. However, that does not seem to be
-  // the case. Perhaps this factor is added later on in auxilary functions which
+  // the case. Perhaps this factor is added later on in auxiliary functions which
   // use these matrices.
 
   // dofs_cells[0](j,k):
@@ -894,7 +894,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
       // First this->dofs_per_face DoFs of the constrained
       // element are made equal to the current (dominating)
       // element, which corresponds to 1 on diagonal of the matrix.
-      // DoFs which correspond to higher polynomes
+      // DoFs which correspond to higher polynomials
       // are zeroed (zero rows in the matrix).
       for (unsigned int i = 0; i < this->dofs_per_face; ++i)
         interpolation_matrix (i, i) = 1;

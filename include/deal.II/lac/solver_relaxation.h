@@ -76,7 +76,7 @@ public:
 
   /**
    * Solve the system $Ax = b$ using the relaxation method $x_{k+1} =
-   * R(x_k,b)$. The amtrix <i>A</i> itself is only used to compute the
+   * R(x_k,b)$. The matrix <i>A</i> itself is only used to compute the
    * residual.
    */
   template<class MATRIX, class RELAXATION>

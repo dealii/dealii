@@ -843,7 +843,7 @@ namespace internal
         // the quad for its line_orientation. however, if
         // the face is rotated, it might be possible,
         // that a standard orientation of the line
-        // with respect to the face corrsponds to a
+        // with respect to the face corresponds to a
         // non-standard orientation for the line with
         // respect to the cell.
         //
@@ -870,7 +870,7 @@ namespace internal
             { { true, true },    // lines 0/1, face_orientation=true, face_flip=false, face_rotation=false and true
               { false, false }
             }
-          },// linea 0/1, face_orientation=true, face_flip=true, face_rotation=false and true
+          },// lines 0/1, face_orientation=true, face_flip=true, face_rotation=false and true
 
           { { { true, true },    // lines 2/3 ...
               { false, false }

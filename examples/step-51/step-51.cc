@@ -389,7 +389,7 @@ namespace Step51
     // The degrees of freedom corresponding to the skeleton strongly enforce
     // Dirichlet boundary conditions, just as in a continuous Galerkin finite
     // element method.  We can enforce the boundary conditions in an analogous
-    // manner through the use of <code>ConstrainMatrix</code> constructs. In
+    // manner through the use of <code>ConstraintMatrix</code> constructs. In
     // addition, hanging nodes are handled in the same way as for
     // continuous finite elements: For the face elements which
     // only define degrees of freedom on the face, this process sets the
@@ -486,7 +486,7 @@ namespace Step51
   // and matrix that are written into the global matrix, whereas the
   // ScratchData contains all data that we need for the local assembly. There
   // is one variable worth noting here, namely the boolean variable @p
-  // trace_reconstruct. As mentioned in the introdution, we solve the HDG
+  // trace_reconstruct. As mentioned in the introduction, we solve the HDG
   // system in two steps. First, we create a linear system for the skeleton
   // system where we condense the local part into it via the Schur complement
   // $D-CA^{-1}B$. Then, we solve for the local part using the skeleton
@@ -1172,7 +1172,7 @@ namespace Step51
   // @sect4{HDG::output_results}
   // We have 3 sets of results that we would like to output:  the local solution,
   // the post-processed local solution, and the skeleton solution.  The former 2
-  // both 'live' on element volumes, wheras the latter lives on codimention-1 surfaces
+  // both 'live' on element volumes, whereas the latter lives on codimension-1 surfaces
   // of the triangulation.  Our @p output_results function writes all local solutions
   // to the same vtk file, even though they correspond to different <code>DoFHandler</code>
   // objects.  The graphical output for the skeleton variable is done through
@@ -1232,7 +1232,7 @@ namespace Step51
     face_out += ".vtk";
     std::ofstream face_output (face_out.c_str());
 
-// The <code>DataOutFaces</code> class works analagously to the <code>DataOut</code>
+// The <code>DataOutFaces</code> class works analogously to the <code>DataOut</code>
 // class when we have a <code>DoFHandler</code> that defines the solution on
 // the skeleton of the triangulation.  We treat it as such here, and the code is
 // similar to that above.

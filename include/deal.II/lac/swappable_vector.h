@@ -113,7 +113,7 @@ public:
    * in multithread mode, it spawns another thread that reads the data in
    * parallel to the usual execution of the program, such that when @p reload
    * is called, the data may eventually be available already. It might
-   * therefore be wirthwhile to call this function some time in advance, if
+   * therefore be worthwhile to call this function some time in advance, if
    * you know that the data will be needed, and loading takes some time, for
    * instance if the file to which the data was written is not in a local tmp
    * directory.

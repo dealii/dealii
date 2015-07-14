@@ -269,7 +269,7 @@ namespace GridGenerator
    *
    * @note This function silently reorders the vertices on the cells to
    * lexicographic ordering (see <code>GridReordering::reorder_grid</code>).
-   * In other words, if reodering of the vertices does occur, the ordering of
+   * In other words, if reordering of the vertices does occur, the ordering of
    * vertices in the array of <code>corners</code> will no longer refer to the
    * same triangulation.
    *
@@ -859,7 +859,7 @@ namespace GridGenerator
    * this is not the case, you will encounter problems when using the
    * triangulation later on.
    *
-   * All informations about cell manifold_ids and material ids are copied from
+   * All information about cell manifold_ids and material ids are copied from
    * one triangulation to the other, and only the boundary manifold_ids and
    * boundary_ids are copied over from the faces of @p in_tria to the faces of
    * @p out_tria. If you need to specify manifold ids on interior faces, they

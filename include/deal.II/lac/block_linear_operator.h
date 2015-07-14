@@ -53,7 +53,7 @@ template <typename Number> class BlockVector;
  *         |
  *  op_a10 | op_a11
  * @endcode
- * The coresponding block_operator invocation takes the form
+ * The corresponding block_operator invocation takes the form
  * @code
  * block_operator<2, 2, BlockVector<double>>({op_a00, op_a01, op_a10, op_a11});
  * @endcode
@@ -154,7 +154,7 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
  *
  * The list @p ops is best passed as an initializer list. Consider for example
  * a linear operator block (acting on Vector<double>) <code>diag(op_a0, op_a1,
- * ..., op_am)</code>. The coresponding block_operator invocation takes the
+ * ..., op_am)</code>. The corresponding block_operator invocation takes the
  * form
  * @code
  * block_diagonal_operator<m, BlockVector<double>>({op_00, op_a1, ..., op_am});
@@ -330,7 +330,7 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
  * block triangular matrix.
  * As argument, it takes an array of array of LinearOperators @p block_matrix
  * representing a lower block triangular matrix and an array of LinearOperators
- * @p inverse_diagonal representing inverses of digonal blocks of @p block_matrix.
+ * @p inverse_diagonal representing inverses of diagonal blocks of @p block_matrix.
  *
  * Let us assume we have a linear system with the following block structure:
  *
@@ -439,7 +439,7 @@ block_forward_substitution(const std::array<std::array<LinearOperator<typename R
  * block triangular matrix.
  * As argument, it takes an array of array of LinearOperators @p block_matrix
  * representing an upper block triangular matrix and an array of LinearOperators
- * @p inverse_diagonal representing inverses of digonal blocks of @p block_matrix.
+ * @p inverse_diagonal representing inverses of diagonal blocks of @p block_matrix.
  *
  * Let us assume we have a linear system with the following block structure:
  *
@@ -548,7 +548,7 @@ block_back_substitution(const std::array<std::array<LinearOperator<typename Rang
  * block_forward_substitution to invert triangular matrices. It takes as input
  * a triangular block matrix @p block_matrix, an array of LinearOperators @p
  * inverse_diagonal representing inverses of block_matrix, and an optional
- * bool @p lower used to specify if block_matrix should be conidered as lower
+ * bool @p lower used to specify if block_matrix should be considered as lower
  * triangular matrix (true) or as upper triangular matrix (false). @p lower is
  * equal to true by default.
  *

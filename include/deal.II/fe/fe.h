@@ -1574,7 +1574,7 @@ public:
    *
    * @note This function is implemented in FiniteElement for the case that the
    * element has support points. In this case, the resulting coefficients are
-   * just the values in the suport points. All other elements must reimplement
+   * just the values in the support points. All other elements must reimplement
    * it.
    */
   virtual
@@ -1753,7 +1753,7 @@ protected:
 
   /**
    * Specify the constraints which the dofs on the two sides of a cell
-   * interface underly if the line connects two cells of which one is refined
+   * interface underlie if the line connects two cells of which one is refined
    * once.
    *
    * For further details see the general description of the derived class.
@@ -1805,7 +1805,7 @@ protected:
    * can be in (all combinations of the three bool flags face_orientation,
    * face_flip and face_rotation).
    *
-   * The standard implementation fills this with zeros, i.e. no permuatation
+   * The standard implementation fills this with zeros, i.e. no permutation
    * at all. Derived finite element classes have to fill this Table with the
    * correct values.
    */

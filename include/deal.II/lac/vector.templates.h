@@ -139,7 +139,7 @@ namespace internal
   }
 
 
-  // Define the functors neccessary to use SIMD with TBB.
+  // Define the functors necessary to use SIMD with TBB.
   template <typename Number>
   struct Vectorization_multiply_factor
   {

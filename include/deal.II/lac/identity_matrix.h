@@ -71,7 +71,7 @@ class IdentityMatrix
 {
 public:
   /**
-   * Declate type for container size.
+   * Declare type for container size.
    */
   typedef types::global_dof_index size_type;
 

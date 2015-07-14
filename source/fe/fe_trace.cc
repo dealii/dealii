@@ -120,7 +120,7 @@ std::vector<unsigned int>
 FE_TraceQ<dim,spacedim>::get_dpo_vector (const unsigned int deg)
 {
   // This constructs FE_TraceQ in exactly the same way as FE_Q except for the
-  // interior degrees of freedom that are not present here (lnine in 1D, quad
+  // interior degrees of freedom that are not present here (line in 1D, quad
   // in 2D, hex in 3D).
   AssertThrow(deg>0,ExcMessage("FE_TraceQ needs to be of degree > 0."));
   std::vector<unsigned int> dpo(dim+1, 1U);

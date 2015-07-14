@@ -1007,8 +1007,8 @@ namespace Patterns
  *       set Nonlinear method = Gradient
  *       # this is a comment
  *       subsection Linear solver
- *         set Solver                        = CG
- *         set Maxmimum number of iterations = 30
+ *         set Solver                       = CG
+ *         set Maximum number of iterations = 30
  *       end
  *     end
  *     ...                       # other stuff
@@ -1140,7 +1140,7 @@ namespace Patterns
  * parameters at the beginning of a log file, since this way input and output
  * are together in one file which makes matching at a later time easier.
  * Additionally, the function also print those entries which have not been
- * modified in the input file und are thus set to default values; since
+ * modified in the input file and are thus set to default values; since
  * default values may change in the process of program development, you cannot
  * know the values of parameters not specified in the input file.
  *
@@ -1385,7 +1385,7 @@ namespace Patterns
  *
  * <h3>Representation of Parameters</h3>
  *
- * Here is some more internal information about the repesentation of
+ * Here is some more internal information about the representation of
  * parameters:
  *
  * Logically, parameters and the nested sections they are arranged in can be
@@ -2390,7 +2390,7 @@ private:
   /**
    * Traverse the section currently set by
    * enter_subsection()/leave_subsection() and see which of the entries are
-   * variante/array entries. Then fill the multiple_choices variable using
+   * variant or array entries. Then fill the multiple_choices variable using
    * this information.
    */
   void init_branches_current_section ();

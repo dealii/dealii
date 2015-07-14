@@ -215,7 +215,7 @@ namespace Functions
   class StokesLSingularity : public FlowFunction<2>
   {
   public:
-    /// Constructor setting upsome data.
+    /// Constructor setting up some data.
     StokesLSingularity();
 
     virtual void vector_values (const std::vector<Point<2> > &points,

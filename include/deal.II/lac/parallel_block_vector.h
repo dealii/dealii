@@ -139,7 +139,7 @@ namespace parallel
                    const MPI_Comm  communicator);
 
       /**
-       * Same as above but the ghost indicies are assumed to be empty.
+       * Same as above but the ghost indices are assumed to be empty.
        */
       BlockVector (const std::vector<IndexSet> &local_ranges,
                    const MPI_Comm  communicator);

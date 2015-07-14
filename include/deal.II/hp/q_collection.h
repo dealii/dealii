@@ -96,7 +96,7 @@ namespace hp
     /**
      * Return the maximum number of quadrature points over all the elements of
      * the collection. This is mostly useful to initialize arrays to allocate
-     * the maxmimum amount of memory that may be used when re-sizing later on
+     * the maximum amount of memory that may be used when re-sizing later on
      * to a articular quadrature formula from within this collection.
      */
     unsigned int max_n_quadrature_points () const;

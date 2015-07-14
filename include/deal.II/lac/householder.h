@@ -171,7 +171,7 @@ Householder<number>::initialize(const FullMatrix<number2> &M)
 
 
       // For all subsequent columns do
-      // the Householder reflexion
+      // the Householder reflection
       for (size_type k=j+1 ; k<n ; ++k)
         {
           number2 sum = diagonal[j]*this->el(j,k);

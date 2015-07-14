@@ -114,7 +114,7 @@ class LogStream : public Subscriptor
 {
 public:
   /**
-   * A subclass allowing for the safe generation and removal of prefices.
+   * A subclass allowing for the safe generation and removal of prefixes.
    *
    * Somewhere at the beginning of a block, create one of these objects, and
    * it will appear as a prefix in LogStream output like @p deallog. At the
@@ -260,7 +260,7 @@ public:
   /**
    * Maximum number of levels to be written to the log file. The functionality
    * is the same as <tt>depth_console</tt>, nevertheless, this function should
-   * be used with care, since it may spoile the value of a log file.
+   * be used with care, since it may spoil the value of a log file.
    *
    * The previous value of this parameter is returned.
    */
@@ -332,7 +332,7 @@ public:
 
   /**
    * set the precision for the underlying stream and returns the previous
-   * stream precision. This fuction mimics
+   * stream precision. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/precision/
    */
   std::streamsize precision (const std::streamsize prec);
@@ -340,7 +340,7 @@ public:
 
   /**
    * set the width for the underlying stream and returns the previous stream
-   * width. This fuction mimics
+   * width. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/width/
    */
   std::streamsize width (const std::streamsize wide);
@@ -348,7 +348,7 @@ public:
 
   /**
    * set the flags for the underlying stream and returns the previous stream
-   * flags. This fuction mimics
+   * flags. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/flags/
    */
   std::ios::fmtflags flags(const std::ios::fmtflags f);
@@ -529,7 +529,7 @@ private:
 
   /**
    * Internal wrapper around "thread local" outstreams. This private function
-   * will return the correct internal ostringstream buffer for operater<<.
+   * will return the correct internal ostringstream buffer for operator<<.
    */
   std::ostringstream &get_stream();
 

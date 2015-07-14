@@ -171,7 +171,7 @@ namespace SparsityTools
 
 #ifdef DEAL_II_WITH_MPI
   /**
-   * Communciate rows in a compressed sparsity pattern over MPI.
+   * Communicate rows in a compressed sparsity pattern over MPI.
    *
    * @param dsp is the sparsity pattern that has been built locally and for
    * which we need to exchange entries with other processors to make sure that

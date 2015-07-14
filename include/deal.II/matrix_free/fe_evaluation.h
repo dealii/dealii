@@ -1173,7 +1173,7 @@ public:
                        const unsigned int q_point);
 
   /**
-   * Write a constribution that is tested by the divergence to the field
+   * Write a contribution that is tested by the divergence to the field
    * containing the values on quadrature points with component @p q_point.
    * Access to the same field as through @p get_gradient. If applied before
    * the function @p integrate(...,true) is called, this specifies what is

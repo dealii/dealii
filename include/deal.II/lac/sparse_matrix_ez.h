@@ -295,7 +295,7 @@ public:
   typedef number value_type;
 
   /**
-   * @name Constructors and initalization
+   * @name Constructors and initialization
    */
 //@{
   /**
@@ -511,7 +511,7 @@ public:
    * Copy the given matrix to this one.  The operation throws an error if the
    * sparsity patterns of the two involved matrices do not point to the same
    * object, since in this case the copy operation is cheaper. Since this
-   * operation is notheless not for free, we do not make it available through
+   * operation is nonetheless not for free, we do not make it available through
    * <tt>operator =</tt>, since this may lead to unwanted usage, e.g. in copy
    * arguments to functions, which should really be arguments by reference.
    *

@@ -651,8 +651,9 @@ private:
  * matrices. This preconditioner is similar to a Jacobi preconditioner if the
  * degree variable is set to one, otherwise some higher order polynomial
  * corrections are used. This preconditioner needs access to the diagonal of
- * the matrix its acts on and needs a respective <tt>vmult</tt> implemention.
- * However, it does not need to explicitly know the matrix entries.
+ * the matrix it acts on and needs a respective <tt>vmult</tt>
+ * implementation. However, it does not need to explicitly know the matrix
+ * entries.
  *
  * This class is useful e.g. in multigrid smoother objects, since it is
  * trivially %parallel (assuming that matrix-vector products are %parallel).

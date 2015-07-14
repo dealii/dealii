@@ -386,10 +386,10 @@ namespace Step53
 
     // The next step is to explain to the triangulation to use our geometry
     // object whenever a new point is needed upon refining the mesh. We do
-    // this by telling the triangulation to use our geometry for everythin
+    // this by telling the triangulation to use our geometry for everything
     // that has manifold indicator zero, and then proceed to mark all cells
     // and their bounding faces and edges with manifold indicator zero. This
-    // ensures that the triangulation consults our geometry object everytime
+    // ensures that the triangulation consults our geometry object every time
     // a new vertex is needed. Since manifold indicators are inherited from
     // mother to children, this also happens after several recursive
     // refinement steps.

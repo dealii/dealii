@@ -100,8 +100,8 @@ DEAL_II_NAMESPACE_OPEN
  * @author Toby D. Young 2008, 2009, 2010, 2011, 2013; and Rickard Armiento
  * 2008.
  *
- * @note Various tweaks and enhancments contributed by Eloy Romero and Jose E.
- * Roman 2009, 2010.
+ * @note Various tweaks and enhancements contributed by Eloy Romero and Jose
+ * E. Roman 2009, 2010.
  */
 namespace SLEPcWrappers
 {

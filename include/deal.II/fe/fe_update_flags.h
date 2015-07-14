@@ -126,8 +126,8 @@ enum UpdateFlags
   //! Transformed quadrature weights
   /**
    * Compute the quadrature weights on the real cell, i.e. the weights of the
-   * quadrature rule multiplied with the determinant of the Jacoian of the
-   * transformation from reference to realcell.
+   * quadrature rule multiplied with the determinant of the Jacobian of the
+   * transformation from reference to real cell.
    */
   update_JxW_values = 0x0020,
   //! Normal vectors
@@ -153,7 +153,7 @@ enum UpdateFlags
   update_jacobians = 0x0080,
   //! Gradient of volume element
   /**
-   * Compute the dervatives of the Jacobian of the transformation.
+   * Compute the derivatives of the Jacobian of the transformation.
    */
   update_jacobian_grads = 0x0100,
   //! Volume element
@@ -331,7 +331,7 @@ operator &= (UpdateFlags &f1, UpdateFlags f2)
  * change if one cell is just a translation of the previous). Currently, this
  * variable does only recognize a translation and an inverted translation (if
  * dim<spacedim). However, this concept makes it easy to add additional
- * staties to be detected in FEValues/FEFaceValues for making use of these
+ * states to be detected in FEValues/FEFaceValues for making use of these
  * similarities as well.
  */
 namespace CellSimilarity

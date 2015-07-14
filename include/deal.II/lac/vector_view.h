@@ -87,7 +87,7 @@ DEAL_II_NAMESPACE_OPEN
  * // The following line should output 4.
  * cout << array[1] << endl;
  *
- * // If debug mode is on, then the following triggers an execption:
+ * // If debug mode is on, then the following triggers an exception:
  * view(6) = 4;
  *
  * // But notice that no checks are performed, so this is legal but WILL
@@ -95,7 +95,7 @@ DEAL_II_NAMESPACE_OPEN
  * VectorView<double> wrong_view(10, array);
  *
  * // Now no assert will be thrown if you type wrong_view(6), but most
- * // likely a seg fault will occur.
+ * // likely a segfault will occur.
  * view(6) = 4;
  *
  * // Notice that this construction is legal. It will create a copy of
@@ -158,7 +158,7 @@ public:
   VectorView(const size_type new_size, const Number *ptr);
 
   /**
-   * This desctructor will only reset the internal sizes and the internal
+   * This destructor will only reset the internal sizes and the internal
    * pointers, but it will NOT clear the memory.
    */
   ~VectorView();
@@ -194,7 +194,7 @@ public:
    *
    * In the above case, the Vector<double>::reinit method is called, and a NEW
    * area of memory is reserved, possibly not starting at the same place as
-   * before. Hoever, the VectorView<double> object keeps pointing to the same
+   * before. However, the VectorView<double> object keeps pointing to the same
    * old area. After the two reinits, any call to view_of_long_vector(i), with
    * i>0 might cause an attempt to access invalid areas of memory, or might
    * function properly, depending on whether or not the system was able to

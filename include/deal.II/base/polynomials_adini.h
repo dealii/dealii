@@ -93,35 +93,35 @@ public:
 
 private:
   /**
-   * Store the coefficients of the polynominals in the order
+   * Store the coefficients of the polynomials in the order
    * $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
    */
   Table<2, double> coef;
 
   /**
-   * Store the coefficients of the x-derivative of the polynominals in the
+   * Store the coefficients of the x-derivative of the polynomials in the
    * order $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
    */
 
   Table<2, double> dx;
   /**
-   * Store the coefficients of the y-derivative of the polynominals in the
+   * Store the coefficients of the y-derivative of the polynomials in the
    * order $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
    */
 
   Table<2, double> dy;
   /**
-   * Store the coefficients of the second x-derivative of the polynominals in
+   * Store the coefficients of the second x-derivative of the polynomials in
    * the order $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
    */
   Table<2, double> dxx;
   /**
-   * Store the coefficients of the second y-derivative of the polynominals in
+   * Store the coefficients of the second y-derivative of the polynomials in
    * the order $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
    */
   Table<2, double> dyy;
   /**
-   * Store the coefficients of the second mixed derivative of the polynominals
+   * Store the coefficients of the second mixed derivative of the polynomials
    * in the order $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
    */
   Table<2, double> dxy;

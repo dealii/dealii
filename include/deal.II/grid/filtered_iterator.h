@@ -189,8 +189,8 @@ namespace IteratorFilters
 
 
   /**
-   * Filter for iterators that evaluates to true if th level subdomain id of a
-   * cell is equal to the current processor id.
+   * Filter for iterators that evaluates to true if the level subdomain id of
+   * a cell is equal to the current processor id.
    *
    * @ingroup Iterators
    */
@@ -216,7 +216,7 @@ namespace IteratorFilters
  * satisfies the predicate if operators ++ or -- are invoked. Intermediate
  * iterator values that lie in between but do not satisfy the predicate are
  * skipped. It is thus very simple to write loops over a certain class of
- * objects without the need to explicitely write down the condition they have
+ * objects without the need to explicitly write down the condition they have
  * to satisfy in each loop iteration. This in particular is helpful if
  * functions are called with a pair of iterators denoting a range on which
  * they shall act, by choosing a filtered iterator instead of usual ones.

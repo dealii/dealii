@@ -287,7 +287,7 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
 }
 
 
-// Note that the CellSimilarity flag is modifyable, since MappingQ can need to
+// Note that the CellSimilarity flag is modifiable, since MappingQ can need to
 // recalculate data even when cells are similar.
 template<int dim, int spacedim>
 CellSimilarity::Similarity

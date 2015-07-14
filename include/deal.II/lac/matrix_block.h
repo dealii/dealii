@@ -70,7 +70,7 @@ namespace internal
  * instance in MGLevelObject without extracting the #matrix first.
  *
  * MatrixBlock comes handy when using BlockMatrixArray. Once the MatrixBlock
- * has been properly initalized and filled, it can be used in the simplest
+ * has been properly initialized and filled, it can be used in the simplest
  * case as:
  * @code
  * MatrixBlockVector<SparseMatrix<double> > > blocks;
@@ -194,7 +194,7 @@ public:
   /**
    * Set several elements in the specified row of the matrix with column
    * indices as given by <tt>col_indices</tt> to the respective value. This is
-   * the function doing thye actual work for the ones adding full matrices.
+   * the function doing the actual work for the ones adding full matrices.
    * The global locations <tt>row_index</tt> and <tt>col_indices</tt> are
    * translated into locations in this block and ExcBlockIndexMismatch is
    * thrown, if the global index does not point into the block referred to by
@@ -292,7 +292,7 @@ public:
 
 private:
   /**
-   * The rwo BlockIndices of the whole system. Using row(), this allows us to
+   * The row BlockIndices of the whole system. Using row(), this allows us to
    * find the index of the first row degree of freedom for this block.
    */
   BlockIndices row_indices;
@@ -363,7 +363,7 @@ public:
    *
    * Since often only clearing of the individual matrices is desired, but not
    * removing the blocks themselves, there is an optional argument. If the
-   * argument is missing or @p false, all matrices will be mepty, but the size
+   * argument is missing or @p false, all matrices will be empty, but the size
    * of this object and the block positions will not change. If @p
    * really_clean is @p true, then the object will contain no blocks at the
    * end.
@@ -475,7 +475,7 @@ public:
    *
    * Since often only clearing of the individual matrices is desired, but not
    * removing the blocks themselves, there is an optional argument. If the
-   * argument is missing or @p false, all matrices will be mepty, but the size
+   * argument is missing or @p false, all matrices will be empty, but the size
    * of this object and the block positions will not change. If @p
    * really_clean is @p true, then the object will contain no blocks at the
    * end.

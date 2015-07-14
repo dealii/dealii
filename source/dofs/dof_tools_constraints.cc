@@ -61,7 +61,7 @@ namespace DoFTools
 
         // then use the algorithm from FullMatrix::gauss_jordan on this
         // matrix to find out whether it is singular. the algorithm there
-        // does piviting and at the end swaps rows back into their proper
+        // does pivoting and at the end swaps rows back into their proper
         // order -- we omit this step here, since we don't care about the
         // inverse matrix, all we care about is whether the matrix is
         // regular or singular

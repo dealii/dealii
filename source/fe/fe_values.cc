@@ -1117,7 +1117,7 @@ namespace FEValuesViews
                     // there is no single nonzero component
                     //
                     // the following is not implemented! we need to consider the
-                    // interplay between mutliple non-zero entries in shape
+                    // interplay between multiple non-zero entries in shape
                     // function and the representation as a symmetric
                     // second-order tensor
                     const unsigned int comp =

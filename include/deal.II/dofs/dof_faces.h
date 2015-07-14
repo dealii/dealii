@@ -77,7 +77,7 @@ namespace internal
 
     /**
      * Store the indices of degrees of freedom on faces in 1D. As these would
-     * be vertices, which are treted separately, don't do anything.
+     * be vertices, which are treated separately, don't do anything.
      *
      * @author Tobias Leicht, 2006
      */

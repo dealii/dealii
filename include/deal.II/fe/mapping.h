@@ -176,7 +176,7 @@ enum MappingType
  * <h4>Mapping of vector fields, differential forms and gradients of vector
  * fields</h4>
  *
- * The transfomation of vector fields, differential forms
+ * The transformation of vector fields, differential forms
  * (gradients/jacobians) and gradients of vector fields between the reference
  * cell and the actual grid cell follows the general form
  *
@@ -196,7 +196,7 @@ enum MappingType
  *
  * <h3>Technical notes</h3>
  *
- * A hint to implementators: no function except the two functions @p
+ * A hint to implementors: no function except the two functions @p
  * update_once and @p update_each may add any flags.
  *
  * For more information about the <tt>spacedim</tt> template parameter check

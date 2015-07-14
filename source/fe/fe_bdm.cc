@@ -336,8 +336,8 @@ FE_BDM<dim>::initialize_support_points (const unsigned int deg)
       }
   Assert(current == npoints, ExcInternalError());
 
-  // Finaly, compute the values of
-  // the test functios in the
+  // Finally, compute the values of
+  // the test functions in the
   // interior quadrature points
   PolynomialsP<dim> poly(deg-2);
 

@@ -164,7 +164,7 @@ namespace SLEPcWrappers
 
     /**
      * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformationthat is appropriate for this class.
+     * the type of spectral transformation that is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };
@@ -211,7 +211,7 @@ namespace SLEPcWrappers
 
     /**
      * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformationthat is appropriate for this class.
+     * the type of spectral transformation that is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };
@@ -259,7 +259,7 @@ namespace SLEPcWrappers
 
     /**
      * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformationthat is appropriate for this class.
+     * the type of spectral transformation that is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };
@@ -308,7 +308,7 @@ namespace SLEPcWrappers
 
     /**
      * Function that takes a Spectral Transformation context object, and sets
-     * the type of spectral transformationthat is appropriate for this class.
+     * the type of spectral transformation that is appropriate for this class.
      */
     virtual void set_transformation_type (ST &st) const;
   };

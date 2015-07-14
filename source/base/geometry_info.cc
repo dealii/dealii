@@ -581,7 +581,7 @@ GeometryInfo<3>::line_refinement_case(const RefinementCase<3> &cell_refinement_c
          ExcIndexRange(line_no, 0, GeometryInfo<dim>::lines_per_cell));
 
   // array indicating, which simple refine
-  // case cuts a line in dirextion x, y or
+  // case cuts a line in direction x, y or
   // z. For example, cut_y and everything
   // containing cut_y (cut_xy, cut_yz,
   // cut_xyz) cuts lines, which are in y

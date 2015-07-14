@@ -298,7 +298,7 @@ public:
    * - <code>simple_table_with_separate_column_description</code>: This format
    * is very similar to <code>table_with_separate_column_description</code>,
    * but it skips aligning the columns with additional white space. This
-   * increases the performance o fwrite_text() for large tables. Example
+   * increases the performance of write_text() for large tables. Example
    * output:
    *   @code
    *     # 1: key1

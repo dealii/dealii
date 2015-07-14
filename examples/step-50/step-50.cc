@@ -599,9 +599,9 @@ namespace Step50
     // for each degree of freedom. Due to the way the ConstraintMatrix
     // stores its data, the function to add a constraint on a single
     // degree of freedom and force it to be zero is called
-    // Constraintmatrix::add_line(); doing so for several degrees of
+    // ConstraintMatrix::add_line(); doing so for several degrees of
     // freedom at once can be done using
-    // Constraintmatrix::add_lines():
+    // ConstraintMatrix::add_lines():
     std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_global_levels());
     std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_global_levels());
     for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)

@@ -963,7 +963,7 @@ FE_Q_Base<POLY,dim,spacedim>::initialize_quad_dof_index_permutation ()
       data(local,7)=(n-1-j) + i      *n - local;
     }
 
-  // aditionally initialize reordering of line dofs
+  // additionally initialize reordering of line dofs
   for (unsigned int i=0; i<this->dofs_per_line; ++i)
     this->adjust_line_dof_index_for_line_orientation_table[i]=this->dofs_per_line-1-i - i;
 }

@@ -267,7 +267,7 @@ protected:
  *
  * Which one of the two sets of weights is provided, can be selected by the @p
  * factor_out_singular_weight parameter. If it is false (the default), then
- * the $\bar{w}_i$ weigths are computed, and you should provide only the
+ * the $\bar{w}_i$ weights are computed, and you should provide only the
  * smooth function $f(x)$, since the singularity is included inside the
  * quadrature. If the parameter is set to true, then the singularity is
  * factored out of the quadrature formula, and you should provide a function
@@ -283,7 +283,7 @@ class QGaussLogR : public Quadrature<dim>
 {
 public:
   /**
-   * The constructor takes four arguments: the order of the gauss formula on
+   * The constructor takes four arguments: the order of the Gauss formula on
    * each of the segments $[0,x_0]$ and $[x_0,1]$, the actual location of the
    * singularity, the scale factor inside the logarithmic function and a flag
    * that decides whether the singularity is left inside the quadrature

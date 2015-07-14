@@ -79,7 +79,7 @@ template <typename> class TriaActiveIterator;
  * The objects pointed to are accessors, derived from TriaAccessorBase. Which
  * kind of accessor is determined by the template argument <em>Accessor</em>.
  * These accessors are not so much data structures as they are a collection of
- * functions providing access to the data stored in Tringulation or DoFHandler
+ * functions providing access to the data stored in Triangulation or DoFHandler
  * objects. Using these accessors, the structure of these classes is hidden
  * from the application program.
  *
@@ -128,7 +128,7 @@ template <typename> class TriaActiveIterator;
  *
  * The iterator class itself does not have much functionality. It only becomes
  * useful when assigned an Accessor (the second template parameter), which
- * really does the access to data. An Accessor has to fulfil some
+ * really does the access to data. An Accessor has to fulfill some
  * requirements:
  *
  * <ul>
@@ -198,7 +198,7 @@ template <typename> class TriaActiveIterator;
  * set to false.
  *
  * The last two checks are not made in <tt>state()</tt> since both cases
- * should only occur upon unitialized construction through @p memcpy and the
+ * should only occur upon uninitialized construction through @p memcpy and the
  * like (the parent triangulation can only be set upon construction). If an
  * iterator is constructed empty through the empty constructor,
  * <tt>present_level==-2</tt> and <tt>present_index==-2</tt>. Thus, the
@@ -213,7 +213,7 @@ template <typename> class TriaActiveIterator;
  * invalid provides a second track of security: if we should have forgotten a
  * check in the library when an iterator is incremented or decremented, we
  * automatically convert the iterator from the allowed state "past-the-end" to
- * the disallowed state "invalid" which increases the chance that somehwen
+ * the disallowed state "invalid" which increases the chance that some time
  * earlier than for past-the-end iterators an exception is raised.
  *
  * @ref Triangulation
@@ -531,7 +531,7 @@ protected:
    *
    * In fact, we would not need them to be friends if they were for different
    * dimensions, but the compiler dislikes giving a fixed dimension and
-   * variable accessor since then it says that would be a artial
+   * variable accessor since then it says that would be a partial
    * specialization.
    */
   template <typename SomeAccessor> friend class TriaRawIterator;

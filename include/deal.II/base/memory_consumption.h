@@ -54,7 +54,7 @@ template <typename T> class VectorizedArray;
  * memory_consumption() will simply call the member function of same name. It
  * is up to the implementation of the data type to provide a good estimate of
  * the amount of memory used. Inside this function, the use of
- * MemoryConsumpton::memory_consumption() for compounds of the class helps to
+ * MemoryConsumption::memory_consumption() for compounds of the class helps to
  * obtain this estimate. Most classes in the deal.II library have such a
  * member function.
  *

@@ -151,7 +151,7 @@ namespace FETools
           // for continuous elements on
           // grids with hanging nodes we
           // need hanging node
-          // constraints. Consequentely,
+          // constraints. Consequently,
           // if there are no constraints
           // then hanging nodes are not
           // allowed.

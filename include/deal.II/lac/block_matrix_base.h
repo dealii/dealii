@@ -228,7 +228,7 @@ namespace BlockMatrixIterators
               const size_type col);
 
     /**
-     * Initalize const accessor from non const accessor.
+     * Initialize const accessor from non const accessor.
      */
     Accessor(const Accessor<BlockMatrix, false> &);
 
@@ -380,7 +380,7 @@ public:
    * Copy the given matrix to this one.  The operation throws an error if the
    * sparsity patterns of the two involved matrices do not point to the same
    * object, since in this case the copy operation is cheaper. Since this
-   * operation is notheless not for free, we do not make it available through
+   * operation is nonetheless not for free, we do not make it available through
    * operator=(), since this may lead to unwanted usage, e.g. in copy
    * arguments to functions, which should really be arguments by reference.
    *
@@ -696,7 +696,7 @@ public:
    * Print the matrix to the given stream, using the format <tt>(line,col)
    * value</tt>, i.e. one nonzero entry of the matrix per line. The optional
    * flag outputs the sparsity pattern in a different style according to the
-   * underlying sparsematrix type.
+   * underlying sparse matrix type.
    */
   void print (std::ostream &out,
               const bool    alternative_output = false) const;

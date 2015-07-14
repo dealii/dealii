@@ -1549,7 +1549,7 @@ void outer_product (Tensor<1,dim,Number>       &dst,
  * Cross-product in 2d. This is just a rotation by 90 degrees clockwise to
  * compute the outer normal from a tangential vector. This function is defined
  * for all space dimensions to allow for dimension independent programming
- * (e.g. within switches over the space dimenion), but may only be called if
+ * (e.g. within switches over the space dimension), but may only be called if
  * the actual dimension of the arguments is two (e.g. from the <tt>dim==2</tt>
  * case in the switch).
  *
@@ -1572,7 +1572,7 @@ cross_product (Tensor<1,dim,Number>       &dst,
 /**
  * Cross-product of 2 vectors in 3d. This function is defined for all space
  * dimensions to allow for dimension independent programming (e.g. within
- * switches over the space dimenion), but may only be called if the actual
+ * switches over the space dimension), but may only be called if the actual
  * dimension of the arguments is three (e.g. from the <tt>dim==3</tt> case in
  * the switch).
  *

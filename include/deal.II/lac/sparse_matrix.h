@@ -520,7 +520,7 @@ public:
   };
 
   /**
-   * @name Constructors and initalization
+   * @name Constructors and initialization
    */
 //@{
   /**
@@ -872,9 +872,10 @@ public:
    * Copy the given matrix to this one.  The operation triggers an assertion
    * if the sparsity patterns of the two involved matrices do not point to the
    * same object, since in this case the copy operation is cheaper. Since this
-   * operation is notheless not for free, we do not make it available through
-   * <tt>operator =</tt>, since this may lead to unwanted usage, e.g. in copy
-   * arguments to functions, which should really be arguments by reference.
+   * operation is nonetheless not for free, we do not make it available
+   * through <tt>operator =</tt>, since this may lead to unwanted usage,
+   * e.g. in copy arguments to functions, which should really be arguments by
+   * reference.
    *
    * The source matrix may be a matrix of arbitrary type, as long as its data
    * type is convertible to the data type of this matrix.
@@ -1567,7 +1568,7 @@ private:
 
   /**
    * Allocated size of #val. This can be larger than the actually used part if
-   * the size of the matrix was reduced somewhen in the past by associating a
+   * the size of the matrix was reduced sometime in the past by associating a
    * sparsity pattern with a smaller size to this object, using the reinit()
    * function.
    */

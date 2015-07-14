@@ -1002,7 +1002,7 @@ namespace StandardExceptions
                     "information.");
 
   /**
-   * Some of our numerical classes allow for setting alll entries to zero
+   * Some of our numerical classes allow for setting all entries to zero
    * using the assignment operator <tt>=</tt>.
    *
    * In many cases, this assignment operator makes sense <b>only</b> for the

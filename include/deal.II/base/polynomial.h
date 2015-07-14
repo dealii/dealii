@@ -300,8 +300,8 @@ namespace Polynomials
   {
   public:
     /**
-     * Constructor. Takes the degree <tt>n</tt> of the Lagrangian polynom and
-     * the index <tt>support_point</tt> of the support point. Fills the
+     * Constructor. Takes the degree <tt>n</tt> of the Lagrangian polynomial
+     * and the index <tt>support_point</tt> of the support point. Fills the
      * <tt>coefficients</tt> of the base class Polynomial.
      */
     LagrangeEquidistant (const unsigned int n,

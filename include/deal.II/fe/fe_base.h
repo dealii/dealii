@@ -232,7 +232,7 @@ public:
 
   /**
    * Number of degrees of freedom in a hexahedron; not including the degrees
-   * of freedom on the quadrilaterals, lines and vertices of the hecahedron.
+   * of freedom on the quadrilaterals, lines and vertices of the hexahedron.
    */
   const unsigned int dofs_per_hex;
 

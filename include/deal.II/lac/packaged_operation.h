@@ -82,7 +82,7 @@ template <typename Range = Vector<double> > class PackagedOperation;
  *   residual.apply(y);
  *   residual.apply_add(y);
  * @endcode
- * or until the @p PackagedOperation object is implictly converted:
+ * or until the @p PackagedOperation object is implicitly converted:
  * @code
  *   dealii::Vector<double> y;
  *   y = residual;
@@ -229,7 +229,7 @@ public:
   }
 
   /**
-   * Subract a constant @p offset (of the @p Range space) from the result of a
+   * Subtract a constant @p offset (of the @p Range space) from the result of a
    * PackagedOperation.
    */
   PackagedOperation<Range> &operator-=(const Range &offset)
@@ -530,7 +530,7 @@ PackagedOperation<Range> operator+(const Range &u, const Range &v)
   PackagedOperation<Range> return_comp;
 
   // ensure to have valid PackagedOperation objects by catching op by value
-  // u is catched by reference
+  // u is caught by reference
 
   return_comp.reinit_vector = [&u](Range &x, bool fast)
   {
@@ -670,7 +670,7 @@ operator*(const LinearOperator<Range, Domain> &op,
   return_comp.reinit_vector = op.reinit_range_vector;
 
   // ensure to have valid PackagedOperation objects by catching op by value
-  // u is catched by reference
+  // u is caught by reference
 
   return_comp.apply = [op, &u](Range &v)
   {
@@ -712,7 +712,7 @@ operator*(const Range &u,
   return_comp.reinit_vector = op.reinit_domain_vector;
 
   // ensure to have valid PackagedOperation objects by catching op by value
-  // u is catched by reference
+  // u is caught by reference
 
   return_comp.apply = [op, &u](Domain &v)
   {
@@ -746,7 +746,7 @@ operator*(const LinearOperator<Range, Domain> &op,
   return_comp.reinit_vector = op.reinit_range_vector;
 
   // ensure to have valid PackagedOperation objects by catching op by value
-  // u is catched by reference
+  // u is caught by reference
 
   return_comp.apply = [op, comp](Domain &v)
   {
@@ -796,7 +796,7 @@ operator*(const PackagedOperation<Range> &comp,
   return_comp.reinit_vector = op.reinit_domain_vector;
 
   // ensure to have valid PackagedOperation objects by catching op by value
-  // u is catched by reference
+  // u is caught by reference
 
   return_comp.apply = [op, comp](Domain &v)
   {

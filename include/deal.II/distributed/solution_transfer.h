@@ -48,7 +48,7 @@ namespace parallel
      * interpolate() or deserialize() you need to supply distributed vectors
      * without ghost elements.
      *
-     * <h3>Transfering a solution</h3> Here VECTOR is your favorite vector
+     * <h3>Transferring a solution</h3> Here VECTOR is your favorite vector
      * type, e.g. PETScWrappers::MPI::Vector, TrilinosWrappers::MPI::Vector,
      * or corresponding blockvectors.
      * @code
@@ -130,7 +130,7 @@ namespace parallel
        * stores the dof indices of each cell and stores the dof values of the
        * vectors in @p all_in in each cell that'll be coarsened. @p all_in
        * includes all vectors that are to be interpolated onto the new
-       * (refined and/or coarsenend) grid.
+       * (refined and/or coarsened) grid.
        */
       void prepare_for_coarsening_and_refinement (const std::vector<const VECTOR *> &all_in);
 

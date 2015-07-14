@@ -241,7 +241,7 @@ struct SubCellData;
  *
  * In two dimensions, another difficulty occurs, which has to do with the
  * sense of a quadrilateral. A quad consists of four lines which have a
- * direction, which is per definitionem as follows:
+ * direction, which is by definition as follows:
  * @verbatim
  *   3-->--2
  *   |     |
@@ -277,7 +277,7 @@ struct SubCellData;
  * For this reason, the <tt>read_*</tt> functions of this class that read in
  * grids in various input formats call the GridReordering class to bring the
  * order of vertices that define the cells into an ordering that satisfies the
- * requiremenets of the Triangulation class. Be sure to read the documentation
+ * requirements of the Triangulation class. Be sure to read the documentation
  * of that class if you experience unexpected problems when reading grids
  * through this class.
  *

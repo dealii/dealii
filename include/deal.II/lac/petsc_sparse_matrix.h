@@ -182,7 +182,7 @@ namespace PETScWrappers
      * Despite the fact that it would seem to be an obvious win, setting the
      * @p preset_nonzero_locations flag to @p true doesn't seem to accelerate
      * program. Rather on the contrary, it seems to be able to slow down
-     * entire programs somewhat. This is suprising, since we can use efficient
+     * entire programs somewhat. This is surprising, since we can use efficient
      * function calls into PETSc that allow to create multiple entries at
      * once; nevertheless, given the fact that it is inefficient, the
      * respective flag has a default value equal to @p false.

@@ -92,7 +92,7 @@ namespace TimeStepping
       VECTOR &y) = 0;
 
     /**
-     * Empty structure used to store informations.
+     * Empty structure used to store information.
      */
     struct Status {};
 

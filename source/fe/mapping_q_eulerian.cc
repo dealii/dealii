@@ -156,7 +156,7 @@ compute_mapping_support_points
   std::vector<Vector<double> > shift_vector(n_support_pts,Vector<double>(n_components));
 
   // fill shift vector for each support point using an fe_values object. make
-  // sure that the fe_values variable isn't used simulatenously from different
+  // sure that the fe_values variable isn't used simultaneously from different
   // threads
   Threads::Mutex::ScopedLock lock(fe_values_mutex);
   fe_values.reinit(dof_cell);

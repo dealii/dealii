@@ -825,7 +825,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   origins.push_back(Point<2>(0.,singularity[1]));
   origins.push_back(singularity);
 
-  // Lexycographical ordering.
+  // Lexicographical ordering.
 
   double eps = 1e-8;
   unsigned int q_id = 0; // Current quad point index.
