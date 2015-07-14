@@ -547,6 +547,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li>New: parallel::distributed::Triangulation::add_periodicity
+  now allows for arbitrary orientations between matching faces.
+  <br>
+  (Daniel Arndt, 2015/07/12)
+  </li>
 
   <li> New: Utilities::trim() function removes trailing and leading spaces.
   <br>

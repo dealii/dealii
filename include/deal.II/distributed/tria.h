@@ -802,8 +802,6 @@ namespace parallel
        * The vector can be filled by the function
        * GridTools::collect_periodic_faces.
        *
-       * @todo At the moment just default orientation is implemented.
-       *
        * @note Before this function can be used the Triangulation has to be
        * initialized and must not be refined. Calling this function more than
        * once is possible, but not recommended: The function destroys and

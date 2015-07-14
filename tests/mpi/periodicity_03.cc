@@ -16,12 +16,10 @@
 
 //
 // check solution for periodicity. The used test case is based on step-22.
-// We consider a 2D quarter hyper shell and require periodicity with respect to
-// the left and lower boundary.
+// We consider a 3D cube and require periodicity with respect to
+// the left and bottom boundary.
 // We refine two times adaptively using the Kelly error estimator.
 //
-
-#define PERIODIC
 
 #include "../tests.h"
 #include <deal.II/base/conditional_ostream.h>
@@ -29,6 +27,7 @@
 #include <deal.II/distributed/grid_refinement.h>
 
 #include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/constraint_matrix.h>
 
 #include <deal.II/lac/trilinos_solver.h>
@@ -36,10 +35,13 @@
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_out.h>
 
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -85,92 +87,18 @@ namespace Step22
     std::vector<IndexSet>                       owned_partitioning;
     std::vector<IndexSet>                       relevant_partitioning;
 
-    TrilinosWrappers::BlockSparsityPattern      sparsity_pattern;
     TrilinosWrappers::BlockSparseMatrix         system_matrix;
 
     TrilinosWrappers::MPI::BlockVector          solution;
     TrilinosWrappers::MPI::BlockVector          system_rhs;
 
     ConditionalOStream                          pcout;
+
+    FullMatrix<double>                          rot_matrix;
+    Tensor<1,dim>                               offset;
+
+    MappingQ<dim>                               mapping;
   };
-
-
-
-  template <int dim>
-  class BoundaryValues : public Function<dim>
-  {
-  public:
-    BoundaryValues () : Function<dim>(dim+1) {}
-
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
-  };
-
-
-  template <int dim>
-  double
-  BoundaryValues<dim>::value (const Point<dim>  &p,
-                              const unsigned int component) const
-  {
-    Assert (component < this->n_components,
-            ExcIndexRange (component, 0, this->n_components));
-
-//    if (component == 0)
-//      return (p[1]-.5)*(1.-p[1]);
-//    return 0;
-    return (1-2*(component==0))*p[(component+1)%2]/(p[0]*p[0]+p[1]*p[1]);
-  }
-
-
-  template <int dim>
-  void
-  BoundaryValues<dim>::vector_value (const Point<dim> &p,
-                                     Vector<double>   &values) const
-  {
-    for (unsigned int c=0; c<this->n_components; ++c)
-      values(c) = BoundaryValues<dim>::value (p, c);
-  }
-
-
-
-  template <int dim>
-  class RightHandSide : public Function<dim>
-  {
-  public:
-    RightHandSide () : Function<dim>(dim+1) {}
-
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
-
-  };
-
-
-  template <int dim>
-  double
-  RightHandSide<dim>::value (const Point<dim>  &/*p*/,
-                             const unsigned int /*component*/) const
-  {
-    return 0;
-  }
-
-
-  template <int dim>
-  void
-  RightHandSide<dim>::vector_value (const Point<dim> &p,
-                                    Vector<double>   &values) const
-  {
-    for (unsigned int c=0; c<this->n_components; ++c)
-      values(c) = RightHandSide<dim>::value (p, c);
-  }
-
-
-
 
 
   template <class Matrix, class Preconditioner>
@@ -214,7 +142,7 @@ namespace Step22
   (TrilinosWrappers::MPI::Vector       &dst,
    const TrilinosWrappers::MPI::Vector &src) const
   {
-    SolverControl solver_control (src.size(), 1e-6*src.l2_norm(), false, false);
+    SolverControl solver_control (10*src.size(), 1e-6*src.l2_norm(), false, false);
     TrilinosWrappers::SolverCG    cg (solver_control,
                                       TrilinosWrappers::SolverCG::AdditionalData());
 
@@ -294,8 +222,17 @@ namespace Step22
            :
            std::cout,
            (Utilities::MPI::this_mpi_process(mpi_communicator)
-            == 0))
-  {}
+            == 0)),
+    rot_matrix(dim),
+    mapping(1)
+{
+  rot_matrix[0][dim-1] = -1.;
+  rot_matrix[dim-1][0] = 1.;
+  if (dim==3)
+    rot_matrix[1][1] =  1.;
+  offset[0] = 0;
+  offset[1] = 0;
+}
 
 
 
@@ -325,55 +262,60 @@ namespace Step22
       DoFTools::extract_locally_relevant_dofs (dof_handler, locally_relevant_dofs);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(n_u, n_u+n_p));
-    
+    }
+
+    {
       constraints.clear ();
-      constraints.reinit(locally_relevant_dofs);
 
       FEValuesExtractors::Vector velocities(0);
       FEValuesExtractors::Scalar pressure(dim);
 
       DoFTools::make_hanging_node_constraints (dof_handler,
                                                constraints);
-#ifdef PERIODIC
-      VectorTools::interpolate_boundary_values (dof_handler,
-                                                3,
-                                                BoundaryValues<dim>(),
-                                                constraints,
-                                                fe.component_mask(velocities));
-#endif
-      VectorTools::interpolate_boundary_values (dof_handler,
-                                                0,
-                                                BoundaryValues<dim>(),//ZeroFunction<dim>(dim+1),
-                                                constraints,
-                                                fe.component_mask(velocities));
-      VectorTools::interpolate_boundary_values (dof_handler,
-                                                1,
-                                                BoundaryValues<dim>(),//ZeroFunction<dim>(dim+1),
-                                                constraints,
-                                                fe.component_mask(velocities));
 
-#ifdef PERIODIC
       std::vector<GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator> >
       periodicity_vector;
-
-      FullMatrix<double> matrix(dim);
-      matrix[0][1]=1.;
-      matrix[1][0]=-1.;
 
       std::vector<unsigned int> first_vector_components;
       first_vector_components.push_back(0);
 
       GridTools::collect_periodic_faces
-      (dof_handler, 2, 3, 1, periodicity_vector, Tensor<1,dim>(),
-       matrix, first_vector_components);
+      (dof_handler, 4, 0, 1, periodicity_vector, offset,
+       rot_matrix, first_vector_components);
 
       DoFTools::make_periodicity_constraints<DoFHandler<dim> >
-      (periodicity_vector, constraints, fe.component_mask(velocities));
-#endif
+        (periodicity_vector, constraints, fe.component_mask(velocities));
+
+      VectorTools::interpolate_boundary_values (mapping,
+                                                dof_handler,
+                                                1,
+                                                ZeroFunction<dim>(dim+1),
+                                                constraints,
+                                                fe.component_mask(velocities));
+
+      VectorTools::interpolate_boundary_values (mapping,
+                                                dof_handler,
+                                                2,
+                                                ZeroFunction<dim>(dim+1),
+                                                constraints,
+                                                fe.component_mask(velocities));
+
+      VectorTools::interpolate_boundary_values (mapping,
+                                                dof_handler,
+                                                3,
+                                                ZeroFunction<dim>(dim+1),
+                                                constraints,
+                                                fe.component_mask(velocities));
+
+      VectorTools::interpolate_boundary_values (mapping,
+                                                dof_handler,
+                                                5,
+                                                ZeroFunction<dim>(dim+1),
+                                                constraints,
+                                                fe.component_mask(velocities));
     }
-
     constraints.close ();
-
+    
     {
       TrilinosWrappers::BlockSparsityPattern bsp
       (owned_partitioning, owned_partitioning,
@@ -404,7 +346,8 @@ namespace Step22
 
     QGauss<dim>   quadrature_formula(degree+2);
 
-    FEValues<dim> fe_values (fe, quadrature_formula,
+    FEValues<dim> fe_values (mapping,
+                             fe, quadrature_formula,
                              update_values    |
                              update_quadrature_points  |
                              update_JxW_values |
@@ -418,10 +361,6 @@ namespace Step22
     Vector<double>       local_rhs (dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-
-    const RightHandSide<dim>          right_hand_side;
-    std::vector<Vector<double> >      rhs_values (n_q_points,
-                                                  Vector<double>(dim+1));
 
     const FEValuesExtractors::Vector velocities (0);
     const FEValuesExtractors::Scalar pressure (dim);
@@ -439,9 +378,6 @@ namespace Step22
           fe_values.reinit (cell);
           local_matrix = 0;
           local_rhs = 0;
-
-          right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
-                                            rhs_values);
 
           for (unsigned int q=0; q<n_q_points; ++q)
             {
@@ -466,9 +402,10 @@ namespace Step22
 
                   const unsigned int component_i =
                     fe.system_to_component_index(i).first;
-                  local_rhs(i) += fe_values.shape_value(i,q) *
-                                  rhs_values[q](component_i) *
-                                  fe_values.JxW(q);
+                  if (component_i==0)
+                    local_rhs(i) += fe_values.shape_value(i,q) *
+                                    1 *
+                                    fe_values.JxW(q);
                 }
             }
 
@@ -559,12 +496,20 @@ namespace Step22
   void StokesProblem<dim>::get_point_value
   (const Point<dim> point, const int proc, Vector<double> &value) const
   {
-    typename DoFHandler<dim>::active_cell_iterator cell
-      = GridTools::find_active_cell_around_point (dof_handler, point);
+    try
+    {
+      const typename DoFHandler<dim>::active_cell_iterator cell
+        = GridTools::find_active_cell_around_point (mapping, dof_handler, point).first;
 
-    if (cell->is_locally_owned())
-      VectorTools::point_value (dof_handler, solution,
-                                point, value);
+      if (cell->is_locally_owned())
+        VectorTools::point_value (mapping, dof_handler, solution,
+                                  point, value);
+    }
+    catch (GridTools::ExcPointNotFound<dim> &p)
+    {
+      pcout<< "Point: " << point << " is not inside a cell!" <<std::endl;
+    }
+
 
     std::vector<double> tmp (value.size());
     for (unsigned int i=0; i<value.size(); ++i)
@@ -580,47 +525,191 @@ namespace Step22
 
   template <int dim>
   void StokesProblem<dim>::check_periodicity (const unsigned int cycle) const
-  {}
+  {
+    AssertThrow(false, ExcNotImplemented());
+  }
 
   template <>
-  void StokesProblem<2>::check_periodicity (const unsigned int cycle) const
+  void StokesProblem<3>::check_periodicity (const unsigned int cycle) const
   {
-    unsigned int n_points = 4;
-    for (unsigned int i = 0; i<cycle; i++)
-      n_points*=2;
+    const unsigned int dim = 3;
+    Quadrature<dim-1> q_dummy (fe.base_element(0).get_unit_face_support_points());
+    FEFaceValues<dim> fe_face_values (mapping,fe, q_dummy, update_quadrature_points);
 
-    for (unsigned int i=1; i< n_points; i++)
+    DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
+    DoFHandler<dim>::active_cell_iterator endc=  dof_handler.end();
+
+    std::vector<double> local_quad_points_first, local_quad_points_second;
+    std::vector<types::global_dof_index> gdi(fe.dofs_per_cell);
+
+    // first collect all points locally
+    for (; cell!=endc; ++cell)
+      if(cell->is_locally_owned() && cell->at_boundary())
+        for (unsigned int face_no=0;face_no<GeometryInfo<dim>::faces_per_cell;
+             ++face_no)
+        {
+          const typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
+          if (face->at_boundary())
+          {
+            if(face->boundary_id()==0)
+            {
+              fe_face_values.reinit(cell, face_no);
+              const std::vector<Point<dim> > tmp_points
+                = fe_face_values.get_quadrature_points();
+              for (unsigned int i=0; i<tmp_points.size(); ++i)
+                for (unsigned int c=0; c<dim; ++c)
+                  local_quad_points_first.push_back(tmp_points[i](c));
+            }
+            else if(face->boundary_id()==4)
+            {
+              fe_face_values.reinit(cell, face_no);
+              const std::vector<Point<dim> > tmp_points
+                = fe_face_values.get_quadrature_points();
+              for (unsigned int i=0; i<tmp_points.size(); ++i)
+                for (unsigned int c=0; c<dim; ++c)
+                  local_quad_points_second.push_back(tmp_points[i](c));
+            }
+          }
+        }
+    // next exchange them
+    std::vector<double> global_quad_points_first;
+    {
+      // how many elements are sent from which process?
+      unsigned int n_my_elements = local_quad_points_first.size();
+      const unsigned int n_processes = Utilities::MPI::n_mpi_processes(mpi_communicator);
+      std::vector<int> n_elements (n_processes);
+      MPI_Allgather (&n_my_elements, 1, MPI_INT,
+                     &n_elements[0], 1, MPI_INT, mpi_communicator);
+      std::vector<int> displacements (n_processes+1);
+      displacements[0] = 0;
+      for (unsigned int i=1; i<=n_processes; ++i)
+        displacements[i] = displacements[i-1]+n_elements[i-1];
+
+      global_quad_points_first.resize(displacements[n_processes]);
+      MPI_Allgatherv(&local_quad_points_first[0], n_my_elements, MPI_DOUBLE,
+                     &global_quad_points_first[0], &n_elements[0], &displacements[0], MPI_DOUBLE,
+                     mpi_communicator);
+    }
+    std::vector<double> global_quad_points_second;
+    {
+       // how many elements are sent from which process?
+      unsigned int n_my_elements = local_quad_points_second.size();
+      const unsigned int n_processes = Utilities::MPI::n_mpi_processes(mpi_communicator);
+      std::vector<int> n_elements (n_processes);
+      MPI_Allgather (&n_my_elements, 1, MPI_INT,
+                     &n_elements[0], 1, MPI_INT, mpi_communicator);
+      std::vector<int> displacements (n_processes+1);
+      displacements[0] = 0;
+      for (unsigned int i=1; i<=n_processes; ++i)
+        displacements[i] = displacements[i-1]+n_elements[i-1];
+
+      global_quad_points_second.resize(displacements[n_processes]);
+      MPI_Allgatherv(&local_quad_points_second[0], n_my_elements, MPI_DOUBLE,
+                     &global_quad_points_second[0], &n_elements[0], &displacements[0], MPI_DOUBLE,
+                     mpi_communicator);
+    }
+
+    // consider points on the boundary with the first indicator
+    // get the values of the solution at these points and compare to the values
+    // at the corresponding points on the boundary with the second indicator
+    {
+      for (unsigned int i=0; i<global_quad_points_first.size(); i+=dim)
       {
-        Vector<double> value1(3);
-        Vector<double> value2(3);
+        Vector<double> value_1(dim+1);
+        Vector<double> value_2(dim+1);
 
-        Point<2> point1;
-        point1(0)=0;
-        point1(1)=.5*(1.+1.*i/n_points);
-        Point<2> point2;
-        point2(0)=.5*(1.+1.*i/n_points);
-        point2(1)=0.;
+        Point<dim> point_1, point_2;
+        Vector<double> vector_point_1(dim);
+        for (unsigned int c=0; c<dim; ++c)
+        {
+          vector_point_1(c) = global_quad_points_first[i+c];
+          point_1(c) = vector_point_1(c);
+        }
+        Vector<double> vector_point_2(dim);
+        rot_matrix.Tvmult(vector_point_2, vector_point_1);
+        for (unsigned int c=0; c<dim; ++c)
+          point_2(c) = vector_point_2(c)+offset[c];
 
-        get_point_value (point1, 0, value1);
-        get_point_value (point2, 0, value2);
+        get_point_value (point_1, 0, value_1);
+        get_point_value (point_2, 0, value_2);
 
         if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
+        {
+          Vector<double> vel_value_1 (dim);
+          Vector<double> vel_value_2 (dim);
+          Vector<double> expected_vel (dim);
+          for (unsigned int c=0; c<dim; ++c)
           {
-            pcout << point1 << "\t" << value1[0] << "\t" << value1[1] << std::endl;
-            if (std::abs(value2[0]-value1[1])>1e-8)
-              {
-                std::cout<<point1<< "\t" << value1[1] << std::endl;
-                std::cout<<point2<< "\t" << value2[0] << std::endl;
-                Assert(false, ExcInternalError());
-              }
-            if (std::abs(value2[1]+value1[0])>1e-8)
-              {
-                std::cout<<point1<< "\t" << value1[0] << std::endl;
-                std::cout<<point2<< "\t" << value2[1] << std::endl;
-                Assert(false, ExcInternalError());
-              }
+            vel_value_1(c) = value_1(c);
+            vel_value_2(c) = value_2(c);
           }
+          rot_matrix.Tvmult(expected_vel, vel_value_1);
+          pcout << "Point 1: " << point_1 << "\t Point 2: " << point_2 << std::endl;
+          Vector<double> error = expected_vel;
+          error -= vel_value_2;
+          if (std::abs(error.l2_norm())>1e-8)
+          {
+            pcout << "first first_rotated second" <<std::endl;
+            for (unsigned int c=0; c<dim; ++c)
+              pcout << vel_value_1(c) << "\t" << expected_vel(c) << "\t" << vel_value_2(c) << std::endl;
+            pcout << std::endl;
+            Assert(false, ExcInternalError());
+          }
+        }
       }
+    }
+
+    // consider points on the boundary with the second indicator
+    // get the values of the solution at these points and compare to the values
+    // at the corresponding points on the boundary with the first indicator
+    {
+      for (unsigned int i=0; i<global_quad_points_second.size(); i+=dim)
+      {
+        Vector<double> value_1(dim+1);
+        Vector<double> value_2(dim+1);
+
+        Point<dim> point_1, point_2;
+        Vector<double> vector_point_1(dim);
+        for (unsigned int c=0; c<dim; ++c)
+        {
+          vector_point_1(c) = global_quad_points_second[i+c];
+          point_1(c) = vector_point_1(c);
+        }
+        Vector<double> vector_point_2(dim);
+        for (unsigned int c=0; c<dim; ++c)
+          vector_point_1(c) -= offset[c];
+        rot_matrix.vmult(vector_point_2, vector_point_1);
+        for (unsigned int c=0; c<dim; ++c)
+          point_2(c) = vector_point_2(c);
+
+        get_point_value (point_1, 0, value_1);
+        get_point_value (point_2, 0, value_2);
+
+        if (Utilities::MPI::this_mpi_process(mpi_communicator)==0)
+        {
+          Vector<double> vel_value_1 (dim);
+          Vector<double> vel_value_2 (dim);
+          Vector<double> expected_vel (dim);
+          for (unsigned int c=0; c<dim; ++c)
+          {
+            vel_value_1(c) = value_1(c);
+            vel_value_2(c) = value_2(c);
+          }
+          rot_matrix.vmult(expected_vel, vel_value_1);
+          pcout << "Point 1: " << point_1 << "\t Point 2: " << point_2 << std::endl;
+          Vector<double> error = expected_vel;
+          error -= vel_value_2;
+          if (std::abs(error.l2_norm())>1e-8)
+          {
+            pcout << "first first_rotated second" <<std::endl;
+            for (unsigned int c=0; c<dim; ++c)
+              pcout << vel_value_1(c) << "\t" << expected_vel(c) << "\t" << vel_value_2(c) << std::endl;
+            pcout << std::endl;
+            Assert(false, ExcInternalError());
+          }
+        }
+      }
+    }
   }
 
 
@@ -686,7 +775,8 @@ namespace Step22
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
     FEValuesExtractors::Scalar pressure(dim);
-    KellyErrorEstimator<dim>::estimate (dof_handler,
+    KellyErrorEstimator<dim>::estimate (mapping,
+                                        dof_handler,
                                         QGauss<dim-1>(degree+1),
                                         typename FunctionMap<dim>::type(),
                                         solution,
@@ -705,40 +795,20 @@ namespace Step22
   template <int dim>
   void StokesProblem<dim>::run ()
   {
-    Point<dim> center;
-    const double inner_radius = .5;
-    const double outer_radius = 1.;
+    GridGenerator::hyper_cube (triangulation, 0., 1., true);
 
-    GridGenerator::quarter_hyper_shell (triangulation,
-                                        center,
-                                        inner_radius,
-                                        outer_radius,
-                                        0,
-                                        true);
-
-#ifdef PERIODIC
     std::vector<GridTools::PeriodicFacePair<typename parallel::distributed::Triangulation<dim>::cell_iterator> >
     periodicity_vector;
-
-    FullMatrix<double> matrix(dim);
-    matrix[0][1]=1.;
-    matrix[1][0]=-1.;
 
     std::vector<unsigned int> first_vector_components;
     first_vector_components.push_back(0);
 
     GridTools::collect_periodic_faces
-    (triangulation, 2, 3, 1, periodicity_vector, Tensor<1,dim>(),
-     matrix, first_vector_components);
-
+    (triangulation, 4, 0, 1, periodicity_vector, offset,
+     rot_matrix, first_vector_components);
     triangulation.add_periodicity(periodicity_vector);
-#endif
 
-
-    triangulation.set_boundary(0, boundary);
-    triangulation.set_boundary(1, boundary);
-
-    triangulation.refine_global (4-dim);
+    triangulation.refine_global (1);
 
     for (unsigned int refinement_cycle = 0; refinement_cycle<3;
          ++refinement_cycle)
@@ -756,8 +826,8 @@ namespace Step22
         pcout << "   Solving..." << std::endl << std::flush;
         solve ();
 
+//        output_results (refinement_cycle);
         check_periodicity(refinement_cycle);
-//         output_results (refinement_cycle);
 
         pcout << std::endl;
       }
@@ -783,13 +853,13 @@ int main (int argc, char *argv[])
           deallog.depth_console(0);
           deallog.threshold_double(1.e-10);
           {
-            StokesProblem<2> flow_problem(1);
+            StokesProblem<3> flow_problem(1);
             flow_problem.run ();
           }
         }
       else
         {
-          StokesProblem<2> flow_problem(1);
+          StokesProblem<3> flow_problem(1);
           flow_problem.run ();
         }
     }
