@@ -396,7 +396,9 @@ private:
  * preconditioner in each iteration step. Therefore, it is also more robust
  * with respect to inaccurate evaluation of the preconditioner. An important
  * application is also the use of a Krylov space method inside the
- * preconditioner.
+ * preconditioner. As opposed to SolverGMRES which allows one to choose
+ * between left and right preconditioning, this solver always applies the
+ * preconditioner from the right.
  *
  * FGMRES needs two vectors in each iteration steps yielding a total of
  * <tt>2*SolverFGMRES::AdditionalData::max_basis_size+1</tt> auxiliary
@@ -417,9 +419,7 @@ public:
   struct AdditionalData
   {
     /**
-     * Constructor. By default, set the number of temporary vectors to 30,
-     * preconditioning from left and the residual of the stopping criterion to
-     * the default residual (cf. class documentation).
+     * Constructor. By default, set the maximum basis size to 30.
      */
     AdditionalData(const unsigned int max_basis_size = 30,
                    const bool /*use_default_residual*/ = true)
@@ -458,14 +458,17 @@ public:
          const PRECONDITIONER &precondition);
 
 private:
+
   /**
    * Additional flags.
    */
   AdditionalData additional_data;
+
   /**
    * Projected system matrix
    */
   FullMatrix<double> H;
+
   /**
    * Auxiliary matrix for inverting @p H
    */
