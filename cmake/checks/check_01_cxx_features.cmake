@@ -324,6 +324,17 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
   ENDIF()
 ENDIF()
 
+
+#
+# Finally disable cxx14 if cxx11 detection failed for whatever reason. This
+# can happen if any of our compile checks above fails, for example threading
+# support.
+# 
+IF (DEAL_II_HAVE_CXX14 AND NOT DEAL_II_HAVE_CXX11)
+  MESSAGE(STATUS "Disabling CXX14 support because CXX11 detection failed.")
+  SET(DEAL_II_HAVE_CXX14 FALSE)
+ENDIF()
+
 #
 # Set up a configuration options for C++11 and C++14 support:
 #
