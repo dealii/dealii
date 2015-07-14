@@ -349,14 +349,14 @@ ENDIF()
 
 
 #
-# in intel (at least 13.1 and 14), vectorization causes
+# In intel (at least 13.1 and 14), vectorization causes
 # wrong code. See https://code.google.com/p/dealii/issues/detail?id=156
 # or tests/hp/solution_transfer.cc
 # A work-around is to disable all vectorization.
 #
-# - Timo Heister, 2013
+# - Timo Heister, 2013, 2015
 #
-IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "15.0.3" )
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-no-vec")
 ENDIF()
 
