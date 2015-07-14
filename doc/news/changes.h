@@ -62,6 +62,16 @@ inconvenience this causes.
 
 <ol>
 
+
+  <li> New: The parallel::distributed::Triangulation can now be told to
+  partition the cells so that the sum of certain weights associated with each
+  cell, rather than the number of cells, is roughly constant between processors.
+  This is done by passing a vector of weights to the function that repartitions
+  the triangulation, parallel::distributed::Triangulation::repartition().
+  <br>
+  (Wolfgang Bangerth, 2015/07/14)
+  </li>
+
 </ol>
 
 */
