@@ -1,0 +1,9 @@
+
+DEAL:2d::processor 0: 256 locally owned active cells
+DEAL:2d::processor 1: 256 locally owned active cells
+DEAL:2d::processor 2: 256 locally owned active cells
+DEAL:2d::processor 3: 256 locally owned active cells
+DEAL:3d::processor 0: 8192 locally owned active cells
+DEAL:3d::processor 1: 8192 locally owned active cells
+DEAL:3d::processor 2: 8192 locally owned active cells
+DEAL:3d::processor 3: 8192 locally owned active cells
