@@ -755,7 +755,7 @@ TRACK
     "Regression Tests" - Reserved for the regression tester
 
 CONFIG_FILE
-  - A configuration file (see docs/development/Config.sample)
+  - A configuration file (see docs/users/config.sample)
     that will be used during the configuration stage (invokes
     $ cmake -C ${CONFIG_FILE}). This only has an effect if
     CTEST_BINARY_DIRECTORY is empty.
@@ -772,7 +772,7 @@ COVERAGE
 MAKEOPTS
   - Additional options that will be passed directly to make (or ninja).
 </pre>
-      Furthermore, the variables described <a href="#setupconfigure">above</a> can also be
+      Furthermore, the variables described <a href="#setup">above</a> can also be
       set and will be handed automatically down to <code>cmake</code>.
     </p>
 
@@ -810,10 +810,10 @@ ctest -j4 -S ../cmake/scripts/run_buildtest.cmake
     <p>
       <b>Note:</b> Build tests require the designated build directory to be
       completely empty. If you want to specify a build configuration for
-      cmake use a <a href="../users/Config.sample">configuration file</a>
+      cmake use a <a href="../users/config.sample">configuration file</a>
       to preseed the cache as explained <a href="#submit">above</a>:
 <pre>
-$ ctest -DCONFIG_FILE="[...]/Config.sample" [...]
+$ ctest -DCONFIG_FILE="[...]/config.sample" [...]
 </pre>
     </p>
 
