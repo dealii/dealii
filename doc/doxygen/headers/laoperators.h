@@ -88,15 +88,10 @@
  * op_a *= op_b; // If op_b is an endomorphism of the domain space of op_a
  * @endcode
  *
- * block_operator() and block_diagonal_operator() provide further
- * encapsulation of individual linear operators into blocked linear
- * operator variants.
- *
  * @note The LinearOperator facility obsoletes some of the @ref Matrix2
- * "derived matrix" classes, such as BlockDiagonalMatrix, IterativeInverse,
- * ProductMatrix, ScaledMatrix, ProductSparseMatrix,
- * InverseMatrixRichardson, SchurMatrix, ShiftedMatrix,
- * ShiftedMatrixGeneralized, TransposeMatrix
+ * "derived matrix" classes, such as IterativeInverse, ProductMatrix,
+ * ScaledMatrix, ProductSparseMatrix, InverseMatrixRichardson, SchurMatrix,
+ * ShiftedMatrix, ShiftedMatrixGeneralized, TransposeMatrix
  *
  *
  * <h3>Packaged Operation</h3>
