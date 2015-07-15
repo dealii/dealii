@@ -181,6 +181,15 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       "
       DEAL_II_HAVE_CXX11_FUNCTIONAL_GCCBUG35569_OK)
 
+    # clang libc++ bug, see https://llvm.org/bugs/show_bug.cgi?id=20084
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      #include <functional>
+      struct A { void foo() const {} };
+      int main() { A a; std::bind(&A::foo,a)(); return 0; }
+      "
+      DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
+
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <memory>
@@ -312,6 +321,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX11 OR DEAL_II_WITH_CXX11)
       DEAL_II_HAVE_CXX11_CONDITION_VARIABLE AND
       DEAL_II_HAVE_CXX11_FUNCTIONAL AND
       DEAL_II_HAVE_CXX11_FUNCTIONAL_GCCBUG35569_OK AND
+      DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK AND
       DEAL_II_HAVE_CXX11_SHARED_PTR AND
       DEAL_II_HAVE_CXX11_THREAD AND
       DEAL_II_HAVE_CXX11_MUTEX AND
