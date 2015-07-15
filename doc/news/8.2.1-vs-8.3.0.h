@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 /**
- * @page changes_between_8_3_and_8_2_1 Changes between Version 8.3 and 8.2.1
+ * @page changes_between_8_2_1_and_8_3 Changes between Version 8.2.1 and 8.3
 
 <p>
 This is the list of changes made between the release of deal.II version
