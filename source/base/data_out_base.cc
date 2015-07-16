@@ -1703,7 +1703,7 @@ namespace DataOutBase
                        "Whether POVRAY should use bicubic patches");
     prm.declare_entry ("Include external file", "true",
                        Patterns::Bool (),
-                       "Whether camera and lightling information should "
+                       "Whether camera and lighting information should "
                        "be put into an external file \"data.inc\" or into "
                        "the POVRAY input file");
   }
