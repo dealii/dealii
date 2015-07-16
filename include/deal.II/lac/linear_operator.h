@@ -831,6 +831,10 @@ namespace
     static std::true_type test(decltype(&C::vmult_add),
                                decltype(&C::Tvmult_add));
 
+    // Work around a bug with icc (up to version 15) that fails during type
+    // deduction in an SFINAE scenario
+#ifndef DEAL_II_ICC_SFINAE_BUG
+
     template <typename C>
     static std::true_type test(decltype(&C::template vmult_add<Range>),
                                decltype(&C::template Tvmult_add<Range>));
@@ -838,6 +842,7 @@ namespace
     template <typename C>
     static std::true_type test(decltype(&C::template vmult_add<Range, Domain>),
                                decltype(&C::template Tvmult_add<Domain, Range>));
+#endif
 
   public:
     // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
