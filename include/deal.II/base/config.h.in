@@ -69,6 +69,7 @@
 #cmakedefine DEAL_II_BOOST_BIND_COMPILER_BUG
 #cmakedefine DEAL_II_BIND_NO_CONST_OP_PARENTHESES
 #cmakedefine DEAL_II_CONSTEXPR_BUG
+#cmakedefine DEAL_II_ICC_SFINAE_BUG
 
 
 /***********************************************************************
