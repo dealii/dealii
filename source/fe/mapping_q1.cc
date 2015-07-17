@@ -94,6 +94,126 @@ namespace internal
 {
   namespace MappingQ1
   {
+    // These are left as templates on the spatial dimension (even though dim
+    // == spacedim must be true for them to make sense) because templates are
+    // expanded before the compiler eliminates code due to the 'if (dim ==
+    // spacedim)' statement (see the body of the general
+    // transform_real_to_unit_cell).
+    template<int spacedim>
+    Point<1>
+    transform_real_to_unit_cell
+    (const std_cxx11::array<Point<spacedim>, GeometryInfo<1>::vertices_per_cell> &vertices,
+     const Point<spacedim> &p)
+    {
+      Assert(spacedim == 1, ExcInternalError());
+      return Point<1>((p[0] - vertices[0](0))/(vertices[1](0) - vertices[0](0)));
+    }
+
+
+
+    template<int spacedim>
+    Point<2>
+    transform_real_to_unit_cell
+    (const std_cxx11::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell> &vertices,
+     const Point<spacedim> &p)
+    {
+      Assert(spacedim == 2, ExcInternalError());
+      const double x = p(0);
+      const double y = p(1);
+
+      const double x0 = vertices[0](0);
+      const double x1 = vertices[1](0);
+      const double x2 = vertices[2](0);
+      const double x3 = vertices[3](0);
+
+      const double y0 = vertices[0](1);
+      const double y1 = vertices[1](1);
+      const double y2 = vertices[2](1);
+      const double y3 = vertices[3](1);
+
+      const double a = (x1 - x3)*(y0 - y2) - (x0 - x2)*(y1 - y3);
+      const double b = -(x0 - x1 - x2 + x3)*y + (x - 2*x1 + x3)*y0 - (x - 2*x0 + x2)*y1
+                       - (x - x1)*y2 + (x - x0)*y3;
+      const double c = (x0 - x1)*y - (x - x1)*y0 + (x - x0)*y1;
+
+      const double discriminant = b*b - 4*a*c;
+      // fast exit if the point is not in the cell (this is the only case
+      // where the discriminant is negative)
+      if (discriminant < 0.0)
+        {
+          return Point<2>(2, 2);
+        }
+
+      double eta1;
+      double eta2;
+      // special case #1: if a is zero, then use the linear formula
+      if (a == 0.0 && b != 0.0)
+        {
+          eta1 = -c/b;
+          eta2 = -c/b;
+        }
+      // special case #2: if c is very small:
+      else if (std::abs(c/b) < 1e-12)
+        {
+          eta1 = (-b - std::sqrt(discriminant)) / (2*a);
+          eta2 = (-b + std::sqrt(discriminant)) / (2*a);
+        }
+      // finally, use the numerically stable version of the quadratic formula:
+      else
+        {
+          eta1 = 2*c / (-b - std::sqrt(discriminant));
+          eta2 = 2*c / (-b + std::sqrt(discriminant));
+        }
+      // pick the one closer to the center of the cell.
+      const double eta = (std::abs(eta1 - 0.5) < std::abs(eta2 - 0.5)) ? eta1 : eta2;
+
+      /*
+       * There are two ways to compute xi from eta, but either one may have a
+       * zero denominator.
+       */
+      const double subexpr0 = -eta*x2 + x0*(eta - 1);
+      const double xi_denominator0 = eta*x3 - x1*(eta - 1) + subexpr0;
+      const double max_x = std::max(std::max(std::abs(x0), std::abs(x1)),
+                                    std::max(std::abs(x2), std::abs(x3)));
+
+      if (std::abs(xi_denominator0) > 1e-10*max_x)
+        {
+          const double xi = (x + subexpr0)/xi_denominator0;
+          return Point<2>(xi, eta);
+        }
+      else
+        {
+          const double max_y = std::max(std::max(std::abs(y0), std::abs(y1)),
+                                        std::max(std::abs(y2), std::abs(y3)));
+          const double subexpr1 = -eta*y2 + y0*(eta - 1);
+          const double xi_denominator1 = eta*y3 - y1*(eta - 1) + subexpr1;
+          if (std::abs(xi_denominator1) > 1e-10*max_y)
+            {
+              const double xi = (subexpr1 + y)/xi_denominator1;
+              return Point<2>(xi, eta);
+            }
+          else // give up and try Newton iteration
+            {
+              return Point<2>(2, 2);
+            }
+        }
+    }
+
+
+
+    template<int spacedim>
+    Point<3>
+    transform_real_to_unit_cell
+    (const std_cxx11::array<Point<spacedim>, GeometryInfo<3>::vertices_per_cell> &/*vertices*/,
+     const Point<spacedim> &/*p*/)
+    {
+      // It should not be possible to get here
+      Assert(false, ExcInternalError());
+      return Point<3>();
+    }
+
+
+
     template <int spacedim>
     void
     compute_shapes_virtual (const unsigned int            n_shape_functions,
@@ -1643,6 +1763,40 @@ MappingQ1<dim,spacedim>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const Point<spacedim>                            &p) const
 {
+  // Use the exact formula if available
+  if (dim == spacedim && (dim == 1 || dim == 2))
+    {
+      // The dimension-dependent algorithms are much faster (about 25-45x in 2D)
+      // but fail most of the time when the given point (p) is not in the
+      // cell. The dimension-independent Newton algorithm given below is
+      // slower, but more robust (though it still sometimes fails).
+      const std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+      vertices = this->get_vertices(cell);
+      // These internal routines do not throw exceptions when the point does
+      // not lie in the cell because manually checking (see the tolerances
+      // before the return statements) is about 10% faster than a throw/catch.
+      Point<dim> point = internal::MappingQ1::transform_real_to_unit_cell(vertices, p);
+
+      if (dim == 1)
+        {
+          // formula not subject to any issues
+          return point;
+        }
+      else if (dim == 2)
+        {
+          // formula not guaranteed to work for points outside of the cell
+          const double eps = 1e-15;
+          if (-eps <= point(1) && point(1) <= 1 + eps &&
+              -eps <= point(0) && point(0) <= 1 + eps)
+            {
+              return point;
+            }
+        }
+      else
+        {
+          Assert(false, ExcInternalError());
+        }
+    }
   // Find the initial value for the
   // Newton iteration by a normal projection
   // to the least square plane determined by
