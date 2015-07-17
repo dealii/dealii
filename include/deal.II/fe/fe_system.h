@@ -840,7 +840,7 @@ protected:
                        const Quadrature<dim-1>              &quadrature,
                        typename Mapping<dim,spacedim>::InternalDataBase      &mapping_data,
                        typename Mapping<dim,spacedim>::InternalDataBase      &fe_data,
-                       FEValuesData<dim,spacedim>                    &data) const ;
+                       FEValuesData<dim,spacedim>                    &data) const;
 
   /**
    * Implementation of the same function in FiniteElement.
@@ -856,7 +856,7 @@ protected:
                           const Quadrature<dim-1>              &quadrature,
                           typename Mapping<dim,spacedim>::InternalDataBase      &mapping_data,
                           typename Mapping<dim,spacedim>::InternalDataBase      &fe_data,
-                          FEValuesData<dim,spacedim>                    &data) const ;
+                          FEValuesData<dim,spacedim>                    &data) const;
 
 
   /**
@@ -878,7 +878,7 @@ protected:
                      CellSimilarity::Similarity                   cell_similarity,
                      typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                      typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-                     FEValuesData<dim,spacedim>                       &data) const ;
+                     FEValuesData<dim,spacedim>                       &data) const;
 
 private:
 
@@ -1036,6 +1036,24 @@ private:
   template <int structdim>
   std::vector<std::pair<unsigned int, unsigned int> >
   hp_object_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
+
+  /**
+   * Compute the equivalent of compute_fill(), but only for the base element
+   * specified by the second-to-last argument.
+   */
+  template <int dim_1>
+  void
+  compute_fill_one_base (
+    const Mapping<dim,spacedim>                      &mapping,
+    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+    const unsigned int                                face_no,
+    const unsigned int                                sub_no,
+    const Quadrature<dim_1>                          &quadrature,
+    CellSimilarity::Similarity                   cell_similarity,
+    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+    typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+    const unsigned int                                base_element,
+    FEValuesData<dim,spacedim>                       &data) const;
 
   /**
    * Usually: Fields of cell-independent data.
