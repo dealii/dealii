@@ -62,6 +62,14 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Fixed: When using FESystem with base elements that require
+  information other than the determinant of the Jacobian (e.g.,
+  elements that require the Jacobian itself), then this information
+  was not passed down to FiniteElement::fill_fe_values of the
+  base element. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, Zhen Tao, 2015/07/17)
+  </li>
 
   <li> New: The parallel::distributed::Triangulation can now be told to
   partition the cells so that the sum of certain weights associated with each
