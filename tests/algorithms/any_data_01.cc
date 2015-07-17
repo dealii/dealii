@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,9 +62,18 @@ void extract(const AnyData& data)
 	  << *p2 << std::endl
 	  << *p3 << std::endl;
 
-  deallog << *data.try_read<double>(" d  17.") << std::endl
-	  << data.try_read<char *>(" d  17.") << std::endl
-	  << data.try_read<double>("does not exist") << std::endl;
+  deallog << *data.try_read<double>(" d  17.") << std::endl;
+
+  if (data.try_read<char *>(" d  17.") == 0)
+    deallog << "(nil)" << std::endl;
+  else
+    AssertThrow (false, ExcInternalError());
+
+  if (data.try_read<double>("does not exist") == 0)
+    deallog << "(nil)" << std::endl;
+  else
+    AssertThrow (false, ExcInternalError());
+  
 // try
   //   {
   //     double* p3a = data.entry<double*>("cd* 17.");
