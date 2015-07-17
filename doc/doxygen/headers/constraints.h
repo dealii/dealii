@@ -38,8 +38,8 @@
  *   solution's value, for example no normal flux, $\mathbf n \cdot
  *   \mathbf u=0$ (as happens in flow problems and is handled by the
  *   VectorTools::compute_no_normal_flux_constraints function) or
- *   prescribed tangential components, $\vec{n}\times\vec{u}=
- *   \vec{n}\times\vec{f}$ (as happens in electromagnetic problems and
+ *   prescribed tangential components, $\mathbf{n}\times\mathbf{u}=
+ *   \mathbf{n}\times\mathbf{f}$ (as happens in electromagnetic problems and
  *   is handled by the VectorTools::project_boundary_values_curl_conforming
  *   function). For the former case, imagine for example that we are at
  *   at vertex where the normal vector has the form $\frac 1{\sqrt{14}}
