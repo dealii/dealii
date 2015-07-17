@@ -1246,14 +1246,27 @@ namespace internal
 //TODO: Several FEValuesBase of a system should share Mapping
 
 /**
- * Contains all data vectors for FEValues.  This class has been extracted from
- * FEValuesBase to be handed over to the fill functions of Mapping and
- * FiniteElement.
+ * A class that contains all data vectors for FEValues, FEFaceValues, and
+ * FESubfaceValues.
  *
- * @note All data fields are public, but this is not critical, because access
- * to this object is private in FEValues.
+ * This class has been extracted from FEValuesBase to encapsulate in one
+ * place all of the data, independent of the functions thater later
+ * access this data in the public interfaces of the FEValues and related
+ * classes. Consequently, this base class is protected in FEValuesBase.
  *
- * The purpose of this class is discussed on the page on
+ * The second reason is because in FEValuesBase::reinit, we first need to
+ * call Mapping::fill_fe_values() to compute mapping related data, and later
+ * call FiniteElement::fill_fe_values() to compute shape function related
+ * data. In the first step, Mapping::fill_fe_values() gets a pointer to
+ * its own internal data structure and a pointer to the FEValuesData base
+ * object of FEValuesBase, and the mapping then places the computed data
+ * into the data fields that pertain to the mapping below. In the second
+ * step, the finite element receives a pointer to its own internal object,
+ * and to the current object, and from both of these computes the shape
+ * function related information and, again, places it into the current
+ * FEValuesData object.
+ *
+ * More information can be found on the page on
  * @ref UpdateFlagsEssay.
  *
  * @ingroup feaccess
@@ -1270,6 +1283,11 @@ public:
   void initialize (const unsigned int        n_quadrature_points,
                    const FiniteElement<dim,spacedim> &fe,
                    const UpdateFlags         flags);
+
+  /**
+   * @name Fields filled by the finite element
+   * @{
+   */
 
   /**
    * Storage type for shape values. Each row in the matrix denotes the values
@@ -1322,6 +1340,15 @@ public:
   HessianVector shape_hessians;
 
   /**
+   * @}
+   */
+
+  /**
+   * @name Fields filled by the mapping
+   * @{
+   */
+
+  /**
    * Store an array of weights times the Jacobi determinant at the quadrature
    * points. This function is reset each time reinit() is called. The Jacobi
    * determinant is actually the reciprocal value of the Jacobi matrices
@@ -1372,6 +1399,10 @@ public:
   std::vector<Tensor<1,spacedim> >  boundary_forms;
 
   /**
+   * @}
+   */
+
+  /**
    * When asked for the value (or gradient, or Hessian) of shape function i's
    * c-th vector component, we need to look it up in the #shape_values,
    * #shape_gradients and #shape_hessians arrays.  The question is where in
@@ -1417,7 +1448,7 @@ public:
  * of finite element and mapping, some values can be computed once on the unit
  * cell. Others must be computed on each cell, but maybe computation of
  * several values at the same time offers ways for optimization. Since this
- * interlay may be complex and depends on the actual finite element, it cannot
+ * interplay may be complex and depends on the actual finite element, it cannot
  * be left to the applications programmer.
  *
  * FEValues, FEFaceValues and FESubfaceValues provide only data handling:
@@ -1469,7 +1500,7 @@ public:
  *
  * <h3>Member functions</h3>
  *
- * The functions of this class fall into different cathegories:
+ * The functions of this class fall into different categories:
  * <ul>
  * <li> shape_value(), shape_grad(), etc: return one of the values of this
  * object at a time. These functions are inlined, so this is the suggested
@@ -1562,7 +1593,7 @@ public:
    * Destructor.
    */
   ~FEValuesBase ();
-  /// @name ShapeAccess Access to shape function values
+  /// @name ShapeAccess Access to shape function values. These fields are filled by the finite element
   //@{
 
   /**
