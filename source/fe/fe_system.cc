@@ -1180,14 +1180,17 @@ FESystem<dim,spacedim>::compute_fill (
           FEValuesData<dim,spacedim> &
           base_data    = fe_data.get_fe_values_data(base_no);
 
-          // Copy quadrature points. These are required for computing
-          // the determinant in the FEPolyTensor class. The
-          // determinant is one ingredient of the Piola
-          // transformation, which is applied to correctly map the RT
-          // space from the reference element to the global coordinate
-          // system.
-          if (cell_similarity != CellSimilarity::translation)
-            base_data.JxW_values = data.JxW_values;
+          // Copy all of the things that the mapping set in the FEValuesData
+          // that we store here into the corresponding objects we pass down
+          // to the various base elements. some of these arrays may be empty,
+          // in which case copying is cheap
+          base_data.JxW_values        = data.JxW_values;
+          base_data.jacobians         = data.jacobians;
+          base_data.jacobian_grads    = data.jacobian_grads;
+          base_data.inverse_jacobians = data.inverse_jacobians;
+          base_data.quadrature_points = data.quadrature_points;
+          base_data.normal_vectors    = data.normal_vectors;
+          base_data.boundary_forms    = data.boundary_forms;
 
 
           // Make sure that in the case of fill_fe_values the data is only
