@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2014 by the deal.II authors
+// Copyright (C) 2013 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,9 +15,10 @@
 
 #include HEADER
 
-// Make sure that config.h is always included:
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
+#if !defined(DEAL_II_NAMESPACE_OPEN) && !defined(dealii__revision_h)
+#error "HEADER does not include config.h."
+#endif
+
 
 int main()
 {
