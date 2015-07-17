@@ -475,9 +475,27 @@ namespace parallel
        * this-@>locally_owned_subdomain()</code>), refinement and coarsening
        * flags are only respected for those locally owned cells. Flags may be
        * set on other cells as well (and may often, in fact, if you call
-       * dealii::Triangulation::prepare_coarsening_and_refinement) but will be
+       * dealii::Triangulation::prepare_coarsening_and_refinement()) but will be
        * largely ignored: the decision to refine the global mesh will only be
        * affected by flags set on locally owned cells.
+       *
+       * @note This function by default partitions the mesh in such a way
+       *   that the number of cells on all processors is roughly equal,
+       *   i.e., it is not possible to "weigh" cells that are more expensive
+       *   to compute on than others. This is because these weights would apply
+       *   to the current set of cells, which will then be refined and
+       *   coarsened into a separate set of cells, which will only then be
+       *   partitioned between processors. In other words, the weights for
+       *   cells you could attach before calling this function will no
+       *   longer be the set of cells that will ultimately be partitioned.
+       *   If you want to set weights for partitioning, you need to create
+       *   your triangulation object by passing the
+       *   parallel::distributed::Triangulation::no_automatic_repartitioning
+       *   flag to the constructor, which ensures that calling the current
+       *   function only refines and coarsens the triangulation, but doesn't
+       *   partition it. You would then call the current function, in a second
+       *   step compute and use cell weights when partitioning the mesh upon
+       *   calling repartition() with a non-default argument.
        */
       virtual void execute_coarsening_and_refinement ();
 
@@ -497,9 +515,53 @@ namespace parallel
        * information will be packed and shipped to different processors. In
        * other words, you probably want to treat a call to repartition() in
        * the same way as execute_coarsening_and_refinement() with respect to
-       * dealing with data movement (SolutionTransfer, etc..).
+       * dealing with data movement (SolutionTransfer, etc.).
+       *
+       * @param weights_per_cell A vector of weights that indicates how
+       *   "expensive" computations are on each of the active cells. If
+       *   left at its default value, this function will partition the
+       *   mesh in such a way that it has roughly equal numbers of cells
+       *   on all processors. If the argument is specified, then the mesh
+       *   is partitioned so that the sum of weights of the cells owned
+       *   by each processor is roughly equal. The size of the vector
+       *   needs to equal the number of active cells of the current
+       *   triangulation (i.e., must be equal to
+       *   <code>triangulation.n_active_cells()</code>) and be in the order
+       *   in which one encounters these cells in a loop over all cells (in
+       *   the same way as vectors of refinement indicators are interpreted
+       *   in namespace GridRefinement). In other words, the element of this
+       *   vector that corresponds to a given cell has index
+       *   <code>cell-@>active_cell_index()</code>. Of the elements of this
+       *   vector, only those that correspond to <i>locally owned</i>
+       *   active cells are actually considered. You can set the rest
+       *   to arbitrary values.
+       *
+       * @note The only requirement on the weights is that every cell's
+       *   weight is positive and that the sum over all weights on all
+       *   processors can be formed using a 64-bit integer. Beyond that,
+       *   it is your choice how you want to interpret the weights. A
+       *   common approach is to consider the weights proportional to
+       *   the cost of doing computations on a cell, e.g., by summing
+       *   the time for assembly and solving. In practice, determining
+       *   this cost is of course not trivial since we don't solve on
+       *   isolated cells, but on the entire mesh. In such cases, one
+       *   could, for example, choose the weight equal to the number
+       *   of unknowns per cell (in the context of hp finite element
+       *   methods), or using a heuristic that estimates the cost on
+       *   each cell depending on whether, for example, one has to
+       *   run some expensive algorithm on some cells but not others
+       *   (such as forming boundary integrals during the assembly
+       *   only on cells that are actually at the boundary, or computing
+       *   expensive nonlinear terms only on some cells but not others,
+       *   e.g., in the elasto-plastic problem in step-42). In any
+       *   case, the scaling does not matter: you can choose the weights
+       *   equal to the number of unknowns on each cell, or equal to ten
+       *   times the number of unknowns -- because only their relative
+       *   size matters in partitioning, both choices will lead to the
+       *   same mesh.
        */
-      void repartition ();
+      void repartition (const std::vector<unsigned int> &weights_per_cell
+                        = std::vector<unsigned int>());
 
       /**
        * When vertices have been moved locally, for example using code like
