@@ -1900,7 +1900,7 @@ namespace internal
 
           case 2:
           {
-            static const TableIndices<2> table[3] =
+            const TableIndices<2> table[3] =
             {
               TableIndices<2> (0,0),
               TableIndices<2> (1,1),
@@ -1911,7 +1911,7 @@ namespace internal
 
           case 3:
           {
-            static const TableIndices<2> table[6] =
+            const TableIndices<2> table[6] =
             {
               TableIndices<2> (0,0),
               TableIndices<2> (1,1),
