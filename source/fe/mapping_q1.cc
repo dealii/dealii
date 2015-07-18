@@ -18,6 +18,7 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/std_cxx11/array.h>
 #include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/grid/tria.h>
@@ -725,10 +726,12 @@ MappingQ1<dim,spacedim>::compute_mapping_support_points(
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   std::vector<Point<spacedim> > &a) const
 {
+  std_cxx11::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  vertices = this->get_vertices(cell);
   a.resize(GeometryInfo<dim>::vertices_per_cell);
 
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    a[i] = cell->vertex(i);
+    a[i] = vertices[i];
 }
 
 
