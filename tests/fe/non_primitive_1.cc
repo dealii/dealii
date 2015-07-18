@@ -325,9 +325,9 @@ test ()
     {
       if (i % (dim*dim*dim) == 0)
         deallog << i << ' ' << p1->value() << std::endl;
-      AssertThrow (p1->value() == p2->value(),
+      AssertThrow (std::abs(p1->value() - p2->value())<1e-15,
                    ExcInternalError());
-      AssertThrow (p1->value() == p3->value(),
+      AssertThrow (std::abs(p1->value() - p3->value())<1e-15,
                    ExcInternalError());
     };
 }

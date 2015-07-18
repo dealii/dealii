@@ -56,10 +56,10 @@ void check_large_numbers()
   w(4) = 3e-303;
   w(5) = -1e-303;
   const double correct4 = std::sqrt(100. + 1. + 4. + 9 + 1.) * 1e-303;
-  AssertThrow (std::abs(w.l2_norm() - correct4) < 1e-13*correct4, ExcInternalError());
+  AssertThrow (std::abs(w.l2_norm() - correct4) <= 1e-13*correct4, ExcInternalError());
 
   const double correct5 = std::pow(1000. + 1. + 8. + 27 + 1., 1./3.) * 1e-303;
-  AssertThrow (std::abs(w.lp_norm(3.) - correct5) < 1e-13*correct5, ExcInternalError());
+  AssertThrow (std::abs(w.lp_norm(3.) - correct5) <= 1e-13*correct5, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 
