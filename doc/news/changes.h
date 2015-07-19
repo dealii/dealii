@@ -61,6 +61,11 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: FESystem now does some work in parallel if your system
+  has multiple processors.
+  <br>
+  (Wolfgang Bangerth, 2015/07/19)
+  </li>
 
   <li> Fixed: When using FESystem with base elements that require
   information other than the determinant of the Jacobian (e.g.,
