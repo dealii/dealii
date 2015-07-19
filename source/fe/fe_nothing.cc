@@ -120,8 +120,8 @@ FE_Nothing<dim,spacedim>::
 fill_fe_values (const Mapping<dim,spacedim> & /*mapping*/,
                 const typename Triangulation<dim,spacedim>::cell_iterator & /*cell*/,
                 const Quadrature<dim> & /*quadrature*/,
-                typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
-                typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
+                const typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
+                const typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
                 FEValuesData<dim,spacedim> & /*data*/,
                 CellSimilarity::Similarity & /*cell_similarity*/) const
 {
@@ -137,8 +137,8 @@ fill_fe_face_values (const Mapping<dim,spacedim> & /*mapping*/,
                      const typename Triangulation<dim,spacedim>::cell_iterator & /*cell*/,
                      const unsigned int /*face*/,
                      const Quadrature<dim-1> & /*quadrature*/,
-                     typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
-                     typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
+                     const typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
+                     const typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
                      FEValuesData<dim,spacedim> & /*data*/) const
 {
   // leave data fields empty
@@ -152,8 +152,8 @@ fill_fe_subface_values (const Mapping<dim,spacedim> & /*mapping*/,
                         const unsigned int /*face*/,
                         const unsigned int /*subface*/,
                         const Quadrature<dim-1> & /*quadrature*/,
-                        typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
-                        typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
+                        const typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
+                        const typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
                         FEValuesData<dim,spacedim> & /*data*/) const
 {
   // leave data fields empty

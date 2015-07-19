@@ -251,8 +251,8 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values
 (const Mapping<dim,spacedim>                      &mapping,
  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
  const Quadrature<dim>                            &quadrature,
- typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
- typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+ const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+ const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
  FEValuesData<dim,spacedim>                       &data,
  CellSimilarity::Similarity                  &cell_similarity) const
 {
@@ -260,8 +260,8 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
 
@@ -290,16 +290,16 @@ fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
                      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                      const unsigned int                    face,
                      const Quadrature<dim-1>              &quadrature,
-                     typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
-                     typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
+                     const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
+                     const typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
                      FEValuesData<dim,spacedim>                    &data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   // offset determines which data set
   // to take (all data sets for all
@@ -405,16 +405,16 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
                                                     const unsigned int                    face,
                                                     const unsigned int                    subface,
                                                     const Quadrature<dim-1>              &quadrature,
-                                                    typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
-                                                    typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
+                                                    const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
+                                                    const typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
                                                     FEValuesData<dim,spacedim>                    &data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   // offset determines which data set
   // to take (all data sets for all

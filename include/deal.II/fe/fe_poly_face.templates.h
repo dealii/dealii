@@ -175,8 +175,8 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_values
 (const Mapping<dim,spacedim> &,
  const typename Triangulation<dim,spacedim>::cell_iterator &,
  const Quadrature<dim> &,
- typename Mapping<dim,spacedim>::InternalDataBase &,
- typename Mapping<dim,spacedim>::InternalDataBase &,
+ const typename Mapping<dim,spacedim>::InternalDataBase &,
+ const typename Mapping<dim,spacedim>::InternalDataBase &,
  FEValuesData<dim,spacedim> &,
  CellSimilarity::Similarity &) const
 {
@@ -193,16 +193,16 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &,
   const unsigned int face,
   const Quadrature<dim-1>& quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase &,
-  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+  const typename Mapping<dim,spacedim>::InternalDataBase &,
+  const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
   FEValuesData<dim,spacedim> &data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
@@ -257,16 +257,16 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_subface_values (
   const unsigned int face,
   const unsigned int subface,
   const Quadrature<dim-1>& quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase &,
-  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+  const typename Mapping<dim,spacedim>::InternalDataBase &,
+  const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
   FEValuesData<dim,spacedim> &data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 

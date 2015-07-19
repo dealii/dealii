@@ -281,8 +281,8 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
   const Mapping<dim,spacedim> &,
   const typename Triangulation<dim,spacedim>::cell_iterator &,
   const Quadrature<dim> &,
-  typename Mapping<dim,spacedim>::InternalDataBase &,
-  typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &,
+  const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
   FEValuesData<dim,spacedim> &data,
   CellSimilarity::Similarity &/*cell_similarity*/) const
 {
@@ -321,8 +321,8 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_face_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &,
   const unsigned int,
   const Quadrature<dim-1>&,
-  typename Mapping<dim,spacedim>::InternalDataBase &,
-  typename Mapping<dim,spacedim>::InternalDataBase       &fe_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &,
+  const typename Mapping<dim,spacedim>::InternalDataBase       &fe_data,
   FEValuesData<dim,spacedim>                             &data) const
 {
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
@@ -361,8 +361,8 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_subface_values (
   const unsigned int,
   const unsigned int,
   const Quadrature<dim-1>&,
-  typename Mapping<dim,spacedim>::InternalDataBase &,
-  typename Mapping<dim,spacedim>::InternalDataBase       &fe_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &,
+  const typename Mapping<dim,spacedim>::InternalDataBase       &fe_data,
   FEValuesData<dim,spacedim>                             &data) const
 {
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);

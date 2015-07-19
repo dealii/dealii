@@ -159,8 +159,8 @@ public:
   fill_fe_values (const Mapping<dim,spacedim> &mapping,
                   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim> &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+                  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                  const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
                   FEValuesData<dim,spacedim> &data,
                   CellSimilarity::Similarity &cell_similarity) const;
 
@@ -177,8 +177,8 @@ public:
                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int face,
                        const Quadrature<dim-1> & quadrature,
-                       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                       typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+                       const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                       const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
                        FEValuesData<dim,spacedim> &data) const;
 
   /**
@@ -195,8 +195,8 @@ public:
                           const unsigned int face,
                           const unsigned int subface,
                           const Quadrature<dim-1> & quadrature,
-                          typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                          typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+                          const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                          const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
                           FEValuesData<dim,spacedim> &data) const;
 
   /**
