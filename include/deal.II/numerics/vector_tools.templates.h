@@ -672,6 +672,8 @@ namespace VectorTools
         cell2->set_dof_values_by_interpolation(cache, u2);
       }
 
+    // finish the work on parallel vectors
+    u2.compress (VectorOperation::insert);
     // Apply hanging node constraints.
     constraints.distribute(u2);
   }
