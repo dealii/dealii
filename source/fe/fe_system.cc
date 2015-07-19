@@ -1087,6 +1087,156 @@ FESystem<dim,spacedim>::fill_fe_subface_values (
 template <int dim, int spacedim>
 template <int dim_1>
 void
+FESystem<dim,spacedim>::compute_fill_one_base (
+  const Mapping<dim,spacedim>                      &mapping,
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const unsigned int                                face_no,
+  const unsigned int                                sub_no,
+  const Quadrature<dim_1>                          &quadrature,
+  CellSimilarity::Similarity                   cell_similarity,
+  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+  const unsigned int                                base_no,
+  FEValuesData<dim,spacedim>                       &data) const
+{
+  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  const unsigned int n_q_points = quadrature.size();
+
+  const FiniteElement<dim,spacedim> &
+  base_fe      = base_element(base_no);
+  typename FiniteElement<dim,spacedim>::InternalDataBase &
+  base_fe_data = fe_data.get_fe_data(base_no);
+  FEValuesData<dim,spacedim> &
+  base_data    = fe_data.get_fe_values_data(base_no);
+
+  // fill_fe_face_values needs argument Quadrature<dim-1> for both cases
+  // dim_1==dim-1 and dim_1=dim. Hence the following workaround
+  const Quadrature<dim>   *cell_quadrature = 0;
+  const Quadrature<dim-1> *face_quadrature = 0;
+
+  // static cast to the common base class of quadrature being either
+  // Quadrature<dim> or Quadrature<dim-1>:
+  const Subscriptor *quadrature_base_pointer = &quadrature;
+
+  if (face_no==invalid_face_number)
+    {
+      Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
+      Assert (dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer) != 0,
+              ExcInternalError());
+
+      cell_quadrature
+        = static_cast<const Quadrature<dim> *>(quadrature_base_pointer);
+    }
+  else
+    {
+      Assert(dim_1==dim-1, ExcDimensionMismatch(dim_1,dim-1));
+      Assert (dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer) != 0,
+              ExcInternalError());
+
+      face_quadrature
+        = static_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
+    }
+
+
+  // Copy all of the things that the mapping set in the FEValuesData
+  // that we store here into the corresponding objects we pass down
+  // to the various base elements. some of these arrays may be empty,
+  // in which case copying is cheap
+  base_data.JxW_values        = data.JxW_values;
+  base_data.jacobians         = data.jacobians;
+  base_data.jacobian_grads    = data.jacobian_grads;
+  base_data.inverse_jacobians = data.inverse_jacobians;
+  base_data.quadrature_points = data.quadrature_points;
+  base_data.normal_vectors    = data.normal_vectors;
+  base_data.boundary_forms    = data.boundary_forms;
+
+  // Make sure that in the case of fill_fe_values the data is only
+  // copied from base_data to data if base_data is changed. therefore
+  // use fe_fe_data.current_update_flags()
+  //
+  // for the case of fill_fe_(sub)face_values the data needs to be
+  // copied from base_data to data on each face, therefore use
+  // base_fe_data.update_flags.
+  if (face_no==invalid_face_number)
+    base_fe.fill_fe_values(mapping, cell, *cell_quadrature, mapping_data,
+                           base_fe_data, base_data, cell_similarity);
+  else if (sub_no==invalid_face_number)
+    base_fe.fill_fe_face_values(mapping, cell, face_no,
+                                *face_quadrature, mapping_data, base_fe_data, base_data);
+  else
+    base_fe.fill_fe_subface_values(mapping, cell, face_no, sub_no,
+                                   *face_quadrature, mapping_data, base_fe_data, base_data);
+
+  // now data has been generated, so copy it. we used to work by
+  // looping over all base elements (i.e. this outer loop), then over
+  // multiplicity, then over the shape functions from that base
+  // element, but that requires that we can infer the global number of
+  // a shape function from its number in the base element. for that we
+  // had the component_to_system_table.
+  //
+  // however, this does of course no longer work since we have
+  // non-primitive elements. so we go the other way round: loop over
+  // all shape functions of the composed element, and here only treat
+  // those shape functions that belong to a given base element
+  //TODO: Introduce the needed table and loop only over base element shape functions. This here is not efficient at all AND very bad style
+  const UpdateFlags base_flags(dim_1==dim ?
+                               base_fe_data.current_update_flags() :
+                               base_fe_data.update_flags);
+
+  // if the current cell is just a translation of the previous one,
+  // the underlying data has not changed, and we don't even need to
+  // enter this section
+  if (cell_similarity != CellSimilarity::translation)
+    for (unsigned int system_index=0; system_index<this->dofs_per_cell;
+         ++system_index)
+      if (this->system_to_base_table[system_index].first.first == base_no)
+        {
+          const unsigned int
+          base_index = this->system_to_base_table[system_index].second;
+          Assert (base_index<base_fe.dofs_per_cell, ExcInternalError());
+
+          // now copy. if the shape function is primitive, then there
+          // is only one value to be copied, but for non-primitive
+          // elements, there might be more values to be copied
+          //
+          // so, find out from which index to take this one value, and
+          // to which index to put
+          unsigned int out_index = 0;
+          for (unsigned int i=0; i<system_index; ++i)
+            out_index += this->n_nonzero_components(i);
+          unsigned int in_index = 0;
+          for (unsigned int i=0; i<base_index; ++i)
+            in_index += base_fe.n_nonzero_components(i);
+
+          // then loop over the number of components to be copied
+          Assert (this->n_nonzero_components(system_index) ==
+                  base_fe.n_nonzero_components(base_index),
+                  ExcInternalError());
+          for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
+            {
+              if (base_flags & update_values)
+                for (unsigned int q=0; q<n_q_points; ++q)
+                  data.shape_values[out_index+s][q] =
+                    base_data.shape_values(in_index+s,q);
+
+              if (base_flags & update_gradients)
+                for (unsigned int q=0; q<n_q_points; ++q)
+                  data.shape_gradients[out_index+s][q]=
+                    base_data.shape_gradients[in_index+s][q];
+
+              // _we_ handle computation of second derivatives, so the
+              // base elements should not have computed them!
+              Assert (!(base_flags & update_hessians),
+                      ExcInternalError());
+            }
+        }
+}
+
+
+
+template <int dim, int spacedim>
+template <int dim_1>
+void
 FESystem<dim,spacedim>::compute_fill (
   const Mapping<dim,spacedim>                      &mapping,
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1142,138 +1292,23 @@ FESystem<dim,spacedim>::compute_fill (
             }
         }
 
-      // fill_fe_face_values needs argument Quadrature<dim-1> for both cases
-      // dim_1==dim-1 and dim_1=dim. Hence the following workaround
-      const Quadrature<dim>   *cell_quadrature = 0;
-      const Quadrature<dim-1> *face_quadrature = 0;
-
-      // static cast to the common base class of quadrature being either
-      // Quadrature<dim> or Quadrature<dim-1>:
-      const Subscriptor *quadrature_base_pointer = &quadrature;
-
-      if (face_no==invalid_face_number)
-        {
-          Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
-          Assert (dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer) != 0,
-                  ExcInternalError());
-
-          cell_quadrature
-            = static_cast<const Quadrature<dim> *>(quadrature_base_pointer);
-        }
-      else
-        {
-          Assert(dim_1==dim-1, ExcDimensionMismatch(dim_1,dim-1));
-          Assert (dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer) != 0,
-                  ExcInternalError());
-
-          face_quadrature
-            = static_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
-        }
-
       // let base elements update the necessary data
+      Threads::TaskGroup<> task_group;
       for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
-        {
-          const FiniteElement<dim,spacedim> &
-          base_fe      = base_element(base_no);
-          typename FiniteElement<dim,spacedim>::InternalDataBase &
-          base_fe_data = fe_data.get_fe_data(base_no);
-          FEValuesData<dim,spacedim> &
-          base_data    = fe_data.get_fe_values_data(base_no);
-
-          // Copy all of the things that the mapping set in the FEValuesData
-          // that we store here into the corresponding objects we pass down
-          // to the various base elements. some of these arrays may be empty,
-          // in which case copying is cheap
-          base_data.JxW_values        = data.JxW_values;
-          base_data.jacobians         = data.jacobians;
-          base_data.jacobian_grads    = data.jacobian_grads;
-          base_data.inverse_jacobians = data.inverse_jacobians;
-          base_data.quadrature_points = data.quadrature_points;
-          base_data.normal_vectors    = data.normal_vectors;
-          base_data.boundary_forms    = data.boundary_forms;
-
-
-          // Make sure that in the case of fill_fe_values the data is only
-          // copied from base_data to data if base_data is changed. therefore
-          // use fe_fe_data.current_update_flags()
-          //
-          // for the case of fill_fe_(sub)face_values the data needs to be
-          // copied from base_data to data on each face, therefore use
-          // base_fe_data.update_flags.
-          if (face_no==invalid_face_number)
-            base_fe.fill_fe_values(mapping, cell, *cell_quadrature, mapping_data,
-                                   base_fe_data, base_data, cell_similarity);
-          else if (sub_no==invalid_face_number)
-            base_fe.fill_fe_face_values(mapping, cell, face_no,
-                                        *face_quadrature, mapping_data, base_fe_data, base_data);
-          else
-            base_fe.fill_fe_subface_values(mapping, cell, face_no, sub_no,
-                                           *face_quadrature, mapping_data, base_fe_data, base_data);
-
-          // now data has been generated, so copy it. we used to work by
-          // looping over all base elements (i.e. this outer loop), then over
-          // multiplicity, then over the shape functions from that base
-          // element, but that requires that we can infer the global number of
-          // a shape function from its number in the base element. for that we
-          // had the component_to_system_table.
-          //
-          // however, this does of course no longer work since we have
-          // non-primitive elements. so we go the other way round: loop over
-          // all shape functions of the composed element, and here only treat
-          // those shape functions that belong to a given base element
-//TODO: Introduce the needed table and loop only over base element shape functions. This here is not efficient at all AND very bad style
-          const UpdateFlags base_flags(dim_1==dim ?
-                                       base_fe_data.current_update_flags() :
-                                       base_fe_data.update_flags);
-
-          // if the current cell is just a translation of the previous one,
-          // the underlying data has not changed, and we don't even need to
-          // enter this section
-          if (cell_similarity != CellSimilarity::translation)
-            for (unsigned int system_index=0; system_index<this->dofs_per_cell;
-                 ++system_index)
-              if (this->system_to_base_table[system_index].first.first == base_no)
-                {
-                  const unsigned int
-                  base_index = this->system_to_base_table[system_index].second;
-                  Assert (base_index<base_fe.dofs_per_cell, ExcInternalError());
-
-                  // now copy. if the shape function is primitive, then there
-                  // is only one value to be copied, but for non-primitive
-                  // elements, there might be more values to be copied
-                  //
-                  // so, find out from which index to take this one value, and
-                  // to which index to put
-                  unsigned int out_index = 0;
-                  for (unsigned int i=0; i<system_index; ++i)
-                    out_index += this->n_nonzero_components(i);
-                  unsigned int in_index = 0;
-                  for (unsigned int i=0; i<base_index; ++i)
-                    in_index += base_fe.n_nonzero_components(i);
-
-                  // then loop over the number of components to be copied
-                  Assert (this->n_nonzero_components(system_index) ==
-                          base_fe.n_nonzero_components(base_index),
-                          ExcInternalError());
-                  for (unsigned int s=0; s<this->n_nonzero_components(system_index); ++s)
-                    {
-                      if (base_flags & update_values)
-                        for (unsigned int q=0; q<n_q_points; ++q)
-                          data.shape_values[out_index+s][q] =
-                            base_data.shape_values(in_index+s,q);
-
-                      if (base_flags & update_gradients)
-                        for (unsigned int q=0; q<n_q_points; ++q)
-                          data.shape_gradients[out_index+s][q]=
-                            base_data.shape_gradients[in_index+s][q];
-
-                      // _we_ handle computation of second derivatives, so the
-                      // base elements should not have computed them!
-                      Assert (!(base_flags & update_hessians),
-                              ExcInternalError());
-                    };
-                };
-        };
+        task_group
+        += Threads::new_task (std_cxx11::function<void ()>(std_cxx11::bind (&FESystem<dim,spacedim>::template compute_fill_one_base<dim_1>,
+                                                           this,
+                                                           std_cxx11::cref(mapping),
+                                                           std_cxx11::cref(cell),
+                                                           face_no,
+                                                           sub_no,
+                                                           std_cxx11::cref(quadrature),
+                                                           CellSimilarity::none,
+                                                           std_cxx11::ref(mapping_data),
+                                                           std_cxx11::ref(fedata),
+                                                           base_no,
+                                                           std_cxx11::ref(data))));
+      task_group.join_all();
     }
 
   if (fe_data.compute_hessians && cell_similarity != CellSimilarity::translation)
