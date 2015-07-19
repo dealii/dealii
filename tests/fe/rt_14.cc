@@ -42,7 +42,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 2
+#define PRECISION 8
 
 
 std::ofstream logfile ("output");
@@ -101,6 +101,3 @@ main()
 
   return 0;
 }
-
-
-

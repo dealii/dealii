@@ -23,7 +23,7 @@
 #include <deal.II/fe/fe_bernstein.h>
 //#include "../../include/fe_bernstein.h"
 
-#define PRECISION 2
+#define PRECISION 8
 
 
 template<int dim>
@@ -73,6 +73,3 @@ int main()
 
   return 0;
 }
-
-
-

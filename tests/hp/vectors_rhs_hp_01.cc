@@ -120,9 +120,7 @@ check ()
 int main ()
 {
   std::ofstream logfile ("output");
-  logfile.precision (4);
-  logfile.setf(std::ios::fixed);
-  deallog << std::setprecision(4) << std::fixed;
+  deallog << std::setprecision(8) << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 

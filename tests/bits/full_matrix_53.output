@@ -79,8 +79,8 @@ DEAL::-0.11 0.11
 DEAL::0.72 -0.22 
 DEAL::Identity = A*A_r_inv
 DEAL::2x2 matrix
-DEAL::1.0 -1.2e-07 
-DEAL::-9.5e-07 1.0 
+DEAL::1.0 0 
+DEAL::0 1.0 
 DEAL::
 DEAL::B matrix
 DEAL::3x2 matrix
@@ -93,5 +93,5 @@ DEAL::-1.3 -0.33 0.67
 DEAL::1.1 0.33 -0.42 
 DEAL::Identity = B_l_inv*B
 DEAL::2x2 matrix
-DEAL::1.0 9.1e-06 
-DEAL::-9.5e-07 1.0 
+DEAL::1.0 0 
+DEAL::0 1.0 

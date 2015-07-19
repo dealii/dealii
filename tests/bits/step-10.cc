@@ -137,10 +137,6 @@ void compute_pi_by_area ()
           table.add_value("error",   static_cast<double> (std::fabs(area-pi)));
         };
 
-      table.omit_column_from_convergence_rate_evaluation("cells");
-      table.omit_column_from_convergence_rate_evaluation("eval.pi");
-      table.evaluate_all_convergence_rates(ConvergenceTable::reduction_rate_log2);
-
       table.set_precision("eval.pi", 16);
       table.set_scientific("error", true);
 
@@ -202,10 +198,6 @@ void compute_pi_by_perimeter ()
           table.add_value("eval.pi", static_cast<double> (perimeter/2.));
           table.add_value("error",   static_cast<double> (std::fabs(perimeter/2.-pi)));
         };
-
-      table.omit_column_from_convergence_rate_evaluation("cells");
-      table.omit_column_from_convergence_rate_evaluation("eval.pi");
-      table.evaluate_all_convergence_rates(ConvergenceTable::reduction_rate_log2);
 
       table.set_precision("eval.pi", 16);
       table.set_scientific("error", true);

@@ -107,7 +107,7 @@ check ()
 int main ()
 {
   std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  deallog << std::setprecision (8);
   deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);

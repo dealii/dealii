@@ -23,7 +23,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 2
+#define PRECISION 8
 
 
 template<int dim>
@@ -68,6 +68,3 @@ main()
 
   return 0;
 }
-
-
-
