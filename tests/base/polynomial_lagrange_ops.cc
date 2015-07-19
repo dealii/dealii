@@ -168,7 +168,7 @@ void check_mult_expand (const std::vector<Polynomial<double> > &p)
           double x = (double)Testing::rand()/RAND_MAX;
           double value1 = p[i].value (x) * p[j].value(x);
           double value2 = q   .value (x);
-          if (std::fabs(value1-value2) > std::max(1e-10,1e-10*std::fabs(value1)))
+          if (std::fabs(value1-value2) > std::max(1e-9,1e-9*std::fabs(value1)))
             deallog << "Error multiply at x=" << x
                     << ": p_"<<i<< "(x)*p_"<<j<<"(x)=" << value1
                     << ", q(x)=" << value2 << std::endl;
