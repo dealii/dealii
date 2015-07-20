@@ -172,18 +172,18 @@ protected:
   fill_fe_values (const Mapping<dim,spacedim>                           &mapping,
                   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                                 &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
-                  typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+                  const typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+                  const typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
                   FEValuesData<dim,spacedim>                            &data,
-                  CellSimilarity::Similarity                       &cell_similarity) const;
+                  const CellSimilarity::Similarity                       cell_similarity) const;
 
   virtual void
   fill_fe_face_values (const Mapping<dim,spacedim> &mapping,
                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int                    face_no,
                        const Quadrature<dim-1>                &quadrature,
-                       typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
-                       typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+                       const typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+                       const typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
                        FEValuesData<dim,spacedim> &data) const ;
 
   virtual void
@@ -192,8 +192,8 @@ protected:
                           const unsigned int                    face_no,
                           const unsigned int                    sub_no,
                           const Quadrature<dim-1>                &quadrature,
-                          typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
-                          typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+                          const typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+                          const typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
                           FEValuesData<dim,spacedim> &data) const ;
 
 

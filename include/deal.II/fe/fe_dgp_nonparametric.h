@@ -252,6 +252,19 @@ template <int dim, int spacedim> class MappingQ;
  *
  * <td align="center"></td> </tr> </table>
  *
+ *
+ * <h3> Implementation details </h3>
+ *
+ * This element does not have an InternalData class, unlike all other elements,
+ * because the InternalData classes are used to store things that can be computed once
+ * and reused multiple times (such as the values of shape functions
+ * at quadrature points on the reference cell). However, because the
+ * element is not mapped, this element has nothing that could be computed on the
+ * reference cell -- everything needs to be computed on the real cell -- and
+ * consequently there is nothing we'd like to store in such an object. We can thus
+ * simply use the members already provided by FiniteElement::InternalDataBase without
+ * adding anything in a derived class in this class.
+ *
  * @author Guido Kanschat, 2002
  */
 template <int dim, int spacedim=dim>
@@ -523,10 +536,10 @@ protected:
   fill_fe_values (const Mapping<dim,spacedim> &mapping,
                   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                                 &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
-                  typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+                  const typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+                  const typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
                   FEValuesData<dim,spacedim>                            &data,
-                  CellSimilarity::Similarity                       &cell_similarity) const;
+                  const CellSimilarity::Similarity                       cell_similarity) const;
 
   /**
    * Implementation of the same function in FiniteElement.
@@ -536,8 +549,8 @@ protected:
                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int                    face_no,
                        const Quadrature<dim-1>                &quadrature,
-                       typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
-                       typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+                       const typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+                       const typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
                        FEValuesData<dim,spacedim> &data) const ;
 
   /**
@@ -549,8 +562,8 @@ protected:
                           const unsigned int                    face_no,
                           const unsigned int                    sub_no,
                           const Quadrature<dim-1>                &quadrature,
-                          typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
-                          typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
+                          const typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
+                          const typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
                           FEValuesData<dim,spacedim> &data) const ;
 
 private:
@@ -594,21 +607,6 @@ private:
    * Pointer to an object representing the polynomial space used here.
    */
   const PolynomialSpace<dim> polynomial_space;
-
-  /**
-   * Fields of cell-independent data.
-   *
-   * For information about the general purpose of this class, see the
-   * documentation of the base class.
-   */
-  class InternalData : public FiniteElement<dim,spacedim>::InternalDataBase
-  {
-  public:
-    // have some scratch arrays
-    std::vector<double> values;
-    std::vector<Tensor<1,dim> > grads;
-    std::vector<Tensor<2,dim> > grad_grads;
-  };
 
   /**
    * Allow access from other dimensions.

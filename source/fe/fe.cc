@@ -1218,11 +1218,10 @@ FiniteElement<1,2>::compute_2nd (
   const Mapping<1,2> &,
   const Triangulation<1,2>::cell_iterator &,
   const unsigned int,
-  Mapping<1,2>::InternalDataBase &,
-  InternalDataBase &,
+  const Mapping<1,2>::InternalDataBase &,
+  const InternalDataBase &,
   FEValuesData<1,2> &) const
 {
-
   Assert(false, ExcNotImplemented());
 }
 
@@ -1233,11 +1232,10 @@ FiniteElement<1,3>::compute_2nd (
   const Mapping<1,3> &,
   const Triangulation<1,3>::cell_iterator &,
   const unsigned int,
-  Mapping<1,3>::InternalDataBase &,
-  InternalDataBase &,
+  const Mapping<1,3>::InternalDataBase &,
+  const InternalDataBase &,
   FEValuesData<1,3> &) const
 {
-
   Assert(false, ExcNotImplemented());
 }
 
@@ -1249,11 +1247,10 @@ FiniteElement<2,3>::compute_2nd (
   const Mapping<2,3> &,
   const Triangulation<2,3>::cell_iterator &,
   const unsigned int,
-  Mapping<2,3>::InternalDataBase &,
-  InternalDataBase &,
+  const Mapping<2,3>::InternalDataBase &,
+  const InternalDataBase &,
   FEValuesData<2,3> &) const
 {
-
   Assert(false, ExcNotImplemented());
 }
 
@@ -1265,8 +1262,8 @@ FiniteElement<dim,spacedim>::compute_2nd (
   const Mapping<dim,spacedim>                   &mapping,
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int offset,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-  InternalDataBase                     &fe_internal,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+  const InternalDataBase                     &fe_internal,
   FEValuesData<dim,spacedim>                    &data) const
 {
   Assert ((fe_internal.update_each | fe_internal.update_once)

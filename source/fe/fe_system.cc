@@ -1037,10 +1037,10 @@ FESystem<dim,spacedim>::fill_fe_values (
   const Mapping<dim,spacedim>                      &mapping,
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                            &quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
   FEValuesData<dim,spacedim>                       &data,
-  CellSimilarity::Similarity                  &cell_similarity) const
+  const CellSimilarity::Similarity                  cell_similarity) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
                quadrature, cell_similarity, mapping_data, fe_data, data);
@@ -1055,8 +1055,8 @@ FESystem<dim,spacedim>::fill_fe_face_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int                    face_no,
   const Quadrature<dim-1>              &quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
   FEValuesData<dim,spacedim>                    &data) const
 {
   compute_fill (mapping, cell, face_no, invalid_face_number, quadrature,
@@ -1074,8 +1074,8 @@ FESystem<dim,spacedim>::fill_fe_subface_values (
   const unsigned int                                face_no,
   const unsigned int                                sub_no,
   const Quadrature<dim-1>                          &quadrature,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
   FEValuesData<dim,spacedim>                       &data) const
 {
   compute_fill (mapping, cell, face_no, sub_no, quadrature,
@@ -1094,12 +1094,12 @@ FESystem<dim,spacedim>::compute_fill_one_base (
   const unsigned int                                sub_no,
   const Quadrature<dim_1>                          &quadrature,
   CellSimilarity::Similarity                   cell_similarity,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
   const unsigned int                                base_no,
   FEValuesData<dim,spacedim>                       &data) const
 {
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
   const unsigned int n_q_points = quadrature.size();
 
   const FiniteElement<dim,spacedim> &
@@ -1243,9 +1243,9 @@ FESystem<dim,spacedim>::compute_fill (
   const unsigned int                                face_no,
   const unsigned int                                sub_no,
   const Quadrature<dim_1>                          &quadrature,
-  CellSimilarity::Similarity                   cell_similarity,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+  const CellSimilarity::Similarity                   cell_similarity,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
   FEValuesData<dim,spacedim>                       &data) const
 {
   const unsigned int n_q_points = quadrature.size();
@@ -1254,8 +1254,8 @@ FESystem<dim,spacedim>::compute_fill (
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   // Either dim_1==dim
   // (fill_fe_values) or dim_1==dim-1

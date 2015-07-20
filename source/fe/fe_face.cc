@@ -521,10 +521,10 @@ FE_FaceQ<1,spacedim>::fill_fe_values
 (const Mapping<1,spacedim> &,
  const typename Triangulation<1,spacedim>::cell_iterator &,
  const Quadrature<1> &,
- typename Mapping<1,spacedim>::InternalDataBase &,
- typename Mapping<1,spacedim>::InternalDataBase &,
+ const typename Mapping<1,spacedim>::InternalDataBase &,
+ const typename Mapping<1,spacedim>::InternalDataBase &,
  FEValuesData<1,spacedim> &,
- CellSimilarity::Similarity &) const
+ const CellSimilarity::Similarity ) const
 {
   // Do nothing, since we do not have values in the interior
 }
@@ -538,8 +538,8 @@ FE_FaceQ<1,spacedim>::fill_fe_face_values (
   const typename Triangulation<1,spacedim>::cell_iterator &,
   const unsigned int face,
   const Quadrature<0> &,
-  typename Mapping<1,spacedim>::InternalDataBase &,
-  typename Mapping<1,spacedim>::InternalDataBase &fedata,
+  const typename Mapping<1,spacedim>::InternalDataBase &,
+  const typename Mapping<1,spacedim>::InternalDataBase &fedata,
   FEValuesData<1,spacedim> &data) const
 {
   const UpdateFlags flags(fedata.update_once | fedata.update_each);
@@ -562,11 +562,11 @@ FE_FaceQ<1,spacedim>::fill_fe_subface_values (
   const unsigned int ,
   const unsigned int ,
   const Quadrature<0> &,
-  typename Mapping<1,spacedim>::InternalDataBase &,
-  typename Mapping<1,spacedim>::InternalDataBase &,
+  const typename Mapping<1,spacedim>::InternalDataBase &,
+  const typename Mapping<1,spacedim>::InternalDataBase &,
   FEValuesData<1,spacedim> &) const
 {
-  Assert(false, ExcMessage("Should not fille subface values in 1D"));
+  Assert(false, ExcMessage("There are no sub-face values to fill in 1D!"));
 }
 
 

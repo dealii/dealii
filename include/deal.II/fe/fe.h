@@ -354,19 +354,39 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Base class for internal data.  Adds data for second derivatives to
-   * Mapping::InternalDataBase()
+   * A base class for internal data that derived finite element classes may
+   * wish to store. This class uses the same data fields as
+   * Mapping::InternalDataBase() but adds a field for the computation of
+   * second derivatives.
    *
-   * For information about the general purpose of this class, see the
-   * documentation of the base class.
+   * The class is used as follows: Whenever an FEValues (or FEFaceValues or
+   * FESubfaceValues) object is initialized, it requests that the finite
+   * element it is associated with creates an object of a class derived from
+   * the current one here. This is done via each derived class's
+   * FiniteElement::get_data() function. This object is then passed to the
+   * FiniteElement::fill_fe_values(), FiniteElement::fill_fe_face_values(),
+   * and FiniteElement::fill_fe_subface_values() functions as a constant
+   * object. The intent of these objects is so that finite element classes
+   * can pre-compute information once at the beginning (in the call to
+   * FiniteElement::get_data() call) that can then be used on each cell
+   * that is subsequently visited. An example for this is the values of
+   * shape functions at the quadrature point of the reference cell,
+   * which remain the same no matter the cell visited, and that can
+   * therefore be computed once at the beginning and reused later on.
    *
-   * @author Guido Kanschat, 2001
+   * Because only derived classes can know what they can pre-compute,
+   * each derived class that wants to store information computed once
+   * at the beginning, needs to derive its own InternalData class from
+   * this class, and return an object of the derived type through its
+   * get_data() function.
+   *
+   * @author Guido Kanschat, 2001; Wolfgang Bangerth, 2015.
    */
   class InternalDataBase : public Mapping<dim,spacedim>::InternalDataBase
   {
   public:
     /**
-     * Destructor. Needed to avoid memory leaks with difference quotients.
+     * Destructor. Made virtual to allow polymorphism.
      */
     virtual ~InternalDataBase ();
 
@@ -1952,8 +1972,8 @@ protected:
   void compute_2nd (const Mapping<dim,spacedim>                      &mapping,
                     const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
                     const unsigned int                       offset,
-                    typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                    InternalDataBase                        &fe_internal,
+                    const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+                    const InternalDataBase                        &fe_internal,
                     FEValuesData<dim,spacedim>                       &data) const;
 
   /**
@@ -2041,10 +2061,10 @@ protected:
   fill_fe_values (const Mapping<dim,spacedim>                               &mapping,
                   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                                     &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_internal,
-                  typename Mapping<dim,spacedim>::InternalDataBase          &fe_internal,
+                  const typename Mapping<dim,spacedim>::InternalDataBase          &mapping_internal,
+                  const typename Mapping<dim,spacedim>::InternalDataBase          &fe_internal,
                   FEValuesData<dim,spacedim>                                &data,
-                  CellSimilarity::Similarity                           &cell_similarity) const = 0;
+                  const CellSimilarity::Similarity                           cell_similarity) const = 0;
 
   /**
    * Fill the fields of FEFaceValues. This function performs all the
@@ -2058,8 +2078,8 @@ protected:
                        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int                    face_no,
                        const Quadrature<dim-1>              &quadrature,
-                       typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
-                       typename Mapping<dim,spacedim>::InternalDataBase       &fe_internal,
+                       const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
+                       const typename Mapping<dim,spacedim>::InternalDataBase       &fe_internal,
                        FEValuesData<dim,spacedim>                    &data) const = 0;
 
   /**
@@ -2075,8 +2095,8 @@ protected:
                           const unsigned int                    face_no,
                           const unsigned int                    sub_no,
                           const Quadrature<dim-1>              &quadrature,
-                          typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                          typename Mapping<dim,spacedim>::InternalDataBase &fe_internal,
+                          const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+                          const typename Mapping<dim,spacedim>::InternalDataBase &fe_internal,
                           FEValuesData<dim,spacedim>                    &data) const = 0;
 
   friend class InternalDataBase;

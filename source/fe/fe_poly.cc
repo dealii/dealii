@@ -33,17 +33,17 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_values
 (const Mapping<1,2>                        &mapping,
  const Triangulation<1,2>::cell_iterator   &cell,
  const Quadrature<1>                       &quadrature,
- Mapping<1,2>::InternalDataBase            &mapping_data,
- Mapping<1,2>::InternalDataBase            &fedata,
+ const Mapping<1,2>::InternalDataBase            &mapping_data,
+ const Mapping<1,2>::InternalDataBase            &fedata,
  FEValuesData<1,2>                         &data,
- CellSimilarity::Similarity           &cell_similarity) const
+ const CellSimilarity::Similarity           cell_similarity) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
 
@@ -71,16 +71,16 @@ FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_values
 (const Mapping<2,3>                      &mapping,
  const Triangulation<2,3>::cell_iterator &cell,
  const Quadrature<2>                     &quadrature,
- Mapping<2,3>::InternalDataBase          &mapping_data,
- Mapping<2,3>::InternalDataBase          &fedata,
+ const Mapping<2,3>::InternalDataBase          &mapping_data,
+ const Mapping<2,3>::InternalDataBase          &fedata,
  FEValuesData<2,3>                       &data,
- CellSimilarity::Similarity         &cell_similarity) const
+ const CellSimilarity::Similarity         cell_similarity) const
 {
 
   // assert that the following dynamics
   // cast is really well-defined.
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
 
@@ -107,18 +107,18 @@ FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_values (
   const Mapping<1,2>                      &mapping,
   const Triangulation<1,2>::cell_iterator &cell,
   const Quadrature<1>                     &quadrature,
-  Mapping<1,2>::InternalDataBase          &mapping_data,
-  Mapping<1,2>::InternalDataBase          &fedata,
+  const Mapping<1,2>::InternalDataBase          &mapping_data,
+  const Mapping<1,2>::InternalDataBase          &fedata,
   FEValuesData<1,2>                       &data,
-  CellSimilarity::Similarity         &cell_similarity) const
+  const CellSimilarity::Similarity         cell_similarity) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
 
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
 
@@ -145,13 +145,13 @@ FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_values
 (const Mapping<2,3>                      &mapping,
  const Triangulation<2,3>::cell_iterator &cell,
  const Quadrature<2>                     &quadrature,
- Mapping<2,3>::InternalDataBase          &mapping_data,
- Mapping<2,3>::InternalDataBase          &fedata,
+ const Mapping<2,3>::InternalDataBase          &mapping_data,
+ const Mapping<2,3>::InternalDataBase          &fedata,
  FEValuesData<2,3>                       &data,
- CellSimilarity::Similarity         &cell_similarity) const
+ const CellSimilarity::Similarity         cell_similarity) const
 {
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0, ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
+  Assert (dynamic_cast<const InternalData *> (&fedata) != 0, ExcInternalError());
+  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
 
   const UpdateFlags flags(fe_data.current_update_flags());
 

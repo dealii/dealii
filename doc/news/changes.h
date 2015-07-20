@@ -39,6 +39,14 @@ inconvenience this causes.
 
 <ol>
 
+  <li> Changed: The signature of the FiniteElement::fill_fe_values(),
+  FiniteElement::fill_fe_face_values(), and FiniteElement::fill_fe_subface_values()
+  functions has been changed, in an effort to clarify which of these contain
+  input information and which contain output information for these functions.
+  <br>
+  (Wolfgang Bangerth, 2015/07/20)
+  </li>
+
 </ol>
 
 
