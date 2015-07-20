@@ -58,6 +58,11 @@ inconvenience this causes.
 
 <ol>
 
+  <li> New: IndexSet now implements iterators.
+  <br>
+  (Timo Heister, 2015/07/12)
+  </li>
+
 </ol>
 
 
