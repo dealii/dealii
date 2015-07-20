@@ -27,7 +27,7 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 
-#define PRECISION 2
+#define PRECISION 8
 
 #include <fstream>
 

@@ -76,7 +76,7 @@ test (const unsigned int degree)
           deallog << "    Quadrature point " << q << ": ";
           for (unsigned int i=0; i<fe_rt.dofs_per_cell; ++i)
             {
-              deallog << '[';
+              deallog << "[ ";
               for (unsigned int c=0; c<fe_rt.n_components(); ++c)
                 deallog << fe_values.shape_value_component(i,q,c) << ' ';
               deallog << ']';

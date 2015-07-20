@@ -25,7 +25,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 2
+#define PRECISION 8
 
 
 
@@ -61,6 +61,3 @@ main()
 
   return 0;
 }
-
-
-
