@@ -35,7 +35,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 3
+#define PRECISION 8
 
 
 Point<2> stretch_coordinates (const Point<2> p)

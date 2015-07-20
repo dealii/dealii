@@ -138,7 +138,7 @@ void run_test (unsigned int *indx)
 
 int main ()
 {
-  logfile.precision(2);
+  logfile.precision(8);
 
   deallog.attach(logfile);
   deallog.depth_console(0);

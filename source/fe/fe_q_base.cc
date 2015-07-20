@@ -214,8 +214,8 @@ struct FE_Q_Base<POLY,xdim,xspacedim>::Implementation
           // to avoid unwanted fill-in of the constraint matrices (which would
           // then increase the number of other DoFs a constrained DoF would
           // couple to)
-          if (std::fabs(fe.interface_constraints(i,j)) < 1e-14)
-            fe.interface_constraints(i,j) = 0;
+          if (std::fabs(fe.interface_constraints(i,face_index_map[j])) < 1e-13)
+            fe.interface_constraints(i,face_index_map[j]) = 0;
         }
   }
 
@@ -390,8 +390,8 @@ struct FE_Q_Base<POLY,xdim,xspacedim>::Implementation
             // zero to avoid unwanted fill-in of the constraint matrices
             // (which would then increase the number of other DoFs a
             // constrained DoF would couple to)
-            if (std::fabs(fe.interface_constraints(i,j)) < 1e-14)
-              fe.interface_constraints(i,j) = 0;
+            if (std::fabs(fe.interface_constraints(i,face_index_map[j])) < 1e-13)
+              fe.interface_constraints(i,face_index_map[j]) = 0;
           }
       }
   }

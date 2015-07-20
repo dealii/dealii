@@ -144,7 +144,7 @@ int
 main()
 {
   std::ofstream logfile ("output");
-  deallog << std::setprecision(2);
+  deallog << std::setprecision(8);
   deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -171,6 +171,3 @@ main()
 
   return 0;
 }
-
-
-
