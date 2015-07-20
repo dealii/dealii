@@ -423,24 +423,26 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 
   if (mapping_type == mapping_raviart_thomas)
     get_face_sign_change_rt (cell, this->dofs_per_face, sign_change);
-
   else if (mapping_type == mapping_nedelec)
     get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
-  // for Piola mapping, the similarity
-  // concept cannot be used because of
-  // possible sign changes from one cell to
-  // the next.
-  if ( (mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
-       || (mapping_type == mapping_nedelec))
-    if (cell_similarity == CellSimilarity::translation)
-      cell_similarity = CellSimilarity::none;
+
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = data.shape_function_to_row_table[i * this->n_components() +
                                                                   this->get_nonzero_components(i).first_selected_component()];
 
-      if (flags & update_values && cell_similarity != CellSimilarity::translation)
+      // update the shape function values as necessary
+      //
+      // we only need to do this if the current cell is not a translation of
+      // the previous one; or, even if it is a translation, if we use mappings
+      // other than the standard mappings that require us to recompute values
+      // and derivatives because of possible sign changes
+      if (flags & update_values &&
+          ((cell_similarity != CellSimilarity::translation)
+           ||
+           ((mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
+            || (mapping_type == mapping_nedelec))))
         switch (mapping_type)
           {
           case mapping_none:
@@ -495,7 +497,14 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
             Assert(false, ExcNotImplemented());
           }
 
-      if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
+      // update gradients. apply the same logic as above
+      if (flags & update_gradients
+          &&
+          ((cell_similarity != CellSimilarity::translation)
+           ||
+           ((mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
+            || (mapping_type == mapping_nedelec))))
+
         {
           std::vector<Tensor<2, spacedim > > shape_grads1 (n_q_points);
           //std::vector<DerivativeForm<1,dim,spacedim> > shape_grads2 (n_q_points);
@@ -583,7 +592,14 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
         }
     }
 
-  if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
+  // finally update second derivatives. again apply the same logic
+  // as above regarding when this has to happen
+  if (flags & update_hessians
+      &&
+      ((cell_similarity != CellSimilarity::translation)
+       ||
+       ((mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
+        || (mapping_type == mapping_nedelec))))
     this->compute_2nd (mapping, cell,
                        typename QProjector<dim>::DataSetDescriptor().cell(),
                        mapping_data, fe_data, data);
