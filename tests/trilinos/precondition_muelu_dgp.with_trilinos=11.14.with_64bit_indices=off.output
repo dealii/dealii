@@ -1,5 +1,3 @@
 
-DEAL:12288:cg::Starting value 1970.22
-DEAL:12288:cg::Convergence step 19 value 0
-DEAL:49152:cg::Starting value 179304.
-DEAL:49152:cg::Convergence step 31 value 0
+DEAL:12288::Solver stopped within 18 - 32 iterations
+DEAL:49152::Solver stopped within 18 - 32 iterations
