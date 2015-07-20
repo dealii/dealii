@@ -178,7 +178,7 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_values
  const typename Mapping<dim,spacedim>::InternalDataBase &,
  const typename Mapping<dim,spacedim>::InternalDataBase &,
  FEValuesData<dim,spacedim> &,
- CellSimilarity::Similarity &) const
+ const CellSimilarity::Similarity ) const
 {
   // Do nothing, since we do not have
   // values in the interior

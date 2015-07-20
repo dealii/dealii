@@ -2064,7 +2064,7 @@ protected:
                   const typename Mapping<dim,spacedim>::InternalDataBase          &mapping_internal,
                   const typename Mapping<dim,spacedim>::InternalDataBase          &fe_internal,
                   FEValuesData<dim,spacedim>                                &data,
-                  CellSimilarity::Similarity                           &cell_similarity) const = 0;
+                  const CellSimilarity::Similarity                           cell_similarity) const = 0;
 
   /**
    * Fill the fields of FEFaceValues. This function performs all the

@@ -254,7 +254,7 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_values
  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
  const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
  FEValuesData<dim,spacedim>                       &data,
- CellSimilarity::Similarity                  &cell_similarity) const
+ const CellSimilarity::Similarity                  cell_similarity) const
 {
   // convert data object to internal
   // data for this class. fails with

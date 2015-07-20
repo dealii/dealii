@@ -250,7 +250,7 @@ protected:
                   const typename Mapping<1,spacedim>::InternalDataBase      &mapping_internal,
                   const typename Mapping<1,spacedim>::InternalDataBase      &fe_internal,
                   FEValuesData<1,spacedim>                            &data,
-                  CellSimilarity::Similarity                       &cell_similarity) const;
+                  const CellSimilarity::Similarity                       cell_similarity) const;
 
   virtual void
   fill_fe_face_values (const Mapping<1,spacedim> &mapping,

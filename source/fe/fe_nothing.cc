@@ -123,7 +123,7 @@ fill_fe_values (const Mapping<dim,spacedim> & /*mapping*/,
                 const typename Mapping<dim,spacedim>::InternalDataBase & /*mapping_data*/,
                 const typename Mapping<dim,spacedim>::InternalDataBase & /*fedata*/,
                 FEValuesData<dim,spacedim> & /*data*/,
-                CellSimilarity::Similarity & /*cell_similarity*/) const
+                const CellSimilarity::Similarity  /*cell_similarity*/) const
 {
   // leave data fields empty
 }

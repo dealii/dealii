@@ -284,7 +284,7 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_values (
   const typename Mapping<dim,spacedim>::InternalDataBase &,
   const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
   FEValuesData<dim,spacedim> &data,
-  CellSimilarity::Similarity &/*cell_similarity*/) const
+  const CellSimilarity::Similarity /*cell_similarity*/) const
 {
   const UpdateFlags flags(fe_data.current_update_flags());
   Assert (flags & update_quadrature_points, ExcInternalError());

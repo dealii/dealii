@@ -825,7 +825,7 @@ protected:
                   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                   const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
                   FEValuesData<dim,spacedim>                       &data,
-                  CellSimilarity::Similarity                  &cell_similarity) const;
+                  const CellSimilarity::Similarity                  cell_similarity) const;
 
   /**
    * Implementation of the same function in FiniteElement.

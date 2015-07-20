@@ -1040,7 +1040,7 @@ FESystem<dim,spacedim>::fill_fe_values (
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
   FEValuesData<dim,spacedim>                       &data,
-  CellSimilarity::Similarity                  &cell_similarity) const
+  const CellSimilarity::Similarity                  cell_similarity) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
                quadrature, cell_similarity, mapping_data, fe_data, data);

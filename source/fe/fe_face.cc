@@ -524,7 +524,7 @@ FE_FaceQ<1,spacedim>::fill_fe_values
  const typename Mapping<1,spacedim>::InternalDataBase &,
  const typename Mapping<1,spacedim>::InternalDataBase &,
  FEValuesData<1,spacedim> &,
- CellSimilarity::Similarity &) const
+ const CellSimilarity::Similarity ) const
 {
   // Do nothing, since we do not have values in the interior
 }

@@ -162,7 +162,7 @@ public:
                   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                   const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
                   FEValuesData<dim,spacedim> &data,
-                  CellSimilarity::Similarity &cell_similarity) const;
+                  const CellSimilarity::Similarity cell_similarity) const;
 
   /**
    * Fill the fields of FEFaceValues. This function performs all the
