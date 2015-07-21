@@ -1090,16 +1090,15 @@ void
 FESystem<dim,spacedim>::compute_fill_one_base (
   const Mapping<dim,spacedim>                      &mapping,
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int                                face_no,
-  const unsigned int                                sub_no,
+  const std::pair<unsigned int, unsigned int>       face_sub_no,
   const Quadrature<dim_1>                          &quadrature,
-  CellSimilarity::Similarity                   cell_similarity,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+  const CellSimilarity::Similarity                  cell_similarity,
+  const std::pair<const typename Mapping<dim,spacedim>::InternalDataBase *,
+  const typename Mapping<dim,spacedim>::InternalDataBase *> mapping_data,
   const unsigned int                                base_no,
   FEValuesData<dim,spacedim>                       &data) const
 {
-  const InternalData &fe_data = static_cast<const InternalData &> (fedata);
+  const InternalData &fe_data = static_cast<const InternalData &> (*mapping_data.second);
   const unsigned int n_q_points = quadrature.size();
 
   const FiniteElement<dim,spacedim> &
@@ -1118,7 +1117,7 @@ FESystem<dim,spacedim>::compute_fill_one_base (
   // Quadrature<dim> or Quadrature<dim-1>:
   const Subscriptor *quadrature_base_pointer = &quadrature;
 
-  if (face_no==invalid_face_number)
+  if (face_sub_no.first==invalid_face_number)
     {
       Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
       Assert (dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer) != 0,
@@ -1157,15 +1156,15 @@ FESystem<dim,spacedim>::compute_fill_one_base (
   // for the case of fill_fe_(sub)face_values the data needs to be
   // copied from base_data to data on each face, therefore use
   // base_fe_data.update_flags.
-  if (face_no==invalid_face_number)
-    base_fe.fill_fe_values(mapping, cell, *cell_quadrature, mapping_data,
+  if (face_sub_no.first==invalid_face_number)
+    base_fe.fill_fe_values(mapping, cell, *cell_quadrature, *mapping_data.first,
                            base_fe_data, base_data, cell_similarity);
-  else if (sub_no==invalid_face_number)
-    base_fe.fill_fe_face_values(mapping, cell, face_no,
-                                *face_quadrature, mapping_data, base_fe_data, base_data);
+  else if (face_sub_no.second==invalid_face_number)
+    base_fe.fill_fe_face_values(mapping, cell, face_sub_no.first,
+                                *face_quadrature, *mapping_data.first, base_fe_data, base_data);
   else
-    base_fe.fill_fe_subface_values(mapping, cell, face_no, sub_no,
-                                   *face_quadrature, mapping_data, base_fe_data, base_data);
+    base_fe.fill_fe_subface_values(mapping, cell, face_sub_no.first, face_sub_no.second,
+                                   *face_quadrature, *mapping_data.first, base_fe_data, base_data);
 
   // now data has been generated, so copy it. we used to work by
   // looping over all base elements (i.e. this outer loop), then over
@@ -1300,12 +1299,11 @@ FESystem<dim,spacedim>::compute_fill (
                                                            this,
                                                            std_cxx11::cref(mapping),
                                                            std_cxx11::cref(cell),
-                                                           face_no,
-                                                           sub_no,
+                                                           std::make_pair(face_no, sub_no),
                                                            std_cxx11::cref(quadrature),
                                                            CellSimilarity::none,
-                                                           std_cxx11::ref(mapping_data),
-                                                           std_cxx11::ref(fedata),
+                                                           std::make_pair(&mapping_data,
+                                                               &fedata),
                                                            base_no,
                                                            std_cxx11::ref(data))));
       task_group.join_all();
