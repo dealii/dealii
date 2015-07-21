@@ -96,7 +96,7 @@ namespace internal
        * mapped quadrature points are accessible, as no finite element data is
        * actually used).
        */
-      const FEValues<dim> &get_fe_values () const;
+      const dealii::FEValues<dim> &get_fe_values () const;
 
       /**
        * Return a vector of inverse transpose Jacobians. For compatibility
@@ -152,7 +152,7 @@ namespace internal
       /**
        * An underlying FEValues object that performs the (scalar) evaluation.
        */
-      FEValues<dim> fe_values;
+      dealii::FEValues<dim> fe_values;
 
       /**
        * Get 1D quadrature formula to be used for reinitializing shape info.
@@ -272,7 +272,7 @@ namespace internal
 
     template <int dim, typename Number>
     inline
-    const FEValues<dim> &
+    const dealii::FEValues<dim> &
     MappingDataOnTheFly<dim,Number>::get_fe_values() const
     {
       return fe_values;
