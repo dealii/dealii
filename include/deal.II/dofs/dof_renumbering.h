@@ -211,9 +211,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The random() function renumbers degrees of freedom randomly. This function
  * is probably seldom of use, except to check the dependence of solvers
- * (iterative or direct ones) on the numbering of the degrees of freedom. It
- * uses the @p random_shuffle function from the C++ standard library to do its
- * work.
+ * (iterative or direct ones) on the numbering of the degrees of freedom.
  *
  *
  * <h3>A comparison of reordering strategies</h3>
@@ -968,14 +966,25 @@ namespace DoFRenumbering
                                    const unsigned int         level);
 
   /**
-   * Renumber the degrees of freedom in a random way.
+   * Renumber the degrees of freedom in a random way. The result of this
+   * function is repeatable in that two runs of the same program will
+   * yield the same result. This is achieved by creating a new random
+   * number generator with a fixed seed every time this function is
+   * entered. In particular, the function therefore does not rely on an
+   * external random number generator for which it would matter how often
+   * it has been called before this function (or, for that matter, whether
+   * other threads running concurrently to this function also draw
+   * random numbers).
    */
   template <class DH>
   void
   random (DH &dof_handler);
 
   /**
-   * Computes the renumbering vector needed by the random() function. Does not
+   * Computes the renumbering vector needed by the random() function. See
+   * there for more information on the computed random renumbering.
+   *
+   * This function does not
    * perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */

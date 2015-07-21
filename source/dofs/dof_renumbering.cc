@@ -46,6 +46,10 @@
 #include <boost/graph/minimum_degree_ordering.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/graph/bandwidth.hpp>
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/random.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <vector>
 #include <map>
@@ -53,16 +57,6 @@
 #include <cmath>
 #include <functional>
 
-
-// for whatever reason, the random_shuffle function used below needs
-// lrand48 to be declared when using -ansi as compiler flag (rather
-// than do so itself). however, inclusion of <cstdlib> or <stdlib.h>
-// does not help, so we declare that function ourselves. Since this
-// holds only for some compiler versions, do so conditionally on a
-// ./configure-time test
-#ifdef DEAL_II_DECLARE_LRAND48
-extern "C" long int lrand48 (void);
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1863,7 +1857,20 @@ namespace DoFRenumbering
     for (unsigned int i=0; i<n_dofs; ++i)
       new_indices[i] = i;
 
-    std::random_shuffle (new_indices.begin(), new_indices.end());
+    // shuffle the elements; the following is essentially the
+    // std::random_shuffle algorithm but uses a predictable
+    // random number generator
+    ::boost::mt19937 random_number_generator;
+    for (unsigned int i=1; i<n_dofs; ++i)
+      {
+        // get a random number between 0 and i (inclusive)
+        const unsigned int j
+          = ::boost::random::uniform_int_distribution<>(0, i)(random_number_generator);
+
+        // if possible, swap the elements
+        if (i != j)
+          std::swap (new_indices[i], new_indices[j]);
+      }
   }
 
 

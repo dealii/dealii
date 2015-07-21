@@ -47,6 +47,12 @@ inconvenience this causes.
   (Wolfgang Bangerth, 2015/07/20)
   </li>
 
+  <li> Changed: The function DoFRenumbering::random() now produces different
+  numberings than it did before, but in return has now acquired the property
+  that its results are predictable and repeatable.
+  <br>
+  (Wolfgang Bangerth, 2015/07/21)
+  </li>
 </ol>
 
 
