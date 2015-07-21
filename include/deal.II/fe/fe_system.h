@@ -1039,19 +1039,19 @@ private:
 
   /**
    * Compute the equivalent of compute_fill(), but only for the base element
-   * specified by the second-to-last argument.
+   * specified by the second-to-last argument. Some elements are grouped
+   * together to stay within the limit of 8 function arguments of boost.
    */
   template <int dim_1>
   void
   compute_fill_one_base (
     const Mapping<dim,spacedim>                      &mapping,
     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-    const unsigned int                                face_no,
-    const unsigned int                                sub_no,
+    const std::pair<unsigned int,unsigned int>        face_sub_no,
     const Quadrature<dim_1>                          &quadrature,
-    CellSimilarity::Similarity                   cell_similarity,
-    const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-    const typename Mapping<dim,spacedim>::InternalDataBase &fedata,
+    const CellSimilarity::Similarity                  cell_similarity,
+    const std::pair<const typename Mapping<dim,spacedim>::InternalDataBase *,
+    const typename Mapping<dim,spacedim>::InternalDataBase *> mapping_data,
     const unsigned int                                base_element,
     FEValuesData<dim,spacedim>                       &data) const;
 
