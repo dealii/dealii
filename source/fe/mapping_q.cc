@@ -247,7 +247,7 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
 // Note that the CellSimilarity flag is modifyable, since MappingQ can need to
 // recalculate data even when cells are similar.
 template<int dim, int spacedim>
-void
+CellSimilarity::Similarity
 MappingQ<dim,spacedim>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                                     &q,
@@ -258,7 +258,7 @@ MappingQ<dim,spacedim>::fill_fe_values (
   std::vector<DerivativeForm<2,dim,spacedim>    >   &jacobian_grads,
   std::vector<DerivativeForm<1,spacedim,dim>    >   &inverse_jacobians,
   std::vector<Point<spacedim> >                             &normal_vectors,
-  CellSimilarity::Similarity                           &cell_similarity) const
+  const CellSimilarity::Similarity                           cell_similarity) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -271,27 +271,35 @@ MappingQ<dim,spacedim>::fill_fe_values (
                                           || cell->has_boundary_lines());
 
   // depending on this result, use this or the other data object for the
-  // mapping. furthermore, we need to ensure that the flag indicating whether
+  // mapping.
+  typename MappingQ1<dim,spacedim>::InternalData *
+  p_data = (data.use_mapping_q1_on_current_cell
+            ?
+            &data.mapping_q1_data
+            :
+            &data);
+
+  // call the base class. we need to ensure that the flag indicating whether
   // we can use some similarity has to be modified - for a general MappingQ,
   // the data needs to be recomputed anyway since then the mapping changes the
   // data. this needs to be known also for later operations, so modify the
   // variable here. this also affects the calculation of the next cell -- if
   // we use Q1 data on the next cell, the data will still be invalid.
-  typename MappingQ1<dim,spacedim>::InternalData *p_data=0;
-  if (data.use_mapping_q1_on_current_cell)
-    p_data=&data.mapping_q1_data;
-  else
-    {
-      p_data=&data;
-      if (get_degree() > 1)
-        cell_similarity = CellSimilarity::invalid_next_cell;
-    }
-
+  const CellSimilarity::Similarity updated_cell_similarity
+    = ((data.use_mapping_q1_on_current_cell == false)
+       &&
+       (get_degree() > 1)
+       ?
+       CellSimilarity::invalid_next_cell
+       :
+       cell_similarity);
   MappingQ1<dim,spacedim>::fill_fe_values(cell, q, *p_data,
                                           quadrature_points, JxW_values,
                                           jacobians, jacobian_grads, inverse_jacobians,
-                                          normal_vectors, cell_similarity);
+                                          normal_vectors,
+                                          updated_cell_similarity);
 
+  return updated_cell_similarity;
 }
 
 

@@ -176,7 +176,7 @@ compute_mapping_support_points
 
 
 template<int dim, class EulerVectorType, int spacedim>
-void
+CellSimilarity::Similarity
 MappingQEulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                                     &q,
@@ -187,15 +187,20 @@ MappingQEulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
   std::vector<DerivativeForm<2,dim,spacedim>  >     &jacobian_grads,
   std::vector<DerivativeForm<1,spacedim,dim>  >     &inverse_jacobians,
   std::vector<Point<spacedim> >                             &normal_vectors,
-  CellSimilarity::Similarity                           &cell_similarity) const
+  const CellSimilarity::Similarity                           ) const
 {
-  // disable any previously detected similarity and hand on to the respective
-  // function of the base class.
-  cell_similarity = CellSimilarity::invalid_next_cell;
+  // call the function of the base class, but ignoring
+  // any potentially detected cell similarity between
+  // the current and the previous cell
   MappingQ<dim,spacedim>::fill_fe_values (cell, q, mapping_data,
                                           quadrature_points, JxW_values, jacobians,
                                           jacobian_grads, inverse_jacobians,
-                                          normal_vectors, cell_similarity);
+                                          normal_vectors,
+                                          CellSimilarity::invalid_next_cell);
+  // also return the updated flag since any detected
+  // similarity wasn't based on the mapped field, but
+  // the original vertices which are meaningless
+  return CellSimilarity::invalid_next_cell;
 }
 
 

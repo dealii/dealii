@@ -373,7 +373,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::get_subface_data (const UpdateFlags upda
 // Note that the CellSimilarity flag is modifyable, since MappingFEField can need to
 // recalculate data even when cells are similar.
 template<int dim, int spacedim, class VECTOR, class DH>
-void
+CellSimilarity::Similarity
 MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                                     &q,
@@ -384,7 +384,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
   std::vector<DerivativeForm<2,dim,spacedim>    >           &jacobian_grads,
   std::vector<DerivativeForm<1,spacedim,dim>    >           &inverse_jacobians,
   std::vector<Point<spacedim> >                             &normal_vectors,
-  CellSimilarity::Similarity                                &cell_similarity) const
+  const CellSimilarity::Similarity                                cell_similarity) const
 {
   AssertDimension(fe->dofs_per_cell, local_dof_values.get().size());
   Assert(local_dof_values.get().size()>0, ExcMessage("Cannot do anything with zero degrees of freedom"));
@@ -394,12 +394,16 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
   Assert (dynamic_cast<InternalData *> (&mapping_data) != 0, ExcInternalError());
   InternalData &data = static_cast<InternalData &> (mapping_data);
 
-  if (get_degree() > 1)
-    cell_similarity = CellSimilarity::invalid_next_cell;
-
   const unsigned int n_q_points=q.size();
+  const  CellSimilarity::Similarity updated_cell_similarity
+    = (get_degree() == 1
+       ?
+       cell_similarity
+       :
+       CellSimilarity::invalid_next_cell);
 
-  compute_fill (cell, n_q_points, QProjector<dim>::DataSetDescriptor::cell (), cell_similarity,
+  compute_fill (cell, n_q_points, QProjector<dim>::DataSetDescriptor::cell (),
+                updated_cell_similarity,
                 data, quadrature_points);
 
   const UpdateFlags update_flags(data.current_update_flags());
@@ -543,6 +547,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
           inverse_jacobians[point] = data.covariant[point].transpose();
     }
 
+  return updated_cell_similarity;
 }
 
 

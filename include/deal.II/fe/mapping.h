@@ -640,7 +640,8 @@ private:
    * The function above adjusted with the variable cell_normal_vectors for the
    * case of codimension 1
    */
-  virtual void
+  virtual
+  CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                         &quadrature,
                   InternalDataBase                              &internal,
@@ -650,7 +651,7 @@ private:
                   std::vector<DerivativeForm<2,dim,spacedim>  > &jacobian_grads,
                   std::vector<DerivativeForm<1,spacedim,dim>  > &inverse_jacobians,
                   std::vector<Point<spacedim> >                 &cell_normal_vectors,
-                  CellSimilarity::Similarity                    &cell_similarity
+                  const CellSimilarity::Similarity                    cell_similarity
                  ) const=0;
 
 
