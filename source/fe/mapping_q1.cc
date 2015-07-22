@@ -732,7 +732,7 @@ MappingQ1<dim,spacedim>::compute_mapping_support_points(
 
 
 template<int dim, int spacedim>
-void
+CellSimilarity::Similarity
 MappingQ1<dim,spacedim>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                        &q,
@@ -743,7 +743,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
   std::vector<DerivativeForm<2,dim,spacedim> > &jacobian_grads,
   std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians,
   std::vector<Point<spacedim> >                &normal_vectors,
-  CellSimilarity::Similarity                   &cell_similarity) const
+  const CellSimilarity::Similarity                   cell_similarity) const
 {
   // ensure that the following static_cast is really correct:
   Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
@@ -906,6 +906,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
           inverse_jacobians[point] = data.covariant[point].transpose();
     }
 
+  return cell_similarity;
 }
 
 

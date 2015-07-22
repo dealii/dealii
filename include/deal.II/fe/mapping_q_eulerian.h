@@ -140,7 +140,8 @@ protected:
    * Implementation of the interface in MappingQ. Overrides the function in
    * the base class, since we cannot use any cell similarity for this class.
    */
-  virtual void
+  virtual
+  CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                                     &quadrature,
                   typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
@@ -150,7 +151,7 @@ protected:
                   std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
                   std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
                   std::vector<Point<spacedim> >                             &cell_normal_vectors,
-                  CellSimilarity::Similarity                           &cell_similarity) const;
+                  const CellSimilarity::Similarity                           cell_similarity) const;
 
   /**
    * Reference to the vector of shifts.

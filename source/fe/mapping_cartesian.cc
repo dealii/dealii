@@ -315,7 +315,7 @@ MappingCartesian<dim, spacedim>::compute_fill (const typename Triangulation<dim,
 
 
 template<int dim, int spacedim>
-void
+CellSimilarity::Similarity
 MappingCartesian<dim, spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const Quadrature<dim> &q,
@@ -326,7 +326,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
                 std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
                 std::vector<Point<spacedim> > &,
-                CellSimilarity::Similarity &cell_similarity) const
+                const CellSimilarity::Similarity cell_similarity) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -386,6 +386,8 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
           for (unsigned int j=0; j<dim; ++j)
             inverse_jacobians[j][j]=1./data.length[j];
         }
+
+  return cell_similarity;
 }
 
 

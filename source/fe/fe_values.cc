@@ -3512,17 +3512,26 @@ FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > &c
 template <int dim, int spacedim>
 void FEValues<dim,spacedim>::do_reinit ()
 {
-  this->get_mapping().fill_fe_values(*this->present_cell,
-                                     quadrature,
-                                     *this->mapping_data,
-                                     this->quadrature_points,
-                                     this->JxW_values,
-                                     this->jacobians,
-                                     this->jacobian_grads,
-                                     this->inverse_jacobians,
-                                     this->normal_vectors,
-                                     this->cell_similarity);
+  // first call the mapping and let it generate the data
+  // specific to the mapping. also let it inspect the
+  // cell similarity flag and, if necessary, update
+  // it
+  this->cell_similarity
+    = this->get_mapping().fill_fe_values(*this->present_cell,
+                                         quadrature,
+                                         *this->mapping_data,
+                                         this->quadrature_points,
+                                         this->JxW_values,
+                                         this->jacobians,
+                                         this->jacobian_grads,
+                                         this->inverse_jacobians,
+                                         this->normal_vectors,
+                                         this->cell_similarity);
 
+  // then call the finite element and, with the data
+  // already filled by the mapping, let it compute the
+  // data for the mapped shape function values, gradients,
+  // etc.
   this->get_fe().fill_fe_values(this->get_mapping(),
                                 *this->present_cell,
                                 quadrature,
