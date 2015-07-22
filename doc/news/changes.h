@@ -80,6 +80,13 @@ inconvenience this causes.
 
 
 <ol>
+
+  <li> Fixed: bug in DynamicSparsityPattern::iterator would cause invalid
+  stl::vector::iterator comparison.
+  <br>
+  (Timo Heister, 2015/07/22)
+  </li>
+
   <li> New: FESystem now does some work in parallel if your system
   has multiple processors.
   <br>
