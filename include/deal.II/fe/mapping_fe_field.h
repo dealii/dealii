@@ -208,8 +208,8 @@ public:
      * Shape function at quadrature point. Shape functions are in tensor
      * product order, so vertices must be reordered to obtain transformation.
      */
-    double shape (const unsigned int qpoint,
-                  const unsigned int shape_nr) const;
+    const double &shape (const unsigned int qpoint,
+                         const unsigned int shape_nr) const;
 
     /**
      * Shape function at quadrature point. See above.
@@ -220,8 +220,8 @@ public:
     /**
      * Gradient of shape function in quadrature point. See above.
      */
-    Tensor<1,dim> derivative (const unsigned int qpoint,
-                              const unsigned int shape_nr) const;
+    const Tensor<1,dim> &derivative (const unsigned int qpoint,
+                                     const unsigned int shape_nr) const;
 
     /**
      * Gradient of shape function in quadrature point. See above.
@@ -277,7 +277,7 @@ public:
      *
      * Computed on each cell.
      */
-    std::vector<DerivativeForm<1,dim, spacedim > >  covariant;
+    mutable std::vector<DerivativeForm<1,dim, spacedim > >  covariant;
 
     /**
      * Tensors of contravariant transformation at each of the quadrature
@@ -286,7 +286,7 @@ public:
      *
      * Computed on each cell.
      */
-    std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
+    mutable std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
 
     /**
      * Unit tangential vectors. Used for the computation of boundary forms and
@@ -306,7 +306,7 @@ public:
     /**
      * Auxiliary vectors for internal use.
      */
-    std::vector<std::vector<Tensor<1,spacedim> > > aux;
+    mutable std::vector<std::vector<Tensor<1,spacedim> > > aux;
 
     /**
      * Number of shape functions. If this is a Q1 mapping, then it is simply
@@ -390,7 +390,7 @@ public:
                      const unsigned int      npts,
                      const typename QProjector<dim>::DataSetDescriptor data_set,
                      const CellSimilarity::Similarity cell_similarity,
-                     InternalData           &data,
+                     const InternalData           &data,
                      std::vector<Point<spacedim> > &quadrature_points) const;
 
 
@@ -403,7 +403,7 @@ public:
                           const unsigned int      npts,
                           const typename QProjector<dim>::DataSetDescriptor data_set,
                           const std::vector<double>   &weights,
-                          InternalData           &mapping_data,
+                          const InternalData           &mapping_data,
                           std::vector<Point<spacedim> >    &quadrature_points,
                           std::vector<double>         &JxW_values,
                           std::vector<Tensor<1,spacedim> > &boundary_form,
@@ -428,7 +428,7 @@ protected:
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                                     &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+                  const typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
                   typename std::vector<Point<spacedim> >                    &quadrature_points,
                   std::vector<double>                                       &JxW_values,
                   std::vector<DerivativeForm<1,dim,spacedim> >       &jacobians,
@@ -444,7 +444,7 @@ protected:
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int face_no,
                        const Quadrature<dim-1>& quadrature,
-                       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                       const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                        typename std::vector<Point<spacedim> >        &quadrature_points,
                        std::vector<double>             &JxW_values,
                        std::vector<Tensor<1,spacedim> >             &exterior_forms,
@@ -460,7 +460,7 @@ protected:
                           const unsigned int face_no,
                           const unsigned int sub_no,
                           const Quadrature<dim-1>& quadrature,
-                          typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                          const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                           typename std::vector<Point<spacedim> >        &quadrature_points,
                           std::vector<double>             &JxW_values,
                           std::vector<Tensor<1,spacedim> > &exterior_forms,
@@ -627,7 +627,7 @@ private:
 
 template<int dim, int spacedim, class DH, class VECTOR>
 inline
-double
+const double &
 MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int qpoint,
     const unsigned int shape_nr) const
 {
@@ -654,7 +654,7 @@ MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::shape (const unsigned int 
 
 template<int dim, int spacedim, class DH, class VECTOR>
 inline
-Tensor<1,dim>
+const Tensor<1,dim> &
 MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::derivative (const unsigned int qpoint,
     const unsigned int shape_nr) const
 {

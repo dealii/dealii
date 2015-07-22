@@ -73,7 +73,7 @@ public:
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                             &quadrature,
-                  typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
+                  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
                   std::vector<Point<spacedim> >                     &quadrature_points,
                   std::vector<double>                               &JxW_values,
                   std::vector<DerivativeForm<1,dim,spacedim> >      &jacobians,
@@ -87,7 +87,7 @@ public:
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int               face_no,
                        const Quadrature<dim-1>&         quadrature,
-                       typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
+                       const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
                        std::vector<Point<dim> >        &quadrature_points,
                        std::vector<double>             &JxW_values,
                        std::vector<Tensor<1,dim> >     &boundary_form,
@@ -99,7 +99,7 @@ public:
                           const unsigned int              face_no,
                           const unsigned int              sub_no,
                           const Quadrature<dim-1>&        quadrature,
-                          typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
+                          const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
                           std::vector<Point<dim> >        &quadrature_points,
                           std::vector<double>             &JxW_values,
                           std::vector<Tensor<1,dim> >     &boundary_form,
@@ -160,6 +160,13 @@ public:
 protected:
   /**
    * Storage for internal data of the scaling.
+   *
+   * This includes data that is computed once when the object is created
+   * (in get_data()) as well as data the class wants to store from between
+   * the call to fill_fe_values(), fill_fe_face_values(), or
+   * fill_fe_subface_values() until possible later calls from the finite
+   * element to functions such as transform(). The latter class of
+   * member variables are marked as 'mutable'.
    */
   class InternalData : public Mapping<dim, spacedim>::InternalDataBase
   {
@@ -178,12 +185,12 @@ protected:
      * Length of the cell in different coordinate directions,
      * <i>h<sub>x</sub></i>, <i>h<sub>y</sub></i>, <i>h<sub>z</sub></i>.
      */
-    Tensor<1,dim> length;
+    mutable Tensor<1,dim> length;
 
     /**
      * The volume element
      */
-    double volume_element;
+    mutable double volume_element;
 
     /**
      * Vector of all quadrature points. Especially, all points on all faces.
@@ -198,7 +205,7 @@ protected:
                      const unsigned int face_no,
                      const unsigned int sub_no,
                      const CellSimilarity::Similarity cell_similarity,
-                     InternalData &data,
+                     const InternalData &data,
                      std::vector<Point<dim> > &quadrature_points,
                      std::vector<Point<dim> > &normal_vectors) const;
 

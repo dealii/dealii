@@ -173,7 +173,7 @@ public:
      * If this flag is @p true we are on an interior cell and the @p
      * mapping_q1_data is used.
      */
-    bool use_mapping_q1_on_current_cell;
+    mutable bool use_mapping_q1_on_current_cell;
 
     /**
      * On interior cells @p MappingQ1 is used.
@@ -189,7 +189,7 @@ protected:
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                            &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                   typename std::vector<Point<spacedim> >           &quadrature_points,
                   std::vector<double>                              &JxW_values,
                   std::vector<DerivativeForm<1,dim,spacedim> >     &jacobians,
@@ -205,7 +205,7 @@ protected:
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int                           face_no,
                        const Quadrature<dim-1>&                     quadrature,
-                       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                       const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                        typename std::vector<Point<spacedim> >       &quadrature_points,
                        std::vector<double>                          &JxW_values,
                        typename std::vector<Tensor<1,spacedim> >    &exterior_form,
@@ -221,7 +221,7 @@ protected:
                           const unsigned int                           face_no,
                           const unsigned int                           sub_no,
                           const Quadrature<dim-1>&                     quadrature,
-                          typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                          const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                           typename std::vector<Point<spacedim> >       &quadrature_points,
                           std::vector<double>                          &JxW_values,
                           typename std::vector<Tensor<1,spacedim> >    &exterior_form,

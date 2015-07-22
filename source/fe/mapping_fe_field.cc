@@ -376,7 +376,7 @@ CellSimilarity::Similarity
 MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                                     &q,
-  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
   std::vector<Point<spacedim> >                             &quadrature_points,
   std::vector<double>                                       &JxW_values,
   std::vector<DerivativeForm<1,dim,spacedim>   >          &jacobians,
@@ -387,8 +387,8 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_values (
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert (dynamic_cast<InternalData *> (&mapping_data) != 0, ExcInternalError());
-  InternalData &data = static_cast<InternalData &> (mapping_data);
+  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0, ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &> (mapping_data);
 
   const unsigned int n_q_points=q.size();
   const  CellSimilarity::Similarity updated_cell_similarity
@@ -554,7 +554,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_face_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int       face_no,
   const Quadrature<dim-1> &q,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   std::vector<Point<spacedim> >     &quadrature_points,
   std::vector<double>          &JxW_values,
   std::vector<Tensor<1,spacedim> >             &exterior_forms,
@@ -564,9 +564,9 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_face_values (
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert (dynamic_cast<InternalData *> (&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0,
           ExcInternalError());
-  InternalData &data = static_cast<InternalData &> (mapping_data);
+  const InternalData &data = static_cast<const InternalData &> (mapping_data);
 
   const unsigned int n_q_points=q.size();
   this->compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
@@ -591,7 +591,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_subface_values (const typename T
     const unsigned int       face_no,
     const unsigned int       sub_no,
     const Quadrature<dim-1> &q,
-    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+    const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
     std::vector<Point<spacedim> >     &quadrature_points,
     std::vector<double>          &JxW_values,
     std::vector<Tensor<1,spacedim> > &exterior_forms,
@@ -601,9 +601,9 @@ MappingFEField<dim,spacedim,VECTOR,DH>::fill_fe_subface_values (const typename T
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert (dynamic_cast<InternalData *> (&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0,
           ExcInternalError());
-  InternalData &data = static_cast<InternalData &> (mapping_data);
+  const InternalData &data = static_cast<const InternalData &> (mapping_data);
 
   const unsigned int n_q_points=q.size();
   this->compute_fill_face (cell, face_no, sub_no,
@@ -967,7 +967,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_fill (
   const unsigned int  n_q_points,
   const typename QProjector<dim>::DataSetDescriptor  data_set,
   const CellSimilarity::Similarity cell_similarity,
-  InternalData  &data,
+  const InternalData  &data,
   std::vector<Point<spacedim> > &quadrature_points) const
 {
   const UpdateFlags update_flags(data.current_update_flags());
@@ -1064,7 +1064,7 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_fill_face (
   const unsigned int      n_q_points,//npts
   const typename QProjector<dim>::DataSetDescriptor data_set,
   const std::vector<double>   &weights,
-  InternalData           &data,
+  const InternalData           &data,
   std::vector<Point<spacedim> >    &quadrature_points,
   std::vector<double>         &JxW_values,
   std::vector<Tensor<1,spacedim> > &boundary_forms,

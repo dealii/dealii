@@ -136,7 +136,7 @@ MappingCartesian<dim, spacedim>::compute_fill (const typename Triangulation<dim,
                                                const unsigned int        face_no,
                                                const unsigned int        sub_no,
                                                const CellSimilarity::Similarity cell_similarity,
-                                               InternalData             &data,
+                                               const InternalData             &data,
                                                std::vector<Point<dim> > &quadrature_points,
                                                std::vector<Point<dim> > &normal_vectors) const
 {
@@ -319,7 +319,7 @@ CellSimilarity::Similarity
 MappingCartesian<dim, spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const Quadrature<dim> &q,
-                typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                 std::vector<Point<spacedim> > &quadrature_points,
                 std::vector<double> &JxW_values,
                 std::vector< DerivativeForm<1,dim,spacedim> > &jacobians,
@@ -332,8 +332,8 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&mapping_data) != 0, ExcInternalError());
-  InternalData &data = static_cast<InternalData &> (mapping_data);
+  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0, ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &> (mapping_data);
 
   std::vector<Point<dim> > dummy;
 
@@ -398,7 +398,7 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const unsigned int             face_no,
   const Quadrature<dim-1>       &q,
-  typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
+  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   std::vector<Point<dim> >      &quadrature_points,
   std::vector<double>           &JxW_values,
   std::vector<Tensor<1,dim> >   &boundary_forms,
@@ -410,9 +410,9 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0,
           ExcInternalError());
-  InternalData &data = static_cast<InternalData &> (mapping_data);
+  const InternalData &data = static_cast<const InternalData &> (mapping_data);
 
   compute_fill (cell, face_no, invalid_face_number,
                 CellSimilarity::none,
@@ -471,7 +471,7 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (
   const unsigned int             face_no,
   const unsigned int             sub_no,
   const Quadrature<dim-1>       &q,
-  typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
+  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   std::vector<Point<dim> >      &quadrature_points,
   std::vector<double>           &JxW_values,
   std::vector<Tensor<1,dim> >   &boundary_forms,
@@ -483,8 +483,8 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<InternalData *> (&mapping_data) != 0, ExcInternalError());
-  InternalData &data = static_cast<InternalData &> (mapping_data);
+  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0, ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &> (mapping_data);
 
   compute_fill (cell, face_no, sub_no, CellSimilarity::none,
                 data,

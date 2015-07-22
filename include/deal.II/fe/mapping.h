@@ -324,7 +324,7 @@ public:
      * The determinant of the Jacobian in each quadrature point. Filled if
      * #update_volume_elements.
      */
-    std::vector<double> volume_elements;
+    mutable std::vector<double> volume_elements;
 
     /**
      * The positions of the mapped (generalized) support points.
@@ -644,15 +644,14 @@ private:
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                         &quadrature,
-                  InternalDataBase                              &internal,
+                  const InternalDataBase                              &internal,
                   std::vector<Point<spacedim> >                 &quadrature_points,
                   std::vector<double>                           &JxW_values,
                   std::vector<DerivativeForm<1,dim,spacedim>  > &jacobians,
                   std::vector<DerivativeForm<2,dim,spacedim>  > &jacobian_grads,
                   std::vector<DerivativeForm<1,spacedim,dim>  > &inverse_jacobians,
                   std::vector<Point<spacedim> >                 &cell_normal_vectors,
-                  const CellSimilarity::Similarity                    cell_similarity
-                 ) const=0;
+                  const CellSimilarity::Similarity                    cell_similarity) const=0;
 
 
 
@@ -670,7 +669,7 @@ private:
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int                            face_no,
                        const Quadrature<dim-1>                      &quadrature,
-                       InternalDataBase                             &internal,
+                       const InternalDataBase                             &internal,
                        std::vector<Point<spacedim> >                &quadrature_points,
                        std::vector<double>                          &JxW_values,
                        std::vector<Tensor<1,spacedim> >             &boundary_form,
@@ -686,7 +685,7 @@ private:
                           const unsigned int                face_no,
                           const unsigned int                sub_no,
                           const Quadrature<dim-1>          &quadrature,
-                          InternalDataBase                 &internal,
+                          const InternalDataBase                 &internal,
                           std::vector<Point<spacedim> >    &quadrature_points,
                           std::vector<double>              &JxW_values,
                           std::vector<Tensor<1,spacedim> > &boundary_form,
