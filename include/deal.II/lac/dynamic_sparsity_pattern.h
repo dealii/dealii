@@ -739,9 +739,8 @@ namespace DynamicSparsityPatternIterators
     // current_entry field may not point to a deterministic location
     return (sparsity_pattern == other.sparsity_pattern &&
             current_row == other.current_row &&
-            ((current_entry == other.current_entry)
-             ||
-             (current_row == numbers::invalid_unsigned_int)));
+            ((current_row == numbers::invalid_unsigned_int)
+             || (current_entry == other.current_entry)));
   }
 
 
