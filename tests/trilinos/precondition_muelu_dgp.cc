@@ -187,8 +187,11 @@ void Step4<dim>::solve ()
     SolverControl           solver_control (1000, 1e-10);
     SolverCG<>              solver (solver_control);
     preconditioner.initialize(system_matrix, data);
-    solver.solve (system_matrix, solution, system_rhs,
-                  preconditioner);
+
+    check_solver_within_range(
+      solver.solve (system_matrix, solution, system_rhs,
+		    preconditioner),
+      solver_control.last_step(), 18, 32);
   }
   deallog.pop();
 }
