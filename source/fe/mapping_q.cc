@@ -50,7 +50,6 @@ std::size_t
 MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 {
   return (MappingQ1<dim,spacedim>::InternalData::memory_consumption () +
-          MemoryConsumption::memory_consumption (unit_normals) +
           MemoryConsumption::memory_consumption (use_mapping_q1_on_current_cell) +
           MemoryConsumption::memory_consumption (mapping_q1_data));
 }
