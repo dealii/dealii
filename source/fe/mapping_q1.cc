@@ -61,6 +61,7 @@ MappingQ1<dim,spacedim>::InternalData::memory_consumption () const
           MemoryConsumption::memory_consumption (aux) +
           MemoryConsumption::memory_consumption (mapping_support_points) +
           MemoryConsumption::memory_consumption (cell_of_current_support_points) +
+          MemoryConsumption::memory_consumption (volume_elements) +
           MemoryConsumption::memory_consumption (is_mapping_q1_data) +
           MemoryConsumption::memory_consumption (n_shape_functions));
 }

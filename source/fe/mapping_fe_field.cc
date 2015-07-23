@@ -60,6 +60,7 @@ template<int dim, int spacedim, class VECTOR, class DH>
 std::size_t
 MappingFEField<dim,spacedim,VECTOR,DH>::InternalData::memory_consumption () const
 {
+  Assert (false, ExcNotImplemented());
   return 0;
 }
 

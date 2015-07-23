@@ -289,6 +289,12 @@ public:
     mutable std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
 
     /**
+     * The determinant of the Jacobian in each quadrature point. Filled if
+     * #update_volume_elements.
+     */
+    mutable std::vector<double> volume_elements;
+
+    /**
      * Unit tangential vectors. Used for the computation of boundary forms and
      * normal vectors.
      *

@@ -279,6 +279,12 @@ public:
     mutable typename Triangulation<dim,spacedim>::cell_iterator cell_of_current_support_points;
 
     /**
+     * The determinant of the Jacobian in each quadrature point. Filled if
+     * #update_volume_elements.
+     */
+    mutable std::vector<double> volume_elements;
+
+    /**
      * Default value of this flag is @p true. If <tt>*this</tt> is an object
      * of a derived class, this flag is set to @p false.
      */

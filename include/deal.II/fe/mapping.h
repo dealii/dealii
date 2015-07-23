@@ -321,12 +321,6 @@ public:
     virtual std::size_t memory_consumption () const;
 
     /**
-     * The determinant of the Jacobian in each quadrature point. Filled if
-     * #update_volume_elements.
-     */
-    mutable std::vector<double> volume_elements;
-
-    /**
      * The positions of the mapped (generalized) support points.
      */
     std::vector<Point<spacedim> > support_point_values;
