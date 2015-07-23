@@ -232,8 +232,8 @@ public:
     /**
      * Second derivative of shape function in quadrature point. See above.
      */
-    Tensor<2,dim> second_derivative (const unsigned int qpoint,
-                                     const unsigned int shape_nr) const;
+    const Tensor<2,dim> &second_derivative (const unsigned int qpoint,
+                                            const unsigned int shape_nr) const;
 
     /**
      * Second derivative of shape function in quadrature point. See above.
@@ -681,7 +681,7 @@ MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::derivative (const unsigned
 
 template <int dim, int spacedim, class DH, class VECTOR>
 inline
-Tensor<2,dim>
+const Tensor<2,dim> &
 MappingFEField<dim,spacedim,DH,VECTOR>::InternalData::second_derivative (const unsigned int qpoint,
     const unsigned int shape_nr) const
 {
