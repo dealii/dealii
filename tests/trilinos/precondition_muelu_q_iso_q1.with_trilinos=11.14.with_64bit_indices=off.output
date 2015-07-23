@@ -1,7 +1,7 @@
 
 DEAL:02401:MueLu_Q::Solver stopped within 31 - 33 iterations
-DEAL:02401:MueLu_Q_iso_Q1::Solver stopped within 36 - 38 iterations
+DEAL:02401:MueLu_Q_iso_Q1::Solver stopped within 24 - 38 iterations
 DEAL:02401::
 DEAL:09409:MueLu_Q::Solver stopped within 31 - 33 iterations
-DEAL:09409:MueLu_Q_iso_Q1::Solver stopped within 36 - 38 iterations
+DEAL:09409:MueLu_Q_iso_Q1::Solver stopped within 24 - 38 iterations
 DEAL:09409::
