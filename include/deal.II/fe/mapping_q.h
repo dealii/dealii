@@ -168,14 +168,6 @@ public:
     virtual std::size_t memory_consumption () const;
 
     /**
-     * Unit normal vectors. Used for the alternative computation of the normal
-     * vectors. See doc of the @p alternative_normals_computation flag.
-     *
-     * Filled (hardcoded) once in @p get_face_data.
-     */
-    std::vector<std::vector<Point<dim> > > unit_normals;
-
-    /**
      * Flag that is set by the <tt>fill_fe_[[sub]face]_values</tt> function.
      *
      * If this flag is @p true we are on an interior cell and the @p
