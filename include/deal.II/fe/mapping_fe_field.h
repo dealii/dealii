@@ -423,7 +423,7 @@ protected:
                   std::vector<DerivativeForm<2,dim,spacedim> >       &jacobian_grads,
                   std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
                   std::vector<Point<spacedim> >                             &cell_normal_vectors,
-                  const CellSimilarity::Similarity                           cell_similarity) const ;
+                  const CellSimilarity::Similarity                           cell_similarity) const;
 
   /**
    * Implementation of the interface in Mapping.
@@ -438,7 +438,7 @@ protected:
                        std::vector<Tensor<1,spacedim> >             &exterior_forms,
                        std::vector<Point<spacedim> >                &normal_vectors,
                        std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
+                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const;
 
   /**
    * Implementation of the interface in Mapping.
@@ -454,7 +454,7 @@ protected:
                           std::vector<Tensor<1,spacedim> > &exterior_forms,
                           std::vector<Point<spacedim> >    &normal_vectors,
                           std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
+                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const;
 
 
   /**

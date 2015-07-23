@@ -800,17 +800,17 @@ protected:
   virtual typename Mapping<dim,spacedim>::InternalDataBase *
   get_data (const UpdateFlags      update_flags,
             const Mapping<dim,spacedim>    &mapping,
-            const Quadrature<dim> &quadrature) const ;
+            const Quadrature<dim> &quadrature) const;
 
   virtual typename Mapping<dim,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags      update_flags,
                  const Mapping<dim,spacedim>    &mapping,
-                 const Quadrature<dim-1> &quadrature) const ;
+                 const Quadrature<dim-1> &quadrature) const;
 
   virtual typename Mapping<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags      update_flags,
                     const Mapping<dim,spacedim>    &mapping,
-                    const Quadrature<dim-1> &quadrature) const ;
+                    const Quadrature<dim-1> &quadrature) const;
 
   /**
    * Implementation of the same function in FiniteElement.
