@@ -471,7 +471,7 @@ namespace Step13
     // the base class.
     //
     // Due to the lack of actual functionality, the programming style of
-    // declaring very abstract base classes reminds of the style used in
+    // declaring very abstract base classes is similar to the style used in
     // Smalltalk or Java programs, where all classes are derived from entirely
     // abstract classes <code>Object</code>, even number representations. The
     // author admits that he does not particularly like the use of such a
