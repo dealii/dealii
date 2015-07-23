@@ -23,9 +23,12 @@
 // a MappingQ to switch between a Q1 while passing through the mesh
 //
 // this tests outputs the Jacobian of the transformation and the derivatives
-// in real space in two locations inside the cell. to make sure the cell
-// similarity code is used, only run the program with one thread
+// in real space in two locations inside the cell.
 
+// To make sure the cell similarity code is used, only run the program with
+// one thread. For this we need to disable LimitConcurreny in ../tests.h and
+// then set the number of threads to 1 (in main() below):
+#define DEAL_II_TEST_DO_NOT_SET_THREAD_LIMIT
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>

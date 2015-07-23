@@ -196,7 +196,7 @@ std::string unify_pretty_function (const std::string &text)
  * calls MPI_InitFinalize itself, we can't adjust the thread count
  * for this here.
  */
-#ifndef DEAL_II_WITH_MPI
+#if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_TEST_DO_NOT_SET_THREAD_LIMIT)
 struct LimitConcurrency
 {
   LimitConcurrency ()
