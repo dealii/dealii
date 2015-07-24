@@ -467,7 +467,7 @@ namespace
             interesting_range[0] = interesting_range[1] = test_threshold;
 
           // terminate the iteration
-          // after 10 go-arounds. this
+          // after 25 go-arounds. this
           // is necessary because
           // oftentimes error
           // indicators on cells have
@@ -477,14 +477,14 @@ namespace
           // the indicators in such a
           // way that we can achieve
           // the desired number of
-          // cells. using a max of 10
+          // cells. using a max of 25
           // iterations means that we
           // terminate the iteration
-          // after 10 steps if the
+          // after 25 steps if the
           // indicators were perfectly
           // badly distributed, and we
           // make at most a mistake of
-          // 1/2^10 in the number of
+          // 1/2^25 in the number of
           // cells flagged if
           // indicators are perfectly
           // equidistributed
