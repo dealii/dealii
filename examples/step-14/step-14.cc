@@ -361,12 +361,6 @@ namespace Step14
   // differences to the previous program.
   namespace LaplaceSolver
   {
-    // Before everything else, forward-declare one class that we will have
-    // later, since we will want to make it a friend of some of the classes
-    // that follow, which requires the class to be known:
-    template <int dim> class WeightedResidual;
-
-
     // @sect4{The Laplace solver base class}
 
     // This class is almost unchanged, with the exception that it declares two
@@ -448,10 +442,11 @@ namespace Step14
       unsigned int
       n_dofs () const;
 
-    protected:
       const SmartPointer<const FiniteElement<dim> >  fe;
       const SmartPointer<const Quadrature<dim> >     quadrature;
       const SmartPointer<const Quadrature<dim-1> >   face_quadrature;
+
+    protected:
       DoFHandler<dim>                                dof_handler;
       Vector<double>                                 solution;
       const SmartPointer<const Function<dim> >       boundary_values;
@@ -806,11 +801,10 @@ namespace Step14
       virtual
       void output_solution () const;
 
-    protected:
       const SmartPointer<const Function<dim> > rhs_function;
-      virtual void assemble_rhs (Vector<double> &rhs) const;
 
-      friend class WeightedResidual<dim>;
+    protected:
+      virtual void assemble_rhs (Vector<double> &rhs) const;
     };
 
 
@@ -1830,8 +1824,6 @@ namespace Step14
       virtual void assemble_rhs (Vector<double> &rhs) const;
 
       static const ZeroFunction<dim> boundary_values;
-
-      friend class WeightedResidual<dim>;
     };
 
     template <int dim>
