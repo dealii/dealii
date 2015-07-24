@@ -491,7 +491,7 @@ MappingQ1<dim,spacedim>::compute_data (const UpdateFlags      update_flags,
 
 
 template<int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename MappingQ1<dim,spacedim>::InternalData *
 MappingQ1<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                    const Quadrature<dim> &q) const
 {
@@ -1427,16 +1427,13 @@ MappingQ1<dim,spacedim>::transform_unit_to_real_cell (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Point<dim> &p) const
 {
-  // Use the get_data function to
-  // create an InternalData with data
-  // vectors of the right size and
-  // transformation shape values
-  // already computed at point p.
+  // Use the get_data function to create an InternalData with data
+  // vectors of the right size and transformation shape values already
+  // computed at point p.
   const Quadrature<dim> point_quadrature(p);
 
-  std_cxx11::unique_ptr<InternalData>
-  mdata (dynamic_cast<InternalData *> (
-           get_data(update_transformation_values, point_quadrature)));
+  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_transformation_values,
+                                                      point_quadrature));
 
   // compute the mapping support
   // points
@@ -1670,9 +1667,8 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       if (spacedim>dim)
         update_flags |= update_jacobian_grads;
 
-      std_cxx11::unique_ptr<InternalData>
-      mdata(dynamic_cast<InternalData *> (
-              MappingQ1<dim,spacedim>::get_data(update_flags, point_quadrature)));
+      std_cxx11::unique_ptr<InternalData> mdata(get_data(update_flags,
+                                                         point_quadrature));
 
       compute_mapping_support_points (cell, mdata->mapping_support_points);
       // The support points have to be at

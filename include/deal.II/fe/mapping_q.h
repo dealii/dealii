@@ -290,8 +290,18 @@ private:
                                          std::vector<Point<spacedim> > &points) const;
 
 
+  /**
+   * Implementation of the Mapping::get_data() interface.
+   *
+   * As allowed by C++ (using a feature called "covariant return
+   * types"), this function returns a pointer to a
+   * MappingQ::InternalData object since these objects are
+   * derived from the Mapping::InternalDataBase class, pointers to
+   * which are returned by the Mapping::get_data() function. This
+   * makes some uses of this function simpler.
+   */
   virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
+  InternalData *
   get_data (const UpdateFlags,
             const Quadrature<dim> &quadrature) const;
 

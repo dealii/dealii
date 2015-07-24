@@ -193,7 +193,7 @@ MappingQ<dim,spacedim>::compute_shapes_virtual (const std::vector<Point<dim> > &
 
 
 template<int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename MappingQ<dim,spacedim>::InternalData *
 MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                   const Quadrature<dim> &quadrature) const
 {
@@ -1043,9 +1043,8 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
   // the right size and transformation shape values already computed at point
   // p.
   const Quadrature<dim> point_quadrature(p);
-  std_cxx11::unique_ptr<InternalData>
-  mdata (dynamic_cast<InternalData *> (
-           get_data(update_transformation_values, point_quadrature)));
+  std_cxx11::unique_ptr<InternalData> mdata (get_data(update_transformation_values,
+                                                      point_quadrature));
 
   mdata->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells ||
                                             cell->has_boundary_lines());
@@ -1129,9 +1128,8 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       UpdateFlags update_flags = update_transformation_values|update_transformation_gradients;
       if (spacedim>dim)
         update_flags |= update_jacobian_grads;
-      std_cxx11::unique_ptr<InternalData>
-      mdata (dynamic_cast<InternalData *> (
-               get_data(update_flags,point_quadrature)));
+      std_cxx11::unique_ptr<InternalData> mdata (get_data(update_flags,
+                                                          point_quadrature));
 
       mdata->use_mapping_q1_on_current_cell = false;
 
