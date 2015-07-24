@@ -144,17 +144,17 @@ protected:
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_data (const UpdateFlags,
             const Mapping<dim,spacedim> &mapping,
-            const Quadrature<dim> &quadrature) const ;
+            const Quadrature<dim> &quadrature) const;
 
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags,
                  const Mapping<dim,spacedim> &mapping,
-                 const Quadrature<dim-1>& quadrature) const ;
+                 const Quadrature<dim-1>& quadrature) const;
 
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags,
                     const Mapping<dim,spacedim> &mapping,
-                    const Quadrature<dim-1>& quadrature) const ;
+                    const Quadrature<dim-1>& quadrature) const;
 
   virtual void
   fill_fe_values (const Mapping<dim,spacedim>                           &mapping,
@@ -172,7 +172,7 @@ protected:
                        const Quadrature<dim-1>                &quadrature,
                        const typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
                        const typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
-                       FEValuesData<dim,spacedim> &data) const ;
+                       FEValuesData<dim,spacedim> &data) const;
 
   virtual void
   fill_fe_subface_values (const Mapping<dim,spacedim> &mapping,
@@ -182,7 +182,7 @@ protected:
                           const Quadrature<dim-1>                &quadrature,
                           const typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
                           const typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
-                          FEValuesData<dim,spacedim> &data) const ;
+                          FEValuesData<dim,spacedim> &data) const;
 
 
   /**

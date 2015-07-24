@@ -330,7 +330,7 @@ public:
                        typename std::vector<Tensor<1,spacedim> >    &boundary_form,
                        typename std::vector<Point<spacedim> >       &normal_vectors,
                        std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
+                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const;
 
   /**
    * Implementation of the interface in Mapping.
@@ -346,7 +346,7 @@ public:
                           typename std::vector<Tensor<1,spacedim> >    &boundary_form,
                           typename std::vector<Point<spacedim> >       &normal_vectors,
                           std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
+                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const;
 
   /**
    * Compute shape values and/or derivatives.

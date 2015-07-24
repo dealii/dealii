@@ -80,7 +80,7 @@ public:
                   std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
                   std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
                   std::vector<Point<spacedim> > &,
-                  const CellSimilarity::Similarity                        cell_similarity) const ;
+                  const CellSimilarity::Similarity                        cell_similarity) const;
 
 
   virtual void
@@ -93,7 +93,7 @@ public:
                        std::vector<Tensor<1,dim> >     &boundary_form,
                        std::vector<Point<spacedim> >   &normal_vectors,
                        std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
+                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const;
   virtual void
   fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                           const unsigned int              face_no,
@@ -105,7 +105,7 @@ public:
                           std::vector<Tensor<1,dim> >     &boundary_form,
                           std::vector<Point<spacedim> >   &normal_vectors,
                           std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const ;
+                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const;
 
   virtual void
   transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,

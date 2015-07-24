@@ -646,14 +646,14 @@ public:
    */
   virtual void   get_intermediate_points_on_line (
     const typename Triangulation< dim, spacedim >::line_iterator   &line,
-    std::vector< Point< spacedim > >         &points) const ;
+    std::vector< Point< spacedim > >         &points) const;
 
   /**
    * Construct a new points on a quad.
    */
   virtual void  get_intermediate_points_on_quad (
     const typename Triangulation< dim, spacedim >::quad_iterator &quad,
-    std::vector< Point< spacedim > >         &points ) const ;
+    std::vector< Point< spacedim > >         &points ) const;
 
   /**
    * Get the normal from cartesian coordinates. This normal does not have unit
@@ -661,7 +661,7 @@ public:
    */
   virtual void get_normals_at_vertices (
     const typename Triangulation< dim, spacedim >::face_iterator &face,
-    typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const ;
+    typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
 
 private:
   //Handy functions
@@ -677,25 +677,25 @@ private:
    * Get the cartesian coordinates of the Torus, i.e., from
    * <tt>(theta,phi)</tt> to <tt>(x,y,z)</tt>.
    */
-  Point<spacedim>  get_real_coord(const Point<dim> &surfP) const ;
+  Point<spacedim>  get_real_coord(const Point<dim> &surfP) const;
 
   /**
    * Get the surface coordinates of the Torus, i.e., from <tt>(x,y,z)</tt> to
    * <tt>(theta,phi)</tt>.
    */
-  Point<dim>       get_surf_coord(const Point<spacedim> &p) const ;
+  Point<dim>       get_surf_coord(const Point<spacedim> &p) const;
 
   /**
    * Get the normal from surface coordinates. This normal does not have unit
    * length.
    */
-  Point<spacedim>  get_surf_norm_from_sp(const Point<dim> &surfP)      const ;
+  Point<spacedim>  get_surf_norm_from_sp(const Point<dim> &surfP)      const;
 
   /**
    * Get the normal from cartesian coordinates. This normal does not have unit
    * length.
    */
-  Point<spacedim>  get_surf_norm(const Point<spacedim> &p) const ;
+  Point<spacedim>  get_surf_norm(const Point<spacedim> &p) const;
 
   /**
    * Inner and outer radii of the shell.
