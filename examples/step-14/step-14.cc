@@ -23,6 +23,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -2898,7 +2899,7 @@ namespace Step14
       // side, domain, boundary values, etc. The pointer needed here defaults
       // to the Null pointer, i.e. you will have to set it in actual instances
       // of this object to make it useful.
-      SmartPointer<const Data::SetUpBase<dim> > data;
+      std_cxx11::unique_ptr<const Data::SetUpBase<dim> > data;
 
       // Since we allow to use different refinement criteria (global
       // refinement, refinement by the Kelly error indicator, possibly with a
@@ -2918,7 +2919,8 @@ namespace Step14
       // Next, an object that describes the dual functional. It is only needed
       // if the dual weighted residual refinement is chosen, and also defaults
       // to a Null pointer.
-      SmartPointer<const DualFunctional::DualFunctionalBase<dim> > dual_functional;
+      std_cxx11::unique_ptr<const DualFunctional::DualFunctionalBase<dim> >
+      dual_functional;
 
       // Then a list of evaluation objects. Its default value is empty,
       // i.e. no evaluation objects.
@@ -2929,7 +2931,7 @@ namespace Step14
       // pointer is zero, but you have to set it to some other value if you
       // want to use the <code>weighted_kelly_indicator</code> refinement
       // criterion.
-      SmartPointer<const Function<dim> > kelly_weight;
+      std_cxx11::unique_ptr<const Function<dim> > kelly_weight;
 
       // Finally, we have a variable that denotes the maximum number of
       // degrees of freedom we allow for the (primal) discretization. If it is
@@ -2979,57 +2981,57 @@ namespace Step14
 
     // Next, select one of the classes implementing different refinement
     // criteria.
-    LaplaceSolver::Base<dim> *solver = 0;
+    std_cxx11::unique_ptr<LaplaceSolver::Base<dim> > solver;
     switch (descriptor.refinement_criterion)
       {
       case ProblemDescription::dual_weighted_error_estimator:
       {
-        solver
-          = new LaplaceSolver::WeightedResidual<dim> (triangulation,
-                                                      primal_fe,
-                                                      dual_fe,
-                                                      quadrature,
-                                                      face_quadrature,
-                                                      descriptor.data->get_right_hand_side(),
-                                                      descriptor.data->get_boundary_values(),
-                                                      *descriptor.dual_functional);
+        solver.reset
+        (new LaplaceSolver::WeightedResidual<dim> (triangulation,
+                                                   primal_fe,
+                                                   dual_fe,
+                                                   quadrature,
+                                                   face_quadrature,
+                                                   descriptor.data->get_right_hand_side(),
+                                                   descriptor.data->get_boundary_values(),
+                                                   *descriptor.dual_functional));
         break;
       }
 
       case ProblemDescription::global_refinement:
       {
-        solver
-          = new LaplaceSolver::RefinementGlobal<dim> (triangulation,
-                                                      primal_fe,
-                                                      quadrature,
-                                                      face_quadrature,
-                                                      descriptor.data->get_right_hand_side(),
-                                                      descriptor.data->get_boundary_values());
+        solver.reset
+        (new LaplaceSolver::RefinementGlobal<dim> (triangulation,
+                                                   primal_fe,
+                                                   quadrature,
+                                                   face_quadrature,
+                                                   descriptor.data->get_right_hand_side(),
+                                                   descriptor.data->get_boundary_values()));
         break;
       }
 
       case ProblemDescription::kelly_indicator:
       {
-        solver
-          = new LaplaceSolver::RefinementKelly<dim> (triangulation,
-                                                     primal_fe,
-                                                     quadrature,
-                                                     face_quadrature,
-                                                     descriptor.data->get_right_hand_side(),
-                                                     descriptor.data->get_boundary_values());
+        solver.reset
+        (new LaplaceSolver::RefinementKelly<dim> (triangulation,
+                                                  primal_fe,
+                                                  quadrature,
+                                                  face_quadrature,
+                                                  descriptor.data->get_right_hand_side(),
+                                                  descriptor.data->get_boundary_values()));
         break;
       }
 
       case ProblemDescription::weighted_kelly_indicator:
       {
-        solver
-          = new LaplaceSolver::RefinementWeightedKelly<dim> (triangulation,
-                                                             primal_fe,
-                                                             quadrature,
-                                                             face_quadrature,
-                                                             descriptor.data->get_right_hand_side(),
-                                                             descriptor.data->get_boundary_values(),
-                                                             *descriptor.kelly_weight);
+        solver.reset
+        (new LaplaceSolver::RefinementWeightedKelly<dim> (triangulation,
+                                                          primal_fe,
+                                                          quadrature,
+                                                          face_quadrature,
+                                                          descriptor.data->get_right_hand_side(),
+                                                          descriptor.data->get_boundary_values(),
+                                                          *descriptor.kelly_weight));
         break;
       }
 
@@ -3071,11 +3073,8 @@ namespace Step14
           break;
       }
 
-    // After the loop has run, clean up the screen, and delete objects no more
-    // needed:
+    // Clean up the screen after the loop has run:
     std::cout << std::endl;
-    delete solver;
-    solver = 0;
   }
 
 }
@@ -3119,7 +3118,7 @@ int main ()
       // values, and right hand side. These are prepackaged in classes. We
       // take here the description of <code>Exercise_2_3</code>, but you can
       // also use <code>CurvedRidges@<dim@></code>:
-      descriptor.data = new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
+      descriptor.data.reset(new Data::SetUp<Data::Exercise_2_3<dim>,dim> ());
 
       // Next set first a dual functional, then a list of evaluation
       // objects. We choose as default the evaluation of the value at an
@@ -3135,8 +3134,8 @@ int main ()
       // each step.  One such additional evaluation is to output the grid in
       // each step.
       const Point<dim> evaluation_point (0.75, 0.75);
-      descriptor.dual_functional
-        = new DualFunctional::PointValueEvaluation<dim> (evaluation_point);
+      descriptor.dual_functional.reset
+      (new DualFunctional::PointValueEvaluation<dim> (evaluation_point));
 
       Evaluation::PointValueEvaluation<dim>
       postprocessor1 (evaluation_point);
