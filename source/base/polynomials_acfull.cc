@@ -33,16 +33,8 @@ PolynomialsACFull<dim>::PolynomialsACFull (const unsigned int k)
   p_grads(polynomial_space.n()),
   p_grad_grads(polynomial_space.n())
 {
-  switch (dim)
-    {
-    case 2:
-    case 3:
-      for (unsigned int i=0; i<monomials.size(); ++i)
-        monomials[i] = Polynomials::Monomial<double> (i);
-      break;
-    default:
-      Assert(false, ExcNotImplemented());
-    }
+  for (unsigned int i=0; i<monomials.size(); ++i)
+    monomials[i] = Polynomials::Monomial<double> (i);
 }
 
 
@@ -164,7 +156,7 @@ PolynomialsACFull<dim>::compute (const Point<dim>            &unit_point,
               +  unit_point(d) 
                * v[0][ix][(d2==0) ? 1 : 0]
                * ((dim>1) ? v[1][iy][(d2==1) ? 1 : 0] : 1.)
-               * ((dim>2) ? v[2][iz][(d2==2) ? 1 : 0] : 1.)
+               * ((dim>2) ? v[2][iz][(d2==2) ? 1 : 0] : 1.);
             }
 
           if (update_grad_grads)
@@ -325,7 +317,7 @@ unsigned int
 PolynomialsACFull<dim>::compute_n_pols(unsigned int k)
 {
   if (dim == 1) return k+2;
-  if (dim == 2) return (k+1)*(k+2)+(k+1)+2 - (k==0)?1:0;
+  if (dim == 2) return (k+1)*(k+2)+(k+1)+2 - ((k==0)?1:0);
   if (dim == 3) return ((k+1)*(k+2)*(k+3))/2+(k+2)*(k+1)/2+3*(k+1);
   Assert(false, ExcNotImplemented());
   return 0;
