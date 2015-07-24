@@ -18,5 +18,6 @@
 for (deal_II_dimension : DIMENSIONS)
   {
     template class FE_PolyTensor_NP<PolynomialsBDM<deal_II_dimension>,deal_II_dimension>;
+    template class FE_PolyTensor_NP<PolynomialsACFull<deal_II_dimension>,deal_II_dimension>;
   }
 
