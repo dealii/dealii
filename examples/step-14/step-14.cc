@@ -810,10 +810,6 @@ namespace Step14
       const SmartPointer<const Function<dim> > rhs_function;
       virtual void assemble_rhs (Vector<double> &rhs) const;
 
-      // Now, in order to work around some problems in one of the compilers
-      // this library can be compiled with, we will have to declare a class
-      // that is actually derived from the present one, as a friend (strange
-      // as that seems). The full rationale will be explained below.
       friend class WeightedResidual<dim>;
     };
 
@@ -1835,7 +1831,6 @@ namespace Step14
 
       static const ZeroFunction<dim> boundary_values;
 
-      // Same as above -- make a derived class a friend of this one:
       friend class WeightedResidual<dim>;
     };
 
@@ -2337,62 +2332,28 @@ namespace Step14
     // interpolation, there is a library function, that takes a
     // ConstraintMatrix object including the hanging node
     // constraints. The rest is standard.
-    //
-    // There is, however, one work-around worth mentioning: in this function,
-    // as in a couple of following ones, we have to access the
-    // <code>DoFHandler</code> objects and solutions of both the primal as
-    // well as of the dual solver. Since these are members of the
-    // <code>Solver</code> base class which exists twice in the class
-    // hierarchy leading to the present class (once as base class of the
-    // <code>PrimalSolver</code> class, once as base class of the
-    // <code>DualSolver</code> class), we have to disambiguate accesses to
-    // them by telling the compiler a member of which of these two instances
-    // we want to access. The way to do this would be identify the member by
-    // pointing a path through the class hierarchy which disambiguates the
-    // base class, for example writing <code>PrimalSolver::dof_handler</code>
-    // to denote the member variable <code>dof_handler</code> from the
-    // <code>Solver</code> base class of the <code>PrimalSolver</code>
-    // class. Unfortunately, this confuses gcc's version 2.96 (a version that
-    // was intended as a development snapshot, but delivered as system
-    // compiler by Red Hat in their 7.x releases) so much that it bails out
-    // and refuses to compile the code.
-    //
-    // Thus, we have to work around this problem. We do this by introducing
-    // references to the <code>PrimalSolver</code> and <code>DualSolver</code>
-    // components of the <code>WeightedResidual</code> object at the beginning
-    // of the function. Since each of these has an unambiguous base class
-    // <code>Solver</code>, we can access the member variables we want through
-    // these references. However, we are now accessing protected member
-    // variables of these classes through a pointer other than the
-    // <code>this</code> pointer (in fact, this is of course the
-    // <code>this</code> pointer, but not explicitly). This finally is the
-    // reason why we had to declare the present class a friend of the classes
-    // we so access.
     template <int dim>
     void
     WeightedResidual<dim>::output_solution () const
     {
-      const PrimalSolver<dim> &primal_solver = *this;
-      const DualSolver<dim>   &dual_solver   = *this;
-
       ConstraintMatrix primal_hanging_node_constraints;
-      DoFTools::make_hanging_node_constraints (primal_solver.dof_handler,
+      DoFTools::make_hanging_node_constraints (PrimalSolver<dim>::dof_handler,
                                                primal_hanging_node_constraints);
       primal_hanging_node_constraints.close();
-      Vector<double> dual_solution (primal_solver.dof_handler.n_dofs());
-      FETools::interpolate (dual_solver.dof_handler,
-                            dual_solver.solution,
-                            primal_solver.dof_handler,
+      Vector<double> dual_solution (PrimalSolver<dim>::dof_handler.n_dofs());
+      FETools::interpolate (DualSolver<dim>::dof_handler,
+                            DualSolver<dim>::solution,
+                            PrimalSolver<dim>::dof_handler,
                             primal_hanging_node_constraints,
                             dual_solution);
 
       DataOut<dim> data_out;
-      data_out.attach_dof_handler (primal_solver.dof_handler);
+      data_out.attach_dof_handler (PrimalSolver<dim>::dof_handler);
 
       // Add the data vectors for which we want output. Add them both, the
       // <code>DataOut</code> functions can handle as many data vectors as you
       // wish to write to output:
-      data_out.add_data_vector (primal_solver.solution,
+      data_out.add_data_vector (PrimalSolver<dim>::solution,
                                 "primal_solution");
       data_out.add_data_vector (dual_solution,
                                 "dual_solution");
@@ -2422,9 +2383,6 @@ namespace Step14
     WeightedResidual<dim>::
     estimate_error (Vector<float> &error_indicators) const
     {
-      const PrimalSolver<dim> &primal_solver = *this;
-      const DualSolver<dim>   &dual_solver   = *this;
-
       // The first task in computing the error is to set up vectors that
       // denote the primal solution, and the weights (z-z_h)=(z-I_hz), both in
       // the finite element space for which we have computed the dual
@@ -2442,13 +2400,13 @@ namespace Step14
       // to create a ConstraintMatrix including the hanging node constraints,
       // but this time of the dual finite element space.
       ConstraintMatrix dual_hanging_node_constraints;
-      DoFTools::make_hanging_node_constraints (dual_solver.dof_handler,
+      DoFTools::make_hanging_node_constraints (DualSolver<dim>::dof_handler,
                                                dual_hanging_node_constraints);
       dual_hanging_node_constraints.close();
-      Vector<double> primal_solution (dual_solver.dof_handler.n_dofs());
-      FETools::interpolate (primal_solver.dof_handler,
-                            primal_solver.solution,
-                            dual_solver.dof_handler,
+      Vector<double> primal_solution (DualSolver<dim>::dof_handler.n_dofs());
+      FETools::interpolate (PrimalSolver<dim>::dof_handler,
+                            PrimalSolver<dim>::solution,
+                            DualSolver<dim>::dof_handler,
                             dual_hanging_node_constraints,
                             primal_solution);
 
@@ -2458,14 +2416,14 @@ namespace Step14
       // <code>interpolate_difference</code> function, that gives (z-I_hz) in
       // the element space of the dual solution.
       ConstraintMatrix primal_hanging_node_constraints;
-      DoFTools::make_hanging_node_constraints (primal_solver.dof_handler,
+      DoFTools::make_hanging_node_constraints (PrimalSolver<dim>::dof_handler,
                                                primal_hanging_node_constraints);
       primal_hanging_node_constraints.close();
-      Vector<double> dual_weights (dual_solver.dof_handler.n_dofs());
-      FETools::interpolation_difference (dual_solver.dof_handler,
+      Vector<double> dual_weights (DualSolver<dim>::dof_handler.n_dofs());
+      FETools::interpolation_difference (DualSolver<dim>::dof_handler,
                                          dual_hanging_node_constraints,
-                                         dual_solver.solution,
-                                         primal_solver.dof_handler,
+                                         DualSolver<dim>::solution,
+                                         PrimalSolver<dim>::dof_handler,
                                          primal_hanging_node_constraints,
                                          dual_weights);
 
@@ -2494,8 +2452,8 @@ namespace Step14
       // threads through a mutex each time they write to (and modify the
       // structure of) this map.
       FaceIntegrals face_integrals;
-      for (active_cell_iterator cell=dual_solver.dof_handler.begin_active();
-           cell!=dual_solver.dof_handler.end();
+      for (active_cell_iterator cell=DualSolver<dim>::dof_handler.begin_active();
+           cell!=DualSolver<dim>::dof_handler.end();
            ++cell)
         for (unsigned int face_no=0;
              face_no<GeometryInfo<dim>::faces_per_cell;
@@ -2507,7 +2465,7 @@ namespace Step14
       // parallel iterator range just as we did in step-9, and hand it
       // all off to WorkStream::run to compute the estimators for all
       // cells in parallel:
-      error_indicators.reinit (dual_solver.dof_handler
+      error_indicators.reinit (DualSolver<dim>::dof_handler
                                .get_tria().n_active_cells());
 
       typedef
@@ -2515,10 +2473,10 @@ namespace Step14
       IteratorTuple;
 
       SynchronousIterators<IteratorTuple>
-      cell_and_error_begin(IteratorTuple (dual_solver.dof_handler.begin_active(),
+      cell_and_error_begin(IteratorTuple (DualSolver<dim>::dof_handler.begin_active(),
                                           error_indicators.begin()));
       SynchronousIterators<IteratorTuple>
-      cell_and_error_end  (IteratorTuple (dual_solver.dof_handler.end(),
+      cell_and_error_end  (IteratorTuple (DualSolver<dim>::dof_handler.end(),
                                           error_indicators.begin()));
 
       WorkStream::run(cell_and_error_begin,
@@ -2530,8 +2488,8 @@ namespace Step14
                                       std_cxx11::_3,
                                       std_cxx11::ref(face_integrals)),
                       std_cxx11::function<void (const WeightedResidualCopyData &)>(),
-                      WeightedResidualScratchData (primal_solver,
-                                                   dual_solver,
+                      WeightedResidualScratchData (*this,
+                                                   *this,
                                                    primal_solution,
                                                    dual_weights),
                       WeightedResidualCopyData());
@@ -2543,8 +2501,8 @@ namespace Step14
       // there, and add them up. Only take minus one half of the jump term,
       // since the other half will be taken by the neighboring cell.
       unsigned int present_cell=0;
-      for (active_cell_iterator cell=dual_solver.dof_handler.begin_active();
-           cell!=dual_solver.dof_handler.end();
+      for (active_cell_iterator cell=DualSolver<dim>::dof_handler.begin_active();
+           cell!=DualSolver<dim>::dof_handler.end();
            ++cell, ++present_cell)
         for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
              ++face_no)
