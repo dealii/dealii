@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/polynomials_acfull.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/geometry_info.h>
@@ -164,6 +165,16 @@ class FE_ACRed : public FE_DGVector_NP<PolynomialsBDM<dim>, dim, spacedim>
 public:
   
   FE_ACRed (const unsigned int p);
+
+  virtual std::string get_name () const;
+};
+
+template <int dim, int spacedim=dim>
+class FE_ACFull : public FE_DGVector_NP<PolynomialsACFull<dim>, dim, spacedim>
+{
+public:
+  
+  FE_ACFull (const unsigned int p);
 
   virtual std::string get_name () const;
 };

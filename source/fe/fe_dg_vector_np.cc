@@ -16,6 +16,7 @@
 
 #include <deal.II/fe/fe_dg_vector_np.templates.h>
 #include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/polynomials_acfull.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -44,6 +45,32 @@ FE_ACRed<dim, spacedim>::get_name () const
 
   return namebuf.str();
 }
+
+template <int dim, int spacedim>
+FE_ACFull<dim, spacedim>::FE_ACFull (const unsigned int p)
+  : FE_DGVector_NP<PolynomialsACFull<dim>, dim, spacedim>(p, mapping_bdm)
+{}
+
+
+template <int dim, int spacedim>
+std::string
+FE_ACFull<dim, spacedim>::get_name () const
+{
+  // note that the
+  // FETools::get_fe_from_name
+  // function depends on the
+  // particular format of the string
+  // this function returns, so they
+  // have to be kept in synch
+
+  std::ostringstream namebuf;
+  namebuf << "FE_ACFull<"
+          << Utilities::dim_string(dim,spacedim)
+          << ">(" << this->degree-1 << ")";
+
+  return namebuf.str();
+}
+
 
 #include "fe_dg_vector_np.inst"
 

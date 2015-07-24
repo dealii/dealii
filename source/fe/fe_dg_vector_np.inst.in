@@ -18,6 +18,7 @@
 for (deal_II_dimension : DIMENSIONS)
   {
     template class FE_DGVector_NP<PolynomialsBDM<deal_II_dimension>, deal_II_dimension>;
-
+    template class FE_DGVector_NP<PolynomialsACFull<deal_II_dimension>, deal_II_dimension>;
     template class FE_ACRed<deal_II_dimension>;
+    template class FE_ACFull<deal_II_dimension>;
   }
