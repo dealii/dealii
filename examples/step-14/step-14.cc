@@ -1128,17 +1128,13 @@ namespace Step14
 
 
     // And now for the derived class that takes the template argument as
-    // explained above. For some reason, C++ requires us to define a
-    // constructor (which maybe empty), as otherwise a warning is generated
-    // that some data is not initialized.
+    // explained above.
     //
     // Here we pack the data elements into private variables, and allow access
     // to them through the methods of the base class.
     template <class Traits, int dim>
     struct SetUp : public SetUpBase<dim>
     {
-      SetUp () {}
-
       virtual
       const Function<dim>   &get_boundary_values () const;
 
