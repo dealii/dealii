@@ -554,6 +554,12 @@ inconvenience this causes.
   <br>
   (Wolfgang Bangerth, Andrea Bonito, 2015/07/24)
   </li>
+  
+  <li> Fixed: Bug in DynamicSparsityPattern::iterator would cause invalid
+  stl::vector::iterator comparison.
+  <br>
+  (Timo Heister, 2015/07/22)
+  </li>
 
   <li>New: parallel::distributed::Triangulation::add_periodicity
   now allows for arbitrary orientations between matching faces.
