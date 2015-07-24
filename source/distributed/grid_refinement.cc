@@ -34,6 +34,7 @@
 #include <numeric>
 #include <algorithm>
 #include <limits>
+#include <iomanip>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -76,7 +77,7 @@ namespace
    * others get a pair of zeros.
    */
   template <typename number>
-  std::pair<double,double>
+  std::pair<number,number>
   compute_global_min_and_max_at_root (const Vector<number> &criteria,
                                       MPI_Comm              mpi_communicator)
   {
@@ -153,7 +154,7 @@ namespace
   void
   get_locally_owned_indicators (const parallel::distributed::Triangulation<dim,spacedim> &tria,
                                 const Vector &criteria,
-                                dealii::Vector<float> &locally_owned_indicators)
+                                dealii::Vector<typename Vector::value_type> &locally_owned_indicators)
   {
     Assert (locally_owned_indicators.size() == tria.n_locally_owned_active_cells(),
             ExcInternalError());
@@ -412,7 +413,22 @@ namespace
                      0, mpi_communicator);
 
           if (interesting_range[0] == interesting_range[1])
-            return interesting_range[0];
+            {
+              // so we have found our threshold. since we adjust
+              // the range at the top of the function to be slightly
+              // larger than the actual extremes of the refinement
+              // criteria values, we can end up in a situation where
+              // the threshold is in fact larger than the maximal
+              // refinement indicator. in such cases, we get no
+              // refinement at all. thus, cap the threshold by the
+              // actual largest value
+              double final_threshold =  std::min (interesting_range[0],
+                                                  global_min_and_max.second);
+              MPI_Bcast (&final_threshold, 1, MPI_DOUBLE,
+                         0, mpi_communicator);
+
+              return final_threshold;
+            }
 
           const double test_threshold
             = (interesting_range[0] > 0
@@ -483,7 +499,15 @@ namespace
                      0, mpi_communicator);
 
           if (interesting_range[0] == interesting_range[1])
-            return interesting_range[0];
+            {
+              // we got the final value. the master adjusts the
+              // value one more time, so receive it from there
+              double final_threshold = -1;
+              MPI_Bcast (&final_threshold, 1, MPI_DOUBLE,
+                         0, mpi_communicator);
+
+              return final_threshold;
+            }
 
           // count how many elements
           // there are that are bigger
@@ -552,7 +576,7 @@ namespace parallel
         // vector of indicators the
         // ones that correspond to
         // cells that we locally own
-        dealii::Vector<float>
+        dealii::Vector<typename Vector::value_type>
         locally_owned_indicators (tria.n_locally_owned_active_cells());
         get_locally_owned_indicators (tria,
                                       criteria,
@@ -566,7 +590,7 @@ namespace parallel
         // need it here, but it's a
         // collective communication
         // call
-        const std::pair<double,double> global_min_and_max
+        const std::pair<typename Vector::value_type,typename Vector::value_type> global_min_and_max
           = compute_global_min_and_max_at_root (locally_owned_indicators,
                                                 mpi_communicator);
 
@@ -664,7 +688,7 @@ namespace parallel
         // vector of indicators the
         // ones that correspond to
         // cells that we locally own
-        dealii::Vector<float>
+        dealii::Vector<typename Vector::value_type>
         locally_owned_indicators (tria.n_locally_owned_active_cells());
         get_locally_owned_indicators (tria,
                                       criteria,
@@ -701,7 +725,6 @@ namespace parallel
                                           top_fraction_of_error *
                                           total_error,
                                           mpi_communicator);
-
             // compute bottom
             // threshold only if
             // necessary. otherwise
