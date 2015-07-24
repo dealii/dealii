@@ -16,6 +16,7 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/polynomials_acfull.h>
 #include <deal.II/fe/fe_poly_tensor_np.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_cartesian.h>
@@ -151,7 +152,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::FE_PolyTensor_NP (const unsigned int degree
     this->component_to_base_table[comp].first.second = comp;
 
   if (dim == 1) piola_boundary = 0;
-  else if (dim == 2) piola_boundary = 2 - (degree==0) ? 1 : 0;
+  else if (dim == 2) piola_boundary = 2 - ((degree==0) ? 1 : 0);
   else piola_boundary = 3*(degree+1);
 
   Assert(piola_boundary < poly_space.n(), 
@@ -290,6 +291,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::get_data (
   const Mapping<dim,spacedim>    &mapping,
   const Quadrature<dim> &quadrature) const
 {
+  // Assert(false,ExcMessage("get_data begin"));
   // generate a new data object and
   // initialize some fields
   InternalData *data = new InternalData;
@@ -382,6 +384,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::get_data (
           }
 
       }
+  Assert(false,ExcMessage("get_data done"));
   return data;
 }
 
