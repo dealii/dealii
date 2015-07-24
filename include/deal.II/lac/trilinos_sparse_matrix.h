@@ -662,7 +662,7 @@ namespace TrilinosWrappers
      * the compress() step).
      */
     SparseMatrix (const Epetra_Map  &parallel_partitioning,
-                  const size_type    n_max_entries_per_row = 0);
+                  const size_type    n_max_entries_per_row = 0) DEAL_II_DEPRECATED;
 
     /**
      * Same as before, but now set a value of nonzeros for each matrix row.
@@ -672,7 +672,7 @@ namespace TrilinosWrappers
      * respective SparseMatrix::reinit call considerably faster.
      */
     SparseMatrix (const Epetra_Map                &parallel_partitioning,
-                  const std::vector<unsigned int> &n_entries_per_row);
+                  const std::vector<unsigned int> &n_entries_per_row) DEAL_II_DEPRECATED;
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -692,7 +692,7 @@ namespace TrilinosWrappers
      */
     SparseMatrix (const Epetra_Map &row_parallel_partitioning,
                   const Epetra_Map &col_parallel_partitioning,
-                  const size_type   n_max_entries_per_row = 0);
+                  const size_type   n_max_entries_per_row = 0) DEAL_II_DEPRECATED;
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -710,7 +710,7 @@ namespace TrilinosWrappers
      */
     SparseMatrix (const Epetra_Map                &row_parallel_partitioning,
                   const Epetra_Map                &col_parallel_partitioning,
-                  const std::vector<unsigned int> &n_entries_per_row);
+                  const std::vector<unsigned int> &n_entries_per_row) DEAL_II_DEPRECATED;
 
     /**
      * This function is initializes the Trilinos Epetra matrix according to
@@ -739,7 +739,7 @@ namespace TrilinosWrappers
     template<typename SparsityType>
     void reinit (const Epetra_Map    &parallel_partitioning,
                  const SparsityType  &sparsity_pattern,
-                 const bool          exchange_data = false);
+                 const bool          exchange_data = false) DEAL_II_DEPRECATED;
 
     /**
      * This function is similar to the other initialization function above,
@@ -757,7 +757,7 @@ namespace TrilinosWrappers
     void reinit (const Epetra_Map    &row_parallel_partitioning,
                  const Epetra_Map    &col_parallel_partitioning,
                  const SparsityType  &sparsity_pattern,
-                 const bool          exchange_data = false);
+                 const bool          exchange_data = false) DEAL_II_DEPRECATED;
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -780,7 +780,7 @@ namespace TrilinosWrappers
                  const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
                  const double                          drop_tolerance=1e-13,
                  const bool                            copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=0);
+                 const ::dealii::SparsityPattern      *use_this_sparsity=0) DEAL_II_DEPRECATED;
 
     /**
      * This function is similar to the other initialization function with
@@ -801,7 +801,7 @@ namespace TrilinosWrappers
                  const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
                  const double                           drop_tolerance=1e-13,
                  const bool                             copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=0);
+                 const ::dealii::SparsityPattern      *use_this_sparsity=0) DEAL_II_DEPRECATED;
 //@}
     /**
      * @name Constructors and initialization using an IndexSet description
@@ -1029,6 +1029,11 @@ namespace TrilinosWrappers
      * returned in case this is called in an MPI-based program.
      */
     size_type memory_consumption () const;
+
+    /**
+     * Return the MPI communicator object in use with this matrix.
+     */
+    MPI_Comm get_mpi_communicator () const;
 
 //@}
     /**
@@ -1664,7 +1669,7 @@ namespace TrilinosWrappers
      * sets the partitioning of the domain space of this matrix, i.e., the
      * partitioning of the vectors this matrix has to be multiplied with.
      */
-    const Epetra_Map &domain_partitioner () const;
+    const Epetra_Map &domain_partitioner ()  const DEAL_II_DEPRECATED;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -1672,14 +1677,14 @@ namespace TrilinosWrappers
      * partitioning of the vectors that are result from matrix-vector
      * products.
      */
-    const Epetra_Map &range_partitioner () const;
+    const Epetra_Map &range_partitioner () const DEAL_II_DEPRECATED;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
      * sets the partitioning of the matrix rows. Equal to the partitioning of
      * the range.
      */
-    const Epetra_Map &row_partitioner () const;
+    const Epetra_Map &row_partitioner () const DEAL_II_DEPRECATED;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -1687,8 +1692,29 @@ namespace TrilinosWrappers
      * equal to the partitioner Epetra_Map for the domain because of overlap
      * in the matrix.
      */
-    const Epetra_Map &col_partitioner () const;
+    const Epetra_Map &col_partitioner () const DEAL_II_DEPRECATED;
 //@}
+
+    /**
+     * @name Partitioners
+     */
+//@{
+
+    /**
+     * Return the partitioning of the domain space of this matrix, i.e., the
+     * partitioning of the vectors this matrix has to be multiplied with.
+     */
+    IndexSet locally_owned_domain_indices() const;
+
+    /**
+     * Return the partitioning of the range space of this matrix, i.e., the
+     * partitioning of the vectors that are result from matrix-vector
+     * products.
+     */
+    IndexSet locally_owned_range_indices() const;
+
+//@}
+
     /**
      * @name Iterators
      */
@@ -2613,6 +2639,24 @@ namespace TrilinosWrappers
   SparseMatrix::range_partitioner () const
   {
     return matrix->RangeMap();
+  }
+
+
+
+  inline
+  IndexSet
+  SparseMatrix::locally_owned_domain_indices () const
+  {
+    return IndexSet(matrix->DomainMap());
+  }
+
+
+
+  inline
+  IndexSet
+  SparseMatrix::locally_owned_range_indices () const
+  {
+    return IndexSet(matrix->RangeMap());
   }
 
 
