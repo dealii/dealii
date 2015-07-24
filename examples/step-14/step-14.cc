@@ -442,11 +442,10 @@ namespace Step14
       unsigned int
       n_dofs () const;
 
+    protected:
       const SmartPointer<const FiniteElement<dim> >  fe;
       const SmartPointer<const Quadrature<dim> >     quadrature;
       const SmartPointer<const Quadrature<dim-1> >   face_quadrature;
-
-    protected:
       DoFHandler<dim>                                dof_handler;
       Vector<double>                                 solution;
       const SmartPointer<const Function<dim> >       boundary_values;
@@ -2018,10 +2017,12 @@ namespace Step14
 
       struct WeightedResidualScratchData
       {
-        WeightedResidualScratchData(const PrimalSolver<dim> &primal_solver,
-                                    const DualSolver<dim>   &dual_solver,
-                                    const Vector<double>    &primal_solution,
-                                    const Vector<double>    &dual_weights);
+        WeightedResidualScratchData (const FiniteElement<dim>  &primal_fe,
+                                     const Quadrature<dim>     &primal_quadrature,
+                                     const Quadrature<dim - 1> &primal_face_quadrature,
+                                     const Function<dim>       &rhs_function,
+                                     const Vector<double>      &primal_solution,
+                                     const Vector<double>      &dual_weights);
 
         WeightedResidualScratchData(const WeightedResidualScratchData &scratch_data);
 
@@ -2186,16 +2187,15 @@ namespace Step14
 
     template <int dim>
     WeightedResidual<dim>::WeightedResidualScratchData::
-    WeightedResidualScratchData (const PrimalSolver<dim> &primal_solver,
-                                 const DualSolver<dim>   &dual_solver,
-                                 const Vector<double>    &primal_solution,
-                                 const Vector<double>    &dual_weights)
+    WeightedResidualScratchData (const FiniteElement<dim>  &primal_fe,
+                                 const Quadrature<dim>     &primal_quadrature,
+                                 const Quadrature<dim - 1> &primal_face_quadrature,
+                                 const Function<dim>       &rhs_function,
+                                 const Vector<double>      &primal_solution,
+                                 const Vector<double>      &dual_weights)
       :
-      cell_data (*dual_solver.fe,
-                 *dual_solver.quadrature,
-                 *primal_solver.rhs_function),
-      face_data (*dual_solver.fe,
-                 *dual_solver.face_quadrature),
+      cell_data (primal_fe, primal_quadrature, rhs_function),
+      face_data (primal_fe, primal_face_quadrature),
       primal_solution(primal_solution),
       dual_weights(dual_weights)
     {}
@@ -2480,8 +2480,10 @@ namespace Step14
                                       std_cxx11::_3,
                                       std_cxx11::ref(face_integrals)),
                       std_cxx11::function<void (const WeightedResidualCopyData &)>(),
-                      WeightedResidualScratchData (*this,
-                                                   *this,
+                      WeightedResidualScratchData (*DualSolver<dim>::fe,
+                                                   *DualSolver<dim>::quadrature,
+                                                   *DualSolver<dim>::face_quadrature,
+                                                   *this->rhs_function,
                                                    primal_solution,
                                                    dual_weights),
                       WeightedResidualCopyData());
