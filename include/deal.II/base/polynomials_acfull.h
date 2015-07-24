@@ -150,7 +150,7 @@ private:
 
 template <int dim>
 inline unsigned int
-PolynomialsBDM<dim>::n() const
+PolynomialsACFull<dim>::n() const
 {
   return n_pols;
 }
@@ -158,7 +158,7 @@ PolynomialsBDM<dim>::n() const
 
 template <int dim>
 inline unsigned int
-PolynomialsBDM<dim>::degree() const
+PolynomialsACFull<dim>::degree() const
 {
   return polynomial_space.degree();
 }
@@ -166,7 +166,7 @@ PolynomialsBDM<dim>::degree() const
 
 template <int dim>
 inline std::string
-PolynomialsBDM<dim>::name() const
+PolynomialsACFull<dim>::name() const
 {
   return "ACFull";
 }
