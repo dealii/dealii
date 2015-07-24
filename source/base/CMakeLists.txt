@@ -48,6 +48,7 @@ SET(_src
   polynomials_adini.cc
   polynomials_bernstein.cc
   polynomials_bdm.cc
+  polynomials_acfull.cc
   polynomials_nedelec.cc
   polynomial_space.cc
   polynomials_p.cc
