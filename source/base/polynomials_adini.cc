@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2014 by the deal.II authors
+// Copyright (C) 2000 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -120,7 +120,7 @@ PolynomialsAdini::compute (const Point<2> &unit_point,
                            std::vector<Tensor<1,2> > &grads,
                            std::vector< Tensor<2,2> > &grad_grads) const
 {
-  if (values.empty() == false) //nur dann was tun
+  if (values.empty() == false) // do not bother if empty
     {
       for (unsigned int i=0; i<values.size(); ++i)
         {
@@ -128,7 +128,7 @@ PolynomialsAdini::compute (const Point<2> &unit_point,
         }
     }
 
-  if (grads.empty() == false) //nur dann was tun
+  if (grads.empty() == false) // do not bother if empty
     {
       for (unsigned int i=0; i<grads.size(); ++i)
         {
@@ -136,7 +136,7 @@ PolynomialsAdini::compute (const Point<2> &unit_point,
         }
     }
 
-  if (grad_grads.empty() == false) //nur dann was tun
+  if (grad_grads.empty() == false) // do not bother if empty
     {
       for (unsigned int i=0; i<grad_grads.size(); ++i)
         {
