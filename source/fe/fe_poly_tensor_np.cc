@@ -151,7 +151,7 @@ FE_PolyTensor_NP<POLY,dim,spacedim>::FE_PolyTensor_NP (const unsigned int degree
     this->component_to_base_table[comp].first.second = comp;
 
   if (dim == 1) piola_boundary = 0;
-  else if (dim == 2) piola_boundary = 2;
+  else if (dim == 2) piola_boundary = 2 - (degree==0) ? 1 : 0;
   else piola_boundary = 3*(degree+1);
 
   Assert(piola_boundary < poly_space.n(), 
