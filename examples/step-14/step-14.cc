@@ -750,34 +750,12 @@ namespace Step14
     // @sect4{The PrimalSolver class}
 
     // The <code>PrimalSolver</code> class is also mostly unchanged except for
-    // overloading the functions <code>solve_problem</code>,
-    // <code>n_dofs</code>, and <code>postprocess</code> of the base class,
-    // and implementing the <code>output_solution</code> function. These
-    // overloaded functions do nothing particular besides calling the
-    // functions of the base class -- that seems superfluous, but works around
-    // a bug in a popular compiler which requires us to write such functions
-    // for the following scenario: Besides the <code>PrimalSolver</code>
-    // class, we will have a <code>DualSolver</code>, both derived from
-    // <code>Solver</code>. We will then have a final classes which derived
-    // from these two, which will then have two instances of the
-    // <code>Solver</code> class as its base classes. If we want, for example,
-    // the number of degrees of freedom of the primal solver, we would have to
-    // indicate this like so: <code>PrimalSolver::n_dofs()</code>.  However,
-    // the compiler does not accept this since the <code>n_dofs</code>
-    // function is actually from a base class of the <code>PrimalSolver</code>
-    // class, so we have to inject the name from the base to the derived class
-    // using these additional functions.
-    //
-    // Regarding the implementation of the <code>output_solution</code>
-    // function, we keep the <code>GlobalRefinement</code> and
-    // <code>RefinementKelly</code> classes in this program, and they can then
-    // rely on the default implementation of this function which simply
-    // outputs the primal solution. The class implementing dual weighted error
-    // estimators will overload this function itself, to also output the dual
-    // solution.
-    //
-    // Except for this, the class is unchanged with respect to the previous
-    // example.
+    // implementing the <code>output_solution</code> function. We keep the
+    // <code>GlobalRefinement</code> and <code>RefinementKelly</code> classes
+    // in this program, and they can then rely on the default implementation
+    // of this function which simply outputs the primal solution. The class
+    // implementing dual weighted error estimators will overload this function
+    // itself, to also output the dual solution.
     template <int dim>
     class PrimalSolver : public Solver<dim>
     {
@@ -788,15 +766,6 @@ namespace Step14
                     const Quadrature<dim-1>  &face_quadrature,
                     const Function<dim>      &rhs_function,
                     const Function<dim>      &boundary_values);
-
-      virtual
-      void solve_problem ();
-
-      virtual
-      unsigned int n_dofs () const;
-
-      virtual
-      void postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
 
       virtual
       void output_solution () const;
@@ -824,31 +793,6 @@ namespace Step14
       rhs_function (&rhs_function)
     {}
 
-
-    template <int dim>
-    void
-    PrimalSolver<dim>::solve_problem ()
-    {
-      Solver<dim>::solve_problem ();
-    }
-
-
-
-    template <int dim>
-    unsigned int
-    PrimalSolver<dim>::n_dofs() const
-    {
-      return Solver<dim>::n_dofs();
-    }
-
-
-    template <int dim>
-    void
-    PrimalSolver<dim>::
-    postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
-    {
-      Solver<dim>::postprocess(postprocessor);
-    }
 
 
     template <int dim>
@@ -1807,18 +1751,6 @@ namespace Step14
                   const Quadrature<dim-1>  &face_quadrature,
                   const DualFunctional::DualFunctionalBase<dim> &dual_functional);
 
-      virtual
-      void
-      solve_problem ();
-
-      virtual
-      unsigned int
-      n_dofs () const;
-
-      virtual
-      void
-      postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
-
     protected:
       const SmartPointer<const DualFunctional::DualFunctionalBase<dim> > dual_functional;
       virtual void assemble_rhs (Vector<double> &rhs) const;
@@ -1843,32 +1775,6 @@ namespace Step14
                    boundary_values),
       dual_functional (&dual_functional)
     {}
-
-
-    template <int dim>
-    void
-    DualSolver<dim>::solve_problem ()
-    {
-      Solver<dim>::solve_problem ();
-    }
-
-
-
-    template <int dim>
-    unsigned int
-    DualSolver<dim>::n_dofs() const
-    {
-      return Solver<dim>::n_dofs();
-    }
-
-
-    template <int dim>
-    void
-    DualSolver<dim>::
-    postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
-    {
-      Solver<dim>::postprocess(postprocessor);
-    }
 
 
 
