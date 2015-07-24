@@ -201,9 +201,9 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
               grads[start][1][0] = 0.;
               grads[start][1][1] = -monovali[1][1] * monovalk[2][0];
               grads[start][1][2] = -monovali[1][0] * monovalk[2][1];
-              grads[start+2][2][0] = 0.;
-              grads[start+2][2][1] = 0.;
-              grads[start+2][2][2] = 0.;
+              grads[start][2][0] = 0.;
+              grads[start][2][1] = 0.;
+              grads[start][2][2] = 0.;
 
               grads[start+1][1][1] = monovali[2][1] * monovalk[0][0];
               grads[start+1][1][2] = unit_point(1) * monovali[2][2] * monovalk[0][0];
