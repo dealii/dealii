@@ -422,10 +422,9 @@ namespace
                :
                (interesting_range[0] + interesting_range[1]) / 2);
 
-          // accumulate the error of those
-          // our own elements above this
-          // threshold and then add to it the
-          // number for all the others
+          // accumulate the error of those our own elements above this
+          // threshold and then add to it the number for all the
+          // others
           double my_error = 0;
           for (unsigned int i=0; i<criteria.size(); ++i)
             if (criteria(i) > test_threshold)
@@ -435,14 +434,10 @@ namespace
           MPI_Reduce (&my_error, &total_error, 1, MPI_DOUBLE,
                       MPI_SUM, 0, mpi_communicator);
 
-          // now adjust the range. if
-          // we have to many cells, we
-          // take the upper half of the
-          // previous range, otherwise
-          // the lower half. if we have
-          // hit the right number, then
-          // set the range to the exact
-          // value
+          // now adjust the range. if we have to many cells, we take
+          // the upper half of the previous range, otherwise the lower
+          // half. if we have hit the right number, then set the range
+          // to the exact value
           if (total_error > target_error)
             interesting_range[0] = test_threshold;
           else if (total_error < target_error)
@@ -450,28 +445,16 @@ namespace
           else
             interesting_range[0] = interesting_range[1] = test_threshold;
 
-          // terminate the iteration
-          // after 25 go-arounds. this
-          // is necessary because
-          // oftentimes error
-          // indicators on cells have
-          // exactly the same value,
-          // and so there may not be a
-          // particular value that cuts
-          // the indicators in such a
-          // way that we can achieve
-          // the desired number of
-          // cells. using a max of 25
-          // iterations means that we
-          // terminate the iteration
-          // after 25 steps if the
-          // indicators were perfectly
-          // badly distributed, and we
-          // make at most a mistake of
-          // 1/2^25 in the number of
-          // cells flagged if
-          // indicators are perfectly
-          // equidistributed
+          // terminate the iteration after 25 go-arounds. this is
+          // necessary because oftentimes error indicators on cells
+          // have exactly the same value, and so there may not be a
+          // particular value that cuts the indicators in such a way
+          // that we can achieve the desired number of cells. using a
+          // max of 25 iterations means that we terminate the
+          // iteration after 25 steps if the indicators were perfectly
+          // badly distributed, and we make at most a mistake of
+          // 1/2^25 in the number of cells flagged if indicators are
+          // perfectly equidistributed
           ++iteration;
           if (iteration == 25)
             interesting_range[0] = interesting_range[1] = test_threshold;
