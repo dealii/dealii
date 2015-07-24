@@ -80,8 +80,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: parallel::distributed::refine_and_coarsen_fixed_fraction()
+  in rare circumstances decided to not refine any cells at all, even
+  if the refinement threshold was nonzero. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, Andrea Bonito, 2015/07/24)
+  </li>
 
-  <li> Fixed: bug in DynamicSparsityPattern::iterator would cause invalid
+  <li> Fixed: Bug in DynamicSparsityPattern::iterator would cause invalid
   stl::vector::iterator comparison.
   <br>
   (Timo Heister, 2015/07/22)
