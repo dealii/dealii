@@ -80,19 +80,6 @@ inconvenience this causes.
 
 
 <ol>
-  <li> Fixed: parallel::distributed::refine_and_coarsen_fixed_fraction()
-  in rare circumstances decided to not refine any cells at all, even
-  if the refinement threshold was nonzero. This is now fixed.
-  <br>
-  (Wolfgang Bangerth, Andrea Bonito, 2015/07/24)
-  </li>
-
-  <li> Fixed: Bug in DynamicSparsityPattern::iterator would cause invalid
-  stl::vector::iterator comparison.
-  <br>
-  (Timo Heister, 2015/07/22)
-  </li>
-
   <li> New: FESystem now does some work in parallel if your system
   has multiple processors.
   <br>
