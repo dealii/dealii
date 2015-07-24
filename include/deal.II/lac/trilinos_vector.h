@@ -988,7 +988,7 @@ namespace internal
                                 TrilinosWrappers::MPI::Vector &v,
                                 bool fast)
       {
-        v.reinit(matrix.range_partitioner(), fast);
+        v.reinit(IndexSet(matrix.range_partitioner()), MPI_COMM_WORLD, fast);
       }
 
       template <typename Matrix>
@@ -997,7 +997,7 @@ namespace internal
                                 TrilinosWrappers::MPI::Vector &v,
                                 bool fast)
       {
-        v.reinit(matrix.domain_partitioner(), fast);
+        v.reinit(IndexSet(matrix.domain_partitioner()), MPI_COMM_WORLD, fast);
       }
     };
 
@@ -1015,7 +1015,7 @@ namespace internal
                                 TrilinosWrappers::Vector &v,
                                 bool fast)
       {
-        v.reinit(matrix.range_partitioner(), fast);
+        v.reinit(IndexSet(matrix.range_partitioner()), MPI_COMM_WORLD, fast);
       }
 
       template <typename Matrix>
@@ -1024,7 +1024,7 @@ namespace internal
                                 TrilinosWrappers::Vector &v,
                                 bool fast)
       {
-        v.reinit(matrix.domain_partitioner(), fast);
+        v.reinit(IndexSet(matrix.domain_partitioner()), MPI_COMM_WORLD, fast);
       }
     };
 
