@@ -34,6 +34,7 @@
 #include <numeric>
 #include <algorithm>
 #include <limits>
+#include <iomanip>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -76,7 +77,7 @@ namespace
    * others get a pair of zeros.
    */
   template <typename number>
-  std::pair<double,double>
+  std::pair<number,number>
   compute_global_min_and_max_at_root (const Vector<number> &criteria,
                                       MPI_Comm              mpi_communicator)
   {
@@ -153,7 +154,7 @@ namespace
   void
   get_locally_owned_indicators (const parallel::distributed::Triangulation<dim,spacedim> &tria,
                                 const Vector &criteria,
-                                dealii::Vector<float> &locally_owned_indicators)
+                                dealii::Vector<typename Vector::value_type> &locally_owned_indicators)
   {
     Assert (locally_owned_indicators.size() == tria.n_locally_owned_active_cells(),
             ExcInternalError());
@@ -412,7 +413,22 @@ namespace
                      0, mpi_communicator);
 
           if (interesting_range[0] == interesting_range[1])
-            return interesting_range[0];
+            {
+              // so we have found our threshold. since we adjust
+              // the range at the top of the function to be slightly
+              // larger than the actual extremes of the refinement
+              // criteria values, we can end up in a situation where
+              // the threshold is in fact larger than the maximal
+              // refinement indicator. in such cases, we get no
+              // refinement at all. thus, cap the threshold by the
+              // actual largest value
+              double final_threshold =  std::min (interesting_range[0],
+                                                  global_min_and_max.second);
+              MPI_Bcast (&final_threshold, 1, MPI_DOUBLE,
+                         0, mpi_communicator);
+
+              return final_threshold;
+            }
 
           const double test_threshold
             = (interesting_range[0] > 0
@@ -422,10 +438,9 @@ namespace
                :
                (interesting_range[0] + interesting_range[1]) / 2);
 
-          // accumulate the error of those
-          // our own elements above this
-          // threshold and then add to it the
-          // number for all the others
+          // accumulate the error of those our own elements above this
+          // threshold and then add to it the number for all the
+          // others
           double my_error = 0;
           for (unsigned int i=0; i<criteria.size(); ++i)
             if (criteria(i) > test_threshold)
@@ -435,14 +450,10 @@ namespace
           MPI_Reduce (&my_error, &total_error, 1, MPI_DOUBLE,
                       MPI_SUM, 0, mpi_communicator);
 
-          // now adjust the range. if
-          // we have to many cells, we
-          // take the upper half of the
-          // previous range, otherwise
-          // the lower half. if we have
-          // hit the right number, then
-          // set the range to the exact
-          // value
+          // now adjust the range. if we have to many cells, we take
+          // the upper half of the previous range, otherwise the lower
+          // half. if we have hit the right number, then set the range
+          // to the exact value
           if (total_error > target_error)
             interesting_range[0] = test_threshold;
           else if (total_error < target_error)
@@ -450,28 +461,16 @@ namespace
           else
             interesting_range[0] = interesting_range[1] = test_threshold;
 
-          // terminate the iteration
-          // after 10 go-arounds. this
-          // is necessary because
-          // oftentimes error
-          // indicators on cells have
-          // exactly the same value,
-          // and so there may not be a
-          // particular value that cuts
-          // the indicators in such a
-          // way that we can achieve
-          // the desired number of
-          // cells. using a max of 10
-          // iterations means that we
-          // terminate the iteration
-          // after 10 steps if the
-          // indicators were perfectly
-          // badly distributed, and we
-          // make at most a mistake of
-          // 1/2^10 in the number of
-          // cells flagged if
-          // indicators are perfectly
-          // equidistributed
+          // terminate the iteration after 25 go-arounds. this is
+          // necessary because oftentimes error indicators on cells
+          // have exactly the same value, and so there may not be a
+          // particular value that cuts the indicators in such a way
+          // that we can achieve the desired number of cells. using a
+          // max of 25 iterations means that we terminate the
+          // iteration after 25 steps if the indicators were perfectly
+          // badly distributed, and we make at most a mistake of
+          // 1/2^25 in the number of cells flagged if indicators are
+          // perfectly equidistributed
           ++iteration;
           if (iteration == 25)
             interesting_range[0] = interesting_range[1] = test_threshold;
@@ -500,7 +499,15 @@ namespace
                      0, mpi_communicator);
 
           if (interesting_range[0] == interesting_range[1])
-            return interesting_range[0];
+            {
+              // we got the final value. the master adjusts the
+              // value one more time, so receive it from there
+              double final_threshold = -1;
+              MPI_Bcast (&final_threshold, 1, MPI_DOUBLE,
+                         0, mpi_communicator);
+
+              return final_threshold;
+            }
 
           // count how many elements
           // there are that are bigger
@@ -569,7 +576,7 @@ namespace parallel
         // vector of indicators the
         // ones that correspond to
         // cells that we locally own
-        dealii::Vector<float>
+        dealii::Vector<typename Vector::value_type>
         locally_owned_indicators (tria.n_locally_owned_active_cells());
         get_locally_owned_indicators (tria,
                                       criteria,
@@ -583,7 +590,7 @@ namespace parallel
         // need it here, but it's a
         // collective communication
         // call
-        const std::pair<double,double> global_min_and_max
+        const std::pair<typename Vector::value_type,typename Vector::value_type> global_min_and_max
           = compute_global_min_and_max_at_root (locally_owned_indicators,
                                                 mpi_communicator);
 
@@ -681,7 +688,7 @@ namespace parallel
         // vector of indicators the
         // ones that correspond to
         // cells that we locally own
-        dealii::Vector<float>
+        dealii::Vector<typename Vector::value_type>
         locally_owned_indicators (tria.n_locally_owned_active_cells());
         get_locally_owned_indicators (tria,
                                       criteria,
@@ -718,7 +725,6 @@ namespace parallel
                                           top_fraction_of_error *
                                           total_error,
                                           mpi_communicator);
-
             // compute bottom
             // threshold only if
             // necessary. otherwise
