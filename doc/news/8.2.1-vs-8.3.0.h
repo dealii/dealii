@@ -548,6 +548,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> Fixed: parallel::distributed::refine_and_coarsen_fixed_fraction()
+  in rare circumstances decided to not refine any cells at all, even
+  if the refinement threshold was nonzero. This is now fixed.
+  <br>
+  (Wolfgang Bangerth, Andrea Bonito, 2015/07/24)
+  </li>
+
   <li>New: parallel::distributed::Triangulation::add_periodicity
   now allows for arbitrary orientations between matching faces.
   <br>
