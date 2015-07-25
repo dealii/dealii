@@ -7185,12 +7185,18 @@ namespace VectorTools
         for (unsigned int i=0; i<fe_mask.size(); ++i)
           if (fe_mask[i])
             {
-              unsigned int base_i = fe_system->component_to_base_index(i).first;
+              const unsigned int base_i = fe_system->component_to_base_index(i).first;
               Assert(degree == numbers::invalid_unsigned_int ||
                      degree == fe_system->base_element(base_i).degree,
                      ExcNotImplemented());
+              Assert(fe_system->base_element(base_i).is_primitive(),
+                     ExcNotImplemented());
               degree = fe_system->base_element(base_i).degree;
             }
+
+        // We create an intermediate FE_Q vector space, and then
+        // interpolate from that vector space to this one, by
+        // carefully selecting the right components.
 
         FESystem<dim,spacedim> feq(FE_Q<dim,spacedim>(degree), spacedim);
         DH dhq(dh.get_tria());
@@ -7213,11 +7219,17 @@ namespace VectorTools
         // v_j phi_j(q_i) = w_k psi_k(q_i) = w_k delta_ki = w_i
         //
         // where psi_k are the basis functions for fe_q, and phi_i are
-        // the basis functions of the target space.
+        // the basis functions of the target space while q_i are the
+        // support points for the fe_q space. With this choice of
+        // interpolation points, on the matrices is the identity
+        // matrix, and we have to invert only one matrix. The
+        // resulting vector will be interpolatory at the support
+        // points of fe_q, even if the finite element does not have
+        // support points.
         //
         // Morally, we should invert the matrix T_ij = phi_i(q_j),
         // however in general this matrix is not invertible, since
-        // there may by components which do not contribute to the
+        // there may be components which do not contribute to the
         // displacement vector. Since we are not interested in those
         // components, we construct a square matrix with the same
         // number of components of the FE_Q system. The FE_Q system
@@ -7241,7 +7253,7 @@ namespace VectorTools
 
         for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
           {
-            unsigned int comp_j = fe.system_to_component_index(j).first;
+            const unsigned int comp_j = fe.system_to_component_index(j).first;
             if (fe_mask[comp_j])
               for (unsigned int i=0; i<points.size(); ++i)
                 {
