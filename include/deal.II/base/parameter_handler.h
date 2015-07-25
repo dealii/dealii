@@ -2355,7 +2355,7 @@ private:
 
     /**
      * List of entry values constructed out of what was given in the input
-     * file (that is stored in EntryValue.
+     * file.
      */
     std::vector<std::string> different_values;
 
