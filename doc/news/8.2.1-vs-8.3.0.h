@@ -393,6 +393,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: IndexSet now can be constructed using Epetra_Map.
+  All constructors of TrilinosWrappers::SparseMatrix which use Epetra_Map
+  were marked deprecated. 
+  <br>
+  (Luca Heltai, 2015/07/25)
+  </li>
+
   <li> New: Added the class Functions::Polynomial for representation of polynomials.
   The new class is derived from the Function class.
   <br>
