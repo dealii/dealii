@@ -179,7 +179,7 @@ private:
    * In multithreaded mode, this counter may be modified by different threads.
    * We thus have to mark it <tt>volatile</tt>. However, this is counter-
    * productive in non-MT mode since it may pessimize code. So use the macro
-   * defined above to selectively add volatility.
+   * defined in <tt>deal.II/base/config.h</tt> to selectively add volatility.
    */
   mutable DEAL_VOLATILE unsigned int counter;
 
