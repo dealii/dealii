@@ -88,7 +88,7 @@ int main()
                       << " ln(|x-" << origins[nos] << "|/"
                       << alphas[nas] << ") = "
                       << exact_integral << endl;
-              for (unsigned int nq = 1; nq < 13; ++nq)
+              for (unsigned int nq = 2; nq < 13; ++nq)
                 {
                   QGaussLogR<1> quad(nq, origins[nos], alphas[nas]);
                   QGaussLogR<1> factored_quad(nq, origins[nos], alphas[nas], true);
@@ -99,8 +99,16 @@ int main()
                     {
                       double qpow = pow(quad.point(q)[0], (double) power);
                       approx_integral += qpow  * quad.weight(q);
-                      qpow *= log(abs( (factored_quad.point(q)-origins[nos])[0] )/alphas[nas] );
-                      approx_integral_factored += qpow * factored_quad.weight(q);
+		      double factor = log(abs( (factored_quad.point(q)-origins[nos])[0] )/alphas[nas] );
+		      // This code cannot work if factor is equal to
+		      // zero. In this case, just pass the other
+		      // quadrature formula, which should be valid anyway.
+                      if(factor != 0.0) {
+			qpow *= factor;
+			approx_integral_factored += qpow * factored_quad.weight(q);
+		      } else {
+			approx_integral_factored +=  qpow * quad.weight(q);
+		      }
                     }
 
                   deallog << "   Error(n=" << quad.size()

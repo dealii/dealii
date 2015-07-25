@@ -771,7 +771,11 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
       {
         Assert( this->quadrature_points[i] != origin,
                 ExcMessage("The singularity cannot be on a Gauss point of the same order!") );
-        this->weights[i] /= std::log(std::abs( (this->quadrature_points[i]-origin)[0] )/alpha );
+        double denominator = std::log(std::abs( (this->quadrature_points[i]-origin)[0] )/alpha);
+        Assert( denominator != 0.0,
+                ExcMessage("The quadrature formula you are using does not allow to "
+                           "factor out the singularity, which is zero at one point."));
+        this->weights[i] /= denominator;
       }
 }
 
