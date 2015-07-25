@@ -548,6 +548,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: VectorTools::get_position_vector now works with arbitrary
+  FESystems, provided that the geometrical components are primitive, 
+  and that you provide a component mask to select what components of 
+  the finite element to use for the geometrical interpolation.
+  <br>
+  (Luca Heltai, 2015/07/25)
+  </li>
+
   <li> Fixed: parallel::distributed::refine_and_coarsen_fixed_fraction()
   in rare circumstances decided to not refine any cells at all, even
   if the refinement threshold was nonzero. This is now fixed.
