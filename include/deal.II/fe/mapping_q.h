@@ -151,7 +151,19 @@ public:
   Mapping<dim,spacedim> *clone () const;
 
   /**
-   * Storage for internal data of Q_degree transformation.
+   * Storage for internal data of this mapping. See Mapping::InternalDataBase
+   * for an extensive description.
+   *
+   * This includes data that is computed once when the object is created
+   * (in get_data()) as well as data the class wants to store from between
+   * the call to fill_fe_values(), fill_fe_face_values(), or
+   * fill_fe_subface_values() until possible later calls from the finite
+   * element to functions such as transform(). The latter class of
+   * member variables are marked as 'mutable'.
+   *
+   * The current class uses essentially the same fields for storage
+   * as the MappingQ1 class. Consequently, it inherits from
+   * MappingQ1::InternalData, rather than from Mapping::InternalDataBase.
    */
   class InternalData : public MappingQ1<dim,spacedim>::InternalData
   {
@@ -173,10 +185,11 @@ public:
      * If this flag is @p true we are on an interior cell and the @p
      * mapping_q1_data is used.
      */
-    bool use_mapping_q1_on_current_cell;
+    mutable bool use_mapping_q1_on_current_cell;
 
     /**
-     * On interior cells @p MappingQ1 is used.
+     * A structure to store the corresponding information for the pure
+     * $Q_1$ mapping that is, by default, used on all interior cells.
      */
     typename MappingQ1<dim,spacedim>::InternalData mapping_q1_data;
   };
@@ -189,7 +202,7 @@ protected:
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                            &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                   typename std::vector<Point<spacedim> >           &quadrature_points,
                   std::vector<double>                              &JxW_values,
                   std::vector<DerivativeForm<1,dim,spacedim> >     &jacobians,
@@ -205,7 +218,7 @@ protected:
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int                           face_no,
                        const Quadrature<dim-1>&                     quadrature,
-                       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                       const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                        typename std::vector<Point<spacedim> >       &quadrature_points,
                        std::vector<double>                          &JxW_values,
                        typename std::vector<Tensor<1,spacedim> >    &exterior_form,
@@ -221,7 +234,7 @@ protected:
                           const unsigned int                           face_no,
                           const unsigned int                           sub_no,
                           const Quadrature<dim-1>&                     quadrature,
-                          typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                          const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                           typename std::vector<Point<spacedim> >       &quadrature_points,
                           std::vector<double>                          &JxW_values,
                           typename std::vector<Tensor<1,spacedim> >    &exterior_form,

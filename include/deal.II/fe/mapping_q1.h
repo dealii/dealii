@@ -153,7 +153,15 @@ public:
   Mapping<dim,spacedim> *clone () const;
 
   /**
-   * Storage for internal data of d-linear transformation.
+   * Storage for internal data of d-linear mappings. See Mapping::InternalDataBase
+   * for an extensive description.
+   *
+   * This includes data that is computed once when the object is created
+   * (in get_data()) as well as data the class wants to store from between
+   * the call to fill_fe_values(), fill_fe_face_values(), or
+   * fill_fe_subface_values() until possible later calls from the finite
+   * element to functions such as transform(). The latter class of
+   * member variables are marked as 'mutable'.
    */
   class InternalData : public Mapping<dim,spacedim>::InternalDataBase
   {
@@ -167,8 +175,8 @@ public:
      * Shape function at quadrature point. Shape functions are in tensor
      * product order, so vertices must be reordered to obtain transformation.
      */
-    double shape (const unsigned int qpoint,
-                  const unsigned int shape_nr) const;
+    const double &shape (const unsigned int qpoint,
+                         const unsigned int shape_nr) const;
 
     /**
      * Shape function at quadrature point. See above.
@@ -179,8 +187,8 @@ public:
     /**
      * Gradient of shape function in quadrature point. See above.
      */
-    Tensor<1,dim> derivative (const unsigned int qpoint,
-                              const unsigned int shape_nr) const;
+    const Tensor<1,dim> &derivative (const unsigned int qpoint,
+                                     const unsigned int shape_nr) const;
 
     /**
      * Gradient of shape function in quadrature point. See above.
@@ -191,8 +199,8 @@ public:
     /**
      * Second derivative of shape function in quadrature point. See above.
      */
-    Tensor<2,dim> second_derivative (const unsigned int qpoint,
-                                     const unsigned int shape_nr) const;
+    const Tensor<2,dim> &second_derivative (const unsigned int qpoint,
+                                            const unsigned int shape_nr) const;
 
     /**
      * Second derivative of shape function in quadrature point. See above.
@@ -228,26 +236,6 @@ public:
     std::vector<Tensor<2,dim> > shape_second_derivatives;
 
     /**
-     * Tensors of covariant transformation at each of the quadrature points.
-     * The matrix stored is the Jacobian * G^{-1}, where G = Jacobian^{t} *
-     * Jacobian, is the first fundamental form of the map; if dim=spacedim
-     * then it reduces to the transpose of the inverse of the Jacobian matrix,
-     * which itself is stored in the @p contravariant field of this structure.
-     *
-     * Computed on each cell.
-     */
-    std::vector<DerivativeForm<1,dim, spacedim > >  covariant;
-
-    /**
-     * Tensors of contravariant transformation at each of the quadrature
-     * points. The contravariant matrix is the Jacobian of the transformation,
-     * i.e. $J_{ij}=dx_i/d\hat x_j$.
-     *
-     * Computed on each cell.
-     */
-    std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
-
-    /**
      * Unit tangential vectors. Used for the computation of boundary forms and
      * normal vectors.
      *
@@ -263,24 +251,10 @@ public:
     std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
 
     /**
-     * Auxiliary vectors for internal use.
-     */
-    std::vector<std::vector<Tensor<1,spacedim> > > aux;
-
-    /**
-     * Stores the support points of the mapping shape functions on the @p
-     * cell_of_current_support_points.
-     */
-    std::vector<Point<spacedim> > mapping_support_points;
-
-    /**
-     * Stores the cell of which the @p mapping_support_points are stored.
-     */
-    typename Triangulation<dim,spacedim>::cell_iterator cell_of_current_support_points;
-
-    /**
      * Default value of this flag is @p true. If <tt>*this</tt> is an object
-     * of a derived class, this flag is set to @p false.
+     * of a derived class, this flag is set to @p false. (This is, for example,
+     * the case for MappingQ, which derives MappingQ::InternalData from the
+     * current MappingQ1::InternalData.)
      */
     bool is_mapping_q1_data;
 
@@ -291,6 +265,48 @@ public:
      * functions may also be different.
      */
     unsigned int n_shape_functions;
+
+    /**
+     * Tensors of covariant transformation at each of the quadrature points.
+     * The matrix stored is the Jacobian * G^{-1}, where G = Jacobian^{t} *
+     * Jacobian, is the first fundamental form of the map; if dim=spacedim
+     * then it reduces to the transpose of the inverse of the Jacobian matrix,
+     * which itself is stored in the @p contravariant field of this structure.
+     *
+     * Computed on each cell.
+     */
+    mutable std::vector<DerivativeForm<1,dim, spacedim > >  covariant;
+
+    /**
+     * Tensors of contravariant transformation at each of the quadrature
+     * points. The contravariant matrix is the Jacobian of the transformation,
+     * i.e. $J_{ij}=dx_i/d\hat x_j$.
+     *
+     * Computed on each cell.
+     */
+    mutable std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
+
+    /**
+     * Auxiliary vectors for internal use.
+     */
+    mutable std::vector<std::vector<Tensor<1,spacedim> > > aux;
+
+    /**
+     * Stores the support points of the mapping shape functions on the @p
+     * cell_of_current_support_points.
+     */
+    mutable std::vector<Point<spacedim> > mapping_support_points;
+
+    /**
+     * Stores the cell of which the @p mapping_support_points are stored.
+     */
+    mutable typename Triangulation<dim,spacedim>::cell_iterator cell_of_current_support_points;
+
+    /**
+     * The determinant of the Jacobian in each quadrature point. Filled if
+     * #update_volume_elements.
+     */
+    mutable std::vector<double> volume_elements;
   };
 
   /**
@@ -308,7 +324,7 @@ public:
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                        &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                   typename std::vector<Point<spacedim> >       &quadrature_points,
                   std::vector<double>                          &JxW_values,
                   std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
@@ -324,7 +340,7 @@ public:
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int                            face_no,
                        const Quadrature<dim-1>                      &quadrature,
-                       typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                       const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                        typename std::vector<Point<spacedim> >       &quadrature_points,
                        std::vector<double>                          &JxW_values,
                        typename std::vector<Tensor<1,spacedim> >    &boundary_form,
@@ -340,7 +356,7 @@ public:
                           const unsigned int                           face_no,
                           const unsigned int                           sub_no,
                           const Quadrature<dim-1>&                     quadrature,
-                          typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                          const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                           typename std::vector<Point<spacedim> >       &quadrature_points,
                           std::vector<double>                          &JxW_values,
                           typename std::vector<Tensor<1,spacedim> >    &boundary_form,
@@ -386,7 +402,7 @@ public:
                      const unsigned int      npts,
                      const DataSetDescriptor data_set,
                      const CellSimilarity::Similarity cell_similarity,
-                     InternalData           &data,
+                     const InternalData           &data,
                      std::vector<Point<spacedim> > &quadrature_points) const;
 
   /**
@@ -398,7 +414,7 @@ public:
                           const unsigned int                npts,
                           const DataSetDescriptor           data_set,
                           const std::vector<double>        &weights,
-                          InternalData                     &mapping_data,
+                          const InternalData                     &mapping_data,
                           std::vector<Point<spacedim> >    &quadrature_points,
                           std::vector<double>              &JxW_values,
                           std::vector<Tensor<1,spacedim> > &boundary_form,
@@ -633,7 +649,7 @@ struct StaticMappingQ1
 
 template<int dim, int spacedim>
 inline
-double
+const double &
 MappingQ1<dim,spacedim>::InternalData::shape (const unsigned int qpoint,
                                               const unsigned int shape_nr) const
 {
@@ -660,7 +676,7 @@ MappingQ1<dim,spacedim>::InternalData::shape (const unsigned int qpoint,
 
 template<int dim, int spacedim>
 inline
-Tensor<1,dim>
+const Tensor<1,dim> &
 MappingQ1<dim,spacedim>::InternalData::derivative (const unsigned int qpoint,
                                                    const unsigned int shape_nr) const
 {
@@ -687,7 +703,7 @@ MappingQ1<dim,spacedim>::InternalData::derivative (const unsigned int qpoint,
 
 template <int dim, int spacedim>
 inline
-Tensor<2,dim>
+const Tensor<2,dim> &
 MappingQ1<dim,spacedim>::InternalData::second_derivative (const unsigned int qpoint,
                                                           const unsigned int shape_nr) const
 {

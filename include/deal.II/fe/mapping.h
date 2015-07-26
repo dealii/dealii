@@ -47,16 +47,32 @@ template <int dim, int spacedim> class FESubfaceValues;
  */
 enum MappingType
 {
-/// No mapping
+  /**
+   * No mapping, i.e., shape functions are not mapped from a reference cell
+   * but instead are defined right on the real-space cell.
+   */
   mapping_none = 0x0000,
-/// Covariant mapping (see Mapping::transform() for details)
+
+  /**
+   * Covariant mapping (see Mapping::transform() for details).
+   */
   mapping_covariant = 0x0001,
-/// Contravariant mapping (see Mapping::transform() for details)
+
+  /**
+   * Contravariant mapping (see Mapping::transform() for details).
+   */
   mapping_contravariant = 0x0002,
-/// Mapping of the gradient of a covariant vector field (see Mapping::transform() for details)
+
+  /**
+   * Mapping of the gradient of a covariant vector field (see Mapping::transform() for details).
+   */
   mapping_covariant_gradient = 0x0003,
-/// Mapping of the gradient of a contravariant vector field (see Mapping::transform() for details)
+
+  /**
+   * Mapping of the gradient of a contravariant vector field (see Mapping::transform() for details).
+   */
   mapping_contravariant_gradient = 0x0004,
+
   /**
    * The Piola transform usually used for Hdiv elements. Piola transform is
    * the standard transformation of vector valued elements in H<sup>div</sup>.
@@ -64,22 +80,30 @@ enum MappingType
    * volume element.
    */
   mapping_piola = 0x0100,
+
   /**
-   * transformation for the gradient of a vector field corresponding to a
+   * Transformation for the gradient of a vector field corresponding to a
    * mapping_piola transformation (see Mapping::transform() for details).
    */
-
   mapping_piola_gradient = 0x0101,
-/// The mapping used for Nedelec elements
+
   /**
-   * curl-conforming elements are mapped as covariant vectors. Nevertheless,
+   * The mapping used for Nedelec elements.
+   *
+   * Curl-conforming elements are mapped as covariant vectors. Nevertheless,
    * we introduce a separate mapping type, such that we can use the same flag
    * for the vector and its gradient (see Mapping::transform() for details).
    */
   mapping_nedelec = 0x0200,
-/// The mapping used for Raviart-Thomas elements
+
+  /**
+   * The mapping used for Raviart-Thomas elements.
+   */
   mapping_raviart_thomas = 0x0300,
-/// The mapping used for BDM elements
+
+  /**
+   * The mapping used for BDM elements.
+   */
   mapping_bdm = mapping_raviart_thomas
 };
 
@@ -240,20 +264,77 @@ public:
     const Point<spacedim>                            &p) const = 0;
 
   /**
-   * Base class for internal data of finite element and mapping objects. The
-   * internal mechanism is that upon construction of a @p FEValues objects, it
+   * Base class for internal data of mapping objects. The
+   * internal mechanism is that upon construction of a FEValues object, it
    * asks the mapping and finite element classes that are to be used to
    * allocate memory for their own purpose in which they may store data that
    * only needs to be computed once. For example, most finite elements will
    * store the values of the shape functions at the quadrature points in this
    * object, since they do not change from cell to cell and only need to be
-   * computed once. Since different @p FEValues objects using different
-   * quadrature rules might access the same finite element object at the same
-   * time, it is necessary to create one such object per @p FEValues object.
-   * Ownership of this object is then transferred to the @p FEValues object,
-   * but a pointer to this object is passed to the finite element object every
-   * time it shall compute some data so that it has access to the precomputed
-   * values stored there.
+   * computed once. The same may be true for Mapping classes that want to
+   * only evaluate the shape functions used for mapping once at the quadrature
+   * points.
+   *
+   * Since different FEValues objects using different
+   * quadrature rules might access the same mapping object at the same
+   * time, it is necessary to create one such object per FEValues object.
+   * FEValues does this by calling Mapping::get_data(), or in reality the
+   * implementation of the corresponding function in derived classes.
+   * Ownership of the object created by Mapping::get_data() is then transferred
+   * to the FEValues object,
+   * but a reference to this object is passed to the mapping object every
+   * time it it is asked to compute information on a concrete cell. This
+   * happens when FEValues::reinit() (or the corresponding classes in
+   * FEFaceValues and FESubfaceValues) call Mapping::fill_fe_values()
+   * (and similarly via Mapping::fill_fe_face_values() and
+   * Mapping::fill_fe_subface_values()).
+   *
+   * The purpose of this class is for mapping objects to store information
+   * that can be computed once at the beginning, on the reference cell,
+   * and to access it later when computing information on a concrete cell.
+   * As such, the object handed to Mapping::fill_fe_values() is marked as
+   * <code>const</code>, because the assumption is that at the time this
+   * information is used, it will not need to modified again. However,
+   * classes derived from Mapping can also use such objects for two other
+   * purposes:
+   *
+   * - To provide scratch space for computations that are done in
+   *   Mapping::fill_fe_values() and similar functions. Some of the
+   *   derived classes would like to use scratch arrays and it would
+   *   be a waste of time to allocate these arrays every time this
+   *   function is called, just to de-allocate it again at the end
+   *   of the function. Rather, one could allocate this memory once
+   *   as a member variable of the current class, and simply use
+   *   it in Mapping::fill_fe_values().
+   * - After calling Mapping::fill_fe_values(), FEValues::reinit()
+   *   calls FiniteElement::fill_fe_values() where the finite element
+   *   computes values, gradients, etc of the shape functions using
+   *   both information computed once at the beginning using a mechanism
+   *   similar to the one described here (see FiniteElement::InternalDataBase)
+   *   as well as the data already computed by Mapping::fill_fe_values().
+   *   As part of its work, some implementations of
+   *   FiniteElement::fill_fe_values() need to transform shape function
+   *   data, and they do so by calling Mapping::transform(). The call
+   *   to the latter function also receives a reference to the
+   *   Mapping::InternalDataBase object. Since Mapping::transform()
+   *   may be called many times on each cell, it is sometimes worth
+   *   for derived classes to compute some information only once
+   *   in Mapping::fill_fe_values() and reuse it in
+   *   Mapping::transform(). This information can also be stored in
+   *   the classes that derived mapping classes derive from
+   *   InternalDataBase.
+   *
+   * In both of these cases, the InternalDataBase object being passed
+   * around is "morally const", i.e., no external observer can tell
+   * whether a scratch array or some intermediate data for
+   * Mapping::transform() is being modified by Mapping::fill_fe_values()
+   * or not. Consequently, the InternalDataBase objects are always
+   * passed around as <code>const</code> objects. Derived classes
+   * that would like to make use of the two additional uses outlined
+   * above therefore need to mark the member variables they want to
+   * use for these purposes as <code>mutable</code> to allow for their
+   * modification despite the fact that the surrounding object is
+   * marked as <code>const</code>.
    */
   class InternalDataBase: public Subscriptor
   {
@@ -265,7 +346,7 @@ public:
 
   public:
     /**
-     * Constructor. Sets @p UpdateFlags to @p update_default and @p first_cell
+     * Constructor. Sets update_flags to @p update_default and @p first_cell
      * to @p true.
      */
     InternalDataBase ();
@@ -321,12 +402,6 @@ public:
     virtual std::size_t memory_consumption () const;
 
     /**
-     * The determinant of the Jacobian in each quadrature point. Filled if
-     * #update_volume_elements.
-     */
-    std::vector<double> volume_elements;
-
-    /**
      * The positions of the mapped (generalized) support points.
      */
     std::vector<Point<spacedim> > support_point_values;
@@ -348,13 +423,13 @@ public:
      */
     std::vector<Tensor<2,spacedim> > support_point_inverse_gradients;
 
-
   private:
     /**
      * The value returned by @p is_first_cell.
      */
     bool first_cell;
   };
+
 
   /**
    * Transform a field of vectors or 1-differential forms according to the
@@ -439,7 +514,6 @@ public:
    * 1@></code> with a <code>Tensor@<1,dim@></code> when using
    * mapping_covariant() in the function transform above this one.
    */
-
   virtual
   void
   transform (const VectorSlice<const std::vector< DerivativeForm<1, dim, spacedim> > > input,
@@ -593,7 +667,8 @@ private:
 
   /**
    * Prepare internal data structures and fill in values independent of the
-   * cell.
+   * cell. See the documentation of Mapping::InternalDataBase for more
+   * information on the purpose of this function.
    */
   virtual InternalDataBase *
   get_data (const UpdateFlags,
@@ -601,7 +676,9 @@ private:
 
   /**
    * Prepare internal data structure for transformation of faces and fill in
-   * values independent of the cell.
+   * values independent of the cell. See the documentation of
+   * Mapping::InternalDataBase for more
+   * information on the purpose of this function.
    */
   virtual InternalDataBase *
   get_face_data (const UpdateFlags flags,
@@ -609,7 +686,9 @@ private:
 
   /**
    * Prepare internal data structure for transformation of children of faces
-   * and fill in values independent of the cell.
+   * and fill in values independent of the cell. See the documentation
+   * of Mapping::InternalDataBase for more
+   * information on the purpose of this function.
    */
   virtual InternalDataBase *
   get_subface_data (const UpdateFlags flags,
@@ -644,15 +723,14 @@ private:
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                   const Quadrature<dim>                         &quadrature,
-                  InternalDataBase                              &internal,
+                  const InternalDataBase                              &internal,
                   std::vector<Point<spacedim> >                 &quadrature_points,
                   std::vector<double>                           &JxW_values,
                   std::vector<DerivativeForm<1,dim,spacedim>  > &jacobians,
                   std::vector<DerivativeForm<2,dim,spacedim>  > &jacobian_grads,
                   std::vector<DerivativeForm<1,spacedim,dim>  > &inverse_jacobians,
                   std::vector<Point<spacedim> >                 &cell_normal_vectors,
-                  const CellSimilarity::Similarity                    cell_similarity
-                 ) const=0;
+                  const CellSimilarity::Similarity                    cell_similarity) const=0;
 
 
 
@@ -670,7 +748,7 @@ private:
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int                            face_no,
                        const Quadrature<dim-1>                      &quadrature,
-                       InternalDataBase                             &internal,
+                       const InternalDataBase                             &internal,
                        std::vector<Point<spacedim> >                &quadrature_points,
                        std::vector<double>                          &JxW_values,
                        std::vector<Tensor<1,spacedim> >             &boundary_form,
@@ -686,7 +764,7 @@ private:
                           const unsigned int                face_no,
                           const unsigned int                sub_no,
                           const Quadrature<dim-1>          &quadrature,
-                          InternalDataBase                 &internal,
+                          const InternalDataBase                 &internal,
                           std::vector<Point<spacedim> >    &quadrature_points,
                           std::vector<double>              &JxW_values,
                           std::vector<Tensor<1,spacedim> > &boundary_form,

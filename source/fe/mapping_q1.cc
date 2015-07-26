@@ -61,6 +61,7 @@ MappingQ1<dim,spacedim>::InternalData::memory_consumption () const
           MemoryConsumption::memory_consumption (aux) +
           MemoryConsumption::memory_consumption (mapping_support_points) +
           MemoryConsumption::memory_consumption (cell_of_current_support_points) +
+          MemoryConsumption::memory_consumption (volume_elements) +
           MemoryConsumption::memory_consumption (is_mapping_q1_data) +
           MemoryConsumption::memory_consumption (n_shape_functions));
 }
@@ -608,7 +609,7 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
                                        const unsigned int  n_q_points,
                                        const DataSetDescriptor  data_set,
                                        const CellSimilarity::Similarity cell_similarity,
-                                       InternalData  &data,
+                                       const InternalData  &data,
                                        std::vector<Point<spacedim> > &quadrature_points) const
 {
   const UpdateFlags update_flags(data.current_update_flags());
@@ -736,7 +737,7 @@ CellSimilarity::Similarity
 MappingQ1<dim,spacedim>::fill_fe_values (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const Quadrature<dim>                        &q,
-  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   std::vector<Point<spacedim> >                &quadrature_points,
   std::vector<double>                          &JxW_values,
   std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
@@ -746,9 +747,9 @@ MappingQ1<dim,spacedim>::fill_fe_values (
   const CellSimilarity::Similarity                   cell_similarity) const
 {
   // ensure that the following static_cast is really correct:
-  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
           ExcInternalError());
-  InternalData &data = static_cast<InternalData &>(mapping_data);
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
   const unsigned int n_q_points=q.size();
 
@@ -926,7 +927,7 @@ namespace internal
                        const unsigned int               subface_no,
                        const unsigned int               n_q_points,
                        const std::vector<double>        &weights,
-                       typename dealii::MappingQ1<dim,spacedim>::InternalData &data,
+                       const typename dealii::MappingQ1<dim,spacedim>::InternalData &data,
                        std::vector<double>              &JxW_values,
                        std::vector<Tensor<1,spacedim> > &boundary_forms,
                        std::vector<Point<spacedim> >    &normal_vectors,
@@ -1071,7 +1072,7 @@ MappingQ1<dim,spacedim>::compute_fill_face (
   const unsigned int               n_q_points,
   const DataSetDescriptor          data_set,
   const std::vector<double>        &weights,
-  InternalData                     &data,
+  const InternalData                     &data,
   std::vector<Point<spacedim> >    &quadrature_points,
   std::vector<double>              &JxW_values,
   std::vector<Tensor<1,spacedim> > &boundary_forms,
@@ -1095,7 +1096,7 @@ MappingQ1<dim,spacedim>::
 fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                      const unsigned int                               face_no,
                      const Quadrature<dim-1>                          &q,
-                     typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                      std::vector<Point<spacedim> >                    &quadrature_points,
                      std::vector<double>                              &JxW_values,
                      std::vector<Tensor<1,spacedim> >                 &boundary_forms,
@@ -1105,9 +1106,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 {
   // ensure that the following cast
   // is really correct:
-  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
           ExcInternalError());
-  InternalData &data = static_cast<InternalData &>(mapping_data);
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
   const unsigned int n_q_points = q.size();
 
@@ -1137,7 +1138,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const unsigned int       face_no,
                         const unsigned int       sub_no,
                         const Quadrature<dim-1> &q,
-                        typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                        const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                         std::vector<Point<spacedim> >     &quadrature_points,
                         std::vector<double>               &JxW_values,
                         std::vector<Tensor<1,spacedim> >  &boundary_forms,
@@ -1147,9 +1148,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 {
   // ensure that the following cast
   // is really correct:
-  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
           ExcInternalError());
-  InternalData &data = static_cast<InternalData &>(mapping_data);
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
   const unsigned int n_q_points = q.size();
 
