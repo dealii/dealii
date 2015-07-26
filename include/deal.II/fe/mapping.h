@@ -264,20 +264,77 @@ public:
     const Point<spacedim>                            &p) const = 0;
 
   /**
-   * Base class for internal data of finite element and mapping objects. The
-   * internal mechanism is that upon construction of a @p FEValues objects, it
+   * Base class for internal data of mapping objects. The
+   * internal mechanism is that upon construction of a FEValues object, it
    * asks the mapping and finite element classes that are to be used to
    * allocate memory for their own purpose in which they may store data that
    * only needs to be computed once. For example, most finite elements will
    * store the values of the shape functions at the quadrature points in this
    * object, since they do not change from cell to cell and only need to be
-   * computed once. Since different @p FEValues objects using different
-   * quadrature rules might access the same finite element object at the same
-   * time, it is necessary to create one such object per @p FEValues object.
-   * Ownership of this object is then transferred to the @p FEValues object,
-   * but a pointer to this object is passed to the finite element object every
-   * time it shall compute some data so that it has access to the precomputed
-   * values stored there.
+   * computed once. The same may be true for Mapping classes that want to
+   * only evaluate the shape functions used for mapping once at the quadrature
+   * points.
+   *
+   * Since different FEValues objects using different
+   * quadrature rules might access the same mapping object at the same
+   * time, it is necessary to create one such object per FEValues object.
+   * FEValues does this by calling Mapping::get_data(), or in reality the
+   * implementation of the corresponding function in derived classes.
+   * Ownership of the object created by Mapping::get_data() is then transferred
+   * to the FEValues object,
+   * but a reference to this object is passed to the mapping object every
+   * time it it is asked to compute information on a concrete cell. This
+   * happens when FEValues::reinit() (or the corresponding classes in
+   * FEFaceValues and FESubfaceValues) call Mapping::fill_fe_values()
+   * (and similarly via Mapping::fill_fe_face_values() and
+   * Mapping::fill_fe_subface_values()).
+   *
+   * The purpose of this class is for mapping objects to store information
+   * that can be computed once at the beginning, on the reference cell,
+   * and to access it later when computing information on a concrete cell.
+   * As such, the object handed to Mapping::fill_fe_values() is marked as
+   * <code>const</code>, because the assumption is that at the time this
+   * information is used, it will not need to modified again. However,
+   * classes derived from Mapping can also use such objects for two other
+   * purposes:
+   *
+   * - To provide scratch space for computations that are done in
+   *   Mapping::fill_fe_values() and similar functions. Some of the
+   *   derived classes would like to use scratch arrays and it would
+   *   be a waste of time to allocate these arrays every time this
+   *   function is called, just to de-allocate it again at the end
+   *   of the function. Rather, one could allocate this memory once
+   *   as a member variable of the current class, and simply use
+   *   it in Mapping::fill_fe_values().
+   * - After calling Mapping::fill_fe_values(), FEValues::reinit()
+   *   calls FiniteElement::fill_fe_values() where the finite element
+   *   computes values, gradients, etc of the shape functions using
+   *   both information computed once at the beginning using a mechanism
+   *   similar to the one described here (see FiniteElement::InternalDataBase)
+   *   as well as the data already computed by Mapping::fill_fe_values().
+   *   As part of its work, some implementations of
+   *   FiniteElement::fill_fe_values() need to transform shape function
+   *   data, and they do so by calling Mapping::transform(). The call
+   *   to the latter function also receives a reference to the
+   *   Mapping::InternalDataBase object. Since Mapping::transform()
+   *   may be called many times on each cell, it is sometimes worth
+   *   for derived classes to compute some information only once
+   *   in Mapping::fill_fe_values() and reuse it in
+   *   Mapping::transform(). This information can also be stored in
+   *   the classes that derived mapping classes derive from
+   *   InternalDataBase.
+   *
+   * In both of these cases, the InternalDataBase object being passed
+   * around is "morally const", i.e., no external observer can tell
+   * whether a scratch array or some intermediate data for
+   * Mapping::transform() is being modified by Mapping::fill_fe_values()
+   * or not. Consequently, the InternalDataBase objects are always
+   * passed around as <code>const</code> objects. Derived classes
+   * that would like to make use of the two additional uses outlined
+   * above therefore need to mark the member variables they want to
+   * use for these purposes as <code>mutable</code> to allow for their
+   * modification despite the fact that the surrounding object is
+   * marked as <code>const</code>.
    */
   class InternalDataBase: public Subscriptor
   {
@@ -289,7 +346,7 @@ public:
 
   public:
     /**
-     * Constructor. Sets @p UpdateFlags to @p update_default and @p first_cell
+     * Constructor. Sets update_flags to @p update_default and @p first_cell
      * to @p true.
      */
     InternalDataBase ();
@@ -366,13 +423,13 @@ public:
      */
     std::vector<Tensor<2,spacedim> > support_point_inverse_gradients;
 
-
   private:
     /**
      * The value returned by @p is_first_cell.
      */
     bool first_cell;
   };
+
 
   /**
    * Transform a field of vectors or 1-differential forms according to the
@@ -457,7 +514,6 @@ public:
    * 1@></code> with a <code>Tensor@<1,dim@></code> when using
    * mapping_covariant() in the function transform above this one.
    */
-
   virtual
   void
   transform (const VectorSlice<const std::vector< DerivativeForm<1, dim, spacedim> > > input,
