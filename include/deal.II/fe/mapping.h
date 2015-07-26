@@ -47,16 +47,32 @@ template <int dim, int spacedim> class FESubfaceValues;
  */
 enum MappingType
 {
-/// No mapping
+  /**
+   * No mapping, i.e., shape functions are not mapped from a reference cell
+   * but instead are defined right on the real-space cell.
+   */
   mapping_none = 0x0000,
-/// Covariant mapping (see Mapping::transform() for details)
+
+  /**
+   * Covariant mapping (see Mapping::transform() for details).
+   */
   mapping_covariant = 0x0001,
-/// Contravariant mapping (see Mapping::transform() for details)
+
+  /**
+   * Contravariant mapping (see Mapping::transform() for details).
+   */
   mapping_contravariant = 0x0002,
-/// Mapping of the gradient of a covariant vector field (see Mapping::transform() for details)
+
+  /**
+   * Mapping of the gradient of a covariant vector field (see Mapping::transform() for details).
+   */
   mapping_covariant_gradient = 0x0003,
-/// Mapping of the gradient of a contravariant vector field (see Mapping::transform() for details)
+
+  /**
+   * Mapping of the gradient of a contravariant vector field (see Mapping::transform() for details).
+   */
   mapping_contravariant_gradient = 0x0004,
+
   /**
    * The Piola transform usually used for Hdiv elements. Piola transform is
    * the standard transformation of vector valued elements in H<sup>div</sup>.
@@ -64,22 +80,30 @@ enum MappingType
    * volume element.
    */
   mapping_piola = 0x0100,
+
   /**
-   * transformation for the gradient of a vector field corresponding to a
+   * Transformation for the gradient of a vector field corresponding to a
    * mapping_piola transformation (see Mapping::transform() for details).
    */
-
   mapping_piola_gradient = 0x0101,
-/// The mapping used for Nedelec elements
+
   /**
-   * curl-conforming elements are mapped as covariant vectors. Nevertheless,
+   * The mapping used for Nedelec elements.
+   *
+   * Curl-conforming elements are mapped as covariant vectors. Nevertheless,
    * we introduce a separate mapping type, such that we can use the same flag
    * for the vector and its gradient (see Mapping::transform() for details).
    */
   mapping_nedelec = 0x0200,
-/// The mapping used for Raviart-Thomas elements
+
+  /**
+   * The mapping used for Raviart-Thomas elements.
+   */
   mapping_raviart_thomas = 0x0300,
-/// The mapping used for BDM elements
+
+  /**
+   * The mapping used for BDM elements.
+   */
   mapping_bdm = mapping_raviart_thomas
 };
 
