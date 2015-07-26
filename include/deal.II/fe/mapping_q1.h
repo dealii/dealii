@@ -153,7 +153,15 @@ public:
   Mapping<dim,spacedim> *clone () const;
 
   /**
-   * Storage for internal data of d-linear transformation.
+   * Storage for internal data of d-linear mappings. See Mapping::InternalDataBase
+   * for an extensive description.
+   *
+   * This includes data that is computed once when the object is created
+   * (in get_data()) as well as data the class wants to store from between
+   * the call to fill_fe_values(), fill_fe_face_values(), or
+   * fill_fe_subface_values() until possible later calls from the finite
+   * element to functions such as transform(). The latter class of
+   * member variables are marked as 'mutable'.
    */
   class InternalData : public Mapping<dim,spacedim>::InternalDataBase
   {
@@ -228,6 +236,37 @@ public:
     std::vector<Tensor<2,dim> > shape_second_derivatives;
 
     /**
+     * Unit tangential vectors. Used for the computation of boundary forms and
+     * normal vectors.
+     *
+     * This vector has (dim-1)GeometryInfo::faces_per_cell entries. The first
+     * GeometryInfo::faces_per_cell contain the vectors in the first
+     * tangential direction for each face; the second set of
+     * GeometryInfo::faces_per_cell entries contain the vectors in the second
+     * tangential direction (only in 3d, since there we have 2 tangential
+     * directions per face), etc.
+     *
+     * Filled once.
+     */
+    std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
+
+    /**
+     * Default value of this flag is @p true. If <tt>*this</tt> is an object
+     * of a derived class, this flag is set to @p false. (This is, for example,
+     * the case for MappingQ, which derives MappingQ::InternalData from the
+     * current MappingQ1::InternalData.)
+     */
+    bool is_mapping_q1_data;
+
+    /**
+     * Number of shape functions. If this is a Q1 mapping, then it is simply
+     * the number of vertices per cell. However, since also derived classes
+     * use this class (e.g. the Mapping_Q() class), the number of shape
+     * functions may also be different.
+     */
+    unsigned int n_shape_functions;
+
+    /**
      * Tensors of covariant transformation at each of the quadrature points.
      * The matrix stored is the Jacobian * G^{-1}, where G = Jacobian^{t} *
      * Jacobian, is the first fundamental form of the map; if dim=spacedim
@@ -246,21 +285,6 @@ public:
      * Computed on each cell.
      */
     mutable std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
-
-    /**
-     * Unit tangential vectors. Used for the computation of boundary forms and
-     * normal vectors.
-     *
-     * This vector has (dim-1)GeometryInfo::faces_per_cell entries. The first
-     * GeometryInfo::faces_per_cell contain the vectors in the first
-     * tangential direction for each face; the second set of
-     * GeometryInfo::faces_per_cell entries contain the vectors in the second
-     * tangential direction (only in 3d, since there we have 2 tangential
-     * directions per face), etc.
-     *
-     * Filled once.
-     */
-    std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
 
     /**
      * Auxiliary vectors for internal use.
@@ -283,20 +307,6 @@ public:
      * #update_volume_elements.
      */
     mutable std::vector<double> volume_elements;
-
-    /**
-     * Default value of this flag is @p true. If <tt>*this</tt> is an object
-     * of a derived class, this flag is set to @p false.
-     */
-    bool is_mapping_q1_data;
-
-    /**
-     * Number of shape functions. If this is a Q1 mapping, then it is simply
-     * the number of vertices per cell. However, since also derived classes
-     * use this class (e.g. the Mapping_Q() class), the number of shape
-     * functions may also be different.
-     */
-    unsigned int n_shape_functions;
   };
 
   /**

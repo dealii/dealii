@@ -159,7 +159,8 @@ public:
 
 protected:
   /**
-   * Storage for internal data of the scaling.
+   * Storage for internal data of the mapping. See Mapping::InternalDataBase
+   * for an extensive description.
    *
    * This includes data that is computed once when the object is created
    * (in get_data()) as well as data the class wants to store from between

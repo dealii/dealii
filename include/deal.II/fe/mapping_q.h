@@ -151,7 +151,19 @@ public:
   Mapping<dim,spacedim> *clone () const;
 
   /**
-   * Storage for internal data of Q_degree transformation.
+   * Storage for internal data of this mapping. See Mapping::InternalDataBase
+   * for an extensive description.
+   *
+   * This includes data that is computed once when the object is created
+   * (in get_data()) as well as data the class wants to store from between
+   * the call to fill_fe_values(), fill_fe_face_values(), or
+   * fill_fe_subface_values() until possible later calls from the finite
+   * element to functions such as transform(). The latter class of
+   * member variables are marked as 'mutable'.
+   *
+   * The current class uses essentially the same fields for storage
+   * as the MappingQ1 class. Consequently, it inherits from
+   * MappingQ1::InternalData, rather than from Mapping::InternalDataBase.
    */
   class InternalData : public MappingQ1<dim,spacedim>::InternalData
   {
@@ -176,7 +188,8 @@ public:
     mutable bool use_mapping_q1_on_current_cell;
 
     /**
-     * On interior cells @p MappingQ1 is used.
+     * A structure to store the corresponding information for the pure
+     * $Q_1$ mapping that is, by default, used on all interior cells.
      */
     typename MappingQ1<dim,spacedim>::InternalData mapping_q1_data;
   };
