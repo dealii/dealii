@@ -694,83 +694,153 @@ private:
   get_subface_data (const UpdateFlags flags,
                     const Quadrature<dim-1>& quadrature) const = 0;
 
-
   /**
-   * Fill the transformation fields of @p FEValues.  Given a grid cell and the
-   * quadrature points on the unit cell, it computes all values specified by
-   * @p flags. The arrays to be filled have to have the correct size.
+   * Compute information about the mapping from the reference cell
+   * to the real cell indicated by the first argument to this function.
+   * Derived classes will have to implement this function based on the
+   * kind of mapping they represent. It is called by FEValues::reinit().
    *
-   * Values are split into two groups: first, @p quadrature_points and @p
-   * JxW_values are filled with the quadrature rule transformed to the cell in
-   * physical space.
+   * Conceptually, this function's represents the application of the
+   * mapping $\mathbf x=\mathbf F_K(\hat {\mathbf x})$ from reference
+   * coordinates $\mathbf\in [0,1]^d$ to real space coordinates
+   * $\mathbf x$ for a given cell $K$. Its purpose is to compute the following
+   * kinds of data:
    *
-   * The second group contains the matrices needed to transform vector-valued
-   * functions, namely @p jacobians, the derivatives @p jacobian_grads, and
-   * the inverse operations in @p inverse_jacobians.
-   */
-  /*     virtual void */
-  /*     fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell, */
-  /*                  const Quadrature<dim>                         &quadrature, */
-  /*                  InternalDataBase                              &internal, */
-  /*                  std::vector<Point<spacedim> >                 &quadrature_points, */
-  /*                  std::vector<double>                           &JxW_values) const = 0; */
-
-  /**
-   * The function above adjusted with the variable cell_normal_vectors for the
-   * case of codimension 1
+   * - Data that results from the application of the mapping itself, e.g.,
+   *   computing the location $\mathbf x_q = \mathbf F_K(\hat{\mathbf x}_q)$
+   *   of quadrature points on the real cell, and that is directly useful
+   *   to users of FEValues, for example during assembly.
+   * - Data that is necessary for finite element implementations to compute
+   *   their shape functions on the real cell. To this end, the
+   *   FEValues::reinit() function calls FiniteElement::fill_fe_values()
+   *   after the current function, and the output of this function serves
+   *   as input to FiniteElement::fill_fe_values(). Examples of
+   *   information that needs to be computed here for use by the
+   *   finite element classes is the Jacobian of the mapping,
+   *   $\hat\nabla \mathbf F_K(\hat{\mathbf x})$ or its inverse,
+   *   for example to transform the gradients of shape functions on
+   *   the reference cell to the gradients of shape functions on
+   *   the real cell.
+   *
+   * The information computed by this function is used to fill the various
+   * member variables of the output argument of this function. Which of
+   * the member variables of that structure should be filled is determined
+   * by the update flags stored in the Mapping::InternalDataBase object
+   * passed to this function.
+   *
+   * @param[in] cell The cell of the triangulation for which this function
+   *   is to compute a mapping from the reference cell to.
+   * @param[in] cell_similarity Whether or not the cell given as first
+   *   argument is simply a translation, rotation, etc of the cell for
+   *   which this function was called the most recent time. This
+   *   information is computed simply by matching the vertices (as stored
+   *   by the Triangulation) between the previous and the current cell.
+   *   The value passed here may be modified by implementations of
+   *   this function and should then be returned (see the discussion of the
+   *   return value of this function).
+   * @param[in] quadrature A reference to the quadrature formula in use
+   *   for the current evaluation. This quadrature object is the same
+   *   as the one used when creating the @p internal_data object
+   * @param[in] internal_data A reference to an object previously
+   *   created by get_data() and that may be used to store information
+   *   the mapping can compute once on the reference cell. See the
+   *   documentation of the Mapping::InternalDataBase class for an
+   *   extensive description of the purpose of these objects.
+   * @param[out] output_data A reference to an object whose member
+   *   variables should be computed. Not all of the members of this
+   *   argument need to be filled; which ones need to be filled is
+   *   determined by the update flags stored inside the
+   *   @p internal_data object.
+   * @return An updated value of the @p cell_similarity argument to
+   *   this function. The returned value will be used for the corresponding
+   *   argument when FEValues::reinit() calls
+   *   FiniteElement::fill_fe_values(). In most cases, derived classes will
+   *   simply want to return the value passed for @p cell_similarity.
+   *   However, implementations of this function may downgrade the
+   *   level of cell similarity. This is, for example, the case for
+   *   classes that take not only into account the locations of the
+   *   vertices of a cell (as reported by the Triangulation), but also
+   *   other information specific to the mapping. The purpose is that
+   *   FEValues::reinit() can compute whether a cell is similar to the
+   *   previous one only based on the cell's vertices, whereas the
+   *   mapping may also consider displacement fields (e.g., in the
+   *   MappingQ1Eulerian and MappingFEField classes). In such cases,
+   *   the mapping may conclude that the previously computed
+   *   cell similarity is too optimistic, and invalidate it for
+   *   subsequent use in FiniteElement::fill_fe_values() by
+   *   returning a less optimistic cell similarity value.
    */
   virtual
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim>                         &quadrature,
-                  const InternalDataBase                              &internal,
-                  std::vector<Point<spacedim> >                 &quadrature_points,
-                  std::vector<double>                           &JxW_values,
-                  std::vector<DerivativeForm<1,dim,spacedim>  > &jacobians,
-                  std::vector<DerivativeForm<2,dim,spacedim>  > &jacobian_grads,
-                  std::vector<DerivativeForm<1,spacedim,dim>  > &inverse_jacobians,
-                  std::vector<Point<spacedim> >                 &cell_normal_vectors,
-                  const CellSimilarity::Similarity                    cell_similarity) const=0;
-
-
+                  const CellSimilarity::Similarity                           cell_similarity,
+                  const Quadrature<dim>                                     &quadrature,
+                  const InternalDataBase                                    &internal_data,
+                  FEValuesData<dim,spacedim>                                &output_data) const = 0;
 
   /**
-   * Performs the same as @p fill_fe_values on a face. Additionally, @p
-   * boundary_form (see
-   * @ref GlossBoundaryForm
-   * ) and @p normal_vectors can be computed on surfaces. Since the boundary
-   * form already contains the determinant of the Jacobian of the
-   * transformation, it is sometimes more economic to use the boundary form
-   * instead of the product of the unit normal and the transformed quadrature
-   * weight.
+   * This function is the equivalent to Mapping::fill_fe_values(),
+   * but for faces of cells. See there for an extensive discussion
+   * of its purpose. It is called by FEFaceValues::reinit().
+   *
+   * @param[in] cell The cell of the triangulation for which this function
+   *   is to compute a mapping from the reference cell to.
+   * @param[in] face_no The number of the face of the given cell for which
+   *   information is requested.
+   * @param[in] quadrature A reference to the quadrature formula in use
+   *   for the current evaluation. This quadrature object is the same
+   *   as the one used when creating the @p internal_data object
+   * @param[in] internal_data A reference to an object previously
+   *   created by get_data() and that may be used to store information
+   *   the mapping can compute once on the reference cell. See the
+   *   documentation of the Mapping::InternalDataBase class for an
+   *   extensive description of the purpose of these objects.
+   * @param[out] output_data A reference to an object whose member
+   *   variables should be computed. Not all of the members of this
+   *   argument need to be filled; which ones need to be filled is
+   *   determined by the update flags stored inside the
+   *   @p internal_data object.
    */
   virtual void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int                            face_no,
-                       const Quadrature<dim-1>                      &quadrature,
-                       const InternalDataBase                             &internal,
-                       std::vector<Point<spacedim> >                &quadrature_points,
-                       std::vector<double>                          &JxW_values,
-                       std::vector<Tensor<1,spacedim> >             &boundary_form,
-                       std::vector<Point<spacedim> >                &normal_vectors,
-                       std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const = 0;
+                       const unsigned int                                         face_no,
+                       const Quadrature<dim-1>                                   &quadrature,
+                       const InternalDataBase                                    &internal_data,
+                       FEValuesData<dim,spacedim>                                &output_data) const = 0;
 
   /**
-   * See above.
+   * This function is the equivalent to Mapping::fill_fe_values(),
+   * but for subfaces (i.e., children of faces) of cells.
+   * See there for an extensive discussion
+   * of its purpose. It is called by FESubfaceValues::reinit().
+   *
+   * @param[in] cell The cell of the triangulation for which this function
+   *   is to compute a mapping from the reference cell to.
+   * @param[in] face_no The number of the face of the given cell for which
+   *   information is requested.
+   * @param[in] subface_no The number of the child of a face of the
+   *   given cell for which information is requested.
+   * @param[in] quadrature A reference to the quadrature formula in use
+   *   for the current evaluation. This quadrature object is the same
+   *   as the one used when creating the @p internal_data object
+   * @param[in] internal_data A reference to an object previously
+   *   created by get_data() and that may be used to store information
+   *   the mapping can compute once on the reference cell. See the
+   *   documentation of the Mapping::InternalDataBase class for an
+   *   extensive description of the purpose of these objects.
+   * @param[out] output_data A reference to an object whose member
+   *   variables should be computed. Not all of the members of this
+   *   argument need to be filled; which ones need to be filled is
+   *   determined by the update flags stored inside the
+   *   @p internal_data object.
    */
   virtual void
   fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int                face_no,
-                          const unsigned int                sub_no,
-                          const Quadrature<dim-1>          &quadrature,
-                          const InternalDataBase                 &internal,
-                          std::vector<Point<spacedim> >    &quadrature_points,
-                          std::vector<double>              &JxW_values,
-                          std::vector<Tensor<1,spacedim> > &boundary_form,
-                          std::vector<Point<spacedim> >    &normal_vectors,
-                          std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const = 0;
+                          const unsigned int                                         face_no,
+                          const unsigned int                                         subface_no,
+                          const Quadrature<dim-1>                                   &quadrature,
+                          const InternalDataBase                                    &internal_data,
+                          FEValuesData<dim,spacedim>                                &output_data) const = 0;
 
   /**
    * Give class @p FEValues access to the private <tt>get_...data</tt> and

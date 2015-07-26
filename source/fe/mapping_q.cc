@@ -27,6 +27,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <numeric>
 
@@ -247,22 +248,17 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
 // recalculate data even when cells are similar.
 template<int dim, int spacedim>
 CellSimilarity::Similarity
-MappingQ<dim,spacedim>::fill_fe_values (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const Quadrature<dim>                                     &q,
-  const typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-  std::vector<Point<spacedim> >                             &quadrature_points,
-  std::vector<double>                                       &JxW_values,
-  std::vector<DerivativeForm<1,dim,spacedim>   >    &jacobians,
-  std::vector<DerivativeForm<2,dim,spacedim>    >   &jacobian_grads,
-  std::vector<DerivativeForm<1,spacedim,dim>    >   &inverse_jacobians,
-  std::vector<Point<spacedim> >                             &normal_vectors,
-  const CellSimilarity::Similarity                           cell_similarity) const
+MappingQ<dim,spacedim>::
+fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                const CellSimilarity::Similarity                           cell_similarity,
+                const Quadrature<dim>                                     &quadrature,
+                const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                FEValuesData<dim,spacedim>                                &output_data) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0, ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &> (mapping_data);
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0, ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &> (internal_data);
 
   // check whether this cell needs the full mapping or can be treated by a
   // reduced Q1 mapping, e.g. if the cell is in the interior of the domain
@@ -292,11 +288,11 @@ MappingQ<dim,spacedim>::fill_fe_values (
        CellSimilarity::invalid_next_cell
        :
        cell_similarity);
-  MappingQ1<dim,spacedim>::fill_fe_values(cell, q, *p_data,
-                                          quadrature_points, JxW_values,
-                                          jacobians, jacobian_grads, inverse_jacobians,
-                                          normal_vectors,
-                                          updated_cell_similarity);
+  MappingQ1<dim,spacedim>::fill_fe_values(cell,
+                                          updated_cell_similarity,
+                                          quadrature,
+                                          *p_data,
+                                          output_data);
 
   return updated_cell_similarity;
 }
@@ -305,23 +301,18 @@ MappingQ<dim,spacedim>::fill_fe_values (
 
 template<int dim, int spacedim>
 void
-MappingQ<dim,spacedim>::fill_fe_face_values (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int                face_no,
-  const Quadrature<dim-1>          &q,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-  std::vector<Point<spacedim> >    &quadrature_points,
-  std::vector<double>              &JxW_values,
-  std::vector<Tensor<1,spacedim> > &exterior_forms,
-  std::vector<Point<spacedim> >    &normal_vectors,
-  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
+MappingQ<dim,spacedim>::
+fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                     const unsigned int                                         face_no,
+                     const Quadrature<dim-1>                                   &quadrature,
+                     const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                     FEValuesData<dim,spacedim>                                &output_data) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0,
           ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &> (mapping_data);
+  const InternalData &data = static_cast<const InternalData &> (internal_data);
 
   // check whether this cell needs the full mapping or can be treated by a
   // reduced Q1 mapping, e.g. if the cell is entirely in the interior of the
@@ -341,7 +332,7 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
        :
        &data);
 
-  const unsigned int n_q_points=q.size();
+  const unsigned int n_q_points = quadrature.size();
   this->compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
                            n_q_points,
                            QProjector<dim>::DataSetDescriptor::
@@ -350,33 +341,32 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
                                  cell->face_flip(face_no),
                                  cell->face_rotation(face_no),
                                  n_q_points),
-                           q.get_weights(),
+                           quadrature.get_weights(),
                            *p_data,
-                           quadrature_points, JxW_values,
-                           exterior_forms, normal_vectors, jacobians,
-                           inverse_jacobians);
+                           output_data.quadrature_points,
+                           output_data.JxW_values,
+                           output_data.boundary_forms,
+                           output_data.normal_vectors,
+                           output_data.jacobians,
+                           output_data.inverse_jacobians);
 }
 
 
 template<int dim, int spacedim>
 void
-MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                                const unsigned int       face_no,
-                                                const unsigned int       sub_no,
-                                                const Quadrature<dim-1> &q,
-                                                const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                                                std::vector<Point<spacedim> >     &quadrature_points,
-                                                std::vector<double>          &JxW_values,
-                                                std::vector<Tensor<1,spacedim> >  &exterior_forms,
-                                                std::vector<Point<spacedim> >     &normal_vectors,
-                                                std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                                                std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
+MappingQ<dim,spacedim>::
+fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                        const unsigned int                                         face_no,
+                        const unsigned int                                         subface_no,
+                        const Quadrature<dim-1>                                   &quadrature,
+                        const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                        FEValuesData<dim,spacedim>                                &output_data) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0,
           ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &> (mapping_data);
+  const InternalData &data = static_cast<const InternalData &> (internal_data);
 
   // check whether this cell needs the full mapping or can be treated by a
   // reduced Q1 mapping, e.g. if the cell is entirely in the interior of the
@@ -396,21 +386,24 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
        :
        &data);
 
-  const unsigned int n_q_points=q.size();
-  this->compute_fill_face (cell, face_no, sub_no,
+  const unsigned int n_q_points = quadrature.size();
+  this->compute_fill_face (cell, face_no, subface_no,
                            n_q_points,
                            QProjector<dim>::DataSetDescriptor::
-                           subface (face_no, sub_no,
+                           subface (face_no, subface_no,
                                     cell->face_orientation(face_no),
                                     cell->face_flip(face_no),
                                     cell->face_rotation(face_no),
                                     n_q_points,
                                     cell->subface_case(face_no)),
-                           q.get_weights(),
+                           quadrature.get_weights(),
                            *p_data,
-                           quadrature_points, JxW_values,
-                           exterior_forms, normal_vectors, jacobians,
-                           inverse_jacobians);
+                           output_data.quadrature_points,
+                           output_data.JxW_values,
+                           output_data.boundary_forms,
+                           output_data.normal_vectors,
+                           output_data.jacobians,
+                           output_data.inverse_jacobians);
 }
 
 

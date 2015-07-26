@@ -177,26 +177,21 @@ compute_mapping_support_points
 
 template<int dim, class EulerVectorType, int spacedim>
 CellSimilarity::Similarity
-MappingQEulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const Quadrature<dim>                                     &q,
-  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-  std::vector<Point<spacedim> >                             &quadrature_points,
-  std::vector<double>                                       &JxW_values,
-  std::vector<DerivativeForm<1,dim,spacedim> >       &jacobians,
-  std::vector<DerivativeForm<2,dim,spacedim>  >     &jacobian_grads,
-  std::vector<DerivativeForm<1,spacedim,dim>  >     &inverse_jacobians,
-  std::vector<Point<spacedim> >                             &normal_vectors,
-  const CellSimilarity::Similarity                           ) const
+MappingQEulerian<dim,EulerVectorType,spacedim>::
+fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                const CellSimilarity::Similarity                           ,
+                const Quadrature<dim>                                     &quadrature,
+                const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                FEValuesData<dim,spacedim>                                &output_data) const
 {
   // call the function of the base class, but ignoring
   // any potentially detected cell similarity between
   // the current and the previous cell
-  MappingQ<dim,spacedim>::fill_fe_values (cell, q, mapping_data,
-                                          quadrature_points, JxW_values, jacobians,
-                                          jacobian_grads, inverse_jacobians,
-                                          normal_vectors,
-                                          CellSimilarity::invalid_next_cell);
+  MappingQ<dim,spacedim>::fill_fe_values (cell,
+                                          CellSimilarity::invalid_next_cell,
+                                          quadrature,
+                                          internal_data,
+                                          output_data);
   // also return the updated flag since any detected
   // similarity wasn't based on the mapped field, but
   // the original vertices which are meaningless

@@ -3518,15 +3518,10 @@ void FEValues<dim,spacedim>::do_reinit ()
   // it
   this->cell_similarity
     = this->get_mapping().fill_fe_values(*this->present_cell,
+                                         this->cell_similarity,
                                          quadrature,
                                          *this->mapping_data,
-                                         this->quadrature_points,
-                                         this->JxW_values,
-                                         this->jacobians,
-                                         this->jacobian_grads,
-                                         this->inverse_jacobians,
-                                         this->normal_vectors,
-                                         this->cell_similarity);
+                                         *this);
 
   // then call the finite element and, with the data
   // already filled by the mapping, let it compute the
@@ -3722,15 +3717,11 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
   Assert(!(this->update_flags & update_jacobian_grads),
          ExcNotImplemented());
 
-  this->get_mapping().fill_fe_face_values(*this->present_cell, face_no,
+  this->get_mapping().fill_fe_face_values(*this->present_cell,
+                                          face_no,
                                           this->quadrature,
                                           *this->mapping_data,
-                                          this->quadrature_points,
-                                          this->JxW_values,
-                                          this->boundary_forms,
-                                          this->normal_vectors,
-                                          this->jacobians,
-                                          this->inverse_jacobians);
+                                          *this);
 
   this->get_fe().fill_fe_face_values(this->get_mapping(),
                                      *this->present_cell, face_no,
@@ -3958,15 +3949,11 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
 
   // now ask the mapping and the finite element to do the actual work
   this->get_mapping().fill_fe_subface_values(*this->present_cell,
-                                             face_no, subface_no,
+                                             face_no,
+                                             subface_no,
                                              this->quadrature,
                                              *this->mapping_data,
-                                             this->quadrature_points,
-                                             this->JxW_values,
-                                             this->boundary_forms,
-                                             this->normal_vectors,
-                                             this->jacobians,
-                                             this->inverse_jacobians);
+                                             *this);
 
   this->get_fe().fill_fe_subface_values(this->get_mapping(),
                                         *this->present_cell,

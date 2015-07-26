@@ -69,43 +69,43 @@ public:
   get_subface_data (const UpdateFlags flags,
                     const Quadrature<dim-1>& quadrature) const;
 
+  /**
+   * Compute mapping-related information for a cell.
+   * See the documentation of Mapping::fill_fe_values() for
+   * a discussion of purpose, arguments, and return value of this function.
+   */
   virtual
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const Quadrature<dim>                             &quadrature,
-                  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-                  std::vector<Point<spacedim> >                     &quadrature_points,
-                  std::vector<double>                               &JxW_values,
-                  std::vector<DerivativeForm<1,dim,spacedim> >      &jacobians,
-                  std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
-                  std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
-                  std::vector<Point<spacedim> > &,
-                  const CellSimilarity::Similarity                        cell_similarity) const;
+                  const CellSimilarity::Similarity                           cell_similarity,
+                  const Quadrature<dim>                                     &quadrature,
+                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                  FEValuesData<dim,spacedim>                                &output_data) const;
 
-
+  /**
+   * Compute mapping-related information for a face of a cell.
+   * See the documentation of Mapping::fill_fe_face_values() for
+   * a discussion of purpose and arguments of this function.
+   */
   virtual void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                       const unsigned int               face_no,
-                       const Quadrature<dim-1>&         quadrature,
-                       const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-                       std::vector<Point<dim> >        &quadrature_points,
-                       std::vector<double>             &JxW_values,
-                       std::vector<Tensor<1,dim> >     &boundary_form,
-                       std::vector<Point<spacedim> >   &normal_vectors,
-                       std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const;
+                       const unsigned int                                         face_no,
+                       const Quadrature<dim-1>                                   &quadrature,
+                       const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                       FEValuesData<dim,spacedim>                                &output_data) const;
+
+  /**
+   * Compute mapping-related information for a child of a face of a cell.
+   * See the documentation of Mapping::fill_fe_subface_values() for
+   * a discussion of purpose and arguments of this function.
+   */
   virtual void
   fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                          const unsigned int              face_no,
-                          const unsigned int              sub_no,
-                          const Quadrature<dim-1>&        quadrature,
-                          const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-                          std::vector<Point<dim> >        &quadrature_points,
-                          std::vector<double>             &JxW_values,
-                          std::vector<Tensor<1,dim> >     &boundary_form,
-                          std::vector<Point<spacedim> >   &normal_vectors,
-                          std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                          std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const;
+                          const unsigned int                                         face_no,
+                          const unsigned int                                         subface_no,
+                          const Quadrature<dim-1>                                   &quadrature,
+                          const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                          FEValuesData<dim,spacedim>                                &output_data) const;
 
   virtual void
   transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
