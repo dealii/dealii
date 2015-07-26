@@ -551,11 +551,11 @@ IndexSet::IndexSet (const Epetra_Map &map)
   index_space_size (map.NumGlobalElements()),
   largest_range (numbers::invalid_unsigned_int)
 {
-  const size_type n_indices = map.NumMyElements();
+  const types::global_dof_index n_indices = map.NumMyElements();
 #ifndef DEAL_II_WITH_64BIT_INDICES
   unsigned int *indices = (unsigned int *)map.MyGlobalElements();
 #else
-  size_type *indices = (size_type *)map.MyGlobalElements64();
+  types::global_dof_index *indices = (types::global_dof_index *)map.MyGlobalElements64();
 #endif
   add_indices(indices, indices+n_indices);
   compress();
