@@ -667,7 +667,8 @@ private:
 
   /**
    * Prepare internal data structures and fill in values independent of the
-   * cell.
+   * cell. See the documentation of Mapping::InternalDataBase for more
+   * information on the purpose of this function.
    */
   virtual InternalDataBase *
   get_data (const UpdateFlags,
@@ -675,7 +676,9 @@ private:
 
   /**
    * Prepare internal data structure for transformation of faces and fill in
-   * values independent of the cell.
+   * values independent of the cell. See the documentation of
+   * Mapping::InternalDataBase for more
+   * information on the purpose of this function.
    */
   virtual InternalDataBase *
   get_face_data (const UpdateFlags flags,
@@ -683,7 +686,9 @@ private:
 
   /**
    * Prepare internal data structure for transformation of children of faces
-   * and fill in values independent of the cell.
+   * and fill in values independent of the cell. See the documentation
+   * of Mapping::InternalDataBase for more
+   * information on the purpose of this function.
    */
   virtual InternalDataBase *
   get_subface_data (const UpdateFlags flags,
