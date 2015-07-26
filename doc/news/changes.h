@@ -66,6 +66,13 @@ inconvenience this causes.
 
 <ol>
 
+  <li> New: MultithreadInfo::set_thread_limit() can now be called more than
+  once and the environment variable DEAL_II_NUM_THREADS will be respected
+  even if user code never calls it.
+  <br>
+  (Timo Heister, 2015/07/26)
+  </li>
+
   <li> New: IndexSet now implements iterators.
   <br>
   (Timo Heister, 2015/07/12)

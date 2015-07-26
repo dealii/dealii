@@ -190,21 +190,19 @@ std::string unify_pretty_function (const std::string &text)
  * each of them runs 64 threads, then we get astronomical loads.
  * Limit concurrency to a fixed (small) number of threads, independent
  * of the core count.
- *
- * Note that we can't do this if we run in MPI mode because then
- * MPI_InitFinalize already calls this function. Since every test
- * calls MPI_InitFinalize itself, we can't adjust the thread count
- * for this here.
  */
-#if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_TEST_DO_NOT_SET_THREAD_LIMIT)
+inline unsigned int testing_max_num_threads()
+{
+    return 5;
+}
+
 struct LimitConcurrency
 {
   LimitConcurrency ()
   {
-    MultithreadInfo::set_thread_limit (5);
+    MultithreadInfo::set_thread_limit (testing_max_num_threads());
   }
 } limit_concurrency;
-#endif
 
 
 
