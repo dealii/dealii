@@ -2345,17 +2345,15 @@ namespace VectorTools
    */
   //@{
   /**
-   * Given a DoFHandler containing at least a spacedim vector field, this
-   * function interpolates the Triangulation at the support points of a FE_Q()
-   * finite element of the same degree as dh->get_fe().degree.
+   * Given a DoFHandler containing at least a spacedim vector field,
+   * this function interpolates the Triangulation at the support
+   * points of a FE_Q() finite element of the same degree as the
+   * degree of the required components.
    *
    * Curved manifold are respected, and the resulting VECTOR will be
-   * geometrically consistent.
-   *
-   * The resulting map is guaranteed to be interpolatory at the support points
-   * of a FE_Q() finite element of the same degree as dh->get_fe().degree.
-   * Notice that this may or may not be meaningful, depending on the
-   * FiniteElement you have distributed in dh.
+   * geometrically consistent. The resulting map is guaranteed to be
+   * interpolatory at the support points of a FE_Q() finite element of
+   * the same degree as the degree of the required components.
    *
    * If the underlying finite element is an FE_Q(1)^spacedim, then the
    * resulting VECTOR is a finite element field representation of the vertices
@@ -2366,6 +2364,9 @@ namespace VectorTools
    * mask is specified at construction time, then a default one is used, i.e.,
    * the first spacedim components of the FiniteElement are assumed to
    * represent the geometry of the problem.
+   *
+   * This function is only implemented for FiniteElements where the
+   * specified components are primitive.
    *
    * @author Luca Heltai, 2015
    */
