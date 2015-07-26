@@ -27,15 +27,19 @@ DEAL_II_NAMESPACE_OPEN
  * together with its DoFHandler and the ConstraintMatrix associated
  * with the handler.
  *
- * Data vectors for finite element discretizations do not make sense
- * without their DoFHandler. Nevertheless, deal.II has assumed for
- * decades, that there is a single DoFHandler in a program and that
- * all vectors refer to it. This class encapsulates both, to begin
- * with in a minimally intrusive way, giving access to both
- * structures.
+ * This class encapsulates a data vector with the finite element space
+ * information associated with it, such that every function which is
+ * not purely algebraic can assogiate the right finite element
+ * function with the data vector. Thus, functions only need a single
+ * argument of type DoFVector instead of several arguments with
+ * separate information on data and finite element space.  To begin,
+ * it is implemented in a minimally intrusive way, giving access to
+ * both structures.
  *
  * @todo Ensure that both objects are synchronized, that is, the
- * DoFHandler is not changes without the vector being resized.
+ * DoFHandler is not changed without the vector being resized. Answer
+ * questions on unusual data structures that cannot be handled by
+ * sync() now first.
  */
 template <class DH, class VECTOR=Vector<double> >
 class DoFVector :  public Subscriptor
@@ -47,54 +51,100 @@ public:
    * Construct an object with a DoFHandler and borrow a vector from
    * GrowingVectorMemory for its data. This vector is then owned by
    * this object and released when the object itself expires.
+   *
+   * The life span of both arguments of this constructor must exceed
+   * the life span of the constructed object, otherwise, Subscriptor
+   * will throw an exception complaining that a used object is being
+   * deleted.
    */
   DoFVector (const DH &dh, const ConstraintMatrix &constraints);
 
   /**
-   * Construct an object with a DoFHandler but without constraints and
+   * Construct an object with a DoFHandler, but without constraints and
    * borrow a vector from GrowingVectorMemory for its data. This
    * vector is then owned by this object and released when the object
    * itself expires.
    *
-   * @note This constructor uses the ConstraintMatrix
-   * #no_constraints. The created object thus can output vectors in
-   * distributed format, but writing into vectors will most likely
-   * fail without using a constraint matrix from somewhere else.
+   * @note This constructor uses an empty ConstraintMatrix. The
+   * created object thus can output vectors in distributed format (see
+   * @ref constraints on compressed and distributed vectors). But
+   * writing into vectors will most likely fail, if there are
+   * constraints associated with the dof handler, since this class
+   * cannot know about them. It cannot even test for them, thus there
+   * cannot be a warning. Exceptions are discontinuous Galerkin
+   * methods which do not require constraints for hanging nodes or at
+   * the boundary.
+   *
+   * The life span of the argument of this constructor must exceed
+   * the life span of the constructed object, otherwise, Subscriptor
+   * will throw an exception complaining that a used object is being
+   * deleted.
    */
-  DoFVector (const DH &dh);
+  explicit DoFVector (const DH &dh);
 
   /**
-   * Construct an object with a DoFHandler and borrow a vector from
-   * GrowingVectorMemory for its data. This vector is not owned by the
+   * Construct an object with a DoFHandler and use the vector provided
+   * as data vector without copying it. This vector is not owned by the
    * object and read-access only.
    *
    * @note An object created this way is effectively constant. In
    * order to avoid obscure access errors to the data vector, it
    * should also be declared `const`.
+   *
+   * The life span of all objects usesd as arguments must exceed the
+   * life span of the constructed object, otherwise, Subscriptor will
+   * throw an exception complaining that a used object is being
+   * deleted.
    */
   DoFVector (const DH &dh, const ConstraintMatrix &constraints, const VECTOR &v);
 
   /**
    * Construct an object with a DoFHandler but without constraints and
-   * borrow a vector from GrowingVectorMemory for its data. This
+   * use the vector provided as data vector without copying it. This
    * vector is not owned by the object and read-access only.
    *
    * @note An object created this way is effectively constant. In
    * order to avoid access errors to the data vector, it should also
    * be declared `const`. Also, vectors are expected to be in
-   * distributed format, since the information on constraints is
+   * distributed format (see @ref constraints on compressed and
+   * distributed vectors), since the information on constraints is
    * missing.
+   *
+   * The life span of the arguments of this constructor must exceed
+   * the life span of the constructed object, otherwise, Subscriptor
+   * will throw an exception complaining that a used object is being
+   * deleted.
    */
   DoFVector (const DH &dh, const VECTOR &v);
 
   /**
    * Destructor, deleting own data.
    */
-  ~DoFVector ();
+  virtual ~DoFVector ();
+
+  /**
+   * Assignment operator. Copies the information from the other
+   * object and resizes the data vector accordingly. Will only be
+   * possible with an object that owns its data vector.
+   */
+  DoFVector<DH, VECTOR> &operator= (const DoFVector<DH, VECTOR> &);
 
   /**
    * Modify the vector dimensions to match the current state of the
-   * dof handler.
+   * dof handler and set it to zero. Will only be possible with an
+   * object that owns its data vector.
+   *
+   * This function calls Vector::reinit() with the total number of
+   * degrees of freedom and BlockVector::reinit() with the global
+   * block structure of the BlockInfo object of the dof handler. If
+   * the vector is an MGLevelObject, it is resized to the number of
+   * levels of this object and then, the appropriate initialization is
+   * run on each level.
+   *
+   * @todo Implementation for TrilinosWrappers::Vector and
+   * PETScWrappers::Vector as well as their block versions. Check
+   * whether the implementation for parallel::distributed::BlockVector
+   * is as intended.
    */
   void sync ();
 
@@ -105,12 +155,17 @@ public:
   /**
    * Access to the DoFHandler
    */
-  const DH &dof_handler () const;
+  const DH &get_dof_handler () const;
+
+  /**
+   * Access ot the constraint matrix.
+   */
+  const ConstraintMatrix &get_constraint_matrix () const;
 
   /**
    * Read-only access to the data vector
    */
-  const VECTOR &data () const;
+  const VECTOR &get_data () const;
 
   /**
    * Read-write access to the data vector.
@@ -118,10 +173,26 @@ public:
    * Read-write access is only possible, if the vector is owned by the
    * object.
    */
-  VECTOR &data ();
+  VECTOR &get_data ();
   ///@}
 
+  /**
+   * Exception thrown when a function tries to modify data of an
+   * object that does not own it. Check out the different
+   * constructors to fix this problem.
+   */
+  DeclExceptionMsg(ExcNotOwner,
+                   "You are trying to modify the data vector of a DoFVector"
+                   "object that does not own its data vector. Only DoFVector"
+                   " objects that have not received the data vector in their"
+                   " constructor can perform this action.");
 private:
+
+  /**
+   * Disable copy constructor.
+   */
+  DoFVector (const DoFVector<DH, VECTOR> &);
+
   /**
    * The pool for allocating the vector.
    */
@@ -130,7 +201,7 @@ private:
   /**
    * Empty constrainty matrix for constructors without one.
    */
-  ConstraintMatrix no_constraints;
+  static const ConstraintMatrix no_constraints;
 
   /**
    * Pointer to the dof handler.
@@ -143,12 +214,14 @@ private:
   SmartPointer<const ConstraintMatrix, DoFVector<DH, VECTOR> > constraints;
 
   /**
-   * The actual data vector, if owned by this object.
+   * The actual data vector, if owned by this object. This pointer
+   * nonzero implies #other_data is zero.
    */
   VECTOR *my_data;
 
   /**
-   * The data vector if referencing a vector not owned by this object.
+   * The data vector if referencing a vector not owned by this
+   * object. This pointer nonzero implies #my_data is zero.
    */
   SmartPointer<const VECTOR, DoFVector<DH, VECTOR> > other_data;
 };
@@ -156,61 +229,8 @@ private:
 
 template <class DH, class VECTOR>
 inline
-DoFVector<DH, VECTOR>::DoFVector (const DH &dh, const ConstraintMatrix &co)
-  : dh(&dh),
-    constraints(&co),
-    my_data(0),
-    other_data(0)
-{
-  my_data = mem.alloc();
-}
-
-
-template <class DH, class VECTOR>
-inline
-DoFVector<DH, VECTOR>::DoFVector (const DH &dh)
-  : dh(&dh),
-    constraints(&no_constraints),
-    my_data(0),
-    other_data(0)
-{
-  my_data = mem.alloc();
-}
-
-
-template <class DH, class VECTOR>
-inline
-DoFVector<DH, VECTOR>::DoFVector (const DH &dh, const ConstraintMatrix &co, const VECTOR &v)
-  : dh(&dh),
-    constraints(&co),
-    my_data(0),
-    other_data(&v)
-{}
-
-
-template <class DH, class VECTOR>
-inline
-DoFVector<DH, VECTOR>::DoFVector (const DH &dh, const VECTOR &v)
-  : dh(&dh),
-    constraints(&no_constraints),
-    my_data(0),
-    other_data(&v)
-{}
-
-
-template <class DH, class VECTOR>
-inline
-DoFVector<DH, VECTOR>::~DoFVector ()
-{
-  if (my_data != 0)
-    mem.free(my_data);
-}
-
-
-template <class DH, class VECTOR>
-inline
 const DH &
-DoFVector<DH, VECTOR>::dof_handler () const
+DoFVector<DH, VECTOR>::get_dof_handler () const
 {
   return *dh;
 }
@@ -218,8 +238,17 @@ DoFVector<DH, VECTOR>::dof_handler () const
 
 template <class DH, class VECTOR>
 inline
+const ConstraintMatrix &
+DoFVector<DH, VECTOR>::get_constraint_matrix () const
+{
+  return *constraints;
+}
+
+
+template <class DH, class VECTOR>
+inline
 const VECTOR &
-DoFVector<DH, VECTOR>::data () const
+DoFVector<DH, VECTOR>::get_data () const
 {
   if (my_data != 0)
     return *my_data;
@@ -231,7 +260,7 @@ DoFVector<DH, VECTOR>::data () const
 template <class DH, class VECTOR>
 inline
 VECTOR &
-DoFVector<DH, VECTOR>::data ()
+DoFVector<DH, VECTOR>::get_data ()
 {
   Assert(my_data != 0, ExcNotInitialized());
   return *my_data;

@@ -38,19 +38,19 @@ void test(const DH& dh)
   
   DoFVector<DH, Vector<number> > dv1(dh);
   dv1.sync();
-  Vector<number>& v1 = dv1.data();
+  Vector<number>& v1 = dv1.get_data();
   deallog << "dim " << DH::dimension << " v1: " << v1.size() << std::endl;
   
   const DoFVector<DH, Vector<number> > dv2(dh);
-  const Vector<number>& v2 = dv2.data();
+  const Vector<number>& v2 = dv2.get_data();
   
   Vector<number> w(5);
   const DoFVector<DH, Vector<number> > dv3(dh, w);
-  const Vector<number>& v3 = dv3.data();
+  const Vector<number>& v3 = dv3.get_data();
 
   DoFVector<DH, BlockVector<number> > dvb(dh);
   dvb.sync();
-  BlockVector<number>& vb = dvb.data();
+  BlockVector<number>& vb = dvb.get_data();
   deallog << "dim " << DH::dimension << " vb: " << vb.get_block_indices().to_string() << std::endl;
   
 }
@@ -62,22 +62,22 @@ void test_mg(const DH& dh)
   
   DoFVector<DH, MGLevelObject<Vector<number> > > dv1(dh);
   dv1.sync();
-  MGLevelObject<Vector<number> >& v1 = dv1.data();
+  MGLevelObject<Vector<number> >& v1 = dv1.get_data();
   deallog << "dim " << DH::dimension << " v1: (" << v1.min_level()
 	  << "->" << v1.max_level() << ')' << std::endl;
   for (unsigned int i=v1.min_level(); i <= v1.max_level();++i)
     deallog << " l" << i << ": " << v1[i].size() << std::endl;
   
   const DoFVector<DH, Vector<number> > dv2(dh);
-  const Vector<number>& v2 = dv2.data();
+  const Vector<number>& v2 = dv2.get_data();
   
   Vector<number> w(5);
   const DoFVector<DH, Vector<number> > dv3(dh, w);
-  const Vector<number>& v3 = dv3.data();
+  const Vector<number>& v3 = dv3.get_data();
 
   DoFVector<DH, MGLevelObject<BlockVector<number> > > dvb(dh);
   dvb.sync();
-  MGLevelObject<BlockVector<number> >& vb = dvb.data();
+  MGLevelObject<BlockVector<number> >& vb = dvb.get_data();
   deallog << "dim " << DH::dimension << " vb: (" << vb.min_level()
 	  << "->" << vb.max_level() << ')' << std::endl;
   for (unsigned int i=vb.min_level(); i <= vb.max_level();++i)

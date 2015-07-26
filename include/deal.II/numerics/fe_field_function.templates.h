@@ -63,15 +63,15 @@ namespace Functions
     Assert (values.size() == n_components,
             ExcDimensionMismatch(values.size(), n_components));
     typename DH::active_cell_iterator cell = cell_hint.get();
-    if (cell == this->dof_handler().end())
-      cell = this->dof_handler().begin_active();
+    if (cell == this->get_dof_handler().end())
+      cell = this->get_dof_handler().begin_active();
 
     boost::optional<Point<dim> >
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
         const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
-          = GridTools::find_active_cell_around_point (mapping, this->dof_handler(), p);
+          = GridTools::find_active_cell_around_point (mapping, this->get_dof_handler(), p);
         AssertThrow (my_pair.first->is_locally_owned(),
                      VectorTools::ExcPointNotAvailableHere());
 
@@ -88,7 +88,7 @@ namespace Functions
     fe_v.reinit(cell);
     std::vector< Vector<typename VECTOR::value_type> >
     vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
-    fe_v.get_function_values(this->data(), vvalues);
+    fe_v.get_function_values(this->get_data(), vvalues);
     values = vvalues[0];
   }
 
@@ -115,15 +115,15 @@ namespace Functions
     Assert (gradients.size() == n_components,
             ExcDimensionMismatch(gradients.size(), n_components));
     typename DH::active_cell_iterator cell = cell_hint.get();
-    if (cell == this->dof_handler().end())
-      cell = this->dof_handler().begin_active();
+    if (cell == this->get_dof_handler().end())
+      cell = this->get_dof_handler().begin_active();
 
     boost::optional<Point<dim> >
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
         const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
-          = GridTools::find_active_cell_around_point (mapping, this->dof_handler(), p);
+          = GridTools::find_active_cell_around_point (mapping, this->get_dof_handler(), p);
         AssertThrow (my_pair.first->is_locally_owned(),
                      VectorTools::ExcPointNotAvailableHere());
 
@@ -144,7 +144,7 @@ namespace Functions
     // function wants to return everything in a vector<double>
     std::vector< std::vector<Tensor<1,dim,typename VECTOR::value_type> > > vgrads
     (1,  std::vector<Tensor<1,dim,typename VECTOR::value_type> >(n_components) );
-    fe_v.get_function_gradients(this->data(), vgrads);
+    fe_v.get_function_gradients(this->get_data(), vgrads);
     gradients = std::vector<Tensor<1,dim> >(vgrads[0].begin(), vgrads[0].end());
   }
 
@@ -172,15 +172,15 @@ namespace Functions
     Assert (values.size() == n_components,
             ExcDimensionMismatch(values.size(), n_components));
     typename DH::active_cell_iterator cell = cell_hint.get();
-    if (cell == this->dof_handler().end())
-      cell = this->dof_handler().begin_active();
+    if (cell == this->get_dof_handler().end())
+      cell = this->get_dof_handler().begin_active();
 
     boost::optional<Point<dim> >
     qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
         const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
-          = GridTools::find_active_cell_around_point (mapping, this->dof_handler(), p);
+          = GridTools::find_active_cell_around_point (mapping, this->get_dof_handler(), p);
         AssertThrow (my_pair.first->is_locally_owned(),
                      VectorTools::ExcPointNotAvailableHere());
 
@@ -197,7 +197,7 @@ namespace Functions
     fe_v.reinit(cell);
     std::vector< Vector<typename VECTOR::value_type> >
     vvalues (1, Vector<typename VECTOR::value_type>(values.size()));
-    fe_v.get_function_laplacians(this->data(), vvalues);
+    fe_v.get_function_laplacians(this->get_data(), vvalues);
     values = vvalues[0];
   }
 
@@ -231,7 +231,7 @@ namespace Functions
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
-    hp::FECollection<dim> fe_collection (this->dof_handler().get_fe ());
+    hp::FECollection<dim> fe_collection (this->get_dof_handler().get_fe ());
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i)
@@ -252,7 +252,7 @@ namespace Functions
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
         std::vector< Vector<typename VECTOR::value_type> > vvalues (nq, Vector<typename VECTOR::value_type>(n_components));
-        fe_v.get_present_fe_values ().get_function_values(this->data(), vvalues);
+        fe_v.get_present_fe_values ().get_function_values(this->get_data(), vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
       }
@@ -293,7 +293,7 @@ namespace Functions
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
-    hp::FECollection<dim> fe_collection (this->dof_handler().get_fe ());
+    hp::FECollection<dim> fe_collection (this->get_dof_handler().get_fe ());
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i)
@@ -315,7 +315,7 @@ namespace Functions
         const unsigned int nq = qpoints[i].size();
         std::vector< std::vector<Tensor<1,dim,typename VECTOR::value_type> > >
         vgrads (nq, std::vector<Tensor<1,dim,typename VECTOR::value_type> >(n_components));
-        fe_v.get_present_fe_values ().get_function_gradients(this->data(), vgrads);
+        fe_v.get_present_fe_values ().get_function_gradients(this->get_data(), vgrads);
         for (unsigned int q=0; q<nq; ++q)
           {
             const unsigned int s = vgrads[q].size();
@@ -358,7 +358,7 @@ namespace Functions
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
-    hp::FECollection<dim> fe_collection (this->dof_handler().get_fe ());
+    hp::FECollection<dim> fe_collection (this->get_dof_handler().get_fe ());
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i)
@@ -379,7 +379,7 @@ namespace Functions
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
         std::vector< Vector<typename VECTOR::value_type> > vvalues (nq, Vector<typename VECTOR::value_type>(n_components));
-        fe_v.get_present_fe_values ().get_function_laplacians(this->data(), vvalues);
+        fe_v.get_present_fe_values ().get_function_laplacians(this->get_data(), vvalues);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vvalues[q];
       }
@@ -430,8 +430,8 @@ namespace Functions
 
     // Current quadrature point
     typename DH::active_cell_iterator cell = cell_hint.get();
-    if (cell == this->dof_handler().end())
-      cell = this->dof_handler().begin_active();
+    if (cell == this->get_dof_handler().end())
+      cell = this->get_dof_handler().begin_active();
 
     {
       // see if the point is
@@ -454,7 +454,7 @@ namespace Functions
         {
           const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> >
           my_pair  = GridTools::find_active_cell_around_point
-                     (mapping, this->dof_handler(), points[0]);
+                     (mapping, this->get_dof_handler(), points[0]);
           AssertThrow (my_pair.first->is_locally_owned(),
                        VectorTools::ExcPointNotAvailableHere());
 
@@ -518,7 +518,7 @@ namespace Functions
         if (left_over == true)
           {
             const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DH>::type, Point<dim> > my_pair
-              = GridTools::find_active_cell_around_point (mapping, this->dof_handler(), points[first_outside]);
+              = GridTools::find_active_cell_around_point (mapping, this->get_dof_handler(), points[first_outside]);
             AssertThrow (my_pair.first->is_locally_owned(),
                          VectorTools::ExcPointNotAvailableHere());
 

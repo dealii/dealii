@@ -20,6 +20,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/parallel_block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -74,14 +75,79 @@ namespace
 
 }
 
+//----------------------------------------------------------------------//
+
+template <class DH, class VECTOR>
+const ConstraintMatrix DoFVector<DH, VECTOR>::no_constraints;
 
 
 template <class DH, class VECTOR>
-inline
+DoFVector<DH, VECTOR>::DoFVector (const DH &dh, const ConstraintMatrix &co)
+  : dh(&dh),
+    constraints(&co),
+    my_data(0),
+    other_data(0)
+{
+  my_data = mem.alloc();
+}
+
+
+template <class DH, class VECTOR>
+DoFVector<DH, VECTOR>::DoFVector (const DH &dh)
+  : dh(&dh),
+    constraints(&no_constraints),
+    my_data(0),
+    other_data(0)
+{
+  my_data = mem.alloc();
+}
+
+
+template <class DH, class VECTOR>
+DoFVector<DH, VECTOR>::DoFVector (const DH &dh, const ConstraintMatrix &co, const VECTOR &v)
+  : dh(&dh),
+    constraints(&co),
+    my_data(0),
+    other_data(&v)
+{}
+
+
+template <class DH, class VECTOR>
+DoFVector<DH, VECTOR>::DoFVector (const DH &dh, const VECTOR &v)
+  : dh(&dh),
+    constraints(&no_constraints),
+    my_data(0),
+    other_data(&v)
+{}
+
+
+template <class DH, class VECTOR>
+DoFVector<DH, VECTOR> &
+DoFVector<DH, VECTOR>::operator= (const DoFVector<DH, VECTOR> &other)
+{
+  Assert(other_data == 0, ExcNotOwner());
+
+  dh = &other.get_dof_handler();
+  constraints = &other.get_constraint_matrix();
+  *my_data = other.get_data();
+  return *this;
+}
+
+
+template <class DH, class VECTOR>
+DoFVector<DH, VECTOR>::~DoFVector ()
+{
+  if (my_data != 0)
+    mem.free(my_data);
+}
+
+
+template <class DH, class VECTOR>
 void
 DoFVector<DH, VECTOR>::sync ()
 {
-  reinit_dof_vector(dof_handler(), data());
+  Assert(other_data == 0, ExcNotOwner());
+  reinit_dof_vector(get_dof_handler(), get_data());
 }
 
 

@@ -52,7 +52,7 @@ namespace Functions
    *
    * @note This function is not intended for assembling a vector or a
    * matrix on a cell-by-cell basis. Tailored access through FEValues
-   * or similar is recommended then. In such a case, the base class
+   * or similar is recommended then. In such a case, the class
    * DoFVector may be helpful.
    *
    * If you know in advance in which cell your points lie, you can accelerate

@@ -17,10 +17,9 @@ for (VEC : SERIAL_VECTORS ; DH : DOFHANDLER_TEMPLATES ; deal_II_dimension : DIME
   {
 #if deal_II_dimension <= deal_II_space_dimension
     template
-    void DoFVector< DH<deal_II_dimension,deal_II_space_dimension>, VEC>::sync ();
+    class DoFVector< DH<deal_II_dimension,deal_II_space_dimension>, VEC>;
 
     template
-    void DoFVector< DH<deal_II_dimension,deal_II_space_dimension>,
-      MGLevelObject<VEC> >::sync ();
+    class DoFVector< DH<deal_II_dimension,deal_II_space_dimension>, MGLevelObject<VEC> >;
 #endif
   }
