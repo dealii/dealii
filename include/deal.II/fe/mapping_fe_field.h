@@ -571,7 +571,7 @@ private:
    * detailed information.
    */
   virtual
-  typename Mapping<dim,spacedim>::InternalDataBase *
+  InternalData *
   get_data (const UpdateFlags,
             const Quadrature<dim> &quadrature) const;
 

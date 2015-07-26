@@ -328,7 +328,8 @@ MappingFEField<dim,spacedim,VECTOR,DH>::compute_face_data (const UpdateFlags upd
 
 
 template<int dim, int spacedim, class VECTOR, class DH>
-typename Mapping<dim,spacedim>::InternalDataBase *
+typename
+MappingFEField<dim,spacedim,VECTOR,DH>::InternalData *
 MappingFEField<dim,spacedim,VECTOR,DH>::get_data (const UpdateFlags update_flags,
                                                   const Quadrature<dim> &quadrature) const
 {
@@ -781,8 +782,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 //  p.
   const Quadrature<dim> point_quadrature(p);
   std_cxx11::unique_ptr<InternalData>
-  mdata (dynamic_cast<InternalData *> (
-           get_data(update_transformation_values, point_quadrature)));
+  mdata (get_data(update_transformation_values, point_quadrature));
 
   update_internal_dofs(cell, *mdata);
 
@@ -843,8 +843,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
   std_cxx11::unique_ptr<InternalData>
-  mdata (dynamic_cast<InternalData *> (
-           get_data(update_flags,point_quadrature)));
+  mdata (get_data(update_flags,point_quadrature));
 
   update_internal_dofs(cell, *mdata);
 
