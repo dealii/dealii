@@ -329,6 +329,18 @@ public:
      * used for the euler vector and the euler dof handler.
      */
     ComponentMask mask;
+
+
+    /**
+     * Storage for the indices of the local degrees of freedom.
+     */
+    std::vector<types::global_dof_index> local_dof_indices;
+
+
+    /**
+     * Storage for local degrees of freedom.
+     */
+    std::vector<double> local_dof_values;
   };
 
 
@@ -509,21 +521,8 @@ private:
   /**
    * Update internal degrees of freedom.
    */
-  void update_internal_dofs(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
-
-  /**
-   * It stores the local degrees of freedom of the DH for each cell (i.e.
-   * euler_vector * dof_indices, see method update_internal_dofs for more
-   * clarifications.).
-   */
-  mutable Threads::ThreadLocalStorage <std::vector<double> >  local_dof_values;
-
-  /**
-   * Store the degrees of freedom of the DH for each cell (i.e.
-   * cell->get_dof_indices(dof_indices), see method update_internal_dofs for
-   * more clarifications.). Thread safe.
-   */
-  mutable  Threads::ThreadLocalStorage <std::vector<types::global_dof_index> > local_dof_indices;
+  void update_internal_dofs(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                            typename MappingFEField<dim, spacedim>::InternalData &data) const;
 
   /**
    * Reimplemented from Mapping. See the documentation of the base class for
