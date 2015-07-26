@@ -1223,7 +1223,7 @@ template<int dim, int spacedim, class VECTOR, class DH>
 void
 MappingFEField<dim,spacedim,VECTOR,DH>::update_internal_dofs (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  typename MappingFEField<dim, spacedim>::InternalData &data) const
+  const typename MappingFEField<dim, spacedim>::InternalData &data) const
 {
   Assert(euler_dof_handler != 0, ExcMessage("euler_dof_handler is empty"));
 

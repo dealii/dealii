@@ -340,13 +340,13 @@ public:
     /**
      * Storage for the indices of the local degrees of freedom.
      */
-    std::vector<types::global_dof_index> local_dof_indices;
+    mutable std::vector<types::global_dof_index> local_dof_indices;
 
 
     /**
      * Storage for local degrees of freedom.
      */
-    std::vector<double> local_dof_values;
+    mutable std::vector<double> local_dof_values;
   };
 
 
@@ -528,7 +528,7 @@ private:
    * Update internal degrees of freedom.
    */
   void update_internal_dofs(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                            typename MappingFEField<dim, spacedim>::InternalData &data) const;
+                            const typename MappingFEField<dim, spacedim>::InternalData &data) const;
 
   /**
    * Reimplemented from Mapping. See the documentation of the base class for
