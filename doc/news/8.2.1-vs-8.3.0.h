@@ -393,6 +393,13 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: IndexSet now can be constructed using Epetra_Map.
+  All constructors of TrilinosWrappers::SparseMatrix which use Epetra_Map
+  were marked deprecated. 
+  <br>
+  (Luca Heltai, 2015/07/25)
+  </li>
+
   <li> New: Added the class Functions::Polynomial for representation of polynomials.
   The new class is derived from the Function class.
   <br>
@@ -548,6 +555,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> New: VectorTools::get_position_vector now works with arbitrary
+  FESystems, provided that the geometrical components are primitive, 
+  and that you provide a component mask to select what components of 
+  the finite element to use for the geometrical interpolation.
+  <br>
+  (Luca Heltai, 2015/07/25)
+  </li>
+
   <li> Fixed: parallel::distributed::refine_and_coarsen_fixed_fraction()
   in rare circumstances decided to not refine any cells at all, even
   if the refinement threshold was nonzero. This is now fixed.

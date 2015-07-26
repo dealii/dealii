@@ -64,14 +64,6 @@ inconvenience this causes.
 
 <ol>
 
-  <li> New: IndexSet now can be constructed using Epetra_Map.
-  All constructors of TrilinosWrappers::SparseMatrix which use Epetra_Map
-  were marked deprecated. 
-  <br>
-  (Luca Heltai, 2015/07/25)
-  </li>
-
-
   <li> New: IndexSet now implements iterators.
   <br>
   (Timo Heister, 2015/07/12)
@@ -88,13 +80,6 @@ inconvenience this causes.
 
 
 <ol>
-  <li> New: VectorTools::get_position_vector now works with arbitrary
-  FESystems, provided that the geometrical components are primitive, 
-  and that you provide a component mask to select what components of 
-  the finite element to use for the geometrical interpolation.
-  <br>
-  (Luca Heltai, 2015/07/25)
-  </li>
 
   <li> New: FESystem now does some work in parallel if your system
   has multiple processors.
