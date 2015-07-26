@@ -185,28 +185,6 @@ std::string unify_pretty_function (const std::string &text)
 // ------------------------------ Functions used in initializing subsystems -------------------
 
 
-/*
- * If we run 64 tests at the same time on a 64-core system, and
- * each of them runs 64 threads, then we get astronomical loads.
- * Limit concurrency to a fixed (small) number of threads, independent
- * of the core count.
- *
- * Note that we can't do this if we run in MPI mode because then
- * MPI_InitFinalize already calls this function. Since every test
- * calls MPI_InitFinalize itself, we can't adjust the thread count
- * for this here.
- */
-#if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_TEST_DO_NOT_SET_THREAD_LIMIT)
-struct LimitConcurrency
-{
-  LimitConcurrency ()
-  {
-    MultithreadInfo::set_thread_limit (5);
-  }
-} limit_concurrency;
-#endif
-
-
 
 #ifdef DEAL_II_WITH_PETSC
 #include <petscsys.h>
