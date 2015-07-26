@@ -64,6 +64,14 @@ inconvenience this causes.
 
 <ol>
 
+  <li> New: IndexSet now can be constructed using Epetra_Map.
+  All constructors of TrilinosWrappers::SparseMatrix which use Epetra_Map
+  were marked deprecated. 
+  <br>
+  (Luca Heltai, 2015/07/25)
+  </li>
+
+
   <li> New: IndexSet now implements iterators.
   <br>
   (Timo Heister, 2015/07/12)

@@ -2310,6 +2310,22 @@ namespace TrilinosWrappers
     return ((sizeof(TrilinosScalar)+sizeof(TrilinosWrappers::types::int_type))*
             matrix->NumMyNonzeros() + sizeof(int)*local_size() + static_memory);
   }
+
+  MPI_Comm SparseMatrix::get_mpi_communicator () const
+  {
+
+#ifdef DEAL_II_WITH_MPI
+
+    const Epetra_MpiComm *mpi_comm
+      = dynamic_cast<const Epetra_MpiComm *>(&range_partitioner().Comm());
+    return mpi_comm->Comm();
+#else
+
+    return MPI_COMM_SELF;
+
+#endif
+
+  }
 }
 
 

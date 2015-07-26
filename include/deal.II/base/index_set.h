@@ -104,6 +104,14 @@ public:
    */
   explicit IndexSet (const size_type size);
 
+
+#ifdef DEAL_II_WITH_TRILINOS
+  /**
+   * Constructor from a trilinos Epetra_Map.
+   */
+  IndexSet(const Epetra_Map &map);
+#endif
+
   /**
    * Remove all indices from this index set. The index set retains its size,
    * however.
@@ -1198,6 +1206,28 @@ IndexSet::IndexSet (const size_type size)
 
 
 
+
+#ifdef DEAL_II_WITH_TRILINOS
+inline
+IndexSet::IndexSet (const Epetra_Map &map)
+  :
+  is_compressed (true),
+  index_space_size (map.NumGlobalElements()),
+  largest_range (numbers::invalid_unsigned_int)
+{
+  const size_type n_indices = map.NumMyElements();
+#ifndef DEAL_II_WITH_64BIT_INDICES
+  unsigned int *indices = (unsigned int *)map.MyGlobalElements();
+#else
+  size_type *indices = (size_type *)map.MyGlobalElements64();
+#endif
+  add_indices(indices, indices+n_indices);
+  compress();
+}
+#endif
+
+
+
 inline
 void
 IndexSet::clear ()
@@ -1206,6 +1236,7 @@ IndexSet::clear ()
   largest_range = 0;
   is_compressed = true;
 }
+
 
 
 inline
