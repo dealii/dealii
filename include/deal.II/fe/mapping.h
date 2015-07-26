@@ -283,7 +283,7 @@ public:
    * Ownership of the object created by Mapping::get_data() is then transferred
    * to the FEValues object,
    * but a reference to this object is passed to the mapping object every
-   * time it it is asked to compute information on a concrete cell. This
+   * time it is asked to compute information on a concrete cell. This
    * happens when FEValues::reinit() (or the corresponding classes in
    * FEFaceValues and FESubfaceValues) call Mapping::fill_fe_values()
    * (and similarly via Mapping::fill_fe_face_values() and
