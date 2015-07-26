@@ -7177,33 +7177,103 @@ namespace VectorTools
         // Once we have this, interpolate with the given finite element
         // to get a Mapping which is interpolatory at the support points
         // of FE_Q(fe.degree())
-        FESystem<dim,spacedim> feq(FE_Q<dim,spacedim>(fe.degree), spacedim);
+        const FESystem<dim,spacedim> *fe_system = dynamic_cast<const FESystem<dim, spacedim> *>(&fe);
+        Assert(fe_system, ExcNotImplemented());
+        unsigned int degree = numbers::invalid_unsigned_int;
+
+        // Get information about the blocks
+        for (unsigned int i=0; i<fe_mask.size(); ++i)
+          if (fe_mask[i])
+            {
+              const unsigned int base_i = fe_system->component_to_base_index(i).first;
+              Assert(degree == numbers::invalid_unsigned_int ||
+                     degree == fe_system->base_element(base_i).degree,
+                     ExcNotImplemented());
+              Assert(fe_system->base_element(base_i).is_primitive(),
+                     ExcNotImplemented());
+              degree = fe_system->base_element(base_i).degree;
+            }
+
+        // We create an intermediate FE_Q vector space, and then
+        // interpolate from that vector space to this one, by
+        // carefully selecting the right components.
+
+        FESystem<dim,spacedim> feq(FE_Q<dim,spacedim>(degree), spacedim);
         DH dhq(dh.get_tria());
         dhq.distribute_dofs(feq);
         Vector<double> eulerq(dhq.n_dofs());
         const ComponentMask maskq(spacedim, true);
         get_position_vector(dhq, eulerq);
 
-        FullMatrix<double> transfer(fe.dofs_per_cell);
+        FullMatrix<double> transfer(fe.dofs_per_cell, feq.dofs_per_cell);
+        FullMatrix<double> local_transfer(feq.dofs_per_cell);
         const std::vector<Point<dim> > &points = feq.get_unit_support_points();
 
-        // Here construct the interpolation matrix from FE_Q^spacedim to
-        // the FiniteElement used by euler_dof_handler.
+        // Here we construct the interpolation matrix from
+        // FE_Q^spacedim to the FiniteElement used by
+        // euler_dof_handler.
         //
-        // The interpolation matrix is then passed to the
-        // VectorTools::interpolate() function to generate
+        // In order to construct such interpolation matrix, we have to
+        // solve the following system:
+        //
+        // v_j phi_j(q_i) = w_k psi_k(q_i) = w_k delta_ki = w_i
+        //
+        // where psi_k are the basis functions for fe_q, and phi_i are
+        // the basis functions of the target space while q_i are the
+        // support points for the fe_q space. With this choice of
+        // interpolation points, on the matrices is the identity
+        // matrix, and we have to invert only one matrix. The
+        // resulting vector will be interpolatory at the support
+        // points of fe_q, even if the finite element does not have
+        // support points.
+        //
+        // Morally, we should invert the matrix T_ij = phi_i(q_j),
+        // however in general this matrix is not invertible, since
+        // there may be components which do not contribute to the
+        // displacement vector. Since we are not interested in those
+        // components, we construct a square matrix with the same
+        // number of components of the FE_Q system. The FE_Q system
+        // was constructed above in such a way that the polynomial
+        // degree of the FE_Q system and that of the given FE are the
+        // same on the cell, which should guarantee that, for the
+        // displacement components only, the interpolation matrix is
+        // invertible. We construct a mapping between indices first,
+        // and check that this is the case. If not, we bail out, not
+        // knowing what to do in this case.
+
+        std::vector<unsigned int> fe_to_feq(fe.dofs_per_cell, numbers::invalid_unsigned_int);
+        unsigned int index=0;
         for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+          if (fe_mask[fe.system_to_component_index(i).first])
+            fe_to_feq[i] = index++;
+
+        // If index is not the same as feq.dofs_per_cell, we won't
+        // know how to invert the resulting matrix. Bail out.
+        Assert(index == feq.dofs_per_cell, ExcNotImplemented());
+
+        for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
           {
-            unsigned int comp_i = fe.system_to_component_index(i).first;
-            if (fe_mask[comp_i])
-              for (unsigned int j=0; j<points.size(); ++j)
+            const unsigned int comp_j = fe.system_to_component_index(j).first;
+            if (fe_mask[comp_j])
+              for (unsigned int i=0; i<points.size(); ++i)
                 {
-                  if ( fe_to_real[comp_i] == feq.system_to_component_index(j).first)
-                    transfer(j, i) = fe.shape_value(i, points[j]);
+                  if ( fe_to_real[comp_j] == feq.system_to_component_index(i).first)
+                    local_transfer(i, fe_to_feq[j]) = fe.shape_value(j, points[i]);
                 }
           }
 
-        transfer.invert(transfer);
+        // Now we construct the rectangular interpolation matrix. This
+        // one is filled only with the information from the components
+        // of the displacement. The rest is set to zero.
+        local_transfer.invert(local_transfer);
+        for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+          if (fe_to_feq[i] != numbers::invalid_unsigned_int)
+            for (unsigned int j=0; j<feq.dofs_per_cell; ++j)
+              transfer(i, j) = local_transfer(fe_to_feq[i], j);
+
+        // The interpolation matrix is then passed to the
+        // VectorTools::interpolate() function to generate the correct
+        // interpolation.
         interpolate(dhq, dh, transfer, eulerq, vector);
       }
   }
