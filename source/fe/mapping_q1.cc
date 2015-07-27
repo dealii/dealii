@@ -1131,20 +1131,17 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
                      FEValuesData<dim,spacedim>                                &output_data) const
 {
-  // ensure that the following cast
-  // is really correct:
+  // ensure that the following cast is really correct:
   Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
-
-  const unsigned int n_q_points = quadrature.size();
 
   compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
                      DataSetDescriptor::face (face_no,
                                               cell->face_orientation(face_no),
                                               cell->face_flip(face_no),
                                               cell->face_rotation(face_no),
-                                              n_q_points),
+                                              quadrature.size()),
                      quadrature,
                      data,
                      output_data);
@@ -1162,20 +1159,17 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
                         FEValuesData<dim,spacedim>                                &output_data) const
 {
-  // ensure that the following cast
-  // is really correct:
+  // ensure that the following cast is really correct:
   Assert (dynamic_cast<const InternalData *>(&internal_data) != 0,
           ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
-
-  const unsigned int n_q_points = quadrature.size();
 
   compute_fill_face (cell, face_no, subface_no,
                      DataSetDescriptor::subface (face_no, subface_no,
                                                  cell->face_orientation(face_no),
                                                  cell->face_flip(face_no),
                                                  cell->face_rotation(face_no),
-                                                 n_q_points,
+                                                 quadrature.size(),
                                                  cell->subface_case(face_no)),
                      quadrature,
                      data,
