@@ -318,28 +318,23 @@ template<int dim, int spacedim>
 CellSimilarity::Similarity
 MappingCartesian<dim, spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                const Quadrature<dim> &q,
-                const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                std::vector<Point<spacedim> > &quadrature_points,
-                std::vector<double> &JxW_values,
-                std::vector< DerivativeForm<1,dim,spacedim> > &jacobians,
-                std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
-                std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
-                std::vector<Point<spacedim> > &,
-                const CellSimilarity::Similarity cell_similarity) const
+                const CellSimilarity::Similarity                           cell_similarity,
+                const Quadrature<dim>                                     &quadrature,
+                const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                FEValuesData<dim,spacedim>                                &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0, ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &> (mapping_data);
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0, ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &> (internal_data);
 
   std::vector<Point<dim> > dummy;
 
   compute_fill (cell, invalid_face_number, invalid_face_number, cell_similarity,
                 data,
-                quadrature_points,
+                output_data.quadrature_points,
                 dummy);
 
   // compute Jacobian
@@ -355,36 +350,37 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
           J *= data.length[d];
         data.volume_element = J;
         if (data.current_update_flags() & update_JxW_values)
-          for (unsigned int i=0; i<JxW_values.size(); ++i)
-            JxW_values[i] = J * q.weight(i);
+          for (unsigned int i=0; i<output_data.JxW_values.size(); ++i)
+            output_data.JxW_values[i] = J * quadrature.weight(i);
       }
   // "compute" Jacobian at the quadrature
   // points, which are all the same
   if (data.current_update_flags() & update_jacobians)
     if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i=0; i<jacobians.size(); ++i)
+      for (unsigned int i=0; i<output_data.jacobians.size(); ++i)
         {
-          jacobians[i] =  DerivativeForm<1,dim,spacedim>();
+          output_data.jacobians[i] =  DerivativeForm<1,dim,spacedim>();
           for (unsigned int j=0; j<dim; ++j)
-            jacobians[i][j][j]=data.length[j];
+            output_data.jacobians[i][j][j] = data.length[j];
         }
   // "compute" the derivative of the Jacobian
   // at the quadrature points, which are all
   // zero of course
   if (data.current_update_flags() & update_jacobian_grads)
     if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i=0; i<jacobian_grads.size(); ++i)
-        jacobian_grads[i]=DerivativeForm<2,dim,spacedim>();
+      for (unsigned int i=0; i<output_data.jacobian_grads.size(); ++i)
+        output_data.jacobian_grads[i]=DerivativeForm<2,dim,spacedim>();
+
   // "compute" inverse Jacobian at the
   // quadrature points, which are all
   // the same
   if (data.current_update_flags() & update_inverse_jacobians)
     if (cell_similarity != CellSimilarity::translation)
-      for (unsigned int i=0; i<inverse_jacobians.size(); ++i)
+      for (unsigned int i=0; i<output_data.inverse_jacobians.size(); ++i)
         {
-          inverse_jacobians[i]=Tensor<2,dim>();
+          output_data.inverse_jacobians[i]=Tensor<2,dim>();
           for (unsigned int j=0; j<dim; ++j)
-            inverse_jacobians[j][j]=1./data.length[j];
+            output_data.inverse_jacobians[j][j]=1./data.length[j];
         }
 
   return cell_similarity;
@@ -394,31 +390,26 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
 template<int dim, int spacedim>
 void
-MappingCartesian<dim, spacedim>::fill_fe_face_values (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int             face_no,
-  const Quadrature<dim-1>       &q,
-  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  std::vector<Point<dim> >      &quadrature_points,
-  std::vector<double>           &JxW_values,
-  std::vector<Tensor<1,dim> >   &boundary_forms,
-  std::vector<Point<spacedim> > &normal_vectors,
-  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
+MappingCartesian<dim, spacedim>::
+fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                     const unsigned int                                         face_no,
+                     const Quadrature<dim-1>                                   &quadrature,
+                     const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                     FEValuesData<dim,spacedim>                                &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0,
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0,
           ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &> (mapping_data);
+  const InternalData &data = static_cast<const InternalData &> (internal_data);
 
   compute_fill (cell, face_no, invalid_face_number,
                 CellSimilarity::none,
                 data,
-                quadrature_points,
-                normal_vectors);
+                output_data.quadrature_points,
+                output_data.normal_vectors);
 
   // first compute Jacobian
   // determinant, which is simply the
@@ -430,12 +421,12 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (
       J *= data.length[d];
 
   if (data.current_update_flags() & update_JxW_values)
-    for (unsigned int i=0; i<JxW_values.size(); ++i)
-      JxW_values[i] = J * q.weight(i);
+    for (unsigned int i=0; i<output_data.JxW_values.size(); ++i)
+      output_data.JxW_values[i] = J * quadrature.weight(i);
 
   if (data.current_update_flags() & update_boundary_forms)
-    for (unsigned int i=0; i<boundary_forms.size(); ++i)
-      boundary_forms[i] = J * normal_vectors[i];
+    for (unsigned int i=0; i<output_data.boundary_forms.size(); ++i)
+      output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
   if (data.current_update_flags() & update_volume_elements)
     {
@@ -446,19 +437,19 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (
     }
 
   if (data.current_update_flags() & update_jacobians)
-    for (unsigned int i=0; i<jacobians.size(); ++i)
+    for (unsigned int i=0; i<output_data.jacobians.size(); ++i)
       {
-        jacobians[i] = DerivativeForm<1,dim,spacedim>();
+        output_data.jacobians[i] = DerivativeForm<1,dim,spacedim>();
         for (unsigned int d=0; d<dim; ++d)
-          jacobians[i][d][d] = data.length[d];
+          output_data.jacobians[i][d][d] = data.length[d];
       }
 
   if (data.current_update_flags() & update_inverse_jacobians)
-    for (unsigned int i=0; i<inverse_jacobians.size(); ++i)
+    for (unsigned int i=0; i<output_data.inverse_jacobians.size(); ++i)
       {
-        inverse_jacobians[i] = DerivativeForm<1,dim,spacedim>();
+        output_data.inverse_jacobians[i] = DerivativeForm<1,dim,spacedim>();
         for (unsigned int d=0; d<dim; ++d)
-          inverse_jacobians[i][d][d] = 1./data.length[d];
+          output_data.inverse_jacobians[i][d][d] = 1./data.length[d];
       }
 }
 
@@ -466,30 +457,25 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (
 
 template<int dim, int spacedim>
 void
-MappingCartesian<dim, spacedim>::fill_fe_subface_values (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int             face_no,
-  const unsigned int             sub_no,
-  const Quadrature<dim-1>       &q,
-  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  std::vector<Point<dim> >      &quadrature_points,
-  std::vector<double>           &JxW_values,
-  std::vector<Tensor<1,dim> >   &boundary_forms,
-  std::vector<Point<spacedim> > &normal_vectors,
-  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
+MappingCartesian<dim, spacedim>::
+fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                        const unsigned int                                         face_no,
+                        const unsigned int                                         subface_no,
+                        const Quadrature<dim-1>                                   &quadrature,
+                        const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                        FEValuesData<dim,spacedim>                                &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert (dynamic_cast<const InternalData *> (&mapping_data) != 0, ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &> (mapping_data);
+  Assert (dynamic_cast<const InternalData *> (&internal_data) != 0, ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &> (internal_data);
 
-  compute_fill (cell, face_no, sub_no, CellSimilarity::none,
+  compute_fill (cell, face_no, subface_no, CellSimilarity::none,
                 data,
-                quadrature_points,
-                normal_vectors);
+                output_data.quadrature_points,
+                output_data.normal_vectors);
 
   // first compute Jacobian
   // determinant, which is simply the
@@ -516,13 +502,13 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (
         cell->face(face_no)->has_children() ?
         cell->face(face_no)->n_children() :
         GeometryInfo<dim>::max_children_per_face;
-      for (unsigned int i=0; i<JxW_values.size(); ++i)
-        JxW_values[i] = J * q.weight(i) / n_subfaces;
+      for (unsigned int i=0; i<output_data.JxW_values.size(); ++i)
+        output_data.JxW_values[i] = J * quadrature.weight(i) / n_subfaces;
     }
 
   if (data.current_update_flags() & update_boundary_forms)
-    for (unsigned int i=0; i<boundary_forms.size(); ++i)
-      boundary_forms[i] = J * normal_vectors[i];
+    for (unsigned int i=0; i<output_data.boundary_forms.size(); ++i)
+      output_data.boundary_forms[i] = J * output_data.normal_vectors[i];
 
   if (data.current_update_flags() & update_volume_elements)
     {
@@ -533,19 +519,19 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (
     }
 
   if (data.current_update_flags() & update_jacobians)
-    for (unsigned int i=0; i<jacobians.size(); ++i)
+    for (unsigned int i=0; i<output_data.jacobians.size(); ++i)
       {
-        jacobians[i] = DerivativeForm<1,dim,spacedim>();
+        output_data.jacobians[i] = DerivativeForm<1,dim,spacedim>();
         for (unsigned int d=0; d<dim; ++d)
-          jacobians[i][d][d] = data.length[d];
+          output_data.jacobians[i][d][d] = data.length[d];
       }
 
   if (data.current_update_flags() & update_inverse_jacobians)
-    for (unsigned int i=0; i<inverse_jacobians.size(); ++i)
+    for (unsigned int i=0; i<output_data.inverse_jacobians.size(); ++i)
       {
-        inverse_jacobians[i] = DerivativeForm<1,spacedim,dim>();
+        output_data.inverse_jacobians[i] = DerivativeForm<1,spacedim,dim>();
         for (unsigned int d=0; d<dim; ++d)
-          inverse_jacobians[i][d][d] = 1./data.length[d];
+          output_data.inverse_jacobians[i][d][d] = 1./data.length[d];
       }
 }
 

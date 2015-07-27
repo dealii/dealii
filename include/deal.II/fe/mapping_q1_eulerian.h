@@ -122,21 +122,20 @@ public:
 
 protected:
   /**
-   * Implementation of the interface in MappingQ1. Overrides the function in
-   * the base class, since we cannot use any cell similarity for this class.
+   * Compute mapping-related information for a cell.
+   * See the documentation of Mapping::fill_fe_values() for
+   * a discussion of purpose, arguments, and return value of this function.
+   *
+   * This function overrides the function in
+   * the base class since we cannot use any cell similarity for this class.
    */
   virtual
   CellSimilarity::Similarity
   fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                  const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
-                  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-                  typename std::vector<Point<spacedim> >                    &quadrature_points,
-                  std::vector<double>                                       &JxW_values,
-                  std::vector<DerivativeForm<1,dim,spacedim> >       &jacobians,
-                  std::vector<DerivativeForm<2,dim,spacedim>  >       &jacobian_grads,
-                  std::vector<DerivativeForm<1,spacedim,dim>  >       &inverse_jacobians,
-                  std::vector<Point<spacedim> >                             &cell_normal_vectors,
-                  const CellSimilarity::Similarity                           cell_similarity) const;
+                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
+                  FEValuesData<dim,spacedim>                                &output_data) const;
 
   /**
    * Reference to the vector of shifts.
