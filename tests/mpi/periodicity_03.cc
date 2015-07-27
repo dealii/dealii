@@ -843,7 +843,7 @@ int main (int argc, char *argv[])
       using namespace dealii;
       using namespace Step22;
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       deallog.depth_console (0);
 
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD)==0)

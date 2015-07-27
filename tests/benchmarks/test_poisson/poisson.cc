@@ -204,7 +204,7 @@ int main (int argc, char **argv)
 
   try
     {
-      Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
       deallog.depth_console (0);
 
       FE_Q<dimension> fe(element_degree);

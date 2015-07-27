@@ -109,7 +109,7 @@ void test(FiniteElement<dim> &fe)
 
 int main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   initlog();
 
   FE_DGP<2> p0(0);

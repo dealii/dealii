@@ -498,14 +498,13 @@ namespace Step50
 // in step-6:
 int main (int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  using namespace dealii;
+  using namespace Step50;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   mpi_initlog();
 
   try
     {
-      using namespace dealii;
-      using namespace Step50;
-
       LaplaceProblem<2> laplace_problem(1);
       laplace_problem.run ();
     }

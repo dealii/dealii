@@ -62,7 +62,7 @@ int main (int argc,char **argv)
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
         PETScWrappers::SparseMatrix m (5,5,3);
         test (m);

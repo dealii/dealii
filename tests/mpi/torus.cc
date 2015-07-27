@@ -66,7 +66,8 @@ DeclException1(ExcMissingCell,
 
 int main(int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  using namespace dealii;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   MPILogInitAll log;
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)

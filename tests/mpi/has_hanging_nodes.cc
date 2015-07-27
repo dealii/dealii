@@ -144,7 +144,7 @@ int main (int argc, char *argv[])
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
    
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   test_int<2>(0,0);
   test_int<2>(2,0);
   test_int<2>(3,1);

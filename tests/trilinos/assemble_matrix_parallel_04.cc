@@ -465,7 +465,7 @@ int main (int argc, char **argv)
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  Utilities::MPI::MPI_InitFinalize init(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   {
     deallog.push("2d");

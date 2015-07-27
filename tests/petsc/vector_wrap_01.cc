@@ -55,7 +55,7 @@ int main (int argc, char **argv)
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       Vec vpetsc;
       int ierr = VecCreateSeq (PETSC_COMM_SELF, 100, &vpetsc);
       AssertThrow (ierr == 0, ExcPETScError(ierr));

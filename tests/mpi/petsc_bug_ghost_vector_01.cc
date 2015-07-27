@@ -244,7 +244,7 @@ void test ()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
