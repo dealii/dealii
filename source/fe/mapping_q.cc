@@ -334,14 +334,13 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 
   const unsigned int n_q_points = quadrature.size();
   this->compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
-                           n_q_points,
                            QProjector<dim>::DataSetDescriptor::
                            face (face_no,
                                  cell->face_orientation(face_no),
                                  cell->face_flip(face_no),
                                  cell->face_rotation(face_no),
                                  n_q_points),
-                           quadrature.get_weights(),
+                           quadrature,
                            *p_data,
                            output_data);
 }
@@ -383,7 +382,6 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
   const unsigned int n_q_points = quadrature.size();
   this->compute_fill_face (cell, face_no, subface_no,
-                           n_q_points,
                            QProjector<dim>::DataSetDescriptor::
                            subface (face_no, subface_no,
                                     cell->face_orientation(face_no),
@@ -391,7 +389,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                                     cell->face_rotation(face_no),
                                     n_q_points,
                                     cell->subface_case(face_no)),
-                           quadrature.get_weights(),
+                           quadrature,
                            *p_data,
                            output_data);
 }

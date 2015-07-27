@@ -389,22 +389,11 @@ public:
   /**
    * Do the computation for the <tt>fill_*</tt> functions.
    */
-  void compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                     const unsigned int      npts,
-                     const DataSetDescriptor data_set,
-                     const CellSimilarity::Similarity cell_similarity,
-                     const InternalData           &data,
-                     std::vector<Point<spacedim> > &quadrature_points) const;
-
-  /**
-   * Do the computation for the <tt>fill_*</tt> functions.
-   */
   void compute_fill_face (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                           const unsigned int                face_no,
                           const unsigned int                subface_no,
-                          const unsigned int                npts,
                           const DataSetDescriptor           data_set,
-                          const std::vector<double>        &weights,
+                          const Quadrature<dim-1>          &quadrature,
                           const InternalData                     &internal_data,
                           FEValuesData<dim,spacedim>                                &output_data) const;
 
