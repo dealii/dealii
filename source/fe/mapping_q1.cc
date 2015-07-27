@@ -924,21 +924,17 @@ namespace internal
                        const unsigned int               n_q_points,
                        const std::vector<double>        &weights,
                        const typename dealii::MappingQ1<dim,spacedim>::InternalData &data,
-                       std::vector<double>              &JxW_values,
-                       std::vector<Tensor<1,spacedim> > &boundary_forms,
-                       std::vector<Point<spacedim> >    &normal_vectors,
-                       std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-                       std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians)
+                       FEValuesData<dim,spacedim>                                   &output_data)
     {
       const UpdateFlags update_flags(data.current_update_flags());
 
       if (update_flags & update_boundary_forms)
         {
-          AssertDimension (boundary_forms.size(), n_q_points);
+          AssertDimension (output_data.boundary_forms.size(), n_q_points);
           if (update_flags & update_normal_vectors)
-            AssertDimension (normal_vectors.size(), n_q_points);
+            AssertDimension (output_data.normal_vectors.size(), n_q_points);
           if (update_flags & update_JxW_values)
-            AssertDimension (JxW_values.size(), n_q_points);
+            AssertDimension (output_data.JxW_values.size(), n_q_points);
 
           // map the unit tangentials to the real cell. checking for d!=dim-1
           // eliminates compiler warnings regarding unsigned int expressions <
@@ -970,14 +966,14 @@ namespace internal
                     // fields (because it has only dim-1 components), but we
                     // can still compute the boundary form by simply
                     // looking at the number of the face
-                    boundary_forms[i][0] = (face_no == 0 ?
-                                            -1 : +1);
+                    output_data.boundary_forms[i][0] = (face_no == 0 ?
+                                                        -1 : +1);
                     break;
                   case 2:
-                    cross_product (boundary_forms[i], data.aux[0][i]);
+                    cross_product (output_data.boundary_forms[i], data.aux[0][i]);
                     break;
                   case 3:
-                    cross_product (boundary_forms[i], data.aux[0][i], data.aux[1][i]);
+                    cross_product (output_data.boundary_forms[i], data.aux[0][i], data.aux[1][i]);
                     break;
                   default:
                     Assert(false, ExcNotImplemented());
@@ -998,9 +994,9 @@ namespace internal
                   if (dim==1)
                     {
                       // J is a tangent vector
-                      boundary_forms[point] = data.contravariant[point].transpose()[0];
-                      boundary_forms[point] /=
-                        (face_no == 0 ? -1. : +1.) * boundary_forms[point].norm();
+                      output_data.boundary_forms[point] = data.contravariant[point].transpose()[0];
+                      output_data.boundary_forms[point] /=
+                        (face_no == 0 ? -1. : +1.) * output_data.boundary_forms[point].norm();
 
                     }
 
@@ -1014,7 +1010,7 @@ namespace internal
 
                       // then compute the face normal from the face tangent
                       // and the cell normal:
-                      cross_product (boundary_forms[point],
+                      cross_product (output_data.boundary_forms[point],
                                      data.aux[0][point], cell_normal);
 
                     }
@@ -1026,31 +1022,32 @@ namespace internal
 
           if (update_flags & (update_normal_vectors
                               | update_JxW_values))
-            for (unsigned int i=0; i<boundary_forms.size(); ++i)
+            for (unsigned int i=0; i<output_data.boundary_forms.size(); ++i)
               {
                 if (update_flags & update_JxW_values)
                   {
-                    JxW_values[i] = boundary_forms[i].norm() * weights[i];
+                    output_data.JxW_values[i] = output_data.boundary_forms[i].norm() * weights[i];
 
                     if (subface_no!=numbers::invalid_unsigned_int)
                       {
                         const double area_ratio=GeometryInfo<dim>::subface_ratio(
                                                   cell->subface_case(face_no), subface_no);
-                        JxW_values[i] *= area_ratio;
+                        output_data.JxW_values[i] *= area_ratio;
                       }
                   }
 
                 if (update_flags & update_normal_vectors)
-                  normal_vectors[i] = Point<spacedim>(boundary_forms[i] / boundary_forms[i].norm());
+                  output_data.normal_vectors[i] = Point<spacedim>(output_data.boundary_forms[i] /
+                                                                  output_data.boundary_forms[i].norm());
               }
 
           if (update_flags & update_jacobians)
             for (unsigned int point=0; point<n_q_points; ++point)
-              jacobians[point] = data.contravariant[point];
+              output_data.jacobians[point] = data.contravariant[point];
 
           if (update_flags & update_inverse_jacobians)
             for (unsigned int point=0; point<n_q_points; ++point)
-              inverse_jacobians[point] = data.covariant[point].transpose();
+              output_data.inverse_jacobians[point] = data.covariant[point].transpose();
         }
     }
   }
@@ -1061,28 +1058,23 @@ namespace internal
 
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::compute_fill_face (
-  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-  const unsigned int               face_no,
-  const unsigned int               subface_no,
-  const unsigned int               n_q_points,
-  const DataSetDescriptor          data_set,
-  const std::vector<double>        &weights,
-  const InternalData                     &data,
-  std::vector<Point<spacedim> >    &quadrature_points,
-  std::vector<double>              &JxW_values,
-  std::vector<Tensor<1,spacedim> > &boundary_forms,
-  std::vector<Point<spacedim> >    &normal_vectors,
-  std::vector<DerivativeForm<1,dim,spacedim> > &jacobians,
-  std::vector<DerivativeForm<1,spacedim,dim> > &inverse_jacobians) const
+MappingQ1<dim,spacedim>::
+compute_fill_face (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                   const unsigned int               face_no,
+                   const unsigned int               subface_no,
+                   const unsigned int               n_q_points,
+                   const DataSetDescriptor          data_set,
+                   const std::vector<double>        &weights,
+                   const InternalData                     &internal_data,
+                   FEValuesData<dim,spacedim>                                &output_data) const
 {
   compute_fill (cell, n_q_points, data_set, CellSimilarity::none,
-                data, quadrature_points);
+                internal_data,
+                output_data.quadrature_points);
   internal::compute_fill_face (*this,
                                cell, face_no, subface_no, n_q_points,
-                               weights, data,
-                               JxW_values, boundary_forms, normal_vectors,
-                               jacobians, inverse_jacobians);
+                               weights, internal_data,
+                               output_data);
 }
 
 
@@ -1112,12 +1104,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                                               n_q_points),
                      quadrature.get_weights(),
                      data,
-                     output_data.quadrature_points,
-                     output_data.JxW_values,
-                     output_data.boundary_forms,
-                     output_data.normal_vectors,
-                     output_data.jacobians,
-                     output_data.inverse_jacobians);
+                     output_data);
 }
 
 
@@ -1150,12 +1137,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                                                  cell->subface_case(face_no)),
                      quadrature.get_weights(),
                      data,
-                     output_data.quadrature_points,
-                     output_data.JxW_values,
-                     output_data.boundary_forms,
-                     output_data.normal_vectors,
-                     output_data.jacobians,
-                     output_data.inverse_jacobians);
+                     output_data);
 }
 
 

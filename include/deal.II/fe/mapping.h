@@ -740,7 +740,10 @@ private:
    *   return value of this function).
    * @param[in] quadrature A reference to the quadrature formula in use
    *   for the current evaluation. This quadrature object is the same
-   *   as the one used when creating the @p internal_data object
+   *   as the one used when creating the @p internal_data object. The
+   *   object is used both to map the location of quadrature points,
+   *   as well as to compute the JxW values for each quadrature
+   *   point (which involves the quadrature weights).
    * @param[in] internal_data A reference to an object previously
    *   created by get_data() and that may be used to store information
    *   the mapping can compute once on the reference cell. See the
@@ -789,7 +792,10 @@ private:
    *   information is requested.
    * @param[in] quadrature A reference to the quadrature formula in use
    *   for the current evaluation. This quadrature object is the same
-   *   as the one used when creating the @p internal_data object
+   *   as the one used when creating the @p internal_data object. The
+   *   object is used both to map the location of quadrature points,
+   *   as well as to compute the JxW values for each quadrature
+   *   point (which involves the quadrature weights).
    * @param[in] internal_data A reference to an object previously
    *   created by get_data() and that may be used to store information
    *   the mapping can compute once on the reference cell. See the
@@ -822,7 +828,10 @@ private:
    *   given cell for which information is requested.
    * @param[in] quadrature A reference to the quadrature formula in use
    *   for the current evaluation. This quadrature object is the same
-   *   as the one used when creating the @p internal_data object
+   *   as the one used when creating the @p internal_data object. The
+   *   object is used both to map the location of quadrature points,
+   *   as well as to compute the JxW values for each quadrature
+   *   point (which involves the quadrature weights).
    * @param[in] internal_data A reference to an object previously
    *   created by get_data() and that may be used to store information
    *   the mapping can compute once on the reference cell. See the

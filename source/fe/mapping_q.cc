@@ -343,12 +343,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                                  n_q_points),
                            quadrature.get_weights(),
                            *p_data,
-                           output_data.quadrature_points,
-                           output_data.JxW_values,
-                           output_data.boundary_forms,
-                           output_data.normal_vectors,
-                           output_data.jacobians,
-                           output_data.inverse_jacobians);
+                           output_data);
 }
 
 
@@ -398,12 +393,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                                     cell->subface_case(face_no)),
                            quadrature.get_weights(),
                            *p_data,
-                           output_data.quadrature_points,
-                           output_data.JxW_values,
-                           output_data.boundary_forms,
-                           output_data.normal_vectors,
-                           output_data.jacobians,
-                           output_data.inverse_jacobians);
+                           output_data);
 }
 
 
