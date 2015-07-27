@@ -1668,8 +1668,8 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       if (spacedim>dim)
         update_flags |= update_jacobian_grads;
 
-      std_cxx11::unique_ptr<InternalData> mdata(get_data(update_flags,
-                                                         point_quadrature));
+      std_cxx11::unique_ptr<InternalData> mdata(MappingQ1<dim,spacedim>::get_data(update_flags,
+                                                point_quadrature));
 
       compute_mapping_support_points (cell, mdata->mapping_support_points);
       // The support points have to be at
