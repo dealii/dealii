@@ -633,19 +633,25 @@ namespace parallel
           // make sure that there are not outstanding requests from updating
           // ghost values or compress
           int flag = 1;
-          int ierr = MPI_Testall (update_ghost_values_requests.size(),
-                                  &update_ghost_values_requests[0],
-                                  &flag, MPI_STATUSES_IGNORE);
-          Assert (ierr == MPI_SUCCESS, ExcInternalError());
-          Assert (flag == 1,
-                  ExcMessage("MPI found unfinished update_ghost_values() requests"
-                             "when calling swap, which is not allowed"));
-          ierr = MPI_Testall (compress_requests.size(), &compress_requests[0],
-                              &flag, MPI_STATUSES_IGNORE);
-          Assert (ierr == MPI_SUCCESS, ExcInternalError());
-          Assert (flag == 1,
-                  ExcMessage("MPI found unfinished compress() requests "
-                             "when calling swap, which is not allowed"));
+          if (update_ghost_values_requests.size()>0)
+            {
+              int ierr = MPI_Testall (update_ghost_values_requests.size(),
+                                      &update_ghost_values_requests[0],
+                                      &flag, MPI_STATUSES_IGNORE);
+              Assert (ierr == MPI_SUCCESS, ExcInternalError());
+              Assert (flag == 1,
+                      ExcMessage("MPI found unfinished update_ghost_values() requests"
+                                 "when calling swap, which is not allowed"));
+            }
+          if (compress_requests.size()>0)
+            {
+              int ierr = MPI_Testall (compress_requests.size(), &compress_requests[0],
+                                      &flag, MPI_STATUSES_IGNORE);
+              Assert (ierr == MPI_SUCCESS, ExcInternalError());
+              Assert (flag == 1,
+                      ExcMessage("MPI found unfinished compress() requests "
+                                 "when calling swap, which is not allowed"));
+            }
         }
 #endif
 
