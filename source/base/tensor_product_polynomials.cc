@@ -357,13 +357,19 @@ AnisotropicPolynomials<dim>::
 compute_index (const unsigned int i,
                unsigned int       (&indices)[dim]) const
 {
+#ifdef DEBUG
   unsigned int n_poly = 1;
   for (unsigned int d=0; d<dim; ++d)
     n_poly *= polynomials[d].size();
   Assert (i < n_poly, ExcInternalError());
+#endif
 
-  internal::compute_tensor_index(i, polynomials[0].size(),
-                                 polynomials[1].size(), indices);
+  if (dim==1)
+    internal::compute_tensor_index(i, polynomials[0].size(),
+                                   0 /*not used*/, indices);
+  else
+    internal::compute_tensor_index(i, polynomials[0].size(),
+                                   polynomials[1].size(), indices);
 }
 
 
