@@ -320,29 +320,23 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
   // is in the interior, as the mapping on the face depends on the mapping of
   // the cell, which in turn depends on the fact whether _any_ of the faces of
   // this cell is at the boundary, not only the present face
-  data.use_mapping_q1_on_current_cell=!(use_mapping_q_on_all_cells
-                                        || cell->has_boundary_lines());
+  data.use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
+                                          || cell->has_boundary_lines());
 
   // depending on this result, use this or the other data object for the
-  // mapping
+  // mapping and call the function in the base class with this
+  // data object to do the work
   const typename MappingQ1<dim,spacedim>::InternalData *p_data
     = (data.use_mapping_q1_on_current_cell
        ?
        &data.mapping_q1_data
        :
        &data);
-
-  const unsigned int n_q_points = quadrature.size();
-  this->compute_fill_face (cell, face_no, numbers::invalid_unsigned_int,
-                           QProjector<dim>::DataSetDescriptor::
-                           face (face_no,
-                                 cell->face_orientation(face_no),
-                                 cell->face_flip(face_no),
-                                 cell->face_rotation(face_no),
-                                 n_q_points),
-                           quadrature,
-                           *p_data,
-                           output_data);
+  MappingQ1<dim,spacedim>::fill_fe_face_values(cell,
+                                               face_no,
+                                               quadrature,
+                                               *p_data,
+                                               output_data);
 }
 
 
@@ -368,30 +362,24 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
   // is in the interior, as the mapping on the face depends on the mapping of
   // the cell, which in turn depends on the fact whether _any_ of the faces of
   // this cell is at the boundary, not only the present face
-  data.use_mapping_q1_on_current_cell=!(use_mapping_q_on_all_cells
-                                        || cell->has_boundary_lines());
+  data.use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
+                                          || cell->has_boundary_lines());
 
   // depending on this result, use this or the other data object for the
-  // mapping
+  // mapping and call the function in the base class with this
+  // data object to do the work
   const typename MappingQ1<dim,spacedim>::InternalData *p_data
     = (data.use_mapping_q1_on_current_cell
        ?
        &data.mapping_q1_data
        :
        &data);
-
-  const unsigned int n_q_points = quadrature.size();
-  this->compute_fill_face (cell, face_no, subface_no,
-                           QProjector<dim>::DataSetDescriptor::
-                           subface (face_no, subface_no,
-                                    cell->face_orientation(face_no),
-                                    cell->face_flip(face_no),
-                                    cell->face_rotation(face_no),
-                                    n_q_points,
-                                    cell->subface_case(face_no)),
-                           quadrature,
-                           *p_data,
-                           output_data);
+  MappingQ1<dim,spacedim>::fill_fe_subface_values(cell,
+                                                  face_no,
+                                                  subface_no,
+                                                  quadrature,
+                                                  *p_data,
+                                                  output_data);
 }
 
 
