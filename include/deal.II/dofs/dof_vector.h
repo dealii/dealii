@@ -28,11 +28,14 @@ DEAL_II_NAMESPACE_OPEN
  * with the handler.
  *
  * This class encapsulates a data vector with the finite element space
- * information associated with it, such that every function which is
- * not purely algebraic can assogiate the right finite element
- * function with the data vector. Thus, functions only need a single
- * argument of type DoFVector instead of several arguments with
- * separate information on data and finite element space.  To begin,
+ * information associated with it, such that every operation which
+ * needs function values of a finite element function, namely every
+ * operation which is not purely algebraic can associate the right
+ * finite element space with the data vector. Thus, functions
+ * implementing such operations need only a single argument of type
+ * DoFVector instead of currently at least three arguments with
+ * separate information on data and finite element space (the latter
+ * being contributed by DoFHandler and ConstraintMatrix).  To begin,
  * it is implemented in a minimally intrusive way, giving access to
  * both structures.
  *
@@ -215,13 +218,13 @@ private:
 
   /**
    * The actual data vector, if owned by this object. This pointer
-   * nonzero implies #other_data is zero.
+   * being nonzero implies #other_data is zero.
    */
   VECTOR *my_data;
 
   /**
    * The data vector if referencing a vector not owned by this
-   * object. This pointer nonzero implies #my_data is zero.
+   * object. This pointer being nonzero implies #my_data is zero.
    */
   SmartPointer<const VECTOR, DoFVector<DH, VECTOR> > other_data;
 };
