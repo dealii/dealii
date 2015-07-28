@@ -128,6 +128,7 @@
 #cmakedefine DEAL_II_HAVE_GETPID
 #cmakedefine DEAL_II_HAVE_TIMES
 #cmakedefine DEAL_II_HAVE_JN
+#cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 
 #cmakedefine DEAL_II_MSVC
 
