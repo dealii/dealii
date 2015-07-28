@@ -138,8 +138,8 @@ main()
   try
     {
       std::ofstream logfile(output_file_name.c_str());
-      logfile << std::setprecision (2);
-      deallog << std::setprecision (2);
+      logfile << std::setprecision (8);
+      deallog << std::setprecision (8);
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
