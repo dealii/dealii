@@ -109,7 +109,7 @@ public:
   /**
    * Constructor from a trilinos Epetra_Map.
    */
-  IndexSet(const Epetra_Map &map);
+  explicit IndexSet(const Epetra_Map &map);
 #endif
 
   /**
