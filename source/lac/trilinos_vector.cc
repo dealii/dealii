@@ -474,10 +474,11 @@ namespace TrilinosWrappers
               ExcMessage ("The input vector has overlapping data, "
                           "which is not allowed."));
 
-      if (vector->Map().SameAs(m.col_partitioner()) == false)
+      if (vector->Map().SameAs(m.trilinos_matrix().ColMap()) == false)
         {
-          Epetra_Map map = m.col_partitioner();
-          vector.reset (new Epetra_FEVector(map));
+          vector.reset (new Epetra_FEVector(
+                          m.trilinos_matrix().ColMap()
+                        ));
         }
 
       Epetra_Import data_exchange (vector->Map(), v.vector->Map());

@@ -2449,7 +2449,7 @@ namespace TrilinosWrappers
           {
             int ierr;
             ierr = matrix->GlobalAssemble(*column_space_map,
-                                          row_partitioner(), false);
+                                          matrix->RowMap(), false);
 
             Assert (ierr == 0, ExcTrilinosError(ierr));
             (void)ierr; // removes -Wunused-but-set-variable in optimized mode

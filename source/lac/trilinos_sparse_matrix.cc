@@ -1399,7 +1399,7 @@ namespace TrilinosWrappers
     // one is when the pattern is already fixed. In the former case, we add
     // the possibility to insert new values, and in the second we just replace
     // data.
-    if (row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == true)
+    if (matrix->RowMap().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == true)
       {
         if (matrix->Filled() == false)
           {
@@ -1589,7 +1589,7 @@ namespace TrilinosWrappers
     // If the calling processor owns the row to which we want to add values, we
     // can directly call the Epetra_CrsMatrix input function, which is much
     // faster than the Epetra_FECrsMatrix function.
-    if (row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == true)
+    if (matrix->RowMap().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == true)
       {
         ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_columns,
                                                              col_value_ptr,
@@ -1632,18 +1632,18 @@ namespace TrilinosWrappers
         std::cout << "------------------------------------------"
                   << std::endl;
         std::cout << "Got error " << ierr << " in row " << row
-                  << " of proc " << row_partitioner().Comm().MyPID()
+                  << " of proc " << matrix->RowMap().Comm().MyPID()
                   << " when trying to add the columns:" << std::endl;
         for (TrilinosWrappers::types::int_type i=0; i<n_columns; ++i)
           std::cout << col_index_ptr[i] << " ";
         std::cout << std::endl << std::endl;
         std::cout << "Matrix row "
-                  << (row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == false ? "(nonlocal part)" : "")
+                  << (matrix->RowMap().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == false ? "(nonlocal part)" : "")
                   << " has the following indices:" << std::endl;
         std::vector<TrilinosWrappers::types::int_type> indices;
         const Epetra_CrsGraph *graph =
           (nonlocal_matrix.get() != 0 &&
-           row_partitioner().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == false) ?
+           matrix->RowMap().MyGID(static_cast<TrilinosWrappers::types::int_type>(row)) == false) ?
           &nonlocal_matrix->Graph() : &matrix->Graph();
 
         indices.resize(graph->NumGlobalIndices(static_cast<TrilinosWrappers::types::int_type>(row)));
@@ -1974,7 +1974,7 @@ namespace TrilinosWrappers
   TrilinosScalar
   SparseMatrix::matrix_norm_square (const VectorBase &v) const
   {
-    Assert (row_partitioner().SameAs(domain_partitioner()),
+    Assert (matrix->RowMap().SameAs(matrix->ColMap()),
             ExcNotQuadratic());
 
     VectorBase temp_vector;
@@ -1990,7 +1990,7 @@ namespace TrilinosWrappers
   SparseMatrix::matrix_scalar_product (const VectorBase &u,
                                        const VectorBase &v) const
   {
-    Assert (row_partitioner().SameAs(domain_partitioner()),
+    Assert (matrix->RowMap().SameAs(matrix->ColMap()),
             ExcNotQuadratic());
 
     VectorBase temp_vector;
@@ -2119,14 +2119,14 @@ namespace TrilinosWrappers
                                                                      indices);
               Assert (num_entries >= 0, ExcInternalError());
 #ifndef DEAL_II_WITH_64BIT_INDICES
-              const size_type GID = inputleft.row_partitioner().GID(i);
+              const size_type GID = inputleft.trilinos_matrix().RowMap().GID(i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-                sparsity_transposed.add (inputleft.col_partitioner().GID(indices[j]),
+                sparsity_transposed.add (inputleft.trilinos_matrix().ColMap().GID(indices[j]),
                                          GID);
 #else
-              const size_type GID = inputleft.row_partitioner().GID64(i);
+              const size_type GID = inputleft.trilinos_matrix().RowMap().GID64(i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-                sparsity_transposed.add (inputleft.col_partitioner().GID64(indices[j]),
+                sparsity_transposed.add (inputleft.trilinos_matrix().ColMap().GID64(indices[j]),
                                          GID);
 #endif
             }
@@ -2141,14 +2141,14 @@ namespace TrilinosWrappers
                                                            values, indices);
               Assert (num_entries >= 0, ExcInternalError());
 #ifndef DEAL_II_WITH_64BIT_INDICES
-              const size_type GID = inputleft.row_partitioner().GID(i);
+              const size_type GID = inputleft.trilinos_matrix().RowMap().GID(i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-                transposed_mat.set (inputleft.col_partitioner().GID(indices[j]),
+                transposed_mat.set (inputleft.trilinos_matrix().ColMap().GID(indices[j]),
                                     GID, values[j]);
 #else
-              const size_type GID = inputleft.row_partitioner().GID64(i);
+              const size_type GID = inputleft.matrix->RowMap().GID64(i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-                transposed_mat.set (inputleft.col_partitioner().GID64(indices[j]),
+                transposed_mat.set (inputleft.trilinos_matrix().ColMap().GID64(indices[j]),
                                     GID, values[j]);
 #endif
             }
