@@ -67,7 +67,7 @@ namespace Step10
   // will only use them for two space dimensions.
   //
   // The first of these functions just generates a triangulation of a circle
-  // (hyperball) and outputs the Qp mapping of its cells for different values
+  // (hyperball) and outputs the $Q_p$ mapping of its cells for different values
   // of <code>p</code>. Then, we refine the grid once and do so again.
   template <int dim>
   void gnuplot_output()
@@ -107,7 +107,7 @@ namespace Step10
         std::string filename_base = "ball";
         filename_base += '0'+refinement;
 
-        // Then output the present grid for Q1, Q2, and Q3 mappings:
+        // Then output the present grid for $Q_1$, $Q_2$, and $Q_3$ mappings:
         for (unsigned int degree=1; degree<4; ++degree)
           {
             std::cout << "Degree = " << degree << std::endl;
@@ -293,7 +293,7 @@ namespace Step10
                 fe_values.reinit (cell);
                 for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)
                   area += fe_values.JxW (i);
-              };
+              }
 
             // ...and store the resulting area values and the errors in the
             // table. We need a static cast to double as there is no
@@ -306,7 +306,7 @@ namespace Step10
             // returns a double).
             table.add_value("eval.pi", static_cast<double> (area));
             table.add_value("error",   static_cast<double> (std::fabs(area-pi)));
-          };
+          }
 
         // We want to compute the convergence rates of the `error'
         // column. Therefore we need to omit the other columns from the
@@ -325,7 +325,7 @@ namespace Step10
         table.write_text(std::cout);
 
         std::cout << std::endl;
-      };
+      }
   }
 
 
@@ -392,11 +392,11 @@ namespace Step10
                     fe_face_values.reinit (cell, face_no);
                     for (unsigned int i=0; i<fe_face_values.n_quadrature_points; ++i)
                       perimeter += fe_face_values.JxW (i);
-                  };
+                  }
             // Then store the evaluated values in the table...
             table.add_value("eval.pi", static_cast<double> (perimeter/2.));
             table.add_value("error",   static_cast<double> (std::fabs(perimeter/2.-pi)));
-          };
+          }
 
         // ...and end this function as we did in the previous one:
         table.omit_column_from_convergence_rate_evaluation("cells");
@@ -409,7 +409,7 @@ namespace Step10
         table.write_text(std::cout);
 
         std::cout << std::endl;
-      };
+      }
   }
 }
 
