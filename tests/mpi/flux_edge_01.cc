@@ -189,11 +189,11 @@ namespace Step39
 
 int main(int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
-  mpi_initlog(true);
-
   using namespace dealii;
   using namespace Step39;
+
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  mpi_initlog(true);
 
   try
     {

@@ -106,9 +106,6 @@ unsigned int MultithreadInfo::n_cores()
 
 void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 {
-  Assert(n_max_threads==numbers::invalid_unsigned_int,
-         ExcMessage("Calling set_thread_limit() more than once is not supported!"));
-
   // set the maximal number of threads to the given value as specified
   n_max_threads = max_threads;
 
@@ -141,25 +138,23 @@ void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
           n_max_threads = max_threads_env;
       }
   }
-  // finally see if we need to tell the TBB about this. if no value has been set
-  // (the if-branch), then simply set n_max_threads to what we get from the TBB
-  // but don't do anything further. otherwise (some value has been set), let the
-  // TBB use this value
+  // Without restrictions from the user query TBB for the recommended number
+  // of threads:
   if (n_max_threads == numbers::invalid_unsigned_int)
     n_max_threads = tbb::task_scheduler_init::default_num_threads();
-  else
-    {
-      static tbb::task_scheduler_init dummy (n_max_threads);
-    }
+
+  // Initialize the scheduler and destroy the old one before doing so
+  static tbb::task_scheduler_init dummy (tbb::task_scheduler_init::deferred);
+  if (dummy.is_active())
+    dummy.terminate();
+  dummy.initialize(n_max_threads);
 }
 
 
 unsigned int MultithreadInfo::n_threads()
 {
-  if (n_max_threads == numbers::invalid_unsigned_int)
-    return tbb::task_scheduler_init::default_num_threads();
-  else
-    return n_max_threads;
+  Assert(n_max_threads != numbers::invalid_unsigned_int, ExcInternalError());
+  return n_max_threads;
 }
 
 
@@ -213,5 +208,18 @@ unsigned int MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
 // definition of the variable which is declared `extern' in the .h file
 MultithreadInfo multithread_info;
 
+namespace
+{
+// Force the first call to set_thread_limit happen before any tasks in TBB are
+// used. This is necessary as tbb::task_scheduler_init has no effect if TBB
+// got automatically initialized (which happens the first time we use it).
+  struct DoOnce
+  {
+    DoOnce ()
+    {
+      MultithreadInfo::set_thread_limit (numbers::invalid_unsigned_int);
+    }
+  } do_once;
+}
 
 DEAL_II_NAMESPACE_CLOSE

@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
   deal_II_exceptions::disable_abort_on_exception();
 
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 #else
   (void)argc;
   (void)argv;

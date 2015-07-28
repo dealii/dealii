@@ -693,12 +693,12 @@ namespace Step39
 
 int main(int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
-  MPILogInitAll log;
-  
   using namespace dealii;
   using namespace Step39;
 
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  MPILogInitAll log;
+  
   try
     {
       FE_DGQ<2> fe1(2);
